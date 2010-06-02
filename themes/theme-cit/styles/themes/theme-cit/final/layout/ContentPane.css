@@ -1,0 +1,23 @@
+/* ContentPane */
+
+.final .dijitContentPane {
+    padding: 0px;
+}
+
+/* nested layouts */
+.final .dijitTabContainerTop-dijitContentPane,
+.final .dijitTabContainerLeft-dijitContentPane,
+.final .dijitTabContainerBottom-dijitContentPane,
+.final .dijitTabContainerRight-dijitContentPane,
+.final .dijitAccordionContainer-dijitContentPane {
+    border: none;
+    background-color: #fff;
+    padding: 5px;
+}
+
+.final .dijitSplitContainer-dijitContentPane,
+.final .dijitBorderContainer-dijitContentPane {
+    border: 1px #ccc solid;
+    background-color: #fff;
+    padding: 5px;
+}

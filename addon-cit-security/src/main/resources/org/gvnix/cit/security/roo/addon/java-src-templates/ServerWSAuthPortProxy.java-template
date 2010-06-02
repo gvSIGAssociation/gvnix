@@ -1,0 +1,93 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package __TARGET_PACKAGE__;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
+ *
+ * @author rgarcia <a href="mailto:rgarcia@disid.com">Ricardo Garcia
+ *         Fernandez</a>
+ *
+ */
+public class ServerWSAuthPortProxy implements __TARGET_PACKAGE__.ServerWSAuthPort {
+  private String _endpoint = null;
+  private __TARGET_PACKAGE__.ServerWSAuthPort serverWSAuthPort = null;
+
+  public ServerWSAuthPortProxy() {
+    _initServerWSAuthPortProxy();
+  }
+
+  public ServerWSAuthPortProxy(String endpoint) {
+    _endpoint = endpoint;
+    _initServerWSAuthPortProxy();
+  }
+
+    private void _initServerWSAuthPortProxy() {
+	try {
+	    serverWSAuthPort = (new __TARGET_PACKAGE__.ServerWSAuthServiceLocator())
+		    .getServerWSAuthPort(new URL(_endpoint));
+	    if (serverWSAuthPort != null) {
+		if (_endpoint != null)
+		    ((javax.xml.rpc.Stub) serverWSAuthPort)
+			    ._setProperty(
+				    "javax.xml.rpc.service.endpoint.address",
+				    _endpoint);
+		else
+		    _endpoint = (String) ((javax.xml.rpc.Stub) serverWSAuthPort)
+			    ._getProperty("javax.xml.rpc.service.endpoint.address");
+	    }
+
+	} catch (javax.xml.rpc.ServiceException serviceException) {
+	} catch (MalformedURLException serviceException) {
+	}
+    }
+
+  public String getEndpoint() {
+    return _endpoint;
+  }
+
+  public void setEndpoint(String endpoint) {
+    _endpoint = endpoint;
+    if (serverWSAuthPort != null)
+      ((javax.xml.rpc.Stub)serverWSAuthPort)._setProperty("javax.xml.rpc.service.endpoint.address", _endpoint);
+
+  }
+
+  public ServerWSAuth.ServerWSAuthPort getServerWSAuthPort() {
+    if (serverWSAuthPort == null)
+      _initServerWSAuthPortProxy();
+    return serverWSAuthPort;
+  }
+
+  public es.gva.cit.WSAuth.xsd.ValidaStruct valida(es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException{
+    if (serverWSAuthPort == null)
+      _initServerWSAuthPortProxy();
+    return serverWSAuthPort.valida(credencial, usuario, password, aplicacion);
+  }
+
+  public es.gva.cit.WSAuth.xsd.ValidaStruct valida_ldap(es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException{
+    if (serverWSAuthPort == null)
+      _initServerWSAuthPortProxy();
+    return serverWSAuthPort.valida_ldap(credencial, usuario, password, aplicacion);
+  }
+
+
+}

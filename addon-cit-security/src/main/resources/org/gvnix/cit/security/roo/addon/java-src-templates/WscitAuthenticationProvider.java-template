@@ -1,0 +1,326 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package __TARGET_PACKAGE__;
+
+import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
+import org.springframework.security.authentication.dao.SaltSource;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.authentication.encoding.PlaintextPasswordEncoder;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import es.gva.cit.WSAuth.xsd.ModuloStruct;
+import es.gva.cit.WSAuth.xsd.ValidaStruct;
+import es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT;
+
+/**
+ * This class implements the security authentication of C.I.T.
+ * It uses C.I.T WsAuth service.
+ *
+ * @author jmvivo <a href="mailto:jmvivo@disid.com">Jose Manuel Vivó Arnal</a>
+ *
+ */
+public class WscitAuthenticationProvider extends
+		AbstractUserDetailsAuthenticationProvider {
+
+	private static Logger logger = Logger
+			.getLogger(WscitAuthenticationProvider.class.getName());
+
+	// Credencial structure for WSAth call
+	private CredencialCIT credentialCit;
+
+	// Credencial Login id
+	private String credentialCitLogin;
+
+	// Credencial Login password
+	private String credentialCitPassword;
+
+	// WSAth client
+	private __TARGET_PACKAGE__.ServerWSAuthPortProxy serverWSAuthPortProxy;
+
+	// Password encoder for User instances
+	private PasswordEncoder passwordEncoder = new PlaintextPasswordEncoder();
+
+	// Salt source to use
+	private SaltSource saltSource;
+
+	/**
+	 * <p>
+	 * Compares the password of the request with the stored in the
+	 * {@link UserDetails}. The {@link UserDetails#getPassword()} is encoded by
+	 * {@link #passwordEncoder} .
+	 * </p>
+	 *
+	 * <p>
+	 * It can't be a duplicate check but is needed because
+	 * <code>userDetail</code> would be come from user cache.
+	 * </p>
+	 *
+	 */
+	@Override
+	protected void additionalAuthenticationChecks(UserDetails userDetails,
+			UsernamePasswordAuthenticationToken authentication)
+			throws AuthenticationException {
+		Object salt = null;
+
+		if (this.saltSource != null) {
+			salt = this.saltSource.getSalt(userDetails);
+		}
+
+		if (authentication.getCredentials() == null) {
+			throw new BadCredentialsException("Bad credentials: "
+					+ userDetails.getUsername());
+		}
+
+		String presentedPassword = authentication.getCredentials().toString();
+
+		if (!passwordEncoder.isPasswordValid(userDetails.getPassword(),
+				presentedPassword, salt)) {
+			throw new BadCredentialsException("Bad credentials: "
+					+ userDetails.getUsername() + " password chekc");
+		}
+
+	}
+
+	/**
+	 * <p>
+	 * Performs request to CIT'a WSAthr service to get the user and fill a
+	 * {@link WscitUser} instance.
+	 * </p>
+	 *
+	 * <p>
+	 * The {@link WscitUser#getPassword()} field will be encoded by
+	 * {@link #passwordEncoder} mixed by {@link #saltSource}.
+	 * </p>
+	 */
+	@Override
+	protected UserDetails retrieveUser(String username,
+			UsernamePasswordAuthenticationToken authentication)
+			throws AuthenticationException {
+
+		String presentedPassword = authentication.getCredentials().toString();
+
+		// Performs the request to the CIT web server
+		ValidaStruct userFromWS = getUserFromWebService(username,
+				authentication.getAuthorities().toString());
+
+		// If there is no user found throws exception
+		if (userFromWS == null) {
+			throw new BadCredentialsException("Bad credentials: " + username
+					+ " user == null");
+		}
+
+		// Transforms the data
+		WscitUser user = convertWSInfoToUser(userFromWS);
+
+		Object salt = null;
+
+		if (this.saltSource != null) {
+			salt = this.saltSource.getSalt(user);
+		}
+
+		// Stores the user password in encoded for
+		user.setPassword(passwordEncoder
+				.encodePassword(presentedPassword, salt));
+
+		// TODO: Remove this log !!!!!!! only used in first tests
+		logger.log(Level.INFO, "Password endoced:" + user.getPassword());
+
+		return user;
+	}
+
+	/**
+	 * <p>
+	 * Creates a {@link WscitUser} from data of {@link ValidaStruct}
+	 * </p>
+	 *
+	 * <p>
+	 * All fields that can't be load from {@link ValidaStruct} are filled whit
+	 * neutral value.
+	 * </p>
+	 *
+	 * <p>
+	 * <b>Note:</b> It dosen't set the <code>password</code> field
+	 * </p>
+	 *
+	 * @param userFromWS
+	 * @return
+	 */
+	private WscitUser convertWSInfoToUser(ValidaStruct userFromWS) {
+		WscitUser user = new WscitUser();
+		user.setNombre(userFromWS.getNombre());
+		user.setCodper(userFromWS.getCodper());
+		user.setBd(userFromWS.getBd());
+		user.setTelefono(userFromWS.getTelefono());
+		user.setCorreo(userFromWS.getCorreo());
+		user.setComentario(userFromWS.getComentario());
+		user.setCpro(userFromWS.getCpro());
+		user.setCserv(userFromWS.getCserv());
+		user.setDaplicacion(userFromWS.getDaplicacion());
+		user.setDgral(userFromWS.getDgral());
+		user.setNrp(userFromWS.getNrp());
+		user.setParam1(userFromWS.getParam1());
+		user.setParam2(userFromWS.getParam2());
+		user.setParam3(userFromWS.getParam3());
+		user.setRolusuar(userFromWS.getRolusuar());
+		user.setServer(userFromWS.getServer());
+		user.setTipo(userFromWS.getTipo());
+		user.setTipousu(userFromWS.getTipousu());
+		user.setUltentra(userFromWS.getUltentra());
+		user.setUltentra_s(userFromWS.getUltentra_s());
+		user.setVersion(userFromWS.getVersion());
+
+		// Sprint Security User info
+		user.setUsername(userFromWS.getUsuario());
+		user.setAccountNonExpired(true); // Status info
+		user.setAccountNonLocked(true);// Status info
+		user.setCredentialsNonExpired(true); // Status info
+		user.setEnabled(true);// Status info
+
+		ModuloStruct[] modulos = userFromWS.getModulos();
+		Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>(
+				modulos.length);
+
+		WscitUserAuthority usAuth;
+		for (ModuloStruct modulo : modulos) {
+			usAuth = new WscitUserAuthority();
+			usAuth.setAuthority(modulo.getModulo());
+			usAuth.setModulo(modulo.getModulo());
+			usAuth.setDescrip(modulo.getDescrip());
+			usAuth.setTipo(modulo.getTipo());
+			usAuth.setValor(modulo.getValor());
+			authorities.add(usAuth);
+		}
+
+		user.setAuthorities(authorities);
+
+		return user;
+
+	}
+
+	/**
+	 * Perform request to CIT's WSAth service
+	 *
+	 * @param userName
+	 * @param password
+	 * @return
+	 */
+	protected ValidaStruct getUserFromWebService(String userName,
+			String password) {
+		try {
+
+			// if (logger.isLoggable(Level.FINE)) {
+			logger.log(Level.INFO, "Invocando validacion servicio web ...");
+			// }
+
+			// Datos de entrada para el servicio web
+			String validaAplicacion = "terceros";
+			if (credentialCit == null) {
+				this.credentialCit = new CredencialCIT(this.credentialCitLogin,
+						this.credentialCitPassword);
+			}
+
+			es.gva.cit.WSAuth.xsd.ValidaStruct validaReturn = getServerWSAuthPortProxy()
+					.valida(credentialCit, userName, password, validaAplicacion);
+
+			// if (logger.isLoggable(Level.FINE)) {
+			logger.log(Level.FINE, "Resultado validacion=" + validaReturn);
+			// }
+
+			if (validaReturn == null
+					|| !userName.equalsIgnoreCase(validaReturn.getUsuario())) {
+
+				logger.log(Level.WARNING, "Usuario= " + userName
+						+ " no validado por servicio web: Respuesta="
+						+ validaReturn);
+				return null;
+			}
+			return validaReturn;
+
+		} catch (RemoteException e) {
+
+			logger.log(Level.WARNING, "Solicitud de login denegada al usuario="
+					+ userName + ": " + e.getLocalizedMessage());
+			throw new BadCredentialsException(
+					"Error en servicio web de login al validar al usuario", e);
+		}
+
+	}
+
+	/**
+	 * The source of salts to use when decoding passwords. <code>null</code> is
+	 * a valid value, meaning the <code>DaoAuthenticationProvider</code> will
+	 * present <code>null</code> to the relevant <code>PasswordEncoder</code>.
+	 *
+	 * @param saltSource
+	 *            to use when attempting to decode passwords via the
+	 *            <code>PasswordEncoder</code>
+	 */
+	public void setSaltSource(SaltSource saltSource) {
+		this.saltSource = saltSource;
+	}
+
+	protected SaltSource getSaltSource() {
+		return saltSource;
+	}
+
+	/**
+	 * Sets the PasswordEncoder instance to be used to encode and validate
+	 * passwords. If not set, {@link PlaintextPasswordEncoder} will be used by
+	 * default.
+	 *
+	 * @param passwordEncoder
+	 *            The passwordEncoder to use
+	 */
+	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
+
+	protected PasswordEncoder getPasswordEncoder() {
+		return passwordEncoder;
+	}
+
+	public void setServerWSAuthPortProxy(
+			ServerWSAuth.ServerWSAuthPortProxy serverWSAuthPortProxy) {
+		this.serverWSAuthPortProxy = serverWSAuthPortProxy;
+	}
+
+	public ServerWSAuth.ServerWSAuthPortProxy getServerWSAuthPortProxy() {
+		return serverWSAuthPortProxy;
+	}
+
+	public void setCredentialCitLogin(String credentialCitLogin) {
+		this.credentialCitLogin = credentialCitLogin;
+	}
+
+	public void setCredentialCitPassword(String credentialCitPassword) {
+		this.credentialCitPassword = credentialCitPassword;
+	}
+
+}

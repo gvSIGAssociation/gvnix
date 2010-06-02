@@ -1,0 +1,45 @@
+/**** Disabled cursor *****/
+.final .dijitSliderDisabled *,
+.final .dijitDisabledClickableRegion,	/* a region the user would be able to click on, but it's disabled */
+.final .dijitSpinnerDisabled *,
+.final .dijitButtonDisabled *,
+.final .dijitDropDownButtonDisabled *,
+.final .dijitComboButtonDisabled *,
+.final .dijitComboBoxDisabled *
+{
+	cursor: not-allowed !important;
+}
+
+/* DnD avatar-specific settings */
+/* For now it uses a default set of rules. Some other DnD classes can be modified as well. */
+.final .dojoDndItemBefore {
+	border-top: 2px solid #369;
+}
+
+.final .dojoDndItemAfter {
+	border-bottom: 2px solid #369;
+}
+
+.final .dojoDndItemOver {
+	cursor:pointer;
+}
+
+.final table.dojoDndAvatar { -moz-border-radius: 0; border: 1px solid #ccc; border-collapse: collapse; background-color: #fff; font-size: 75%; color: black;}
+.final .dojoDndAvatar td	{ border: none; }
+.final .dojoDndAvatar tr	{ border: none; }
+.final .dojoDndAvatarHeader td	{ height: 20px; padding: 0 0 0 21px; }
+.final .dojoDndAvatarItem td { padding: 2px;}
+.final.dojoDndMove .dojoDndAvatarHeader	{background-color: #f58383; background-image: url(images/dndNoMove.png); background-repeat: no-repeat; background-position: 2px center;}
+.final.dojoDndCopy .dojoDndAvatarHeader	{background-color: #f58383; background-image: url(images/dndNoCopy.png); background-repeat: no-repeat; background-position: 2px center;}
+.final.dojoDndMove .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-color: #97e68d; background-image: url(images/dndMove.png); background-repeat: no-repeat; background-position: 2px center;}
+.final.dojoDndCopy .dojoDndAvatarCanDrop .dojoDndAvatarHeader	{background-color: #97e68d; background-image: url(images/dndCopy.png); background-repeat: no-repeat; background-position: 2px center;}
+
+.final .dijitContentPaneLoading {
+	background:url('images/loading.gif') no-repeat left center;
+	padding-left:25px;
+}
+
+.final .dijitContentPaneError {
+	background:url('images/warning.png') no-repeat left center;
+	padding-left:25px;
+}

@@ -1,0 +1,79 @@
+.final .dijitMenu {
+	border: 1px solid #7eabcd;
+	margin: 0px;
+	padding: 0px;
+}
+
+.final .dijitMenuItem {
+	background-color: #f7f7f7;
+	font-family: sans-serif;
+	margin: 0;
+}
+.final .dijitMenuPreviousButton, .final .dijitMenuNextButton {
+	font-style: italic;
+}
+.final .dijitMenuItem td {
+	padding:2px;
+}
+
+.final .dijitMenuItemHover {
+	background-color: #3559ac;
+	color:#fff;
+}
+
+.final .dijitMenuItemIcon {
+	width: 16px;
+	height: 16px;
+}
+
+.final .dijitMenuExpand {
+	width: 7px;
+	height: 7px;
+	background-image: url('images/spriteArrows.png');
+	background-repeat: no-repeat;
+	background-position: -14px 0px;
+	font-size: 1px;
+	display: block;
+}
+.dj_ie6 .final .dijitMenuExpand {
+	background-image: url('images/spriteArrows.gif');
+}
+
+.final .dijitMenuSeparator {
+	background-color: #f7f7f7;
+}
+
+/* separator can be two pixels -- set border of either one to 0px to have only one */
+.final .dijitMenuSeparatorTop {
+	border-bottom: 1px solid #9b9b9b;
+}
+
+.final .dijitMenuSeparatorBottom {
+	border-top: 1px solid #e8e8e8;
+}
+
+/* the checked menu item */
+.final .dijitCheckedMenuItemIconChar {
+	display: none;
+}
+
+.final .dijitCheckedMenuItemIcon {
+	background-image: url('images/checkmark.png');
+	background-position: -16px;
+}
+
+.dj_ie6 .final .dijitCheckedMenuItemIcon {
+	background-image: url('images/checkmark.gif');
+}
+
+.final .dijitCheckedMenuItemIconChecked {
+	background-position: 0px;
+}
+
+.final .dijitMenuItemHover .dijitCheckedMenuItemIcon {
+	background-position: -80px;
+}
+
+.final .dijitMenuItemHover .dijitCheckedMenuItemIconChecked {
+	background-position: -64px;
+}

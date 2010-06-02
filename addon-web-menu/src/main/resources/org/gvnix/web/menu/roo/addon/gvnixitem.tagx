@@ -1,0 +1,91 @@
+<jsp:root xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+
+
+	<!--
+    gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+    i Transport - Generalitat Valenciana
+    Copyright (C) 2010 CIT - Generalitat Valenciana
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	 -->
+
+	<!-- gvNIX menu item renderer -->
+
+
+
+	<jsp:output omit-xml-declaration="yes"/>
+
+
+	<jsp:directive.attribute name="menuPath" type="java.lang.String" required="true" description="The identifier for this tag (do not change!)"/>
+	<jsp:directive.attribute name="label" type="java.lang.String" required="false" description="The label for this item"/>
+	<jsp:directive.attribute name="messageCode" type="java.lang.String" required="false" description="The code for the label of this item"/>
+	<jsp:directive.attribute name="name" type="java.lang.String" required="true" description="The menu item name"/>
+	<jsp:directive.attribute name="hidden" type="java.lang.Boolean" required="false" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
+	<jsp:directive.attribute name="children" type="java.util.Collection" required="false" description="Item's Children" />
+	<jsp:directive.attribute name="destination" type="java.lang.String" required="false" description="Detination of the item (usually a url)" />
+	<jsp:directive.attribute name="roles" type="java.lang.String" required="false" description="Roles allowed to see this item (empty allows all)" />
+
+	<c:if test="${not empty destination}">
+		<!-- Try to identify an EL expression and evaluate it -->
+		<jsp:useBean id="destination" type="java.lang.String" />
+		<jsp:scriptlet>
+		if (destination.matches(".*[$][{].*[}].*")){
+				try{
+					Object destinationEvaluated = jspContext.getExpressionEvaluator().evaluate(destination,
+							java.lang.String.class, jspContext.getVariableResolver(), null);
+
+					jspContext.setAttribute("destination", destinationEvaluated );
+
+				} catch (Exception ex){
+					//Don't set attribute
+				}
+
+
+		}
+		</jsp:scriptlet>
+
+		<spring:url value="${destination}" var="targetUrl"/>
+	</c:if>
+
+
+	<!-- draw if not hidden -->
+	<c:if test="${empty hidden or not hidden}">
+
+
+		<c:choose>
+			<!-- single item -->
+			<c:when test="${empty children}">
+				<menu:item url="${destination}" name="${name}" id="${menuPath}" label="${label}" messageCode="${messageCode}"/>
+			</c:when>
+			<c:otherwise>
+				<!--  item with children -->
+
+				<c:if test="${not empty messageCode}">
+					<spring:message code="${messageCode}" var="label"/>
+				</c:if>
+				 <!-- menu:category doesn't support url attribute. We need to add  url="${targetUrl} -->
+				 <menu:category name="${name}" id="${menuPath}" label="${label}">
+
+					<!-- iterate over all children -->
+					<c:forEach items="${children}" var="menuItem">
+						<menu:gvnixitem name="${menuItem.name}" menuPath="${menuItem.path}"
+							hidden="${menuItem.hidden}" label="${menuItem.label}" messageCode="${menuItem.messageCode}"
+							children="${menuItem.children}" destination="${menuItem.destination}"  roles="${menuItem.roles}"/>
+					</c:forEach>
+				</menu:category>
+			</c:otherwise>
+		</c:choose>
+
+	</c:if>
+</jsp:root>

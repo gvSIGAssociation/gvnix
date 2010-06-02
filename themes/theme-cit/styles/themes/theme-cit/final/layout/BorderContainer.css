@@ -1,0 +1,50 @@
+/* BorderContainer */
+
+.final .dijitBorderContainer {
+	background-color: #fcfcfc;
+	padding: 5px;
+}
+
+.final .dijitBorderContainer-dijitBorderContainer {
+	border: none;
+	padding: 0px;
+}
+
+.final .dijitSplitterH,
+.final .dijitGutterH {
+	background:#fcfcfc;
+	border:0;
+	height:5px;
+}
+
+.final .dijitSplitterH .dijitSplitterThumb {
+	background:url("../images/splitContainerSizerH-thumb.png") no-repeat;
+	top:1px;
+	width:19px;
+	height:2px;
+}
+
+.final .dijitSplitterV,
+.final .dijitGutterV {
+	background:#fcfcfc;
+	border:0;
+	width:5px;
+}
+
+.final .dijitSplitterV .dijitSplitterThumb {
+	background:url("../images/splitContainerSizerV-thumb.png") no-repeat;
+	left:1px;
+	height:19px;
+	width:5px;
+}
+
+/* active splitter */
+.final .dijitSplitterActive {
+	font-size: 1px;
+	background-image: none;
+	background-color: #aaa;
+	-moz-opacity: 0.6;
+	opacity: 0.6;
+	filter: Alpha(Opacity=60);
+	margin: 0;
+}

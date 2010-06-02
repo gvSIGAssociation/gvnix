@@ -1,0 +1,74 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package __TOP_LEVEL_PACKAGE__.web.menu;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.gvnix.web.menu.roo.addon.GvNIXMenuModel;
+import org.springframework.roo.addon.javabean.RooJavaBean;
+
+/**
+ * Menu Model Root class
+ *
+ * @author Jose Manuel Vivó ( jmvivo at disid dot com ) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ *
+ */
+@RooJavaBean(settersByDefault = false)
+@GvNIXMenuModel
+public class Menu {
+
+    /**
+     * Menu's name. This is for future uses.
+     */
+    private String name;
+
+    /**
+     * Menu's path to add the automatically Roo menu generated items.
+     *
+     * This will be used by add-on
+     */
+    private String rooMenuBasePath;
+
+    /***
+     * First leve menu items.
+     */
+    private List<MenuItem> children = new ArrayList<MenuItem>();
+
+    protected Menu(String name) {
+	if (name != null) {
+	    this.name = name;
+	} else {
+	    this.name = "menu";
+	}
+    }
+
+    void setName(String name) {
+	this.name = name;
+    }
+
+    void setRooMenuBasePath(String rooMenuBasePath) {
+	this.rooMenuBasePath = rooMenuBasePath;
+    }
+
+    void addChild(MenuItem child) {
+	this.children.add(child);
+    }
+
+}

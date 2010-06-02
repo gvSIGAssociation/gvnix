@@ -1,0 +1,45 @@
+// Spring Roo ENGINEERING BUILD [rev unknown] log opened at 2010-04-06 11:43:45
+project --topLevelPackage org.gvnix.test.tomcat5compat --java 5
+persistence setup --provider HIBERNATE --database H2_IN_MEMORY 
+entity --class ~.domain.Entity1
+field string --fieldName field1
+field string --fieldName field2
+controller all --package ~.web
+dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1
+dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3
+// script --file ../log.roo
+// Spring Roo ENGINEERING BUILD [rev unknown] log opened at 2010-04-07 13:23:47
+enum type --class ~.domain.AnEnum
+enum constant --class ~.domain.AnEnum --name ONE
+enum constant --class ~.domain.AnEnum --name TWO
+enum constant --class ~.domain.AnEnum --name THREE
+field enum --fieldName anEnum --class ~.domain.Entity1 --type ~.domain.AnEnum
+finder list --class ~.domain.Entity1
+finder add --finderName findEntity1sByAnEnumAndfindEntity1sByField1LikeAndfindEntity1sByField2Like
+finder add --finderName findEntity1sByAnEnum
+entity --class ~.domain.Entity2
+field string --fieldName secondString1
+field reference --fieldName theEntity1 --type ~.domain.Entity1
+controller all --package ~.web
+field set --fieldName entity2s --element ~.domain.Entity2 --class ~.domain.Entity1
+// Spring Roo ENGINEERING BUILD [rev unknown] log opened at 2010-04-08 09:32:05
+// Spring Roo ENGINEERING BUILD [rev unknown] log opened at 2010-04-08 11:43:04
+field boolean --fieldName aBool --class ~.domain.Entity2
+field number --fieldName aInteger --type java.lang.Integer
+field number --fieldName aDouble --type java.lang.Double
+field date --fieldName aDate --type java.util.Date
+field email template 
+version 
+email sender setup --hostServer localhost
+email template setup --from me@myOrg.org --subject "This is a mail example"
+perform eclipse
+field email template --fieldName anEmail
+// Spring Roo ENGINEERING BUILD [rev unknown] log opened at 2010-04-08 12:39:28
+// Spring Roo ENGINEERING BUILD [rev unknown] log opened at 2010-04-08 13:11:21
+test integration --entity ~.domain.Entity1
+test integration --entity ~.domain.Entity2
+// [failed] selenium test --controller ~.web.Entity1
+// [failed] selenium test --controller ~.web.Entity2
+selenium test --controller ~.web.Entity1Controller
+selenium test --controller ~.web.Entity2Controller
+perform tests

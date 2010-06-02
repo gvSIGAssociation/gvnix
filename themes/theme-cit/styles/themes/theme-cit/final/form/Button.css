@@ -1,0 +1,141 @@
+
+/*****
+		dijit.form.Button
+		dijit.form.DropDownButton
+		dijit.form.ComboButton
+		dijit.form.ComboBox (partial)
+ *****/
+
+.final .dijitButtonNode {
+	/* enabled state - inner */
+	border: 1px solid #c0c0c0; 
+	border-bottom: 1px solid #9b9b9b; 
+	padding: 0.1em 0.2em 0.2em 0.2em; 
+	background: #fff url("../images/buttonEnabled.png") repeat-x bottom left;
+}
+
+.final .dijitButtonNode button { 
+	border: 0px; 
+	background-color: transparent; 
+} 
+ 
+.final .dijitButtonText {
+	text-align: center; 
+	padding: 0 0.3em;
+}
+
+.final .dijitDisabled .dijitButtonText {
+	color: #7F7F7F;
+}
+
+/*
+.final .dijitComboBox .dijitButtonNode {
+	border: 0px;
+}
+*/
+
+.final .dijitArrowButton {
+	color: #111;
+}
+
+.final .dijitComboButton .dijitDownArrowButton {
+	padding-right:4px;
+}
+
+.dj_ff2 .final .dijitComboButton .dijitButtonContentsFocused,
+.dj_ff2 .final .dijitComboButton .dijitDownArrowButtonFocused {
+	border: 1px solid transparent; /*make transparent so FF2 focus rect. is visible */
+}
+
+.final .dijitButtonDisabled .dijitButtonNode,
+.final .dijitToggleButtonDisabled .dijitButtonNode,
+.final .dijitDropDownButtonDisabled .dijitButtonNode,
+.final .dijitComboButtonDisabled .dijitButtonNode,
+.final .dijitComboBoxDisabled,
+.final .dijitSpinnerDisabled,
+.final .dijitSpinnerDisabled .dijitButtonNode {
+	/* disabled state - inner */
+	/* border-color: #d5d5d5 #bdbdbd #bdbdbd #d5d5d5; */
+	border-color: #d5d5d5 #d5d5d5 #bdbdbd #d5d5d5; 
+	background:#e4e4e4 url("../images/buttonDisabled.png") top repeat-x;
+}
+
+.final .dijitButtonHover .dijitButtonNode,
+.final .dijitButtonNodeHover,
+.final .dijitToggleButtonHover .dijitButtonNode,
+.final .dijitDropDownButtonHover .dijitButtonNode,
+.final .dijitComboButtonHover .dijitButtonContents,
+.final .dijitComboButtonDownArrowHover .dijitDownArrowButton,
+.final .dijitComboBoxHover .dijitDownArrowButton,
+.final .dijitSpinnerUpArrowHover .dijitUpArrowButton,
+.final .dijitSpinnerDownArrowHover .dijitDownArrowButton {
+	/* hover state - inner */
+	/* TODO: change from Hover to Selected so that button is still highlighted while drop down is being used */
+	border-color:		#a5beda; 
+	border-bottom-color:#5c7590; 
+	color:#243C5F;
+	background:#fcfdff url("../images/buttonHover.png") repeat-x bottom;
+}
+
+.final .dijitSpinnerUpArrowActive .dijitUpArrowButton,
+.final .dijitSpinnerDownArrowActive .dijitDownArrowButton,
+.final .dijitButtonActive .dijitButtonNode,
+.final .dijitToggleButtonActive .dijitButtonNode,
+.final .dijitDropDownButtonActive .dijitButtonNode,
+.final .dijitComboButtonActive .dijitButtonContents,
+.final .dijitDownArrowActive .dijitDownArrowButton,
+.final .dijitComboBoxActive .dijitDownArrowButton {
+	/* active state - inner (for when you are pressing a normal button, or
+	 * when a toggle button is in a depressed state
+	 */
+	border-color:#366dba;
+	background: #ededed url("../images/buttonActive.png") bottom repeat-x;
+}
+
+.final .dijitArrowButtonInner {
+	background-image:url("../images/spriteArrows.png");
+	background-position: left top;
+	width: 7px;
+	height: 7px;
+	font-size: 1px;
+	margin: 0px 4px 0px 5px;
+}
+.dj_ie6 .final .dijitArrowButtonInner {
+	background-image:url("../images/spriteArrows.gif");
+}
+.final .dijitDisabled .dijitArrowButtonInner {
+	background-position: -28px top;
+}
+.final .dijitUpArrowButton .dijitArrowButtonInner { 
+	background-position: -21px top; 
+}
+
+.final .dijitDisabled .dijitUpArrowButton .dijitArrowButtonInner { 
+	background-position: -49px top; 
+}
+
+
+/* Since ComboBox doesn't have it's own file... */
+.final .dijitComboBox .dijitArrowButton .dijitArrowButtonInner {
+	background-image: url("../images/comboArrowDown.gif");
+	background-repeat: no-repeat;
+	background-attachment: scroll;
+	background-position: center center;
+	height: auto;
+	font-size: 100%;
+	font-size: inherit;
+}
+.final .dijitComboBoxHover .dijitArrowButtonInner {
+	/* TODO: url("../images/arrowDownHover.png") but in IE6 it flickers some? */
+}
+
+/* Since Spinner doesn't have it's own file */
+.final .dijitSpinner .dijitArrowButtonInner {
+	display: block;  /* inline just isnt going to work for us here IMO */
+	position:absolute;
+	top: 50%; 
+	margin-top: -4px; /* half its height */
+	left: 50%;
+	margin-left: -4px; /* half its width */
+	line-height: 2px;
+}

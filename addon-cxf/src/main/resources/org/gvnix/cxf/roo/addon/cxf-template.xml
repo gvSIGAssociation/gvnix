@@ -1,0 +1,21 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:jaxws="http://cxf.apache.org/jaxws"
+        xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+  <import resource="classpath:META-INF/cxf/cxf.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+  <!-- Service example 
+  <bean id="__SIMPLE_SERVICE_IMPL_NAME__" class="__FULLY_QUALIFIED_SERVICE_IMPL_NAME__" />
+  -->
+
+  <!-- Service endpoint example 
+  <jaxws:endpoint id="__SIMPLE_SERVICE_IFACE_NAME__" implementor="#__SIMPLE_SERVICE_IMPL_NAME__" 
+    address="/__SIMPLE_SERVICE_IFACE_NAME__" />
+  -->
+
+</beans>

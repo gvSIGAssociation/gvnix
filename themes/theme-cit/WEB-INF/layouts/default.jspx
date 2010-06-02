@@ -1,0 +1,200 @@
+<html 
+  xmlns:jsp="http://java.sun.com/JSP/Page"
+  xmlns:c="http://java.sun.com/jsp/jstl/core"
+  xmlns:tiles="http://tiles.apache.org/tags-tiles"
+  xmlns:form="http://www.springframework.org/tags/form"
+  xmlns:spring="http://www.springframework.org/tags"
+  xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" >  
+  
+  <jsp:directive.page contentType="text/html;charset=UTF-8" />  
+    
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />    
+    <spring:url value="/resources/dojo/dojo.js" var="dojo_url"/>
+    <!-- <spring:url value="/static/styles/cit.css" var="cit_url"/> -->
+
+    <!-- Scripts YUI -->
+    <spring:url value="/static/scripts/yahoo-dom-event.js" var="yui_event"/>
+    <spring:url value="/static/scripts/container_core-min.js" var="yui_core"/>
+    <spring:url value="/static/scripts/menu-min.js" var="yui_menu"/>
+
+    <!-- spring:url value="/static/scripts/yahoo-debug.js" var="yui_yahoo"/>
+    <spring:url value="/static/scripts/dom-debug.js" var="yui_dom"/>
+    <spring:url value="/static/scripts/event-debug.js" var="yui_event"/>
+    <spring:url value="/static/scripts/container_core-debug.js" var="yui_core"/>
+    <spring:url value="/static/scripts/menu-debug.js" var="menu"/>
+    <spring:url value="/static/scripts/logger-debug.js" var="yui_logger"/ -->
+
+    <spring:theme code="styleSheet" var="cit_css"/> 
+    <spring:url value="/static/styles/cit.css" var="cit_css_url"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="${cit_css_url}"><!-- //required for FF3 and Opera --></link>
+    
+    <spring:url value="/static/styles/themes/theme-cit/final/final.css" var="final_url"/>
+    <spring:url value="/resources/spring/Spring.js" var="spring_url"/>
+    <spring:url value="/resources/spring/Spring-Dojo.js" var="spring_dojo_url"/>    
+    <spring:url value="/static/images/cit/theme/logoGVA.gif" var="favicon" />
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="${cit_url}"></link> -->
+    <link rel="stylesheet" type="text/css" href="${final_url}"><!-- //required for FF3 and Opera --></link> 
+    <link rel="SHORTCUT ICON" href="${favicon}" />
+    <script type="text/javascript"><![CDATA[
+      function readCookie(name) {
+        var nameEQ = name + '=';
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+      }
+      var djConfig={locale:readCookie('locale')}; 
+    ]]>
+    </script>
+
+    <script src="${dojo_url}" type="text/javascript" ><!-- //required for FF3 and Opera --></script>
+    <script src="${spring_url}" type="text/javascript"><!-- //required for FF3 and Opera --></script>
+    <script src="${spring_dojo_url}" type="text/javascript"><!-- //required for FF3 and Opera --></script>
+    <script language="JavaScript" type="text/javascript">dojo.require("dojo.parser");</script>
+
+    <script src="${yui_event}" type="text/javascript"><!-- //  --></script>
+    <script src="${yui_core}" type="text/javascript"><!-- //  --></script>
+    <script src="${yui_menu}" type="text/javascript"><!-- //  --></script>
+
+    <spring:message code="application.name" var="app_name"/>
+    <title><spring:message code="welcome.h3" arguments="${app_name}" /></title>
+    
+  </head>
+
+    <body class="final spring">
+    
+    <script type="text/javascript">
+    
+        // Instantiate and render the menu when it is available in the DOM
+    
+        YAHOO.util.Event.onContentReady("showMenu", function () {
+    
+            /*
+                Instantiate the menu and corresponding submenus. The first argument passed 
+                to the constructor is the id of the element in the DOM that represents 
+                the menu; the second is an object literal representing a set of 
+                configuration properties for the menu.
+            */ 
+    
+            var oMenu = new YAHOO.widget.Menu("showMenu", { fixedcenter: false });
+    
+    
+            /*
+                 Call the "render" method with no arguments since the 
+                 markup for this Menu instance is already exists in the page.
+            */
+    
+            oMenu.render();
+    
+    
+            YAHOO.util.Event.addListener("appmenu", "mouseover", oMenu.show, null, oMenu);
+        
+        });
+        
+    </script>
+
+      <div id="wrapper">
+        <table id="application_menu" >
+          <tbody>
+            <tr class="txtcabecera">
+              <td>
+                <spring:url var="logo_gva" value="/static/images/cit/theme/logoGVA.gif" />
+                <img id="logo_gva" src="${logo_gva}" />
+              </td>
+              <td>
+							  <div id="capa_menuReal">
+							      
+							    <table>
+							      <tbody>
+							        <tr>
+								        <td>
+								          <div class="OpcionMenu">
+								
+								            <ul class="navh" id="navh">
+								              <spring:url var="menu_arrow" value="/static/images/cit/theme/acciones/16.gif" />
+								              <li id="appmenu" class="OpcionMenu" >Menu <img src="${menu_arrow}" /> 
+								              <br/>
+	                              
+                                <tiles:insertAttribute name="menu" ignore="true" />
+									            </li>
+									          </ul>
+									
+									        </div>
+									      </td>
+									    </tr>
+									  </tbody>
+								  </table>
+								</div>
+        
+              </td>
+        
+              <td>v.0.3</td>
+        
+              <td>
+						    <c:choose>
+						    <c:when test="${pageContext.request.userPrincipal != null}">
+						        <c:out value="${pageContext.request.userPrincipal.name}"/>
+						    </c:when>
+						    <c:otherwise>
+						      Usuario Invitado
+						    </c:otherwise>
+						    </c:choose>
+              </td>
+        
+              <td>  
+                <span id="hora">00:00</span>
+              </td>
+              <td>
+                <span id="fecha">--/--/----</span>
+              </td>
+              <td id="exit_menu">
+        
+                <spring:url var="home" value="/" />
+                <spring:url var="logo" value="/static/images/cit/theme/imagenes/cerrar.gif" />
+                <c:if test="${pageContext.request.userPrincipal != null}">  
+                  <span>          
+                    <spring:url var="logout" value="/static/j_spring_security_logout" />
+                    <spring:message code="security.logout" var="sponsored"/>
+                    <a href="${logout}" title="${sponsored}" class="close"><img src="${logo}" alt="${sponsored}" align="center" class="close"/></a>
+                  </span>       
+                </c:if>
+                
+                <c:if test="${pageContext.request.userPrincipal == null}">  
+                  <spring:message code="button.home" var="sponsored"/>
+                  <span><a href="${home}" title="${sponsored}" class="close"><img src="${logo}" alt="${sponsored}" align="center"/></a></span>
+                </c:if>
+        
+                <spring:url var="logo" value="/static/images/cit/theme/imagenes/min.gif" />
+                <spring:message code="button.end" var="sponsored"/>
+                <span><a href="${home}" title="${sponsored}" class="close"><img src="${logo}" alt="${sponsored}" align="center"/></a></span>
+        
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div id="main">
+          <tiles:insertAttribute name="body" />
+          
+          <!-- <div id="footer">        
+            <spring:url var="home" value="/" />
+            <span><a href="${home}"><spring:message code="button.home"/></a></span>           
+            <c:if test="${pageContext.request.userPrincipal != null}">  
+              <c:out value=" | "/>
+              <span>          
+                <spring:url var="logout" value="/static/j_spring_security_logout" />
+                <a href="${logout}"><spring:message code="security.logout" /></a>
+              </span>             
+          </c:if>         
+            
+          <util:language />
+          <util:theme /> -->
+          
+        </div>
+      </div>
+    </body>
+</html>
