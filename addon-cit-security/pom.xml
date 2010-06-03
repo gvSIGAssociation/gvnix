@@ -34,7 +34,7 @@
 		<artifactId>org.gvnix.parent</artifactId>
 		<version>0.3.0-SNAPSHOT</version>
 	</parent>
-	<groupId>org.gvnix.cit.security.roo.addon</groupId>
+	<groupId>org.gvnix.cit</groupId>
 	<artifactId>org.gvnix.cit.security.roo.addon</artifactId>
 	<packaging>bundle</packaging>
 	<version>0.3.0-SNAPSHOT</version>

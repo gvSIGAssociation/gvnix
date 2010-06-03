@@ -305,6 +305,9 @@ public class ControllerJsp20SupportOperationsImpl implements
 	if (isActivated == null) {
 	    ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
 		    .get(ProjectMetadata.getProjectIdentifier());
+	    if (projectMetadata == null){
+		return false;
+	    }
 	    // XXX Any additional checks?
 	    if (projectMetadata.isDependencyRegistered(DEPENDENCY_SERVLET_2_4)) {
 		isActivated = Boolean.TRUE;
