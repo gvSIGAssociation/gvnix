@@ -41,7 +41,7 @@
         <module>addon-theme-manager</module>
         <module>addon-web-exception-handler</module>
         <module>addon-web-mvc-jsp-2.0</module>
-
+        <module>addon-web-relation-styles</module>
 
         <module>addon-cit-security</module>
 	<!--
