@@ -37,23 +37,14 @@ public interface CitSecurityOperations {
      */
     public boolean isAlreadyInstalled();
 
-    /**
-     * TO BE REMOVED FROM API
-     *
-     *
-     */
-    public void clearAlreadyInstalled();
-
-    /**
-     * TO BE REMOVED FROM API
-     *
-     */
-    public boolean checkIsAlredyInstalled();
 
     /**
      * Install CIT Security in this projet
+     * @param password
+     * @param appName
+     * @param url
      *
      */
-    public void setup();
+    public void setup(String url, String appName, String password);
 
 }

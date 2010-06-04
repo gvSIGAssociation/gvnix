@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package __TARGET_PACKAGE__;
+package ServerWSAuth;
 
 /**
  *
@@ -25,7 +25,7 @@ package __TARGET_PACKAGE__;
  *
  */
 public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
-	implements __TARGET_PACKAGE__.ServerWSAuthPort {
+	implements ServerWSAuth.ServerWSAuthPort {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
     private java.util.Vector cachedSerFactories = new java.util.Vector();

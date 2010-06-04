@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package __TARGET_PACKAGE__;
+package ServerWSAuth;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,9 +27,9 @@ import java.net.URL;
  *         Fernandez</a>
  *
  */
-public class ServerWSAuthPortProxy implements __TARGET_PACKAGE__.ServerWSAuthPort {
+public class ServerWSAuthPortProxy implements ServerWSAuth.ServerWSAuthPort {
   private String _endpoint = null;
-  private __TARGET_PACKAGE__.ServerWSAuthPort serverWSAuthPort = null;
+  private ServerWSAuth.ServerWSAuthPort serverWSAuthPort = null;
 
   public ServerWSAuthPortProxy() {
     _initServerWSAuthPortProxy();
@@ -42,7 +42,7 @@ public class ServerWSAuthPortProxy implements __TARGET_PACKAGE__.ServerWSAuthPor
 
     private void _initServerWSAuthPortProxy() {
 	try {
-	    serverWSAuthPort = (new __TARGET_PACKAGE__.ServerWSAuthServiceLocator())
+	    serverWSAuthPort = (new ServerWSAuth.ServerWSAuthServiceLocator())
 		    .getServerWSAuthPort(new URL(_endpoint));
 	    if (serverWSAuthPort != null) {
 		if (_endpoint != null)

@@ -25,7 +25,7 @@ import org.springframework.roo.shell.*;
 
 /**
  * Clase que declara los comandos del add-on <b>cit securty</b>
- * 
+ *
  * @author Jose Manuel Vivó ( jmvivo at disid dot com ) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
  */
 @Component
@@ -44,8 +44,10 @@ public class CitSecurityCommands implements CommandMarker {
     }
 
     @CliCommand(value = "cit security setup", help = "Configura la autenticación de usuarios con el mecanismo de la Consellería de Infraestructuras y Transportes.")
-    public void setup() {
-	citSecurityOperations.setup();
+    public void setup(@CliOption(key="url", mandatory=true, help="URL del servicio de autenticación.") String url,
+	    @CliOption(key="appName", mandatory=true, help="Nombre de la aplicación para el servicio.") String appName,
+	    @CliOption(key="password", mandatory=true, help="Clave de acceso al servicio.") String password) {
+	citSecurityOperations.setup(url,appName,password);
 
     }
 

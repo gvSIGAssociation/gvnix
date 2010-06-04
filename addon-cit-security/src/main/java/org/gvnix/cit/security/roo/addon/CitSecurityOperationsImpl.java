@@ -18,26 +18,46 @@
  */
 package org.gvnix.cit.security.roo.addon;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.*;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.security.SecurityOperations;
 import org.springframework.roo.file.monitor.FileMonitorService;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.*;
-import org.springframework.roo.support.util.*;
+import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.FileCopyUtils;
+import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
  * Clase que implementa las operaciones del add-on <b>cit securty</b>
- * 
- * @author Jose Manuel Vivó ( jmvivo at disid dot com ) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ *
+ * @author Jose Manuel Vivó ( jmvivo at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 @Component
 @Service
@@ -55,14 +75,19 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 	    + PROVIDER_CLASS_FILENAME;
 
     private static final String[] JAVA_CLASS_FILENAMES = new String[] {
-	    PROVIDER_TARGET_CLASS_FILENAME, "ServerWSAuthBindingStub.java",
-	    "ServerWSAuthPort.java", "ServerWSAuthPortProxy.java",
-	    "ServerWSAuthService.java", "ServerWSAuthServiceLocator.java",
-	    "WscitAuthenticationProvider.java", "WscitUserAuthority.java",
-	    "WscitUser.java", };
+	    PROVIDER_CLASS_FILENAME, "WscitAuthenticationProvider.java",
+	    "WscitUserAuthority.java", "WscitUser.java", };
+
+    private static final String[] JAVA_WS_CLASS_FILENAMES = new String[] {
+	    "ServerWSAuthBindingStub.java", "ServerWSAuthPort.java",
+	    "ServerWSAuthPortProxy.java", "ServerWSAuthService.java",
+	    "ServerWSAuthServiceLocator.java" };
 
     private static final String WSAUTH_PROPERTIES_NAME = "CITWSAuth.properties";
     private static final String SECURITY_XML_TEMPLATE = "applicationContext-security-template.xml";
+
+    private static final Dependency AXIS_DEPENDENCY = new Dependency("axis",
+	    "axis", "1.4");
 
     private static Logger logger = Logger
 	    .getLogger(CitSecurityOperationsImpl.class.getName());
@@ -81,6 +106,12 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private Boolean alreadyInstaled = null;
     @Reference
     private FileMonitorService fileMonitorService;
+
+    private ComponentContext context;
+
+    protected void activate(ComponentContext context) {
+	this.context = context;
+    }
 
     public boolean isSetupAvailable() {
 	// Si no esta configurada la seguriad pero se puede configurar
@@ -132,10 +163,10 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 		Path.SRC_MAIN_JAVA, PROVIDER_TARGET_CLASS_FILENAME));
     }
 
-    public void setup() {
+    public void setup(String url, String appName, String password) {
 	// Si no esta configurada la seguriad pero se puede configurar
 	// ya lo haremos nosotros
-	if (!securityOperations.isInstallSecurityAvailable()) {
+	if (securityOperations.isInstallSecurityAvailable()) {
 	    securityOperations.installSecurity();
 	}
 
@@ -143,62 +174,130 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 	copyJavaFiles();
 
 	// Copiar los archivos de configuracion que necesitamos
-	copyConfigFiles();
+	copyConfigFiles(url,appName,password);
 
 	// Actualizamos la configuracion de seguriada
 	updateSecurityConfig();
+
+	// Añadimos dependencias
+	addDependencies();
+
+    }
+
+    private void addDependencies() {
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(ProjectMetadata.getProjectIdentifier());
+
+	Set<Dependency> dependencies = projectMetadata
+		.getDependenciesExcludingVersion(AXIS_DEPENDENCY);
+
+	if (!dependencies.isEmpty()) {
+	    Assert.isTrue(dependencies.size() == 1,
+		    "Duplicate AXIS library dependecy");
+	    Dependency current = dependencies.iterator().next();
+	    String[] currentVersion = current.getVersionId().split("[.]");
+	    if (currentVersion.length > 1) {
+		String[] requiredVersion = AXIS_DEPENDENCY.getVersionId()
+			.split("[.]");
+		int cur, req;
+		for (int i = 0; i < currentVersion.length
+			&& i < requiredVersion.length; i++) {
+		    try {
+			cur = Integer.parseInt(currentVersion[i]);
+			req = Integer.parseInt(requiredVersion[i]);
+		    } catch (NumberFormatException e) {
+			// Actualizamos la dependencia por si acaso.
+			projectOperations.addDependency(AXIS_DEPENDENCY);
+			return;
+		    }
+		    if (cur > req) {
+			// La dependencia actual una versión más nueva:
+			// no cambiamos
+			return;
+		    }
+		}
+
+	    } else {
+		// no sabemos la versión asumimos que es buena
+		return;
+	    }
+
+	}
+	projectOperations.addDependency(AXIS_DEPENDENCY);
 
     }
 
     /**
      * Copia los archivos de configuración própios de nuestra herramienta
+     *
+     * @param password
+     * @param appName
+     * @param url
      */
-    private void copyConfigFiles() {
+    private void copyConfigFiles(String url, String appName, String password) {
 
 	String properties = pathResolver.getIdentifier(Path.SPRING_CONFIG_ROOT,
 		WSAUTH_PROPERTIES_NAME);
-	String source = getClass().getResource(
-		"config/" + WSAUTH_PROPERTIES_NAME).getFile();
-
+	if (fileManager.exists(properties)) {
+	    return;
+	}
+	InputStream templateInputStream = null;
 	try {
-	    FileCopyUtils.copy(new File(source), new File(properties));
+	    templateInputStream = TemplateUtils.getTemplate(getClass(),
+		    "config/" + WSAUTH_PROPERTIES_NAME);
+	    String template = FileCopyUtils.copyToString(new InputStreamReader(templateInputStream));
+	    template = StringUtils.replace(template, "__URL__", url);
+	    template = StringUtils.replace(template, "__APPNAME__", appName);
+	    template = StringUtils.replace(template, "__PASSWORD__", password);
+
+	    FileCopyUtils.copy(template, new OutputStreamWriter(fileManager.createFile(
+			properties).getOutputStream()));
 	} catch (IOException e) {
-	    throw new IllegalStateException("Unable to create '"
-		    + WSAUTH_PROPERTIES_NAME + "'", e);
+		throw new IllegalStateException("Unable to create '"
+			+ WSAUTH_PROPERTIES_NAME + "'", e);
+	} finally {
+	    if (templateInputStream != null) {
+		try {
+		    templateInputStream.close();
+		} catch (IOException e) {
+		    logger.throwing(getClass().getName(), "copyConfigFiles", e);
+		}
+	    }
 	}
 
     }
 
     private void updateSecurityConfig() {
 
-	String cxfDestFile = "applicationContext-security.xml";
-	String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		cxfDestFile);
+	String secTemplate = "config/applicationContext-security-template.xml";
+	String secXmlPath = pathResolver.getIdentifier(Path.SPRING_CONFIG_ROOT,
+		"applicationContext-security.xml");
 
-	Document cxfXmlDoc;
+	Document secXmlDoc;
 	MutableFile mutableFile;
-	if (fileManager.exists(cxfXmlPath)) {
-	    // File exists, nothing to do
-	    return;
+	if (fileManager.exists(secXmlPath)) {
+	    // File exists, update file
+	    mutableFile = fileManager.updateFile(secXmlPath);
+	} else {
+	    // Create file
+	    mutableFile = fileManager.createFile(secXmlPath);
 	}
 
-	// Create file
-	mutableFile = fileManager.createFile(cxfXmlPath);
 	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
-		"cxf-template.xml");
+		secTemplate);
 	try {
-	    cxfXmlDoc = XmlUtils.getDocumentBuilder()
+	    secXmlDoc = XmlUtils.getDocumentBuilder()
 		    .parse(templateInputStream);
 
-	    Element root = cxfXmlDoc.getDocumentElement();
+	    Element root = secXmlDoc.getDocumentElement();
 	    Element bean = XmlUtils.findFirstElement(
-		    "/beans/bean[id='wscitAuthenticationProvider']", root);
+		    "/beans/bean[@id='wscitAuthenticationProvider']", root);
 	    String clazz = bean.getAttribute("class");
 	    bean.setAttribute("class", clazz.replace("__TARGET_PACKAGE__",
 		    CLASSES_PACKAGE));
 
 	    bean = XmlUtils.findFirstElement(
-		    "/beans/bean[id='serverWSAuthPortProxy']", root);
+		    "/beans/bean[@id='serverWSAuthPortProxy']", root);
 	    clazz = bean.getAttribute("class");
 	    bean.setAttribute("class", clazz.replace("__TARGET_PACKAGE__",
 		    CLASSES_PACKAGE));
@@ -208,7 +307,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 	}
 
 	// Write file
-	XmlUtils.writeXml(mutableFile.getOutputStream(), cxfXmlDoc);
+	XmlUtils.writeXml(mutableFile.getOutputStream(), secXmlDoc);
 
 	fileManager.scan();
     }
@@ -219,6 +318,12 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
 		.get(prjId);
 
+	// Copiamos los ficheros del cliente del servicio WSAuth
+	for (String className : JAVA_WS_CLASS_FILENAMES) {
+	    installTemplate("java-src-templates", className, "ServerWSAuth",
+		    projectMetadata, null, false);
+	}
+
 	// Copiamos los ficheros del Provider, usuarios y el cliente del
 	// servicio WSAuth
 	for (String className : JAVA_CLASS_FILENAMES) {
@@ -227,11 +332,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 	}
 
 	// Copiamos los ficheros de los xsd del servicio WSAuth
-	String xsdTargetFolder = pathResolver.getRoot(Path.SRC_MAIN_JAVA);
-	String source = getClass().getResource("java-src").getFile();
-
-	FileUtils.copyRecursively(new File(source), new File(xsdTargetFolder),
-		false);
+	copyDirectoryContents("java-src/**", pathResolver
+		.getRoot(Path.SRC_MAIN_JAVA));
     }
 
     /***
@@ -239,13 +341,13 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      * Método de utilida que genera un fichero <code>targetFilename</code>
      * basado en un <i>template</i>.
      * </p>
-     * 
+     *
      * <p>
      * Los <i>template</i> se buscan en el paquete de la clase actual compuestos
      * por <code>targetFilename</code> con la extensión terminada en
      * <code>-template</code>.
      * </p>
-     * 
+     *
      * <p>
      * Antes de escribir el fichero destino, se reemplazan las siguientes
      * cadenas:
@@ -257,11 +359,11 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      * <li>Por cada elemento de <code>parameters</code>: <code>__</code>
      * <i>clave</i><code>__</code> --> <i>valor<i></li>
      * </ul>
-     * 
+     *
      * @param sourceFolder
      *            path relativo a esta clase para buscar el template, si es null
      *            usa la la ruta de la clase actual
-     * 
+     *
      * @param targetFilename
      *            nombre del fichero final
      * @param targetPackage
@@ -274,7 +376,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      *            si no se necesita)
      * @param override
      *            especifica si sobreescribir el archivo si ya existe
-     * 
+     *
      */
     private void installTemplate(String sourceFolder, String targetFilename,
 	    String targetPackage, ProjectMetadata projectMetadata,
@@ -317,8 +419,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 		input = input.replace("__TOP_LEVEL_PACKAGE__", projectMetadata
 			.getTopLevelPackage().getFullyQualifiedPackageName());
 
-		input = input.replace("__TARGET_PACKAGE__", projectMetadata
-			.getTopLevelPackage().getFullyQualifiedPackageName());
+		input = input.replace("__TARGET_PACKAGE__", finalTargetPackage);
 
 		if (parameters != null) {
 		    for (Entry<String, String> entry : parameters.entrySet()) {
@@ -335,6 +436,51 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 	    } catch (IOException ioe) {
 		throw new IllegalStateException("Unable to create '"
 			+ targetFilename + "'", ioe);
+	    }
+	}
+    }
+
+    /**
+     * This method will copy the contents of a directory to another if the
+     * resource does not already exist in the target directory
+     *
+     * @param sourceAntPath
+     *            directory
+     * @param target
+     *            directory
+     */
+    private void copyDirectoryContents(String sourceAntPath,
+	    String targetDirectory) {
+	Assert.hasText(sourceAntPath, "Source path required");
+	Assert.hasText(targetDirectory, "Target directory required");
+
+	if (!targetDirectory.endsWith("/")) {
+	    targetDirectory += "/";
+	}
+
+	if (!fileManager.exists(targetDirectory)) {
+	    fileManager.createDirectory(targetDirectory);
+	}
+
+	String path = TemplateUtils.getTemplatePath(getClass(), sourceAntPath);
+	Set<URL> urls = TemplateUtils.findMatchingClasspathResources(context
+		.getBundleContext(), path);
+	Assert.notNull(urls,
+		"Could not search bundles for resources for Ant Path '" + path
+			+ "'");
+	for (URL url : urls) {
+	    String fileName = url.getPath().substring(
+		    url.getPath().lastIndexOf("/") + 1);
+	    if (!fileManager.exists(targetDirectory + fileName)) {
+		try {
+		    FileCopyUtils.copy(url.openStream(), fileManager
+			    .createFile(targetDirectory + fileName)
+			    .getOutputStream());
+		} catch (IOException e) {
+		    new IllegalStateException(
+			    "Encountered an error during copying of resources for MVC JSP addon.",
+			    e);
+		}
 	    }
 	}
     }

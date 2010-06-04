@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package __TARGET_PACKAGE__;
+package ServerWSAuth;
 
 /**
  *
@@ -25,7 +25,7 @@ package __TARGET_PACKAGE__;
  *
  */
 public class ServerWSAuthServiceLocator extends org.apache.axis.client.Service
-	implements __TARGET_PACKAGE__.ServerWSAuthService {
+	implements ServerWSAuth.ServerWSAuthService {
 
     public ServerWSAuthServiceLocator() {
     }
@@ -57,7 +57,7 @@ public class ServerWSAuthServiceLocator extends org.apache.axis.client.Service
         ServerWSAuthPortWSDDServiceName = name;
     }
 
-    public __TARGET_PACKAGE__.ServerWSAuthPort getServerWSAuthPort() throws javax.xml.rpc.ServiceException {
+    public ServerWSAuth.ServerWSAuthPort getServerWSAuthPort() throws javax.xml.rpc.ServiceException {
        java.net.URL endpoint;
         try {
             endpoint = new java.net.URL(ServerWSAuthPort_address);
@@ -68,9 +68,9 @@ public class ServerWSAuthServiceLocator extends org.apache.axis.client.Service
         return getServerWSAuthPort(endpoint);
     }
 
-    public __TARGET_PACKAGE__.ServerWSAuthPort getServerWSAuthPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
+    public ServerWSAuth.ServerWSAuthPort getServerWSAuthPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
-            __TARGET_PACKAGE__.ServerWSAuthBindingStub _stub = new __TARGET_PACKAGE__.ServerWSAuthBindingStub(portAddress, this);
+            ServerWSAuth.ServerWSAuthBindingStub _stub = new ServerWSAuth.ServerWSAuthBindingStub(portAddress, this);
             _stub.setPortName(getServerWSAuthPortWSDDServiceName());
             return _stub;
         }
@@ -90,8 +90,8 @@ public class ServerWSAuthServiceLocator extends org.apache.axis.client.Service
      */
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
-            if (__TARGET_PACKAGE__.ServerWSAuthPort.class.isAssignableFrom(serviceEndpointInterface)) {
-        	__TARGET_PACKAGE__.ServerWSAuthBindingStub _stub = new __TARGET_PACKAGE__.ServerWSAuthBindingStub(new java.net.URL(ServerWSAuthPort_address), this);
+            if (ServerWSAuth.ServerWSAuthPort.class.isAssignableFrom(serviceEndpointInterface)) {
+        	ServerWSAuth.ServerWSAuthBindingStub _stub = new ServerWSAuth.ServerWSAuthBindingStub(new java.net.URL(ServerWSAuthPort_address), this);
                 _stub.setPortName(getServerWSAuthPortWSDDServiceName());
                 return _stub;
             }

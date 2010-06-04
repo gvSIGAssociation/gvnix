@@ -17,9 +17,7 @@
         <intercept-url pattern="/resources/**" access="permitAll" />
         <intercept-url pattern="/static/**" access="permitAll" />
         <intercept-url pattern="/login**" access="permitAll" />
-        <intercept-url pattern="/entidad**" access="hasRole('ROLE_USER')" />
-        <intercept-url pattern="/**" access="permitAll" />
-        <intercept-url pattern="/" access="permitAll" />
+        <intercept-url pattern="/**" access="isAuthenticated()" />
     </http>
 
 	<!-- Configure Authentication mechanism -->
@@ -53,7 +51,7 @@
 
 
 
-    <beans:bean id="serverWSAuthPortProxy" class="__TARGET_PACKAGE__.ServerWSAuthPortProxy">
+    <beans:bean id="serverWSAuthPortProxy" class="ServerWSAuth.ServerWSAuthPortProxy">
 		<beans:property name="endpoint" value="${wsauth.url}" />
     </beans:bean>
 

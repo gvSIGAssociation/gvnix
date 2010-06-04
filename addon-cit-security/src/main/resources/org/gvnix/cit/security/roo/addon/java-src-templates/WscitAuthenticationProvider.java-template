@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -62,7 +63,7 @@ public class WscitAuthenticationProvider extends
 	private String credentialCitPassword;
 
 	// WSAth client
-	private __TARGET_PACKAGE__.ServerWSAuthPortProxy serverWSAuthPortProxy;
+	private ServerWSAuth.ServerWSAuthPortProxy serverWSAuthPortProxy;
 
 	// Password encoder for User instances
 	private PasswordEncoder passwordEncoder = new PlaintextPasswordEncoder();
@@ -149,9 +150,6 @@ public class WscitAuthenticationProvider extends
 		user.setPassword(passwordEncoder
 				.encodePassword(presentedPassword, salt));
 
-		// TODO: Remove this log !!!!!!! only used in first tests
-		logger.log(Level.INFO, "Password endoced:" + user.getPassword());
-
 		return user;
 	}
 
@@ -235,9 +233,9 @@ public class WscitAuthenticationProvider extends
 			String password) {
 		try {
 
-			// if (logger.isLoggable(Level.FINE)) {
-			logger.log(Level.INFO, "Invocando validacion servicio web ...");
-			// }
+			if (logger.isLoggable(Level.FINE)) {
+				logger.log(Level.INFO, "Invocando validacion servicio web ...");
+			}
 
 			// Datos de entrada para el servicio web
 			String validaAplicacion = "terceros";
@@ -249,9 +247,9 @@ public class WscitAuthenticationProvider extends
 			es.gva.cit.WSAuth.xsd.ValidaStruct validaReturn = getServerWSAuthPortProxy()
 					.valida(credentialCit, userName, password, validaAplicacion);
 
-			// if (logger.isLoggable(Level.FINE)) {
-			logger.log(Level.FINE, "Resultado validacion=" + validaReturn);
-			// }
+			if (logger.isLoggable(Level.FINE)) {
+				logger.log(Level.FINE, "Validation return=" + validaReturn);
+			}
 
 			if (validaReturn == null
 					|| !userName.equalsIgnoreCase(validaReturn.getUsuario())) {
@@ -265,9 +263,9 @@ public class WscitAuthenticationProvider extends
 
 		} catch (RemoteException e) {
 
-			logger.log(Level.WARNING, "Solicitud de login denegada al usuario="
-					+ userName + ": " + e.getLocalizedMessage());
-			throw new BadCredentialsException(
+			logger.log(Level.WARNING, "Solicitud de login denegada (usuario='"
+					+ userName + "'): " + e.getLocalizedMessage());
+			throw new AuthenticationServiceException(
 					"Error en servicio web de login al validar al usuario", e);
 		}
 
