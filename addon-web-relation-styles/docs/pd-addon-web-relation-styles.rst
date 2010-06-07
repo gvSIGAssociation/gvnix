@@ -30,17 +30,26 @@ Definitions
 Requirements
 =============
 
-This add-on have to install and manage the application menu of Roo projects.
+This add-on have to install and manage the application visualization for entities.
 
+# Preparar los archivos que se van a copiar al proyecto:
+- Conjunto de tagx para la visualización.
+# Crear MetadataProvider y Metadata para la generación de:
+- Archivos AspectJ con el método para la búsqueda de elementos paginados. Regenerar completamente la clase AspectJ con los métodos.
+# Crear un MetadataListener para monitorizar los cambios cuando se haya ejecutado el @RooWebScaffold:
+- Regenerar los ficheros jspx y comprobar si han cambiado para sustituirlos por los nuevos o mantener los anteriores. 
+- Se genera a partir de los datos que se recogen de la entidad relacionada a la vista.
+# Activar el Add-on al inicializar la consola de roo.
 
 Estructura para la creación del Add-on
 ========================================
 
-Funcionalidad del Add-on.
+Add-on functionality.
 
-h3. Conjunto de tagx para la visualización
+Group of tagx for visualization.
+--------------------------------------
 
-Copiar los tagx que se incluyen en la carpeta resources del Add-on dentro de la carpeta ``WEB-INF/`` del proyecto::
+Copy the tagx included in resources folder of the Add-on inside ``WEB-INF/`` project folder::
 
     src/main/webapp/WEB-INF/tags/relations/
     |-- decorators
@@ -53,18 +62,36 @@ Copiar los tagx que se incluyen en la carpeta resources del Add-on dentro de la 
     src/main/webapp/WEB-INF/tags/util
     `-- gvnixcallfunction.tagx
 
-h3. ITD
+ITD
+----
 
-Crear MetadataITD .
+Create a Metadata
+...................
 
-Crear ProviderITD escucha a RooEntity.
+Metadata for create AspecJ method using entity's properties (1-n relations).
 
-h3. Listener que extienda MetadataListener.
+# The metadata creates the search method for paginated related entities.
+  * Crete AspecJ method for related entities that are annotated as 1-n relationship.
+# Use DefaultClassOrInterfaceDetail to retrieve the annotation information for the declared relationships.
+
+Create MetadataProvider that listens RooEntity's changes
+..........................................................
+
+Retrieve the metadata to be written. Always generates the whole file to disk.
+
+# Register as RooEntity to launch the generation.
+
+Create MetadataListener
+------------------------
 
 Crear un listener que extienda de MetadataListener para escuchar a RooWebSaffold o JspMetadata. INFO.
+# Registrar el MetadataListener (@Service, @Component).
+# Comprobar si se han añadido relaciones del tipo 1-n LAZY a las entidades con los métodos de acceso a las propiedades de la entidad que se visualiza en la jspx.
+# **Siempre** comprobar lo que se ha generado usando Strings (no se pueden utilizar los atributos z).
 
-Extender el MetadataListener para crear uno nuevo que se ejecute después de @RooWebScaffold.
-Comprobar si se han añadido relaciones del tipo 1-n LAZY a las entidades. ¿ Cómo ?
+Jspx files
+...........
+
 Acceder a las jspx show y update.
 
 * El atributo ``render`` de las relaciones generadas por rooWebScaffold ponerlo a false para que no muestre lo que genera Roo.
@@ -79,15 +106,6 @@ Acceder a las jspx show y update.
 
     * Dentro de esta etiqueta instancia la propiedad mediante la llamada al tagx <relation:tabview> (en el caso de mostrar los datos dentro de las pestañas) para la visualización con el formato de tabla incluyendo los parámetros necesarios para generar el código.
 
-Crear el método para mostrar los datos paginados mediante la plantilla AspectJ.
-* Si la plantilla existe
-
-  * Añadir el método con la plantilla para método de búsqueda.
-
-* Si no existe
-
-  * Crear la clase AspectJ mediante la plantilla de la clase y el método relacionado con la plantilla para el método.
-
 Roo Shell commands
 ====================
 
@@ -95,10 +113,6 @@ Comandos asociados al Add-on.
 
 ``web relation styles setup``
 ------------------------------
-
-Parameters:
-
-* ``--view`` (mandatory): Selects the view to show the relations of an Entity.
 
 Use cases
 =============
@@ -112,33 +126,9 @@ Developer wants to use new menu in his Roo application. This are the steeps to g
 
 #. Execute command ``web relation styles setup --view tab``.
 
+Future enhancements
+====================
 
-Classes toString de Roo Metadata y MetadataProvider
------------------------------------------------------
+Add Parameters to setup command:
 
-  protected void activate(ComponentContext context) {
-    metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-    // Ensure we're notified of all metadata related to physical Java types, in particular their initial creation
-    metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-    beanInfoMetadataProvider.addMetadataTrigger(new JavaType(RooToString.class.getName()));
-    addMetadataTrigger(new JavaType(RooToString.class.getName()));
-  }
-  
-  protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
-    // Acquire bean info (we need getters details, specifically)
-    JavaType javaType = ToStringMetadata.getJavaType(metadataIdentificationString);
-    Path path = ToStringMetadata.getPath(metadataIdentificationString);
-    String beanInfoMetadataKey = BeanInfoMetadata.createIdentifier(javaType, path);
-
-    // We want to be notified if the getter info changes in any way 
-    metadataDependencyRegistry.registerDependency(beanInfoMetadataKey, metadataIdentificationString);
-    BeanInfoMetadata beanInfoMetadata = (BeanInfoMetadata) metadataService.get(beanInfoMetadataKey);
-    
-    // Abort if we don't have getter information available
-    if (beanInfoMetadata == null) {
-      return null;
-    }
-    
-    // Otherwise go off and create the to String metadata
-    return new ToStringMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, beanInfoMetadata);
-  }
+* ``--view`` (mandatory): Selects the view to show the relations of an Entity.
