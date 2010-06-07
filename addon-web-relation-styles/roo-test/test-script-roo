@@ -1,0 +1,30 @@
+project --topLevelPackage org.gvnix.test.relation.list.table --java 5 --projectName displayRelationsTable
+// persistence setup --provider HIBERNATE --database POSTGRES --databaseName test-roo --userName person --password person
+persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
+
+entity --class ~.domain.Person --testAutomatically 
+field string --fieldName name --notNull
+field number --fieldName edad --type java.lang.Integer 
+field date --fieldName fecha --type java.util.Calendar 
+
+entity --class org.gvnix.test.relation.list.table.domain.Horse
+field string --fieldName name --notNull
+field reference --fieldName person --type org.gvnix.test.relation.list.table.domain.Person
+
+focus --class ~.domain.Person
+field set --fieldName horses --element org.gvnix.test.relation.list.table.domain.Horse --cardinality ONE_TO_MANY --mappedBy person 
+
+entity --class org.gvnix.test.relation.list.table.domain.Car
+field string --fieldName name --notNull
+field reference --fieldName person --type org.gvnix.test.relation.list.table.domain.Person
+
+focus --class ~.domain.Person
+field set --fieldName coches --element org.gvnix.test.relation.list.table.domain.Car --cardinality ONE_TO_MANY --mappedBy person 
+
+dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1
+dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3
+
+controller all --package ~.web
+
+// focus --class ~.domain.Person
+// finder add --finderName findPeopleByName
