@@ -1,0 +1,64 @@
+<jsp:root xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+<jsp:directive.tag import="java.lang.reflect.Method"/>
+<jsp:directive.tag import="org.springframework.util.StringUtils"/>
+<jsp:directive.tag import="java.util.Map.Entry"/>
+<jsp:directive.tag import="java.util.List"/>
+
+	<!--
+    gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+    i Transport - Generalitat Valenciana
+    Copyright (C) 2010 CIT - Generalitat Valenciana
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	 -->
+
+	<jsp:output omit-xml-declaration="yes"/>
+
+  <jsp:directive.attribute name="name" type="java.lang.String" required="true" description="Function to call." />
+  <jsp:directive.attribute name="object" type="java.lang.Object" required="true" description="Object to call the method." />
+  <jsp:directive.attribute name="paramValues" type="java.util.List" required="true" description="Method parameters values."/>
+
+  <jsp:directive.attribute name="dataResult" type="java.lang.String" required="true" description="Method result variable name." />
+
+	<!-- Use the attributes inside the scriptlet -->
+  <jsp:useBean id="name" type="java.lang.String" />
+  <jsp:useBean id="object" type="java.lang.Object" />
+  <jsp:useBean id="paramValues" type="java.util.List" />
+  <jsp:useBean id="dataResult" type="java.lang.String" />
+
+  <!--
+    Scriptlet to call a method using Reflection API.
+    The scriplet sets the result as attribute in the session context.
+    name - Call this method name.
+    object - Object that has the method.
+    paramValues - Parameters values of the method.
+    dataResult - Result of the method to include in session context.
+  -->
+	<jsp:scriptlet>
+		Class cl = object.getClass();
+		Class[] paramTypes = new Class[paramValues.size()];
+		      
+    for (int i = 0; i &lt; paramValues.size(); i++) {
+      paramTypes[i] = paramValues.get(i).getClass();
+    }
+		
+	  Method m = cl.getMethod(name, paramTypes);
+	    
+	  Object result = m.invoke(object, paramValues.toArray());  	 
+	  
+	  jspContext.setAttribute(dataResult, result, PageContext.SESSION_SCOPE);
+	  
+	</jsp:scriptlet>
+
+</jsp:root>
