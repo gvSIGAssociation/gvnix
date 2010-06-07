@@ -78,7 +78,9 @@ public class RealtionsTableViewOperationsImpl implements RealtionsTableViewOpera
     public void copyTagx() {
 
 	copyDirectoryContents("tags/relations/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/relations"));
-	copyDirectoryContents("tags/relations/decorators*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/relations/decoratos"));
+	copyDirectoryContents("tags/relations/decorators/*.tagx", pathResolver
+		.getIdentifier(Path.SRC_MAIN_WEBAPP,
+			"/WEB-INF/tags/relations/decorators"));
 	copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"));
     }
     /**
