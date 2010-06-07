@@ -49,13 +49,13 @@ public class RealtionsTableViewCommands implements CommandMarker {
     protected void deactivate(ComponentContext context) {
     }
 
-    @CliAvailabilityIndicator("relation table setup")
+    @CliAvailabilityIndicator("relationships setup table")
     public boolean isCopyTagxAvailable() {
 	return realtionsTableViewOperations.isProjectAvailable(); // it's safe to always see the
 						// properties we expose
     }
 
-    @CliCommand(value = "relation table setup", help = "Installs the visualization for related entities grouped by tabs into tables.")
+    @CliCommand(value = "relationships setup table", help = "Installs the visualization for related entities grouped by tabs into tables.")
     public void copyTagx() {
 	realtionsTableViewOperations.copyTagx();
     }
