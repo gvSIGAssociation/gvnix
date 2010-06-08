@@ -117,8 +117,7 @@ public class PaginatedRealationMetadata extends
 		}
 
 		MethodMetadata getEntityRelatedEntriesMethod = getEntityRelatedEntriesMethod(
-			methodName.toString(), entityName, relationName,
-			relationSet);
+			methodName.toString(), entityName, relationSet);
 
 		builder.addMethod(getEntityRelatedEntriesMethod);
 
@@ -136,15 +135,13 @@ public class PaginatedRealationMetadata extends
      *            MethodName definition created using entity relationship name.
      * @param entityName
      *            Entity which has the relations.
-     * @param relationName
-     *            Relation name to create the query.
      * @param enclosingRelation
      *            Relation JavaType to create the query and return type for the
      *            method.
      * @return
      */
     public MethodMetadata getEntityRelatedEntriesMethod(String methodName,
-	    String entityName, String relationName, JavaType enclosingRelation) {
+	    String entityName, JavaType enclosingRelation) {
 
 	// Compute the relevant toString method name
 	JavaSymbolName javaMethodName = new JavaSymbolName(methodName);
