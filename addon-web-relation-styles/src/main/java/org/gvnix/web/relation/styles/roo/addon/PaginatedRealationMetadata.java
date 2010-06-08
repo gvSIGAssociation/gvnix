@@ -205,8 +205,6 @@ public class PaginatedRealationMetadata extends
 		false, builder.getImportRegistrationResolver())
 		+ stringBuilder.toString());
 
-	bodyBuilder.appendFormalLine(stringBuilder.toString());
-
 	// Add parameters to the query.
 	stringBuilder = new StringBuilder();
 	stringBuilder.append("q.setParameter(\""
