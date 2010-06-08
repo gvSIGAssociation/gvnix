@@ -187,16 +187,16 @@ public class PaginatedRealationMetadata extends
 	// Create query
 	StringBuilder stringBuilder = new StringBuilder();
 	stringBuilder.append(" q = em.createQuery(\"select\" "
-			+ StringUtils.uncapitalize(enclosingRelation.getClass()
-				.getName())
+		+ StringUtils.uncapitalize(enclosingRelation
+			.getSimpleTypeName())
 			+ " from "
-			+ enclosingRelation.getClass().getName()
+		+ enclosingRelation.getSimpleTypeName()
 			+ " "
-			+ StringUtils.uncapitalize(enclosingRelation.getClass()
-				.getName())
+		+ StringUtils.uncapitalize(enclosingRelation
+			.getSimpleTypeName())
 			+ " where "
-			+ StringUtils.uncapitalize(enclosingRelation.getClass()
-				.getName()) + "."
+		+ StringUtils.uncapitalize(enclosingRelation
+			.getSimpleTypeName()) + "."
 			+ StringUtils.uncapitalize(entityName) + " = :"
 			+ StringUtils.uncapitalize(entityName) + ");");
 
@@ -222,6 +222,7 @@ public class PaginatedRealationMetadata extends
 	bodyBuilder.appendFormalLine(stringBuilder.toString());
 
 	// Return result
+	stringBuilder = new StringBuilder();
 	stringBuilder.append("return q.getResultList();");
 
 	bodyBuilder.appendFormalLine(stringBuilder.toString());
