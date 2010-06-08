@@ -104,7 +104,7 @@ public class PaginatedRealationMetadataProvider extends
     }
 
     public String getItdUniquenessFilenameSuffix() {
-	return "PaginatedRealation";
+	return "gvNIX_related_entries";
     }
 
 	protected String getGovernorPhysicalTypeIdentifier(
