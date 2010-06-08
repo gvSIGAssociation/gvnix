@@ -23,7 +23,6 @@ package org.gvnix.web.relation.styles.roo.addon;
 import org.apache.felix.scr.annotations.*;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.beaninfo.BeanInfoMetadata;
-import org.springframework.roo.addon.beaninfo.BeanInfoMetadataProvider;
 import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -47,16 +46,11 @@ import org.springframework.roo.project.Path;
 public class PaginatedRealationMetadataProvider extends
 	AbstractItdMetadataProvider {
 
-    @Reference
-    private BeanInfoMetadataProvider beanInfoMetadataProvider;
-
     protected void activate(ComponentContext context) {
 	// Ensure we're notified of all metadata related to physical Java types,
 	// in particular their initial creation
 	metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
 		.getMetadataIdentiferType(), getProvidesType());
-	beanInfoMetadataProvider.addMetadataTrigger(new JavaType(
-		RooEntity.class.getName()));
 	addMetadataTrigger(new JavaType(RooEntity.class.getName()));
     }
 
@@ -92,8 +86,6 @@ public class PaginatedRealationMetadataProvider extends
 	}
 
 	// We need to be informed if our dependent metadata changes
-	metadataDependencyRegistry.registerDependency(beanInfoMetadataKey,
-		metadataIdentificationString);
 	metadataDependencyRegistry.registerDependency(entityMetadataKey,
 		metadataIdentificationString);
 

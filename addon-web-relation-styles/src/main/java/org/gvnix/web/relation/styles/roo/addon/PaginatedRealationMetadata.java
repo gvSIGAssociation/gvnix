@@ -59,7 +59,6 @@ public class PaginatedRealationMetadata extends
     private static final JavaType QUERY = new JavaType(
 	    "javax.persistence.Query");
 
-    private BeanInfoMetadata beanInfoMetadata;
     private EntityMetadata entityMetadata;
 
     public PaginatedRealationMetadata(String identifier, JavaType aspectName,
@@ -75,7 +74,6 @@ public class PaginatedRealationMetadata extends
 	    return;
 	}
 
-	this.beanInfoMetadata = beanInfoMetadata;
 	this.entityMetadata = entityMetadata;
 
 	// Retrieve the fields that are defined as OneToMany relationship.
@@ -174,19 +172,22 @@ public class PaginatedRealationMetadata extends
 	MethodMetadata entityManagerMethod = entityMetadata
 		.getEntityManagerMethod();
 
-	// Create body resolving imports.
+	// StringBuilder
+	StringBuilder stringBuilder = new StringBuilder();
+
+	// Create EntityManager.
+	stringBuilder.append(" em = "
+		+ governorTypeDetails.getName().getSimpleTypeName() + "."
+		+ entityManagerMethod.getMethodName().getSymbolName() + "();");
+
 	bodyBuilder.appendFormalLine(ENTITY_MANAGER
 		.getNameIncludingTypeParameters(false, builder
 			.getImportRegistrationResolver())
-		+ " em = "
-		+ governorTypeDetails.getName().getSimpleTypeName()
-		+ "."
-		+ entityManagerMethod.getMethodName().getSymbolName()
-		+ "();");
+		+ stringBuilder.toString());
 
 	// Create query
-	StringBuilder stringBuilder = new StringBuilder();
-	stringBuilder.append(" q = em.createQuery(\"select\" "
+	stringBuilder = new StringBuilder();
+	stringBuilder.append(" q = em.createQuery(select "
 		+ StringUtils.uncapitalize(enclosingRelation
 			.getSimpleTypeName())
 			+ " from "
