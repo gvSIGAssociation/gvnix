@@ -62,12 +62,12 @@ privileged aspect ${entity_class}_gvnix_persistence_occ {
     }
 
     @Transactional
-    public void ${entity_class}.merge() {
+    public ${entity_class} ${entity_class}.merge() {
         if (this.entityManager == null) this.entityManager = entityManager();
         this.checkConcurrency(null);
         ${entity_class} merged = this.entityManager.merge(this);
         this.entityManager.flush();
-        this.${id_field} = merged.${id_accessor}();
+        return merged;
     }
 
     public void ${entity_class}.checkConcurrency(${entity_class} attached) {
