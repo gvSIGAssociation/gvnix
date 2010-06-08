@@ -32,22 +32,23 @@ Requirements
 
 This add-on have to install and manage the application visualization for entities.
 
-# Preparar los archivos que se van a copiar al proyecto:
-- Conjunto de tagx para la visualización.
-# Crear MetadataProvider y Metadata para la generación de:
-- Archivos AspectJ con el método para la búsqueda de elementos paginados. Regenerar completamente la clase AspectJ con los métodos.
-# Crear un MetadataListener para monitorizar los cambios cuando se haya ejecutado el @RooWebScaffold:
-- Regenerar los ficheros jspx y comprobar si han cambiado para sustituirlos por los nuevos o mantener los anteriores. 
-- Se genera a partir de los datos que se recogen de la entidad relacionada a la vista.
-# Activar el Add-on al inicializar la consola de roo.
+# Tagx files to show the related entities in forms show and update.
 
-Estructura para la creación del Add-on
-========================================
+# Create MetadataProvider and Metadata for generate:
+- AspectJ file and method to retrieve paginated results for related entities. 
+- Regenerate the AspectJ class when perform any change in the one_to_many relations of the entity.
+# Create a MetadataListener to monitoring changes after the execution @RooWebScaffold:
+- Regenerate jspx files (show and update) if there any changes in the entity adding o removing a 1-n relationship.
+- It depends on the entity data class and its relationships.
+# Activate the Add-on at Roo console startup to monitoring. After its installation.
+
+Functionality
+===============
 
 Add-on functionality.
 
-Group of tagx for visualization.
---------------------------------------
+Group of tagx for visualization structure.
+----------------------------------
 
 Copy the tagx included in resources folder of the Add-on inside ``WEB-INF/`` project folder::
 
@@ -77,7 +78,7 @@ Metadata for create AspecJ method using entity's properties (1-n relations).
 Create MetadataProvider that listens RooEntity's changes
 ..........................................................
 
-Retrieve the metadata to be written. Always generates the whole file to disk.
+Retrieve the metadata to be written. Always checks the Entity to generate the methods.
 
 # Register as RooEntity to launch the generation.
 
@@ -85,9 +86,10 @@ Create MetadataListener
 ------------------------
 
 Crear un listener que extienda de MetadataListener para escuchar a RooWebSaffold o JspMetadata. INFO.
-# Registrar el MetadataListener (@Service, @Component).
-# Comprobar si se han añadido relaciones del tipo 1-n LAZY a las entidades con los métodos de acceso a las propiedades de la entidad que se visualiza en la jspx.
-# **Siempre** comprobar lo que se ha generado usando Strings (no se pueden utilizar los atributos z).
+# Register the MetadataListener (@Service, @Component).
+# Check if have been added 1-n LAZY relationships to the entities.
+- Use the defined access method to the entity metadata properties to be show in jspx.
+# Check **always** the generated code using Strings (the z attribute can't be used).
 
 Jspx files
 ...........
