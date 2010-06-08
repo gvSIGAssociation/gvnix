@@ -1,5 +1,5 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures     
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
  * i Transport - Generalitat Valenciana
  * Copyright (C) 2010 CIT - Generalitat Valenciana
  *
@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -64,15 +64,6 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
 
     private static Logger logger = Logger
 	    .getLogger(MenuPageOperationsImpl.class.getName());
-
-    private static final Dependency DEPENDENCY_GVNIX_WEB_ANOTATIONS = new Dependency(
-	    "org.gvnix", "org.gvnix.annotations", "0.3.0-SNAPSHOT"); // FIXME
-    // Version
-    // must
-    // be
-    // load
-    // by
-    // anyway
 
     private static final String SS_VERSION = "3.0.3.CI-SNAPSHOT";
 
@@ -542,7 +533,20 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
     }
 
     private void addAnnotationDependecy() {
-	projectOperations.dependencyUpdate(DEPENDENCY_GVNIX_WEB_ANOTATIONS);
+
+	List<Element> databaseProperties = XmlUtils.findElements(
+		"/configuration/gvnix/properties/*", XmlUtils.getConfiguration(this.getClass(), "properties.xml"));
+	for (Element property : databaseProperties) {
+	    projectOperations.addProperty(new Property(property));
+	}
+
+	List<Element> databaseDependencies = XmlUtils.findElements(
+		"/configuration/gvnix/dependencies/dependency",
+		XmlUtils.getConfiguration(this.getClass(), "dependencies.xml"));
+	for (Element dependencyElement : databaseDependencies) {
+	    projectOperations
+		    .dependencyUpdate(new Dependency(dependencyElement));
+	}
     }
 
     public MenuPageItem addPage(MenuPageItem parent, String name, String label,

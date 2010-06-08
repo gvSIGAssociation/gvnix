@@ -53,7 +53,10 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.XmlUtils;
+import org.w3c.dom.Element;
 
 /**
  * gvNIX OCCChecksum operation service implementation
@@ -63,15 +66,6 @@ import org.springframework.roo.support.util.Assert;
 @Component
 @Service
 public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
-
-    private static final Dependency GVNIX_CORE_ANOTATIONS = new Dependency(
-	    "org.gvnix", "org.gvnix.annotations", "0.3.0-SNAPSHOT"); // FIXME
-									       // Version
-									       // must
-									       // be
-									       // load
-									       // by
-									       // anyway
 
     private static Logger logger = Logger.getLogger(OCCChecksumOperationsImpl.class
 	    .getName());
@@ -234,20 +228,19 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
      * @see org.gvnix.persistence.roo.addon.OCCChecksumOperations#addGvNIXAnnotationsDependecy()
      */
     public void addGvNIXAnnotationsDependecy() {
-	ProjectMetadata project = (ProjectMetadata) metadataService
-		.get(ProjectMetadata.getProjectIdentifier());
-	if (project == null) {
-	    return;
+	List<Element> databaseProperties = XmlUtils.findElements(
+		"/configuration/gvnix/properties/*", XmlUtils.getConfiguration(this.getClass(), "properties.xml"));
+	for (Element property : databaseProperties) {
+	    projectOperations.addProperty(new Property(property));
 	}
 
-	if (project.getDependencies().contains(GVNIX_CORE_ANOTATIONS)) {
-	    return;
-	} else if (project.getDependenciesExcludingVersion(
-		GVNIX_CORE_ANOTATIONS).size() > 0) {
-	    // TODO what we should do?
-
+	List<Element> databaseDependencies = XmlUtils.findElements(
+		"/configuration/gvnix/dependencies/dependency",
+		XmlUtils.getConfiguration(this.getClass(), "dependencies.xml"));
+	for (Element dependencyElement : databaseDependencies) {
+	    projectOperations
+		    .dependencyUpdate(new Dependency(dependencyElement));
 	}
-	projectOperations.dependencyUpdate(GVNIX_CORE_ANOTATIONS);
     }
 
 }
