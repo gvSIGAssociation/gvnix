@@ -24,7 +24,6 @@ import org.apache.felix.scr.annotations.*;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.mvc.jsp.JspMetadata;
 import org.springframework.roo.metadata.*;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Listens for {@link WebScaffoldMetadata} and produces JSPs when requested by
@@ -59,18 +58,15 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
      */
     public void notify(String upstreamDependency, String downstreamDependency) {
 
-	if (MetadataIdentificationUtils
-		.isIdentifyingClass(downstreamDependency)) {
+	if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
+		.equals(
+			MetadataIdentificationUtils
+				.getMetadataClass(JspMetadata
+					.getMetadataIdentiferType()))) {
+
+	    logger.warning("JspMetadata retrieved.");
+
 	}
-
-	Assert.isTrue(MetadataIdentificationUtils.getMetadataClass(
-		upstreamDependency).equals(
-		MetadataIdentificationUtils.getMetadataClass(JspMetadata
-			.getMetadataIdentiferType())),
-		"Expected JspMetadata notifications (not '"
-			+ upstreamDependency + "')");
-
-	logger.warning("JspMetadata retrieved.");
 
     }
 
