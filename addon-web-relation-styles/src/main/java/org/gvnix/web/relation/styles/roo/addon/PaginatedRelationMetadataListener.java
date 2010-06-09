@@ -18,19 +18,25 @@
  */
 package org.gvnix.web.relation.styles.roo.addon;
 
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.beaninfo.BeanInfoMetadata;
 import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.addon.mvc.jsp.JspMetadata;
 import org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.metadata.*;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.support.util.*;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Listens for {@link WebScaffoldMetadata} and produces JSPs when requested by
@@ -53,7 +59,17 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
     @Reference
     private MetadataService metadataService;
 
-    protected ClassOrInterfaceTypeDetails governorTypeDetails;
+    @Reference
+    private FileManager fileManager;
+
+    @Reference
+    private PathResolver pathResolver;
+
+    private WebScaffoldMetadata webScaffoldMetadata;
+
+    private EntityMetadata entityMetadata;
+
+    private BeanInfoMetadata beanInfoMetadata;
 
     private static Logger logger = Logger.getLogger(PaginatedRelationMetadataListener.class.getName());
 
@@ -81,6 +97,11 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    List<FieldMetadata> oneToManyFieldMetadatas = getAnnotatedFields(
 		    upstreamDependency, annotationPath);
 
+	    // Retrieve the associated jspx (show an update).
+	    if (!oneToManyFieldMetadatas.isEmpty()) {
+
+		updateView("show", oneToManyFieldMetadatas, "tab");
+	    }
 	}
 
     }
@@ -113,6 +134,17 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
 		.get(webScaffoldMetadataKey);
 
+	this.webScaffoldMetadata = webScaffoldMetadata;
+
+	// BeanInfoMetadata
+	String beanInfoMetadataKey = webScaffoldMetadata
+		.getIdentifierForBeanInfoMetadata();
+
+	BeanInfoMetadata beanInfoMetadata = (BeanInfoMetadata) metadataService
+		.get(beanInfoMetadataKey);
+
+	this.beanInfoMetadata = beanInfoMetadata;
+
 	// Retrieve Controller Entity
 	String entityMetadataInfo = webScaffoldMetadata
 		.getIdentifierForEntityMetadata();
@@ -127,6 +159,15 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	EntityMetadata entityMetadata = (EntityMetadata) metadataService
 		.get(entityMetadataKey);
 
+	this.entityMetadata = entityMetadata;
+
+	// We need to abort if we couldn't find dependent metadata
+	if (beanInfoMetadata == null || !beanInfoMetadata.isValid()
+		|| entityMetadata == null || !entityMetadata.isValid()) {
+	    // Can't get hold of the entity we are needing to build JSPs for
+	    return null;
+	}
+
 	DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
 		.getItdTypeDetails();
 
@@ -136,6 +177,166 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 			new JavaType(annotationPath));
 
 	return fieldMetadataList;
+    }
+
+    /**
+     * Returns the jspx file updated to show the relations using defined view
+     * tagx.
+     * 
+     * @param viewName
+     *            Name of the view to update.
+     * @param oneToManyFieldMetadatas
+     *            List of relation fields to show.
+     * 
+     * @param selectedDecorator
+     *            Decorator element name to show realtionships.
+     * 
+     * @return Updated Document with the new fields.
+     */
+    private Document updateView(String viewName,
+	    List<FieldMetadata> oneToManyFieldMetadatas,
+	    String selectedDecorator) {
+	
+	DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
+		.getItdTypeDetails();
+
+	String entityName = defaultItdTypeDetails.getGovernor().getName()
+		.getSimpleTypeName();
+
+	String controllerPath = webScaffoldMetadata.getAnnotationValues()
+		.getPath();
+
+	if (controllerPath.startsWith("/")) {
+	    controllerPath = controllerPath.substring(1);
+	}
+
+	String jspxPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		"WEB-INF/views/" + controllerPath + "/" + viewName + ".jspx");
+
+	Assert.isTrue(fileManager.exists(jspxPath), viewName
+		+ ".jspx not found");
+
+	Document jspxView;
+	MutableFile jspxMutableFile = null;
+
+	try {
+	    jspxMutableFile = fileManager.updateFile(jspxPath);
+	    jspxView = XmlUtils.getDocumentBuilder().parse(
+		    jspxMutableFile.getInputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+	Element documentRoot = jspxView.getDocumentElement();
+
+	// Loop for each OneToMany field.
+
+	Element defaultField = null;
+
+	// Views to create.
+	Element groupViews = null;
+	Element views = null;
+
+	Element divView = XmlUtils.findFirstElement("/div", documentRoot);
+	Assert.isTrue(divView != null, "There is no div tagx defined in "
+		+ viewName + ".jspx.");
+
+	// Add the new view if doesn't exists
+	groupViews = XmlUtils.findFirstElement("/div/" + selectedDecorator
+		+ "[@id='relations']", documentRoot);
+
+	// Create element for group views.
+	// relations="urn:jsptagdir:/WEB-INF/tags/relations"
+	if (groupViews == null) {
+
+	    // Add tagx attributes to div bean.
+	    divView.setAttribute("xmlns:relations",
+		    "urn:jsptagdir:/WEB-INF/tags/relations");
+	    divView.setAttribute("xmlns:relation",
+		    "urn:jsptagdir:/WEB-INF/tags/relations/decorators");
+	    divView.setAttribute("xmlns:table",
+		    "urn:jsptagdir:/WEB-INF/tags/form/fields");
+
+	    // xmlns:relations="urn:jsptagdir:/WEB-INF/tags/relations"
+	    // xmlns:relation="urn:jsptagdir:/WEB-INF/tags/relations/decorators"
+	    // xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields"
+
+	    groupViews = new XmlElementBuilder(
+		    "relations:" + selectedDecorator, jspxView).addAttribute(
+		    "id", "relations").build();
+	}
+
+	// Add the relationship views.
+	for (FieldMetadata fieldMetadata : oneToManyFieldMetadatas) {
+
+	    // "/div/display[@field='/" + exceptionViewName + "']"
+
+	    if (viewName.compareTo("show") == 0) {
+
+		defaultField = XmlUtils.findFirstElement(
+			"/div/show/display[@field='"
+				+ fieldMetadata.getFieldName() + "']",
+			documentRoot);
+	    } else if (viewName.compareTo("update") == 0) {
+		defaultField = XmlUtils.findFirstElement(
+			"/div/update/simple[@field='"
+				+ fieldMetadata.getFieldName() + "']",
+			documentRoot);
+	    }
+
+	    if (defaultField == null) {
+		break;
+	    }
+
+	    // Don't show the default view of relationship.
+	    defaultField.setAttribute("render", "false");
+
+	    // relation="urn:jsptagdir:/WEB-INF/tags/relations/decorators"
+
+	    String propertyName = fieldMetadata.getFieldName().getSymbolName();
+
+	    views = new XmlElementBuilder("relation:" + selectedDecorator
+		    + "view", jspxView)
+		    .addAttribute("data",
+			    "${" + StringUtils.uncapitalize(entityName) + "}")
+		    .addAttribute("id",
+			    "s:" + fieldMetadata.getFieldName().getSymbolName())
+		    .addAttribute("field",
+			    fieldMetadata.getFieldName().getSymbolName())
+		    .addAttribute("fieldId",
+			    "l:" + fieldMetadata.getFieldName().getSymbolName())
+		    .addAttribute("messageCode", "entity.reference.not.managed")
+		    .addAttribute("messageCodeAttribute", entityName)
+		    .addAttribute(
+			    "path",
+			    "/"
+				    + StringUtils
+					    .uncapitalize(fieldMetadata
+						    .getFieldType()
+						    .getSimpleTypeName()))
+		    .addAttribute("delete", "false").addAttribute("dataResult",
+			    propertyName + "list").addAttribute(
+			    "relatedEntitySet",
+			    "${" + StringUtils.uncapitalize(entityName) + "."
+				    + propertyName + "}").build();
+
+	    groupViews.appendChild(views);
+	    // <relation:tabview
+	    // data="${person}"
+	    // id="s:org.gvnix.test.relation.list.table.domain.Person.coches"
+	    // field="coches"
+	    // fieldId="l:org.gvnix.test.relation.list.table.domain.Person.coches"
+	    // messageCode="entity.reference.not.managed"
+	    // messageCodeAttribute="Person"
+	    // path="/cars"
+	    // delete="false"
+	    // dataResult="cocheslist"
+	    // relatedEntitySet="${person.coches}">
+
+	    logger.warning("Created element:\n" + views.toString());
+	}
+
+	jspxView.getLastChild().appendChild(groupViews);
+	return jspxView;
     }
 
 }
