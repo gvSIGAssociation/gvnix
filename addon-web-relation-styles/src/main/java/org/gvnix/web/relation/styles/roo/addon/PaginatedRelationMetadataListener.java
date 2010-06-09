@@ -76,49 +76,11 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 				.getMetadataClass(JspMetadata
 					.getMetadataIdentiferType()))) {
 
-	    logger.warning("JspMetadata retrieved.");
-	    // JavaType javaType = JspMetadata.getJavaType(upstreamDependency);
-
-	    // org.gvnix.test.relation.list.table.web.NuevoController
-	    // @RooWebScaffold(path = "cars", formBackingObject = Car.class)
-	    // @OneToMany(cascade = CascadeType.ALL, mappedBy = "person")
-
 	    // Work out the MIDs of the other metadata we depend on
+	    String annotationPath = "javax.persistence.OneToMany";
+	    List<FieldMetadata> oneToManyFieldMetadatas = getAnnotatedFields(
+		    upstreamDependency, annotationPath);
 
-	    JavaType javaType = JspMetadata.getJavaType(upstreamDependency);
-	    Path webPath = JspMetadata.getPath(upstreamDependency);
-	    String webScaffoldMetadataKey = WebScaffoldMetadata
-		    .createIdentifier(javaType, webPath);
-	    WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
-		    .get(webScaffoldMetadataKey);
-
-	    // Retrieve Controller Entity
-	    String entityMetadataInfo = webScaffoldMetadata
-		    .getIdentifierForEntityMetadata();
-
-	    JavaType entityJavaType = EntityMetadata
-		    .getJavaType(entityMetadataInfo);
-
-	    Path path = EntityMetadata.getPath(entityMetadataInfo);
-
-	    String entityMetadataKey = EntityMetadata.createIdentifier(
-		    entityJavaType, path);
-	    EntityMetadata entityMetadata = (EntityMetadata) metadataService
-		    .get(entityMetadataKey);
-
-
-	    DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
-		    .getItdTypeDetails();
-
-	    
-	    // Retrieve the fields that are defined as OneToMany relationship.
-	    List<FieldMetadata> fieldMetadataList = MemberFindingUtils
-		    .getFieldsWithAnnotation(defaultItdTypeDetails
-			    .getGovernor(), new JavaType(
-			    "javax.persistence.OneToMany"));
-
-	    logger.warning("Entity field anotated with @oneToMany:\n"
-		    + fieldMetadataList.size());
 	}
 
     }
@@ -127,6 +89,53 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
     private boolean writeToDiskIfNecessary(String jspFilename, Document proposed) {
 	// TODO:
 	return true;
+    }
+
+    /**
+     * Retrieves the fields of the entity wrapped by the controller with the
+     * defined annotation.
+     * 
+     * @param upstreamDependency
+     *            JspMetadata to retrieve Entity Controller information.
+     * @param annotationPath
+     *            Complete Class name of the annotation. ie:
+     *            "javax.persistence.OneToMany"
+     * @return FieldMetada {@link List} list of entity fields with the
+     *         annotation. If there are any fields, returns an empty ArrayList.
+     */
+    private List<FieldMetadata> getAnnotatedFields(String upstreamDependency,
+	    String annotationPath) {
+
+	JavaType javaType = JspMetadata.getJavaType(upstreamDependency);
+	Path webPath = JspMetadata.getPath(upstreamDependency);
+	String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
+		javaType, webPath);
+	WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+		.get(webScaffoldMetadataKey);
+
+	// Retrieve Controller Entity
+	String entityMetadataInfo = webScaffoldMetadata
+		.getIdentifierForEntityMetadata();
+
+	JavaType entityJavaType = EntityMetadata
+		.getJavaType(entityMetadataInfo);
+
+	Path path = EntityMetadata.getPath(entityMetadataInfo);
+
+	String entityMetadataKey = EntityMetadata.createIdentifier(
+		entityJavaType, path);
+	EntityMetadata entityMetadata = (EntityMetadata) metadataService
+		.get(entityMetadataKey);
+
+	DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
+		.getItdTypeDetails();
+
+	// Retrieve the fields that are defined as OneToMany relationship.
+	List<FieldMetadata> fieldMetadataList = MemberFindingUtils
+		.getFieldsWithAnnotation(defaultItdTypeDetails.getGovernor(),
+			new JavaType(annotationPath));
+
+	return fieldMetadataList;
     }
 
 }
