@@ -97,7 +97,7 @@ public class PaginatedRealationMetadataProvider extends
 	return "gvNIX_related_entries";
     }
 
-	protected String getGovernorPhysicalTypeIdentifier(
+    protected String getGovernorPhysicalTypeIdentifier(
 	    String metadataIdentificationString) {
 	JavaType javaType = PaginatedRealationMetadata
 		.getJavaType(metadataIdentificationString);

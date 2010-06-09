@@ -18,12 +18,19 @@
  */
 package org.gvnix.web.relation.styles.roo.addon;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.addon.mvc.jsp.JspMetadata;
+import org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata;
+import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.metadata.*;
+import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.Path;
+import org.w3c.dom.Document;
 
 /**
  * Listens for {@link WebScaffoldMetadata} and produces JSPs when requested by
@@ -42,6 +49,11 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
     @Reference
     private MetadataDependencyRegistry metadataDependencyRegistry;
+
+    @Reference
+    private MetadataService metadataService;
+
+    protected ClassOrInterfaceTypeDetails governorTypeDetails;
 
     private static Logger logger = Logger.getLogger(PaginatedRelationMetadataListener.class.getName());
 
@@ -65,9 +77,56 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 					.getMetadataIdentiferType()))) {
 
 	    logger.warning("JspMetadata retrieved.");
+	    // JavaType javaType = JspMetadata.getJavaType(upstreamDependency);
 
+	    // org.gvnix.test.relation.list.table.web.NuevoController
+	    // @RooWebScaffold(path = "cars", formBackingObject = Car.class)
+	    // @OneToMany(cascade = CascadeType.ALL, mappedBy = "person")
+
+	    // Work out the MIDs of the other metadata we depend on
+
+	    JavaType javaType = JspMetadata.getJavaType(upstreamDependency);
+	    Path webPath = JspMetadata.getPath(upstreamDependency);
+	    String webScaffoldMetadataKey = WebScaffoldMetadata
+		    .createIdentifier(javaType, webPath);
+	    WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+		    .get(webScaffoldMetadataKey);
+
+	    // Retrieve Controller Entity
+	    String entityMetadataInfo = webScaffoldMetadata
+		    .getIdentifierForEntityMetadata();
+
+	    JavaType entityJavaType = EntityMetadata
+		    .getJavaType(entityMetadataInfo);
+
+	    Path path = EntityMetadata.getPath(entityMetadataInfo);
+
+	    String entityMetadataKey = EntityMetadata.createIdentifier(
+		    entityJavaType, path);
+	    EntityMetadata entityMetadata = (EntityMetadata) metadataService
+		    .get(entityMetadataKey);
+
+
+	    DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
+		    .getItdTypeDetails();
+
+	    
+	    // Retrieve the fields that are defined as OneToMany relationship.
+	    List<FieldMetadata> fieldMetadataList = MemberFindingUtils
+		    .getFieldsWithAnnotation(defaultItdTypeDetails
+			    .getGovernor(), new JavaType(
+			    "javax.persistence.OneToMany"));
+
+	    logger.warning("Entity field anotated with @oneToMany:\n"
+		    + fieldMetadataList.size());
 	}
 
+    }
+
+    /** return indicates if disk file was changed (ie updated or created) */
+    private boolean writeToDiskIfNecessary(String jspFilename, Document proposed) {
+	// TODO:
+	return true;
     }
 
 }
