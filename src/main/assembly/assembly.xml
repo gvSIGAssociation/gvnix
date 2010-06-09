@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>true</includeBaseDirectory>
+	<baseDirectory>gvNIX-${project.version}</baseDirectory>
+
+	<files>
+		<!-- Roo readme.txt -->
+		<file>
+			<source>${roo.distribution.final-location}/readme.txt</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>readme-roo.txt</destName>
+ 		</file>
+		<!-- gvNIX readme.txt -->
+		<file>
+			<source>src/main/assembly/readme.txt</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>readme.txt</destName>
+			<filtered>true</filtered>
+ 		</file>
+		<!-- Roo license.txt -->
+		<file>
+			<source>${roo.distribution.final-location}/legal/LICENSE.TXT</source>
+			<outputDirectory>/legal</outputDirectory>
+			<destName>ROO-LICENSE.TXT</destName>
+ 		</file>
+		<!-- gvNIX license.txt -->
+		<file>
+			<source>LICENSE.TXT</source>
+			<outputDirectory>/legal</outputDirectory>
+			<destName>LICENSE.TXT</destName>
+ 		</file>
+		<!-- gvNIX gvnix.sh -->
+		<file>
+			<source>${roo.distribution.final-location}/bin/roo.sh</source>
+			<outputDirectory>/bin</outputDirectory>
+			<destName>gvnix.sh</destName>
+			<fileMode>775</fileMode>
+ 		</file>
+		<!-- gvNIX gvnix.bat -->
+		<file>
+			<source>${roo.distribution.final-location}/bin/roo.bat</source>
+			<outputDirectory>/bin</outputDirectory>
+			<destName>gvnix.bat</destName>
+			<fileMode>775</fileMode>
+ 		</file>
+	</files>
+
+
+
+
+	<fileSets>
+		<!-- Roo bin -->
+		<fileSet>
+			<outputDirectory>/</outputDirectory>
+			<directory>${roo.distribution.final-location}</directory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<include>bin/**</include>
+			</includes>
+			<excludes>
+				<exclude>bin/roo.*</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/</outputDirectory>
+			<directory>${roo.distribution.final-location}</directory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<!-- Roo annotations -->
+				<include>annotations/**</include>
+				<!-- Roo bundle -->
+				<include>bundle/**</include>
+				<!-- Roo conf -->
+				<include>conf/**</include>
+				<!-- Roo legal -->
+				<include>legal/**</include>
+				<!-- Roo samples -->
+				<include>samples/**</include>
+			</includes>
+			<excludes>
+				<exclude>legal/LICENSE.txt</exclude>
+			</excludes>
+		</fileSet>
+		<!-- Roo docs -->
+		<fileSet>
+			<outputDirectory>/docs/roo</outputDirectory>
+			<directory>${roo.distribution.final-location}/docs</directory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<include>**</include>
+			</includes>
+		</fileSet>
+
+
+
+
+		<!-- gvNIX docs -->
+		<fileSet>
+			<outputDirectory>/docs/pdf</outputDirectory>
+			<directory>target/site/reference/pdf</directory>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/docs/html</outputDirectory>
+			<directory>target/site/reference/html</directory>
+		</fileSet>
+		<!-- gvNIX annotations -->
+		<fileSet>
+		    <outputDirectory>/annotations</outputDirectory>
+		    <directory>annotations/target</directory>
+		    <useDefaultExcludes>true</useDefaultExcludes>
+		    <includes>
+			<include>*.jar</include>
+		    </includes>
+		    <excludes>
+			<exclude>*-tests.jar</exclude>
+		    </excludes>
+		</fileSet>
+
+		<!-- gvNIX bundles -->
+		<fileSet>
+		    <outputDirectory>/bundle</outputDirectory>
+		    <directory>${project.build.directory}/bundle</directory>
+		    <useDefaultExcludes>true</useDefaultExcludes>
+		    <includes>
+			<include>*.jar</include>
+		    </includes>
+		</fileSet>
+		<!-- gvNIX themes -->
+		<fileSet>
+		    <outputDirectory>/themes</outputDirectory>
+		    <directory>themes</directory>
+		    <useDefaultExcludes>true</useDefaultExcludes>
+		    <includes>
+			    <include>**/*</include>
+		    </includes>
+		</fileSet>
+		<!-- gvNIX samples -->
+		<fileSet>
+		    <outputDirectory>/samples</outputDirectory>
+		    <directory>src/main/assembly/samples</directory>
+		    <useDefaultExcludes>true</useDefaultExcludes>
+		    <includes>
+			    <include>**/*</include>
+		    </includes>
+		</fileSet>
+
+	</fileSets>
+</assembly>

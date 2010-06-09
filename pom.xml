@@ -218,11 +218,12 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.0.1</version>
+		<version>2.1.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
 			<_include>${project.build.directory}/build-number.mf</_include>
+			<Export-Package>${pom.artifactId}.*;version=${pom.version}</Export-Package>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <Bundle-Copyright>Copyright ${pom.organization.name}.</Bundle-Copyright>
                         <Bundle-DocURL>${pom.url}</Bundle-DocURL>
@@ -259,7 +260,7 @@
 							<tasks>
                                 <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
                                 <if>
-                                    <equals arg1="${project.name}" arg2="Spring Roo"/>
+                                    <equals arg1="${project.name}" arg2="gvNIX"/>
                                     <then>
                                         <echo message="No need to copy '${project.name}'"/>
                                     </then>
@@ -286,6 +287,26 @@
                                         </if>
                                     </else>
                                 </if>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>extract-roo-distribution-for-assembly</id>
+						<phase>package</phase>
+						<configuration>
+
+							<tasks>
+                                <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
+				<if>
+                                    <equals arg1="${project.name}" arg2="gvNIX"/>
+                                    <then>
+                                    	<unzip src="roo-distributions/${roo.distribution.file}" 
+						dest="${roo.distribution.extract}"/>
+				    </then>
+				</if>
 							</tasks>
 						</configuration>
 						<goals>
@@ -487,8 +508,9 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2-beta-3</version>
                 <configuration>
+		    <finalName>${project.name}-${project.version}</finalName>
                     <descriptors>
-                        <descriptor>bootstrap/src/main/assembly/assembly.xml</descriptor>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
@@ -507,9 +529,11 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.0-beta-7</version>
                 <configuration>
+		    <releaseProfiles>release</releaseProfiles>
                     <tagBase>
                         http://webdav.cop.gva.es/svn/gvnix/tags
                     </tagBase>
+		    <goals>package site assembly:assembly</goals>
                 </configuration>
             </plugin>
             <!-- IDE -->
@@ -597,6 +621,21 @@
         <spring.version.osgi>[2.5.6.A]</spring.version.osgi>
 	<roo.version>1.1.0.M1</roo.version>
 	<gvnix.version>0.3.0-SNAPSHOT</gvnix.version>
+        <roo.distribution.file>spring-roo-1.1.0.M1.zip</roo.distribution.file>
+	<roo.distribution.extract>${project.build.directory}/roo-dist</roo.distribution.extract>
+	<roo.distribution.directory>spring-roo-1.1.0.M1</roo.distribution.directory>
+	<roo.distribution.final-location>${roo.distribution.extract}/${roo.distribution.directory}</roo.distribution.final-location>
     </properties>
+
+    <profiles>
+	    <profile>
+		    <id>release</id>
+		    <properties>
+		    	<connectionUrl>${project.scm.developerConnection}</connectionUrl>
+		    </properties>
+
+	    </profile>
+    </profiles>
+
 
 </project>

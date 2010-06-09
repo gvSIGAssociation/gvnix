@@ -1,0 +1,22 @@
+project --topLevelPackage org.gvnix.sample --java 5
+dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1
+dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3
+persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
+entity --class ~.domain.Entity1
+field string field1
+field string field2
+entity --class ~.domain.Entity2
+field string otherField1
+field string otherField2
+occ checksum all
+controller all --package ~.web
+controller jsp2.0 support
+theme install --name theme-gvNIX 
+theme set --name theme-gvNIX 
+page menu setup
+page add --name others --label Others
+page add --parent /others --name gvpontis --destination http://www.gvpontis.gva.es/ --label gvPONTIS
+page add --parent /others --name moskitt --destination http://www.moskitt.org/ --label MOSKitt
+page add --parent /others --name gvSIG --destination http://www.gvsig.org/ --label gvSIG
+page add --parent /others --name gvhidra --destination http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo/gvhidra-herramienta/ --label gvHIDRA
+exception handler add --exception java.io.IOException --title "Input Output Exception" --description "There were problems sending or receiving data" --language en
