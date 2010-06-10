@@ -30,14 +30,17 @@
 	<parent>
 		<groupId>org.gvnix</groupId>
 		<artifactId>org.gvnix.parent</artifactId>
-		<version>${gvnix.version}</version>
+		<version>0.3.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.gvnix</groupId>
 	<artifactId>org.gvnix.persistence.roo.addon</artifactId>
 	<packaging>bundle</packaging>
-	<version>${gvnix.version}</version>
+	<version>0.3.0-SNAPSHOT</version>
 	<name>gvNIX - Addon - Persistence</name>
 	<description>gvNIX persitence add-on</description>
+	<properties>
+		<gvnix.version>${parent.version}</gvnix.version>
+	</properties>
 	<dependencies>
         <!-- OSGi -->
          <dependency>

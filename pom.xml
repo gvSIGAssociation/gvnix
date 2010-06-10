@@ -32,7 +32,7 @@
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.parent</artifactId>
     <packaging>pom</packaging>
-    <version>${gvnix.version}</version>
+    <version>0.3.0-SNAPSHOT</version>
     <description>Spring Roo based RAD tool for Conselleria d'Infraestructures i Transport - Generalitat Valenciana</description>
     <name>gvNIX</name>
     <modules>
@@ -188,6 +188,12 @@
 
     <build>
         <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ftp</artifactId>
+         <version>1.0-beta-6</version>
+      </extension>
+
             <extension>
                 <groupId>org.springframework.build.aws</groupId>
                 <artifactId>org.springframework.build.aws.maven</artifactId>
@@ -301,10 +307,9 @@
 							<tasks>
                                 <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
 				<if>
-                                    <equals arg1="${project.name}" arg2="gvNIX"/>
+                                    <equals arg1="${project.name}" arg2="gvNIX" />
                                     <then>
-                                    	<unzip src="roo-distributions/${roo.distribution.file}" 
-						dest="${roo.distribution.extract}"/>
+                                    	<unzip src="roo-distributions/${roo.distribution.file}" dest="${roo.distribution.extract}" />
 				    </then>
 				</if>
 							</tasks>
@@ -523,17 +528,31 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.4</version>
+		<configuration>
+			<file>${project.build.directory}/${project.name}-${project.version}.zip</file>
+			<!-- <repositoryId>ftp-disid-cit</repositoryId> -->
+			<groupId>gvNIX-install</groupId>
+			<artifactId>gvNIX</artifactId>
+			<version>${project.version}</version>
+			<url>ftp://ftp.disid.com:2121/upload</url>
+			<packaging>zip</packaging>
+		</configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.0-beta-7</version>
+                <version>2.0</version>
                 <configuration>
-		    <releaseProfiles>release</releaseProfiles>
+		    <autoVersionSubmodules>true</autoVersionSubmodules>
+		    <!-- this declaration is optional because we're using standart svn layout -->
                     <tagBase>
                         http://webdav.cop.gva.es/svn/gvnix/tags
                     </tagBase>
-		    <goals>package site assembly:assembly</goals>
+		    <!-- this declaration is optional because we're using standart svn layout -->
+                    <branchBase>
+                        http://webdav.cop.gva.es/svn/gvnix/branches
+                    </branchBase>
+		    <goals>package site assembly:assembly deploy:deploy-file</goals>
                 </configuration>
             </plugin>
             <!-- IDE -->
@@ -620,22 +639,9 @@
         <spring.version>3.0.2.RELEASE</spring.version>
         <spring.version.osgi>[2.5.6.A]</spring.version.osgi>
 	<roo.version>1.1.0.M1</roo.version>
-	<gvnix.version>0.3.0-SNAPSHOT</gvnix.version>
         <roo.distribution.file>spring-roo-1.1.0.M1.zip</roo.distribution.file>
 	<roo.distribution.extract>${project.build.directory}/roo-dist</roo.distribution.extract>
 	<roo.distribution.directory>spring-roo-1.1.0.M1</roo.distribution.directory>
 	<roo.distribution.final-location>${roo.distribution.extract}/${roo.distribution.directory}</roo.distribution.final-location>
     </properties>
-
-    <profiles>
-	    <profile>
-		    <id>release</id>
-		    <properties>
-		    	<connectionUrl>${project.scm.developerConnection}</connectionUrl>
-		    </properties>
-
-	    </profile>
-    </profiles>
-
-
 </project>
