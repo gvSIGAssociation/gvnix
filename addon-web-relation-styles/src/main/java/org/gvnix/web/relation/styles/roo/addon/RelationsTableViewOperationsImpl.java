@@ -49,9 +49,9 @@ import org.springframework.roo.support.util.*;
  */
 @Component
 @Service
-public class RealtionsTableViewOperationsImpl implements RealtionsTableViewOperations {
+public class RelationsTableViewOperationsImpl implements RelationsTableViewOperations {
 
-    private static Logger logger = Logger.getLogger(RealtionsTableViewOperations.class.getName());
+    private static Logger logger = Logger.getLogger(RelationsTableViewOperations.class.getName());
 
     @Reference
     private FileManager fileManager;
@@ -73,7 +73,7 @@ public class RealtionsTableViewOperationsImpl implements RealtionsTableViewOpera
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.relation.styles.roo.addon.RealtionsTableViewOperations#copyTagx()
+     * @see org.gvnix.web.relation.styles.roo.addon.RelationsTableViewOperations#copyTagx()
      */
     public void copyTagx() {
 
@@ -126,6 +126,26 @@ public class RealtionsTableViewOperationsImpl implements RealtionsTableViewOpera
 		}
 	    }
 	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.web.relation.styles.roo.addon.RelationsTableViewOperations#
+     * isActivated()
+     */
+    public boolean isActivated() {
+	if (!isProjectAvailable()) {
+	    return false;
+	}
+
+	if (!fileManager.exists(pathResolver.getIdentifier(
+		Path.SRC_MAIN_WEBAPP,
+		"WEB-INF/tags/util/gvnixcallfunction.tagx"))) {
+	    return false;
+	}
+	return true;
     }
 
     /**

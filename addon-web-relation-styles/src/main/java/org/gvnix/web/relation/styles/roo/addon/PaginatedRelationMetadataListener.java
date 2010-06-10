@@ -21,8 +21,10 @@ package org.gvnix.web.relation.styles.roo.addon;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.beaninfo.BeanInfoMetadata;
 import org.springframework.roo.addon.entity.EntityMetadata;
@@ -55,7 +57,7 @@ import org.w3c.dom.Element;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component
+@Component(immediate = true)
 @Service
 public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	MetadataNotificationListener {
@@ -72,16 +74,23 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
     @Reference private ItdMetadataScanner itdMetadataScanner;
 
-    @Reference private MetadataDependencyRegistry dependencyRegistry;
-
     private WebScaffoldMetadata webScaffoldMetadata;
 
     private EntityMetadata entityMetadata;
 
     private BeanInfoMetadata beanInfoMetadata;
 
+    private RelationsTableViewOperations relationsTableViewOperations;
+
+    private ServiceReference serviceReference;
+
+    private ComponentContext context;
+
+    private static Logger logger = Logger.getLogger(PaginatedRelationMetadataListener.class.getName());
+
     protected void activate(ComponentContext context) {
 	metadataDependencyRegistry.addNotificationListener(this);
+	this.context = context;
     }
 
     /*
@@ -92,6 +101,13 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
      * java.lang.String, java.lang.String)
      */
     public void notify(String upstreamDependency, String downstreamDependency) {
+
+	logger.warning("Notificación:\t" + upstreamDependency);
+
+	RelationsTableViewOperations op = getRelationsTableViewOperations();
+	if (op == null || !op.isActivated()) {
+	    return;
+	}
 
 	if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
 		.equals(
@@ -120,7 +136,27 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
     }
 
-    /** return indicates if disk file was changed (ie updated or created) */
+    private RelationsTableViewOperations getRelationsTableViewOperations() {
+	if (relationsTableViewOperations == null) {
+	    relationsTableViewOperations = (RelationsTableViewOperations) context
+		    .getBundleContext()
+		    .getService(getOperationsServiceReference());
+	}
+	return relationsTableViewOperations;
+    }
+
+    private ServiceReference getOperationsServiceReference() {
+	if (serviceReference == null) {
+	    serviceReference = context.getBundleContext().getServiceReference(
+		    RelationsTableViewOperations.class.getName());
+	}
+	return serviceReference;
+    }
+
+    /**
+     * 
+     * return indicates if disk file was changed (ie updated or created)
+     */
     private boolean writeToDiskIfNecessary(String jspFilename, Document proposed) {
 
 	String controllerPath = webScaffoldMetadata.getAnnotationValues()
@@ -490,7 +526,7 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 			if (relationshipJavaType.compareTo(em
 				.getItdTypeDetails().getName()) == 0) {
 
-			    Set<String> downstream = dependencyRegistry
+			    Set<String> downstream = metadataDependencyRegistry
 				    .getDownstream(em.getId());
 			    // check to see if this entity metadata has a web
 			    // scaffold metadata listening to it

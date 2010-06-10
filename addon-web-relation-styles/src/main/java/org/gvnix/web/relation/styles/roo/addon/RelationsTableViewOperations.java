@@ -30,7 +30,7 @@ package org.gvnix.web.relation.styles.roo.addon;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public interface RealtionsTableViewOperations {
+public interface RelationsTableViewOperations {
 
     boolean isProjectAvailable();
 
@@ -38,4 +38,11 @@ public interface RealtionsTableViewOperations {
      * Copy tagx files to project WEB-INF directory.
      */
     void copyTagx();
+
+    /**
+     * Informs if table views relations are installed.
+     * 
+     * @return
+     */
+    public boolean isActivated();
 }

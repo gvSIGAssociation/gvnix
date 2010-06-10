@@ -36,12 +36,12 @@ import org.springframework.roo.shell.converters.StaticFieldConverter;
  */
 @Component
 @Service
-public class RealtionsTableViewCommands implements CommandMarker {
+public class RelationsTableViewCommands implements CommandMarker {
 
-    private static Logger logger = Logger.getLogger(RealtionsTableViewCommands.class.getName());
+    private static Logger logger = Logger.getLogger(RelationsTableViewCommands.class.getName());
 
     @Reference
-    private RealtionsTableViewOperations realtionsTableViewOperations;
+    private RelationsTableViewOperations relationsTableViewOperations;
 
     protected void activate(ComponentContext context) {
     }
@@ -51,13 +51,16 @@ public class RealtionsTableViewCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("relationships setup table")
     public boolean isCopyTagxAvailable() {
-	return realtionsTableViewOperations.isProjectAvailable(); // it's safe to always see the
+	return relationsTableViewOperations.isProjectAvailable()
+		&& !relationsTableViewOperations.isActivated(); // it's safe to
+								// always see
+								// the
 						// properties we expose
     }
 
     @CliCommand(value = "relationships setup table", help = "Installs the visualization for related entities grouped by tabs into tables.")
     public void copyTagx() {
-	realtionsTableViewOperations.copyTagx();
+	relationsTableViewOperations.copyTagx();
     }
 
 }
