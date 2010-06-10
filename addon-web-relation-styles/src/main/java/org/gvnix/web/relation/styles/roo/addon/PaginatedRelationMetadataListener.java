@@ -21,7 +21,6 @@ package org.gvnix.web.relation.styles.roo.addon;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.osgi.service.component.ComponentContext;
@@ -36,6 +35,7 @@ import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.itd.ItdMetadataScanner;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.metadata.*;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
@@ -55,36 +55,30 @@ import org.w3c.dom.Element;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component(immediate = true)
+@Component
 @Service
 public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	MetadataNotificationListener {
 
-    @Reference
-    private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference
-    private MetadataService metadataService;
+    @Reference private MetadataService metadataService;
 
-    @Reference
-    private FileManager fileManager;
+    @Reference private FileManager fileManager;
 
-    @Reference
-    private PathResolver pathResolver;
+    @Reference private PathResolver pathResolver;
 
-    @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    @Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
-    @Reference
-    private ItdMetadataScanner itdMetadataScanner;
+    @Reference private ItdMetadataScanner itdMetadataScanner;
+
+    @Reference private MetadataDependencyRegistry dependencyRegistry;
 
     private WebScaffoldMetadata webScaffoldMetadata;
 
     private EntityMetadata entityMetadata;
 
     private BeanInfoMetadata beanInfoMetadata;
-
-    private static Logger logger = Logger.getLogger(PaginatedRelationMetadataListener.class.getName());
 
     protected void activate(ComponentContext context) {
 	metadataDependencyRegistry.addNotificationListener(this);
@@ -113,7 +107,14 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    // Retrieve the associated jspx (show an update).
 	    if (!oneToManyFieldMetadatas.isEmpty()) {
 
-		updateView("show", oneToManyFieldMetadatas, "tab");
+
+		Document showDocument = updateView("show",
+			oneToManyFieldMetadatas, "tab");
+		writeToDiskIfNecessary("show", showDocument);
+
+		Document updateDocument = updateView("update",
+			oneToManyFieldMetadatas, "tab");
+		writeToDiskIfNecessary("update", updateDocument);
 	    }
 	}
 
@@ -121,8 +122,39 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
     /** return indicates if disk file was changed (ie updated or created) */
     private boolean writeToDiskIfNecessary(String jspFilename, Document proposed) {
-	// TODO:
-	return true;
+
+	String controllerPath = webScaffoldMetadata.getAnnotationValues()
+		.getPath();
+
+	if (controllerPath.startsWith("/")) {
+	    controllerPath = controllerPath.substring(1);
+	}
+
+	String jspxPath = pathResolver
+		.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/views/"
+			+ controllerPath + "/" + jspFilename + ".jspx");
+
+	Assert.isTrue(fileManager.exists(jspxPath), jspFilename
+		+ ".jspx not found");
+
+	Document jspxView;
+	MutableFile jspxMutableFile = null;
+
+	try {
+	    jspxMutableFile = fileManager.updateFile(jspxPath);
+	    jspxView = XmlUtils.getDocumentBuilder().parse(
+		    jspxMutableFile.getInputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+
+	if (jspxView.getTextContent().compareTo(proposed.getTextContent()) != 0) {
+
+	    XmlUtils.writeXml(jspxMutableFile.getOutputStream(), proposed);
+	    return true;
+	}
+
+	return false;
     }
 
     /**
@@ -209,7 +241,7 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
     private Document updateView(String viewName,
 	    List<FieldMetadata> oneToManyFieldMetadatas,
 	    String selectedDecorator) {
-	
+
 	DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
 		.getItdTypeDetails();
 
@@ -269,10 +301,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    divView.setAttribute("xmlns:table",
 		    "urn:jsptagdir:/WEB-INF/tags/form/fields");
 
-	    // xmlns:relations="urn:jsptagdir:/WEB-INF/tags/relations"
-	    // xmlns:relation="urn:jsptagdir:/WEB-INF/tags/relations/decorators"
-	    // xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields"
-
 	    groupViews = new XmlElementBuilder(
 		    "relations:" + selectedDecorator, jspxView).addAttribute(
 		    "id", "relations").build();
@@ -303,17 +331,25 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		delete = "true";
 	    }
 
-	    if (defaultField == null) {
-		break;
+	    if (defaultField != null) {
+		// Don't show the default view of relationship.
+		defaultField.setAttribute("render", "false");
 	    }
 
-	    // Don't show the default view of relationship.
-	    defaultField.setAttribute("render", "false");
-
-	    // relation="urn:jsptagdir:/WEB-INF/tags/relations/decorators"
-
 	    // Retrieve Related Entities Metadata
-	    relatedWebScaffoldMetadata = getRelatedEntityWebScaffoldMetadata(fieldMetadata);
+	    JavaType relationshipJavaType = fieldMetadata.getFieldType();
+	    // ignoring java.util.Map field types (see ROO-194)
+	    if (relationshipJavaType.getFullyQualifiedTypeName().equals(
+		    Set.class.getName())) {
+
+		Assert
+			.isTrue(
+				relationshipJavaType.getParameters().size() == 1,
+				"A set is defined without specification of its type (via generics) - unable to create view for it");
+	    }
+
+	    relationshipJavaType = relationshipJavaType.getParameters().get(0);
+	    relatedWebScaffoldMetadata = getRelatedEntityWebScaffoldMetadata(relationshipJavaType);
 
 	    // If doesn't exist related controller to entity relation.
 	    // Don't enable table action properties.
@@ -363,7 +399,36 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 				    .concat(".").concat(propertyName).concat(
 					    "}")).build();
 
-	    // TODO: Create column fields.
+	    // Create column fields and gruop the elements created.
+	    // <table:column
+	    // id="s:org.gvnix.test.relation.list.table.domain.Car.name"
+	    // property="name" z="user-managed"/>
+
+	    String idEntityMetadata = physicalTypeMetadataProvider
+		    .findIdentifier(relationshipJavaType);
+	    BeanInfoMetadata relatedBeanInfoMetadata = (BeanInfoMetadata) metadataService
+		    .get(idEntityMetadata);
+
+	    List<FieldMetadata> fieldMetadataList = getElegibleFields(relatedBeanInfoMetadata);
+	    Element columnField;
+
+	    String relatedEntityClassName = relatedBeanInfoMetadata.getItdTypeDetails().getName().getFullyQualifiedTypeName();
+	    String property;
+	    String z = "user-managed";
+
+	    for (FieldMetadata relatedEntityfieldMetadata : fieldMetadataList) {
+
+		property = relatedEntityfieldMetadata.getFieldName()
+			.getSymbolName();
+		columnField = new XmlElementBuilder("table:column", jspxView)
+			.addAttribute("id",
+				relatedEntityClassName.concat(property))
+			.addAttribute("property", z).addAttribute("z", z)
+			.build();
+
+		views.appendChild(columnField);
+	    }
+
 	    groupViews.appendChild(views);
 	}
 
@@ -372,87 +437,147 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
     }
 
     /**
-     * Retrieve the associated WebScaffoldMetada from a FieldMetada of related
-     * entity.
+     * Retrieve the associated WebScaffoldMetada from a JavaType.
      * 
-     * @param fieldMetadata
+     * @param relationshipJavaType
+     *            Relationship JavaType
      * @return
      */
     private WebScaffoldMetadata getRelatedEntityWebScaffoldMetadata(
-	    FieldMetadata fieldMetadata) {
+	    JavaType relationshipJavaType) {
 
 	WebScaffoldMetadata relationshipMetadata = null;
 	WebScaffoldMetadata tmpWebScaffoldMetadata;
 
-	// Retrieve relation type class name.
-	JavaType relationshipJavaType = fieldMetadata.getFieldType();
-	// ignoring java.util.Map field types (see ROO-194)
-	if (relationshipJavaType.equals(new JavaType(Map.class.getName()))) {
-	    return relationshipMetadata;
-	}
-	if (relationshipJavaType.getFullyQualifiedTypeName().equals(
-		Set.class.getName())) {
-	    if (relationshipJavaType.getParameters().size() != 1) {
-		throw new IllegalArgumentException(
-			"A set is defined without specification of its type (via generics) - unable to create view for it");
-	    }
-	    relationshipJavaType = relationshipJavaType.getParameters().get(0);
+	FileDetails srcRoot = new FileDetails(new File(pathResolver
+		.getRoot(Path.SRC_MAIN_JAVA)), null);
+	String antPath = pathResolver.getRoot(Path.SRC_MAIN_JAVA)
+		+ File.separatorChar + "**" + File.separatorChar + "*.java";
+	SortedSet<FileDetails> entries = fileManager
+		.findMatchingAntPath(antPath);
 
-	    FileDetails srcRoot = new FileDetails(new File(pathResolver
-		    .getRoot(Path.SRC_MAIN_JAVA)), null);
-	    String antPath = pathResolver.getRoot(Path.SRC_MAIN_JAVA)
-		    + File.separatorChar + "**" + File.separatorChar + "*.java";
-	    SortedSet<FileDetails> entries = fileManager
-		    .findMatchingAntPath(antPath);
+	for (FileDetails file : entries) {
+	    String fullPath = srcRoot.getRelativeSegment(file
+		    .getCanonicalPath());
+	    fullPath = fullPath.substring(1, fullPath.lastIndexOf(".java"))
+		    .replace(File.separatorChar, '.'); // ditch the first /
+	    // and .java
+	    JavaType javaType = new JavaType(fullPath);
+	    String id = physicalTypeMetadataProvider.findIdentifier(javaType);
+	    if (id != null) {
+		PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+			.get(id);
+		if (ptm == null
+			|| ptm.getPhysicalTypeDetails() == null
+			|| !(ptm.getPhysicalTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
+		    continue;
+		}
 
-	    for (FileDetails file : entries) {
-		String fullPath = srcRoot.getRelativeSegment(file
-			.getCanonicalPath());
-		fullPath = fullPath.substring(1, fullPath.lastIndexOf(".java"))
-			.replace(File.separatorChar, '.'); // ditch the first /
-		// and .java
-		JavaType javaType = new JavaType(fullPath);
-		String id = physicalTypeMetadataProvider
-			.findIdentifier(javaType);
-		if (id != null) {
-		    PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
-			    .get(id);
-		    if (ptm == null
-			    || ptm.getPhysicalTypeDetails() == null
-			    || !(ptm.getPhysicalTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
-			continue;
-		    }
+		ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) ptm
+			.getPhysicalTypeDetails();
+		if (Modifier.isAbstract(cid.getModifier())) {
+		    continue;
+		}
 
-		    ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) ptm
-			    .getPhysicalTypeDetails();
-		    if (Modifier.isAbstract(cid.getModifier())) {
-			continue;
-		    }
+		Set<MetadataItem> metadata = itdMetadataScanner.getMetadata(id);
+		WebScaffoldAnnotationValues tmpWebScaffoldAnnotationValues;
 
-		    Set<MetadataItem> metadata = itdMetadataScanner
-			    .getMetadata(id);
-		    WebScaffoldAnnotationValues tmpWebScaffoldAnnotationValues;
+		for (MetadataItem item : metadata) {
+		    
+		    if (item instanceof EntityMetadata) {
+			EntityMetadata em = (EntityMetadata) item;
 
-		    for (MetadataItem item : metadata) {
-			if (item instanceof WebScaffoldMetadata) {
-			    tmpWebScaffoldMetadata = (WebScaffoldMetadata) item;
+			if (relationshipJavaType.compareTo(em
+				.getItdTypeDetails().getName()) == 0) {
 
-			    tmpWebScaffoldAnnotationValues = tmpWebScaffoldMetadata
-				    .getAnnotationValues();
-
-			    if (relationshipJavaType
-				    .compareTo(tmpWebScaffoldAnnotationValues
-					    .getFormBackingObject()) == 0) {
-				relationshipMetadata = tmpWebScaffoldMetadata;
-				return relationshipMetadata;
+			    Set<String> downstream = dependencyRegistry
+				    .getDownstream(em.getId());
+			    // check to see if this entity metadata has a web
+			    // scaffold metadata listening to it
+			    for (String ds : downstream) {
+				if (WebScaffoldMetadata.isValid(ds)) {
+				    // there is already a controller for this
+				    // entity
+				    String entityMetadataKey = WebScaffoldMetadata
+					    .createIdentifier(
+						    WebScaffoldMetadata
+							    .getJavaType(ds),
+						    WebScaffoldMetadata
+							    .getPath(ds));
+				    relationshipMetadata = (WebScaffoldMetadata) metadataService
+					    .get(entityMetadataKey);
+				    return relationshipMetadata;
+				}
 			    }
-
 			}
 		    }
+				
+
+		    // if (item instanceof WebScaffoldMetadata) {
+		    // tmpWebScaffoldMetadata = (WebScaffoldMetadata) item;
+		    //
+		    // tmpWebScaffoldAnnotationValues = tmpWebScaffoldMetadata
+		    // .getAnnotationValues();
+		    //
+		    // if (relationshipJavaType
+		    // .compareTo(tmpWebScaffoldAnnotationValues
+		    // .getFormBackingObject()) == 0) {
+		    // relationshipMetadata = tmpWebScaffoldMetadata;
+		    // return relationshipMetadata;
+		    // }
+		    //
+		    // }
 		}
 	    }
 	}
 	return relationshipMetadata;
     }
 
+
+    /**
+     * Retrieve BeanInfoMetadata fields.
+     * 
+     * @return {@link FieldMetadata} list.
+     */
+    private List<FieldMetadata> getElegibleFields(
+	    BeanInfoMetadata beanInfoMetadata) {
+	List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
+	for (MethodMetadata method : beanInfoMetadata.getPublicAccessors(false)) {
+	    JavaSymbolName propertyName = BeanInfoMetadata
+		    .getPropertyNameForJavaBeanMethod(method);
+	    FieldMetadata field = beanInfoMetadata
+		    .getFieldForPropertyName(propertyName);
+
+	    if (field != null && hasMutator(field, beanInfoMetadata)) {
+
+		// Never include id field (it shouldn't normally have a mutator
+		// anyway, but the user might have added one)
+		if (MemberFindingUtils
+			.getAnnotationOfType(field.getAnnotations(),
+				new JavaType("javax.persistence.Id")) != null) {
+		    continue;
+		}
+		// Never include version field (it shouldn't normally have a
+		// mutator anyway, but the user might have added one)
+		if (MemberFindingUtils.getAnnotationOfType(field
+			.getAnnotations(), new JavaType(
+			"javax.persistence.Version")) != null) {
+		    continue;
+		}
+		fields.add(field);
+	    }
+	}
+	return fields;
+    }
+
+    private boolean hasMutator(FieldMetadata fieldMetadata,
+	    BeanInfoMetadata beanInfoMetadata) {
+	for (MethodMetadata mutator : beanInfoMetadata.getPublicMutators()) {
+	    if (fieldMetadata.equals(beanInfoMetadata
+		    .getFieldForPropertyName(BeanInfoMetadata
+			    .getPropertyNameForJavaBeanMethod(mutator))))
+		return true;
+	}
+	return false;
+    }
 }
