@@ -18,6 +18,8 @@
  */
 package org.gvnix.web.relation.styles.roo.addon;
 
+import java.io.File;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -26,8 +28,13 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.beaninfo.BeanInfoMetadata;
 import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.addon.mvc.jsp.JspMetadata;
+import org.springframework.roo.addon.web.mvc.controller.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata;
+import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.details.*;
+import org.springframework.roo.classpath.itd.ItdMetadataScanner;
+import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.metadata.*;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
@@ -64,6 +71,12 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
     @Reference
     private PathResolver pathResolver;
+
+    @Reference
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+
+    @Reference
+    private ItdMetadataScanner itdMetadataScanner;
 
     private WebScaffoldMetadata webScaffoldMetadata;
 
@@ -265,10 +278,15 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		    "id", "relations").build();
 	}
 
+	WebScaffoldMetadata relatedWebScaffoldMetadata;
+
+	// Show initialized table properties.
+	String create = "false";
+	String delete = "false";
+	String update = "false";
+
 	// Add the relationship views.
 	for (FieldMetadata fieldMetadata : oneToManyFieldMetadatas) {
-
-	    // "/div/display[@field='/" + exceptionViewName + "']"
 
 	    if (viewName.compareTo("show") == 0) {
 
@@ -276,11 +294,13 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 			"/div/show/display[@field='"
 				+ fieldMetadata.getFieldName() + "']",
 			documentRoot);
+		delete = "false";
 	    } else if (viewName.compareTo("update") == 0) {
 		defaultField = XmlUtils.findFirstElement(
 			"/div/update/simple[@field='"
 				+ fieldMetadata.getFieldName() + "']",
 			documentRoot);
+		delete = "true";
 	    }
 
 	    if (defaultField == null) {
@@ -292,51 +312,147 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
 	    // relation="urn:jsptagdir:/WEB-INF/tags/relations/decorators"
 
+	    // Retrieve Related Entities Metadata
+	    relatedWebScaffoldMetadata = getRelatedEntityWebScaffoldMetadata(fieldMetadata);
+
+	    // If doesn't exist related controller to entity relation.
+	    // Don't enable table action properties.
+	    if (relatedWebScaffoldMetadata == null) {
+		create = "false";
+		delete = "false";
+		update = "false";
+	    } else {
+		create = "true";
+		update = "true";
+	    }
+
+	    // Check if exists the path.
+	    String path = "/".concat(relatedWebScaffoldMetadata
+		    .getAnnotationValues().getPath());
+
 	    String propertyName = fieldMetadata.getFieldName().getSymbolName();
 
-	    views = new XmlElementBuilder("relation:" + selectedDecorator
-		    + "view", jspxView)
-		    .addAttribute("data",
-			    "${" + StringUtils.uncapitalize(entityName) + "}")
-		    .addAttribute("id",
-			    "s:" + fieldMetadata.getFieldName().getSymbolName())
+	    views = new XmlElementBuilder("relation:".concat(selectedDecorator)
+		    .concat("view"), jspxView)
+		    .addAttribute(
+			    "data",
+			    "${".concat(StringUtils.uncapitalize(entityName))
+				    .concat("}"))
+		    .addAttribute(
+			    "id",
+			    "s:"
+				    + beanInfoMetadata.getJavaBean()
+					    .getFullyQualifiedTypeName()
+					    .concat(".").concat(propertyName))
 		    .addAttribute("field",
 			    fieldMetadata.getFieldName().getSymbolName())
-		    .addAttribute("fieldId",
-			    "l:" + fieldMetadata.getFieldName().getSymbolName())
+		    .addAttribute(
+			    "fieldId",
+			    "l:"
+				    + beanInfoMetadata.getJavaBean()
+					    .getFullyQualifiedTypeName()
+					    .concat(".").concat(propertyName))
 		    .addAttribute("messageCode", "entity.reference.not.managed")
 		    .addAttribute("messageCodeAttribute", entityName)
-		    .addAttribute(
-			    "path",
-			    "/"
-				    + StringUtils
-					    .uncapitalize(fieldMetadata
-						    .getFieldType()
-						    .getSimpleTypeName()))
-		    .addAttribute("delete", "false").addAttribute("dataResult",
-			    propertyName + "list").addAttribute(
+		    .addAttribute("path", path).addAttribute("delete", delete)
+		    .addAttribute("create", create).addAttribute("update",
+			    update).addAttribute("dataResult",
+			    propertyName.concat("list")).addAttribute(
 			    "relatedEntitySet",
-			    "${" + StringUtils.uncapitalize(entityName) + "."
-				    + propertyName + "}").build();
+			    "${".concat(StringUtils.uncapitalize(entityName))
+				    .concat(".").concat(propertyName).concat(
+					    "}")).build();
 
+	    // TODO: Create column fields.
 	    groupViews.appendChild(views);
-	    // <relation:tabview
-	    // data="${person}"
-	    // id="s:org.gvnix.test.relation.list.table.domain.Person.coches"
-	    // field="coches"
-	    // fieldId="l:org.gvnix.test.relation.list.table.domain.Person.coches"
-	    // messageCode="entity.reference.not.managed"
-	    // messageCodeAttribute="Person"
-	    // path="/cars"
-	    // delete="false"
-	    // dataResult="cocheslist"
-	    // relatedEntitySet="${person.coches}">
-
-	    logger.warning("Created element:\n" + views.toString());
 	}
 
 	jspxView.getLastChild().appendChild(groupViews);
 	return jspxView;
+    }
+
+    /**
+     * Retrieve the associated WebScaffoldMetada from a FieldMetada of related
+     * entity.
+     * 
+     * @param fieldMetadata
+     * @return
+     */
+    private WebScaffoldMetadata getRelatedEntityWebScaffoldMetadata(
+	    FieldMetadata fieldMetadata) {
+
+	WebScaffoldMetadata relationshipMetadata = null;
+	WebScaffoldMetadata tmpWebScaffoldMetadata;
+
+	// Retrieve relation type class name.
+	JavaType relationshipJavaType = fieldMetadata.getFieldType();
+	// ignoring java.util.Map field types (see ROO-194)
+	if (relationshipJavaType.equals(new JavaType(Map.class.getName()))) {
+	    return relationshipMetadata;
+	}
+	if (relationshipJavaType.getFullyQualifiedTypeName().equals(
+		Set.class.getName())) {
+	    if (relationshipJavaType.getParameters().size() != 1) {
+		throw new IllegalArgumentException(
+			"A set is defined without specification of its type (via generics) - unable to create view for it");
+	    }
+	    relationshipJavaType = relationshipJavaType.getParameters().get(0);
+
+	    FileDetails srcRoot = new FileDetails(new File(pathResolver
+		    .getRoot(Path.SRC_MAIN_JAVA)), null);
+	    String antPath = pathResolver.getRoot(Path.SRC_MAIN_JAVA)
+		    + File.separatorChar + "**" + File.separatorChar + "*.java";
+	    SortedSet<FileDetails> entries = fileManager
+		    .findMatchingAntPath(antPath);
+
+	    for (FileDetails file : entries) {
+		String fullPath = srcRoot.getRelativeSegment(file
+			.getCanonicalPath());
+		fullPath = fullPath.substring(1, fullPath.lastIndexOf(".java"))
+			.replace(File.separatorChar, '.'); // ditch the first /
+		// and .java
+		JavaType javaType = new JavaType(fullPath);
+		String id = physicalTypeMetadataProvider
+			.findIdentifier(javaType);
+		if (id != null) {
+		    PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+			    .get(id);
+		    if (ptm == null
+			    || ptm.getPhysicalTypeDetails() == null
+			    || !(ptm.getPhysicalTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
+			continue;
+		    }
+
+		    ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) ptm
+			    .getPhysicalTypeDetails();
+		    if (Modifier.isAbstract(cid.getModifier())) {
+			continue;
+		    }
+
+		    Set<MetadataItem> metadata = itdMetadataScanner
+			    .getMetadata(id);
+		    WebScaffoldAnnotationValues tmpWebScaffoldAnnotationValues;
+
+		    for (MetadataItem item : metadata) {
+			if (item instanceof WebScaffoldMetadata) {
+			    tmpWebScaffoldMetadata = (WebScaffoldMetadata) item;
+
+			    tmpWebScaffoldAnnotationValues = tmpWebScaffoldMetadata
+				    .getAnnotationValues();
+
+			    if (relationshipJavaType
+				    .compareTo(tmpWebScaffoldAnnotationValues
+					    .getFormBackingObject()) == 0) {
+				relationshipMetadata = tmpWebScaffoldMetadata;
+				return relationshipMetadata;
+			    }
+
+			}
+		    }
+		}
+	    }
+	}
+	return relationshipMetadata;
     }
 
 }
