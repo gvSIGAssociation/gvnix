@@ -50,7 +50,7 @@ public class RelationsTableViewCommands implements CommandMarker {
     }
 
     @CliAvailabilityIndicator("relationships setup table")
-    public boolean isCopyTagxAvailable() {
+    public boolean isSetUpAvailable() {
 	return relationsTableViewOperations.isProjectAvailable(); // it's safe
 								  // to
 								// always see
@@ -59,8 +59,8 @@ public class RelationsTableViewCommands implements CommandMarker {
     }
 
     @CliCommand(value = "relationships setup table", help = "Installs the visualization for related entities grouped by tabs into tables.")
-    public void copyTagx() {
-	relationsTableViewOperations.copyTagx();
+    public void setUp() {
+	relationsTableViewOperations.setUp();
     }
 
 }

@@ -35,9 +35,20 @@ public interface RelationsTableViewOperations {
     boolean isProjectAvailable();
 
     /**
+     * Set up relations table views.
+     */
+    public void setUp();
+
+    /**
      * Copy tagx files to project WEB-INF directory.
      */
-    void copyTagx();
+    public void copyTagx();
+
+    /**
+     * Launch entity filter to genrate AspectJ for entities with @OneToMany
+     * relationship.
+     */
+    public void launchEntityFilter();
 
     /**
      * Informs if table views relations are installed.

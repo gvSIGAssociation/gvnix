@@ -20,22 +20,24 @@ package org.gvnix.web.relation.styles.roo.addon;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.net.URL;
-import java.util.Date;
 import java.util.Set;
-import java.util.logging.Level;
+import java.util.SortedSet;
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
+import org.apache.felix.scr.annotations.*;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.addon.entity.EntityMetadata;
+import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.itd.ItdMetadataScanner;
+import org.springframework.roo.file.monitor.event.FileDetails;
+import org.springframework.roo.metadata.*;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.*;
 import org.springframework.roo.support.util.*;
 
 /**
@@ -60,6 +62,15 @@ public class RelationsTableViewOperationsImpl implements RelationsTableViewOpera
     @Reference
     private PathResolver pathResolver;
 
+    @Reference
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+
+    @Reference
+    private ItdMetadataScanner itdMetadataScanner;
+
+    @Reference
+    private MetadataDependencyRegistry dependencyRegistry;
+
     private ComponentContext context;
 
     protected void activate(ComponentContext context) {
@@ -73,6 +84,20 @@ public class RelationsTableViewOperationsImpl implements RelationsTableViewOpera
     /*
      * (non-Javadoc)
      * 
+     * @see
+     * org.gvnix.web.relation.styles.roo.addon.RelationsTableViewOperations#
+     * setUp()
+     */
+    public void setUp() {
+	// Copy tagx to the project.
+	copyTagx();
+
+	// Launch search for entity manager.
+	launchEntityFilter();
+    }
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.gvnix.web.relation.styles.roo.addon.RelationsTableViewOperations#copyTagx()
      */
     public void copyTagx() {
@@ -82,6 +107,57 @@ public class RelationsTableViewOperationsImpl implements RelationsTableViewOpera
 		.getIdentifier(Path.SRC_MAIN_WEBAPP,
 			"/WEB-INF/tags/relations/decorators"));
 	copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"));
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.web.relation.styles.roo.addon.RelationsTableViewOperations#
+     * launchEntityFilter()
+     */
+    public void launchEntityFilter() {
+	FileDetails srcRoot = new FileDetails(new File(pathResolver
+		.getRoot(Path.SRC_MAIN_JAVA)), null);
+	String antPath = pathResolver.getRoot(Path.SRC_MAIN_JAVA)
+		+ File.separatorChar + "**" + File.separatorChar + "*.java";
+	SortedSet<FileDetails> entries = fileManager
+		.findMatchingAntPath(antPath);
+
+	for (FileDetails file : entries) {
+	    String fullPath = srcRoot.getRelativeSegment(file
+		    .getCanonicalPath());
+	    fullPath = fullPath.substring(1, fullPath.lastIndexOf(".java"))
+		    .replace(File.separatorChar, '.'); // ditch the first / and
+						       // .java
+	    JavaType javaType = new JavaType(fullPath);
+	    String id = physicalTypeMetadataProvider.findIdentifier(javaType);
+	    if (id != null) {
+		PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+			.get(id);
+		if (ptm == null
+			|| ptm.getPhysicalTypeDetails() == null
+			|| !(ptm.getPhysicalTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
+		    continue;
+		}
+
+		ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) ptm
+			.getPhysicalTypeDetails();
+		if (Modifier.isAbstract(cid.getModifier())) {
+		    continue;
+		}
+
+		Set<MetadataItem> metadata = itdMetadataScanner.getMetadata(id);
+		for (MetadataItem item : metadata) {
+		    if (item instanceof EntityMetadata) {
+			EntityMetadata em = (EntityMetadata) item;
+
+			dependencyRegistry.notifyDownstream(em.getId());
+		    }
+		}
+	    }
+	}
+	return;
     }
     /**
      * This method will copy the contents of a directory to another if the

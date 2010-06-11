@@ -106,35 +106,35 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
 
 
-	if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
-		.equals(
-			MetadataIdentificationUtils
-				.getMetadataClass(JspMetadata
-					.getMetadataIdentiferType()))) {
-	    
-		RelationsTableViewOperations op = getRelationsTableViewOperations();
-		if (op == null || !op.isActivated()) {
-		    return;
-		}
-
-	    // Work out the MIDs of the other metadata we depend on
-	    String annotationPath = "javax.persistence.OneToMany";
-	    List<FieldMetadata> oneToManyFieldMetadatas = getAnnotatedFields(
-		    upstreamDependency, annotationPath);
-
-	    // Retrieve the associated jspx (show an update).
-	    if (!oneToManyFieldMetadatas.isEmpty()) {
-
-
-		Document showDocument = updateView("show",
-			oneToManyFieldMetadatas, "tab");
-		writeToDiskIfNecessary("show", showDocument);
-
-		Document updateDocument = updateView("update",
-			oneToManyFieldMetadatas, "tab");
-		writeToDiskIfNecessary("update", updateDocument);
-	    }
-	}
+	// if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
+	// .equals(
+	// MetadataIdentificationUtils
+	// .getMetadataClass(JspMetadata
+	// .getMetadataIdentiferType()))) {
+	//	    
+	// RelationsTableViewOperations op = getRelationsTableViewOperations();
+	// if (op == null || !op.isActivated()) {
+	// return;
+	// }
+	//
+	// // Work out the MIDs of the other metadata we depend on
+	// String annotationPath = "javax.persistence.OneToMany";
+	// List<FieldMetadata> oneToManyFieldMetadatas = getAnnotatedFields(
+	// upstreamDependency, annotationPath);
+	//
+	// // Retrieve the associated jspx (show an update).
+	// if (!oneToManyFieldMetadatas.isEmpty()) {
+	//
+	//
+	// Document showDocument = updateView("show",
+	// oneToManyFieldMetadatas, "tab");
+	// writeToDiskIfNecessary("show", showDocument);
+	//
+	// Document updateDocument = updateView("update",
+	// oneToManyFieldMetadatas, "tab");
+	// writeToDiskIfNecessary("update", updateDocument);
+	// }
+	// }
 
     }
 
