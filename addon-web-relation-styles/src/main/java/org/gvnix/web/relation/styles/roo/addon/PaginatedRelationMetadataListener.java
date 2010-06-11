@@ -104,16 +104,18 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
 	logger.warning("Notificación:\t" + upstreamDependency);
 
-	RelationsTableViewOperations op = getRelationsTableViewOperations();
-	if (op == null || !op.isActivated()) {
-	    return;
-	}
+
 
 	if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
 		.equals(
 			MetadataIdentificationUtils
 				.getMetadataClass(JspMetadata
 					.getMetadataIdentiferType()))) {
+	    
+		RelationsTableViewOperations op = getRelationsTableViewOperations();
+		if (op == null || !op.isActivated()) {
+		    return;
+		}
 
 	    // Work out the MIDs of the other metadata we depend on
 	    String annotationPath = "javax.persistence.OneToMany";
@@ -387,20 +389,22 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    relationshipJavaType = relationshipJavaType.getParameters().get(0);
 	    relatedWebScaffoldMetadata = getRelatedEntityWebScaffoldMetadata(relationshipJavaType);
 
+	    // Check if exists the path.
+	    String path;
+
 	    // If doesn't exist related controller to entity relation.
 	    // Don't enable table action properties.
 	    if (relatedWebScaffoldMetadata == null) {
 		create = "false";
 		delete = "false";
 		update = "false";
+		path = "/";
 	    } else {
 		create = "true";
 		update = "true";
+		path = "/".concat(relatedWebScaffoldMetadata
+			.getAnnotationValues().getPath());
 	    }
-
-	    // Check if exists the path.
-	    String path = "/".concat(relatedWebScaffoldMetadata
-		    .getAnnotationValues().getPath());
 
 	    String propertyName = fieldMetadata.getFieldName().getSymbolName();
 

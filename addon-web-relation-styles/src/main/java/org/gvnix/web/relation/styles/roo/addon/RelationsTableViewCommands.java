@@ -51,8 +51,8 @@ public class RelationsTableViewCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("relationships setup table")
     public boolean isCopyTagxAvailable() {
-	return relationsTableViewOperations.isProjectAvailable()
-		&& !relationsTableViewOperations.isActivated(); // it's safe to
+	return relationsTableViewOperations.isProjectAvailable(); // it's safe
+								  // to
 								// always see
 								// the
 						// properties we expose
