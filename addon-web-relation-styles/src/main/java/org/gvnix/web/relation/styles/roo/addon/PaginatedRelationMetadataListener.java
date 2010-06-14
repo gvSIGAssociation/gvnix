@@ -92,7 +92,10 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
     private ComponentContext context;
 
-    private static Logger logger = Logger.getLogger(PaginatedRelationMetadataListener.class.getName());
+    private List<String> upstreamDependencyList = new ArrayList<String>();
+
+    private static Logger logger = Logger
+	    .getLogger(PaginatedRelationMetadataListener.class.getName());
 
     protected void activate(ComponentContext context) {
 	this.context = context;
@@ -112,15 +115,14 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
 	logger.warning("Notificación:\t" + upstreamDependency);
 
-
-
 	if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
 		.equals(
 			MetadataIdentificationUtils
 				.getMetadataClass(JspMetadata
 					.getMetadataIdentiferType()))) {
 
-	    // TODO: Add upstreamDependency to a Stack.
+	    // Add upstreamDependency to a Stack.
+	    upstreamDependencyList.add(upstreamDependency);
 	}
 
     }
@@ -128,8 +130,8 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
     private RelationsTableViewOperations getRelationsTableViewOperations() {
 	if (relationsTableViewOperations == null) {
 	    relationsTableViewOperations = (RelationsTableViewOperations) context
-		    .getBundleContext()
-		    .getService(getOperationsServiceReference());
+		    .getBundleContext().getService(
+			    getOperationsServiceReference());
 	}
 	return relationsTableViewOperations;
     }
@@ -162,24 +164,14 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	Assert.isTrue(fileManager.exists(jspxPath), jspFilename
 		+ ".jspx not found");
 
-	Document jspxView;
-	MutableFile jspxMutableFile = null;
-
 	try {
-	    jspxMutableFile = fileManager.updateFile(jspxPath);
-	    jspxView = XmlUtils.getDocumentBuilder().parse(
-		    jspxMutableFile.getInputStream());
+	    XmlUtils.writeXml(fileManager.updateFile(jspxPath)
+		    .getOutputStream(), proposed);
 	} catch (Exception e) {
 	    throw new IllegalStateException(e);
 	}
 
-	if (jspxView.getTextContent().compareTo(proposed.getTextContent()) != 0) {
-
-	    XmlUtils.writeXml(jspxMutableFile.getOutputStream(), proposed);
-	    return true;
-	}
-
-	return false;
+	return true;
     }
 
     /**
@@ -287,12 +279,10 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		+ ".jspx not found");
 
 	Document jspxView;
-	MutableFile jspxMutableFile = null;
 
 	try {
-	    jspxMutableFile = fileManager.updateFile(jspxPath);
 	    jspxView = XmlUtils.getDocumentBuilder().parse(
-		    jspxMutableFile.getInputStream());
+		    fileManager.getInputStream(jspxPath));
 	} catch (Exception e) {
 	    throw new IllegalStateException(e);
 	}
@@ -338,6 +328,9 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	String delete = "false";
 	String update = "false";
 
+	// Check if exists view elements to update the jspx.
+	Boolean updateJspx = false;
+
 	// Add the relationship views.
 	for (FieldMetadata fieldMetadata : oneToManyFieldMetadatas) {
 
@@ -356,9 +349,12 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		delete = "true";
 	    }
 
-	    if (defaultField != null) {
+	    if ((defaultField != null)
+		    && ((defaultField.getAttribute("render").compareTo("") == 0) || (defaultField
+			    .getAttribute("render").compareTo("true") == 0))) {
 		// Don't show the default view of relationship.
 		defaultField.setAttribute("render", "false");
+		updateJspx = true;
 	    }
 
 	    // Retrieve Related Entities Metadata
@@ -395,6 +391,23 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
 	    String propertyName = fieldMetadata.getFieldName().getSymbolName();
 
+	    // Check if the child node exists.
+	    views = XmlUtils.findFirstElement("/div/"
+		    + selectedDecorator
+		    + "/"
+		    + selectedDecorator.concat("view")
+		    + "[@id='"
+		    + "s:"
+		    + beanInfoMetadata.getJavaBean()
+			    .getFullyQualifiedTypeName().concat(".").concat(
+				    propertyName) + "']", documentRoot);
+
+	    if (views == null) {
+		updateJspx = true;
+	    } else {
+		continue;
+	    }
+
 	    views = new XmlElementBuilder("relation:".concat(selectedDecorator)
 		    .concat("view"), jspxView)
 		    .addAttribute(
@@ -426,20 +439,38 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 				    .concat(".").concat(propertyName).concat(
 					    "}")).build();
 
-	    // Create column fields and gruop the elements created.
+	    // Create column fields and group the elements created.
 	    // <table:column
 	    // id="s:org.gvnix.test.relation.list.table.domain.Car.name"
 	    // property="name" z="user-managed"/>
 
 	    String idEntityMetadata = physicalTypeMetadataProvider
 		    .findIdentifier(relationshipJavaType);
-	    BeanInfoMetadata relatedBeanInfoMetadata = (BeanInfoMetadata) metadataService
-		    .get(idEntityMetadata);
+
+	    Set<MetadataItem> metadata = itdMetadataScanner
+		    .getMetadata(idEntityMetadata);
+
+	    BeanInfoMetadata relatedBeanInfoMetadata = null;
+
+	    for (MetadataItem item : metadata) {
+		if (item instanceof BeanInfoMetadata) {
+		    relatedBeanInfoMetadata = (BeanInfoMetadata) item;
+		    break;
+		}
+	    }
+
+	    Assert.notNull(relatedBeanInfoMetadata,
+		    "There is no metadata related for this identifier:\t"
+			    + idEntityMetadata);
+
+	    // relatedBeanInfoMetadata = (BeanInfoMetadata) metadataService
+	    // .get(idEntityMetadata);
 
 	    List<FieldMetadata> fieldMetadataList = getElegibleFields(relatedBeanInfoMetadata);
 	    Element columnField;
 
-	    String relatedEntityClassName = relatedBeanInfoMetadata.getItdTypeDetails().getName().getFullyQualifiedTypeName();
+	    String relatedEntityClassName = relatedBeanInfoMetadata
+		    .getItdTypeDetails().getName().getFullyQualifiedTypeName();
 	    String property;
 	    String z = "user-managed";
 
@@ -459,8 +490,12 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    groupViews.appendChild(views);
 	}
 
-	jspxView.getLastChild().appendChild(groupViews);
-	return jspxView;
+	if (updateJspx) {
+	    jspxView.getLastChild().appendChild(groupViews);
+	    return jspxView;
+	} else {
+	    return null;
+	}
     }
 
     /**
@@ -510,7 +545,7 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		WebScaffoldAnnotationValues tmpWebScaffoldAnnotationValues;
 
 		for (MetadataItem item : metadata) {
-		    
+
 		    if (item instanceof EntityMetadata) {
 			EntityMetadata em = (EntityMetadata) item;
 
@@ -538,7 +573,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 			    }
 			}
 		    }
-				
 
 		    // if (item instanceof WebScaffoldMetadata) {
 		    // tmpWebScaffoldMetadata = (WebScaffoldMetadata) item;
@@ -559,7 +593,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	}
 	return relationshipMetadata;
     }
-
 
     /**
      * Retrieve BeanInfoMetadata fields.
@@ -635,7 +668,43 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
      * 
      */
     public void performDelayed() {
-	// TODO Auto-generated method stub
+
 	logger.warning("Operations delayed.");
+
+	// Work out the MIDs of the other metadata we depend on
+	String annotationPath = "javax.persistence.OneToMany";
+
+	Iterator<String> iter = upstreamDependencyList.iterator();
+	if (!iter.hasNext()) {
+	    return;
+	}
+
+	String upstreamDependency;
+
+	while (iter.hasNext()) {
+	    upstreamDependency = iter.next();
+
+	    List<FieldMetadata> oneToManyFieldMetadatas = getAnnotatedFields(
+		    upstreamDependency, annotationPath);
+
+	    // Retrieve the associated jspx (show an update).
+	    if (!oneToManyFieldMetadatas.isEmpty()) {
+
+		Document showDocument = updateView("show",
+			oneToManyFieldMetadatas, "tab");
+		if (showDocument != null) {
+		    writeToDiskIfNecessary("show", showDocument);
+		}
+
+		Document updateDocument = updateView("update",
+			oneToManyFieldMetadatas, "tab");
+		if (updateDocument != null) {
+		    writeToDiskIfNecessary("update", updateDocument);
+		}
+	    }
+
+	    iter.remove();
+	}
+
     }
 }
