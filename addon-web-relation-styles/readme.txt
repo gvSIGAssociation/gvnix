@@ -20,17 +20,24 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 
 .. |date| date::
 
-Requirements
-=============
+Introduction
+===============
 
-Development mode
------------------
+Add-on update jspx views from entities that have OneToMany mapped relationship to show them inside tabs.
 
-Runtime mode
--------------
+Project contents
+=================
 
-Make gvNIX installation
-------------------------
+This folder contains add-on sources and documents folder ``docs`` with documentation of this project.
+
+Features
+===========
+
+This add-ons have this features:
+
+#. Installs new tagx in the project.
+#. Generates AspectJ files.
+#. Update the jspx views.
 
 Installation Proof
 ===================
@@ -39,6 +46,8 @@ Install the Add-on.
 --------------------
 
 Install the Add-on in gvNIX/Roo shell with the required commands for 1.1.0-M1 version.
+
+Follow instructions of document https://svn.disid.com/svn/gvcit/gvNIX/roo-addon-roo-1.1.rst .
 
 Create a web application
 -------------------------
@@ -62,14 +71,18 @@ After copying tagx files, generate AspectJ files and new jspx views, run again t
 Uninstall the Add-on
 =====================
 
-To remove the Add-on you have to delete **gvnixcallfunction.tagx** file located in::
+To remove the Add-on functionalities from your project you have to delete **gvnixcallfunction.tagx** file located in::
 
  - src/main/webapp/WEB-INF/tags/util/gvnixcallfunction.tagx
+
+Remove all related entities called with the tagx in jspx show and update.
 
 Future enhancements
 ====================
 
 Choose between two types of visualization for oneToMany relationships:
-1
+
 # Tabs: Show the relationships 1-n between entities inside tabs.
 # Accordion: Show the relationships 1-n between entities inside panels (current default option).
+
+# Remove command: To remove all related entities called with the tagx in jspx (show and update). 

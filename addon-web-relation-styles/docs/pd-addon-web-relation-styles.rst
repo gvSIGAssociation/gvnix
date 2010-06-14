@@ -85,8 +85,8 @@ Retrieve the metadata to be written. Always checks the Entity to generate the me
 Create MetadataListener
 ------------------------
 
-Crear un listener que extienda de MetadataListener para escuchar a RooWebSaffold o JspMetadata. INFO.
-# Register the MetadataListener (@Service, @Component).
+Create a listener that implements ``MetadataNotificationListener`` to listen JspMetadata notifications.
+# Register the MetadataListener (@Service, @Component(immediate = true)).
 # Check if have been added 1-n LAZY relationships to the entities.
 - Use the defined access method to the entity metadata properties to be show in jspx.
 # Check **always** the generated code using Strings (the z attribute can't be used).
@@ -95,26 +95,35 @@ Jspx files
 ...........
 
 Acceder a las jspx show y update.
+Access to show and update jspx files::
 
-* El atributo ``render`` de las relaciones generadas por rooWebScaffold ponerlo a false para que no muestre lo que genera Roo.
-* Crear la llamada al tag que engloba las relaciones fuera del tag de page (page:show o page:update que utiliza Roo).
+* Set ``render`` attribute in OneToMany relationships to false.
+* Create the new tagx call to show related entities outside tagx page (page:show or page:update depending what jspx you are checking).
 
-  * Comprobar si existe en la jspx
-  * Si no existe
+  * Check if exists
+  * Not Exists
 
-    * <relations:tab> en el caso que se utilice la visualización por ``tabs``.
-    * Dentro de esta etiqueta instancia la propiedad mediante la llamada al tagx <relation:tabview> (en el caso de mostrar los datos dentro de las pestañas) para la visualización con el formato de tabla incluyendo los parámetros necesarios para generar el código.
-  * Si existe
+    * <relations:tab> using tabs visualization: ``tabs``.
+    * This tag contains each relationship definided inside using tagx from the Add-on ``<relation:tabview>``.
+      
+      * For each property of the related entity have to create a column tag to show the element properties inside table columns.
+  * Exists
 
-    * Dentro de esta etiqueta instancia la propiedad mediante la llamada al tagx <relation:tabview> (en el caso de mostrar los datos dentro de las pestañas) para la visualización con el formato de tabla incluyendo los parámetros necesarios para generar el código.
+    * This tag contains each relationship definided inside using tagx from the Add-on ``<relation:tabview>``.
+      
+      * For each property of the related entity have to create a column tag to show the element properties inside table columns.
 
 Roo Shell commands
 ====================
 
 Comandos asociados al Add-on.
 
-``web relation styles setup``
+``relationships setup table``
 ------------------------------
+
+This method install tagx, creates AspectJ files and updates the jspx views.
+
+This doesn't need any parameters.
 
 Use cases
 =============
@@ -126,7 +135,11 @@ Developer wants to use new menu in his Roo application. This are the steeps to g
 
 #. Install this add-on if it isn't already installed.
 
-#. Execute command ``web relation styles setup --view tab``.
+#. Create a web application with gvNix/Roo Shell script in ``test-roo`` directory::
+
+      script --file test-script-roo
+
+#. Execute command ``relationships setup table``.
 
 Future enhancements
 ====================
@@ -134,3 +147,11 @@ Future enhancements
 Add Parameters to setup command:
 
 * ``--view`` (mandatory): Selects the view to show the relations of an Entity.
+
+New commands
+--------------
+
+``relationships remove table``
+------------------------------
+
+Remove the tagx, aspectJ files and the tagx references in jspx from the project.
