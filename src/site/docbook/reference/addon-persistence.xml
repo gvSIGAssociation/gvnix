@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-persistence"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Add-on Persistence</title>
+
+  <para>Add-on de utilidades enfocadas a la persistencia de las
+  entidades.</para>
+
+  <section xml:id="addon-persistence_descripcion">
+    <title>Descripción</title>
+
+    <para>Este add-on contiene un conjunto de herramientas enfocadas a la
+    persistencia de Entidades del modelo de datos.</para>
+
+    <para>La herramientas disponibles son:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><link
+        linkend="addon-persistence_occchecksum">OCCCheckSum</link></term>
+
+        <listitem>
+          <para>Control de <emphasis>Concurrencia Optimista</emphasis> basada
+          en <emphasis>CheckSum</emphasis> de los datos.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <section xml:id="addon-persistence_occchecksum">
+      <title>OCCCheckSum</title>
+
+      <para>Esta utilidad añade a las entidadas la funcionalidad de
+      <emphasis>Control de Concurrencia</emphasis> basada una operación de
+      <emphasis>Checksum</emphasis> sobre todos los campos persistentes que
+      contiene la entidad.</para>
+
+      <para>Esta funcionalidad nace de la necesidad de Controlar la
+      concurrencia sobre modelos de datos heredados en los que, por
+      requerimientos del sistema, no podemos alterar el modelo para añadir un
+      campos de control como <emphasis>version</emphasis> (numérico que
+      identifica la versión del objeto) o <emphasis>lastUpdate</emphasis>
+      (fecha de la última actualización) en los que se basa el mecanismo de
+      <emphasis>Control de Concurrencia</emphasis> de la especificación <link
+      xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr220/index.html">JPA</link>.</para>
+
+      <para>El Cheksum <emphasis>se calcula en el momento de la
+      carga</emphasis> de la entidad desde la Base de datos es almacenado en
+      una <emphasis>propiedad no persistente</emphasis>.</para>
+
+      <para>En el momento de <emphasis>actualizar o eliminar</emphasis> un
+      elemento de dicha entidad se carga el elemento que está persistido en la
+      Base de dato y <emphasis>se compara el valor de Checksum</emphasis> con
+      el que se calculó en el momento de la carga del elemento editado o a
+      eliminar. <emphasis>Si no coincide se lanza una
+      Excepción</emphasis>(<link
+      xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OptimisticLockException.html">javax.persistence.OptimisticLockException</link>)
+      y la operación no se realizará.</para>
+
+      <para>Esta operación supone un coste adicional en las tareas de
+      persistencia, pero no debería ser apreciable en condiciones del uso
+      cotidiano de la aplicación excepto de procesos de actualizaciones
+      masivas de registros.</para>
+
+      <para>Para activar este comportamiento en una Entidad se puede usar los
+      comandos:</para>
+
+      <variablelist>
+        <varlistentry>
+          <term><link
+          linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
+          checksum set</link></term>
+
+          <listitem>
+            <para>Establecer el control de concurrencia a una entidad.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><link
+          linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">occ
+          checksum all</link></term>
+
+          <listitem>
+            <para>Establecer el control de concurrencia a todas las entidades
+            de la aplicación.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+
+      <para>Estos comandos añaden a los ficheros <filename>.java</filename> de
+      las entidades una anotación
+      <classname>@GvNIXEntityOCCChecksum</classname> y un campo no persistente
+      para almacenar el Checksum de la lectura. En base a esta anotación se
+      generará un <emphasis>ITD</emphasis> (fichero
+      <filename>*_gvNIX_occChecksum.aj</filename>) con toda la lógica
+      necesaria. Está lógica sera manejada automáticamente por el
+      add-on.</para>
+    </section>
+  </section>
+</chapter>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="instalacion" xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Instalación de gvNIX</title>
+
+  <section xml:id="instalacion_requisitos">
+    <title>Requisitos prévios</title>
+
+  </section>
+
+  <section xml:id="instalacion_instalacion_linux">
+    <title>Instalación en equipos Linux/Unix</title>
+
+  </section>
+
+</chapter>

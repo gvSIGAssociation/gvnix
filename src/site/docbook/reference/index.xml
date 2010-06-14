@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book version="5.0" xml:id="spring-roo-reference-guide"
+      xmlns="http://docbook.org/ns/docbook"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+      xmlns:ns4="http://www.w3.org/2000/svg"
+      xmlns:ns3="http://www.w3.org/1999/xhtml"
+      xmlns:ns="http://docbook.org/ns/docbook">
+  <info>
+    <title>gvNIX - Documentación de referencia</title>
+
+    <productname>gvNIX</productname>
+
+    <releaseinfo>0.3.0</releaseinfo>
+
+    <authorgroup>
+      <author>
+        <personname>Jose Manuel Vivó</personname>
+
+        <email>jmvivo@disid.com</email>
+      </author>
+    </authorgroup>
+
+    <legalnotice>
+      <para>Copyright 2010 Conselleria d'Infraestructures i Transport -
+      Generalitat Valenciana</para>
+
+      <para>This work is licensed under the Creative Commons Attribution-Share
+      Alike 3.0 Unported License. To view a copy of this license, visit
+      http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+      Creative Commons, 171 Second Street, Suite 300, San Francisco,
+      California, 94105, USA.</para>
+    </legalnotice>
+  </info>
+
+  <toc></toc>
+
+  <part xml:id="introduzcion">
+    <title>Introducción</title>
+
+    <partintro>
+      Esta parte de la documentación contiene la información necesaria para entender qué es gvNIX y cómo empezar a utilizarlo.
+    </partintro>
+
+    <xi:include href="introduccion.xml" />
+
+    <xi:include href="instalacion.xml" />
+  </part>
+
+  <part>
+    <title>Add-ons de gvNIX</title>
+
+    <partintro>
+      Descripción de las funcionalidades que aporte gvNIX a la que ya ofrece Spring Roo.
+    </partintro>
+
+    <xi:include href="resumen-addons.xml" />
+
+    <xi:include href="addon-persistence.xml" />
+
+    <xi:include href="addon-theme-manager.xml" />
+
+    <xi:include href="addon-web-exception-handler.xml" />
+
+    <xi:include href="addon-web-menu.xml" />
+
+    <xi:include href="addon-web-mvc-jsp-2.0.xml" />
+
+    <xi:include href="addon-web-relation-styles.xml" />
+
+    <xi:include href="addon-cit-security.xml" />
+  </part>
+
+  <part>
+    <title>Documentos de desarrollo</title>
+
+    <partintro>
+      Documentos útiles para el desarrollo de aplicaciones con gvNIX y desarrollo de add-ons de Spring Roo
+    </partintro>
+
+    <xi:include href="guia_desarrollo.xml" />
+
+    <xi:include href="guia_desarrollo_addon_roo.xml" />
+  </part>
+
+  <part>
+    <title>Apéndices</title>
+
+    <partintro>
+      Documentación adicional
+    </partintro>
+
+    <xi:include href="apendice_comandos.xml" />
+
+    <xi:include href="recursos.xml" />
+  </part>
+</book>
