@@ -51,7 +51,11 @@ public class RelationsTableViewCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("relationships setup table")
     public boolean isSetUpAvailable() {
-	return relationsTableViewOperations.isProjectAvailable(); // it's safe
+	
+	
+	return (relationsTableViewOperations.isProjectAvailable()
+		&& relationsTableViewOperations.isWebScaffoldGenerated() && !relationsTableViewOperations
+		.isActivated()); // it's safe
 								  // to
 								// always see
 								// the

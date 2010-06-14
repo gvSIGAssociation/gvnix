@@ -40,7 +40,6 @@ import org.springframework.roo.metadata.*;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.process.manager.event.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
@@ -86,9 +85,8 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
     private BeanInfoMetadata beanInfoMetadata;
 
-    private RelationsTableViewOperations relationsTableViewOperations;
-
-    private ServiceReference serviceReference;
+    @Reference
+    private PaginatedRelationTableActivationInfo paginatedRelationTableActivationInfo;
 
     private ComponentContext context;
 
@@ -113,7 +111,12 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
      */
     public void notify(String upstreamDependency, String downstreamDependency) {
 
-	logger.warning("Notificación:\t" + upstreamDependency);
+	if (!paginatedRelationTableActivationInfo.isProjectAvailable()
+		|| !paginatedRelationTableActivationInfo
+			.isWebScaffoldGenerated()
+		|| !paginatedRelationTableActivationInfo.isActivated()) {
+	    return;
+	}
 
 	if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
 		.equals(
@@ -125,23 +128,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    upstreamDependencyList.add(upstreamDependency);
 	}
 
-    }
-
-    private RelationsTableViewOperations getRelationsTableViewOperations() {
-	if (relationsTableViewOperations == null) {
-	    relationsTableViewOperations = (RelationsTableViewOperations) context
-		    .getBundleContext().getService(
-			    getOperationsServiceReference());
-	}
-	return relationsTableViewOperations;
-    }
-
-    private ServiceReference getOperationsServiceReference() {
-	if (serviceReference == null) {
-	    serviceReference = context.getBundleContext().getServiceReference(
-		    RelationsTableViewOperations.class.getName());
-	}
-	return serviceReference;
     }
 
     /**
@@ -416,17 +402,17 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 				    .concat("}"))
 		    .addAttribute(
 			    "id",
-			    "s:"
-				    + beanInfoMetadata.getJavaBean()
-					    .getFullyQualifiedTypeName()
+		    "s:".concat(
+			    beanInfoMetadata.getJavaBean()
+				    .getFullyQualifiedTypeName())
 					    .concat(".").concat(propertyName))
 		    .addAttribute("field",
 			    fieldMetadata.getFieldName().getSymbolName())
 		    .addAttribute(
 			    "fieldId",
-			    "l:"
-				    + beanInfoMetadata.getJavaBean()
-					    .getFullyQualifiedTypeName()
+		    "l:".concat(
+			    beanInfoMetadata.getJavaBean()
+				    .getFullyQualifiedTypeName())
 					    .concat(".").concat(propertyName))
 		    .addAttribute("messageCode", "entity.reference.not.managed")
 		    .addAttribute("messageCodeAttribute", entityName)
@@ -440,9 +426,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 					    "}")).build();
 
 	    // Create column fields and group the elements created.
-	    // <table:column
-	    // id="s:org.gvnix.test.relation.list.table.domain.Car.name"
-	    // property="name" z="user-managed"/>
 
 	    String idEntityMetadata = physicalTypeMetadataProvider
 		    .findIdentifier(relationshipJavaType);
@@ -463,9 +446,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		    "There is no metadata related for this identifier:\t"
 			    + idEntityMetadata);
 
-	    // relatedBeanInfoMetadata = (BeanInfoMetadata) metadataService
-	    // .get(idEntityMetadata);
-
 	    List<FieldMetadata> fieldMetadataList = getElegibleFields(relatedBeanInfoMetadata);
 	    Element columnField;
 
@@ -479,9 +459,11 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		property = relatedEntityfieldMetadata.getFieldName()
 			.getSymbolName();
 		columnField = new XmlElementBuilder("table:column", jspxView)
-			.addAttribute("id",
-				relatedEntityClassName.concat(property))
-			.addAttribute("property", z).addAttribute("z", z)
+			.addAttribute(
+				"id",
+				"s:".concat(relatedEntityClassName.concat(".")
+					.concat(property))).addAttribute(
+				"property", property).addAttribute("z", z)
 			.build();
 
 		views.appendChild(columnField);
@@ -509,7 +491,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    JavaType relationshipJavaType) {
 
 	WebScaffoldMetadata relationshipMetadata = null;
-	WebScaffoldMetadata tmpWebScaffoldMetadata;
 
 	FileDetails srcRoot = new FileDetails(new File(pathResolver
 		.getRoot(Path.SRC_MAIN_JAVA)), null);
@@ -542,7 +523,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		}
 
 		Set<MetadataItem> metadata = itdMetadataScanner.getMetadata(id);
-		WebScaffoldAnnotationValues tmpWebScaffoldAnnotationValues;
 
 		for (MetadataItem item : metadata) {
 
@@ -573,21 +553,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 			    }
 			}
 		    }
-
-		    // if (item instanceof WebScaffoldMetadata) {
-		    // tmpWebScaffoldMetadata = (WebScaffoldMetadata) item;
-		    //
-		    // tmpWebScaffoldAnnotationValues = tmpWebScaffoldMetadata
-		    // .getAnnotationValues();
-		    //
-		    // if (relationshipJavaType
-		    // .compareTo(tmpWebScaffoldAnnotationValues
-		    // .getFormBackingObject()) == 0) {
-		    // relationshipMetadata = tmpWebScaffoldMetadata;
-		    // return relationshipMetadata;
-		    // }
-		    //
-		    // }
 		}
 	    }
 	}
@@ -668,8 +633,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
      * 
      */
     public void performDelayed() {
-
-	logger.warning("Operations delayed.");
 
 	// Work out the MIDs of the other metadata we depend on
 	String annotationPath = "javax.persistence.OneToMany";

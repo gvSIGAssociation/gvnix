@@ -43,21 +43,33 @@ Install the Add-on in gvNIX/Roo shell with the required commands for 1.1.0-M1 ve
 Create a web application
 -------------------------
 
-TODO:
+Create a web application with gvNix/Roo Shell script in ``test-roo directory``::
 
-Create a web application with gvNix/Roo Shell script::
+  script --file test-script-roo
 
-  
-Run the application and see the actual style::
+Run the application in Bash Shell and see the actual style::
 
   mvn tomcat:run
+
+Back to the gvNIX/Roo Shell and type::
+
+  relationships setup table
+
+After copying tagx files, generate AspectJ files and new jspx views, run again the applicationwith the maven commmand::
+
+  mvn tomcat:run
+
+Uninstall the Add-on
+=====================
+
+To remove the Add-on you have to delete **gvnixcallfunction.tagx** file located in::
+
+ - src/main/webapp/WEB-INF/tags/util/gvnixcallfunction.tagx
 
 Future enhancements
 ====================
 
-Choose between two types of visualization:
-
+Choose between two types of visualization for oneToMany relationships:
+1
 # Tabs: Show the relationships 1-n between entities inside tabs.
-# Accordion: Show the reletionships 1-n between entities inside panels (current default option).
-
-
+# Accordion: Show the relationships 1-n between entities inside panels (current default option).

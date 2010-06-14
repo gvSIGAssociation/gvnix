@@ -9,6 +9,8 @@
   <jsp:directive.attribute name="messageCodeAttribute" type="java.lang.String" required="false" description="The description to the owner entity."/>
   <jsp:directive.attribute name="messageCode" type="java.lang.String" required="false" description="The description of simple label."/>
   <jsp:directive.attribute name="delete" type="java.lang.Boolean" required="false" description="Indicate if the contents of table could be deleted."/>
+  <jsp:directive.attribute name="create" type="java.lang.Boolean" required="false" description="Indicate if the contents of table could be created."/>
+  <jsp:directive.attribute name="update" type="java.lang.Boolean" required="false" description="Indicate if the contents of table could be updated."/>
 
   <jsp:directive.attribute name="label" type="java.lang.String" required="false" description="The label used for this object, will default to a message bundle if not supplied"/>
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
@@ -83,7 +85,7 @@
 
                 <util:gvnixcallfunction name="${function}" object="${data}" paramValues="${parameterValuesList}" dataResult="dataList"/>
 
-                <decorators:tableview data="${data}" id="${id}" path="${path}" delete="${delete}" parameterList="${parameterList}" parameterValuesList="${parameterValuesList}" >
+                <decorators:tableview data="${data}" id="${id}" path="${path}" delete="${delete}" update="${update}" create="${create}" parameterList="${parameterList}" parameterValuesList="${parameterValuesList}" >
                   <jsp:doBody />
                 </decorators:tableview>
                 

@@ -44,6 +44,9 @@ import org.springframework.roo.project.Path;
 public class PaginatedRealationMetadataProvider extends
 	AbstractItdMetadataProvider {
 
+    @Reference
+    private PaginatedRelationTableActivationInfo paginatedRelationTableActivationInfo;
+
     protected void activate(ComponentContext context) {
 	// Ensure we're notified of all metadata related to physical Java types,
 	// in particular their initial creation
@@ -59,6 +62,14 @@ public class PaginatedRealationMetadataProvider extends
 	    String metadataIdentificationString, JavaType aspectName,
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
 	    String itdFilename) {
+
+	if (!paginatedRelationTableActivationInfo.isProjectAvailable()
+		|| !paginatedRelationTableActivationInfo
+			.isWebScaffoldGenerated()
+		|| !paginatedRelationTableActivationInfo.isActivated()) {
+	    return null;
+	}
+
 	// We know governor type details are non-null and can be safely cast
 
 	// Work out the MIDs of the other metadata we depend on

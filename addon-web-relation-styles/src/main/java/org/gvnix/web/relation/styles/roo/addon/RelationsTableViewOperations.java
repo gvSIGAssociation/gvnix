@@ -56,4 +56,6 @@ public interface RelationsTableViewOperations {
      * @return
      */
     public boolean isActivated();
+
+    public boolean isWebScaffoldGenerated();
 }

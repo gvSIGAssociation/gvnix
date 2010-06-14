@@ -182,7 +182,7 @@ public class PaginatedRealationMetadata extends
 
 	// Create query
 	stringBuilder = new StringBuilder();
-	stringBuilder.append(" q = em.createQuery(select "
+	stringBuilder.append(" q = em.createQuery(\"select "
 		+ StringUtils.uncapitalize(enclosingRelation
 			.getSimpleTypeName())
 			+ " from "
@@ -194,7 +194,7 @@ public class PaginatedRealationMetadata extends
 		+ StringUtils.uncapitalize(enclosingRelation
 			.getSimpleTypeName()) + "."
 			+ StringUtils.uncapitalize(entityName) + " = :"
-			+ StringUtils.uncapitalize(entityName) + ");");
+		+ StringUtils.uncapitalize(entityName) + "\");");
 
 	// Create body resolving imports.
 	bodyBuilder.appendFormalLine(QUERY.getNameIncludingTypeParameters(

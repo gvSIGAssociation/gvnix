@@ -10,8 +10,8 @@
     </c:if>
       <!-- script type="text/javascript">dojo.require('dijit.TitlePane');</script -->
       <div id="${label}">
-          <!-- script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '${label}', widgetType : 'dijit.TitlePane', widgetAttrs : {title: '${label}'}})); </script -->
           <jsp:doBody />
+          <!-- script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '${label}', widgetType : 'dijit.TitlePane', widgetAttrs : {title: '${label}'}})); </script -->
       </div>
   </c:if>
 </jsp:root>

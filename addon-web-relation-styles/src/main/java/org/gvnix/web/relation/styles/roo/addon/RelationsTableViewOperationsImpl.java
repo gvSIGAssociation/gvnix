@@ -71,6 +71,9 @@ public class RelationsTableViewOperationsImpl implements RelationsTableViewOpera
     @Reference
     private MetadataDependencyRegistry dependencyRegistry;
 
+    @Reference
+    private PaginatedRelationTableActivationInfo paginatedRelationTableActivationInfo;
+    
     private ComponentContext context;
 
     protected void activate(ComponentContext context) {
@@ -78,7 +81,7 @@ public class RelationsTableViewOperationsImpl implements RelationsTableViewOpera
     }
 
     public boolean isProjectAvailable() {
-	return getPathResolver() != null;
+	return paginatedRelationTableActivationInfo.isProjectAvailable();
     }
 
     /*
@@ -159,6 +162,7 @@ public class RelationsTableViewOperationsImpl implements RelationsTableViewOpera
 	}
 	return;
     }
+
     /**
      * This method will copy the contents of a directory to another if the
      * resource does not already exist in the target directory
@@ -212,27 +216,12 @@ public class RelationsTableViewOperationsImpl implements RelationsTableViewOpera
      * isActivated()
      */
     public boolean isActivated() {
-	if (!isProjectAvailable()) {
-	    return false;
-	}
 
-	if (!fileManager.exists(pathResolver.getIdentifier(
-		Path.SRC_MAIN_WEBAPP,
-		"WEB-INF/tags/util/gvnixcallfunction.tagx"))) {
-	    return false;
-	}
-	return true;
+	return paginatedRelationTableActivationInfo.isActivated();
     }
 
-    /**
-     * @return the path resolver or null if there is no user project
-     */
-    private PathResolver getPathResolver() {
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(ProjectMetadata.getProjectIdentifier());
-	if (projectMetadata == null) {
-	    return null;
-	}
-	return projectMetadata.getPathResolver();
+    public boolean isWebScaffoldGenerated() {
+
+	return paginatedRelationTableActivationInfo.isWebScaffoldGenerated();
     }
 }
