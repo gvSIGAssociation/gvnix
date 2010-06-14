@@ -28,7 +28,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.beaninfo.BeanInfoMetadata;
 import org.springframework.roo.addon.entity.EntityMetadata;
-import org.springframework.roo.addon.mvc.jsp.JspMetadata;
+import org.springframework.roo.addon.mvc.jsp.*;
 import org.springframework.roo.addon.web.mvc.controller.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -41,6 +41,7 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.process.manager.event.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.*;
@@ -74,6 +75,11 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
     @Reference private ItdMetadataScanner itdMetadataScanner;
 
+    @Reference
+    private ProcessManagerStatusProvider processManagerStatus;
+
+    private StatusListener statusListener;
+
     private WebScaffoldMetadata webScaffoldMetadata;
 
     private EntityMetadata entityMetadata;
@@ -89,8 +95,10 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
     private static Logger logger = Logger.getLogger(PaginatedRelationMetadataListener.class.getName());
 
     protected void activate(ComponentContext context) {
-	metadataDependencyRegistry.addNotificationListener(this);
 	this.context = context;
+	metadataDependencyRegistry.addNotificationListener(this);
+	statusListener = new StatusListener(this);
+	processManagerStatus.addProcessManagerStatusListener(statusListener);
     }
 
     /*
@@ -106,35 +114,14 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
 
 
-	// if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
-	// .equals(
-	// MetadataIdentificationUtils
-	// .getMetadataClass(JspMetadata
-	// .getMetadataIdentiferType()))) {
-	//	    
-	// RelationsTableViewOperations op = getRelationsTableViewOperations();
-	// if (op == null || !op.isActivated()) {
-	// return;
-	// }
-	//
-	// // Work out the MIDs of the other metadata we depend on
-	// String annotationPath = "javax.persistence.OneToMany";
-	// List<FieldMetadata> oneToManyFieldMetadatas = getAnnotatedFields(
-	// upstreamDependency, annotationPath);
-	//
-	// // Retrieve the associated jspx (show an update).
-	// if (!oneToManyFieldMetadatas.isEmpty()) {
-	//
-	//
-	// Document showDocument = updateView("show",
-	// oneToManyFieldMetadatas, "tab");
-	// writeToDiskIfNecessary("show", showDocument);
-	//
-	// Document updateDocument = updateView("update",
-	// oneToManyFieldMetadatas, "tab");
-	// writeToDiskIfNecessary("update", updateDocument);
-	// }
-	// }
+	if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
+		.equals(
+			MetadataIdentificationUtils
+				.getMetadataClass(JspMetadata
+					.getMetadataIdentiferType()))) {
+
+	    // TODO: Add upstreamDependency to a Stack.
+	}
 
     }
 
@@ -619,5 +606,36 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		return true;
 	}
 	return false;
+    }
+
+    class StatusListener implements ProcessManagerStatusListener {
+
+	PaginatedRelationMetadataListener paginatedRelationMetadataListener;
+
+	public StatusListener(
+		PaginatedRelationMetadataListener paginatedRelationMetadataListener) {
+	    super();
+	    this.paginatedRelationMetadataListener = paginatedRelationMetadataListener;
+	}
+
+	public void onProcessManagerStatusChange(
+		ProcessManagerStatus oldStatus, ProcessManagerStatus newStatus) {
+	    if (newStatus == ProcessManagerStatus.AVAILABLE) {
+
+		// logger.warning("Operations delayed.");
+		paginatedRelationMetadataListener.performDelayed();
+	    }
+
+	}
+
+    }
+
+    /**
+     * Execute delayed operations.
+     * 
+     */
+    public void performDelayed() {
+	// TODO Auto-generated method stub
+	logger.warning("Operations delayed.");
     }
 }
