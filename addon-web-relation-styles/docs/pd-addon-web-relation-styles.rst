@@ -30,7 +30,7 @@ Definitions
 Requirements
 =============
 
-This add-on have to install and manage the application visualization for entities.
+This add-on have to install and manage the application visualization for entities paginated inside a table grouped by tabs.
 
 # Tagx files to show the related entities in forms show and update.
 
@@ -72,7 +72,7 @@ Create a Metadata
 Metadata for create AspecJ method using entity's properties (1-n relations).
 
 # The metadata creates the search method for paginated related entities.
-  * Crete AspecJ method for related entities that are annotated as 1-n relationship.
+  * Crete AspecJ method for retrieve related entities that are annotated as 1-n relationship.
 # Use DefaultClassOrInterfaceDetail to retrieve the annotation information for the declared relationships.
 
 Create MetadataProvider that listens RooEntity's changes

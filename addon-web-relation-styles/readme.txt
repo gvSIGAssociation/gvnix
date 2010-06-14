@@ -23,7 +23,7 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introduction
 ===============
 
-Add-on update jspx views from entities that have OneToMany mapped relationship to show them inside tabs.
+Add-on update jspx views from entities that have OneToMany mapped relationship to show them inside paginated tables grouped by tabs.
 
 Project contents
 =================
@@ -36,8 +36,8 @@ Features
 This add-ons have this features:
 
 #. Installs new tagx in the project.
-#. Generates AspectJ files.
-#. Update the jspx views.
+#. Generates AspectJ files to get related entities paginated to be show in the jspx table inside a tab.
+#. Update the jspx views using featured tagx from the Add-on.
 
 Installation Proof
 ===================
