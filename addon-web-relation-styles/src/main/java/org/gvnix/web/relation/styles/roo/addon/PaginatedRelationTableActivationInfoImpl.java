@@ -63,8 +63,17 @@ public class PaginatedRelationTableActivationInfoImpl implements
      */
     public boolean isProjectAvailable() {
 
-	return getPathResolver() != null;
+	if (getPathResolver() == null) {
+	    return false;
+	}
 
+	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		"WEB-INF/spring/webmvc-config.xml");
+
+	if (!fileManager.exists(webXmlPath)) {
+	    return false;
+	}
+	return true;
     }
 
     /**

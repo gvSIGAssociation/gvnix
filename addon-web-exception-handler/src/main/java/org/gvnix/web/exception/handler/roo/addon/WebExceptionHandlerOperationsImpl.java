@@ -804,8 +804,10 @@ public class WebExceptionHandlerOperationsImpl implements
 
 	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
 		"WEB-INF/spring/webmvc-config.xml");
-	Assert.isTrue(fileManager.exists(webXmlPath),
-		"webmvc-config.xml not found");
+
+	if (!fileManager.exists(webXmlPath)) {
+	    return false;
+	}
 
 	MutableFile webXmlMutableFile = null;
 	Document webXml;
@@ -832,7 +834,18 @@ public class WebExceptionHandlerOperationsImpl implements
     }
 
     public boolean isProjectAvailable() {
-	return getPathResolver() != null;
+
+	if (getPathResolver() == null) {
+	    return false;
+	}
+
+	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		"WEB-INF/spring/webmvc-config.xml");
+
+	if (!fileManager.exists(webXmlPath)) {
+	    return false;
+	}
+	return true;
     }
 
     /**
