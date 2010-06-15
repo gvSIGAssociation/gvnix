@@ -163,7 +163,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 		Path.SRC_MAIN_JAVA, PROVIDER_TARGET_CLASS_FILENAME));
     }
 
-    public void setup(String url, String appName, String password) {
+    public void setup(String url, String login, String password, String appName) {
 	// Si no esta configurada la seguriad pero se puede configurar
 	// ya lo haremos nosotros
 	if (securityOperations.isInstallSecurityAvailable()) {
@@ -174,7 +174,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 	copyJavaFiles();
 
 	// Copiar los archivos de configuracion que necesitamos
-	copyConfigFiles(url,appName,password);
+	copyConfigFiles(url, login, password, appName);
 
 	// Actualizamos la configuracion de seguriada
 	updateSecurityConfig();
@@ -229,12 +229,14 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
     /**
      * Copia los archivos de configuración própios de nuestra herramienta
-     *
+     * 
+     * @param url
+     * @param login
      * @param password
      * @param appName
-     * @param url
      */
-    private void copyConfigFiles(String url, String appName, String password) {
+    private void copyConfigFiles(String url, String login, String password,
+	    String appName) {
 
 	String properties = pathResolver.getIdentifier(Path.SPRING_CONFIG_ROOT,
 		WSAUTH_PROPERTIES_NAME);
@@ -247,8 +249,9 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 		    "config/" + WSAUTH_PROPERTIES_NAME);
 	    String template = FileCopyUtils.copyToString(new InputStreamReader(templateInputStream));
 	    template = StringUtils.replace(template, "__URL__", url);
-	    template = StringUtils.replace(template, "__APPNAME__", appName);
+	    template = StringUtils.replace(template, "__LOGIN__", login);
 	    template = StringUtils.replace(template, "__PASSWORD__", password);
+	    template = StringUtils.replace(template, "__APPNAME__", appName);
 
 	    FileCopyUtils.copy(template, new OutputStreamWriter(fileManager.createFile(
 			properties).getOutputStream()));
@@ -470,16 +473,19 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 			+ "'");
 	for (URL url : urls) {
 	    String fileName = url.getPath().substring(
-		    url.getPath().lastIndexOf("/") + 1);
-	    if (!fileManager.exists(targetDirectory + fileName)) {
-		try {
-		    FileCopyUtils.copy(url.openStream(), fileManager
-			    .createFile(targetDirectory + fileName)
-			    .getOutputStream());
-		} catch (IOException e) {
-		    new IllegalStateException(
-			    "Encountered an error during copying of resources for MVC JSP addon.",
-			    e);
+		    url.getPath().lastIndexOf("java-src/") + 9);
+
+	    if (fileName.endsWith(".java")) {
+		if (!fileManager.exists(targetDirectory + fileName)) {
+		    try {
+			FileCopyUtils.copy(url.openStream(), fileManager
+				.createFile(targetDirectory + fileName)
+				.getOutputStream());
+		    } catch (IOException e) {
+			new IllegalStateException(
+				"Encountered an error during copying of resources for MVC JSP addon.",
+				e);
+		    }
 		}
 	    }
 	}

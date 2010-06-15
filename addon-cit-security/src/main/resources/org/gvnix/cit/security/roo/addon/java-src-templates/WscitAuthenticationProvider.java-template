@@ -62,6 +62,9 @@ public class WscitAuthenticationProvider extends
 	// Credencial Login password
 	private String credentialCitPassword;
 
+    // Application Name
+    private String applicationName;
+
 	// WSAth client
 	private ServerWSAuth.ServerWSAuthPortProxy serverWSAuthPortProxy;
 
@@ -129,7 +132,7 @@ public class WscitAuthenticationProvider extends
 
 		// Performs the request to the CIT web server
 		ValidaStruct userFromWS = getUserFromWebService(username,
-				authentication.getAuthorities().toString());
+				presentedPassword);
 
 		// If there is no user found throws exception
 		if (userFromWS == null) {
@@ -238,14 +241,13 @@ public class WscitAuthenticationProvider extends
 			}
 
 			// Datos de entrada para el servicio web
-			String validaAplicacion = "terceros";
 			if (credentialCit == null) {
 				this.credentialCit = new CredencialCIT(this.credentialCitLogin,
 						this.credentialCitPassword);
 			}
 
 			es.gva.cit.WSAuth.xsd.ValidaStruct validaReturn = getServerWSAuthPortProxy()
-					.valida(credentialCit, userName, password, validaAplicacion);
+					.valida(credentialCit, userName, password, this.applicationName);
 
 			if (logger.isLoggable(Level.FINE)) {
 				logger.log(Level.FINE, "Validation return=" + validaReturn);
@@ -320,5 +322,9 @@ public class WscitAuthenticationProvider extends
 	public void setCredentialCitPassword(String credentialCitPassword) {
 		this.credentialCitPassword = credentialCitPassword;
 	}
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
 
 }

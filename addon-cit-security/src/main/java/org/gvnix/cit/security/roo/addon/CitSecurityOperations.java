@@ -37,14 +37,14 @@ public interface CitSecurityOperations {
      */
     public boolean isAlreadyInstalled();
 
-
     /**
      * Install CIT Security in this projet
+     * 
+     * @param url
+     * @param login
      * @param password
      * @param appName
-     * @param url
-     *
      */
-    public void setup(String url, String appName, String password);
+    public void setup(String url, String login, String password, String appName);
 
 }

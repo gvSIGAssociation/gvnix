@@ -45,9 +45,10 @@ public class CitSecurityCommands implements CommandMarker {
 
     @CliCommand(value = "cit security setup", help = "Configura la autenticación de usuarios con el mecanismo de la Consellería de Infraestructuras y Transportes.")
     public void setup(@CliOption(key="url", mandatory=true, help="URL del servicio de autenticación.") String url,
-	    @CliOption(key="appName", mandatory=true, help="Nombre de la aplicación para el servicio.") String appName,
-	    @CliOption(key="password", mandatory=true, help="Clave de acceso al servicio.") String password) {
-	citSecurityOperations.setup(url,appName,password);
+	    @CliOption(key = "login", mandatory = true, help = "Usuario de acceso al servicio.") String password,
+	    @CliOption(key = "password", mandatory = true, help = "Clave de acceso al servicio.") String login,
+	    @CliOption(key = "appName", mandatory = true, help = "Nombre de la aplicación para el servicio.") String appName) {
+	citSecurityOperations.setup(url, login, password, appName);
 
     }
 

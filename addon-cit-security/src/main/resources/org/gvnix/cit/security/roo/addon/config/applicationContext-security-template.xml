@@ -29,6 +29,7 @@
         <beans:property name="serverWSAuthPortProxy" ref="serverWSAuthPortProxy"/>
         <beans:property name="credentialCitLogin" value="${wsauth.loggin}"/>
         <beans:property name="credentialCitPassword" value="${wsauth.password}"/>
+        <beans:property name="applicationName" value="${wsauth.appName}"/>
         <beans:property name="passwordEncoder" ref="passwordEncoder"/>
         <beans:property name="saltSource" ref="saltSource"/>
     </beans:bean>
