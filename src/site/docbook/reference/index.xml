@@ -8,19 +8,16 @@
       xmlns:ns3="http://www.w3.org/1999/xhtml"
       xmlns:ns="http://docbook.org/ns/docbook">
   <info>
-    <title>gvNIX - Documentación de referencia</title>
+    <title xml:lang="es">gvNIX - Documentación de referencia</title>
 
-    <productname>gvNIX</productname>
+    <productname>gvNIX. Spring Roo based RAD tool</productname>
 
     <releaseinfo>0.3.0</releaseinfo>
 
-    <authorgroup>
-      <author>
-        <personname>Jose Manuel Vivó</personname>
-
-        <email>jmvivo@disid.com</email>
-      </author>
-    </authorgroup>
+    <author>
+      <personname>DiSiD Technologies S.L. <link
+      xlink:href="http://www.disid.com">DiSiD Technologies</link></personname>
+    </author>
 
     <legalnotice>
       <para>Copyright 2010 Conselleria d'Infraestructures i Transport -
@@ -37,22 +34,26 @@
   <toc></toc>
 
   <part xml:id="introduzcion">
-    <title>Introducción</title>
+    <title xml:lang="es">Introducción</title>
 
     <partintro>
-      Esta parte de la documentación contiene la información necesaria para entender qué es gvNIX y cómo empezar a utilizarlo.
+      <para xml:lang="es">Esta parte de la documentación contiene la
+      información necesaria para entender qué es gvNIX y cómo empezar a
+      utilizarlo</para>
     </partintro>
 
     <xi:include href="introduccion.xml" />
 
     <xi:include href="instalacion.xml" />
+    <xi:include href="primeros-pasos.xml" />
   </part>
 
   <part>
-    <title>Add-ons de gvNIX</title>
+    <title xml:lang="es">Add-ons de gvNIX</title>
 
     <partintro>
-      Descripción de las funcionalidades que aporte gvNIX a la que ya ofrece Spring Roo.
+      <para xml:lang="es">Descripción de las funcionalidades que aporte gvNIX
+      a la que ya ofrece Spring Roo.</para>
     </partintro>
 
     <xi:include href="resumen-addons.xml" />
@@ -73,10 +74,11 @@
   </part>
 
   <part>
-    <title>Documentos de desarrollo</title>
+    <title xml:lang="es">Documentos de desarrollo</title>
 
     <partintro>
-      Documentos útiles para el desarrollo de aplicaciones con gvNIX y desarrollo de add-ons de Spring Roo
+      <para xml:lang="es">Documentos útiles para el desarrollo de aplicaciones
+      con gvNIX y desarrollo de add-ons de Spring Roo</para>
     </partintro>
 
     <xi:include href="guia_desarrollo.xml" />
@@ -85,13 +87,13 @@
   </part>
 
   <part>
-    <title>Apéndices</title>
+    <title xml:lang="es">Apéndices</title>
 
     <partintro>
-      Documentación adicional
+      <para xml:lang="es">Documentación adicional</para>
     </partintro>
 
-    <xi:include href="apendice_comandos.xml" />
+    <xi:include href="apendice-comandos.xml" />
 
     <xi:include href="recursos.xml" />
   </part>

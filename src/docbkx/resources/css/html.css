@@ -324,9 +324,9 @@ tt {
 }
 
 div.navfooter table {
-    border: dashed gray;
+    /*border: dashed gray;
     border-width: 1px 1px 1px 1px;
-    background-color: #ebb22f;
+    background-color: #ebb22f;*/
 }
 
 pre {

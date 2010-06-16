@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="addon-web-menu" xmlns="http://docbook.org/ns/docbook"
+<chapter version="5.0" xml:id="addon-web-menu"
+         xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
@@ -7,8 +8,200 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title>Add-on Web Menu</title>
 
+  <para>Sistema de menú Web de gvNIX</para>
+
   <section xml:id="addon-web-menu_descripcion">
     <title>Descripción</title>
 
+    <para>Este Add-on instala un sistema nuevo de menú Web en la aplicación
+    sobre la que trabajamos.</para>
+
+    <para>Las principales características de este sistema son:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>Modelo de menú separado de visualización</term>
+
+        <listitem>
+          <para>El modelo de menú no está ubicado en la misma página que lo
+          visualiza.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Múltiples niveles de menú</term>
+
+        <listitem>
+          <para>Soporte para crear elementos agrupados a distintos
+          niveles.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Gestión de elementos desde consola</term>
+
+        <listitem>
+          <para>Permite añadir,quitar,mover y actualizar lo elementos de menú
+          desde la consola de Spring Roo.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Integración con Spring Security</term>
+
+        <listitem>
+          <para>Si está instalado, los elementos de menú no serán visualizados
+          si el usuario no tiene permiso de acceso a la página o no está entre
+          los roles predefinidos.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Gestiona las peticiones de Roo</term>
+
+        <listitem>
+          <para>Aunque el sistema de menú cambia, el add-on gestiona las
+          peticiones de generación de elementos de menú realizadas por las
+          herramientas estándar de Spring Roo.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Soporte para menús contextuales</term>
+
+        <listitem>
+          <para>Soporta que los elementos de menú a pintar sean dependientes
+          del la pagina que se está visualizando.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section>
+    <title>Definiciones</title>
+
+    <para>Antes de continuar explicando las funcionalidades de la herramienta
+    vamos a dar una lista de definiciones:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>Página</term>
+
+        <listitem>
+          <para>Representación e una URL. El destino puede ser interno (dentro
+          de la propia aplicación) o externo. <emphasis role="bold">Los
+          destinos internos deben de ser únicos</emphasis>: no pueden dos
+          páginas con el mismo destino.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Grupo</term>
+
+        <listitem>
+          <para>Contenedor de páginas. El contenido pueden ser también otros
+          grupos. También puede tener asociado una URL pero con las misma
+          restricciones que la Página.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Menú</term>
+
+        <listitem>
+          <para>Estructura de árbol de páginas y grupos.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Menú contextual</term>
+
+        <listitem>
+          <para>Sub-vista del Menú cuya composición depende de la página en la
+          que se está visualizando.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Ítem de menú</term>
+
+        <listitem>
+          <para>Un elemento del menú que puede ser una Página o un
+          Grupo.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section>
+    <title>Instalar la gestión de menús.</title>
+
+    <para>El uso de el sistema de menús aportado por esta herramienta es
+    opcional. Por ello, par ponerlo en marcha es necesario usar el comando
+    <command><link
+    linkend="apendice-comandos_addon-web-menu_page-menu-setup">page menu
+    setup</link></command>. Este comando añadirá lo siguiente:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Clases para el modelo de datos del menú. Cada una de estas
+        clases están anotadas con una anotación
+        <classname>@GvNIXMenu*</classname> para poder ser
+        identificadas.</para>
+      </listitem>
+
+      <listitem>
+        <para>Una Clase para la carga del menú y hacerlo disponible para su
+        pintado en la vista.</para>
+      </listitem>
+
+      <listitem>
+        <para>Archivo XML para almacenar el modelo de datos del menú,
+        rellenado con los menú que existiese en ese momento creado por
+        Roo.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>Tagx</emphasis> necesarios para el pintado del
+        menú.</para>
+      </listitem>
+
+      <listitem>
+        <para>Una nueva página de menú en la que utiliza los
+        <emphasis>tagx</emphasis> de pintado del menú.</para>
+      </listitem>
+
+      <listitem>
+        <para>Clases para el uso de los menús contextuales.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>Para más información ver sobre el comando <command><link
+    linkend="apendice-comandos_addon-web-menu_page-menu-setup">page menu
+    setup</link></command> en el <link
+    linkend="apendice-comandos_addon-web-menu">apéndice de comandos de este
+    add-on</link>.</para>
+
+    <para>El nombre del fichero XML que contiene el modelo es tomado de la
+    constante <constant>MENU_CONFIG_FILE</constant> de la clase anotada como
+    <classname>@GvNIXMenuLoader</classname>. </para>
+  </section>
+
+  <section>
+    <title>Modificación del menú.</title>
+
+    <para>Para hacer cambios en el menú se debe usar los comando disponibles
+    en la consola, que estarán disponibles después de haber instalado la
+    gestión de menú.</para>
+
+    <para>Para mas información sobre los comandos ver <link
+    linkend="apendice-comandos_addon-web-menu">apéndice de comandos de este
+    add-on</link>.</para>
+  </section>
+
+  <section>
+    <title>Uso de menús contextuales.</title>
+
+    <para><emphasis role="bold">TODO</emphasis></para>
   </section>
 </chapter>

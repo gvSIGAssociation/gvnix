@@ -16,7 +16,8 @@
 
     <variablelist>
       <varlistentry>
-        <term>OCCChecksum</term>
+        <term><link
+        linkend="resumen-addons_persistence_occchecksum">OCCChecksum</link></term>
 
         <listitem>
           <para>Soporte para <emphasis>Control de Concurrencia
@@ -26,7 +27,7 @@
       </varlistentry>
     </variablelist>
 
-    <section>
+    <section xml:id="resumen-addons_persistence_occchecksum">
       <title>OCCChecksum</title>
 
       <para>El <emphasis>Control de Concurrencia Optimista</emphasis> está

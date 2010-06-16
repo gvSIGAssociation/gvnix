@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="introduccion" xmlns="http://docbook.org/ns/docbook"
+<chapter version="5.0" xml:id="introduccion"
+         xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
@@ -8,7 +9,292 @@
   <title>Introducción</title>
 
   <section xml:id="introduccion_que-es-gvnix">
-    <title>¿Qué es gvNIX?</title>
+    <title xml:lang="es">¿Qué es gvNIX?</title>
 
+    <para xml:lang="es">Entorno de trabajo Java para la CIT productivo y
+    flexible, sin comprometer la calidad de los proyectos.</para>
+
+    <para xml:lang="es">Esta versión es la primera que usa como base <link
+    xlink:href="http://www.springsource.org/roo">Spring Roo</link>. Añade
+    funcionalidades de productividad de alto nivel a las prestaciones que ya
+    se obtienen con <link xlink:href="http://www.springsource.org/roo">Spring
+    Roo</link>.</para>
+  </section>
+
+  <section>
+    <title xml:lang="es">¿Qué es Spring Roo?</title>
+
+    <para xml:lang="es"><citation xml:lang="es"><author>
+        <personname>Ben Alex</personname>
+      </author> "Roo es un pequeño genio que observa desde un segundo plano y
+    gestiona todo aquello de lo que no me quiero preocupar" </citation></para>
+
+    <para xml:lang="es">Spring Roo es un framework Java que permite el
+    desarrollo Web de forma más rápida y cómoda para el desarrollador. Sus
+    principales características son:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">Generación de código en Java (lenguaje
+        estático)</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Eliminar el trabajo tedioso centrando el
+        desarrollo en la lógica de negocio.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Convención sobre configuración.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Enfoque DDD (Domain-Driven Development).</para>
+
+        <itemizedlist>
+          <listitem>
+            <para xml:lang="es">Dirigido por el modelo de entidades.</para>
+          </listitem>
+
+          <listitem>
+            <para xml:lang="es">Lógica en las entidades (Real Object
+            Oriented), elimina capas redundantes.</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Crea un proyecto en segundos.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Realimentación: Añade valor durante todo el ciclo
+        de vida.</para>
+      </listitem>
+
+      <listitem>
+        <para>No se ejecuta en <emphasis>Runtime</emphasis> por lo que no
+        penaliza la velocidad la aplicación.</para>
+      </listitem>
+
+      <listitem>
+        <para>No requiere ningún IDE.</para>
+      </listitem>
+
+      <listitem>
+        <para>Recibe instrucciones a través de una consola interactiva con
+        autocompletado y ayuda en linea.</para>
+      </listitem>
+
+      <listitem>
+        <para>Extensible usando <emphasis>bundles OSGi</emphasis>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Re aprovechamiento de conocimiento: No necesita más conocimiento
+        que desarrollo nociones de J2EE.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title xml:lang="es">El interprete de Comandos</title>
+
+    <para>Para que el framework empiece a funcionar, hay que arrancar una
+    consola interactiva con la que haremos peticiones. Esta consola, a su vez,
+    monitoriza los cambios que vaya realizándose en los artefactos para
+    ajustar la generación de código.</para>
+
+    <para>La consola tiene este aspecto:</para>
+
+    <programlisting>    ____  ____  ____  
+   / __ \/ __ \/ __ \ 
+  / /_/ / / / / / / / 
+ / _, _/ /_/ / /_/ /  
+/_/ |_|\____/\____/    1.1.0.RELEASE [rev XXX]
+
+
+Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
+roo&gt;</programlisting>
+  </section>
+
+  <section>
+    <title xml:lang="es">¿Cómo funciona?</title>
+
+    <para>Este diagrama muestra a alto nivel el modelo funcional de
+    Roo:</para>
+
+    <figure xml:lang="es">
+      <title xml:lang="es">Diagrama de modelo funcional de Roo</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/modelo-roo.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <para xml:lang="es">En este diagrama podemos ver:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term xml:lang="es">Proyecto Java</term>
+
+        <listitem>
+          <para xml:lang="es">Es el contenido de nuestra aplicación formada
+          por todos los archivos necesarios.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term xml:lang="es">Infraestructura de Roo</term>
+
+        <listitem>
+          <para xml:lang="es">Toda la infraestructura de Roo es auto contenida
+          y separada del proyecto final. Se compone de:</para>
+
+          <variablelist>
+            <varlistentry>
+              <term xml:lang="es">Add-ons</term>
+
+              <listitem>
+                <para xml:lang="es">Componentes que monitorizan nuestro
+                proyecto y realizan las operaciones que solicita el
+                desarrollador a través de <emphasis
+                role="bold">Shell</emphasis>.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term xml:lang="es">Interprete de comandos (Shell)</term>
+
+              <listitem>
+                <para xml:lang="es">Componente que permite la recepción de
+                comando por parte del desarrollador</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term xml:lang="es">STS: SpringSource Tool Suite</term>
+
+              <listitem>
+                <para xml:lang="es">Herramienta Eclipse de Spring para
+                trabajar con proyectos Spring, ofrece herramientas para
+                trabajar con Roo desde Eclipse </para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term xml:lang="es">Anotaciones</term>
+
+        <listitem>
+          <para xml:lang="es">Conjunto de <link
+          xlink:href="http://hartocodigo.blogspot.com/2009/02/anotaciones-en-java-5.html">anotaciones
+          JAVA</link> que utiliza el framework para poder identificar el tipo
+          de artefacto y su configuración para poder ser gestionado por los
+          Add-ons. Tiene una política de retención <emphasis>SOURCE</emphasis>
+          por lo que el compilador JAVA no las incluirá en la clases
+          compiladas.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section>
+    <title xml:lang="es">Usabilidad</title>
+
+    <para xml:lang="es">La usabilidad es un aspecto muy importante, entre la
+    principales características en este punto encontramos:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">Comandos 'hint' y 'help': Guían al usuario sobre
+        la forma de proceder</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">TAB para completar prácticamente cualquier
+        comando.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Si se produce algún error en alguna operación, Roo
+        deshará todos los cambios generados dejando la aplicación como estaba.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Ejecución de scripts: permiten automatizar
+        generación de aplicaciones.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Funcionamiento predictivo y conservador: El
+        desarrollador tiene el control y Roo no se entromete en la forma de
+        hacer las cosas.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title xml:lang="es">El Proyecto generado</title>
+
+    <para xml:lang="es">El proyecto que se genera usando Roo es un proyecto
+    estándar de Spring y otras especificaciones y librerías estándar. Las
+    principales son:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Spring 3.0</para>
+      </listitem>
+
+      <listitem>
+        <para>Spring Security</para>
+      </listitem>
+
+      <listitem>
+        <para>Spring MVC</para>
+      </listitem>
+
+      <listitem>
+        <para>JPA 2.0</para>
+      </listitem>
+
+      <listitem>
+        <para>Hibernate</para>
+      </listitem>
+
+      <listitem>
+        <para>iBatis</para>
+      </listitem>
+
+      <listitem>
+        <para>AspectJ</para>
+      </listitem>
+
+      <listitem>
+        <para>JUnit</para>
+      </listitem>
+
+      <listitem>
+        <para>JMS</para>
+      </listitem>
+    </itemizedlist>
+
+    <para xml:lang="es">En el siguiente diagrama podemos ver las distintas
+    librerías y elementos:</para>
+
+    <figure>
+      <title xml:lang="es">Diagrama de proyecto generado</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/gvnix-arquitectura-v0_3.png" scale="80"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
   </section>
 </chapter>

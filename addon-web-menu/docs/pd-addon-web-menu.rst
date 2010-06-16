@@ -30,7 +30,7 @@ Definitions
 Here you have an definition's list we going to use:
 
 * `Page`_: URL representation (It could be interal or external).
-* `Group`_: Container `Page`_. The contained pages could be pages or groups.
+* `Group`_: `Page`_ container. The contained pages could be pages or groups.
 * `Menu`_: A page tree.
 * `Context Menu`_ : Menu sub-view rendered depending current navigator `page`_.
 * `Menu item`_: Contains information needed to access and identify a `Page`_.
@@ -196,7 +196,9 @@ This will have this properties:
 
 * ``rooId``: String for item Roo identification. Needed for mapping with Roo generated menus if it's not form Roo generated components this will not need this.
 
-* ``title``: Message code for title.
+* ``label``: Text to use for item rendering.
+
+* ``messageCode``: Message code for item rendering.
 
 * ``hidden``: Don't show this element. We need it for Roo generated menus. In any time Roo can try to regenerate it because item controller has been changed. So is better hide items to prevent erroneous menu item regenerations.
 
@@ -435,7 +437,9 @@ List current menu tree structure with the *name* value. This is an example::
 
 Parameters:
 
-* ``--title`` (optional): Shows *title* page value.
+* ``--label`` (optional): Shows *label* page value.
+
+* ``--messageCode`` (optional): Shows *messageCode* page value.
 
 * ``--destination`` (optional): Shows *destination* page value.
 
@@ -461,14 +465,14 @@ If we use all this parameters the output will show something like this::
 Shows all information about a page. examples:
 
         /Main
-          - Title: Main
+          - Label: Main
           - Children:
             * Authors
             * Books
             * Book_a_book: /bookABook
 
         /Main/Book_a_book
-          - Title: Main
+          - Label: Main
           - Destination: /bookABook
           - roles: [USER]
 
@@ -497,60 +501,60 @@ List menu structure
 
 Developer wants show current menu structure:
 
-#. Execute command ``menu list --title --destination --roles``
+#. Execute command ``menu list --messageCode --destination --roles``
 
 In console appears::
 
-        Main {app.main}
-          Authors {app.authors}
-            New {app.new}: /author/?form [USER_MANAGER,USER]
-            List {app.list}: /authors
-          Books {app.books}
-            New {app.new}: /book/?form [USER_MANAGER,USER]
-            List {app.list}: /books
-          Book_a_book {app.bookabook}: /bookABook [USER]
-        About_us {app.about}
-          Our_History {app.history}: /history
-          Contact {app.contact}: /contact
+/Main                    app.main
+/Main/Authors            app.authors
+/Main/Authors/New        app.new        /author/?form  USER_MANAGER,USER
+/Main/Authors/List       app.list       /authors
+/Main/Books              app.books
+/Main/Books/New          app.new        /book/?form    USER_MANAGER,USER
+/Main/Books/List         app.list       /books
+/Main/Books/Book_a_book  app.bookabook  /bookABook     USER
+/About_us                app.about
+/About_us/Our_History    app.history    /history
+/About_us/Contact        app.contact    /contact
 
 Change a page item
 --------------------
 
 Developer wants to change the element ``Main`` to ``My_Main`` and its title to ``app.myMain``:
 
-#. Execute command list to show menu path ``page list --title`` ::
+#. Execute command list to show menu path ``page list --messageCode`` ::
 
-        Main {app.main}
-          Authors {app.authors}
-            New {app.new}
-            List {app.list}
-          Books
-            New {app.new}
-            List {app.list}
-          Book_a_book {app.bookabook}
-        About_us {app.about}
-          Our_History {app.history}
-          Contact {app.contact}
+/Main                    app.main
+/Main/Authors            app.authors
+/Main/Authors/New        app.new
+/Main/Authors/List       app.list
+/Main/Books              app.books
+/Main/Books/New          app.new
+/Main/Books/List         app.list
+/Main/Books/Book_a_book  app.bookabook
+/About_us                app.about
+/About_us/Our_History    app.history
+/About_us/Contact        app.contact
 
 
-
-#. Execute command ``page update --page "/Main" --name My_Main --title "app.myMain``
+#. Execute command ``page update --page "/Main" --name My_Main --messageCode "app.myMain``
 
 #. Execute command list to show result ``page list --title`` ::
 
-        My_Main {app.myMain}
-          Authors {app.authors}
-            New {app.new}
-            List {app.list}
-          Books {app.books}
-            New {app.new}
-            List {app.list}
-          Book_a_book {app.bookABook}
-        About_us {app.about}
-          Our_History {app.history}
-          Contact {app.contact}
+/My_Main                    app.myMain
+/My_Main/Authors            app.authors
+/My_Main/Authors/New        app.new
+/My_Main/Authors/List       app.list
+/My_Main/Books              app.books
+/My_Main/Books/New          app.new
+/My_Main/Books/List         app.list
+/My_Main/Books/Book_a_book  app.bookabook
+/About_us                   app.about
+/About_us/Our_History       app.history
+/About_us/Contact           app.contact
 
-The add-on changed the values in the ``src/main/webapp/WEB-INF/menu-config.xml``.
+
+The add-on changed the values in the ``src/main/webapp/WEB-INF/gvnix-menu.xml``.
 
 
 .. _Struct-menu: http://struts-menu.sourceforge.net/

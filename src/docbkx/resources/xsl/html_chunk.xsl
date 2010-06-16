@@ -73,12 +73,12 @@
     <!-- cabeceras y pies de página -->
     <xsl:template name="user.header.navigation">
         <div style="background-color:white;border:none;height:105px;">
+            <a style="border:none;" href="http://www.cit.gva.es/" title="Generalitat Valenciana - Conselleria d'Infrestructures i Transport">
+                <img style="border:none;" src="images/logoGVAhome.gif"/>
+            </a>
             <a style="border:none;" href="http://www.gvpontis.gva.es/"
                title="gvNIX">
-                <img style="border:none;" src="images/encabezado.jpg"/>
-            </a>
-            <a style="border:none;" href="http://www.cit.gva.es/" title="Generalitat Valenciana - Conselleria d'Infrestructures i Transport">
-                <img style="border:none;position:absolute;padding-top:0px;right:2em;" src="images/logoGVAhome.gif"/>
+                <img style="border:none;position:absolute;padding-top:0px;right:2em;" src="images/logo-gvNIX-encabezado.png"/>
             </a>
         </div>
     </xsl:template>
@@ -119,7 +119,7 @@
                                                 </xsl:call-template>
                                             </xsl:attribute>
                                             <xsl:call-template name="navig.content">
-                                                <xsl:with-param name="direction" select="'prev'"/>
+                                                <xsl:with-param name="direction" select="'previo'"/>
                                             </xsl:call-template>
                                         </a>
                                     </xsl:if>
@@ -136,7 +136,7 @@
                                                     </xsl:call-template>
                                                 </xsl:attribute>
                                                 <xsl:call-template name="navig.content">
-                                                    <xsl:with-param name="direction" select="'home'"/>
+                                                    <xsl:with-param name="direction" select="'principal'"/>
                                                 </xsl:call-template>
                                             </a>
                                             <xsl:if test="$chunk.tocs.and.lots != 0 and $nav.context != 'toc'">
@@ -170,7 +170,7 @@
                                                 </xsl:call-template>
                                             </xsl:attribute>
                                             <xsl:call-template name="navig.content">
-                                                <xsl:with-param name="direction" select="'next'"/>
+                                                <xsl:with-param name="direction" select="'siguiente'"/>
                                             </xsl:call-template>
                                         </a>
                                     </xsl:if>

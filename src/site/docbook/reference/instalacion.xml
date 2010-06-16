@@ -1,20 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="instalacion" xmlns="http://docbook.org/ns/docbook"
+<chapter version="5.0" xml:id="instalacion"
+         xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title>Instalación de gvNIX</title>
+  <title xml:lang="es">Instalación de gvNIX</title>
 
   <section xml:id="instalacion_requisitos">
-    <title>Requisitos prévios</title>
+    <title xml:lang="es">Requisitos prévios</title>
 
+    <para xml:lang="es">gvNIX es una aplicación JAVA de escritorio por lo que
+    requiere tener un JDK instalado en el sistema.</para>
+
+    <para xml:lang="es">La lista de requisitos es la siguiente:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Una instalación de Java JDK (SUN, JRocket, IBM) 5 o 6.</para>
+      </listitem>
+
+      <listitem>
+        <para>Una instalación de Apache Maven 2.0.9 o superior, incluida en el
+        <emphasis>PATH</emphasis> del sistema.</para>
+      </listitem>
+
+      <listitem>
+        <para>Conexión a Interntet para descargar las dependencias de los
+        proyectos.</para>
+      </listitem>
+    </itemizedlist>
   </section>
 
-  <section xml:id="instalacion_instalacion_linux">
-    <title>Instalación en equipos Linux/Unix</title>
+  <section xml:id="instalacion_instalacion">
+    <title xml:lang="es">Instalación</title>
 
+    <para xml:lang="es">Con todos los requisitos instalados descomprimimos el
+    fichero .zip y añadir el acceso al ejecutable correspondiente del
+    directorio <filename>bin</filename> del directorio descomprimido.</para>
+
+    <para xml:lang="es">Esto se puede hacer:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">Para sistemas *nix y Apple: Crear un enlace
+        simbolico en el directorio <filename>$HOME/bin</filename> del usuario
+        o en alguno disponible en el <varname>$PATH</varname> al fichero
+        <filename>$ROO_HOME/bin/gvnix.sh</filename>. Ejemplo:<programlisting>mkdir $HOME/bin
+ln -s $ROO_HOME/bin/gvnix $HOME/bin/gvnix.sh gvnix</programlisting></para>
+      </listitem>
+
+      <listitem>
+        <para>Para sistemas Windows apadir la ruta a
+        <filename>$ROO_HOME\bin</filename> a la variable de entorno
+        <varname>%Path%</varname></para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Una vez hecho esto, ya se puede trabajar con el framework.</para>
   </section>
-
 </chapter>

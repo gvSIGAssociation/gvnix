@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="apendice-comandos"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Apéndice de Comandos de gvNIX</title>
+
+  <section xml:id="apendice-comandos_addon-persistence">
+    <title xml:lang="es">Comandos del Add-on Persistence</title>
+
+    <para xml:lang="es">Para una descripción general ver <link
+    linkend="addon-persistence">Add-on Persistence</link>.</para>
+
+    <table>
+      <title>Comandos de Add-on Persistence</title>
+
+      <tgroup cols="2">
+        <thead>
+          <colspec colwidth="150" />
+
+          <row>
+            <entry align="center">Comando</entry>
+
+            <entry align="center">Descripción</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
+            checksum set</link></entry>
+
+            <entry>Establece el control de concurrencia por Checksum en una
+            Entidad</entry>
+          </row>
+
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">occ
+            checksum all</link></entry>
+
+            <entry>Establece el control de concurrencia por Checksum en todas
+            las Entidades de la aplicación</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <section>
+      <title>OCCChecksum</title>
+
+      <para>Para ver una descripción de este componente ver <link
+      linkend="addon-persistence_occchecksum">OCCChecksum</link>.</para>
+
+      <para>Este componente añade los siguiente comandos:</para>
+
+      <section>
+        <title
+        xml:id="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
+        checksum set</title>
+
+        <para>Estable el control de concurrencia a una entidad del modelo. Si
+        la entidad ya tenia configurado el sistema de control, la
+        configuración será sobreescrita.</para>
+
+        <para>Los parámetros son:<variablelist>
+            <varlistentry>
+              <term>--entity</term>
+
+              <listitem>
+                <para><emphasis>[Requerido si no se está en contexto] [Clase
+                Java] [autocompletado]</emphasis></para>
+
+                <para>Entidad a establecer el sistema de Control de
+                Concucurrencia.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>--fieldName</term>
+
+              <listitem>
+                <para><emphasis>[Opcional] [Cadena]</emphasis></para>
+
+                <para>Nombre del campo para almacenar el CheckSum</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>--digestMethod</term>
+
+              <listitem>
+                <para><emphasis>[Opcional] [Cadena]</emphasis></para>
+
+                <para>Método de cálculo para el CheckSum [ SHA, MD5, ...
+                ]</para>
+              </listitem>
+            </varlistentry>
+          </variablelist></para>
+      </section>
+
+      <section>
+        <title
+        xml:id="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">occ
+        checksum all</title>
+
+        <para>Estable el control de concurrencia a todas las entidades de la
+        aplicación. Si la entidad ya tuviese configurada con la anotación los
+        parámetros serán sobreescritos.</para>
+
+        <para>Los parámetros son:<variablelist>
+            <varlistentry>
+              <term>--fieldName</term>
+
+              <listitem>
+                <para><emphasis>[Opcional] [Cadena]</emphasis></para>
+
+                <para>Nombre del campo para almacenar el CheckSum</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>--digestMethod</term>
+
+              <listitem>
+                <para><emphasis>[Opcional] [Cadena]</emphasis></para>
+
+                <para>Método de cálculo para el CheckSum [ SHA, MD5, ... ].
+                Para más información sobre este parámetro ver <classname><link
+                xlink:href="http://java.sun.com/j2se/1.5.0/docs/api/java/security/MessageDigest.html">java.security.MessageDigest</link></classname>.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist></para>
+      </section>
+    </section>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-theme-manager">
+    <title xml:lang="es">Comandos del Add-on Theme Manager</title>
+
+    <para xml:lang="es">Para una descripción general ver <link
+    linkend="addon-theme-manager">Add-on Theme Manager</link>.</para>
+
+    <table>
+      <title>Comandos de Add-on Theme Manager</title>
+
+      <tgroup cols="2">
+        <thead>
+          <colspec colwidth="150" />
+
+          <row>
+            <entry align="center">Comando</entry>
+
+            <entry align="center">Descripción</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-theme-manager_theme-install">theme
+            install</link></entry>
+
+            <entry>Instala un tema en la amplicación</entry>
+          </row>
+
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-theme-manager_theme-set">theme
+            set</link></entry>
+
+            <entry>Establece el tema en la aplicación</entry>
+          </row>
+
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-theme-manager_theme-list">theme
+            list</link></entry>
+
+            <entry>Lista los temas disponible, instalados y el
+            establecido</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <section xml:id="apendice-comandos_addon-theme-manager_theme-install">
+      <title
+      xml:id="apendice-comandos_addon-theme-manager_theme-install">theme
+      install</title>
+
+      <para xml:lang="es">Instala (copia) un tema
+      <emphasis>disponible</emphasis> en el directorio
+      <filename>themes</filename> de la aplicación. A partir de ese momento
+      ese tema estará disponible para usarlo con el comando <link
+      linkend="apendice-comandos_addon-theme-manager_theme-set">theme
+      set</link>.</para>
+
+      <para xml:lang="es">Los parámetros son:<variablelist>
+          <varlistentry>
+            <term>--name</term>
+
+            <listitem>
+              <para><emphasis>[Requerido] [Nombre de tema]
+              [autocompletado]</emphasis></para>
+
+              <para>Nombre del tema a instalar.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+    </section>
+
+    <section xml:id="apendice-comandos_addon-theme-manager_theme-set">
+      <title xml:lang="es">theme set</title>
+
+      <para xml:lang="es">Establece (copia) un tema
+      <emphasis>instaladado</emphasis> sobre la aplicación y actualiza el
+      fichero <filename>src/main/webapp/WEB-INF/theme.xml</filename> con la
+      información. Este comando <emphasis role="bold">sobreescribe los
+      ficheros</emphasis> que existan en la aplicación <emphasis
+      role="bold">sin tener en cuenta si ya había algún tema</emphasis>
+      establecido. Por eso, podemos decir que este comando es
+      <emphasis>acumulativo</emphasis>.</para>
+
+      <para xml:lang="es">Los parámetros son:<variablelist>
+          <varlistentry>
+            <term>--name</term>
+
+            <listitem>
+              <para><emphasis>[Obligatorio] [Nombre de tema]
+              [autocompletado]</emphasis></para>
+
+              <para>Nombre del tema a establecer.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+    </section>
+
+    <section xml:id="apendice-comandos_addon-theme-manager_theme-list">
+      <title xml:id="apendice-comandos_addon-theme-manager_theme-list">theme
+      list</title>
+
+      <para xml:lang="es">Lista por consola todos los temas
+      <emphasis>disponibles</emphasis>, <emphasis>instalados</emphasis> y el
+      <emphasis>establecido</emphasis>. La salida del comando es similar a la
+      siguiente:</para>
+
+      <programlisting>  gvNIX           Installed       Active        Name        Description               
+-------------- ---------------- -------------- ----------- -------------------------------
+    X                X                          CIT         CIT theme for Roo projects  
+    X                X              X           gvNIX       gvNIX base theme            
+    X                                           blue        Blue color theme            </programlisting>
+    </section>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-web-exception-handler">
+    <title xml:lang="es">Comandos del Add-on Web Exception Handler</title>
+
+    <para xml:lang="es"></para>
+  </section>
+
+  <xi:include href="apendice-comandos_addon-web-menu.xml" />
+
+  <section xml:id="apendice-comandos_addon-web-mvc-jsp-2.0">
+    <title>Comandos del Add-on Web MVC JSP 2.0</title>
+
+    <para xml:lang="es">Para una descripción general ver <link
+    linkend="addon-web-mvc-jsp-2.0">Add-on Web MVC JSP 2.0</link>.</para>
+
+    <table>
+      <title>Comandos de Add-on Web MVC JSP 2.0</title>
+
+      <tgroup cols="2">
+        <thead>
+          <colspec colwidth="150" />
+
+          <row>
+            <entry align="center">Comando</entry>
+
+            <entry align="center">Descripción</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-web-mvc-jsp-2.0_controller-jsp2.0-support">controller
+            jsp2.0 support</link></entry>
+
+            <entry>Habilita el soporte para la especificacion JSP 2.0</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <section xml:id="apendice-comandos_addon-web-mvc-jsp-2.0_controller-jsp2.0-support">
+      <title>controller jsp2.0 support</title>
+
+      <para>Habilita el soporte para la especificacion JSP 2.0</para>
+    </section>
+  </section>
+
+  <section xml:id="apendice-comandos_web-relation-styles">
+    <title xml:lang="es">Comandos del Add-on Web Relation Styles</title>
+
+    <para xml:lang="es"></para>
+  </section>
+
+  <section xml:id="apendice-comandos_cit-security">
+    <title xml:lang="es">Comandos del Add-on CIT Security</title>
+
+    <para xml:lang="es">Para una descripción general ver <link
+    linkend="addon-cit-security">Add-on CIT Security</link>.</para>
+
+    <table>
+      <title>Comandos de Add-on CIT Security</title>
+
+      <tgroup cols="2">
+        <thead>
+          <colspec colwidth="150" />
+
+          <row>
+            <entry align="center">Comando</entry>
+
+            <entry align="center">Descripción</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">cit
+            security setup</link></entry>
+
+            <entry>Instala el soporte para el servicio Web de Atenticación y
+            Autorización de la CIT</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <para>Los parámetros son:<variablelist>
+        <varlistentry>
+          <term>--url</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [URL]</emphasis></para>
+
+            <para>URL del <emphasis>end-point</emphasis> del servicio web de
+            autenticación y autorización.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--login</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [Cadena]</emphasis></para>
+
+            <para>Nombre de usuario para <emphasis role="bold">el uso del
+            servicio</emphasis>.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--password</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [Cadena]</emphasis></para>
+
+            <para>Contraseña para el <emphasis role="bold">uso del
+            servicio</emphasis>.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--appName</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [Cadena]</emphasis></para>
+
+            <para>Nombre a usar como identificador de la aplicación para el
+            servicio.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
+</chapter>

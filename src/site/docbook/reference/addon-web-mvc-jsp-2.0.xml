@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="addon-web-mvc-jsp-2.0" xmlns="http://docbook.org/ns/docbook"
+<chapter version="5.0" xml:id="addon-web-mvc-jsp-2.0"
+         xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
@@ -10,5 +11,20 @@
   <section xml:id="addon-web-mvc-jsp-2.0_descripcion">
     <title>Descripción</title>
 
+    <para>Este add-on configura el proyecto para que pueda ser desplegado
+    dentro de un contenedor con soporte para la especificación JSP 2.0 (como
+    el Tomcat 5.5 por ejemplo).</para>
+
+    <para>Por defecto los proyectos generados con Spring Roo se generar para
+    la especificación de JSP 2.1 y muchas empresas y organizaciones, por
+    problemas de compatibilidad y/o migración de aplicaciones no tiene la
+    posibilidad de actualizar la versión de su contenedor de datos.</para>
+
+    <para>Para activar el soporte hay que ejecutar el comando <command><link
+    linkend="apendice-comandos_addon-web-mvc-jsp-2.0_controller-jsp2.0-support">controller
+    jsp2.0 support</link></command>. Este comando configura las dependencias
+    para que la aplicación pueda desplegarse en el contenedor sin problemas. Y
+    se queda activa escuchando cambios que pudiesen romper esta
+    compatibilidad.</para>
   </section>
 </chapter>
