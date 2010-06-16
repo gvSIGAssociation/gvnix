@@ -8,9 +8,519 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Guía de desarrollo de aplicaciones con gvNIX</title>
 
-  <section>
-    <title xml:lang="es">Apartado 1</title>
+  <section xml:id="guia-desarrollo_aplicacion-base">
+    <title xml:lang="es">Crear una Aplicación Base con gvNIX</title>
 
-    <para></para>
+    <para xml:lang="es">Utilizando Spring Roo para desarrollar una aplicación
+    web para una <emphasis role="bold">Pizza Shop</emphasis>. Entre los
+    requerimientos para la aplicación de la pizzería se incluye la capacidad
+    para crear una Pizza por los empleados de la pizzería. La <emphasis
+    role="bold">Pizza</emphasis> se compone de una <emphasis
+    role="bold">Base</emphasis> y uno o más <emphasis
+    role="bold">Toppings</emphasis> (Ingredientes). Además el dueño de la
+    tienda quiere permitir que los clientes hagan pedidos a través de la
+    web.</para>
+
+    <para xml:lang="es">Después de esta breve explicación se ha creado un
+    diagrama para el modelo de datos.</para>
+
+    <figure>
+      <title>Pizza Shop Domain Model</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/pizza.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <section xml:id="guia-desarrollo_aplicacion-base_crear-projecto">
+      <title xml:lang="es">Crear el nuevo proyecto</title>
+
+      <para xml:lang="es">Creamos un nuevo proyecto Roo, para eso hay que
+      crear el directorio del proyecto y acceder a la consola de gvNIX:</para>
+
+      <programlisting>bash&gt; <command>mkdir pizza</command>
+bash&gt; <command>cd pizza</command>
+bash&gt; <command>gvnix</command>
+<computeroutput>    ____  ____  ____  
+   / __ \/ __ \/ __ \ 
+  / /_/ / / / / / / / 
+ / _, _/ /_/ / /_/ /  
+/_/ |_|\____/\____/    1.1.0.M1 [rev 3a0b8a3]
+
+
+Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.</computeroutput>
+roo&gt;</programlisting>
+
+      <para xml:lang="es">Después accedemos a la consola de Roo y tecleamos
+      <command>hint</command> para mostrar la guía en el proceso de creación
+      del proyecto:</para>
+
+      <programlisting>roo&gt; <command>hint</command> 
+<computeroutput>Welcome to Roo! We hope you enjoy your stay!
+
+Before you can use many features of Roo, you need to start a new project.
+
+To do this, type 'project' (without the quotes) and then hit TAB.
+
+Enter a --topLevelPackage like 'com.mycompany.projectname' (no quotes).
+When you've finished completing your --topLevelPackage, press ENTER.
+Your new project will then be created in the current working directory.
+
+Note that Roo frequently allows the use of TAB, so press TAB regularly.
+Once your project is created, type 'hint' and ENTER for the next suggestion.
+You're also welcome to visit http://forum.springframework.org for Roo help.</computeroutput></programlisting>
+
+      <para xml:lang="es">Nos muestra las instrucciones para continuar y crear
+      un proyecto, teclear <command>project</command> y pulsar la tecla TAB
+      (tabulador) y se mostrará el parámetro
+      <parameter>--topLevelPackage</parameter> y definir el paquete principal
+      del proyecto en este caso
+      <package>com.springsource.roo.pizzashop</package>. Indicamos también con
+      que JDK se va a trabajar en el proyecto añadiendo el atributo
+      <parameter>--java 5</parameter>, el número 5 corresponde a la versión
+      del JDK utilizado, en este caso JDK 1.5, si no se especifica Roo por
+      defecto utiliza el JDK 1.6</para>
+
+      <programlisting>roo&gt; <command>project --topLevelPackage com.springsource.roo.pizzashop --java 5</command>
+<computeroutput>Created /Users/sschmidt/Development/workspaces/test9/pom.xml
+Created SRC_MAIN_JAVA
+Created SRC_MAIN_RESOURCES
+Created SRC_TEST_JAVA
+Created SRC_TEST_RESOURCES
+Created SRC_MAIN_WEBAPP
+Created SRC_MAIN_RESOURCES/META-INF/spring
+Created SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
+Created SRC_MAIN_RESOURCES/META-INF/spring/log4j.properties</computeroutput></programlisting>
+
+      <para xml:lang="es">Como vemos la posición del shell ha cambiado, ahora
+      estamos dentro del proyecto indicándolo con el nombre del paquete que
+      hemos creado como base</para>
+
+      <programlisting>com.springsource.roo.pizzashop roo&gt;</programlisting>
+
+      <important>
+        <para xml:lang="es">Si se utiliza el JDK1.5 hay ejecutar las
+        siguientes intrucciones para evitar la excepción
+        <errortext>NoClassDefFoundError:
+        javax/xml/bind/JAXBException:</errortext><programlisting>roo&gt; <emphasis
+              role="bold">dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1</emphasis>
+<computeroutput>dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1</computeroutput>
+roo&gt; <command>dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3</command>
+<computeroutput>Managed ROOT/pom.xml [Added dependency com.sun.xml.bind:jaxb-impl:2.1.3]</computeroutput></programlisting></para>
+      </important>
+
+      <para xml:lang="es">Se crea una estructura de carpetas parecida a la que
+      crea maven.</para>
+
+      <figure>
+        <title xml:lang="es">Estructura de carpetas</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/projectfolders.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <para xml:lang="es">Ahora se ha de definir el proveedor JPA con la BBDD
+      asociada. Volvemos a teclear *hint* y nos muestra el siguiente paso a
+      seguir:</para>
+
+      <programlisting>roo&gt; <command>hint</command>
+<computeroutput>Roo requires the installation of a JPA provider and associated database.
+
+Type 'persistence setup' and then hit TAB three times.
+We suggest you type 'H' then TAB to complete "HIBERNATE".
+After the --provider, press TAB twice for database choices.
+For testing purposes, type (or TAB) HYPERSONIC_IN_MEMORY.
+If you press TAB again, you'll see there are no more options.
+As such, you're ready to press ENTER to execute the command.
+
+Once JPA is installed, type 'hint' and ENTER for the next suggestion.</computeroutput>
+roo&gt;</programlisting>
+
+      <para xml:lang="es">Creamos la persistencia utilizando los comandos que
+      nos muestra y tabulando para que nos muestre las opciones
+      disponibles:</para>
+
+      <programlisting>roo&gt; <command>persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</command>
+<computeroutput>Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
+Created SRC_MAIN_RESOURCES/META-INF/spring/database.properties
+Managed SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
+Managed ROOT/pom.xml [Added dependency org.hsqldb:hsqldb:1.8.0.10]
+Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-core:3.5.0-Final]
+Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-entitymanager:3.5.0-Final]
+Managed ROOT/pom.xml [Added dependency org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.0.Final]
+Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-validator:4.0.2.GA]
+Managed ROOT/pom.xml [Added dependency javax.validation:validation-api:1.0.0.GA]
+Managed ROOT/pom.xml [Added dependency cglib:cglib-nodep:2.2]
+Managed ROOT/pom.xml [Added dependency javax.transaction:jta:1.1]
+Managed ROOT/pom.xml [Added dependency org.springframework:spring-jdbc:${spring.version}]
+Managed ROOT/pom.xml [Added dependency org.springframework:spring-orm:${spring.version}]
+Managed ROOT/pom.xml [Added dependency commons-pool:commons-pool:1.5.4]
+Managed ROOT/pom.xml [Added dependency commons-dbcp:commons-dbcp:1.3]
+Managed ROOT/pom.xml</computeroutput>
+roo&gt;</programlisting>
+    </section>
+
+    <section xml:id="guia-desarrollo_aplicacion-base_crear-entidades">
+      <title xml:lang="es">Crear las Entidades y los atributos</title>
+
+      <para xml:lang="es">Ahora hay que crear las entidades, con sus atributos
+      y las relaciones corespondientes a cada una que se han definido en el
+      modelo. Volvemos a teclear <command>hint</command> para que nos muestre
+      el siguiente paso y las opciones existentes:</para>
+
+      <programlisting>roo&gt; <command>hint</command>
+<computeroutput>You can create entities either via Roo or your IDE.
+Using the Roo shell is fast and easy, especially thanks to the TAB completion.
+
+Start by typing 'ent' and then hitting TAB twice.
+Enter the --class in the form '~.domain.MyEntityClassName'
+In Roo, '~' means the --topLevelPackage you specified via 'create project'.
+
+After specify a --class argument, press SPACE then TAB. Note nothing appears.
+Because nothing appears, it means you've entered all mandatory arguments.
+However, optional arguments do exist for this command (and most others in Roo).
+To see the optional arguments, type '--' and then hit TAB. Mostly you won't
+need any optional arguments, but let's select the --testAutomatically option
+and hit ENTER. You can always use this approach to view optional arguments.
+
+After creating an entity, use 'hint' for the next suggestion.</computeroutput>
+roo&gt;</programlisting>
+
+      <para xml:lang="es">El comando <command>entity</command> tiene un número
+      de atributos opcionales mientras que el atributo requerido es
+      <parameter>--class</parameter>, además también se debe utilizar
+      <parameter>--testAutomatically</parameter> para crear automáticamente
+      los test de integración para el <emphasis>Domain Object</emphasis>. Para
+      empezar crearemos la entidad <classname>Topping:</classname></para>
+
+      <programlisting>roo&gt; <command>entity --class ~.domain.Topping --testAutomatically</command>
+<computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping.java
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingDataOnDemand.java
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingIntegrationTest.java
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping_Roo_Entity.aj
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping_Roo_ToString.aj
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping_Roo_Configurable.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingIntegrationTest_Roo_Configurable.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingDataOnDemand_Roo_DataOnDemand.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingIntegrationTest_Roo_IntegrationTest.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingDataOnDemand_Roo_Configurable.aj</computeroutput>
+~.domain.Topping roo&gt;</programlisting>
+
+      <para xml:lang="es">Se ha utilizado para la creación de la entidad el
+      carácter <literal>~</literal> para situarlo en el paquete base del
+      proyecto. Ahora la consola Roo nos lleva dentro de la entidad Topping y
+      así poder definir los campos y las relaciones que tenga. En este caso
+      añadir el atributo <parameter>name</parameter> utilizando el comando
+      <command>entity</command>. Volvemos a teclear <command>hint</command>
+      para que Roo nos muestre el siguiente paso a seguir:</para>
+
+      <programlisting>~.domain.Topping roo&gt; <command>hint</command>
+<computeroutput>You can add fields to your entities using either Roo or your IDE.
+
+To add a new field, type 'field' and then hit TAB. Be sure to select
+your entity and provide a legal Java field name. Use TAB to find an entity
+name, and '~' to refer to the top level package. Also remember to use TAB
+to access each mandatory argument for the command.
+
+After completing the mandatory arguments, press SPACE, type '--' and then TAB.
+The optional arguments shown reflect official JSR 303 Validation constraints.
+Feel free to use an optional argument, or delete '--' and hit ENTER.
+
+If creating multiple fields, use the UP arrow to access command history.
+
+After adding your fields, type 'hint' for the next suggestion.
+To learn about setting up many-to-one fields, type 'hint relationships'.</computeroutput>
+~.domain.Topping roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+<computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping.java
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping_Roo_JavaBean.aj
+Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingDataOnDemand_Roo_DataOnDemand.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping_Roo_ToString.aj</computeroutput>
+~.domain.Topping roo&gt; </programlisting>
+
+      <para xml:lang="es">Utilizando el comando <command>field
+      {tipo}</command> se pueden añadir restricciones (constraints) a los
+      campos usando los atributos opcionales como
+      <parameter>--notNull</parameter> and <parameter>--sizeMin 2</parameter>.
+      Estando en el contexto de la entidad, en este caso
+      <classname>Topping</classname>, Roo añade los atributos a la clase
+      utilizando el comando <command>entity</command>. Si se quiere añadir el
+      campo a cualquier otra entidad se ha de especificar el atributo
+      <parameter>--class</parameter> y la entidad a crear/modificar indicando
+      también el paquete al que pertenece.</para>
+
+      <para xml:lang="es">Ahora se han de crear las demás entidades y sus
+      respectivos atributos correspondientes al modelo definido:</para>
+
+      <programlisting>~.domain.Topping roo&gt; <command>entity --class ~.domain.Base --testAutomatically</command> 
+<computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base.java
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseDataOnDemand.java
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseIntegrationTest.java
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base_Roo_Entity.aj
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base_Roo_ToString.aj
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base_Roo_Configurable.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseIntegrationTest_Roo_Configurable.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseDataOnDemand_Roo_DataOnDemand.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseIntegrationTest_Roo_IntegrationTest.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseDataOnDemand_Roo_Configurable.aj</computeroutput>
+~.domain.Base roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+<computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base.java
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base_Roo_JavaBean.aj
+Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseDataOnDemand_Roo_DataOnDemand.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base_Roo_ToString.aj</computeroutput>
+~.domain.Base roo&gt; <command>entity --class ~.domain.Pizza --testAutomatically</command>
+<computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaDataOnDemand.java
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaIntegrationTest.java
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_Entity.aj
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.aj
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_Configurable.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaDataOnDemand_Roo_Configurable.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaDataOnDemand_Roo_DataOnDemand.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaIntegrationTest_Roo_Configurable.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaIntegrationTest_Roo_IntegrationTest.aj</computeroutput>
+~.domain.Pizza roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+<computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_JavaBean.aj
+Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaDataOnDemand_Roo_DataOnDemand.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.aj</computeroutput>
+~.domain.Pizza roo&gt; <command>field number --fieldName price --type java.lang.Float</command>
+<computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_JavaBean.aj
+Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaDataOnDemand_Roo_DataOnDemand.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.aj</computeroutput>
+~.domain.Pizza roo&gt; </programlisting>
+
+      <para xml:lang="es">Después de añadir el <varname>nombre</varname> y el
+      <varname>precio</varname> a la entidad <classname>Pizza</classname> hay
+      que definir las relaciones con <classname>Base</classname> y
+      <classname>Topping</classname>. Primero la relación
+      <emphasis>m:n</emphasis> (Una <classname>Pizza</classname> puede tener
+      varios <classname>Topping</classname> y un
+      <classname>Topping</classname> puede ser utilizado en varias
+      <classname>Pizzas</classname>) entre <classname>Pizza</classname> y
+      <classname>Topping</classname>. Para crear una relación
+      <emphasis>many-to-many</emphasis> Roo proporciona el siguiente
+      comando:</para>
+
+      <programlisting>~.domain.Pizza roo&gt; <command>field set --fieldName toppings --element ~.domain.Topping</command>
+<computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_JavaBean.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.aj</computeroutput>
+~.domain.Pizza roo&gt;</programlisting>
+
+      <para xml:lang="es">De una manera parecida se definen las relaciones
+      <emphasis>1:1</emphasis> entre las entidades Pizza y Base usando el
+      comando:</para>
+
+      <programlisting>~.domain.Pizza roo&gt; <command>field reference --fieldName base --type ~.domain.Base</command>
+<computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_JavaBean.aj
+Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaDataOnDemand_Roo_DataOnDemand.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.aj</computeroutput>
+~.domain.Pizza roo&gt;</programlisting>
+
+      <para xml:lang="es">De la misma manera se han de crear las entidades y
+      relaciones <classname>PizzaOrder</classname>:</para>
+
+      <programlisting>~.domain.Pizza roo&gt; <command>entity --class ~.domain.PizzaOrder --testAutomatically</command> 
+<computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand.java
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderIntegrationTest.java
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_Entity.aj
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_Configurable.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand_Roo_Configurable.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand_Roo_DataOnDemand.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderIntegrationTest_Roo_Configurable.aj
+Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderIntegrationTest_Roo_IntegrationTest.aj</computeroutput>
+~.domain.PizzaOrder roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+<computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_JavaBean.aj
+Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand_Roo_DataOnDemand.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj</computeroutput>
+~.domain.PizzaOrder roo&gt; <command>field string --fieldName address --sizeMax 30</command>
+<computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_JavaBean.aj
+Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand_Roo_DataOnDemand.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj</computeroutput>
+~.domain.PizzaOrder roo&gt; <command>field number --fieldName total --type java.lang.Float</command> 
+<computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_JavaBean.aj
+Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand_Roo_DataOnDemand.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj</computeroutput>
+~.domain.PizzaOrder roo&gt; <command>field date --fieldName deliveryDate --type java.util.Date</command>
+<computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_JavaBean.aj
+Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand_Roo_DataOnDemand.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj</computeroutput>
+~.domain.PizzaOrder roo&gt; <command>field set --fieldName pizzas --element ~.domain.Pizza</command>
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_JavaBean.aj
+Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj
+~.domain.PizzaOrder roo&gt; </programlisting>
+
+      <para xml:lang="es">Con esto concluye el diseño del modelo de
+      entidades.</para>
+    </section>
+
+    <section xml:id="guia-desarrollo_aplicacion-base_test-integracion">
+      <title xml:lang="es">Test de Integración</title>
+
+      <para xml:lang="es">Después de haber creado la primera iteración del
+      modelo de objetos se ha de hacer una comprobación ejecutando los test de
+      integración que se han ido creando a medida que añadíamos una entidad.
+      Para ejecutar los test utilizaremos el comando <command>perform
+      tests</command>:</para>
+
+      <programlisting>~.domain.PizzaOrder roo&gt; <command>perform test</command>
+<computeroutput>[Thread-4] Warning: JAVA_HOME environment variable is not set.
+[Thread-4] [INFO] Scanning for projects...
+[Thread-4] [INFO] ------------------------------------------------------------------------
+[Thread-4] [INFO] Building pizzashop
+[Thread-4] [INFO]    task-segment: [test]
+[Thread-4] [INFO] ------------------------------------------------------------------------
+[Thread-4] [INFO] [aspectj:compile {execution: default}]
+[Thread-4] [WARNING] advice defined in org.springframework.mock.staticmock.AnnotationDrivenStaticEntityMockingControl has not been applied [Xlint:adviceDidNotMatch]
+[Thread-4] [WARNING] advice defined in org.springframework.mock.staticmock.AbstractMethodMockingControl has not been applied [Xlint:adviceDidNotMatch]
+[Thread-4] [INFO] [resources:resources {execution: default-resources}]
+[Thread-4] [WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[Thread-4] [INFO] Copying 4 resources
+[Thread-4] [INFO] [compiler:compile {execution: default-compile}]
+[Thread-4] [INFO] Nothing to compile - all classes are up to date
+[Thread-4] [INFO] [aspectj:test-compile {execution: default}]
+[Thread-4] [WARNING] advice defined in org.springframework.orm.jpa.aspectj.JpaExceptionTranslatorAspect has not been applied [Xlint:adviceDidNotMatch]
+[Thread-4] [WARNING] advice defined in org.springframework.mock.staticmock.AnnotationDrivenStaticEntityMockingControl has not been applied [Xlint:adviceDidNotMatch]
+[Thread-4] [WARNING] advice defined in org.springframework.mock.staticmock.AbstractMethodMockingControl has not been applied [Xlint:adviceDidNotMatch]
+[Thread-4] [INFO] [resources:testResources {execution: default-testResources}]
+[Thread-4] [WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[Thread-4] [INFO] Copying 0 resource
+[Thread-4] [INFO] [compiler:testCompile {execution: default-testCompile}]
+[Thread-4] [INFO] Nothing to compile - all classes are up to date
+[Thread-4] [INFO] [surefire:test {execution: default-test}]
+[Thread-4] [INFO] Surefire report directory: /tmp/test-gvNIX/t3/target/surefire-reports
+[Thread-4] zzaOrder roo&gt; 
+[Thread-4] -------------------------------------------------------
+[Thread-4]  T E S T Soo&gt; 
+[Thread-4] -------------------------------------------------------
+[Thread-4] Running com.springsource.roo.pizzashop.domain.PizzaOrderIntegrationTest
+[Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.389 sec
+[Thread-4] Running com.springsource.roo.pizzashop.domain.ToppingIntegrationTest
+[Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.174 sec
+[Thread-4] Running com.springsource.roo.pizzashop.domain.PizzaIntegrationTest
+[Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.145 sec
+[Thread-4] Running com.springsource.roo.pizzashop.domain.BaseIntegrationTest
+[Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.137 sec
+[Thread-4] zzaOrder roo&gt; 
+[Thread-4] Results :roo&gt; 
+[Thread-4] zzaOrder roo&gt; 
+[Thread-4] Tests run: 36, Failures: 0, Errors: 0, Skipped: 0
+[Thread-4] zzaOrder roo&gt; 
+[Thread-4] [INFO] ------------------------------------------------------------------------
+[Thread-4] [INFO] BUILD SUCCESSFUL
+[Thread-4] [INFO] ------------------------------------------------------------------------
+[Thread-4] [INFO] Total time: 17 seconds
+[Thread-4] [INFO] Finished at: Wed Jun 16 21:10:22 CEST 2010
+[Thread-4] [INFO] Final Memory: 45M/299M
+[Thread-4] [INFO] ------------------------------------------------------------------------</computeroutput>
+~.domain.PizzaOrder roo&gt;</programlisting>
+    </section>
+
+    <section xml:id="guia-desarrollo_aplicacion-base_usar-eclipse">
+      <title xml:id="es">Utilizar Eclipse como IDE</title>
+
+      <para xml:lang="es">Para crear una estructura de proyecto eclipse Roo
+      hay que utilizar el comando <command>perform eclipse</command>:</para>
+
+      <programlisting>~.domain.PizzaOrder roo&gt; <command>perform eclipse</command>
+<computeroutput>[Thread-6] Warning: JAVA_HOME environment variable is not set.
+[Thread-6] [INFO] Scanning for projects...
+[Thread-6] [INFO] ------------------------------------------------------------------------
+[Thread-6] [INFO] Building pizzashop
+[Thread-6] [INFO]    task-segment: [eclipse:clean, eclipse:eclipse]
+[Thread-6] [INFO] ------------------------------------------------------------------------
+[Thread-6] [INFO] [eclipse:clean {execution: default-cli}]
+[Thread-6] [INFO] Deleting file: .project
+[Thread-6] [INFO] Deleting file: .classpath
+[Thread-6] [INFO] Deleting file: .wtpmodules
+[Thread-6] [INFO] Deleting file: .component
+[Thread-6] [INFO] Deleting file: org.eclipse.wst.common.component
+[Thread-6] [INFO] Deleting file: org.eclipse.wst.common.project.facet.core.xml
+[Thread-6] [INFO] Deleting file: org.eclipse.jdt.core.prefs
+[Thread-6] [INFO] Deleting file: org.eclipse.ajdt.ui.prefs
+[Thread-6] [INFO] Preparing eclipse:eclipse
+[Thread-6] [INFO] [aspectj:compile {execution: default}]
+[Thread-6] [INFO] [eclipse:eclipse {execution: default-cli}]
+[Thread-6] [INFO] Adding support for WTP version 2.0.
+[Thread-6] [INFO] Using Eclipse Workspace: null
+[Thread-6] [INFO] Adding default classpath container: org.eclipse.jdt.launching.JRE_CONTAINER
+[Thread-6] [INFO] Wrote settings to /tmp/test-gvNIX/t3/.settings/org.eclipse.jdt.core.prefs
+[Thread-6] [INFO] Wrote Eclipse project for "pizzashop" to /tmp/test-gvNIX/t3.
+[Thread-6] [INFO] r roo&gt; 
+[Thread-6]        Javadoc for some artifacts is not available.
+[Thread-6]        Please run the same goal with the -DdownloadJavadocs=true parameter in order to check remote repositories for javadoc.
+[Thread-6]        List of artifacts without a javadoc archive:
+[Thread-6]          o cglib:cglib-nodep:2.2
+[Thread-6]          o com.sun.xml.bind:jaxb-impl:2.1.3
+[Thread-6]          o javax.xml.bind:jaxb-api:2.1
+[Thread-6]          o javax.xml.stream:stax-api:1.0-2
+[Thread-6]          o javax.activation:activation:1.1
+[Thread-6]          o commons-dbcp:commons-dbcp:1.3
+[Thread-6]          o commons-pool:commons-pool:1.5.4
+[Thread-6]          o javax.annotation:jsr250-api:1.0
+[Thread-6]          o javax.servlet:servlet-api:2.5
+[Thread-6]          o javax.transaction:jta:1.1
+[Thread-6]          o javax.validation:validation-api:1.0.0.GA
+[Thread-6]          o junit:junit:4.8.1
+[Thread-6]          o log4j:log4j:1.2.15
+[Thread-6]          o org.aspectj:aspectjrt:1.6.9.M2
+[Thread-6]          o org.hibernate:hibernate-core:3.5.0-Final
+[Thread-6]          o antlr:antlr:2.7.6
+[Thread-6]          o dom4j:dom4j:1.6.1
+[Thread-6]          o xml-apis:xml-apis:1.0.b2
+[Thread-6]          o org.slf4j:slf4j-api:1.6.0
+[Thread-6]          o org.hibernate:hibernate-entitymanager:3.5.0-Final
+[Thread-6]          o org.hibernate:hibernate-annotations:3.5.0-Final
+[Thread-6]          o org.hibernate:hibernate-commons-annotations:3.2.0.Final
+[Thread-6]          o org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.0.Final
+[Thread-6]          o javassist:javassist:3.9.0.GA
+[Thread-6]          o org.hibernate:hibernate-validator:4.0.2.GA
+[Thread-6]          o org.hsqldb:hsqldb:1.8.0.10
+[Thread-6]          o org.slf4j:jcl-over-slf4j:1.6.0
+[Thread-6]          o org.slf4j:slf4j-log4j12:1.6.0
+[Thread-6]          o org.springframework:spring-aop:3.0.2.RELEASE
+[Thread-6]          o aopalliance:aopalliance:1.0
+[Thread-6]          o org.springframework:spring-asm:3.0.2.RELEASE
+[Thread-6]          o org.springframework:spring-beans:3.0.2.RELEASE
+[Thread-6]          o org.springframework:spring-core:3.0.2.RELEASE
+[Thread-6]          o org.springframework:spring-aspects:3.0.2.RELEASE
+[Thread-6]          o org.springframework:spring-context:3.0.2.RELEASE
+[Thread-6]          o org.springframework:spring-expression:3.0.2.RELEASE
+[Thread-6]          o org.springframework:spring-context-support:3.0.2.RELEASE
+[Thread-6]          o org.springframework:spring-test:3.0.2.RELEASE
+[Thread-6]          o org.springframework:spring-jdbc:3.0.2.RELEASE
+[Thread-6]          o org.springframework:spring-tx:3.0.2.RELEASE
+[Thread-6]          o org.springframework:spring-orm:3.0.2.RELEASE
+[Thread-6]          o org.springframework.roo:org.springframework.roo.annotations:1.1.0.M1
+[Thread-6] zzaOrder roo&gt; 
+[Thread-6] [INFO] ------------------------------------------------------------------------
+[Thread-6] [INFO] BUILD SUCCESSFUL
+[Thread-6] [INFO] ------------------------------------------------------------------------
+[Thread-6] [INFO] Total time: 4 seconds
+[Thread-6] [INFO] Finished at: Wed Jun 16 21:21:49 CEST 2010
+[Thread-6] [INFO] Final Memory: 36M/330M
+[Thread-6] [INFO] ------------------------------------------------------------------------</computeroutput>
+~.domain.PizzaOrder roo&gt;</programlisting>
+
+      <para>Ahora se ha de importar al entorno de trabajo mediante
+      <command>File -&gt; Import -&gt; Existing Projects into
+      workSpace</command>.</para>
+    </section>
   </section>
 </chapter>
