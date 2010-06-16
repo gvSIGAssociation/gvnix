@@ -18,18 +18,16 @@
  */
 package org.gvnix.web.relation.styles.roo.addon;
 
-import java.io.File;
+import java.io.*;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.beaninfo.BeanInfoMetadata;
 import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.addon.mvc.jsp.*;
-import org.springframework.roo.addon.web.mvc.controller.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
@@ -40,12 +38,12 @@ import org.springframework.roo.metadata.*;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.process.manager.event.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 
 /**
  * Listens for {@link WebScaffoldMetadata} and produces JSPs when requested by
@@ -101,7 +99,12 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	statusListener = new StatusListener(this);
 	processManagerStatus.addProcessManagerStatusListener(statusListener);
     }
-
+    
+    protected void deactivate(ComponentContext context) {
+	if (paginatedRelationTableActivationInfo.isActivated()) {
+	    this.cleanupMetadaCache();
+	}
+    }
     /*
      * (non-Javadoc)
      * 
@@ -150,12 +153,45 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	Assert.isTrue(fileManager.exists(jspxPath), jspFilename
 		+ ".jspx not found");
 
-	try {
-	    XmlUtils.writeXml(fileManager.updateFile(jspxPath)
-		    .getOutputStream(), proposed);
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
+	ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+	XmlUtils.writeXml(XmlUtils.createIndentingTransformer(),
+		byteArrayOutputStream, proposed);
+	String proposedString = byteArrayOutputStream.toString();
+
+	MutableFile mutableFile = null;
+	if (fileManager.exists(jspxPath)) {
+	    String originalString = null;
+
+	    try {
+		originalString = FileCopyUtils.copyToString(new FileReader(
+			jspxPath));
+	    } catch (Exception e) {
+		// TODO: handle exception
+	    }
+
+	    if (!proposedString.equals(originalString)) {
+		mutableFile = fileManager.updateFile(jspxPath);
+	    }
+
+	    try {
+		if (mutableFile != null) {
+
+		    FileCopyUtils.copy(proposedString, new OutputStreamWriter(
+			    mutableFile.getOutputStream()));
+		    fileManager.scan();
+		}
+	    } catch (IOException ioe) {
+		throw new IllegalStateException("Could not output '"
+			+ mutableFile.getCanonicalPath() + "'", ioe);
+	    }
 	}
+
+	// try {
+	// XmlUtils.writeXml(fileManager.updateFile(jspxPath)
+	// .getOutputStream(), proposed);
+	// } catch (Exception e) {
+	// throw new IllegalStateException(e);
+	// }
 
 	return true;
     }
@@ -290,6 +326,24 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	groupViews = XmlUtils.findFirstElement("/div/" + selectedDecorator
 		+ "[@id='relations']", documentRoot);
 
+
+	// There aren't relationships to update or remove.
+	if (oneToManyFieldMetadatas.isEmpty() && groupViews == null) {
+	    return null;
+	} else
+	// It doesn't have relationships. Remove old relation views and
+	// attributes.
+	if (oneToManyFieldMetadatas.isEmpty() && groupViews != null) {
+
+	    divView.removeAttribute("xmlns:relations");
+	    divView.removeAttribute("xmlns:relation");
+	    divView.removeAttribute("xmlns:table");
+
+	    groupViews.getParentNode().removeChild(groupViews);
+
+	    return jspxView;
+	}
+
 	// Create element for group views.
 	// relations="urn:jsptagdir:/WEB-INF/tags/relations"
 	if (groupViews == null) {
@@ -302,10 +356,16 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    divView.setAttribute("xmlns:table",
 		    "urn:jsptagdir:/WEB-INF/tags/form/fields");
 
-	    groupViews = new XmlElementBuilder(
-		    "relations:" + selectedDecorator, jspxView).addAttribute(
-		    "id", "relations").build();
 	}
+
+	if (groupViews != null) {
+
+	    groupViews.getParentNode().removeChild(groupViews);
+	}
+
+	// Create group views.
+	groupViews = new XmlElementBuilder("relations:" + selectedDecorator,
+		jspxView).addAttribute("id", "relations").build();
 
 	WebScaffoldMetadata relatedWebScaffoldMetadata;
 
@@ -313,9 +373,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	String create = "false";
 	String delete = "false";
 	String update = "false";
-
-	// Check if exists view elements to update the jspx.
-	Boolean updateJspx = false;
 
 	// Add the relationship views.
 	for (FieldMetadata fieldMetadata : oneToManyFieldMetadatas) {
@@ -340,7 +397,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 			    .getAttribute("render").compareTo("true") == 0))) {
 		// Don't show the default view of relationship.
 		defaultField.setAttribute("render", "false");
-		updateJspx = true;
 	    }
 
 	    // Retrieve Related Entities Metadata
@@ -376,23 +432,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    }
 
 	    String propertyName = fieldMetadata.getFieldName().getSymbolName();
-
-	    // Check if the child node exists.
-	    views = XmlUtils.findFirstElement("/div/"
-		    + selectedDecorator
-		    + "/"
-		    + selectedDecorator.concat("view")
-		    + "[@id='"
-		    + "s:"
-		    + beanInfoMetadata.getJavaBean()
-			    .getFullyQualifiedTypeName().concat(".").concat(
-				    propertyName) + "']", documentRoot);
-
-	    if (views == null) {
-		updateJspx = true;
-	    } else {
-		continue;
-	    }
 
 	    views = new XmlElementBuilder("relation:".concat(selectedDecorator)
 		    .concat("view"), jspxView)
@@ -472,12 +511,8 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    groupViews.appendChild(views);
 	}
 
-	if (updateJspx) {
 	    jspxView.getLastChild().appendChild(groupViews);
 	    return jspxView;
-	} else {
-	    return null;
-	}
     }
 
     /**
@@ -651,22 +686,30 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		    upstreamDependency, annotationPath);
 
 	    // Retrieve the associated jspx (show an update).
-	    if (!oneToManyFieldMetadatas.isEmpty()) {
 
-		Document showDocument = updateView("show",
-			oneToManyFieldMetadatas, "tab");
-		if (showDocument != null) {
-		    writeToDiskIfNecessary("show", showDocument);
-		}
+	    Document showDocument = updateView("show", oneToManyFieldMetadatas,
+		    "tab");
+	    if (showDocument != null) {
+		writeToDiskIfNecessary("show", showDocument);
+	    }
 
-		Document updateDocument = updateView("update",
-			oneToManyFieldMetadatas, "tab");
-		if (updateDocument != null) {
-		    writeToDiskIfNecessary("update", updateDocument);
-		}
+	    Document updateDocument = updateView("update",
+		    oneToManyFieldMetadatas, "tab");
+	    if (updateDocument != null) {
+		writeToDiskIfNecessary("update", updateDocument);
 	    }
 
 	    iter.remove();
+	}
+
+    }
+    
+    private void cleanupMetadaCache() {
+	PaginatedRealationMetadata item = (PaginatedRealationMetadata) metadataService
+		.get(PaginatedRealationMetadata.getMetadataIdentiferType());
+
+	if (item != null) {
+	    metadataService.evict(item.getId());
 	}
 
     }
