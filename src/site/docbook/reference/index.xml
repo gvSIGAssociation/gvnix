@@ -45,10 +45,11 @@
     <xi:include href="introduccion.xml" />
 
     <xi:include href="instalacion.xml" />
+
     <xi:include href="primeros-pasos.xml" />
   </part>
 
-  <part>
+  <part xml:id="addons-gvnix">
     <title xml:lang="es">Add-ons de gvNIX</title>
 
     <partintro>
@@ -73,7 +74,7 @@
     <xi:include href="addon-cit-security.xml" />
   </part>
 
-  <part>
+  <part xml:id="desarrollo">
     <title xml:lang="es">Documentos de desarrollo</title>
 
     <partintro>
@@ -86,7 +87,7 @@
     <xi:include href="guia_desarrollo_addon_roo.xml" />
   </part>
 
-  <part>
+  <part xml:id="apendices">
     <title xml:lang="es">Apéndices</title>
 
     <partintro>

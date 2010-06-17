@@ -107,7 +107,7 @@
     <para>Instala el sistema de menú de gvNIX en la aplicación actual.</para>
   </section>
 
-  <section>
+  <section xml:id="apendice-comandos_addon-web-menu_page-add">
     <title>page add</title>
 
     <para>Añade una página. Esta opción <emphasis role="bold">sólo crea el

@@ -51,8 +51,9 @@
       <warning>
         <para><emphasis role="bold">Por defecto las aplicaciones de Spring Roo
         se configuran para que la Base de datos se regenere cada vez que se
-        arranca la aplicación, por lo que es conveniente que si se utiliza una
-        Base de datos preexistente se configure correctamente el fichero
+        arranca la aplicación (borrando y creando de nuevo las tablas), por lo
+        que es conveniente que si se utiliza una Base de datos preexistente se
+        configure correctamente el fichero
         <filename>src/main/resources/META-INF/persistence.xml</filename> para
         evitar sorpresas desagradables.</emphasis></para>
       </warning>

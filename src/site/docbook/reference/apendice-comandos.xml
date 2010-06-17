@@ -51,11 +51,11 @@
       </tgroup>
     </table>
 
-    <section>
+    <section xml:id="apendice-comandos_addon-persistence_occchecksum">
       <title>OCCChecksum</title>
 
-      <para>Para ver una descripción de este componente ver <link
-      linkend="addon-persistence_occchecksum">OCCChecksum</link>.</para>
+      <para xml:lang="es">Para ver una descripción de este componente ver
+      <link linkend="addon-persistence_occchecksum">OCCChecksum</link>.</para>
 
       <para>Este componente añade los siguiente comandos:</para>
 
@@ -190,9 +190,7 @@
     </table>
 
     <section xml:id="apendice-comandos_addon-theme-manager_theme-install">
-      <title
-      xml:id="apendice-comandos_addon-theme-manager_theme-install">theme
-      install</title>
+      <title>theme install</title>
 
       <para xml:lang="es">Instala (copia) un tema
       <emphasis>disponible</emphasis> en el directorio
@@ -242,8 +240,7 @@
     </section>
 
     <section xml:id="apendice-comandos_addon-theme-manager_theme-list">
-      <title xml:id="apendice-comandos_addon-theme-manager_theme-list">theme
-      list</title>
+      <title>theme list</title>
 
       <para xml:lang="es">Lista por consola todos los temas
       <emphasis>disponibles</emphasis>, <emphasis>instalados</emphasis> y el
@@ -334,7 +331,7 @@
         <tbody>
           <row>
             <entry><link
-            linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">cit
+            linkend="apendice-comandos_addon-cit-security_cit-security-setup">cit
             security setup</link></entry>
 
             <entry>Instala el soporte para el servicio Web de Atenticación y
@@ -344,50 +341,57 @@
       </tgroup>
     </table>
 
-    <para>Los parámetros son:<variablelist>
-        <varlistentry>
-          <term>--url</term>
+    <section xml:id="apendice-comandos_addon-cit-security_cit-security-setup">
+      <title>cit security setup</title>
 
-          <listitem>
-            <para><emphasis>[Requerido] [URL]</emphasis></para>
+      <para>Instala el soporte para el servicio Web de Atenticación y
+      Autorización de la CIT.</para>
 
-            <para>URL del <emphasis>end-point</emphasis> del servicio web de
-            autenticación y autorización.</para>
-          </listitem>
-        </varlistentry>
+      <para>Los parámetros son:<variablelist>
+          <varlistentry>
+            <term>--url</term>
 
-        <varlistentry>
-          <term>--login</term>
+            <listitem>
+              <para><emphasis>[Requerido] [URL]</emphasis></para>
 
-          <listitem>
-            <para><emphasis>[Requerido] [Cadena]</emphasis></para>
+              <para>URL del <emphasis>end-point</emphasis> del servicio web de
+              autenticación y autorización.</para>
+            </listitem>
+          </varlistentry>
 
-            <para>Nombre de usuario para <emphasis role="bold">el uso del
-            servicio</emphasis>.</para>
-          </listitem>
-        </varlistentry>
+          <varlistentry>
+            <term>--login</term>
 
-        <varlistentry>
-          <term>--password</term>
+            <listitem>
+              <para><emphasis>[Requerido] [Cadena]</emphasis></para>
 
-          <listitem>
-            <para><emphasis>[Requerido] [Cadena]</emphasis></para>
+              <para>Nombre de usuario para <emphasis role="bold">el uso del
+              servicio</emphasis>.</para>
+            </listitem>
+          </varlistentry>
 
-            <para>Contraseña para el <emphasis role="bold">uso del
-            servicio</emphasis>.</para>
-          </listitem>
-        </varlistentry>
+          <varlistentry>
+            <term>--password</term>
 
-        <varlistentry>
-          <term>--appName</term>
+            <listitem>
+              <para><emphasis>[Requerido] [Cadena]</emphasis></para>
 
-          <listitem>
-            <para><emphasis>[Requerido] [Cadena]</emphasis></para>
+              <para>Contraseña para el <emphasis role="bold">uso del
+              servicio</emphasis>.</para>
+            </listitem>
+          </varlistentry>
 
-            <para>Nombre a usar como identificador de la aplicación para el
-            servicio.</para>
-          </listitem>
-        </varlistentry>
-      </variablelist></para>
+          <varlistentry>
+            <term>--appName</term>
+
+            <listitem>
+              <para><emphasis>[Requerido] [Cadena]</emphasis></para>
+
+              <para>Nombre a usar como identificador de la aplicación para el
+              servicio.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+    </section>
   </section>
 </chapter>

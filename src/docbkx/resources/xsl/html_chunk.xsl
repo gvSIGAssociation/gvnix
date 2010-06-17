@@ -119,7 +119,7 @@
                                                 </xsl:call-template>
                                             </xsl:attribute>
                                             <xsl:call-template name="navig.content">
-                                                <xsl:with-param name="direction" select="'previo'"/>
+                                                <xsl:with-param name="direction" select="'prev'"/>
                                             </xsl:call-template>
                                         </a>
                                     </xsl:if>
@@ -136,7 +136,7 @@
                                                     </xsl:call-template>
                                                 </xsl:attribute>
                                                 <xsl:call-template name="navig.content">
-                                                    <xsl:with-param name="direction" select="'principal'"/>
+                                                    <xsl:with-param name="direction" select="'home'"/>
                                                 </xsl:call-template>
                                             </a>
                                             <xsl:if test="$chunk.tocs.and.lots != 0 and $nav.context != 'toc'">
@@ -170,7 +170,7 @@
                                                 </xsl:call-template>
                                             </xsl:attribute>
                                             <xsl:call-template name="navig.content">
-                                                <xsl:with-param name="direction" select="'siguiente'"/>
+                                                <xsl:with-param name="direction" select="'next'"/>
                                             </xsl:call-template>
                                         </a>
                                     </xsl:if>
