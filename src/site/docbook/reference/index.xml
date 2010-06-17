@@ -82,9 +82,9 @@
       con gvNIX y desarrollo de add-ons de Spring Roo</para>
     </partintro>
 
-    <xi:include href="guia_desarrollo.xml" />
+    <xi:include href="guia-desarrollo.xml" />
 
-    <xi:include href="guia_desarrollo_addon_roo.xml" />
+    <xi:include href="guia-desarrollo-addon-roo.xml" />
   </part>
 
   <part xml:id="apendices">
