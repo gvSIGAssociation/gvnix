@@ -35,7 +35,7 @@
 			<outputDirectory>/legal</outputDirectory>
 			<destName>LICENSE.TXT</destName>
  		</file>
-		<!-- gvNIX doc-license.txt -->
+		<!-- gvNIX doc-license.txt html-single-->
 		<file>
 			<source>LICENSE.TXT</source>
 			<outputDirectory>/legal</outputDirectory>
@@ -47,6 +47,12 @@
 			<outputDirectory>/docs/html</outputDirectory>
 			<destName>LICENSE.TXT</destName>
  		</file>
+		<!-- gvNIX doc-license.txt html-->
+		<file>
+			<source>src/main/assembly/DOCS-LICENSE.TXT</source>
+			<outputDirectory>/docs/html-single</outputDirectory>
+			<destName>LICENSE.TXT</destName>
+ 		</file>
 		<!-- gvNIX doc-license.txt pdf-->
 		<file>
 			<source>src/main/assembly/DOCS-LICENSE.TXT</source>
@@ -55,7 +61,11 @@
  		</file>
 		<!-- gvNIX gvnix.sh -->
 		<file>
-			<source>${roo.distribution.final-location}/bin/roo.sh</source>
+			<!-- FIXED problem when ROO is installed on with-spaces path
+			     see http://jira.springframework.org/browse/ROO-905 
+			<source>${roo.distribution.final-location}/bin/roo.sh</source> 
+			-->
+			<source>src/main/assembly/roo.sh</source> 
 			<outputDirectory>/bin</outputDirectory>
 			<destName>gvnix.sh</destName>
 			<fileMode>775</fileMode>
@@ -126,6 +136,10 @@
 		<fileSet>
 			<outputDirectory>/docs/html</outputDirectory>
 			<directory>target/site/reference/html</directory>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/docs/html-single</outputDirectory>
+			<directory>target/site/reference/html-single</directory>
 		</fileSet>
 		<!-- gvNIX annotations -->
 		<fileSet>
