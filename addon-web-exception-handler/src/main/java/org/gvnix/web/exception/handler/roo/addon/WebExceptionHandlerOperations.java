@@ -73,6 +73,12 @@ public interface WebExceptionHandlerOperations {
 	    String exceptionLanguage);
 
     /**
+     * Set up gvNIX initial Exceptions to the project.
+     * 
+     */
+    public void setUpGvNIXExceptions();
+
+    /**
      * Retrieve the Language FileName selected
      * 
      * @param exceptionLanguage
@@ -89,4 +95,5 @@ public interface WebExceptionHandlerOperations {
     public boolean isExceptionMappingAvailable();
 
     public boolean isProjectAvailable();
+
 }

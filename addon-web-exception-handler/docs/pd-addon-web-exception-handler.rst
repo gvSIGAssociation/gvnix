@@ -74,6 +74,8 @@ exception handler remove - Removes an existing Exception::
 exception handler set language - Updates the messages of the Exception in the selected language::
 
   Parameters: --excepcion Name of the exception e.g. java.lang.Exception,  --title Title of the exception, --description Description of the exception to show in the view and --language The language of the messages [es, en... etc].
+
+exception handler setup gvnix - Creates a Set of defined exceptions for gvNix
   
 Proof of Concept
 =================

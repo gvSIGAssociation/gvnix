@@ -96,4 +96,15 @@ public class WebExceptionHandlerCommands implements CommandMarker {
 		exceptionTitle, exceptionDescription, exceptionLanguage);
     }
 
+    @CliAvailabilityIndicator("exception handler setup gvnix")
+    public boolean isSetUpGvNIXExceptionsAvailable() {
+	return exceptionOperations.isProjectAvailable()
+		&& exceptionOperations.isExceptionMappingAvailable();
+    }
+
+    @CliCommand(value = "exception handler setup gvnix", help = "Defines gvNIX predefined Exceptions.")
+    public void setUpGvNIXExceptions() {
+	exceptionOperations.setUpGvNIXExceptions();
+    }
+
 }

@@ -38,7 +38,10 @@ import org.apache.felix.scr.annotations.*;
 /**
  * Implementation of Exception commands that are available via the Roo shell.
  * 
- * @author Ricardo García ( rgarcia at disid dot com ) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Ricardo García ( rgarcia at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 @Component
 @Service
@@ -298,17 +301,17 @@ public class WebExceptionHandlerOperationsImpl implements
 				+ "/property[@name='exceptionMappings']/props/prop[@key='"
 				+ exceptionName + "']", root);
 
-	Assert
-		.isNull(simpleMappingExceptionResolverProp,
-			"There is a Handled Exception with the name:\t"
-				+ exceptionName);
+
+	if (simpleMappingExceptionResolverProp != null) {
+	    return simpleMappingExceptionResolverProp.getTextContent();
+	}
+
+	// View name for this Exception.
+	String exceptionViewName = getExceptionViewName(exceptionName);
 
 	// Exception Mapping
 	Element newExceptionMapping = webXml.createElement("prop");
 	newExceptionMapping.setAttribute("key", exceptionName);
-
-	// View name for this Exception.
-	String exceptionViewName = getExceptionViewName(exceptionName);
 
 	Assert.isTrue(exceptionViewName != null,
 		"Can't create the view for the:\t" + exceptionName
@@ -333,7 +336,8 @@ public class WebExceptionHandlerOperationsImpl implements
     }
 
     /**
-     * Returns the exception view name checking if exists in the file system.
+     * Returns the exception view name checking if exists in the file
+     * webmvc-config.xml file.
      * 
      * @param exceptionName
      *            to create the view.
@@ -457,6 +461,16 @@ public class WebExceptionHandlerOperationsImpl implements
 	    throw new IllegalStateException(e);
 	}
 	Element root = webXml.getDocumentElement();
+
+	// Compare views bean.
+	Element viewToCheck = XmlUtils.findFirstElement(
+		"/tiles-definitions/definition[@name='" + exceptionViewName
+			+ "']", root);
+
+	// Exists the ExceptionView.
+	if (viewToCheck != null) {
+	    return;
+	}
 
 	// New Exception Mapping to the jspx.
 	Element viewJspxException = webXml.createElement("definition");
@@ -684,6 +698,7 @@ public class WebExceptionHandlerOperationsImpl implements
 	String canonicalPath;
 	String fileName;
 
+	String tmpProperty;
 	for (Entry<String, String> entry : params.entrySet()) {
 
 	    for (FileDetails fileDetails : propertiesFiles) {
@@ -693,12 +708,28 @@ public class WebExceptionHandlerOperationsImpl implements
 		fileName = propertyFilePath.concat(StringUtils
 			.getFilename(canonicalPath));
 
-		if (propertyFileName.compareTo(fileName) == 0) {
-		    propFileOperations.changeProperty(Path.SRC_MAIN_WEBAPP,
-			    propertyFileName, entry.getKey(), entry.getValue());
+		if (propertyFileName.compareTo(fileName.substring(1)) == 0) {
+
+		    tmpProperty = propFileOperations.getProperty(
+			    Path.SRC_MAIN_WEBAPP, fileName, entry.getKey());
+		    if (tmpProperty == null) {
+
+			propFileOperations.changeProperty(Path.SRC_MAIN_WEBAPP,
+				propertyFileName, entry.getKey(), entry
+					.getValue());
+		    } else if (tmpProperty.compareTo(entry.getValue()) != 0) {
+			propFileOperations.changeProperty(Path.SRC_MAIN_WEBAPP,
+				propertyFileName, entry.getKey(), entry
+					.getValue());
+		    }
 		} else {
-		    propFileOperations.changeProperty(Path.SRC_MAIN_WEBAPP,
-			    fileName, entry.getKey(), entry.getKey());
+
+		    // Updates the file if the property doesn't exists.
+		    if (propFileOperations.getProperty(Path.SRC_MAIN_WEBAPP,
+			    fileName, entry.getKey()) == null) {
+			propFileOperations.changeProperty(Path.SRC_MAIN_WEBAPP,
+				fileName, entry.getKey(), entry.getKey());
+		    }
 		}
 	    }
 
@@ -733,8 +764,19 @@ public class WebExceptionHandlerOperationsImpl implements
 		exceptionDescription);
 
 	for (Entry<String, String> entry : params.entrySet()) {
-	    propFileOperations.changeProperty(Path.SRC_MAIN_WEBAPP,
-		    propertyFileName, entry.getKey(), entry.getValue());
+
+	    String tmpProperty = propFileOperations.getProperty(
+		    Path.SRC_MAIN_WEBAPP,
+		    propertyFileName, entry.getKey());
+	    if (tmpProperty == null) {
+
+		propFileOperations.changeProperty(Path.SRC_MAIN_WEBAPP,
+			propertyFileName, entry.getKey(), entry.getValue());
+	    } else if (tmpProperty.compareTo(entry.getValue()) != 0) {
+		propFileOperations.changeProperty(Path.SRC_MAIN_WEBAPP,
+			propertyFileName, entry.getKey(), entry.getValue());
+	    }
+
 	}
 
     }
@@ -777,6 +819,82 @@ public class WebExceptionHandlerOperationsImpl implements
 	    }
 
 	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * #setUpGvNIXExceptions()
+     */
+    public void setUpGvNIXExceptions() {
+
+	// java.sql.SQLException
+	addNewHandledException("java.sql.SQLException", "SQLException",
+		"Se ha producido un error en el acceso a la Base de datos.",
+		"es");
+
+	languageExceptionHandled("java.sql.SQLException", "SQLException",
+		"There was an error accessing the database.", "en");
+
+	// java.io.IOException
+	addNewHandledException("java.io.IOException", "IOException",
+		"Existen problemas para enviar o recibir datos.", "es");
+
+	languageExceptionHandled("java.io.IOException", "IOException",
+		"There are problems sending or receiving data.", "en");
+
+	// org.springframework.transaction.TransactionException
+	addNewHandledException(
+		"org.springframework.transaction.TransactionException",
+		"TransactionException",
+		"Se ha producido un error en la transacción. No se han guardado los datos correctamente.",
+		"es");
+
+	languageExceptionHandled(
+		"org.springframework.transaction.TransactionException",
+		"TransactionException",
+		"There was an error in the transaction. No data have been stored properly.",
+		"en");
+
+	// java.lang.UnsupportedOperationException
+	addNewHandledException("java.lang.UnsupportedOperationException",
+		"UnsupportedOperationException",
+		"Se ha producido un error no controlado.", "es");
+
+	languageExceptionHandled("java.lang.UnsupportedOperationException",
+		"UnsupportedOperationException",
+		"There was an unhandled error.", "en");
+    }
+
+    private boolean isGvNixExceptionActivated(String exceptionName) {
+	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		"WEB-INF/spring/webmvc-config.xml");
+	Assert.isTrue(fileManager.exists(webXmlPath),
+		"webmvc-config.xml not found");
+
+	Document webXml;
+
+	try {
+	    webXml = XmlUtils.getDocumentBuilder().parse(
+		    fileManager.getInputStream(webXmlPath));
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+
+	Element root = webXml.getDocumentElement();
+
+	Element simpleMappingExceptionResolverProp = XmlUtils
+		.findFirstElement(
+			"/beans/bean[@class='org.springframework.web.servlet.handler.SimpleMappingExceptionResolver']/property[@name='exceptionMappings']/props/prop[@key='"
+				+ exceptionName + "']", root);
+
+	if (simpleMappingExceptionResolverProp == null) {
+	    return false;
+	}
+
+	return true;
     }
 
     /**
