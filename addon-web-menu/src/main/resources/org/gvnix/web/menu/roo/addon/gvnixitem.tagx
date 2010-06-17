@@ -35,6 +35,7 @@
 	<jsp:directive.attribute name="children" type="java.util.Collection" required="false" description="Item's Children" />
 	<jsp:directive.attribute name="destination" type="java.lang.String" required="false" description="Detination of the item (usually a url)" />
 	<jsp:directive.attribute name="roles" type="java.lang.String" required="false" description="Roles allowed to see this item (empty allows all)" />
+	<jsp:directive.attribute name="ignoreHidden" type="java.lang.Boolean" required="false" description="Ignore hidden menu item value (show all)" />
 
 	<c:if test="${not empty destination}">
 		<!-- Try to identify an EL expression and evaluate it -->
@@ -60,28 +61,60 @@
 
 
 	<!-- draw if not hidden -->
-	<c:if test="${empty hidden or not hidden}">
+  <c:choose>
 
+    <c:when test="${hidden}">
+      <c:choose>
+        <c:when test="${empty ignoreHidden or not ignoreHidden}">
+          <c:set var="showItem" value="false"/>
+        </c:when>
+        <c:otherwise>
+          <c:set var="showItem" value="true"/>
+        </c:otherwise>
+      </c:choose>
+
+    </c:when>
+    <c:otherwise>
+      <c:set var="showItem" value="true"/>
+    </c:otherwise>
+  </c:choose>
+
+  <c:if test="${showItem}">
 
 		<c:choose>
 			<!-- single item -->
 			<c:when test="${empty children}">
-				<menu:item url="${destination}" name="${name}" id="${menuPath}" label="${label}" messageCode="${messageCode}"/>
+				<menu:item url="${destination}" 
+				name="${name}" id="${menuPath}" label="${label}" 
+				messageCode="${messageCode}"/>
 			</c:when>
 			<c:otherwise>
 				<!--  item with children -->
-
+	
 				<c:if test="${not empty messageCode}">
 					<spring:message code="${messageCode}" var="label"/>
 				</c:if>
 				 <!-- menu:category doesn't support url attribute. We need to add  url="${targetUrl} -->
 				 <menu:category name="${name}" id="${menuPath}" label="${label}">
+          <c:if test="${menuItem.hidden}">
+            <c:choose>
+              <c:when test="${empty ignoreHidden or not ignoreHidden}">
+                <c:set var="itemHidden" value="true"/>
+              </c:when>
+              <c:otherwise>
+                <c:set var="itemHidden" value="false"/>
+              </c:otherwise>
+            </c:choose>
+          </c:if>
 
 					<!-- iterate over all children -->
 					<c:forEach items="${children}" var="menuItem">
-						<menu:gvnixitem name="${menuItem.name}" menuPath="${menuItem.path}"
-							hidden="${menuItem.hidden}" label="${menuItem.label}" messageCode="${menuItem.messageCode}"
-							children="${menuItem.children}" destination="${menuItem.destination}"  roles="${menuItem.roles}"/>
+						<menu:gvnixitem name="${menuItem.name}" 
+						  menuPath="${menuItem.path}" hidden="${menuItem.hidden}" 
+						  label="${menuItem.label}" messageCode="${menuItem.messageCode}"
+							children="${menuItem.children}" 
+							destination="${menuItem.destination}" 
+							roles="${menuItem.roles}" ignoreHidden="${itemHidden}"/>
 					</c:forEach>
 				</menu:category>
 			</c:otherwise>

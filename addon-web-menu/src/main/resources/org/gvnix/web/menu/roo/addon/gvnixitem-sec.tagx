@@ -37,59 +37,65 @@
 	<jsp:directive.attribute name="roles" type="java.lang.String" required="false" description="Roles allowed to see this item (empty allows all)" />
 	<jsp:directive.attribute name="ignoreHidden" type="java.lang.Boolean" required="false" description="Ignore hidden menu item value (show all)" />
 
-	<c:if test="${not empty destination and fn:length(fn:trim(destination)) > 0}">
 
-		<!-- Try to identify an EL expression and evaluate it -->
-		<jsp:scriptlet>// <![CDATA[
-		if (destination.matches(".*[$][{].*[}].*")){
-				try{
-					Object destinationEvaluated = jspContext.getExpressionEvaluator().evaluate(destination,
-							java.lang.String.class, jspContext.getVariableResolver(), null);
+  <c:choose>
+    <!-- roles check -->
+    <c:when test="${not empty destination and fn:length(fn:trim(destination)) > 0}">
 
-					jspContext.setAttribute("destination", destinationEvaluated );
+			<!-- Try to identify an EL expression and evaluate it -->
+			<jsp:scriptlet>// <![CDATA[
+			if (destination.matches(".*[$][{].*[}].*")){
+					try{
+						Object destinationEvaluated = jspContext.getExpressionEvaluator().evaluate(destination,
+								java.lang.String.class, jspContext.getVariableResolver(), null);
+	
+						jspContext.setAttribute("destination", destinationEvaluated );
+	
+					} catch (Exception ex){
+						//Don't set attribute
+					}
+	
+			}
+			// ]]>
+			</jsp:scriptlet>
+			<spring:url value="${destination}" var="targetUrl"/>
+	
+	    <!-- url authorization check -->
+	    <sec:authorize url="${destination}" >
+	      <c:set var="authorizedUrl" value="true"/>
+	    </sec:authorize>
+    
+    </c:when>
+    <c:otherwise>
+        <c:set var="authorizedUrl" value="true"/>
+    </c:otherwise>
+  </c:choose>
 
-				} catch (Exception ex){
-					//Don't set attribute
-				}
 
-		}
-		// ]]>
-		</jsp:scriptlet>
-		<spring:url value="${destination}" var="targetUrl"/>
+	<!-- Security -->
+	<c:choose>
+		<!-- roles check -->
+		<c:when test="${not empty roles}">
+			<sec:authorize ifAnyGranted="${roles}">
+				<c:set value="true" var="authorizedRole" />
+			</sec:authorize>
 
+		</c:when>
+		<c:otherwise>
+			<!-- no roles: authorized all -->
+			<c:set var="authorizedRole" value="true"/>
+		</c:otherwise>
 
+	</c:choose>
 
-		<!-- Security -->
-		<c:choose>
-			<!-- roles check -->
-			<c:when test="${not empty roles}">
-				<sec:authorize ifAnyGranted="${roles}">
-					<c:set value="true" var="authorizedRole" />
-				</sec:authorize>
-
-			</c:when>
-			<c:otherwise>
-				<!-- no roles: authorized all -->
-				<c:set var="authorizedRole" value="true"/>
-			</c:otherwise>
-
-		</c:choose>
-
-		<!-- url authorization check -->
-		<sec:authorize url="${destination}" >
-			<c:set var="authorizedUrl" value="true"/>
-		</sec:authorize>
-
-		<c:if test="${empty hidden or not hidden}">
-			<!-- if there is a authorization problem hidden <== true -->
-			<c:if test="${empty authorizedRole || empty authorizedUrl }">
-				<c:set var="notAuthorized" value="true"  />
-			</c:if>
+	<c:if test="${empty hidden or not hidden}">
+		<!-- if there is a authorization problem hidden <== true -->
+		<c:if test="${empty authorizedRole || empty authorizedUrl }">
+			<c:set var="notAuthorized" value="true"  />
 		</c:if>
-		<!-- / Security -->
-
-
 	</c:if>
+	<!-- / Security -->
+
 
 	<c:choose>
 		<c:when test="${notAuthorized}">
@@ -149,7 +155,7 @@
 							label="${menuItem.label}" messageCode="${menuItem.messageCode}"
 							children="${menuItem.children}"
 							destination="${menuItem.destination}"
-							roles="${menuItem.roles}" ignoreHidden="${ignoreHidden}"/>
+							roles="${menuItem.roles}" ignoreHidden="${itemHidden}"/>
 					</c:forEach>
 				</menu:category>
 			</c:otherwise>
