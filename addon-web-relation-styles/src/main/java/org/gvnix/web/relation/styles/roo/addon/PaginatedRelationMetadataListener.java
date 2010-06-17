@@ -161,7 +161,8 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		originalString = FileCopyUtils.copyToString(new FileReader(
 			jspxPath));
 	    } catch (Exception e) {
-		// TODO: handle exception
+		throw new IllegalStateException("Could not get the file:\t'"
+			+ jspxPath + "'", e.getCause());
 	    }
 
 	    if (!proposedString.equals(originalString)) {
@@ -180,13 +181,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 			+ mutableFile.getCanonicalPath() + "'", ioe);
 	    }
 	}
-
-	// try {
-	// XmlUtils.writeXml(fileManager.updateFile(jspxPath)
-	// .getOutputStream(), proposed);
-	// } catch (Exception e) {
-	// throw new IllegalStateException(e);
-	// }
 
 	return true;
     }
