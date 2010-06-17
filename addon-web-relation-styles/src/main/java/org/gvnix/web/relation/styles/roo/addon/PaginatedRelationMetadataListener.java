@@ -100,11 +100,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	processManagerStatus.addProcessManagerStatusListener(statusListener);
     }
     
-    protected void deactivate(ComponentContext context) {
-	if (paginatedRelationTableActivationInfo.isActivated()) {
-	    this.cleanupMetadaCache();
-	}
-    }
     /*
      * (non-Javadoc)
      * 
@@ -700,16 +695,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    }
 
 	    iter.remove();
-	}
-
-    }
-    
-    private void cleanupMetadaCache() {
-	PaginatedRealationMetadata item = (PaginatedRealationMetadata) metadataService
-		.get(PaginatedRealationMetadata.getMetadataIdentiferType());
-
-	if (item != null) {
-	    metadataService.evict(item.getId());
 	}
 
     }
