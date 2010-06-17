@@ -171,7 +171,7 @@ public class MenuPageCommands implements CommandMarker {
 	}
 
 	operations.updatePage(page, name.getSymbolName(), label, messageCode,
-		destination, roles, null, hidden);
+		destination, roles, page.getRooId(), hidden);
     }
 
     @CliCommand(value = "page list", help = "List current menu tree structure.")
