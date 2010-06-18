@@ -10,8 +10,11 @@
 	line-height:normal;
 	margin-right:4px;	/* space between one tab and the next in top/bottom mode */
 	padding:0px;
-	border:1px solid #ccc;
-	background:#e2e2e2 url("../images/tabEnabled.png") repeat-x;
+  border-top-color:#CCCCCC;
+  border-left-color:#CCCCCC;
+  border-right-color:#CCCCCC;
+  border-bottom-color:#E2E2E2;	
+	background:#e2e2e2;
 }
 
 .final .dijitTabInnerDiv {
@@ -25,24 +28,31 @@
 /* checked tab*/
 .final .dijitTabChecked {
 	/* the selected tab (with or without hover) */
-	background-color:#fff;
-	border-color: #ccc;
-	background-image:none;
+	background-color:#f5f5f5;
+  border-top-color:#CCCCCC;
+  border-left-color:#CCCCCC;
+  border-right-color:#CCCCCC;
+  border-bottom-color:#E2E2E2;
+  background-image:none;
 }
 
 /* hovered tab */
 .final .dijitTabHover {
-	color: #243C5F;
-	border-top-color:#92a0b3;
-	border-left-color:#92a0b3;
-	border-right-color:#92a0b3;
-	background:#e2e2e2 url("../images/tabHover.gif") repeat-x;
+  background-color:#f5f5f5;
+  border-top-color:#CCCCCC;
+  border-left-color:#CCCCCC;
+  border-right-color:#CCCCCC;
+  border-bottom-color:#E2E2E2;
+  background-image:none;
 }
 
 .final .dijitTabCheckedHover {
-	color: inherit;
-	border:1px solid #ccc;
-	background:#fff;
+  background-color:#f5f5f5;
+  border-top-color:#CCCCCC;
+  border-left-color:#CCCCCC;
+  border-right-color:#CCCCCC;
+  border-bottom-color:#E2E2E2;
+  background-image:none;
 }
 
 .final .dijitTab .dijitClosable .closeNode {
@@ -92,6 +102,7 @@
 .final .dijitTabContainerTop-tabs {
 	margin-bottom: -1px;
 	border-color: #ccc;
+  background-color: #5E5E5E;
 }
 
 /* top container */
@@ -235,3 +246,4 @@
 	padding-top: 0px;
 	padding-left: 0px;	
 }
+
