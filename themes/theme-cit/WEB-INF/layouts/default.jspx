@@ -26,6 +26,8 @@
     <spring:url value="/static/scripts/menu-debug.js" var="menu"/>
     <spring:url value="/static/scripts/logger-debug.js" var="yui_logger"/ -->
 
+    <spring:url value="/static/scripts/fecha.js" var="fechajs"/>
+
     <spring:theme code="styleSheet" var="cit_css"/> 
     <spring:url value="/static/styles/cit.css" var="cit_css_url"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${cit_css_url}"><!-- //required for FF3 and Opera --></link>
@@ -60,6 +62,8 @@
     <script src="${yui_event}" type="text/javascript"><!-- //  --></script>
     <script src="${yui_core}" type="text/javascript"><!-- //  --></script>
     <script src="${yui_menu}" type="text/javascript"><!-- //  --></script>
+
+    <script src="${fechajs}" type="text/javascript"><!-- //  --></script>
 
     <spring:message code="application.name" var="app_name"/>
     <title><spring:message code="welcome.h3" arguments="${app_name}" /></title>
@@ -147,7 +151,7 @@
               </td>
         
               <td>  
-                <span id="hora">00:00</span>
+                <span></span>
               </td>
               <td>
                 <span id="fecha">--/--/----</span>
@@ -193,7 +197,10 @@
             
           <util:language />
           <util:theme /> -->
-          
+	<SCRIPT LANGUAGE="JavaScript">
+	displayFecha();
+	</SCRIPT>
+
         </div>
       </div>
     </body>
