@@ -94,7 +94,7 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 
     private ComponentContext context;
 
-    private List<String> upstreamDependencyList = new ArrayList<String>();
+    private Set<String> upstreamDependencyList = new HashSet<String>();
 
     private static Logger logger = Logger
 	    .getLogger(PaginatedRelationMetadataListener.class.getName());
