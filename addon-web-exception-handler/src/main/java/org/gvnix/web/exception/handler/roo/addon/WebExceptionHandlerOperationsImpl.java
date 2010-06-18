@@ -301,16 +301,24 @@ public class WebExceptionHandlerOperationsImpl implements
 				+ "/property[@name='exceptionMappings']/props/prop[@key='"
 				+ exceptionName + "']", root);
 
-
-	if (simpleMappingExceptionResolverProp != null) {
-	    return simpleMappingExceptionResolverProp.getTextContent();
-	}
+	boolean updateMappings = false;
+	boolean updateController = false;
 
 	// View name for this Exception.
-	String exceptionViewName = getExceptionViewName(exceptionName);
+	String exceptionViewName;
+
+	if (simpleMappingExceptionResolverProp != null) {
+	    exceptionViewName = simpleMappingExceptionResolverProp
+		    .getTextContent();
+	} else {
+	    updateMappings = true;
+	    exceptionViewName = getExceptionViewName(exceptionName);
+	}
+
+	Element newExceptionMapping;
 
 	// Exception Mapping
-	Element newExceptionMapping = webXml.createElement("prop");
+	newExceptionMapping = webXml.createElement("prop");
 	newExceptionMapping.setAttribute("key", exceptionName);
 
 	Assert.isTrue(exceptionViewName != null,
@@ -319,18 +327,33 @@ public class WebExceptionHandlerOperationsImpl implements
 
 	newExceptionMapping.setTextContent(exceptionViewName);
 
-	simpleMappingExceptionResolverProps.appendChild(newExceptionMapping);
+	if (updateMappings) {
+	    simpleMappingExceptionResolverProps
+		    .appendChild(newExceptionMapping);
+	}
 
 	// Exception Controller
-	Element newExceptionView = webXml.createElementNS(
+	Element newExceptionView = XmlUtils.findFirstElement(
+		"/beans/view-controller[@path='/" + exceptionViewName + "']",
+		root);
+
+	if (newExceptionView == null) {
+	    updateController = true;
+	}
+
+	newExceptionView = webXml.createElementNS(
 		"http://www.springframework.org/schema/mvc", "view-controller");
 	newExceptionView.setPrefix("mvc");
 
 	newExceptionView.setAttribute("path", "/" + exceptionViewName);
 
-	root.appendChild(newExceptionView);
+	if (updateController) {
+	    root.appendChild(newExceptionView);
+	}
 
-	XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);
+	if (updateMappings || updateController) {
+	    XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);
+	}
 
 	return exceptionViewName;
     }
@@ -766,8 +789,7 @@ public class WebExceptionHandlerOperationsImpl implements
 	for (Entry<String, String> entry : params.entrySet()) {
 
 	    String tmpProperty = propFileOperations.getProperty(
-		    Path.SRC_MAIN_WEBAPP,
-		    propertyFileName, entry.getKey());
+		    Path.SRC_MAIN_WEBAPP, propertyFileName, entry.getKey());
 	    if (tmpProperty == null) {
 
 		propFileOperations.changeProperty(Path.SRC_MAIN_WEBAPP,
@@ -866,35 +888,18 @@ public class WebExceptionHandlerOperationsImpl implements
 	languageExceptionHandled("java.lang.UnsupportedOperationException",
 		"UnsupportedOperationException",
 		"There was an unhandled error.", "en");
-    }
 
-    private boolean isGvNixExceptionActivated(String exceptionName) {
-	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		"WEB-INF/spring/webmvc-config.xml");
-	Assert.isTrue(fileManager.exists(webXmlPath),
-		"webmvc-config.xml not found");
+	// javax.persistence.OptimisticLockException
+	addNewHandledException("javax.persistence.OptimisticLockException",
+		"OptimisticLockException",
+		"No se puede actualizar el registro debido a que ha sido actualizado previamente.",
+		"es");
 
-	Document webXml;
+	languageExceptionHandled("javax.persistence.OptimisticLockException",
+		"OptimisticLockException",
+		"Can not update the record because it has been previously updated.",
+		"en");
 
-	try {
-	    webXml = XmlUtils.getDocumentBuilder().parse(
-		    fileManager.getInputStream(webXmlPath));
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
-	}
-
-	Element root = webXml.getDocumentElement();
-
-	Element simpleMappingExceptionResolverProp = XmlUtils
-		.findFirstElement(
-			"/beans/bean[@class='org.springframework.web.servlet.handler.SimpleMappingExceptionResolver']/property[@name='exceptionMappings']/props/prop[@key='"
-				+ exceptionName + "']", root);
-
-	if (simpleMappingExceptionResolverProp == null) {
-	    return false;
-	}
-
-	return true;
     }
 
     /**
