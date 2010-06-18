@@ -32,8 +32,6 @@
     </c:if>
       <spring:message arguments="${label}" code="entity.show" var="title_msg"/>
       <div id="${label}">
-          <script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '${label}', widgetType : 'dijit.layout.ContentPane', widgetAttrs : {title: '${label}', style: 'height: 100%'}})); </script>
-          
             <c:choose>
             <c:when test="${not empty data}">
 
@@ -112,6 +110,7 @@
               <spring:message arguments="${label}" code="entity.not.found.single"/>
             </c:otherwise>
           </c:choose>
+          <script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '${label}', widgetType : 'dijit.layout.ContentPane', widgetAttrs : {title: '${label}', style: 'height: 100%'}})); </script>
       </div>
   </c:if>
 </jsp:root>

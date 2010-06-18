@@ -60,17 +60,23 @@ import org.w3c.dom.*;
 public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	MetadataNotificationListener {
 
-    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private FileManager fileManager;
+    @Reference
+    private FileManager fileManager;
 
-    @Reference private PathResolver pathResolver;
+    @Reference
+    private PathResolver pathResolver;
 
-    @Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    @Reference
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
-    @Reference private ItdMetadataScanner itdMetadataScanner;
+    @Reference
+    private ItdMetadataScanner itdMetadataScanner;
 
     @Reference
     private ProcessManagerStatusProvider processManagerStatus;
@@ -99,7 +105,7 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	statusListener = new StatusListener(this);
 	processManagerStatus.addProcessManagerStatusListener(statusListener);
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -304,6 +310,7 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	Element defaultField = null;
 
 	// Views to create.
+	Element oldGroupViews = null;
 	Element groupViews = null;
 	Element views = null;
 
@@ -312,30 +319,29 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 		+ viewName + ".jspx.");
 
 	// Add the new view if doesn't exists
-	groupViews = XmlUtils.findFirstElement("/div/" + selectedDecorator
+	oldGroupViews = XmlUtils.findFirstElement("/div/" + selectedDecorator
 		+ "[@id='relations']", documentRoot);
 
-
 	// There aren't relationships to update or remove.
-	if (oneToManyFieldMetadatas.isEmpty() && groupViews == null) {
+	if (oneToManyFieldMetadatas.isEmpty() && oldGroupViews == null) {
 	    return null;
 	} else
 	// It doesn't have relationships. Remove old relation views and
 	// attributes.
-	if (oneToManyFieldMetadatas.isEmpty() && groupViews != null) {
+	if (oneToManyFieldMetadatas.isEmpty() && oldGroupViews != null) {
 
 	    divView.removeAttribute("xmlns:relations");
 	    divView.removeAttribute("xmlns:relation");
 	    divView.removeAttribute("xmlns:table");
 
-	    groupViews.getParentNode().removeChild(groupViews);
+	    oldGroupViews.getParentNode().removeChild(oldGroupViews);
 
 	    return jspxView;
 	}
 
 	// Create element for group views.
 	// relations="urn:jsptagdir:/WEB-INF/tags/relations"
-	if (groupViews == null) {
+	if (oldGroupViews == null) {
 
 	    // Add tagx attributes to div bean.
 	    divView.setAttribute("xmlns:relations",
@@ -345,11 +351,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    divView.setAttribute("xmlns:table",
 		    "urn:jsptagdir:/WEB-INF/tags/form/fields");
 
-	}
-
-	if (groupViews != null) {
-
-	    groupViews.getParentNode().removeChild(groupViews);
 	}
 
 	// Create group views.
@@ -423,35 +424,29 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    String propertyName = fieldMetadata.getFieldName().getSymbolName();
 
 	    views = new XmlElementBuilder("relation:".concat(selectedDecorator)
-		    .concat("view"), jspxView)
-		    .addAttribute(
-			    "data",
-			    "${".concat(StringUtils.uncapitalize(entityName))
-				    .concat("}"))
-		    .addAttribute(
-			    "id",
+		    .concat("view"), jspxView).addAttribute(
+		    "data",
+		    "${".concat(StringUtils.uncapitalize(entityName)).concat(
+			    "}")).addAttribute(
+		    "id",
 		    "s:".concat(
 			    beanInfoMetadata.getJavaBean()
-				    .getFullyQualifiedTypeName())
-					    .concat(".").concat(propertyName))
-		    .addAttribute("field",
-			    fieldMetadata.getFieldName().getSymbolName())
-		    .addAttribute(
-			    "fieldId",
+				    .getFullyQualifiedTypeName()).concat(".")
+			    .concat(propertyName)).addAttribute("field",
+		    fieldMetadata.getFieldName().getSymbolName()).addAttribute(
+		    "fieldId",
 		    "l:".concat(
 			    beanInfoMetadata.getJavaBean()
-				    .getFullyQualifiedTypeName())
-					    .concat(".").concat(propertyName))
-		    .addAttribute("messageCode", "entity.reference.not.managed")
-		    .addAttribute("messageCodeAttribute", entityName)
-		    .addAttribute("path", path).addAttribute("delete", delete)
-		    .addAttribute("create", create).addAttribute("update",
-			    update).addAttribute("dataResult",
-			    propertyName.concat("list")).addAttribute(
-			    "relatedEntitySet",
-			    "${".concat(StringUtils.uncapitalize(entityName))
-				    .concat(".").concat(propertyName).concat(
-					    "}")).build();
+				    .getFullyQualifiedTypeName()).concat(".")
+			    .concat(propertyName)).addAttribute("messageCode",
+		    "entity.reference.not.managed").addAttribute(
+		    "messageCodeAttribute", entityName).addAttribute("path",
+		    path).addAttribute("delete", delete).addAttribute("create",
+		    create).addAttribute("update", update).addAttribute(
+		    "dataResult", propertyName.concat("list")).addAttribute(
+		    "relatedEntitySet",
+		    "${".concat(StringUtils.uncapitalize(entityName)).concat(
+			    ".").concat(propertyName).concat("}")).build();
 
 	    // Create column fields and group the elements created.
 
@@ -500,8 +495,8 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    groupViews.appendChild(views);
 	}
 
-	    jspxView.getLastChild().appendChild(groupViews);
-	    return jspxView;
+	oldGroupViews.getParentNode().replaceChild(groupViews, oldGroupViews);
+	return jspxView;
     }
 
     /**
