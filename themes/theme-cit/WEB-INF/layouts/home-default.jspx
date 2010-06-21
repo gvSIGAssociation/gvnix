@@ -25,6 +25,11 @@
     <spring:url value="/static/scripts/container_core-min.js" var="yui_core"/>
     <spring:url value="/static/scripts/menu-min.js" var="yui_menu"/>
 
+    <spring:url value="/static/ayuda/indice/indice.htm" var="ayuda"/>
+    
+    <spring:url value="/static/scripts/global.js" var="global"/>
+    <script src="${global}" type="text/javascript"><!-- //  --></script>
+
 		<link rel="stylesheet" type="text/css" media="screen" href="${cit_url}"></link>
 		<link rel="stylesheet" type="text/css" href="${final_url}"><!-- //required for FF3 and Opera --></link>	
 		<link rel="SHORTCUT ICON" href="${favicon}" />
@@ -123,7 +128,7 @@
 				              <td>
 				              <spring:url value="/static/images/cit/theme/herramientasAux/agenda.gif" var="agenda" />
 				              <img title="Ayuda" alt="-" src="${agenda}"/>
-				              <a href="#">Ayuda</a>
+				              <a onclick="openWindow('${ayuda}','urlAbs','toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=700,height=500')" href="#">Ayuda</a>
 				              <br/>
 				              
 				              <util:language />
@@ -146,3 +151,4 @@
 			</div>
 		</body>
 </html>
+
