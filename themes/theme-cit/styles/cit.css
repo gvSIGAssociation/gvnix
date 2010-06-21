@@ -568,7 +568,7 @@ div .OpcionMenu {
 div .OpcionSubMenu {
   color: #FFFFFF;
   background: #DCDAD5;
-  border: 2px solid #8F8F8F;
+  /* border: 2px solid #8F8F8F; */
   width: 150px;
   display: block;
   position:absolute;
