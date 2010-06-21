@@ -358,7 +358,8 @@ javax.persistence.OptimisticLockException</programlisting>
 
               <para xml:lang="es">Nombre de la excepción a capturar. Se ha de
               especificar el paquete java completo del que proviene. Ej:
-              "java.lang.Exception"</para>
+              "java.lang.Exception" para que así las definiciones sean
+              únicas.</para>
             </listitem>
           </varlistentry>
 
@@ -496,7 +497,9 @@ javax.persistence.OptimisticLockException</programlisting>
       handler setup gvnix</title>
 
       <para xml:lang="es">Instala las excepciones por defecto de gvNIX en la
-      aplicación.</para>
+      aplicación. Para mas información ver: <link
+      linkend="addon-web-exception-handler">Add-on Web Exception
+      Handler</link>.</para>
     </section>
   </section>
 

@@ -19,7 +19,7 @@
     definido.</para>
 
     <para xml:lang="es">Después de la definición de la excepción se pueden
-    añadir definiciones para cada idioma disponible en la aplicación.</para>
+    añadir mensajes para cada idioma disponible en la aplicación.</para>
   </section>
 
   <section xml:id="addon-web-exception-handler_excptiones-de-gvnix">
