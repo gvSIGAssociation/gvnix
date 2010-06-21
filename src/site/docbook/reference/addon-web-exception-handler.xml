@@ -28,9 +28,10 @@
     <para xml:lang="es">Conjunto de excepciones iniciales definidas para
     gvNIX.</para>
 
-    <para xml:lang="es">Inlcuye un comando <emphasis>exception handler setup
-    gvnix</emphasis> para instalar un conjunto de excepciones definidas para
-    gvnix en los idiomas español e inglés:</para>
+    <para xml:lang="es">Inlcuye un comando <link
+    linkend="apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix">exception
+    handler setup gvnix</link> para instalar un conjunto de excepciones
+    definidas para gvnix en los idiomas español e inglés:</para>
 
     <para xml:lang="es"><itemizedlist>
         <listitem>

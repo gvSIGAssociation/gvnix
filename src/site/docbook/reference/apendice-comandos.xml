@@ -228,7 +228,7 @@
             <term>--name</term>
 
             <listitem>
-              <para><emphasis>[Obligatorio] [Nombre de tema]
+              <para><emphasis>[Requerido] [Nombre de tema]
               [autocompletado]</emphasis></para>
 
               <para>Nombre del tema a establecer.</para>
@@ -665,7 +665,7 @@ javax.persistence.OptimisticLockException</programlisting>
             <term>--stringEmptyAsNull</term>
 
             <listitem>
-              <para><emphasis>[opcional] [false por defecto]
+              <para><emphasis>[Opcional] [false por defecto]
               [Booleano]</emphasis></para>
 
               <para>Añadir el editor <link

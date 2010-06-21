@@ -88,7 +88,8 @@
       </note>
 
       <note>
-        <para>Es posible que, despues de ejecutar el comando <command><link
+        <para xml:lang="es">Es posible que, despues de ejecutar el comando
+        <command><link
         linkend="apendice-comandos_addon-web-mvc-jsp-2.0_controller-jsp2.0-support">controller
         jsp2.0 support</link></command> sea necesario regenerar los fichero de
         eclipse del proyecto. <link
