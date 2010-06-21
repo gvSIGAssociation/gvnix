@@ -393,11 +393,12 @@
       <section xml:id="guia-desarrollo_manejo-entidades_definicion_crear-a-mano">
         <title xml:lang="es">Crear una Entidad a mano</title>
 
-        <para xml:lang="es">Para que se identifique una clase *java* como
-        entidad, debe de estar anotada como <classname>@RooEntity</classname>
-        y como <classname>@Entity</classname> de JPA. El framework, cuando
-        crea la entidad con el comando <command>entity</command> genera una
-        clase como esta:</para>
+        <para xml:lang="es">Para que se identifique una clase
+        <literal>java</literal> como entidad, debe de estar anotada como
+        <classname>@RooEntity</classname> y como
+        <classname>@Entity</classname> de JPA. El framework, cuando crea la
+        entidad con el comando <command>entity</command> genera una clase como
+        esta:</para>
 
         <programlisting>    @Entity
     @RooJavaBean
@@ -661,20 +662,20 @@
 
     <para xml:lang="es">En la Capa Web se centra el control de gestión de las
     peticiones por parte del usuario. Esta capa dependerá del Front-End que
-    vallamos a usar. Actualmente están diponibles el Spring MVC y el GWT. Este
-    último, aunque es funcional, todavía está en fase de refinamiento. En este
-    apardo nos centraremos en cómo se genera la aplicación para Spring
+    vallamos a usar. Actualmente están disponibles el Spring MVC y el GWT.
+    Este último, aunque es funcional, todavía está en fase de refinamiento. En
+    este apartado nos centraremos en cómo se genera la aplicación para Spring
     MVC.</para>
 
     <para xml:lang="es">La gestión de peticiones en Spring MVC se base en los
     Controllers, clases en las que, mediante anotaciones, vamos a ir
-    registrando que métodos atienden que penticiones. Un controler puede tener
+    registrando que métodos atienden que peticiones. Un controller puede tener
     o no asociada una entidad.</para>
 
     <para xml:lang="es">Actualmente es posible generar controllers para
-    gestionar las peticiones de CRUD de una entidad de forma automática,
+    gestionar las peticiones de CRUDA de una entidad de forma automática,
     generados a partir de la información que el framework tiene de la entidad.
-    Esto incluye busqueadas configurables (se registran en la entidad y se
+    Esto incluye búsquedas configurables (se registran en la entidad y se
     generan vistas para usarlas).</para>
 
     <section xml:id="guia-desarrollo_web_definir-controller">
@@ -690,13 +691,14 @@
       entidades, tenemos la opción de crearlos a mano además de unos comandos
       que nos aporta el framework.</para>
 
-      <section>
+      <section xml:id="guia-desarrollo_web_definir-controller_usando-comandos">
         <title xml:lang="es">Crear controller usando comandos</title>
 
         <para xml:lang="es">Desde la consola del framework podemos crear
-        controllers de foma sencilla, ya sean para el gestionar el CRUDS (la S
-        no es error tipográfico sino que signifa <literal>Search</literal>)
-        como independientes. Para ello tenemos tres comandos:</para>
+        controllers de forma sencilla, ya sean para el gestionar el CRUDS (la
+        S no es error tipográfico sino que significa
+        <literal>Search</literal>) como independientes. Para ello tenemos tres
+        comandos:</para>
 
         <itemizedlist>
           <listitem>
@@ -704,7 +706,7 @@
           </listitem>
 
           <listitem>
-            <para><command>controller scafold</command></para>
+            <para><command>controller scaffold</command></para>
           </listitem>
 
           <listitem>
@@ -715,9 +717,9 @@
         <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-class">
           <title>controller class</title>
 
-          <para xml:lang="es">Este comando crear un Controller plantilla no
-          vinculado a ninguna entidad en concreto para su implementación
-          manual.</para>
+          <para xml:lang="es">Este comando permite crear un Controller
+          plantilla no vinculado a ninguna entidad en concreto para su
+          implementación manual.</para>
 
           <para xml:lang="es">Los parámetros para este comando son:</para>
 
@@ -768,7 +770,7 @@ public class MyController {
 }</programlisting>
 
           <para xml:lang="es">En este ejemplo la clase atenderá cualquier
-          petición cuya URL comienze por <filename>{URLBase}/my</filename>
+          petición cuya URL comience por <filename>{URLBase}/my</filename>
           definido por la anotación <classname>@RequestMapping</classname>. El
           método receptor, tal cual están definidas las anotaciones
           <classname>@RequestMapping</classname> en los métodos cumplirán
@@ -783,7 +785,7 @@ public class MyController {
             </listitem>
 
             <listitem>
-              <para> las peticiones a <filename>{URLBase}/my/index</filename>
+              <para>las peticiones a <filename>{URLBase}/my/index</filename>
               que se atenderán en el método <methodname>index</methodname> que
               muestra la vista <filename>my/index</filename>.</para>
             </listitem>
@@ -794,30 +796,36 @@ public class MyController {
             </listitem>
           </orderedlist>
 
-          <para xml:lang="es">Para más información sobre la antación
+          <para xml:lang="es">Para más información sobre la anotación
           <classname>@RequestMapping</classname> ver la documentación de <link
           xlink:href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping">Spring
           MVC</link>.</para>
+
+          <para>Este comando, además, generará la vista la vista
+          <filename>WEB-INF/views/my/index.jspx</filename>, añadirá una
+          entrada de menú para ella y actualizará el fichero
+          <filename>WEB-INF/i18n/application.properties</filename> con
+          entradas de internacionalización.</para>
         </section>
 
         <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-scaffold">
           <title>controller scaffold</title>
 
           <para xml:lang="es">Este comando crear un Controller con el CRUDS
-          una Entidad especificada. No hay restrinciones para crear varios
+          una Entidad especificada. No hay restricciones para crear varios
           controllers para la misma Entidad.</para>
 
           <para xml:lang="es">Este comando, además de generar el Controller
           genera las vistas para la creación, visualización, listado,
-          actualización y busquedas de los registros de la entidad.</para>
+          actualización y búsquedas de los registros de la entidad.</para>
 
           <para xml:lang="es">Las URL de las peticiones que acepta el
           Controller generado siguen el convenio <link
           xlink:href="http://en.wikipedia.org/wiki/Representational_State_Transfer">RESTful</link>
           (<link
           xlink:href="http://es.wikipedia.org/wiki/Representational_State_Transfer">en
-          español</link>). Toda la lógica se genera en un ficher
-          <filename>*_Roo_*.aj</filename> asociado al controler, de forma que
+          español</link>). Toda la lógica se genera en un fichero
+          <filename>*_Roo_*.aj</filename> asociado al controller, de forma que
           la clase Java queda limpia de los métodos generados
           automáticamente.</para>
 
@@ -839,7 +847,7 @@ public class MyController {
               <term xml:lang="es">--entity</term>
 
               <listitem>
-                <para xml:lang="es">Nombre de la clase Entidad que manjará el
+                <para xml:lang="es">Nombre de la clase Entidad que manejará el
                 Controller.</para>
               </listitem>
             </varlistentry>
@@ -857,9 +865,9 @@ public class MyController {
               <term xml:lang="es">--disallowedOperations</term>
 
               <listitem>
-                <para xml:lang="es">Lista de operaciones, sepearada por comas,
-                de las operaciones NO permitidas en este controler. Los
-                elementos de esta lista deben estar enter estos:
+                <para xml:lang="es">Lista de operaciones, separada por comas,
+                de las operaciones NO permitidas en este controller. Los
+                elementos de esta lista deben estar entre estos:
                 <literal>create update delete</literal>.</para>
               </listitem>
             </varlistentry>
@@ -869,8 +877,149 @@ public class MyController {
         <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-scafold">
           <title>controller all</title>
 
-          <para xml:lang="es">Este comando crear un Controller
-          plantilla</para>
+          <para xml:lang="es">Este comando ejecuta un <link
+          linkend="guia-desarrollo_web_definir-controller_comandos_controller-scaffold">controller
+          scaffold</link> para cada una de las entidades registradas en la
+          aplicación.</para>
+
+          <para xml:lang="es">Los parámetros para este comando son:</para>
+
+          <variablelist>
+            <varlistentry>
+              <term xml:lang="es">--package</term>
+
+              <listitem>
+                <para xml:lang="es">Nombre del paquete donde se generarán los
+                controllers.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+        </section>
+      </section>
+
+      <section xml:id="guia-desarrollo_web_definir-controller_a-mano">
+        <title xml:lang="es">Crear controller a mano</title>
+
+        <para xml:lang="es">Para que una clase <literal>java</literal> sea un
+        controller de Spring debe estar anotada con la anotación
+        <classname>@Controller</classname> y añadir la anotación <link
+        xlink:href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping"><classname>@RequestMapping</classname></link>
+        como convenga para hacer el mapeo de URL y métodos. Los controllers
+        puedes ser propios, para realizar las operaciones que deseemos o
+        podemos crear controllers automáticos de CRUDA que genera Roo.</para>
+
+        <section xml:id="guia-desarrollo_web_definir-controller_a-mano_propio">
+          <title>Controllers propios</title>
+
+          <para>Para crear un controller manual, además de generar la clase
+          con la anotaciones pertinentes, debemos tener en cuenta las
+          siguientes cuestiones:</para>
+
+          <itemizedlist>
+            <listitem>
+              <para xml:lang="es">Si usamos vista, deberemos crearlas dentro
+              de <filename>WEB-INF/views/{path}</filename> junto con un
+              fichero <filename>WEB-INF/views/{path}/views.xml</filename> de
+              configuración del <literal>Tiles</literal>.</para>
+            </listitem>
+
+            <listitem>
+              <para>Si usamos cadenas de literales susceptibles de
+              internacionalización deberíamos darlas de alta en los ficheros
+              <filename>WEB-INF/i18n/*.properties</filename> para los idiomas
+              disponibles.</para>
+            </listitem>
+          </itemizedlist>
+        </section>
+
+        <section xml:id="guia-desarrollo_web_definir-controller_a-mano_automatico">
+          <title xml:lang="es">Controllers CRUDA automáticos</title>
+
+          <para xml:lang="es">Para crear un controller automático de Spring
+          Roo hay que añadir, además de las anotaciones ya explicadas, la
+          anotación <classname>@RooWebScaffold</classname> que admite la
+          siguiente configuración:</para>
+
+          <variablelist>
+            <varlistentry>
+              <term>path</term>
+
+              <listitem>
+                <para xml:lang="es">Ruta base del controller. Debe coincidir
+                con la ruta de la anotación
+                <classname>@RequestMapping</classname> de la clase. También se
+                usará como ruta base para crear las vistas automáticas a
+                partir de <filename>WEB-INF/views/</filename> en la
+                aplicación.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>formBackingObject</term>
+
+              <listitem>
+                <para xml:lang="es">Objeto que maneja el controller. Debe ser
+                una clase java anotada como entidad de Roo.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>update delete create</term>
+
+              <listitem>
+                <para xml:lang="es">Establece si hay que crear esto métodos en
+                el controller. Por defecto <literal>True</literal>.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>exposeFinders</term>
+
+              <listitem>
+                <para xml:lang="es">Generar vistas para las búsquedas
+                declaradas en la entidad o no. Por defecto
+                <literal>True</literal>.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>registerConverters</term>
+
+              <listitem>
+                <para xml:lang="es">Crear un método
+                <classname>@InitBinder</classname> para registrar
+                convertidores de Objetos a cadenas. Por defecto
+                <literal>True</literal>.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+
+          <para xml:lang="es">Cuando el framework detecte la anotación
+          realizará las siguientes operaciones:</para>
+
+          <orderedlist>
+            <listitem>
+              <para xml:lang="es">Creará un fichero *_Roo_Controller.aj donde
+              generará todos los método para gestionar las peticiones
+              automáticas al controller.</para>
+            </listitem>
+
+            <listitem>
+              <para>Añadirá las vista necesaria en
+              <filename>WEB-INF/views/{nombre_controller}</filename> para
+              gestionar las acciones configuradas en la anotación. </para>
+            </listitem>
+
+            <listitem>
+              <para>Añadirá las entradas de menú pertinentes.</para>
+            </listitem>
+
+            <listitem>
+              <para>Añadirá en el fichero
+              <filename>WEB-INF/i18n/application.properties</filename>
+              entradas para los literales</para>
+            </listitem>
+          </orderedlist>
         </section>
       </section>
     </section>
