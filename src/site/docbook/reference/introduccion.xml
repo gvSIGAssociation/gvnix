@@ -98,6 +98,73 @@
   </section>
 
   <section>
+    <title xml:lang="es">Arquitectura.</title>
+
+    <para xml:lang="es">Spring Roo se centrantra en el desarrollo de
+    aplicaciones de gestión escritas en Java. Actualmente, estas aplicaciones
+    suelen tener un acceso a Bases de Datos datos relacional, usando el API
+    Java Persistence (JPA), inyección de dependencias y gestión de
+    transacciones usando el Framework de Spring, pruebas usando JUnit,
+    generación de la aplicación usando Maven y vistas JSP usando Spring MVC
+    como front-end. Como es habítual en las aplicaciones modernas basadas en
+    Java.</para>
+
+    <para xml:lang="es">Mientras la mayoría de genten se centrar en el
+    desarrollo de aplicaciones web basadas en Spring MVC, es importante
+    destacar que Roo no impone ninguna restrición sobre el tipo de
+    aplicaciones que se pueden generar con este framework. Desde la versión
+    1.0.0 de Spring Roo se pueden generar cualquier typo de aplicación
+    autocontenida. Algunos ejemplos de la funcionalidades que se puden cubrir
+    fácilmente incluyen (pero no están limitados a estos):</para>
+
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">Escucha de mensajes por JMS o envío por
+        SMPT.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Escritura de servicios para acceso remoto de
+        clientes RIA.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Ejecución de acciones predefinadas contra Base de
+        datos.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Investigación de las nuevas funcionalidades de
+        Spring y AspectJ con una inversión dn tiempo mínima.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para xml:lang="es">Una de las mayores difencias entre Spring Roo y las
+    aplicaciones generadas a mano es que no añade capas de abtracción
+    innecesarias. Las aplicaciones J2EE mas tradicionales tendrán una capa
+    DAO, capas de servicios, capa de dominio y una capa de Control. En una
+    aplicación tipica de este framework solo usará una <link
+    linkend="guia-desarrollo_manejo-entidades">capa de Entidad</link> (que es
+    similar a la cama de dominio) y una <link
+    linkend="guia-desarrollo_web">capa Web</link>. Como se indica en la lista
+    anterior, se puede añadir una capa de Servicios si es necesario, aunque es
+    estremadamente extraño añadir una capa DAO.</para>
+
+    <para xml:lang="es">Aquí podemos ver un diagrama de estas capas, con sus
+    tecnologías relacionadas para ilustrar mejor este modelo:</para>
+
+    <figure>
+      <title xml:lang="es">Diagrama Arquitectura</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/gvnix-arquitectura-v0_3.png" scale="80"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
+  </section>
+
+  <section>
     <title xml:lang="es">El interprete de Comandos</title>
 
     <para>Para que el framework empiece a funcionar, hay que arrancar una
@@ -180,7 +247,7 @@ roo&gt;</programlisting>
               <listitem>
                 <para xml:lang="es">Herramienta Eclipse de Spring para
                 trabajar con proyectos Spring, ofrece herramientas para
-                trabajar con Roo desde Eclipse </para>
+                trabajar con Roo desde Eclipse</para>
               </listitem>
             </varlistentry>
           </variablelist>
@@ -222,8 +289,8 @@ roo&gt;</programlisting>
 
       <listitem>
         <para xml:lang="es">Si se produce algún error en alguna operación, Roo
-        deshará todos los cambios generados dejando la aplicación como estaba.
-        </para>
+        deshará todos los cambios generados dejando la aplicación como
+        estaba.</para>
       </listitem>
 
       <listitem>
@@ -286,15 +353,5 @@ roo&gt;</programlisting>
 
     <para xml:lang="es">En el siguiente diagrama podemos ver las distintas
     librerías y elementos:</para>
-
-    <figure>
-      <title xml:lang="es">Diagrama de proyecto generado</title>
-
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="images/gvnix-arquitectura-v0_3.png" scale="80"></imagedata>
-        </imageobject>
-      </mediaobject>
-    </figure>
   </section>
 </chapter>

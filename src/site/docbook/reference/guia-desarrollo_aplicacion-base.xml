@@ -98,7 +98,7 @@ Created SRC_MAIN_RESOURCES/META-INF/spring/log4j.properties</computeroutput></pr
 
     <important>
       <para xml:lang="es">Si se utiliza el JDK1.5 hay ejecutar las siguientes
-      intrucciones para evitar la excepción <errortext>NoClassDefFoundError:
+      instrucciones para evitar la excepción <errortext>NoClassDefFoundError:
       javax/xml/bind/JAXBException:</errortext><programlisting>roo&gt; <emphasis
             role="bold">dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1</emphasis>
 <computeroutput>dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1</computeroutput>
@@ -166,7 +166,8 @@ roo&gt;</programlisting>
       que es conveniente que si se utiliza una Base de datos preexistente se
       configure correctamente el fichero
       <filename>src/main/resources/META-INF/persistence.xml</filename> para
-      evitar sorpresas desagradables.</emphasis></para>
+      evitar sorpresas desagradables. Más información <link
+      linkend="guia-desarrollo_manejo-entidades_regeneracion-bbdd">aquí</link>.</emphasis></para>
     </warning>
   </section>
 
@@ -174,7 +175,7 @@ roo&gt;</programlisting>
     <title xml:lang="es">Crear las Entidades y los atributos</title>
 
     <para xml:lang="es">Ahora hay que crear las entidades, con sus atributos y
-    las relaciones corespondientes a cada una que se han definido en el
+    las relaciones correspondientes a cada una que se han definido en el
     modelo. Volvemos a teclear <command>hint</command> para que nos muestre el
     siguiente paso y las opciones existentes:</para>
 
@@ -251,8 +252,8 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping_Roo_ToString
 
     <para xml:lang="es">Utilizando el comando <command>field {tipo}</command>
     se pueden añadir restricciones (constraints) a los campos usando los
-    atributos opcionales como <parameter>--notNull</parameter> and
-    <parameter>--sizeMin 2</parameter>. Estando en el contexto de la entidad,
+    atributos opcionales como <parameter>--notNull</parameter> y
+    <parameter>--sizeMin 2</parameter>. Dentro de el contexto de la entidad,
     en este caso <classname>Topping</classname>, Roo añade los atributos a la
     clase utilizando el comando <command>entity</command>. Si se quiere añadir
     el campo a cualquier otra entidad se ha de especificar el atributo
@@ -427,8 +428,18 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToStr
 [Thread-6] [INFO] ------------------------------------------------------------------------</computeroutput>
 ~.domain.PizzaOrder roo&gt;</programlisting>
 
-    <para>Ahora se ha de importar al entorno de trabajo mediante <command>File
-    -&gt; Import -&gt; Existing Projects into workSpace</command>.</para>
+    <para xml:lang="es">Este comando termina ejecutando un <command>mvn
+    eclipse:eclipse</command> para el proyecto, por lo que es indiferente el
+    uso de ambos métodos.</para>
+
+    <para xml:lang="es">Ahora se ha de importar al entorno de trabajo mediante
+    <command>File -&gt; Import -&gt; Existing Projects into
+    workSpace</command>.</para>
+
+    <para xml:lang="es">También es posible borrar la configuración de eclipse
+    ejecutando el comando <command>mvn eclipse:clean</command>. Para regenerar
+    la configuración de eclipse en un solo comando usar <command>mvn
+    eclipse:clean eclipse:eclipse</command>.</para>
   </section>
 
   <section>
@@ -467,13 +478,209 @@ Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
   <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion">
     <title xml:lang="es">Arrancar la aplicación web</title>
 
-    <para xml:lang="es">hora solamente queda poner en marcha la aplicación web
-    para esto debemos salir de la consola de Roo mediante el comando
+    <para xml:lang="es">Ahora solamente queda poner en marcha la aplicación
+    web para esto debemos salir de la consola de Roo mediante el comando
     <command>quit</command>. Al situarnos de nuevo en el shell, en la carpeta
     raíz del proyecto se ha de ejecutar la orden <command>mvn
     tomcat:run</command>.</para>
 
     <para>Para poder ver en funcionamiento la aplicación debemos acceder a la
     dirección: <uri>http://localhost:8080/pizzashop</uri></para>
+  </section>
+
+  <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse">
+    <title xml:lang="es">Arrancar la aplicación con Eclipse</title>
+
+    <para xml:lang="es">Es posible arrancar la aplicación desde el propio
+    Eclipse y que, además de permitir depurarla, nos permita hacer algunos
+    cambios en caliente sobre la aplicación.</para>
+
+    <para xml:lang="es">Para ello, debemos tener la aplicación importada en un
+    <emphasis>workspace</emphasis> de Eclipse (ver como hacerlo <link
+    linkend="guia-desarrollo_aplicacion-base_usar-eclipse">aquí</link>) y
+    configurar el servidor dónde queremos ejecutarlo. Eclipse es capaz de
+    gestionar distinto tipos de servidores, generando sus propios directorio y
+    ficheros de configuración.</para>
+
+    <para xml:lang="es">Para prepara un servido seguiremos los siguiente
+    pasos:</para>
+
+    <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_mostrar-vista-servidores">
+      <title>Mostrar la Vista de Servidores de Eclipse</title>
+
+      <para>Eclipse tiene una vista que permite ver los distintos servidores
+      configurados y gestionarlos desde ahí. Estos son los pasos para mostrar
+      la vista:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>Abra una perspectiva de desarrollo Java (Java o java).</para>
+        </listitem>
+
+        <listitem>
+          <para>Abra la opción del menú <literal>Window/Show
+          view/Other...</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para>Busque la vista llamada <literal>Servers</literal> y pulse el
+          botón <literal>Ok</literal>.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_crear-entorno-ejecucion">
+      <title xml:lang="es">Crear un entrono de ejecución de Server (Server
+      Runtime environment)</title>
+
+      <para xml:lang="es">Se pueden definir múltiples entornos de ejecución
+      para los servidores. Esta configuración incluye el tipo de servidor
+      (Tomcat, Jetty, JBoss, etc..), Máquina Virtual Java (JRE 1.5, JRE 1.6,
+      etc...) y la ruta a los binarios del servidor.</para>
+
+      <para xml:lang="es">Cabe destacar que eclipse <emphasis role="bold">no
+      usa la configuración que exista en la instalación del
+      servidor</emphasis> en la mayoría de los casos. Solo usa los ejecutables
+      para arrancarlo con ficheros de configuración que almacena en el propio
+      workspace.</para>
+
+      <para xml:lang="es">En este caso, vamos a prepara el entrono para Tomcat
+      6 (para Tomcat 5.5 ver <link linkend="addon-web-mvc-jsp-2.0">Add-on Web
+      MVC JSP 2.0</link>) que es uno de los entornos que se usan
+      frecuentemente para arrancar la aplicaciones de Spring Roo.</para>
+
+      <para xml:lang="es">Asumimos que disponemos de una instalación de Tomcat
+      6 en nuestra máquina, no importa que esté configurada o no, y seguiremos
+      los siguientes pasos:</para>
+
+      <orderedlist>
+        <listitem>
+          <para xml:lang="es">Abrir el diálogo de preferencias de Eclipse
+          desde el menú <literal>Window/Preferences</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Ir al Panel de configuración de los entornos de
+          servidor que se encuentra en <literal>Server/Runtime
+          environments</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Pulsar el botón
+          <literal>Add...</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Seleccione <literal>Apache Tomcat v6.0</literal>
+          de la lista de tipos y pulse el botón
+          <literal>Next</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Introduzca un nombre para la
+          configuración.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Seleccione el directorio donde se encuentra la
+          instalación de Tomcat 6.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Seleccione la máquina virtual Java con la que
+          ejecutar el servidor.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Pulse el botón <literal>Finish</literal>.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_crear-servidor">
+      <title xml:lang="es">Crear una configuración de Servidor</title>
+
+      <para xml:lang="es">Una configuración de servidor se compone del <link
+      linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_crear-entorno-ejecucion">entrono
+      de ejecución</link>, una o varias aplicaciones a arrancar y una
+      configuración del servicio (puertos, parámetros de memoria, recursos,
+      variables...). Eclipse permite crear todas las configuraciones que
+      necesitemos con las combinaciones posibles.</para>
+
+      <para xml:lang="es">Para crear una nueva configuración siga los pasos
+      siguientes:</para>
+
+      <orderedlist>
+        <listitem>
+          <para xml:lang="es">En <link
+          linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_mostrar-vista-servidores">vista
+          de servidores</link>, pulsar botón derecho sobre el fondo y
+          seleccionar <literal>New/Server</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Seleccione el tipo de servidor (<literal>Tomcat
+          v6.0</literal> en nuestro caso) del la lista <literal>server
+          type</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Establezca el nombre para el nuevo
+          servidor.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Seleccione el <link
+          linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_crear-entorno-ejecucion">entrono
+          de ejecución</link> que debe usar el servidor.</para>
+        </listitem>
+
+        <listitem>
+          <para>Añada las aplicaciones a ejecutar en este servidor de entre
+          las disponibles.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_ajustar-configuracion-server">
+      <title xml:lang="es">Ajustar la configuración del Servidor</title>
+
+      <para xml:lang="es">Puede ser necesario ajustar algunas opciones de la
+      configuración del servidor. Para poder acceder a dichas opciones hay que
+      seleccionar el servidor desde la <link
+      linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_mostrar-vista-servidores">vista
+      de servidores</link> y, con el botón derecho del ratón sobre el pulsar
+      <literal>Open</literal>.</para>
+
+      <para xml:lang="es">Desde el panel abierto podremos gestionar:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Datos generales del servidor.</para>
+        </listitem>
+
+        <listitem>
+          <para>Opciones de publicación y seguridad.</para>
+        </listitem>
+
+        <listitem>
+          <para>TimeOuts (muy útil si se está depurando algún proceso de
+          arranque).</para>
+        </listitem>
+
+        <listitem>
+          <para>Puertos</para>
+        </listitem>
+
+        <listitem>
+          <para>Configuración de tipos MIME.</para>
+        </listitem>
+
+        <listitem>
+          <para>Las aplicaciones/modulos a lanzar (admite módulos
+          externos).</para>
+        </listitem>
+      </itemizedlist>
+    </section>
   </section>
 </section>

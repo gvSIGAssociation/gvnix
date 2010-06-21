@@ -61,11 +61,11 @@
     accesible.</para>
 
     <para>Para establecer un tema se realiza usando el comando <link
-    linkend="apendice-comandos_addon-theme-manager_theme-install"><command>theme
+    linkend="apendice-comandos_addon-theme-manager_theme-set"><command>theme
     set</command></link>. Este comando copiará el contenido del tema al
     directorio de la aplicación, sobreescribiendo los fichero ya existentes.
-    Este comando <emphasis role="bold">es acumulativo y no
-    reversible</emphasis>.</para>
+    Este comando <emphasis role="bold">es acumulativo y no implementa ningún
+    mecanismo para revertir los cambios</emphasis>.</para>
 
     <para>Los temas <emphasis>disponibles</emphasis> están ubicados en el
     directorio <filename>themes</filename> de la instalación de gvNIX.</para>
@@ -102,26 +102,28 @@
   </section>
 
   <section>
-    <title>Futuras versiones</title>
+    <title xml:lang="es">Futuras versiones</title>
 
-    <para>Para las futuras versiones de esta herramienta se preve (aunque no
-    están planificadas) añadir la siguientes funcionalidades:</para>
+    <para xml:lang="es">Para las futuras versiones de esta herramienta se
+    preve (aunque no están planificadas) añadir la siguientes
+    funcionalidades:</para>
 
     <variablelist>
       <varlistentry>
-        <term>Exportación de temas</term>
+        <term xml:lang="es">Exportación de temas</term>
 
         <listitem>
-          <para>Generar un Tema basado en los elementos de visualización
-          actuales de la aplicación.</para>
+          <para xml:lang="es">Generar un Tema basado en los elementos de
+          visualización actuales de la aplicación.</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term>Descarga de temas</term>
+        <term xml:lang="es">Descarga de temas</term>
 
         <listitem>
-          <para>Soporte de descarga de temas desde servidores.</para>
+          <para xml:lang="es">Soporte de descarga de temas desde
+          servidores.</para>
         </listitem>
       </varlistentry>
     </variablelist>

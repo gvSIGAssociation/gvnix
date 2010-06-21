@@ -2,8 +2,8 @@
 <chapter version="5.0" xml:id="guia-desarrollo"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
-	 xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
@@ -106,8 +106,9 @@
       <section xml:id="guia-desarrollo_manejo-entidades_definicion_crear-con-comando">
         <title xml:lang="es">Crear una Entidad usando comandos</title>
 
-        <para xml:lang="es">Desde la consola de *Roo* podemos crear de forma
-        sencilla. Para ello usaremos dos comandos:</para>
+        <para xml:lang="es">Desde la consola del framework podemos crear
+        Entidades de forma sencilla. Para ello tenemos disponibles dos
+        comandos:</para>
 
         <itemizedlist>
           <listitem>
@@ -138,7 +139,7 @@
 
               <listitem>
                 <para xml:lang="es">Nombre de la clase java para la entidad
-                entidad (incluido su paquete) (recordar que se puede usar el
+                (incluido su paquete) (recordar que se puede usar el
                 <literal>~</literal> para especificar el paquete base de la
                 aplicación).</para>
               </listitem>
@@ -251,7 +252,7 @@
               <term xml:lang="es">field number</term>
 
               <listitem xml:lang="es">
-                <para>Crea un campo de tipo numerico (es posible especificarle
+                <para>Crea un campo de tipo numérico (es posible especificarle
                 el tipo mediante el parámetro
                 <parameter>--type</parameter>).</para>
               </listitem>
@@ -342,7 +343,7 @@
           <section xml:id="guia-desarrollo_manejo-entidades_definicion_crear-con-comando_field_ejemplos">
             <title xml:lang="es">Ejemplos</title>
 
-            <para xml:lang="es">Estos son algunos ejemplos de ceración de
+            <para xml:lang="es">Estos son algunos ejemplos de creación de
             campos:</para>
 
             <orderedlist>
@@ -554,7 +555,7 @@
           <filename>{Entidad}_Roo_JavaBean.aj</filename>. También es admitida
           en otras clases que no sean entidades, por lo que es muy útil para
           toda la aplicación.<important>
-              <para>La <emphasis role="bold">restrición del paquete
+              <para>La <emphasis role="bold">restricción del paquete
               base</emphasis> que se menciona en la <link
               linkend="guia-desarrollo_manejo-entidades_definicion_crear-a-mano_anotacion-rooentity">anotación
               @RooEntity</link> se <emphasis role="bold">aplica a todas las
@@ -563,31 +564,314 @@
         </section>
       </section>
 
-      <section>
-        <title>Modificar el modelo</title>
+      <section xml:id="guia-desarrollo_manejo-entidades_definicion_modificar-modelo">
+        <title xml:lang="es">Modificar el modelo</title>
 
-        <para>Como podreís comprobar, no existe comando para <emphasis
-        role="bold">eliminar una entidad</emphasis> del modelo. Para ello lo
-        único que teneís que hacer es <emphasis role="bold">eliminar el
-        fichero</emphasis> <filename>.java</filename> de la entidad y gvNIX,
-        automáticamente, detectará el cambio y limpiara el sus elementos
-        relacionados (ficheros {entidad}_Roo_*.aj, controladores asociados,
-        elementos de menú).</para>
+        <para xml:lang="es">Como podréis comprobar, no existe comando para
+        <emphasis role="bold">eliminar una entidad</emphasis> del modelo. Para
+        ello lo único que tenéis que hacer es <emphasis role="bold">eliminar
+        el fichero</emphasis> <filename>.java</filename> de la entidad y
+        gvNIX, automáticamente, detectará el cambio y limpiara el sus
+        elementos relacionados (ficheros {entidad}_Roo_*.aj, controladores
+        asociados, elementos de menú).</para>
 
-        <para>Para <emphasis role="bold">eliminar un campo</emphasis> solo hay
-        que <emphasis role="bold">eliminarlo de la clase</emphasis>
-        <filename>.java</filename> y todos los componentes relacionados serán
-        actualizados automáticamente.</para>
+        <para xml:lang="es">Para <emphasis role="bold">eliminar un
+        campo</emphasis> solo hay que <emphasis role="bold">eliminarlo de la
+        clase</emphasis> <filename>.java</filename> y todos los componentes
+        relacionados serán actualizados automáticamente.</para>
 
-        <para>Para <emphasis role="bold">añadir un campo</emphasis> una
-        entidad existente se puede hacer <emphasis
+        <para xml:lang="es">Para <emphasis role="bold">añadir un
+        campo</emphasis> una entidad existente se puede hacer <emphasis
         role="bold">manualmente</emphasis> (con las anotaciones adecuadas)
         <emphasis role="bold">o usando el comando</emphasis> <command><link
         linkend="guia-desarrollo_manejo-entidades_definicion_crear-con-comando_field">field</link></command>.</para>
 
-        <para>En cualquier caso gvNIX <emphasis role="bold">monitoriza los
-        cambios en el proyecto</emphasis> y <emphasis role="bold">actualiza
-        los componentes</emphasis> relacionados cuando es necesario.</para>
+        <para xml:lang="es">En cualquier caso gvNIX <emphasis
+        role="bold">monitoriza los cambios en el proyecto</emphasis> y
+        <emphasis role="bold">actualiza los componentes</emphasis>
+        relacionados cuando es necesario.</para>
+      </section>
+
+      <section xml:id="guia-desarrollo_manejo-entidades_definicion_identificadores-compuestos">
+        <title xml:lang="es">Identificadores Compuestos</title>
+
+        <para xml:lang="es">Ahora mismo no está completo el soporte para
+        identificadores que estén compuestos de mas de un campo.</para>
+
+        <para xml:lang="es">Para más información ver:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><link
+            xlink:href="https://jira.springsource.org/browse/ROO-505">ROO-505</link></para>
+          </listitem>
+
+          <listitem>
+            <para><link
+            xlink:href="https://jira.springsource.org/browse/ROO-345">ROO-345</link></para>
+          </listitem>
+        </itemizedlist>
+      </section>
+    </section>
+
+    <section xml:id="guia-desarrollo_manejo-entidades_ingenieria-inversa">
+      <title xml:lang="es">Ingeniería inversa de entidades</title>
+
+      <para xml:lang="es">En en proyecto de Spring Roo tiene planeado añadir
+      soporte para soportar ingeniería inversa de entidades. En un principio
+      nosotros sugerimos el uso de Hiberate Tools para realizar la tarea, pero
+      desde el proyecto pretenden dar un soporte nativo a ello.</para>
+
+      <para xml:lang="es">En la versión en desarrollo (v1.1.0M2) se ha
+      iniciado ya el desarrollo del mecanismo para ello. Se puede ver más
+      información en: <link
+      xlink:href="https://jira.springsource.org/browse/ROO-435">ROO-435</link>.</para>
+    </section>
+
+    <section xml:id="guia-desarrollo_manejo-entidades_regeneracion-bbdd">
+      <title xml:lang="es">Regeneración de la Base de datos en cada
+      arranque.</title>
+
+      <para xml:lang="es">Por defecto, la configuración de Roo <emphasis
+      role="bold">reconstruye la BBDD en cada ejecución de la
+      aplicación</emphasis>. Cuando usamos una base de datos pre-existente o
+      compartida, lo mas seguro, que este comportamiento no nos
+      convenga.</para>
+
+      <para xml:lang="es">Para evitar esto se debe modificar el fichero
+      <filename>src/main/resources/META-INF/persistence.xml</filename>
+      comentando la siguiente linea:</para>
+
+      <programlisting>    &lt;!-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
+    </section>
+
+    <section>
+      <title xml:lang="es">Múltipes fuentes de datos</title>
+
+      <para>En este <link
+      xlink:href="http://forum.springsource.org/showpost.php?p=289577&amp;postcount=4">post
+      del foro de Spring Roo</link> tenemos un ejemplo de los cambios a
+      realizar en nuestra aplicación para que las entidades tenga distintas
+      fuentes de datos.</para>
+    </section>
+  </section>
+
+  <section xml:id="guia-desarrollo_web">
+    <title xml:lang="es">Capa Web</title>
+
+    <para xml:lang="es">En la Capa Web se centra el control de gestión de las
+    peticiones por parte del usuario. Esta capa dependerá del Front-End que
+    vallamos a usar. Actualmente están diponibles el Spring MVC y el GWT. Este
+    último, aunque es funcional, todavía está en fase de refinamiento. En este
+    apardo nos centraremos en cómo se genera la aplicación para Spring
+    MVC.</para>
+
+    <para xml:lang="es">La gestión de peticiones en Spring MVC se base en los
+    Controllers, clases en las que, mediante anotaciones, vamos a ir
+    registrando que métodos atienden que penticiones. Un controler puede tener
+    o no asociada una entidad.</para>
+
+    <para xml:lang="es">Actualmente es posible generar controllers para
+    gestionar las peticiones de CRUD de una entidad de forma automática,
+    generados a partir de la información que el framework tiene de la entidad.
+    Esto incluye busqueadas configurables (se registran en la entidad y se
+    generan vistas para usarlas).</para>
+
+    <section xml:id="guia-desarrollo_web_definir-controller">
+      <title xml:lang="es">Definir un Controller</title>
+
+      <para xml:lang="es">Un controller es una clase Java anotada con
+      <classname>@Controller</classname> y que identifica a que peticiones
+      atiende mediante la anotación <classname>@RequestMapping</classname>.
+      Esta última anotación se puede usar tanto en la clase como en los
+      métodos.</para>
+
+      <para xml:lang="es">Para crear los Controllers, al igual que las
+      entidades, tenemos la opción de crearlos a mano además de unos comandos
+      que nos aporta el framework.</para>
+
+      <section>
+        <title xml:lang="es">Crear controller usando comandos</title>
+
+        <para xml:lang="es">Desde la consola del framework podemos crear
+        controllers de foma sencilla, ya sean para el gestionar el CRUDS (la S
+        no es error tipográfico sino que signifa <literal>Search</literal>)
+        como independientes. Para ello tenemos tres comandos:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><command>controller class</command></para>
+          </listitem>
+
+          <listitem>
+            <para><command>controller scafold</command></para>
+          </listitem>
+
+          <listitem>
+            <para><command>controller all</command></para>
+          </listitem>
+        </itemizedlist>
+
+        <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-class">
+          <title>controller class</title>
+
+          <para xml:lang="es">Este comando crear un Controller plantilla no
+          vinculado a ninguna entidad en concreto para su implementación
+          manual.</para>
+
+          <para xml:lang="es">Los parámetros para este comando son:</para>
+
+          <variablelist>
+            <varlistentry>
+              <term xml:lang="es">--class</term>
+
+              <listitem>
+                <para xml:lang="es">Nombre de la clase java para el controller
+                (incluido su paquete) (recordar que se puede usar el
+                <literal>~</literal> para especificar el paquete base de la
+                aplicación).</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term xml:lang="es">--preferredMapping</term>
+
+              <listitem>
+                <para xml:lang="es">Permite la ruta de la petición para este
+                controller.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+
+          <para>Un ejemplo:</para>
+
+          <programlisting>roo&gt; <command>controller class --class ~.web.MyController</command></programlisting>
+
+          <para>Genera una clase como esta:</para>
+
+          <programlisting>@RequestMapping("/my/**")
+@Controller
+public class MyController {
+
+    @RequestMapping
+    public void get(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "{id}")
+    public void post(@PathVariable Long id, ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+    }
+
+    @RequestMapping
+    public String index() {
+        return "my/index";
+    }
+}</programlisting>
+
+          <para xml:lang="es">En este ejemplo la clase atenderá cualquier
+          petición cuya URL comienze por <filename>{URLBase}/my</filename>
+          definido por la anotación <classname>@RequestMapping</classname>. El
+          método receptor, tal cual están definidas las anotaciones
+          <classname>@RequestMapping</classname> en los métodos cumplirán
+          estas reglas:</para>
+
+          <orderedlist>
+            <listitem>
+              <para>Las peticiones de tipo POST con una petición cuya URL
+              cumpla <filename>{URLBase}/myController/{entero}</filename>
+              entrarán por el método <methodname>post</methodname> de la
+              clase.</para>
+            </listitem>
+
+            <listitem>
+              <para> las peticiones a <filename>{URLBase}/my/index</filename>
+              que se atenderán en el método <methodname>index</methodname> que
+              muestra la vista <filename>my/index</filename>.</para>
+            </listitem>
+
+            <listitem>
+              <para>El resto de peticiones serán atendidas en el método
+              <methodname>get</methodname> de la clase.</para>
+            </listitem>
+          </orderedlist>
+
+          <para xml:lang="es">Para más información sobre la antación
+          <classname>@RequestMapping</classname> ver la documentación de <link
+          xlink:href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping">Spring
+          MVC</link>.</para>
+        </section>
+
+        <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-scaffold">
+          <title>controller scaffold</title>
+
+          <para xml:lang="es">Este comando crear un Controller con el CRUDS
+          una Entidad especificada. No hay restrinciones para crear varios
+          controllers para la misma Entidad.</para>
+
+          <para xml:lang="es">Este comando, además de generar el Controller
+          genera las vistas para la creación, visualización, listado,
+          actualización y busquedas de los registros de la entidad.</para>
+
+          <para xml:lang="es">Las URL de las peticiones que acepta el
+          Controller generado siguen el convenio <link
+          xlink:href="http://en.wikipedia.org/wiki/Representational_State_Transfer">RESTful</link>
+          (<link
+          xlink:href="http://es.wikipedia.org/wiki/Representational_State_Transfer">en
+          español</link>). Toda la lógica se genera en un ficher
+          <filename>*_Roo_*.aj</filename> asociado al controler, de forma que
+          la clase Java queda limpia de los métodos generados
+          automáticamente.</para>
+
+          <para xml:lang="es">Los parámetros para este comando son:</para>
+
+          <variablelist>
+            <varlistentry>
+              <term xml:lang="es">--class</term>
+
+              <listitem>
+                <para xml:lang="es">Nombre de la clase java para el controller
+                (incluido su paquete) (recordar que se puede usar el
+                <literal>~</literal> para especificar el paquete base de la
+                aplicación).</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term xml:lang="es">--entity</term>
+
+              <listitem>
+                <para xml:lang="es">Nombre de la clase Entidad que manjará el
+                Controller.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term xml:lang="es">--path</term>
+
+              <listitem>
+                <para xml:lang="es">Ruta base para la generación de la URL
+                para las peticiones basadas en RESTful.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term xml:lang="es">--disallowedOperations</term>
+
+              <listitem>
+                <para xml:lang="es">Lista de operaciones, sepearada por comas,
+                de las operaciones NO permitidas en este controler. Los
+                elementos de esta lista deben estar enter estos:
+                <literal>create update delete</literal>.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+        </section>
+
+        <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-scafold">
+          <title>controller all</title>
+
+          <para xml:lang="es">Este comando crear un Controller
+          plantilla</para>
+        </section>
       </section>
     </section>
   </section>

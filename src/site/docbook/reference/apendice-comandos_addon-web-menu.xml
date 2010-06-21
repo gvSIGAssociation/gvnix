@@ -12,7 +12,7 @@
   linkend="addon-web-menu">Add-on Web Menu</link>.</para>
 
   <table>
-    <title>Comandos de Add-on Web Menu</title>
+    <title xml:lang="es">Comandos de Add-on Web Menu</title>
 
     <tgroup cols="2">
       <thead>
@@ -104,19 +104,20 @@
   <section xml:id="apendice-comandos_addon-web-menu_page-menu-setup">
     <title>page menu setup</title>
 
-    <para>Instala el sistema de menú de gvNIX en la aplicación actual.</para>
+    <para xml:lang="es">Instala el sistema de menú de gvNIX en la aplicación
+    actual.</para>
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-add">
     <title>page add</title>
 
-    <para>Añade una página. Esta opción <emphasis role="bold">sólo crea el
-    elemento de menú</emphasis> asociado. Con este comando se pueden añadir
-    página que puedan ser grupos de páginas.</para>
+    <para xml:lang="es">Añade una página. Esta opción <emphasis
+    role="bold">sólo crea el elemento de menú</emphasis> asociado. Con este
+    comando se pueden añadir página que puedan ser grupos de páginas.</para>
 
-    <para><emphasis role="bold">No permite</emphasis> añadir páginas con
-    <emphasis role="bold">destinos internos duplicados</emphasis>. para mas
-    información ver <link linkend="addon-web-menu">Add-on Web
+    <para xml:lang="es"><emphasis role="bold">No permite</emphasis> añadir
+    páginas con <emphasis role="bold">destinos internos duplicados</emphasis>.
+    para mas información ver <link linkend="addon-web-menu">Add-on Web
     Menu</link>.</para>
 
     <para xml:lang="es">Los parámetros son:<variablelist>
@@ -269,8 +270,8 @@
   <section xml:id="apendice-comandos_addon-web-menu_page-move">
     <title xml:lang="es">page move</title>
 
-    <para>Mueve una página, incluidos sus hijos si los tuviese, dentro o antes
-    de otra página.</para>
+    <para xml:lang="es">Mueve una página, incluidos sus hijos si los tuviese,
+    dentro o antes de otra página.</para>
 
     <para xml:lang="es">Los parámetros son:<variablelist>
         <varlistentry>

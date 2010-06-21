@@ -55,7 +55,8 @@
         que es conveniente que si se utiliza una Base de datos preexistente se
         configure correctamente el fichero
         <filename>src/main/resources/META-INF/persistence.xml</filename> para
-        evitar sorpresas desagradables.</emphasis></para>
+        evitar sorpresas desagradables. Más información <link
+        linkend="guia-desarrollo_manejo-entidades_regeneracion-bbdd">aquí</link>.</emphasis></para>
       </warning>
 
       <para>El Cheksum <emphasis>se calcula en el momento de la

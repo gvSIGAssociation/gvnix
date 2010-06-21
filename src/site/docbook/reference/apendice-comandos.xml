@@ -16,16 +16,16 @@
     linkend="addon-persistence">Add-on Persistence</link>.</para>
 
     <table>
-      <title>Comandos de Add-on Persistence</title>
+      <title xml:lang="es">Comandos de Add-on Persistence</title>
 
       <tgroup cols="2">
         <thead>
           <colspec colwidth="150" />
 
           <row>
-            <entry align="center">Comando</entry>
+            <entry align="center" xml:lang="es">Comando</entry>
 
-            <entry align="center">Descripción</entry>
+            <entry align="center" xml:lang="es">Descripción</entry>
           </row>
         </thead>
 
@@ -35,8 +35,8 @@
             linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
             checksum set</link></entry>
 
-            <entry>Establece el control de concurrencia por Checksum en una
-            Entidad</entry>
+            <entry xml:lang="es">Establece el control de concurrencia por
+            Checksum en una Entidad</entry>
           </row>
 
           <row>
@@ -44,8 +44,8 @@
             linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">occ
             checksum all</link></entry>
 
-            <entry>Establece el control de concurrencia por Checksum en todas
-            las Entidades de la aplicación</entry>
+            <entry xml:lang="es">Establece el control de concurrencia por
+            Checksum en todas las Entidades de la aplicación</entry>
           </row>
         </tbody>
       </tgroup>
@@ -57,27 +57,25 @@
       <para xml:lang="es">Para ver una descripción de este componente ver
       <link linkend="addon-persistence_occchecksum">OCCChecksum</link>.</para>
 
-      <para>Este componente añade los siguiente comandos:</para>
+      <para xml:lang="es">Este componente añade los siguiente comandos:</para>
 
-      <section>
-        <title
-        xml:id="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
-        checksum set</title>
+      <section xml:id="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">
+        <title>occ checksum set</title>
 
-        <para>Estable el control de concurrencia a una entidad del modelo. Si
-        la entidad ya tenia configurado el sistema de control, la
-        configuración será sobreescrita.</para>
+        <para xml:lang="es">Estable el control de concurrencia a una entidad
+        del modelo. Si la entidad ya tenia configurado el sistema de control,
+        la configuración será sobreescrita.</para>
 
-        <para>Los parámetros son:<variablelist>
+        <para xml:lang="es">Los parámetros son:<variablelist>
             <varlistentry>
               <term>--entity</term>
 
               <listitem>
-                <para><emphasis>[Requerido si no se está en contexto] [Clase
-                Java] [autocompletado]</emphasis></para>
+                <para xml:lang="es"><emphasis>[Requerido si no se está en
+                contexto] [Clase Java] [autocompletado]</emphasis></para>
 
-                <para>Entidad a establecer el sistema de Control de
-                Concucurrencia.</para>
+                <para xml:lang="es">Entidad a establecer el sistema de Control
+                de Concucurrencia.</para>
               </listitem>
             </varlistentry>
 
@@ -85,9 +83,11 @@
               <term>--fieldName</term>
 
               <listitem>
-                <para><emphasis>[Opcional] [Cadena]</emphasis></para>
+                <para xml:lang="es"><emphasis>[Opcional]
+                [Cadena]</emphasis></para>
 
-                <para>Nombre del campo para almacenar el CheckSum</para>
+                <para xml:lang="es">Nombre del campo para almacenar el
+                CheckSum</para>
               </listitem>
             </varlistentry>
 
@@ -97,23 +97,21 @@
               <listitem>
                 <para><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-                <para>Método de cálculo para el CheckSum [ SHA, MD5, ...
-                ]</para>
+                <para xml:lang="es">Método de cálculo para el CheckSum [ SHA,
+                MD5, ... ]</para>
               </listitem>
             </varlistentry>
           </variablelist></para>
       </section>
 
-      <section>
-        <title
-        xml:id="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">occ
-        checksum all</title>
+      <section xml:id="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">
+        <title xml:lang="es">occ checksum all</title>
 
-        <para>Estable el control de concurrencia a todas las entidades de la
-        aplicación. Si la entidad ya tuviese configurada con la anotación los
-        parámetros serán sobreescritos.</para>
+        <para xml:lang="es">Estable el control de concurrencia a todas las
+        entidades de la aplicación. Si la entidad ya tuviese configurada con
+        la anotación los parámetros serán sobreescritos.</para>
 
-        <para>Los parámetros son:<variablelist>
+        <para xml:lang="es">Los parámetros son:<variablelist>
             <varlistentry>
               <term>--fieldName</term>
 
@@ -147,7 +145,7 @@
     linkend="addon-theme-manager">Add-on Theme Manager</link>.</para>
 
     <table>
-      <title>Comandos de Add-on Theme Manager</title>
+      <title xml:lang="es">Comandos de Add-on Theme Manager</title>
 
       <tgroup cols="2">
         <thead>
@@ -166,7 +164,7 @@
             linkend="apendice-comandos_addon-theme-manager_theme-install">theme
             install</link></entry>
 
-            <entry>Instala un tema en la amplicación</entry>
+            <entry xml:lang="es">Instala un tema en la amplicación</entry>
           </row>
 
           <row>
@@ -174,7 +172,7 @@
             linkend="apendice-comandos_addon-theme-manager_theme-set">theme
             set</link></entry>
 
-            <entry>Establece el tema en la aplicación</entry>
+            <entry xml:lang="es">Establece el tema en la aplicación</entry>
           </row>
 
           <row>
@@ -182,7 +180,7 @@
             linkend="apendice-comandos_addon-theme-manager_theme-list">theme
             list</link></entry>
 
-            <entry>Lista los temas disponible, instalados y el
+            <entry xml:lang="es">Lista los temas disponible, instalados y el
             establecido</entry>
           </row>
         </tbody>
@@ -258,7 +256,7 @@
   <section xml:id="apendice-comandos_addon-web-exception-handler">
     <title xml:lang="es">Comandos del Add-on Web Exception Handler</title>
 
-    <para xml:lang="es"></para>
+    <para xml:lang="es">TBC</para>
   </section>
 
   <xi:include href="apendice-comandos_addon-web-menu.xml" />
@@ -305,7 +303,7 @@
   <section xml:id="apendice-comandos_web-relation-styles">
     <title xml:lang="es">Comandos del Add-on Web Relation Styles</title>
 
-    <para xml:lang="es"></para>
+    <para xml:lang="es">TBC</para>
   </section>
 
   <section xml:id="apendice-comandos_cit-security">

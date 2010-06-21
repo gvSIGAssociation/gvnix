@@ -9,22 +9,92 @@
   <title>Add-on Web MVC JSP 2.0</title>
 
   <section xml:id="addon-web-mvc-jsp-2.0_descripcion">
-    <title>Descripción</title>
+    <title xml:lang="es">Descripción</title>
 
-    <para>Este add-on configura el proyecto para que pueda ser desplegado
-    dentro de un contenedor con soporte para la especificación JSP 2.0 (como
-    el Tomcat 5.5 por ejemplo).</para>
+    <para xml:lang="es">Este add-on configura el proyecto para que pueda ser
+    desplegado dentro de un contenedor con soporte para la especificación JSP
+    2.0 (como el Tomcat 5.5 por ejemplo).</para>
 
-    <para>Por defecto los proyectos generados con Spring Roo se generar para
-    la especificación de JSP 2.1 y muchas empresas y organizaciones, por
-    problemas de compatibilidad y/o migración de aplicaciones no tiene la
-    posibilidad de actualizar la versión de su contenedor de datos.</para>
+    <para xml:lang="es">Por defecto los proyectos generados con Spring Roo se
+    generar para la especificación de JSP 2.1 y muchas empresas y
+    organizaciones, por problemas de compatibilidad y/o migración de
+    aplicaciones no tiene la posibilidad de actualizar la versión de su
+    contenedor de datos.</para>
 
-    <para>Para activar el soporte hay que ejecutar el comando <command><link
+    <para xml:lang="es">Para activar el soporte hay que ejecutar el comando
+    <command><link
     linkend="apendice-comandos_addon-web-mvc-jsp-2.0_controller-jsp2.0-support">controller
     jsp2.0 support</link></command>. Este comando configura las dependencias
     para que la aplicación pueda desplegarse en el contenedor sin problemas. Y
     se queda activa escuchando cambios que pudiesen romper esta
     compatibilidad.</para>
+  </section>
+
+  <section xml:id="addon-web-mvc-jsp-2.0_arranque-aplicacion">
+    <title xml:lang="es">Arrancar la aplicación sobre un contenedor JSP
+    2.0</title>
+
+    <para xml:lang="es">La configuración por defecto de los proyectos están
+    preparadas arrancar la aplicación usando los contenedores Tomcat 6 y
+    Jetty. Ya que el primero usa la especificación JSP 2.0 y el segundo admite
+    ambas, no tenemos una configuración que nos pueda validar si realmente el
+    soporte está funcionando.</para>
+
+    <section xml:id="addon-web-mvc-jsp-2.0_arranque-aplicacion_linea-comandos">
+      <title xml:lang="es">Arrancar desde linea de comandos</title>
+
+      <para xml:lang="es">El add-on también añade la configuración necesaria
+      al proyecto para poder lanzar el plugin de maven <link
+      xlink:href="http://cargo.codehaus.org/Maven2+plugin">cargo</link> con un
+      Tomcat 5.5 como servidor. Esta configuración hace que se descarguen los
+      binarios de Tomcat 5.5 en el directorio
+      <filename>$HOME/.m2/resources</filename> automáticamente, de forma que
+      sólo sea necesario la primera vez.</para>
+
+      <para xml:lang="es">Para arrancar el Tomcat 5.5, una vez activado el
+      soporte con el comando <command><link
+      linkend="apendice-comandos_addon-web-mvc-jsp-2.0_controller-jsp2.0-support">controller
+      jsp2.0 support</link></command>, hay que usar del comando <command>mvn
+      cargo:start</command> o <command>perform command --mavenCommand
+      cargo:start</command> si lo ejecutamos desde dentro del
+      framework.</para>
+
+      <note>
+        <para xml:lang="es">No hay ninguna ventaja en ejecutar la aplicación
+        desde dentro del framework ya que, para finalizar la ejecución del
+        servidor usaremos <literal>Ctrl+C</literal> que, además de cerrar el
+        servidor, provocará la salida de framework.</para>
+      </note>
+    </section>
+
+    <section xml:lang="addon-web-mvc-jsp-2.0_arranque-aplicacion_eclipse">
+      <title xml:lang="es">Arrancar desde Eclipse</title>
+
+      <para xml:lang="es">En la sección <link
+      linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse">Arrancar
+      la aplicación con Eclipse</link> del capítulo <link
+      linkend="guia-desarrollo">Guía de desarrollo</link> se dan instrucciones
+      para configurar el Eclipse para arrancar la aplicación. Seguiremos esta
+      guía para crear un servidor de tipo Tomcat 5.5. Este parámetro es el
+      único que varía con respecto a lo que describe la guía.</para>
+
+      <note>
+        <para xml:lang="es">Hay que tener en cuenta que el <emphasis
+        role="bold">Eclipse sólo permite añadir aplicaciones</emphasis> a un
+        servidor <emphasis role="bold">que sean compatibles</emphasis> con
+        este. Por lo que, en nuestra configuración para Tomcat 5.5 no nos
+        permitirá añadir el arranque de aplicaciones en las que no esté activa
+        la compatibilidad.</para>
+      </note>
+
+      <note>
+        <para>Es posible que, despues de ejecutar el comando <command><link
+        linkend="apendice-comandos_addon-web-mvc-jsp-2.0_controller-jsp2.0-support">controller
+        jsp2.0 support</link></command> sea necesario regenerar los fichero de
+        eclipse del proyecto. <link
+        linkend="guia-desarrollo_aplicacion-base_usar-eclipse">Ver más
+        información</link>.</para>
+      </note>
+    </section>
   </section>
 </chapter>

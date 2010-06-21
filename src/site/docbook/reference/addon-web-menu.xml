@@ -184,7 +184,7 @@
 
     <para>El nombre del fichero XML que contiene el modelo es tomado de la
     constante <constant>MENU_CONFIG_FILE</constant> de la clase anotada como
-    <classname>@GvNIXMenuLoader</classname>. </para>
+    <classname>@GvNIXMenuLoader</classname>.</para>
   </section>
 
   <section>
@@ -202,6 +202,6 @@
   <section>
     <title>Uso de menús contextuales.</title>
 
-    <para><emphasis role="bold">TODO</emphasis></para>
+    <para><emphasis role="bold">TBC</emphasis></para>
   </section>
 </chapter>
