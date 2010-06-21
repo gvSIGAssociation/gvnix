@@ -8,9 +8,160 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Add-on Web Exception Handler</title>
 
+  <para>Add-on para la gestión de excepciones no controladas.</para>
+
   <section xml:id="addon-web-exception-handler_descripcion">
     <title xml:lang="es">Descripción</title>
 
-    <para xml:lang="es">TBC</para>
+    <para xml:lang="es">Este Add-on permite gestionar las excepciones no
+    controladas en la aplicación en tiempo de ejecución para mostrar mensajes
+    inteligibles al usuario en una página jspx nueva en un idioma
+    definido.</para>
+
+    <para xml:lang="es">Después de la definición de la excepción se pueden
+    añadir definiciones para cada idioma disponible en la aplicación.</para>
+  </section>
+
+  <section xml:id="addon-web-exception-handler_excptiones-de-gvnix">
+    <title xml:lang="es">Excepciones de gvNIX</title>
+
+    <para xml:lang="es">Conjunto de excepciones iniciales definidas para
+    gvNIX.</para>
+
+    <para xml:lang="es">Inlcuye un comando <emphasis>exception handler setup
+    gvnix</emphasis> para instalar un conjunto de excepciones definidas para
+    gvnix en los idiomas español e inglés:</para>
+
+    <para xml:lang="es"><itemizedlist>
+        <listitem>
+          <para xml:lang="es">java.sql.SQLException.</para>
+
+          <para xml:lang="es">Se ha producido un error en el acceso a la Base
+          de datos.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">java.io.IOException.</para>
+
+          <para xml:lang="es">Existen problemas para enviar o recibir
+          datos.</para>
+        </listitem>
+
+        <listitem>
+          <para
+          xml:lang="es">org.springframework.transaction.TransactionException.</para>
+
+          <para xml:lang="es">Se ha producido un error en la transacción. No
+          se han guardado los datos correctamente.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">java.lang.UnsupportedOperationException.</para>
+
+          <para xml:lang="es">Se ha producido un error no controlado.</para>
+        </listitem>
+
+        <listitem>
+          <para
+          xml:lang="es">javax.persistence.OptimisticLockException.</para>
+
+          <para xml:lang="es">No se puede actualizar el registro debido a que
+          ha sido actualizado previamente.</para>
+        </listitem>
+      </itemizedlist></para>
+  </section>
+
+  <section xml:id="addon-web-exception-handler_funcionalidad">
+    <title xml:lang="es">Funcionalidad</title>
+
+    <para xml:lang="es">Pasos a seguir para gestionar una excepción en la
+    aplicación.</para>
+
+    <para xml:lang="es">El Add-on nos proporciona las siguientes opciones para
+    gestionar las excepciones:</para>
+
+    <orderedlist>
+      <listitem>
+        <para xml:lang="es">Añadir una excepción a la aplicación</para>
+
+        <itemizedlist>
+          <listitem>
+            <para xml:lang="es">Define la excepción a capturar en el bean
+            <emphasis>SimpleMappingExceptionResolver</emphasis> del archivo
+            <emphasis>webmvc-config.xml</emphasis>.</para>
+          </listitem>
+
+          <listitem>
+            <para xml:lang="es">Crea una dirección asociada a la excepcion en
+            un nuevo bean <emphasis>&lt;mvc:view-controller&gt;</emphasis> con
+            la dirección específica.</para>
+          </listitem>
+
+          <listitem>
+            <para xml:lang="es">Crea la nueva jspx asociada a la
+            excepción.</para>
+          </listitem>
+
+          <listitem>
+            <para xml:lang="es">Instancia la jspx creada en el archivo
+            <emphasis>views.xml</emphasis> en el directorio
+            <emphasis>WEB-INF</emphasis> la aplicación.</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Muestra las excepciones gestionadas por la
+        aplicación.</para>
+
+        <itemizedlist>
+          <listitem>
+            <para xml:lang="es">Muestra la lista de excepciones definidas en
+            el bean <emphasis>SimpleMappingExceptionResolver</emphasis> del
+            archivo <emphasis>webmvc-config.xml</emphasis>.</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Elimina las excepciones de la aplicación.</para>
+
+        <itemizedlist>
+          <listitem>
+            <para xml:lang="es">Elimina la excepción a partir del nombre que
+            se muestra en la lista de excepciones gestionadas por la
+            aplicación.</para>
+          </listitem>
+
+          <listitem>
+            <para xml:lang="es">Elimina la página jspx asociada.</para>
+          </listitem>
+
+          <listitem>
+            <para xml:lang="es">Elimina las referencias a la excepción en el
+            archivo views.xml.</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+    </orderedlist>
+  </section>
+
+  <section xml:id="addon-web-exception-handler_futuras-versiones">
+    <title xml:lang="es">Futuras versiones</title>
+
+    <para xml:lang="es">Mejoras a incluir en futuras versiones del
+    Add-on.</para>
+
+    <itemizedlist xml:lang="es">
+      <listitem>
+        <para xml:lang="es">Obtención de los mensajes de las excepciones desde
+        un Base de datos.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Envío de un informe de la excepción que se ha
+        producido por email.</para>
+      </listitem>
+    </itemizedlist>
   </section>
 </chapter>
