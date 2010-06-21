@@ -92,7 +92,7 @@
 
       <listitem>
         <para>Re aprovechamiento de conocimiento: No necesita más conocimiento
-        que desarrollo nociones de J2EE.</para>
+        que el necesario para el desarrollo de aplicaciones J2EE.</para>
       </listitem>
     </itemizedlist>
   </section>
@@ -109,11 +109,11 @@
     como front-end. Como es habítual en las aplicaciones modernas basadas en
     Java.</para>
 
-    <para xml:lang="es">Mientras la mayoría de genten se centrar en el
+    <para xml:lang="es">Mientras la mayoría de gente se centrará en el
     desarrollo de aplicaciones web basadas en Spring MVC, es importante
     destacar que Roo no impone ninguna restrición sobre el tipo de
     aplicaciones que se pueden generar con este framework. Desde la versión
-    1.0.0 de Spring Roo se pueden generar cualquier typo de aplicación
+    1.0.0 de Spring Roo se pueden generar cualquier tipo de aplicación
     autocontenida. Algunos ejemplos de la funcionalidades que se puden cubrir
     fácilmente incluyen (pero no están limitados a estos):</para>
 
@@ -135,7 +135,7 @@
 
       <listitem>
         <para xml:lang="es">Investigación de las nuevas funcionalidades de
-        Spring y AspectJ con una inversión dn tiempo mínima.</para>
+        Spring y AspectJ con una inversión de tiempo mínima.</para>
       </listitem>
     </itemizedlist>
 
@@ -350,8 +350,5 @@ roo&gt;</programlisting>
         <para>JMS</para>
       </listitem>
     </itemizedlist>
-
-    <para xml:lang="es">En el siguiente diagrama podemos ver las distintas
-    librerías y elementos:</para>
   </section>
 </chapter>
