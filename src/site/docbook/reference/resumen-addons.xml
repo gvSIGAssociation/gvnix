@@ -148,6 +148,15 @@
     Styles</link>.</para>
   </section>
 
+  <section xml:id="resumen-addons_web-mvc-binding">
+    <title xml:lang="es">Web MVC Binding</title>
+
+    <para>Prepara la configuración global de editores de propiedades para
+    Spring MVC. Incluye la inicialización del editor de cadenas que transforma
+    las cadenas vacías a Nulos. Para ver más informaicón consultar <link
+    linkend="addon-web-mvc-binding">Add-on Web MVC Binding</link>.</para>
+  </section>
+
   <section xml:id="resumen-addons_cit-security">
     <title>CIT Security</title>
 

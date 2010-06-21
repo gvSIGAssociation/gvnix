@@ -471,8 +471,8 @@ javax.persistence.OptimisticLockException</programlisting>
       xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-remove">exception
       handler remove</title>
 
-      <para xml:lang="es">Eimina la excepción seleccionada de la aplicación:
-      </para>
+      <para xml:lang="es">Eimina la excepción seleccionada de la
+      aplicación:</para>
 
       <para xml:lang="es">Los parámetros son:<variablelist>
           <varlistentry>
@@ -550,6 +550,98 @@ javax.persistence.OptimisticLockException</programlisting>
     <para xml:lang="es">TBC</para>
   </section>
 
+  <section xml:id="apendice-comandos_addon-web-mvc-binding">
+    <title xml:lang="es">Comandos del Add-on Web MVC Binding</title>
+
+    <para xml:lang="es">Para una descripción general ver <link
+    linkend="addon-web-mvc-binding">Add-on CIT Security</link>.</para>
+
+    <table>
+      <title xml:lang="es">Comandos de Add-on Web MVC Binding</title>
+
+      <tgroup cols="2">
+        <thead>
+          <colspec colwidth="150" />
+
+          <row>
+            <entry align="center">Comando</entry>
+
+            <entry align="center">Descripción</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-web-mvc-binding_web-binding-setup">web
+            binding setup</link></entry>
+
+            <entry xml:lang="es">Instala el inicializador de editores.</entry>
+          </row>
+
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-web-mvc-binding_web-binding-drop">web
+            binding drop</link></entry>
+
+            <entry xml:lang="es">Desactiva el inicializador de
+            editores.</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <section xml:id="apendice-comandos_addon-web-mvc-binding_web-binding-setup">
+      <title>web binding setup</title>
+
+      <para xml:lang="es">Instala el inicializador de editores en la
+      aplicación actual.</para>
+
+      <para xml:lang="es">Para ello crea una clase que implementa <link
+      xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/web/bind/support/WebBindingInitializer.html">WebBindingInitializer</link>
+      y la registra en el fichero
+      <filename>WEB-INF/spring/webmvc-config.xml</filename>.</para>
+
+      <para xml:lang="es">Los parámetros son:<variablelist>
+          <varlistentry>
+            <term>--class</term>
+
+            <listitem>
+              <para><emphasis>[Requerido] [clase Java]</emphasis></para>
+
+              <para>Nombre de la clase Java para el inicializador. Si la clase
+              existe, comprueba que implementa el interface <link
+              xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/web/bind/support/WebBindingInitializer.html">WebBindingInitializer</link>
+              para poder usarla.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--stringEmptyAsNull</term>
+
+            <listitem>
+              <para><emphasis>[opcional] [false por defecto]
+              [Booleano]</emphasis></para>
+
+              <para>Añadir el editor <link
+              xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/beans/propertyeditors/StringTrimmerEditor.html">StringTrimmerEditor</link>
+              con el constructor a <literal>True</literal>. De esta forma, las
+              cadenas vacias se almacenará como
+              <literal>null</literal>.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+    </section>
+
+    <section xml:id="apendice-comandos_addon-web-mvc-binding_web-binding-drop">
+      <title>web binding drop</title>
+
+      <para>Descativa el inicializador de editores. Este comando no elimina la
+      clase creada para el inicializador. Sólo elmina la configuración del
+      fichero <filename>WEB-INF/spring/webmvc-config.xml</filename>.</para>
+    </section>
+  </section>
+
   <section xml:id="apendice-comandos_cit-security">
     <title xml:lang="es">Comandos del Add-on CIT Security</title>
 
@@ -586,10 +678,10 @@ javax.persistence.OptimisticLockException</programlisting>
     <section xml:id="apendice-comandos_addon-cit-security_cit-security-setup">
       <title>cit security setup</title>
 
-      <para>Instala el soporte para el servicio Web de Atenticación y
-      Autorización de la CIT.</para>
+      <para xml:lang="es">Instala el soporte para el servicio Web de
+      Atenticación y Autorización de la CIT.</para>
 
-      <para>Los parámetros son:<variablelist>
+      <para xml:lang="es">Los parámetros son:<variablelist>
           <varlistentry>
             <term>--url</term>
 
