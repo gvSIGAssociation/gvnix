@@ -8,7 +8,7 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Add-on Persistence</title>
 
-  <para xml:id="es">Add-on de utilidades enfocadas a la persistencia de las
+  <para xml:lang="es">Add-on de utilidades enfocadas a la persistencia de las
   entidades.</para>
 
   <section xml:id="addon-persistence_descripcion">
