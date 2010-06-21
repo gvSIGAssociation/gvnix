@@ -8,77 +8,81 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title>Add-on Theme Manager</title>
 
-  <para>Add-on para el manejo de temas visuales.</para>
+  <para xml:lang="es">Add-on para el manejo de temas visuales.</para>
 
   <section xml:id="addon-theme-manager_descripcion">
-    <title>Descripción</title>
+    <title xml:lang="es">Descripción</title>
 
-    <para>Este add-on permite gestionar temas visuales en la
+    <para xml:lang="es">Este add-on permite gestionar temas visuales en la
     aplicación.</para>
 
-    <para>Un tema visual está compuesto por ficheros (css, tagx, layouts,
-    imágenes) que, usando los comandos de esta utilidad, se pueden instalar en
-    la aplicación sobre la que se trabaja. Tiene también un fichero XML de
-    descripción con el identificador del tema.</para>
+    <para xml:lang="es">Un tema visual está compuesto por ficheros (css, tagx,
+    layouts, imágenes) que, usando los comandos de esta utilidad, se pueden
+    instalar en la aplicación sobre la que se trabaja. Tiene también un
+    fichero XML de descripción con el identificador del tema.</para>
 
-    <para>Los temas pueden estar:</para>
+    <para xml:lang="es">Los temas pueden estar:</para>
 
     <variablelist>
       <varlistentry>
-        <term>Establecido</term>
+        <term xml:lang="es">Establecido</term>
 
         <listitem>
-          <para>Último tema que se ha aplicado a la aplicación.</para>
+          <para xml:lang="es">Último tema que se ha aplicado a la
+          aplicación.</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term>Instalado</term>
+        <term xml:lang="es">Instalado</term>
 
         <listitem>
-          <para>Temas que se encuentran almacenados dentro de la aplicación y
-          preparados para establecer.</para>
+          <para xml:lang="es">Temas que se encuentran almacenados dentro de la
+          aplicación y preparados para establecer.</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term>Disponible</term>
+        <term xml:lang="es">Disponible</term>
 
         <listitem>
-          <para>Temas que se pueden instalar en la aplicación que están
-          incluido en la instalación de gvNIX.</para>
+          <para xml:lang="es">Temas que se pueden instalar en la aplicación
+          que están incluido en la instalación de gvNIX.</para>
         </listitem>
       </varlistentry>
     </variablelist>
 
-    <para>Un Tema, para poder ser <emphasis>establecido</emphasis> en la
-    aplicación de trabajo, debe de estar <emphasis>Instalado</emphasis>. La
-    instalación de un Tema puede hacerse mediante el comando <link
+    <para xml:lang="es">Un Tema, para poder ser
+    <emphasis>establecido</emphasis> en la aplicación de trabajo, debe de
+    estar <emphasis>Instalado</emphasis>. La instalación de un Tema puede
+    hacerse mediante el comando <link
     linkend="apendice-comandos_addon-theme-manager_theme-install"><command>theme
     install</command></link> o copiando el tema en el directorio
     <filename>themes</filename> de la aplicación con la que se está
     trabajando. gvNIX detectará la instalación manual de un tema y la hará
     accesible.</para>
 
-    <para>Para establecer un tema se realiza usando el comando <link
+    <para xml:lang="es">Para establecer un tema se realiza usando el comando
+    <link
     linkend="apendice-comandos_addon-theme-manager_theme-set"><command>theme
     set</command></link>. Este comando copiará el contenido del tema al
     directorio de la aplicación, sobreescribiendo los fichero ya existentes.
     Este comando <emphasis role="bold">es acumulativo y no implementa ningún
     mecanismo para revertir los cambios</emphasis>.</para>
 
-    <para>Los temas <emphasis>disponibles</emphasis> están ubicados en el
-    directorio <filename>themes</filename> de la instalación de gvNIX.</para>
+    <para xml:lang="es">Los temas <emphasis>disponibles</emphasis> están
+    ubicados en el directorio <filename>themes</filename> de la instalación de
+    gvNIX.</para>
 
-    <para>Para ver todos los comandos y sus opciones ver el <link
-    linkend="apendice-comandos_addon-theme-manager">apéndice de
+    <para xml:lang="es">Para ver todos los comandos y sus opciones ver el
+    <link linkend="apendice-comandos_addon-theme-manager">apéndice de
     comandos</link>.</para>
   </section>
 
   <section>
-    <title>Temas disponibles por defecto.</title>
+    <title xml:lang="es">Temas disponibles por defecto.</title>
 
-    <para>La distribución de gvNIX viene con dos temas
+    <para xml:lang="es">La distribución de gvNIX viene con dos temas
     <emphasis>disponibles</emphasis>:</para>
 
     <variablelist>
@@ -86,7 +90,7 @@
         <term>theme-cit</term>
 
         <listitem>
-          <para>Tema por defecto para la CIT.</para>
+          <para xml:lang="es">Tema por defecto para la CIT.</para>
         </listitem>
       </varlistentry>
 
@@ -94,8 +98,8 @@
         <term>theme-gvNIX</term>
 
         <listitem>
-          <para>Tema de ejemplo con una personalización del estándar de Spring
-          Roo.</para>
+          <para xml:lang="es">Tema de ejemplo con una personalización del
+          estándar de Spring Roo.</para>
         </listitem>
       </varlistentry>
     </variablelist>
