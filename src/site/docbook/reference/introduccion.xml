@@ -158,7 +158,7 @@
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/gvnix-arquitectura-v0_3.png" scale="80"></imagedata>
+          <imagedata fileref="images/gvnix-arquitectura-v0_3.png"></imagedata>
         </imageobject>
       </mediaobject>
     </figure>

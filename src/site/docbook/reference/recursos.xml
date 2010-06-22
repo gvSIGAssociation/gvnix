@@ -46,24 +46,6 @@
 
     <itemizedlist>
       <listitem>
-        <para xml:lang="es">Documentación de referencia de Spring Roo
-        (<emphasis>desde de la distribución de gvNIX</emphasis>):</para>
-
-        <itemizedlist>
-          <listitem>
-            <para xml:lang="es"><link
-            xlink:href="../roo/html/index.html">Formato HTML</link></para>
-          </listitem>
-
-          <listitem>
-            <para xml:lang="es"><link
-            xlink:href="../roo/pdf/spring-roo-docs.pdf">Formato
-            PDF</link></para>
-          </listitem>
-        </itemizedlist>
-      </listitem>
-
-      <listitem>
         <para xml:lang="es"><link
         xlink:href="http://static.springsource.org/spring-roo/reference/html/index.html">Documentación
         de referencia Spring Roo (<emphasis>on-line</emphasis>)</link></para>
