@@ -78,16 +78,17 @@ Write doc
 Package gvNIX
 ================
 
-From gvNIX folder execute::
+To pack a ready-to-install release use the following command from the gvNIX 
+home directory::
 
-  bash:~/gvnix/trunk/code$ mvn package site assembly:assembly
+  bash:~/gvnix/trunk/code$ mvn clean install site assembly:assembly
 
-This will generate the ZIP file ``target/gvNIX-{version}.zip``
+This will create the ZIP file ``target/gvNIX-{version}.zip``. To install it read the *gvNIX Reference Guide*.
 
 Need more info?
 ================
 
-For more information generate and read the *gvNIX Reference Guide*
+For more information generate and read the *gvNIX Reference Guide* (spanish).
 
 # Run the following command from the root checkout location::
 
@@ -105,4 +106,10 @@ For more information generate and read the *gvNIX Reference Guide*
             |   `-- index.html
             `-- pdf
                 `-- gvNIX-referencia.pdf
+
+This reference guide will help you to get started. Useful sections are:
+
+* Instalación de gvNIX
+* Primeros pasos con gvNIX
+* Desarrollo de aplicaciones con gvNIX
 
