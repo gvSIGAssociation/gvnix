@@ -115,11 +115,15 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
     xlink:href="http://localhost:8080/tenminutes">http://localhost:8080/tenminutes</link>.
     Debería ver algo como esto:</para>
 
-    <mediaobject>
-      <imageobject>
-        <imagedata align="center" fileref="images/tenminutes.png" scale="80"></imagedata>
-      </imageobject>
-    </mediaobject>
+    <figure>
+      <title xml:lang="es">Pantalla inicial de la aplicación</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/tenminutes.png" scale="65"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
 
     <para>Esto es sólo una muestra de la potencia de la herramienta. Puede ver
     mas información en la documentación de Spring Roo adjunta y en la sección
