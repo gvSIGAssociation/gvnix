@@ -387,8 +387,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 			    .getAttribute("render").compareTo("true") == 0))) {
 		// Don't show the default view of relationship.
 		defaultField.setAttribute("render", "false");
-		defaultField.setAttribute("z", XmlRoundTripUtils
-			.calculateUniqueKeyFor(defaultField));
 	    }
 
 	    // Retrieve Related Entities Metadata
@@ -497,7 +495,11 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    groupViews.appendChild(views);
 	}
 
+	if (oldGroupViews == null) {
+	    jspxView.getLastChild().appendChild(groupViews);
+	} else {
 	oldGroupViews.getParentNode().replaceChild(groupViews, oldGroupViews);
+	}
 	return jspxView;
     }
 
