@@ -364,6 +364,8 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	String delete = "false";
 	String update = "false";
 
+	String z = "user-managed";
+
 	// Add the relationship views.
 	for (FieldMetadata fieldMetadata : oneToManyFieldMetadatas) {
 
@@ -387,6 +389,7 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 			    .getAttribute("render").compareTo("true") == 0))) {
 		// Don't show the default view of relationship.
 		defaultField.setAttribute("render", "false");
+		defaultField.setAttribute("z", z);
 	    }
 
 	    // Retrieve Related Entities Metadata
@@ -475,7 +478,6 @@ public class PaginatedRelationMetadataListener implements // MetadataProvider,
 	    String relatedEntityClassName = relatedBeanInfoMetadata
 		    .getItdTypeDetails().getName().getFullyQualifiedTypeName();
 	    String property;
-	    String z = "user-managed";
 
 	    for (FieldMetadata relatedEntityfieldMetadata : fieldMetadataList) {
 
