@@ -117,7 +117,7 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
 
     <mediaobject>
       <imageobject>
-        <imagedata fileref="images/tenminutes.png"></imagedata>
+        <imagedata align="center" fileref="images/tenminutes.png" scale="80"></imagedata>
       </imageobject>
     </mediaobject>
 
