@@ -1,126 +1,108 @@
+
 =============================================
- gvNIX - Spring Roo based RAD tool
+ gvNIX - RAD tool for Java developers
 =============================================
 
-Welcome to gvNIX.
+Welcome to gvNIX, Spring Roo based RAD tool for Java developers.
 
-In this you will find intructions to start develop whit this tool.
+About this doc
+===============
+
+These instructions show you how to get started with gvNIX source tree. Note 
+that these instructions are for developers looking to develop gvNIX itself.
+
+If you like to try a release that has already been built, tested and 
+distributed by the core development team, we recommend that you visit gvNIX 
+download page:
+
+   http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo
+
+This document is written using the reStructuredText markup.
+
+Copyright (C) 2010 Conselleria de Infraestructuras y Transporte - Generalitat Valenciana
+
+This work is licensed under the Creative Commons Attribution-Share Alike 3.0
+Unported License. To view a copy of this license, visit 
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to 
+Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
+94105, USA.
 
 Pre-requisites
 ================
 
-JDK 1.5
---------
+To start with gvNIX you need:
 
-You must have installed Java Development Kit 1.5 or higher.
+* A *nix machine (Windows users should be OK if they write a .bat)
+* JDK 5.0 or above ( http://java.sun.com/javase/downloads/index.jsp )
+* Maven 2.0.9 or above ( http://maven.apache.org/download.html )
+* Internet access so that Maven can download required dependencies
+* Git client, http://en.wikipedia.org/wiki/Git_%28software%29
+* Checkout Spring Roo 1.1.0.M1 to gvNIX folder:
 
-Maven 2.x
-------------
+  * Use your Git client to checkout Spring Roo sources from ``git://git.springsource.org/roo/roo.git``. Example::
 
-You must have installed Maven 2.x in your system
+     bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
 
-Internet connection
---------------------
+  * Change to Spring Roo folder and switch to 1.1.0.M1 version ``3a0b8a399aae14167139c185e4e31355e20d1f25``. Example::
 
-To download dependencies and sorces.
+     bash:~/gvnix/trunk/code$ cd roo
+     bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
 
-Git
---------
-
-You must have installed Git client.
-
-Spring Roo 1.1.0-M1 sources
------------------------------
-
-You must compile Spring Roo 1.1.0-M1 in your system. To do that you can follow this steps:
-
-1. Creare a folder for checkout Spring Roo sources.
-
-2. Open a shell and go into this folder.
-
-3. Checkout Spring Roo sources with this instruction:
-
-  git clone git://git.springsource.org/roo/roo.git
-
-4. Switch to las 1.1.0M1 version
-
-  git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
-
-5. Compile and Install Spring Roo projects: follow steps in readme.txt
-
-Compile gvNIX
+Run gvNIX dev
 =================
 
-For compile gvNIX you have to use maven command:
+#. Build gvNIX::
 
-  mvn clean install
+    bash:~/gvnix/trunk/code$ mvn clean install
 
-Installl gvNIX add-ons into roo-dev
-=======================================
+#. Get started with gvNIX
 
-1. run roo-dev.
+   * Add gvNIX ``bin`` directory to PATH::
 
-2. install OSGi bundle.
+      bash:~/gvnix/trunk/code$ PATH=$PWD/bin:$PATH
 
-   osgi install --url file:path-to-add-on-jar
-   
-   The output will be osgi component ID.
+   * Change to Java project directory::
 
-3. start bundel.
+      bash:~/gvnix/trunk/code$ cd ~/project-directory
 
-   felix shell start ID
+   * Execute gvNIX shell::
 
-Uninstall gvNIX add-on from roo-dev
-============================================
+      bash:~/project-directory$ gvnix-dev
 
-1. run roo-dev
+Write doc
+==========
 
-2. localte OSGi bundle add-on's name.
+* Download and install XMLmind XML Editor Personal Edition ( http://www.xmlmind.com/xmleditor/download.shtml )
+* Use your preferred DocBook editor (i.e. XMLmind) to open ``src/site/docbook/reference/index.xml`` and contribute your knowledge
 
-   osgi ps
+Package gvNIX
+================
 
-3. uninstalll OSGi bundle.
+From gvNIX folder execute::
 
-   osgi uninstall --bundleSymbolicName org.gnix.NAME-OF-BUNDLE
+  bash:~/gvnix/trunk/code$ mvn package site assembly:assembly
 
-Reinstall gvNIX add-on in roo-dev
-============================================
+This will generate the ZIP file ``target/gvNIX-{version}.zip``
 
-1. Compile and install the add-on
+Need more info?
+================
 
-1. run roo-dev
+For more information generate and read the *gvNIX Reference Guide*
 
-2. localte OSGi bundle add-on's name.
+# Run the following command from the root checkout location::
 
-   osgi ps
+   bash:~/gvnix/trunk/code$ mvn site
 
-3. update OSGi bundle.
+# This will create the guide in the "target/site/reference" directory (in several formats)::
 
-   osgi update --bundleSymbolicName org.gnix.NAME-OF-BUNDLE
+    target
+    `-- site
+        `-- reference
+            |-- html
+            |   |-- index.html
+            |   `-- ...
+            |-- html-single
+            |   `-- index.html
+            `-- pdf
+                `-- gvNIX-referencia.pdf
 
-Generate reference document
-==============================
-
-From this folder execute:
-
-  mvn site
-
-That generates this files:
-
-* target/site/reference/html/index.html: Reference document in html
-
-* target/site/reference/pdf/gvNIX-referencia.pdf: Reference document in pdf
-
-* target/site/reference/html-single/index.html: Reference document in a single html file
-
-
-Generate gvNIX package
-=============================
-
-From this folder execute:
-
-  mvn package site assembly:assembly
-
-This generate a file:
-
-  target/gvNIX-{version}.zip
