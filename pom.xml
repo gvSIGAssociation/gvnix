@@ -36,6 +36,7 @@
     <description>Spring Roo based RAD tool for Conselleria d'Infraestructures i Transport - Generalitat Valenciana</description>
     <name>gvNIX</name>
     <modules>
+        <module>roo</module>
         <module>addon-persistence</module>
         <module>addon-web-menu</module>
         <module>addon-theme-manager</module>
@@ -300,25 +301,6 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-					<execution>
-						<id>extract-roo-distribution-for-assembly</id>
-						<phase>package</phase>
-						<configuration>
-
-							<tasks>
-                                <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
-				<if>
-                                    <equals arg1="${project.name}" arg2="gvNIX" />
-                                    <then>
-                                    	<unzip src="roo-distributions/${roo.distribution.file}" dest="${roo.distribution.extract}" />
-				    </then>
-				</if>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
 				</executions>
 				<dependencies>
 					<dependency>
@@ -403,7 +385,6 @@
                             <goal>generate-html</goal>
                         </goals>
                         <configuration>
-							<!-- TODO ajust xsl-->
                             <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
                             <postProcess>
                                 <move todir="${basedir}/target/site/reference/html-single">
@@ -451,7 +432,6 @@
                         </goals>
                         <configuration>
                             <chunkedOutput>true</chunkedOutput>
-							<!-- TODO ajust xsl-->
                             <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
                             <postProcess>
                                 <move todir="${basedir}/target/site/reference">
@@ -640,9 +620,5 @@
         <spring.version>3.0.2.RELEASE</spring.version>
         <spring.version.osgi>[2.5.6.A]</spring.version.osgi>
 	<roo.version>1.1.0.M1</roo.version>
-        <roo.distribution.file>spring-roo-1.1.0.M1.zip</roo.distribution.file>
-	<roo.distribution.extract>${project.build.directory}/roo-dist</roo.distribution.extract>
-	<roo.distribution.directory>spring-roo-1.1.0.M1</roo.distribution.directory>
-	<roo.distribution.final-location>${roo.distribution.extract}/${roo.distribution.directory}</roo.distribution.final-location>
     </properties>
 </project>

@@ -1,0 +1,81 @@
+#!/bin/bash
+this_file=`readlink -f $0`
+this_dir=`dirname $this_file`
+export GVNIX_HOME=`dirname $this_dir`
+export ROO_THEMES=$GVNIX_HOME/themes
+export ROO_HOME=$GVNIX_HOME/roo
+
+mkdir -p $ROO_HOME/bootstrap/target/osgi/bin
+mkdir -p $ROO_HOME/bootstrap/target/osgi/bundle
+mkdir -p $ROO_HOME/bootstrap/target/osgi/conf
+
+# copy gvnix add-ons
+cp `find $GVNIX_HOME -name org.gvnix.*.roo.addon-*.jar | grep ".*/target/org.gvnix..*.roo.addon-.*.jar"` $ROO_HOME/bootstrap/target/osgi/bundle
+
+# copy gvnix add-ons dependencies
+cp `find $GVNIX_HOME -name *.jar | grep '.*/code/[^r][^o][^o][^/].*/target/dependency/.*.jar'` $ROO_HOME/bootstrap/target/osgi/bundle 2> /dev/null
+
+
+cp $ROO_HOME/bootstrap/src/main/bin/* $ROO_HOME/bootstrap/target/osgi/bin
+chmod +x $ROO_HOME/bootstrap/target/osgi/bin/*.sh
+
+cp $ROO_HOME/bootstrap/src/main/conf/* $ROO_HOME/bootstrap/target/osgi/conf
+
+# Most Roo bundles are not special and belong in "bundle"
+cp `find $ROO_HOME -name org.springframework.roo.*.jar | grep .*/target/org.springframework.roo..*.jar` $ROO_HOME/bootstrap/target/osgi/bundle
+
+# Most Roo dependencies are not special and belong in "bundle"
+cp `find $ROO_HOME -name *.jar | grep .*/target/dependency/.*.jar` $ROO_HOME/bootstrap/target/osgi/bundle 2> /dev/null
+
+# Now add the replacement "Main" class for launching Roo (this is not a bundle, but rather a normal JAR)
+cp $ROO_HOME/bootstrap/target/org.springframework.roo.bootstrap-*.jar $ROO_HOME/bootstrap/target/osgi/bin
+rm $ROO_HOME/bootstrap/target/osgi/bundle/org.springframework.roo.bootstrap-*.jar
+
+# Now add the Felix OSGi service platform JAR so we can launch it all
+cp $ROO_HOME/bootstrap/target/dependency/org.apache.felix.framework-*.jar $ROO_HOME/bootstrap/target/osgi/bin
+rm $ROO_HOME/bootstrap/target/osgi/bundle/org.apache.felix.framework-*.jar
+
+# Get rid of those annoying source, test and annotation files
+rm `find $ROO_HOME/bootstrap/target/osgi -name *-sources.jar`
+rm `find $ROO_HOME/bootstrap/target/osgi -name *-tests.jar`
+rm `find $ROO_HOME/bootstrap/target/osgi -name org.springframework.roo.annotations-*.jar`
+
+# Build a classpath containing our two magical startup JARs
+ROO_CP=`echo $ROO_HOME/bootstrap/target/osgi/bin/*.jar | sed 's/ /:/g'`
+# echo ROO_CP: $ROO_CP
+
+# Store file locations in variables to facilitate Cygwin conversion if needed
+
+ROO_OSGI_FRAMEWORK_STORAGE="$ROO_HOME/bootstrap/target/osgi/cache"
+# echo "ROO_OSGI_FRAMEWORK_STORAGE: $ROO_OSGI_FRAMEWORK_STORAGE"
+
+ROO_AUTO_DEPLOY_DIRECTORY="$ROO_HOME/bootstrap/target/osgi/bundle"
+# echo "ROO_AUTO_DEPLOY_DIRECTORY: $ROO_AUTO_DEPLOY_DIRECTORY"
+
+ROO_CONFIG_FILE_PROPERTIES="$ROO_HOME/bootstrap/target/osgi/conf/config.properties"
+# echo "ROO_CONFIG_FILE_PROPERTIES: $ROO_CONFIG_FILE_PROPERTIES"
+
+cygwin=false;
+case "`uname`" in
+    CYGWIN*)
+        cygwin=true
+        ;;
+esac
+
+if [ "$cygwin" = "true" ]; then
+	export ROO_HOME="`cygpath -wp $ROO_HOME`"
+	export ROO_CP="`cygpath -wp $ROO_CP`"
+	export ROO_OSGI_FRAMEWORK_STORAGE="`cygpath -wp $ROO_OSGI_FRAMEWORK_STORAGE`"
+	export ROO_AUTO_DEPLOY_DIRECTORY="`cygpath -wp $ROO_AUTO_DEPLOY_DIRECTORY`"
+	export ROO_CONFIG_FILE_PROPERTIES="`cygpath -wp $ROO_CONFIG_FILE_PROPERTIES`"
+	# echo "Modified ROO_HOME: $ROO_HOME"
+	# echo "Modified ROO_CP: $ROO_CP"
+	# echo "Modified ROO_OSGI_FRAMEWORK_STORAGE: $ROO_OSGI_FRAMEWORK_STORAGE"
+	# echo "Modified ROO_AUTO_DEPLOY_DIRECTORY: $ROO_AUTO_DEPLOY_DIRECTORY"
+	# echo "Modified ROO_CONFIG_FILE_PROPERTIES: $ROO_CONFIG_FILE_PROPERTIES"
+fi
+
+# Hop, hop, hop...
+java -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,address=4000,server=y,suspend=n -Dorg.osgi.framework.bootdelegation=org.netbeans.lib.profiler,org.netbeans.lib.profiler.\* -Droo.args="$*" -DdevelopmentMode=true -Dorg.osgi.framework.storage="$ROO_OSGI_FRAMEWORK_STORAGE" -Dfelix.auto.deploy.dir="$ROO_AUTO_DEPLOY_DIRECTORY" -Dfelix.config.properties="file:$ROO_CONFIG_FILE_PROPERTIES" -cp $ROO_CP org.springframework.roo.bootstrap.Main
+EXITED=$?
+echo Roo exited with code $EXITED

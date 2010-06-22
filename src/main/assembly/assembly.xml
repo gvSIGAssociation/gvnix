@@ -12,7 +12,7 @@
 	<files>
 		<!-- Roo readme.txt -->
 		<file>
-			<source>${roo.distribution.final-location}/readme.txt</source>
+			<source>roo/bootstrap/readme.txt</source>
 			<outputDirectory>/</outputDirectory>
 			<destName>readme-roo.txt</destName>
  		</file>
@@ -25,7 +25,7 @@
  		</file>
 		<!-- Roo license.txt -->
 		<file>
-			<source>${roo.distribution.final-location}/legal/LICENSE.TXT</source>
+			<source>roo/LICENSE.TXT</source>
 			<outputDirectory>/legal</outputDirectory>
 			<destName>ROO-LICENSE.TXT</destName>
  		</file>
@@ -72,7 +72,7 @@
  		</file>
 		<!-- gvNIX gvnix.bat -->
 		<file>
-			<source>${roo.distribution.final-location}/bin/roo.bat</source>
+			<source>roo/bootstrap/src/main/bin/roo.bat</source>
 			<outputDirectory>/bin</outputDirectory>
 			<destName>gvnix.bat</destName>
 			<fileMode>775</fileMode>
@@ -83,49 +83,127 @@
 
 
 	<fileSets>
-		<!-- Roo bin -->
+		<!-- Roo base -->
 		<fileSet>
-			<outputDirectory>/</outputDirectory>
-			<directory>${roo.distribution.final-location}</directory>
+			<outputDirectory>/bin</outputDirectory>
+			<directory>roo/bootstrap/target</directory>
 			<useDefaultExcludes>true</useDefaultExcludes>
 			<includes>
-				<include>bin/**</include>
+				<include>org.springframework.roo.bootstrap-*.jar</include>
 			</includes>
 			<excludes>
-				<exclude>bin/roo.*</exclude>
+				<exclude>*-sources.jar</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet>
-			<outputDirectory>/</outputDirectory>
-			<directory>${roo.distribution.final-location}</directory>
+			<outputDirectory>/bin</outputDirectory>
+			<directory>roo/bootstrap/target/dependency</directory>
 			<useDefaultExcludes>true</useDefaultExcludes>
 			<includes>
-				<!-- Roo annotations -->
-				<include>annotations/**</include>
-				<!-- Roo bundle -->
-				<include>bundle/**</include>
-				<!-- Roo conf -->
-				<include>conf/**</include>
-				<!-- Roo legal -->
-				<include>legal/**</include>
-				<!-- Roo samples -->
-				<include>samples/**</include>
+				<include>org.apache.felix.framework-*.jar</include>
 			</includes>
-			<excludes>
-				<exclude>legal/LICENSE.txt</exclude>
-			</excludes>
 		</fileSet>
-		<!-- Roo docs -->
+	       <fileSet>
+       		     <outputDirectory>/bundle</outputDirectory>
+		     <directory>roo/target/bundle</directory>
+        	   <useDefaultExcludes>true</useDefaultExcludes>
+	            <includes>
+       		         <include>*.jar</include>
+	            </includes>
+       	    </fileSet>
+        <fileSet>
+            <outputDirectory>/conf</outputDirectory>
+	    <directory>roo/bootstrap/src/main/conf</directory>
+            <lineEnding>unix</lineEnding>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <includes>
+                <include>*.*</include>
+            </includes>
+        </fileSet>
 		<fileSet>
-			<outputDirectory>/docs/roo</outputDirectory>
-			<directory>${roo.distribution.final-location}/docs</directory>
+			<outputDirectory>/samples</outputDirectory>
+			<directory>roo/classpath/src/main/resources</directory>
+			<lineEnding>unix</lineEnding>
 			<useDefaultExcludes>true</useDefaultExcludes>
 			<includes>
-				<include>**</include>
+				<include>*.roo</include>
 			</includes>
 		</fileSet>
-
-
+        <fileSet>
+            <outputDirectory>/annotations</outputDirectory>
+	    <directory>roo/annotations/target</directory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <excludes>
+                <exclude>*-tests.jar</exclude>
+            </excludes>
+        </fileSet>
+		<fileSet>
+			<outputDirectory>/legal</outputDirectory>
+			<directory>roo/addon-plural</directory>
+			<lineEnding>unix</lineEnding>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<include>legal-*.txt</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/legal</outputDirectory>
+			<directory>roo/bootstrap</directory>
+			<lineEnding>unix</lineEnding>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<include>legal-*.txt</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/legal</outputDirectory>
+			<directory>roo/classpath-javaparser</directory>
+			<lineEnding>unix</lineEnding>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<include>legal-*.txt</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/legal</outputDirectory>
+			<directory>roo/shell-jline</directory>
+			<lineEnding>unix</lineEnding>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<include>legal-*.txt</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/legal</outputDirectory>
+			<directory>roo/support</directory>
+			<lineEnding>unix</lineEnding>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<include>legal-*.txt</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/legal</outputDirectory>
+			<directory>roo/addon-web-mvc-jsp</directory>
+			<lineEnding>unix</lineEnding>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<include>legal-*.txt</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>/legal</outputDirectory>
+			<directory>roo/addon-gwt</directory>
+			<lineEnding>unix</lineEnding>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<include>legal-*.txt</include>
+			</includes>
+		</fileSet>
+		<!-- / Roo base -->
 
 
 		<!-- gvNIX docs -->
