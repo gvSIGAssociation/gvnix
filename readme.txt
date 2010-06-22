@@ -18,7 +18,7 @@ read the *gvNIX Reference Guide* included in package.
 
 This document is written using the reStructuredText markup and UTF-8 charset encoding.
 
-Copyright (C) 2010 Conselleria de Infraestructuras y Transporte - Generalitat Valenciana
+Copyright (C) 2010 Conselleria d'Infraestructures i Transport - Generalitat Valenciana
 
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
 Unported License. To view a copy of this license, visit 

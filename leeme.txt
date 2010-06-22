@@ -1,0 +1,120 @@
+
+===================================================
+ gvNIX - Herramienta RAD para desarrolladores Java
+===================================================
+
+Bienvenid@ a gvNIX, una herramienta basada en Spring Roo para desarrollo rápido de aplicaciones Java.
+
+Sobre este documento
+=====================
+
+Estas instrucciones muestran cómo empezar a trabajar con el código fuente de 
+gvNIX. Notar que estas instrucciones son para desarrolladores que quieran 
+participar en el desarrollo de gvNIX en sí mismo.
+
+Si lo que quieres es probar una versión que ya ha sido empaquetada, probada y
+distribuida por el equipo de desarrollo, te recomendamos que visites la 
+página de descargas de gvNIX 
+http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo y leas la 
+*Documentación de referencia* incluida en la distribución.
+
+Para la elaboración de este documento se ha utilizado reStructuredText y la codificación de caracteres UTF-8.
+
+Copyright (C) 2010 Conselleria d'Infraestructures i Transport - Generalitat Valenciana
+
+Esta obra está bajo la licencia `Reconocimiento-Compartir bajo la misma licencia 3.0 España <http://creativecommons.org/licenses/by-sa/3.0/es/>`_ 
+de Creative Commons. La licencia completa se puede consultar en 
+http://creativecommons.org/licenses/by-sa/3.0/es/
+
+Requisitos
+================
+
+Para empezar con gvNIX necesitas:
+
+* Una máquina *nix (usuarios de Windows deberían poder usar gvNIX creando sus propios scripts .bat)
+* JDK 5.0 o superior ( http://java.sun.com/javase/downloads/index.jsp )
+* Maven 2.0.9 o superior ( http://maven.apache.org/download.html )
+* Acceso a Internet para que Maven pueda descargar las dependencias
+* Cliente git, http://en.wikipedia.org/wiki/Git_%28software%29
+* Descargar Spring Roo 1.1.0.M1 al directorio de gvNIX:
+
+  * Utiliza tu cliente Git para descargar los fuentes de Spring Roo desde
+    ``git://git.springsource.org/roo/roo.git``. Ejemplo::
+
+     bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
+
+  * Cambia al directorio de Spring Roo y actualizar a la versión 1.1.0.M1 
+    ``3a0b8a399aae14167139c185e4e31355e20d1f25``. Ejemplo::
+
+     bash:~/gvnix/trunk/code$ cd roo
+     bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
+
+Arrancar gvNIX dev
+====================
+
+#. Construir gvNIX::
+
+    bash:~/gvnix/trunk/code$ mvn clean install
+
+#. Empezando con gvNIX
+
+   * Incluir el directorio ``bin`` de gvNIX en la variable de entorno PATH::
+
+      bash:~/gvnix/trunk/code$ PATH=$PWD/bin:$PATH
+
+   * Cambiar al directorio del proyecto Java::
+
+      bash:~/gvnix/trunk/code$ cd ~/project-directory
+
+   * Ejecutar el intérprete de comandos de gvNIX::
+
+      bash:~/project-directory$ gvnix-dev
+
+Escribir documentación
+=======================
+
+* Descargar e instalar el editor XML XMLmind Edición Personal ( http://www.xmlmind.com/xmleditor/download.shtml )
+* Usa tu editor de DocBook (por ejemplo, XMLmind) para abrir 
+``src/site/docbook/reference/index.xml`` y contribuir tu conocimiento.
+
+Empaquetar gvNIX
+=================
+
+Para empaquetar una versión lista-para-instalar, utiliza el siguiente comando
+desde el directorio raíz de gvNIX::
+
+  bash:~/gvnix/trunk/code$ mvn clean install site assembly:assembly
+
+Creará el archivo ZIP ``target/gvNIX-{version}.zip``. Para instalarlo lee 
+la sección *Instalación de gvNIX* del documento 
+*gvNIX - Documentación de referencia*.
+
+¿Necesitas más información?
+============================
+
+Para más información crea y lee el documento *gvNIX - Documentación de referencia* (spanish).
+
+# Ejecuta el siguiente comando desde el directorio raíz de gvNIX::
+
+   bash:~/gvnix/trunk/code$ mvn site
+
+# Creará la documentación en el directorio "target/site/reference" (en distintos formatos)::
+
+    target
+    `-- site
+        `-- reference
+            |-- html
+            |   |-- index.html
+            |   `-- ...
+            |-- html-single
+            |   `-- index.html
+            `-- pdf
+                `-- gvNIX-referencia.pdf
+
+Esta guía de referencia te ayudará a empezar a trabajar. Algunas secciones
+útiles son:
+
+* Instalación de gvNIX
+* Primeros pasos con gvNIX
+* Desarrollo de aplicaciones con gvNIX
+
