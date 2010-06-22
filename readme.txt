@@ -13,11 +13,10 @@ that these instructions are for developers looking to develop gvNIX itself.
 
 If you like to try a release that has already been built, tested and 
 distributed by the core development team, we recommend that you visit gvNIX 
-download page:
+download page http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo and
+read the *gvNIX Reference Guide* included in package.
 
-   http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo
-
-This document is written using the reStructuredText markup.
+This document is written using the reStructuredText markup and UTF-8 charset encoding.
 
 Copyright (C) 2010 Conselleria de Infraestructuras y Transporte - Generalitat Valenciana
 
