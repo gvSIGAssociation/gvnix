@@ -1,4 +1,4 @@
-package org.es.gva.cit.web_binder.roo.addon;
+package org.gvnix.web.mvc.binding.roo.addon;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;

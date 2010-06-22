@@ -1,4 +1,4 @@
-package org.es.gva.cit.web_binder.roo.addon;
+package org.gvnix.web.mvc.binding.roo.addon;
 
 import org.apache.felix.scr.annotations.*;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
