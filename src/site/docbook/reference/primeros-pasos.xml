@@ -117,9 +117,10 @@ bash$ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
     y a partir de ese momento poder desarrollar desde el propio Eclipse, por
     ejemplo con el STS instalado.</para>
 
-    <para xml:lang="es">Con el comando <emphasis>mvn tomcat:run</emphasis>
-    arrancamos un Tomcat arrancado con la aplicación web, en este momento
-    podemos ejecutar tests funcionales con Selenium:</para>
+    <para xml:lang="es">Con el comando <emphasis role="bold">mvn
+    tomcat:run</emphasis> arrancamos un Tomcat con la aplicación web, en este
+    momento podemos navegar por la aplicación y ejecutar tests funcionales con
+    Selenium:</para>
 
     <orderedlist>
       <listitem>
