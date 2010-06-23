@@ -64,6 +64,8 @@
 			<!-- FIXED problem when ROO is installed on with-spaces path
 			     see http://jira.springframework.org/browse/ROO-905 
 			<source>${roo.distribution.final-location}/bin/roo.sh</source> 
+
+			added -Droo.home
 			-->
 			<source>src/main/assembly/roo.sh</source> 
 			<outputDirectory>/bin</outputDirectory>
@@ -72,7 +74,7 @@
  		</file>
 		<!-- gvNIX gvnix.bat -->
 		<file>
-			<source>roo/bootstrap/src/main/bin/roo.bat</source>
+			<source>src/main/assembly/roo.bat</source>
 			<outputDirectory>/bin</outputDirectory>
 			<destName>gvnix.bat</destName>
 			<fileMode>664</fileMode>
