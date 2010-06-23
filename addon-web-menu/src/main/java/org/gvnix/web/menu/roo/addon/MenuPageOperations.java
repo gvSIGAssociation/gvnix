@@ -1,5 +1,5 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures     
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
  * i Transport - Generalitat Valenciana
  * Copyright (C) 2010 CIT - Generalitat Valenciana
  *
@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -75,12 +75,12 @@ public interface MenuPageOperations {
      * External destination must be absolute and starts with <code>http://</code> or <code>https://</code> (example: <code>http://www.disid.com</code>)<br>
      *
      * You can't duplicate page's name in the same parent.<br>
-     * 
+     *
      * @param parent new page's parent, if is null parent will be root
      * @param name page's name (mandatory)
      * @param label label to use in page. You must set a label or a messageCode
      * @param messageCode code of message to use in page. It has higher priority than label
-     * @param destination URL destination of item. 
+     * @param destination URL destination of item.
      * @param roles coma separated list of roles allowed to show this page. If it's <code>null</code> there will be no restrictions.
      * @param rooId Roo menu id. This is used for stardard roo menu operations
      * @param hide Hide this page
@@ -92,7 +92,7 @@ public interface MenuPageOperations {
 
     /**
      * Remove a page.<br>
-     * 
+     *
      * If <code>page</code> has children this operation will fail.<br>
      *
      * If <code>page</code> has set <code>rooId</code> property this operation will only set to hidden.<br>
@@ -103,33 +103,93 @@ public interface MenuPageOperations {
      */
     public void removePage(MenuPageItem page, boolean force, boolean ignoreRooId);
 
-    /** TODO */
+    /**
+     * Update values of a page.<br/>
+     *
+     *
+     * @param page
+     * @param symbolName
+     * @param label
+     * @param messageCode
+     * @param destination
+     * @param roles
+     * @param rooId
+     * @param hidden
+     * @return
+     */
     public MenuPageItem updatePage(MenuPageItem page, String symbolName,
 	    String label, String messageCode, String destination, String roles,
 	    String rooId, boolean hidden);
 
-    /** TODO */
+    /**
+     * Changes page's visibility to hidden
+     *
+     * @param page
+     */
     public void hidePage(MenuPageItem page);
 
-    /** TODO */
+    /**
+     * Changes page's visibility visible
+     *
+     * @param page
+     */
     public void showPage(MenuPageItem page);
 
-    /** TODO */
+    /**
+     * Return a formated string with a list representation of a subtree.
+     *
+     * @param page main node of subtree
+     * @param label show label values
+     * @param messageCode show messageCode values
+     * @param destination show destination values
+     * @param roles show roles values
+     * @return
+     */
     public String getFormatedList(MenuPageItem page, boolean label, boolean messageCode, boolean destination, boolean roles);
 
-    /** TODO */
+    /**
+     * Return a string with a formated string page information
+     *
+     * @param page
+     * @return
+     */
     public String getFormatedInfo(MenuPageItem page);
 
-    /** TODO */
+    /**
+     * Informs if setup command is available
+     *
+     * @return
+     */
     public boolean isSetupAvailable();
 
-    /** TODO */
+    /**
+     * Move the node page and its children into another node.<br/>
+     *
+     * The element will be place at the end of <code>into</code> children.
+     *
+     * @param page
+     * @param into
+     * @return
+     */
     public MenuPageItem moveInto(MenuPageItem page, MenuPageItem into);
 
-    /** TODO */
+    /**
+     * Move the node page and its children before another node.<br/>
+     *
+     * The element will be place into the same parent of <code>before</code> and
+     * before it.
+     *
+     * @param page
+     * @param before
+     * @return
+     */
     public MenuPageItem moveBefore(MenuPageItem page, MenuPageItem before);
 
-    /** TODO */
+    /**
+     * Informs if menu model if modifiable.
+     *
+     * @return
+     */
     public boolean isModelModifiable();
 
     /**
