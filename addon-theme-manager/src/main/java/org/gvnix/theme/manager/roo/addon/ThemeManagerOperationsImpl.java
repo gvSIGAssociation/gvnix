@@ -99,11 +99,20 @@ public class ThemeManagerOperationsImpl implements ThemeManagerOperations {
 
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * 
-     * @see
-     * org.gvnix.theme.manager.roo.addon.ThemeManagerOperations#getThemesPath()
+     * Returns the path for gvNIX installation themes. Search order:
+     * <ul>
+     * <li>
+     * System property 'roo.themes' (java -Droo.themes).</li>
+     * <li>
+     * Environment variable 'ROO_THEMES'.</li>
+     * <li>
+     * System property 'roo.home' (java -Droo.home).</li>
+     * <li>
+     * Environment variable 'ROO_HOME'.</li>
+     * </ul>
      */
     public String getThemesPath() {
 
