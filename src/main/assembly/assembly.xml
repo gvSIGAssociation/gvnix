@@ -59,7 +59,7 @@
 			<outputDirectory>/docs/pdf</outputDirectory>
 			<destName>LICENSE.TXT</destName>
  		</file>
-		<!-- gvNIX gvnix.sh -->
+		<!-- gvNIX gvnix script -->
 		<file>
 			<!-- FIXED problem when ROO is installed on with-spaces path
 			     see http://jira.springframework.org/browse/ROO-905 
@@ -67,7 +67,7 @@
 			-->
 			<source>src/main/assembly/roo.sh</source> 
 			<outputDirectory>/bin</outputDirectory>
-			<destName>gvnix.sh</destName>
+			<destName>gvnix</destName>
 			<fileMode>775</fileMode>
  		</file>
 		<!-- gvNIX gvnix.bat -->
@@ -75,7 +75,7 @@
 			<source>roo/bootstrap/src/main/bin/roo.bat</source>
 			<outputDirectory>/bin</outputDirectory>
 			<destName>gvnix.bat</destName>
-			<fileMode>775</fileMode>
+			<fileMode>664</fileMode>
  		</file>
 	</files>
 
