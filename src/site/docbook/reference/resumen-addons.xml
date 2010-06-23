@@ -34,14 +34,17 @@
       pervisto e implementado en Spring Roo. El problema es que se basa en la
       existencia de un campo de <emphasis>version</emphasis> o
       <emphasis>lastupdate</emphasis> en la tabla. Esto es un problema para
-      aquellas bases de datos ya exsitentes y que no podemos alterar su
-      extructura.</para>
+      aquellas bases de datos ya existentes y que no podemos alterar su
+      estructura.</para>
 
-      <para>Este Mecanismo nos permite seguir usando el sistema de control de
-      concurrencia en base al cálculo de una <emphasis role="bold">Suma de
-      control</emphasis> de los valore de todos los campos persistentes,
-      evitando así la necesidad de almacenar ningún tipo de información en la
-      Base de datos. Para más información ver <link
+      <para>Este mecanismo permite usar un sistema de control de concurrencia
+      sin necesidad de alterar la estructura de base de datos. </para>
+
+      <para>Se basa en el cálculo de una <emphasis role="bold">suma de
+      control</emphasis> de los valores de todos los campos persistentes y en
+      su comprobación posterior para validar si ha habido algún cambio por
+      terceras partes, en cuyo caso ha habido un conflicto de concurrencia.
+      Para más información ver <link
       linkend="addon-persistence_occchecksum">Descripción de
       OCCChecksum</link>.</para>
     </section>
@@ -51,9 +54,9 @@
     <title>Theme Manager</title>
 
     <para>Este add-on permite el manejo de <emphasis>Temas Web</emphasis> en
-    la aplicación. Los <emphasis>Temas</emphasis> son unos fichero a
-    reemplazar en la aplicación de destino <emphasis>(css, imágenes, paginas
-    por defecto, layout de tails, tagx,...)</emphasis> para alterar su
+    la aplicación. Los <emphasis>Temas</emphasis> son un conjunto de ficheros
+    de la aplicación <emphasis>(css, imágenes, paginas por defecto, layout de
+    tails, tagx,...)</emphasis> que permiten personalizar su estilo de
     visualización. Para más información ver <link
     linkend="addon-theme-manager">Add-on Theme Manager</link>.</para>
   </section>
@@ -61,29 +64,27 @@
   <section xml:id="resumen-addons_web-exception-handler">
     <title>Web Exception Handler</title>
 
-    <para>Permite configurar la página y el mensaje que se muestra en la
-    aplicación cuando sucede una excepción que no ha sido gestionada dentro de
-    ella. Los comando de este Add-on añade y configura la página y permite
-    añadir las traducciones localizadas de los mensajes a mostrar. Par más
-    información ver <link linkend="addon-web-exception-handler">Add-on Web
-    Exception Handler</link>.</para>
+    <para>Permite definir qué mensaje se muestra al usuario cuando sucede una
+    error que el desarrollador no ha tenido en cuenta y por tanto no gestiona.
+    Par más información ver <link linkend="addon-web-exception-handler">Add-on
+    Web Exception Handler</link>.</para>
   </section>
 
   <section xml:id="resumen-addons_web-menu">
     <title>Web Menu</title>
 
-    <para>Este add-on reemplaza el mecanismo de menú que lleva Spring Roo de
-    forma estándar. Las principales características del nuevo mecanismo
-    son:</para>
+    <para>Este add-on permite gestionar la estructura o mapa de páginas de la
+    aplicación y los permisos asociados a cada página. Las principales
+    características del nuevo mecanismo son:</para>
 
     <variablelist>
       <varlistentry>
         <term>Modelo de datos en XML</term>
 
         <listitem>
-          <para>La definición de la estructura del menú <emphasis
-          role="bold">no está en la página de pintado</emphasis> de
-          menú.</para>
+          <para>La estructura del menú es independiente de la visualización.
+          Actualmente se define en un archivo XML y en un futuro podrá estar
+          almacenada en base de datos.</para>
         </listitem>
       </varlistentry>
 
@@ -111,10 +112,9 @@
         <term>Integración con Spring Security</term>
 
         <listitem>
-          <para>Detecta automáticamente la configuración de Spring Security y
-          no muestra aquellas opciones de menú que no son visibles. Además
-          podemos añadirle información de <emphasis role="bold">visibilidad
-          por roles</emphasis> de usuario.</para>
+          <para>Permite gestionar los permisos de acceso a las páginas y no
+          muestrar aquellas opciones de menú para las que no se tiene permiso
+          de acceso.</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -123,27 +123,24 @@
   <section xml:id="resumen-addons_web-mvc-jsp-2.0">
     <title>Web MVC JSP 2.0</title>
 
-    <para>Spring Roo, por defecto, Está configurado para usar la versión de
-    JSP 2.1. Esto es un problema en algunas instalaciones que usan
-    contenedores que no soportan esta versión de la especificación (como por
-    ejemplo Tomcat 5.5).</para>
+    <para>Spring Roo por defecto utiliza elementos JSP 2.1. Esto es un
+    problema en algunas instalaciones que usan contenedores de servlets que no
+    soportan esta versión de la especificación (como por ejemplo Tomcat
+    5.5).</para>
 
     <para>Este add-on ajusta la configuración de dependencias del proyecto
-    para que las aplicaciones resultado se puedan desplegar sobre un
-    contenedor con soporte para la versión 2.0 de la especificación JSP. Para
-    más información ver <link linkend="addon-web-mvc-jsp-2.0">Add-on Web MVC
-    JSP 2.0</link>.</para>
+    para que las aplicaciones se puedan desplegar sobre un contenedor con
+    soporte para la versión 2.0 de la especificación JSP. Para más información
+    ver <link linkend="addon-web-mvc-jsp-2.0">Add-on Web MVC JSP
+    2.0</link>.</para>
   </section>
 
   <section xml:id="resumen-addons_web-relation-styles">
     <title>Web Relation Styles</title>
 
-    <para>La visualización de relaciones 1 a N en Roo se realiza de forma
-    estándar, en el lado del 1, con una lista de elementos seleccionables.
-    Este Add-on permite modificar esto de forma de visualización usando tablas
-    de elementos paginadas. La tablas de las relaciones se agrupan al final de
-    la vista usando algún componente gráfico para gestionar su visualización.
-    Para ver más información consultar <link
+    <para>Este Add-on permite gestionar el estilo de visualización de las
+    relaciones 1:N, por ejemplo usando tablas para contener los elementos
+    relacionados. Para ver más información consultar <link
     linkend="addon-web-relation-styles">Add-on Web Relation
     Styles</link>.</para>
   </section>
@@ -160,9 +157,9 @@
   <section xml:id="resumen-addons_cit-security">
     <title>CIT Security</title>
 
-    <para>Este add-on instala en los proyecto que lo usa el sistema de
-    Autenticación y Autorización sobre Spring Security que utiliza el Servicio
-    Web disponible en la CIT para tal fin. Para ver más información ver <link
+    <para>Instala y configura el sistema de autenticación y autorización sobre
+    Spring Security que utilizado en la Conselleria d'Infraestructures i
+    Transport. Para ver más información ver <link
     linkend="addon-cit-security">Add-on CIT Security</link>.</para>
   </section>
 </chapter>

@@ -11,8 +11,8 @@
   <section xml:id="introduccion_que-es-gvnix">
     <title xml:lang="es">¿Qué es gvNIX?</title>
 
-    <para xml:lang="es">Entorno de trabajo Java para la CIT productivo y
-    flexible, sin comprometer la calidad de los proyectos.</para>
+    <para xml:lang="es">Entorno de trabajo Java para la CIT, productivo y
+    flexible, que no compromete la calidad de los proyectos.</para>
 
     <para xml:lang="es">Esta versión es la primera que usa como base <link
     xlink:href="http://www.springsource.org/roo">Spring Roo</link>. Añade
@@ -29,9 +29,9 @@
       </author> "Roo es un pequeño genio que observa desde un segundo plano y
     gestiona todo aquello de lo que no me quiero preocupar" </citation></para>
 
-    <para xml:lang="es">Spring Roo es un framework Java que permite el
-    desarrollo Web de forma más rápida y cómoda para el desarrollador. Sus
-    principales características son:</para>
+    <para xml:lang="es">Spring Roo es un entorno de trabajo Java que permite
+    el desarrollo de aplicaciones web de forma rápida y cómoda para el
+    desarrollador. Sus principales características son:</para>
 
     <itemizedlist>
       <listitem>
@@ -73,8 +73,8 @@
       </listitem>
 
       <listitem>
-        <para>No se ejecuta en <emphasis>Runtime</emphasis> por lo que no
-        penaliza la velocidad la aplicación.</para>
+        <para>No incorpora elementos adicionales al entorno de ejecución, por
+        lo que no penaliza la velocidad la aplicación.</para>
       </listitem>
 
       <listitem>
@@ -83,7 +83,7 @@
 
       <listitem>
         <para>Recibe instrucciones a través de una consola interactiva con
-        autocompletado y ayuda en linea.</para>
+        autocompletado y ayuda en línea.</para>
       </listitem>
 
       <listitem>
@@ -91,8 +91,8 @@
       </listitem>
 
       <listitem>
-        <para>Re aprovechamiento de conocimiento: No necesita más conocimiento
-        que el necesario para el desarrollo de aplicaciones J2EE.</para>
+        <para>Aprovecha el conocimiento: No necesita más conocimiento que el
+        necesario para el desarrollo de aplicaciones JEE.</para>
       </listitem>
     </itemizedlist>
   </section>
@@ -100,58 +100,64 @@
   <section>
     <title xml:lang="es">Arquitectura.</title>
 
-    <para xml:lang="es">Spring Roo se centrantra en el desarrollo de
-    aplicaciones de gestión escritas en Java. Actualmente, estas aplicaciones
-    suelen tener un acceso a Bases de Datos datos relacional, usando el API
-    Java Persistence (JPA), inyección de dependencias y gestión de
-    transacciones usando el Framework de Spring, pruebas usando JUnit,
-    generación de la aplicación usando Maven y vistas JSP usando Spring MVC
-    como front-end. Como es habítual en las aplicaciones modernas basadas en
-    Java.</para>
+    <para xml:lang="es">Spring Roo se centra en el desarrollo de aplicaciones
+    escritas en Java para entornos corporativos.</para>
+
+    <para xml:lang="es">La arquitectura de Roo se subdivide en 2 grandes
+    bloques: el entorno de desarrollo y el entorno de ejecución</para>
+
+    <para xml:lang="es">El entorno de desarrollo incorpora distintas
+    herramientas enfocadas al desarrollo rápido de aplicaciones Java. La
+    característica más importante del entorno de desarrollo es que no
+    introduce ningún tipo de librería propia de Roo, de tal forma que en
+    tiempo de ejecución no añade sobre coste de rendimiento a las
+    aplicaciones.</para>
+
+    <para xml:lang="es">El entorno de ejecución es un entorno típico de
+    aplicaciones basadas en Spring 3: acceso a bases de datos relacionales
+    usando el API Java Persistence (JPA), inyección de dependencias, gestión
+    de transacciones propia de Spring, pruebas unitarias con JUnit,
+    configuración Maven para construir las aplicaciones y vistas JSP usando
+    Spring MVC como front-end. Este tipo de aplicaciones basadas en Spring son
+    probablemente las aplicaciones Java más modernas.</para>
 
     <para xml:lang="es">Mientras la mayoría de gente se centrará en el
     desarrollo de aplicaciones web basadas en Spring MVC, es importante
     destacar que Roo no impone ninguna restrición sobre el tipo de
-    aplicaciones que se pueden generar con este framework. Desde la versión
-    1.0.0 de Spring Roo se pueden generar cualquier tipo de aplicación
-    autocontenida. Algunos ejemplos de la funcionalidades que se puden cubrir
-    fácilmente incluyen (pero no están limitados a estos):</para>
+    aplicaciones que se pueden generar con este entorno. Algunos ejemplos de
+    las funcionalidades que se pueden cubrir fácilmente con la versión actual
+    son (notar que no están limitados únicamente a estas):</para>
 
     <itemizedlist>
       <listitem>
-        <para xml:lang="es">Escucha de mensajes por JMS o envío por
-        SMPT.</para>
+        <para xml:lang="es">Intercambio de mensajes por JMS o envío por
+        SMTP.</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Escritura de servicios para acceso remoto de
-        clientes RIA.</para>
+        <para xml:lang="es">Capa de servicios opcional con posibilidad de
+        acceso remoto para clientes RIA.</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Ejecución de acciones predefinadas contra Base de
-        datos.</para>
-      </listitem>
-
-      <listitem>
-        <para xml:lang="es">Investigación de las nuevas funcionalidades de
-        Spring y AspectJ con una inversión de tiempo mínima.</para>
+        <para xml:lang="es">Ejecución de acciones predefinidas contra la base
+        de datos.</para>
       </listitem>
     </itemizedlist>
 
-    <para xml:lang="es">Una de las mayores difencias entre Spring Roo y las
-    aplicaciones generadas a mano es que no añade capas de abtracción
-    innecesarias. Las aplicaciones J2EE mas tradicionales tendrán una capa
-    DAO, capas de servicios, capa de dominio y una capa de Control. En una
-    aplicación tipica de este framework solo usará una <link
+    <para xml:lang="es">Una de las mayores diferencias entre Spring Roo y las
+    aplicaciones tradicionales generadas a mano es que Roo no añade capas de
+    abstracción innecesarias. Las aplicaciones Java más tradicionales tienen
+    una capa DAO, capas de servicios, capa de dominio y una capa de control.
+    En una aplicación típica de Roo solo se usa una <link
     linkend="guia-desarrollo_manejo-entidades">capa de Entidad</link> (que es
     similar a la cama de dominio) y una <link
     linkend="guia-desarrollo_web">capa Web</link>. Como se indica en la lista
-    anterior, se puede añadir una capa de Servicios si es necesario, aunque es
-    estremadamente extraño añadir una capa DAO.</para>
+    anterior, si fuera necesario se podría añadir una capa de
+    Servicios.</para>
 
-    <para xml:lang="es">Aquí podemos ver un diagrama de estas capas, con sus
-    tecnologías relacionadas para ilustrar mejor este modelo:</para>
+    <para xml:lang="es">Aquí podemos ver un diagrama de los componentes de la
+    arquitectura de Roo, capas y tecnologías relacionadas:</para>
 
     <figure>
       <title xml:lang="es">Diagrama Arquitectura</title>
@@ -165,12 +171,25 @@
   </section>
 
   <section>
-    <title xml:lang="es">El interprete de Comandos</title>
+    <title xml:lang="es">El intérprete de comandos</title>
 
-    <para>Para que el framework empiece a funcionar, hay que arrancar una
-    consola interactiva con la que haremos peticiones. Esta consola, a su vez,
-    monitoriza los cambios que vaya realizándose en los artefactos para
-    ajustar la generación de código.</para>
+    <para>Para que el entorno empiece a funcionar, hay que arrancar un
+    intérprete de comandos (Roo shell) con el que interactuaremos con el
+    entorno de desarrollo. Este intérprete de comandos tiene dos funciones
+    básicas:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Ejecutar las órdenes indicadas por el desarrollador.</para>
+      </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+      <listitem>
+        <para>Monitorizar cualquier cambio en el proyecto para reajustar el
+        código generado.</para>
+      </listitem>
+    </itemizedlist>
 
     <para>La consola tiene este aspecto:</para>
 
@@ -186,7 +205,7 @@ roo&gt;</programlisting>
   </section>
 
   <section>
-    <title xml:lang="es">¿Cómo funciona?</title>
+    <title xml:lang="es">¿Cómo funciona Roo?</title>
 
     <para>Este diagrama muestra a alto nivel el modelo funcional de
     Roo:</para>
@@ -201,7 +220,8 @@ roo&gt;</programlisting>
       </mediaobject>
     </figure>
 
-    <para xml:lang="es">En este diagrama podemos ver:</para>
+    <para xml:lang="es">Los elementos funcionales presentados en el diagrama
+    son:</para>
 
     <variablelist>
       <varlistentry>
@@ -217,8 +237,9 @@ roo&gt;</programlisting>
         <term xml:lang="es">Infraestructura de Roo</term>
 
         <listitem>
-          <para xml:lang="es">Toda la infraestructura de Roo es auto contenida
-          y separada del proyecto final. Se compone de:</para>
+          <para xml:lang="es">Toda la infraestructura de Roo que forma el
+          entorno de desarrollo, auto contenida y separada del proyecto final.
+          Se compone de:</para>
 
           <variablelist>
             <varlistentry>
@@ -227,17 +248,16 @@ roo&gt;</programlisting>
               <listitem>
                 <para xml:lang="es">Componentes que monitorizan nuestro
                 proyecto y realizan las operaciones que solicita el
-                desarrollador a través de <emphasis
-                role="bold">Shell</emphasis>.</para>
+                desarrollador a través del intérprete de comandos.</para>
               </listitem>
             </varlistentry>
 
             <varlistentry>
-              <term xml:lang="es">Interprete de comandos (Shell)</term>
+              <term xml:lang="es">Intérprete de comandos (Shell)</term>
 
               <listitem>
-                <para xml:lang="es">Componente que permite la recepción de
-                comando por parte del desarrollador</para>
+                <para xml:lang="es">Componente que permite la recepción y
+                ejecución de órdenes del desarrollador</para>
               </listitem>
             </varlistentry>
 
@@ -260,11 +280,10 @@ roo&gt;</programlisting>
         <listitem>
           <para xml:lang="es">Conjunto de <link
           xlink:href="http://hartocodigo.blogspot.com/2009/02/anotaciones-en-java-5.html">anotaciones
-          JAVA</link> que utiliza el framework para poder identificar el tipo
-          de artefacto y su configuración para poder ser gestionado por los
-          Add-ons. Tiene una política de retención <emphasis>SOURCE</emphasis>
-          por lo que el compilador JAVA no las incluirá en la clases
-          compiladas.</para>
+          JAVA</link> que utiliza Roo para poder identificar un tipo de
+          artefacto concreto y su configuración. Tienen una política de
+          retención <emphasis>SOURCE</emphasis> por lo que el compilador Java
+          no las incluirá en la clases compiladas.</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -273,8 +292,9 @@ roo&gt;</programlisting>
   <section>
     <title xml:lang="es">Usabilidad</title>
 
-    <para xml:lang="es">La usabilidad es un aspecto muy importante, entre la
-    principales características en este punto encontramos:</para>
+    <para xml:lang="es">La usabilidad es un factor clave en el entorno de
+    trabajo. Entre las principales características de usabilidad
+    encontramos:</para>
 
     <itemizedlist>
       <listitem>
@@ -294,60 +314,15 @@ roo&gt;</programlisting>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Ejecución de scripts: permiten automatizar
-        generación de aplicaciones.</para>
+        <para xml:lang="es">Ejecución de <emphasis>scripts</emphasis>:
+        permiten guardar una secuencia de comandos y ejecutarlos en conjunto
+        (batch) cuantas veces se necesite.</para>
       </listitem>
 
       <listitem>
         <para xml:lang="es">Funcionamiento predictivo y conservador: El
         desarrollador tiene el control y Roo no se entromete en la forma de
-        hacer las cosas.</para>
-      </listitem>
-    </itemizedlist>
-  </section>
-
-  <section>
-    <title xml:lang="es">El Proyecto generado</title>
-
-    <para xml:lang="es">El proyecto que se genera usando Roo es un proyecto
-    estándar de Spring y otras especificaciones y librerías estándar. Las
-    principales son:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Spring 3.0</para>
-      </listitem>
-
-      <listitem>
-        <para>Spring Security</para>
-      </listitem>
-
-      <listitem>
-        <para>Spring MVC</para>
-      </listitem>
-
-      <listitem>
-        <para>JPA 2.0</para>
-      </listitem>
-
-      <listitem>
-        <para>Hibernate</para>
-      </listitem>
-
-      <listitem>
-        <para>iBatis</para>
-      </listitem>
-
-      <listitem>
-        <para>AspectJ</para>
-      </listitem>
-
-      <listitem>
-        <para>JUnit</para>
-      </listitem>
-
-      <listitem>
-        <para>JMS</para>
+        hacer las cosas</para>
       </listitem>
     </itemizedlist>
   </section>

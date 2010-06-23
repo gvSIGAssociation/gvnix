@@ -7,7 +7,7 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title xml:lang="es">Guía de desarrollo de aplicaciones con gvNIX</title>
+  <title xml:lang="es">Desarrollo de aplicaciones con gvNIX</title>
 
   <xi:include href="guia-desarrollo_aplicacion-base.xml" />
 
@@ -1007,7 +1007,7 @@ public class MyController {
             <listitem>
               <para>Añadirá las vista necesaria en
               <filename>WEB-INF/views/{nombre_controller}</filename> para
-              gestionar las acciones configuradas en la anotación. </para>
+              gestionar las acciones configuradas en la anotación.</para>
             </listitem>
 
             <listitem>

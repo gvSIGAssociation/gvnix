@@ -6,7 +6,7 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title xml:lang="es">Crear una Aplicación Base con gvNIX</title>
+  <title xml:lang="es">Crear una nueva aplicación</title>
 
   <para xml:lang="es">Utilizando Spring Roo para desarrollar una aplicación
   web para una <emphasis role="bold">Pizza Shop</emphasis>. Entre los
@@ -31,7 +31,7 @@
   </figure>
 
   <section xml:id="guia-desarrollo_aplicacion-base_crear-projecto">
-    <title xml:lang="es">Crear el nuevo proyecto</title>
+    <title xml:lang="es">Crear el proyecto</title>
 
     <para xml:lang="es">Creamos un nuevo proyecto Roo, para eso hay que crear
     el directorio del proyecto y acceder a la consola de gvNIX:</para>
@@ -172,7 +172,7 @@ roo&gt;</programlisting>
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_crear-entidades">
-    <title xml:lang="es">Crear las Entidades y los atributos</title>
+    <title xml:lang="es">Crear las entidades y sus atributos</title>
 
     <para xml:lang="es">Ahora hay que crear las entidades, con sus atributos y
     las relaciones correspondientes a cada una que se han definido en el
@@ -358,7 +358,7 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToStr
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_test-integracion">
-    <title xml:lang="es">Test de Integración</title>
+    <title xml:lang="es">Test de integración</title>
 
     <para xml:lang="es">Después de haber creado la primera iteración del
     modelo de objetos se ha de hacer una comprobación ejecutando los test de
@@ -443,7 +443,7 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToStr
   </section>
 
   <section>
-    <title xml:lang="es">Crear la aplicación Web</title>
+    <title xml:lang="es">Crear la capa web</title>
 
     <para xml:lang="es">Se han de crear los controllers y las vistas para
     poder visualizar la aplicación web mediante el comando de Roo

@@ -9,21 +9,21 @@
   <title xml:lang="es">Instalación de gvNIX</title>
 
   <section xml:id="instalacion_requisitos">
-    <title xml:lang="es">Requisitos prévios</title>
+    <title xml:lang="es">Requisitos previos</title>
 
-    <para xml:lang="es">gvNIX es una aplicación JAVA de escritorio por lo que
-    requiere tener un JDK instalado en el sistema.</para>
+    <para xml:lang="es">gvNIX es en si mismo una aplicación Java por lo que
+    requiere tener una máquina virtual Java instalada en el sistema.</para>
 
     <para xml:lang="es">La lista de requisitos es la siguiente:</para>
 
     <itemizedlist>
       <listitem>
-        <para>Una instalación de Java JDK (SUN, JRocket, IBM) 5 o 6.</para>
+        <para>Java JDK 5 o 6.</para>
       </listitem>
 
       <listitem>
-        <para>Una instalación de Apache Maven 2.0.9 o superior, incluida en el
-        <emphasis>PATH</emphasis> del sistema.</para>
+        <para>Maven 2.0.9 o superior, incluida en el <emphasis>PATH</emphasis>
+        del sistema.</para>
       </listitem>
 
       <listitem>
@@ -36,46 +36,74 @@
   <section xml:id="instalacion_instalacion">
     <title xml:lang="es">Instalación</title>
 
-    <para xml:lang="es">Con todos los requisitos instalados descomprimimos el
-    fichero .zip y añadir el acceso al ejecutable correspondiente del
-    directorio <filename>bin</filename> del directorio descomprimido.</para>
+    <orderedlist>
+      <listitem>
+        <para>Descomprimir el fichero ZIP de la versión de gvNIX, por ejemplo
+        gvNIX-0.3.0.zip</para>
 
-    <para xml:lang="es">Esto se puede hacer:</para>
+        <itemizedlist>
+          <listitem>
+            <para>Ejemplo para sistemas *nix y Apple:</para>
+
+            <programlisting>bash:~$ unzip gvNIX-0.3.0.zip</programlisting>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para>Al descomprimir el fichero ZIP se creará un nuevo directorio,
+        por ejemplo gvNIX-0.3.0. En el resto del documento nos referiremos a
+        este directorio como GVNIX_HOME</para>
+      </listitem>
+
+      <listitem>
+        <para>Incluir el directorio <emphasis>bin</emphasis> de gvNIX en la
+        variable de entorno PATH</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Ejemplo para sistemas *nix y Apple:</para>
+
+            <programlisting>bash:~$ cd gvNIX-0.3.0
+bash:~/gvNIX-0.3.0$ export PATH=$PWD/bin:$PATH</programlisting>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+    </orderedlist>
+
+    <para>Una vez hecho esto, ya se puede trabajar con el entorno
+    gvNIX:</para>
 
     <itemizedlist>
       <listitem>
-        <para xml:lang="es">Para sistemas *nix y Apple: Crear un enlace
-        simbolico en el directorio <filename>$HOME/bin</filename> del usuario
-        o en alguno disponible en el <varname>$PATH</varname> al fichero
-        <filename>$ROO_HOME/bin/gvnix.sh</filename>. Ejemplo:<programlisting>mkdir $HOME/bin
-ln -s $ROO_HOME/bin/gvnix $HOME/bin/gvnix.sh gvnix</programlisting></para>
+        <para>Cambia al directorio del proyecto Java</para>
+
+        <programlisting>bash:~$ cd ~/project-directory</programlisting>
       </listitem>
 
       <listitem>
-        <para>Para sistemas Windows apadir la ruta a
-        <filename>$ROO_HOME\bin</filename> a la variable de entorno
-        <varname>%Path%</varname></para>
+        <para>Ejecuta el intérprete de comando de gvNIX para interactuar con
+        el proyecto Java</para>
+
+        <programlisting>bash:~/project-directory$ gvnix</programlisting>
       </listitem>
     </itemizedlist>
-
-    <para>Una vez hecho esto, ya se puede trabajar con el framework.</para>
   </section>
 
   <section>
-    <title xml:lang="es">Prepara el Eclipse para trabajar con gvNIX</title>
+    <title xml:lang="es">Preparar el Eclipse para trabajar con gvNIX</title>
 
-    <para>Con los proyectos generados podemos trabajar y usar eclipse. El
-    requisito mínimo es que tengamos instalado del plugin de AspectJ para
-    eclipse <link xlink:href="???">AJDT</link> para que el Eclipse sea capaz
-    de compilar los proyectos.</para>
+    <para>Existe la posibilidad de utilizar el IDE Eclipse para el desarrollo
+    de los proyectos gvNIX. El requisito mínimo es que tengamos instalado del
+    plugin de AspectJ para Eclipse, <link xlink:href="???">AJDT</link>.</para>
 
-    <para>Para instalarlo usar la Herramienta de instalación en Eclipse
-    3.5:</para>
+    <para>Para instalarlo usar la herramienta de instalación de extensiones de
+    Eclipse 3.5:</para>
 
     <orderedlist>
       <listitem>
         <para>Abrir la venta de instalación de software de eclipse: Menú
-        <code>Help/Install new Software...</code> </para>
+        <code>Help/Install new Software...</code></para>
       </listitem>
 
       <listitem>
@@ -104,10 +132,10 @@ ln -s $ROO_HOME/bin/gvnix $HOME/bin/gvnix.sh gvnix</programlisting></para>
     xlink:href="http://www.eclipse.org/ajdt/downloads/">esta
     página</link>.</para>
 
-    <para>Tambiés es posible usar la Herramienta <link
-    xlink:href="http://www.springsource.com/products/sts">Spring Tools
-    Suit</link> (o STS) que es una personalización de Eclipse de Spring. Esta
-    incorpora una consola de Roo entre otras opciones.</para>
+    <para>Es recomendable usar la extensión <link
+    xlink:href="http://www.springsource.com/products/sts">SpringSource Tool
+    Suite</link> (o STS) porque incorpora un intérprete de comandos de Roo que
+    permite ejecutar órdenes sin necesidad de salir de Eclipse.</para>
 
     <para>Para instalar el STS existen dos opciones:</para>
 
