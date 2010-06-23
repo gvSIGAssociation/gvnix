@@ -97,11 +97,17 @@ Created ...
 ~.web roo&gt; <emphasis role="bold">selenium test --controller ~.web.TimerController</emphasis>
 Created ...
 ~.web roo&gt; <emphasis role="bold">theme install --name theme-cit</emphasis>
-roo&gt; <emphasis role="bold">theme set --name theme-cit</emphasis>
-roo&gt; <emphasis role="bold">perform tests</emphasis>
-roo&gt; <emphasis role="bold">perform package</emphasis>
-roo&gt; <emphasis role="bold">perform eclipse</emphasis>
-roo&gt; <emphasis role="bold">quit</emphasis>
+~.web roo&gt; <emphasis role="bold">theme set --name theme-cit</emphasis>
+~.web roo&gt; <emphasis role="bold">perform tests</emphasis>
+...
+[INFO] BUILD SUCCESSFUL
+~.web roo&gt; <emphasis role="bold">perform package</emphasis>
+...
+[INFO] BUILD SUCCESSFUL
+~.web roo&gt; <emphasis role="bold">perform eclipse</emphasis>
+...
+[INFO] BUILD SUCCESSFUL
+~.web roo&gt; <emphasis role="bold">quit</emphasis>
 bash$ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
 
     <para xml:lang="es">El comando <command>perform</command> es una forma
