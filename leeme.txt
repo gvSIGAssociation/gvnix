@@ -59,9 +59,40 @@ Spring Roo 1.1.0.M1
 Maven
 ------------
 
-* Configurar la variable de entorno MAVEN_OPTS : TBC
+* Configurar la variable de entorno MAVEN_OPTS:
 
-* Configurar acceso a Internet vía proxy : TBC
+  Puedes necesitar incrementar la memoria disponible para Maven para compilar y generar la documentación. Ejemplo::
+  
+     bash:~/gvnix/trunk/code$ export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
+
+* Configurar acceso a Internet vía proxy:
+
+  Para configura el acceso de Maven a través de un proxy hay que definir la configuración en el fichero $M2_HOME/config/settings.xml. Este es un ejemplo de este fichero con una configuración del proxy::
+
+
+     <?xml version="1.0" encoding="UTF-8"?>
+
+     <settings xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                        http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+         ...
+
+         <proxies>
+             <proxy>
+                 <id>optional</id>
+                 <active>true</active>
+                 <protocol>http</protocol>
+                 <host>proxy.somewhere.com</host>
+                 <port>8080</port>
+                 <username>proxyuser</username>
+                 <password>somepassword</password>
+                 <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
+             </proxy>
+         </proxies>
+     </settings>
+
 
 Arrancar gvNIX dev
 ====================
