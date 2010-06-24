@@ -12,9 +12,10 @@ This gvNIX version (${gvnix.version}) is based on Spring Roo ${roo.version}.
 
 In this package we've included all available documentation:
 
-  docs/roo: Original Roo documentation.
   docs: gvNIX Documentation available.
   readme-roo.txt: Roo readme file.
+
+To see installation and run information read Chapter 2. Instalación de gvNIX (spanish)
 
 You can find more information online at:
 
