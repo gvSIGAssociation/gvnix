@@ -36,18 +36,32 @@ Para empezar con gvNIX necesitas:
 * Maven 2.0.9 o superior ( http://maven.apache.org/download.html )
 * Acceso a Internet para que Maven pueda descargar las dependencias
 * Cliente git, http://en.wikipedia.org/wiki/Git_%28software%29
-* Descargar Spring Roo 1.1.0.M1 al directorio de gvNIX:
 
-  * Utiliza tu cliente Git para descargar los fuentes de Spring Roo desde
-    ``git://git.springsource.org/roo/roo.git``. Ejemplo::
+Instrucciones de configuración
+================================
 
-     bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
+Spring Roo 1.1.0.M1
+-----------------------------
 
-  * Cambia al directorio de Spring Roo y actualizar a la versión 1.1.0.M1 
-    ``3a0b8a399aae14167139c185e4e31355e20d1f25``. Ejemplo::
+* Cambiar al directorio raíz de gvNIX
 
-     bash:~/gvnix/trunk/code$ cd roo
-     bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
+* Utiliza tu cliente Git para descargar los fuentes de Spring Roo desde
+  ``git://git.springsource.org/roo/roo.git`` en el directorio raíz de gvNXI. Ejemplo::
+
+    bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
+
+* Cambia al directorio de Spring Roo y actualizar a la versión 1.1.0.M1 
+  ``3a0b8a399aae14167139c185e4e31355e20d1f25``. Ejemplo::
+
+    bash:~/gvnix/trunk/code$ cd roo
+    bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
+
+Maven
+------------
+
+* Configurar la variable de entorno MAVEN_OPTS : TBC
+
+* Configurar acceso a Internet vía proxy : TBC
 
 Arrancar gvNIX dev
 ====================

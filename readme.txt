@@ -34,16 +34,30 @@ To start with gvNIX you need:
 * Maven 2.0.9 or above ( http://maven.apache.org/download.html )
 * Internet access so that Maven can download required dependencies
 * Git client, http://en.wikipedia.org/wiki/Git_%28software%29
-* Checkout Spring Roo 1.1.0.M1 to gvNIX folder:
 
-  * Use your Git client to checkout Spring Roo sources from ``git://git.springsource.org/roo/roo.git``. Example::
+Setup instructions
+===================
 
-     bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
+Spring Roo 1.1.0.M1
+-----------------------------
 
-  * Change to Spring Roo folder and switch to 1.1.0.M1 version ``3a0b8a399aae14167139c185e4e31355e20d1f25``. Example::
+* Go to gvNIX root directory
 
-     bash:~/gvnix/trunk/code$ cd roo
-     bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
+* Use your Git client to checkout Spring Roo sources from ``git://git.springsource.org/roo/roo.git`` to gvNIX root directory. Example::
+
+   bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
+
+* Change to Spring Roo folder and switch to 1.1.0.M1 version ``3a0b8a399aae14167139c185e4e31355e20d1f25``. Example::
+
+   bash:~/gvnix/trunk/code$ cd roo
+   bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
+
+Maven
+------------
+
+* Setup environment variable called MAVEN_OPTS : TBC
+
+* Setup Internet access through proxy : TBC
 
 Run gvNIX dev
 =================
