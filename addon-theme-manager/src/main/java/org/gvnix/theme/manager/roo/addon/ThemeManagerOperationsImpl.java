@@ -611,7 +611,7 @@ public class ThemeManagerOperationsImpl implements ThemeManagerOperations {
     private void fileCopyToProject(File source, File destination) {
 
 	MutableFile mutableFile;
-	String template;
+	byte[] template;
 
 	InputStream templateInputStream;
 	InputStreamReader readerFile;
@@ -622,7 +622,7 @@ public class ThemeManagerOperationsImpl implements ThemeManagerOperations {
 
 	    readerFile = new InputStreamReader(templateInputStream);
 
-	    template = FileCopyUtils.copyToString(readerFile);
+	    template = FileCopyUtils.copyToByteArray(templateInputStream);
 
 	} catch (IOException ioe) {
 	    throw new IllegalStateException("Unable load ITD css template", ioe);
@@ -638,12 +638,7 @@ public class ThemeManagerOperationsImpl implements ThemeManagerOperations {
 
 	try {
 
-	    if (source.getAbsolutePath().contains("image")) {
-		FileCopyUtils.copy(source, destination);
-	    } else {
-		FileCopyUtils.copy(template.getBytes(), mutableFile
-			.getOutputStream());
-	    }
+	    FileCopyUtils.copy(template, mutableFile.getOutputStream());
 
 	} catch (IOException ioe) {
 	    throw new IllegalStateException("Could not output '"
