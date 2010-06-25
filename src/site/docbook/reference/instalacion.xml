@@ -93,62 +93,28 @@ bash:~/gvNIX-0.3.0$ export PATH=$PWD/bin:$PATH</programlisting>
   <section>
     <title xml:lang="es">Preparar el Eclipse para trabajar con gvNIX</title>
 
-    <para>Existe la posibilidad de utilizar el IDE Eclipse para el desarrollo
-    de los proyectos gvNIX. El requisito mínimo es que tengamos instalado del
-    plugin de AspectJ para Eclipse, <link xlink:href="???">AJDT</link>.</para>
-
-    <para>Para instalarlo usar la herramienta de instalación de extensiones de
-    Eclipse 3.5:</para>
-
-    <orderedlist>
-      <listitem>
-        <para>Abrir la venta de instalación de software de eclipse: Menú
-        <code>Help/Install new Software...</code></para>
-      </listitem>
-
-      <listitem>
-        <para>Pulsar el botón <code>Add...</code> .</para>
-      </listitem>
-
-      <listitem>
-        <para>En <literal>name</literal> introducir <literal>AJDT</literal> y
-        en location
-        <literal>http://download.eclipse.org/tools/ajdt/35/update</literal>.</para>
-      </listitem>
-
-      <listitem>
-        <para>Seleciónar todo el paquete <literal>AspectJ Development
-        Tools</literal> y el paquete <literal>Other AJDP
-        Tools</literal>.</para>
-      </listitem>
-
-      <listitem>
-        <para>Pulsar el botón <literal>Next</literal> y terminar el asistente
-        aceptando la licencia.</para>
-      </listitem>
-    </orderedlist>
-
-    <para>Para otras versiones de Eclipse ver <link
-    xlink:href="http://www.eclipse.org/ajdt/downloads/">esta
-    página</link>.</para>
-
-    <para>Es recomendable usar la extensión <link
+    <para>Para utilizar Eclipse como IDE de desarrollo de los proyectos gvNIX
+    se recomienda utilizar la extensión <link
     xlink:href="http://www.springsource.com/products/sts">SpringSource Tool
-    Suite</link> (o STS) porque incorpora un intérprete de comandos de Roo que
-    permite ejecutar órdenes sin necesidad de salir de Eclipse.</para>
+    Suite</link> (o STS).</para>
 
-    <para>Para instalar el STS existen dos opciones:</para>
+    <para>Entre otras funcionalidades incorpora un intérprete de comandos de
+    Roo que permite ejecutar órdenes sin necesidad de salir de Eclipse.</para>
+
+    <para>Existen 2 distribuciones del STS:</para>
 
     <orderedlist>
       <listitem>
-        <para>Instalar STS completo descargado de <link
-        xlink:href="http://www.springsource.com/products/springsource-tool-suite-download">aquí</link>.</para>
+        <para>Instalación como <link
+        xlink:href="http://www.springsource.com/products/springsource-tool-suite-download">RCP</link>.</para>
       </listitem>
 
       <listitem>
-        <para>Instalar STS dentro de nuestro Eclipse usando <link
-        xlink:href="http://dist.springsource.com/release/STS/doc/STS-installation_instructions.pdf">estas
-        instrucciones (pdf)</link>.</para>
+        <para>Instalación como plugin de nuestro Eclipse: Para instalar el
+        plugin STS sigue las instrucciones del punto "UPDATE SITE
+        INSTALLATION" del documento <link
+        xlink:href="http://dist.springsource.com/release/STS/doc/STS-installation_instructions.pdf">Spring
+        Source Tool Suite 2.3.2 Installation Instructions</link>.</para>
       </listitem>
     </orderedlist>
   </section>
