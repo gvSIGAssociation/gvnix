@@ -55,11 +55,17 @@ Spring Roo 1.1.0.M1
 Maven
 ------------
 
-* Setup environment variable called MAVEN_OPTS:
+* Setup environment variable called MAVEN_OPTS::
 
-  You may need to increase the memory used by Maven to compile and generate documentation. Example::
+    bash:~/gvnix/trunk/code$ export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
 
-     bash:~/gvnix/trunk/code$ export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
+  If you already have a MAVEN_OPTS, just check it has the memory sizes
+  shown above (or greater).
+
+  On a *nix machines, we recommed to add the setup to your ``.bashrc``::
+
+   bash:~$ echo export MAVEN_OPTS=\"-Xmx1024m -XX:MaxPermSize=512m\" >> ~/.bashrc
+   bash:~$ source ~/.bashrc
 
 * Setup Internet access through proxy:
 
