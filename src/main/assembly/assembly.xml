@@ -71,6 +71,7 @@
 			<outputDirectory>/bin</outputDirectory>
 			<destName>gvnix</destName>
 			<fileMode>775</fileMode>
+			<filtered>true</filtered>
  		</file>
 		<!-- gvNIX gvnix.bat -->
 		<file>
