@@ -11,8 +11,426 @@
 
   <xi:include href="guia-desarrollo_aplicacion-base.xml" />
 
-  <section xml:id="guia-desarrollo_manejo-entidades">
-    <title xml:lang="es">Manejo de Entidades</title>
+  <section xml:id="guia-desarrollo_gestion-acceso-datos">
+    <title xml:lang="es">Gestión de acceso a datos</title>
+
+    <para xml:lang="es">En lo ejemplos que han aparecido hasta ahora se han
+    estado usando bases de datos que se encuentran definidas en memoria y se
+    recrean cada vez que arrancamos la aplicación.</para>
+
+    <para xml:lang="es">El framework admite múltiples tipos de base de datos,
+    entre ellas:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>PostgreSQL</para>
+      </listitem>
+
+      <listitem>
+        <para>MySQL</para>
+      </listitem>
+
+      <listitem>
+        <para>Oracle</para>
+      </listitem>
+
+      <listitem>
+        <para>SYBASE</para>
+      </listitem>
+
+      <listitem>
+        <para>Microsoft SQL Server</para>
+      </listitem>
+
+      <listitem>
+        <para>DB2</para>
+      </listitem>
+
+      <listitem>
+        <para>HSQLDB (en memoria o persistente)</para>
+      </listitem>
+
+      <listitem>
+        <para>H2 en memoria</para>
+      </listitem>
+    </itemizedlist>
+
+    <para xml:lang="es">Y múltiples librerías de mapeo de objetos a bases de
+    datos relacionales (<link
+    xlink:href="http://es.wikipedia.org/wiki/Mapeo_objeto-relacional">ORM</link>):</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Hibernate</para>
+      </listitem>
+
+      <listitem>
+        <para>EclipseLink</para>
+      </listitem>
+
+      <listitem>
+        <para>OpenJPA</para>
+      </listitem>
+    </itemizedlist>
+
+    <para xml:lang="es">Toda esta configuración se realiza mediante comandos
+    de la consola y en cualquier momento. Por ello, una opción interesante es
+    usar para desarrollo una de las bases de datos que residen en memoria para
+    las primeras fases del desarrollo. Luego migrar es posible migrar a otra
+    base de datos persistente.</para>
+
+    <section>
+      <title>Comandos de configuración del acceso a datos</title>
+
+      <para>Para hacer la configuración se usan los siguientes
+      comandos:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><command>persistence setup</command></para>
+        </listitem>
+
+        <listitem>
+          <para><command>database properties</command></para>
+        </listitem>
+      </itemizedlist>
+
+      <section>
+        <title><command>persistence setup</command></title>
+
+        <para xml:lang="es">Este permite la configuración del acceso a datos.
+        Entre los parámetros necesitaremos el proveedor de ORM y la base de
+        datos a usar.</para>
+
+        <para xml:lang="es">Los parámetros que admite este comando son:</para>
+
+        <variablelist>
+          <varlistentry>
+            <term>--provider</term>
+
+            <listitem>
+              <para xml:lang="es">Proveedor de ORM a usar. Este comando admite
+              autocompletado. Los valores posibles son:</para>
+
+              <variablelist>
+                <varlistentry>
+                  <term>DATANUCLEUS</term>
+
+                  <listitem>
+                    <para><link xlink:href="http://www.datanucleus.org/">Data
+                    Nucleus</link></para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>ECLIPSELINK</term>
+
+                  <listitem>
+                    <para><link
+                    xlink:href="http://www.eclipse.org/eclipselink/">EclipseLink</link></para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>HIBERNATE</term>
+
+                  <listitem>
+                    <para><link
+                    xlink:href="http://www.hibernate.org/">Hibernate</link></para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>OPENJPA</term>
+
+                  <listitem>
+                    <para><link
+                    xlink:href="http://openjpa.apache.org/">OpenJPA</link></para>
+                  </listitem>
+                </varlistentry>
+              </variablelist>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--database</term>
+
+            <listitem>
+              <para xml:lang="es">Tipo de base de datos a usar. Este comando
+              admite autocompletado. Los valores posible son:</para>
+
+              <itemizedlist>
+                <listitem>
+                  <para>DB2 <emphasis>(Hay que instalar manualmente el driver
+                  JDBC)</emphasis></para>
+                </listitem>
+
+                <listitem>
+                  <para>DERBY</para>
+                </listitem>
+
+                <listitem>
+                  <para>GOOGLE_APP_ENGINE</para>
+                </listitem>
+
+                <listitem>
+                  <para>H2_IN_MEMORY</para>
+                </listitem>
+
+                <listitem>
+                  <para>HYPERSONIC_IN_MEMORY</para>
+                </listitem>
+
+                <listitem>
+                  <para>HYPERSONIC_PERSISTENT</para>
+                </listitem>
+
+                <listitem>
+                  <para>MSSQL</para>
+                </listitem>
+
+                <listitem>
+                  <para>ORACLE <emphasis>(Hay que instalar manualmente el
+                  driver JDBC)</emphasis></para>
+                </listitem>
+
+                <listitem>
+                  <para>POSTGRES</para>
+                </listitem>
+
+                <listitem>
+                  <para>SYBASE</para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--applicationId</term>
+
+            <listitem>
+              <para xml:lang="es">Identificación de aplicación en Google App
+              Engine (sólo usado para esta base de datos).</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--jndiDataSource</term>
+
+            <listitem>
+              <para xml:lang="es">Fuente de datos JNDI a usar.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--databaseName</term>
+
+            <listitem>
+              <para xml:lang="es">Nombre de la base de datos.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--userName</term>
+
+            <listitem>
+              <para xml:lang="es">Nombre del usuario para la conexión.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--password</term>
+
+            <listitem>
+              <para xml:lang="es">Contraseña del usuario de la
+              conexión.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+
+        <para xml:lang="es">Dependiendo del tipo de base de datos podemos
+        puede ser necesarios unos u otros parámetros y puede o no ser
+        necesario instrucciones adiciones para la configuración del acceso a
+        datos.</para>
+      </section>
+
+      <section>
+        <title><command>database properties</command></title>
+
+        <para xml:lang="es">Este conjunto de instrucciones permiten la
+        consulta, eliminación y actualización de las propiedades de conexión a
+        la BBDD. Estas propiedades se almacenan el fichero
+        <filename>src/main/resources/META-INF/spring/database.properties</filename>
+        de la aplicación.</para>
+
+        <para xml:lang="es">Sus variantes son:</para>
+
+        <variablelist>
+          <varlistentry>
+            <term>database properties list</term>
+
+            <listitem>
+              <para xml:lang="es">Lista las propiedades de configuración de la
+              base de datos.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>database properties remove</term>
+
+            <listitem>
+              <para xml:lang="es">Elimina una propiedad de la configuración.
+              Requiere un único parámetro <parameter>--key</parameter> para
+              especificar la clave a eliminar.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>database properties set</term>
+
+            <listitem>
+              <para xml:lang="es">Crea o actualiza una de las propiedades la
+              configuración. Requiere un parámetro
+              <parameter>--key</parameter> con el nombre de la propiedad y un
+              <parameter>--value</parameter> con el valor a establecer.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </section>
+    </section>
+
+    <section>
+      <title>Ejemplo de configuración de acceso a datos a PostgreSQL</title>
+
+      <para xml:lang="es">En este ejemplo vamos a configurar la conexión a un
+      servidor PostgreSQL en una máquina en nuestra red local. Los datos de
+      conexión de ejemplo serán:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para xml:lang="es">Servidor de base de datos:
+          <literal>dbserver</literal></para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="rd">Puerto de conexión:
+          <literal>5438</literal></para>
+        </listitem>
+
+        <listitem>
+          <para>Nombre de la base de datos: <literal>my_db</literal></para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Nombre de usuario de la base de datos:
+          <literal>user1</literal></para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Contraseña del usuario:
+          <literal>1234</literal></para>
+        </listitem>
+      </itemizedlist>
+
+      <para xml:lang="es">Hay que recordar que estos comando se pueden
+      realizar en cualquier momento.</para>
+
+      <para xml:lang="es">Los pasos a seguir para la configuración son:
+      </para>
+
+      <orderedlist>
+        <listitem>
+          <para xml:lang="es">Usar el comando <command>persistence
+          setup</command> con los parámetros que disponemos:</para>
+
+          <programlisting>roo&gt; <command>persistence setup --provider HIBERNATE --database POSTGRES --databaseName my_db --userName user1 --password 1234</command>
+Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
+Please enter your database details in src/main/resources/META-INF/spring/database.properties.
+Created SRC_MAIN_RESOURCES/META-INF/spring/database.properties
+Managed SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
+Managed ROOT/pom.xml ...
+roo&gt; </programlisting>
+
+          <para xml:lang="es">Podemos observar que ya se nos sugiere que es
+          necesario actualizar el fichero
+          <filename>database.properties</filename>. Esto es debido a que el
+          comando no contempla todas las opciones necesarias para completar la
+          configuración. </para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Comprobar como ha quedado la configuración de la
+          conexión. Para ello usar el comando <command>database properties
+          list</command>:</para>
+
+          <programlisting>roo&gt; <command>database properties list</command>
+database.driverClassName = org.postgresql.Driver
+database.password = 1234
+database.url = jdbc:postgresql://localhost:5432/my_db
+database.username = user1
+roo&gt; </programlisting>
+
+          <para>Podemos observar que lo único que nos falta es configurar el
+          servidor y el puerto de la base de datos en la propiedad
+          <literal>database.url</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Configurar la URL de conexión a servidor
+          correctamente usando el comando <command>database properties
+          set</command>:</para>
+
+          <programlisting>roo&gt; <command>database properties set --key database.url --value jdbc:postgresql://dbserver:5438/my_db </command>
+Managed SRC_MAIN_RESOURCES/META-INF/spring/database.properties
+roo&gt; </programlisting>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Volver a comprobar el estado de los parámetros
+          con el comando <command>database properties list</command>:</para>
+
+          <programlisting>roo&gt; <command>database properties list</command>
+database.driverClassName = org.postgresql.Driver
+database.password = 1234
+database.url = jdbc:postgresql://dbserver:5438/my_db
+database.username = user1
+roo&gt; </programlisting>
+        </listitem>
+      </orderedlist>
+
+      <para xml:lang="es">Una vez hecho, la siguiente vez que arranquemos la
+      aplicación usará la base de datos que le hemos configurado. Es
+      recomendable la lectura de la sección <link
+      linkend="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente">Enlazar
+      modelo de entidades con base de datos existente</link>.</para>
+
+      <warning>
+        <para xml:lang="es"><emphasis role="bold">Por defecto las aplicaciones
+        de Spring Roo se configuran para que la Base de datos se regenere cada
+        vez que se arranca la aplicación (borrando y creando de nuevo las
+        tablas), por lo que es conveniente que si se utiliza una Base de datos
+        preexistente se configure correctamente el fichero
+        <filename>src/main/resources/META-INF/persistence.xml</filename> para
+        evitar sorpresas desagradables. Más información <link
+        linkend="guia-desarrollo_manejo-entidades_regeneracion-bbdd">aquí</link>.</emphasis></para>
+      </warning>
+    </section>
+
+    <section xml:id="guia-desarrollo_gestion-acceso-datos_multiples-fuentes-datos">
+      <title xml:lang="es">Múltiples fuentes de datos</title>
+
+      <para><emphasis role="bold">TBC</emphasis></para>
+
+      <para>En este <link
+      xlink:href="http://forum.springsource.org/showpost.php?p=289577&amp;postcount=4">post
+      del foro de Spring Roo</link> tenemos un ejemplo de los cambios a
+      realizar en nuestra aplicación para que las entidades tenga distintas
+      fuentes de datos.</para>
+    </section>
+  </section>
+
+  <section xml:id="guia-desarrollo_gestion-entidades">
+    <title xml:lang="es">Gestión de entidades</title>
 
     <para xml:lang="es">En Spring Roo el artefacto que define la unidad de
     dato es la <classname>Entidad</classname> o <classname>Entity</classname>.
@@ -21,7 +439,7 @@
     entidades o de la aplicación. Por ello es una pieza clave de la
     aplicación.</para>
 
-    <section xml:id="guia-desarrollo_manejo-entidades_definicion">
+    <section xml:id="guia-desarrollo_gestion-entidades_definicion">
       <title xml:lang="es">Definición de una entidad</title>
 
       <para xml:lang="es">Una entidad se define en una clase
@@ -83,8 +501,8 @@
         </listitem>
 
         <listitem>
-          <para>Genera de forma automática los <emphasis>Accesores</emphasis>
-          y <emphasis>Mutadores</emphasis> (<emphasis>getters</emphasis> y
+          <para>Genera de forma automática los <emphasis>accesores</emphasis>
+          y <emphasis>mutadores</emphasis> (<emphasis>getters</emphasis> y
           <emphasis>setters</emphasis>).</para>
         </listitem>
       </itemizedlist>
@@ -103,11 +521,11 @@
         </listitem>
       </orderedlist>
 
-      <section xml:id="guia-desarrollo_manejo-entidades_definicion_crear-con-comando">
+      <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando">
         <title xml:lang="es">Crear una Entidad usando comandos</title>
 
         <para xml:lang="es">Desde la consola del framework podemos crear
-        Entidades de forma sencilla. Para ello tenemos disponibles dos
+        entidades de forma sencilla. Para ello tenemos disponibles dos
         comandos:</para>
 
         <itemizedlist>
@@ -120,7 +538,7 @@
           </listitem>
         </itemizedlist>
 
-        <section xml:id="guia-desarrollo_manejo-entidades_definicion_crear-con-comando_entity">
+        <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_entity">
           <title xml:lang="es">El comando <command>entity</command></title>
 
           <para xml:lang="es">Este comando crea una nueva entidad en nuestro
@@ -192,11 +610,11 @@
           <para xml:lang="es">Existen más opciones para configurar la entidad,
           aunque no todos se pueden especificar usando este comando. Ver el
           apartado <link
-          linkend="guia-desarrollo_manejo-entidades_definicion_crear-a-mano_anotacion-rooentity">Anotación
+          linkend="guia-desarrollo_gestion-entidades_definicion_crear-a-mano_anotacion-rooentity">Anotación
           RooEntity</link>.</para>
         </section>
 
-        <section xml:id="guia-desarrollo_manejo-entidades_definicion_crear-con-comando_field">
+        <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_field">
           <title xml:lang="es">El comando <command>field</command></title>
 
           <para xml:lang="es">No existe un comando <command>field</command>
@@ -340,7 +758,7 @@
           <para xml:lang="es">Existe mas opciones dependiendo del tipo de
           dato, para mas información ver la ayuda de la consola.</para>
 
-          <section xml:id="guia-desarrollo_manejo-entidades_definicion_crear-con-comando_field_ejemplos">
+          <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_field_ejemplos">
             <title xml:lang="es">Ejemplos</title>
 
             <para xml:lang="es">Estos son algunos ejemplos de creación de
@@ -390,7 +808,7 @@
         </section>
       </section>
 
-      <section xml:id="guia-desarrollo_manejo-entidades_definicion_crear-a-mano">
+      <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-a-mano">
         <title xml:lang="es">Crear una Entidad a mano</title>
 
         <para xml:lang="es">Para que se identifique una clase
@@ -479,7 +897,7 @@
           subpaquetes)</emphasis>.</para>
         </important>
 
-        <section xml:id="guia-desarrollo_manejo-entidades_definicion_crear-a-mano_anotacion-rooentity">
+        <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-a-mano_anotacion-rooentity">
           <title xml:lang="es">La anotación
           <classname>@RooEntity</classname></title>
 
@@ -547,7 +965,7 @@
           <methodname>setter</methodname>.</para>
         </section>
 
-        <section xml:id="guia-desarrollo_manejo-entidades_definicion_crear-a-mano_anotacion-roojavabean">
+        <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-a-mano_anotacion-roojavabean">
           <title xml:lang="es">La anotación
           <classname>@RooJavaBean</classname></title>
 
@@ -558,14 +976,15 @@
           toda la aplicación.<important>
               <para>La <emphasis role="bold">restricción del paquete
               base</emphasis> que se menciona en la <link
-              linkend="guia-desarrollo_manejo-entidades_definicion_crear-a-mano_anotacion-rooentity">anotación
-              @RooEntity</link> se <emphasis role="bold">aplica a todas las
-              anotaciones</emphasis> de gvNIX.</para>
+              linkend="guia-desarrollo_gestion-entidades_definicion_crear-a-mano_anotacion-rooentity">anotación
+              <classname>@RooEntity</classname></link> se <emphasis
+              role="bold">aplica a todas las anotaciones</emphasis> de
+              gvNIX.</para>
             </important></para>
         </section>
       </section>
 
-      <section xml:id="guia-desarrollo_manejo-entidades_definicion_modificar-modelo">
+      <section xml:id="guia-desarrollo_gestion-entidades_definicion_modificar-modelo">
         <title xml:lang="es">Modificar el modelo</title>
 
         <para xml:lang="es">Como podréis comprobar, no existe comando para
@@ -585,7 +1004,7 @@
         campo</emphasis> una entidad existente se puede hacer <emphasis
         role="bold">manualmente</emphasis> (con las anotaciones adecuadas)
         <emphasis role="bold">o usando el comando</emphasis> <command><link
-        linkend="guia-desarrollo_manejo-entidades_definicion_crear-con-comando_field">field</link></command>.</para>
+        linkend="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_field">field</link></command>.</para>
 
         <para xml:lang="es">En cualquier caso gvNIX <emphasis
         role="bold">monitoriza los cambios en el proyecto</emphasis> y
@@ -593,7 +1012,7 @@
         relacionados cuando es necesario.</para>
       </section>
 
-      <section xml:id="guia-desarrollo_manejo-entidades_definicion_identificadores-compuestos">
+      <section xml:id="guia-desarrollo_gestion-entidades_definicion_identificadores-compuestos">
         <title xml:lang="es">Identificadores Compuestos</title>
 
         <para xml:lang="es">Ahora mismo no está completo el soporte para
@@ -615,7 +1034,390 @@
       </section>
     </section>
 
-    <section xml:id="guia-desarrollo_manejo-entidades_ingenieria-inversa">
+    <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente">
+      <title xml:lang="es">Enlazar modelo de entidades con base de datos
+      existente</title>
+
+      <para xml:lang="es">Una vez creado el modelo de datos se puede necesitar
+      ajustar ciertos aspecto para que encaje en una base de dato ya
+      existente.</para>
+
+      <section>
+        <title>Tablas en la base de datos.</title>
+
+        <para>Por defecto, se usa como nombre de tabla el nombre de la
+        entidad. Este comportamiento lo podemos modelar usando la anotación
+        <classname><link
+        xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/Table.html">@Table</link></classname>
+        de la clase java de la entidad, añadiéndole los parámetros
+        necesarios.</para>
+
+        <para>Este es un ejemplo de uso de esta anotación:</para>
+
+        <programlisting>@Entity
+@RooJavaBean
+@RooToString
+@RooEntity
+@Table(name = "ENT1")
+public class Entity1 {
+
+    private String field1;
+}</programlisting>
+      </section>
+
+      <section>
+        <title>Columnas en la base de datos.</title>
+
+        <para>Por defecto, se usa el nombre del campo (propiedades de la clase
+        java) y su tipo para hacer el mapeo en la tabla de base de datos.
+        Existen varías anotaciones que permiten modelar como se mapean los
+        campos a columnas de la tabla.</para>
+
+        <para>Las más importantes son:</para>
+
+        <variablelist>
+          <varlistentry>
+            <term><classname><link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/Column.htmlhttp://java.sun.com/javaee/5/docs/api/javax/persistence/Column.html">@column</link></classname></term>
+
+            <listitem>
+              <para>Concreta la definición del mapeo de el campo sobre la
+              columna de la base de datos. Si se omite este anotación se usan
+              ajustes por defecto</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><classname><link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/Transient.html">@Transient</link></classname></term>
+
+            <listitem>
+              <para>Indica que el campo (propiedad de la clase java) no tiene
+              representación en la tabla (no será cargado ni
+              persistido)</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><classname><link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/JoinColumn.html">@JoinColumn</link></classname>,
+            <classname><link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/JoinColumns.html">@JoinColumns</link></classname>,
+            <link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OneToOne.html"><classname>@OneToOne</classname></link>,
+            <link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/ManyToOne.html"><classname>@ManyToOne</classname></link></term>
+
+            <listitem>
+              <para>Definición del mapeo de un campo de relación
+              <emphasis>n-1</emphasis> con otra entidad</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><classname><link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/JoinTable.html">@JoinTable</link></classname>,
+            <link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OneToMany.html"><classname>@OneToMany</classname></link>,
+            <classname><link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/ManyToMany.html">@ManyToMany</link></classname>,
+            <classname><link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OrderBy.html">@OrderBy</link></classname></term>
+
+            <listitem>
+              <para>Definición del mapeo de un campo de relación
+              <emphasis>1-n</emphasis> o <emphasis>n-m</emphasis></para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+
+        <para>Un ejemplo del uso de algunas de estas anotaciones:</para>
+
+        <programlisting>@Entity
+@RooJavaBean
+@RooToString
+@RooEntity
+@Table(name = "ENT1")
+public class Entity1 {
+
+    private String field1; //<emphasis role="bold">[1]</emphasis>
+
+    @Transient
+    private String tmpInfo; //<emphasis role="bold">[2]</emphasis>
+
+    @Column(name="ORDER_COST", precision=12, scale=2) //<emphasis role="bold">[3]</emphasis>
+    private BigDecimal cost;
+
+    @ManyToOne(targetEntity = Customer.class) //<emphasis role="bold">[4]</emphasis>
+    @JoinColumn(name = "CUSTOMER_ID") //<emphasis role="bold">[5]</emphasis>
+    private Customer customer;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "entity1") //<emphasis
+            role="bold">[6]</emphasis>
+    private Set&lt;Price&gt; prices = new java.util.HashSet&lt;Price&gt;();
+
+}</programlisting>
+
+        <variablelist>
+          <varlistentry>
+            <term>[1]</term>
+
+            <listitem>
+              <para>Este campo se cargará y almacenará en la columna
+              <literal>field1</literal> de la tabla
+              <literal>ENT1</literal></para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>[2]</term>
+
+            <listitem>
+              <para>Este campo no se tendrá en cuenta en la carga y guardado
+              de la base de datos.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>[3]</term>
+
+            <listitem>
+              <para>Este campo numérico se cargará y almacenará en la columna
+              <literal>ORDER_COST</literal> de la tabla
+              <literal>ENT1</literal>, usando los valores de
+              <emphasis>precisión</emphasis> y <emphasis>escala</emphasis>
+              especificados.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>[4]</term>
+
+            <listitem>
+              <para>Declara que la propiedad tiene origen en una relación
+              <emphasis>n-1</emphasis>, con la entidad
+              <classname>Customer</classname>. La tablas de esta entidad y sus
+              columnas se tomarán de las declaraciones que se hayan hecho en
+              esa entidad.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>[5]</term>
+
+            <listitem>
+              <para>Especifica que la columna de clave ajena en la tabla
+              <literal>ENT1</literal> para esta relación (con
+              <classname>Customer</classname>) es
+              <literal>CUSTOMER_ID</literal></para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>[6]</term>
+
+            <listitem>
+              <para>Declara que el campo <literal>prices</literal> es una
+              relación <emphasis>1-n</emphasis> con la entidad
+              <literal>Price</literal>. También declara que los cambios de
+              <literal>Entity1</literal> se aplican en cascada sobre
+              <literal>Price</literal>. El campo (propiedad en la clase java)
+              que estable la clave ajena en <literal>Price</literal> se llama
+              <literal>entity1</literal>.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </section>
+
+      <section>
+        <title>Clave primaria.</title>
+
+        <para>Por defecto, se genera un campo Id (propiedad en la clase java),
+        de tipo <classname>java.lang.Long</classname>, como identificador
+        (clave primaria) de la entidad. Para ajustar esto se dispone de dos
+        opciones:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>Configurar la anotación <link
+            linkend="guia-desarrollo_gestion-entidades_definicion_crear-a-mano_anotacion-rooentity">anotación
+            <classname>@RooEntity</classname></link> ajustar el nombre del
+            campo, tipo y nombre de columna en la tabla. Un ejemplo de
+            esto:</para>
+
+            <programlisting>@Entity
+@RooJavaBean
+@RooToString
+@RooEntity(identifierField="entity1Id", 
+        identifierType=Long.class, identifierColumn="ENT_ID")
+public class Entity1 {
+
+    private String field1;
+
+}</programlisting>
+          </listitem>
+
+          <listitem>
+            <para>Añadir manualmente el campo en la clase java. La declaración
+            se detectará por el framework que no la generará automáticamente.
+            Un ejemplo de esto:</para>
+
+            <programlisting>@Entity
+@RooJavaBean
+@RooToString
+@RooEntity
+public class Entity1 {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ENT1_ID")
+    private Long ent1Id;
+
+    public Long getEnt1Id(){
+        return ent1Id;
+    }
+
+    public void setEnt1Id(Long ent1Id){
+        this.ent1Id = ent1Id;
+    }
+
+    private String field1;
+
+}</programlisting>
+
+            <para>Si se declara el campo de identificador en la clase java,
+            también es necesario añadir sus métodos <emphasis>get y
+            set</emphasis> manualmente.</para>
+
+            <para>Para más información sobre las anotaciones JPA (como
+            <classname><link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/GeneratedValue.html">@GeneratedValue</link></classname>
+            ) consultar el <link
+            xlink:href="http://java.sun.com/javaee/5/docs/api/index.html?javax/persistence/package-summary.html">API</link>.</para>
+          </listitem>
+        </orderedlist>
+      </section>
+
+      <section>
+        <title>Campo para el control de concurrencia optimista.</title>
+
+        <para>Por defecto, se genera un campo de control de concurrencia
+        optimista llamado <literal>version</literal> de tipo
+        <classname>java.lang.Integer</classname>. Para ajustarlo disponemos de
+        tres opciones:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>Configurar la anotación <link
+            linkend="guia-desarrollo_gestion-entidades_definicion_crear-a-mano_anotacion-rooentity">anotación
+            <classname>@RooEntity</classname></link> ajustar el nombre del
+            campo, y tipo. Si dejamos el nombre de campo a <emphasis>cadena
+            vacía</emphasis> (<literal>""</literal>) no se generará ningún
+            campo. Un ejemplo de esto:</para>
+
+            <programlisting>@Entity
+@RooJavaBean
+@RooToString
+@RooEntity(versionField="version", 
+        versionType=Long.class, identifierColumn="ENT_ID")
+public class Entity1 {
+
+    private String field1;
+
+}</programlisting>
+
+            <para>Otro ejemplo desactivando el control de concurrencia
+            optimista:</para>
+
+            <programlisting>@Entity
+@RooJavaBean
+@RooToString
+@RooEntity(versionField="")
+public class Entity1 {
+
+    private String field1;
+
+}</programlisting>
+          </listitem>
+
+          <listitem>
+            <para>Añadir manualmente el campo en la clase java. La declaración
+            se detectará por el framework que no la generará automáticamente.
+            Un ejemplo de esto:</para>
+
+            <programlisting>@Entity
+@RooJavaBean
+@RooToString
+@RooEntity
+public class Entity1 {
+
+    @Version
+    @Column(name = "ENT1_VERSION")
+    private Integer version;
+
+    public Integer getVersion(){
+        return ent1Id;
+    }
+
+    public void setVersion(Integer version){
+        this.version = version;
+    }
+
+    private String field1;
+
+}</programlisting>
+          </listitem>
+
+          <listitem>
+            <para>Usar el control de concurrencia optimista de gvNIX. Para
+            ello se debe usar el comando <command><link
+            linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
+            checksum set</link></command>. Con este comando la clase se
+            quedará así:</para>
+
+            <programlisting>@Entity
+@RooJavaBean
+@RooToString
+@RooEntity
+public class Entity1 {
+
+    @Version
+    @Transient
+    private String occChekcsum;
+
+    public String getOccChekcsum() {
+        return this.occChekcsum;
+    }
+
+    public void setOccChekcsum(String checksum) {
+        this.occChekcsum = checksum;
+    }
+
+    private String field1;
+
+}</programlisting>
+          </listitem>
+        </orderedlist>
+      </section>
+
+      <section xml:id="guia-desarrollo_configuracion-acceso-BD_regeneracion-bbdd">
+        <title xml:lang="es">Regeneración de la Base de datos en cada
+        arranque.</title>
+
+        <para xml:lang="es">Por defecto, la configuración de Roo <emphasis
+        role="bold">reconstruye la BBDD en cada ejecución de la
+        aplicación</emphasis>. Cuando usamos una base de datos preexistente o
+        compartida, normalmente, este comportamiento no nos convenga.</para>
+
+        <para xml:lang="es">Para evitar esto se debe modificar el fichero
+        <filename>src/main/resources/META-INF/persistence.xml</filename>
+        comentando la siguiente linea:</para>
+
+        <programlisting>    &lt;!-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
+      </section>
+    </section>
+
+    <section xml:id="guia-desarrollo_gestion-entidades_ingenieria-inversa">
       <title xml:lang="es">Ingeniería inversa de entidades</title>
 
       <para xml:lang="es">En en proyecto de Spring Roo tiene planeado añadir
@@ -628,37 +1430,10 @@
       información en: <link
       xlink:href="https://jira.springsource.org/browse/ROO-435">ROO-435</link>.</para>
     </section>
-
-    <section xml:id="guia-desarrollo_manejo-entidades_regeneracion-bbdd">
-      <title xml:lang="es">Regeneración de la Base de datos en cada
-      arranque.</title>
-
-      <para xml:lang="es">Por defecto, la configuración de Roo <emphasis
-      role="bold">reconstruye la BBDD en cada ejecución de la
-      aplicación</emphasis>. Cuando usamos una base de datos pre-existente o
-      compartida, lo mas seguro, que este comportamiento no nos
-      convenga.</para>
-
-      <para xml:lang="es">Para evitar esto se debe modificar el fichero
-      <filename>src/main/resources/META-INF/persistence.xml</filename>
-      comentando la siguiente linea:</para>
-
-      <programlisting>    &lt;!-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
-    </section>
-
-    <section>
-      <title xml:lang="es">Múltipes fuentes de datos</title>
-
-      <para>En este <link
-      xlink:href="http://forum.springsource.org/showpost.php?p=289577&amp;postcount=4">post
-      del foro de Spring Roo</link> tenemos un ejemplo de los cambios a
-      realizar en nuestra aplicación para que las entidades tenga distintas
-      fuentes de datos.</para>
-    </section>
   </section>
 
   <section xml:id="guia-desarrollo_web">
-    <title xml:lang="es">Capa Web</title>
+    <title xml:lang="es">Gestión de la capa web</title>
 
     <para xml:lang="es">En la Capa Web se centra el control de gestión de las
     peticiones por parte del usuario. Esta capa dependerá del Front-End que
@@ -668,7 +1443,7 @@
     MVC.</para>
 
     <para xml:lang="es">La gestión de peticiones en Spring MVC se base en los
-    Controllers, clases en las que, mediante anotaciones, vamos a ir
+    controllers, clases en las que, mediante anotaciones, vamos a ir
     registrando que métodos atienden que peticiones. Un controller puede tener
     o no asociada una entidad.</para>
 
@@ -687,7 +1462,7 @@
       Esta última anotación se puede usar tanto en la clase como en los
       métodos.</para>
 
-      <para xml:lang="es">Para crear los Controllers, al igual que las
+      <para xml:lang="es">Para crear los controllers, al igual que las
       entidades, tenemos la opción de crearlos a mano además de unos comandos
       que nos aporta el framework.</para>
 
@@ -717,7 +1492,7 @@
         <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-class">
           <title>controller class</title>
 
-          <para xml:lang="es">Este comando permite crear un Controller
+          <para xml:lang="es">Este comando permite crear un controller
           plantilla no vinculado a ninguna entidad en concreto para su
           implementación manual.</para>
 
