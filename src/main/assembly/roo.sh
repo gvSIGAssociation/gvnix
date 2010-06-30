@@ -1,5 +1,4 @@
 #!/bin/sh
-set -x
 PRG="$0"
 
 while [ -h "$PRG" ]; do
@@ -16,9 +15,9 @@ ROO_HOME=`dirname "$PRG"`
 # Absolute path
 ROO_HOME=`cd "$ROO_HOME/.." ; pwd`
 
-## Check if gvnix annotations jar is installed in maven local repository
-local_annotation_jar="$HOME/.m2/repository/org/gvnix/org.gvnix.annotations/${version}/org.gvnix.annotations-${version}.jar"
-if ( [ ! -f "$local_annotation_jar" ] ) ; then
+## Check if gvNIX annotations jar is installed in Maven local repository
+gvnix_annotations_jar="$HOME/.m2/repository/org/gvnix/org.gvnix.annotations/${version}/org.gvnix.annotations-${version}.jar"
+if ( [ ! -f "$gvnix_annotations_jar" ] ) ; then
 	## Install jar
 	mvn install:install-file -DgroupId=org.gvnix -DartifactId=org.gvnix.annotations -Dversion=${version} -Dpackaging=jar -Dfile="$ROO_HOME/annotations/org.gvnix.annotations-${version}.jar"
 
