@@ -335,8 +335,7 @@
       <para xml:lang="es">Hay que recordar que estos comando se pueden
       realizar en cualquier momento.</para>
 
-      <para xml:lang="es">Los pasos a seguir para la configuración son:
-      </para>
+      <para xml:lang="es">Los pasos a seguir para la configuración son:</para>
 
       <orderedlist>
         <listitem>
@@ -355,7 +354,7 @@ roo&gt; </programlisting>
           necesario actualizar el fichero
           <filename>database.properties</filename>. Esto es debido a que el
           comando no contempla todas las opciones necesarias para completar la
-          configuración. </para>
+          configuración.</para>
         </listitem>
 
         <listitem>
@@ -412,7 +411,7 @@ roo&gt; </programlisting>
         preexistente se configure correctamente el fichero
         <filename>src/main/resources/META-INF/persistence.xml</filename> para
         evitar sorpresas desagradables. Más información <link
-        linkend="guia-desarrollo_manejo-entidades_regeneracion-bbdd">aquí</link>.</emphasis></para>
+        linkend="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">aquí</link>.</emphasis></para>
       </warning>
     </section>
 
@@ -1042,7 +1041,7 @@ roo&gt; </programlisting>
       ajustar ciertos aspecto para que encaje en una base de dato ya
       existente.</para>
 
-      <section>
+      <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_tablas">
         <title>Tablas en la base de datos.</title>
 
         <para>Por defecto, se usa como nombre de tabla el nombre de la
@@ -1065,7 +1064,7 @@ public class Entity1 {
 }</programlisting>
       </section>
 
-      <section>
+      <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_columnas">
         <title>Columnas en la base de datos.</title>
 
         <para>Por defecto, se usa el nombre del campo (propiedades de la clase
@@ -1229,7 +1228,7 @@ public class Entity1 {
         </variablelist>
       </section>
 
-      <section>
+      <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_clave-primaria">
         <title>Clave primaria.</title>
 
         <para>Por defecto, se genera un campo Id (propiedad en la clase java),
@@ -1298,7 +1297,7 @@ public class Entity1 {
         </orderedlist>
       </section>
 
-      <section>
+      <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_campo-control-optimista">
         <title>Campo para el control de concurrencia optimista.</title>
 
         <para>Por defecto, se genera un campo de control de concurrencia
@@ -1400,7 +1399,7 @@ public class Entity1 {
         </orderedlist>
       </section>
 
-      <section xml:id="guia-desarrollo_configuracion-acceso-BD_regeneracion-bbdd">
+      <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">
         <title xml:lang="es">Regeneración de la Base de datos en cada
         arranque.</title>
 

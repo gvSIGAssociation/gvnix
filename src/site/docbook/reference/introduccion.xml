@@ -150,7 +150,7 @@
     abstracción innecesarias. Las aplicaciones Java más tradicionales tienen
     una capa DAO, capas de servicios, capa de dominio y una capa de control.
     En una aplicación típica de Roo solo se usa una <link
-    linkend="guia-desarrollo_manejo-entidades">capa de Entidad</link> (que es
+    linkend="guia-desarrollo_gestion-entidades">capa de Entidad</link> (que es
     similar a la cama de dominio) y una <link
     linkend="guia-desarrollo_web">capa Web</link>. Como se indica en la lista
     anterior, si fuera necesario se podría añadir una capa de

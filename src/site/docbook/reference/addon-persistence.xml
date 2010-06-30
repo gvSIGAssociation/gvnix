@@ -57,7 +57,7 @@
         preexistente se configure correctamente el fichero
         <filename>src/main/resources/META-INF/persistence.xml</filename> para
         evitar sorpresas desagradables. Más información <link
-        linkend="guia-desarrollo_manejo-entidades_regeneracion-bbdd">aquí</link>.</emphasis></para>
+        linkend="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">aquí</link>.</emphasis></para>
       </warning>
 
       <para xml:lang="es">El Cheksum <emphasis>se calcula en el momento de la

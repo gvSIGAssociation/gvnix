@@ -118,6 +118,10 @@ roo&gt; <command>dependency add --groupId com.sun.xml.bind --artifactId jaxb-imp
         </imageobject>
       </mediaobject>
     </figure>
+  </section>
+
+  <section>
+    <title>Configurar el acceso a datos.</title>
 
     <para xml:lang="es">Ahora se ha de definir el proveedor JPA con la BBDD
     asociada. Volvemos a teclear *hint* y nos muestra el siguiente paso a
@@ -167,7 +171,7 @@ roo&gt;</programlisting>
       configure correctamente el fichero
       <filename>src/main/resources/META-INF/persistence.xml</filename> para
       evitar sorpresas desagradables. Más información <link
-      linkend="guia-desarrollo_manejo-entidades_regeneracion-bbdd">aquí</link>.</emphasis></para>
+      linkend="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">aquí</link>.</emphasis></para>
     </warning>
   </section>
 
@@ -357,14 +361,47 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToStr
     entidades.</para>
   </section>
 
+  <section>
+    <title xml:lang="es">Crear la capa web</title>
+
+    <para xml:lang="es">Se han de crear los controllers y las vistas para
+    poder visualizar la aplicación web mediante el comando de Roo
+    <command>controller</command>:</para>
+
+    <programlisting>~.domain.PizzaOrder roo&gt; <command>controller all --package ~.web</command>
+<computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/web
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/web/ToppingController.java
+Created SRC_MAIN_WEBAPP/WEB-INF/spring
+Created SRC_MAIN_WEBAPP/WEB-INF/spring/webmvc-config.xml
+Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/web/ToppingController_Roo_Controller.aj
+Managed ROOT/pom.xml [Added dependency org.apache.tiles:tiles-core:2.2.1]
+Managed ROOT/pom.xml [Added dependency org.apache.tiles:tiles-jsp:2.2.1]
+Managed SRC_MAIN_WEBAPP/WEB-INF/spring/webmvc-config.xml
+Created SRC_MAIN_WEBAPP/images
+Created SRC_MAIN_WEBAPP/images/de.png
+...
+...
+Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
+Managed SRC_MAIN_WEBAPP/WEB-INF/views/bases/views.xml
+Created SRC_MAIN_WEBAPP/WEB-INF/views/bases/update.jspx
+Managed SRC_MAIN_WEBAPP/WEB-INF/views/bases/views.xml
+Managed SRC_MAIN_WEBAPP/WEB-INF/i18n/application.properties
+Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
+~.web roo&gt; </computeroutput></programlisting>
+
+    <para xml:lang="es">Este comando ha creado la estructura de visualización
+    y los controllers asociados a partir de la definición de las
+    entidades.</para>
+  </section>
+
   <section xml:id="guia-desarrollo_aplicacion-base_test-integracion">
     <title xml:lang="es">Test de integración</title>
 
     <para xml:lang="es">Después de haber creado la primera iteración del
-    modelo de objetos se ha de hacer una comprobación ejecutando los test de
-    integración que se han ido creando a medida que añadíamos una entidad.
-    Para ejecutar los test utilizaremos el comando <command>perform
-    tests</command>:</para>
+    modelo de objetos se puede hacer la comprobación ejecutando los test de
+    integración que se han ido creando a medida que añadíamos una entidad (que
+    naturalmente funcionarán correctamente). Para ejecutar los test
+    utilizaremos el comando <command>perform tests</command>:</para>
 
     <programlisting>~.domain.PizzaOrder roo&gt; <command>perform test</command>
 <computeroutput>[Thread-4] [INFO] Scanning for projects...
@@ -440,39 +477,6 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToStr
     ejecutando el comando <command>mvn eclipse:clean</command>. Para regenerar
     la configuración de eclipse en un solo comando usar <command>mvn
     eclipse:clean eclipse:eclipse</command>.</para>
-  </section>
-
-  <section>
-    <title xml:lang="es">Crear la capa web</title>
-
-    <para xml:lang="es">Se han de crear los controllers y las vistas para
-    poder visualizar la aplicación web mediante el comando de Roo
-    <command>controller</command>:</para>
-
-    <programlisting>~.domain.PizzaOrder roo&gt; <command>controller all --package ~.web</command>
-<computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/web
-Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/web/ToppingController.java
-Created SRC_MAIN_WEBAPP/WEB-INF/spring
-Created SRC_MAIN_WEBAPP/WEB-INF/spring/webmvc-config.xml
-Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/web/ToppingController_Roo_Controller.aj
-Managed ROOT/pom.xml [Added dependency org.apache.tiles:tiles-core:2.2.1]
-Managed ROOT/pom.xml [Added dependency org.apache.tiles:tiles-jsp:2.2.1]
-Managed SRC_MAIN_WEBAPP/WEB-INF/spring/webmvc-config.xml
-Created SRC_MAIN_WEBAPP/images
-Created SRC_MAIN_WEBAPP/images/de.png
-...
-...
-Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
-Managed SRC_MAIN_WEBAPP/WEB-INF/views/bases/views.xml
-Created SRC_MAIN_WEBAPP/WEB-INF/views/bases/update.jspx
-Managed SRC_MAIN_WEBAPP/WEB-INF/views/bases/views.xml
-Managed SRC_MAIN_WEBAPP/WEB-INF/i18n/application.properties
-Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
-~.web roo&gt; </computeroutput></programlisting>
-
-    <para xml:lang="es">Este comando ha creado la estructura de visualización
-    y los controllers asociados a partir de la definición de las
-    entidades.</para>
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion">
