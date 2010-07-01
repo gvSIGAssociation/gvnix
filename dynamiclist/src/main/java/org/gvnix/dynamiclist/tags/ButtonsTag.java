@@ -1,3 +1,21 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures     
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gvnix.dynamiclist.tags;
 
 import java.io.IOException;
@@ -7,13 +25,18 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
 
 import org.apache.commons.lang.StringUtils;
+import org.gvnix.dynamiclist.util.Messages;
 
-
+/**
+ * gvNIX dynamiclist buttons tag.
+ *
+ * <p>This class provide the buttons custom tag to manage the operations of dynamiclist.
+ *
+ *
+ * @author Ernesto Calás made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ */
 public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
-
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = -7857540693393637605L;
 	
 	public static final String BUTTONS_CRUD = "BUTTONS_CRUD";
@@ -81,35 +104,35 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 		buffer.append("<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"colorBarraHerramientas\">\n");		
 		buffer.append("<tr align='left'>\n");		
 		if (create){
-			buffer.append("<td width='31'><a id='create' href=' " + contextPath + "/client/form.html' >");
+			//buffer.append("<td width='31'><a id='create' href=' " + contextPath + "/client/form.html' >");
 			
 			
-			//buffer.append("<td width='31'><a id='create' href='javascript:dynamicListCreate(\"");
-			//buffer.append(contextPath + "/client/form.html");
-			//buffer.append("\",\"");
+			buffer.append("<td width='31'><a id='add' href='javascript:dl_add(\"");
+			buffer.append(contextPath + "/client/form.html");
+			buffer.append("\",\"");
 			//buffer.append(this.configuracion.getHandlerparameter());
-			//buffer.append( "\");'>");			
+			buffer.append( "\");'>");			
 			buffer.append("<img src='");
 			buffer.append(imagesPath);
-			buffer.append("/icono03.gif' name='Image2' class='botonAlta' id='Image2' alt=\"");
-			//buffer.append(this.getMensaje("informe.nuevoregistro"));
+			buffer.append("/icono03.gif' name='Image2' class='botonAlta' id='Image2' title=\"");
+			buffer.append(Messages.getMessage("button.add"));
 			buffer.append("\" ></a></td>\n");			
 		}
 		if (read){
-			buffer.append("<td width='31'><a id='Ver' href='javascript:SDFvisualizacion(\"");
-			//buffer.append(this.configuracion.getIdinforme());
+			buffer.append("<td width='31'><a id='read' href='javascript:dl_read(\"");
+			buffer.append(contextPath + "/client/form.html");
 			buffer.append("\",\"");
 			//buffer.append(this.getMensaje("tc.seleccione"));
 			buffer.append("\",\"");
 			//buffer.append(this.configuracion.getHandlerparameter());
 			buffer.append("\");'><img src='");
 			buffer.append(imagesPath);
-			buffer.append("/icono05.gif' name='Image5' class='botonVisualizacion' id='Image5' alt=\"");
-			//buffer.append(this.getMensaje("informe.visualizarregistro"));
+			buffer.append("/icono05.gif' name='Image5' class='botonVisualizacion' id='Image5' title=\"");
+			buffer.append(Messages.getMessage("button.read"));
 			buffer.append("\" ></a></td>\n");			
 		}
 		if (update){
-			buffer.append("<td width='31'><a id='ModificarSDF' href='javascript:SDFmodificacion(\"");
+			buffer.append("<td width='31'><a href='javascript:dl_write(\"");
 			//buffer.append(this.configuracion.getIdinforme());
 			buffer.append("\",\"");
 			//buffer.append( this.getMensaje("tc.seleccione"));
@@ -117,12 +140,12 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 			//buffer.append(this.configuracion.getHandlerparameter());
 			buffer.append("\");'><img src='");
 			buffer.append(imagesPath);
-			buffer.append("/icono04.gif' name='Image4' class='botonAlta' id='Image4' alt=\"");
-			//buffer.append(this.getMensaje("informe.editarregistro"));
+			buffer.append("/icono04.gif' name='Image4' class='botonAlta' id='Image4' title=\"");
+			buffer.append(Messages.getMessage("button.write"));
 			buffer.append("\" ></a></td>\n");
 		}
 		if (delete){
-			buffer.append("<td width='31'><a id='EliminarSDF' href='javascript:SDFbaja(\"");
+			buffer.append("<td width='31'><a href='javascript:dl_delete(\"");
 			//buffer.append(this.configuracion.getIdinforme());
 			buffer.append("\",\"");
 			//buffer.append(this.getMensaje("tc.seleccione").replaceAll("'", "\\\'"));
@@ -132,15 +155,15 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 			//buffer.append(this.configuracion.getHandlerparameter());
 			buffer.append("\");'><img src='");
 			buffer.append(imagesPath);
-			buffer.append("/icono06.gif' name='Image6' class='botonBaja' id='Image6' alt=\"");
-			//buffer.append(this.getMensaje("informe.visualizarregistro"));
+			buffer.append("/icono06.gif' name='Image6' class='botonBaja' id='Image6' title=\"");
+			buffer.append(Messages.getMessage("button.delete"));
 			buffer.append("\" ></a></td>\n");			
 		}
 		
 		if (StringUtils.isEmpty(noCrudButtons) || noCrudButtons.equalsIgnoreCase("S")){
 			
 			if (StringUtils.isEmpty(button_group) || button_group.equalsIgnoreCase("S")){
-				buffer.append("<td width='40' >&nbsp;</td>\n" + "<td width='31'><a href='javascript:SDFagruparTC(\"");
+				buffer.append("<td width='40' >&nbsp;</td>\n" + "<td width='31'><a href='javascript:dl_groupBy(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getTabla());
@@ -148,12 +171,12 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				//buffer.append(this.configuracion.getHandlerparameter());
 				buffer.append("\");'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono08.gif' name='Image8' class='botonAgrupar' id='Image8' alt=\"");
-				//buffer.append(this.getMensaje("informe.agrupar"));
+				buffer.append("/icono08.gif' name='Image8' class='botonAgrupar' id='Image8' title=\"");
+				buffer.append(Messages.getMessage("button.groupby"));
 				buffer.append("\" ></a></td>\n");				
 			}
 			if (StringUtils.isEmpty(button_order) || button_order.equalsIgnoreCase("S")){
-				buffer.append("<td width='32'><a href='javascript:SDFordenarTC(\"");
+				buffer.append("<td width='32'><a href='javascript:dl_order(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getTabla());
@@ -161,21 +184,21 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				//buffer.append(this.configuracion.getHandlerparameter());
 				buffer.append("\");'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono09.gif' name='Image9' class='botonOrdenar' id='Image9'alt=\"");
-				//buffer.append(this.getMensaje("informe.ordenar"));
+				buffer.append("/icono09.gif' name='Image9' class='botonOrdenar' id='Image9' title=\"");
+				buffer.append(Messages.getMessage("button.order"));
 				buffer.append("\" ></a></td>\n");
 			}
 			if (StringUtils.isEmpty(button_export) || button_export.equalsIgnoreCase("S")){
-				buffer.append("<td width='26'><a href='javascript:SDFexportarTC(\"");
+				buffer.append("<td width='26'><a href='javascript:dl_export(\"");
 				//buffer.append(this.getMensaje("tc.limiteexcel"));
 				buffer.append("\");'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono19.gif' name='Image19' class='botonExportar' id='Image19'  alt=\"");
-				//buffer.append(this.getMensaje("informe.exportaraexcel"));
+				buffer.append("/icono19.gif' name='Image19' class='botonExportar' id='Image19'  title=\"");
+				buffer.append(Messages.getMessage("button.export"));
 				buffer.append("\" ></a></td>\n");
 			}
 			if (StringUtils.isEmpty(button_columns) || button_columns.equalsIgnoreCase("S")){
-				buffer.append("<td width='26'><a href='javascript:SDFcolumnasTC(\"");
+				buffer.append("<td width='26'><a href='javascript:dl_columns(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getTabla());
@@ -183,13 +206,13 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				//buffer.append(this.configuracion.getHandlerparameter());
 				buffer.append( "\");'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono22.gif' name='Image22' class='botonColumnas' id='Image22' alt=\"");
-				//buffer.append(this.getMensaje("informe.seleccionarcampos"));
+				buffer.append("/icono22.gif' name='Image22' class='botonColumnas' id='Image22' title=\"");
+				buffer.append(Messages.getMessage("button.columns"));
 				buffer.append("\" ></a></td>\n");				
 			}
 			
 			if (StringUtils.isEmpty(button_createFilter) || button_createFilter.equalsIgnoreCase("S")){
-				buffer.append("<td width='31'><a href='javascript:SDFfiltroTC(\"");
+				buffer.append("<td width='31'><a href='javascript:df_createFilter(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getTabla());
@@ -197,21 +220,21 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				//buffer.append(this.configuracion.getHandlerparameter());
 				buffer.append( "\");'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono12.gif' name='Image12' class='botonFiltroCrear' id='Image12' alt=\"");
-				//buffer.append(this.getMensaje("informe.crearfiltro"));
+				buffer.append("/icono12.gif' name='Image12' class='botonFiltroCrear' id='Image12' title=\"");
+				buffer.append(Messages.getMessage("button.createfilter"));
 				buffer.append("\" ></a></td>\n");				
 			}
 			if (StringUtils.isEmpty(button_deleteFilter) || button_deleteFilter.equalsIgnoreCase("S")){
-				buffer.append("<td width='34'><a href='javascript:SDFquitarfiltroTC(\"");
+				buffer.append("<td width='34'><a href='javascript:dl_deleteFilter(\"");
 				//buffer.append(this.getMensaje("tc.quitarfiltro"));
 				buffer.append("\");'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono13.gif' name='Image13' class='botonFiltroElim' id='Image13' alt=\"");
-				//buffer.append(this.getMensaje("informe.eliminarfiltro"));
+				buffer.append("/icono13.gif' name='Image13' class='botonFiltroElim' id='Image13' title=\"");
+				buffer.append(Messages.getMessage("button.deletefilter"));
 				buffer.append("\" ></a></td>\n");
 			}
 			if (StringUtils.isEmpty(button_infFilter) || button_infFilter.equalsIgnoreCase("S")){
-				buffer.append("<td width='33'><a href='javascript:SDFfiltroactualTC(\"");
+				buffer.append("<td width='33'><a href='javascript:dl_infFilter(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getTabla());
@@ -219,19 +242,19 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				//buffer.append(this.configuracion.getHandlerparameter());
 				buffer.append("\");'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono14.gif' name='Image14' class='botonFiltroVer' id='Image14' alt=\"");
-				//buffer.append(this.getMensaje("informe.verfiltro"));
+				buffer.append("/icono14.gif' name='Image14' class='botonFiltroVer' id='Image14' title=\"");
+				buffer.append(Messages.getMessage("button.inffilter"));
 				buffer.append("\" ></a></td>\n");
 			}
 			if (StringUtils.isEmpty(button_updateFilter) || button_updateFilter.equalsIgnoreCase("S")){				
 				buffer.append("<td width='30'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono15.gif' name='Image15' class='botonFiltroGuardar' id='Image15' alt=\"");
-				//buffer.append(this.getMensaje("informe.guardarfiltro"));
+				buffer.append("/icono15.gif' name='Image15' class='botonFiltroGuardar' id='Image15' title=\"");
+				buffer.append(Messages.getMessage("button.updatefilter"));
 				buffer.append("\" ");
 				
 				//si hay filtro
-				buffer.append(" onclick='SDFguardafiltroTC(\"");
+				buffer.append(" onclick='dl_updateFilter(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getTabla());
@@ -244,7 +267,7 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				buffer.append("  ></td>\n");
 				
 				//button_deleteSaveFilter
-				buffer.append("<td width='32'><a href='javascript:SDFborrafiltroTC(\"");
+				buffer.append("<td width='32'><a href='javascript:dl_deleteFilter(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getTabla());
@@ -252,11 +275,13 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				//buffer.append(this.configuracion.getHandlerparameter());
 				buffer.append("\");'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono18.gif' name='Image18' class='botonFiltroElimG' id='Image18' alt=\"");
-				//buffer.append(this.getMensaje("informe.eliminarfiltroguardado"));
+				buffer.append("/icono18.gif' name='Image18' class='botonFiltroElimG' id='Image18' title=\"");
+				buffer.append(Messages.getMessage("button.deletefilter"));
 				buffer.append("\" ></a></td>\n");
+								
+				//button Save configuration	state			
 				buffer.append("<td width='40' >&nbsp;</td>\n");
-				buffer.append("<td width='26'><a href='javascript:SDFguardaestadoTC(\"");
+				buffer.append("<td width='26'><a href='javascript:df_saveState(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getHandlerparameter());
@@ -264,12 +289,12 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				//buffer.append(this.getMensaje("tc.guardadoconexito"));
 				buffer.append("\");'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono20.gif' name='Image20' class='botonConfigGuardar' id='Image20' alt=\"");
-				//buffer.append(this.getMensaje("informe.guardarconfiguracion"));
+				buffer.append("/icono20.gif' name='Image20' class='botonConfigGuardar' id='Image20' title=\"");
+				buffer.append(Messages.getMessage("button.savestate"));
 				buffer.append("\"  ></a></td>\n");
 				
-				//button deleteSaveFilters
-				buffer.append("<td width='26'><a href='javascript:SDFborraestadoTC(\"");
+				//button delete configuration state
+				buffer.append("<td width='26'><a href='javascript:dl_deleteState(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getHandlerparameter());
@@ -279,16 +304,16 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				//buffer.append(this.getMensaje("tc.eliminadoconexito"));
 				buffer.append("\");'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono21.gif' name='Image21' class='botonConfigElim' id='Image21' alt=\"");
-				//buffer.append(this.getMensaje("informe.eliminarconfiguracion"));
+				buffer.append("/icono21.gif' name='Image21' class='botonConfigElim' id='Image21' title=\"");
+				buffer.append(Messages.getMessage("button.deletestate"));
 				buffer.append("\"  ></a></td>\n");
 				buffer.append("<td width='40' >&nbsp;</td>\n");				
 			}
 			if (StringUtils.isEmpty(button_reload) || button_reload.equalsIgnoreCase("S")){				
 				buffer.append("<td width='29'><a href='javascript:location.reload();'><img src='");
 				buffer.append(imagesPath);
-				buffer.append("/icono16.gif' name='Image16' class='botonRefrescar' id='Image16' alt=\"");
-				//buffer.append(this.getMensaje("informe.refrescar"));
+				buffer.append("/icono16.gif' name='Image16' class='botonRefrescar' id='Image16' title=\"");
+				buffer.append(Messages.getMessage("button.reload"));
 				buffer.append("\" ></a></td>\n");		
 				//buffer.append("<td width='20' >&nbsp;</td>\n" + "<td width='165'>");								
 			}			

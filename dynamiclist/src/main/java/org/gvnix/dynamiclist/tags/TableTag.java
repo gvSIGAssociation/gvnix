@@ -1,29 +1,52 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures     
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gvnix.dynamiclist.tags;
+
+import javax.servlet.jsp.tagext.TagSupport;
 
 
 /**
- * El Class TagTCTabla.
+ * gvNIX dynamiclist Table Tag.
+ *
+ * <p>This class provide the files of de table custom tag to show the object list.
+ *
+ * @author Ernesto Calás made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
  */
-public class TableTag {
-
-	/**
-	 * Construct an iterator for the specified collection, and begin looping
-	 * through the body once per element.
-	 * 
-	 * @exception JspException
-	 *                if a JSP exception has occurred
+public class TableTag extends TagSupport {
+	
+	private static final long serialVersionUID = -217053490008543012L;
+	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
 	 */
-	public int doStartTag() {
-		return (0);
+	public int doStartTag() {	
+		
+		return EVAL_BODY_INCLUDE;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.jsp.tagext.TagSupport#doEndTag()
+	 */
+	public int doEndTag() {
+		return EVAL_PAGE;
 	}	
 
-	/**
-	 * Clean up after processing this enumeration.
-	 * 
-	 * @exception JspException
-	 *                if a JSP exception has occurred
-	 */
-	public int doEndTag()  {		
-		return 0;
-	}
 }

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!-- SESSION DATA FILTER (SDF) -->
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+
+<taglib>
+
+	<tlibversion>1.0</tlibversion>
+	<jspversion>1.1</jspversion>
+	<shortname>dynamicList</shortname>
+	<uri>dynamicList</uri>
+	<info>Libreria de gvnix</info>
+
+	<tag>
+		<name>buttonsTag</name>
+		<tagclass>org.gvnix.dynamiclist.tags.ButtonsTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<info>Buttons dynamicList</info>
+		<attribute>
+			<name>imagesPath</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>crudButtons</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>noCrudButtons</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>button_group</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>button_order</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>button_export</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>button_columns</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>button_createFilter</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>button_deleteFilter</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>button_infFilter</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>button_updateFilter</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>button_deleteSaveFilter</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>button_reload</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>		
+	</tag>
+	
+	<tag>
+		<name>actionsTag</name>
+		<tagclass>org.gvnix.dynamiclist.tags.ActionsTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<info>ActionsTag of dynamicList</info>
+	</tag>
+	
+	<tag>
+		<name>headerTableTag</name>
+		<tagclass>org.gvnix.dynamiclist.tags.HeaderTableTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<info>HeaderTableTag of dynamicList</info>
+	</tag>
+	
+	<tag>
+		<name>tableTag</name>
+		<tagclass>org.gvnix.dynamiclist.tags.TableTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<info>TableTag of dynamicList</info>
+	</tag>
+	
+	<tag>
+		<name>footerTableTag</name>
+		<tagclass>org.gvnix.dynamiclist.tags.FooterTableTag</tagclass>
+		<bodycontent>JSP</bodycontent>
+		<info>FooterTableTag of dynamicList</info>
+	</tag>
+</taglib>

@@ -1,3 +1,21 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures     
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gvnix.dynamiclist.util;
 
 import java.text.MessageFormat;
@@ -7,8 +25,8 @@ import java.util.ResourceBundle;
 
 /**
  * Helper class for message bundle access.
- * @author Fabrizio Giustina
- * @version $Revision: 1081 $ ($Author: fgiust $)
+ * 
+ * @author Ernesto Calás made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a> 
  */
 public final class Messages
 {
@@ -16,7 +34,7 @@ public final class Messages
     /**
      * Base name for the bundle.
      */
-    private static final String BUNDLE_NAME = "org.displaytag.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "org.gvnix.dynamiclist.messages";
 
     /**
      * Loaded ResourceBundle.
@@ -27,16 +45,14 @@ public final class Messages
      * Don't instantiate.
      */
     private Messages()
-    {
-        // unused
-    }
+    { }
 
     /**
      * Returns a message from the resource bundle.
      * @param key Message key.
      * @return message String.
      */
-    public static String getString(String key)
+    public static String getMessage(String key)
     {
         try
         {
@@ -54,7 +70,7 @@ public final class Messages
      * @param parameters Parameters to pass to MessageFormat.format()
      * @return message String.
      */
-    public static String getString(String key, Object[] parameters)
+    public static String getMessage(String key, Object[] parameters)
     {
         String baseMsg;
         try
@@ -75,8 +91,8 @@ public final class Messages
      * @param parameter single parameter to pass to MessageFormat.format()
      * @return message String.
      */
-    public static String getString(String key, Object parameter)
+    public static String getMessage(String key, Object parameter)
     {
-        return getString(key, new Object[]{parameter});
+        return getMessage(key, new Object[]{parameter});
     }
 }

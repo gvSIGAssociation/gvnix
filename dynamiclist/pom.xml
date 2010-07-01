@@ -1,16 +1,43 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<licenses>
+		<license>
+			<name>GPLv3</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+			<comments>
+      <![CDATA[
+      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+      i Transport - Generalitat Valenciana
+      Copyright (C) 2010 CIT - Generalitat Valenciana
+  
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+  
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+  
+      You should have received a copy of the GNU General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+      ]]>
+			</comments>
+		</license>
+	</licenses>
 
-  <groupId>org.gvnix.dynamiclist</groupId>
-  <artifactId>dynamiclist</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+	<modelVersion>4.0.0</modelVersion>
 
-  <name>dynamiclist</name>
-  <url>http://maven.apache.org</url>
+	<groupId>org.gvnix.dynamiclist</groupId>
+	<artifactId>dynamiclist</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
-  <dependencies>
+	<name>dynamiclist</name>
+	<url>http://maven.apache.org</url>
+
+	<dependencies>
 		<dependency>
 			<groupId>org.junit</groupId>
 			<artifactId>com.springsource.org.junit</artifactId>
@@ -75,7 +102,7 @@
 			<artifactId>org.springframework.web.servlet</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-	
+
 		<!-- Dependencies for aspectj -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -151,7 +178,13 @@
 			<artifactId>com.springsource.org.apache.commons.lang</artifactId>
 			<version>2.1.0</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.beanutils
+			</artifactId>
+			<version>1.8.0</version>
+		</dependency>
+
 
 		<!-- Dependencies for logging -->
 		<dependency>
@@ -180,12 +213,12 @@
 			<artifactId>com.springsource.ch.qos.logback.classic</artifactId>
 			<version>${logback.version}</version>
 		</dependency>
-				
-  </dependencies>
-  
-  <build>
+
+	</dependencies>
+
+	<build>
 		<finalName>dynamiclist</finalName>
-		<plugins>			
+		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -194,12 +227,65 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<show>private</show>
+					<nohelp>true</nohelp>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-5</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>package-native</id>
+						<phase>install</phase>
+						<goals>
+							<goal>attached</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-	
+
 	<properties>
-		<spring.version>3.0.3.RELEASE</spring.version>		
-		<aspectj.version>1.6.6.RELEASE</aspectj.version>		
+		<spring.version>3.0.3.RELEASE</spring.version>
+		<aspectj.version>1.6.6.RELEASE</aspectj.version>
 		<slf4j.version>1.5.10</slf4j.version>
 		<logback.version>0.9.15</logback.version>
 		<junit.version>4.7.0</junit.version>
