@@ -44,13 +44,8 @@
         <module>addon-web-mvc-jsp-2.0</module>
         <module>addon-web-relation-styles</module>
         <module>addon-web-mvc-binding</module>
-
         <module>addon-cit-security</module>
-
         <module>annotations</module>
-	<!--
-        <module>addon-web-mvc-binding</module>
-	-->
     </modules>
 
     <organization>
