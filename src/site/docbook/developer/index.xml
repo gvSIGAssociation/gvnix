@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book version="5.0" xml:id="spring-roo-reference-guide"
+      xmlns="http://docbook.org/ns/docbook"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+      xmlns:ns4="http://www.w3.org/2000/svg"
+      xmlns:ns3="http://www.w3.org/1999/xhtml"
+      xmlns:ns="http://docbook.org/ns/docbook"
+      xml:lang="es">
+  <info>
+    <title xml:lang="es">gvNIX - Documentación de desarrollo</title>
+
+    <productname>gvNIX. Spring Roo based RAD tool</productname>
+
+    <releaseinfo>0.3.0</releaseinfo>
+
+    <author>
+      <personname>DiSiD Technologies S.L. <link
+      xlink:href="http://www.disid.com">DiSiD Technologies</link></personname>
+    </author>
+
+    <legalnotice>
+      <para>Copyright 2010 Conselleria d'Infraestructures i Transport -
+      Generalitat Valenciana</para>
+
+      <para>This work is licensed under the Creative Commons Attribution-Share
+      Alike 3.0 Unported License. To view a copy of this license, visit
+      http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+      Creative Commons, 171 Second Street, Suite 300, San Francisco,
+      California, 94105, USA.</para>
+    </legalnotice>
+  </info>
+
+  <toc></toc>
+
+  <part xml:id="introduccion-part">
+    <title xml:lang="es">Introducción</title>
+
+    <partintro>
+      <para xml:lang="es">Esta parte de la documentación contiene la
+      información de desarrollo de gvNIX</para>
+    </partintro>
+
+    <!--
+    <xi:include href="introduccion.xml" />
+
+    <xi:include href="instalacion.xml" />
+
+    <xi:include href="primeros-pasos.xml" />
+    -->
+  </part>
+
+</book>

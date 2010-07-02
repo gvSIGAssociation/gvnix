@@ -375,12 +375,13 @@
                 <version>2.0.8</version>
                 <executions>
                     <execution>
-                        <id>single-page</id>
+                        <id>reference-single-page</id>
                         <goals>
                             <goal>generate-html</goal>
                         </goals>
                         <configuration>
                             <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
+                            <sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
                             <postProcess>
                                 <move todir="${basedir}/target/site/reference/html-single">
                                     <fileset dir="${basedir}/target/docbkx/html">
@@ -407,12 +408,47 @@
                         <phase>pre-site</phase>
                     </execution>
                     <execution>
-                        <id>single-pdf</id>
+                        <id>developer-single-page</id>
                         <goals>
-                            <goal>generate-pdf</goal>
+                            <goal>generate-html</goal>
+                        </goals>
+                        <configuration>
+                            <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
+                            <sourceDirectory>${basedir}/src/site/docbook/developer</sourceDirectory>
+                            <postProcess>
+                                <move todir="${basedir}/target/site/developer/html-single">
+                                    <fileset dir="${basedir}/target/docbkx/html">
+                                        <include name="index.html" />
+                                    </fileset>
+                                </move>
+                                <copy todir="${basedir}/target/site/developer/html-single">
+                                    <fileset dir="${basedir}/src/docbkx/resources">
+                                        <include name="**/*.css" />
+                                        <include name="**/*.png" />
+                                        <include name="**/*.gif" />
+                                        <include name="**/*.jpg" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${basedir}/target/site/developer/html-single">
+                                    <fileset dir="${basedir}/src/site/docbook/developer">
+                                        <include name="**/*.png" />
+                                        <include name="**/*.gif" />
+                                        <include name="**/*.jpg" />
+                                    </fileset>
+                                </copy>
+                            </postProcess>
+                        </configuration>
+                        <phase>pre-site</phase>
+                    </execution>
+		    <!-- Disabled pdf generation
+                    <execution>
+                        <id>reference-single-pdf</id>
+                        <goals>
+                            <goal>reference-generate-pdf</goal>
                         </goals>
                         <configuration>
                             <imgSrcPath>src/site/docbook/reference/</imgSrcPath>
+                            <sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
                             <admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
                             <postProcess>
                                 <move file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/gvNIX-referencia.pdf" failonerror="false" />
@@ -420,13 +456,15 @@
                         </configuration>
                         <phase>pre-site</phase>
                     </execution>
+		    -->
                     <execution>
-                        <id>multi-page</id>
+                        <id>reference-multi-page</id>
                         <goals>
                             <goal>generate-html</goal>
                         </goals>
                         <configuration>
                             <chunkedOutput>true</chunkedOutput>
+                            <sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
                             <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
                             <postProcess>
                                 <move todir="${basedir}/target/site/reference">
@@ -444,6 +482,40 @@
                                 </copy>
                                 <copy todir="${basedir}/target/site/reference/html">
                                     <fileset dir="${basedir}/src/site/docbook/reference">
+                                        <include name="**/*.png" />
+                                        <include name="**/*.gif" />
+                                        <include name="**/*.jpg" />
+                                    </fileset>
+                                </copy>
+                            </postProcess>
+                        </configuration>
+                        <phase>pre-site</phase>
+                    </execution>
+                    <execution>
+                        <id>developer-multi-page</id>
+                        <goals>
+                            <goal>generate-html</goal>
+                        </goals>
+                        <configuration>
+                            <chunkedOutput>true</chunkedOutput>
+                            <sourceDirectory>${basedir}/src/site/docbook/developer</sourceDirectory>
+                            <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
+                            <postProcess>
+                                <move todir="${basedir}/target/site/developer">
+                                    <fileset dir="${basedir}/target/docbkx">
+                                        <include name="**/*.html" />
+                                    </fileset>
+                                </move>
+                                <copy todir="${basedir}/target/site/developer/html">
+                                    <fileset dir="${basedir}/src/docbkx/resources">
+                                        <include name="**/*.css" />
+                                        <include name="**/*.png" />
+                                        <include name="**/*.gif" />
+                                        <include name="**/*.jpg" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${basedir}/target/site/developer/html">
+                                    <fileset dir="${basedir}/src/site/docbook/developer">
                                         <include name="**/*.png" />
                                         <include name="**/*.gif" />
                                         <include name="**/*.jpg" />
@@ -472,7 +544,6 @@
                     <chunkedOutput>false</chunkedOutput>
                     <draftWatermarkImage />
                     <htmlStylesheet>css/html.css</htmlStylesheet>
-                    <sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
                     <foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
                     <xincludeSupported>true</xincludeSupported>
                     <entities>
