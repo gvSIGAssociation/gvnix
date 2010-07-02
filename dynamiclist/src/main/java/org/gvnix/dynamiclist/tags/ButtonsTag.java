@@ -40,6 +40,8 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 	private static final long serialVersionUID = -7857540693393637605L;
 	
 	public static final String BUTTONS_CRUD = "BUTTONS_CRUD";
+	public static final String BUTTONS_CRUD_ERROR_MESSAGE = "Error en buttonsTag. El atributo \"crudButtons\" debe tener un valor \"S|N|S|S\" indicando" 
+					+ "así si el botón se dibujará (S) o no (N) siguiendo el orden create|read|update|delete";
 	
 	
 	protected String imagesPath = null;
@@ -53,7 +55,7 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 	
 	protected String button_createFilter = null;
 	protected String button_deleteFilter = null;
-	protected String button_infFilter = null;
+	protected String button_infoFilter = null;
 	protected String button_updateFilter = null;
 	protected String button_deleteSaveFilter = null;	
 	protected String button_reload = null;
@@ -96,8 +98,7 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				delete = false;
 			}
 		} catch (Exception e1) {
-			throw new JspException("Error en buttonsTag. El atributo \"crudButtons\" debe tener un valor \"S|N|S|S\" indicando" 
-					+ "asi si el boton se dibujara (S) o no (N) siguiendo el orden create|read|update|delete");
+			throw new JspException(BUTTONS_CRUD_ERROR_MESSAGE);
 		}
 		
 		StringBuffer buffer = new StringBuffer();		
@@ -105,13 +106,11 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 		buffer.append("<tr align='left'>\n");		
 		if (create){
 			//buffer.append("<td width='31'><a id='create' href=' " + contextPath + "/client/form.html' >");
-			
-			
 			buffer.append("<td width='31'><a id='add' href='javascript:dl_add(\"");
-			buffer.append(contextPath + "/client/form.html");
+			//buffer.append(contextPath + "/client/form.html");
 			buffer.append("\",\"");
 			//buffer.append(this.configuracion.getHandlerparameter());
-			buffer.append( "\");'>");			
+			buffer.append( "\");'>");		
 			buffer.append("<img src='");
 			buffer.append(imagesPath);
 			buffer.append("/icono03.gif' name='Image2' class='botonAlta' id='Image2' title=\"");
@@ -119,13 +118,13 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 			buffer.append("\" ></a></td>\n");			
 		}
 		if (read){
-			buffer.append("<td width='31'><a id='read' href='javascript:dl_read(\"");
-			buffer.append(contextPath + "/client/form.html");
+			buffer.append("<td width='31'><a id='read' href='javascript:dl_read(\"");			
+			//buffer.append(contextPath + "/client/form.html");
 			buffer.append("\",\"");
 			//buffer.append(this.getMensaje("tc.seleccione"));
 			buffer.append("\",\"");
 			//buffer.append(this.configuracion.getHandlerparameter());
-			buffer.append("\");'><img src='");
+			buffer.append("\");'><img src='");			
 			buffer.append(imagesPath);
 			buffer.append("/icono05.gif' name='Image5' class='botonVisualizacion' id='Image5' title=\"");
 			buffer.append(Messages.getMessage("button.read"));
@@ -190,7 +189,7 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 			}
 			if (StringUtils.isEmpty(button_export) || button_export.equalsIgnoreCase("S")){
 				buffer.append("<td width='26'><a href='javascript:dl_export(\"");
-				//buffer.append(this.getMensaje("tc.limiteexcel"));
+				buffer.append("exportanto a muerte ...");
 				buffer.append("\");'><img src='");
 				buffer.append(imagesPath);
 				buffer.append("/icono19.gif' name='Image19' class='botonExportar' id='Image19'  title=\"");
@@ -212,7 +211,7 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 			}
 			
 			if (StringUtils.isEmpty(button_createFilter) || button_createFilter.equalsIgnoreCase("S")){
-				buffer.append("<td width='31'><a href='javascript:df_createFilter(\"");
+				buffer.append("<td width='31'><a href='javascript:dl_createFilter(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getTabla());
@@ -233,8 +232,8 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				buffer.append(Messages.getMessage("button.deletefilter"));
 				buffer.append("\" ></a></td>\n");
 			}
-			if (StringUtils.isEmpty(button_infFilter) || button_infFilter.equalsIgnoreCase("S")){
-				buffer.append("<td width='33'><a href='javascript:dl_infFilter(\"");
+			if (StringUtils.isEmpty(button_infoFilter) || button_infoFilter.equalsIgnoreCase("S")){
+				buffer.append("<td width='33'><a href='javascript:dl_infoFilter(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getTabla());
@@ -243,29 +242,27 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				buffer.append("\");'><img src='");
 				buffer.append(imagesPath);
 				buffer.append("/icono14.gif' name='Image14' class='botonFiltroVer' id='Image14' title=\"");
-				buffer.append(Messages.getMessage("button.inffilter"));
+				buffer.append(Messages.getMessage("button.infofilter"));
 				buffer.append("\" ></a></td>\n");
 			}
-			if (StringUtils.isEmpty(button_updateFilter) || button_updateFilter.equalsIgnoreCase("S")){				
-				buffer.append("<td width='30'><img src='");
-				buffer.append(imagesPath);
-				buffer.append("/icono15.gif' name='Image15' class='botonFiltroGuardar' id='Image15' title=\"");
-				buffer.append(Messages.getMessage("button.updatefilter"));
-				buffer.append("\" ");
-				
+			if (StringUtils.isEmpty(button_updateFilter) || button_updateFilter.equalsIgnoreCase("S")){
+				buffer.append("<td width='32'><a href='javascript:");				
 				//si hay filtro
-				buffer.append(" onclick='dl_updateFilter(\"");
+				buffer.append("dl_updateFilter(\"");
 				//buffer.append(this.configuracion.getIdinforme());
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getTabla());
 				buffer.append("\",\"");
 				//si no hay filtro				
-				buffer.append(" onclick=\"alert('" );
-				//buffer.append(this.getMensaje("popup.guardarfiltro.txtintroduccion"));
-				buffer.append("');\" ");
+				//buffer.append("alert('" );
+				//buffer.append(Messages.getMessage("popup.guardarfiltro.txtintroduccion"));	
 				
-				buffer.append("  ></td>\n");
-				
+				buffer.append("\");'><img src='");
+				buffer.append(imagesPath);
+				buffer.append("/icono15.gif' name='Image15' class='botonFiltroGuardar' id='Image15' title=\"");
+				buffer.append(Messages.getMessage("button.updatefilter"));
+				buffer.append("\" ></a></td>\n");
+								
 				//button_deleteSaveFilter
 				buffer.append("<td width='32'><a href='javascript:dl_deleteFilter(\"");
 				//buffer.append(this.configuracion.getIdinforme());
@@ -299,7 +296,7 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 				buffer.append("\",\"");
 				//buffer.append(this.configuracion.getHandlerparameter());
 				buffer.append("\",\"");
-				//buffer.append(this.getMensaje("tc.confimareliminarconfiguracion"));
+				buffer.append(Messages.getMessage("configState.confirmDeleteState"));
 				buffer.append("\",\"");
 				//buffer.append(this.getMensaje("tc.eliminadoconexito"));
 				buffer.append("\");'><img src='");
@@ -422,13 +419,13 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 	}
 
 
-	public String getButton_infFilter() {
-		return button_infFilter;
+	public String getButton_infoFilter() {
+		return button_infoFilter;
 	}
 
 
-	public void setButton_infFilter(String buttonInfFilter) {
-		button_infFilter = buttonInfFilter;
+	public void setButton_infoFilter(String buttonInfoFilter) {
+		button_infoFilter = buttonInfoFilter;
 	}
 
 
