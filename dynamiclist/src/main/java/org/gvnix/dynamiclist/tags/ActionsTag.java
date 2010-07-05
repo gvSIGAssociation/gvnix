@@ -18,7 +18,12 @@
  */
 package org.gvnix.dynamiclist.tags;
 
+import java.io.IOException;
+
+import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
+
+import org.gvnix.dynamiclist.util.TagConstants;
 
 /**
  * gvNIX dynamiclist Actions Tag.
@@ -36,9 +41,8 @@ public class ActionsTag extends TagSupport{
 	 * (non-Javadoc)
 	 * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
 	 */
-	public int doStartTag() {	
-		
-		return EVAL_BODY_INCLUDE;
+	public int doStartTag() throws JspException {		
+		return SKIP_BODY;
 	}
 
 
@@ -46,7 +50,38 @@ public class ActionsTag extends TagSupport{
 	 * (non-Javadoc)
 	 * @see javax.servlet.jsp.tagext.TagSupport#doEndTag()
 	 */
-	public int doEndTag() {
+	public int doEndTag() throws JspException{
+		
+		
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<table width=\"99%\" height=\"24\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"colorAcciones\">\n");
+		buffer.append("<tr align=\"left\">\n");
+		buffer.append("<td colspan=\"8\"><img src=\"\n");
+		buffer.append(pageContext.getAttribute(TagConstants.IMAGES_PATH));
+		buffer.append("/transparent.gif\" width=\"1\" height=\"1\"></td>\n");
+		buffer.append("</tr>\n");
+		buffer.append("<tr align=\"left\">\n");
+		buffer.append("<td>\n");
+		
+		// ACCIONES
+		
+		// FILTER
+		
+		// USER FILTER
+		
+		// PAGINATION
+		
+		
+		buffer.append("</td>\n");
+		buffer.append("<td width=\"9\" >&nbsp;</td>\n");
+		buffer.append("</tr>\n </table>");
+		
+		try {
+			pageContext.getOut().write(buffer.toString());			
+		} catch (IOException e){
+			e.printStackTrace();
+			new JspException(e);
+		}
 		return EVAL_PAGE;
 	}	
 }

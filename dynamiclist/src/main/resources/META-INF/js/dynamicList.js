@@ -17,11 +17,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+var pkAct=null;
+var estiloant='';
+var estAct=null;
+var aObjFilaVieja=null;
+var aObjFilaActual=null;
+var pkalternativa = null;
+
+//function ponerPk(pObjFila){
+function setPkAct(pObjRow){
+	aObjFilaActual=pObjRow;
+	if(pObjRow.lang != ''){
+		pkalternativa = pObjRow.lang;
+	}
+	if(aObjFilaVieja != null){
+		aObjFilaVieja.className = estiloant;
+	}
+	if (pObjrow.className != 'fondoseleccion'){
+		estiloant = pObjRow.className;
+	}
+	aObjFilaVieja = pObjRow;
+	var aObjFilaNueva;
+	aObjFilaNueva = document.getElementById(pObjRow.id);
+	aObjFilaNueva.className = 'fondoseleccion';
+	pkAct = aObjFilaNueva.id;
+}
+
+function ponerEst(pObjFila){
+	// Si el id de una fila contiene puntos hay problemas al enviar el hidden 
+	if (pObjFila.id.indexOf(".")!=-1){
+		pObjFila.id = pObjFila.id.replace(".","");
+	}
+	estAct = document.getElementById(pObjFila.id + 'H').value;
+}
 
 //dl_add
-function dl_add(action,handler){
-	alert('dl_add');
+function dl_add(urlMapping){	
+	window.location.href = urlMapping;
 }
+
 function SDFalta(action,handler){
 	try{
 		var comboGlobal = document.getElementById('FILTROGLOBAL');
@@ -40,14 +74,47 @@ function SDFalta(action,handler){
 	}
 }
 
-//dl_read
-function dl_read(){
-	alert('read');
+//dl_read   show ("/url_base/{id}") GET
+function dl_read(urlBaseMapping, msj1){
+	if (pkAct != null) {
+		window.location.href = urlBaseMapping + '/' + 1 + '/show.html';
+	} else {
+		alert(msj1);
+	}
+}
+function SDFvisualizacion(action,msj1,handler){
+	try{
+		if (pkAct != null) {
+			var comboGlobal = document.getElementById('FILTROGLOBAL');
+			var indice = comboGlobal.selectedIndex;
+			var longitud = comboGlobal.length;
+
+			var opcion = comboGlobal[indice].value;
+			if (opcion == 'todos') {
+				window.location.href = action + '.do?'+handler+'=generarPantalla&pStrModo=V&pk=' + pkAct;
+			}
+			else {
+				window.location.href = action + '.do?'+handler+'=generarPantalla&pStrModo=V&filtroglobal=' + opcion + '&pk=' + pkAct;
+			}
+		} else {
+			alert(msj1);
+		}
+	}catch(e){
+		if (pkAct != null) {
+			window.location.href = action + '.do?'+handler+'=generarPantalla&pStrModo=V&pk=' + pkAct;
+		} else {
+			alert(msj1);
+		}
+	}
 }
 
 //dl_write
-function dl_write(action,msj1,handler){
-	alert('dl_write');
+function dl_write(urlBaseMapping, msj1){
+	if (pkAct != null) {
+		window.location.href = urlBaseMapping + '/' + 1 + '/form.html';
+	} else {
+		alert(msj1);
+	}
 }
 function SDFmodificacion(action,msj1,handler){
 	try{
@@ -80,8 +147,14 @@ function SDFmodificacion(action,msj1,handler){
 }
 
 //dl_delete
-function dl_delete(action,msj1,msj2){
-	alert('dl_delete');
+function dl_delete(urlBaseMapping, msj1, msj2){
+	if (pkAct != null) {
+		if (confirm(msj2)){
+			window.location.href = urlBaseMapping + '/' + 1 + '/delete.html';;
+		}		
+	} else {
+		alert(msj1);
+	}
 }
 
 
@@ -101,8 +174,8 @@ function SDFbajatc(action,msj1,msj2){
 
 
 //dl_groupBy
-function dl_groupBy(columna,action,handler){
-	alert('dl_groupBy');
+function dl_groupBy(urlMapping){
+	windowsOpen(urlMapping,'400','500');
 }
 function SDFmuestraAgrupar(columna,action,handler){
 	if(columna!='false'){
@@ -119,8 +192,9 @@ function SDFagruparTC(action,tabla,handler){
 
 
 //dl_order
-function dl_order(action,tabla,handler){
-	alert('dl_order');
+function dl_order(urlMapping){
+	//alert('dl_order');	
+	windowsOpen(urlMapping,'600','600');
 }
 
 function SDFordenarTC(action,tabla,handler){
@@ -138,15 +212,39 @@ function SDFmuestraOrdenar(columnas,action,handler){
 
 
 //dl_export
-function dl_export(pStrMensajeLimiteRegistros){
-	alert (pStrMensajeLimiteRegistros);
+var exporting = 0;
+function dl_export(msj1, msj2){
+	// Si esta exportando, no ejecutamos nada
+	if(exporting == 0){
+		exporting = 1;
+
+		// comprobamos que no se exceden los registros
+		var reg = document.getElementById("TOTALREGISTROS").value;
+		if(reg > 20000){
+			alert(msj1);
+			exportando = 0;
+			return;
+		}
+
+		//llamar a controller exportación??
+		
+		var url=window.location.href;
+		url=url+'&excel=si';
+		window.location.href=url;
+		window.setTimeout( permitirExportarExcel,5000);
+		
+		
+		
+	}else{
+		alert(msj2);
+	}
 }
 
-var exportando = 0;
+
 function SDFexportarTC(pStrMensajeLimiteRegistros){
 	// Si esta exportando, no ejecutamos nada
-	if(exportando == 0){
-		exportando = 1;
+	if(exporting == 0){
+		exporting = 1;
 
 		// comprobamos que no se exceden los registros
 		var reg = document.getElementById("TOTALREGISTROS").value;
@@ -168,8 +266,8 @@ function SDFexportarTC(pStrMensajeLimiteRegistros){
 
 
 //dl_columns
-function dl_columns(action,tabla,handler){
-	alert('dl_columns');
+function dl_columns(urlMapping){
+	windowsOpen(urlMapping,'550','600');
 }
 
 function SDFcolumnasTC(action,tabla,handler){
@@ -190,7 +288,7 @@ function SDFmuestraColumnas(columnas,action,handler){
 
 //dl_createFilter
 function dl_createFilter(action,tabla,handler){
-	alert('dl_createFilter');
+	alert(action);
 }
 function SDFfiltroTC(action,tabla,handler){
 	abrirVentana(action + '.do?'+handler+'=SDFfiltro&tabla=' + tabla + '&action=' + action,'600','600');
@@ -274,6 +372,7 @@ function windowsOpen(url,height,width){
 	 str += ",left=" + xc + ",screenX=" + xc;
 	 str += ",top=" + yc + ",screenY=" + yc;
 	 str += ",scrollbars=yes,resizable=yes";
-
 	 window.open(url,"",str);
 }
+
+

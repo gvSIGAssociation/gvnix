@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<!-- SESSION DATA FILTER (SDF) -->
-<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN" "http://java.sun.com/j2ee/dtd/Web-jsptaglibrary_1_2.dtd">
 
 <taglib>
 
-	<tlibversion>1.0</tlibversion>
-	<jspversion>1.1</jspversion>
-	<shortname>dynamicList</shortname>
-	<uri>dynamicList</uri>
-	<info>Libreria de gvnix</info>
+	<tlib-version>1.0</tlib-version>
+	<jsp-version>1.2</jsp-version>
+	<short-name>dynamiclist</short-name>
+	<uri>dynamiclist</uri>	
+	<description>Libreria de gvnix</description>
 
 	<tag>
 		<name>buttonsTag</name>
-		<tagclass>org.gvnix.dynamiclist.tags.ButtonsTag</tagclass>
-		<bodycontent>JSP</bodycontent>
-		<info>Buttons dynamicList</info>
+		<tag-class>org.gvnix.dynamiclist.tags.ButtonsTag</tag-class>
+		<body-content>JSP</body-content>
+		<description>Buttons dynamicList</description>		
 		<attribute>
 			<name>imagesPath</name>
 			<required>false</required>
@@ -79,34 +78,49 @@
 			<name>button_reload</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>url_base</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>classObject</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
 		</attribute>		
 	</tag>
 	
 	<tag>
 		<name>actionsTag</name>
-		<tagclass>org.gvnix.dynamiclist.tags.ActionsTag</tagclass>
-		<bodycontent>JSP</bodycontent>
-		<info>ActionsTag of dynamicList</info>
+		<tag-class>org.gvnix.dynamiclist.tags.ActionsTag</tag-class>
+		<body-content>JSP</body-content>
+		<description>ActionsTag of dynamicList</description>
 	</tag>
 	
 	<tag>
 		<name>headerTableTag</name>
-		<tagclass>org.gvnix.dynamiclist.tags.HeaderTableTag</tagclass>
-		<bodycontent>JSP</bodycontent>
-		<info>HeaderTableTag of dynamicList</info>
+		<tag-class>org.gvnix.dynamiclist.tags.HeaderTableTag</tag-class>
+		<body-content>JSP</body-content>
+		<description>HeaderTableTag of dynamicList</description>
 	</tag>
 	
 	<tag>
 		<name>tableTag</name>
-		<tagclass>org.gvnix.dynamiclist.tags.TableTag</tagclass>
-		<bodycontent>JSP</bodycontent>
-		<info>TableTag of dynamicList</info>
+		<tag-class>org.gvnix.dynamiclist.tags.TableTag</tag-class>
+		<body-content>JSP</body-content>
+		<description>TableTag of dynamicList</description>
+		<attribute>
+			<name>list</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>	
 	</tag>
 	
 	<tag>
 		<name>footerTableTag</name>
-		<tagclass>org.gvnix.dynamiclist.tags.FooterTableTag</tagclass>
-		<bodycontent>JSP</bodycontent>
-		<info>FooterTableTag of dynamicList</info>
+		<tag-class>org.gvnix.dynamiclist.tags.FooterTableTag</tag-class>
+		<body-content>JSP</body-content>
+		<description>FooterTableTag of dynamicList</description>
 	</tag>
 </taglib>

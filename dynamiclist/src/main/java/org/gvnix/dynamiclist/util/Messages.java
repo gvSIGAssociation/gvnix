@@ -60,7 +60,8 @@ public final class Messages
         }
         catch (MissingResourceException e)
         {
-            return '!' + key + '!';
+            return key;
+            //return '!' + key + '!';
         }
     }
 
@@ -79,7 +80,8 @@ public final class Messages
         }
         catch (MissingResourceException e)
         {
-            return '!' + key + '!';
+            return key;
+            //return '!' + key + '!';
         }
 
         return MessageFormat.format(baseMsg, parameters);
