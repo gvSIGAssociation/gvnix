@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="metadatos" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Metadatos</title>
+
+  <para xml:lang="es">TBC</para>
+
+  <para xml:lang="es">(de roo-arquitectura-interna.rst)</para>
+
+  <section xml:id="metadatos_fisico" xml:lang="es">
+    <title xml:lang="es">Metadatos de tipo físico</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-arquitectura-interna.rst)</para>
+  </section>
+
+  <section xml:id="metadatos_itd" xml:lang="es">
+    <title xml:lang="es">Metadatos ITD</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-arquitectura-interna.rst)</para>
+  </section>
+
+  <section xml:id="metadatos_dependencias" xml:lang="es">
+    <title xml:lang="es">Dependencias entre metadatos</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-arquitectura-interna.rst)</para>
+
+    <section xml:id="metadatos_dependencias_listener" xml:lang="es">
+      <title xml:lang="es">Añadir listener de metadatos general</title>
+
+      <para xml:lang="es">TBC</para>
+
+      <para xml:lang="es">(de roo-arquitectura-interna.rst)</para>
+    </section>
+
+    <section xml:id="metadatos_dependencias_nuevo-metadato" xml:lang="es">
+      <title xml:lang="es">Registrar un nuevo tipo de metadatos y sus
+      dependencias</title>
+
+      <para xml:lang="es">TBC</para>
+
+      <para xml:lang="es">(de roo-arquitectura-interna.rst)</para>
+    </section>
+  </section>
+
+  <section xml:id="metadatos_consideraciones-generarcion-orden" xml:lang="es">
+    <title xml:lang="es">Consideraciones sobre los metadatos que generan
+    productos y su orden de ejecución</title>
+
+    <para>TBC</para>
+
+    <para>(de roo-arquitectura-interna.rst)</para>
+  </section>
+
+  <section xml:id="metadatos_esquema-relacion" xml:lang="es">
+    <title xml:lang="es">Esquema de relación de componentes entre los add-ons
+    y los servicios de metadatos</title>
+
+    <para>TBC</para>
+
+    <para>(de roo-arquitectura-interna.rst)</para>
+  </section>
+</chapter>

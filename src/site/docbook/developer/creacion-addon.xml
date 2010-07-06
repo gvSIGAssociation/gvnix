@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="creacion-addon" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Creación de proyecto de add-on</title>
+
+  <para xml:lang="es">TBC</para>
+
+  <para xml:lang="es">(de roo-addon-desarrollo.rst)</para>
+
+  <section xml:id="creacion-addon_converters" xml:lang="es">
+    <title xml:lang="es">Converters del Shell</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">[Nuevo]</para>
+  </section>
+
+  <section xml:id="creacion-addon_commands" xml:lang="es">
+    <title xml:lang="es">La clase Commands</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst) [revisar]</para>
+
+    <section xml:id="creacion-addon_commands_accesibilidad" xml:lang="es">
+      <title xml:lang="es">Métodos de accesibilidad</title>
+
+      <para>TBC</para>
+
+      <para xml:lang="es">(de roo-addon-desarrollo.rst) [ampliar con el
+      soporte a múltiples comandos en una anotación. Añadir consejos para
+      cacheado de estados]</para>
+    </section>
+
+    <section xml:id="creacion-addon_commands_command" xml:lang="es">
+      <title xml:lang="es">Métodos de comando</title>
+
+      <para xml:lang="es">TBC</para>
+
+      <para xml:lang="es">(de roo-addon-desarrollo.rst) [extender con el
+      'focus' y el parámetros "sin nombre" ]</para>
+    </section>
+  </section>
+
+  <section xml:id="creacion-addon_operations" xml:lang="es">
+    <title xml:lang="es">La interface Operations</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst)</para>
+  </section>
+
+  <section xml:id="creacion-addon_operationsimpl" xml:lang="es">
+    <title xml:lang="es">La clase OperationsImpl</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst) [Extender con
+    comentarios para clases abstractas]</para>
+  </section>
+
+  <section xml:id="creacion-addon_propertyname" xml:lang="es">
+    <title xml:lang="es">La clase PropertyName</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst)</para>
+  </section>
+
+  <section xml:id="creacion-addon_test" xml:lang="es">
+    <title xml:lang="es">Test unitarios</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <section xml:id="creacion-addon_test_tdd" xml:lang="es">
+      <title xml:lang="es">Desarrollo dirigido por Test (TDD)</title>
+
+      <para xml:lang="es">TBC [Explicación y ventajas]</para>
+    </section>
+
+    <section xml:id="creacion-addon_test_test" xml:lang="es">
+      <title xml:lang="es">Test Unitarios</title>
+
+      <para xml:lang="es">TBC [Descripción]</para>
+    </section>
+
+    <section xml:id="creacion-addon_test_mock" xml:lang="es">
+      <title xml:lang="es">Objetos Mock</title>
+
+      <para xml:lang="es">TBC [Descripción y referencia a EasyMock]</para>
+    </section>
+
+    <section xml:id="creacion-addon_test_ejemplo" xml:lang="es">
+      <title xml:lang="es">Ejemplo</title>
+
+      <para xml:lang="es">TBC [Ejemplo simple de test unitario usando algún
+      mock para simular un servicio (¿usar una versión simplificada de jsp
+      2.0?)]</para>
+    </section>
+  </section>
+</chapter>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="puntos-entrada" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Puntos de entrada al framework</title>
+
+  <para>TBC (de roo-arquitectura-interna.rst) </para>
+
+  <section xml:id="puntos-entrada_commands" xml:lang="es">
+    <title xml:lang="es">Commands</title>
+
+    <para xml:lang="es">TBC (de roo-arquitectura-interna.rst) </para>
+  </section>
+
+  <section xml:id="puntos-entrada_listeners" xml:lang="es">
+    <title xml:lang="es">Listeners</title>
+
+    <para xml:lang="es">TBC (de roo-arquitectura-interna.rst) </para>
+  </section>
+</chapter>

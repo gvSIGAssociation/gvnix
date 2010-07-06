@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="convenciones" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Convenciones</title>
+
+  <section xml:id="convenciones_nombres-comandos" xml:lang="es">
+    <title xml:lang="es">Nombres de los comandos</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+  </section>
+
+  <section xml:id="convenciones_paquetes" xml:lang="es">
+    <title>Nombres de paquetes</title>
+
+    <para>TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst)</para>
+
+    <section xml:id="convenciones_paquetes_addons" xml:lang="es">
+      <title>Add-ons</title>
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+
+      <para></para>
+    </section>
+
+    <section xml:id="convenciones_paquetes_codigo-generado" xml:lang="es">
+      <title>Código generado</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+    </section>
+  </section>
+
+  <section xml:id="convenciones_comentarios-codigo" xml:lang="es">
+    <title>Comentarios en el Código fuente</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+  </section>
+
+  <section xml:id="convenciones_javadoc" xml:lang="es">
+    <title>Cabecera Javadoc para la clase java</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+  </section>
+
+  <section xml:id="convenciones_nombre-addon" xml:lang="es">
+    <title>Nombre de add-ons</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+  </section>
+
+  <section xml:id="convenciones_licencia-addon" xml:lang="es">
+    <title>Licencia de add-ons</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+  </section>
+</chapter>

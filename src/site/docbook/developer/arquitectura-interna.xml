@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="arquitectura-interna" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Arquitectura interna</title>
+
+  <section xml:id="arquitectura-interna_esquema-general" xml:lang="es">
+    <title xml:lang="es">Esquema general de componentes</title>
+
+    <para xml:lang="es">TBC</para>
+
+    <para xml:lang="es">[Breve descripción de los componentes y diagrama] (de
+    roo-arquitectura-interna.rst ver si está actualizado a OSGi)</para>
+  </section>
+
+  <section xml:id="arquitectura-interna_file-monitor" xml:lang="es">
+    <title>File Monitor</title>
+
+    <para>TBC</para>
+
+    <para>(de roo-arquitectura-interna.rst)</para>
+  </section>
+
+  <section xml:id="arquitectura-interna_model" xml:lang="es">
+    <title>Model</title>
+
+    <para>TBC</para>
+
+    <para>(de roo-arquitectura-interna.rst)</para>
+  </section>
+
+  <section xml:id="arquitectura-interna_metadata" xml:lang="es">
+    <title>Metadata</title>
+
+    <para>TBC</para>
+
+    <para>(de roo-arquitectura-interna.rst)</para>
+  </section>
+
+  <section xml:id="arquitectura-interna_shell" xml:lang="es">
+    <title>Shell</title>
+
+    <para>TBC</para>
+
+    <para>(de roo-arquitectura-interna.rst)</para>
+  </section>
+
+  <section xml:id="arquitectura-interna_process-manager" xml:lang="es">
+    <title>Process Manager</title>
+
+    <para>TBC</para>
+
+    <para>(de roo-arquitectura-interna.rst)</para>
+  </section>
+
+  <section xml:id="arquitectura-interna_framework-osgi" xml:lang="es">
+    <title>Framework OSGi</title>
+
+    <para>TBC</para>
+
+    <para>[Características. Descripción de los servicios y componentes.
+    Referencias.] (Nuevo)</para>
+  </section>
+</chapter>

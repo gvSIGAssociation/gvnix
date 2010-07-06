@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="escucha-eventos" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Escucha de eventos</title>
+
+  <para>TBC</para>
+
+  <para>(de roo-addon-desarrollo.rst)</para>
+
+  <section xml:id="escucha-eventos_ficheros" xml:lang="es">
+    <title xml:lang="es">Eventos de ficheros y directorios</title>
+
+    <para>TBC</para>
+
+    <para>(de roo-addon-desarrollo.rst)</para>
+  </section>
+
+  <section xml:id="escucha-eventos_metadatos" xml:lang="es">
+    <title xml:lang="es">Eventos de metadatos</title>
+
+    <para>TBC</para>
+
+    <para>(de roo-addon-desarrollo.rst)</para>
+  </section>
+
+  <section xml:id="escucha-eventos_procesos" xml:lang="es">
+    <title xml:lang="es">Eventos de procesos</title>
+
+    <para>TBC</para>
+
+    <para>(de roo-addon-desarrollo.rst)</para>
+  </section>
+</chapter>

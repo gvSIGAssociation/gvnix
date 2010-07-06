@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="validacion" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Validación de Add-ons</title>
+
+  <para>TBC [FALTA Info del proceso]</para>
+
+  <section>
+    <title>Test Integración</title>
+
+    <para>TBC [FALTA Info del proceso]</para>
+  </section>
+
+  <section>
+    <title>Test Funcionales</title>
+
+    <para>TBC [FALTA Info del proceso]</para>
+  </section>
+</chapter>

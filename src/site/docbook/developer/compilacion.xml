@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="compilacion" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Compilación e instalación de add-ons</title>
+
+  <para>TBC [Pequeña introducción hablando de OSGi e
+  instalación/desinstalación en caliente]</para>
+
+  <section>
+    <title>Compilación y empaquetado de un add-on.</title>
+
+    <para>TBC (de roo-addon-desarrollo.rst)</para>
+  </section>
+
+  <section>
+    <title>Instalación</title>
+
+    <para>TBC (de roo-addon-desarrollo.rst)</para>
+
+    <section>
+      <title>Instalar en desarrollo.</title>
+
+      <para>TBC (de roo-addon-desarrollo.rst)</para>
+    </section>
+
+    <section>
+      <title>Depuración de add-on</title>
+
+      <para>TBC [Hablar de gvnix-devel y como configurar el eclipse]</para>
+    </section>
+
+    <section>
+      <title>Añadir en una instalación de gvNIX.</title>
+
+      <para>TBC [Describir como añadir en una instalación de binarios de
+      gvnix: igual que en desarrollo o copiando al directorio
+      'plugins']</para>
+    </section>
+
+    <section>
+      <title>Añadir un add-on al la distribución de gvNIX.</title>
+
+      <para>TBC [Describir añadir al pom.xml padre como modulo, limpiar
+      pom.xml del addon, añadir artefactos extra a la distribución de binarios
+      en el assembly.xml]</para>
+    </section>
+  </section>
+</chapter>

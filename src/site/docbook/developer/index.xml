@@ -35,20 +35,60 @@
   <toc></toc>
 
   <part xml:id="introduccion-part">
-    <title xml:lang="es">Introducción</title>
+    <title xml:lang="es">Introducción al desarrollo de gvNIX</title>
 
+    <partintro>
+      <para xml:lang="es">Esta parte de la documentación de introducción
+	      a la arquitectura interna y información básica para 
+	      el desarrollo de gvNIX.
+      </para>
+    </partintro>
+
+    <xi:include href="arquitectura-interna.xml" />
+
+    <xi:include href="puntos-entrada.xml" />
+
+    <xi:include href="metadatos.xml" />
+  </part>
+
+  <part xml:id="desarrollo-part">
+    <title xml:lang="es">Desarrollo de gvNIX</title>
     <partintro>
       <para xml:lang="es">Esta parte de la documentación contiene la
       información de desarrollo de gvNIX</para>
     </partintro>
 
-    <!--
-    <xi:include href="introduccion.xml" />
+    <xi:include href="convenciones.xml" />
 
-    <xi:include href="instalacion.xml" />
+    <xi:include href="repositorio.xml" />
 
-    <xi:include href="primeros-pasos.xml" />
-    -->
+    <xi:include href="metodologia.xml" />
+
+    <xi:include href="creacion-addon.xml" />
+
+    <xi:include href="comandos.xml" />
+
+    <xi:include href="escucha-eventos.xml" />
+
+    <xi:include href="cambios-ficheros.xml" />
+
+    <xi:include href="crear-itd.xml" />
+
+    <xi:include href="compilacion.xml" />
+
+    <xi:include href="validacion.xml" />
+
+  </part>
+  <part xml:id="recursos-part">
+    <title xml:lang="es">Recursos</title>
+    <partintro>
+      <para xml:lang="es">En esta parte podrá encontrar recursos útiles
+      para el desarrollo de gvNIX</para>
+    </partintro>
+
+
+    <xi:include href="recetas.xml" />
+
   </part>
 
 </book>
