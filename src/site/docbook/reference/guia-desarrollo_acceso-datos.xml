@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="guia-desarrollo-acceso-datos" 
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook"
+         xml:lang="es">
+
+  <title xml:lang="es">Gestión del acceso a datos</title>
+
+  <section xml:lang="es">
+    <title xml:lang="es">Persistencia de objetos</title>
+
+    <para xml:lang="es">Trabajar en un entorno orientado a objetos con acceso
+    a fuentes de datos relacionales (lo habitual en tecnología Java) puede
+    suponer un incremento de los tiempos de desarrollo porque debemos incluir
+    la lógica necesaria para hacer corresponder el modelo relacional, que
+    trata con relaciones y conjuntos, con el paradigma orientado a objetos,
+    que trata con objetos, atributos y asociaciones de unos con otros. Esta
+    problemática es la que se conoce como <emphasis>desajuste
+    objeto-relacional</emphasis> (object-relational impedance mismatch).</para>
+
+    <important>
+      <title xml:lang="es">Desajuste objeto-relacional</title>
+
+      <para xml:lang="es">Para almacenar los objetos de una aplicación,
+      normalmente se abre una conexión JDBC, se crea una sentencia SQL y se
+      plasman todos los valores de sus propiedades sobre la sentencia SQL.
+      Esto puede ser fácil para un objeto pequeño, sin embargo, ¿qué pasa con
+      las asociaciones? ¿y si un objeto quiere almacenar una lista de objetos
+      relacionados? ¿también se almacenan? ¿automáticamente? ¿manualmente?
+      ¿qué pasa con las restricciones de claves ajenas? ¿y con la
+      herencia?</para>
+
+      <para xml:lang="es">Lo mismo aplica para la carga: cuando se carga un
+      objeto de la base de datos y que tiene una relación con otras entidades.
+      ¿se cargan los objetos relacionados también? ¿no se cargan ahora pero si
+      más tarde? ¿qué ocurre si cada objeto relacionado tiene una asociación
+      con todavía más objetos?</para>
+
+      <para xml:lang="es">Como se observa, el desajuste entre el paradigma
+      orientado a objetos y el modelo relacional se amplia muy rápidamente 
+      con modelos de
+      objetos de cierta complejidad. Y hay muchas más cosas a considerar como
+      la carga lenta, las referencias circulares, la caché, etc. De hecho, se
+      han realizado estudios que demuestran que el 35% del código de una
+      aplicación se produce para mepear datos entre la aplicación y la base de
+      datos.</para>
+    </important>
+
+    <para xml:lang="es">La técnica y herramientas <emphasis>ORM</emphasis>
+    (Object-Relational Mapping) surgen para reducir el coste de desarrollo que
+    supone el desajuste objeto-relacional. Las técnicas de ORM permiten
+    automatizar procesos que trasladan objetos a formas almacenables en tablas
+    y viceversa, preservando los atributos de los objetos. Para esto se basan
+    en la utilización de metadatos de correspondencia que especifican la
+    información necesaria para que se pueda efectuar de forma automática la
+    conversión de datos entre el sistema relacional y el sistema orientado a
+    objetos.</para>
+
+    <para xml:lang="es">Esta técnica supuso que empezaran a aparecer multitud
+    de librerías y herramientas ORM para Java. Para estandarizar esta técnica
+    en el mundo Java y hacer nuestras aplicaciones independientes de la
+    herramienta surgió JPA (Java Persistence API), actualmente en su versión 2
+    (<link xlink:href="http://jcp.org/en/jsr/detail?id=317">JSR
+    317</link>).</para>
+
+    <para xml:lang="es">gvNIX (herencia del núcleo Spring Roo) fundamenta su
+    interacción con la base de datos en un sistema de persistencia
+    <emphasis>JPA 2</emphasis>. Gracias a esto las aplicaciones desarrolladas
+    con gvNIX se benefician de las mejoras de tiempos de desarrollo que
+    aportan la técnica y herramientas ORM.</para>
+
+    <para xml:lang="es">Regresando a la creación del nuevo proyecto, el primer
+    paso es instalar y configurar el sistema de persistencia. Teclear
+    <command>hint</command> y se nos sugerirá los siguientes pasos a
+    dar:</para>
+
+    <programlisting>roo&gt; <command>hint</command>
+<computeroutput>Roo requires the installation of a JPA provider and associated database.
+
+Type 'persistence setup' and then hit TAB three times.
+We suggest you type 'H' then TAB to complete "HIBERNATE".
+After the --provider, press TAB twice for database choices.
+For testing purposes, type (or TAB) HYPERSONIC_IN_MEMORY.
+If you press TAB again, you'll see there are no more options.
+As such, you're ready to press ENTER to execute the command.
+
+Once JPA is installed, type 'hint' and ENTER for the next suggestion.</computeroutput>
+roo&gt;</programlisting>
+
+    <para xml:lang="es">En el ámbito de este tutorial es suficiente con
+    conectar la aplicación a una base de datos en memoria e Hibernate
+    implementación del sistema de persistencia:</para>
+
+    <programlisting>roo&gt; <command>persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</command>
+<computeroutput>Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
+Created SRC_MAIN_RESOURCES/META-INF/spring/database.properties
+Managed SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
+Managed ROOT/pom.xml [Added dependency org.hsqldb:hsqldb:1.8.0.10]
+Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-core:3.5.0-Final]
+Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-entitymanager:3.5.0-Final]
+Managed ROOT/pom.xml [Added dependency org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.0.Final]
+Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-validator:4.0.2.GA]
+Managed ROOT/pom.xml [Added dependency javax.validation:validation-api:1.0.0.GA]
+Managed ROOT/pom.xml [Added dependency cglib:cglib-nodep:2.2]
+Managed ROOT/pom.xml [Added dependency javax.transaction:jta:1.1]
+Managed ROOT/pom.xml [Added dependency org.springframework:spring-jdbc:${spring.version}]
+Managed ROOT/pom.xml [Added dependency org.springframework:spring-orm:${spring.version}]
+Managed ROOT/pom.xml [Added dependency commons-pool:commons-pool:1.5.4]
+Managed ROOT/pom.xml [Added dependency commons-dbcp:commons-dbcp:1.3]
+Managed ROOT/pom.xml</computeroutput>
+roo&gt;</programlisting>
+
+    <warning>
+      <para xml:lang="es">Una base de datos en memoria no es la mejor opción
+      para un entorno de producción, utilizarla sólo para entornos de
+      desarrollo, demostraciones y formación.</para>
+    </warning>
+
+    <warning>
+      <para xml:lang="es">Por defecto, gvNIX configura el sistema de
+      persistencia para borrar y crear la base de datos cada vez que se
+      arranca la aplicación, por lo que los datos de la demo se perderán cada
+      vez que paremos la aplicación.</para>
+
+      <para xml:lang="es">Esto se puede cambiar en la configuración del
+      sistema de persistencia:
+      <filename>src/main/resources/META-INF/persistence.xml</filename>.
+      Consultar la sección <link
+      linkend="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">enlazar
+      base de datos existente</link> para aprender cómo cambiar el
+      comportamiento por defecto.</para>
+    </warning>
+  </section>
+
+  <section xml:id="guia-desarrollo_gestion-acceso-datos">
+    <title xml:lang="es">Configurar la conexión con la base de datos</title>
+
+    <para xml:lang="es">En cualquier punto del ciclo de vida de una aplicación
+    puede surgir la necesidad de cambiar de base de datos (paso de desarrollo
+    a producción, nuevo sistema con mejor rendimiento, etc), para estos
+    casos gvNIX ofrece una serie de comandos que simplificarán la 
+    actualización de la configuración de acceso a la base de datos:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><command>persistence setup</command></para>
+        </listitem>
+
+        <listitem>
+          <para><command>database properties</command></para>
+        </listitem>
+      </itemizedlist>
+
+      <section>
+        <title>persistence setup</title>
+
+        <para xml:lang="es">Configurar el acceso a datos.
+        Entre los parámetros necesitaremos la herramienta ORM y la base 
+        de datos a usar.</para>
+
+        <para xml:lang="es">Los parámetros que admite este comando son:</para>
+
+        <variablelist>
+          <varlistentry>
+            <term>--provider</term>
+
+            <listitem>
+              <para xml:lang="es">Identificador de la herramienta ORM. 
+              Los valores posibles son:</para>
+
+              <variablelist>
+                <varlistentry>
+                  <term>DATANUCLEUS</term>
+
+                  <listitem>
+                    <para><link xlink:href="http://www.datanucleus.org/">Data
+                    Nucleus</link></para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>ECLIPSELINK</term>
+
+                  <listitem>
+                    <para><link
+                    xlink:href="http://www.eclipse.org/eclipselink/">EclipseLink</link></para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>HIBERNATE</term>
+
+                  <listitem>
+                    <para><link
+                    xlink:href="http://www.hibernate.org/">Hibernate</link></para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term>OPENJPA</term>
+
+                  <listitem>
+                    <para><link
+                    xlink:href="http://openjpa.apache.org/">OpenJPA</link></para>
+                  </listitem>
+                </varlistentry>
+              </variablelist>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--database</term>
+
+            <listitem>
+              <para xml:lang="es">Identificador de la base de datos.
+              Los valores posibles son:</para>
+
+              <itemizedlist>
+                <listitem>
+                  <para>DB2<emphasis>. Debido a que los drivers JDBC no están
+                  disponibles en ningún repositorio Maven, en caso de utilizar
+                  DB2 habrá que instalar manualmente el driver 
+                  JDBC.</emphasis></para>
+                </listitem>
+
+                <listitem>
+                  <para>DERBY</para>
+                </listitem>
+
+                <listitem>
+                  <para>GOOGLE_APP_ENGINE</para>
+                </listitem>
+
+                <listitem>
+                  <para>H2_IN_MEMORY</para>
+                </listitem>
+
+                <listitem>
+                  <para>HYPERSONIC_IN_MEMORY</para>
+                </listitem>
+
+                <listitem>
+                  <para>HYPERSONIC_PERSISTENT</para>
+                </listitem>
+
+                <listitem>
+                  <para>MSSQL</para>
+                </listitem>
+
+                <listitem>
+                  <para>ORACLE<emphasis>. Debido a que los drivers JDBC no están
+                  disponibles en ningún repositorio Maven, en caso de utilizar
+                  Oracle habrá que instalar manualmente el driver 
+                  JDBC.</emphasis></para>
+                </listitem>
+
+                <listitem>
+                  <para>POSTGRES</para>
+                </listitem>
+
+                <listitem>
+                  <para>SYBASE</para>
+                </listitem>
+              </itemizedlist>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--applicationId</term>
+
+            <listitem>
+              <para xml:lang="es">Identificación de aplicación en Google App
+              Engine (sólo usado para esta base de datos).</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--jndiDataSource</term>
+
+            <listitem>
+              <para xml:lang="es">Fuente de datos JNDI a usar.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--databaseName</term>
+
+            <listitem>
+              <para xml:lang="es">Nombre de la base de datos.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--userName</term>
+
+            <listitem>
+              <para xml:lang="es">Nombre del usuario para la conexión.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--password</term>
+
+            <listitem>
+              <para xml:lang="es">Contraseña del usuario de la
+              conexión.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+
+        <para xml:lang="es">Dependiendo del tipo de base de datos 
+        pueden ser necesarios unos u otros parámetros y puede o no ser
+        necesario instrucciones adicionales para la configuración del 
+        acceso a datos. Se recomienda usar el completado de comandos con
+        <emphasis>TAB</emphasis> para que gvNIX nos indique qué nos hace
+        falta en función de nuestro contexto.</para>
+      </section>
+
+      <section>
+        <title>database properties</title>
+
+        <para xml:lang="es">Permite la
+        consulta, eliminación y actualización de las propiedades de conexión a
+        la base de datos (a diferencia del comando anterior que configura el
+        sistema de persitencia en su totalidad). Estas propiedades se 
+        almacenan el fichero
+        <filename>src/main/resources/META-INF/spring/database.properties</filename>
+        de la aplicación.</para>
+
+        <para xml:lang="es">Opciones:</para>
+
+        <variablelist>
+          <varlistentry>
+            <term>database properties list</term>
+
+            <listitem>
+              <para xml:lang="es">Lista las propiedades de configuración de la
+              base de datos.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>database properties remove</term>
+
+            <listitem>
+              <para xml:lang="es">Elimina una propiedad de la configuración.
+              Requiere un único parámetro <parameter>--key</parameter> para
+              especificar la clave a eliminar.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>database properties set</term>
+
+            <listitem>
+              <para xml:lang="es">Crea o actualiza una de las propiedades la
+              configuración. Requiere un parámetro
+              <parameter>--key</parameter> con el nombre de la propiedad y un
+              <parameter>--value</parameter> con el valor a establecer.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </section>
+
+    <section>
+      <title>Ejemplo: Conectar con PostgreSQL</title>
+
+      <para xml:lang="es">En este ejemplo vamos a configurar la conexión a un
+      servidor PostgreSQL en una máquina en nuestra red local. Los datos de
+      conexión de ejemplo serán:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para xml:lang="es">Servidor de base de datos:
+          <literal>dbserver</literal></para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="rd">Puerto de conexión:
+          <literal>5438</literal></para>
+        </listitem>
+
+        <listitem>
+          <para>Nombre de la base de datos: <literal>my_db</literal></para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Nombre de usuario de la base de datos:
+          <literal>user1</literal></para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Contraseña del usuario:
+          <literal>1234</literal></para>
+        </listitem>
+      </itemizedlist>
+
+      <para xml:lang="es">Hay que recordar que estos comando se pueden
+      realizar en cualquier momento.</para>
+
+      <para xml:lang="es">Los pasos a seguir para la configuración son:</para>
+
+      <orderedlist>
+        <listitem>
+          <para xml:lang="es">Usar el comando <command>persistence
+          setup</command> con los parámetros que disponemos:</para>
+
+          <programlisting>roo&gt; <command>persistence setup --provider HIBERNATE --database POSTGRES --databaseName my_db --userName user1 --password 1234</command>
+Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
+Please enter your database details in src/main/resources/META-INF/spring/database.properties.
+Created SRC_MAIN_RESOURCES/META-INF/spring/database.properties
+Managed SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
+Managed ROOT/pom.xml ...
+roo&gt; </programlisting>
+
+          <para xml:lang="es">Podemos observar que ya se nos sugiere que es
+          necesario actualizar el fichero
+          <filename>database.properties</filename>. Esto es debido a que el
+          comando no contempla todas las opciones necesarias para completar la
+          configuración.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Comprobar como ha quedado la configuración de la
+          conexión. Para ello usar el comando <command>database properties
+          list</command>:</para>
+
+          <programlisting>roo&gt; <command>database properties list</command>
+database.driverClassName = org.postgresql.Driver
+database.password = 1234
+database.url = jdbc:postgresql://localhost:5432/my_db
+database.username = user1
+roo&gt; </programlisting>
+
+          <para>Podemos observar que lo único que nos falta es configurar el
+          servidor y el puerto de la base de datos en la propiedad
+          <literal>database.url</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Configurar la URL de conexión a servidor
+          correctamente usando el comando <command>database properties
+          set</command>:</para>
+
+          <programlisting>roo&gt; <command>database properties set --key database.url --value jdbc:postgresql://dbserver:5438/my_db </command>
+Managed SRC_MAIN_RESOURCES/META-INF/spring/database.properties
+roo&gt; </programlisting>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Volver a comprobar el estado de los parámetros
+          con el comando <command>database properties list</command>:</para>
+
+          <programlisting>roo&gt; <command>database properties list</command>
+database.driverClassName = org.postgresql.Driver
+database.password = 1234
+database.url = jdbc:postgresql://dbserver:5438/my_db
+database.username = user1
+roo&gt; </programlisting>
+        </listitem>
+      </orderedlist>
+
+      <para xml:lang="es">Una vez hecho, la siguiente vez que arranquemos la
+      aplicación usará la base de datos que le hemos configurado.
+      </para>
+    </section>
+
+    <section xml:id="guia-desarrollo_acceso-datos_actualizacion-esquema">
+        <title>Actualización automática del esquema</title>
+        <para xml:lang="es">Recordar que por defecto se crea el esquema de
+        base de datos necesario para el modelo de entidades creado con gvNIX, 
+        por lo que si conectamos nuestra aplicación con una base de datos
+        existente <emphasis>debemos</emphasis> revisar la configuración del 
+        sistema de persistencia antes de pasar al siguiente capítulo.</para>
+        <para xml:lang="es">
+        <emphasis>Si conectamos a una base de datos existente se debe 
+        deshabilitar la actualización automática del esquema</emphasis>:
+        </para>
+
+      <itemizedlist>
+        <listitem>
+          <para xml:lang="es">Editar el archivo 
+        <filename>src/main/resources/META-INF/persistence.xml</filename> 
+          </para>
+        </listitem>
+        <listitem>
+          <para xml:lang="es">Borrar o comentar la propiedad
+          <emphasis>hibernate.hbm2ddl.auto</emphasis>:</para>
+          <programlisting>
+&lt;-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section xml:id="guia-desarrollo_gestion-acceso-datos_multiples-fuentes-datos">
+      <title xml:lang="es">Múltiples fuentes de datos</title>
+
+      <para><emphasis role="bold">TBC</emphasis></para>
+      <!-- 
+      <para>En este <link
+      xlink:href="http://forum.springsource.org/showpost.php?p=289577&amp;postcount=4">post
+      del foro de Spring Roo</link> tenemos un ejemplo de los cambios a
+      realizar en nuestra aplicación para que las entidades tenga distintas
+      fuentes de datos.</para>
+      -->
+    </section>
+  </section>
+</chapter>

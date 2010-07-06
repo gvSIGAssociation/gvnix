@@ -5,7 +5,8 @@
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook">
+         xmlns:ns="http://docbook.org/ns/docbook" 
+         xml:lang="es">
   <title xml:lang="es">Add-on Web Relation Styles</title>
 
   <para xml:lang="es">Add-on para la visualización de las relaciones 1 a n de
@@ -39,7 +40,8 @@
 public class Person {
     ...
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "person")
-    private Set&lt;org.gvnix.test.relation.list.table.domain.Car&gt; coches = new java.util.HashSet&lt;org.gvnix.test.relation.list.table.domain.Car&gt;();
+    private Set&lt;org.gvnix.test.relation.list.table.domain.Car&gt; coches = 
+      new java.util.HashSet&lt;org.gvnix.test.relation.list.table.domain.Car&gt;();
     ...
 }</programlisting>
 
@@ -70,7 +72,9 @@ public class Person {
     <title xml:lang="es">Futuras versiones</title>
 
     <para xml:lang="es">Posibilidad de elección de la visualización para las
-    entidades relacionadas 1 a n (<emphasis>ONE_TO_MANY</emphasis>,
+    entidades relacionadas 1 a N (<emphasis>ONE_TO_MANY</emphasis>,
     <emphasis>mappedBy</emphasis>) mediante un comando.</para>
+
+    <para xml:lang="es">Patrones de pantallas</para>
   </section>
 </chapter>

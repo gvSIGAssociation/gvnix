@@ -5,14 +5,13 @@
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook">
+         xmlns:ns="http://docbook.org/ns/docbook"
+         xml:lang="es">
   <title xml:lang="es">Add-on Persistence</title>
 
   <para xml:lang="es">Add-on de utilidades enfocadas a la persistencia de las
   entidades.</para>
 
-  <section xml:id="addon-persistence_descripcion">
-    <title xml:lang="es">Descripción</title>
 
     <para xml:lang="es">Este add-on contiene un conjunto de herramientas
     enfocadas a la persistencia de Entidades del modelo de datos.</para>
@@ -49,19 +48,8 @@
       <emphasis>Control de Concurrencia</emphasis> de la especificación <link
       xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr220/index.html">JPA</link>.</para>
 
-      <warning>
-        <para xml:lang="es"><emphasis role="bold">Por defecto las aplicaciones
-        de Spring Roo se configuran para que la Base de datos se regenere cada
-        vez que se arranca la aplicación (borrando y creando de nuevo las
-        tablas), por lo que es conveniente que si se utiliza una Base de datos
-        preexistente se configure correctamente el fichero
-        <filename>src/main/resources/META-INF/persistence.xml</filename> para
-        evitar sorpresas desagradables. Más información <link
-        linkend="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">aquí</link>.</emphasis></para>
-      </warning>
-
-      <para xml:lang="es">El Cheksum <emphasis>se calcula en el momento de la
-      carga</emphasis> de la entidad desde la Base de datos es almacenado en
+      <para xml:lang="es">El checksum <emphasis>se calcula en el momento de la
+      carga</emphasis> de la entidad desde la base de datos es almacenado en
       una <emphasis>propiedad no persistente</emphasis>.</para>
 
       <para xml:lang="es">En el momento de <emphasis>actualizar o
@@ -84,8 +72,7 @@
       <variablelist>
         <varlistentry>
           <term><link
-          linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
-          checksum set</link></term>
+          linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ checksum set</link></term>
 
           <listitem>
             <para xml:lang="es">Establecer el control de concurrencia a una
@@ -95,8 +82,7 @@
 
         <varlistentry>
           <term><link
-          linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">occ
-          checksum all</link></term>
+          linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">occ checksum all</link></term>
 
           <listitem>
             <para xml:lang="es">Establecer el control de concurrencia a todas
@@ -118,5 +104,4 @@
       <link linkend="apendice-comandos_addon-persistence_occchecksum">apéndice
       de comandos</link>.</para>
     </section>
-  </section>
 </chapter>

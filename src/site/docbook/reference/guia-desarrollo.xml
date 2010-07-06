@@ -7,16 +7,236 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title xml:lang="es">Desarrollo de aplicaciones con gvNIX</title>
+  <title xml:lang="es">Crear una nueva aplicación</title>
 
-  <xi:include href="guia-desarrollo_aplicacion-base.xml" />
+  <para xml:lang="es">El proyecto de ejemplo que utilizaremos consiste
+  en crear una aplicación web para venta de pizzas, <emphasis role="bold">Pizza
+  Shop</emphasis>.</para>
+
+  <para xml:lang="es">Requerimientos:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>Los clientes pueden hacer pedidos por la web</para>
+    </listitem>
+    <listitem>
+      <para>Los empleados crean pedidos recibidos por teléfono</para>
+    </listitem>
+    <listitem>
+      <para>Las pizzas son un conjunto de ingredientes sobre una base.</para>
+    </listitem>
+  </itemizedlist>
+
+  <para xml:lang="es">gvNIX es especialmente potente si usamos los principios del <emphasis>diseño dirigido por el dominio</emphasis> (DDD). Básicamente son un conjunto de patrones para construir aplicaciones a partir del modelo del dominio, destacando en el ámbito de gvNIX:
+  </para>
+
+  <itemizedlist>
+    <listitem>
+      <para><emphasis role="bold">Diseño dirigido por el modelo</emphasis>. 
+      Representar fielmente los conceptos seleccionados del dominio del
+      problema, por ejemplo utilizando UML (diagramas de clases).</para>
+    </listitem>
+    <listitem>
+      <para><emphasis role="bold">Arquitectura por capas</emphasis>. Separar la lógica de negocio de la lógica de aplicación (transacciones, seguridad, etc), de la lógica de presentación y de la lógica de infraestructura (acceso a datos, acceso a servicios externos, etc).</para>
+      <para>La arquitectura por capas es un patrón que gvNIX se encarga de aplicar por nosotros, sin embargo, debemos conocer las capas generadas por gvNIX porque este conocimiento será de utilidad a la hora de hacer nuestros desarrollos. Repasar el diagrama de arquitectura del entorno de ejecución en la sección TBC.</para>
+    </listitem>
+  </itemizedlist>
+
+  <para>Por tanto, lo primero que hacemos a continuación es definir el modelo del dominio:</para>
+  <figure>
+    <title>Pizza Shop Domain Model</title>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/pizza.png"></imagedata>
+      </imageobject>
+    </mediaobject>
+  </figure>
+
+  <section xml:id="guia-desarrollo_aplicacion-base_crear-projecto">
+    <title xml:lang="es">Crear un nuevo proyecto</title>
+
+    <para xml:lang="es">Creamos un nuevo proyecto Roo, para eso hay que crear
+    el directorio del proyecto y acceder a la consola de gvNIX:</para>
+
+    <programlisting>bash&gt; <command>mkdir pizza</command>
+bash&gt; <command>cd pizza</command>
+bash&gt; <command>gvnix</command>
+<computeroutput>    ____  ____  ____  
+   / __ \/ __ \/ __ \ 
+  / /_/ / / / / / / / 
+ / _, _/ /_/ / /_/ /  
+/_/ |_|\____/\____/    1.1.0.M1 [rev 3a0b8a3]
+
+
+Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.</computeroutput>
+roo&gt;</programlisting>
+
+    <para xml:lang="es">Después accedemos a la consola de Roo y tecleamos
+    <command>hint</command> para mostrar la guía en el proceso de creación del
+    proyecto:</para>
+
+    <programlisting>roo&gt; <command>hint</command> 
+<computeroutput>Welcome to Roo! We hope you enjoy your stay!
+
+Before you can use many features of Roo, you need to start a new project.
+
+To do this, type 'project' (without the quotes) and then hit TAB.
+
+Enter a --topLevelPackage like 'com.mycompany.projectname' (no quotes).
+When you've finished completing your --topLevelPackage, press ENTER.
+Your new project will then be created in the current working directory.
+
+Note that Roo frequently allows the use of TAB, so press TAB regularly.
+Once your project is created, type 'hint' and ENTER for the next suggestion.
+You're also welcome to visit http://forum.springframework.org for Roo help.</computeroutput></programlisting>
+
+    <para xml:lang="es">Nos muestra las instrucciones para continuar y crear
+    un proyecto, teclear <command>project</command> y pulsar la tecla TAB
+    (tabulador) y se mostrará el parámetro
+    <parameter>--topLevelPackage</parameter> y definir el paquete principal
+    del proyecto en este caso
+    <package>com.springsource.roo.pizzashop</package>. Indicamos también con
+    que JDK se va a trabajar en el proyecto añadiendo el atributo
+    <parameter>--java 5</parameter>, el número 5 corresponde a la versión del
+    JDK utilizado, en este caso JDK 1.5, si no se especifica Roo por defecto
+    utiliza el JDK 1.6</para>
+
+    <programlisting>roo&gt; <command>project --topLevelPackage com.springsource.roo.pizzashop --java 5</command>
+<computeroutput>Created .../pom.xml
+Managed .../pom.xml [Added dependency javax.annotation:jsr250-api:1.0]
+Created SRC_MAIN_JAVA
+Created SRC_MAIN_RESOURCES
+Created SRC_TEST_JAVA
+Created SRC_TEST_RESOURCES
+Created SRC_MAIN_WEBAPP
+Created SRC_MAIN_RESOURCES/META-INF/spring
+Created SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
+Created SRC_MAIN_RESOURCES/log4j.properties</computeroutput></programlisting>
+
+    <important>
+      <para xml:lang="es">Si se utiliza el JDK1.5 hay ejecutar las siguientes
+      instrucciones para evitar la excepción <errortext>NoClassDefFoundError:
+      javax/xml/bind/JAXBException:</errortext><programlisting>roo&gt; <emphasis
+            role="bold">dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1</emphasis>
+Managed ROOT/pom.xml [Added dependency javax.xml.bind:jaxb-api:2.1]
+roo&gt; <command>dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3</command>
+<computeroutput>Managed ROOT/pom.xml [Added dependency com.sun.xml.bind:jaxb-impl:2.1.3]</computeroutput></programlisting></para>
+    </important>
+
+    <important>
+      <para xml:lang="es">Existe un error de seguridad importante en las
+      versiones de Spring anteriores a la 3.0.3.RELEASE 
+      (http://securityreason.com/securityalert/7526). Para actualizar la
+      versión de Spring en el nuevo proyecto editar el archivo
+      <emphasis>pom.xml</emphasis>, buscar la propiedad
+      <emphasis>spring.version</emphasis> y cambiar el valor a
+      <emphasis>3.0.3.RELEASE</emphasis><programlisting>&lt;properties&gt;
+  &lt;roo.version&gt;1.1.0.M1&lt;/roo.version&gt;
+  &lt;spring.version&gt;3.0.3.RELEASE&lt;/spring.version&gt;
+  ...
+&lt;/properties&gt;
+</programlisting></para>
+    </important>
+
+    <para xml:lang="es">Una vez creado el proyecto observaremos que la
+    posición del shell ha cambiado, ahora estamos dentro del proyecto
+    indicándolo con el nombre del paquete que hemos creado como base</para>
+
+    <programlisting>com.springsource.roo.pizzashop roo&gt;</programlisting>
+
+    <para xml:lang="es">Por otro lado, la estructura de directorios creada
+    esta basada en las recomendaciones de Maven.</para>
+
+    <figure>
+      <title xml:lang="es">Estructura de carpetas</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/projectfolders.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
+  </section>
+</chapter>
+
+<chapter version="5.0" xml:id="guia-desarrollo"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Gestión del acceso a datos</title>
+
+  <section>
+    <title>Configurar el acceso a datos</title>
+
+    <para xml:lang="es">Lo primero que haremos en el nuevo proyecto es definir 
+    cómo se conectará a la base de datos. En gvNIX se utiliza JPA (Java 
+    Persistence API) para añadir la característica de persistencia a las 
+    entidades del modelo del dominio.</para>
+
+    <para xml:lang="es">Para configurar el proveedor JPA con la BBDD asociada. Volvemos a teclear *hint* y nos muestra el siguiente paso a
+    seguir:</para>
+
+    <programlisting>roo&gt; <command>hint</command>
+<computeroutput>Roo requires the installation of a JPA provider and associated database.
+
+Type 'persistence setup' and then hit TAB three times.
+We suggest you type 'H' then TAB to complete "HIBERNATE".
+After the --provider, press TAB twice for database choices.
+For testing purposes, type (or TAB) HYPERSONIC_IN_MEMORY.
+If you press TAB again, you'll see there are no more options.
+As such, you're ready to press ENTER to execute the command.
+
+Once JPA is installed, type 'hint' and ENTER for the next suggestion.</computeroutput>
+roo&gt;</programlisting>
+
+    <para xml:lang="es">Creamos la persistencia utilizando los comandos que
+    nos muestra y tabulando para que nos muestre las opciones
+    disponibles:</para>
+
+    <programlisting>roo&gt; <command>persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</command>
+<computeroutput>Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
+Created SRC_MAIN_RESOURCES/META-INF/spring/database.properties
+Managed SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
+Managed ROOT/pom.xml [Added dependency org.hsqldb:hsqldb:1.8.0.10]
+Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-core:3.5.0-Final]
+Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-entitymanager:3.5.0-Final]
+Managed ROOT/pom.xml [Added dependency org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.0.Final]
+Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-validator:4.0.2.GA]
+Managed ROOT/pom.xml [Added dependency javax.validation:validation-api:1.0.0.GA]
+Managed ROOT/pom.xml [Added dependency cglib:cglib-nodep:2.2]
+Managed ROOT/pom.xml [Added dependency javax.transaction:jta:1.1]
+Managed ROOT/pom.xml [Added dependency org.springframework:spring-jdbc:${spring.version}]
+Managed ROOT/pom.xml [Added dependency org.springframework:spring-orm:${spring.version}]
+Managed ROOT/pom.xml [Added dependency commons-pool:commons-pool:1.5.4]
+Managed ROOT/pom.xml [Added dependency commons-dbcp:commons-dbcp:1.3]
+Managed ROOT/pom.xml</computeroutput>
+roo&gt;</programlisting>
+
+    <warning>
+      <para>Por defecto las aplicaciones de Spring Roo se configuran para que
+      la base de datos se regenere cada vez que se arranca la aplicación
+      (borrando y creando de nuevo las tablas), por lo que es conveniente que
+      si se utiliza una Base de datos preexistente se configure correctamente
+      el fichero 
+      <filename>src/main/resources/META-INF/persistence.xml</filename> para 
+      evitarlo. Consultar la sección <link
+      linkend="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">enlazar base de datos exitente</link> para aprender cómo 
+      cambiar el comportamiento por defecto.</para>
+    </warning>
+  </section>
 
   <section xml:id="guia-desarrollo_gestion-acceso-datos">
     <title xml:lang="es">Gestión de acceso a datos</title>
 
     <para xml:lang="es">En lo ejemplos que han aparecido hasta ahora se han
-    estado usando bases de datos que se encuentran definidas en memoria y se
-    recrean cada vez que arrancamos la aplicación.</para>
+    usan bases de datos que se encuentran definidas en memoria y se
+    crean cada vez que arrancamos la aplicación (perdiendo los datos 
+    anteriores).</para>
 
     <para xml:lang="es">El framework admite múltiples tipos de base de datos,
     entre ellas:</para>
@@ -76,8 +296,8 @@
     <para xml:lang="es">Toda esta configuración se realiza mediante comandos
     de la consola y en cualquier momento. Por ello, una opción interesante es
     usar para desarrollo una de las bases de datos que residen en memoria para
-    las primeras fases del desarrollo. Luego migrar es posible migrar a otra
-    base de datos persistente.</para>
+    las primeras fases del desarrollo. En caso de ser necesario es posible 
+    cambiar a otra base de datos.</para>
 
     <section>
       <title>Comandos de configuración del acceso a datos</title>

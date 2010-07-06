@@ -5,7 +5,8 @@
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook">
+         xmlns:ns="http://docbook.org/ns/docbook" 
+         xml:lang="es">
   <title xml:lang="es">Instalación de gvNIX</title>
 
   <section xml:id="instalacion_requisitos">
@@ -88,34 +89,5 @@ bash:~/gvNIX-0.3.0$ export PATH=$PWD/bin:$PATH</programlisting>
         <programlisting>bash:~/project-directory$ gvnix</programlisting>
       </listitem>
     </itemizedlist>
-  </section>
-
-  <section>
-    <title xml:lang="es">Preparar el Eclipse para trabajar con gvNIX</title>
-
-    <para>Para utilizar Eclipse como IDE de desarrollo de los proyectos gvNIX
-    se recomienda utilizar la extensión <link
-    xlink:href="http://www.springsource.com/products/sts">SpringSource Tool
-    Suite</link> (o STS).</para>
-
-    <para>Entre otras funcionalidades incorpora un intérprete de comandos de
-    Roo que permite ejecutar órdenes sin necesidad de salir de Eclipse.</para>
-
-    <para>Existen 2 distribuciones del STS:</para>
-
-    <orderedlist>
-      <listitem>
-        <para>Instalación como <link
-        xlink:href="http://www.springsource.com/products/springsource-tool-suite-download">RCP</link>.</para>
-      </listitem>
-
-      <listitem>
-        <para>Instalación como plugin de nuestro Eclipse: Para instalar el
-        plugin STS sigue las instrucciones del punto "UPDATE SITE
-        INSTALLATION" del documento <link
-        xlink:href="http://dist.springsource.com/release/STS/doc/STS-installation_instructions.pdf">Spring
-        Source Tool Suite 2.3.2 Installation Instructions</link>.</para>
-      </listitem>
-    </orderedlist>
   </section>
 </chapter>

@@ -5,7 +5,8 @@
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook">
+         xmlns:ns="http://docbook.org/ns/docbook" 
+         xml:lang="es">
   <title xml:lang="es">Add-on Web Exception Handler</title>
 
   <para>Add-on para la gestión de excepciones no controladas.</para>

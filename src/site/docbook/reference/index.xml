@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<book version="5.0" xml:id="spring-roo-reference-guide"
+<book version="5.0" xml:id="spring-roo-reference-guide" 
       xmlns="http://docbook.org/ns/docbook"
       xmlns:xlink="http://www.w3.org/1999/xlink"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:ns5="http://www.w3.org/1998/Math/MathML"
       xmlns:ns4="http://www.w3.org/2000/svg"
       xmlns:ns3="http://www.w3.org/1999/xhtml"
-      xmlns:ns="http://docbook.org/ns/docbook"
+      xmlns:ns="http://docbook.org/ns/docbook" 
       xml:lang="es">
   <info>
     <title xml:lang="es">gvNIX - Documentación de referencia</title>
@@ -15,10 +15,12 @@
 
     <releaseinfo>0.3.0</releaseinfo>
 
-    <author>
-      <personname>DiSiD Technologies S.L. <link
-      xlink:href="http://www.disid.com">DiSiD Technologies</link></personname>
-    </author>
+    <authorgroup>
+      <author>
+        <personname><link xlink:href="http://www.disid.com"
+        xlink:show="new">DiSiD Technologies S.L.</link></personname>
+      </author>
+    </authorgroup>
 
     <legalnotice>
       <para>Copyright 2010 Conselleria d'Infraestructures i Transport -
@@ -43,49 +45,124 @@
       utilizarlo</para>
     </partintro>
 
-    <xi:include href="introduccion.xml" />
+    <xi:include href="intro_introduccion.xml" />
 
-    <xi:include href="instalacion.xml" />
+    <xi:include href="intro_instalacion.xml" />
 
-    <xi:include href="primeros-pasos.xml" />
-  </part>
-
-  <part xml:id="addons-gvnix">
-    <title xml:lang="es">Add-ons de gvNIX</title>
-
-    <partintro>
-      <para xml:lang="es">Descripción de las funcionalidades que aporte gvNIX
-      a la que ya ofrece Spring Roo.</para>
-    </partintro>
-
-    <xi:include href="resumen-addons.xml" />
-
-    <xi:include href="addon-persistence.xml" />
-
-    <xi:include href="addon-theme-manager.xml" />
-
-    <xi:include href="addon-web-exception-handler.xml" />
-
-    <xi:include href="addon-web-menu.xml" />
-
-    <xi:include href="addon-web-mvc-jsp-2.0.xml" />
-
-    <xi:include href="addon-web-relation-styles.xml" />
-
-    <xi:include href="addon-web-mvc-binding.xml" />
-
-    <xi:include href="addon-cit-security.xml" />
+    <xi:include href="intro_primeros-pasos.xml" />
   </part>
 
   <part xml:id="desarrollo">
-    <title xml:lang="es">Documentos de desarrollo</title>
+    <title xml:lang="es">Desarrollo de aplicaciones con gvNIX</title>
 
     <partintro>
-      <para xml:lang="es">Documentos útiles para el desarrollo de aplicaciones
-      con gvNIX y desarrollo de add-ons de Spring Roo</para>
+      <para xml:lang="es">En esta sección veremos paso a paso cómo desarrollar
+      una aplicación web desde 0 para mostrar cómo utilizar gvNIX en cualquier
+      proyecto web. Algunas de las características de gvNIX que se muestran
+      son:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Crear un nuevo proyecto</para>
+        </listitem>
+
+        <listitem>
+          <para>Gestión de acceso a datos</para>
+        </listitem>
+
+        <listitem>
+          <para>Gestión del modelo de entidades</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>Enlazar el modelo de entidades con una base de datos
+              existente</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+
+        <listitem>
+          <para>Gestión de la capa web</para>
+        </listitem>
+
+        <listitem>
+          <para>Desarrollo con Eclipse</para>
+        </listitem>
+      </itemizedlist>
     </partintro>
 
-    <xi:include href="guia-desarrollo.xml" />
+    <xi:include href="guia-desarrollo_crear-app.xml" />
+    <xi:include href="guia-desarrollo_acceso-datos.xml" />
+    <xi:include href="guia-desarrollo_entidades.xml" />
+    <xi:include href="guia-desarrollo_capa-web.xml" />
+    <xi:include href="guia-desarrollo_eclipse.xml" />
+  </part>
+
+  <part xml:id="addons-gvnix">
+    <title xml:lang="es">Desarrollo avanzado con gvNIX</title>
+
+    <partintro>
+      <para xml:lang="es">En esta sección veremos cómo ampliar 
+      una aplicación web básica creada con gvNIX para cumplir con los
+      requerimientos de cualquier proyecto real.</para>
+
+      <para xml:lang="es">Revisaremos las características distintivas de gvNIX 
+      enfocadas al desarrollo de funcionalidades próximas al usuario final:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Control de concurrencia</para>
+        </listitem>
+        <listitem>
+          <para>Gestión de temas</para>
+        </listitem>
+        <listitem>
+          <para>Gestión de excepciones</para>
+        </listitem>
+        <listitem>
+          <para>Gestión de la estructura de páginas</para>
+        </listitem>
+        <listitem>
+          <para>Soporte para JSP 2.0</para>
+        </listitem>
+        <listitem>
+          <para>Gestión de la visualización de relaciones</para>
+        </listitem>
+        <listitem>
+          <para>Gestión de transformación de cadenas</para>
+        </listitem>
+        <listitem>
+          <para>Control de acceso</para>
+        </listitem>
+      </itemizedlist>
+    </partintro>
+<!--
+    <xi:include href="resumen-addons.xml" />
+-->
+    <xi:include href="addon-theme-manager.xml" />
+
+    <xi:include href="addon-web-menu.xml" />
+
+    <xi:include href="addon-persistence.xml" />
+
+    <xi:include href="addon-web-exception-handler.xml" />
+
+    <xi:include href="addon-web-relation-styles.xml" />
+
+    <xi:include href="addon-cit-security.xml" />
+
+    <xi:include href="addon-web-mvc-jsp-2.0.xml" />
+
+    <xi:include href="addon-web-mvc-binding.xml" />
+  </part>
+
+  <part xml:id="desarrollo-addons">
+    <title xml:lang="es">Desarrollo de nuevos add-ons</title>
+
+    <partintro>
+      <para xml:lang="es">Documentos útiles para el desarrollo de add-ons para
+      gvNIX y desarrollo de add-ons de Spring Roo</para>
+    </partintro>
 
     <xi:include href="guia-desarrollo-addon-roo.xml" />
   </part>
@@ -96,6 +173,8 @@
     <partintro>
       <para xml:lang="es">Documentación adicional</para>
     </partintro>
+
+    <para xml:lang="es">TBC Integración con MOSKitt <!-- (vore com s'explica en Roo integració amb STS) --></para>
 
     <xi:include href="apendice-comandos.xml" />
 

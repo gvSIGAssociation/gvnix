@@ -5,15 +5,15 @@
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook">
+         xmlns:ns="http://docbook.org/ns/docbook" 
+         xml:lang="es">
   <title xml:lang="es">Primeros pasos con gvNIX</title>
 
   <section xml:id="primeros-pasos_primer-paso">
-    <title xml:lang="es">Primer paso: Una aplicación en menos de 10
-    minutos</title>
+    <title xml:lang="es">Tu aplicación web en menos de 10 minutos</title>
 
-    <para xml:lang="es">Ahora vamos a probar a crear una aplicación sencilla
-    en unos minutos.</para>
+    <para xml:lang="es">Después de instalar gvNIX, vamos a probar a crear una
+    aplicación sencilla en unos minutos.</para>
 
     <para xml:lang="es">La siguiente aplicación es simplemente para mostrar
     las posibilidades del entorno, por lo que no se da una explicación
