@@ -121,7 +121,6 @@ Project Dependencies
 -----------------------
 
 spring.version 3.0.3.RELEASE
-org.apache.el 6.0.20
 javax.servlet 2.4.0
 javax.servlet.jsp 2.0
 javax.servlet.jsp.jstl 1.1.2
