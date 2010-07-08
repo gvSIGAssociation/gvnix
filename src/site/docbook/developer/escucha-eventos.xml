@@ -8,24 +8,124 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Escucha de eventos</title>
 
-  <para>TBC</para>
+  <para>En el framework, además de los comandos de la consola, también puede
+  ser necesario gestionar eventos en los artefactos y/o ficheros que estamos
+  manejando. Para ello, debemos suscribirnos a los eventos que nos ofrece el
+  framework. Algunos de ellos son componente-servicio OSGi y no es necesario
+  su registro (se localizan automáticamente en base a su interface).</para>
 
-  <para>(de roo-addon-desarrollo.rst)</para>
+  <para>Disponemos de distintos tipos de <emphasis>Listener</emphasis> que
+  podemos registrar dentro de nuestro add-on:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>Metadatos</para>
+    </listitem>
+
+    <listitem>
+      <para>Dependencias del proyecto</para>
+    </listitem>
+
+    <listitem>
+      <para>Ficheros y directorios</para>
+    </listitem>
+
+    <listitem>
+      <para>Estado de los procesos</para>
+    </listitem>
+  </itemizedlist>
 
   <section xml:id="escucha-eventos_ficheros" xml:lang="es">
     <title xml:lang="es">Eventos de ficheros y directorios</title>
 
-    <para>TBC</para>
+    <para>Las notificaciones que podemos recibir son de los siguientes
+    tipos:</para>
 
-    <para>(de roo-addon-desarrollo.rst)</para>
+    <itemizedlist>
+      <listitem>
+        <para>Inicio Monitorización.</para>
+      </listitem>
+
+      <listitem>
+        <para>Fin Monitorización.</para>
+      </listitem>
+
+      <listitem>
+        <para>Creación.</para>
+      </listitem>
+
+      <listitem>
+        <para>Eliminación.</para>
+      </listitem>
+
+      <listitem>
+        <para>Actualización.</para>
+      </listitem>
+
+      <listitem>
+        <para>Renombrado.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>El servicio del framework encargado de la monitorización de los
+    cambios en disco es el que implementa el interface
+    <classname>FileMonitorService</classname>. Este servicio notificará de los
+    cambios a todos los <link
+    linkend="creacion-addon_osgi">componente-servicio OSGi</link> que cumplan
+    el interface <classname>FileEventListener</classname> en el método
+    <methodname>onFileEvent</methodname> que recibe un
+    <classname>FileEvent</classname>.</para>
+
+    <para>Los recursos que monitoriza el
+    <classname>FileMonitorService</classname> se registran como instancias de
+    <classname>MonitoringRequest</classname> a través del método
+    <methodname>add</methodname>.</para>
+
+    <para>En el capítulo de <link linkend="???">recetas</link> podemos
+    encontrar un ejemplo de <link
+    linkend="recetas_crear-listener-filesystem">crear listeners del
+    Filesystem</link> y otro para <link
+    linkend="recetas_monitorizacion-directorios">monitorización de
+    directorios</link>.</para>
   </section>
 
   <section xml:id="escucha-eventos_metadatos" xml:lang="es">
     <title xml:lang="es">Eventos de metadatos</title>
 
-    <para>TBC</para>
+    <para>Algunos metadatos lanzan notificaciones en algunas circunstancias.
+    Estas notificaciones son iniciadas de forma arbitraría, por lo que, si
+    sabemos que el <classname>MetadataProvider</classname> en cuestión efectúa
+    una notificación que podemos utilizar, podemos recibirla. </para>
 
-    <para>(de roo-addon-desarrollo.rst)</para>
+    <para>Para ello, necesitamos crear una clase que implemente el interface
+    <classname>MetadataNotificationListener</classname> y registrarlo en el
+    <classname>MetadataDependencyRegistry</classname>.<methodname>addNotificationListener</methodname>.
+    A partir de ese momento recibiremos todas las *notificaciones* generadas
+    por todos los <classname>MetadataProvider</classname> en el método
+    <methodname>notify</methodname> con los parámetros:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>upstream</term>
+
+        <listitem>
+          <para>La identificación de metadato que notifica.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>downstream</term>
+
+        <listitem>
+          <para><literal>null</literal></para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>En el capítulo de <link linkend="???">recetas</link> podemos
+    encontrar un ejemplo de <link
+    linkend="recetas_crear-listener-metadatos">crear listener de
+    metadatos</link>.</para>
   </section>
 
   <section xml:id="escucha-eventos_procesos" xml:lang="es">
@@ -33,6 +133,6 @@
 
     <para>TBC</para>
 
-    <para>(de roo-addon-desarrollo.rst)</para>
+    <para>[Nuevo]</para>
   </section>
 </chapter>

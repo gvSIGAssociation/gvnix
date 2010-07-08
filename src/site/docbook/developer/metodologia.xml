@@ -8,7 +8,82 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Recomendaciones de metodología de desarrollo</title>
 
-  <para>TBC</para>
+  <para>A la hora de abordar la creación de una nueva funcionalidad, se
+  recomienda seguir la siguiente guía:</para>
 
-  <para>(de roo-addon-desarrollo.rst)</para>
+  <orderedlist>
+    <listitem>
+      <para>Crear la carpeta que contendrá el add-on o la librería. Así
+      tendremos un sitio para almacenar documentos que podamos necesitar para
+      su desarrollo.</para>
+    </listitem>
+
+    <listitem>
+      <para>Crear el documento ``readme.rst`` dentro de esta carpeta donde
+      informaremos brevemente el propósito de la funcionalidad.</para>
+    </listitem>
+
+    <listitem>
+      <para>Crear la carpeta <filename>docs</filename> dentro de la carpeta
+      que hemos creado anteriormente.</para>
+    </listitem>
+
+    <listitem>
+      <para>Añadir dentro de <filename>docs</filename> documentación
+      pertinente, entre la que podemos encontrar:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>requisitos</para>
+        </listitem>
+
+        <listitem>
+          <para>casos de uso</para>
+        </listitem>
+
+        <listitem>
+          <para>análisis</para>
+        </listitem>
+
+        <listitem>
+          <para>diseños</para>
+        </listitem>
+
+        <listitem>
+          <para>propuesta</para>
+        </listitem>
+
+        <listitem>
+          <para>estimación de propuesta</para>
+        </listitem>
+      </itemizedlist>
+    </listitem>
+
+    <listitem>
+      <para>Crear proyecto de prueba de concepto. Este proyecto puede
+      almacenarse en el repositorio descrito en el punto anterior para tal
+      fin, pero es opcional.</para>
+    </listitem>
+
+    <listitem>
+      <para>Referenciar (si se ha almacenado) la prueba de concepto en la
+      funcionalidad, como mínimo en el <filename>readme.rst</filename>.</para>
+    </listitem>
+
+    <listitem>
+      <para>Actualizar (si es necesario) la documentación de la funcionalidad
+      con el resultado del Add-on. Por ejemplo, si ya han cambiado los
+      comandos a implementar, puntos a tener en cuenta en el desarrollo,
+      etc...</para>
+    </listitem>
+
+    <listitem>
+      <para>Desarrollar la funcionalidad con la experiencia de que la prueba
+      de concepto.</para>
+    </listitem>
+  </orderedlist>
+
+  <para>En caso de que el add-on evolucione y es necesario realizar una prueba
+  de concepto, no reutilizar la prueba anterior. Crear una prueba a partir el
+  resultado actual de el add-on o desde cero.</para>
 </chapter>

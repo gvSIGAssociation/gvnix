@@ -8,7 +8,115 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Repositorio de gvNIX</title>
 
-  <para>TBC</para>
+  <para>El proyecto gvNIX se guarda en un repositorio con la siguiente
+  estructura:</para>
 
-  <para>(de roo-addon-desarrollo.rst)</para>
+  <programlisting>    doc
+    |-- ...
+    `-- ...
+    code
+    |-- addon-cxf
+    |   |-- pom.xml
+    |   `-- src
+    |-- addon-persistence
+    |   |-- pom.xml
+    |   `-- src
+    ...
+    |-- tcon
+    |   |-- pom.xml
+    |   `-- src
+    |-- src
+    |   |-- site
+    |   `-- ...
+    |-- annotations
+    |-- target
+    |-- ...
+     `-- pom.xml
+    readme.txt
+    LICENSE.TXT</programlisting>
+
+  <para>Los detalles de esta estructura son los siguientes:</para>
+
+  <variablelist>
+    <varlistentry>
+      <term>doc</term>
+
+      <listitem>
+        <para>En este directorio se almacenará todos los documentos de
+        análisis y de <emphasis>gvMetrica</emphasis>.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>code</term>
+
+      <listitem>
+        <para>Este directorio contendrá todo el código fuente y los artefactos
+        necesario para genera el proyecto.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>code/addon-xxx</term>
+
+      <listitem>
+        <para>Este es un ejemplo de un directorio de un add-on genérico para
+        la comunidad.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>code/addon-cit-xxx</term>
+
+      <listitem>
+        <para>Este es un ejemplo de un directorio de un add-on especializado
+        para la CIT.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>code/tcon</term>
+
+      <listitem>
+        <para> Este es un ejemplo de un directorio de una librería o
+        componente <emphasis>no add-on</emphasis>.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>code/annotations</term>
+
+      <listitem>
+        <para>Meta-proyecto para la generación de librería con las anotaciones
+        necesarias para los add-ons.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>code/src</term>
+
+      <listitem>
+        <para>Directorio para fuentes de proyecto genéricos, ya sean para
+        generar el site o documentación (como la que está leyendo),
+        empaquetado, etc.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>code/target</term>
+
+      <listitem>
+        <para>Directorio de trabajo de maven, en el repositorio estará
+        vacío.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>code/pom.xml</term>
+
+      <listitem>
+        <para>Fichero de proyecto maven principal o padre.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
 </chapter>

@@ -8,77 +8,611 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Creación de proyecto de add-on</title>
 
-  <para xml:lang="es">TBC</para>
+  <para xml:lang="es">Estos son los a seguir para prepara un proyecto de
+  add-on:</para>
 
-  <para xml:lang="es">(de roo-addon-desarrollo.rst)</para>
+  <orderedlist>
+    <listitem>
+      <para>Crear el directorio que contendrá el proyecto del add-on.</para>
+    </listitem>
 
-  <section xml:id="creacion-addon_converters" xml:lang="es">
-    <title xml:lang="es">Converters del Shell</title>
+    <listitem>
+      <para>Ejecutar la consola del framework desde el directorio que acabamos
+      de crear.</para>
+    </listitem>
 
-    <para xml:lang="es">TBC</para>
+    <listitem>
+      <para>Crear el proyecto con el comando <command>project</command> usando
+      el <emphasis>template</emphasis> de add-on. Ejemplo:</para>
 
-    <para xml:lang="es">[Nuevo]</para>
+      <programlisting>project --topLevelPackage org.gvnix.cxf.roo.addon --template ROO_ADDON_SIMPLE</programlisting>
+
+      <para>El nombre del paquete base tiene las siguientes
+      limitaciones:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Debe empezar por <package>org.</package>,
+          <package>net.</package> o <package>com.</package>.</para>
+        </listitem>
+
+        <listitem>
+          <para>Debe terminar en <package>roo.addon</package>.</para>
+        </listitem>
+      </itemizedlist>
+    </listitem>
+
+    <listitem>
+      <para>utilizar el formato de paquetes subsiguientes con la misma
+      estructura que tengan las librerías que estamos extendiendo y/o
+      utilizando como base. Ejemplos:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><package>org.gvnix.cxf.roo.addon</package></para>
+        </listitem>
+
+        <listitem>
+          <para><package>org.gvnix.security.roo.addon</package></para>
+        </listitem>
+      </itemizedlist>
+    </listitem>
+  </orderedlist>
+
+  <para>Esto nos genera los elementos necesario con tres clase de
+  ejemplo:</para>
+
+  <orderedlist>
+    <listitem>
+      <para>Una clase <classname>Commands</classname>: Clase que declara los
+      <emphasis>comandos</emphasis> que expone el add-on.</para>
+    </listitem>
+
+    <listitem>
+      <para>Una interfaz <classname>Operations</classname>: Interfaz de
+      ejemplo con los métodos declarados para los
+      <emphasis>comandos</emphasis> registrados.</para>
+    </listitem>
+
+    <listitem>
+      <para>Una clase <classname>OperationsImpl</classname>: Clase de ejemplo
+      que implementa la interfaz <classname>Operations</classname> para la
+      implementación de los comandos registrados.</para>
+    </listitem>
+
+    <listitem>
+      <para>Una clase <classname>PropertyName</classname>: Clase de ejemplo de
+      declaración/registro de propiedades de tipo enumerados disponibles para
+      la linea de comando con autocompletados. Para mostrar las opciones
+      inicializadas en la clase de un parámetro asociado al comando.</para>
+    </listitem>
+  </orderedlist>
+
+  <para>Si vamos a trabajar con eclipse podemos ejecutar:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>Desde la consola del framework:</para>
+
+      <programlisting>perform eclipse</programlisting>
+    </listitem>
+
+    <listitem>
+      <para>Desde el shell del sistema:</para>
+
+      <programlisting>mvn eclipse:eclipse</programlisting>
+    </listitem>
+  </itemizedlist>
+
+  <section xml:id="creacion-addon_osgi">
+    <title xml:lang="es">Declaración y uso de componente-servicios
+    OSGi</title>
+
+    <para>El framework rueda sobre la implementación OSGi <link
+    xlink:href="http://felix.apache.org/">Apache Felix</link>. Todos los
+    servicios (excepto algunas utilidades que se acceden a través de métodos
+    estáticos) están declarados como componente-servicio OSGi.</para>
+
+    <para>Un componente-servicio OSGi se declara:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Definiendo un interface para el acceso a los métodos del
+        servicio.</para>
+      </listitem>
+
+      <listitem>
+        <para>Clases que implementan ese interface que ofrecen ese servicio
+        anotadas con <classname>@Component</classname> y
+        <classname>@Service</classname>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Las implementaciones de servicio no deben tener constructor
+        declarado.</para>
+      </listitem>
+
+      <listitem>
+        <para>Si las implementaciones de servicio requieren algún tipo de
+        inicialización deben implementar los métodos
+        <methodname>activate</methodname> y
+        <methodname>deactivate</methodname> que serán llamados por OSGi en la
+        activación y desactivación del servicio respectivamente. La firma de
+        estos métodos es la siguiente:</para>
+
+        <programlisting>  protected void activate(ComponentContext context) {
+
+  }
+
+  protected void deactivate(ComponentContext context) {
+
+  }</programlisting>
+      </listitem>
+    </orderedlist>
+
+    <para>El framework OSGi se encarga de construir las instancias de los
+    servicio e inicializarlas correctamente. La implementación a usar por cada
+    interface las decide el framework en base a la prioridades de cada
+    servicio o su disponibilidad. Este es un ejemplo de un servicio
+    OSGi:</para>
+
+    <programlisting>// Service interface
+public interface MyService {
+  public String sayHello();
+}</programlisting>
+
+    <programlisting>// Service implementation
+@Component
+@Service
+public class MyServiceImpl implements MyService{
+  
+  private String helloPhrase;
+
+  protected void activate(ComponentContext context) {
+     helloPhrase = "Hello Man!";
+  }
+
+  protected void deactivate(ComponentContext context) {
+     helloPhrase = null;
+  }
+
+  public String sayHello(){
+     return helloPhrase;
+  }
+}</programlisting>
+
+    <para>Para usar un servicio OSGi:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>La clase debe de ser un componente OSGi, para ello debe de estar
+        anotada con <classname>@Component</classname>. En el caso que la clase
+        se abstracta, deberemos usar la anotación
+        <classname>@AbstractComponent</classname>. La clase puede o no ser a
+        su vez un servicio (<classname>@Service</classname>).</para>
+      </listitem>
+
+      <listitem>
+        <para>Declararemos una propiedad privada del tipo del interface del
+        servicio.</para>
+      </listitem>
+
+      <listitem>
+        <para>Anotaremos dicha propiedad con
+        <classname>@Reference</classname>.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>El framework OSGi se encargará de inyectarnos la implementación
+    correspondiente en esta propiedades.</para>
+
+    <para>Un ejemplo de uso del ejemplo de servicio anterior:</para>
+
+    <programlisting>@Component
+public class MyServiceUser{
+
+  @Reference
+  private MyService service;
+
+  public void printSayHello(){
+    System.out.println(service.sayHello());
+  }
+}</programlisting>
+
+    <para>Cabe destacar una serie de comando útiles para identificar problemas
+    con los componente OSGi que ofrece el framework:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>osgi log</term>
+
+        <listitem>
+          <para>Muestra el log de framework OSGi. Permite ver excepciones
+          producidas en la inicialización y activación de servicios y
+          componentes (puede que estos mensaje se produzcan sin que se
+          muestren en otro sitio).</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>osgi ps</term>
+
+        <listitem>
+          <para>Muestra los bundles (conjuntos de componentes OSGi) instalados
+          y su estado</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>osgi scr list</term>
+
+        <listitem>
+          <para>Muestra los componentes-servicio instalados y su
+          estado.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>felix shell</term>
+
+        <listitem>
+          <para>Permite ejecuar comandos directamente al framework
+          OSGi.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
   </section>
 
   <section xml:id="creacion-addon_commands" xml:lang="es">
     <title xml:lang="es">La clase Commands</title>
 
-    <para xml:lang="es">TBC</para>
+    <para xml:lang="es">Clase de registro de operaciones. Esta clase no
+    requiere registro, será localizada como servicio OSGi al implementar el
+    interface <classname>CommandMarker</classname>. Los requisitos para que
+    esta clase sea usada en el framework son los siguientes:</para>
 
-    <para xml:lang="es">(de roo-addon-desarrollo.rst) [revisar]</para>
+    <orderedlist>
+      <listitem>
+        <para>implementar el interface
+        <classname>org.springframework.roo.shell.CommandMarker</classname>.</para>
+      </listitem>
+
+      <listitem>
+        <para>La clase debe ser un <link
+        linkend="creacion-addon_osgi">componente-servicio OSGi</link>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Contiene dos tipos de métodos:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>Indicadores de <emphasis><link
+            linkend="creacion-addon_commands_accesibilidad">accesibilidad</link></emphasis>:
+            Indician si un comando es accesible para el usuario en el contexto
+            actual.</para>
+          </listitem>
+
+          <listitem>
+            <para><link
+            linkend="creacion-addon_commands_command">Comandos</link>: Punto
+            de entrada y registro de un comando.</para>
+          </listitem>
+        </orderedlist>
+      </listitem>
+
+      <listitem>
+        <para>Tendrá poca o ninguna implementación. La implementación de las
+        acciones se realizará en las clases <link
+        linkend="creacion-addon_operationsimpl">OperationsImpl</link>.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>Estas clases no requieren ser registradas ya que se localizan
+    gracias al framework OSGi.</para>
 
     <section xml:id="creacion-addon_commands_accesibilidad" xml:lang="es">
       <title xml:lang="es">Métodos de accesibilidad</title>
 
-      <para>TBC</para>
+      <para>Estos métodos deben de hacer las comprobaciones necesarias para
+      indicar si un comando o comandos deben estar accesible para el usuario.
+      Su características principales son:</para>
 
-      <para xml:lang="es">(de roo-addon-desarrollo.rst) [ampliar con el
-      soporte a múltiples comandos en una anotación. Añadir consejos para
-      cacheado de estados]</para>
+      <itemizedlist>
+        <listitem>
+          <para>El método está anotado con la anotación
+          <classname>@CliAvailabilityIndicator</classname>, con los parámetros
+          la lista de comandos a los que afecta.</para>
+        </listitem>
+
+        <listitem>
+          <para>Devuelven <literal>boolean</literal>.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Estos son ejemplos de estos métodos:</para>
+
+      <programlisting>    @CliAvailabilityIndicator("myaddon setup")
+    public boolean isSetupAvailable(){
+        return true; 
+    }
+
+    @CliAvailabilityIndicator({"myaddon add", "myaddon remove", "myaddon update"})
+    public boolean isActionsAvailable(){
+        return true;
+    }</programlisting>
     </section>
 
     <section xml:id="creacion-addon_commands_command" xml:lang="es">
       <title xml:lang="es">Métodos de comando</title>
 
-      <para xml:lang="es">TBC</para>
+      <para xml:lang="es">Definición y punto de entrada de los comando que
+      registra nuestro plugin. Sus características son:</para>
 
-      <para xml:lang="es">(de roo-addon-desarrollo.rst) [extender con el
-      'focus' y el parámetros "sin nombre" ]</para>
+      <itemizedlist>
+        <listitem>
+          <para>El método debe estar anotado con
+          <classname>@CliCommand</classname>. Los parámetros de esta anotación
+          son:</para>
+
+          <variablelist>
+            <varlistentry>
+              <term>value</term>
+
+              <listitem>
+                <para>Cadena del comando</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>help</term>
+
+              <listitem>
+                <para>Cadena de ayuda para este comando. Usado por el comando
+                <command>help</command> y el autocompletado del
+                framework.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+        </listitem>
+
+        <listitem>
+          <para>Cada parámetro debe estar anotado con
+          <classname>@CliOption</classname>. Los parámetros de esta anotación
+          son:</para>
+
+          <variablelist>
+            <varlistentry>
+              <term>key</term>
+
+              <listitem>
+                <para>Nombre del parámetro para el shell. El usuario podrá
+                usar el parámetro usando el nombre que indiquemos aquí
+                precedido de dos guiones (<literal>--</literal>). Es posible
+                añadir mas de un key. Si se añade una cadena vacía se asumirá
+                que es el parámetro por defecto (por ejemplo es equivalente el
+                comando <command>field string campoCadena</command> que
+                <command>entity --fieldName campoCadena</command>).</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>mandatory</term>
+
+              <listitem>
+                <para>Indica si el parámetro es requerido o no.
+                Booleano.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>specifiedDefaultValue</term>
+
+              <listitem>
+                <para>Valor que recibe parámetro a usar si es añadido el
+                parámetro en el comando por el usuario sin especificar ningún
+                valor. Muy útil para los parámetro tipo booleanos.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>unspecifiedDefaultValue</term>
+
+              <listitem>
+                <para>Valor que recibe este parámetro si es omitido en la
+                línea de comando. Admite el valor <literal>"*"</literal> que
+                usara como valor el <emphasis>foco</emphasis> actual del shell
+                (un ejemplo es la omisión del parámetro
+                <parameter>--class</parameter> en el comando
+                <command>field</command> justo después de usar el comando
+                <command>entity</command>).</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>help</term>
+
+              <listitem>
+                <para>Texto de ayuda, usado en el comando
+                <command>help</command> y en el autocompletado.</para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term>optionContext</term>
+
+              <listitem>
+                <para>Opciones de contexto para el parámetro. Esta cadena es
+                útil para configurar los parámetro de un tipo asociado a un
+                <link
+                linkend="creacion-addon_converters">Converter</link>.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+        </listitem>
+
+        <listitem>
+          <para>Su valor de retorno debe ser void o String, dependiendo si es
+          un comando que realiza alguna opción o es un comando que devuelve
+          información a la consola (como el <command>help</command>,
+          <command>hint</command> o el <command>properties
+          list</command>).</para>
+        </listitem>
+      </itemizedlist>
+
+      <para xml:lang="es">Estos son ejemplos de estos métodos:</para>
+
+      <programlisting>  @CliCommand(value="welcome write hello", help="Writes hello.txt in the project root directory")
+  public void writeHello() {
+     operations.writeTextFile("hello");
+  }
+  
+  @CliCommand(value="welcome property", help="Obtains a pre-defined system property")
+  public String property(
+          @CliOption(key="name", 
+              mandatory=false, 
+              specifiedDefaultValue="USERNAME", 
+              unspecifiedDefaultValue="USERNAME", 
+              help="The property name you'd like to display") PropertyName propertyName) {
+     return operations.getProperty(propertyName);
+  }</programlisting>
     </section>
+  </section>
+
+  <section xml:id="creacion-addon_converters" xml:lang="es">
+    <title xml:lang="es">Converters del Shell</title>
+
+    <para xml:lang="es">Son clases del Shell del framework que permiten
+    transformar las cadenas que introduce el usuario en la línea de comandos
+    en las clases Java que usarán la clase Commands. Además, estas clases son
+    las que permiten el autocompletado de los valores de los parámetros en el
+    Shell.</para>
+
+    <para xml:lang="es">Sus características principales son:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Deben implementar el interface
+        <classname>org.springframework.roo.shell.Converter</classname>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Deben ser <link
+        linkend="creacion-addon_osgi">componente-servicio OSGi</link>.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>Existen algunos ya registrados en el sistema que pueden ser
+    útiles:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><classname>StaticFieldConverter</classname>: Nos permite
+        registrar enumerados Java.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Estas clases pueden ser muy útiles si nuestro add-on trabaja con
+    tipos (por ejemplo un datos de un elementos de menú). En el add-on se ha
+    definido una clase para el tipo en cuestión y crea un converter que
+    permita la conversión de lo que introduzca el usuario en el Shell al tipo.
+    Es recomendable que estos tipos se creen como <emphasis>tipos
+    inmutables</emphasis> (al objeto de tipos se inicializa en el constructor
+    y no permite modificar sus datos).</para>
+
+    <para>TBC [Añadir la descripción de la clase]</para>
   </section>
 
   <section xml:id="creacion-addon_operations" xml:lang="es">
     <title xml:lang="es">La interface Operations</title>
 
-    <para xml:lang="es">TBC</para>
-
-    <para xml:lang="es">(de roo-addon-desarrollo.rst)</para>
+    <para xml:lang="es">Es la Interfaz dónde se definen los métodos necesarios
+    para el funcionamiento del Add-on. Para ser invocados desde la clase
+    <classname>Commands</classname> o desde otro Add-on que pueda
+    utilizarlos.</para>
   </section>
 
   <section xml:id="creacion-addon_operationsimpl" xml:lang="es">
     <title xml:lang="es">La clase OperationsImpl</title>
 
-    <para xml:lang="es">TBC</para>
+    <para xml:lang="es">Esta clase implementa la interfaz definida
+    <classname>Operations</classname>. Contendrá la implementación de las
+    operaciones disponibles en el add-on.</para>
 
-    <para xml:lang="es">(de roo-addon-desarrollo.rst) [Extender con
-    comentarios para clases abstractas]</para>
+    <para xml:lang="es">Sus requisitos son:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Debe ser un <link
+        linkend="creacion-addon_osgi">componente-servicio OSGi</link>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Implementar el interface <classname>Operations</classname> que
+        usará la clase <classname>Commands</classname>.</para>
+      </listitem>
+
+      <listitem>
+        <para>No tener método constructor.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para xml:lang="es">Si la clase necesita inicialización o registrar otros
+    componentes debería utilizar los métodos <classname>activate</classname> y
+    <classname>deactivate</classname> del los componentes-servicios
+    OSGi.</para>
+
+    <para>Para estas clases podemos dar la siguientes recomendaciones:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Intentar que los estados usado para tomar las decisiones de si
+        está activado o no algún comando sean lo más simples posible o que
+        estén <emphasis>cacheados</emphasis> (aunque suponga implementar algún
+        listener para identificar cambios de estado).</para>
+
+        <para>Los métodos de habilitación de comandos son llamados
+        <emphasis>muy frecuentemente</emphasis> (por ejemplo con el uso de la
+        tecla <literal>TAB</literal> del autocompletado del Shell). Una mala
+        implementación de esto puede repercutir seriamente en la agilidad de
+        uso del framework.</para>
+      </listitem>
+
+      <listitem>
+        <para>Intentar evitar las referencias cíclicas entre
+        componentes-servicios OSGi.</para>
+
+        <para>Podemos encontrarnos que intentamos usar un servicio que no está
+        cargado porque, a su vez este servicio requiere de nuestro
+        componente.</para>
+
+        <para>Si aun así no encontramos con este problema, intentar usar
+        mecanismos de <emphasis>ejecución retardada</emphasis>. Como por
+        ejemplo, acumular en una lista las operaciones a realizar hasta que
+        detectemos que todos los servicios necesarios están disponibles (un
+        <classname>ProcessListener</classname> puede ayudar).</para>
+      </listitem>
+    </itemizedlist>
   </section>
 
   <section xml:id="creacion-addon_propertyname" xml:lang="es">
     <title xml:lang="es">La clase PropertyName</title>
 
-    <para xml:lang="es">TBC</para>
-
-    <para xml:lang="es">(de roo-addon-desarrollo.rst)</para>
+    <para xml:lang="es">Esta clase es un ejemplo de clase que se puede
+    registrar en el <classname>StaticFieldConverter</classname> comentado en
+    la sección de <link
+    linkend="creacion-addon_converters">Converter</link>.</para>
   </section>
 
   <section xml:id="creacion-addon_test" xml:lang="es">
     <title xml:lang="es">Test unitarios</title>
 
-    <para xml:lang="es">TBC</para>
+    <para xml:lang="es">Para mantener y garantizar la calidad en los add-on
+    generados es fundamental que estos tenga implementados una batería de
+    pruebas unitarias para las operaciones principales de los add-on.</para>
 
     <section xml:id="creacion-addon_test_tdd" xml:lang="es">
-      <title xml:lang="es">Desarrollo dirigido por Test (TDD)</title>
+      <title xml:lang="es">Desarrollo dirigido por Test (RDA)</title>
 
       <para xml:lang="es">TBC [Explicación y ventajas]</para>
     </section>

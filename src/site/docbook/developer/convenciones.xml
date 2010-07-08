@@ -13,63 +13,200 @@
 
     <para xml:lang="es">TBC</para>
 
-    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+    <para xml:lang="es">(de roo-addon-desarrollo.rst)</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Para los comandos genéricos que aportará gvNIX usaremos una
+        nomenclatura basada en su funcionalidad. Por ejemplo:</para>
+
+        <programlisting>cxf setup</programlisting>
+
+        <para>Cuando la funcionalidad sea una extensión a la funcionalidad de
+        Roo utilizaremos una nomenclatura similar a la de Roo, de forma que al
+        pulsar el tabulador para autocompletar obtengamos tanto los comandos
+        de Roo como los propios de gvNIX. Ejemplos:</para>
+
+        <programlisting>web flow          // Comando de Roo
+
+web binding setup // Comando de gvNIX</programlisting>
+
+        <para>Notar que en ambos casos al escribir la primera parte del
+        comando <literal>web</literal> y al pulsar el tabulador nos aconsejará
+        <literal>flow</literal> y <literal>binding</literal>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Para los comandos propios de la CIT parece más adecuado y cómodo
+        que los comandos estén agrupados por un prefijo común. Ejemplo:</para>
+
+        <programlisting>cit security setup</programlisting>
+      </listitem>
+    </itemizedlist>
   </section>
 
   <section xml:id="convenciones_paquetes" xml:lang="es">
     <title>Nombres de paquetes</title>
 
-    <para>TBC</para>
+    <para>Paquete raíz de gvNIX: <package>org.gvnix</package></para>
 
-    <para xml:lang="es">(de roo-addon-desarrollo.rst)</para>
+    <para xml:lang="es">Paquete raíz para probar funcionalidades genéricas:
+    <package>org.gvnix.test.funcionalidad</package></para>
+
+    <para xml:lang="es">Paquete raíz para probar funcionalidades específicas
+    CIT: <package>org.gvnix.test.cit.funcionalidad</package></para>
 
     <section xml:id="convenciones_paquetes_addons" xml:lang="es">
       <title>Add-ons</title>
-    <para xml:lang="es">TBC</para>
 
-    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+      <itemizedlist>
+        <listitem>
+          <para>Para addons genéricos que aportará gvNIX añadir al paquete
+          raíz la funcionalidad y finalizar con <literal>roo.addon</literal>
+          (esto último es requerimiento de Roo). El patrón a seguir sería
+          <package>org.gvnix.FUNCIONALIDAD.roo.addon</package>.
+          Ejemplo:</para>
 
-      <para></para>
+          <programlisting> org.gvnix.cxf.roo.addon</programlisting>
+        </listitem>
+
+        <listitem>
+          <para>Para addons específicos para un entorno, por ejemplo la CIT,
+          seguir el siguiente patrón
+          <package>org.gvnix.ID_ENTORNO.FUNCIONALIDAD.roo.addon</package>.
+          Ejemplo:</para>
+
+          <programlisting>org.gvnix.cit.security.roo.addon</programlisting>
+        </listitem>
+      </itemizedlist>
     </section>
 
     <section xml:id="convenciones_paquetes_codigo-generado" xml:lang="es">
       <title>Código generado</title>
 
-    <para xml:lang="es">TBC</para>
+      <para xml:lang="es">El código generado DEBE ubicarse dentro del paquete
+      raíz del proyecto. Los addons deberán utilizar las utilidades de Roo
+      para que las clases generadas se creen dentro de la estructura de
+      paquetes del proyecto.</para>
 
-    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+      <para xml:lang="es">Por ejemplo, si el proyecto se creó con el comando
+      Roo <command>project --topLevelPackage es.gv.cit.pizzashop</command>,
+      las clases generadas se encontrarán dentro de ese paquete raíz.</para>
+
+      <para>Se recomienda que a partir del paquete raíz del proyecto se siga
+      una estructura similar a la de la funcionalidad implementada.</para>
+
+      <para> Por ejemplo, si implementamos un sistema de autenticación para un
+      entorno específico con Spring Security seguir una estructura similar a
+      la planteada por Spring Security. Ejemplo:</para>
+
+      <programlisting>es.gv.cit.pizzashop.security.authentication.wscit</programlisting>
     </section>
   </section>
 
   <section xml:id="convenciones_comentarios-codigo" xml:lang="es">
     <title>Comentarios en el Código fuente</title>
 
-    <para xml:lang="es">TBC</para>
-
-    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+    <para xml:lang="es">El idioma de desarrollo será el inglés, tanto para el
+    código fuente generado como para el código fuente de los addons: métodos,
+    propiedades, variables y javadoc.</para>
   </section>
 
   <section xml:id="convenciones_javadoc" xml:lang="es">
     <title>Cabecera Javadoc para la clase java</title>
 
-    <para xml:lang="es">TBC</para>
-
-    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+    <programlisting> /**
+   * Provides strategies management shell commands.
+   *
+   * @author DEVELOPER_NAME (DEVELOPER_USERNAME at CIT_PROVIDER dot com) at &lt;a href="http://www.CIT_PROVIDER.com"&gt;CIT_PROVIDER&lt;/a&gt; made for &lt;a href="http://www.cit.gva.es"&gt;Conselleria d'Infraestructures i Transport&lt;/a&gt;
+   */</programlisting>
   </section>
 
   <section xml:id="convenciones_nombre-addon" xml:lang="es">
     <title>Nombre de add-ons</title>
 
-    <para xml:lang="es">TBC</para>
+    <para xml:lang="es">Dentro del fichero pom.xml habría que añadir la
+    etiqueta ``description`` dentro de ``project`` con una breve descripción
+    del add-on. Ejemplo:</para>
 
-    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+    <programlisting>  &lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+  &lt;project ...&gt;
+        ....
+        ....
+        &lt;name&gt;gvNIX - Addon - Web menu&lt;/name&gt;
+        &lt;description&gt;gvNIX web menu add-on&lt;/description&gt;
+        ....
+        ....</programlisting>
   </section>
 
   <section xml:id="convenciones_licencia-addon" xml:lang="es">
     <title>Licencia de add-ons</title>
 
-    <para xml:lang="es">TBC</para>
+    <para xml:lang="es">Se utilizará GPLv3.</para>
 
-    <para xml:lang="es">(de roo-addon-desarrollo.rst) </para>
+    <para xml:lang="es">Copiar al directorio <filename>legal</filename> del
+    addon el archivo <filename>gvnix/trunk/code/LICENSE.TXT.</filename></para>
+
+    <para>El texto original de la licencia se encuentra en <link
+    xlink:href="http://www.gnu.org/licenses/gpl-3.0.txt">http://www.gnu.org/licenses/gpl-3.0.txt</link>.
+    Guia de referencia: <link
+    xlink:href="http://www.gnu.org/licenses/quick-guide-gplv3.html">http://www.gnu.org/licenses/quick-guide-gplv3.html</link>.</para>
+
+    <para>Licencia a integrar en las cabeceras de las clases java:</para>
+
+    <programlisting>/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures     
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ */</programlisting>
+
+    <para>Este es un ejemplo de como debería quedar el fichero
+    <filename>pom.xml</filename> del proyecto:</para>
+
+    <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;project ...&gt;
+...
+&lt;licenses&gt;
+  &lt;license&gt;
+    &lt;name&gt;GPLv3&lt;/name&gt;
+    &lt;url&gt;http://www.gnu.org/licenses/gpl-3.0.html&lt;/url&gt;
+    &lt;comments&gt;
+    &lt;![CDATA[
+    gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+    i Transport - Generalitat Valenciana
+    Copyright (C) 2010 CIT - Generalitat Valenciana
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+    ]]&gt;
+    &lt;/comments&gt;
+  &lt;/license&gt;
+&lt;/licenses&gt;
+...
+&lt;/project&gt;
+</programlisting>
   </section>
 </chapter>
