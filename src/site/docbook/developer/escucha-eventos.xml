@@ -81,12 +81,12 @@
     <classname>MonitoringRequest</classname> a través del método
     <methodname>add</methodname>.</para>
 
-    <para>En el capítulo de <link linkend="???">recetas</link> podemos
+    <para>En el capítulo de <link linkend="recetas">recetas</link> podemos
     encontrar un ejemplo de <link
     linkend="recetas_crear-listener-filesystem">crear listeners del
     Filesystem</link> y otro para <link
-    linkend="recetas_monitorizacion-directorios">monitorización de
-    directorios</link>.</para>
+    linkend="recetas_monitorizacion-directorios-no-registrados">monitorización
+    de directorios no registrados</link>.</para>
   </section>
 
   <section xml:id="escucha-eventos_metadatos" xml:lang="es">
@@ -95,7 +95,7 @@
     <para>Algunos metadatos lanzan notificaciones en algunas circunstancias.
     Estas notificaciones son iniciadas de forma arbitraría, por lo que, si
     sabemos que el <classname>MetadataProvider</classname> en cuestión efectúa
-    una notificación que podemos utilizar, podemos recibirla. </para>
+    una notificación que podemos utilizar, podemos recibirla.</para>
 
     <para>Para ello, necesitamos crear una clase que implemente el interface
     <classname>MetadataNotificationListener</classname> y registrarlo en el
@@ -122,7 +122,7 @@
       </varlistentry>
     </variablelist>
 
-    <para>En el capítulo de <link linkend="???">recetas</link> podemos
+    <para>En el capítulo de <link linkend="recetas">recetas</link> podemos
     encontrar un ejemplo de <link
     linkend="recetas_crear-listener-metadatos">crear listener de
     metadatos</link>.</para>

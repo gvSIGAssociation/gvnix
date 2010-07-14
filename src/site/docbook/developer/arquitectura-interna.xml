@@ -41,7 +41,7 @@
 
         <listitem>
           <para xml:lang="es">Componente básico. Contiene las clases e
-          interfaces básicos para el framework. </para>
+          interfaces básicos para el framework.</para>
         </listitem>
       </varlistentry>
 
@@ -50,8 +50,8 @@
 
         <listitem>
           <para xml:lang="es">El interprete de comando interactivo que recibe
-          los comando que solicita el usuario. Soporta autocompletado (*TAB*)
-          y ayuda en línea.</para>
+          los comando que solicita el usuario. Soporta autocompletado
+          (<literal>TAB</literal>) y ayuda en línea.</para>
         </listitem>
       </varlistentry>
 
@@ -69,7 +69,7 @@
         <term>Model</term>
 
         <listitem>
-          <para> Clases que se encarga de representar Tipos o clases
+          <para>Clases que se encarga de representar Tipos o clases
           Java.</para>
         </listitem>
       </varlistentry>
@@ -112,7 +112,7 @@
     </variablelist>
 
     <para xml:lang="es">El sistemas se arranca en un framework OSGi, por lo
-    que casi todos estos compopentes se acceden como servicios referencias de
+    que casi todos estos componentes se acceden como servicios referencias de
     servicios OSGi.</para>
 
     <para xml:lang="es">Aquí se detalla un poco más alguno de ellos.</para>
@@ -162,7 +162,7 @@
       <listitem>
         <para>Cada uno tiene un identificador de tipo cadena único cuya
         generación es totalmente predecible. El primer requisito es que
-        comience por los carácteres <literal>MID:</literal>.</para>
+        comience por los caracteres <literal>MID:</literal>.</para>
       </listitem>
 
       <listitem>
@@ -190,7 +190,7 @@
 
     <para xml:lang="es">Componente que implementa una consola interactiva que
     soporta autocompletado y ayuda en linea. A través de este componente el
-    framework interactua con el usuario. </para>
+    framework interactúa con el usuario.</para>
   </section>
 
   <section xml:id="arquitectura-interna_process-manager" xml:lang="es">

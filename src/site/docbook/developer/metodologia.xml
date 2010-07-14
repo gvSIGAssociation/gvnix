@@ -19,8 +19,9 @@
     </listitem>
 
     <listitem>
-      <para>Crear el documento ``readme.rst`` dentro de esta carpeta donde
-      informaremos brevemente el propósito de la funcionalidad.</para>
+      <para>Crear el documento <filename>readme.rst</filename> dentro de esta
+      carpeta donde informaremos brevemente el propósito de la
+      funcionalidad.</para>
     </listitem>
 
     <listitem>

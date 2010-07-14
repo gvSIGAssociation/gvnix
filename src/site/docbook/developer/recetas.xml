@@ -9,5 +9,655 @@
   <title xml:lang="es">Recetas</title>
 
   <para>TBC (de roo-addon-desarrollo.rst) [Las recetas que todavía sean
-  válidas en M1. Ver si extraer alguna de los addons implementados]</para>
+  válidas en M1. Ver si extraer alguna de los add-ons implementados]</para>
+
+  <para>En este capitulo se incluyen una serie de recetas que pueden ser
+  útiles en el desarrollo de framework para realizar algunas funciones
+  comunes.</para>
+
+  <section xml:id="recetas_clases-utilidad">
+    <title>Clases de utilidad</title>
+
+    <para>El framework provee de una serie de clases para la ayuda al add-on.
+    Estas clases son abstractas con sus métodos declarados como estáticos.
+    Entre ellas encontramos:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>org.springframework.roo.support.util.FileCopyUtils</term>
+
+        <listitem>
+          <para>Utilidades de copia de ficheros.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>org.springframework.roo.support.util.FileUtils</term>
+
+        <listitem>
+          <para>Utilidades para manejo de ficheros.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>org.springframework.roo.support.util.DomUtils</term>
+
+        <listitem>
+          <para>Utilidades para el manejo del API Dom (búsquedas de elementos,
+          etc...).</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>org.springframework.roo.support.util.Assert</term>
+
+        <listitem>
+          <para>Utilidades para hacer comprobaciones de parámetros y
+          variables.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>org.springframework.roo.support.util.XmlUtils</term>
+
+        <listitem>
+          <para>Utilidases para editar o crear ficheros xml.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>org.springframework.roo.support.util.WebXmlUtils</term>
+
+        <listitem>
+          <para>Utilidades para actualizar el fichero web.xml en proyectos
+          web.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="recetas_servicios-framework">
+    <title>Servicios del framework</title>
+
+    <para>El framework provee de una serie de servicios (<link
+    linkend="creacion-addon_osgi">componentes-servicios OSGi</link>) que
+    podemos necesitar para desarrollar nuestros add-ons. Para usarlos debemos
+    revisar que nuestro add-on tiene registradas la dependencias de los
+    proyecto de cada bundle.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>org.springframework.roo.process.manager.FileManager</term>
+
+        <listitem>
+          <para>Servicios para modificación de ficheros. Es necesario su uso
+          para habilitar el soporte de <emphasis>deshacer cambios ante un
+          fallo</emphasis>.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>org.springframework.roo.project.PathResolver</term>
+
+        <listitem>
+          <para>Ayudas para el manejo de rutas de fichero dentro de proyecto
+          (obtener rutas absolutas a partir de relativas al proyecto).</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>org.springframework.roo.metadata.MetadataService</term>
+
+        <listitem>
+          <para>Permite consultar metadatos de nuestra aplicación.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>org.springframework.roo.metadata.MetadataDependencyRegistry</term>
+
+        <listitem>
+          <para>Gestiona las dependencias entre metadatos.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>org.springframework.roo.project.ProjectOperations</term>
+
+        <listitem>
+          <para>Operaciones para la gestión del proyecto.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="recetas_manejo-ficheros-xml">
+    <title>Manejo de fichero XML</title>
+
+    <para>La clase
+    <classname>org.springframework.roo.support.util.XmlUtils</classname> tiene
+    herramientas básica para la lectura, búsqueda, creación y modificación de
+    fichero XML. Entre sus métodos encontramos:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><methodname>getDocumentBuilder</methodname></para>
+      </listitem>
+
+      <listitem>
+        <para><methodname>writeXml</methodname></para>
+      </listitem>
+
+      <listitem>
+        <para><methodname>findElements</methodname></para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Aquí hay una serie de recetas para el manejo de este tipo de
+    ficheros.</para>
+
+    <section xml:id="recetas_manejo-ficheros-xml_crear">
+      <title>Crear un fichero XML</title>
+
+      <para>Este ejemplo crea un fichero <filename>cxf-servlet.xml</filename>
+      dentro del directorio <filename>WEB-INF</filename> de la
+      aplicación:</para>
+
+      <programlisting>    //Ruta relativa 
+    String xmlPath =pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/cxf-servlet.xml");
+
+    Document xml;
+    MutableFile mutableFile= fileManager.createFile(xmlPath);
+
+    Element root = xml.createElement("root");
+        
+    Element child1 = xml.createElement("child1");
+    child1.setNodeValue("nodo 1");
+    root.appendChild(child1);
+
+    Element child2 = xml.createElement("child2");
+    child2.setAttribute("attr", "hola");
+
+    Element child3 = xml.createElement("child3");
+    child3.setNodeValue("nodo 3");
+
+    child2.appendChild(child3);
+    root.appendChild(child2);
+        
+        
+    xml.appendChild(root);
+
+
+    // Write file
+    XmlUtils.writeXml(mutableFile.getOutputStream(), xml);
+
+    fileManager.scan();</programlisting>
+    </section>
+
+    <section xml:id="recetas_manejo-ficheros-xml_añadir-dtd">
+      <title>Añadir DTD a un XML</title>
+
+      <para>Al utilizar el método <command>XmlUtils.writeXml(OutpuStream,
+      Xml)</command> en un xml con DTD elimina el DTD al actualizarlo o si
+      definimos uno cuando creamos un archivo xml.</para>
+
+      <para>Para evitar este problema se ha de crear un Transformer con los
+      datos necesarios de nuestro DTD:</para>
+
+      <programlisting>    final static String DOCTYPE_PUBLIC = "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN";
+    final static String DOCTYPE_SYSTEM = "http://tiles.apache.org/dtds/tiles-config_2_1.dtd";</programlisting>
+
+      <para>Crear un Transformer para llamar al método sobrecargado que
+      contiene el parámetro del tipo <emphasis>transformer</emphasis> y así
+      definir la gramática del xml:</para>
+
+      <programlisting>   // Define DTD
+   Transformer xformer;
+   try {
+       xformer = XmlUtils.createIndentingTransformer();
+   } catch (Exception ex) {
+       throw new IllegalStateException(ex);
+   }
+
+   xformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC);
+   xformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM);
+   
+   XmlUtils.writeXml(xformer, webXmlMutableFileDestination.getOutputStream(), webXmlDestination);</programlisting>
+    </section>
+
+    <section xml:id="recetas_manejo-ficheros-xml_crear-a-partir-plantilla">
+      <title>Crear un XML a partir de una plantilla</title>
+
+      <para>El siguiente ejemplo crea un fichero
+      <filename>cxf-servlet.xml</filename> dentro del directorio
+      <filename>WEB-INF</filename> de la aplicación a partir de una plantilla
+      que hayamos incluido en los recursos del add-on:</para>
+
+      <programlisting>    //Ruta relativa 
+    String xmlPath =pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/cxf-servlet.xml");
+
+    Document xml;
+    MutableFile mutableFile= fileManager.createFile(xmlPath);
+    InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "cxf-servlet-template.xml");
+    try {
+            xml = XmlUtils.getDocumentBuilder().parse(templateInputStream);
+    } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+    }
+
+    // Write file
+    XmlUtils.writeXml(mutableFile.getOutputStream(), xml);
+
+    fileManager.scan();</programlisting>
+    </section>
+
+    <section xml:id="recetas_manejo-ficheros-xml_actualizar-elemento">
+      <title>Buscar un elemento de un XML para actualizarlo</title>
+
+      <para>Este ejemplo se busca dentro del fichero
+      <filename>web.xml</filename> el elemento que define un servlet y lo
+      añade si no existe:</para>
+
+      <programlisting>    String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml");
+    Assert.isTrue(fileManager.exists(webXmlPath),"web.xml not found");
+
+    MutableFile webXmlMutableFile = null;
+    Document webXml;
+
+    try {
+           webXmlMutableFile = fileManager.updateFile(webXmlPath);
+           webXml = XmlUtils.getDocumentBuilder().parse(webXmlMutableFile.getInputStream());
+    } catch (Exception e) {
+           throw new IllegalStateException(e);
+    }
+    Element root = webXml.getDocumentElement();
+
+    if (null != XmlUtils.findFirstElement("/web-app/servlet[servlet-class='org.apache.cxf.transport.servlet.CXFServlet']", root)) {
+            //cxf servlet already installed, nothing to do
+            return;
+    }
+
+
+    Element firstServletMapping = XmlUtils.findRequiredElement("/web-app/servlet-mapping", root);
+
+    Element servlet = webXml.createElement("servlet");
+    Element servletName = webXml.createElement("servlet-name");
+    servletName.setTextContent("CXFServlet");
+    servlet.appendChild(servletName);
+    Element servletClass = webXml.createElement("servlet-class");
+    servletClass.setTextContent("org.apache.cxf.transport.servlet.CXFServlet");
+    servlet.appendChild(servletClass);
+    root.insertBefore(servlet, firstServletMapping.getPreviousSibling());
+
+    Element servletMapping = webXml.createElement("servlet-mapping");
+    Element servletName2 = webXml.createElement("servlet-name");
+    servletName2.setTextContent("CXFServlet");
+    servletMapping.appendChild(servletName2);
+    Element urlMapping = webXml.createElement("url-pattern");
+    urlMapping.setTextContent("/services/*");
+    servletMapping.appendChild(urlMapping);
+    root.insertBefore(servletMapping, firstServletMapping);
+
+    XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);</programlisting>
+    </section>
+  </section>
+
+  <section xml:id="recetas_añadir-dependencia">
+    <title>Añadir dependencias al proyecto</title>
+
+    <para>En este ejemplo añadiremos dependencias al proyecto a partir de un
+    fichero xml ubicado dentro de los recursos del add-on.</para>
+
+    <para>El fichero de definición puede ser como este:</para>
+
+    <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;dependencies&gt;
+     &lt;cxf&gt;
+          &lt;dependency org="org.apache.cxf" name="cxf-api" rev="2.1.3" /&gt;
+          &lt;dependency org="org.apache.cxf" name="cxf-rt-frontend-jaxws" rev="2.1.3" /&gt;
+          &lt;dependency org="org.apache.cxf" name="cxf-rt-transports-http" rev="2.1.3" /&gt;
+          &lt;dependency org="javax.xml.bind" name="jaxb-api" rev="2.1" /&gt;
+     &lt;/cxf&gt;
+&lt;/dependencies&gt;</programlisting>
+
+    <para>El siguiente código añade las dependencias al proyecto:</para>
+
+    <programlisting>    InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "dependencies.xml");
+    Assert.notNull(templateInputStream, "Could not acquire dependencies.xml file");
+    Document dependencyDoc;
+    try {
+            dependencyDoc = XmlUtils.getDocumentBuilder().parse(templateInputStream);
+    } catch (Exception e) {
+            throw new IllegalStateException(e);
+    }
+    
+    Element dependencies = (Element) dependencyDoc.getFirstChild();
+    
+    
+    List&lt;Element&gt; cxfDependencies = XmlUtils.findElements("/dependencies/cxf/dependency", dependencies);
+    for(Element dependency : cxfDependencies) {
+            projectOperations.dependencyUpdate(new Dependency(dependency));
+    }</programlisting>
+  </section>
+
+  <section xml:id="recetas_crear-listener-filesystem">
+    <title>Crear listeners del filesystem</title>
+
+    <para>En la mayoría de casos no usaremos este tipo de listeners ya que
+    normalmente dependeremos de los metadatos.</para>
+
+    <para>Para solicitar notificaciones del filesystem debemos de crear una
+    clase que implemente <classname>FileEventListener</classname>.</para>
+
+    <para>Se añaden las anotaciones <classname>@Component</classname> y
+    <classname>@Service</classname> a la clase para que el
+    <classname>FileMonitorService</classname> de Roo lo detecte
+    automáticamente. Para ver más sobre esto leer <link
+    linkend="creacion-addon_osgi">declaración y uso de componente-servicios
+    OSGi</link>.</para>
+
+    <para>El servicio <emphasis>no monitoriza todos los ficheros</emphasis> de
+    base. Puede ser necesario registrar los recursos que deseamos monitorizar
+    (aunque por defecto ya pueden estar los que necesitamos). Esto se maneja
+    desde el la clase que implementa la interfaz
+    <classname>FileMonitorService</classname>:
+    <classname>NotifiableFileMonitorService</classname>.</para>
+
+    <para>Este ejemplo muestra un mensaje de <emphasis>log</emphasis> de cada
+    cambio producido en los recursos monitorizados:</para>
+
+    <programlisting>  @Component
+  @Service
+  public class LogFiles implements FileEventListener {
+        
+       private static Logger logger = Logger.getLogger(LogFiles.class.getName());
+                                
+       public void onFileEvent(FileEvent fileEvent) {
+           logger.warning(fileEvent.getOperation().name()+":"+fileEvent.getFileDetails().getCanonicalPath());
+       }
+  }</programlisting>
+  </section>
+
+  <section xml:id="recetas_crear-listener-metadatos">
+    <title>Crear listener de metadatos</title>
+
+    <para>Este es un ejemplo sencillo de implementación de listener de
+    metadatos.</para>
+
+    <para>La clase de listener debe implementar la interfaz
+    <classname>MetadataNotificationListener</classname> y se añaden las
+    anotaciones <classname>@Component</classname> y
+    <classname>@Service</classname> a la clase para que el
+    <classname>MetadataDependencyRegistry</classname> la inyecte
+    automáticamente al ser un módulo OSGI que implementa
+    <classname>MetadataNotificationListener</classname>.</para>
+
+    <para>En este ejemplo crearemos un listener que muestra información sobre
+    los eventos recibidos de clase java. Si, además es una entidad muestra sus
+    métodos:</para>
+
+    <programlisting>@Component
+@Service
+public class JavaClassMetadataListener implements MetadataNotificationListener {
+
+   private static Logger logger = Logger.getLogger(JavaClassMetadataListener.class.getName());
+
+   private static final String javaClassMetadataType = MetadataIdentificationUtils.getMetadataClass(PhysicalTypeIdentifier.getMetadataIdentiferType());
+
+   @Reference
+   private MetadataDependencyRegistry metadataDependencyRegistry;
+
+   @Reference
+   private MetadataService metadataService;
+
+   public void notify(String upstreamDependency, String downstreamDependency) {
+
+     if (!javaClassMetadataType.equals(MetadataIdentificationUtils.getMetadataClass(upstreamDependency))){
+       // NO es la notificación del metadato de tipo "clase java"
+      return;
+     }
+     logger.warning("---------------------------------------------");
+     PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(upstreamDependency);
+
+     PhysicalTypeDetails details = physicalTypeMetadata.getPhysicalTypeDetails();
+
+     JavaType javaType = details.getName();
+     Path path = PhysicalTypeIdentifierNamingUtils.getPath(javaClassMetadataType, upstreamDependency);
+
+     logger.warning("Notificación de la clase: "+ javaType.getSimpleTypeName());
+
+     EntityMetadata entityMetadata = (EntityMetadata) metadataService.get(EntityMetadata.createIdentifier(javaType, path));
+     if (entityMetadata == null){
+        logger.warning("\tNo es entiedad");
+     } else {
+        logger.warning("\tmetodos: ");
+        for (MethodMetadata method : entityMetadata.getItdTypeDetails().getDeclaredMethods()){
+          logger.warning("\t\t"+method.getMethodName());
+        }
+     }
+     logger.warning("---------------------------------------------");
+  }
+}</programlisting>
+  </section>
+
+  <section xml:id="recetas_copia-directorios-recursiva">
+    <title>Copiar directorios recursivamente</title>
+
+    <para>Ejemplo sencillo para la copia de un directorio de forma recursiva
+    dentro del proyecto específico.</para>
+
+    <para>Se utiliza el componente <classname>FileManager</classname> para la
+    gestión de archivos para tener el soporte de deshacer la acción ante un
+    error.</para>
+
+    <para>Este método se llama a si mismo recursivamente para los directorios
+    y para los fichero delega en un método
+    <methodname>fileCopyToProject</methodname> que definido más abajo:</para>
+
+    <programlisting>    private boolean copyRecursively(File source, File destination, boolean deleteDestinationOnExit) {
+    
+      Assert.notNull(source, "Source directory required");
+      Assert.notNull(destination, "Destination directory required");
+      Assert.isTrue(source.exists(), "Source directory '" + source + "' must exist");
+      Assert.isTrue(source.isDirectory(), "Source directory '" + source + "' must be a directory");
+      if (destination.exists()) {
+          Assert.isTrue(destination.isDirectory(), "Destination directory '"
+            + destination + "' must be a directory");
+      } else {
+          destination.mkdirs();
+          if (deleteDestinationOnExit) {
+            destination.deleteOnExit();
+          }
+      }
+      for (File s : source.listFiles()) {
+          File d = new File(destination, s.getName());
+          if (deleteDestinationOnExit) {
+            d.deleteOnExit();
+          }
+          if (s.isFile()) {
+            fileCopyToProject(s, d);
+          } else {
+            // It's a sub-directory, so copy it
+            d.mkdir();
+            if (!copyRecursively(s, d, deleteDestinationOnExit)) {
+                return false;
+            }
+          }
+      }
+      return true;
+    }</programlisting>
+
+    <para>El método <methodname>fileCopyToProject</methodname> copia un
+    archivo utilizando el servicio <classname>FileManager</classname> mediante
+    del archivo origen al destino:</para>
+
+    <programlisting>
+   private void fileCopyToProject(File source, File destination) {
+      MutableFile mutableFile;
+      byte[] template;
+
+      InputStream templateInputStream;
+      InputStreamReader readerFile;
+
+      try {
+
+        templateInputStream = new FileInputStream(source);
+
+        readerFile = new InputStreamReader(templateInputStream);
+
+        template = FileCopyUtils.copyToByteArray(templateInputStream);
+
+      } catch (IOException ioe) {
+        throw new IllegalStateException("Unable load ITD css template", ioe);
+      }
+
+      if (!fileManager.exists(destination.getAbsolutePath())) {
+        mutableFile = fileManager.createFile(destination.getAbsolutePath());
+        Assert.notNull(mutableFile, "Could not create ITD file '"
+            + destination.getAbsolutePath() + "'");
+      } else {
+        mutableFile = fileManager.updateFile(destination.getAbsolutePath());
+      }
+
+      try {
+
+        FileCopyUtils.copy(template, mutableFile.getOutputStream());
+      } catch (IOException ioe) {
+        throw new IllegalStateException("Could not output '"
+            + mutableFile.getCanonicalPath() + "'", ioe);
+      }
+   }</programlisting>
+  </section>
+
+  <section xml:id="recetas_monitorizacion-directorios-no-registrados">
+    <title>Monitorización de directorios no registrados</title>
+
+    <para>En este ejemplo necesitamos monitorizar los cambios en un directorio
+    que no está registrado para monitorizar en la configuración por defecto
+    del framework.</para>
+
+    <para>Para habilitar la monitorización del directorio debemos registrar un
+    instancia de <classname>DirectoryMonitoringRequest</classname> en el
+    servicio <classname>NotifiableFileMonitorService</classname>:</para>
+
+    <programlisting>   @Reference
+   private NotifiableFileMonitorService fileMonitorService;
+   .
+   .
+   .
+        DirectoryMonitoringRequest directoryMonitoringRequest = new DirectoryMonitoringRequest(
+        new File("./myDir"), true, (MonitoringRequest
+          .getInitialMonitoringRequest("./myDir"))
+          .getNotifyOn());
+
+        fileMonitorService.add(directoryMonitoringRequest);
+        fileMonitorService.scanAll();</programlisting>
+
+    <para>En la llamada al
+    <methodname>fileMonitorService.scanAll()</methodname> ya comenzará las
+    notificaciones de este directorio.</para>
+  </section>
+
+  <section xml:base="recetas_crear-clase-desde-codigo">
+    <title>Crear una clase java desde código</title>
+
+    <para><emphasis>[Hay que revisar el código]</emphasis></para>
+
+    <para>En este ejemplo creamos una clase Java usando código Java. En este
+    caso estamos generando una clase que implementa un interface, rellenando
+    su método:</para>
+
+    <programlisting>  private void generateJavaFile(JavaType initializerClass) {
+      String ressourceIdentifier = classpathOperations.getPhysicalLocationCanonicalPath(
+              initializerClass, Path.SRC_MAIN_JAVA);
+      String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(initializerClass, 
+              pathResolver.getPath(ressourceIdentifier));
+
+      List&lt;MethodMetadata&gt; declaredMethods = new ArrayList&lt;MethodMetadata&gt;(1);
+
+      InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+      bodyBuilder.appendFormalLine(
+             "binder.registerCustomEditor(java.lang.String.class, new org.springframework.beans.propertyeditors.StringTrimmerEditor(true);");
+
+      // Params
+      List&lt;JavaType&gt; params = new ArrayList&lt;JavaType&gt;(2);
+      params.add(new JavaType("org.springframework.web.bind.WebDataBinder"));
+      params.add(new JavaType("org.springframework.web.context.request.WebRequest"));
+
+      // Params Names
+      List&lt;JavaSymbolName&gt; paramNames = new ArrayList&lt;JavaSymbolName&gt;(2);
+      paramNames.add(new JavaSymbolName("binder"));
+      paramNames.add(new JavaSymbolName("request"));
+
+
+      //Annotations
+      List&lt;AnnotationMetadata&gt; annotations = new ArrayList&lt;AnnotationMetadata&gt;(1);
+      annotations.add(new DefaultAnnotationMetadata(new JavaType(Override.class.getName()), null));
+
+      declaredMethods.add(new DefaultMethodMetadata(
+             declaredByMetadataId,
+             Modifier.PUBLIC,
+             new JavaSymbolName("initBinder"),
+             null,
+             AnnotatedJavaType.convertFromJavaTypes(params),
+             paramNames,
+             annotations,
+             null,
+             body)
+        );
+
+
+      List&lt;JavaType&gt; implementsTypes = new ArrayList&lt;JavaType&gt;();
+      implementsTypes.add( new JavaType("org.springframework.web.bind.support.WebBindingInitializer"));
+
+
+      ClassOrInterfaceTypeDetails details = new DefaultClassOrInterfaceTypeDetails(
+             declaredByMetadataId,
+             initializerClass,
+             Modifier.PUBLIC,
+             PhysicalTypeCategory.CLASS,
+             null,null,declaredMethods,null,null,implementsTypes,null,null
+             );
+
+      classpathOperations.generateClassFile(details);
+
+  }</programlisting>
+  </section>
+
+  <section>
+    <title xml:base="recetas_comprobar-dependencia">Comprobar si el proyecto
+    tiene registrada una dependencia</title>
+
+    <para>En este trozo de código investiga si el proyecto ya incluye una
+    dependencia con una librería en concreto, comprobando también si existe
+    pero con versión distinta:</para>
+
+    <programlisting>        ProjectMetadata project = (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
+        if (project == null) {
+                return false;
+        }
+
+        Dependency myDependency = new Dependency("GROUP-ID", "ARTIFACT-ID", "VERSION");
+
+        if (project.getDependencies().contains(myDependecy)) {
+                // La depencencia está en el proyecto
+
+        } else if (project.getDependenciesExcludingVersion(myDependecy).size() &gt; 0){
+                // La existe la depencencia, pero con otra versión
+        }</programlisting>
+  </section>
+
+  <section xml:id="recetas_alterar-comportamiento-metodo">
+    <title>Alterar comportamiento de métodos existentes</title>
+
+    <para>La librería <emphasis>AspectJ</emphasis> permite, dentro de un
+    fichero <filename>.aj</filename>, añadir anotaciones a método de la clase
+    a que ser asocia. Esto <emphasis>no está limitado a los métodos que
+    definimos en nuestro fichero o a los método declarados en el
+    .java</emphasis>, también podemos añadir anotaciones a métodos definidos
+    en otros .<filename>aj</filename> que no hayamos definido nosotros.</para>
+
+    <para>La información está recogida de este mensaje en el foro: <link
+    xlink:href="http://forum.springsource.org/showpost.php?p=286967&amp;postcount=3">http://forum.springsource.org/showpost.php?p=286967&amp;postcount=3</link></para>
+  </section>
 </chapter>

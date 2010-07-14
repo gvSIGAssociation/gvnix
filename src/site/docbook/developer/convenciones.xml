@@ -61,7 +61,7 @@ web binding setup // Comando de gvNIX</programlisting>
 
       <itemizedlist>
         <listitem>
-          <para>Para addons genéricos que aportará gvNIX añadir al paquete
+          <para>Para add-ons genéricos que aportará gvNIX añadir al paquete
           raíz la funcionalidad y finalizar con <literal>roo.addon</literal>
           (esto último es requerimiento de Roo). El patrón a seguir sería
           <package>org.gvnix.FUNCIONALIDAD.roo.addon</package>.
@@ -71,7 +71,7 @@ web binding setup // Comando de gvNIX</programlisting>
         </listitem>
 
         <listitem>
-          <para>Para addons específicos para un entorno, por ejemplo la CIT,
+          <para>Para add-ons específicos para un entorno, por ejemplo la CIT,
           seguir el siguiente patrón
           <package>org.gvnix.ID_ENTORNO.FUNCIONALIDAD.roo.addon</package>.
           Ejemplo:</para>
@@ -85,7 +85,7 @@ web binding setup // Comando de gvNIX</programlisting>
       <title>Código generado</title>
 
       <para xml:lang="es">El código generado DEBE ubicarse dentro del paquete
-      raíz del proyecto. Los addons deberán utilizar las utilidades de Roo
+      raíz del proyecto. Los add-ons deberán utilizar las utilidades de Roo
       para que las clases generadas se creen dentro de la estructura de
       paquetes del proyecto.</para>
 
@@ -96,7 +96,7 @@ web binding setup // Comando de gvNIX</programlisting>
       <para>Se recomienda que a partir del paquete raíz del proyecto se siga
       una estructura similar a la de la funcionalidad implementada.</para>
 
-      <para> Por ejemplo, si implementamos un sistema de autenticación para un
+      <para>Por ejemplo, si implementamos un sistema de autenticación para un
       entorno específico con Spring Security seguir una estructura similar a
       la planteada por Spring Security. Ejemplo:</para>
 
@@ -108,7 +108,7 @@ web binding setup // Comando de gvNIX</programlisting>
     <title>Comentarios en el Código fuente</title>
 
     <para xml:lang="es">El idioma de desarrollo será el inglés, tanto para el
-    código fuente generado como para el código fuente de los addons: métodos,
+    código fuente generado como para el código fuente de los add-ons: métodos,
     propiedades, variables y javadoc.</para>
   </section>
 
@@ -126,8 +126,9 @@ web binding setup // Comando de gvNIX</programlisting>
     <title>Nombre de add-ons</title>
 
     <para xml:lang="es">Dentro del fichero pom.xml habría que añadir la
-    etiqueta ``description`` dentro de ``project`` con una breve descripción
-    del add-on. Ejemplo:</para>
+    etiqueta <literal>description</literal> dentro de
+    <literal>project</literal> con una breve descripción del add-on.
+    Ejemplo:</para>
 
     <programlisting>  &lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
   &lt;project ...&gt;

@@ -28,7 +28,7 @@
   registro, comportamiento y creación de ese tipo de metadato.</para>
 
   <para>El manejo de los metadatos se realiza a través del servicio
-  <classname>MetadataService</classname> que espone los metadatos a través del
+  <classname>MetadataService</classname> que expone los metadatos a través del
   método <literal>get</literal>.</para>
 
   <para>Dentro del framework ahora existen varios tipos de
@@ -103,9 +103,8 @@
         <term><classname>EntityMetadata</classname></term>
 
         <listitem>
-          <para> Metadatos de la anotación de
-          <classname>@RooEntity</classname> (junto con
-          <classname>EntityMetadataProvider</classname>).</para>
+          <para>Metadatos de la anotación de <classname>@RooEntity</classname>
+          (junto con <classname>EntityMetadataProvider</classname>).</para>
         </listitem>
       </varlistentry>
 
@@ -137,7 +136,7 @@
       </listitem>
 
       <listitem>
-        <para> Generando nuestros propio <emphasis>metadato</emphasis> y
+        <para>Generando nuestros propio <emphasis>metadato</emphasis> y
         registrando las dependencias que necesitemos en el
         <classname>MetadataDependencyManager</classname>.</para>
       </listitem>
@@ -196,9 +195,9 @@
       <para>Hay que recalcar que las <emphasis>notificaciones no se lanzan de
       forma automática</emphasis> (excepto en el primer caso explicado en el
       párrafo anterior). Es decir, que la notificación, por ejemplo, de un
-      <emphasis>metadato</emphasis> de una clase, es lanzadado desde un
+      <emphasis>metadato</emphasis> de una clase, es lanzado desde un
       <classname>FileListener</classname>, que registra el framework, cuando
-      detecta algún evento en un fichero <literal>.java</literal>. </para>
+      detecta algún evento en un fichero <literal>.java</literal>.</para>
     </section>
   </section>
 
@@ -213,7 +212,7 @@
     las dependencias... pero, entre ellos, tampoco es posible especificar un
     orden</emphasis>. De hecho, las estructuras de datos que almacenan esta
     dependencias están basadas en <classname>HashSet</classname> y
-    <classname>HashMap</classname>. Es más, se ha podido observar que apartir
+    <classname>HashMap</classname>. Es más, se ha podido observar que a partir
     de una primera notificación de un <literal>metadato</literal>, se pueden
     producir varias notificaciones al mismos
     <classname>MetadataProvider</classname> en distintos puntos de las
@@ -223,7 +222,7 @@
     add-on genera metadatos y, esos metadatos producen algún tipo de producto,
     <emphasis role="bold">siempre</emphasis> nos tendremos que asegurar que
     nuestro producto sea el correcto <emphasis role="bold">sin esperar ni
-    pretender tener ningun tipos de control sobre el orden de
+    pretender tener ningún tipos de control sobre el orden de
     ejecución</emphasis>.</para>
 
     <para>Para ilustrar esto, podemos ver una <emphasis>traza de notificación

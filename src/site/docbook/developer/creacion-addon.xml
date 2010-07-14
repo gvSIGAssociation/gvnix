@@ -256,11 +256,15 @@ public class MyServiceUser{
         <term>felix shell</term>
 
         <listitem>
-          <para>Permite ejecuar comandos directamente al framework
+          <para>Permite ejecutar comandos directamente al framework
           OSGi.</para>
         </listitem>
       </varlistentry>
     </variablelist>
+
+    <para>Para más información sobre los comandos relacionados disponibles
+    usar <command>help osgi</command> y <command>felix shell help</command>
+    desde la consola del framework.</para>
   </section>
 
   <section xml:id="creacion-addon_commands" xml:lang="es">
@@ -635,6 +639,101 @@ public class MyServiceUser{
       <para xml:lang="es">TBC [Ejemplo simple de test unitario usando algún
       mock para simular un servicio (¿usar una versión simplificada de jsp
       2.0?)]</para>
+    </section>
+  </section>
+
+  <section>
+    <title>Recomendaciones sobre el desarrollo de los add-on</title>
+
+    <para>En este apartado se añaden una serie de recomendaciones y las
+    conveciones sobre la creación/implementación de los add-ons.</para>
+
+    <para>Una lectura interesante en este sentido es la presentación de Ben
+    Alex sobre el desarrollo de roo disponible en <link
+    xlink:href="http://www.slideshare.net/benalexau/spring-roo-100-technical-deep-dive">Spring
+    Roo 1.0.0 Technical Deep Dive</link>.</para>
+
+    <section>
+      <title>Evitar lanzar un error si podemos dar la solución</title>
+
+      <para>Una de las premisas que parece reinar el proyecto Roo es que si el
+      add-on, ante la falta de algún paso, si es conocedor de como solucionar
+      la falta, intentar solucionarlo el mismo en vez de <emphasis>protestar y
+      alguien los solucionara</emphasis>.</para>
+    </section>
+
+    <section>
+      <title>Si ya existe alguien que sabe resolverlo, que se encargue de
+      ello</title>
+
+      <para>Si nuestro add-on depende de que otro se ejecute, deberíamos
+      intentar, en la medida de lo posible, que sea él el que resuelva el
+      problema. Un ejemplo puede ser que si nuestro add-on registra un
+      <emphasis>Proveedor de autenticación</emphasis> y no se ha instalado las
+      dependencias de las librería adecuadas, delegaremos en el add-on
+      existente para que realice la tarea.</para>
+    </section>
+
+    <section>
+      <title>Actualización de Add-ons</title>
+
+      <para>Nuestro add-on debería identificar productos generados por otras
+      versiones de si mismo y <emphasis>actualizarlos</emphasis> de forma
+      coherente.</para>
+    </section>
+
+    <section>
+      <title>Anotaciones mejor que ficheros de configuración</title>
+
+      <para>Para simplificar el mantenimiento y reducir el número de
+      artefactos a gestionar en la aplicación, debemos de tender a usar
+      anotaciones, siempre que sea adecuado y con sentido común, en vez de
+      registro en el los ficheros de contexto Spring.</para>
+    </section>
+
+    <section>
+      <title>Evitar en lo posible ficheros properties de configuración</title>
+
+      <para>Cuando usemos variables, es recomendable que los valores sean
+      actualizados en los <emphasis>ficheros de contexto de Spring</emphasis>,
+      siempre se sea posible, en vez de repartirlos por fichero
+      <filename>.properties</filename>.</para>
+
+      <para>Si estos valores son dependientes del entorno, como en el caso del
+      uso de profiles de maven, es preferible tratar los fichero de Spring en
+      la compilación que en un <filename>.properties</filename>.</para>
+    </section>
+
+    <section>
+      <title>Agilidad en métodos de disponibilidad de comandos</title>
+
+      <para>Ya que los método de <emphasis>disponibilidad de un
+      comando</emphasis> pueden ser llamados desde la línea de comandos y de
+      manera muy frecuente, tendríamos que cuidar de que fuesen <emphasis>lo
+      más sencillos y optimizados posible </emphasis>. </para>
+
+      <para>Por ejemplo, intentar ver si comprobando dependencias del proyecto
+      y/o la existencia de algún/os ficheros tenemos suficiente o usar
+      variables de estado <emphasis>cacheadas</emphasis>, coordinado con algún
+      listener que las limpie cuando convenga. </para>
+    </section>
+
+    <section>
+      <title>add-ons genéricos y específicos CIT</title>
+
+      <para>Intentaremos implementar add-ons de consola Roo genéricos para que
+      puedan ser utilizados en múltiples ámbitos y luego estos add-ons podrían
+      ser personalizados para la CIT mediante scripts de consola Roo.</para>
+
+      <para>Adicionalmente, puede ser interesante, en algunos casos, que
+      algunos de nuestros add-ons necesiten ejecutar como paso previo otro
+      addon antes de realizar sus tareas. Por ejemplo, la instalación del
+      sistema de seguridad de la CIT requiere que antes se haya ejecutado la
+      instalación del sistema de seguridad de Spring, por lo que lo más
+      recomendable es que nuestro addon de seguridad CIT invoque como paso
+      previo al addon de seguridad Spring, si no hubiese sido ejecutado
+      todavía. La finalidad que se busca es que no obligar a invocar a un
+      comando manualmente antes de invocar a otro comando.</para>
     </section>
   </section>
 </chapter>

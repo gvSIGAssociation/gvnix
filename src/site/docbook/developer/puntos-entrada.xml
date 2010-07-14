@@ -16,7 +16,7 @@
 
       <listitem>
         <para>Acción se inicia en base a una petición del usuario en el Shell
-        o por otro add-on. Pricipalmente se identifican por los
+        o por otro add-on. Principalmente se identifican por los
         Commands.</para>
       </listitem>
     </varlistentry>
@@ -31,25 +31,25 @@
     </varlistentry>
   </variablelist>
 
-  <para>En la mayoría de ocasiones, no encontraremos con un comando de </para>
+  <para>En la mayoría de ocasiones, no encontraremos con un comando de</para>
 
   <section xml:id="puntos-entrada_commands" xml:lang="es">
     <title xml:lang="es">Commands</title>
 
     <para xml:lang="es">Son clases que, mediante el uso de anotaciones,
     identifican operaciones accesibles al usuario desde la consola de Roo.
-    Esta anotaciones contienen información sufuciente para que la consola sea
+    Esta anotaciones contienen información suficiente para que la consola sea
     capaz de mostrar ayuda en linea, el autocompletado, parámetros disponibles
-    y de su disponibilidad. </para>
+    y de su disponibilidad.</para>
 
     <para xml:lang="es">Estas clases suelen ser declarativas o con poca lógica
     (adaptar parámetros y opciones por defecto, etc...), delegando la
     ejecución de los comando a servicios OSGi definidos por un interface
-    (nomalmente con nombre terminado en el sufijo
+    (normalmente con nombre terminado en el sufijo
     <literal>Operations</literal>). Normalmente, la clase
     <literal>Commands</literal>, el Interface <literal>Operations</literal> y
     la implementación de esta última (<literal>OperationsImpl</literal>) se
-    encuentran en el mísmo paquete.</para>
+    encuentran en el mismo paquete.</para>
   </section>
 
   <section xml:id="puntos-entrada_listeners" xml:lang="es">
@@ -105,6 +105,6 @@
     </variablelist>
 
     <para xml:lang="es">En muchas ocasiones, nuestros add-ons necesitarán
-    notificaciones del Listener de metadatos.</para>
+    notificaciones del listeners de metadatos.</para>
   </section>
 </chapter>
