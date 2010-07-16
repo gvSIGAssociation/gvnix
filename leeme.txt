@@ -46,9 +46,13 @@ Spring Roo 1.1.0.M1
 * Cambiar al directorio raíz de gvNIX
 
 * Utiliza tu cliente Git para descargar los fuentes de Spring Roo desde
-  ``git://git.springsource.org/roo/roo.git`` en el directorio raíz de gvNXI. Ejemplo::
+  ``git://git.springsource.org/roo/roo.git`` en el directorio raíz de gvNXI. 
 
-    bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
+  Si se accede a internet a través de un proxy se ha de habilitar en la configuración de `Git`_ (Anexo -> Configruación proxy -> Git).
+
+  Ejemplo::
+
+      bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
 
 * Cambia al directorio de Spring Roo y actualizar a la versión 1.1.0.M1 
   ``3a0b8a399aae14167139c185e4e31355e20d1f25``. Ejemplo::
@@ -71,37 +75,10 @@ Maven
    bash:~$ echo export MAVEN_OPTS=\"-Xmx1024m -XX:MaxPermSize=512m\" >> ~/.bashrc
    bash:~$ source ~/.bashrc
 
-* Configurar acceso a Internet vía proxy:
-
-  Para configura el acceso de Maven a través de un proxy hay que definir la configuración en el fichero $M2_HOME/config/settings.xml. Este es un ejemplo de este fichero con una configuración del proxy::
-
-
-     <?xml version="1.0" encoding="UTF-8"?>
-
-     <settings xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                        http://maven.apache.org/xsd/settings-1.0.0.xsd">
-
-         ...
-
-         <proxies>
-             <proxy>
-                 <id>optional</id>
-                 <active>true</active>
-                 <protocol>http</protocol>
-                 <host>proxy.somewhere.com</host>
-                 <port>8080</port>
-                 <username>proxyuser</username>
-                 <password>somepassword</password>
-                 <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
-             </proxy>
-         </proxies>
-     </settings>
-
-
 Arrancar gvNIX dev
 ====================
+
+Si se accede a internet a través de un proxy se ha de habilitar en la configuración de `Maven`_ (Anexo -> Configruación proxy -> Maven).
 
 #. Construir gvNIX::
 
@@ -168,4 +145,60 @@ Esta guía de referencia te ayudará a empezar a trabajar. Algunas secciones
 * Instalación de gvNIX
 * Primeros pasos con gvNIX
 * Desarrollo de aplicaciones con gvNIX
+
+Anexo
+======
+
+Configruación proxy
+---------------------
+
+Git
+~~~~
+
+Configurar el acceso de Git a través de un proxy.
+
+# Configurar el proxy http en el entorno de trabajo:
+
+    bash:~$ export http_proxy=http://<username>:<password>@<proxy_ip>:<proxy_port>
+
+# Configurar utilizando la herramienta de configuracion de Git:
+
+    bash:~$ git config --global http.proxy proxy_addr:proxy_port
+
+# La descarga de un proyecto cambia si se utiliza un proxy, el comando es el mismo pero el protocolo cambia.
+
+    Checkout sin proxy::
+
+        bash:~$ git clone git://github.com/doctrine/doctrine2.git doctrine
+
+    Checkout *con proxy (se utiliza *http* en vez de git)::
+
+        bash:~$ git clone http://github.com/doctrine/doctrine2.git doctrine
+
+Maven
+~~~~~~
+
+Para configurar el acceso de Maven a través de un proxy hay que definir la configuración en el fichero $M2_HOME/config/settings.xml. Este es un ejemplo de este fichero con una configuración del proxy::
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <settings xmlns="http://maven.apache.org/POM/4.0.0" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                            http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+        ...
+
+        <proxies>
+            <proxy>
+                <id>optional</id>
+                <active>true</active>
+                <protocol>http</protocol>
+                <host>proxy.somewhere.com</host>
+                <port>8080</port>
+                <username>proxyuser</username>
+                <password>somepassword</password>
+                <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
+            </proxy>
+        </proxies>
+    </settings>
 

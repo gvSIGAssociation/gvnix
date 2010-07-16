@@ -43,9 +43,13 @@ Spring Roo 1.1.0.M1
 
 * Go to gvNIX root directory
 
-* Use your Git client to checkout Spring Roo sources from ``git://git.springsource.org/roo/roo.git`` to gvNIX root directory. Example::
+* Use your Git client to checkout Spring Roo sources from ``git://git.springsource.org/roo/roo.git`` to gvNIX root directory.
 
-   bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
+  If your internet connection is defined through a proxy you have to set up the confifuration in `Git`_ (Appendix -> Proxy configuration -> Git).
+
+  Example::
+
+     bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
 
 * Change to Spring Roo folder and switch to 1.1.0.M1 version ``3a0b8a399aae14167139c185e4e31355e20d1f25``. Example::
 
@@ -67,38 +71,10 @@ Maven
    bash:~$ echo export MAVEN_OPTS=\"-Xmx1024m -XX:MaxPermSize=512m\" >> ~/.bashrc
    bash:~$ source ~/.bashrc
 
-* Setup Internet access through proxy:
-
-  Maven proxy configuration is declared by the $M2_HOME/config/settings.xml. This is settings.xml proxy configuration example:
-
-
-     <?xml version="1.0" encoding="UTF-8"?>
-
-     <settings xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                        http://maven.apache.org/xsd/settings-1.0.0.xsd">
-
-         ...
-
-         <proxies>
-             <proxy>
-                 <id>optional</id>
-                 <active>true</active>
-                 <protocol>http</protocol>
-                 <host>proxy.somewhere.com</host>
-                 <port>8080</port>
-                 <username>proxyuser</username>
-                 <password>somepassword</password>
-                 <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
-             </proxy>
-         </proxies>
-     </settings>
-
-
-
 Run gvNIX dev
 =================
+
+If you have internet access through a proxy you have to enable in `Maven`_ configuration (Appendix -> Proxy configuration -> Maven).
 
 #. Build gvNIX::
 
@@ -161,4 +137,60 @@ This reference guide will help you to get started. Useful sections are:
 * Instalación de gvNIX
 * Primeros pasos con gvNIX
 * Desarrollo de aplicaciones con gvNIX
+
+Appendix
+=========
+
+Proxy configuration
+---------------------
+
+Git
+~~~~
+
+Configure Git access through a proxy.
+
+# Set ``http_proxy`` as an environment variable::
+
+    bash:~$ export http_proxy=http://<username>:<password>@<proxy_ip>:<proxy_port>
+
+# Set ``http.proxy`` using Git config command::
+
+    bash:~$ git config --global http.proxy proxy_addr:proxy_port
+
+# To download the project trhough a proxy you have to use the same command changing the protocol.
+
+    Checkout without proxy (git)::
+
+        bash:~$ git clone git://github.com/doctrine/doctrine2.git doctrine
+
+    Checkout *through a proxy* (use *http* instead of git)::
+
+        bash:~$ git clone http://github.com/doctrine/doctrine2.git doctrine
+
+Maven
+~~~~~~
+
+To configure Maven access through a proxy you have to set the proxy parameters in Maven configuration file $M2_HOME/config/settings.xml. This is an example of the proxy configuration in the file::
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <settings xmlns="http://maven.apache.org/POM/4.0.0" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                            http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+        ...
+
+        <proxies>
+            <proxy>
+                <id>optional</id>
+                <active>true</active>
+                <protocol>http</protocol>
+                <host>proxy.somewhere.com</host>
+                <port>8080</port>
+                <username>proxyuser</username>
+                <password>somepassword</password>
+                <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
+            </proxy>
+        </proxies>
+    </settings>
 
