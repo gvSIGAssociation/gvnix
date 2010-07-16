@@ -155,7 +155,7 @@ Configruación proxy
 Git
 ~~~~
 
-Configurar el acceso de Git a través de un proxy.
+Configurar el acceso de Git a través de un proxy http.
 
 # Configurar el proxy http en el entorno de trabajo:
 
@@ -178,7 +178,7 @@ Configurar el acceso de Git a través de un proxy.
 Maven
 ~~~~~~
 
-Para configurar el acceso de Maven a través de un proxy hay que definir la configuración en el fichero $M2_HOME/config/settings.xml. Este es un ejemplo de este fichero con una configuración del proxy::
+Para configurar el acceso de Maven a través de un proxy http hay que definir la configuración en el fichero $M2_HOME/config/settings.xml. Este es un ejemplo de este fichero con una configuración del proxy::
 
     <?xml version="1.0" encoding="UTF-8"?>
     <settings xmlns="http://maven.apache.org/POM/4.0.0" 
@@ -201,4 +201,22 @@ Para configurar el acceso de Maven a través de un proxy hay que definir la conf
             </proxy>
         </proxies>
     </settings>
+
+SVN
+~~~~
+
+Para configurar el acceso de SVN a través de un proxy http hay que definir la configuración en el fichero '~/.subversion/servers'::
+
+   [groups]
+   mosuma=svn.mosuma.com
+   [mosuma]
+   http-proxy-host=proxy.ntu.edu.sg
+   http-proxy-port=8080
+
+Groups define una dirección a la que acceder mediante svn y los valores para este grupo.
+
+Variables::
+
+  * [groups] Dentro del grupo ``groups`` definir la dirección del repositorio donde accede. Nombre del grupo y dirección.
+  * [Nombre del grupo] Definir las propiedades del proxy asociado al grupo (http-proxy-host y http-proxy-port).
 

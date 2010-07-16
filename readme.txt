@@ -194,3 +194,21 @@ To configure Maven access through a proxy you have to set the proxy parameters i
         </proxies>
     </settings>
 
+SVN
+~~~~
+
+To configure SVN access through a http proxy, e.g. your web browser requires a http proxy, add the following lines to '~/.subversion/servers'::
+
+   [groups]
+   mosuma=svn.mosuma.com
+   [mosuma]
+   http-proxy-host=proxy.ntu.edu.sg
+   http-proxy-port=8080
+
+Groups defines a specific direction to access by svn and then set the proxy values for this group.
+
+Variables::
+
+  * [groups] Set repository address to access inside group ``groups``. Name and address.
+  * [Name] Set group proxy connection properties (http-proxy-host y http-proxy-port).
+
