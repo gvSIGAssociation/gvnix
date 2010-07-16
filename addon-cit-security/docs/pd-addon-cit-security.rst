@@ -106,5 +106,5 @@ Parameters:
 
 Examples::
 
-    cit security setup --url http://localhost:9090/ServerWSAuth --appName myApp --password abcdefg
+    cit security setup --url http://localhost:9090/ServerWSAuth --appName terceros --login wsauth --password xx42valid
 
