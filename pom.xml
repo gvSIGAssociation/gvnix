@@ -36,7 +36,6 @@
     <description>Spring Roo based RAD tool for Conselleria d'Infraestructures i Transport - Generalitat Valenciana</description>
     <name>gvNIX</name>
     <modules>
-        <module>roo</module>
         <module>addon-persistence</module>
         <module>addon-web-menu</module>
         <module>addon-theme-manager</module>
@@ -70,27 +69,15 @@
         <system>bamboo</system>
         <url>https://build.springframework.org/browse/ROO</url>
     </ciManagement>
-
+    -->
+    
     <distributionManagement>
         <repository>
-            <id>spring-milestone</id>
-            <name>Spring Milestone Repository</name>
-            <url>s3://maven.springframework.org/milestone</url>
+            <id>gvNIX-releases</id>
+            <name>gvNIX Releases</name>
+            <url>ftp://ftp.disid.com:2121/upload</url>
         </repository>
-
-        <snapshotRepository>
-            <id>spring-snapshot</id>
-            <name>Spring Snapshot Repository</name>
-            <url>s3://maven.springframework.org/snapshot</url>
-        </snapshotRepository>
-
-        <site>
-            <id>static.springframework.org</id>
-            <url>scp://static.springframework.org/var/www/domains/springframework.org/static/htdocs/spring-roo</url>
-        </site>
-
     </distributionManagement>
-    -->
 
     <repositories>
         <repository>
@@ -577,7 +564,7 @@
                 <version>2.4</version>
 		<configuration>
 			<file>${project.build.directory}/${project.name}-${project.version}.zip</file>
-			<!-- <repositoryId>ftp-disid-cit</repositoryId> -->
+			<repositoryId>gvNIX-releases</repositoryId>
 			<groupId>gvNIX-install</groupId>
 			<artifactId>gvNIX</artifactId>
 			<version>${project.version}</version>

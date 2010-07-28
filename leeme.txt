@@ -46,7 +46,7 @@ Spring Roo 1.1.0.M1
 * Cambiar al directorio raíz de gvNIX
 
 * Utiliza tu cliente Git para descargar los fuentes de Spring Roo desde
-  ``git://git.springsource.org/roo/roo.git`` en el directorio raíz de gvNXI. 
+  ``git://git.springsource.org/roo/roo.git`` en el directorio raíz de gvNIX. 
 
   Si se accede a internet a través de un proxy se ha de habilitar en la configuración de `Git`_ (Anexo -> Configruación proxy -> Git).
 
