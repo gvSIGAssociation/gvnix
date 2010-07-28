@@ -22,7 +22,7 @@
       GNU General Public License for more details.
   
       You should have received a copy of the GNU General Public License
-      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+      along with this program.  If not, see <http://www.gnu.org/licenses />.
       ]]>
       </comments>
     </license>
@@ -32,7 +32,7 @@
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.0</version>
     <description>Spring Roo based RAD tool for Conselleria d'Infraestructures i Transport - Generalitat Valenciana</description>
     <name>gvNIX</name>
     <modules>
@@ -52,13 +52,13 @@
         <url>http://www.cit.gva.es/</url>
     </organization>
     <inceptionYear>2010</inceptionYear>
-    <url></url>
+    <url />
 
     <!-- Note when doing releases: tagBase is set in release plugin configuration below -->
 
     <scm>
-        <connection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/trunk/code</connection>
-        <developerConnection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/trunk/code</developerConnection>
+        <connection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/tags/0.3.0</connection>
+        <developerConnection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/tags/0.3.0</developerConnection>
     </scm>
     <!--
     <issueManagement>
@@ -250,27 +250,27 @@
 							<tasks>
                                 <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
                                 <if>
-                                    <equals arg1="${project.name}" arg2="gvNIX"/>
+                                    <equals arg1="${project.name}" arg2="gvNIX" />
                                     <then>
-                                        <echo message="No need to copy '${project.name}'"/>
+                                        <echo message="No need to copy '${project.name}'" />
                                     </then>
                                     <else>
                                         <if>
-                                            <equals arg1="${project.parent.build.directory}" arg2="$${project.parent.build.directory}"/>
+                                            <equals arg1="${project.parent.build.directory}" arg2="$${project.parent.build.directory}" />
                                             <then>
-                                                <echo message="Skipping as ${project.parent.build.directory} not set"/>
+                                                <echo message="Skipping as ${project.parent.build.directory} not set" />
                                             </then>
                                             <else>
-                                                <mkdir dir="${project.build.directory}/dependency"/>
+                                                <mkdir dir="${project.build.directory}/dependency" />
                                                 <copy todir="${project.parent.build.directory}/bundle/" preservelastmodified="true">
                                                     <fileset dir="${project.build.directory}">
-                                                        <include name="*.jar"/>
-                                                        <exclude name="*-sources.jar"/>
-                                                        <exclude name="org.springframework.roo.bootstrap-*.jar"/>
+                                                        <include name="*.jar" />
+                                                        <exclude name="*-sources.jar" />
+                                                        <exclude name="org.springframework.roo.bootstrap-*.jar" />
                                                     </fileset>
                                                     <fileset dir="${project.build.directory}/dependency">
-                                                        <include name="*.jar"/>
-                                                        <exclude name="org.apache.felix.framework-*.jar"/>
+                                                        <include name="*.jar" />
+                                                        <exclude name="org.apache.felix.framework-*.jar" />
                                                     </fileset>
                                                 </copy>
                                             </else>

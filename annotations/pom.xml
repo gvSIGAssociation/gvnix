@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <licenses>
     <license>
@@ -23,7 +22,7 @@
       GNU General Public License for more details.
   
       You should have received a copy of the GNU General Public License
-      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+      along with this program.  If not, see <http://www.gnu.org/licenses />.
       ]]>
       </comments>
     </license>
@@ -32,7 +31,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.gvnix</groupId>
 	<artifactId>org.gvnix.annotations</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>0.3.0</version>
 	<packaging>jar</packaging>
 	<name>gvNIX - Annotations</name>
         <organization>
@@ -116,15 +115,15 @@
 						<configuration>
 							<tasks>
 								<echo message="Deleting current content" />
-								<delete dir="${basedir}/src/main/java/org/"/>
+								<delete dir="${basedir}/src/main/java/org/" />
 								<echo message="Copying over annotations" />
                                 <copy todir="${basedir}/src/main/java/" preservelastmodified="true">
                                     <fileset dir="${basedir}/..">
-                                        <include name="**/GvNIX*.java"/>
-					<!--<exclude name="core/**"/>-->
+                                        <include name="**/GvNIX*.java" />
+					<!--<exclude name="core/**" />-->
                                     </fileset>
                                     <!-- Discard the module names prefixes from each file path -->
-									<regexpmapper from="^(.*).src.main.java.(.*)$$" to="\2"/>
+									<regexpmapper from="^(.*).src.main.java.(.*)$$" to="\2" />
                                 </copy>
 							</tasks>
 						</configuration>
