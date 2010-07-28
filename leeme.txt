@@ -15,8 +15,8 @@ participar en el desarrollo de gvNIX en sí mismo.
 Si lo que quieres es probar una versión que ya ha sido empaquetada, probada y
 distribuida por el equipo de desarrollo, te recomendamos que visites la 
 página de descargas de gvNIX 
-http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo y leas la 
-*Documentación de referencia* incluida en la distribución.
+http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo/gvnix/gvnix-documentacion/
+y leas la documentación *Guía de referencia*.
 
 Para la elaboración de este documento se ha utilizado reStructuredText y la codificación de caracteres UTF-8.
 
@@ -27,70 +27,240 @@ de Creative Commons. La licencia completa se puede consultar en
 http://creativecommons.org/licenses/by-sa/3.0/es/
 
 Requisitos
-================
+==========
 
 Para empezar con gvNIX necesitas:
 
-* Una máquina *nix (usuarios de Windows deberían poder usar gvNIX creando sus propios scripts .bat)
+* Una máquina Unix (usuarios de Windows deberían poder usar gvNIX creando sus propios scripts .bat)
 * JDK 5.0 o superior ( http://java.sun.com/javase/downloads/index.jsp )
 * Maven 2.0.9 o superior ( http://maven.apache.org/download.html )
-* Acceso a Internet para que Maven pueda descargar las dependencias
 * Cliente git, http://en.wikipedia.org/wiki/Git_%28software%29
+* Subversion
+* Acceso a Internet
+
+A continuación, se detalla el proceso de instalación y configuración de cada uno de estos requisitos.
+
+Instalación y configuración
+---------------------------
+
+Configuración del entorno Unix
+``````````````````````````````
+
+.. admonition:: Directorio de trabajo
+
+  Nos referiremos a $HOME como nuestro directorio de trabajo. En nuestro ejemplo, se corresponde con el directorio /home/user en donde user es el nombre de nuestro usuario en el sistema.
+
+Es de gran utilidad que en nuestro entorno estén definidas una serie de variables que nos ayuden en nuestro trabajo diario. Para ello, prepararemos un script donde iremos añadiendo lo que necesitemos. Para la preparación de nuestro script realizaremos la siguiente configuración previa:
+
+#. Crear en nuestro directorio de trabajo *$HOME* el fichero *.bash_devel*::
+
+    Intérprete de comandos bash:
+
+         touch $HOME/.bash_devel
+
+#. Modificar en nuestro directorio de trabajo *$HOME* el fichero *.bashrc* para que ejecute el fichero *.bash_devel* añadiendo al final las siguientes líneas::
+
+	# Development settings
+	if [ -f ~/.bash_devel ]; then
+	    . ~/.bash_devel
+	fi
+
+El fichero *.bashrc* se ejecuta siempre que se ejecuta el programa *bash*, por ejemplo cuando abrimos una consola nueva, por lo que siempre tendremos disponibles nuestras variables.
+
+Si hemos modificado el fichero *.bash_devel* y ya teníamos la consola abierta los cambios no serán aplicados en esta sesión, pero podemos volver a ejecutar dicho fichero con el comando::
+
+    Intérprete de comandos bash:
+
+         source .bash_devel
+
+A partir de ahora, cuando abramos una consola de comandos se ejecutará el contenido del fichero *.bash_devel*.
+
+.. admonition:: Importante
+
+  Cualquier referencia futura que hagamos a establecer una variable de entorno (``export``) deberá añadirse al *.bash_devel*.
+
+JDK
+```
+
+Por defecto, el equipo de desarrollo de gvNIX utiliza la versión 1.5.0_7 del JDK, pero puede utilizarse cualquier versión JDK 5.0 o superior.
+Se recomienda realizar hacer siempre la instalación siguiendo estos pasos:
+
+#. Descargar el JDK 1.5.0_7 de http://java.sun.com/products/archive/
+
+#. En el apartado Java Platform Standard Edition (Java SE)
+
+#. Sub-apartado JDK/JRE - 5.0
+
+#. Seleccionar 5.0 Update 7 y pulsar en "Go"
+
+#. Pulsar en la descarga de JDK 5.0 Update 7: "Donwload JDK".
+
+#. Seleccionar la plataforma Linux y el lenguage multidioma.
+
+#. Se puede descargar en formato .bin.
+
+#. Añadirle permiso de ejecución y ejecutarlo para que se descomprima::
+
+    Intérprete de comandos bash:
+
+         chmod 744 jdk-1_5_0_07-linux-i586.bin
+         ./jdk-1_5_0_07-linux-i586.bin
+
+#. Nos mostrará las condiciones de uso en texto y deberemos bajar hasta el final y aceptarlas.
+
+#. Se habrá descomprimido en un nuevo directorio dentro de *tmp_jdk*. Este nuevo directorio debemos moverlo a */usr/lib/jvm/*::
+
+    Intérprete de comandos bash:
+
+         sudo mkdir -p /usr/lib/jvm
+         sudo mv jdk1.5.0.0_07 /usr/lib/jvm
+
+#. Establecer las siguientes variables de entorno añadiendo las siguientes líneas en el fichero $HOME/.bash_devel::
+
+        export JAVA_HOME=/usr/lib/jvm/jdk1.5.0_07
+        export JRE_HOME=$JAVA_HOME/jre
+        export PATH=$JAVA_HOME/bin:$PATH
+
+Podemos comprobar que todo ha ido correctamente ejecutando en nuestra consola ya abierta::
+
+    Intérprete de comandos bash:
+
+         cd $HOME
+         source .bash_devel
+         java -version
+
+Y debemos ver un resultado parecido a este este::
+
+        java version "1.5.0_07"
+        Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_07-XXX)
+        Java HotSpot(TM) XXX Server VM (build 1.5.0_07-XX, mixed mode)
+
+Se pueden investigar las carpetas contenidas dentro del jdk, siendo las más importantes la carpeta 'bin' que contiene los ficheros ejecutables para compilar o lanzar aplicaciones java y la carpeta 'jre' que contiene la máquina virtual de java.
+
+.. admonition:: Nota
+
+  Si aún estás identificado como usuario root salir a usuario normal.
+
+Apache Maven 2
+``````````````
+
+#. Descargarlo con la última actualización 2.X.X (en el momento de elaboración de este documento, la 2.0.9):
+
+        http://maven.apache.org/download.html
+
+   Puede descargarse la versión comprimida en formato bz2 que será la que menos espacio ocupe.
+
+#. Descomprimirlo en el directorio deseado, en nuestro ejemplo lo haremos en $HOME/software/java
+
+#. Establecer las siguientes variables de entorno añadiendo las siguientes líneas en el fichero $HOME/.bash_devel::
+
+        export M2_HOME=$HOME/software/java/apache-maven-2.X.X
+        export M2=$M2_HOME/bin
+        export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
+        export PATH=$M2:$PATH
+
+Podemos comprobar que todo ha ido correctamente ejecutando en nuestra consola ya abierta::
+
+    Intérprete de comandos bash:
+
+         cd $HOME
+         source .bash_devel
+         mvn -version
+
+.. admonition:: Nota
+
+        Reemplazar 2.X.X por el número de actualización.
+
+Cliente Git
+```````````
+
+Installation using aptitude or apt.
+
+* Aptitude
+
+  Bash shell::
+
+    sudo aptitude install git-core
+
+* Apt-get
+
+  Bash shell::
+
+    sudo apt-get install git-core 
+
+Subversion
+``````````
+
+Esta herramienta es muy recomendable que sea instalada desde las utilidades del sistema operativo.
+
+Como ejemplo, para una distribución basada en *Debian* usaríamos el comando::
+
+    Intérprete de comandos bash:
+
+         sudo apt-get install subversion
+
+Podemos encontrar los paquetes binarios e instrucciones en la página http://subversion.tigris.org/getting.html#binary-packages
 
 Instrucciones de configuración
 ================================
 
-Spring Roo 1.1.0.M1
------------------------------
+Spring Roo
+----------
+
+gvNIX está basado en Spring Roo, por este motivo es necesario disponer del código fuente de Roo para compilar gvNIX.
 
 * Cambiar al directorio raíz de gvNIX
 
+  Ejemplo::
+
+      bash:/$ cd ~/gvnix/trunk/code
+
 * Utiliza tu cliente Git para descargar los fuentes de Spring Roo desde
-  ``git://git.springsource.org/roo/roo.git`` en el directorio raíz de gvNIX. 
+  su repositorio en el directorio raíz de gvNIX. 
 
   Si se accede a internet a través de un proxy se ha de habilitar en la configuración de `Git`_ (Anexo -> Configruación proxy -> Git).
 
   Ejemplo::
 
       bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
+  
+  Esto habrá descargado la rama raiz de desarrollo, es decir, el código fuente más actual del proyecto Roo.
+  En general, durante el desarrollo, trabajaremos con este código fuente más actual de Roo a no ser que se indique lo contrario.
+  
+  En algunos casos, podemos requerir una versión de Roo menos actual, por ejemplo, una versión de Roo anterior por requerimiento de gvNIX.
+  Para ello, necesitamos cambiar al directorio de Spring Roo y actualizar a la versión deseada.
+  Por ejemplo a la versión 1.1.0.M1 mediante el código ``3a0b8a399aae14167139c185e4e31355e20d1f25``::
 
-* Cambia al directorio de Spring Roo y actualizar a la versión 1.1.0.M1 
-  ``3a0b8a399aae14167139c185e4e31355e20d1f25``. Ejemplo::
+      bash:~/gvnix/trunk/code$ cd roo
+      bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
 
-    bash:~/gvnix/trunk/code$ cd roo
-    bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
-
-Maven
-------------
-
-* Configurar la variable de entorno MAVEN_OPTS::
-
-    bash:~/gvnix/trunk/code$ export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
-
-  Si ya tienes configurada la variable MAVEN_OPTS, simplemente valida que 
-  los tamaños de memoria son igual o superior a los indicados antes.
-
-  En entornos *nix, aconsejamos añadir la configuración a tu ``.bashrc``::
-
-   bash:~$ echo export MAVEN_OPTS=\"-Xmx1024m -XX:MaxPermSize=512m\" >> ~/.bashrc
-   bash:~$ source ~/.bashrc
-
-Arrancar gvNIX dev
-====================
+Arrancar la versión gvNIX de desarrollo
+=======================================
 
 Si se accede a internet a través de un proxy se ha de habilitar en la configuración de `Maven`_ (Anexo -> Configruación proxy -> Maven).
+
+#. Construir Roo::
+
+    bash:~/gvnix/trunk/code/roo$ mvn clean install
+   
+   Cada vez que actualizes el código fuente del proyecto Roo con el comando ``git pull`` necesitarás volver a construirlo.
 
 #. Construir gvNIX::
 
     bash:~/gvnix/trunk/code$ mvn clean install
+    
+   Cada vez que modifiques el proyecto gvNIX o hayas reconstruido el proyecto Roo, necesitarás volver a construir el gvNIX si quieres disponer de dichas modificaciones.
 
 #. Empezando con gvNIX
 
    * Incluir el directorio ``bin`` de gvNIX en la variable de entorno PATH::
 
-      bash:~/gvnix/trunk/code$ PATH=$PWD/bin:$PATH
+      bash:~/gvnix/trunk/code$ export PATH=~/gvnix/trunk/code/bin:$PATH
 
-   * Cambiar al directorio del proyecto Java::
+     A continuación, escribir el comando anterior en el fichero $HOME/.bash_devel para que
+     esté disponible en el futuro en todas las nuevas consolas que abras.
+
+   * Cambiar al directorio existente o nuevo del proyecto Java que quieras desarrollar con gvNIX::
 
       bash:~/gvnix/trunk/code$ cd ~/project-directory
 
@@ -98,35 +268,37 @@ Si se accede a internet a través de un proxy se ha de habilitar en la configura
 
       bash:~/project-directory$ gvnix-dev
 
-Escribir documentación
-=======================
-
-* Descargar e instalar el editor XML XMLmind Edición Personal ( http://www.xmlmind.com/xmleditor/download.shtml )
-* Usa tu editor de DocBook (por ejemplo, XMLmind) para abrir 
-``src/site/docbook/reference/index.xml`` y contribuir tu conocimiento.
-
 Empaquetar gvNIX
-=================
+================
 
-Para empaquetar una versión lista-para-instalar, utiliza el siguiente comando
-desde el directorio raíz de gvNIX::
+Para empaquetar una versión lista-para-instalar:
 
-  bash:~/gvnix/trunk/code$ mvn clean install site assembly:assembly
+* Utiliza el siguiente comando desde el directorio roo de gvNIX::
+
+   bash:~/gvnix/trunk/code/roo$ mvn clean install assembly:assembly
+
+* Utiliza el siguiente comando desde el directorio raíz de gvNIX::
+
+   bash:~/gvnix/trunk/code$ mvn clean install site assembly:assembly
 
 Creará el archivo ZIP ``target/gvNIX-{version}.zip``. Para instalarlo lee 
-la sección *Instalación de gvNIX* del documento 
-*gvNIX - Documentación de referencia*.
+la sección *Instalación de gvNIX* de la documentación a la que podrás acceder
+tal como se indica en la siguiente sección.
+
+Si lo que deseas es empaquetar una versión definitiva de gvNIX para ser distribuida al exterior,
+lee el documento emplazado en ``doc/general/empaquetado-relesease-gvnix.rst``.
 
 ¿Necesitas más información?
-============================
+===========================
 
-Para más información crea y lee el documento *gvNIX - Documentación de referencia* (spanish).
+Para más información crea y lee la documentación del proyecto.
 
-# Ejecuta el siguiente comando desde el directorio raíz de gvNIX::
+#. Si has ejecutado los comandos de la sección anterior, ya dispondrás de dicha documentación generada.
+   Sino, ejecuta el siguiente comando desde el directorio raíz de gvNIX::
 
-   bash:~/gvnix/trunk/code$ mvn site
+    bash:~/gvnix/trunk/code$ mvn site
 
-# Creará la documentación en el directorio "target/site/reference" (en distintos formatos)::
+#. Tendrás la documentación en el directorio "target/site/reference" (en distintos formatos)::
 
     target
     `-- site
@@ -138,22 +310,39 @@ Para más información crea y lee el documento *gvNIX - Documentación de refere
             |   `-- index.html
             `-- pdf
                 `-- gvNIX-referencia.pdf
+        `-- developer
+            |-- html
+            |   |-- index.html
+            |   `-- ...
+            |-- html-single
+            |   `-- index.html
+            `-- pdf
+                `-- gvNIX-desarrollo.pdf
 
-Esta guía de referencia te ayudará a empezar a trabajar. Algunas secciones
-útiles son:
+La documentación emplazada en ``reference`` te ayudará a empezar a desarrollar proyectos con gvNIX.
+Algunas secciones útiles son:
 
 * Instalación de gvNIX
 * Primeros pasos con gvNIX
 * Desarrollo de aplicaciones con gvNIX
 
-Anexo
-======
+La documentación emplazada en ``developer`` te ayudará a desarrollar el propio código de gvNIX.
 
-Configruación proxy
----------------------
+Escribir documentación
+======================
+
+* Descargar e instalar el editor XML XMLmind Edición Personal ( http://www.xmlmind.com/xmleditor/download.shtml )
+* Usa tu editor de DocBook (por ejemplo, XMLmind) para abrir 
+  ``src/site/docbook/reference/index.xml`` y contribuir tu conocimiento.
+
+Anexo
+=====
+
+Configuración proxy
+-------------------
 
 Git
-~~~~
+```
 
 Configurar el acceso de Git a través de un proxy http.
 
@@ -176,7 +365,7 @@ Configurar el acceso de Git a través de un proxy http.
         bash:~$ git clone http://github.com/doctrine/doctrine2.git doctrine
 
 Maven
-~~~~~~
+`````
 
 Para configurar el acceso de Maven a través de un proxy http hay que definir la configuración en el fichero $M2_HOME/config/settings.xml. Este es un ejemplo de este fichero con una configuración del proxy::
 
@@ -203,7 +392,7 @@ Para configurar el acceso de Maven a través de un proxy http hay que definir la
     </settings>
 
 SVN
-~~~~
+```
 
 Para configurar el acceso de SVN a través de un proxy http hay que definir la configuración en el fichero '~/.subversion/servers'::
 
