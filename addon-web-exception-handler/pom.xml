@@ -31,12 +31,12 @@
 	<parent>
 		<groupId>org.gvnix</groupId>
 		<artifactId>org.gvnix.parent</artifactId>
-		<version>0.5.0-SNAPSHOT</version>
+		<version>0.4.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.gvnix</groupId>
 	<artifactId>org.gvnix.web.exception.handler.roo.addon</artifactId>
 	<packaging>bundle</packaging>
-	<version>0.5.0-SNAPSHOT</version>
+	<version>0.4.0-SNAPSHOT</version>
 	<name>gvNIX - Addon - Uncaught Exception Handler Add-on</name>
     <description>gvNIX Uncaught Exception Handler Add-on</description>
 	<dependencies>
