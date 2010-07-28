@@ -57,8 +57,8 @@
     <!-- Note when doing releases: tagBase is set in release plugin configuration below -->
 
     <scm>
-        <connection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/trunk/code</connection>
-        <developerConnection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/trunk/code</developerConnection>
+        <connection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/branches/0.4.0</connection>
+        <developerConnection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/branches/0.4.0</developerConnection>
     </scm>
     <!--
     <issueManagement>
