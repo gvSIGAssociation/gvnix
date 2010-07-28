@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 
 import org.gvnix.dynamiclist.util.Messages;
@@ -39,18 +40,29 @@ public class HeaderTableTag extends javax.servlet.jsp.tagext.TagSupport {
 	
 	private static final long serialVersionUID = 6091229755397505524L;
 
+	private Integer actualPage = 0;
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.jsp.tagext.TagSupport#doEndTag()
 	 */
 	public int doStartTag() throws JspException {		
 		
-		List<String> metaFieldsNames = (List<String>)pageContext.getRequest().getAttribute(TagConstants.META_FIELDS_NAMES);
-		List<Type> metaFieldsTypes = (List<Type>)pageContext.getRequest().getAttribute(TagConstants.META_FIELDS_TYPES);
+		actualPage = pageContext.getRequest().getAttribute(TagConstants.PAGE_NAME) != null ? 
+				(Integer)pageContext.getRequest().getAttribute(TagConstants.PAGE_NAME) : 0;		
 		
-		pageContext.setAttribute(TagConstants.META_FIELDS_TYPES, metaFieldsTypes);
-		pageContext.setAttribute(TagConstants.META_FIELDS_NAMES, metaFieldsNames);
+		HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
+				
+		List<String> metaFieldsNames = (List<String>)request.getAttribute(TagConstants.META_FIELDS_NAMES);
+		List<Type> metaFieldsTypes = (List<Type>)request.getAttribute(TagConstants.META_FIELDS_TYPES);
 		
+		//pageContext.setAttribute(TagConstants.META_FIELDS_TYPES, metaFieldsTypes);
+		//pageContext.setAttribute(TagConstants.META_FIELDS_NAMES, metaFieldsNames);
+		
+		String contextPath = request.getContextPath();
+		String imagesPath = (String)pageContext.getAttribute(TagConstants.IMAGES_PATH);
+		String url_base = contextPath + "/" + pageContext.getAttribute(TagConstants.URL_BASE);
+		String classObject = pageContext.getAttribute(TagConstants.URL_BASE) + ".";
 		
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("<table width=\"99%\" height=\"24\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"colorAcciones\">\n");
@@ -69,8 +81,24 @@ public class HeaderTableTag extends javax.servlet.jsp.tagext.TagSupport {
 			/*buffer.append("<TD width=\"" + lStrPorcentaje + "\"");
 			" title=\""+ lStrTituloColumnaAbreviada +"\" "			
 			 */
+			buffer.append(">\n");
 			
-			buffer.append("><img src=\"");
+			buffer.append("<a href=\"");
+			buffer.append(url_base);
+			buffer.append(TagConstants.URL_SEARCH);
+			buffer.append("?");
+			buffer.append("page=");
+			buffer.append(actualPage);
+			buffer.append("&");
+			buffer.append("orderByColumn=");
+			buffer.append(metaFieldName);
+			buffer.append(" ASC");
+			buffer.append("\">");
+			buffer.append("<img src=\"\n");
+			buffer.append(imagesPath);
+			buffer.append("/flechaverde_arriba.gif\" class=\"paginacionFlecha\"></a>\n");
+			
+			/*buffer.append("<img src=\"");
 			buffer.append(pageContext.getAttribute(TagConstants.IMAGES_PATH));
 			buffer.append("/flechaverde_arriba.gif\"");
 			buffer.append(" onclick=\"SDFmuestraOrdenar('");
@@ -79,19 +107,28 @@ public class HeaderTableTag extends javax.servlet.jsp.tagext.TagSupport {
 			//buffer.append(lStrAction);
 			buffer.append("','");
 			//buffer.append(this.configuracion.getHandlerparameter());
-			buffer.append("')\" ><B><FONT FACE=Verdana SIZE=-2>");
+			buffer.append("')\" >");*/
 			
-			buffer.append(Messages.getMessage(metaFieldName));
+			buffer.append("<B><FONT FACE=Verdana SIZE=-2>");
+			buffer.append(Messages.getMessage(classObject + metaFieldName, request));
+			buffer.append("</B></FONT>");
 			
-			buffer.append("</B></FONT><img src=\"");
-			buffer.append(pageContext.getAttribute(TagConstants.IMAGES_PATH));
-			buffer.append("/flechaverde_bajo.gif\" onclick=\"SDFmuestraOrdenar('");
-			//buffer.append(lStrNomcolbd);
-			buffer.append(" DESC','");
-			//buffer.append(lStrAction);
-			buffer.append("','");
-			//buffer.append(this.configuracion.getHandlerparameter());
-			buffer.append("')\" ></td>");		
+			buffer.append("<a href=\"");
+			buffer.append(url_base);
+			buffer.append(TagConstants.URL_SEARCH);
+			buffer.append("?");
+			buffer.append("page=");
+			buffer.append(pageContext.getRequest().getAttribute(TagConstants.PAGE_NAME));
+			buffer.append("&");
+			buffer.append("orderByColumn=");
+			buffer.append(metaFieldName);
+			buffer.append(" DESC");
+			buffer.append("\">");
+			buffer.append("<img src=\"\n");
+			buffer.append(imagesPath);
+			buffer.append("/flechaverde_bajo.gif\" class=\"paginacionFlecha\"></a>\n");			
+			buffer.append("</td>");
+		
 		}
 		
 		buffer.append("<td width=\"9\" >&nbsp;</td>\n");
@@ -125,6 +162,14 @@ public class HeaderTableTag extends javax.servlet.jsp.tagext.TagSupport {
 			new JspException(e);
 		}
 		return EVAL_PAGE;
+	}
+
+	public Integer getActualPage() {
+		return actualPage;
+	}
+
+	public void setActualPage(Integer actualPage) {
+		this.actualPage = actualPage;
 	}
 
 	

@@ -20,6 +20,11 @@ package org.gvnix.dynamiclist.exception;
 
 import java.util.Date;
 
+/**
+ * 
+ * Custom DAO Exception for DynamicList.
+ *
+ */
 public class DynamiclistDaoException extends Exception {
 
 	private static final long serialVersionUID = 1L;	
@@ -93,11 +98,11 @@ public class DynamiclistDaoException extends Exception {
 	 */
 	public String toString() {
 		String lStrError = "\n#####################################################";
-		lStrError += "\nFecha: " + date;
-		lStrError += "\nCODIGO ERROR: " + code;
-		lStrError += "\nClase: " + className;
-		lStrError += "\nM�todo: " + methodName;
-		lStrError += "\nExcepci�n:\n" + exception;
+		lStrError += "\nDate: " + date;
+		lStrError += "\nERROR CODE: " + code;
+		lStrError += "\nClasS: " + className;
+		lStrError += "\nMethod: " + methodName;
+		lStrError += "\nException:\n" + exception;
 		lStrError += "\n#####################################################\n";
 
 		return lStrError;

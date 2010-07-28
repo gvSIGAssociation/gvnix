@@ -21,13 +21,18 @@ package org.gvnix.dynamiclist.tags;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+import org.gvnix.dynamiclist.util.Messages;
 import org.gvnix.dynamiclist.util.TagConstants;
 
 
@@ -43,23 +48,23 @@ public class TableTag extends TagSupport {
 	private static final long serialVersionUID = -217053490008543012L;
 	
 	private List<?> list;
+	private String pk;
+	private String dateFormat;
 	
-	private String classObject;
 	private String url_base;
-	private List<String> metaFieldsNames;
+	private Collection<String> metaFieldsNames;
+	private String groupBy;
 	 
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.jsp.tagext.TagSupport#doStartTag()
 	 */
-	public int doStartTag() throws JspException {
-		
+	@SuppressWarnings("unchecked")
+	public int doStartTag() throws JspException {		
 		//pageContext.getAttribute(TagConstants.IMAGES_PATH);		
 		url_base = (String)pageContext.getAttribute(TagConstants.URL_BASE);
-		classObject = (String)pageContext.getAttribute(TagConstants.CLASS_OBJECT);
-		metaFieldsNames = (List<String>)pageContext.getAttribute(TagConstants.META_FIELDS_NAMES);
-		
-		pageContext.setAttribute(TagConstants.LIST, list);
+		metaFieldsNames = (Collection<String>)pageContext.getRequest().getAttribute(TagConstants.META_FIELDS_NAMES);		
+		groupBy = (String) pageContext.getRequest().getAttribute(TagConstants.GROUPBY);
 		
 		return SKIP_BODY;
 	}
@@ -69,9 +74,14 @@ public class TableTag extends TagSupport {
 	 * @see javax.servlet.jsp.tagext.TagSupport#doEndTag()
 	 */
 	public int doEndTag() throws JspException {
+		HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
+		String contextPath = request.getContextPath();		
+		if (StringUtils.isEmpty(dateFormat)){
+			dateFormat = TagConstants.DATE_FORMAT_DEFAULT;
+		}
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
 		
-		StringBuffer buffer = new StringBuffer();
-		
+		StringBuffer buffer = new StringBuffer();		
 		buffer.append("<SCRIPT>\n");
 		/*
 		 * // Funciones de cambio de pk, cambio de estado...
@@ -85,8 +95,18 @@ public class TableTag extends TagSupport {
 		
 		int cont = 0;
 		String colorRow = "";
+		String previusValue = "";
+		
 		//iterate rows
 		for (Object object : list) {
+			StringBuffer row = new StringBuffer();
+			String objectId;
+			try {
+				objectId = PropertyUtils.getProperty(object, "id").toString(); 
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new JspException("Error, Id atribute not found", e);
+			}			
 			
 			//se pinta la fila
 			if (cont % 2 == 0) {
@@ -94,44 +114,77 @@ public class TableTag extends TagSupport {
 			} else {
 				colorRow = "txresultadoblanco";
 			}			
-			buffer.append("<TR id='");
-			//buffer.append(lStrPk);
-			buffer.append("' lang='");
+			row.append("<tr id='");
+			row.append(objectId);
+			row.append("' lang='");
 			//buffer.append(lStrPkalternativa);
-			buffer.append("' class='");
-			buffer.append(colorRow);
-			buffer.append("' onclick=\"ponerPk(this);ponerEst(this); ");
-			buffer.append("\" ");
+			row.append("' class='");
+			row.append(colorRow);
+			row.append("' onclick=\"setPkAct(this);");
+			//buffer.append("ponerEst(this); ");
+			row.append("\" ");
 			
-			buffer.append(" ondblclick=\"");
-			//buffer.append(b);			
-			buffer.append("\"");
-			buffer.append(" >\n");
+			row.append(" ondblclick='dl_read(\"");
+			row.append(contextPath);	
+			row.append("/");
+			row.append(url_base);
+			row.append("\",\"");
+			row.append(Messages.getMessage("dynamiclist.alert.select", request));
+			row.append("\");'>");
 			
-		
+			
+			boolean changeValueGroupBy = false;
 			for (String name : metaFieldsNames) {
 				Method method;
+				String value;
 				try{
-					method = object.getClass().getMethod("get" + name);				
+					method = object.getClass().getMethod("get" + StringUtils.capitalize(name));
+					//Format the attribute Date type 
+					if (method.getGenericReturnType() == Date.class) {
+						value = simpleDateFormat.format(method.invoke(object));
+					} else {
+						value = method.invoke(object).toString();
+					}
 				} catch (NoSuchMethodException e) {
 					e.printStackTrace();
-					throw new JspException("", e);
+					throw new JspException("Error in metaFieldsNames", e);
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+					throw new JspException("Error in metaFieldsNames", e);
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+					throw new JspException("Error in metaFieldsNames", e);
 				}	
 				
-				buffer.append(" <td>");
-				try {
-					buffer.append(method.invoke(object).toString());
-				} catch (InvocationTargetException e) {
-					throw new JspException("", e);
-				} catch (IllegalAccessException e) {
-					throw new JspException("", e);
-				}				
-				buffer.append(" </td>\n");
-			}
-			
+				//groupBy is not empty
+				if (StringUtils.isNotEmpty(groupBy) && name.equalsIgnoreCase(groupBy)){
+					if (StringUtils.isNotEmpty(previusValue) && previusValue.equalsIgnoreCase(value)){
+						row.append("<td></td>\n");
+					} else {
+						row.append("<td><B>");
+						row.append(value);
+						row.append("</B></td>\n");
+						if (cont!=0){
+							changeValueGroupBy = true;
+						}
+					}
+					previusValue = value;
+				} else {
+					row.append("<td>");
+					row.append(value);
+					row.append("</td>\n");					
+				}
+			}			
 			//close row
-			buffer.append("</TR>");
+			row.append("</TR>");
 			
+			if (StringUtils.isNotEmpty(groupBy) && changeValueGroupBy){
+				buffer.append("<TR bgcolor=\"#B6CCC6\"> <TD height=\"2\" colspan=\"");					
+				buffer.append(metaFieldsNames.size());
+				buffer.append("\">");
+				buffer.append("</TD></TR>");					
+			}
+			buffer.append(row);			
 			cont++;
 		}		
 		try {
@@ -150,6 +203,22 @@ public class TableTag extends TagSupport {
 
 	public void setList(List<?> list) {
 		this.list = list;
-	}	
+	}
+
+	public String getPk() {
+		return pk;
+	}
+
+	public void setPk(String pk) {
+		this.pk = pk;
+	}
+
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
 
 }

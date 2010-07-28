@@ -1,226 +1,89 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html:html>
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+
+<html>
+
 <head>
-<%@ page 
-language="java"
-contentType="text/html; charset=ISO-8859-1"
-pageEncoding="ISO-8859-1"
-%>
-
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<meta name="GENERATOR" content="IBM WebSphere Studio">
-<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title><spring:message code="exportList.title"/></title>
 </head>
-
 <body>
 
+	
 <%
-	String lStrTitulo = (String) request.getAttribute("pStrVista");
+	String lStrTitulo = (String) request.getAttribute("simpleNameClass");
 	String lStrArchivo = lStrTitulo + ".xls";
 	String contentDisposition = "attachment;filename=" + lStrArchivo;
-	response.setHeader("Content-Disposition",contentDisposition);
+	response.setHeader("Content-Disposition", contentDisposition);
 %>
-<%
-	MetadatoDTO[] lObjColumnas = (MetadatoDTO[]) request.getAttribute("pObjColumnas");
-%>
-<%
-	Auxiliar lObjAuxiliar = new Auxiliar();
-%>
-<% String lStrAgrupar = (String) request.getAttribute("pStrAgrupar"); %>
-<% String lStrTabla = (String) request.getAttribute("pStrTabla"); %>
-<% String lStrFiltro = (String) request.getAttribute("pStrFiltro"); %>
-<% String lStrNomFiltro = (String) request.getAttribute("pStrNomFiltro"); %>
 
-	
-<html:form action="operador.do">
-
-<%
-	String lStrFijo;
-	int lIntFijo=0;
-	int lIntAux=0;
-	for (int i=0; i<lObjColumnas.length; i++){
-		lIntAux = Integer.parseInt(lObjColumnas[i].getPorcentaje()) + 20;
-		lObjColumnas[i].setPorcentaje(String.valueOf(lIntAux));
-		lStrFijo = lObjColumnas[i].getPorcentaje();
-		lIntFijo = lIntFijo + Integer.parseInt(lStrFijo);
-		lObjColumnas[i].setPorcentaje(String.valueOf(lIntAux) + "px");
-	}
-	if (lIntFijo < 730) {
-		lIntFijo = 730;
-	}
-	
-	
-%>
-<table width="<%= String.valueOf(lIntFijo + 3) %>" border="0">
+<table border="0">
 	<tr>
-		 <td width="3px">
-		 </td>
-		 <td width="<%= String.valueOf(lIntFijo) %>">
-			<table width="<%= String.valueOf(lIntFijo) %>" border="0">
+		 <td width="3px"></td>		 
+		 <td>
+			
+			<table border="0">
 				<tr>
-						<td colspan="2">
-							<b>
-							<font face=Verdana size=3 color=black>
-								<u>
-								<% if(lStrTitulo!=null){%>
-									<%=lStrTitulo%>
-								<% } else { %>
-									<spring:message code="exportList.title"/>
-								<% } %>
-								</u>
-							</font>
-							</b>
-						</td>
-						<td colspan="2">
-							<font face=Verdana size=1 color=black>
-								<% if(lStrNomFiltro!=null){%>
-									<%=lStrNomFiltro%>
-								<% } else { %>
-									<spring:message code="exportList.notEstablish"/>
-								<% } %>
-							</font>
-						</td>
-						<td colspan="10">
-							<font face=Verdana size=1 color=black>
-								<% if(lStrFiltro!=null){%>
-									<%=lStrFiltro%>
-								<% } else { %>
-									<spring:message code="exportList.notFilter"/>
-								<% } %>
-							</font>
-						</td>
+					<td colspan="2">
+						<B>
+							<FONT FACE=Verdana SIZE=3 COLOR=black>
+								<u><spring:message code='${url_base}' text="${simpleNameClass}"/></u>
+							</FONT>
+						</B>
+					</td>
+					<td colspan="2">
+						<FONT FACE=Verdana SIZE=1 COLOR=black>
+							<c:set var="labelFilterDefault" value='<spring:message code="exportList.defaultFilterName"/>' />
+							<spring:message code="${labelFilter}" text="${labelFilterDefault}" />
+						</FONT>
+					</td>
+					<td colspan="10">
+						<FONT FACE=Verdana SIZE=1 COLOR=black>														
+							<c:if test="${not empty humanTextFilter}">
+								<c:out value="${humanTextFilter}"/>
+							</c:if>
+							<c:if test="${empty humanTextFilter}">
+								<spring:message code="exportList.notFilter"/>
+							</c:if>							
+						</FONT>
+					</td>
 				</tr>
-					<tr>
-						<td>
-							
-						</td>
-					</tr>
+				<tr><td></td></tr>
 			</table>
 			
-			<table width="<%= String.valueOf(lIntFijo) %>" border="1" cellpadding="0" cellspacing="0">
-				<tbody>
-					<tr bgcolor=white>
-					<% int lIntContador = 0; %>					
-					<c:forEach var="column" items="${pObjColumnas}">						
-						<!-- <bean:define id="lStrNomColActual" name="pObjColumnas" property="nomcolbd" /> -->							
-						<td width='<c:out value="${column.porcentaje}"/>' >
-							<b>
-								<font face=Verdana size=-2 color=black>
-									<spring:message code="${column.nomcolproperties}" />
-								</font>
-							</b>
-						</td>
-						<% lIntContador++; %>
+			<TABLE border="1" cellpadding="0" cellspacing="0">				
+				<TBODY>
+					<TR bgcolor=white>													
+					<c:forEach items="${columns}" var="column">						
+						<TD width="<c:out value="${columnsWidth[column] + 5}"/> px">
+							<B>
+								<FONT FACE=Verdana SIZE=-2 COLOR=black>
+								    <!-- spring:message code= -->
+								    <spring:message code="${url_base}.${column}" text="${column}"/>									
+								</FONT>
+							</B>
+						</TD>						
 					</c:forEach>
-					</tr>
+					</TR>
+				</TBODY>
 					
-					<% String lStrValAnt="inicio"; %>
-					<% boolean lBooDel=false; %>
-					<% int lIntConDatos = 0; %>	
-										
-					<c:forEach var="object" items="${pObjDatos}">	
-					<% boolean lBooBordeinferior = false; 
-					<% if (lStrAgrupar!=null) { %>
-						<% 	String lStrNombreBean = "";
-							String lStrPropertyBean = "";
-							boolean lBooEsNulo = false;
-						%>
-						<c:if test="${not empty object.<%= lStrAgrupar%>}">						
-							<% 	lStrNombreBean = "pObjDatos"; 
-								lStrPropertyBean = lStrAgrupar.toLowerCase();%>
-						</c:if>
-						
-						<c:if test="${empty object.<%= lStrAgrupar%>}">						
-							<% 	lStrNombreBean = "pObjDatos"; 
-								lStrPropertyBean = "codpue";
-								lBooEsNulo = true; %>								
-						</c:if>
-						
-						<% if (!(lBooEsNulo)) { %>							
-							<c:set var="lStrValAct" value='${<%= lStrNombreBean +"."+ lStrPropertyBean %>}'/>			
-							<% if (!(lStrValAnt.equals(String.valueOf(lStrValAct)))) { %>
-								<% lStrValAnt = String.valueOf(lStrValAct); %>
-								<% if (lIntConDatos != 0) { %>
-									<% lBooDel = true; %>
-								<% } %>
-							<% } %>
-						<% } else { %>
-							<% if (!(lStrValAnt.equals("valornulo"))) { %>
-								<% lStrValAnt = "valornulo"; %>
-								<% if (lIntConDatos != 0) { %>
-									<% lBooDel = true; %>
-								<% } %>
-							<% } %>
-						<% } %>
-						<% if ((lBooDel)&&(lIntConDatos != 0)) { 
-								lBooBordeinferior = true;
-						   } %>
-					<% } %>
-					
-					<% String lStrColorCol = "FFFFFF"; %>
-						
-					<tr bgcolor="<%= lStrColorCol %>">
-					<% for(int i = 0; i < lObjColumnas.length; i++)  { %>
-					
-					<% String lStrColAct = lObjColumnas[i].getNomcolbd(); %>
-					
-					<td <% if (lObjColumnas[i].getTipodato().equalsIgnoreCase("DATE")){%> style='mso-number-format:"General Date";' align="right" <%}%>>
-						<font FACE=Verdana size=-2>					
-						<% if ((lStrAgrupar != null)&&(lStrAgrupar.equalsIgnoreCase(lStrColAct))) { 
-							    if ((lBooDel)||(lIntConDatos==0)) { %>
-							    	<b>
-							    	<% if (lObjColumnas[i].getTipodato().equalsIgnoreCase("DATE")){%>										
-										<fmt:formatDate value="${object.<%= lStrColAct.toLowerCase() %>}" pattern="yyyy/MM/dd HH:mm" /> 
-									<% } else if (lObjColumnas[i].getTipodato().equalsIgnoreCase("NUMBER")){%>											
-											<c:set var="lStrNumeroActual" value="${object.<%= lStrColAct.toLowerCase() %>}"/>											
-											<%
-												String lStrNumber = String.valueOf(lStrNumeroActual);
-												lStrNumber = lStrNumber.trim();
-												if (lStrNumber.indexOf(".") != -1){
-													lStrNumber = lStrNumber.replace('.',',');
-												}
-											%>
-											<%=lStrNumber%>
-								    <%} else { %>
-										<c:out value="${object.<%= lStrColAct.toLowerCase() %>}" />&nbsp;
-									<% } %>
-							    	</b>
-							   <% }
-						 	} 
-						   	else { %>
-									<% if (lObjColumnas[i].getTipodato().equalsIgnoreCase("DATE")){%>											
-											<fmt:formatDate value="${object.<%= lStrColAct.toLowerCase() %>}" pattern="yyyy/MM/dd HH:mm" />
-									<% } else if (lObjColumnas[i].getTipodato().equalsIgnoreCase("NUMBER")){%>											
-											<c:set var="lStrNumeroActual1" value="${object.<%= lStrColAct.toLowerCase() %>}"/>
-											<%
-												String lStrNumber1 = String.valueOf(lStrNumeroActual1);
-												lStrNumber1 = lStrNumber1.trim();
-												if (lStrNumber1.indexOf(".") != -1){
-													lStrNumber1 = lStrNumber1.replace('.',',');
-												}
-											%>
-											<%=lStrNumber1%>
-									 <%} else { %>
-										<c:out value="${object.<%= lStrColAct.toLowerCase() %>}" />&nbsp;
-									<% } %>
-							<% } %>
-						</font>
-					</td>
-					<% } %>					
-					</tr>
-					<% if (lBooDel) lBooDel = false; %>
-					<% lIntConDatos++; %>
-					</c:forEach>	
-				</tbody>
-			</table>
+				<c:forEach items="${objectList}" var="dataObject">
+					<tr bgcolor="FFFFFF">
+						<c:forEach items="${columns}" var="column">
+						<TD>
+							<FONT FACE=Verdana SIZE=-2>
+								<c:out value="${dataObject[column]}"/>
+							</FONT>
+						</TD>
+						</c:forEach>
+					</tr>	
+				</c:forEach>
+			</TABLE>			
 		</td>
 	</tr>
 </table>
 
-<!-- 
-<input type="hidden" id="pStrGUID" name="value(pStrGUID)" value='<logic:present name="pStrGUID"><bean:write name="pStrGUID"/></logic:present>' /></html:form>
- -->
- 
 </body>
-</html:html>
-
+</html>

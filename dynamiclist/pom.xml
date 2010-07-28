@@ -102,6 +102,23 @@
 			<artifactId>org.springframework.web.servlet</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		
+		<!-- Dependencies for spring security -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>org.springframework.security.annotation</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>org.springframework.security.core</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>org.springframework.security.taglibs</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
 
 		<!-- Dependencies for aspectj -->
 		<dependency>
@@ -113,7 +130,15 @@
 			<groupId>org.aspectj</groupId>
 			<artifactId>com.springsource.org.aspectj.weaver</artifactId>
 			<version>${aspectj.version}</version>
-		</dependency>		
+		</dependency>
+			
+		<!-- Dependencies for persistence -->
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>com.springsource.javax.persistence</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>com.springsource.javax.servlet</artifactId>
@@ -237,6 +262,7 @@
 
 	<properties>
 		<spring.version>3.0.3.RELEASE</spring.version>
+		<spring.security.version>2.0.5.RELEASE</spring.security.version>
 		<aspectj.version>1.6.6.RELEASE</aspectj.version>		
 		<junit.version>4.7.0</junit.version>
 	</properties>
