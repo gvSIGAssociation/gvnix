@@ -8,6 +8,10 @@
 :Revision:  $Rev$
 :Date:      $Date$
 
+.. contents::
+   :depth: 2
+   :backlinks: none
+
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
 Unported License. To view a copy of this license, visit 
 http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to 
@@ -17,29 +21,30 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Requirements
 ============
 
-* Generate local services, withour web service support (Spring @Service).
+* Allow the generation of local services, withour web service support (Spring @Service).
 
 * Generate web service clients and servers easily.
 
 * Web service servers creation without write wsdl and xsd.
-  Contract first model, but contract (wsdl+xsd) generated from Java with a DSL language (Java Annotations).
+  Use contract first model, but generate contract (wsdl + xsd) from Java with a DSL language as Java Annotations.
   
-  A change in the source code should not affect the generated service contract (wsdl+xsd). 
-  If a code change makes their relationship inconsistent with the information defined in the annotations of the service, would be important to generate a compilation error.
+  A change in the source code should not affect the generated service contract (wsdl + xsd). 
+  If a code change makes inconsistent the relationship with the service annotations, would be required to generate a compilation or startup error.
   
-* Support web services clients generation compatible with JAX-RPC web service servers.
+* Support web services clients generation compatible with JAX-RPC web service servers standar.
 
-* Web services clients and servers generation compatible with FUSE ESB / Servicemix.
+* Web services clients and servers generation would be executable on FUSE ESB / Servicemix environments.
 
-* Allow web service servers generation from service layer o entity layer.
-  Not use interfaces related to the implementation on service layer and entitity layer.
+* Allow web service servers generation on the service layer o entity layer of Roo.
+
+* Not use interfaces related to the implementation on service layer and entitity layer web service servers generation.
 
 * Web service framework installation will be automatic when client or server generation is required. 
 
-* Utilizar en los servidores generados SOAP binding document/literal frente a RPC, ya que RPC está obsoleto.
+* Using SOAP binding document / literal versus RPC / encoded servers generated, because RPC is obsolete by WS-I Basic Profile.
 
 Additionally, There are some limitations on wsdl generation from Java.
-The addon requirements are solve or avoid this limitations too.
+Another requirements are to solve or avoid this limitations too.
 
 Limitations
 -----------
@@ -77,8 +82,10 @@ These limitations would be resolved. There are sorted by relevance:
 #. Reusability
 
    Defining your schema in a separate file allows you to reuse that file in different scenarios.
+   
+More information:
 
-http://static.springsource.org/spring-ws/sites/2.0/reference/html/why-contract-first.html
+* http://static.springsource.org/spring-ws/sites/2.0/reference/html/why-contract-first.html
 
 Analysis
 ========
@@ -86,7 +93,7 @@ Analysis
 Web Services Framework
 ----------------------
 
-Spring Web Services and Apache CXF comparisson.
+Spring Web Services and Apache CXF comparisson:
 
 .. list-table:: 
    :widths: 50 50 50
@@ -98,15 +105,15 @@ Spring Web Services and Apache CXF comparisson.
    * - Development styles
      - Contract first
      - Contract first and code first
-   * - JAX-RPC and JAX-WS APIs support
+   * - JAX-RPC support
      - Yes
-     - Only JAX-WS, because JAX-RPC is deprecated (http://stackoverflow.com/questions/412772/java-rpc-encoded-wsdls-are-not-supported-in-jaxws-2-0)
+     - No, because JAX-RPC is deprecated (http://stackoverflow.com/questions/412772/java-rpc-encoded-wsdls-are-not-supported-in-jaxws-2-0)
    * - JAX-WS support
-     - No, they use their own implementation
+     - No, use their own implementation
      - Yes
    * - JAX-B support
      - Yes
-     - Yes, and more framewworks
+     - Yes, and more frameworks
    * - REST support
      - Yes, on lastest versions
      - Yes
@@ -117,14 +124,34 @@ Spring Web Services and Apache CXF comparisson.
      - Yes
      - Yes
 
-CXF has no support JAX-RPC client generation, Axis will be used instead on this clients.
-CXF is already integrated with Roo.
-We have already some web service servers generated with CXF on the gvNIX sponsor organization.
+Pros and cons:
 
-FUSE ESB / Servicemix has no support Spring WS.
-The Spring annotations provides less control of the contract wsdl generated, because its orientation appears first contract focused on prewriting of wsdl.
+* Apache CXF
+
+ * Pros:
  
-**CXF has been selected as web services framework.**
+  * Is already integrated by us on Roo.
+  * We have already some web service servers generated with CXF on the gvNIX sponsor organization.
+  * FUSE ESB / Servicemix support.
+  
+ * Cons:
+ 
+  * CXF has no support JAX-RPC client generation, Axis could be used instead on this clients.
+  
+* Spring Web Services
+
+ * Pros
+ 
+  * Roo is a Spring product as Spring Web Services: better integration expected.
+  
+ * Cons
+ 
+  * No FUSE ESB / Servicemix support.
+  * The Spring annotations provides less control of the contract wsdl generated, because its orientation appears first contract focused on prewriting of wsdl.
+ 
+**CXF has been selected as web services framework because has ESB / Servicemix support and better contract generation annotations.**
+
+More information:
 
 * http://static.springsource.org/spring-ws/sites/2.0/reference/html/tutorial.html
 * http://cxf.apache.org/docs/defining-contract-first-webservices-with-wsdl-generation-from-java.html   
@@ -139,7 +166,7 @@ Limitations solution
 
    Use JAX-B and JAX-WS annotations to avoid source code modifications makes web service contract change.
 
-   **Source code elements related on operations contract generation with JAX-WS:**
+   **Source code elements related to contract operations generation:**
    
    * Class package
    * Class name
@@ -158,8 +185,10 @@ Limitations solution
    * Throwed exceptions:
    
     * Exception type
+   
+   Use JAX-WS annotations.
     
-   **Source code elements related on entities contract generation with JAX-B:**	
+   **Source code elements related to contract entities generation:**	
    
    * Class package
    * Class name
@@ -169,34 +198,35 @@ Limitations solution
    * Each property type
    * Each property type compatibility
    
+   Use JAX-B annotations.
+   
 #. Unportable types
  	
-   Only allow a set of specific types that have no conversion problems. For example, let String, but not allow TreeMap.
-
-   TODO We may also need to define the mapping of certain types of data that is not completely accurate, for example, the Date in Java provides the time and XML:
+   Allow only a list of specific types that has no conversion problems. For example, let String, but not allow TreeMap.
    
-    https://jaxb.dev.java.net/guide/Using_different_datatypes.html.
+   We may also need to define the mapping of certain types of data that is not completely accurate, for example, the Date in Java provides the time and XML (https://jaxb.dev.java.net/guide/Using_different_datatypes.html).
 
 #. Cyclic graphs
 
-   Related entities shall not be processed in the conversion to XML with the @XmlTransient JAX-B annotation. 
+   Related entities shall not be processed on the conversion to XML with the @XmlTransient JAX-B annotation. 
    
-   Otra opción en las versiones más modernas de JAX-B es implementar una interfaz que nos obliga a definir las operaciones a realizar para evitar los ciclos.
+   Another option in the newest versions of JAX-B is to implement an interface that forces us to define operations to be performed to avoid cycles.
    
-   https://jaxb.dev.java.net/guide/Mapping_cyclic_references_to_XML.html 
+   More information:
+   
+   * https://jaxb.dev.java.net/guide/Mapping_cyclic_references_to_XML.html
 
 #. Performance
 
-   As previous explanation, related entities shall not be processed in the conversion to XML with the @XmlTransient JAX-B annotation. 
+   As previous explanation, some related entities shall not be processed in the conversion to XML. 
 
 #. Versioning
 
-   En un principio, podrían definirse como distintas operaciones o distintos endpoints.
-   Aún no está claro como lo haríamos porque aún no hemos analizado la documentación sobre verdionado de servicios web.
+   Different operation versions could be defined as different operations or different endpoints.
 
 #. XSD extensions
 
-   Not be allowed XSD extensions on web service servers generated.
+   We will not allow XSD extensions on the generated web service servers.
 
    To add a restriction on any of the input parameters of the web service server, validate the retricción in your method code and return a exception if not satisfied.
    This will generate a fault on the web service server when restriction is not respected. 
@@ -206,22 +236,24 @@ Limitations solution
    Generate the XML Schema (XSD) in a separate file from the WSDL file.
    The WSDL file will include (use) the XSD file, and other services could do the same. 
 
-http://www.liquid-reality.de:8080/display/liquid/2008/08/20/Defining+Contract+first+webservices+by+generating+wsdl+from+java
+More information:
+
+* http://www.liquid-reality.de:8080/display/liquid/2008/08/20/Defining+Contract+first+webservices+by+generating+wsdl+from+java
 
 Design
 ======
 
 Proof of concept repository location:
 
- http://webdav.cop.gva.es/svn/gvnix/trunk/code/addon-cxf/docs/td-contract-first-from-java.rst
+* https://svn.disid.com/svn/disid/proof/spring_roo/gvnix-cxf-web-service
 
 Developing a service
 --------------------
 
 The service endpoint interface (SEI) is the piece of Java code that is shared between a service and the consumers that make requests on it. When starting from Java, it is the up to a developer to create the SEI. There are two basic patterns for creating an SEI:
 
-   1. Green field development: You are developing a new service from the ground up. When starting fresh, it is best to start by creating the SEI first. You can then distribute the SEI to any developers that are responsible for implementing the services and consumers that use the SEI.
-   2. Service enablement: In this pattern, you typically have an existing set of functionality that is implemented as a Java class and you want to service enable it.
+#. Green field development: You are developing a new service from the ground up. When starting fresh, it is best to start by creating the SEI first. You can then distribute the SEI to any developers that are responsible for implementing the services and consumers that use the SEI.
+#. Service enablement: In this pattern, you typically have an existing set of functionality that is implemented as a Java class and you want to service enable it.
 
 The SEI corresponds to a wsdl:portType element. The methods defined by the SEI correspond to wsdl:operation elements in the wsdl:portType element.
 
