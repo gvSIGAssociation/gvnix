@@ -32,8 +32,11 @@ Requirements
 * Web services clients and servers generation compatible with FUSE ESB / Servicemix.
 
 * Allow web service servers generation from service layer o entity layer.
+  Not use interfaces related to the implementation on service layer and entitity layer.
 
 * Web service framework installation will be automatic when client or server generation is required. 
+
+* Utilizar en los servidores generados SOAP binding document/literal frente a RPC, ya que RPC está obsoleto.
 
 Additionally, There are some limitations on wsdl generation from Java.
 The addon requirements are solve or avoid this limitations too.
@@ -244,55 +247,75 @@ Paquetes base javax.xml.ws, javax.jws.
 
 * @WebFault ( name="NoSuchCustomer" ): Nos permite independizar el nombre de la clase de excepción del nombre del dato a transmitir.
 
-    * name
-    * targetNamespace
-    * faultName
+    * name: Specifies the local name of the fault element.
+    * targetNamespace: Specifies the namespace under which the fault element is defined. The default value is the target namespace of the SEI.
+    * faultBean: Specifies the full name of the Java class that implements the exception.
+    
+  The name property is required.
 
 * @WebService: Marca una clase como servicio
 
-    * name
-    * targetNamespace
-    * serviceName
-    * wsdlLocation
-    * endPointInterface
-    * portName
+	* name: Specifies the name of the service interface. This property is mapped to the name attribute of the wsdl:portType element that defines the service's interface in a WSDL contract. The default is to append PortType to the name of the implementation class.
+	* targetNamespace: Specifies the target namespace under which the service is defined. If this property is not specified, the target namespace is derived from the package name.
+	* serviceName: Specifies the name of the published service. This property is mapped to the name attribute of the wsdl:service element that defines the published service. The default is to use the name of the service's implementation class. Note: Not allowed on the SEI
+	* wsdlLocation: Specifies the URI at which the service's WSDL contract is stored. The default is the URI at which the service is deployed. The location of a predefined WSDL file describing the service.
+	* endpointInterface: Specifies the full name of the SEI that the implementation class implements. This property is only used when the attribute is used on a service implementation class. Note: Not allowed on the SEI
+	* portName: Specifies the name of the endpoint at which the service is published. This property is mapped to the name attribute of the wsdl:port element that specifies the endpoint details for a published service. The default is the append Port to the name of the service's implementation class. Note: Not allowed on the SEI
 
 * @WebParam ( name="name" ): Necesario para que Java no pierda el nombre de un parámetro web y así evitar que en el wsdl contenda arg0 en lugar del nombre deseado.
 
-    * name
-    * targetNamespace
+    * name: Specifies the name of the parameter as it appears in the WSDL. For RPC bindings, this is name of the wsdl:part representing the parameter. For document bindings, this is the local name of the XML element representing the parameter. Per the JAX-WS specification, the default is argN, where N is replaced with the zero-based argument index (i.e., arg0, arg1, etc.)
+    * targetNamespace: Specifies the namespace for the parameter. It is only used with document bindings where the parameter maps to an XML element. The defaults is to use the service's namespace.
     * mode: Mode.IN, Mode,OUT, Mode.INOUT
+    
+      Specifies the direction of the parameter.
+    
     * header: false, true
-    * partName
+    
+      Specifies if the parameter is passed as part of the SOAP header.
+    
+    * partName: Specifies the value of the name attribute of the wsdl:part element for the parameter when the binding is document. Default parametes.
 
   Los primeros son los valores por defecto.
   
 * @WebResult del paquete the javax.jws: Allows you to specify the properties of the generated wsdl:part that is generated for the method's return value.
 
-    * name
-    * targetNamespace
-    * header
-    * partName
+    * name: Specifies the name of the return value as it appears in the WSDL. For RPC bindings, this is name of the wsdl:part representing the return value. For document bindings, this is the local name of the XML element representing the return value. The default value is return.
+    * targetNamespace: Specifies the namespace for the return value. It is only used with document bindings where the return value maps to an XML element. The defaults is to use the service's namespace.
+    * header: Specifies if the return value is passed as part of the SOAP header.
+    * partName: Specifies the value of the name attribute of the wsdl:part element for the return value when the binding is document. Default parametes.
 
 * @WebMethod del paquete javax.jws: Provides the information that is normally represented in the wsdl:operation element describing the operation to which the method is associated. Sus propiedades son:
 
-    * operationName
-    * action
-    * exclude
+    * operationName: Specifies the value of the associated wsdl:operation element's name. The default value is the name of the method.
+    * action: Specifies the value of the soapAction attribute of the soap:operation element generated for the method. The default value is an empty string.
+    * exclude: Specifies if the method should be excluded from the service interface. The default is false.
 
 * @SOAPBinding del paquete javax.jws.soap: Provee información sobre como se relaciona el servicio con SOAP. Si no se especifica se toma document/literal. Pueden definirse las siguientes propiedades:
 
     * style: Style.DOCUMENT, Style.RPC
+    
+      Specifies the style of the SOAP message. If RPC style is specified, each message part within the SOAP body is a parameter or return value and will appear inside a wrapper element within the soap:body element. The message parts within the wrapper element correspond to operation parameters and must appear in the same order as the parameters in the operation. If DOCUMENT style is specified, the contents of the SOAP body must be a valid XML document, but its form is not as tightly constrained.
+    
     * use: Use.LITERAL, Use.ENCODED
+    
+      Specifies how the data of the SOAP message is streamed.
+    
     * parameterStyle: ParameterStyle.WRAPPED, ParameterStyle.BARE
+    
+      Specifies how the method parameters, which correspond to message parts in a WSDL contract, are placed into the SOAP message body. A parameter style of BARE means that each parameter is placed into the message body as a child element of the message root. A parameter style of WRAPPED means that all of the input parameters are wrapped into a single element on a request message and that all of the output parameters are wrapped into a single element in the response message. If you set the style to RPC you must use the WRAPPED parameter style.
 
   Los primeros son los valores por defecto.
 
 *  @RequestWrapper y @ResponseWrapper del paquete javax.xml.ws: Java class that implements the wrapper bean for the method parameters that are included in the request or response message in a remote invocation. It is also used to specify the element names, and namespaces, used by the runtime when marshalling and unmarshalling the messages. Propiedades:
 
-      o localName
-      o targetNamespace
-      o className
+      o localName: Specifies the local name of the wrapper element in the XML representation of the message. The default value is the name of the method or the value of the @WebMethod annotation's operationName property.
+      o targetNamespace: Specifies the namespace under which the XML wrapper element is defined. The default value is the target namespace of the SEI.
+      o className: Specifies the full name of the Java class that implements the wrapper element.
+      
+   Tip: Only the className property is required.
+   
+   Se define en la variable className una clase a crear automáticamente que será el objeto contenedor donde se guardan los parámetros que se envían o se devuelven.
 
    Ejemplo::
 
@@ -319,6 +342,8 @@ Paquete base javax.xml.bind.annotation.
 * The @XmlRootElement annotation notifies JAXB that the annotated class is the root element of the XML document. If this annotation is missing, JAXB will throw an exception.
 
  * name
+ 
+ The @XmlRootElement annotation notifies JAXB that the annotated class is the root element of the XML document. If this annotation is missing, JAXB will throw an exception.
 
 * @XmlTransient: You can use this annotation on a class or an attribute to exclude this element of the XML conversion.
 
@@ -384,6 +409,118 @@ API de la anotaciones de JAXB: http://download.oracle.com/javaee/5/api/javax/xml
    
 * JAXB Tutorial: http://java.sun.com/webservices/docs/2.0/tutorial/doc/JAXBWorks.html#wp100322
 
+* http://www.devx.com/Java/Article/34069/1954?pf=true
+
+* http://download-llnw.oracle.com/javaee/5/api/index.html?javax/xml/bind/annotation/XmlType.html
+
+Service annotation
+------------------
+
+* Definir en la interfaz los parámetros relativos a @WebService::
+
+    package org.gvnix.test.project.web.services.impl;
+
+	@WebService(name = "PersonServicePortType", 
+	    targetNamespace = "http://impl.services.web.project.test.gvnix.org/")
+	public interface PersonService
+
+* Definir el la implementación del servicio los parámetros de @WebService::
+
+    package org.gvnix.test.project.web.services.impl;
+
+	@WebService(endpointInterface = "org.gvnix.test.project.web.services.impl.PersonService",
+	    serviceName = "PersonService",
+	    targetNamespace = "http://impl.services.web.project.test.gvnix.org/", 
+	    portName = "PersonServiceImplPort")
+	public class PersonServiceImpl implements PersonService
+	
+* Definido el servicio mediante la anotación @SOAPBinding con los valores de los parámetros asociados. No hay variación por Código Java::
+
+	@SOAPBinding(style = Style.DOCUMENT, use = Use.LITERAL, parameterStyle = ParameterStyle.WRAPPED)
+	
+* Definida la anotación @WebMethod para la operación del servicio en la interfaz::
+
+	@WebMethod(operationName = "getPersonName", action = "", exclude = false)
+	
+* Definición de la anotación en la interfaz del servicio en la operación::
+
+	@RequestWrapper(localName = "getPersonName", targetNamespace = "http://services.web.project.test.gvnix.org/types", className = "java.lang.Long")
+	abstract Person getPersonName(@WebParam(name = "id") Long id);
+	
+  Si cambiamos el parámetro de entrada al método por List<Integer> id en la intefaz y la implementación: El wsdl generado sigue siendo el mismo.
+  
+  Envía dentro de RequestWrapper el parámetro que no está está anotado como @WebParam. No se puede controlar que no varíe el contrato del servicio si se altera la signatura del método.
+
+* Definición de la anotación en la interfaz del servicio en la operación::
+
+	@ResponseWrapper(localName = "getPersonNameResponse", targetNamespace = "http://services.web.project.test.gvnix.org/types", className = "org.gvnix.test.project.web.services.domain.Person")
+	abstract Person getPersonName(@WebParam(name = "id") Long id);
+
+  Crea un objeto Person en el wsdl que le envía como respuesta de la operación del servicio.
+  
+  Si cambiamos el parámetro de salida al método por Long en la intefaz y la implementación: El wsdl generado sigue siendo el mismo que devuelve un objeto Person como resultado, pero como ahora devuelve un objeto distinto es como si devolviera un null.
+
+* Definición de la anotación en la cabecera de la excepción que va a utilizar la operación del servicio web::
+
+	@WebFault(name = "FaultException", targetNamespace = "http://services.web.project.test.gvnix.org/types", faultBean = "org.gvnix.test.project.web.services.exceptions.FaultException")
+	public class FaultException extends Exception
+
+  Se añade al método del servicio definido en la interfaz y en su implementación::
+
+	abstract Person getPersonName(@WebParam(name = "id") Long id) throws FaultException;
+	public Person getPersonName(Long id) throws FaultException {...}
+
+  Crear una exception nueva que tenga el mismo name, namespace y faultBean: Falla al compilar ya que el faultBean debe ser la clase de la excepción que se está definiendo.
+  
+  Si hay un cambio de excepción en el wsdl se ha de cambiar el contrato del servicio, no se puede cambiar la excepción en java para que el servicio publique otra definida por el parámetro faultBean ya que aparecería un warning al generar el contrato del servicio.
+  
+  Si se define una segunda excepción y se mantienen los mismos parámetros en la anotación, no cambia el contrato de servicio. La definición en la anotación de la excepción creada tiene preferencia sobre los atributos definidos en su clase.
+  
+* @WebParam: Si se cambia el Tipo de parámetro de entrada (en la interfaz y la implementación) cambia el contrato de servicio pero no cambia el nombre del parámetro que se ha definido en la variable name.
+  No controla el tipo del parámetro que utiliza la operación del servicio (método de la clase) con anotaciones.
+  Si se añade un atributo nuevo al objeto de entrada en la operación se genera un nuevo contrato para el servicio. Esto se debería evitar creando los XSD por separado e importándolos como esquemas ya que el wsdl generado incluye la definición del Objeto en XML.
+  
+  TODO Probar si incluir un parámetro que no está anotado con @WebParam.
+  
+* @WebResult: Si se cambia el Tipo de parámetro de que devuelve (en la interfaz y la implementación) cambia el contrato de servicio pero no cambia el nombre del parámetro que se ha definido en la variable name.
+  No controla el tipo del parámetro que devuelve como resultado la operación del servicio (método de la clase) con anotaciones.
+  Si se añade un atributo nuevo al objeto que devuelve la operación se genera un nuevo contrato para el servicio. Esto se debería evitar creando los XSD por separado e importándolos como esquemas ya que el wsdl generado incluye la definición del Objeto en XML.
+  
+* Si se añade la etiqueta @OneWay en la interfaz (SEI) de un método de la clase del servicio, la operación del servicio no devolverá nada, ejemplo::
+
+	@WebMethod(operationName = "returnString", action = "", exclude = false)
+	@Oneway
+	abstract String returnString();
+
+  El resultado al consultar el servicio está vacío, no devuelve nada aunque en la implementación del método devuelva el string. Cualquier tipo de resultado definido en el método no hará que se regenere el contrato y no devolverá ningún objeto (XML).
+
+* CXF: http://cxf.apache.org/docs/configuration.html
+* Jaxb2: http://java.sun.com/developer/technicalArticles/J2SE/jax_ws_2/
+* https://svn.disid.com/svn/gvcit/JavaESB/docs/soa-analisis-contrato-servicios.rst
+* https://svn.disid.com/svn/gvcit/JavaESB/docs/soa-analisis-guia-XSD.rst
+
+Entities annotation
+-------------------
+
+* Cabera de la clase::
+
+	@XmlRootElement(name = "horse", namespace = "http://services.web.project.test.gvnix.org/horse")
+	@XmlType(propOrder = { "name", "person" }, name = "horse", namespace = "http://services.web.project.test.gvnix.org/horse")
+	@XmlAccessorType(XmlAccessType.FIELD)
+
+  Para controlar que los cambios en los atributos de la entidad no afecten al contrato de servicio se han de definir los atributos en la anotación @XmlType con el parámetro 'propOrder = { "name", "person" }' para que así si se añade un atributo nuevo a la entidad de un warning al intentar publicar el servicio.
+  Si se utiliza propOrder se han de ordenar/definir todas las propiedades del objeto que no estén anotadas con @XmlTransient, da igual que no estén anotadas con @XmlElement (Esta anotación sirve para convertir la propiedad a una etiqueta xml con un nombre específico) falla.
+
+* En cada campo que se quiere crear como elemento se ha definir la anotación con el nombre que se quiere mostrar en xml para no alterar el contrato del servicio::
+  
+	@XmlElement(name = "persona")
+	
+* Si no se quiere convertir una propiedad de la clase se ha de añadir la anotación @XmlTransient en la declaración de la propiedad.
+  Se utilizará para evitar Grafos cíclicos.
+
+  Después de unas pruebas con entidades relacionadas ('1 a n' y 'n a 1') la configuración correcta es asignar @XmlTransient a la entidad que contiene la lista de entidades (1-n) que no serán mostradas en una consulta por entidades ya que son gestionadas en la otra parte de la relación.
+  Podríamos rumiar un poco más la idea ya que en algunos casos puede ser información muy interesante. Por ejemplo, en los terceros ver la lista de sus domicilios o cuentas puede ser interesante, pero ¿ hasta donde puede llegar el grafo de objetos a transformar ?. Esto colisiona con el requerimiento de rendimiento.
+
 Addon commands
 --------------
 
@@ -398,6 +535,15 @@ Addon commands
 * service export ws --class clase --name nombreServicio : Generará lo necesario para que este método o la clase (dependiendo si --name se define) sea accesible externamente. La clase debería poder ser una clase de servicio o una entidad (habría que ver opciones u otro comando para publicar CRUD). Tendríamos que ver como implementar esto para que permitiese exportar de distintas formas (por ejemplo si es un proyecto ESB o no, etc). Este comando requerirá mucho más análisis.
 
 * service export ws --wsdl url2wsdl: Generará generará una clase de servicio a partir de su definición en wsdl. Los métodos serán generados en blanco para que el desarrollador pueda realizar su implementación. Este comando es el mismo que el anterior pero con sólo el parámetro de la descripción del contrato. Como paquete y clase se usará el namespace que haya definido en el contrato. Este comando requerirá mucho más análisis.
+
+Posibles mejoras el add-on cd CXF:
+
+Creación de una operación en un servicio.
+
+    * Siempre está disponible el comando 'cxf operation'.
+    * Los parámetros que pide el add-on para la creación de la operación en el servicio no son obligatorios, pero cuando creas un servicio sin parámetros hace la comprobación de que no tienen que ser nulos.
+    * El servicio que pide para añadirla la nueva operación es la Interfaz del servicio pero no lo pide para que quede claro.
+    * Mejorar la forma de Buscar la implementación del servicio para añadirle la operación, ya que se podría añadir una operación a cualquier servicio existente.
 
 TODO
 ====
