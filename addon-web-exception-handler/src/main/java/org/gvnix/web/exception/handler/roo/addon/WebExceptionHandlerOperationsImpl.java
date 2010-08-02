@@ -270,7 +270,7 @@ public class WebExceptionHandlerOperationsImpl implements
      *            Exception Name to Handle.
      * @return {@link String} The exceptionViewName to create the .jspx view.
      */
-    private String updateWebMvcConfig(String exceptionName) {
+    protected String updateWebMvcConfig(String exceptionName) {
 
 	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
 		"WEB-INF/spring/webmvc-config.xml");

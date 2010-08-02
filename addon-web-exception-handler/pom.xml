@@ -116,5 +116,38 @@
             <type>bundle</type>
         </dependency>
 		<!-- Other modules (if any) -->
+
+    <!-- Unit Test dependencies -->
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <version>3.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${spring.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>${spring.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+       <groupId>org.unitils</groupId>
+       <artifactId>unitils-mock</artifactId>
+       <version>3.1</version>
+       <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+       <groupId>org.unitils</groupId>
+       <artifactId>unitils-inject</artifactId>
+       <version>3.1</version>
+       <scope>test</scope>
+    </dependency>
 	</dependencies>
 </project>
