@@ -612,33 +612,350 @@ public class MyServiceUser{
     <title xml:lang="es">Test unitarios</title>
 
     <para xml:lang="es">Para mantener y garantizar la calidad en los add-on
-    generados es fundamental que estos tenga implementados una batería de
+    generados es fundamental que estos tengan implementados una batería de
     pruebas unitarias para las operaciones principales de los add-on.</para>
 
     <section xml:id="creacion-addon_test_tdd" xml:lang="es">
       <title xml:lang="es">Desarrollo dirigido por Test (RDA)</title>
 
-      <para xml:lang="es">TBC [Explicación y ventajas]</para>
+      <para xml:lang="es">Desarrollo dirigido por Test o Test-driven
+      development (TDD) es una práctica de programación que se basa en la
+      repetición de un ciclo de desarrollo muy corto. En primer lugar se
+      escribe una prueba (test) y se verifica que la prueba falle, luego se
+      implementa el código que haga que la prueba pase satisfactoriamente y
+      seguidamente se refactoriza el código escrito. La idea es que los
+      requerimientos sean traducidos a pruebas, de este modo, cuando las
+      pruebas pasen se garantizará que los requerimientos se hayan
+      implementado correctamente.</para>
     </section>
 
     <section xml:id="creacion-addon_test_test" xml:lang="es">
       <title xml:lang="es">Test Unitarios</title>
 
-      <para xml:lang="es">TBC [Descripción]</para>
+      <para xml:lang="es">Los Test unitarios son una forma de probar el
+      correcto funcionamiento de un módulo de código, en este caso las
+      operaciones de un add-on. Esto sirve para asegurar que cada una de las
+      operaciones funciona correctamente por separado. Se contemplan los casos
+      posibles de error para el desarrollo dirigido por test y así asegurar su
+      correcto funcionamiento e implementación del código necesario.</para>
     </section>
 
     <section xml:id="creacion-addon_test_mock" xml:lang="es">
       <title xml:lang="es">Objetos Mock</title>
 
-      <para xml:lang="es">TBC [Descripción y referencia a EasyMock]</para>
+      <para xml:lang="es">Los tests unitarios se centran en módulos de código
+      concretos. A veces un módulo necesita o utiliza un objeto externo para
+      realizar una operación, por ejemplo una operación de un add-on necesita
+      utilizar un servicio que pertenece a otro add-on, para poder desarrollar
+      un test con todos los resultados posibles relacionados con el servicio
+      que utiliza, debemos simular el comportamiento del servicio mediante un
+      Mock para centrarnos en los tests del módulo concreto.</para>
+
+      <para xml:lang="es">Un Mock es un objeto creado para reemplazar el
+      comportamiento del original, simular su comportamiento dentro del test
+      que se está desarrollando. El Mock se instancia como parámetro de la
+      clase sobre la que vamos a crear las pruebas e implementamos el
+      comportamiento que va a tener dentro del test en cuestión. Nos permite
+      simular la llamada a este objeto definiendo los parámetros de entrada y
+      de salida.</para>
+
+      <para xml:lang="es">Un Mock puede simular el comportamiento de cualquier
+      clase, no es imprescindible que sea un servicio.</para>
+
+      <para xml:lang="es">Para el desarrollo de los tests mediante Mocks
+      utilizaremos la librería EasyMock: </para>
+
+      <para xml:lang="es"><link
+      xlink:href="http://www.easymock.org/">http://www.easymock.org/</link></para>
+
+      <para xml:lang="es">Ejemplo:</para>
+
+      <orderedlist>
+        <listitem>
+          <para xml:lang="es">Crear el servicio que utiliza como un Mock e
+          instanciarlo a la clase de test para sustituir el original:</para>
+
+          <programlisting>// Mock objects to emulate Roo OSGi Services
+private FileManager fileManager;
+...
+fileManager = createMock(FileManager.class);
+ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "fileManager", fileManager);</programlisting>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Simular la llamada al método (utilizando el
+          método expect) con los parámetros que se utilizan en la operación
+          para devolver con el método andReturn el resultado que
+          esperamos:</para>
+
+          <programlisting>expect(fileManager.exists("webmvc-config.xml")).andReturn(true);</programlisting>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Antes de ejecutar la llamada al método de la
+          clase sobre la que se desarrollan los tests, se ejecuta el método
+          replay sobre los Mocks de los que se ha definido su
+          comportamiento:</para>
+
+          <programlisting>replay(fileManager);
+webExceptionHandlerOperationsImpl.getHandledExceptionList();</programlisting>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Después de la ejecución del test se han de
+          reiniciar los valores de los Mocks utilizados durante la llamada al
+          método sobre el que se han ejecutado los tests con el comando
+          reset:</para>
+
+          <programlisting>reset(fileManager);</programlisting>
+        </listitem>
+      </orderedlist>
     </section>
 
     <section xml:id="creacion-addon_test_ejemplo" xml:lang="es">
       <title xml:lang="es">Ejemplo</title>
 
-      <para xml:lang="es">TBC [Ejemplo simple de test unitario usando algún
-      mock para simular un servicio (¿usar una versión simplificada de jsp
-      2.0?)]</para>
+      <para xml:lang="es">Ejemplo simple de test unitario usando Mocks para
+      simular los servicios osgi para una operación del add-on
+      <emphasis>addon-web-exception-handler</emphasis>.</para>
+
+      <orderedlist>
+        <listitem>
+          <para xml:lang="es">Añadir dependencias correspondientes al proyecto
+          add-on.</para>
+
+          <para xml:lang="es">Para el desarrollo de tests en un add-on se
+          necesita importar las librerías de test en el pom.xml del
+          proyecto:</para>
+
+          <programlisting>&lt;!-- Unit Test dependencies --&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;org.easymock&lt;/groupId&gt;
+  &lt;artifactId&gt;easymock&lt;/artifactId&gt;
+  &lt;version&gt;3.0&lt;/version&gt;
+  &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-test&lt;/artifactId&gt;
+  &lt;version&gt;${spring.version}&lt;/version&gt;
+  &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-core&lt;/artifactId&gt;
+  &lt;version&gt;${spring.version}&lt;/version&gt;
+  &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;commons-logging&lt;/groupId&gt;
+  &lt;artifactId&gt;commons-logging&lt;/artifactId&gt;
+  &lt;version&gt;1.1.1&lt;/version&gt;
+  &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</programlisting>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Crear la clase de Test</para>
+
+          <para xml:lang="es">Este primer test está dirigido a la clase
+          Operations del Addon WebExceptionHandlerOperationsImpl.</para>
+
+          <orderedlist>
+            <listitem>
+              <para xml:lang="es">Crear una nueva clase utilizando el nombre
+              de la clase que se quiere hacer el test añadiendo el sufijo
+              Test: WebExceptionHandlerOperationsImplTest.</para>
+            </listitem>
+
+            <listitem>
+              <para xml:lang="es">Declarar como atributo la clase sobre la que
+              se quieren ejecutar los tests y los servicios que utiliza la
+              clase operations del Addon:</para>
+
+              <programlisting>//Class under test
+private WebExceptionHandlerOperationsImpl exceptionHandlerOperationsImpl;
+
+// Mock objects to emulate Roo OSGi Services
+private FileManager fileManager;
+private MetadataService metadataService;
+private PathResolver pathResolver;
+private PropFileOperations propFileOperations;
+
+// Mock to emulate file management.
+private MutableFile webXmlMutableFile;
+
+// Files to use placed in src/test/resorces
+static final String EXC_WEB_XML = "exceptions-webmvc-config.xml";
+static final String NO_EXC_WEB_XML = "no-exceptions-webmvc-config.xml";
+
+// Project web config file path
+static final String WEB_XML_PATH = "WEB-INF/spring/webmvc-config.xml";</programlisting>
+            </listitem>
+
+            <listitem>
+              <para xml:lang="es">Utilizando las anotaciones de JUnit se ha de
+              instanciar la clase de test y los servicios que utiliza para
+              simular su comportamiento instanciándolos como Mocks:</para>
+
+              <programlisting>/**
+ * Setup operations instance and Mock objects
+ *
+ * @throws java.lang.Exception
+ */
+@Before
+public void setUp() throws Exception {
+
+  // Class under test
+  webExceptionHandlerOperationsImpl = new WebExceptionHandlerOperationsImpl();
+
+  // Setup Mock service objects
+  fileManager = createMock(FileManager.class);
+  metadataService = createMock(MetadataService.class);
+  pathResolver = createMock(PathResolver.class);
+  propFileOperations = createMock(PropFileOperations.class);
+
+  // Mock Objects
+  webXmlMutableFile = createMock(MutableFile.class);
+
+  // Inject mock objects in instance. This emulate OSGi environment
+  ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "fileManager", fileManager);
+  ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "metadataService", metadataService);
+  ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "pathResolver", pathResolver);
+  ReflectionTestUtils.setField(webExceptionHandlerOperationsImpl, "propFileOperations", propFileOperations);
+}</programlisting>
+
+              <para xml:lang="es">El método <emphasis>setUp()</emphasis> se
+              ejecuta antes de cada test de esta clase debido a la anotación
+              <emphasis>@Before</emphasis> para instanciar los elementos
+              necesarios en cada método de la clase operations. Ahora se han
+              de crear los métodos de test por cada uno de los métodos
+              implementados en la clase de operaciones del add-on. Puede que
+              para algunos métodos no sea necesario el test debido a la
+              simplicidad que representan, pero es recomendable crearlos
+              también.</para>
+            </listitem>
+
+            <listitem>
+              <para xml:lang="es">Crear test para el método
+              <emphasis>getHandledExceptionList():</emphasis></para>
+
+              <programlisting>/**
+ * Checks method
+ * {@link WebExceptionHandlerOperationsImpl#getHandledExceptionList()}
+ * 
+ * @throws Exception
+ */
+@Test
+public void testGetHandledExceptionList() throws Exception {
+
+  String result;
+  String expected;
+
+  /*
+   * Test 1 - Encuentra excepciones instanciadas en el archivo de
+   * configuración EXC_WEB_XML
+   */
+  expect(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, WEB_XML_PATH)).andReturn(EXC_WEB_XML);
+
+  expect(fileManager.exists(EXC_WEB_XML)).andReturn(true);
+
+  expect(fileManager.updateFile(EXC_WEB_XML)).andReturn(webXmlMutableFile);
+
+  expect(webXmlMutableFile.getInputStream()).andReturn(getClass().getResourceAsStream(EXC_WEB_XML));
+
+  replay(pathResolver, fileManager, webXmlMutableFile);
+
+  result = webExceptionHandlerOperationsImpl.getHandledExceptionList();
+
+  assertTrue("There aren't exceptions defined in " + EXC_WEB_XML + " file", result != null);
+
+  reset(pathResolver, fileManager, webXmlMutableFile);
+
+  /*
+   * Test 2 - No encuentra excepciones instanciadas en el archivo de
+   * configuración NO_EXC_WEB_XML
+   */
+  expect(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, WEB_XML_PATH)).andReturn(NO_EXC_WEB_XML);
+
+  expect(fileManager.exists(NO_EXC_WEB_XML)).andReturn(true);
+
+  expect(fileManager.updateFile(NO_EXC_WEB_XML)).andReturn(webXmlMutableFile);
+
+  expect(webXmlMutableFile.getInputStream()).andReturn(getClass().getResourceAsStream(NO_EXC_WEB_XML));
+
+  replay(pathResolver, fileManager, webXmlMutableFile);
+
+  result = webExceptionHandlerOperationsImpl.getHandledExceptionList();
+
+  expected = "Handled Exceptions:\n";
+
+  assertEquals("There are exceptions defined in " + NO_EXC_WEB_XML
+    + " file", expected, result);
+
+  reset(pathResolver, fileManager, webXmlMutableFile);
+
+}</programlisting>
+
+              <para xml:lang="es">Se añade la anotación
+              <emphasis>@Test</emphasis> de <emphasis>JUnit</emphasis> para
+              que el método sea reconocido y se ejecute al lanzar el comando
+              test de maven.</para>
+            </listitem>
+          </orderedlist>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Archivos <emphasis>xml</emphasis> para obtener
+          los resultados del test.</para>
+
+          <para xml:lang="es">Este test se basa en la comprobación de datos
+          que se obtienen de un archivo xml de configuración de un proyecto.
+          Los casos de uso del test están relacionados con el tratamiento de
+          archivos por eso necesitamos crear los archivos para obtener las
+          distintas soluciones.</para>
+
+          <para xml:lang="es">Crear los archivos xml que se utilizarán para la
+          ejecución del test <emphasis>exceptions-webmvc-config.xml</emphasis>
+          y <emphasis>no-exceptions-webmvc-config.xml</emphasis> en el mismo
+          paquete java que se ha creado el test dentro de la carpeta
+          <emphasis>src/test/resources</emphasis>.</para>
+
+          <para xml:lang="es">El primero de los archivos <emphasis>contiene
+          las excepciones instanciadas</emphasis> para que el test funcione
+          correctamente según se ha implementado el <emphasis>Test
+          1:</emphasis></para>
+
+          <programlisting>&lt;!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views. 
+     The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet container: 
+     this will happen - here with all other types of exceptions. --&gt;
+&lt;bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver" p:defaultErrorView="uncaughtException"&gt;
+ &lt;property name="exceptionMappings"&gt;
+  &lt;props&gt;
+   &lt;prop key=".DataAccessException"&gt;dataAccessFailure&lt;/prop&gt;
+   &lt;prop key=".NoSuchRequestHandlingMethodException"&gt;resourceNotFound&lt;/prop&gt;
+   &lt;prop key=".TypeMismatchException"&gt;resourceNotFound&lt;/prop&gt;
+   &lt;prop key=".MissingServletRequestParameterException"&gt;resourceNotFound&lt;/prop&gt;
+  &lt;/props&gt;
+ &lt;/property&gt;
+&lt;/bean&gt;</programlisting>
+
+          <para xml:lang="es">Mientras que el segundo <emphasis>no contiene
+          excepciones instanciadas</emphasis>, se utiliza en el <emphasis>Test
+          2</emphasis> para comprobar que no existen excepciones en el archivo
+          de configuración correspondiente:</para>
+
+          <programlisting>&lt;!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views. 
+     The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet container: 
+     this will happen - here with all other types of exceptions. --&gt;
+&lt;bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver" p:defaultErrorView="uncaughtException"&gt;
+ &lt;property name="exceptionMappings"&gt;
+  &lt;props&gt;
+  &lt;/props&gt;
+ &lt;/property&gt;
+&lt;/bean&gt;</programlisting>
+        </listitem>
+      </orderedlist>
     </section>
   </section>
 
@@ -710,12 +1027,12 @@ public class MyServiceUser{
       <para>Ya que los método de <emphasis>disponibilidad de un
       comando</emphasis> pueden ser llamados desde la línea de comandos y de
       manera muy frecuente, tendríamos que cuidar de que fuesen <emphasis>lo
-      más sencillos y optimizados posible </emphasis>. </para>
+      más sencillos y optimizados posible </emphasis>.</para>
 
       <para>Por ejemplo, intentar ver si comprobando dependencias del proyecto
       y/o la existencia de algún/os ficheros tenemos suficiente o usar
       variables de estado <emphasis>cacheadas</emphasis>, coordinado con algún
-      listener que las limpie cuando convenga. </para>
+      listener que las limpie cuando convenga.</para>
     </section>
 
     <section>
