@@ -553,42 +553,141 @@ Entities annotation
   Después de unas pruebas con entidades relacionadas ('1 a n' y 'n a 1') la configuración correcta es asignar @XmlTransient a la entidad que contiene la lista de entidades (1-n) que no serán mostradas en una consulta por entidades ya que son gestionadas en la otra parte de la relación.
   Podríamos rumiar un poco más la idea ya que en algunos casos puede ser información muy interesante. Por ejemplo, en los terceros ver la lista de sus domicilios o cuentas puede ser interesante, pero ¿ hasta donde puede llegar el grafo de objetos a transformar ?. Esto colisiona con el requerimiento de rendimiento.
 
+Anotar todas las entidades de la aplicación al "instalar" el Add-on de servicios, es decir al publicar un servicio como servicio web.
+
+* Crear el fichero aj para que anote cada uno de los campos de la entidad con @XmlElement y las relaciones, definidas por @OneToMany, @ManyToOne, etc como transient.
+
 Addon commands
 --------------
 
-* service class: Crear una clase para gestionar servicios. Añadiría las anotaciones de Spring que necesitase (@Service?). Hay que pensar si alguna más (puede que del própio add-on).
+* service class --class:
 
-* service operation --class clase --name nombreOperacion --return clase: Añadiría a una clase de servicio (o a una entidad, una entidad también podrá tener servicios) un método de operación, que devolverá (o no) un tipo en concreto. Habría que ver como concretar la especificación del tipo devuelto cuando es Map, Collection, Set, etc...).
+  - ``class``: Nombre de la nueva clase servicio.
 
-* service parameter --class clase --operation nombreOperacion --name nombreParametro --type clase: Añade un parámetro de entrada a una operación de una clase servicio (o de entidad). Habría que ver como concretar la especificación del parámetro cuando es Map, Collection, Set, etc...).
+    Crear una clase para gestionar servicios. Añadiría las anotaciones de Spring que necesitase ``@Service``.
+    
+    Hay que pensar si alguna más (puede que del propio add-on). Ninguna ya que es una clase de Servicio no Servicio Web.
 
-* service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml: Creará a una clase de servicio que hará de proxy de las operaciones que publica un Web Service remoto. El parámetro endPoint sería opcional y debería poder ser una propiedad configurable desde los profiles (esto será útil para configura accesos a los servicios de desarrollo/pre-producción/producción). La clase y el paquete a generar se usará el namespace del contrato del servicio.
+* service entity --class nombreClase:
 
-* service export ws --class clase --name nombreServicio : Generará lo necesario para que este método o la clase (dependiendo si --name se define) sea accesible externamente. La clase debería poder ser una clase de servicio o una entidad (habría que ver opciones u otro comando para publicar CRUD). Tendríamos que ver como implementar esto para que permitiese exportar de distintas formas (por ejemplo si es un proyecto ESB o no, etc). Este comando requerirá mucho más análisis.
+  - ``class``: Entidad que a partir de la que se va a crear el servicio.
 
-* service export ws --wsdl url2wsdl: Generará generará una clase de servicio a partir de su definición en wsdl. Los métodos serán generados en blanco para que el desarrollador pueda realizar su implementación. Este comando es el mismo que el anterior pero con sólo el parámetro de la descripción del contrato. Como paquete y clase se usará el namespace que haya definido en el contrato. Este comando requerirá mucho más análisis.
+    Crear una clase a partir de una entidad para gestionar servicios.
+    
+    Añadiría las anotaciones de Spring que necesitase ``@Service`` y ``@GvNixEntityService``.
+
+* service operation --class clase --name nombreOperacion --return clase:
+
+  - ``class``: Clase @Service a la que se va a añadir el método nuevo.
+  - ``name``: nombre del método.
+  - ``return``: Objeto que devuelve el método.
+
+    Sólo está activo para las clases anotadas con ``@Service`` (Autocompletado).
+    
+    Si la clase viene de una entidad se mostrarán los nombres de los métodos que se pueden publicar. La clase estará anotada con @GvNixEntityService y no hará falta definir los parámetros de entrada ni los de salida, toma como plantilla el método de la clase definido en el fichero aj de la entidad.
+    
+    Un método, que devolverá (o no) un tipo en concreto. Habría que ver como concretar la especificación del tipo devuelto cuando es Map, Collection, Set, etc...).
+
+* service parameter --class clase --method nombreOperacion --name nombreParametro --type clase:
+
+  - ``class``: Clase ``@Service`` que no sea ``@GvNixEntityService`` que se va a añadir el parámetro al método.
+  - ``method``: nombre del método que se va a editar.
+  - ``name``: parámetro que se va a añadir al método.
+  - ``type``: Tipo del parámetro.
+
+    Añade un parámetro de entrada a un método de una clase servicio (o de entidad). 
+    
+    Habría que ver como concretar la especificación del parámetro cuando es Map, Collection, Set, etc...).
+
+* service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
+
+  - ``endPoint`` urlOPropiedad
+  - ``wsdl`` url
+
+    Creará a una clase de servicio que hará de proxy de las operaciones que publica un Web Service remoto. 
+    
+    El parámetro endPoint sería opcional y debería poder ser una propiedad configurable desde los profiles (esto será útil para configura accesos a los servicios de desarrollo/pre-producción/producción). 
+    
+    La clase y el paquete a generar se usará el namespace del contrato del servicio.
+
+* service export ws --class clase --name nombreServicio:
+
+  - ``class``: clase que se va a publicar como servicio web. Anotar la clase con ``@GvNixWebService``.
+  - ``name``: nombre que se le va dar al servicio a definir.
+
+    Generará lo necesario para que esta clase (dependiendo si --name se define) sea accesible externamente. 
+    
+    La clase debería poder ser una clase de servicio o una entidad (habría que ver opciones u otro comando para publicar CRUD). Publicar el CRUD como servicio ?
+
+    **Duda:** 
+      Se deberían añadir las anotaciones JAXB al crear cualquier servicio web a todas las clases que se encuentren en el paquete ...domain al crear el primer servicio.
+
+    **TODO:**
+      Tendríamos que ver como implementar esto para que permitiese exportar de distintas formas (por ejemplo si es un proyecto ESB o no, etc). 
+      Este comando requerirá mucho más análisis.
+
+* service export operation ws --class clase --method nombreMetodoEntidad --name nombreAPublicar: 
+
+  - ``clase``: Clase anotada con ``@Service``.
+  - ``method``: nombre del método de la clase que se quiere publicar.
+  - ``name``: nombre con el que se quiere publicar el método de la clase.
+
+    Publicar como operación de un servicio web un método definido en la clase de servicio concreta.
+    
+    Anota un método definido en la clase del Servicio como operación del servicio web.
+    
+    Sólo está activo para clases que se han publicado como servicios ``@GvNixWebService`` en el paquete service (Autocompletado).
+    
+    Asigna la anotación @GvNixWebMethod al método que se va a publicar.
+    
+    **Parámetros:**
+      Los parámetros del método si los tiene se anotan con ``@WebParam`` y los valores por defecto, es decir los que se han declarado en el método.
+    
+    **Importante:** 
+      Si no se define ni method ni name se aplica a todos los métodos con los valores por defecto.
+
+* service export ws --wsdl url2wsdl:
+
+  - ``wsdl``: localización del archivo wsdl.
+
+    Generará generará una clase de servicio a partir de su definición en wsdl. 
+    
+    Los métodos serán generados en blanco para que el desarrollador pueda realizar su implementación. 
+    
+    Este comando es el mismo que el anterior pero con sólo el parámetro de la descripción del contrato. 
+    
+    Como paquete y clase se usará el namespace que haya definido en el contrato. Este comando requerirá mucho más análisis.
 
 Posibles mejoras el add-on cd CXF:
 
-Creación de una operación en un servicio.
+  Creación de una operación en un servicio.
 
-    * Siempre está disponible el comando 'cxf operation'.
-    * Los parámetros que pide el add-on para la creación de la operación en el servicio no son obligatorios, pero cuando creas un servicio sin parámetros hace la comprobación de que no tienen que ser nulos.
-    * El servicio que pide para añadirla la nueva operación es la Interfaz del servicio pero no lo pide para que quede claro.
-    * Mejorar la forma de Buscar la implementación del servicio para añadirle la operación, ya que se podría añadir una operación a cualquier servicio existente.
+      * Siempre está disponible el comando ``service operation`` si existe alguna clase anotada con ``@Service``.
+      * Los parámetros que pide el add-on para la creación de la operación en el servicio no son obligatorios, pero cuando creas una operación de servicio (método) sin parámetros hace la comprobación de que no tienen que ser nulos.
+            * Si es sin parámetros, ¿ que va a comprobar ?
+      * Mejorar la forma de Buscar la implementación del servicio para añadirle la operación, ya que se podría añadir una operación a cualquier servicio existente.
+            * Comandos ``service operation`` y ``service parameter``.
 
 TODO
 ====
 
-* Publish an operation as web service with AJs or with Annotations ? 
+* Publish an operation as web service with AJs or with Annotations
+    * Publish with AJs and Annotations.
 * Validate the generated contract with the WS-I Basic Profile standar (http://www.ws-i.org).
   Parece que, en general, se sigue la versión 1.1 de este estándar.
 * Use interfaces or only implementations on web service servers generation ?
+    * No usar interfaces ya que se crea el servicio como tal y la clase AspectJ se encarga de publicarlo como servicio web.
 * WSDL and XSD documentation generation on the contract.
+    * No genera documentación a partir de javadoc automáticamente.
 * Define the list compatible types list allowed on web service server generation on the properties objects: https://jaxb.dev.java.net/guide/Using_different_datatypes.html
-* Can be XML schemas generated in a separate file ?
+    * Tipos compatibles.
+* Can be XML schemas generated in a separate file.
+    * Por lo que he visto no hay manera, genera dentro del contrato y no nos debe afectar al desarrollo.
 * Can be the contract generated with versioning structure ?
 * To use annotations as bind validation (jsr303) to simulate XSD extensions.
 * Web services unit testing.
 * Para el tema del namespace es posible que sea necesario añadir monitorizaciones adicionales al NotifiableFileMonitorService, ya que seguramente las clases de los servicios no estén dentro de directorio del paquete base de la aplicación.
-* Una opción muy interesante sería poder hacer una prueba de generación del servicio utilizando el plugin para maven wsdl2java ya que por defecto se ejecuta en el arranque o primera petición del servicio.
+    * Como que no estén dentro del paquete base? es para crear la clase, se puede crear en cualquier paquete, puede que no haya entendido este punto.
+* Una opción muy interesante sería poder hacer una prueba de generación del servicio utilizando el plugin para maven **java2ws** ya que por defecto se ejecuta en el arranque o primera petición del servicio.
+    * He estado haciendo las pruebas arrancando la aplicación, debido a que de esta manera también podía probar el servicio mediante web-services-explorer de eclipse.
+    * Se ha añadido el plugin para generar el wsdl en la fase de compilación.
