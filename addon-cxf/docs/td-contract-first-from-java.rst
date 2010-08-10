@@ -21,19 +21,15 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Requirements
 ============
 
-* Allow the generation of local services, withour web service support (Spring @Service).
-
-* Generate web service clients and servers easily.
+Requirements are in priority order:
 
 * Web service servers creation without write wsdl and xsd.
-  Use contract first model, but generate contract (wsdl + xsd) from Java with a DSL language as Java Annotations.
+  Use contract first model, but generate contract (wsdl + xsd) from Java with a DSL language as Java Annotations and/or AspectJ.
   
   A change in the source code should not affect the generated service contract (wsdl + xsd). 
   If a code change makes inconsistent the relationship with the service annotations, would be required to generate a compilation or startup error.
-  
-* Support web services clients generation compatible with JAX-RPC web service servers standar.
 
-* Web services clients and servers generation would be executable on FUSE ESB / Servicemix environments.
+* Using SOAP binding document / literal versus RPC / encoded servers generated, because RPC is obsolete by WS-I Basic Profile.
 
 * Allow web service servers generation on the service layer o entity layer of Roo.
 
@@ -41,7 +37,13 @@ Requirements
 
 * Web service framework installation will be automatic when client or server generation is required. 
 
-* Using SOAP binding document / literal versus RPC / encoded servers generated, because RPC is obsolete by WS-I Basic Profile.
+* Allow the generation of local services, withour web service support (Spring @Service).
+
+* Generate web service clients and servers easily.
+
+* Support web services clients generation compatible with JAX-RPC web service servers standar.
+
+* Web services clients and servers generation would be executable on FUSE ESB / Servicemix environments.
 
 Additionally, There are some limitations on wsdl generation from Java.
 Another requirements are to solve or avoid this limitations too.
@@ -673,9 +675,7 @@ TODO
 
 * Publish an operation as web service with AJs or with Annotations
     * Publish with AJs and Annotations.
-* Validate the generated contract with the WS-I Basic Profile standar (http://www.ws-i.org).
-  Parece que, en general, se sigue la versión 1.1 de este estándar.
-* Use interfaces or only implementations on web service servers generation ?
+* Validate the generated contract with the WS-I Basic Profile standar (http://www.ws-i.org). Parece que, en general, se sigue la versión 1.1 de este estándar.
     * No usar interfaces ya que se crea el servicio como tal y la clase AspectJ se encarga de publicarlo como servicio web.
 * WSDL and XSD documentation generation on the contract.
     * No genera documentación a partir de javadoc automáticamente.
