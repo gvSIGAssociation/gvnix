@@ -27,9 +27,9 @@ import org.springframework.roo.support.util.FileCopyUtils;
  */
 @Component
 @Service
-public class OperationsImpl implements Operations{
+public class GvNixServiceLayerOperationsImpl implements GvNixServiceLayerOperations{
 
-	private static Logger logger = Logger.getLogger(Operations.class.getName());
+	private static Logger logger = Logger.getLogger(GvNixServiceLayerOperations.class.getName());
 
 	@Reference private FileManager fileManager;
 	@Reference private MetadataService metadataService;

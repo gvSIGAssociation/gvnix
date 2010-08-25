@@ -24,11 +24,11 @@ import org.springframework.roo.support.util.Assert;
  */
 @Component
 @Service
-public class Commands implements CommandMarker {
+public class GvNixServiceLayerCommands implements CommandMarker {
 	
-	private static Logger logger = Logger.getLogger(Commands.class.getName());
+	private static Logger logger = Logger.getLogger(GvNixServiceLayerCommands.class.getName());
 
-	@Reference private Operations operations;
+	@Reference private GvNixServiceLayerOperations operations;
 	@Reference private StaticFieldConverter staticFieldConverter;
 
 	protected void activate(ComponentContext context) {

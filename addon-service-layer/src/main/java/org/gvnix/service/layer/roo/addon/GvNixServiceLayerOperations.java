@@ -6,7 +6,7 @@ package org.gvnix.service.layer.roo.addon;
  * @author Ben Alex
  * @since 1.1.0-M1
  */
-public interface Operations {
+public interface GvNixServiceLayerOperations {
 
 	boolean isProjectAvailable();
 
