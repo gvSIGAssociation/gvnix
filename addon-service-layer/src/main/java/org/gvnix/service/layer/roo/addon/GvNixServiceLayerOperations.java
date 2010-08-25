@@ -1,25 +1,34 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gvnix.service.layer.roo.addon;
 
 /**
- * Interface of commands that are available via the Roo shell.
- *
- * @author Ben Alex
- * @since 1.1.0-M1
+ * Addon for Handle Service Layer
+ * 
+ * @author Ricardo García ( rgarcia at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 public interface GvNixServiceLayerOperations {
 
-	boolean isProjectAvailable();
+    boolean isProjectAvailable();
 
-	/**
-	 * @param propertyName to obtain (required)
-	 * @return a message that will ultimately be displayed on the shell
-	 */
-	String getProperty(PropertyName propertyName);
-
-	/**
-	 * @return true if the user's project has a /[name].txt file
-	 */
-	boolean isTextFileAvailable(String name);
-
-	void writeTextFile(String name);
+    String returnString(String name);
 }

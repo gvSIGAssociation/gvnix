@@ -1,3 +1,21 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gvnix.service.layer.roo.addon;
 
 import java.io.File;
@@ -20,85 +38,63 @@ import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
 
 /**
- * Implementation of commands that are available via the Roo shell.
- *
- * @author Ben Alex
- * @since 1.1.0M1
+ * Addon for Handle Service Layer
+ * 
+ * @author Ricardo García ( rgarcia at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 @Component
 @Service
-public class GvNixServiceLayerOperationsImpl implements GvNixServiceLayerOperations{
+public class GvNixServiceLayerOperationsImpl implements
+	GvNixServiceLayerOperations {
 
-	private static Logger logger = Logger.getLogger(GvNixServiceLayerOperations.class.getName());
+    private static Logger logger = Logger
+	    .getLogger(GvNixServiceLayerOperations.class.getName());
 
-	@Reference private FileManager fileManager;
-	@Reference private MetadataService metadataService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private MetadataService metadataService;
 
     private ComponentContext context;
 
     protected void activate(ComponentContext context) {
-	    this.context = context;
+	this.context = context;
     }
 
-	public boolean isProjectAvailable() {
-		return getPathResolver() != null;
-	}
+    public boolean isProjectAvailable() {
+	return getPathResolver() != null;
+    }
 
-	/**
-	 * @param propertyName to obtain (required)
-	 * @return a message that will ultimately be displayed on the shell
-	 */
-	public String getProperty(PropertyName propertyName) {
-		Assert.notNull(propertyName, "Property name required");
-		String internalName = "user.name";
-		if (PropertyName.HOME_DIRECTORY.equals(propertyName)) {
-			internalName = "user.home";
-		}
-		return propertyName.getPropertyName() + " : " + System.getProperty(internalName);
+    /**
+     * @return true if the user's project has a /[name].txt file
+     */
+    public boolean isTextFileAvailable(String name) {
+	Assert.hasText(name, "Text file name to check for is required");
+	PathResolver pr = getPathResolver();
+	if (pr == null) {
+	    return false;
 	}
+	File file = new File(pr.getIdentifier(Path.ROOT, name + ".txt"));
+	return file.exists();
+    }
 
-	/**
-	 * @return true if the user's project has a /[name].txt file
-	 */
-	public boolean isTextFileAvailable(String name) {
-		Assert.hasText(name, "Text file name to check for is required");
-		PathResolver pr = getPathResolver();
-		if (pr == null) {
-			return false;
-		}
-		File file = new File(pr.getIdentifier(Path.ROOT, name + ".txt"));
-		return file.exists();
-	}
+    public String returnString(String name) {
 
-	public void writeTextFile(String name) {
-		Assert.hasText(name, "Text file name to write is required");
-		PathResolver pr = getPathResolver();
-		Assert.notNull(pr, "Path resolver not found");
-		String path = pr.getIdentifier(Path.ROOT, name + ".txt");
-		File file = new File(path);
-		MutableFile mutableFile;
-		if (file.exists()) {
-			mutableFile = fileManager.updateFile(path);
-		} else {
-			mutableFile = fileManager.createFile(path);
-		}
-		byte[] input = new String("Write text file method called at " + new Date().toString()).getBytes();
-		try {
-			FileCopyUtils.copy(input, mutableFile.getOutputStream());
-		} catch (IOException ioe) {
-			throw new IllegalStateException(ioe);
-		}
-		logger.log(Level.WARNING, "Wrote: " + new String(input));
-	}
+	return name;
+    }
 
-	/**
-	 * @return the path resolver or null if there is no user project
-	 */
-	private PathResolver getPathResolver() {
-		ProjectMetadata projectMetadata = (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
-		if (projectMetadata == null) {
-			return null;
-		}
-		return projectMetadata.getPathResolver();
+    /**
+     * @return the path resolver or null if there is no user project
+     */
+    private PathResolver getPathResolver() {
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(ProjectMetadata.getProjectIdentifier());
+	if (projectMetadata == null) {
+	    return null;
 	}
+	return projectMetadata.getPathResolver();
+    }
 }
