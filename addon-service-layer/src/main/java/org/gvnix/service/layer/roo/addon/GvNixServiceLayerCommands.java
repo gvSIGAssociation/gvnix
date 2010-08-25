@@ -40,17 +40,15 @@ public class GvNixServiceLayerCommands implements CommandMarker {
 	    .getLogger(GvNixServiceLayerCommands.class.getName());
 
     @Reference
-    private GvNixServiceLayerOperations operations;
-    @Reference
-    private StaticFieldConverter staticFieldConverter;
+    private GvNixServiceLayerOperations serviceLayerOperations;
 
-    @CliAvailabilityIndicator("welcome write hello")
+    @CliAvailabilityIndicator("service export ws")
     public boolean isWriteHelloAvailable() {
-	return operations.isProjectAvailable();
+	return serviceLayerOperations.isProjectAvailable();
     }
 
-    @CliCommand(value = "welcome write hello", help = "Writes hello.txt in the project root directory")
+    @CliCommand(value = "service export ws", help = "Exports a Service class to Web Service.")
     public String writeHello() {
-	return operations.returnString("hello");
+	return serviceLayerOperations.returnString("Service exported.");
     }
 }
