@@ -48,9 +48,9 @@ public class GvNixServiceLayerCommands implements CommandMarker {
     }
 
     @CliCommand(value = "service export ws", help = "Exports a Service class to Web Service. If the class doesn't exists the Addon will create it.")
-    public String serviceExport(
+    public void serviceExport(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass) {
-	return "Service exported.";
+	serviceLayerOperations.exportService(serviceClass);
     }
 
     @CliAvailabilityIndicator("service operation")

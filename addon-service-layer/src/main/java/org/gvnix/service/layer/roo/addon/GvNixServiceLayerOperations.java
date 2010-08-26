@@ -20,6 +20,7 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.List;
 
+import org.springframework.roo.model.JavaType;
 import org.w3c.dom.Element;
 
 /**
@@ -33,6 +34,21 @@ import org.w3c.dom.Element;
 public interface GvNixServiceLayerOperations {
 
     boolean isProjectAvailable();
+
+
+    /**
+     * <p>
+     * Set up Cxf configuration to a project.
+     * </p>
+     */
+    public void setUpCxf();
+
+    /**
+     * <p>
+     * Exports a class to Web Service.
+     * </p>
+     */
+    public void exportService(JavaType className);
 
     /**
      * <p>
@@ -70,10 +86,4 @@ public interface GvNixServiceLayerOperations {
      */
     public boolean isCxfConfigurated();
 
-    /**
-     * <p>
-     * Set up Cxf configuration to a project.
-     * </p>
-     */
-    public void setUpCxf();
 }

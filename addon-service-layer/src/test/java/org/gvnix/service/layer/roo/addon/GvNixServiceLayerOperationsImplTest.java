@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataItem;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
@@ -58,6 +59,7 @@ public class GvNixServiceLayerOperationsImplTest {
     private MetadataService metadataService;
     private PathResolver pathResolver;
     private ProjectOperations projectOperations;
+    private ClasspathOperations classpathOperations;
 
     // Mock to emulate file management.
     private MutableFile webXmlMutableFile;
@@ -83,6 +85,7 @@ public class GvNixServiceLayerOperationsImplTest {
 	metadataService = createMock(MetadataService.class);
 	pathResolver = createMock(PathResolver.class);
 	projectOperations = createMock(ProjectOperations.class);
+	classpathOperations = createMock(ClasspathOperations.class);
 
 	// Mock Objects
 	webXmlMutableFile = createMock(MutableFile.class);
@@ -98,6 +101,8 @@ public class GvNixServiceLayerOperationsImplTest {
 		"pathResolver", pathResolver);
 	ReflectionTestUtils.setField(gvNixServiceLayerOperationsImpl,
 		"projectOperations", projectOperations);
+	ReflectionTestUtils.setField(gvNixServiceLayerOperationsImpl,
+		"classpathOperations", classpathOperations);
 
     }
 

@@ -19,14 +19,25 @@
 package org.gvnix.service.layer.roo.addon;
 
 import java.io.InputStream;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.classpath.PhysicalTypeCategory;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.DefaultClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.*;
@@ -58,9 +69,13 @@ public class GvNixServiceLayerOperationsImpl implements
     private PathResolver pathResolver;
     @Reference
     private ProjectOperations projectOperations;
+    @Reference
+    private ClasspathOperations classpathOperations;
 
     private ComponentContext context;
 
+    private static String specifiedDefaultValue = "SRC_MAIN_JAVA";
+    
     protected void activate(ComponentContext context) {
 	this.context = context;
     }
@@ -96,6 +111,77 @@ public class GvNixServiceLayerOperationsImpl implements
 	    return null;
 	}
 	return projectMetadata.getPathResolver();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * If the class to export as web service doesn't exist it will be created
+     * automatically in 'src/main/java' directory inside the package defined.
+     * </p>
+     * 
+     * @param serviceClass
+     */
+    public void exportService(JavaType serviceClass) {
+
+	String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		serviceClass.getFullyQualifiedTypeName().replace('.', '/')
+			.concat(".java"));
+
+	if (!fileManager.exists(fileLocation)) {
+	    logger
+		    .log(Level.INFO,
+			    "Crea la nueva clase de servicio para publicarla como servicio web.");
+	}
+
+	// Service class
+	String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
+		serviceClass, Path.SRC_MAIN_JAVA);
+
+	// WebService annotations
+	List<AnnotationMetadata> ifaceAnnotations = new ArrayList<AnnotationMetadata>();
+	ifaceAnnotations.add(new DefaultAnnotationMetadata(new JavaType(
+		"javax.jws.WebService"),
+		new ArrayList<AnnotationAttributeValue<?>>()));
+
+	ClassOrInterfaceTypeDetails ifaceDetails = new DefaultClassOrInterfaceTypeDetails(
+		declaredByMetadataId, serviceClass, Modifier.PUBLIC,
+		PhysicalTypeCategory.INTERFACE, null, null, null, null, null,
+		null, ifaceAnnotations, null);
+	classpathOperations.generateClassFile(ifaceDetails);
+
+	// Service Implementation class name = full qualified name + Impl
+	JavaType srvName = new JavaType(serviceClass
+		.getFullyQualifiedTypeName()
+		.concat("Impl"));
+
+	String srvDeclaredByMetadataId = PhysicalTypeIdentifier
+		.createIdentifier(srvName, Path.SRC_MAIN_JAVA);
+
+	List<JavaType> implementsTypes = new ArrayList<JavaType>();
+	implementsTypes.add(serviceClass);
+
+	// Implementation annotations
+	List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+	attrs.add(new StringAttributeValue(new JavaSymbolName(
+			"endpointInterface"), serviceClass
+			.getFullyQualifiedTypeName()));
+	attrs.add(new StringAttributeValue(new JavaSymbolName("serviceName"),
+		serviceClass.getSimpleTypeName()));
+
+	List<AnnotationMetadata> entityAnnotations = new ArrayList<AnnotationMetadata>();
+	entityAnnotations.add(new DefaultAnnotationMetadata(new JavaType(
+		"javax.jws.WebService"), attrs));
+
+	ClassOrInterfaceTypeDetails srvDetails = new DefaultClassOrInterfaceTypeDetails(
+		srvDeclaredByMetadataId, srvName, Modifier.PUBLIC,
+		PhysicalTypeCategory.CLASS, null, null, null, null, null,
+		implementsTypes, entityAnnotations, null);
+	classpathOperations.generateClassFile(srvDetails);
+
+	// Update CXF XML
+	//updateCxfXml(serviceClass, srvName);
     }
 
     /**
