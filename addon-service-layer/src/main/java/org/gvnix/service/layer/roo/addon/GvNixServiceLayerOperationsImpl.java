@@ -31,9 +31,7 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.*;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
 
@@ -57,6 +55,8 @@ public class GvNixServiceLayerOperationsImpl implements
     private FileManager fileManager;
     @Reference
     private MetadataService metadataService;
+    @Reference
+    private PathResolver pathResolver;
 
     private ComponentContext context;
 
@@ -64,27 +64,26 @@ public class GvNixServiceLayerOperationsImpl implements
 	this.context = context;
     }
 
-    public boolean isProjectAvailable() {
-	return getPathResolver() != null;
-    }
-
-    /**
-     * @return true if the user's project has a /[name].txt file
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.gvnix.service.layer.roo.addon.GvNixServiceLayerOperations#
+     * isProjectAvailable()
      */
-    public boolean isTextFileAvailable(String name) {
-	Assert.hasText(name, "Text file name to check for is required");
-	PathResolver pr = getPathResolver();
-	if (pr == null) {
+    public boolean isProjectAvailable() {
+	if (getPathResolver() == null) {
 	    return false;
 	}
-	File file = new File(pr.getIdentifier(Path.ROOT, name + ".txt"));
-	return file.exists();
+
+	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		"WEB-INF/spring/webmvc-config.xml");
+
+	if (!fileManager.exists(webXmlPath)) {
+	    return false;
+	}
+	return true;
     }
 
-    public String returnString(String name) {
-
-	return name;
-    }
 
     /**
      * @return the path resolver or null if there is no user project
@@ -96,5 +95,79 @@ public class GvNixServiceLayerOperationsImpl implements
 	    return null;
 	}
 	return projectMetadata.getPathResolver();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Checks these types:
+     * </p>
+     * <ul>
+     * <li>
+     * Cxf Dependencies in pom.xml.</li>
+     * <li>
+     * Cxf configuration file exists.</li>
+     * </ul>
+     * 
+     * dependencies installed </p>
+     */
+    public boolean isCxfInstalled() {
+
+	boolean cxfConfigFileExists = isCxfConfigurated();
+
+	boolean cxfDependeciesExists = isCxfDependencyInstalled();
+
+	return cxfConfigFileExists && cxfDependeciesExists;
+    }
+
+    /**
+     * <p>
+     * Chekc if Cxf config file is created in the project.
+     * </p>
+     * 
+     * @return true or false if exists Cxf configuration file.
+     */
+    private boolean isCxfConfigurated() {
+
+	String prjId = ProjectMetadata.getProjectIdentifier();
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(prjId);
+	String prjName = projectMetadata.getProjectName();
+
+	String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
+
+	// Checks for src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
+	String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		cxfFile);
+
+	boolean cxfInstalled = fileManager.exists(cxfXmlPath);
+
+	return cxfInstalled;
+    }
+
+    /**
+     * <p>
+     * Check if Cxf dependencies are set in project's pom.xml.
+     * </p>
+     * 
+     * @return true or false are Cxf dependcies set.
+     */
+    private boolean isCxfDependencyInstalled() {
+
+	boolean cxfDependeciesExists;
+
+	ProjectMetadata project = (ProjectMetadata) metadataService
+		.get(ProjectMetadata.getProjectIdentifier());
+	if (project == null) {
+	    return false;
+	}
+
+	// Only permit installation if they don't already have the version of
+	// CXF installed.
+	cxfDependeciesExists = project.isDependencyRegistered(new Dependency(
+		"org.apache.cxf", "cxf-rt-core", "2.2.6"));
+
+	return cxfDependeciesExists;
     }
 }

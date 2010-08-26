@@ -30,5 +30,12 @@ public interface GvNixServiceLayerOperations {
 
     boolean isProjectAvailable();
 
-    String returnString(String name);
+    /**
+     * <p>
+     * Check if Cxf is properly configurated in a project.
+     * </p>
+     * 
+     * @return true or false if it's configurated.
+     */
+    public boolean isCxfInstalled();
 }

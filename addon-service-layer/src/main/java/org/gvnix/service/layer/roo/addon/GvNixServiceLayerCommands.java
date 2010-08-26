@@ -43,12 +43,24 @@ public class GvNixServiceLayerCommands implements CommandMarker {
     private GvNixServiceLayerOperations serviceLayerOperations;
 
     @CliAvailabilityIndicator("service export ws")
-    public boolean isWriteHelloAvailable() {
+    public boolean isServiceExportAvailable() {
 	return serviceLayerOperations.isProjectAvailable();
     }
 
     @CliCommand(value = "service export ws", help = "Exports a Service class to Web Service.")
-    public String writeHello() {
-	return serviceLayerOperations.returnString("Service exported.");
+    public String serviceExport() {
+	return "Service exported.";
     }
+
+    @CliAvailabilityIndicator("service operation")
+    public boolean isServiceOperationAvailable() {
+	return serviceLayerOperations.isProjectAvailable()
+		&& serviceLayerOperations.isCxfInstalled();
+    }
+
+    @CliCommand(value = "service operation", help = "Publish a method as Web Service Operation.")
+    public String serviceOperation() {
+	return "Web Service Operation published.";
+    }
+
 }
