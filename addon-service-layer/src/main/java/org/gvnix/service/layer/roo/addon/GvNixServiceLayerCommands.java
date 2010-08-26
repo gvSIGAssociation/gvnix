@@ -21,6 +21,7 @@ package org.gvnix.service.layer.roo.addon;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.*;
 
 /**
@@ -46,8 +47,9 @@ public class GvNixServiceLayerCommands implements CommandMarker {
 	return serviceLayerOperations.isProjectAvailable();
     }
 
-    @CliCommand(value = "service export ws", help = "Exports a Service class to Web Service.")
-    public String serviceExport() {
+    @CliCommand(value = "service export ws", help = "Exports a Service class to Web Service. If the class doesn't exists the Addon will create it.")
+    public String serviceExport(
+	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass) {
 	return "Service exported.";
     }
 

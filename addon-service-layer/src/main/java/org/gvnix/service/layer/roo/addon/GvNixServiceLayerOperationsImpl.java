@@ -128,6 +128,7 @@ public class GvNixServiceLayerOperationsImpl implements
 	// Add dependencies to project
 	updateDependencies();
 
+	// TODO: comprobar si ya se ha añadido la url rewrite.
 	// Setup URL rewrite to avoid to filter requests to WebServices
 	updateRewriteRules();
 
@@ -379,13 +380,15 @@ public class GvNixServiceLayerOperationsImpl implements
     }
 
     /**
+     * {@inheritDoc}
+     * 
      * <p>
-     * Chekc if Cxf config file is created in the project.
+     * Checks if exists Cxf config file using project name.
      * </p>
      * 
      * @return true or false if exists Cxf configuration file.
      */
-    private boolean isCxfConfigurated() {
+    public boolean isCxfConfigurated() {
 
 	String prjId = ProjectMetadata.getProjectIdentifier();
 	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
@@ -435,7 +438,6 @@ public class GvNixServiceLayerOperationsImpl implements
 	    cxfDependency = new Dependency(element);
 	    cxfDependenciesExists = cxfDependenciesExists
 		    && project.isDependencyRegistered(cxfDependency);
-
 	}
 
 	return cxfDependenciesExists;

@@ -63,6 +63,15 @@ public interface GvNixServiceLayerOperations {
 
     /**
      * <p>
+     * Check if Cxf config file is created in the project.
+     * </p>
+     * 
+     * @return true or false if exists Cxf configuration file.
+     */
+    public boolean isCxfConfigurated();
+
+    /**
+     * <p>
      * Set up Cxf configuration to a project.
      * </p>
      */

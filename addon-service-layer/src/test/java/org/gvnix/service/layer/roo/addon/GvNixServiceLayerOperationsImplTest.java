@@ -22,6 +22,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Before;
@@ -109,7 +110,7 @@ public class GvNixServiceLayerOperationsImplTest {
     @Test
     public void testAreCxfDependenciesInstalled() throws Exception {
 
-	boolean areCxfDependenciesInstalled;
+	boolean areCxfDependenciesInstalledResult;
 	
 	/*
 	 * Test 1 - Todas las dependencias de CXF han sido definidas en el
@@ -132,9 +133,97 @@ public class GvNixServiceLayerOperationsImplTest {
 
 	replay(metadataService, projectMetadata);
 
-	areCxfDependenciesInstalled = gvNixServiceLayerOperationsImpl.areCxfDependenciesInstalled();
+	areCxfDependenciesInstalledResult = gvNixServiceLayerOperationsImpl
+		.areCxfDependenciesInstalled();
 
-	assertTrue("There is one or more depdencies not set.",
-		areCxfDependenciesInstalled);
+	assertTrue("There is one or more dependencies not set.",
+		areCxfDependenciesInstalledResult);
+
+	logger.log(Level.INFO,
+		"Test 1 \nAll Cxf Dependencies defined in pom.xml");
+
+	reset(metadataService, projectMetadata);
+
+	/*
+	 * Test 2 - Falta al menos una dependencia por definir en el pom.xml del
+	 * proyecto.
+	 */
+	String dependencyNotDefined = "jaxb-api";
+
+	expect(metadataService.get(ProjectMetadata.getProjectIdentifier()))
+		.andReturn(projectMetadata);
+
+	for (Element element : dependencyList) {
+
+	    dependency = new Dependency(element);
+	    if (dependency.getArtifactId().getSymbolName().compareTo(
+		    dependencyNotDefined) == 0) {
+		expect(projectMetadata.isDependencyRegistered(dependency))
+			.andReturn(false);
+	    }
+	    expect(projectMetadata.isDependencyRegistered(dependency))
+		    .andReturn(true);
+	}
+
+	replay(metadataService, projectMetadata);
+
+	areCxfDependenciesInstalledResult = gvNixServiceLayerOperationsImpl
+		.areCxfDependenciesInstalled();
+
+	assertFalse("There are all dependencies set.",
+		areCxfDependenciesInstalledResult);
+
+	logger.log(Level.INFO, "Test 2 \njaxb-api dependency is not set.");
+
+	reset(metadataService, projectMetadata);
+
+    }
+
+    /**
+     * Checks method {@link GvNixServiceLayerOperationsImpl#sCxfConfigurated()}
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testIsCxfConfigurated() throws Exception {
+
+	String projectName;
+	String cxfprojectFile;
+	String cxfPath;
+	boolean cxfConfigFileExpected;
+	
+	/*
+	 * Test 1 - Exists Cxf config file using project name.
+	 * 
+	 * projectName = test-service-layer.
+	 */
+	projectName = "test-service-layer";
+
+	cxfprojectFile = "WEB-INF/cxf-".concat(projectName)
+		.concat(".xml");
+
+	cxfPath = cxfprojectFile;
+
+	cxfConfigFileExpected = true;
+	
+	expect(metadataService.get(ProjectMetadata.getProjectIdentifier()))
+		.andReturn(projectMetadata);
+
+	expect(projectMetadata.getProjectName()).andReturn(projectName);
+
+	expect(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, cxfprojectFile))
+		.andReturn(cxfPath);
+
+	expect(fileManager.exists(cxfPath)).andReturn(cxfConfigFileExpected);
+
+	replay(metadataService, projectMetadata, pathResolver, fileManager);
+
+	assertTrue("The Cxf config file doesn't exists.", cxfConfigFileExpected);
+
+	logger.log(Level.INFO,
+		"Test 1 \nThe Cxf config file using project name exists.");
+
+	reset(metadataService, projectMetadata, pathResolver, fileManager);
+
     }
 }
