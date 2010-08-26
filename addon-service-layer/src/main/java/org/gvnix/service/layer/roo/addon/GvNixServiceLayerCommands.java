@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.springframework.roo.shell.*;
-import org.springframework.roo.shell.converters.StaticFieldConverter;
 
 /**
  * Addon for Handle Service Layer

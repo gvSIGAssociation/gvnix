@@ -18,10 +18,8 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-import java.util.logging.Level;
+import java.io.InputStream;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
@@ -32,8 +30,9 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.*;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
+import org.springframework.roo.support.util.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Addon for Handle Service Layer
@@ -57,6 +56,8 @@ public class GvNixServiceLayerOperationsImpl implements
     private MetadataService metadataService;
     @Reference
     private PathResolver pathResolver;
+    @Reference
+    private ProjectOperations projectOperations;
 
     private ComponentContext context;
 
@@ -101,6 +102,262 @@ public class GvNixServiceLayerOperationsImpl implements
      * {@inheritDoc}
      * 
      * <p>
+     * Check if Cxf is set in the project.
+     * </p>
+     * <p>
+     * If is not set, then installs dependencies to the pom.xml and creates the
+     * cxf configuration file.
+     * </p>
+     */
+    public void setUpCxf() {
+
+	// Check if it's already installed.
+	if (isCxfInstalled()) {
+	    // Nothing to do
+	    return;
+	}
+
+	// Create CXF config file src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
+	addCxfXml();
+
+	// Update src/main/webapp/WEB-INF/web.xml :
+	// - Add CXFServlet and map it to /services/*
+	// - Add cxf-PROJECT_NAME.xml to Spring Context Loader
+	updateWebConfig();
+
+	// Add dependencies to project
+	updateDependencies();
+
+	// Setup URL rewrite to avoid to filter requests to WebServices
+	updateRewriteRules();
+
+    }
+
+    /**
+     * Update url rewrite rules
+     */
+    private void updateRewriteRules() {
+	List<Element> rules = getRewriteRules();
+
+	// Open file and append rules before the first element
+	String xmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		"WEB-INF/urlrewrite.xml");
+	Assert.isTrue(fileManager.exists(xmlPath), "urlrewrite.xml not found");
+
+	MutableFile xmlMutableFile = null;
+	Document urlXml;
+
+	try {
+	    xmlMutableFile = fileManager.updateFile(xmlPath);
+	    urlXml = XmlUtils.getDocumentBuilder().parse(
+		    xmlMutableFile.getInputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+	Element root = urlXml.getDocumentElement();
+
+	for (Element rule : rules) {
+
+	    // Create rule in dest doc
+	    Element rewRule = (Element) urlXml.adoptNode(rule);
+
+	    root.insertBefore(rewRule, root.getFirstChild());
+
+	}
+	XmlUtils.writeXml(xmlMutableFile.getOutputStream(), urlXml);
+    }
+
+    /**
+     * Get addon rewrite rules
+     * 
+     * @return List of addon rewrite rules
+     */
+    private List<Element> getRewriteRules() {
+	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+		"urlrewrite-rules.xml");
+	Assert.notNull(templateInputStream,
+		"Could not acquire urlrewrite-rules.xml file");
+	Document dependencyDoc;
+	try {
+	    dependencyDoc = XmlUtils.getDocumentBuilder().parse(
+		    templateInputStream);
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+
+	Element root = (Element) dependencyDoc.getFirstChild();
+
+	return XmlUtils.findElements("/urlrewrite-rules/cxf/rule", root);
+
+    }
+
+    /**
+     * <p>
+     * Get addon dependencies defined in dependencies.xml
+     * </p>
+     * 
+     * @return List of addon dependencies as xml elements.
+     */
+    public List<Element> getCxfDependencies() {
+	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+		"dependencies.xml");
+	Assert.notNull(templateInputStream,
+		"Could not acquire dependencies.xml file");
+	Document dependencyDoc;
+	try {
+	    dependencyDoc = XmlUtils.getDocumentBuilder().parse(
+		    templateInputStream);
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+
+	Element dependencies = (Element) dependencyDoc.getFirstChild();
+
+	return XmlUtils.findElements("/dependencies/cxf/dependency",
+		dependencies);
+
+    }
+
+    /**
+     * Add addon dependencies to project dependencies if necessary
+     */
+    private void updateDependencies() {
+
+	// If dependencies are installed continue.
+	if (areCxfDependenciesInstalled()) {
+	    return;
+	}
+
+	List<Element> cxfDependencies = getCxfDependencies();
+	for (Element dependency : cxfDependencies) {
+	    projectOperations.dependencyUpdate(new Dependency(dependency));
+	}
+    }
+
+    /**
+     * <p>
+     * Update WEB-INF/web.xml
+     * </p>
+     * <ul>
+     * <li>Create the CXF servlet declaration and mapping</li>
+     * <li>Configure ContextLoader to load cxf-PROJECT_ID.xml</li>
+     * </ul>
+     */
+    private void updateWebConfig() {
+	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		"WEB-INF/web.xml");
+	Assert.isTrue(fileManager.exists(webXmlPath), "web.xml not found");
+
+	MutableFile webXmlMutableFile = null;
+	Document webXml;
+
+	try {
+	    webXmlMutableFile = fileManager.updateFile(webXmlPath);
+	    webXml = XmlUtils.getDocumentBuilder().parse(
+		    webXmlMutableFile.getInputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+	Element root = webXml.getDocumentElement();
+
+	if (null != XmlUtils
+		.findFirstElement(
+			"/web-app/servlet[servlet-class='org.apache.cxf.transport.servlet.CXFServlet']",
+			root)) {
+	    // cxf servlet already installed, nothing to do
+	    return;
+	}
+
+	// Insert servlet def
+	Element firstServletMapping = XmlUtils.findRequiredElement(
+		"/web-app/servlet-mapping", root);
+
+	Element servlet = webXml.createElement("servlet");
+	Element servletName = webXml.createElement("servlet-name");
+
+	// TODO: Create command parameter to set the servlet name
+	servletName.setTextContent("CXFServlet");
+	servlet.appendChild(servletName);
+	Element servletClass = webXml.createElement("servlet-class");
+	servletClass
+		.setTextContent("org.apache.cxf.transport.servlet.CXFServlet");
+	servlet.appendChild(servletClass);
+	root.insertBefore(servlet, firstServletMapping.getPreviousSibling());
+
+	// Insert servlet mapping
+	Element servletMapping = webXml.createElement("servlet-mapping");
+	Element servletName2 = webXml.createElement("servlet-name");
+	servletName2.setTextContent("CXFServlet");
+	servletMapping.appendChild(servletName2);
+
+	// TODO: Create command parameter to set the servlet mapping
+	Element urlMapping = webXml.createElement("url-pattern");
+	urlMapping.setTextContent("/services/*");
+	servletMapping.appendChild(urlMapping);
+	root.insertBefore(servletMapping, firstServletMapping);
+
+	// Configure ContextLoader
+	String prjId = ProjectMetadata.getProjectIdentifier();
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(prjId);
+	String prjName = projectMetadata.getProjectName();
+	String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
+
+	Element contextConfigLocation = XmlUtils
+		.findFirstElement(
+			"/web-app/context-param[param-name='contextConfigLocation']/param-value",
+			root);
+	String paramValueContent = contextConfigLocation.getTextContent();
+	contextConfigLocation.setTextContent(cxfFile.concat(" ").concat(
+		paramValueContent));
+
+	XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);
+    }
+
+    /**
+     * Add the file <code>src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml</code> from
+     * <code>cxf-template.xml</code> if not exists.
+     */
+    private void addCxfXml() {
+
+	// Project ID
+	String prjId = ProjectMetadata.getProjectIdentifier();
+
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(prjId);
+	Assert.isTrue(projectMetadata != null, "Project metadata required");
+
+	// Project Name
+	String prjName = projectMetadata.getProjectName();
+
+	String cxfDestFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
+	String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		cxfDestFile);
+
+	// Document cxfXmlDoc;
+	// MutableFile mutableFile;
+	if (fileManager.exists(cxfXmlPath)) {
+	    // File exists, nothing to do
+	    return;
+	}
+
+	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+		"cxf-template.xml");
+	MutableFile cxfXmlMutableFile = fileManager.createFile(cxfXmlPath);
+	try {
+	    FileCopyUtils.copy(templateInputStream, cxfXmlMutableFile
+		    .getOutputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+
+	fileManager.scan();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
      * Checks these types:
      * </p>
      * <ul>
@@ -116,7 +373,7 @@ public class GvNixServiceLayerOperationsImpl implements
 
 	boolean cxfConfigFileExists = isCxfConfigurated();
 
-	boolean cxfDependeciesExists = isCxfDependencyInstalled();
+	boolean cxfDependeciesExists = areCxfDependenciesInstalled();
 
 	return cxfConfigFileExists && cxfDependeciesExists;
     }
@@ -147,15 +404,18 @@ public class GvNixServiceLayerOperationsImpl implements
     }
 
     /**
+     * {@inheritDoc}
+     * 
      * <p>
-     * Check if Cxf dependencies are set in project's pom.xml.
+     * Search if the dependencies defined in xml Addon file dependencies.xml are
+     * set in pom.xml.
      * </p>
      * 
-     * @return true or false are Cxf dependcies set.
+     * @return true if all dependecies are set in pom.xml.
      */
-    private boolean isCxfDependencyInstalled() {
+    public boolean areCxfDependenciesInstalled() {
 
-	boolean cxfDependeciesExists;
+	boolean cxfDependenciesExists = true;
 
 	ProjectMetadata project = (ProjectMetadata) metadataService
 		.get(ProjectMetadata.getProjectIdentifier());
@@ -163,11 +423,21 @@ public class GvNixServiceLayerOperationsImpl implements
 	    return false;
 	}
 
-	// Only permit installation if they don't already have the version of
-	// CXF installed.
-	cxfDependeciesExists = project.isDependencyRegistered(new Dependency(
-		"org.apache.cxf", "cxf-rt-core", "2.2.6"));
+	// Dependencies elements are defined as:
+	// <dependency org="org.apache.cxf" name="cxf-rt-bindings-soap"
+	// rev="2.2.6" />
+	List<Element> cxfDependenciesList = getCxfDependencies();
 
-	return cxfDependeciesExists;
+	Dependency cxfDependency;
+
+	for (Element element : cxfDependenciesList) {
+
+	    cxfDependency = new Dependency(element);
+	    cxfDependenciesExists = cxfDependenciesExists
+		    && project.isDependencyRegistered(cxfDependency);
+
+	}
+
+	return cxfDependenciesExists;
     }
 }

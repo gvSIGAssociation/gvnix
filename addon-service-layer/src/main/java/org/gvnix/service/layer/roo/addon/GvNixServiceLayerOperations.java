@@ -18,6 +18,10 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.List;
+
+import org.w3c.dom.Element;
+
 /**
  * Addon for Handle Service Layer
  * 
@@ -38,4 +42,29 @@ public interface GvNixServiceLayerOperations {
      * @return true or false if it's configurated.
      */
     public boolean isCxfInstalled();
+
+    /**
+     * <p>
+     * Check if Cxf dependencies are set in project's pom.xml.
+     * </p>
+     * 
+     * @return true or false if Cxf dependcies are set.
+     */
+    public boolean areCxfDependenciesInstalled();
+
+    /**
+     * <p>
+     * Get Addon dependencies list to install.
+     * </p>
+     * 
+     * @return List of dependencies as xml elements.
+     */
+    public List<Element> getCxfDependencies();
+
+    /**
+     * <p>
+     * Set up Cxf configuration to a project.
+     * </p>
+     */
+    public void setUpCxf();
 }

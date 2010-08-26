@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<urlrewrite-rules>
+  <cxf>
+    <rule>
+      <from>/services/**</from>
+      <to last="true">/services/$1</to>
+    </rule>
+  </cxf>
+</urlrewrite-rules>
+
