@@ -39,6 +39,9 @@
   <version>0.4.0-SNAPSHOT</version>
   <name>gvNIX - Addon - Service Layer</name>
   <description>gvNIX Service Layer Add-on</description>
+  <properties>
+    <gvnix.version>${parent.version}</gvnix.version>
+  </properties>
   <dependencies>
     <!-- OSGi -->
     <dependency>
@@ -115,8 +118,19 @@
         <version>${roo.version}</version>
         <type>bundle</type>
     </dependency>
+    <dependency>
+        <groupId>org.springframework.roo</groupId>
+        <artifactId>org.springframework.roo.addon.web.mvc.jsp</artifactId>
+        <version>${roo.version}</version>
+        <type>bundle</type>
+    </dependency>
+
     <!-- Other modules (if any) -->
-  
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
     <!-- Unit Test dependencies -->
     <dependency>
         <groupId>org.easymock</groupId>

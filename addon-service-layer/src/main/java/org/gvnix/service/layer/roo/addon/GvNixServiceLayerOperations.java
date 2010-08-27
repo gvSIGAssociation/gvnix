@@ -47,8 +47,39 @@ public interface GvNixServiceLayerOperations {
      * <p>
      * Exports a class to Web Service.
      * </p>
+     * 
+     * @param className
+     *            class to export.
      */
     public void exportService(JavaType className);
+
+    /**
+     * <p>
+     * Create a Service class.
+     * </p>
+     * 
+     * @param serviceClass
+     *            class to be created.
+     */
+    public void createServiceClass(JavaType serviceClass);
+
+    /**
+     * <p>
+     * Update an existing class to a web service.
+     * </p>
+     * 
+     * @param serviceClass
+     *            class to be published as Web Service.
+     */
+    public void updateClassAsWebService(JavaType serviceClass);
+
+    /**
+     * Define Web Service class in cxf configuration file to be published.
+     * 
+     * @param serviceClass
+     *            class to define as Web Service in Cxf configuration file.
+     */
+    public void updateCxfXml(JavaType serviceClass);
 
     /**
      * <p>
@@ -85,5 +116,12 @@ public interface GvNixServiceLayerOperations {
      * @return true or false if exists Cxf configuration file.
      */
     public boolean isCxfConfigurated();
+
+    /**
+     * Adds GvNIX annotations library dependency to the current project
+     * 
+     * TO BE REMOVED FROM API
+     */
+    public void addGvNIXAnnotationsDependecy();
 
 }

@@ -25,14 +25,17 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.mvc.jsp.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.DefaultClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;
@@ -71,10 +74,13 @@ public class GvNixServiceLayerOperationsImpl implements
     private ProjectOperations projectOperations;
     @Reference
     private ClasspathOperations classpathOperations;
+    @Reference
+    private TilesOperations tilesOperations;
 
     private ComponentContext context;
 
-    private static String specifiedDefaultValue = "SRC_MAIN_JAVA";
+    private static final String DOCTYPE_PUBLIC = "-//tuckey.org//DTD UrlRewrite 3.0//EN";
+    private static final String DOCTYPE_SYSTEM = "http://tuckey.org/res/dtds/urlrewrite3.0.dtd";
     
     protected void activate(ComponentContext context) {
 	this.context = context;
@@ -125,6 +131,10 @@ public class GvNixServiceLayerOperationsImpl implements
      */
     public void exportService(JavaType serviceClass) {
 
+	// Checks if Cxf is configured in the project and installs it if it's
+	// not available.
+	setUpCxf();
+
 	String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
 		serviceClass.getFullyQualifiedTypeName().replace('.', '/')
 			.concat(".java"));
@@ -133,55 +143,161 @@ public class GvNixServiceLayerOperationsImpl implements
 	    logger
 		    .log(Level.INFO,
 			    "Crea la nueva clase de servicio para publicarla como servicio web.");
+	    // Create service class with Service Annotation.
+	    createServiceClass(serviceClass);
+
 	}
+
+	// Define Web Service Annotations.
+	updateClassAsWebService(serviceClass);
+
+	// Update CXF XML
+	updateCxfXml(serviceClass);
+
+	// Add GvNixAnnotations to the project.
+	addGvNIXAnnotationsDependecy();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Adds @org.springframework.stereotype.Service annotation to the class.
+     * </p>
+     */
+    public void createServiceClass(JavaType serviceClass) {
 
 	// Service class
 	String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
 		serviceClass, Path.SRC_MAIN_JAVA);
 
 	// WebService annotations
-	List<AnnotationMetadata> ifaceAnnotations = new ArrayList<AnnotationMetadata>();
-	ifaceAnnotations.add(new DefaultAnnotationMetadata(new JavaType(
-		"javax.jws.WebService"),
+	List<AnnotationMetadata> serviceAnnotations = new ArrayList<AnnotationMetadata>();
+	serviceAnnotations.add(new DefaultAnnotationMetadata(new JavaType(
+		"org.springframework.stereotype.Service"),
 		new ArrayList<AnnotationAttributeValue<?>>()));
 
-	ClassOrInterfaceTypeDetails ifaceDetails = new DefaultClassOrInterfaceTypeDetails(
+	ClassOrInterfaceTypeDetails serviceDetails = new DefaultClassOrInterfaceTypeDetails(
 		declaredByMetadataId, serviceClass, Modifier.PUBLIC,
-		PhysicalTypeCategory.INTERFACE, null, null, null, null, null,
-		null, ifaceAnnotations, null);
-	classpathOperations.generateClassFile(ifaceDetails);
-
-	// Service Implementation class name = full qualified name + Impl
-	JavaType srvName = new JavaType(serviceClass
-		.getFullyQualifiedTypeName()
-		.concat("Impl"));
-
-	String srvDeclaredByMetadataId = PhysicalTypeIdentifier
-		.createIdentifier(srvName, Path.SRC_MAIN_JAVA);
-
-	List<JavaType> implementsTypes = new ArrayList<JavaType>();
-	implementsTypes.add(serviceClass);
-
-	// Implementation annotations
-	List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
-	attrs.add(new StringAttributeValue(new JavaSymbolName(
-			"endpointInterface"), serviceClass
-			.getFullyQualifiedTypeName()));
-	attrs.add(new StringAttributeValue(new JavaSymbolName("serviceName"),
-		serviceClass.getSimpleTypeName()));
-
-	List<AnnotationMetadata> entityAnnotations = new ArrayList<AnnotationMetadata>();
-	entityAnnotations.add(new DefaultAnnotationMetadata(new JavaType(
-		"javax.jws.WebService"), attrs));
-
-	ClassOrInterfaceTypeDetails srvDetails = new DefaultClassOrInterfaceTypeDetails(
-		srvDeclaredByMetadataId, srvName, Modifier.PUBLIC,
 		PhysicalTypeCategory.CLASS, null, null, null, null, null,
-		implementsTypes, entityAnnotations, null);
-	classpathOperations.generateClassFile(srvDetails);
+		null, serviceAnnotations, null);
 
-	// Update CXF XML
-	//updateCxfXml(serviceClass, srvName);
+	classpathOperations.generateClassFile(serviceDetails);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Adds @GvNixWebService annotation to the class.
+     * </p>
+     * 
+     */
+    public void updateClassAsWebService(JavaType serviceClass) {
+
+	// Load class details. If class not found an exception will be raised.
+	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
+		.getClassOrInterface(serviceClass);
+
+	// Checks if it's mutable
+	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+		tmpServiceDetails, "Can't modify " + tmpServiceDetails.getName());
+
+	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
+
+	List<? extends AnnotationMetadata> serviceAnnotations = serviceDetails
+		.getTypeAnnotations();
+
+	// @Service and @GvNixWebService annotation.
+	AnnotationMetadata gvNixWebServiceAnnotation = null;
+
+	// @GvNixWebService Annotation attributes.
+	List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+
+	gvNixAnnotationAttributes.add(new StringAttributeValue(
+		new JavaSymbolName("name"), serviceClass.getSimpleTypeName().concat("PortType")));
+
+	// TODO: Crear namespace a la inversa del nombre del paquete de la
+	// clase.
+	gvNixAnnotationAttributes.add(new StringAttributeValue(
+		new JavaSymbolName("targetNamespace"), "http://".concat(serviceClass.getPackage().toString()).concat("/")));
+
+	gvNixAnnotationAttributes.add(new StringAttributeValue(
+		new JavaSymbolName("serviceName"), serviceClass.getSimpleTypeName()));
+
+	for (AnnotationMetadata tmpAnnotationMetadata : serviceAnnotations) {
+
+	    if (tmpAnnotationMetadata.getAnnotationType()
+		    .getFullyQualifiedTypeName().equals(
+			    GvNixWebService.class.getName())) {
+
+		serviceDetails.removeTypeAnnotation(new JavaType(
+			GvNixWebService.class.getName()));
+	    }
+
+	}
+
+	// Define GvNixWebService annotation.
+	gvNixWebServiceAnnotation = new DefaultAnnotationMetadata(new JavaType(
+		GvNixWebService.class.getName()), gvNixAnnotationAttributes);
+
+	// Adds GvNIXEntityOCCChecksum to the entity
+	serviceDetails.addTypeAnnotation(gvNixWebServiceAnnotation);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public void updateCxfXml(JavaType className) {
+
+	// Project ID
+	String prjId = ProjectMetadata.getProjectIdentifier();
+
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(prjId);
+
+	Assert.isTrue(projectMetadata != null, "Project metadata required");
+
+	// Project Name
+	String prjName = projectMetadata.getProjectName();
+
+	String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
+	String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		cxfFile);
+
+	Assert.isTrue(fileManager.exists(cxfXmlPath),
+		"Cxf configuration file not found, export again the service.");
+
+	MutableFile cxfXmlMutableFile = null;
+	Document cxfXml;
+
+	try {
+	    cxfXmlMutableFile = fileManager.updateFile(cxfXmlPath);
+	    cxfXml = XmlUtils.getDocumentBuilder().parse(
+		    cxfXmlMutableFile.getInputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+	Element root = cxfXml.getDocumentElement();
+
+	Element bean = cxfXml.createElement("bean");
+	bean.setAttribute("id", className.getSimpleTypeName());
+	bean.setAttribute("class", className.getFullyQualifiedTypeName());
+
+	Element endpoint = cxfXml.createElement("jaxws:endpoint");
+	endpoint.setAttribute("id", className.getSimpleTypeName());
+	endpoint.setAttribute("implementor", "#".concat(className
+		.getSimpleTypeName()));
+	endpoint.setAttribute("address", "/".concat(className
+		.getSimpleTypeName()));
+
+	root.appendChild(bean);
+	root.appendChild(endpoint);
+
+	XmlUtils.writeXml(cxfXmlMutableFile.getOutputStream(), cxfXml);
     }
 
     /**
@@ -214,7 +330,7 @@ public class GvNixServiceLayerOperationsImpl implements
 	// Add dependencies to project
 	updateDependencies();
 
-	// TODO: comprobar si ya se ha añadido la url rewrite.
+	// TODO: comprobar si ya se ha actualizado el fichero urlrewrite.
 	// Setup URL rewrite to avoid to filter requests to WebServices
 	updateRewriteRules();
 
@@ -251,7 +367,19 @@ public class GvNixServiceLayerOperationsImpl implements
 	    root.insertBefore(rewRule, root.getFirstChild());
 
 	}
-	XmlUtils.writeXml(xmlMutableFile.getOutputStream(), urlXml);
+
+	// Define DTD
+	Transformer xformer;
+	try {
+	    xformer = XmlUtils.createIndentingTransformer();
+	} catch (Exception ex) {
+	    throw new IllegalStateException(ex);
+	}
+
+	xformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC);
+	xformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM);
+
+	XmlUtils.writeXml(xformer, xmlMutableFile.getOutputStream(), urlXml);
     }
 
     /**
@@ -528,4 +656,30 @@ public class GvNixServiceLayerOperationsImpl implements
 
 	return cxfDependenciesExists;
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.gvnix.service.layer.roo.addon.GvNixServiceLayerOperations#
+     * addGvNIXAnnotationsDependecy()
+     */
+    public void addGvNIXAnnotationsDependecy() {
+
+	List<Element> projectProperties = XmlUtils.findElements(
+		"/configuration/gvnix/properties/*", XmlUtils.getConfiguration(
+			this.getClass(), "properties.xml"));
+	for (Element property : projectProperties) {
+	    projectOperations.addProperty(new Property(property));
+	}
+
+	List<Element> databaseDependencies = XmlUtils.findElements(
+		"/configuration/gvnix/dependencies/dependency", XmlUtils
+			.getConfiguration(this.getClass(),
+				"gvnix-annotation-dependencies.xml"));
+	for (Element dependencyElement : databaseDependencies) {
+	    projectOperations
+		    .dependencyUpdate(new Dependency(dependencyElement));
+	}
+    }
+
 }
