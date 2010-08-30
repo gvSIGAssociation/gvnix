@@ -44,7 +44,7 @@ import org.w3c.dom.Element;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public class GvNixServiceLayerOperationsImplTest {
+public class ServiceLayerOperationsImplTest {
 
     static final String WEB_XML = "webmvc-config.xml";
 
@@ -52,7 +52,7 @@ public class GvNixServiceLayerOperationsImplTest {
     static final String WEB_XML_PATH = "WEB-INF/spring/webmvc-config.xml";
 
     // Class under test
-    private GvNixServiceLayerOperationsImpl gvNixServiceLayerOperationsImpl;
+    private ServiceLayerOperationsImpl serviceLayerOperationsImpl;
 
     // Mock objects to emulate Roo OSGi Services
     private FileManager fileManager;
@@ -67,7 +67,7 @@ public class GvNixServiceLayerOperationsImplTest {
     private MetadataItem metadataItem;
 
     private static Logger logger = Logger
-	    .getLogger(GvNixServiceLayerOperationsImplTest.class.getName());
+	    .getLogger(ServiceLayerOperationsImplTest.class.getName());
 
     /**
      * Setup operations instance and Mock objects
@@ -78,7 +78,7 @@ public class GvNixServiceLayerOperationsImplTest {
     public void setUp() throws Exception {
 
 	// Class under test
-	gvNixServiceLayerOperationsImpl = new GvNixServiceLayerOperationsImpl();
+	serviceLayerOperationsImpl = new ServiceLayerOperationsImpl();
 
 	// Setup Mock service objects
 	fileManager = createMock(FileManager.class);
@@ -93,22 +93,22 @@ public class GvNixServiceLayerOperationsImplTest {
 	metadataItem = createMock(MetadataItem.class);
 
 	// Inject mock objects in instance. This emulate OSGi environment
-	ReflectionTestUtils.setField(gvNixServiceLayerOperationsImpl,
+	ReflectionTestUtils.setField(serviceLayerOperationsImpl,
 		"fileManager", fileManager);
-	ReflectionTestUtils.setField(gvNixServiceLayerOperationsImpl,
+	ReflectionTestUtils.setField(serviceLayerOperationsImpl,
 		"metadataService", metadataService);
-	ReflectionTestUtils.setField(gvNixServiceLayerOperationsImpl,
+	ReflectionTestUtils.setField(serviceLayerOperationsImpl,
 		"pathResolver", pathResolver);
-	ReflectionTestUtils.setField(gvNixServiceLayerOperationsImpl,
+	ReflectionTestUtils.setField(serviceLayerOperationsImpl,
 		"projectOperations", projectOperations);
-	ReflectionTestUtils.setField(gvNixServiceLayerOperationsImpl,
+	ReflectionTestUtils.setField(serviceLayerOperationsImpl,
 		"classpathOperations", classpathOperations);
 
     }
 
     /**
      * Checks method
-     * {@link GvNixServiceLayerOperationsImpl#areCxfDependenciesInstalled()}
+     * {@link ServiceLayerOperationsImpl#areCxfDependenciesInstalled()}
      * 
      * @throws Exception
      */
@@ -126,7 +126,7 @@ public class GvNixServiceLayerOperationsImplTest {
 
 	Dependency dependency;
 
-	List<Element> dependencyList = gvNixServiceLayerOperationsImpl
+	List<Element> dependencyList = serviceLayerOperationsImpl
 		.getCxfDependencies();
 
 	for (Element element : dependencyList) {
@@ -138,7 +138,7 @@ public class GvNixServiceLayerOperationsImplTest {
 
 	replay(metadataService, projectMetadata);
 
-	areCxfDependenciesInstalledResult = gvNixServiceLayerOperationsImpl
+	areCxfDependenciesInstalledResult = serviceLayerOperationsImpl
 		.areCxfDependenciesInstalled();
 
 	assertTrue("There is one or more dependencies not set.",
@@ -172,7 +172,7 @@ public class GvNixServiceLayerOperationsImplTest {
 
 	replay(metadataService, projectMetadata);
 
-	areCxfDependenciesInstalledResult = gvNixServiceLayerOperationsImpl
+	areCxfDependenciesInstalledResult = serviceLayerOperationsImpl
 		.areCxfDependenciesInstalled();
 
 	assertFalse("There are all dependencies set.",
@@ -185,7 +185,7 @@ public class GvNixServiceLayerOperationsImplTest {
     }
 
     /**
-     * Checks method {@link GvNixServiceLayerOperationsImpl#sCxfConfigurated()}
+     * Checks method {@link ServiceLayerOperationsImpl#sCxfConfigurated()}
      * 
      * @throws Exception
      */

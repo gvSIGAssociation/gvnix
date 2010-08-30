@@ -58,11 +58,11 @@ import org.w3c.dom.Element;
  */
 @Component
 @Service
-public class GvNixServiceLayerOperationsImpl implements
-	GvNixServiceLayerOperations {
+public class ServiceLayerOperationsImpl implements
+	ServiceLayerOperations {
 
     private static Logger logger = Logger
-	    .getLogger(GvNixServiceLayerOperations.class.getName());
+	    .getLogger(ServiceLayerOperations.class.getName());
 
     @Reference
     private FileManager fileManager;

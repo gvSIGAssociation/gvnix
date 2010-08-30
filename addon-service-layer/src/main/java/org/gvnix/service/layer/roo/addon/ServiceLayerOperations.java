@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public interface GvNixServiceLayerOperations {
+public interface ServiceLayerOperations {
 
     boolean isProjectAvailable();
 

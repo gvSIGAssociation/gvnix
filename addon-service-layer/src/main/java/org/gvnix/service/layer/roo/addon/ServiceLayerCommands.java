@@ -34,13 +34,13 @@ import org.springframework.roo.shell.*;
  */
 @Component
 @Service
-public class GvNixServiceLayerCommands implements CommandMarker {
+public class ServiceLayerCommands implements CommandMarker {
 
     private static Logger logger = Logger
-	    .getLogger(GvNixServiceLayerCommands.class.getName());
+	    .getLogger(ServiceLayerCommands.class.getName());
 
     @Reference
-    private GvNixServiceLayerOperations serviceLayerOperations;
+    private ServiceLayerOperations serviceLayerOperations;
 
     @CliAvailabilityIndicator("service export ws")
     public boolean isServiceExportAvailable() {
