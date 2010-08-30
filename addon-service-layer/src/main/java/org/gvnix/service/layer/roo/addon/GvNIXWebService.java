@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 
 /**
  * <p>
- * GvNix Annotation to identify GvNIX created WebFault related to WebService.
+ * GvNix Annotation to identify GvNIX publish as WebService.
  * </p>
  * 
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -32,6 +32,13 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface GvNixWebFault {
+public @interface GvNIXWebService {
 
+    String name() default "";
+
+    String targetNamespace() default "";
+
+    String serviceName() default "";
+
+    String address() default "";
 }

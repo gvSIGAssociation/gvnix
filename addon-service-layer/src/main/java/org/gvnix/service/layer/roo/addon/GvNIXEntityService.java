@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 
 /**
  * <p>
- * GvNix Annotation to identify GvNIX publish as WebService.
+ * GvNix Annotation to identify related entity to the service class.
  * </p>
  * 
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -32,13 +32,8 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface GvNixWebService {
+public @interface GvNIXEntityService {
 
-    String name() default "";
+    Class<?> rooEntity();
 
-    String targetNamespace() default "";
-
-    String serviceName() default "";
-
-    String address() default "";
 }

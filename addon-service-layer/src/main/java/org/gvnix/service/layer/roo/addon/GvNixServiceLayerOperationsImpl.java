@@ -190,7 +190,7 @@ public class GvNixServiceLayerOperationsImpl implements
      * {@inheritDoc}
      * 
      * <p>
-     * Adds @GvNixWebService annotation to the class.
+     * Adds @GvNIXWebService annotation to the class.
      * </p>
      * 
      */
@@ -209,10 +209,10 @@ public class GvNixServiceLayerOperationsImpl implements
 	List<? extends AnnotationMetadata> serviceAnnotations = serviceDetails
 		.getTypeAnnotations();
 
-	// @Service and @GvNixWebService annotation.
+	// @Service and @GvNIXWebService annotation.
 	AnnotationMetadata gvNixWebServiceAnnotation = null;
 
-	// @GvNixWebService Annotation attributes.
+	// @GvNIXWebService Annotation attributes.
 	List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
 
 	gvNixAnnotationAttributes.add(new StringAttributeValue(
@@ -230,17 +230,17 @@ public class GvNixServiceLayerOperationsImpl implements
 
 	    if (tmpAnnotationMetadata.getAnnotationType()
 		    .getFullyQualifiedTypeName().equals(
-			    GvNixWebService.class.getName())) {
+			    GvNIXWebService.class.getName())) {
 
 		serviceDetails.removeTypeAnnotation(new JavaType(
-			GvNixWebService.class.getName()));
+			GvNIXWebService.class.getName()));
 	    }
 
 	}
 
-	// Define GvNixWebService annotation.
+	// Define GvNIXWebService annotation.
 	gvNixWebServiceAnnotation = new DefaultAnnotationMetadata(new JavaType(
-		GvNixWebService.class.getName()), gvNixAnnotationAttributes);
+		GvNIXWebService.class.getName()), gvNixAnnotationAttributes);
 
 	// Adds GvNIXEntityOCCChecksum to the entity
 	serviceDetails.addTypeAnnotation(gvNixWebServiceAnnotation);

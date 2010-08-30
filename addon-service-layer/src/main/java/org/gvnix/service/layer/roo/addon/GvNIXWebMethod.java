@@ -33,7 +33,7 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface GvNixWebMethod {
+public @interface GvNIXWebMethod {
 
     String methodName() default "";
 

@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 
 /**
  * <p>
- * GvNix Annotation to identify related entity to the service class.
+ * GvNix Annotation to identify GvNIX created WebFault related to WebService.
  * </p>
  * 
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -32,8 +32,6 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface GvNixEntityService {
-
-    Class<?> rooEntity();
+public @interface GvNIXWebFault {
 
 }
