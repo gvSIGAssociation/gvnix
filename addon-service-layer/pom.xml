@@ -124,13 +124,8 @@
         <version>${roo.version}</version>
         <type>bundle</type>
     </dependency>
-
     <!-- Other modules (if any) -->
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
-        <version>${spring.version}</version>
-    </dependency>
+
     <!-- Unit Test dependencies -->
     <dependency>
         <groupId>org.easymock</groupId>

@@ -35,7 +35,6 @@ public interface ServiceLayerOperations {
 
     boolean isProjectAvailable();
 
-
     /**
      * <p>
      * Set up Cxf configuration to a project.

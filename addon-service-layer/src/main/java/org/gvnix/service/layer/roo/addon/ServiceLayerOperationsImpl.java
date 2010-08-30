@@ -32,7 +32,6 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.mvc.jsp.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
@@ -75,7 +74,7 @@ public class ServiceLayerOperationsImpl implements
     @Reference
     private ClasspathOperations classpathOperations;
     @Reference
-    private TilesOperations tilesOperations;
+    private ServiceLayerActivationInfo serviceLayerActivationInfo;
 
     private ComponentContext context;
 
@@ -93,17 +92,7 @@ public class ServiceLayerOperationsImpl implements
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
-	if (getPathResolver() == null) {
-	    return false;
-	}
-
-	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		"WEB-INF/spring/webmvc-config.xml");
-
-	if (!fileManager.exists(webXmlPath)) {
-	    return false;
-	}
-	return true;
+	return serviceLayerActivationInfo.isProjectAvailable();
     }
 
 
@@ -156,6 +145,7 @@ public class ServiceLayerOperationsImpl implements
 
 	// Add GvNixAnnotations to the project.
 	addGvNIXAnnotationsDependecy();
+
     }
 
     /**
@@ -586,9 +576,11 @@ public class ServiceLayerOperationsImpl implements
      */
     public boolean isCxfInstalled() {
 
-	boolean cxfConfigFileExists = isCxfConfigurated();
+	boolean cxfConfigFileExists = serviceLayerActivationInfo
+		.isCxfConfigurated();
 
-	boolean cxfDependeciesExists = areCxfDependenciesInstalled();
+	boolean cxfDependeciesExists = serviceLayerActivationInfo
+		.areCxfDependenciesInstalled();
 
 	return cxfConfigFileExists && cxfDependeciesExists;
     }
@@ -603,21 +595,7 @@ public class ServiceLayerOperationsImpl implements
      * @return true or false if exists Cxf configuration file.
      */
     public boolean isCxfConfigurated() {
-
-	String prjId = ProjectMetadata.getProjectIdentifier();
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(prjId);
-	String prjName = projectMetadata.getProjectName();
-
-	String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
-
-	// Checks for src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
-	String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		cxfFile);
-
-	boolean cxfInstalled = fileManager.exists(cxfXmlPath);
-
-	return cxfInstalled;
+	return serviceLayerActivationInfo.isCxfConfigurated();
     }
 
     /**
@@ -632,29 +610,7 @@ public class ServiceLayerOperationsImpl implements
      */
     public boolean areCxfDependenciesInstalled() {
 
-	boolean cxfDependenciesExists = true;
-
-	ProjectMetadata project = (ProjectMetadata) metadataService
-		.get(ProjectMetadata.getProjectIdentifier());
-	if (project == null) {
-	    return false;
-	}
-
-	// Dependencies elements are defined as:
-	// <dependency org="org.apache.cxf" name="cxf-rt-bindings-soap"
-	// rev="2.2.6" />
-	List<Element> cxfDependenciesList = getCxfDependencies();
-
-	Dependency cxfDependency;
-
-	for (Element element : cxfDependenciesList) {
-
-	    cxfDependency = new Dependency(element);
-	    cxfDependenciesExists = cxfDependenciesExists
-		    && project.isDependencyRegistered(cxfDependency);
-	}
-
-	return cxfDependenciesExists;
+	return serviceLayerActivationInfo.areCxfDependenciesInstalled();
     }
 
     /*

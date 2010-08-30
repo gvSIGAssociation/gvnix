@@ -27,11 +27,8 @@ import java.util.logging.Logger;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.roo.classpath.operations.ClasspathOperations;
-import org.springframework.roo.metadata.MetadataItem;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.*;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.w3c.dom.Element;
@@ -44,7 +41,7 @@ import org.w3c.dom.Element;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public class ServiceLayerOperationsImplTest {
+public class ServiceLayerActivationInfoImplTest {
 
     static final String WEB_XML = "webmvc-config.xml";
 
@@ -52,22 +49,18 @@ public class ServiceLayerOperationsImplTest {
     static final String WEB_XML_PATH = "WEB-INF/spring/webmvc-config.xml";
 
     // Class under test
-    private ServiceLayerOperationsImpl serviceLayerOperationsImpl;
+    private ServiceLayerActivationInfoImpl serviceLayerActivationInfoImpl;
 
     // Mock objects to emulate Roo OSGi Services
     private FileManager fileManager;
     private MetadataService metadataService;
     private PathResolver pathResolver;
-    private ProjectOperations projectOperations;
-    private ClasspathOperations classpathOperations;
 
     // Mock to emulate file management.
-    private MutableFile webXmlMutableFile;
     private ProjectMetadata projectMetadata;
-    private MetadataItem metadataItem;
 
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerOperationsImplTest.class.getName());
+	    .getLogger(ServiceLayerActivationInfoImplTest.class.getName());
 
     /**
      * Setup operations instance and Mock objects
@@ -78,37 +71,29 @@ public class ServiceLayerOperationsImplTest {
     public void setUp() throws Exception {
 
 	// Class under test
-	serviceLayerOperationsImpl = new ServiceLayerOperationsImpl();
+	serviceLayerActivationInfoImpl = new ServiceLayerActivationInfoImpl();
 
 	// Setup Mock service objects
 	fileManager = createMock(FileManager.class);
 	metadataService = createMock(MetadataService.class);
 	pathResolver = createMock(PathResolver.class);
-	projectOperations = createMock(ProjectOperations.class);
-	classpathOperations = createMock(ClasspathOperations.class);
 
 	// Mock Objects
-	webXmlMutableFile = createMock(MutableFile.class);
 	projectMetadata = createMock(ProjectMetadata.class);
-	metadataItem = createMock(MetadataItem.class);
 
 	// Inject mock objects in instance. This emulate OSGi environment
-	ReflectionTestUtils.setField(serviceLayerOperationsImpl,
+	ReflectionTestUtils.setField(serviceLayerActivationInfoImpl,
 		"fileManager", fileManager);
-	ReflectionTestUtils.setField(serviceLayerOperationsImpl,
+	ReflectionTestUtils.setField(serviceLayerActivationInfoImpl,
 		"metadataService", metadataService);
-	ReflectionTestUtils.setField(serviceLayerOperationsImpl,
+	ReflectionTestUtils.setField(serviceLayerActivationInfoImpl,
 		"pathResolver", pathResolver);
-	ReflectionTestUtils.setField(serviceLayerOperationsImpl,
-		"projectOperations", projectOperations);
-	ReflectionTestUtils.setField(serviceLayerOperationsImpl,
-		"classpathOperations", classpathOperations);
 
     }
 
     /**
      * Checks method
-     * {@link ServiceLayerOperationsImpl#areCxfDependenciesInstalled()}
+     * {@link ServiceLayerActivationInfoImpl#areCxfDependenciesInstalled()}
      * 
      * @throws Exception
      */
@@ -126,7 +111,7 @@ public class ServiceLayerOperationsImplTest {
 
 	Dependency dependency;
 
-	List<Element> dependencyList = serviceLayerOperationsImpl
+	List<Element> dependencyList = serviceLayerActivationInfoImpl
 		.getCxfDependencies();
 
 	for (Element element : dependencyList) {
@@ -138,7 +123,7 @@ public class ServiceLayerOperationsImplTest {
 
 	replay(metadataService, projectMetadata);
 
-	areCxfDependenciesInstalledResult = serviceLayerOperationsImpl
+	areCxfDependenciesInstalledResult = serviceLayerActivationInfoImpl
 		.areCxfDependenciesInstalled();
 
 	assertTrue("There is one or more dependencies not set.",
@@ -172,7 +157,7 @@ public class ServiceLayerOperationsImplTest {
 
 	replay(metadataService, projectMetadata);
 
-	areCxfDependenciesInstalledResult = serviceLayerOperationsImpl
+	areCxfDependenciesInstalledResult = serviceLayerActivationInfoImpl
 		.areCxfDependenciesInstalled();
 
 	assertFalse("There are all dependencies set.",
@@ -185,7 +170,7 @@ public class ServiceLayerOperationsImplTest {
     }
 
     /**
-     * Checks method {@link ServiceLayerOperationsImpl#sCxfConfigurated()}
+     * Checks method {@link ServiceLayerActivationInfoImpl#sCxfConfigurated()}
      * 
      * @throws Exception
      */
