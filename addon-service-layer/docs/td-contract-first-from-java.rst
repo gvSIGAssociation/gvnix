@@ -570,14 +570,6 @@ Addon commands
     
     Hay que pensar si alguna más (puede que del propio add-on). Ninguna ya que es una clase de Servicio no Servicio Web.
 
-* service entity --class nombreClase:
-
-  - ``class``: Entidad que a partir de la que se va a crear el servicio.
-
-    Crear una clase a partir de una entidad para gestionar servicios.
-    
-    Añadiría las anotaciones de Spring que necesitase ``@Service`` y ``@GvNixEntityService``.
-
 * service operation --class clase --name nombreOperacion --return clase:
 
   - ``class``: Clase @Service a la que se va a añadir el método nuevo.
@@ -601,17 +593,6 @@ Addon commands
     
     Habría que ver como concretar la especificación del parámetro cuando es Map, Collection, Set, etc...).
 
-* service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
-
-  - ``endPoint`` urlOPropiedad
-  - ``wsdl`` url
-
-    Creará a una clase de servicio que hará de proxy de las operaciones que publica un Web Service remoto. 
-    
-    El parámetro endPoint sería opcional y debería poder ser una propiedad configurable desde los profiles (esto será útil para configura accesos a los servicios de desarrollo/pre-producción/producción). 
-    
-    La clase y el paquete a generar se usará el namespace del contrato del servicio.
-
 * service export ws --class clase --name nombreServicio:
 
   - ``class``: clase que se va a publicar como servicio web. Anotar la clase con ``@GvNixWebService``.
@@ -632,7 +613,7 @@ Addon commands
 
 * service export operation ws --class clase --method nombreMetodoEntidad --name nombreAPublicar: 
 
-  - ``clase``: Clase anotada con ``@Service``.
+  - ``clase``: Clase anotada con ``@GvNixEntityService``.
   - ``method``: nombre del método de la clase que se quiere publicar.
   - ``name``: nombre con el que se quiere publicar el método de la clase.
 
@@ -662,6 +643,25 @@ Addon commands
     
     Como paquete y clase se usará el namespace que haya definido en el contrato. Este comando requerirá mucho más análisis.
 
+* service entity --class nombreClase:
+
+  - ``class``: Entidad que a partir de la que se va a crear el servicio.
+
+    Crear una clase a partir de una entidad para gestionar servicios.
+    
+    Añadiría las anotaciones de Spring que necesitase ``@Service`` y ``@GvNixEntityService``.
+
+* service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
+
+  - ``endPoint`` urlOPropiedad
+  - ``wsdl`` url
+
+    Creará a una clase de servicio que hará de proxy de las operaciones que publica un Web Service remoto. 
+    
+    El parámetro endPoint sería opcional y debería poder ser una propiedad configurable desde los profiles (esto será útil para configura accesos a los servicios de desarrollo/pre-producción/producción). 
+    
+    La clase y el paquete a generar se usará el namespace del contrato del servicio.
+
 Posibles mejoras el add-on cd CXF:
 
   Creación de una operación en un servicio.
@@ -671,6 +671,16 @@ Posibles mejoras el add-on cd CXF:
             * Si es sin parámetros, ¿ que va a comprobar ?
       * Mejorar la forma de Buscar la implementación del servicio para añadirle la operación, ya que se podría añadir una operación a cualquier servicio existente.
             * Comandos ``service operation`` y ``service parameter``.
+
+Addon Annotations
+-------------------
+
+Anotaciones definidas por el Addon para la gestión de servicios web:
+
+* @GvNIXWebFault: Anotación para definir las anotaciones utilizadas como excepciones en las operaciones de un servicio web.
+* @GvNIXWebMethod: Anotación para identificar el método a publicar como operación de un servicio web.
+* @GvNIXWebService: Anotación para identificar la clase publicada como servicio web.
+* @GvNIXWebParam: Anotación asociada la los parámetros del método que se publica como operación de un servicio.
 
 TODO
 ====

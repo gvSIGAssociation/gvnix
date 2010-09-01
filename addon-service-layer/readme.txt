@@ -23,7 +23,7 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introduction
 ===============
 
-This project generates the addon to generate and manage service classes and export and import web services.
+This project generates the addon to generate and manage service classes and export and import to web services.
 
 Features
 ===========
@@ -31,6 +31,28 @@ Features
 TBC
 
 This are features contained:
+
+Development
+============
+
+Create two Operation classes, one for service layer management ``ServiceLayerOperationsImpl`` and another for manage the web service layer ``WebServiceLayerOperationsImpl``.
+
+Commands
+---------
+
+* service class --class:
+
+* service operation --class clase --name nombreOperacion --return clase:
+
+* service parameter --class clase --method nombreOperacion --name nombreParametro --type clase:
+
+* service export ws --class clase --name nombreServicio:
+
+* service export operation ws --class clase --method nombreMetodoEntidad --name nombreAPublicar: 
+
+* service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
+
+* service entity --class nombreClase:
 
 Proof of Concept
 =================

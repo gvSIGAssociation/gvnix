@@ -18,17 +18,13 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
-import org.springframework.roo.addon.entity.EntityMetadata;
-import org.springframework.roo.classpath.*;
-import org.springframework.roo.classpath.details.MethodMetadata;
-import org.springframework.roo.metadata.*;
-import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.metadata.*;
 
 /**
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -36,7 +32,7 @@ import org.osgi.service.component.ComponentContext;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component
+@Component(immediate = true)
 @Service
 public class ServiceLayerMetadataNotificationListener implements
 	MetadataNotificationListener {
@@ -50,7 +46,7 @@ public class ServiceLayerMetadataNotificationListener implements
     @Reference
     private MetadataDependencyRegistry metadataDependencyRegistry;
     @Reference
-    private MetadataService metadataService;
+    private ServiceLayerOperations serviceLayerOperations;
 
     protected void activate(ComponentContext context) {
 	metadataDependencyRegistry.addNotificationListener(this);
@@ -61,12 +57,19 @@ public class ServiceLayerMetadataNotificationListener implements
      */
     public void notify(String upstreamDependency, String downstreamDependency) {
 
-	if (!serviceLayerMetadataType.equals(MetadataIdentificationUtils
-		.getMetadataClass(upstreamDependency))) {
-	    // NO es la notificación del metadato de tipo "clase java"
-	    return;
+
+	if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
+		.equals(
+			MetadataIdentificationUtils
+				.getMetadataClass(PhysicalTypeIdentifier
+					.getMetadataIdentiferType()))) {
+
+	    // Show info
+	    logger
+		    .log(
+			    Level.WARNING,
+			    "The Service contract has been changed.\n You have to use the command 'service operation' to update the web service contract.");
 	}
-	logger.warning("---------------------------------------------");
 
     }
 

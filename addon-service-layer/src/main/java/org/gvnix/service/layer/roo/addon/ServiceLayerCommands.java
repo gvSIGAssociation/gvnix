@@ -42,24 +42,38 @@ public class ServiceLayerCommands implements CommandMarker {
     @Reference
     private ServiceLayerOperations serviceLayerOperations;
 
+    @Reference
+    private WebServiceLayerOperations webServiceLayerOperations;
+
+    @CliAvailabilityIndicator("service class")
+    public boolean isCreateServiceClassAvailable() {
+	return serviceLayerOperations.isProjectAvailable();
+    }
+
+    @CliCommand(value = "service class", help = "Creates a Service class int the project.")
+    public void createServiceClass(
+	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to create") JavaType serviceClass) {
+	serviceLayerOperations.createServiceClass(serviceClass);
+    }
+
     @CliAvailabilityIndicator("service export ws")
     public boolean isServiceExportAvailable() {
-	return serviceLayerOperations.isProjectAvailable();
+	return webServiceLayerOperations.isProjectAvailable();
     }
 
     @CliCommand(value = "service export ws", help = "Exports a Service class to Web Service. If the class doesn't exists the Addon will create it.")
     public void serviceExport(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass) {
-	serviceLayerOperations.exportService(serviceClass);
+	webServiceLayerOperations.exportService(serviceClass);
     }
 
-    @CliAvailabilityIndicator("service operation")
+    @CliAvailabilityIndicator("service export operation")
     public boolean isServiceOperationAvailable() {
-	return serviceLayerOperations.isProjectAvailable()
-		&& serviceLayerOperations.isCxfInstalled();
+	return webServiceLayerOperations.isProjectAvailable()
+		&& webServiceLayerOperations.isCxfInstalled();
     }
 
-    @CliCommand(value = "service operation", help = "Publish a method as Web Service Operation.")
+    @CliCommand(value = "service export operation", help = "Publish a method as Web Service Operation.")
     public String serviceOperation() {
 	return "Web Service Operation published.";
     }

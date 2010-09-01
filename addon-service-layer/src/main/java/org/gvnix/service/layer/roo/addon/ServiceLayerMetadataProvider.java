@@ -43,7 +43,7 @@ import org.springframework.roo.project.Path;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component(immediate = true)
+@Component
 @Service
 public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
 
@@ -56,11 +56,11 @@ public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
 	    .getLogger(ServiceLayerMetadataProvider.class.getName());
 
     protected void activate(ComponentContext context) {
-//	// Ensure we're notified of all metadata related to physical Java types,
-//	// in particular their initial creation
-//	metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
-//		.getMetadataIdentiferType(), getProvidesType());
-//	addMetadataTrigger(new JavaType(GvNIXWebService.class.getName()));
+	// Ensure we're notified of all metadata related to physical Java types,
+	// in particular their initial creation
+	metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
+		.getMetadataIdentiferType(), getProvidesType());
+	addMetadataTrigger(new JavaType(GvNIXWebService.class.getName()));
     }
 
     /* (non-Javadoc)
@@ -68,8 +68,7 @@ public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
      */
     @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
-	// TODO Auto-generated method stub
-	return null;
+	return ServiceLayerMetadata.createIdentifier(javaType, path);
     }
 
     /* (non-Javadoc)
@@ -78,8 +77,13 @@ public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
     @Override
     protected String getGovernorPhysicalTypeIdentifier(
 	    String metadataIdentificationString) {
-	// TODO Auto-generated method stub
-	return null;
+	JavaType javaType = ServiceLayerMetadata
+		.getJavaType(metadataIdentificationString);
+	Path path = ServiceLayerMetadata
+		.getPath(metadataIdentificationString);
+	String physicalTypeIdentifier = PhysicalTypeIdentifier
+		.createIdentifier(javaType, path);
+	return physicalTypeIdentifier;
     }
 
     /* (non-Javadoc)
@@ -96,7 +100,11 @@ public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
 			Level.WARNING,
 			"The Service contract has been changed.\n You have to use the command 'service operation' to update the web service contract.");
 
-	return null;
+	ServiceLayerMetadata serviceLayerMetadata = new ServiceLayerMetadata(
+		metadataIdentificationString, aspectName,
+		governorPhysicalTypeMetadata);
+
+	return serviceLayerMetadata;
     }
 
     /* (non-Javadoc)

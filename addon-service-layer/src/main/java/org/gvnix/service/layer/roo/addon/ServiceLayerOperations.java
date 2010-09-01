@@ -18,10 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.util.List;
-
 import org.springframework.roo.model.JavaType;
-import org.w3c.dom.Element;
 
 /**
  * Addon for Handle Service Layer
@@ -37,23 +34,6 @@ public interface ServiceLayerOperations {
 
     /**
      * <p>
-     * Set up Cxf configuration to a project.
-     * </p>
-     */
-    public void setUpCxf();
-
-    /**
-     * <p>
-     * Exports a class to Web Service.
-     * </p>
-     * 
-     * @param className
-     *            class to export.
-     */
-    public void exportService(JavaType className);
-
-    /**
-     * <p>
      * Create a Service class.
      * </p>
      * 
@@ -61,66 +41,5 @@ public interface ServiceLayerOperations {
      *            class to be created.
      */
     public void createServiceClass(JavaType serviceClass);
-
-    /**
-     * <p>
-     * Update an existing class to a web service.
-     * </p>
-     * 
-     * @param serviceClass
-     *            class to be published as Web Service.
-     */
-    public void updateClassAsWebService(JavaType serviceClass);
-
-    /**
-     * Define Web Service class in cxf configuration file to be published.
-     * 
-     * @param serviceClass
-     *            class to define as Web Service in Cxf configuration file.
-     */
-    public void updateCxfXml(JavaType serviceClass);
-
-    /**
-     * <p>
-     * Check if Cxf is properly configurated in a project.
-     * </p>
-     * 
-     * @return true or false if it's configurated.
-     */
-    public boolean isCxfInstalled();
-
-    /**
-     * <p>
-     * Check if Cxf dependencies are set in project's pom.xml.
-     * </p>
-     * 
-     * @return true or false if Cxf dependcies are set.
-     */
-    public boolean areCxfDependenciesInstalled();
-
-    /**
-     * <p>
-     * Get Addon dependencies list to install.
-     * </p>
-     * 
-     * @return List of dependencies as xml elements.
-     */
-    public List<Element> getCxfDependencies();
-
-    /**
-     * <p>
-     * Check if Cxf config file is created in the project.
-     * </p>
-     * 
-     * @return true or false if exists Cxf configuration file.
-     */
-    public boolean isCxfConfigurated();
-
-    /**
-     * Adds GvNIX annotations library dependency to the current project
-     * 
-     * TO BE REMOVED FROM API
-     */
-    public void addGvNIXAnnotationsDependecy();
 
 }

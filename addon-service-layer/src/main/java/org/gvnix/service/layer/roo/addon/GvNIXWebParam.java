@@ -16,14 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.service.layer.roo.addon;
+package org.gvnix.test.project.web.services.annotation;
 
 import java.lang.annotation.*;
 
 /**
  * <p>
- * GvNix Annotation to identify GvNIX created WebMethods to publish as
- * operations in the Web Service.
+ * GvNix Annotation to identify WebParams in a Web Service operation.
  * </p>
  * 
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -32,25 +31,11 @@ import java.lang.annotation.*;
  *         Transport</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface GvNIXWebMethod {
+@Target(ElementType.PARAMETER)
+public @interface GvNIXWebParam {
 
-    String methodName() default "";
+    String name() default "";
 
-    String operationName() default "";
-
-    Class<?> webResultType() default void.class;
-
-    String resutlName() default "";
-
-    String resultNamespace() default "";
-
-    String responseWrapperName() default "";
-
-    String responseWrapperNamespace() default "";
-
-    String requestWrapperName() default "";
-
-    String requestWrapperNamespace() default "";
+    Class<?> type() default void.class;
 
 }

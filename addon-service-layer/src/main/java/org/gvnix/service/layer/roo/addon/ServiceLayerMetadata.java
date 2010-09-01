@@ -28,6 +28,7 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -59,7 +60,7 @@ public class ServiceLayerMetadata extends
 	    return;
 	}
 
-	// TODO: Preuba de creación de un metadato.
+	// TODO: Prueba de creación de un metadato.
 	AnnotationMetadata gvNIXWebServiceAnnotation = MemberFindingUtils
 		.getTypeAnnotation(governorTypeDetails, new JavaType(
 			"org.gvnix.service.layer.roo.addon.GvNIXWebService"));
@@ -83,6 +84,21 @@ public class ServiceLayerMetadata extends
     public static boolean isValid(String metadataIdentificationString) {
 	return PhysicalTypeIdentifierNamingUtils.isValid(
 		WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
+    }
+
+    public static final JavaType getJavaType(String metadataIdentificationString) {
+	return PhysicalTypeIdentifierNamingUtils.getJavaType(
+		WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
+    }
+
+    public static final Path getPath(String metadataIdentificationString) {
+	return PhysicalTypeIdentifierNamingUtils.getPath(
+		WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
+    }
+
+    public static final String createIdentifier(JavaType javaType, Path path) {
+	return PhysicalTypeIdentifierNamingUtils.createIdentifier(
+		WEB_SERVICE_TYPE_STRING, javaType, path);
     }
 
 }
