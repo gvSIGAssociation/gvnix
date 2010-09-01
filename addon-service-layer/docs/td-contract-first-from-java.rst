@@ -560,7 +560,7 @@ Anotar todas las entidades de la aplicación al "instalar" el Add-on de servicio
 * Crear el fichero aj para que anote cada uno de los campos de la entidad con @XmlElement y las relaciones, definidas por @OneToMany, @ManyToOne, etc como transient.
 
 Addon commands
---------------
+---------------
 
 * service class --class:
 

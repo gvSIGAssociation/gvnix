@@ -35,7 +35,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface GvNIXWebMethod {
 
-    String methodName() default "";
+    String method() default "";
 
     String operationName() default "";
 
