@@ -18,6 +18,10 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.List;
+
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
 /**
@@ -42,4 +46,43 @@ public interface ServiceLayerOperations {
      */
     public void createServiceClass(JavaType serviceClass);
 
+    /**
+     * <p>
+     * Adds an operation to a class.
+     * </p>
+     * 
+     * @param opeName
+     *            Operation Name to be created.
+     * @param returnType
+     *            Operation java return Type.
+     * @param className
+     *            Class to insert the operation.
+     */
+    public void addServiceOperation(JavaSymbolName opeName,
+	    JavaType returnType, JavaType className);
+
+    /**
+     * <p>
+     * Inserts a new operation to a class.
+     * </p>
+     * 
+     * @param methodName
+     *            Method name.
+     * @param returnType
+     *            Operation java return Type.
+     * @param targetType
+     *            Class to insert the operation.
+     * @param modifier
+     *            Method modifier declaration.
+     * @param paramTypes
+     *            Input parameters types.
+     * @param paramNames
+     *            Input parameters names.
+     * @param body
+     *            Method body.
+     */
+    public void insertMethod(JavaSymbolName methodName, JavaType returnType,
+	    JavaType targetType, int modifier,
+	    List<AnnotatedJavaType> paramTypes,
+	    List<JavaSymbolName> paramNames, String body);
 }

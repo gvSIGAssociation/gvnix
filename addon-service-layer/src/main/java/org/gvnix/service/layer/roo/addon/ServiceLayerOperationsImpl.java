@@ -25,16 +25,17 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.classpath.PhysicalTypeCategory;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.DefaultClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.*;
+import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
+import org.springframework.roo.support.util.Assert;
 
 /**
  * Addon for Handle Service Layer
@@ -124,4 +125,101 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
 
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Creates the body of the new method (the return line) and calls the
+     * 'insertMethod' method to add into the class.
+     * </p>
+     */
+    public void addServiceOperation(JavaSymbolName operationName,
+	    JavaType returnType, JavaType className) {
+
+	InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+	// Create some method content to get the user started.
+	String todoMessage = "// TODO: You have to place the method logic here.\n";
+	bodyBuilder.appendFormalLine(todoMessage);
+
+	// If return type != null we must add method body (return null);
+	String returnLine = "return "
+		.concat(returnType == null ? ";" : "null;");
+	bodyBuilder.appendFormalLine(returnLine);
+
+	insertMethod(operationName, returnType, className, Modifier.PUBLIC,
+		new ArrayList<AnnotatedJavaType>(),
+		new ArrayList<JavaSymbolName>(), bodyBuilder.getOutput());
+    }
+
+    /*
+     * Utilities
+     */
+
+    /**
+     * <p>
+     * Inserts the method as abstract in the selected class.
+     * </p>
+     * 
+     * @param opeName
+     *            Method name.
+     * @param returnType
+     *            Operation java return Type.
+     * @param targetType
+     *            Class to insert the operation.
+     * @param modifier
+     *            Method modifier declaration.
+     * @param paramTypes
+     *            Input parameters types.
+     * @param paramNames
+     *            Input parameters names.
+     * @param body
+     *            Method body.
+     */
+    private void insertAbstractMethod(JavaSymbolName opeName,
+	    JavaType returnType, JavaType targetType,
+	    List<AnnotatedJavaType> paramTypes,
+	    List<JavaSymbolName> paramNames, String body) {
+	insertMethod(opeName, returnType, targetType, Modifier.ABSTRACT,
+		paramTypes, paramNames, body);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Updates the class with the new method.
+     * </p>
+     */
+    public void insertMethod(JavaSymbolName methodName, JavaType returnType,
+	    JavaType targetType, int modifier,
+	    List<AnnotatedJavaType> paramTypes,
+	    List<JavaSymbolName> paramNames, String body) {
+	Assert.notNull(paramTypes, "Param type mustn't be null");
+	Assert.notNull(paramNames, "Param name mustn't be null");
+
+	// MetadataID
+	String targetId = PhysicalTypeIdentifier.createIdentifier(targetType,
+		Path.SRC_MAIN_JAVA);
+
+	// Obtain the physical type and itd mutable details
+	PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+		.get(targetId);
+	PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
+	Assert.notNull(ptd, "Java source code details unavailable for type "
+		+ PhysicalTypeIdentifier.getFriendlyName(targetId));
+	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, ptd,
+		"Java source code is immutable for type "
+			+ PhysicalTypeIdentifier.getFriendlyName(targetId));
+	MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
+
+	// create method
+	MethodMetadata operationMetadata = new DefaultMethodMetadata(targetId,
+		modifier, methodName,
+		(returnType == null ? JavaType.VOID_PRIMITIVE : returnType),
+		paramTypes, paramNames, new ArrayList<AnnotationMetadata>(),
+		new ArrayList<JavaType>(), body);
+	mutableTypeDetails.addMethod(operationMetadata);
+    }
 }

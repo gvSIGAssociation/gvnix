@@ -34,7 +34,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.w3c.dom.Element;
 
 /**
- * Addon operations Test class.
+ * Addon Activation info Test class.
  * 
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a

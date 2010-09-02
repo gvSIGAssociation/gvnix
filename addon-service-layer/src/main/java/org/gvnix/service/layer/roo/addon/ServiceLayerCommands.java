@@ -21,6 +21,7 @@ package org.gvnix.service.layer.roo.addon;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.*;
 
@@ -45,7 +46,7 @@ public class ServiceLayerCommands implements CommandMarker {
     @Reference
     private WebServiceLayerOperations webServiceLayerOperations;
 
-    @CliAvailabilityIndicator("service class")
+    @CliAvailabilityIndicator( { "service class", "service operation" })
     public boolean isCreateServiceClassAvailable() {
 	return serviceLayerOperations.isProjectAvailable();
     }
@@ -54,6 +55,17 @@ public class ServiceLayerCommands implements CommandMarker {
     public void createServiceClass(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to create") JavaType serviceClass) {
 	serviceLayerOperations.createServiceClass(serviceClass);
+    }
+
+    @CliCommand(value = "service operation", help = "Adds a new Operation to existing Service")
+    public void addServiceOperation(
+	    @CliOption(key = { "", "name" }, mandatory = true, help = "The name of the operation to add") JavaSymbolName operationName,
+	    @CliOption(key = "return", mandatory = false, unspecifiedDefaultValue = "__NULL__", help = "The Java type this operation returns") JavaType returnType,
+	    @CliOption(key = "params", mandatory = false, help = "The parameters of the operation") String paramNames,
+	    @CliOption(key = "types", mandatory = false, help = "The Java types of the given parameters") String paramTypes,
+	    @CliOption(key = "service", mandatory = true, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the service to receive this field") JavaType className) {
+	serviceLayerOperations.addServiceOperation(operationName, returnType,
+		className);
     }
 
     @CliAvailabilityIndicator("service export ws")
