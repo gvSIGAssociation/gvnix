@@ -1,5 +1,5 @@
 ==================================
- gvNIX gvNIX Service Layer Add-on
+ gvNIX Service Layer Add-on
 ==================================
 
 :Project:   gvNIX. Spring Roo based RAD tool
@@ -18,8 +18,17 @@ http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
 Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 
 94105, USA.
 
-Requirements
+Introducción
 =============
+
+**DOCUMENTO EN DESARROLLO**
+
+TBC: Objetivo del addon
+
+Requerimientos
+===============
+
+TBC: Traducir
 
 Requirements are in priority order:
 
@@ -48,8 +57,10 @@ Requirements are in priority order:
 Additionally, There are some limitations on wsdl generation from Java.
 Another requirements are to solve or avoid this limitations too.
 
-Limitations
------------
+Limitaciones
+==============
+
+TBC: Traducir
 
 These limitations would be resolved. There are sorted by relevance:
 
@@ -89,49 +100,67 @@ More information:
 
 * http://static.springsource.org/spring-ws/sites/2.0/reference/html/why-contract-first.html
 
-Use Case
-=========
+Especificación funcional
+=========================
 
-TODO:
+TBC
  
-Analysis
-=========
+Diseño técnico
+================
 
-Analysis for the development of the Add-on displayed by commands.
+Comandos que ofrece el add-on:
 
-Crear una clase servicio
--------------------------
+TBC: Lista de comandos
 
-service class:
+Monitorizaciones de archivos y procesos internos
 
-    Crear la clase en el directorio que representa el paquete java al que pertenece.
-    Añandir la anotación **@Service** a la cabecera de la clase.
+TBC: Indicar qué se monitoriza, por ejemplo, crear una clase anotada con *tal* anotación y el proceso asociado, por ejemplo, crea un .aj con *tal cosa*. Este punto será muy útil para la integración con MOSKitt
+
+service class
+--------------
+
+Crear la clase en el directorio que representa el paquete java al que pertenece.
+
+Añadir la anotación **@Service** a la cabecera de la clase.
+
+Opciones del comando:
+  
+* ``--class`` (mandatory) New Service Class name 
+
+service operation
+------------------
 
 Crear una operación en una clase
----------------------------------
-
-service operation:
 
 * Si la clase viene de una entidad se mostrarán los nombres de los métodos que se pueden publicar. La clase estará anotada con @GvNixEntityService y no hará falta definir los parámetros de entrada ni los de salida, toma como plantilla el método de la clase definido en el fichero aj de la entidad.
 * Crear el método con el nombre del parámetro name y el tipo de objeto a devolver para actualizar la clase seleccionada. El tipo de dato a devolver por defecto ha de ser un **null** en indicar en varias líneas definidas por un **TODO:** que es donde se va a añadir la lógica manualmente.
 
-Añádir un parámetro de entrada
+Opciones del comando:
+
+* ``--class`` (mandatory) Class in wich will be created the method.
+* ``--name`` (mandatory) Name of the method to be created.
+* ``--return`` Type of the returning method object. Default void.
+
+service parameter
 -------------------------------
 
 Comando para añadir un parámetro de entrada al método de una clase en concreto.
     
-service parameter:
+Opciones del comando:
 
-* Añade un parámetro de entrada al método de la clase servicio (o de entidad) seleccionada.
+* ``--class`` (mandatory) Class in wich will be created the method.
+* ``--method`` (mandatory) Name of the method to update. 
+* ``--name`` (mandatory) Name of the new parameter. 
+* ``--type`` (mandatory) Type of the new parameter.
 
-Publicar un servicio web
+service export ws
 -------------------------
 
 Comando para publicar una clase servicie como servicio web.
 
-service export ws:
+Permite:
 
-* Añandir la anotación *@GvNixWebService* con los parámetros introducidos (name, targetNamespace, etc) o por defecto en la cabecera de la clase.
+* Añadir la anotación *@GvNixWebService* con los parámetros introducidos (name, targetNamespace, etc) o por defecto en la cabecera de la clase.
 * Añadir las dependencias de CXF al pom.xml
 * Añadir la configuración en el pom.xml para generar el contrato de servicio en la fase de compilación para así evitar errores de publicarción sin que se llegue a publicar el servicio.
 * Añadir la definición de servicio al archivo de configuración de *CXF*. Crear el archivo si no existe.
@@ -140,12 +169,18 @@ service export ws:
     * Definir las anotaciones @WebService y @SOAPBinding a la clase con los parámetros que se han introducido o los definidos por defecto para publicación de un servicio.
     * Anotar con *@WebMethod(exclude = true)* los métodos de la clase a publicar que no contengan la anotación *@GvNixWebMethod*.
 
+Opciones del comando:
+
+* ``--class`` (mandatory) Class to be exported as a Web Service.
+* ``--name`` Name to publish the Web Service.
+* ``--wsdl`` Generates the Service Class using a wsdl definition.
+
+service export operation ws
+-----------------------------
+
 Publicar un método como una operación de un servicio web
----------------------------------------------------------
 
-Comando para publicar un método como operación.
-
-service operation:
+Permite:
 
 * Generar o Regenerar el archivo AspectJ asociado a la clase en la que se encuentra el método que se ha de publicar con la anotación **@GvNixWebService** si contienen algún método anotado con **@GvNixWebMethod** para así generar un método en el archivo AspectJ con las anotaciones necesarias para pubilcarse como operación. Se añade la excepción _java.lang.Exception_ para controlar las excepciones en tiempo de ejecución si contiene ninguna definida.
 
@@ -175,17 +210,26 @@ service operation:
 
     * Las entidades anotadas con *@GvNixXmlElement* se les asocia un fichero aj para anotar mediante JAXB, los atributos de relaciones se anotan con *@XmlTransient* y los demás atributos con *@XmlElement*. Se comprueba que estén dentro de +los tipos conocidos de datos+. Una lista que contendrá el Addon para las entidades de la aplicación y los definidos por nosotros, si no se encuentran en ninguna de ambas listas se anotarán como *@XmlTransient*.
 
-Tipos de datos soportados
---------------------------
+Opciones del comando:
 
-Datos Básicos
-~~~~~~~~~~~~~~
+* ``--class`` (mandatory) Class to export a method.
+* ``--method`` (mandatory) Method to export.
+* ``--operationName`` Name of the method to be showed as a Web Service operation.
+* ``--resutlName`` Method result name.
+* ``--resultNamespace`` Namespace of the result type.
+* ``--responseWrapperName`` Name to define the Response Wrapper Object. 
+* ``--responseWrapperNamespace``: Namespace of the Response Wrapper Object.
+* ``--requestWrapperName``: Name to define the Request Wrapper Object.
+* ``--requestWrapperNamespace``: Namespace of the Request Wrapper Object.
 
-Los datos básicos están soportados:
+Tipos de datos
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Todos los tipos básicos están soportados:
 
 *  http://download.oracle.com/docs/cd/E12840_01/wls/docs103/webserv/data_types.html#wp231439
 
-Y los objetos básicos:
+Y las clases básicas:
 
 * Long
 * String
@@ -196,7 +240,9 @@ Y los objetos básicos:
 * Double
 
 Colecciones
-~~~~~~~~~~~~
+_______________
+
+TBC: Indicar que NO SE PUEDE UTILIZAR Map
 
 Al añadir un Map o un Set a la entidad y anotarla para hacer la serialización a XML hay que declararlos de la siguiente manera inicializados::
 
@@ -237,8 +283,8 @@ Colecciones excludidas:
 
 * Map<K, V>:  Ya que están ordenadas por un valor determinado.
 
-Datos propios: Entidades del proyecto
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tipos de datos: Entidades del proyecto
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Maneja cualquier tipo de clase entidad que esté definida en nuestro proyecto.
 Reestricción de monitorización de Roo del paquete principal del proyecto. 
@@ -249,81 +295,10 @@ Si se utilizan Clases con otro paquete que no pertence al principal del proyecto
       <context:include-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
     </context:component-scan>
 
-Commands
-=========
-
-There are defined eight commands in this Add-on:
-
-service class
---------------
-
-Create new Service Class.
-
-Parameters: 
-  
-  * ``--class`` (mandatory) New Service Class name 
-
-service operation
-------------------
-
-Creates new operation in the selected class.
-
-Parameters:
-
-  * ``--class`` (mandatory) Class in wich will be created the method.
-  * ``--name`` (mandatory) Name of the method to be created.
-  * ``--return`` Type of the returning method object. Default void.
-
-service parameter
-------------------
-
-Adds a parameter in the selected method.
-
-Parameters:
-
-  * ``--class`` (mandatory) Class in wich will be created the method.
-  * ``--method`` (mandatory) Name of the method to update. 
-  * ``--name`` (mandatory) Name of the new parameter. 
-  * ``--type`` (mandatory) Type of the new parameter.
-
-service export ws
-------------------
-
-Exports a Class to a Web Service.
-
-Parameters:
-
-  * ``--class`` (mandatory) Class to be exported as a Web Service.
-  * ``--name`` Name to publish the Web Service.
-
-service export operation ws 
-----------------------------
-
-Publish a service method as a Web Service operation.
-
-Parameters:
-
-  * ``--class`` (mandatory) Class to export a method.
-  * ``--method`` (mandatory) Method to export.
-  * ``--operationName`` Name of the method to be showed as a Web Service operation.
-  * ``--resutlName`` Method result name.
-  * ``--resultNamespace`` Namespace of the result type.
-  * ``--responseWrapperName`` Name to define the Response Wrapper Object. 
-  * ``--responseWrapperNamespace``: Namespace of the Response Wrapper Object.
-  * ``--requestWrapperName``: Name to define the Request Wrapper Object.
-  * ``--requestWrapperNamespace``: Namespace of the Request Wrapper Object.
-
-service export ws
--------------------
-
-Generates a Service Class using a wsdl definition.
-
-Parameters:
-
-  * ``--wsdl`` (mandatory) Wsdl file location.
-
 service import ws
 -------------------
+
+TBC: Traducir
 
 Creates a service class to act as a proxy for the Web Service defined in wsdl.
 
@@ -332,19 +307,14 @@ Parameters:
   * ``--endPoint`` Class to act as a proxy.
   * ``--wsdl`` (mandatory) Location of the remote Web Service.
 
-service entity
-----------------
-
-Entity Class to export as a Web Service. 
-
-Parameters:
-
-  * ``--class`` Entity to export.
-
 Proof of Concept
 =================
 
-TODO: The location of the project will be updated when the shell is built
+TBC: The location of the project will be updated when the shell is built
 
 Notes
 =======
+
+TBC
+
+
