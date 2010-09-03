@@ -46,7 +46,8 @@ public class ServiceLayerCommands implements CommandMarker {
     @Reference
     private WebServiceLayerOperations webServiceLayerOperations;
 
-    @CliAvailabilityIndicator( { "service class", "service operation" })
+    @CliAvailabilityIndicator( { "service class", "service operation",
+	    "service parameter" })
     public boolean isCreateServiceClassAvailable() {
 	return serviceLayerOperations.isProjectAvailable();
     }
@@ -66,6 +67,16 @@ public class ServiceLayerCommands implements CommandMarker {
 	    @CliOption(key = "service", mandatory = true, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the service to receive this field") JavaType className) {
 	serviceLayerOperations.addServiceOperation(operationName, returnType,
 		className);
+    }
+
+    @CliCommand(value = "service parameter", help = "Adds a input parameter to an existing operation method.")
+    public void addServiceOperationParameters(
+	    @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the service to receive this field") JavaType className,
+	    @CliOption(key = { "", "method" }, mandatory = true, help = "The name of the operation to add") JavaSymbolName method,
+	    @CliOption(key = "param", mandatory = true, help = "The parameters of the operation") String paramName,
+	    @CliOption(key = "type", mandatory = true, help = "The Java types of the given parameters") JavaType paramType) {
+	serviceLayerOperations.addServiceOperationParameter(className, method,
+		paramName, paramType);
     }
 
     @CliAvailabilityIndicator("service export ws")

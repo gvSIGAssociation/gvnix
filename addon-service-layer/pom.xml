@@ -124,6 +124,13 @@
         <version>${roo.version}</version>
         <type>bundle</type>
     </dependency>
+    <dependency>
+        <groupId>org.springframework.roo</groupId>
+        <artifactId>org.springframework.roo.classpath.javaparser</artifactId>
+        <version>${roo.version}</version>
+        <type>bundle</type>
+    </dependency>
+
     <!-- Other modules (if any) -->
 
     <!-- Unit Test dependencies -->

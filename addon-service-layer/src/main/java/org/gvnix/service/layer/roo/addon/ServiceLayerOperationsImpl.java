@@ -25,8 +25,10 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.classpath.*;
-import org.springframework.roo.classpath.details.*;
+import org.springframework.roo.classpath.PhysicalTypeCategory;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.DefaultClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
@@ -35,7 +37,6 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Addon for Handle Service Layer
@@ -64,6 +65,8 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
     private ClasspathOperations classpathOperations;
     @Reference
     private ServiceLayerActivationInfo serviceLayerActivationInfo;
+    @Reference
+    private ServiceLayerUtils serviceLayerUtils;
 
     private ComponentContext context;
 
@@ -152,6 +155,36 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
 		new ArrayList<JavaSymbolName>(), bodyBuilder.getOutput());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Updates the class with the new method.
+     * </p>
+     */
+    public void insertMethod(JavaSymbolName methodName, JavaType returnType,
+	    JavaType targetType, int modifier,
+	    List<AnnotatedJavaType> paramTypes,
+	    List<JavaSymbolName> paramNames, String body) {
+	
+	serviceLayerUtils.createMethod(methodName, returnType, targetType,
+		modifier, new ArrayList<JavaType>(),
+		new ArrayList<AnnotationMetadata>(), paramTypes, paramNames,
+		body);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public void addServiceOperationParameter(JavaType className,
+	    JavaSymbolName method, String paramName, JavaType paramType) {
+
+	serviceLayerUtils.updateMethodParameters(className, method, paramName,
+		paramType);
+
+    }
+
     /*
      * Utilities
      */
@@ -185,41 +218,4 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
 
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * <p>
-     * Updates the class with the new method.
-     * </p>
-     */
-    public void insertMethod(JavaSymbolName methodName, JavaType returnType,
-	    JavaType targetType, int modifier,
-	    List<AnnotatedJavaType> paramTypes,
-	    List<JavaSymbolName> paramNames, String body) {
-	Assert.notNull(paramTypes, "Param type mustn't be null");
-	Assert.notNull(paramNames, "Param name mustn't be null");
-
-	// MetadataID
-	String targetId = PhysicalTypeIdentifier.createIdentifier(targetType,
-		Path.SRC_MAIN_JAVA);
-
-	// Obtain the physical type and itd mutable details
-	PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
-		.get(targetId);
-	PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
-	Assert.notNull(ptd, "Java source code details unavailable for type "
-		+ PhysicalTypeIdentifier.getFriendlyName(targetId));
-	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, ptd,
-		"Java source code is immutable for type "
-			+ PhysicalTypeIdentifier.getFriendlyName(targetId));
-	MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
-
-	// create method
-	MethodMetadata operationMetadata = new DefaultMethodMetadata(targetId,
-		modifier, methodName,
-		(returnType == null ? JavaType.VOID_PRIMITIVE : returnType),
-		paramTypes, paramNames, new ArrayList<AnnotationMetadata>(),
-		new ArrayList<JavaType>(), body);
-	mutableTypeDetails.addMethod(operationMetadata);
-    }
 }

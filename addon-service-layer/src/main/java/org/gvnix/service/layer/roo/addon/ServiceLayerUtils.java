@@ -20,48 +20,25 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.List;
 
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
 /**
- * Addon for Handle Service Layer
+ * Utilities to manage java clases elements, create, update methods.
  * 
  * @author Ricardo García ( rgarcia at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public interface ServiceLayerOperations {
-
-    boolean isProjectAvailable();
+public interface ServiceLayerUtils {
 
     /**
-     * <p>
-     * Create a Service class.
-     * </p>
-     * 
-     * @param serviceClass
-     *            class to be created.
-     */
-    public void createServiceClass(JavaType serviceClass);
-
-    /**
-     * <p>
-     * Adds an operation to a class.
-     * </p>
-     * 
-     * @param operationName
-     *            Operation Name to be created.
-     * @param returnType
-     *            Operation java return Type.
-     * @param className
-     *            Class to insert the operation.
-     */
-    public void addServiceOperation(JavaSymbolName operationName,
-	    JavaType returnType, JavaType className);
-
-    /**
+     * /**
      * <p>
      * Inserts a new operation to a class.
      * </p>
@@ -74,17 +51,28 @@ public interface ServiceLayerOperations {
      *            Class to insert the operation.
      * @param modifier
      *            Method modifier declaration.
+     * @param throwsTypes
+     *            Method exception.
+     * @param annotationList
+     *            Method annotations.
      * @param paramTypes
      *            Input parameters types.
      * @param paramNames
      *            Input parameters names.
      * @param body
      *            Method body.
+     * 
      */
-    public void insertMethod(JavaSymbolName methodName, JavaType returnType,
-	    JavaType targetType, int modifier,
+    public void createMethod(JavaSymbolName methodName, JavaType returnType,
+	    JavaType targetType, int modifier, List<JavaType> throwsTypes,
+	    List<AnnotationMetadata> annotationList,
 	    List<AnnotatedJavaType> paramTypes,
 	    List<JavaSymbolName> paramNames, String body);
+
+    /**
+     * TODO:
+     */
+    public void updateMethodAnnotations();
 
     /**
      * <p>
@@ -100,6 +88,17 @@ public interface ServiceLayerOperations {
      * @param paramType
      *            Input parameter Type.
      */
-    public void addServiceOperationParameter(JavaType className,
+    public void updateMethodParameters(JavaType className,
 	    JavaSymbolName method, String paramName, JavaType paramType);
+
+    /**
+     * <p>
+     * Updates the class with the new values.
+     * </p>
+     * 
+     * @param classOrInterfaceTypeDetails
+     *            class to update.
+     */
+    public void updateClass(
+	    ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails);
 }
