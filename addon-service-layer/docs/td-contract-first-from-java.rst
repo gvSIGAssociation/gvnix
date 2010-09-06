@@ -230,7 +230,7 @@ Limitations solution
 
    We will not allow XSD extensions on the generated web service servers.
 
-   To add a restriction on any of the input parameters of the web service server, validate the retricción in your method code and return a exception if not satisfied.
+   To add a restriction on any of the input parameters of the web service server, validate the restriction in your method code and return a exception if not satisfied.
    This will generate a fault on the web service server when restriction is not respected. 
 
 #. Reusability
