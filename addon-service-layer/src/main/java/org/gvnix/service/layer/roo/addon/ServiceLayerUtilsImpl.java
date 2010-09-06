@@ -117,6 +117,9 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
     public void updateMethodParameters(JavaType className,
 	    JavaSymbolName method, String paramName, JavaType paramType) {
 
+	// TODO: Probar 'MethodDeclaration' ya que permite la creación con
+	// javadoc.
+
 	// MetadataID
 	String targetId = PhysicalTypeIdentifier.createIdentifier(className,
 		Path.SRC_MAIN_JAVA);
@@ -158,6 +161,12 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 	    if (methodMetadata.getMethodName().toString().compareTo(
 		    method.toString()) == 0) {
 
+		Assert.isTrue(!javaParserMethodMetadata.getParameterNames()
+			.contains(parameterName),
+			"There couldn't be two parameters with same name: '"
+				+ parameterName + "' in the method "
+				+ methodMetadata.getMethodName());
+		
 		for (JavaSymbolName tmpParameterName : javaParserMethodMetadata
 			.getParameterNames()) {
 		    parameterNamelist.add(tmpParameterName);
@@ -250,6 +259,9 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 
 	// TODO: Comprobar si ha variado el contenido para no hacer operaciones
 	// innecesarias.
+
+	// TODO: 'ClassOrInterfaceDeclaration' mantiene el javaDoc.
+
 	String javaIdentifier = physicalTypeMetadataProvider
 		.findIdentifier(classOrInterfaceTypeDetails.getName());
 	javaIdentifier = javaIdentifier.substring(
