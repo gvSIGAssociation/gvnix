@@ -18,8 +18,16 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import japa.parser.ast.body.MethodDeclaration;
+import japa.parser.JavaParser;
+import japa.parser.ParseException;
+import japa.parser.ast.CompilationUnit;
+import japa.parser.ast.body.*;
+import japa.parser.ast.expr.ClassExpr;
+import japa.parser.ast.expr.NameExpr;
+import japa.parser.ast.type.ClassOrInterfaceType;
+import japa.parser.ast.type.Type;
 
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +38,7 @@ import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.javaparser.JavaParserMutableClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.javaparser.JavaParserUtils;
 import org.springframework.roo.classpath.javaparser.details.JavaParserMethodMetadata;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;
@@ -104,11 +113,148 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 
     /**
      * {@inheritDoc}
+     * 
+     * TODO: Updates method annotations.
      */
     public void updateMethodAnnotations() {
 
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Updates method using 'CompilationUnit'
+     * </p>
+     * 
+     * <p>
+     * TODO: Method to improve. Unused.
+     * </p>
+     */
+    @Deprecated
+    public void updateWithJavaDoc(JavaType className, JavaSymbolName method,
+	    String paramName, JavaType paramType) throws ParseException {
+
+	
+	String targetId = PhysicalTypeIdentifier.createIdentifier(className,
+		Path.SRC_MAIN_JAVA);
+
+	String javaIdentifier = physicalTypeMetadataProvider
+		.findIdentifier(className);
+	javaIdentifier = javaIdentifier.substring(
+		javaIdentifier.indexOf("?") + 1).replaceAll("\\.", "/");
+
+	String fileIdentifier = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		javaIdentifier.concat(".java"));
+
+	// Retrieve class file to update.
+	CompilationUnit compilationUnit;
+
+	compilationUnit = JavaParser.parse(fileManager
+		.getInputStream(fileIdentifier));
+
+	// Obtain the physical type and itd mutable details
+	PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+		.get(targetId);
+	PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
+	Assert.notNull(ptd, "Java source code details unavailable for type "
+		+ PhysicalTypeIdentifier.getFriendlyName(targetId));
+	Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
+		ptd, "Java source code is immutable for type "
+			+ PhysicalTypeIdentifier.getFriendlyName(targetId));
+
+	JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
+
+	
+	// Create param type.
+	AnnotatedJavaType annotatedJavaType = new AnnotatedJavaType(paramType,
+		null);
+
+	// Create param name.
+	JavaSymbolName parameterName = new JavaSymbolName(paramName);
+	
+	ClassOrInterfaceDeclaration clazz = null;
+
+	for (TypeDeclaration classType : compilationUnit.getTypes()) {
+	    if (classType instanceof ClassOrInterfaceDeclaration) {
+		clazz = (ClassOrInterfaceDeclaration) classType;
+		break;
+	    }
+	}
+
+	if (clazz == null) {
+	    return;
+	}
+
+	List<BodyDeclaration> members = clazz.getMembers();
+
+	MethodDeclaration methodToUpdate = null;
+
+	for (BodyDeclaration bodyMember : members) {
+
+	    if (bodyMember instanceof MethodDeclaration) {
+
+		methodToUpdate = (MethodDeclaration) bodyMember;
+		
+		if (methodToUpdate.getName().equals(method.getSymbolName())) {
+
+		    List<Parameter> methodParameters = methodToUpdate
+			    .getParameters();
+
+		    // Compute the parameter type
+		    Type parameterType = null;
+		    if (paramType.isPrimitive()) {
+			parameterType = JavaParserUtils.getType(paramType);
+		    } else {
+			NameExpr importedType = JavaParserUtils
+				.importTypeIfRequired(mutableTypeDetails
+					.getEnclosingTypeName(),
+					mutableTypeDetails.getImports(),
+					paramType);
+
+			ClassOrInterfaceType cit = JavaParserUtils
+				.getClassOrInterfaceType(importedType);
+
+			parameterType = cit;
+		    }
+
+		    // TODO: Añadir anotaciones
+		    /*
+		     * p.setAnnotations(parameterAnnotations);
+		     */
+
+		    methodParameters.add(new Parameter(parameterType,
+			    new VariableDeclaratorId(
+			    paramName)));
+
+		    break;
+		}
+		
+	    }
+	}
+	
+
+	try {
+
+	    fileManager.delete(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		    javaIdentifier.concat(".java")));
+
+	    JavaParserMutableClassOrInterfaceTypeDetails details = new JavaParserMutableClassOrInterfaceTypeDetails(
+		    compilationUnit,
+		    clazz, fileManager, mutableTypeDetails
+			    .getDeclaredByMetadataId(), javaIdentifier,
+		    className, metadataService, physicalTypeMetadataProvider);
+
+	    classpathOperations.generateClassFile(details);
+	    
+	} catch (CloneNotSupportedException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	} catch (IOException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+    }
     /**
      * {@inheritDoc}
      * <p>
@@ -130,10 +276,12 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 	PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
 	Assert.notNull(ptd, "Java source code details unavailable for type "
 		+ PhysicalTypeIdentifier.getFriendlyName(targetId));
-	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, ptd,
+	Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
+		ptd,
 		"Java source code is immutable for type "
 			+ PhysicalTypeIdentifier.getFriendlyName(targetId));
-	MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
+
+	JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
 
 	// Update method
 	List<? extends MethodMetadata> methodsList = mutableTypeDetails
@@ -242,7 +390,12 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 			: null);
 
 	// Updates the class in file system.
-	updateClass(classOrInterfaceTypeDetails);
+	try {
+	    updateClass(classOrInterfaceTypeDetails);
+	} catch (ParseException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
     }
 
     /**

@@ -183,8 +183,7 @@ service operation:
     * Si la excepción que utiliza el método no se encuentra dentro del proyecto se genera un fichero AspectJ para anotarla como **@WebFault** y no se añade ninguna anotación a la clase.
 * Crea el método en la clase AspectJ correspondiente con los mismos parámetros de entrada y salida y la excepción correspondiente.
 
-    * Dentro del método hace la llamada al método definido en la clase de servicio, de esta manera se controla que no cambien los parámetros entrada/salida/excepción asociados al método.
-* Se definen en la anotaciones de GvNix (*@GvNixWebService* y *@GvNixWebMethod*) los parámetros necesarios para regenerar una operación cuando haya que actualizar debido que se publique o elimine algún método como operación.
+* Se definen en la anotaciones de GvNix (*@GvNixWebService* y *@GvNixWebMethod*) los parámetros necesarios para regenerar el archivo aspectJ cuando haya que actualizar debido que se publique o elimine algún método como operación.
 * Se asigna la anotación *@GvNixXmlElement* a las entidades que se utilicen como parámetros de entrada o salida de la operación.
 
     * Las entidades anotadas con *@GvNixXmlElement* se les asocia un fichero aj para anotar mediante JAXB, los atributos de relaciones se anotan con *@XmlTransient* y los demás atributos con *@XmlElement*. Se comprueba que estén dentro de +los tipos conocidos de datos+. Una lista que contendrá el Addon para las entidades de la aplicación y los definidos por nosotros, si no se encuentran en ninguna de ambas listas se anotarán como *@XmlTransient*.

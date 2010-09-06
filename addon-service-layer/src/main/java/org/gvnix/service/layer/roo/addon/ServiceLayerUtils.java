@@ -18,6 +18,8 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import japa.parser.ParseException;
+
 import java.util.List;
 
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -91,6 +93,22 @@ public interface ServiceLayerUtils {
     public void updateMethodParameters(JavaType className,
 	    JavaSymbolName method, String paramName, JavaType paramType);
 
+    /**
+     * <p>
+     * Adds an input parameter into selected class method.
+     * </p>
+     * 
+     * @param className
+     *            Class to update the method with the new parameter.
+     * @param method
+     *            Method name.
+     * @param paramName
+     *            Input parameter names.
+     * @param paramType
+     *            Input parameter Type.
+     */
+    public void updateWithJavaDoc(JavaType className, JavaSymbolName method,
+	    String paramName, JavaType paramType) throws ParseException;
     /**
      * <p>
      * Updates the class with the new values.
