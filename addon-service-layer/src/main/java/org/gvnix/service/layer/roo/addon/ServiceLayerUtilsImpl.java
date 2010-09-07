@@ -135,7 +135,6 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
     public void updateWithJavaDoc(JavaType className, JavaSymbolName method,
 	    String paramName, JavaType paramType) throws ParseException {
 
-	
 	String targetId = PhysicalTypeIdentifier.createIdentifier(className,
 		Path.SRC_MAIN_JAVA);
 
@@ -165,14 +164,13 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 
 	JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
 
-	
 	// Create param type.
 	AnnotatedJavaType annotatedJavaType = new AnnotatedJavaType(paramType,
 		null);
 
 	// Create param name.
 	JavaSymbolName parameterName = new JavaSymbolName(paramName);
-	
+
 	ClassOrInterfaceDeclaration clazz = null;
 
 	for (TypeDeclaration classType : compilationUnit.getTypes()) {
@@ -195,7 +193,7 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 	    if (bodyMember instanceof MethodDeclaration) {
 
 		methodToUpdate = (MethodDeclaration) bodyMember;
-		
+
 		if (methodToUpdate.getName().equals(method.getSymbolName())) {
 
 		    List<Parameter> methodParameters = methodToUpdate
@@ -224,15 +222,13 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 		     */
 
 		    methodParameters.add(new Parameter(parameterType,
-			    new VariableDeclaratorId(
-			    paramName)));
+			    new VariableDeclaratorId(paramName)));
 
 		    break;
 		}
-		
+
 	    }
 	}
-	
 
 	try {
 
@@ -240,13 +236,12 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 		    javaIdentifier.concat(".java")));
 
 	    JavaParserMutableClassOrInterfaceTypeDetails details = new JavaParserMutableClassOrInterfaceTypeDetails(
-		    compilationUnit,
-		    clazz, fileManager, mutableTypeDetails
+		    compilationUnit, clazz, fileManager, mutableTypeDetails
 			    .getDeclaredByMetadataId(), javaIdentifier,
 		    className, metadataService, physicalTypeMetadataProvider);
 
 	    classpathOperations.generateClassFile(details);
-	    
+
 	} catch (CloneNotSupportedException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
@@ -255,6 +250,7 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 	    e.printStackTrace();
 	}
     }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -277,8 +273,7 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 	Assert.notNull(ptd, "Java source code details unavailable for type "
 		+ PhysicalTypeIdentifier.getFriendlyName(targetId));
 	Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
-		ptd,
-		"Java source code is immutable for type "
+		ptd, "Java source code is immutable for type "
 			+ PhysicalTypeIdentifier.getFriendlyName(targetId));
 
 	JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
@@ -314,7 +309,7 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 			"There couldn't be two parameters with same name: '"
 				+ parameterName + "' in the method "
 				+ methodMetadata.getMethodName());
-		
+
 		for (JavaSymbolName tmpParameterName : javaParserMethodMetadata
 			.getParameterNames()) {
 		    parameterNamelist.add(tmpParameterName);
@@ -363,39 +358,35 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 
 	    }
 	}
-	
+
 	List<ConstructorMetadata> contructorList = new ArrayList<ConstructorMetadata>();
 	contructorList.addAll(mutableTypeDetails.getDeclaredConstructors());
-	
+
 	List<FieldMetadata> fieldMetadataList = new ArrayList<FieldMetadata>();
 	fieldMetadataList.addAll(mutableTypeDetails.getDeclaredFields());
-	
+
 	List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
 	annotationMetadataList.addAll(mutableTypeDetails.getTypeAnnotations());
-	
+
 	// Replicates the values from the original class.
 	ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = new DefaultClassOrInterfaceTypeDetails(
 		mutableTypeDetails.getDeclaredByMetadataId(),
-		mutableTypeDetails.getName(), mutableTypeDetails.getModifier(),
+		mutableTypeDetails.getName(),
+		mutableTypeDetails.getModifier(),
 		mutableTypeDetails.getPhysicalTypeCategory(),
 		contructorList,
-		fieldMetadataList, 
+		fieldMetadataList,
 		updatedMethodList,
 		mutableTypeDetails.getSuperclass(),
-		mutableTypeDetails.getExtendsTypes(), 
-		mutableTypeDetails.getImplementsTypes(), 
-		annotationMetadataList, 
+		mutableTypeDetails.getExtendsTypes(),
+		mutableTypeDetails.getImplementsTypes(),
+		annotationMetadataList,
 		(mutableTypeDetails.getPhysicalTypeCategory() == PhysicalTypeCategory.ENUMERATION) ? mutableTypeDetails
 			.getEnumConstants()
 			: null);
 
 	// Updates the class in file system.
-	try {
-	    updateClass(classOrInterfaceTypeDetails);
-	} catch (ParseException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+	updateClass(classOrInterfaceTypeDetails);
     }
 
     /**
