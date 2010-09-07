@@ -21,10 +21,8 @@ package org.gvnix.service.layer.roo.addon;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
-import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -32,10 +30,8 @@ import org.springframework.roo.classpath.details.DefaultClassOrInterfaceTypeDeta
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
-import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
 
 /**
@@ -50,33 +46,12 @@ import org.springframework.roo.project.*;
 @Service
 public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
 
-    private static Logger logger = Logger
-	    .getLogger(ServiceLayerOperations.class.getName());
-
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private PathResolver pathResolver;
-    @Reference
-    private ProjectOperations projectOperations;
     @Reference
     private ClasspathOperations classpathOperations;
     @Reference
-    private ServiceLayerActivationInfo serviceLayerActivationInfo;
-    @Reference
     private ServiceLayerUtils serviceLayerUtils;
 
-    private ComponentContext context;
-
-    private static final String DOCTYPE_PUBLIC = "-//tuckey.org//DTD UrlRewrite 3.0//EN";
-    private static final String DOCTYPE_SYSTEM = "http://tuckey.org/res/dtds/urlrewrite3.0.dtd";
     
-    protected void activate(ComponentContext context) {
-	this.context = context;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -84,20 +59,7 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
-	return serviceLayerActivationInfo.isProjectAvailable();
-    }
-
-
-    /**
-     * @return the path resolver or null if there is no user project
-     */
-    private PathResolver getPathResolver() {
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(ProjectMetadata.getProjectIdentifier());
-	if (projectMetadata == null) {
-	    return null;
-	}
-	return projectMetadata.getPathResolver();
+	return serviceLayerUtils.isProjectAvailable();
     }
 
     /**

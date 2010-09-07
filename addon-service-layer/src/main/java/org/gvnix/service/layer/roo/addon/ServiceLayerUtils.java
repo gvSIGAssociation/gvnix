@@ -23,7 +23,6 @@ import japa.parser.ParseException;
 import java.util.List;
 
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
@@ -38,6 +37,8 @@ import org.springframework.roo.model.JavaType;
  *         Transport</a>
  */
 public interface ServiceLayerUtils {
+
+    public boolean isProjectAvailable();
 
     /**
      * /**

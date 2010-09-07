@@ -20,17 +20,38 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.List;
 
+import org.springframework.roo.model.JavaType;
 import org.w3c.dom.Element;
 
 /**
- * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
+ * Utilities to manage the web services library.
+ * 
+ * @author Ricardo García ( rgarcia at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public interface ServiceLayerActivationInfo {
+public interface WebServiceLibraryUtils {
 
-    public boolean isProjectAvailable();
+    /**
+     * <p>
+     * Set up library configuration to a project.
+     * </p>
+     */
+    public void setUp();
+
+    /**
+     * <p>
+     * Check if library is properly configurated in a project.
+     * </p>
+     * 
+     * @return true or false if it's configurated.
+     */
+    public boolean isInstalled();
 
     /**
      * <p>
@@ -48,7 +69,7 @@ public interface ServiceLayerActivationInfo {
      * 
      * @return true or false if Cxf dependcies are set.
      */
-    public boolean areCxfDependenciesInstalled();
+    public boolean areDependenciesInstalled();
 
     /**
      * <p>
@@ -57,6 +78,14 @@ public interface ServiceLayerActivationInfo {
      * 
      * @return List of dependencies as xml elements.
      */
-    public List<Element> getCxfDependencies();
+    public List<Element> getDependencies();
+
+    /**
+     * Define Web Service class in cxf configuration file to be published.
+     * 
+     * @param serviceClass
+     *            class to define as Web Service in Cxf configuration file.
+     */
+    public void updateCxfXml(JavaType serviceClass);
 
 }

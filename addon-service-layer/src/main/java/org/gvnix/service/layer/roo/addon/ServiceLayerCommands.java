@@ -18,8 +18,6 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.util.logging.Logger;
-
 import org.apache.felix.scr.annotations.*;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -37,15 +35,16 @@ import org.springframework.roo.shell.*;
 @Service
 public class ServiceLayerCommands implements CommandMarker {
 
-    private static Logger logger = Logger
-	    .getLogger(ServiceLayerCommands.class.getName());
-
     @Reference
     private ServiceLayerOperations serviceLayerOperations;
-
     @Reference
     private WebServiceLayerOperations webServiceLayerOperations;
-
+    @Reference
+    private WebServiceProxyLayerOperations webServiceProxyLayerOperations;
+    @Reference
+    private WebServiceLibraryUtils webServiceLibraryUtils;
+    
+    
     @CliAvailabilityIndicator( { "service class", "service operation",
 	    "service parameter" })
     public boolean isCreateServiceClassAvailable() {
@@ -93,12 +92,24 @@ public class ServiceLayerCommands implements CommandMarker {
     @CliAvailabilityIndicator("service export operation")
     public boolean isServiceOperationAvailable() {
 	return webServiceLayerOperations.isProjectAvailable()
-		&& webServiceLayerOperations.isCxfInstalled();
+		&& webServiceLibraryUtils.isInstalled();
     }
 
     @CliCommand(value = "service export operation", help = "Publish a method as Web Service Operation.")
     public String serviceOperation() {
 	return "Web Service Operation published.";
+    }
+
+    @CliAvailabilityIndicator("service import ws")
+    public boolean isServiceImportAvailable() {
+	return webServiceProxyLayerOperations.isProjectAvailable();
+    }
+
+    @CliCommand(value = "service import ws", help = "Imports a Web Service to Service class. If the class doesn't exists the Addon will create it.")
+    public void serviceImport(
+	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to import or create") JavaType serviceClass,
+	    @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
+	webServiceProxyLayerOperations.importService(serviceClass, url);
     }
 
 }

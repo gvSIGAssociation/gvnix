@@ -47,6 +47,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
 
@@ -70,6 +71,36 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     @Reference
     private PathResolver pathResolver;
+
+    
+    /* (non-Javadoc)
+     * @see org.gvnix.service.layer.roo.addon.ServiceLayerActivationInfo#isProjectAvailable()
+     */
+    public boolean isProjectAvailable() {
+	if (getPathResolver() == null) {
+	    return false;
+	}
+
+	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		"WEB-INF/spring/webmvc-config.xml");
+
+	if (!fileManager.exists(webXmlPath)) {
+	    return false;
+	}
+	return true;
+    }
+
+    /**
+     * @return the path resolver or null if there is no user project
+     */
+    private PathResolver getPathResolver() {
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(ProjectMetadata.getProjectIdentifier());
+	if (projectMetadata == null) {
+	    return null;
+	}
+	return projectMetadata.getPathResolver();
+    }
 
     /**
      * {@inheritDoc}
