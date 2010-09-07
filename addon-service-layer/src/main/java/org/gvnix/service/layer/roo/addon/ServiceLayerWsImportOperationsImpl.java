@@ -38,10 +38,10 @@ import org.springframework.roo.project.*;
  */
 @Component
 @Service
-public class WebServiceProxyLayerOperationsImpl implements WebServiceProxyLayerOperations {
+public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportOperations {
 
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerOperations.class.getName());
+	    .getLogger(ServiceLayerWsImportOperations.class.getName());
 
     @Reference
     private FileManager fileManager;
@@ -50,7 +50,7 @@ public class WebServiceProxyLayerOperationsImpl implements WebServiceProxyLayerO
     @Reference
     private MetadataService metadataService;
     @Reference
-    private WebServiceLibraryUtils webServiceLibraryUtils;
+    private ServiceLayerWsConfigService serviceLayerWsConfigService;
 
     
     /*
@@ -93,7 +93,7 @@ public class WebServiceProxyLayerOperationsImpl implements WebServiceProxyLayerO
 
 	// Checks if Cxf is configured in the project and installs it if it's
 	// not available.
-	webServiceLibraryUtils.setUp();
+	serviceLayerWsConfigService.setUp();
 
 	String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
 		serviceClass.getFullyQualifiedTypeName().replace('.', '/')

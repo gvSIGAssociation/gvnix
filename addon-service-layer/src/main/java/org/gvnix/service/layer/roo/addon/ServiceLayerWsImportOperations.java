@@ -21,62 +21,27 @@ package org.gvnix.service.layer.roo.addon;
 import org.springframework.roo.model.JavaType;
 
 /**
- * Addon for Handle Service Layer
+ * Addon for Handle Web Service Proxy Layer
  * 
- * @author Ricardo García ( rgarcia at disid dot com ) at <a
+ * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public interface WebServiceLayerOperations {
+public interface ServiceLayerWsImportOperations {
 
     boolean isProjectAvailable();
 
     /**
      * <p>
-     * Exports a class to Web Service.
+     * Imports a Web Service to class.
      * </p>
      * 
      * @param className
-     *            class to export.
+     *            class to import.
+     * @param url
+     *            contract wsdl url to import.
      */
-    public void exportService(JavaType className);
-
-    /**
-     * <p>
-     * Create a Service class.
-     * </p>
-     * 
-     * @param serviceClass
-     *            class to be created.
-     */
-    public void createServiceClass(JavaType serviceClass);
-
-    /**
-     * <p>
-     * Update an existing class to a web service.
-     * </p>
-     * 
-     * @param serviceClass
-     *            class to be published as Web Service.
-     */
-    public void updateClassAsWebService(JavaType serviceClass);
-
-    /**
-     * <p>
-     * Check if Cxf config file is created in the project.
-     * </p>
-     * 
-     * @return true or false if exists Cxf configuration file.
-     */
-    public boolean isCxfConfigurated();
-
-    /**
-     * <p>
-     * Adds GvNIX annotations library dependency to the current project
-     * </p>
-     * TO BE REMOVED FROM API
-     */
-    public void addGvNIXAnnotationsDependecy();
+    public void importService(JavaType className, String url);
 
 }

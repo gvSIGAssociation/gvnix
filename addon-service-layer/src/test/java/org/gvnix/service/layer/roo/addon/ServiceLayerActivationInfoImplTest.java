@@ -49,7 +49,7 @@ public class ServiceLayerActivationInfoImplTest {
     static final String WEB_XML_PATH = "WEB-INF/spring/webmvc-config.xml";
 
     // Class under test
-    private WebServiceLibraryUtilsImpl webServiceLibraryUtilsImpl;
+    private ServiceLayerWsConfigServiceImpl serviceLayerWsConfigServiceImpl;
 
     // Mock objects to emulate Roo OSGi Services
     private FileManager fileManager;
@@ -71,7 +71,7 @@ public class ServiceLayerActivationInfoImplTest {
     public void setUp() throws Exception {
 
 	// Class under test
-	webServiceLibraryUtilsImpl = new WebServiceLibraryUtilsImpl();
+	serviceLayerWsConfigServiceImpl = new ServiceLayerWsConfigServiceImpl();
 
 	// Setup Mock service objects
 	fileManager = createMock(FileManager.class);
@@ -82,11 +82,11 @@ public class ServiceLayerActivationInfoImplTest {
 	projectMetadata = createMock(ProjectMetadata.class);
 
 	// Inject mock objects in instance. This emulate OSGi environment
-	ReflectionTestUtils.setField(webServiceLibraryUtilsImpl,
+	ReflectionTestUtils.setField(serviceLayerWsConfigServiceImpl,
 		"fileManager", fileManager);
-	ReflectionTestUtils.setField(webServiceLibraryUtilsImpl,
+	ReflectionTestUtils.setField(serviceLayerWsConfigServiceImpl,
 		"metadataService", metadataService);
-	ReflectionTestUtils.setField(webServiceLibraryUtilsImpl,
+	ReflectionTestUtils.setField(serviceLayerWsConfigServiceImpl,
 		"pathResolver", pathResolver);
 
     }
@@ -111,7 +111,7 @@ public class ServiceLayerActivationInfoImplTest {
 
 	Dependency dependency;
 
-	List<Element> dependencyList = webServiceLibraryUtilsImpl
+	List<Element> dependencyList = serviceLayerWsConfigServiceImpl
 		.getDependencies();
 
 	for (Element element : dependencyList) {
@@ -123,7 +123,7 @@ public class ServiceLayerActivationInfoImplTest {
 
 	replay(metadataService, projectMetadata);
 
-	areCxfDependenciesInstalledResult = webServiceLibraryUtilsImpl
+	areCxfDependenciesInstalledResult = serviceLayerWsConfigServiceImpl
 		.areDependenciesInstalled();
 
 	assertTrue("There is one or more dependencies not set.",
@@ -157,7 +157,7 @@ public class ServiceLayerActivationInfoImplTest {
 
 	replay(metadataService, projectMetadata);
 
-	areCxfDependenciesInstalledResult = webServiceLibraryUtilsImpl
+	areCxfDependenciesInstalledResult = serviceLayerWsConfigServiceImpl
 		.areDependenciesInstalled();
 
 	assertFalse("There are all dependencies set.",

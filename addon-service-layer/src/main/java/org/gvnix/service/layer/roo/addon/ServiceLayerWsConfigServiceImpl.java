@@ -55,7 +55,7 @@ import org.w3c.dom.Element;
  */
 @Component(immediate = true)
 @Service
-public class WebServiceLibraryUtilsImpl implements WebServiceLibraryUtils {
+public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigService {
 
     @Reference
     private MetadataService metadataService;

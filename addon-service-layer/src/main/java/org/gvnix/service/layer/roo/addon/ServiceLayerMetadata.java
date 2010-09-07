@@ -24,7 +24,6 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaType;
@@ -61,7 +60,7 @@ public class ServiceLayerMetadata extends
 	}
 
 	// TODO: Prueba de creación de un metadato.
-	AnnotationMetadata gvNIXWebServiceAnnotation = MemberFindingUtils
+	MemberFindingUtils
 		.getTypeAnnotation(governorTypeDetails, new JavaType(
 			"org.gvnix.service.layer.roo.addon.GvNIXWebService"));
 

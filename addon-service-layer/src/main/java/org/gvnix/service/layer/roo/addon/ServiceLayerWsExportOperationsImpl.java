@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
@@ -48,10 +49,10 @@ import org.w3c.dom.Element;
  */
 @Component
 @Service
-public class WebServiceLayerOperationsImpl implements WebServiceLayerOperations {
+public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportOperations {
 
     private static Logger logger = Logger
-	    .getLogger(WebServiceLayerOperations.class.getName());
+	    .getLogger(ServiceLayerWsExportOperations.class.getName());
 
     @Reference
     private FileManager fileManager;
@@ -64,7 +65,7 @@ public class WebServiceLayerOperationsImpl implements WebServiceLayerOperations 
     @Reference
     private ClasspathOperations classpathOperations;
     @Reference
-    private WebServiceLibraryUtils webServiceLibraryUtils;
+    private ServiceLayerWsConfigService serviceLayerWsConfigService;
     
     
     /*
@@ -119,7 +120,7 @@ public class WebServiceLayerOperationsImpl implements WebServiceLayerOperations 
 
 	// Checks if Cxf is configured in the project and installs it if it's
 	// not available.
-	webServiceLibraryUtils.setUp();
+	serviceLayerWsConfigService.setUp();
 
 	String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
 		serviceClass.getFullyQualifiedTypeName().replace('.', '/')
@@ -138,7 +139,7 @@ public class WebServiceLayerOperationsImpl implements WebServiceLayerOperations 
 	updateClassAsWebService(serviceClass);
 
 	// Update CXF XML
-	webServiceLibraryUtils.updateCxfXml(serviceClass);
+	serviceLayerWsConfigService.updateCxfXml(serviceClass);
 
 	// Add GvNixAnnotations to the project.
 	addGvNIXAnnotationsDependecy();
@@ -244,7 +245,7 @@ public class WebServiceLayerOperationsImpl implements WebServiceLayerOperations 
      * @return true or false if exists Cxf configuration file.
      */
     public boolean isCxfConfigurated() {
-	return webServiceLibraryUtils.isCxfConfigurated();
+	return serviceLayerWsConfigService.isCxfConfigurated();
     }
 
     /*

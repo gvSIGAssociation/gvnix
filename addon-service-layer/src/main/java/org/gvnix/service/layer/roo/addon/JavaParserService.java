@@ -36,7 +36,7 @@ import org.springframework.roo.model.JavaType;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public interface ServiceLayerUtils {
+public interface JavaParserService {
 
     /**
      * /**

@@ -40,13 +40,8 @@ public class ServiceLayerMetadataNotificationListener implements
     private static Logger logger = Logger
 	    .getLogger(ServiceLayerMetadataNotificationListener.class.getName());
 
-    private static final String serviceLayerMetadataType = MetadataIdentificationUtils
-	    .getMetadataClass(PhysicalTypeIdentifier.getMetadataIdentiferType());
-
     @Reference
     private MetadataDependencyRegistry metadataDependencyRegistry;
-    @Reference
-    private ServiceLayerOperations serviceLayerOperations;
 
     protected void activate(ComponentContext context) {
 	metadataDependencyRegistry.addNotificationListener(this);

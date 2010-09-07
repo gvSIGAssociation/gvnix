@@ -38,11 +38,11 @@ public class ServiceLayerCommands implements CommandMarker {
     @Reference
     private ServiceLayerOperations serviceLayerOperations;
     @Reference
-    private WebServiceLayerOperations webServiceLayerOperations;
+    private ServiceLayerWsExportOperations serviceLayerWsExportOperations;
     @Reference
-    private WebServiceProxyLayerOperations webServiceProxyLayerOperations;
+    private ServiceLayerWsImportOperations serviceLayerWsImportOperations;
     @Reference
-    private WebServiceLibraryUtils webServiceLibraryUtils;
+    private ServiceLayerWsConfigService serviceLayerWsConfigService;
     
     
     @CliAvailabilityIndicator( { "service class", "service operation",
@@ -80,19 +80,19 @@ public class ServiceLayerCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("service export ws")
     public boolean isServiceExportAvailable() {
-	return webServiceLayerOperations.isProjectAvailable();
+	return serviceLayerWsExportOperations.isProjectAvailable();
     }
 
     @CliCommand(value = "service export ws", help = "Exports a Service class to Web Service. If the class doesn't exists the Addon will create it.")
     public void serviceExport(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass) {
-	webServiceLayerOperations.exportService(serviceClass);
+	serviceLayerWsExportOperations.exportService(serviceClass);
     }
 
     @CliAvailabilityIndicator("service export operation")
     public boolean isServiceOperationAvailable() {
-	return webServiceLayerOperations.isProjectAvailable()
-		&& webServiceLibraryUtils.isInstalled();
+	return serviceLayerWsExportOperations.isProjectAvailable()
+		&& serviceLayerWsConfigService.isInstalled();
     }
 
     @CliCommand(value = "service export operation", help = "Publish a method as Web Service Operation.")
@@ -102,14 +102,14 @@ public class ServiceLayerCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("service import ws")
     public boolean isServiceImportAvailable() {
-	return webServiceProxyLayerOperations.isProjectAvailable();
+	return serviceLayerWsImportOperations.isProjectAvailable();
     }
 
     @CliCommand(value = "service import ws", help = "Imports a Web Service to Service class. If the class doesn't exists the Addon will create it.")
     public void serviceImport(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to import or create") JavaType serviceClass,
 	    @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
-	webServiceProxyLayerOperations.importService(serviceClass, url);
+	serviceLayerWsImportOperations.importService(serviceClass, url);
     }
 
 }

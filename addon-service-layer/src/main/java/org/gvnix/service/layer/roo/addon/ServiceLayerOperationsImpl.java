@@ -52,7 +52,7 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
     @Reference
     private ClasspathOperations classpathOperations;
     @Reference
-    private ServiceLayerUtils serviceLayerUtils;
+    private JavaParserService javaParserService;
 
     
     /*
@@ -148,7 +148,7 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
 	    List<AnnotatedJavaType> paramTypes,
 	    List<JavaSymbolName> paramNames, String body) {
 	
-	serviceLayerUtils.createMethod(methodName, returnType, targetType,
+	javaParserService.createMethod(methodName, returnType, targetType,
 		modifier, new ArrayList<JavaType>(),
 		new ArrayList<AnnotationMetadata>(), paramTypes, paramNames,
 		body);
@@ -161,41 +161,8 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
     public void addServiceOperationParameter(JavaType className,
 	    JavaSymbolName method, String paramName, JavaType paramType) {
 
-	serviceLayerUtils.updateMethodParameters(className, method, paramName,
+	javaParserService.updateMethodParameters(className, method, paramName,
 		paramType);
-
-    }
-
-    /*
-     * Utilities
-     */
-
-    /**
-     * <p>
-     * Inserts the method as abstract in the selected class.
-     * </p>
-     * 
-     * @param opeName
-     *            Method name.
-     * @param returnType
-     *            Operation java return Type.
-     * @param targetType
-     *            Class to insert the operation.
-     * @param modifier
-     *            Method modifier declaration.
-     * @param paramTypes
-     *            Input parameters types.
-     * @param paramNames
-     *            Input parameters names.
-     * @param body
-     *            Method body.
-     */
-    private void insertAbstractMethod(JavaSymbolName opeName,
-	    JavaType returnType, JavaType targetType,
-	    List<AnnotatedJavaType> paramTypes,
-	    List<JavaSymbolName> paramNames, String body) {
-	insertMethod(opeName, returnType, targetType, Modifier.ABSTRACT,
-		paramTypes, paramNames, body);
 
     }
 

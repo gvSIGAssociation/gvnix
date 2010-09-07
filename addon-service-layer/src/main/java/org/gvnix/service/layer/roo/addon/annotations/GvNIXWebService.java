@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.service.layer.roo.addon;
+package org.gvnix.service.layer.roo.addon.annotations;
 
 import java.lang.annotation.*;
 
 /**
  * <p>
- * GvNix Annotation to identify GvNIX created WebFault related to WebService.
+ * GvNix Annotation to identify GvNIX publish as WebService.
  * </p>
  * 
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -32,6 +32,13 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface GvNIXWebFault {
+public @interface GvNIXWebService {
 
+    String name() default "";
+
+    String targetNamespace() default "";
+
+    String serviceName() default "";
+
+    String address() default "";
 }

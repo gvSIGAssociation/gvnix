@@ -22,13 +22,11 @@ import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.body.*;
-import japa.parser.ast.expr.ClassExpr;
 import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.Type;
 
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,9 +45,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 
 /**
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -59,7 +55,7 @@ import org.springframework.roo.support.util.StringUtils;
  */
 @Component(immediate = true)
 @Service
-public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
+public class JavaParserServiceImpl implements JavaParserService {
 
     @Reference
     private MetadataService metadataService;
@@ -164,13 +160,6 @@ public class ServiceLayerUtilsImpl implements ServiceLayerUtils {
 			+ PhysicalTypeIdentifier.getFriendlyName(targetId));
 
 	JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
-
-	// Create param type.
-	AnnotatedJavaType annotatedJavaType = new AnnotatedJavaType(paramType,
-		null);
-
-	// Create param name.
-	JavaSymbolName parameterName = new JavaSymbolName(paramName);
 
 	ClassOrInterfaceDeclaration clazz = null;
 

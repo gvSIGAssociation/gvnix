@@ -18,40 +18,49 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.util.List;
-
 import org.springframework.roo.model.JavaType;
-import org.w3c.dom.Element;
 
 /**
- * Utilities to manage the web services library.
+ * Addon for Handle Service Layer
  * 
  * @author Ricardo García ( rgarcia at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
- * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
  */
-public interface WebServiceLibraryUtils {
+public interface ServiceLayerWsExportOperations {
+
+    boolean isProjectAvailable();
 
     /**
      * <p>
-     * Set up library configuration to a project.
-     * </p>
-     */
-    public void setUp();
-
-    /**
-     * <p>
-     * Check if library is properly configurated in a project.
+     * Exports a class to Web Service.
      * </p>
      * 
-     * @return true or false if it's configurated.
+     * @param className
+     *            class to export.
      */
-    public boolean isInstalled();
+    public void exportService(JavaType className);
+
+    /**
+     * <p>
+     * Create a Service class.
+     * </p>
+     * 
+     * @param serviceClass
+     *            class to be created.
+     */
+    public void createServiceClass(JavaType serviceClass);
+
+    /**
+     * <p>
+     * Update an existing class to a web service.
+     * </p>
+     * 
+     * @param serviceClass
+     *            class to be published as Web Service.
+     */
+    public void updateClassAsWebService(JavaType serviceClass);
 
     /**
      * <p>
@@ -64,28 +73,10 @@ public interface WebServiceLibraryUtils {
 
     /**
      * <p>
-     * Check if Cxf dependencies are set in project's pom.xml.
+     * Adds GvNIX annotations library dependency to the current project
      * </p>
-     * 
-     * @return true or false if Cxf dependcies are set.
+     * TO BE REMOVED FROM API
      */
-    public boolean areDependenciesInstalled();
-
-    /**
-     * <p>
-     * Get Addon dependencies list to install.
-     * </p>
-     * 
-     * @return List of dependencies as xml elements.
-     */
-    public List<Element> getDependencies();
-
-    /**
-     * Define Web Service class in cxf configuration file to be published.
-     * 
-     * @param serviceClass
-     *            class to define as Web Service in Cxf configuration file.
-     */
-    public void updateCxfXml(JavaType serviceClass);
+    public void addGvNIXAnnotationsDependecy();
 
 }
