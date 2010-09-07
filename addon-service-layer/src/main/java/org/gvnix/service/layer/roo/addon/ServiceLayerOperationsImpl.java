@@ -30,6 +30,7 @@ import org.springframework.roo.classpath.details.DefaultClassOrInterfaceTypeDeta
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.*;
@@ -47,6 +48,8 @@ import org.springframework.roo.project.*;
 public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
 
     @Reference
+    private MetadataService metadataService;
+    @Reference
     private ClasspathOperations classpathOperations;
     @Reference
     private ServiceLayerUtils serviceLayerUtils;
@@ -59,7 +62,23 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
-	return serviceLayerUtils.isProjectAvailable();
+
+	return getPathResolver() != null;
+    }
+
+    /**
+     * @return the path resolver or null if there is no user project
+     */
+    private PathResolver getPathResolver() {
+
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(ProjectMetadata.getProjectIdentifier());
+	if (projectMetadata == null) {
+
+	    return null;
+	}
+
+	return projectMetadata.getPathResolver();
     }
 
     /**

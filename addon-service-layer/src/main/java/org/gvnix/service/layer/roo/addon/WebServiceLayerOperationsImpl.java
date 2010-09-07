@@ -29,6 +29,7 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
@@ -55,16 +56,16 @@ public class WebServiceLayerOperationsImpl implements WebServiceLayerOperations 
     @Reference
     private FileManager fileManager;
     @Reference
+    private MetadataService metadataService;
+    @Reference
     private PathResolver pathResolver;
     @Reference
     private ProjectOperations projectOperations;
     @Reference
     private ClasspathOperations classpathOperations;
     @Reference
-    private ServiceLayerUtils serviceLayerUtils;
-    @Reference
     private WebServiceLibraryUtils webServiceLibraryUtils;
-
+    
     
     /*
      * (non-Javadoc)
@@ -73,7 +74,35 @@ public class WebServiceLayerOperationsImpl implements WebServiceLayerOperations 
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
-	return serviceLayerUtils.isProjectAvailable();
+
+	if (getPathResolver() == null) {
+
+	    return false;
+	}
+
+	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		"/WEB-INF/web.xml");
+	if (!fileManager.exists(webXmlPath)) {
+
+	    return false;
+	}
+
+	return true;
+    }
+
+    /**
+     * @return the path resolver or null if there is no user project
+     */
+    private PathResolver getPathResolver() {
+
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(ProjectMetadata.getProjectIdentifier());
+	if (projectMetadata == null) {
+
+	    return null;
+	}
+
+	return projectMetadata.getPathResolver();
     }
 
     /**

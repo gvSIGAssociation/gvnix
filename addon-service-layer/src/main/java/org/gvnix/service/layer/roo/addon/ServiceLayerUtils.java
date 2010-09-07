@@ -38,8 +38,6 @@ import org.springframework.roo.model.JavaType;
  */
 public interface ServiceLayerUtils {
 
-    public boolean isProjectAvailable();
-
     /**
      * /**
      * <p>

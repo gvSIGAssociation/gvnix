@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
@@ -47,7 +48,7 @@ public class WebServiceProxyLayerOperationsImpl implements WebServiceProxyLayerO
     @Reference
     private PathResolver pathResolver;
     @Reference
-    private ServiceLayerUtils serviceLayerUtils;
+    private MetadataService metadataService;
     @Reference
     private WebServiceLibraryUtils webServiceLibraryUtils;
 
@@ -59,7 +60,23 @@ public class WebServiceProxyLayerOperationsImpl implements WebServiceProxyLayerO
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
-	return serviceLayerUtils.isProjectAvailable();
+
+	return getPathResolver() != null;
+    }
+
+    /**
+     * @return the path resolver or null if there is no user project
+     */
+    private PathResolver getPathResolver() {
+
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(ProjectMetadata.getProjectIdentifier());
+	if (projectMetadata == null) {
+
+	    return null;
+	}
+
+	return projectMetadata.getPathResolver();
     }
 
     /**
@@ -90,6 +107,8 @@ public class WebServiceProxyLayerOperationsImpl implements WebServiceProxyLayerO
 //	    createServiceClass(serviceClass);
 
 	}
+	
+	// TODO Develop method
 
 //	// Define Web Service Annotations.
 //	updateClassAsWebService(serviceClass);
