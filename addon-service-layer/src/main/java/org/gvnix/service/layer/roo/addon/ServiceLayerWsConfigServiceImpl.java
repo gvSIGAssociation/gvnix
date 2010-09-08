@@ -34,6 +34,7 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
 import org.springframework.roo.support.util.TemplateUtils;
@@ -426,7 +427,6 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 
     /**
      * {@inheritDoc}
-     * 
      */
     public void updateCxfXml(JavaType className) {
 
@@ -477,4 +477,26 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	XmlUtils.writeXml(cxfXmlMutableFile.getOutputStream(), cxfXml);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void addGvNIXAnnotationsDependecy() {
+
+	List<Element> projectProperties = XmlUtils.findElements(
+		"/configuration/gvnix/properties/*", XmlUtils.getConfiguration(
+			this.getClass(), "properties.xml"));
+	for (Element property : projectProperties) {
+	    projectOperations.addProperty(new Property(property));
+	}
+
+	List<Element> databaseDependencies = XmlUtils.findElements(
+		"/configuration/gvnix/dependencies/dependency", XmlUtils
+			.getConfiguration(this.getClass(),
+				"gvnix-annotation-dependencies.xml"));
+	for (Element dependencyElement : databaseDependencies) {
+	    projectOperations
+		    .dependencyUpdate(new Dependency(dependencyElement));
+	}
+    }
+    
 }

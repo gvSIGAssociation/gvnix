@@ -29,13 +29,16 @@ import org.springframework.roo.model.JavaType;
  *         Transport</a>
  */
 public interface ServiceLayerWsImportOperations {
-
+    
+    /**
+     * Is service layer web service import command available on Roo console ?.
+     * 
+     * @return Service layer web service import command available on Roo console 
+     */
     boolean isProjectAvailable();
 
     /**
-     * <p>
      * Imports a Web Service to class.
-     * </p>
      * 
      * @param className
      *            class to import.

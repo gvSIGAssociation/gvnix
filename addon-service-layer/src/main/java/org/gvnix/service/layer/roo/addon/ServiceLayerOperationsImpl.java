@@ -20,16 +20,10 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.felix.scr.annotations.*;
-import org.springframework.roo.classpath.PhysicalTypeCategory;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.DefaultClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
-import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -50,15 +44,13 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
     @Reference
     private MetadataService metadataService;
     @Reference
-    private ClasspathOperations classpathOperations;
-    @Reference
     private JavaParserService javaParserService;
 
     
     /*
      * (non-Javadoc)
      * 
-     * @seeorg.gvnix.service.layer.roo.addon.GvNixServiceLayerOperations#
+     * @seeorg.gvnix.service.layer.roo.addon.ServiceLayerOperations#
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
@@ -90,23 +82,7 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
      */
     public void createServiceClass(JavaType serviceClass) {
 
-	// Service class
-	String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
-		serviceClass, Path.SRC_MAIN_JAVA);
-
-	// Service annotations
-	List<AnnotationMetadata> serviceAnnotations = new ArrayList<AnnotationMetadata>();
-	serviceAnnotations.add(new DefaultAnnotationMetadata(new JavaType(
-		"org.springframework.stereotype.Service"),
-		new ArrayList<AnnotationAttributeValue<?>>()));
-
-	ClassOrInterfaceTypeDetails serviceDetails = new DefaultClassOrInterfaceTypeDetails(
-		declaredByMetadataId, serviceClass, Modifier.PUBLIC,
-		PhysicalTypeCategory.CLASS, null, null, null, null, null,
-		null, serviceAnnotations, null);
-
-	classpathOperations.generateClassFile(serviceDetails);
-
+	javaParserService.createServiceClass(serviceClass);
     }
 
     /**
@@ -131,39 +107,21 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
 		.concat(returnType == null ? ";" : "null;");
 	bodyBuilder.appendFormalLine(returnLine);
 
-	insertMethod(operationName, returnType, className, Modifier.PUBLIC,
+	javaParserService.createMethod(operationName, returnType, className,
+		Modifier.PUBLIC, new ArrayList<JavaType>(),
+		new ArrayList<AnnotationMetadata>(),
 		new ArrayList<AnnotatedJavaType>(),
 		new ArrayList<JavaSymbolName>(), bodyBuilder.getOutput());
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * <p>
-     * Updates the class with the new method.
-     * </p>
-     */
-    public void insertMethod(JavaSymbolName methodName, JavaType returnType,
-	    JavaType targetType, int modifier,
-	    List<AnnotatedJavaType> paramTypes,
-	    List<JavaSymbolName> paramNames, String body) {
-	
-	javaParserService.createMethod(methodName, returnType, targetType,
-		modifier, new ArrayList<JavaType>(),
-		new ArrayList<AnnotationMetadata>(), paramTypes, paramNames,
-		body);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      */
     public void addServiceOperationParameter(JavaType className,
 	    JavaSymbolName method, String paramName, JavaType paramType) {
 
 	javaParserService.updateMethodParameters(className, method, paramName,
 		paramType);
-
     }
 
 }

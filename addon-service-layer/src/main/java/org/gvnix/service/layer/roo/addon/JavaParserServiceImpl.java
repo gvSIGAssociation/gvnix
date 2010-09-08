@@ -27,6 +27,7 @@ import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.Type;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,9 @@ import org.apache.felix.scr.annotations.*;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.DefaultAnnotationMetadata;
 import org.springframework.roo.classpath.javaparser.JavaParserMutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.javaparser.JavaParserUtils;
 import org.springframework.roo.classpath.javaparser.details.JavaParserMethodMetadata;
@@ -67,6 +70,34 @@ public class JavaParserServiceImpl implements JavaParserService {
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     @Reference
     private PathResolver pathResolver;
+
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Adds @org.springframework.stereotype.Service annotation to the class.
+     * </p>
+     */
+    public void createServiceClass(JavaType serviceClass) {
+
+	// Service class
+	String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
+		serviceClass, Path.SRC_MAIN_JAVA);
+
+	// Service annotations
+	List<AnnotationMetadata> serviceAnnotations = new ArrayList<AnnotationMetadata>();
+	serviceAnnotations.add(new DefaultAnnotationMetadata(new JavaType(
+		"org.springframework.stereotype.Service"),
+		new ArrayList<AnnotationAttributeValue<?>>()));
+
+	ClassOrInterfaceTypeDetails serviceDetails = new DefaultClassOrInterfaceTypeDetails(
+		declaredByMetadataId, serviceClass, Modifier.PUBLIC,
+		PhysicalTypeCategory.CLASS, null, null, null, null, null,
+		null, serviceAnnotations, null);
+
+	classpathOperations.generateClassFile(serviceDetails);
+    }
 
     /**
      * {@inheritDoc}

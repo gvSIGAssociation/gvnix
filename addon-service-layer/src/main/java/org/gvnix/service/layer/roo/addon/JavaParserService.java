@@ -39,6 +39,16 @@ import org.springframework.roo.model.JavaType;
 public interface JavaParserService {
 
     /**
+     * <p>
+     * Create a Service class.
+     * </p>
+     * 
+     * @param serviceClass
+     *            class to be created.
+     */
+    public void createServiceClass(JavaType serviceClass);
+
+    /**
      * /**
      * <p>
      * Inserts a new operation to a class.

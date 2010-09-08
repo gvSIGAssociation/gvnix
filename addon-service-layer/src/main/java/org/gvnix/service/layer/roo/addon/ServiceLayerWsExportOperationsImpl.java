@@ -18,15 +18,12 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
-import org.springframework.roo.classpath.PhysicalTypeCategory;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
@@ -35,9 +32,7 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
-import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.*;
-import org.w3c.dom.Element;
 
 /**
  * Addon for Handle Service Layer
@@ -61,17 +56,16 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
     @Reference
     private PathResolver pathResolver;
     @Reference
-    private ProjectOperations projectOperations;
-    @Reference
     private ClasspathOperations classpathOperations;
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
-    
+    @Reference
+    private JavaParserService javaParserService;
     
     /*
      * (non-Javadoc)
      * 
-     * @seeorg.gvnix.service.layer.roo.addon.WebServiceLayerOperations#
+     * @seeorg.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations#
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
@@ -131,7 +125,7 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 		    + serviceClass.getSimpleTypeName()
 		    + " para publicarla como servicio web.");
 	    // Create service class with Service Annotation.
-	    createServiceClass(serviceClass);
+	    javaParserService.createServiceClass(serviceClass);
 
 	}
 
@@ -142,47 +136,20 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	serviceLayerWsConfigService.updateCxfXml(serviceClass);
 
 	// Add GvNixAnnotations to the project.
-	addGvNIXAnnotationsDependecy();
-
+	serviceLayerWsConfigService.addGvNIXAnnotationsDependecy();
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * <p>
-     * Adds @org.springframework.stereotype.Service annotation to the class.
-     * </p>
-     */
-    public void createServiceClass(JavaType serviceClass) {
-
-	// Service class
-	String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
-		serviceClass, Path.SRC_MAIN_JAVA);
-
-	// Service annotations
-	List<AnnotationMetadata> serviceAnnotations = new ArrayList<AnnotationMetadata>();
-	serviceAnnotations.add(new DefaultAnnotationMetadata(new JavaType(
-		"org.springframework.stereotype.Service"),
-		new ArrayList<AnnotationAttributeValue<?>>()));
-
-	ClassOrInterfaceTypeDetails serviceDetails = new DefaultClassOrInterfaceTypeDetails(
-		declaredByMetadataId, serviceClass, Modifier.PUBLIC,
-		PhysicalTypeCategory.CLASS, null, null, null, null, null,
-		null, serviceAnnotations, null);
-
-	classpathOperations.generateClassFile(serviceDetails);
-
-    }
-
-    /**
-     * {@inheritDoc}
+     * Update an existing class to a web service.
      * 
      * <p>
      * Adds @GvNIXWebService annotation to the class.
      * </p>
      * 
+     * @param serviceClass
+     *            class to be published as Web Service.
      */
-    public void updateClassAsWebService(JavaType serviceClass) {
+    private void updateClassAsWebService(JavaType serviceClass) {
 
 	// Load class details. If class not found an exception will be raised.
 	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
@@ -232,45 +199,6 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 
 	// Adds GvNIXEntityOCCChecksum to the entity
 	serviceDetails.addTypeAnnotation(gvNixWebServiceAnnotation);
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * <p>
-     * Checks if exists Cxf config file using project name.
-     * </p>
-     * 
-     * @return true or false if exists Cxf configuration file.
-     */
-    public boolean isCxfConfigurated() {
-	return serviceLayerWsConfigService.isCxfConfigurated();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @seeorg.gvnix.service.layer.roo.addon.WebServiceLayerOperations#
-     * addGvNIXAnnotationsDependecy()
-     */
-    public void addGvNIXAnnotationsDependecy() {
-
-	List<Element> projectProperties = XmlUtils.findElements(
-		"/configuration/gvnix/properties/*", XmlUtils.getConfiguration(
-			this.getClass(), "properties.xml"));
-	for (Element property : projectProperties) {
-	    projectOperations.addProperty(new Property(property));
-	}
-
-	List<Element> databaseDependencies = XmlUtils.findElements(
-		"/configuration/gvnix/dependencies/dependency", XmlUtils
-			.getConfiguration(this.getClass(),
-				"gvnix-annotation-dependencies.xml"));
-	for (Element dependencyElement : databaseDependencies) {
-	    projectOperations
-		    .dependencyUpdate(new Dependency(dependencyElement));
-	}
     }
 
 }

@@ -87,5 +87,14 @@ public interface ServiceLayerWsConfigService {
      *            class to define as Web Service in Cxf configuration file.
      */
     public void updateCxfXml(JavaType serviceClass);
+    
+    /**
+     * Adds GvNIX annotations library dependency to the current project.
+     * 
+     * <p>
+     * TODO REMOVE FROM API
+     * <p>
+     */
+    public void addGvNIXAnnotationsDependecy();
 
 }

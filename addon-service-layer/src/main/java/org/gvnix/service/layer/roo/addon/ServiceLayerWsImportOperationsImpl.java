@@ -56,7 +56,7 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
     /*
      * (non-Javadoc)
      * 
-     * @seeorg.gvnix.service.layer.roo.addon.GvNixServiceLayerOperations#
+     * @seeorg.gvnix.service.layer.roo.addon.ServiceLayerWsImportOperations#
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
