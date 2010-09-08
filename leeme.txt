@@ -41,10 +41,10 @@ Para empezar con gvNIX necesitas:
 A continuación, se detalla el proceso de instalación y configuración de cada uno de estos requisitos.
 
 Instalación y configuración
----------------------------
+==============================
 
 Configuración del entorno Unix
-``````````````````````````````
+-------------------------------
 
 .. admonition:: Directorio de trabajo
 
@@ -80,7 +80,7 @@ A partir de ahora, cuando abramos una consola de comandos se ejecutará el conte
   Cualquier referencia futura que hagamos a establecer una variable de entorno (``export``) deberá añadirse al *.bash_devel*.
 
 JDK
-```
+--------
 
 Por defecto, el equipo de desarrollo de gvNIX utiliza la versión 1.5.0_7 del JDK, pero puede utilizarse cualquier versión JDK 5.0 o superior.
 Se recomienda realizar hacer siempre la instalación siguiendo estos pasos:
@@ -142,7 +142,7 @@ Se pueden investigar las carpetas contenidas dentro del jdk, siendo las más imp
   Si aún estás identificado como usuario root salir a usuario normal.
 
 Apache Maven 2
-``````````````
+-----------------
 
 #. Descargarlo con la última actualización 2.X.X (en el momento de elaboración de este documento, la 2.0.9):
 
@@ -172,7 +172,7 @@ Podemos comprobar que todo ha ido correctamente ejecutando en nuestra consola ya
         Reemplazar 2.X.X por el número de actualización.
 
 Cliente Git
-```````````
+--------------
 
 Installation using aptitude or apt.
 
@@ -189,7 +189,7 @@ Installation using aptitude or apt.
     sudo apt-get install git-core 
 
 Subversion
-``````````
+-------------
 
 Esta herramienta es muy recomendable que sea instalada desde las utilidades del sistema operativo.
 
@@ -200,9 +200,6 @@ Como ejemplo, para una distribución basada en *Debian* usaríamos el comando::
          sudo apt-get install subversion
 
 Podemos encontrar los paquetes binarios e instrucciones en la página http://subversion.tigris.org/getting.html#binary-packages
-
-Instrucciones de configuración
-================================
 
 Spring Roo
 ----------
@@ -234,13 +231,12 @@ gvNIX está basado en Spring Roo, por este motivo es necesario disponer del cód
       bash:~/gvnix/trunk/code$ cd roo
       bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
 
-Arrancar la versión gvNIX de desarrollo
-=======================================
+Construir el proyecto
+=======================
 
-Si se accede a internet a través de un proxy se ha de habilitar en la configuración de `Maven`_ (Anexo -> Configruación proxy -> Maven).
+#. Dado que gvNIX está basado en Roo, el primer paso es compilar y construir Roo::
 
-#. Construir Roo::
-
+    bash:~/gvnix/trunk/code$ cd roo
     bash:~/gvnix/trunk/code/roo$ mvn clean install
    
    Cada vez que actualizes el código fuente del proyecto Roo con el comando ``git pull`` necesitarás volver a construirlo.
@@ -250,6 +246,11 @@ Si se accede a internet a través de un proxy se ha de habilitar en la configura
     bash:~/gvnix/trunk/code$ mvn clean install
     
    Cada vez que modifiques el proyecto gvNIX o hayas reconstruido el proyecto Roo, necesitarás volver a construir el gvNIX si quieres disponer de dichas modificaciones.
+
+Arrancar la versión gvNIX de desarrollo
+=======================================
+
+Si se accede a internet a través de un proxy se ha de habilitar en la configuración de `Maven`_ (Anexo -> Configruación proxy -> Maven).
 
 #. Empezando con gvNIX
 
