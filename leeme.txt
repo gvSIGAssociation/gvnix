@@ -241,6 +241,21 @@ Construir el proyecto
    
    Cada vez que actualizes el código fuente del proyecto Roo con el comando ``git pull`` necesitarás volver a construirlo.
 
+   .. admonition::Error al instalar
+
+     El plugin de Maven *exec-maven-plugin* en su versión 1.2 puede dar problemas al instalar el proyecto, es necesario utilizar la versión 1.1.1
+
+     En estos casos actualizar el pom.xml como sigue::
+
+        ...
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>  <!-- Añadir esta línea -->
+                <executions>
+        ...
+
 #. Construir gvNIX::
 
     bash:~/gvnix/trunk/code$ mvn clean install
