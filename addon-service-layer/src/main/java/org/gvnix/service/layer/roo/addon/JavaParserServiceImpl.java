@@ -277,6 +277,7 @@ public class JavaParserServiceImpl implements JavaParserService {
      * <p>
      * </p>
      */
+    @Deprecated
     public void updateMethodParameters(JavaType className,
 	    JavaSymbolName method, String paramName, JavaType paramType) {
 

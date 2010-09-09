@@ -39,9 +39,7 @@ import org.springframework.roo.model.JavaType;
 public interface JavaParserService {
 
     /**
-     * <p>
      * Create a Service class.
-     * </p>
      * 
      * @param serviceClass
      *            class to be created.
@@ -49,10 +47,7 @@ public interface JavaParserService {
     public void createServiceClass(JavaType serviceClass);
 
     /**
-     * /**
-     * <p>
      * Inserts a new operation to a class.
-     * </p>
      * 
      * @param methodName
      *            Method name.
@@ -86,9 +81,7 @@ public interface JavaParserService {
     public void updateMethodAnnotations();
 
     /**
-     * <p>
      * Adds an input parameter into selected class method.
-     * </p>
      * 
      * @param className
      *            Class to update the method with the new parameter.
@@ -103,9 +96,7 @@ public interface JavaParserService {
 	    JavaSymbolName method, String paramName, JavaType paramType);
 
     /**
-     * <p>
      * Adds an input parameter into selected class method.
-     * </p>
      * 
      * @param className
      *            Class to update the method with the new parameter.
@@ -119,9 +110,7 @@ public interface JavaParserService {
     public void updateWithJavaDoc(JavaType className, JavaSymbolName method,
 	    String paramName, JavaType paramType) throws ParseException;
     /**
-     * <p>
      * Updates the class with the new values.
-     * </p>
      * 
      * @param classOrInterfaceTypeDetails
      *            class to update.
