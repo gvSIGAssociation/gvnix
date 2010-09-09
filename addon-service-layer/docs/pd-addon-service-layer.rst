@@ -356,6 +356,13 @@ Parameters:
 
   * ``--class`` Entity to export.
 
+Commands Availability
+---------------------
+
+* Local Service Layer commands as class or operation creation only requires a Roo project to be available.
+* Import Service Layer commands only requires a Roo project to be available, too.
+* Export Service Layer Commannds requires a Roo web project to be available, because web services are published by the web tier.
+
 Proof of Concept
 =================
 
