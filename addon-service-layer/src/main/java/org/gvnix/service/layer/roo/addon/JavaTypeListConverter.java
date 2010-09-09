@@ -26,6 +26,7 @@ import java.util.*;
 import org.apache.felix.scr.annotations.*;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
 import org.springframework.roo.shell.Converter;
@@ -52,8 +53,23 @@ public class JavaTypeListConverter implements Converter {
      */
     public Object convertFromText(String value, Class<?> requiredType,
 	    String optionContext) {
-	// TODO Auto-generated method stub
-	return new JavaTypeList();
+
+	JavaTypeList javaTypeList = new JavaTypeList();
+	List<JavaType> javaTypes = new ArrayList<JavaType>();
+
+	String[] javaTypeStringList;
+
+	javaTypeStringList = StringUtils.commaDelimitedListToStringArray(value);
+
+	JavaType javaType;
+	for (int i = 0; i <= javaTypeStringList.length - 1; i++) {
+	    javaType = new JavaType(javaTypeStringList[i]);
+	    javaTypes.add(javaType);
+	}
+
+	javaTypeList.setJavaTypes(javaTypes);
+
+	return javaTypeList;
     }
 
     /*
@@ -74,7 +90,7 @@ public class JavaTypeListConverter implements Converter {
 
 	// Prepare the strings to compare with JavaTypes.
 	String tmpExistingData = existingDataToComplete(existingData);
-	String completeExistingDataList = convertInputIntoPreffixCompletion(existingData);
+	String completeExistingDataList = convertInputIntoPrefixCompletion(existingData);
 
 	// Compare Java Basic Types.
 	completeJavaSpecificPaths(completions, existingData, optionContext,
@@ -99,10 +115,15 @@ public class JavaTypeListConverter implements Converter {
      * them statically.
      * 
      * @param completions
+     *            Completions to show in console for the Input String.
      * @param existingData
+     *            String value from the command attribute.
      * @param optionContext
+     *            Option context to evaluate.
      * @param completeExistingDataList
+     *            String separated comma list of JavaType.
      * @param tmpExistingData
+     *            The last JavaType from console Input to auto complete.
      */
     private void completeJavaSpecificPaths(List<String> completions,
 	    String existingData, String optionContext,
@@ -138,46 +159,43 @@ public class JavaTypeListConverter implements Converter {
     }
 
     /**
-     * Converts the input String from the shell to a Preffix to the completions.
+     * Converts the input String from the shell to a Prefix to the completions.
      * 
      * @param existingData
      *            String value from the command attribute.
      * 
-     * @return {@link String} completePreffix to add for completions.
+     * @return {@link String} completePrefix to add for completions.
      */
-    private String convertInputIntoPreffixCompletion(String existingData) {
+    private String convertInputIntoPrefixCompletion(String existingData) {
 
 	String[] existingDataList;
 	String completeExistingDataList = "";
-	
+
 	existingDataList = StringUtils
 		.commaDelimitedListToStringArray(existingData);
 
-	if (existingDataList.length > 0) {
-
-	    for (int i = 0; i < existingDataList.length - 1; i++) {
-		if (completeExistingDataList.compareTo("") == 0) {
-		    completeExistingDataList = completeExistingDataList
-			    .concat(existingDataList[i]);
-		} else {
-		    completeExistingDataList = completeExistingDataList.concat(
-			    ",").concat(existingDataList[i]);
-		}
+	for (int i = 0; i < existingDataList.length - 1; i++) {
+	    if (completeExistingDataList.compareTo("") == 0) {
+		completeExistingDataList = completeExistingDataList
+			.concat(existingDataList[i]);
+	    } else {
+		completeExistingDataList = completeExistingDataList.concat(",")
+			.concat(existingDataList[i]);
 	    }
+	}
 
+	if (existingDataList.length > 1) {
 	    completeExistingDataList = completeExistingDataList.concat(",");
-	} else {
-	    completeExistingDataList = existingData;
 	}
 
 	return completeExistingDataList;
     }
 
     /**
-     * Return the last String member auto-complete.
+     * Return the last String member for auto completion.
      * 
      * <p>
-     * The Input String is separated between comas.
+     * The Input String is separated between commas.
      * </p>
      * 
      * @param existingData
