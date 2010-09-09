@@ -31,6 +31,8 @@ TBC: Objetivo del addon
 Requirements
 =============
 
+TBC: 
+
 Requirements are in priority order:
 
 * Web service servers creation without write wsdl and xsd.
@@ -47,11 +49,11 @@ Requirements are in priority order:
 
 * Web service framework installation will be automatic when client or server generation is required. 
 
-* Allow the generation of local services, withour web service support (Spring @Service).
+* Allow the generation of local services, without web service support (Spring @Service).
 
 * Generate web service clients and servers easily.
 
-* Support web services clients generation compatible with JAX-RPC web service servers standar.
+* Support web services clients generation compatible with JAX-RPC web service servers standard.
 
 * Web services clients and servers generation would be executable on FUSE ESB / Servicemix environments.
 
@@ -60,6 +62,8 @@ Another requirements are to solve or avoid this limitations too.
 
 Limitations
 -----------
+
+TBC: 
 
 These limitations would be resolved. There are sorted by relevance:
 
@@ -113,30 +117,25 @@ TBC: Indicar qué se monitoriza, por ejemplo, crear una clase anotada con *tal* 
 
 Analysis for the development of the Add-on displayed by commands.
 
-Crear una clase servicio
+Create a Service Class
 -------------------------
 
 service class:
 
-    Crear la clase en el directorio que representa el paquete java al que pertenece.
-    Añandir la anotación **@Service** a la cabecera de la clase.
+    Create the class in java package directory that belongs.
+    Add **@service** annotation to header's class.
 
-Crear una operación en una clase
+Create an operation into a Class
 ---------------------------------
 
 service operation:
 
-* Si la clase viene de una entidad se mostrarán los nombres de los métodos que se pueden publicar. La clase estará anotada con @GvNixEntityService y no hará falta definir los parámetros de entrada ni los de salida, toma como plantilla el método de la clase definido en el fichero aj de la entidad.
-* Crear el método con el nombre del parámetro name y el tipo de objeto a devolver para actualizar la clase seleccionada. El tipo de dato a devolver por defecto ha de ser un **null** en indicar en varias líneas definidas por un **TODO:** que es donde se va a añadir la lógica manualmente.
+* Create a method with input name in the selected class. The method is composed by:
 
-Añadir un parámetro de entrada
--------------------------------
+    * Return type: The default return type is ``void`` if there is no return type defined. 
+    * Input parameters: T aren't mandatory to be defined in an operation.
 
-Comando para añadir un parámetro de entrada al método de una clase en concreto.
-    
-service parameter:
-
-* Añade un parámetro de entrada al método de la clase servicio (o de entidad) seleccionada.
+        * Created the class **JavaTypeList** to retrieve the parameter types and manage with the converter *JavaTypeListConverter**.
 
 Publicar un servicio web
 -------------------------
@@ -188,17 +187,17 @@ service operation:
 
     * Las entidades anotadas con *@GvNixXmlElement* se les asocia un fichero aj para anotar mediante JAXB, los atributos de relaciones se anotan con *@XmlTransient* y los demás atributos con *@XmlElement*. Se comprueba que estén dentro de +los tipos conocidos de datos+. Una lista que contendrá el Addon para las entidades de la aplicación y los definidos por nosotros, si no se encuentran en ninguna de ambas listas se anotarán como *@XmlTransient*.
 
-Tipos de datos soportados
+Supported data types
 --------------------------
 
-Datos Básicos
-~~~~~~~~~~~~~~
+Data types: Basic Data
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-Todos los tipos básicos están soportados:
+All basic data are supported in web services:
 
 *  http://download.oracle.com/docs/cd/E12840_01/wls/docs103/webserv/data_types.html#wp231439
 
-Y las clases básicas:
+And Basic Objects:
 
 * Long
 * String
@@ -208,10 +207,8 @@ Y las clases básicas:
 * Character
 * Double
 
-Colecciones
-~~~~~~~~~~~~
-
-TBC: Indicar que NO SE PUEDE UTILIZAR Map
+Data types: Collections
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Al añadir un Map o un Set a la entidad y anotarla para hacer la serialización a XML hay que declararlos de la siguiente manera inicializados::
 
@@ -242,17 +239,15 @@ Aunque se convierten en listas para el cliente en el orden que se han establecid
       </xs:complexType>
     </xs:element>
 
-No habrá que dejar que se utilice Map como colección (Map es la interfaz, es decir, cualquier colección que implemente Map).
-
 **Conclusión:**
 
-No se puede asegurar la funcionalidad de un Map en los servicios web, por lo tanto no se va a permitir que tomen partido en las operaciones de un servicio.
+**No** habrá que dejar que se utilice Map como colección (Map es la interfaz, es decir, cualquier colección que implemente Map) debido a que **NO** se puede asegurar la funcionalidad de un Map en los servicios web, por lo tanto no se va a permitir que tomen partido en las operaciones de un servicio.
 
 Colecciones excludidas:
 
 * Map<K, V>:  Ya que están ordenadas por un valor determinado.
 
-Tipos de datos: Entidades del proyecto
+Data types: Project entities
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Maneja cualquier tipo de clase entidad que esté definida en nuestro proyecto.
@@ -288,18 +283,8 @@ Parameters:
   * ``--class`` (mandatory) Class in wich will be created the method.
   * ``--name`` (mandatory) Name of the method to be created.
   * ``--return`` Type of the returning method object. Default void.
-
-service parameter
-------------------
-
-Adds a parameter into the selected method.
-
-Parameters:
-
-  * ``--class`` (mandatory) Class in wich will be created the method.
-  * ``--method`` (mandatory) Name of the method to update. 
-  * ``--params`` (mandatory) Name of the new parameter. 
-  * ``--type`` (mandatory) Type of the new parameter.
+  * ``--paramNames`` Method parameter input names.
+  * ``--paramTypes`` Method parameter input types.
 
 service export ws
 ------------------
