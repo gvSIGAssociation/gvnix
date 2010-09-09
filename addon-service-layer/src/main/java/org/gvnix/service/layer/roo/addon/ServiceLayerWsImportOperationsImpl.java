@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
@@ -93,7 +94,7 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
 
 	// Checks if Cxf is configured in the project and installs it if it's
 	// not available.
-	serviceLayerWsConfigService.setUp();
+	serviceLayerWsConfigService.install(CommunicationSense.IMPORT);
 
 	String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
 		serviceClass.getFullyQualifiedTypeName().replace('.', '/')

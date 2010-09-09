@@ -18,13 +18,10 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.util.List;
-
 import org.springframework.roo.model.JavaType;
-import org.w3c.dom.Element;
 
 /**
- * Utilities to manage the web services library.
+ * Service to manage the Web Services.
  * 
  * @author Ricardo García ( rgarcia at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -36,65 +33,29 @@ import org.w3c.dom.Element;
  *         Transport</a>
  */
 public interface ServiceLayerWsConfigService {
-
-    /**
-     * <p>
-     * Set up library configuration to a project.
-     * </p>
-     */
-    public void setUp();
-
-    /**
-     * <p>
-     * Check if library is properly configurated in a project.
-     * </p>
-     * 
-     * @return true or false if it's configurated.
-     */
-    public boolean isInstalled();
-
-    /**
-     * <p>
-     * Check if Cxf config file is created in the project.
-     * </p>
-     * 
-     * @return true or false if exists Cxf configuration file.
-     */
-    public boolean isCxfConfigurated();
-
-    /**
-     * <p>
-     * Check if Cxf dependencies are set in project's pom.xml.
-     * </p>
-     * 
-     * @return true or false if Cxf dependcies are set.
-     */
-    public boolean areDependenciesInstalled();
-
-    /**
-     * <p>
-     * Get Addon dependencies list to install.
-     * </p>
-     * 
-     * @return List of dependencies as xml elements.
-     */
-    public List<Element> getDependencies();
-
-    /**
-     * Define Web Service class in cxf configuration file to be published.
-     * 
-     * @param serviceClass
-     *            class to define as Web Service in Cxf configuration file.
-     */
-    public void updateCxfXml(JavaType serviceClass);
     
     /**
-     * Adds GvNIX annotations library dependency to the current project.
-     * 
-     * <p>
-     * TODO REMOVE FROM API
-     * <p>
+     * Sense of the Communication.
+     * <ul>
+     * <li>EXPORT: From this to external systems.</li>
+     * <li>IMPORT: From external systems to this.</li>
+     * </ul>
      */
-    public void addGvNIXAnnotationsDependecy();
+    public enum CommunicationSense { EXPORT, IMPORT };
+
+    /**
+     * Install and configure Web Service library on a project.
+     * 
+     * @param type Communication type
+     */
+    public void install(CommunicationSense type);
+
+    /**
+     * Publish a class as Web Service.
+     * 
+     * @param serviceClass
+     *            class to be configured as Web Service.
+     */
+    public void exportClass(JavaType serviceClass);
 
 }

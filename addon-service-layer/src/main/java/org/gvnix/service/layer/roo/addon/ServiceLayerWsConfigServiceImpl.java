@@ -34,7 +34,6 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
 import org.springframework.roo.support.util.TemplateUtils;
@@ -80,70 +79,83 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * If is not set, then installs dependencies to the pom.xml and creates the
      * cxf configuration file.
      * </p>
+     * 
+     * @param type Communication type
      */
-    public void setUp() {
+    public void install(CommunicationSense type) {
 
 	// Check if it's already installed.
-	if (isInstalled()) {
+	if (isCxfInstalled(type)) {
 	    // Nothing to do
 	    return;
 	}
 
-	// Create CXF config file src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
-	addCxfXml();
-
-	// Update src/main/webapp/WEB-INF/web.xml :
-	// - Add CXFServlet and map it to /services/*
-	// - Add cxf-PROJECT_NAME.xml to Spring Context Loader
-	updateWebConfig();
-
 	// Add dependencies to project
-	updateDependencies();
+	installCxfDependencies(type);
+	
+	if (type == CommunicationSense.EXPORT) {
 
-	// TODO: comprobar si ya se ha actualizado el fichero urlrewrite.
-	// Setup URL rewrite to avoid to filter requests to WebServices
-	updateRewriteRules();
+	    // Create CXF config file src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
+	    installCxfConfigurationFile();
 
+	    // Update src/main/webapp/WEB-INF/web.xml :
+	    // - Add CXFServlet and map it to /services/*
+	    // - Add cxf-PROJECT_NAME.xml to Spring Context Loader
+	    installCxfWebConfigurationFile();
+
+	    // TODO: comprobar si ya se ha actualizado el fichero urlrewrite.
+	    // Setup URL rewrite to avoid to filter requests to WebServices
+	    installCxfUrlRewriteConfigurationFile();
+	}
     }
 
     /**
-     * {@inheritDoc}
+     * Check if library is properly configurated in a project.
      * 
      * <p>
      * Checks these types:
      * </p>
      * <ul>
      * <li>
-     * Cxf Dependencies in pom.xml.</li>
+     * Cxf Dependencies in pom.xml</li>
      * <li>
-     * Cxf configuration file exists.</li>
+     * Cxf configuration file exists</li>
      * </ul>
      * 
-     * dependencies installed </p>
+     * @param type Communication type
+     * @return true or false if it's configurated
      */
-    public boolean isInstalled() {
+    private boolean isCxfInstalled(CommunicationSense type) {
+	
+	// TODO Are not checked Web and Url Rewrite configuration files, check it ?
+	
+	boolean cxfInstalled = isCxfDependenciesInstalled(type);
+	
+	if (type == CommunicationSense.EXPORT) {
 
-	boolean cxfConfigFileExists = isCxfConfigurated();
-
-	boolean cxfDependeciesExists = areDependenciesInstalled();
-
-	return cxfConfigFileExists && cxfDependeciesExists;
+	    cxfInstalled = cxfInstalled && getCxfConfigurationFilePath() != null;
+	}
+	
+	return cxfInstalled;
     }
 
     /**
-     * {@inheritDoc}
+     * Check if Cxf config file exists in the project and return the path.
      * 
      * <p>
      * Checks if exists Cxf config file using project name.
+     * If not exists, null will be returned.
      * </p>
      * 
-     * @return true or false if exists Cxf configuration file.
+     * @return Path to the Cxf configuration file or null if not exists
      */
-    public boolean isCxfConfigurated() {
+    private String getCxfConfigurationFilePath() {
 
+	// Project ID
 	String prjId = ProjectMetadata.getProjectIdentifier();
 	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
 		.get(prjId);
+	Assert.isTrue(projectMetadata != null, "Project metadata required");
 	String prjName = projectMetadata.getProjectName();
 
 	String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
@@ -154,32 +166,25 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 
 	boolean cxfInstalled = fileManager.exists(cxfXmlPath);
 
-	return cxfInstalled;
+	if (cxfInstalled) {
+	    
+	    return cxfXmlPath;
+	}
+	else {
+	    
+	    return null;
+	}
     }
 
     /**
      * Add the file <code>src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml</code> from
      * <code>cxf-template.xml</code> if not exists.
      */
-    private void addCxfXml() {
+    private void installCxfConfigurationFile() {
 
-	// Project ID
-	String prjId = ProjectMetadata.getProjectIdentifier();
-
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(prjId);
-	Assert.isTrue(projectMetadata != null, "Project metadata required");
-
-	// Project Name
-	String prjName = projectMetadata.getProjectName();
-
-	String cxfDestFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
-	String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		cxfDestFile);
-
-	// Document cxfXmlDoc;
-	// MutableFile mutableFile;
-	if (fileManager.exists(cxfXmlPath)) {
+	String cxfXmlPath = getCxfConfigurationFilePath();
+	if (cxfXmlPath == null) {
+	    
 	    // File exists, nothing to do
 	    return;
 	}
@@ -187,10 +192,14 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
 		"cxf-template.xml");
 	MutableFile cxfXmlMutableFile = fileManager.createFile(cxfXmlPath);
+	
 	try {
+	    
 	    FileCopyUtils.copy(templateInputStream, cxfXmlMutableFile
 		    .getOutputStream());
-	} catch (Exception e) {
+	} 
+	catch (Exception e) {
+	    
 	    throw new IllegalStateException(e);
 	}
 
@@ -198,29 +207,146 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
     }
 
     /**
+     * Check if Cxf dependencies are set in project's pom.xml.
+     * 
      * <p>
-     * Update WEB-INF/web.xml
+     * Search if the dependencies defined in xml Addon file dependencies-export.xml are
+     * set in pom.xml.
      * </p>
+     * 
+     * @param type Communication type
+     * @return true if all dependecies are set in pom.xml
+     */
+    protected boolean isCxfDependenciesInstalled(CommunicationSense type) {
+
+	boolean cxfDependenciesExists = true;
+
+	ProjectMetadata project = (ProjectMetadata) metadataService
+		.get(ProjectMetadata.getProjectIdentifier());
+	if (project == null) {
+	    return false;
+	}
+
+	// Dependencies elements are defined as:
+	// <dependency org="org.apache.cxf" name="cxf-rt-bindings-soap"
+	// rev="2.2.6" />
+	List<Element> cxfDependenciesList = getCxfRequiredDependencies(type);
+
+	Dependency cxfDependency;
+
+	for (Element element : cxfDependenciesList) {
+
+	    cxfDependency = new Dependency(element);
+	    cxfDependenciesExists = cxfDependenciesExists
+		    && project.isDependencyRegistered(cxfDependency);
+	}
+
+	return cxfDependenciesExists;
+    }
+    
+    /**
+     * Get the file name of the Cxf required dependencies of certain type. 
+     * 
+     * @param type Type of required dependencies
+     * @return File name
+     */
+    private String getCxfRequiredDependenciesFileName(CommunicationSense type) {
+	
+	StringBuffer name = new StringBuffer("dependencies-");
+	
+	switch (type) {
+	    case EXPORT:
+		name.append("export");
+		break;
+	    case IMPORT:
+		name.append("import");
+		break;
+	}
+	
+	name.append(".xml");
+	
+	return name.toString();
+    }
+
+    /**
+     * Get Addon dependencies list to install.
+     * 
+     * <p>
+     * Get addon dependencies defined in dependencies-export.xml
+     * </p>
+     * 
+     * @param type Communication type
+     * @return List of addon dependencies as xml elements
+     */
+    protected List<Element> getCxfRequiredDependencies(CommunicationSense type) {
+
+	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+		getCxfRequiredDependenciesFileName(type));
+	Assert.notNull(templateInputStream,
+		"Can't adquire dependencies file " + type);
+
+	Document dependencyDoc;
+	try {
+
+	    dependencyDoc = XmlUtils.getDocumentBuilder().parse(
+		    templateInputStream);
+	} catch (Exception e) {
+
+	    throw new IllegalStateException(e);
+	}
+
+	Element dependencies = (Element) dependencyDoc.getFirstChild();
+
+	return XmlUtils.findElements("/dependencies/cxf/dependency",
+		dependencies);
+    }
+
+    /**
+     * Add addon dependencies to project dependencies if necessary.
+     * 
+     * @param type Communication type
+     */
+    private void installCxfDependencies(CommunicationSense type) {
+
+	// If dependencies are installed continue.
+	if (isCxfDependenciesInstalled(type)) {
+	    
+	    return;
+	}
+
+	List<Element> cxfDependencies = getCxfRequiredDependencies(type);
+	for (Element dependency : cxfDependencies) {
+	    projectOperations.dependencyUpdate(new Dependency(dependency));
+	}
+    }
+
+    /**
+     * Update WEB-INF/web.xml.
+     * 
      * <ul>
      * <li>Create the CXF servlet declaration and mapping</li>
      * <li>Configure ContextLoader to load cxf-PROJECT_ID.xml</li>
      * </ul>
      */
-    private void updateWebConfig() {
+    private void installCxfWebConfigurationFile() {
+	
 	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
 		"WEB-INF/web.xml");
 	Assert.isTrue(fileManager.exists(webXmlPath), "web.xml not found");
 
 	MutableFile webXmlMutableFile = null;
 	Document webXml;
-
 	try {
+
 	    webXmlMutableFile = fileManager.updateFile(webXmlPath);
 	    webXml = XmlUtils.getDocumentBuilder().parse(
 		    webXmlMutableFile.getInputStream());
+
 	} catch (Exception e) {
+
 	    throw new IllegalStateException(e);
 	}
+	
 	Element root = webXml.getDocumentElement();
 
 	if (null != XmlUtils
@@ -259,13 +385,10 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	servletMapping.appendChild(urlMapping);
 	root.insertBefore(servletMapping, firstServletMapping);
 
-	// Configure ContextLoader
-	String prjId = ProjectMetadata.getProjectIdentifier();
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(prjId);
-	String prjName = projectMetadata.getProjectName();
-	String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
-
+	String cxfFile = getCxfConfigurationFilePath();
+	Assert.isNull(cxfFile,
+		"Cxf configuration file not found, can't set context loader");
+	
 	Element contextConfigLocation = XmlUtils
 		.findFirstElement(
 			"/web-app/context-param[param-name='contextConfigLocation']/param-value",
@@ -278,26 +401,10 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
     }
 
     /**
-     * Add addon dependencies to project dependencies if necessary
+     * Update url rewrite rules.
      */
-    private void updateDependencies() {
-
-	// If dependencies are installed continue.
-	if (areDependenciesInstalled()) {
-	    return;
-	}
-
-	List<Element> cxfDependencies = getDependencies();
-	for (Element dependency : cxfDependencies) {
-	    projectOperations.dependencyUpdate(new Dependency(dependency));
-	}
-    }
-
-    /**
-     * Update url rewrite rules
-     */
-    private void updateRewriteRules() {
-	List<Element> rules = getRewriteRules();
+    private void installCxfUrlRewriteConfigurationFile() {
+	List<Element> rules = getCxfUrlRewriteRequiredRules();
 
 	// Open file and append rules before the first element
 	String xmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
@@ -340,77 +447,17 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
     }
 
     /**
-     * <p>
-     * Search if the dependencies defined in xml Addon file dependencies.xml are
-     * set in pom.xml.
-     * </p>
-     * 
-     * @return true if all dependecies are set in pom.xml.
-     */
-    public boolean areDependenciesInstalled() {
-
-	boolean cxfDependenciesExists = true;
-
-	ProjectMetadata project = (ProjectMetadata) metadataService
-		.get(ProjectMetadata.getProjectIdentifier());
-	if (project == null) {
-	    return false;
-	}
-
-	// Dependencies elements are defined as:
-	// <dependency org="org.apache.cxf" name="cxf-rt-bindings-soap"
-	// rev="2.2.6" />
-	List<Element> cxfDependenciesList = getDependencies();
-
-	Dependency cxfDependency;
-
-	for (Element element : cxfDependenciesList) {
-
-	    cxfDependency = new Dependency(element);
-	    cxfDependenciesExists = cxfDependenciesExists
-		    && project.isDependencyRegistered(cxfDependency);
-	}
-
-	return cxfDependenciesExists;
-    }
-
-    /**
-     * <p>
-     * Get addon dependencies defined in dependencies.xml
-     * </p>
-     * 
-     * @return List of addon dependencies as xml elements.
-     */
-    public List<Element> getDependencies() {
-	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
-		"dependencies.xml");
-	Assert.notNull(templateInputStream,
-		"Could not acquire dependencies.xml file");
-	Document dependencyDoc;
-	try {
-	    dependencyDoc = XmlUtils.getDocumentBuilder().parse(
-		    templateInputStream);
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
-	}
-
-	Element dependencies = (Element) dependencyDoc.getFirstChild();
-
-	return XmlUtils.findElements("/dependencies/cxf/dependency",
-		dependencies);
-
-    }
-
-    /**
-     * Get addon rewrite rules
+     * Get addon rewrite rules.
      * 
      * @return List of addon rewrite rules
      */
-    private List<Element> getRewriteRules() {
+    private List<Element> getCxfUrlRewriteRequiredRules() {
+	
 	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
 		"urlrewrite-rules.xml");
 	Assert.notNull(templateInputStream,
-		"Could not acquire urlrewrite-rules.xml file");
+		"Could not adquire urlrewrite-rules.xml file");
+	
 	Document dependencyDoc;
 	try {
 	    dependencyDoc = XmlUtils.getDocumentBuilder().parse(
@@ -422,35 +469,23 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	Element root = (Element) dependencyDoc.getFirstChild();
 
 	return XmlUtils.findElements("/urlrewrite-rules/cxf/rule", root);
-
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * <p>
+     * Define a Web Service class in cxf configuration file to be published.
+     * <p>
      */
-    public void updateCxfXml(JavaType className) {
-
-	// Project ID
-	String prjId = ProjectMetadata.getProjectIdentifier();
-
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(prjId);
-
-	Assert.isTrue(projectMetadata != null, "Project metadata required");
-
-	// Project Name
-	String prjName = projectMetadata.getProjectName();
-
-	String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
-	String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		cxfFile);
-
-	Assert.isTrue(fileManager.exists(cxfXmlPath),
+    public void exportClass(JavaType className) {
+	
+	String cxfXmlPath = getCxfConfigurationFilePath();
+	Assert.isNull(cxfXmlPath,
 		"Cxf configuration file not found, export again the service.");
 
 	MutableFile cxfXmlMutableFile = null;
 	Document cxfXml;
-
 	try {
 	    cxfXmlMutableFile = fileManager.updateFile(cxfXmlPath);
 	    cxfXml = XmlUtils.getDocumentBuilder().parse(
@@ -458,8 +493,8 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	} catch (Exception e) {
 	    throw new IllegalStateException(e);
 	}
+	
 	Element root = cxfXml.getDocumentElement();
-
 	Element bean = cxfXml.createElement("bean");
 	bean.setAttribute("id", className.getSimpleTypeName());
 	bean.setAttribute("class", className.getFullyQualifiedTypeName());
@@ -477,26 +512,4 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	XmlUtils.writeXml(cxfXmlMutableFile.getOutputStream(), cxfXml);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void addGvNIXAnnotationsDependecy() {
-
-	List<Element> projectProperties = XmlUtils.findElements(
-		"/configuration/gvnix/properties/*", XmlUtils.getConfiguration(
-			this.getClass(), "properties.xml"));
-	for (Element property : projectProperties) {
-	    projectOperations.addProperty(new Property(property));
-	}
-
-	List<Element> databaseDependencies = XmlUtils.findElements(
-		"/configuration/gvnix/dependencies/dependency", XmlUtils
-			.getConfiguration(this.getClass(),
-				"gvnix-annotation-dependencies.xml"));
-	for (Element dependencyElement : databaseDependencies) {
-	    projectOperations
-		    .dependencyUpdate(new Dependency(dependencyElement));
-	}
-    }
-    
 }

@@ -41,19 +41,18 @@ public class ServiceLayerCommands implements CommandMarker {
     private ServiceLayerWsExportOperations serviceLayerWsExportOperations;
     @Reference
     private ServiceLayerWsImportOperations serviceLayerWsImportOperations;
-    @Reference
-    private ServiceLayerWsConfigService serviceLayerWsConfigService;
-    
-    
+
     @CliAvailabilityIndicator( { "service class", "service operation",
 	    "service parameter" })
     public boolean isCreateServiceClassAvailable() {
+
 	return serviceLayerOperations.isProjectAvailable();
     }
 
     @CliCommand(value = "service class", help = "Creates a Service class int the project.")
     public void createServiceClass(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to create") JavaType serviceClass) {
+
 	serviceLayerOperations.createServiceClass(serviceClass);
     }
 
@@ -64,6 +63,7 @@ public class ServiceLayerCommands implements CommandMarker {
 	    @CliOption(key = "params", mandatory = false, help = "The parameters of the operation") String paramNames,
 	    @CliOption(key = "types", mandatory = false, help = "The Java types of the given parameters") String paramTypes,
 	    @CliOption(key = "service", mandatory = true, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the service to receive this field") JavaType className) {
+
 	serviceLayerOperations.addServiceOperation(operationName, returnType,
 		className);
     }
@@ -74,34 +74,39 @@ public class ServiceLayerCommands implements CommandMarker {
 	    @CliOption(key = { "", "method" }, mandatory = true, help = "The name of the operation to add") JavaSymbolName method,
 	    @CliOption(key = "param", mandatory = true, help = "The parameters of the operation") String paramName,
 	    @CliOption(key = "type", mandatory = true, help = "The Java types of the given parameters") JavaType paramType) {
+
 	serviceLayerOperations.addServiceOperationParameter(className, method,
 		paramName, paramType);
     }
 
     @CliAvailabilityIndicator("service export ws")
     public boolean isServiceExportAvailable() {
+
 	return serviceLayerWsExportOperations.isProjectAvailable();
     }
 
     @CliCommand(value = "service export ws", help = "Exports a Service class to Web Service. If the class doesn't exists the Addon will create it.")
     public void serviceExport(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass) {
+
 	serviceLayerWsExportOperations.exportService(serviceClass);
     }
 
     @CliAvailabilityIndicator("service export operation")
     public boolean isServiceOperationAvailable() {
-	return serviceLayerWsExportOperations.isProjectAvailable()
-		&& serviceLayerWsConfigService.isInstalled();
+
+	return serviceLayerWsExportOperations.isProjectAvailable();
     }
 
     @CliCommand(value = "service export operation", help = "Publish a method as Web Service Operation.")
     public String serviceOperation() {
+
 	return "Web Service Operation published.";
     }
 
     @CliAvailabilityIndicator("service import ws")
     public boolean isServiceImportAvailable() {
+
 	return serviceLayerWsImportOperations.isProjectAvailable();
     }
 
@@ -109,6 +114,7 @@ public class ServiceLayerCommands implements CommandMarker {
     public void serviceImport(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to import or create") JavaType serviceClass,
 	    @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
+
 	serviceLayerWsImportOperations.importService(serviceClass, url);
     }
 

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.roo.metadata.MetadataService;
@@ -112,7 +113,7 @@ public class ServiceLayerActivationInfoImplTest {
 	Dependency dependency;
 
 	List<Element> dependencyList = serviceLayerWsConfigServiceImpl
-		.getDependencies();
+		.getCxfRequiredDependencies(CommunicationSense.EXPORT);
 
 	for (Element element : dependencyList) {
 
@@ -124,7 +125,7 @@ public class ServiceLayerActivationInfoImplTest {
 	replay(metadataService, projectMetadata);
 
 	areCxfDependenciesInstalledResult = serviceLayerWsConfigServiceImpl
-		.areDependenciesInstalled();
+		.isCxfDependenciesInstalled(CommunicationSense.EXPORT);
 
 	assertTrue("There is one or more dependencies not set.",
 		areCxfDependenciesInstalledResult);
@@ -158,7 +159,7 @@ public class ServiceLayerActivationInfoImplTest {
 	replay(metadataService, projectMetadata);
 
 	areCxfDependenciesInstalledResult = serviceLayerWsConfigServiceImpl
-		.areDependenciesInstalled();
+		.isCxfDependenciesInstalled(CommunicationSense.EXPORT);
 
 	assertFalse("There are all dependencies set.",
 		areCxfDependenciesInstalledResult);

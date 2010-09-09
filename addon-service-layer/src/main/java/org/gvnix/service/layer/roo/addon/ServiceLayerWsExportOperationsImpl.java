@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
@@ -61,6 +62,8 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
     @Reference
     private JavaParserService javaParserService;
+    @Reference
+    private AnnotationsService annotationsService;
     
     /*
      * (non-Javadoc)
@@ -114,7 +117,7 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 
 	// Checks if Cxf is configured in the project and installs it if it's
 	// not available.
-	serviceLayerWsConfigService.setUp();
+	serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
 
 	String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
 		serviceClass.getFullyQualifiedTypeName().replace('.', '/')
@@ -133,10 +136,10 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	updateClassAsWebService(serviceClass);
 
 	// Update CXF XML
-	serviceLayerWsConfigService.updateCxfXml(serviceClass);
+	serviceLayerWsConfigService.exportClass(serviceClass);
 
 	// Add GvNixAnnotations to the project.
-	serviceLayerWsConfigService.addGvNIXAnnotationsDependecy();
+	annotationsService.addGvNIXAnnotationsDependency();
     }
 
     /**
