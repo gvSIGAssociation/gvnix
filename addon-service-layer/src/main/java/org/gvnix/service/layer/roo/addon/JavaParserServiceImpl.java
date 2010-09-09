@@ -122,6 +122,8 @@ public class JavaParserServiceImpl implements JavaParserService {
 	// Obtain the physical type and itd mutable details
 	PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
 		.get(targetId);
+	Assert.notNull(ptm, "Java source class doesn't exists.");
+
 	PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
 	Assert.notNull(ptd, "Java source code details unavailable for type "
 		+ PhysicalTypeIdentifier.getFriendlyName(targetId));
