@@ -20,6 +20,7 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.felix.scr.annotations.*;
 import org.springframework.roo.classpath.details.annotations.*;
@@ -28,6 +29,7 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.*;
+import org.springframework.roo.support.util.Assert;
 
 /**
  * Addon for Handle Service Layer
@@ -89,12 +91,14 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
      * {@inheritDoc}
      * 
      * <p>
-     * Creates the body of the new method (the return line) and calls the
-     * 'insertMethod' method to add into the class.
+     * Creates the body of the new method (the return line), checks the input
+     * parameters if they exists and calls the 'createMethod' method from
+     * {@link JavaParserService} to add into the class.
      * </p>
      */
     public void addServiceOperation(JavaSymbolName operationName,
-	    JavaType returnType, JavaType className) {
+	    JavaType returnType, JavaType className,
+	    List<JavaType> paramTypeList, List<String> paramNameList) {
 
 	InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
@@ -107,21 +111,35 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
 		.concat(returnType == null ? ";" : "null;");
 	bodyBuilder.appendFormalLine(returnLine);
 
+	// Parameter names
+	List<JavaSymbolName> parameterNameList = new ArrayList<JavaSymbolName>();
+	// Parameter types.
+	List<AnnotatedJavaType> parameterTypeList = new ArrayList<AnnotatedJavaType>();
+
+	Assert
+		.isTrue(
+			paramTypeList != null
+				&& paramTypeList.size() == paramNameList.size(),
+			"The method parameter types must have the same number of parameter names to create the method.");
+
+	if (paramNameList.size() > 0) {
+	    for (String parameterName : paramNameList) {
+		parameterNameList.add(new JavaSymbolName(parameterName));
+	    }
+	}
+
+	
+	if (paramTypeList != null && paramTypeList.size() > 0) {
+	    for (JavaType parameterType : paramTypeList) {
+		parameterTypeList
+			.add(new AnnotatedJavaType(parameterType, null));
+	    }
+	}
+
 	javaParserService.createMethod(operationName, returnType, className,
 		Modifier.PUBLIC, new ArrayList<JavaType>(),
-		new ArrayList<AnnotationMetadata>(),
-		new ArrayList<AnnotatedJavaType>(),
-		new ArrayList<JavaSymbolName>(), bodyBuilder.getOutput());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addServiceOperationParameter(JavaType className,
-	    JavaSymbolName method, String paramName, JavaType paramType) {
-
-	javaParserService.updateMethodParameters(className, method, paramName,
-		paramType);
+		new ArrayList<AnnotationMetadata>(), parameterTypeList,
+		parameterNameList, bodyBuilder.getOutput());
     }
 
 }

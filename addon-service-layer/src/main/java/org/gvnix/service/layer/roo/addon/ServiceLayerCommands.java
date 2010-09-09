@@ -18,10 +18,15 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.felix.scr.annotations.*;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.*;
+import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * Addon for Handle Service Layer
@@ -42,8 +47,7 @@ public class ServiceLayerCommands implements CommandMarker {
     @Reference
     private ServiceLayerWsImportOperations serviceLayerWsImportOperations;
 
-    @CliAvailabilityIndicator( { "service class", "service operation",
-	    "service parameter" })
+    @CliAvailabilityIndicator( { "service class", "service operation" })
     public boolean isCreateServiceClassAvailable() {
 
 	return serviceLayerOperations.isProjectAvailable();
@@ -60,23 +64,50 @@ public class ServiceLayerCommands implements CommandMarker {
     public void addServiceOperation(
 	    @CliOption(key = { "", "name" }, mandatory = true, help = "The name of the operation to add") JavaSymbolName operationName,
 	    @CliOption(key = "return", mandatory = false, unspecifiedDefaultValue = "__NULL__", help = "The Java type this operation returns") JavaType returnType,
-	    @CliOption(key = "params", mandatory = false, help = "The parameters of the operation") String paramNames,
-	    @CliOption(key = "types", mandatory = false, help = "The Java types of the given parameters") String paramTypes,
+	    @CliOption(key = "params", mandatory = false, help = "The parameters of the operation. They must be introduced separated by commas without blank spaces.") String paramNames,
+	    @CliOption(key = "types", mandatory = false, help = "The Java types of the given parameters. They must be introduced separated by commas without blank spaces.") JavaTypeList paramTypes,
 	    @CliOption(key = "service", mandatory = true, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the service to receive this field") JavaType className) {
 
-	serviceLayerOperations.addServiceOperation(operationName, returnType,
-		className);
-    }
+	String[] paramNameArray;
+	List<String> paramNameList = new ArrayList<String>();
+	boolean existsParamTypes = paramTypes != null;
 
-    @CliCommand(value = "service parameter", help = "Adds a input parameter to an existing operation method.")
-    public void addServiceOperationParameters(
-	    @CliOption(key = "class", mandatory = true, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the service to receive this field") JavaType className,
-	    @CliOption(key = { "", "method" }, mandatory = true, help = "The name of the operation to add") JavaSymbolName method,
-	    @CliOption(key = "param", mandatory = true, help = "The parameters of the operation") String paramName,
-	    @CliOption(key = "type", mandatory = true, help = "The Java types of the given parameters") JavaType paramType) {
+	if (existsParamTypes && paramTypes.getJavaTypes().size() > 0) {
+	    Assert.isTrue(StringUtils.hasText(paramNames),
+		    "You must provide parameter names to create the method.");
 
-	serviceLayerOperations.addServiceOperationParameter(className, method,
-		paramName, paramType);
+	} else if (StringUtils.hasText(paramNames)) {
+	    Assert.isTrue(existsParamTypes
+		    && paramTypes.getJavaTypes().size() > 0,
+		    "You must provide parameter Types to create the method.");
+
+	}
+
+	if (StringUtils.hasText(paramNames)
+		&& paramTypes.getJavaTypes().size() > 0) {
+
+	    paramNameArray = StringUtils
+		    .commaDelimitedListToStringArray(paramNames);
+
+	    Assert
+		    .isTrue(
+			    paramTypes.getJavaTypes().size() == paramNameArray.length,
+			    "The method parameter types must have the same number of parameter names to create the method.");
+
+	    for (int i = 0; i <= paramNameArray.length - 1; i++) {
+
+		paramNameList.add(paramNameArray[i]);
+	    }
+
+	    serviceLayerOperations.addServiceOperation(operationName,
+		    returnType, className, paramTypes.getJavaTypes(),
+		    paramNameList);
+	} else {
+
+	    serviceLayerOperations.addServiceOperation(operationName,
+		    returnType, className, new ArrayList<JavaType>(),
+		    paramNameList);
+	}
     }
 
     @CliAvailabilityIndicator("service export ws")

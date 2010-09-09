@@ -18,6 +18,8 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.List;
+
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
@@ -39,9 +41,7 @@ public interface ServiceLayerOperations {
     boolean isProjectAvailable();
 
     /**
-     * <p>
      * Create a Service class.
-     * </p>
      * 
      * @param serviceClass
      *            class to be created.
@@ -49,9 +49,7 @@ public interface ServiceLayerOperations {
     public void createServiceClass(JavaType serviceClass);
 
     /**
-     * <p>
      * Adds an operation to a class.
-     * </p>
      * 
      * @param operationName
      *            Operation Name to be created.
@@ -59,25 +57,13 @@ public interface ServiceLayerOperations {
      *            Operation java return Type.
      * @param className
      *            Class to insert the operation.
+     * @param paramTypeList
+     *            List of JavaType for each input parameter.
+     * @param paramNameList
+     *            List of names for each input parameter.
      */
     public void addServiceOperation(JavaSymbolName operationName,
-	    JavaType returnType, JavaType className);
+	    JavaType returnType, JavaType className, List<JavaType> paramTypeList,
+	    List<String> paramNameList);
 
-    /**
-     * <p>
-     * Adds an input parameter into selected class method.
-     * </p>
-     * 
-     * @param className
-     *            Class to update the method with the new parameter.
-     * @param method
-     *            Method name.
-     * @param paramName
-     *            Input parameter names.
-     * @param paramType
-     *            Input parameter Type.
-     */
-    public void addServiceOperationParameter(JavaType className,
-	    JavaSymbolName method, String paramName, JavaType paramType);
-    
 }
