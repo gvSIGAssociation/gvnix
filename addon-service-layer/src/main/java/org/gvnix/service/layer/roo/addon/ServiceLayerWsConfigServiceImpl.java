@@ -481,8 +481,8 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * Define a Web Service class in cxf configuration file to be published.
      * <p>
      */
-    public void exportClass(JavaType className) {
-	
+    public void exportClass(JavaType className, String serviceName) {
+
 	String cxfXmlPath = getCxfConfigurationFilePath();
 	Assert.isTrue(cxfXmlPath != null,
 		"Cxf configuration file not found, export again the service.");
@@ -496,30 +496,27 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	} catch (Exception e) {
 	    throw new IllegalStateException(e);
 	}
-	
+
 	Element root = cxfXml.getDocumentElement();
-	
+
 	Element createdService = XmlUtils.findFirstElement("/beans/bean[@id='"
-		+ className.getSimpleTypeName() + "']", root);
+		+ serviceName + "']", root);
 
 	// Service is already published.
 	if (createdService != null) {
-	    logger.log(Level.INFO, "The service '"
-		    + className.getSimpleTypeName()
+	    logger.log(Level.INFO, "The service '" + serviceName
 		    + "' is already set in cxf config file.");
 	    return;
 	}
-	
+
 	Element bean = cxfXml.createElement("bean");
-	bean.setAttribute("id", className.getSimpleTypeName());
+	bean.setAttribute("id", serviceName);
 	bean.setAttribute("class", className.getFullyQualifiedTypeName());
 
 	Element endpoint = cxfXml.createElement("jaxws:endpoint");
-	endpoint.setAttribute("id", className.getSimpleTypeName());
-	endpoint.setAttribute("implementor", "#".concat(className
-		.getSimpleTypeName()));
-	endpoint.setAttribute("address", "/".concat(className
-		.getSimpleTypeName()));
+	endpoint.setAttribute("id", serviceName);
+	endpoint.setAttribute("implementor", "#".concat(serviceName));
+	endpoint.setAttribute("address", "/".concat(serviceName));
 
 	root.appendChild(bean);
 	root.appendChild(endpoint);

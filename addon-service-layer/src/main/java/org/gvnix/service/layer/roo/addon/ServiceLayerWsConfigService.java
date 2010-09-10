@@ -55,8 +55,10 @@ public interface ServiceLayerWsConfigService {
      * 
      * @param serviceClass
      *            class to be configured as Web Service.
+     * @param serviceName
+     *            Name to publish the Web Service.
      */
-    public void exportClass(JavaType serviceClass);
+    public void exportClass(JavaType serviceClass, String serviceName);
 
     /**
      * Converts package name to a Target Namespace.

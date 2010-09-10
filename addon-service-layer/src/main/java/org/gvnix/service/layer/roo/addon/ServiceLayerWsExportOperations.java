@@ -38,13 +38,18 @@ public interface ServiceLayerWsExportOperations {
     boolean isProjectAvailable();
 
     /**
-     * <p>
      * Exports a class to Web Service.
-     * </p>
      * 
      * @param className
      *            class to export.
+     * @param serviceName
+     *            Name to publish the Web Service.
+     * @param name
+     *            Name to define the portType.
+     * @param targetNamespace
+     *            Namespace name for the service.
      */
-    public void exportService(JavaType className);
+    public void exportService(JavaType className, String serviceName,
+	    String name, String targetNamespace);
 
 }

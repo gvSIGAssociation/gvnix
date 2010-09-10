@@ -111,9 +111,9 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
      * automatically in 'src/main/java' directory inside the package defined.
      * </p>
      * 
-     * @param serviceClass
      */
-    public void exportService(JavaType serviceClass) {
+    public void exportService(JavaType serviceClass, String serviceName,
+	    String name, String targetNamespace) {
 
 	// Checks if Cxf is configured in the project and installs it if it's
 	// not available.
@@ -132,11 +132,16 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 
 	}
 
+	// Checks serviceName parameter to publish the web service.
+	serviceName = StringUtils.hasText(serviceName) ? StringUtils
+		.capitalize(serviceName) : serviceClass.getSimpleTypeName();
+
 	// Define Web Service Annotations.
-	updateClassAsWebService(serviceClass);
+	updateClassAsWebService(serviceClass, serviceName, name,
+		targetNamespace);
 
 	// Update CXF XML
-	serviceLayerWsConfigService.exportClass(serviceClass);
+	serviceLayerWsConfigService.exportClass(serviceClass, serviceName);
 
 	// Add GvNixAnnotations to the project.
 	annotationsService.addGvNIXAnnotationsDependency();
@@ -150,9 +155,16 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
      * </p>
      * 
      * @param serviceClass
-     *            class to be published as Web Service.
+     *            class to export.
+     * @param serviceName
+     *            Name to publish the Web Service.
+     * @param name
+     *            Name to define the portType.
+     * @param targetNamespace
+     *            Namespace name for the service.
      */
-    private void updateClassAsWebService(JavaType serviceClass) {
+    private void updateClassAsWebService(JavaType serviceClass,
+	    String serviceName, String name, String targetNamespace) {
 
 	// Load class details. If class not found an exception will be raised.
 	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
@@ -165,10 +177,17 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
 
 	// Namespace for the web service.
-	String targetNameSpace = serviceLayerWsConfigService
+	if (StringUtils.hasText(targetNamespace)) {
+	    Assert.isTrue(StringUtils.startsWithIgnoreCase(targetNamespace,
+		    "http://"),
+			    "The namespace has to start with 'http://' and end with '/'.\ni.e.: http://name.of.namespace/");
+
+	} else {
+	    targetNamespace = serviceLayerWsConfigService
 		.convertPackageToTargetNamespace(serviceClass.getPackage()
 			.toString());
-	targetNameSpace = "http://".concat(targetNameSpace).concat("/");
+	    targetNamespace = "http://".concat(targetNamespace).concat("/");
+	}
 
 	List<? extends AnnotationMetadata> serviceAnnotations = serviceDetails
 		.getTypeAnnotations();
@@ -189,14 +208,23 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	// @GvNIXWebService Annotation attributes.
 	List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
 
-	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("name"), serviceClass.getSimpleTypeName().concat("PortType")));
+	// Checks name parameter to define PortType.
+	name = StringUtils.hasText(name) ? StringUtils.capitalize(name)
+		: serviceName;
+
+	// Checks if name ends with PortType to support web services
+	// interoperability.
+	name = StringUtils.endsWithIgnoreCase(name, "PortType") ? name : name
+		.concat("PortType");
 
 	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("targetNamespace"), targetNameSpace));
+		new JavaSymbolName("name"), name));
 
 	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("serviceName"), serviceClass.getSimpleTypeName()));
+		new JavaSymbolName("targetNamespace"), targetNamespace));
+
+	gvNixAnnotationAttributes.add(new StringAttributeValue(
+		new JavaSymbolName("serviceName"), serviceName));
 
 	for (AnnotationMetadata tmpAnnotationMetadata : serviceAnnotations) {
 
