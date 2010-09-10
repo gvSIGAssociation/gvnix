@@ -137,21 +137,21 @@ service operation:
 
         * Created the class **JavaTypeList** to retrieve the parameter types and manage with the converter *JavaTypeListConverter**.
 
-Publicar un servicio web
+Publish web service
 -------------------------
 
-Comando para publicar una clase servicie como servicio web.
+Commmando to publish a service class as a web service.
 
 service export ws:
 
-* Añadir la anotación *@GvNixWebService* con los parámetros introducidos (name, targetNamespace, etc) o por defecto en la cabecera de la clase.
-* Añadir las dependencias de CXF al pom.xml
-* Añadir la configuración en el pom.xml para generar el contrato de servicio en la fase de compilación para así evitar errores de publicarción sin que se llegue a publicar el servicio.
-* Añadir la definición de servicio al archivo de configuración de *CXF*. Crear el archivo si no existe.
-* Crear el fichero Aj. Metadato asociado la clase con las anotaciones propias de CXF:
+* Add *@GvNixWebService* annotation with the command attributes (name, targetNamespace, etc) or if they hadn't been defined set default values.
+* Add CXF dependecies into pom.xml.
+* Add jax-ws build into the pom.xml to check the correct service contract generated before it will be published in compilation goal.
+* Add web service definition to CXF config file. Create the file if doesn't exists.
+* Crete AspectJ file. Associated metadata to service class within CXF annotations: 
 
-    * Definir las anotaciones @WebService y @SOAPBinding a la clase con los parámetros que se han introducido o los definidos por defecto para publicación de un servicio.
-    * Anotar con *@WebMethod(exclude = true)* los métodos de la clase a publicar que no contengan la anotación *@GvNixWebMethod*.
+    * Define @WebService and @SOAPBinding to the published class setting the *@GvNIXWebService* annotation attributes into corresponding CXF annotation properties or default ones.
+    * Annotate with *@WebMethod(exclude = true)* all class methods that aren't defined with *@GvNixWebMethod*.
 
 Publicar un método como una operación de un servicio web
 ---------------------------------------------------------
@@ -294,7 +294,9 @@ Exports a Class to a Web Service.
 Parameters:
 
   * ``--class`` (mandatory) Class to be exported as a Web Service.
-  * ``--name`` Name to publish the Web Service.
+  * ``--name`` Name to define the portType.
+  * ``--serviceName`` Name to publish the Web Service.
+  * ``--targetNamespace`` Namespace name for the service.
 
 service export operation ws 
 ----------------------------

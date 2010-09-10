@@ -118,7 +118,10 @@ public class ServiceLayerCommands implements CommandMarker {
 
     @CliCommand(value = "service export ws", help = "Exports a Service class to Web Service. If the class doesn't exists the Addon will create it.")
     public void serviceExport(
-	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass) {
+	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass,
+	    @CliOption(key = "serviceName", mandatory = false, help = "Name to publish the Web Service.") String serviceName,
+	    @CliOption(key = "name", mandatory = false, help = "Name to define the portType.") String name,
+	    @CliOption(key = "targetNamespace", mandatory = false, help = "Namespace name for the service. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String targetNamespace) {
 
 	serviceLayerWsExportOperations.exportService(serviceClass);
     }
