@@ -164,8 +164,24 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 
 	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
 
+	// Namespace for the web service.
+	String targetNameSpace = serviceLayerWsConfigService
+		.convertPackageToTargetNamespace(serviceClass.getPackage()
+			.toString());
+	targetNameSpace = "http://".concat(targetNameSpace).concat("/");
+
 	List<? extends AnnotationMetadata> serviceAnnotations = serviceDetails
 		.getTypeAnnotations();
+	
+	// Checks if is @GvNIXWebService annotation defined.
+	// TODO: The annotation can't be updated yet.
+	for (AnnotationMetadata annotationMetadata : serviceAnnotations) {
+	    if (annotationMetadata.getAnnotationType()
+		    .getFullyQualifiedTypeName().equals(
+			    GvNIXWebService.class.getName())) {
+		return;
+	    }
+	}
 
 	// @Service and @GvNIXWebService annotation.
 	AnnotationMetadata gvNixWebServiceAnnotation = null;
@@ -176,10 +192,8 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	gvNixAnnotationAttributes.add(new StringAttributeValue(
 		new JavaSymbolName("name"), serviceClass.getSimpleTypeName().concat("PortType")));
 
-	// TODO: Crear namespace a la inversa del nombre del paquete de la
-	// clase.
 	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("targetNamespace"), "http://".concat(serviceClass.getPackage().toString()).concat("/")));
+		new JavaSymbolName("targetNamespace"), targetNameSpace));
 
 	gvNixAnnotationAttributes.add(new StringAttributeValue(
 		new JavaSymbolName("serviceName"), serviceClass.getSimpleTypeName()));

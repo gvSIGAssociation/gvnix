@@ -31,18 +31,19 @@ import org.junit.Test;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
+import org.springframework.roo.support.util.Assert;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.w3c.dom.Element;
 
 /**
- * Addon Activation info Test class.
+ * Addon Web Service configuration Test class.
  * 
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public class ServiceLayerActivationInfoImplTest {
+public class ServiceLayerWsConfigServiceImplTest {
 
     static final String WEB_XML = "webmvc-config.xml";
 
@@ -61,7 +62,7 @@ public class ServiceLayerActivationInfoImplTest {
     private ProjectMetadata projectMetadata;
 
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerActivationInfoImplTest.class.getName());
+	    .getLogger(ServiceLayerWsConfigServiceImplTest.class.getName());
 
     /**
      * Setup operations instance and Mock objects
@@ -94,7 +95,7 @@ public class ServiceLayerActivationInfoImplTest {
 
     /**
      * Checks method
-     * {@link ServiceLayerActivationInfoImpl#areCxfDependenciesInstalled()}
+     * {@link ServiceLayerWsConfigServiceImpl#isCxfDependenciesInstalled()}
      * 
      * @throws Exception
      */
@@ -171,7 +172,7 @@ public class ServiceLayerActivationInfoImplTest {
     }
 
     /**
-     * Checks method {@link ServiceLayerActivationInfoImpl#sCxfConfigurated()}
+     * Checks method {@link ServiceLayerWsConfigServiceImpl#isCxfConfigurated()}
      * 
      * @throws Exception
      */
@@ -217,4 +218,28 @@ public class ServiceLayerActivationInfoImplTest {
 	reset(metadataService, projectMetadata, pathResolver, fileManager);
 
     }
+
+    /**
+     * Checks method
+     * {@link ServiceLayerWsConfigServiceImpl#convertPackageToTargetNamespace(String)}
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testConvertPackageToTargetNamespace() throws Exception {
+
+	String packageName = "org.gvnix.service.layer.roo.addon";
+
+	String targetNamespaceResult;
+	/*
+	 * Test 1 - Check's method functionality.
+	 */
+	targetNamespaceResult = serviceLayerWsConfigServiceImpl
+		.convertPackageToTargetNamespace(packageName);
+
+	Assert.isTrue(targetNamespaceResult != null
+		&& targetNamespaceResult.length() != 0,
+		"The method doesn't work properly.");
+    }
+
 }

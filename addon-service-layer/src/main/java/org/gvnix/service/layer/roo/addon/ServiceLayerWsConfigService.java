@@ -58,4 +58,12 @@ public interface ServiceLayerWsConfigService {
      */
     public void exportClass(JavaType serviceClass);
 
+    /**
+     * Converts package name to a Target Namespace.
+     * 
+     * @param packageName
+     *            Initial String split with dots.
+     * @return Initial String reverted the order.
+     */
+    public String convertPackageToTargetNamespace(String packageName);
 }

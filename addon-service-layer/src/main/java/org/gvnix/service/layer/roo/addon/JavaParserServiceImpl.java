@@ -171,7 +171,7 @@ public class JavaParserServiceImpl implements JavaParserService {
 	String javaIdentifier = physicalTypeMetadataProvider
 		.findIdentifier(className);
 	javaIdentifier = javaIdentifier.substring(
-		javaIdentifier.indexOf("?") + 1).replaceAll("\\.", "/");
+		javaIdentifier.indexOf("?") + 1).replace('.', '/');
 
 	String fileIdentifier = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
 		javaIdentifier.concat(".java"));

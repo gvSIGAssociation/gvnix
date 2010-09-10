@@ -19,7 +19,10 @@
 package org.gvnix.service.layer.roo.addon;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -34,10 +37,7 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.TemplateUtils;
-import org.springframework.roo.support.util.XmlUtils;
+import org.springframework.roo.support.util.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -69,6 +69,9 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
     private static final String DOCTYPE_PUBLIC = "-//tuckey.org//DTD UrlRewrite 3.0//EN";
     private static final String DOCTYPE_SYSTEM = "http://tuckey.org/res/dtds/urlrewrite3.0.dtd";
     
+    private static Logger logger = Logger
+	    .getLogger(ServiceLayerWsConfigService.class.getName());
+
     /**
      * {@inheritDoc}
      * 
@@ -183,7 +186,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
     private void installCxfConfigurationFile() {
 
 	String cxfXmlPath = getCxfConfigurationFilePath();
-	if (cxfXmlPath == null) {
+	if (cxfXmlPath != null) {
 	    
 	    // File exists, nothing to do
 	    return;
@@ -481,7 +484,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
     public void exportClass(JavaType className) {
 	
 	String cxfXmlPath = getCxfConfigurationFilePath();
-	Assert.isNull(cxfXmlPath,
+	Assert.isTrue(cxfXmlPath != null,
 		"Cxf configuration file not found, export again the service.");
 
 	MutableFile cxfXmlMutableFile = null;
@@ -495,6 +498,18 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	}
 	
 	Element root = cxfXml.getDocumentElement();
+	
+	Element createdService = XmlUtils.findFirstElement("/beans/bean[@id='"
+		+ className.getSimpleTypeName() + "']", root);
+
+	// Service is already published.
+	if (createdService != null) {
+	    logger.log(Level.INFO, "The service '"
+		    + className.getSimpleTypeName()
+		    + "' is already set in cxf config file.");
+	    return;
+	}
+	
 	Element bean = cxfXml.createElement("bean");
 	bean.setAttribute("id", className.getSimpleTypeName());
 	bean.setAttribute("class", className.getFullyQualifiedTypeName());
@@ -510,6 +525,33 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	root.appendChild(endpoint);
 
 	XmlUtils.writeXml(cxfXmlMutableFile.getOutputStream(), cxfXml);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Reverts the order of the package name split with dots.
+     * </p>
+     * 
+     */
+    public String convertPackageToTargetNamespace(String packageName) {
+
+	String[] delimitedString = StringUtils.delimitedListToStringArray(
+		packageName, ".");
+	List<String> revertedList = new ArrayList<String>();
+
+	String revertedString;
+
+	for (int i = delimitedString.length - 1; i >= 0; i--) {
+	    revertedList.add(delimitedString[i]);
+	}
+
+	revertedString = StringUtils.collectionToDelimitedString(revertedList,
+		".");
+
+	return revertedString;
+
     }
 
 }
