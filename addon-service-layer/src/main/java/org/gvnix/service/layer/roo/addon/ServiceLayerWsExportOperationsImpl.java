@@ -152,7 +152,6 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	    targetNamespace = serviceLayerWsConfigService
 		    .convertPackageToTargetNamespace(serviceClass.getPackage()
 			    .toString());
-	    targetNamespace = "http://".concat(targetNamespace).concat("/");
 	}
 
 	// Define Web Service Annotations.

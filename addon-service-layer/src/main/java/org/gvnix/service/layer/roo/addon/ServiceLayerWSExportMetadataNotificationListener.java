@@ -34,11 +34,11 @@ import org.springframework.roo.metadata.*;
  */
 @Component(immediate = true)
 @Service
-public class ServiceLayerMetadataNotificationListener implements
+public class ServiceLayerWSExportMetadataNotificationListener implements
 	MetadataNotificationListener {
 
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerMetadataNotificationListener.class.getName());
+	    .getLogger(ServiceLayerWSExportMetadataNotificationListener.class.getName());
 
     @Reference
     private MetadataDependencyRegistry metadataDependencyRegistry;

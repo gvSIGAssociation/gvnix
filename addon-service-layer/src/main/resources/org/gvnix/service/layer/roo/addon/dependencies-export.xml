@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dependencies>
   <cxf>
-    <dependency org="org.apache.cxf" name="cxf-rt-core" rev="2.2.10">
+    <dependency org="org.apache.cxf" name="cxf-rt-core" rev="${cxf.version}">
       <exclusions>
         <exclusion org="org.springframework" name="spring-beans" />
         <exclusion org="org.springframework" name="spring-core" />
         <exclusion org="org.springframework" name="spring-context" />
       </exclusions>
     </dependency>
-    <dependency org="org.apache.cxf" name="cxf-rt-bindings-soap" rev="2.2.10" />
-    <dependency org="org.apache.cxf" name="cxf-rt-databinding-jaxb" rev="2.2.10" />
-    <dependency org="org.apache.cxf" name="cxf-rt-frontend-jaxws" rev="2.2.10" />
-    <dependency org="org.apache.cxf" name="cxf-rt-transports-http" rev="2.2.10">
+    <dependency org="org.apache.cxf" name="cxf-rt-bindings-soap" rev="${cxf.version}" />
+    <dependency org="org.apache.cxf" name="cxf-rt-databinding-jaxb" rev="${cxf.version}" />
+    <dependency org="org.apache.cxf" name="cxf-rt-frontend-jaxws" rev="${cxf.version}" />
+    <dependency org="org.apache.cxf" name="cxf-rt-transports-http" rev="${cxf.version}">
       <exclusions>
         <exclusion org="org.springframework" name="spring-web" />
       </exclusions>

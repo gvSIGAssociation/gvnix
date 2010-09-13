@@ -46,7 +46,7 @@ import org.springframework.roo.project.Path;
  */
 @Component
 @Service
-public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
+public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataProvider {
 
     @Reference
     protected MetadataService metadataService;
@@ -54,7 +54,7 @@ public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
     protected MetadataDependencyRegistry metadataDependencyRegistry;
 
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerMetadataProvider.class.getName());
+	    .getLogger(ServiceLayerWSExportMetadataProvider.class.getName());
 
     protected void activate(ComponentContext context) {
 	// Ensure we're notified of all metadata related to physical Java types,
@@ -69,7 +69,7 @@ public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
      */
     @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
-	return ServiceLayerMetadata.createIdentifier(javaType, path);
+	return ServiceLayerWSExportMetadata.createIdentifier(javaType, path);
     }
 
     /* (non-Javadoc)
@@ -78,9 +78,9 @@ public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
     @Override
     protected String getGovernorPhysicalTypeIdentifier(
 	    String metadataIdentificationString) {
-	JavaType javaType = ServiceLayerMetadata
+	JavaType javaType = ServiceLayerWSExportMetadata
 		.getJavaType(metadataIdentificationString);
-	Path path = ServiceLayerMetadata
+	Path path = ServiceLayerWSExportMetadata
 		.getPath(metadataIdentificationString);
 	String physicalTypeIdentifier = PhysicalTypeIdentifier
 		.createIdentifier(javaType, path);
@@ -101,7 +101,7 @@ public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
 			Level.WARNING,
 			"The Service contract has been changed.\n You have to use the command 'service operation' to update the web service contract.");
 
-	ServiceLayerMetadata serviceLayerMetadata = new ServiceLayerMetadata(
+	ServiceLayerWSExportMetadata serviceLayerMetadata = new ServiceLayerWSExportMetadata(
 		metadataIdentificationString, aspectName,
 		governorPhysicalTypeMetadata);
 
@@ -119,7 +119,7 @@ public class ServiceLayerMetadataProvider extends AbstractItdMetadataProvider {
      * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
      */
     public String getProvidesType() {
-	return ServiceLayerMetadata.getMetadataIdentiferType();
+	return ServiceLayerWSExportMetadata.getMetadataIdentiferType();
     }
 
 }

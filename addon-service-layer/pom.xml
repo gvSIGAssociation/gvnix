@@ -41,7 +41,6 @@
   <description>gvNIX Service Layer Add-on</description>
   <properties>
     <gvnix.version>${parent.version}</gvnix.version>
-    <cxf.version>2.2.10</cxf.version>
   </properties>
   <dependencies>
     <!-- OSGi -->

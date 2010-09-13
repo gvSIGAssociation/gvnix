@@ -530,6 +530,11 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      */
     public String convertPackageToTargetNamespace(String packageName) {
 
+	// If there isn't package name in the class, return a blank String.
+	if (!StringUtils.hasText(packageName)) {
+	    return "";
+	}
+
 	String[] delimitedString = StringUtils.delimitedListToStringArray(
 		packageName, ".");
 	List<String> revertedList = new ArrayList<String>();
@@ -542,6 +547,8 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 
 	revertedString = StringUtils.collectionToDelimitedString(revertedList,
 		".");
+
+	revertedString = "http://".concat(revertedString).concat("/");
 
 	return revertedString;
 
@@ -592,9 +599,11 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 			"Jax-Ws plugin is not defined in the pom.xml, relaunch again this command.");
 
 	// Checks if already exists the execution.
-	Element serviceExecution = XmlUtils.findFirstElement(
-		"/project/build/plugins/plugin/executions/execution/configuration/className["
-			+ serviceClass.getFullyQualifiedTypeName() + "]", root);
+	Element serviceExecution = XmlUtils
+		.findFirstElement(
+			"/project/build/plugins/plugin/executions/execution/configuration[className='"
+				+ serviceClass.getFullyQualifiedTypeName()
+				+ "']", root);
 
 	if (serviceExecution != null) {
 	    logger.log(Level.INFO, "Wsdl generation with CXF plugin for '"
@@ -646,17 +655,24 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	serviceExecution.appendChild(goals);
 
 	// Checks if already exists the execution.
-	Element executions = XmlUtils.findFirstElement(
+	Element oldExecutions = XmlUtils.findFirstElement(
 		"/project/build/plugins/plugin/executions", root);
 
-	if (executions != null) {
-	    executions.appendChild(serviceExecution);
+	Element newExecutions = oldExecutions;
+
+	// To Update execution definitions It must be replaced in pom.xml to
+	// maintain the format.
+	if (oldExecutions != null) {
+	    newExecutions.appendChild(serviceExecution);
+	    oldExecutions.getParentNode().replaceChild(oldExecutions,
+		    newExecutions);
 	} else {
-	    executions = pom.createElement("executions");
-	    executions.appendChild(serviceExecution);
+	    newExecutions = pom.createElement("executions");
+	    newExecutions.appendChild(serviceExecution);
+
+	    jaxWsPlugin.appendChild(newExecutions);
 	}
 
-	jaxWsPlugin.appendChild(executions);
 
 	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
     }

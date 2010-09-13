@@ -40,15 +40,15 @@ import org.springframework.roo.support.util.Assert;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public class ServiceLayerMetadata extends
+public class ServiceLayerWSExportMetadata extends
 	AbstractItdTypeDetailsProvidingMetadataItem {
 
-    private static final String WEB_SERVICE_TYPE_STRING = ServiceLayerMetadata.class
+    private static final String WEB_SERVICE_TYPE_STRING = ServiceLayerWSExportMetadata.class
 	    .getName();
     private static final String WEB_SERVICE_TYPE = MetadataIdentificationUtils
 	    .create(WEB_SERVICE_TYPE_STRING);
 
-    public ServiceLayerMetadata(String identifier, JavaType aspectName,
+    public ServiceLayerWSExportMetadata(String identifier, JavaType aspectName,
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata) {
 	super(identifier, aspectName, governorPhysicalTypeMetadata);
 
