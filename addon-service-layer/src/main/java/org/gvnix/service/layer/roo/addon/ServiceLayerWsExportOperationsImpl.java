@@ -136,12 +136,35 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	serviceName = StringUtils.hasText(serviceName) ? StringUtils
 		.capitalize(serviceName) : serviceClass.getSimpleTypeName();
 
+	// Namespace for the web service.
+	if (StringUtils.hasText(targetNamespace)) {
+	    Assert
+		    .isTrue(
+			    StringUtils.startsWithIgnoreCase(targetNamespace,
+				    "http://"),
+			    "The namespace has to start with 'http://' and end with '/'.\ni.e.: http://name.of.namespace/");
+
+	    // Adds '/' if is not defined in targetNamespace.
+	    targetNamespace = targetNamespace.endsWith("/") ? targetNamespace
+		    : targetNamespace.concat("/");
+
+	} else {
+	    targetNamespace = serviceLayerWsConfigService
+		    .convertPackageToTargetNamespace(serviceClass.getPackage()
+			    .toString());
+	    targetNamespace = "http://".concat(targetNamespace).concat("/");
+	}
+
 	// Define Web Service Annotations.
 	updateClassAsWebService(serviceClass, serviceName, name,
 		targetNamespace);
 
 	// Update CXF XML
 	serviceLayerWsConfigService.exportClass(serviceClass, serviceName);
+
+	// Define Jax-WS plugin and creates and execution build for this service
+	// to generate the wsdl file to check errors before deploy.
+	serviceLayerWsConfigService.jaxwsBuildPlugin(serviceClass, serviceName);
 
 	// Add GvNixAnnotations to the project.
 	annotationsService.addGvNIXAnnotationsDependency();
@@ -175,19 +198,6 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 		tmpServiceDetails, "Can't modify " + tmpServiceDetails.getName());
 
 	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
-
-	// Namespace for the web service.
-	if (StringUtils.hasText(targetNamespace)) {
-	    Assert.isTrue(StringUtils.startsWithIgnoreCase(targetNamespace,
-		    "http://"),
-			    "The namespace has to start with 'http://' and end with '/'.\ni.e.: http://name.of.namespace/");
-
-	} else {
-	    targetNamespace = serviceLayerWsConfigService
-		.convertPackageToTargetNamespace(serviceClass.getPackage()
-			.toString());
-	    targetNamespace = "http://".concat(targetNamespace).concat("/");
-	}
 
 	List<? extends AnnotationMetadata> serviceAnnotations = serviceDetails
 		.getTypeAnnotations();

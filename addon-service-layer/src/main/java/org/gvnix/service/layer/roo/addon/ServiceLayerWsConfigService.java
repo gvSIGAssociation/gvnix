@@ -68,4 +68,15 @@ public interface ServiceLayerWsConfigService {
      * @return Initial String reverted the order.
      */
     public String convertPackageToTargetNamespace(String packageName);
+
+    /**
+     * Create Jax-WS plugin configuration in pom.xml to generate the wsdl from a
+     * Service.
+     * 
+     * @param serviceClass
+     *            Service to generate Wsdl.
+     * @param serviceName
+     *            Service name for wsdl file.
+     */
+    public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName);
 }

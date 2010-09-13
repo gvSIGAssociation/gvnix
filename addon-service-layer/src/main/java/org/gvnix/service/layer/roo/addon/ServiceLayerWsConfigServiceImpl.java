@@ -32,11 +32,7 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.Dependency;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
-import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.*;
 import org.springframework.roo.support.util.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -549,6 +545,155 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 
 	return revertedString;
 
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Adds the plugin configuration from a file.
+     * </p>
+     * <p>
+     * Defines an execution for the serviceClass with the serviceName to
+     * generate in maven compile goal.
+     * </p>
+     */
+    public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName) {
+
+	Element pluginElement = XmlUtils.findFirstElement(
+		"/jaxws-plugin/plugin", XmlUtils.getConfiguration(this
+			.getClass(), "dependencies-export-jaxws-plugin.xml"));
+
+	projectOperations.buildPluginUpdate(new Plugin(pluginElement));
+
+	// Update plugin with execution configuration.
+	String pomPath = getPomFilePath();
+	Assert.isTrue(pomPath != null,
+		"Cxf configuration file not found, export again the service.");
+
+	MutableFile pomMutableFile = null;
+	Document pom;
+	try {
+	    pomMutableFile = fileManager.updateFile(pomPath);
+	    pom = XmlUtils.getDocumentBuilder().parse(
+		    pomMutableFile.getInputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+
+	Element root = pom.getDocumentElement();
+
+	Element jaxWsPlugin = XmlUtils.findFirstElement(
+			"/project/build/plugins/plugin[groupId='org.apache.cxf']",
+		root);
+
+	Assert
+		.notNull(jaxWsPlugin,
+			"Jax-Ws plugin is not defined in the pom.xml, relaunch again this command.");
+
+	// Checks if already exists the execution.
+	Element serviceExecution = XmlUtils.findFirstElement(
+		"/project/build/plugins/plugin/executions/execution/configuration/className["
+			+ serviceClass.getFullyQualifiedTypeName() + "]", root);
+
+	if (serviceExecution != null) {
+	    logger.log(Level.INFO, "Wsdl generation with CXF plugin for '"
+		    + serviceName + " service, it's already configured.");
+	    return;
+	}
+
+	// Execution
+	serviceExecution = pom.createElement("execution");
+
+	String gerenateServiceName = StringUtils.uncapitalize(serviceName);
+
+	Element id = pom.createElement("id");
+	id.setTextContent("generate-gvnix-service-".concat(gerenateServiceName)
+		.concat("-wsdl"));
+
+	serviceExecution.appendChild(id);
+	Element phase = pom.createElement("phase");
+	phase.setTextContent("compile");
+
+	serviceExecution.appendChild(phase);
+
+	// Configuration
+	Element configuration = pom.createElement("configuration");
+	Element className = pom.createElement("className");
+	className.setTextContent(serviceClass.getFullyQualifiedTypeName());
+	Element outputFile = pom.createElement("outputFile");
+	outputFile
+		.setTextContent("${project.basedir}/src/test/resources/generated/wsdl/"
+			.concat(serviceName).concat(".wsdl"));
+	Element genWsdl = pom.createElement("genWsdl");
+	genWsdl.setTextContent("true");
+	Element verbose = pom.createElement("verbose");
+	verbose.setTextContent("true");
+
+	configuration.appendChild(className);
+	configuration.appendChild(outputFile);
+	configuration.appendChild(genWsdl);
+	configuration.appendChild(verbose);
+
+	serviceExecution.appendChild(configuration);
+
+	// Goals
+	Element goals = pom.createElement("goals");
+	Element goal = pom.createElement("goal");
+	goal.setTextContent("java2ws");
+	goals.appendChild(goal);
+
+	serviceExecution.appendChild(goals);
+
+	// Checks if already exists the execution.
+	Element executions = XmlUtils.findFirstElement(
+		"/project/build/plugins/plugin/executions", root);
+
+	if (executions != null) {
+	    executions.appendChild(serviceExecution);
+	} else {
+	    executions = pom.createElement("executions");
+	    executions.appendChild(serviceExecution);
+	}
+
+	jaxWsPlugin.appendChild(executions);
+
+	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+    }
+
+    /**
+     * Check if pom.xml file exists in the project and return the path.
+     * 
+     * <p>
+     * Checks if exists pom.xml config file. If not exists, null will be
+     * returned.
+     * </p>
+     * 
+     * @return Path to the pom.xml file or null if not exists.
+     */
+    private String getPomFilePath() {
+
+	// Project ID
+	String prjId = ProjectMetadata.getProjectIdentifier();
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(prjId);
+	Assert.isTrue(projectMetadata != null, "Project metadata required");
+
+	String pomFileName = "pom.xml";
+
+	// Checks for pom.xml
+	String pomPath = pathResolver.getIdentifier(Path.ROOT,
+		pomFileName);
+
+	boolean pomInstalled = fileManager.exists(pomPath);
+
+	if (pomInstalled) {
+
+	    return pomPath;
+	} else {
+
+	    return null;
+	}
     }
 
 }

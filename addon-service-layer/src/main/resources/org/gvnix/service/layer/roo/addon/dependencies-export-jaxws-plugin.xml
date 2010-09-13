@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jaxws-plugin>
+  <plugin>
+    <groupId>org.apache.cxf</groupId>
+    <artifactId>cxf-java2ws-plugin</artifactId>
+    <version>${cxf.version}</version>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxws</artifactId>
+        <version>${cxf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-simple</artifactId>
+        <version>${cxf.version}</version>
+      </dependency>
+    </dependencies>
+  </plugin>
+</jaxws-plugin>

@@ -3,6 +3,7 @@
   <gvnix>
     <properties>
       <gvnix.version>${gvnix.version}</gvnix.version>
+      <cxf.version>${cxf.version}</cxf.version>
     </properties>
   </gvnix>
 </configuration>
