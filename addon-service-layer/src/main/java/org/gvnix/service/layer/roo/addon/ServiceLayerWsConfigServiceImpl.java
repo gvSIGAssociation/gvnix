@@ -132,18 +132,18 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	
 	if (type == CommunicationSense.EXPORT) {
 
-	    cxfInstalled = cxfInstalled && getCxfConfigurationFilePath() != null;
+	    cxfInstalled = cxfInstalled
+		    && fileManager.exists(getCxfConfigurationFilePath());
 	}
 	
 	return cxfInstalled;
     }
 
     /**
-     * Check if Cxf config file exists in the project and return the path.
+     * Returns the cxf configuration file path in the project.
      * 
      * <p>
-     * Checks if exists Cxf config file using project name.
-     * If not exists, null will be returned.
+     * Creates the cxf config file using project name.
      * </p>
      * 
      * @return Path to the Cxf configuration file or null if not exists
@@ -163,16 +163,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
 		cxfFile);
 
-	boolean cxfInstalled = fileManager.exists(cxfXmlPath);
-
-	if (cxfInstalled) {
-	    
-	    return cxfXmlPath;
-	}
-	else {
-	    
-	    return null;
-	}
+	return cxfXmlPath;
     }
 
     /**
@@ -182,7 +173,8 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
     private void installCxfConfigurationFile() {
 
 	String cxfXmlPath = getCxfConfigurationFilePath();
-	if (cxfXmlPath != null) {
+
+	if (fileManager.exists(cxfXmlPath)) {
 	    
 	    // File exists, nothing to do
 	    return;
@@ -385,7 +377,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	root.insertBefore(servletMapping, firstServletMapping);
 
 	String cxfFile = getCxfConfigurationFilePath();
-	Assert.isNull(cxfFile,
+	Assert.isTrue(fileManager.exists(cxfFile),
 		"Cxf configuration file not found, can't set context loader");
 	
 	Element contextConfigLocation = XmlUtils
@@ -480,7 +472,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
     public void exportClass(JavaType className, String serviceName) {
 
 	String cxfXmlPath = getCxfConfigurationFilePath();
-	Assert.isTrue(cxfXmlPath != null,
+	Assert.isTrue(fileManager.exists(cxfXmlPath),
 		"Cxf configuration file not found, export again the service.");
 
 	MutableFile cxfXmlMutableFile = null;
@@ -655,14 +647,15 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	serviceExecution.appendChild(goals);
 
 	// Checks if already exists the execution.
-	Element oldExecutions = XmlUtils.findFirstElement(
-		"/project/build/plugins/plugin/executions", root);
+	Element oldExecutions = XmlUtils.findFirstElementByName("executions",
+		jaxWsPlugin);
 
-	Element newExecutions = oldExecutions;
+	Element newExecutions;
 
 	// To Update execution definitions It must be replaced in pom.xml to
 	// maintain the format.
 	if (oldExecutions != null) {
+	    newExecutions = oldExecutions;
 	    newExecutions.appendChild(serviceExecution);
 	    oldExecutions.getParentNode().replaceChild(oldExecutions,
 		    newExecutions);

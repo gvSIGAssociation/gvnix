@@ -28,8 +28,6 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
-import org.springframework.roo.metadata.MetadataDependencyRegistry;
-import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 
@@ -44,14 +42,9 @@ import org.springframework.roo.project.Path;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component
+@Component(immediate = true)
 @Service
 public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataProvider {
-
-    @Reference
-    protected MetadataService metadataService;
-    @Reference
-    protected MetadataDependencyRegistry metadataDependencyRegistry;
 
     private static Logger logger = Logger
 	    .getLogger(ServiceLayerWSExportMetadataProvider.class.getName());
@@ -67,7 +60,6 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
     /* (non-Javadoc)
      * @see org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#createLocalIdentifier(org.springframework.roo.model.JavaType, org.springframework.roo.project.Path)
      */
-    @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
 	return ServiceLayerWSExportMetadata.createIdentifier(javaType, path);
     }
@@ -75,7 +67,6 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
     /* (non-Javadoc)
      * @see org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getGovernorPhysicalTypeIdentifier(java.lang.String)
      */
-    @Override
     protected String getGovernorPhysicalTypeIdentifier(
 	    String metadataIdentificationString) {
 	JavaType javaType = ServiceLayerWSExportMetadata
@@ -90,7 +81,6 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
     /* (non-Javadoc)
      * @see org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getMetadata(java.lang.String, org.springframework.roo.model.JavaType, org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
      */
-    @Override
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
 	    String metadataIdentificationString, JavaType aspectName,
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
