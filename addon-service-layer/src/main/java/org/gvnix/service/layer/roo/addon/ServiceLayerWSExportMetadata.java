@@ -18,7 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.lang.reflect.Modifier;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +27,6 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
-import org.springframework.roo.classpath.itd.ItdSourceFileComposer;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.*;
 import org.springframework.roo.project.Path;
@@ -69,7 +68,7 @@ public class ServiceLayerWSExportMetadata extends
 
 	if (annotationMetadata != null) {
 
-	    // @javax.jws.WebService and @javax.jws.soap.SOAPBinding
+	    // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
 
 	    builder
 		    .addTypeAnnotation(getWebServiceAnnotation(annotationMetadata));
@@ -77,15 +76,9 @@ public class ServiceLayerWSExportMetadata extends
 	    builder.addTypeAnnotation(getSoapBindingAnnotation());
 	}
 
-	DeclaredMethodAnnotationDetails declaredMethodAnnotationDetails;
-
-	List<MethodMetadata> metadataList = MemberFindingUtils
-		.getMethods(governorTypeDetails);
-
-	for (MethodMetadata md : metadataList) {
-	    builder.addMethod(md);
-	}
-	// builder.addMethodAnnotation(declaredMethodAnnotationDetails);
+	// Update methods without GvNIXWebMethod annotation with
+	// '@WebMethod(exclude = true)'
+	updateMethodWithoutGvNIXAnnotation();
 
 	// Create a representation of the desired output ITD
 	itdTypeDetails = builder.build();
@@ -191,6 +184,53 @@ public class ServiceLayerWSExportMetadata extends
 		.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
 
 	return result == null;
+    }
+
+    /**
+     * Update methods without @GvNIXWebMethod annotation with @WebMethod(exclude
+     * = true).
+     */
+    public void updateMethodWithoutGvNIXAnnotation() {
+
+	List<MethodMetadata> methodMetadataList = MemberFindingUtils
+		.getMethods(governorTypeDetails);
+
+	List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
+	attributes.add(new BooleanAttributeValue(new JavaSymbolName("exclude"),
+		true));
+
+	AnnotationMetadata methodAnnotation = new DefaultAnnotationMetadata(
+		new JavaType("javax.jws.WebMethod"), attributes);
+
+	List<AnnotationMetadata> methodAnnotationList;
+
+	DefaultAnnotationMetadata defaultAnnotationMetadata = new DefaultAnnotationMetadata(
+		new JavaType(
+			"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod"),
+		new ArrayList<AnnotationAttributeValue<?>>());
+
+	for (MethodMetadata md : methodMetadataList) {
+
+	    methodAnnotationList = md.getAnnotations();
+
+	    if (methodAnnotationList.size() == 0) {
+
+		builder
+			.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+				md, methodAnnotation));
+	    } else {
+		for (AnnotationMetadata annotationMetadata : methodAnnotationList) {
+
+		    if (!annotationMetadata.getAnnotationType().equals(
+			    defaultAnnotationMetadata.getAnnotationType()))
+
+			builder
+				.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+					md, methodAnnotation));
+		}
+	    }
+	}
+
     }
 
     public static String getMetadataIdentiferType() {
