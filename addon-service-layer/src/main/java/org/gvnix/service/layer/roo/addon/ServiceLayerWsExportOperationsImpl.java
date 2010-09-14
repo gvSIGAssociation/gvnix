@@ -169,6 +169,14 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	annotationsService.addGvNIXAnnotationsDependency();
     }
 
+    public void exportOperation(JavaType serviceClass, String methodName,
+	    String operationName, String resutlName, String resultNamespace,
+	    String responseWrapperName, String responseWrapperNamespace,
+	    String requestWrapperName, String requestWrapperNamespace) {
+	// TODO Auto-generated method stub
+
+    }
+
     /**
      * Update an existing class to a web service.
      * 

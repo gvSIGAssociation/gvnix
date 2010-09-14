@@ -133,8 +133,46 @@ public class ServiceLayerCommands implements CommandMarker {
 	return serviceLayerWsExportOperations.isProjectAvailable();
     }
 
+    /**
+     * Command to export a method as a web service operation.
+     * 
+     * <p>
+     * Parameters:
+     * </p>
+     * <ul>
+     * <li>
+     * ``--class`` (mandatory) Class to export a method.</li>
+     * <li>
+     * ``--method``(mandatory) Method to export.</li>
+     * <li>
+     * ``--operationName`` Name of the method to be showed as a Web Service
+     * operation.</li>
+     * <li>
+     * ``--resutlName`` Method result name.</li>
+     * <li>
+     * ``--resultNamespace`` Namespace of the result type.</li>
+     * <li>
+     * ``--responseWrapperName`` Name to define the Response Wrapper Object.</li>
+     * <li>
+     * ``--responseWrapperNamespace``: Namespace of the Response Wrapper Object.
+     * </li>
+     * <li>
+     * ``--requestWrapperName``: Name to define the Request Wrapper Object.</li>
+     * <li>
+     * ``--requestWrapperNamespace``: Namespace of the Request Wrapper Object.</li>
+     * </ul>
+     */
     @CliCommand(value = "service export operation", help = "Publish a method as Web Service Operation.")
-    public String serviceOperation() {
+    public String serviceOperation(
+	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export a method.") JavaType serviceClass,
+	    @CliOption(key = "method", mandatory = true, help = "Method to export as Web Service Operation.") String methodName,
+	    @CliOption(key = "operationName", mandatory = false, help = "Name of the method to be showed as a Web Service operation.") String operationName,
+	    @CliOption(key = "resutlName", mandatory = false, help = "Method result name.") String resutlName,
+	    @CliOption(key = "resultNamespace", mandatory = false, help = "NNamespace of the result type. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String resultNamespace,
+	    @CliOption(key = "responseWrapperName", mandatory = false, help = "Name to define the Response Wrapper Object.") String responseWrapperName,
+	    @CliOption(key = "responseWrapperNamespace", mandatory = false, help = "Namespace of the Response Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String responseWrapperNamespace,
+	    @CliOption(key = "requestWrapperName", mandatory = false, help = "Name to define the Request Wrapper Object.") String requestWrapperName,
+	    @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String requestWrapperNamespace) {
 
 	return "Web Service Operation published.";
     }

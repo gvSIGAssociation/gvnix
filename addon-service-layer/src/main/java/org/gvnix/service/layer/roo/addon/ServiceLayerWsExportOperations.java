@@ -52,4 +52,31 @@ public interface ServiceLayerWsExportOperations {
     public void exportService(JavaType className, String serviceName,
 	    String name, String targetNamespace);
 
+    /**
+     * Exports an operation to a Web Service Operation.
+     * 
+     * @param serviceClass
+     *            Class to export a method.
+     * @param methodName
+     *            Method to export.
+     * @param operationName
+     *            Name of the method to be showed as a Web Service operation.
+     * @param resutlName
+     *            Method result name.
+     * @param resultNamespace
+     *            Namespace of the result type.
+     * @param responseWrapperName
+     *            Name to define the Response Wrapper Object.
+     * @param responseWrapperNamespace
+     *            Namespace of the Response Wrapper Object.
+     * @param requestWrapperName
+     *            Name to define the Request Wrapper Object.
+     * @param requestWrapperNamespace
+     *            Namespace of the Request Wrapper Object.
+     * 
+     */
+    public void exportOperation(JavaType serviceClass, String methodName,
+	    String operationName, String resutlName, String resultNamespace,
+	    String responseWrapperName, String responseWrapperNamespace,
+	    String requestWrapperName, String requestWrapperNamespace);
 }
