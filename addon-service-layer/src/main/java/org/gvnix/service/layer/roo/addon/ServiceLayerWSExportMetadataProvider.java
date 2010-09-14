@@ -99,7 +99,7 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
      * @see org.springframework.roo.classpath.itd.ItdMetadataProvider#getItdUniquenessFilenameSuffix()
      */
     public String getItdUniquenessFilenameSuffix() {
-	return "gvNix_WebService";
+	return "GvNix_WebService";
     }
 
     /* (non-Javadoc)
