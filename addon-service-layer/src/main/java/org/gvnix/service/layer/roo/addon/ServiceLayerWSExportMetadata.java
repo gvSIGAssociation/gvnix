@@ -18,15 +18,17 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
 
@@ -59,10 +61,24 @@ public class ServiceLayerWSExportMetadata extends
 	    return;
 	}
 
-	// TODO: Prueba de creación de un metadato.
-	MemberFindingUtils
+	// Create the metadata.
+	AnnotationMetadata annotationMetadata = MemberFindingUtils
 		.getTypeAnnotation(governorTypeDetails, new JavaType(
-			"org.gvnix.service.layer.roo.addon.GvNIXWebService"));
+				"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService"));
+
+	if (annotationMetadata != null) {
+
+	    // @javax.jws.WebService and @javax.jws.SOAPBinding
+
+	    if (isAnnotationIntroduced("javax.jws.WebService")) {
+
+		builder
+			.addTypeAnnotation(getWebServiceAnnotation(annotationMetadata));
+	    }
+	    if (isAnnotationIntroduced("javax.jws.SOAPBinding")) {
+		builder.addTypeAnnotation(getSoapBindingAnnotation());
+	    }
+	}
 
 	List<MethodMetadata> methodList = MemberFindingUtils
 		.getMethods(governorTypeDetails);
@@ -74,6 +90,107 @@ public class ServiceLayerWSExportMetadata extends
 	// Create a representation of the desired output ITD
 	itdTypeDetails = builder.build();
 
+    }
+
+    /**
+     * Adds @javax.jws.WebService annotation to the type, unless it already
+     * exists.
+     * 
+     * @param annotationMetadata
+     *            to retrieve selected values to @javax.jws.WebService
+     * 
+     * @return the annotation is already exists or will be created, or null if
+     *         it will not be created (required)
+     */
+    public AnnotationMetadata getWebServiceAnnotation(AnnotationMetadata annotationMetadata) {
+
+	JavaType javaType = new JavaType("javax.jws.WebService");
+
+	if (isAnnotationIntroduced("javax.jws.WebService")) {
+
+	    List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+	    StringAttributeValue nameAttributeValue = (StringAttributeValue) annotationMetadata
+		    .getAttribute(new JavaSymbolName("name"));
+
+	    annotationAttributeValueList.add(nameAttributeValue);
+
+	    StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) annotationMetadata
+		    .getAttribute(new JavaSymbolName("targetNamespace"));
+
+	    annotationAttributeValueList.add(targetNamespaceAttributeValue);
+
+	    StringAttributeValue serviceNameAttributeValue = (StringAttributeValue) annotationMetadata
+		    .getAttribute(new JavaSymbolName("serviceName"));
+
+	    annotationAttributeValueList.add(serviceNameAttributeValue);
+
+	    return new DefaultAnnotationMetadata(javaType,
+		    annotationAttributeValueList);
+	}
+
+	return MemberFindingUtils.getDeclaredTypeAnnotation(
+		governorTypeDetails, javaType);
+    }
+
+    /**
+     * Adds @javax.jws.SOAPBinding annotation to the type, unless it already
+     * exists.
+     * 
+     * @return the annotation is already exists or will be created, or null if
+     *         it will not be created (required)
+     */
+    public AnnotationMetadata getSoapBindingAnnotation() {
+	JavaType javaType = new JavaType("javax.jws.SOAPBinding");
+
+	if (isAnnotationIntroduced("javax.jws.SOAPBinding")) {
+
+	    List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+	    EnumAttributeValue enumStyleAttributeValue = new EnumAttributeValue(
+		    new JavaSymbolName("style"), new EnumDetails(new JavaType(
+			    "javax.jws.soap.SOAPBinding.Style"),
+			    new JavaSymbolName("DOCUMENT")));
+
+	    annotationAttributeValueList.add(enumStyleAttributeValue);
+
+	    EnumAttributeValue enumUseAttributeValue = new EnumAttributeValue(
+		    new JavaSymbolName("use"), new EnumDetails(new JavaType(
+			    "javax.jws.soap.SOAPBinding.Use"),
+			    new JavaSymbolName("LITERAL")));
+
+	    annotationAttributeValueList.add(enumUseAttributeValue);
+
+	    EnumAttributeValue enumparameterStyleAttributeValue = new EnumAttributeValue(
+		    new JavaSymbolName("parameterStyle"),
+		    new EnumDetails(new JavaType(
+			    "javax.jws.soap.SOAPBinding.ParameterStyle"),
+			    new JavaSymbolName("WRAPPED")));
+
+	    annotationAttributeValueList.add(enumparameterStyleAttributeValue);
+
+	    return new DefaultAnnotationMetadata(javaType,
+		    annotationAttributeValueList);
+	}
+
+	return MemberFindingUtils.getDeclaredTypeAnnotation(
+		governorTypeDetails, javaType);
+    }
+
+    /**
+     * Indicates whether the annotation will be introduced via this ITD.
+     * 
+     * @param annotation
+     *            to be check if exists.
+     * 
+     * @return true if it will be introduced, false otherwise
+     */
+    public boolean isAnnotationIntroduced(String annotation) {
+	JavaType javaType = new JavaType(annotation);
+	AnnotationMetadata result = MemberFindingUtils
+		.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+
+	return result == null;
     }
 
     public static String getMetadataIdentiferType() {

@@ -32,8 +32,6 @@ import org.springframework.roo.metadata.*;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component(immediate = true)
-@Service
 public class ServiceLayerWSExportMetadataNotificationListener implements
 	MetadataNotificationListener {
 

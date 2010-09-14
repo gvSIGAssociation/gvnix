@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.beaninfo.BeanInfoMetadata;
+import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
@@ -85,11 +87,6 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
 	    String metadataIdentificationString, JavaType aspectName,
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
 	    String itdFilename) {
-
-	logger
-		.log(
-			Level.WARNING,
-			"The Service contract has been changed.\n You have to use the command 'service operation' to update the web service contract.");
 
 	ServiceLayerWSExportMetadata serviceLayerMetadata = new ServiceLayerWSExportMetadata(
 		metadataIdentificationString, aspectName,
