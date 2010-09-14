@@ -18,15 +18,16 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.itd.ItdSourceFileComposer;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.*;
 import org.springframework.roo.project.Path;
@@ -68,24 +69,23 @@ public class ServiceLayerWSExportMetadata extends
 
 	if (annotationMetadata != null) {
 
-	    // @javax.jws.WebService and @javax.jws.SOAPBinding
+	    // @javax.jws.WebService and @javax.jws.soap.SOAPBinding
 
-	    if (isAnnotationIntroduced("javax.jws.WebService")) {
+	    builder
+		    .addTypeAnnotation(getWebServiceAnnotation(annotationMetadata));
 
-		builder
-			.addTypeAnnotation(getWebServiceAnnotation(annotationMetadata));
-	    }
-	    if (isAnnotationIntroduced("javax.jws.SOAPBinding")) {
-		builder.addTypeAnnotation(getSoapBindingAnnotation());
-	    }
+	    builder.addTypeAnnotation(getSoapBindingAnnotation());
 	}
 
-	List<MethodMetadata> methodList = MemberFindingUtils
+	DeclaredMethodAnnotationDetails declaredMethodAnnotationDetails;
+
+	List<MethodMetadata> metadataList = MemberFindingUtils
 		.getMethods(governorTypeDetails);
 
-	for (MethodMetadata methodMetadata : methodList) {
-	    builder.addMethod(methodMetadata);
+	for (MethodMetadata md : metadataList) {
+	    builder.addMethod(md);
 	}
+	// builder.addMethodAnnotation(declaredMethodAnnotationDetails);
 
 	// Create a representation of the desired output ITD
 	itdTypeDetails = builder.build();
@@ -134,16 +134,16 @@ public class ServiceLayerWSExportMetadata extends
     }
 
     /**
-     * Adds @javax.jws.SOAPBinding annotation to the type, unless it already
-     * exists.
+     * Adds @javax.jws.soap.SOAPBinding annotation to the type, unless it
+     * already exists.
      * 
      * @return the annotation is already exists or will be created, or null if
      *         it will not be created (required)
      */
     public AnnotationMetadata getSoapBindingAnnotation() {
-	JavaType javaType = new JavaType("javax.jws.SOAPBinding");
+	JavaType javaType = new JavaType("javax.jws.soap.SOAPBinding");
 
-	if (isAnnotationIntroduced("javax.jws.SOAPBinding")) {
+	if (isAnnotationIntroduced("javax.jws.soap.SOAPBinding")) {
 
 	    List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 

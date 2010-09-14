@@ -18,5 +18,6 @@ dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1
 dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3
 controller all --package org.gvnix.test.service.layer.project.web
 service class --class org.gvnix.test.service.layer.project.services.Clase
+service operation --name returnString --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String
 service export ws --class org.gvnix.test.service.layer.project.services.Clase
 perform eclipse

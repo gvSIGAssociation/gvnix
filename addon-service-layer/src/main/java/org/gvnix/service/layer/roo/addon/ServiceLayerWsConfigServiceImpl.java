@@ -140,7 +140,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
     }
 
     /**
-     * Returns the cxf configuration file path in the project.
+     * Returns CXF absolute configuration file path in the project.
      * 
      * <p>
      * Creates the cxf config file using project name.
@@ -150,20 +150,30 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      */
     private String getCxfConfigurationFilePath() {
 
-	// Project ID
-	String prjId = ProjectMetadata.getProjectIdentifier();
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(prjId);
-	Assert.isTrue(projectMetadata != null, "Project metadata required");
-	String prjName = projectMetadata.getProjectName();
-
-	String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
+	String cxfFile = "WEB-INF/cxf-".concat(getProjectName()).concat(".xml");
 
 	// Checks for src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
 	String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
 		cxfFile);
 
 	return cxfXmlPath;
+    }
+
+    /**
+     * Returns project name to set CXF configuration file.
+     * 
+     * @return Project Name.
+     */
+    private String getProjectName() {
+	// Project ID
+	String prjId = ProjectMetadata.getProjectIdentifier();
+	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		.get(prjId);
+	Assert.isTrue(projectMetadata != null, "Project metadata required");
+
+	String projectName = projectMetadata.getProjectName();
+
+	return projectName;
     }
 
     /**
@@ -376,9 +386,10 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	servletMapping.appendChild(urlMapping);
 	root.insertBefore(servletMapping, firstServletMapping);
 
-	String cxfFile = getCxfConfigurationFilePath();
-	Assert.isTrue(fileManager.exists(cxfFile),
-		"Cxf configuration file not found, can't set context loader");
+	// Project Name
+	String prjName = getProjectName();
+
+	String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
 	
 	Element contextConfigLocation = XmlUtils
 		.findFirstElement(
@@ -498,12 +509,13 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	}
 
 	Element bean = cxfXml.createElement("bean");
-	bean.setAttribute("id", serviceName);
+	bean.setAttribute("id", serviceName.concat("Impl"));
 	bean.setAttribute("class", className.getFullyQualifiedTypeName());
 
 	Element endpoint = cxfXml.createElement("jaxws:endpoint");
 	endpoint.setAttribute("id", serviceName);
-	endpoint.setAttribute("implementor", "#".concat(serviceName));
+	endpoint.setAttribute("implementor", "#".concat(serviceName).concat(
+		"Impl"));
 	endpoint.setAttribute("address", "/".concat(serviceName));
 
 	root.appendChild(bean);
