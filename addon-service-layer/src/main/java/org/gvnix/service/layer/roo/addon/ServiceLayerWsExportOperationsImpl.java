@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
@@ -64,6 +66,8 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
     private JavaParserService javaParserService;
     @Reference
     private AnnotationsService annotationsService;
+    @Reference
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     
     /*
      * (non-Javadoc)
@@ -169,12 +173,51 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	annotationsService.addGvNIXAnnotationsDependency();
     }
 
-    public void exportOperation(JavaType serviceClass, String methodName,
-	    String operationName, String resutlName, String resultNamespace,
-	    String responseWrapperName, String responseWrapperNamespace,
-	    String requestWrapperName, String requestWrapperNamespace) {
-	// TODO Auto-generated method stub
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public void exportOperation(JavaType serviceClass,
+	    JavaSymbolName methodName, String operationName, String resutlName,
+	    String resultNamespace, String responseWrapperName,
+	    String responseWrapperNamespace, String requestWrapperName,
+	    String requestWrapperNamespace) {
 
+	Assert.notNull(serviceClass, "Java type required");
+	Assert.notNull(methodName, "Operation name required");
+
+	Assert.isTrue(isWebService(serviceClass));
+    }
+
+    /**
+     * Checks if the selected class exists and contains
+     * {@link ServiceLayerWSExportMetadata}.
+     * 
+     * @param serviceClass
+     *            class to be checked.
+     * @return true if the {@link JavaType} contains
+     *         {@link ServiceLayerWSExportMetadata}.
+     */
+    private boolean isWebService(JavaType serviceClass) {
+	String id = physicalTypeMetadataProvider.findIdentifier(serviceClass);
+
+	Assert.notNull(id, "Cannot locate source for '"
+		+ serviceClass.getFullyQualifiedTypeName() + "'");
+
+	// Go and get the service layer ws metadata to export selected method.
+	JavaType javaType = PhysicalTypeIdentifier.getJavaType(id);
+	Path path = PhysicalTypeIdentifier.getPath(id);
+	String entityMid = ServiceLayerWSExportMetadata.createIdentifier(
+		javaType, path);
+
+	// Get the service layer ws metadata.
+	ServiceLayerWSExportMetadata serviceLayerWSExportMetadata = (ServiceLayerWSExportMetadata) metadataService
+		.get(entityMid);
+	Assert.notNull(serviceLayerWSExportMetadata,
+		"Cannot export operation because '"
+			+ serviceClass.getFullyQualifiedTypeName()
+			+ "' is not a Web Service.");
+	return true;
     }
 
     /**

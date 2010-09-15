@@ -128,7 +128,7 @@ public class ServiceLayerCommands implements CommandMarker {
     }
 
     @CliAvailabilityIndicator("service export operation")
-    public boolean isServiceOperationAvailable() {
+    public boolean isServiceExportOperationAvailable() {
 
 	return serviceLayerWsExportOperations.isProjectAvailable();
     }
@@ -163,9 +163,9 @@ public class ServiceLayerCommands implements CommandMarker {
      * </ul>
      */
     @CliCommand(value = "service export operation", help = "Publish a method as Web Service Operation.")
-    public String serviceOperation(
+    public void serviceExportOperation(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export a method.") JavaType serviceClass,
-	    @CliOption(key = "method", mandatory = true, help = "Method to export as Web Service Operation.") String methodName,
+	    @CliOption(key = "method", mandatory = true, help = "Method to export as Web Service Operation.") JavaSymbolName methodName,
 	    @CliOption(key = "operationName", mandatory = false, help = "Name of the method to be showed as a Web Service operation.") String operationName,
 	    @CliOption(key = "resutlName", mandatory = false, help = "Method result name.") String resutlName,
 	    @CliOption(key = "resultNamespace", mandatory = false, help = "NNamespace of the result type. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String resultNamespace,
@@ -174,7 +174,10 @@ public class ServiceLayerCommands implements CommandMarker {
 	    @CliOption(key = "requestWrapperName", mandatory = false, help = "Name to define the Request Wrapper Object.") String requestWrapperName,
 	    @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String requestWrapperNamespace) {
 
-	return "Web Service Operation published.";
+	serviceLayerWsExportOperations.exportOperation(serviceClass,
+		methodName, operationName, resutlName, resultNamespace,
+		responseWrapperName, responseWrapperNamespace,
+		requestWrapperName, requestWrapperNamespace);
     }
 
     @CliAvailabilityIndicator("service import ws")

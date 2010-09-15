@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
 /**
@@ -75,8 +76,9 @@ public interface ServiceLayerWsExportOperations {
      *            Namespace of the Request Wrapper Object.
      * 
      */
-    public void exportOperation(JavaType serviceClass, String methodName,
-	    String operationName, String resutlName, String resultNamespace,
-	    String responseWrapperName, String responseWrapperNamespace,
-	    String requestWrapperName, String requestWrapperNamespace);
+    public void exportOperation(JavaType serviceClass,
+	    JavaSymbolName methodName, String operationName, String resutlName,
+	    String resultNamespace, String responseWrapperName,
+	    String responseWrapperNamespace, String requestWrapperName,
+	    String requestWrapperNamespace);
 }
