@@ -122,7 +122,7 @@ public class ServiceLayerCommands implements CommandMarker {
 	    @CliOption(key = "serviceName", mandatory = false, help = "Name to publish the Web Service.") String serviceName,
 	    @CliOption(key = "portTypeName", mandatory = false, help = "Name to define the portType.") String portTypeName,
 	    @CliOption(key = "addressName", mandatory = false, help = "Address to publish the Web Service in server. Default class name value.") String addressName,
-	    @CliOption(key = "targetNamespace", mandatory = false, help = "Namespace name for the service. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String targetNamespace) {
+	    @CliOption(key = "targetNamespace", mandatory = false, help = "Namespace name for the service. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String targetNamespace) {
 
 	serviceLayerWsExportOperations.exportService(serviceClass, serviceName,
 		portTypeName, targetNamespace, addressName);
@@ -149,7 +149,7 @@ public class ServiceLayerCommands implements CommandMarker {
      * ``--operationName`` Name of the method to be showed as a Web Service
      * operation.</li>
      * <li>
-     * ``--resutlName`` Method result name.</li>
+     * ``--resultName`` Method result name.</li>
      * <li>
      * ``--resultNamespace`` Namespace of the result type.</li>
      * <li>
@@ -168,15 +168,38 @@ public class ServiceLayerCommands implements CommandMarker {
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export a method.") JavaType serviceClass,
 	    @CliOption(key = "method", mandatory = true, help = "Method to export as Web Service Operation.") JavaSymbolName methodName,
 	    @CliOption(key = "operationName", mandatory = false, help = "Name of the method to be showed as a Web Service operation.") String operationName,
-	    @CliOption(key = "resutlName", mandatory = false, help = "Method result name.") String resutlName,
-	    @CliOption(key = "resultNamespace", mandatory = false, help = "NNamespace of the result type. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String resultNamespace,
+	    @CliOption(key = "resultName", mandatory = false, help = "Method result name.") String resultName,
+	    @CliOption(key = "resultNamespace", mandatory = false, help = "NNamespace of the result type. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String resultNamespace,
 	    @CliOption(key = "responseWrapperName", mandatory = false, help = "Name to define the Response Wrapper Object.") String responseWrapperName,
-	    @CliOption(key = "responseWrapperNamespace", mandatory = false, help = "Namespace of the Response Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String responseWrapperNamespace,
+	    @CliOption(key = "responseWrapperNamespace", mandatory = false, help = "Namespace of the Response Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String responseWrapperNamespace,
 	    @CliOption(key = "requestWrapperName", mandatory = false, help = "Name to define the Request Wrapper Object.") String requestWrapperName,
-	    @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String requestWrapperNamespace) {
+	    @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String requestWrapperNamespace) {
+
+	if (StringUtils.hasText(resultNamespace)) {
+	    Assert
+		    .isTrue(StringUtils.startsWithIgnoreCase(resultNamespace,
+			    "http://"),
+			    "Name space for WebResult is not correctly defined. It must have URI format.");
+	}
+
+	if (StringUtils.hasText(requestWrapperNamespace)) {
+	    Assert
+		    .isTrue(
+			    StringUtils.startsWithIgnoreCase(
+				    requestWrapperNamespace, "http://"),
+			    "Name space for RequestWrapper is not correctly defined. It must have URI format.");
+	}
+
+	if (StringUtils.hasText(responseWrapperNamespace)) {
+	    Assert
+		    .isTrue(
+			    StringUtils.startsWithIgnoreCase(
+				    responseWrapperNamespace, "http://"),
+			    "Name space for ResponsetWrapper is not correctly defined. It must have URI format.");
+	}
 
 	serviceLayerWsExportOperations.exportOperation(serviceClass,
-		methodName, operationName, resutlName, resultNamespace,
+		methodName, operationName, resultName, resultNamespace,
 		responseWrapperName, responseWrapperNamespace,
 		requestWrapperName, requestWrapperNamespace);
     }

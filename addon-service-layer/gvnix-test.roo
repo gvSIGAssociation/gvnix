@@ -20,4 +20,5 @@ controller all --package org.gvnix.test.service.layer.project.web
 service class --class org.gvnix.test.service.layer.project.services.Clase
 service operation --name returnString --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String
 service export ws --class org.gvnix.test.service.layer.project.services.Clase
+service export operation --class org.gvnix.test.service.layer.project.services.Clase --method returnString --resultName resultado
 perform eclipse

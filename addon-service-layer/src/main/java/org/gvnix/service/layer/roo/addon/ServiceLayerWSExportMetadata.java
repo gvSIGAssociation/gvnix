@@ -209,6 +209,7 @@ public class ServiceLayerWSExportMetadata extends
 			"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod"),
 		new ArrayList<AnnotationAttributeValue<?>>());
 
+	boolean exclude = true;
 	for (MethodMetadata md : methodMetadataList) {
 
 	    methodAnnotationList = md.getAnnotations();
@@ -221,12 +222,18 @@ public class ServiceLayerWSExportMetadata extends
 	    } else {
 		for (AnnotationMetadata annotationMetadata : methodAnnotationList) {
 
-		    if (!annotationMetadata.getAnnotationType().equals(
-			    defaultAnnotationMetadata.getAnnotationType()))
+		    if (annotationMetadata.getAnnotationType().equals(
+			    defaultAnnotationMetadata.getAnnotationType())) {
+			exclude = false;
+			break;
+		    }
 
-			builder
-				.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
-					md, methodAnnotation));
+		}
+
+		if (exclude) {
+		    builder
+			    .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+				    md, methodAnnotation));
 		}
 	    }
 	}

@@ -169,7 +169,7 @@ service operation:
     * method: *obligatorio* nombre del método que se va a publicar como operación del servicio (autocompletado de los métodos publicados como servicio, o si se trata de una entidad los de ésta).
     * operationName: nombre con el que se va a definir la operación.
     * webResultType: tipo de clase que va a devolver el método, void por defecto para comprobar que no va a variar el contrato de servicio.
-    * resutlName: nombre asignado a la propiedad _name_ de la anotación @WebResult.
+    * resultName: nombre asignado a la propiedad _name_ de la anotación @WebResult.
     * resultNamespace: namespace utilizado para @WebResult.
     * responseWrapperName: name para @ResponseWrapper
     * responseWrapperNamespace: namespace utilizado para @ResponseWrapper.
@@ -308,7 +308,7 @@ Parameters:
   * ``--class`` (mandatory) Class to export a method.
   * ``--method`` (mandatory) Method to export.
   * ``--operationName`` Name of the method to be showed as a Web Service operation.
-  * ``--resutlName`` Method result name.
+  * ``--resultName`` Method result name.
   * ``--resultNamespace`` Namespace of the result type.
   * ``--responseWrapperName`` Name to define the Response Wrapper Object. 
   * ``--responseWrapperNamespace``: Namespace of the Response Wrapper Object.
