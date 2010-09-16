@@ -197,7 +197,9 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	}
 
 	// Check if method exists in the class.
-	Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName));
+	Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName),
+		"The method: '" + methodName + " doesn't exists in the class '"
+			+ serviceClass.getFullyQualifiedTypeName() + "'.");
 
 	// TODO: Create annotations to selected Method
 	List<AnnotationMetadata> annotationMetadataUpdateList = getAnnotationsToExportOperation(
@@ -312,6 +314,9 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
     /**
      * Check if the method methodName exists in serviceClass and is not
      * annotated before with @GvNIXWebMethod.
+     * <p>
+     * TODO: Check if method exists in the class.
+     * </p>
      * 
      * @param serviceClass
      * @param methodName
@@ -320,7 +325,40 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
     private boolean isMethodAvailableToExport(JavaType serviceClass,
 	    JavaSymbolName methodName) {
 
-	return true;
+	// Load class details. If class not found an exception will be raised.
+	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
+		.getClassOrInterface(serviceClass);
+
+	// Checks if it's mutable
+	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+		tmpServiceDetails, "Can't modify " + tmpServiceDetails.getName());
+
+	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
+	
+	List<? extends MethodMetadata> methodList = serviceDetails.getDeclaredMethods();
+	List<AnnotationMetadata> annotationMethodList;
+
+	for (MethodMetadata methodMetadata : methodList) {
+	    if (methodMetadata.getMethodName().equals(methodName)) {
+
+		annotationMethodList = methodMetadata.getAnnotations();
+		for (AnnotationMetadata annotationMetadata : annotationMethodList) {
+		    Assert
+			    .isTrue(
+				    annotationMetadata
+					    .getAnnotationType()
+					    .getFullyQualifiedTypeName()
+					    .compareTo(
+						    "org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod") != 0,
+				    "The method '"
+					    + methodName
+					    + "' has been annotated with @GvNIXWebMethod before, you could update annotation parameters inside its class.");
+		}
+		return true;
+	    }
+	}
+
+	return false;
     }
 
     /**

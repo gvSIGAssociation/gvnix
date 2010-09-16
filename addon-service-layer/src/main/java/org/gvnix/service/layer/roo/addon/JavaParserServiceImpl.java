@@ -198,14 +198,11 @@ public class JavaParserServiceImpl implements JavaParserService {
 
 		Assert
 			.isTrue(
-				!isAnnotationIntroduced(
+				!isAnnotationIntroducedInMethod(
 					"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod",
-					mutableTypeDetails), "The method '"
+					methodMetadata), "The method '"
 					+ method.toString()
-					+ "' has been annotated with '@"
-					+ annotationMetadataUpdateList.get(0)
-						.getAnnotationType()
-						.getSimpleTypeName() + "'.");
+					+ "' has been annotated with '@org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod' before.");
 		
 		methodAnnotationList.addAll(javaParserMethodMetadata.getAnnotations());
 		methodAnnotationList.addAll(annotationMetadataUpdateList);
@@ -559,15 +556,24 @@ public class JavaParserServiceImpl implements JavaParserService {
      * 
      * @param annotation
      *            to be check if exists.
+     * @param methodMetadata
+     *            method to check if annotation exists.
      * 
      * @return true if it will be introduced, false otherwise
      */
-    public boolean isAnnotationIntroduced(String annotation, ClassOrInterfaceTypeDetails governorTypeDetails) {
-	JavaType javaType = new JavaType(annotation);
-	AnnotationMetadata result = MemberFindingUtils
-		.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+    public boolean isAnnotationIntroducedInMethod(String annotation,
+	    MethodMetadata methodMetadata) {
 
-	return result != null;
+	List<AnnotationMetadata> annotationMethodList = methodMetadata
+		.getAnnotations();
+
+	for (AnnotationMetadata annotationMetadata : annotationMethodList) {
+	    if (annotationMetadata.getAnnotationType()
+		    .getFullyQualifiedTypeName().compareTo(annotation) == 0) {
+		return true;
+	    }
+	}
+	return false;
     }
 
     /**

@@ -23,6 +23,7 @@ import japa.parser.ParseException;
 import java.util.List;
 
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
@@ -126,4 +127,17 @@ public interface JavaParserService {
      */
     public void updateClass(
 	    ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails);
+
+    /**
+     * Indicates whether the annotation will be introduced via this ITD.
+     * 
+     * @param annotation
+     *            to be check if exists.
+     * @param methodMetadata
+     *            method to check if annotation exists.
+     * 
+     * @return true if it will be introduced, false otherwise
+     */
+    public boolean isAnnotationIntroducedInMethod(String annotation,
+	    MethodMetadata methodMetadata);
 }
