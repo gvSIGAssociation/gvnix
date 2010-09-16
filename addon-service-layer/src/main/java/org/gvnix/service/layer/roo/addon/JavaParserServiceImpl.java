@@ -552,14 +552,11 @@ public class JavaParserServiceImpl implements JavaParserService {
     }
 
     /**
-     * Indicates whether the annotation will be introduced via this ITD.
+     * {@inheritDoc}
      * 
-     * @param annotation
-     *            to be check if exists.
-     * @param methodMetadata
-     *            method to check if annotation exists.
-     * 
-     * @return true if it will be introduced, false otherwise
+     * <p>
+     * return true if exists an annotation with the same name in method.
+     * </p>
      */
     public boolean isAnnotationIntroducedInMethod(String annotation,
 	    MethodMetadata methodMetadata) {
@@ -574,6 +571,22 @@ public class JavaParserServiceImpl implements JavaParserService {
 	    }
 	}
 	return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Checks if annotation is defined in as DeclaredType.
+     * </p>
+     */
+    public boolean isAnnotationIntroduced(String annotation,
+	    ClassOrInterfaceTypeDetails governorTypeDetails) {
+	JavaType javaType = new JavaType(annotation);
+	AnnotationMetadata result = MemberFindingUtils
+		.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+
+	return result != null;
     }
 
     /**

@@ -140,4 +140,15 @@ public interface JavaParserService {
      */
     public boolean isAnnotationIntroducedInMethod(String annotation,
 	    MethodMetadata methodMetadata);
+
+    /**
+     * Indicates whether the annotation will be introduced via this ITD.
+     * 
+     * @param annotation
+     *            to be check if exists.
+     * 
+     * @return true if it will be introduced, false otherwise
+     */
+    public boolean isAnnotationIntroduced(String annotation,
+	    ClassOrInterfaceTypeDetails governorTypeDetails);
 }

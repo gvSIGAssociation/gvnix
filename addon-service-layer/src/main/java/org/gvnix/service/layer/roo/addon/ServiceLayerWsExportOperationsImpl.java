@@ -155,7 +155,8 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 			    .toString());
 	}
 
-	// Check if address name value and set service name if isn't defined.
+	// Check if address name value is not blank and set service name if
+	// isn't defined.
 	addressName = StringUtils.hasText(addressName) ? StringUtils
 		.capitalize(addressName) : serviceClass.getSimpleTypeName();
 
@@ -395,13 +396,13 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	
 	// Checks if is @GvNIXWebService annotation defined.
 	// TODO: The annotation can't be updated yet.
-	for (AnnotationMetadata annotationMetadata : serviceAnnotations) {
-	    if (annotationMetadata.getAnnotationType()
-		    .getFullyQualifiedTypeName().equals(
-			    GvNIXWebService.class.getName())) {
-		return;
-	    }
-	}
+	Assert
+		.isTrue(
+			!javaParserService
+				.isAnnotationIntroduced(
+					"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService",
+					serviceDetails),
+			"The annotation @GvNIXWebService can't be updated yet with service command.");
 
 	// @Service and @GvNIXWebService annotation.
 	AnnotationMetadata gvNixWebServiceAnnotation = null;
