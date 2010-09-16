@@ -76,9 +76,18 @@ public interface JavaParserService {
 	    List<JavaSymbolName> paramNames, String body);
 
     /**
-     * TODO:
+     * Adds annotation into selected class method.
+     * 
+     * @param className
+     *            Class to update the method with the new parameter.
+     * @param method
+     *            Method name.
+     * @param annotationMetadataUpdateList
+     *            Annotations to set to method.
      */
-    public void updateMethodAnnotations();
+    public void updateMethodAnnotations(JavaType className,
+	    JavaSymbolName method,
+	    List<AnnotationMetadata> annotationMetadataUpdateList);
 
     /**
      * Adds an input parameter into selected class method.

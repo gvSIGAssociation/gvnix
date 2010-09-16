@@ -480,7 +480,8 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * Define a Web Service class in cxf configuration file to be published.
      * <p>
      */
-    public void exportClass(JavaType className, String serviceName) {
+    public void exportClass(JavaType className, String serviceName,
+	    String addressName) {
 
 	String cxfXmlPath = getCxfConfigurationFilePath();
 	Assert.isTrue(fileManager.exists(cxfXmlPath),
@@ -516,7 +517,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	endpoint.setAttribute("id", serviceName);
 	endpoint.setAttribute("implementor", "#".concat(serviceName).concat(
 		"Impl"));
-	endpoint.setAttribute("address", "/".concat(serviceName));
+	endpoint.setAttribute("address", "/".concat(addressName));
 
 	root.appendChild(bean);
 	root.appendChild(endpoint);
@@ -569,7 +570,8 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * generate in maven compile goal.
      * </p>
      */
-    public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName) {
+    public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName,
+	    String addressName) {
 
 	Element pluginElement = XmlUtils.findFirstElement(
 		"/jaxws-plugin/plugin", XmlUtils.getConfiguration(this
@@ -637,7 +639,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	Element outputFile = pom.createElement("outputFile");
 	outputFile
 		.setTextContent("${project.basedir}/src/test/resources/generated/wsdl/"
-			.concat(serviceName).concat(".wsdl"));
+			.concat(addressName).concat(".wsdl"));
 	Element genWsdl = pom.createElement("genWsdl");
 	genWsdl.setTextContent("true");
 	Element verbose = pom.createElement("verbose");

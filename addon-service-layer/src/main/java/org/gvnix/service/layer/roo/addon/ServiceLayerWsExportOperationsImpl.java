@@ -29,6 +29,7 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.javaparser.details.JavaParserAnnotationMetadata;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
@@ -117,7 +118,7 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
      * 
      */
     public void exportService(JavaType serviceClass, String serviceName,
-	    String name, String targetNamespace) {
+	    String portTypeName, String targetNamespace, String addressName) {
 
 	// Checks if Cxf is configured in the project and installs it if it's
 	// not available.
@@ -137,8 +138,8 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	}
 
 	// Checks serviceName parameter to publish the web service.
-	serviceName = StringUtils.hasText(serviceName) ? StringUtils
-		.capitalize(serviceName) : serviceClass.getSimpleTypeName();
+	serviceName = StringUtils.hasText(serviceName) ? serviceName
+		: serviceClass.getSimpleTypeName();
 
 	// Namespace for the web service.
 	if (StringUtils.hasText(targetNamespace)) {
@@ -148,26 +149,28 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 				    "http://"),
 			    "The namespace has to start with 'http://' and end with '/'.\ni.e.: http://name.of.namespace/");
 
-	    // Adds '/' if is not defined in targetNamespace.
-	    targetNamespace = targetNamespace.endsWith("/") ? targetNamespace
-		    : targetNamespace.concat("/");
-
 	} else {
 	    targetNamespace = serviceLayerWsConfigService
 		    .convertPackageToTargetNamespace(serviceClass.getPackage()
 			    .toString());
 	}
 
+	// Check if address name value and set service name if isn't defined.
+	addressName = StringUtils.hasText(addressName) ? StringUtils
+		.capitalize(addressName) : serviceClass.getSimpleTypeName();
+
 	// Define Web Service Annotations.
-	updateClassAsWebService(serviceClass, serviceName, name,
+	updateClassAsWebService(serviceClass, serviceName, portTypeName,
 		targetNamespace);
 
 	// Update CXF XML
-	serviceLayerWsConfigService.exportClass(serviceClass, serviceName);
+	serviceLayerWsConfigService.exportClass(serviceClass, serviceName,
+		addressName);
 
 	// Define Jax-WS plugin and creates and execution build for this service
 	// to generate the wsdl file to check errors before deploy.
-	serviceLayerWsConfigService.jaxwsBuildPlugin(serviceClass, serviceName);
+	serviceLayerWsConfigService.jaxwsBuildPlugin(serviceClass, serviceName,
+		addressName);
 
 	// Add GvNixAnnotations to the project.
 	annotationsService.addGvNIXAnnotationsDependency();
@@ -186,7 +189,92 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	Assert.notNull(serviceClass, "Java type required");
 	Assert.notNull(methodName, "Operation name required");
 
-	Assert.isTrue(isWebService(serviceClass));
+	// Check if serviceClass is a Web Service. If doesn't exist shows an
+	// error.
+	if (!isWebServiceClass(serviceClass)) {
+	    // Export as a service.
+	    exportService(serviceClass, null, null, null, null);
+	}
+
+	// Check if method exists in the class.
+	Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName));
+
+	// TODO: Create annotations to selected Method
+	List<AnnotationMetadata> annotationMetadataUpdateList = getAnnotationsToExportOperation(
+		serviceClass, methodName, operationName, resutlName,
+		resultNamespace, responseWrapperName, responseWrapperNamespace,
+		requestWrapperName, requestWrapperNamespace);
+
+	javaParserService.updateMethodAnnotations(serviceClass, methodName,
+		annotationMetadataUpdateList);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * If the values are not set, define them using WS-i standard names.
+     * </p>
+     * <p>
+     * Annotations to create:
+     * </p>
+     * <ul>
+     * <li>@GvNIXWebMethod()</li>
+     * <li>@WebMethod(operationName = "operationName", action = "", exclude =
+     * false)</li>
+     * <li>@RequestWrapper(localName = "requestWrapperName", targetNamespace =
+     * "requestWrapperNamespace", className = "")</li>
+     * <li>@ResponseWrapper(localName = "responseWrapperName", targetNamespace =
+     * "responseWrapperNamespace", className = "")</li>
+     * <li>@WebResult(name = "resutlName", targetNamespace = "resultNamespace",
+     * header = false, partName = "parameters")</li>
+     * </ul>
+     */
+    public List<AnnotationMetadata> getAnnotationsToExportOperation(
+	    JavaType serviceClass, JavaSymbolName methodName,
+	    String operationName, String resutlName, String resultNamespace,
+	    String responseWrapperName, String responseWrapperNamespace,
+	    String requestWrapperName, String requestWrapperNamespace) {
+
+	List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
+
+	// org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod
+	AnnotationMetadata gvNIXWebMethod = new DefaultAnnotationMetadata(
+		new JavaType(
+			"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod"),
+		new ArrayList<AnnotationAttributeValue<?>>());
+
+	annotationMetadataList.add(gvNIXWebMethod);
+
+	// // javax.jws.WebMethod
+	// AnnotationMetadata webMethod = new DefaultAnnotationMetadata(
+	// new JavaType("javax.jws.WebMethod"),
+	// new ArrayList<AnnotationAttributeValue<?>>());
+	//
+	// annotationMetadataList.add(webMethod);
+	//
+	// // javax.xml.ws.RequestWrapper
+	// AnnotationMetadata requestWrapper = new DefaultAnnotationMetadata(
+	// new JavaType("javax.xml.ws.RequestWrapper"),
+	// new ArrayList<AnnotationAttributeValue<?>>());
+	//
+	// annotationMetadataList.add(requestWrapper);
+	//
+	// // javax.xml.ws.ResponseWrapper
+	// AnnotationMetadata responseWrapper = new DefaultAnnotationMetadata(
+	// new JavaType("javax.xml.ws.ResponseWrapper"),
+	// new ArrayList<AnnotationAttributeValue<?>>());
+	//
+	// annotationMetadataList.add(responseWrapper);
+	//
+	// // javax.jws.WebResult
+	// AnnotationMetadata webResult = new DefaultAnnotationMetadata(
+	// new JavaType("javax.jws.WebResult"),
+	// new ArrayList<AnnotationAttributeValue<?>>());
+	// annotationMetadataList.add(webResult);
+
+	return annotationMetadataList;
     }
 
     /**
@@ -198,7 +286,7 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
      * @return true if the {@link JavaType} contains
      *         {@link ServiceLayerWSExportMetadata}.
      */
-    private boolean isWebService(JavaType serviceClass) {
+    private boolean isWebServiceClass(JavaType serviceClass) {
 	String id = physicalTypeMetadataProvider.findIdentifier(serviceClass);
 
 	Assert.notNull(id, "Cannot locate source for '"
@@ -213,10 +301,25 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	// Get the service layer ws metadata.
 	ServiceLayerWSExportMetadata serviceLayerWSExportMetadata = (ServiceLayerWSExportMetadata) metadataService
 		.get(entityMid);
-	Assert.notNull(serviceLayerWSExportMetadata,
-		"Cannot export operation because '"
-			+ serviceClass.getFullyQualifiedTypeName()
-			+ "' is not a Web Service.");
+
+	if (serviceLayerWSExportMetadata == null) {
+	    return false;
+	} else {
+	    return true;
+	}
+    }
+
+    /**
+     * Check if the method methodName exists in serviceClass and is not
+     * annotated before with @GvNIXWebMethod.
+     * 
+     * @param serviceClass
+     * @param methodName
+     * @return
+     */
+    private boolean isMethodAvailableToExport(JavaType serviceClass,
+	    JavaSymbolName methodName) {
+
 	return true;
     }
 
@@ -231,13 +334,13 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
      *            class to export.
      * @param serviceName
      *            Name to publish the Web Service.
-     * @param name
+     * @param portTypeName
      *            Name to define the portType.
      * @param targetNamespace
      *            Namespace name for the service.
      */
     private void updateClassAsWebService(JavaType serviceClass,
-	    String serviceName, String name, String targetNamespace) {
+	    String serviceName, String portTypeName, String targetNamespace) {
 
 	// Load class details. If class not found an exception will be raised.
 	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
@@ -269,16 +372,11 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
 
 	// Checks name parameter to define PortType.
-	name = StringUtils.hasText(name) ? StringUtils.capitalize(name)
-		: serviceName;
-
-	// Checks if name ends with PortType to support web services
-	// interoperability.
-	name = StringUtils.endsWithIgnoreCase(name, "PortType") ? name : name
-		.concat("PortType");
+	portTypeName = StringUtils.hasText(portTypeName) ? portTypeName
+		: serviceName.concat("PortType");
 
 	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("name"), name));
+		new JavaSymbolName("name"), portTypeName));
 
 	gvNixAnnotationAttributes.add(new StringAttributeValue(
 		new JavaSymbolName("targetNamespace"), targetNamespace));

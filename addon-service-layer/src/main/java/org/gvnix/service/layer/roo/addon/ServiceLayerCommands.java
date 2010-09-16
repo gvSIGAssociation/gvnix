@@ -120,11 +120,12 @@ public class ServiceLayerCommands implements CommandMarker {
     public void serviceExport(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass,
 	    @CliOption(key = "serviceName", mandatory = false, help = "Name to publish the Web Service.") String serviceName,
-	    @CliOption(key = "name", mandatory = false, help = "Name to define the portType.") String name,
+	    @CliOption(key = "portTypeName", mandatory = false, help = "Name to define the portType.") String portTypeName,
+	    @CliOption(key = "addressName", mandatory = false, help = "Address to publish the Web Service in server. Default class name value.") String addressName,
 	    @CliOption(key = "targetNamespace", mandatory = false, help = "Namespace name for the service. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'") String targetNamespace) {
 
 	serviceLayerWsExportOperations.exportService(serviceClass, serviceName,
-		name, targetNamespace);
+		portTypeName, targetNamespace, addressName);
     }
 
     @CliAvailabilityIndicator("service export operation")

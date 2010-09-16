@@ -57,8 +57,11 @@ public interface ServiceLayerWsConfigService {
      *            class to be configured as Web Service.
      * @param serviceName
      *            Name to publish the Web Service.
+     * @param addressName
+     *            Address to access the service.
      */
-    public void exportClass(JavaType serviceClass, String serviceName);
+    public void exportClass(JavaType serviceClass, String serviceName,
+	    String addressName);
 
     /**
      * Converts package name to a Target Namespace.
@@ -77,6 +80,9 @@ public interface ServiceLayerWsConfigService {
      *            Service to generate Wsdl.
      * @param serviceName
      *            Service name for wsdl file.
+     * @param addressName
+     *            Address to access the service.
      */
-    public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName);
+    public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName,
+	    String addressName);
 }

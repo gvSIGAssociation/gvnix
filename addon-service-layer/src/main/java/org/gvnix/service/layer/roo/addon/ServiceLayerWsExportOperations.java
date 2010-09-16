@@ -18,6 +18,9 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.List;
+
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
@@ -45,13 +48,15 @@ public interface ServiceLayerWsExportOperations {
      *            class to export.
      * @param serviceName
      *            Name to publish the Web Service.
-     * @param name
+     * @param portTypeName
      *            Name to define the portType.
      * @param targetNamespace
      *            Namespace name for the service.
+     * @param addressName
+     *            Address to access the service.
      */
     public void exportService(JavaType className, String serviceName,
-	    String name, String targetNamespace);
+	    String portTypeName, String targetNamespace, String addressName);
 
     /**
      * Exports an operation to a Web Service Operation.
@@ -81,4 +86,33 @@ public interface ServiceLayerWsExportOperations {
 	    String resultNamespace, String responseWrapperName,
 	    String responseWrapperNamespace, String requestWrapperName,
 	    String requestWrapperNamespace);
+
+    /**
+     * Creates the list of annotations with the values defined.
+     * 
+     * @param serviceClass
+     *            Class to export a method.
+     * @param methodName
+     *            Method to export.
+     * @param operationName
+     *            Name of the method to be showed as a Web Service operation.
+     * @param resutlName
+     *            Method result name.
+     * @param resultNamespace
+     *            Namespace of the result type.
+     * @param responseWrapperName
+     *            Name to define the Response Wrapper Object.
+     * @param responseWrapperNamespace
+     *            Namespace of the Response Wrapper Object.
+     * @param requestWrapperName
+     *            Name to define the Request Wrapper Object.
+     * @param requestWrapperNamespace
+     *            Namespace of the Request Wrapper Object.
+     * 
+     */
+    public List<AnnotationMetadata> getAnnotationsToExportOperation(
+	    JavaType serviceClass, JavaSymbolName methodName,
+	    String operationName, String resutlName, String resultNamespace,
+	    String responseWrapperName, String responseWrapperNamespace,
+	    String requestWrapperName, String requestWrapperNamespace);
 }
