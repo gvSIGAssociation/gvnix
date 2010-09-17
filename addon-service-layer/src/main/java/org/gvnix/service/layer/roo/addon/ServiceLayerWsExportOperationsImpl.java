@@ -547,7 +547,7 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	gvNixWebServiceAnnotation = new DefaultAnnotationMetadata(new JavaType(
 		GvNIXWebService.class.getName()), gvNixAnnotationAttributes);
 
-	// Adds GvNIXEntityOCCChecksum to the entity
+	// Adds GvNIXWebService to the entity
 	serviceDetails.addTypeAnnotation(gvNixWebServiceAnnotation);
     }
 

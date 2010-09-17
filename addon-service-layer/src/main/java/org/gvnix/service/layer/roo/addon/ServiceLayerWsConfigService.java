@@ -85,4 +85,13 @@ public interface ServiceLayerWsConfigService {
      */
     public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName,
 	    String addressName);
+    
+    /**
+     * Add codegen plugin configuration, if not exists, and adds a wsdl location.
+     * 
+     * @param wsdlLocation
+     *            WSDL file location.
+     */
+    public void importWsdl(String wsdlLocation);
+    
 }

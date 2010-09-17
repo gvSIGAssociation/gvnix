@@ -21,4 +21,6 @@ service class --class org.gvnix.test.service.layer.project.services.Clase
 service operation --name returnString --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String
 service export ws --class org.gvnix.test.service.layer.project.services.Clase
 service export operation --class org.gvnix.test.service.layer.project.services.Clase --method returnString --resultName resultado
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
 perform eclipse
+perform assembly

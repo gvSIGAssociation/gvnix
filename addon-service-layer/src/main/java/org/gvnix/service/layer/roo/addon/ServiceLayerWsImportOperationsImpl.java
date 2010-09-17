@@ -52,7 +52,10 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
     private MetadataService metadataService;
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
-
+    @Reference
+    private JavaParserService javaParserService;
+    @Reference
+    private AnnotationsService annotationsService;
     
     /*
      * (non-Javadoc)
@@ -90,10 +93,9 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
      * 
      * @param serviceClass
      */
-    public void importService(JavaType serviceClass, String url) {
+    public void importService(JavaType serviceClass, String wsdlLocation) {
 
-	// Checks if Cxf is configured in the project and installs it if it's
-	// not available.
+	// Install Ws import configuration requirements, if not installed 
 	serviceLayerWsConfigService.install(CommunicationSense.IMPORT);
 
 	String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
@@ -101,25 +103,17 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
 			.concat(".java"));
 
 	if (!fileManager.exists(fileLocation)) {
-	    logger.log(Level.INFO, "Crea la nueva clase de servicio: "
-		    + serviceClass.getSimpleTypeName()
-		    + " para publicarla como servicio web.");
+	    logger.log(Level.INFO, "New service class created: "
+		    + serviceClass.getSimpleTypeName());
+	    
 	    // Create service class with Service Annotation.
-//	    createServiceClass(serviceClass);
-
+	    javaParserService.createServiceClass(serviceClass);
 	}
 	
-	// TODO Develop method
+	serviceLayerWsConfigService.importWsdl(wsdlLocation);
 
-//	// Define Web Service Annotations.
-//	updateClassAsWebService(serviceClass);
-//
-//	// Update CXF XML
-//	updateCxfXml(serviceClass);
-//
-//	// Add GvNixAnnotations to the project.
-//	addGvNIXAnnotationsDependecy();
-
+	// Add GvNixAnnotations to the project.
+	annotationsService.addGvNIXAnnotationsDependency();
     }
 
 }

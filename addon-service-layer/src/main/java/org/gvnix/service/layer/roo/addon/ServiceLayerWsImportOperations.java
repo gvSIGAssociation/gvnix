@@ -42,9 +42,9 @@ public interface ServiceLayerWsImportOperations {
      * 
      * @param className
      *            class to import.
-     * @param url
+     * @param wsdlLocation
      *            contract wsdl url to import.
      */
-    public void importService(JavaType className, String url);
+    public void importService(JavaType className, String wsdlLocation);
 
 }

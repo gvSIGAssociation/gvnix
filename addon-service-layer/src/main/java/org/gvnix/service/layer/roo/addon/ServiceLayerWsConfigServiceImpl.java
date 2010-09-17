@@ -597,7 +597,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	Element root = pom.getDocumentElement();
 
 	Element jaxWsPlugin = XmlUtils.findFirstElement(
-			"/project/build/plugins/plugin[groupId='org.apache.cxf']",
+			"/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-java2ws-plugin']",
 		root);
 
 	Assert
@@ -681,6 +681,82 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	}
 
 
+	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Adds a wsdl location to the codegen plugin configuration.
+     * If codegen plugin configuration not exists, it will be created.
+     * </p>
+     */
+    public void importWsdl(String wsdlLocation) {
+
+	// Get plugin template
+	Element pluginElement = XmlUtils.findFirstElement(
+		"/codegen-plugin/plugin", XmlUtils.getConfiguration(this
+			.getClass(), "dependencies-import-codegen-plugin.xml"));
+
+	// Add plugin
+	projectOperations.buildPluginUpdate(new Plugin(pluginElement));
+
+	// Get pom.xml
+	String pomPath = getPomFilePath();
+	Assert.notNull(pomPath, "pom.xml configuration file not found.");
+
+	// Get a mutable pom.xml reference to modify it
+	MutableFile pomMutableFile = null;
+	Document pom;
+	try {
+	    pomMutableFile = fileManager.updateFile(pomPath);
+	    pom = XmlUtils.getDocumentBuilder().parse(
+		    pomMutableFile.getInputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+
+	Element root = pom.getDocumentElement();
+
+	// Get plugin element
+	Element codegenWsPlugin = XmlUtils.findFirstElement(
+		"/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']",
+		root);
+
+	// If plugin element not exists, message error
+	Assert
+		.notNull(codegenWsPlugin,
+			"Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+
+	// Access executions > execution > configuration > wsdlOptions element
+	// configuration and wsdlOptions are created if not exists
+	Element executions = XmlUtils.findFirstElementByName("executions",
+		codegenWsPlugin);
+	Element execution = XmlUtils.findFirstElementByName("execution",
+		executions);
+	Element configuration = XmlUtils.findFirstElementByName("configuration",
+		execution);
+	if (configuration == null) {
+	
+	    configuration = pom.createElement("configuration");
+	    execution.appendChild(configuration);
+	}
+	Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
+		configuration);
+	if (wsdlOptions == null) {
+		
+	    wsdlOptions = pom.createElement("wsdlOptions");
+	    configuration.appendChild(wsdlOptions);
+	}
+	
+	Element wsdlOption = pom.createElement("wsdlOption");
+	Element wsdl = pom.createElement("wsdl");
+	wsdl.setTextContent(wsdlLocation);
+	
+	wsdlOption.appendChild(wsdl);
+	wsdlOptions.appendChild(wsdlOption);
+	
 	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
     }
 

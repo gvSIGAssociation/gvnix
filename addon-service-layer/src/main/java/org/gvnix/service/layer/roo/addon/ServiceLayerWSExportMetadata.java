@@ -22,6 +22,7 @@ package org.gvnix.service.layer.roo.addon;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.*;
@@ -64,11 +65,13 @@ public class ServiceLayerWSExportMetadata extends
 	// Create the metadata.
 	AnnotationMetadata annotationMetadata = MemberFindingUtils
 		.getTypeAnnotation(governorTypeDetails, new JavaType(
-				"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService"));
+				GvNIXWebService.class.getName()));
 
 	if (annotationMetadata != null) {
 
 	    // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
+	    
+	    // TODO Comprobar el uso de AutoPopulationUtils.populate(this, annotation) para añadir las anotaciones
 
 	    builder
 		    .addTypeAnnotation(getWebServiceAnnotation(annotationMetadata));
