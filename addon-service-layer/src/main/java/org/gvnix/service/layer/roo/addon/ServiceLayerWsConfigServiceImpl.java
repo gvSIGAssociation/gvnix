@@ -33,6 +33,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.*;
+import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -313,6 +314,15 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	if (isCxfDependenciesInstalled(type)) {
 	    
 	    return;
+	}
+	
+	// Add project properties as cxf version
+	// TODO Check cxf version property before ?
+	List<Element> projectProperties = XmlUtils.findElements(
+		"/configuration/gvnix/properties/*", XmlUtils.getConfiguration(
+			this.getClass(), "properties.xml"));
+	for (Element property : projectProperties) {
+	    projectOperations.addProperty(new Property(property));
 	}
 
 	List<Element> cxfDependencies = getCxfRequiredDependencies(type);
@@ -688,11 +698,11 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * {@inheritDoc}
      * 
      * <p>
-     * Adds a wsdl location to the codegen plugin configuration.
-     * If codegen plugin configuration not exists, it will be created.
+     * Adds a wsdl location to the codegen plugin configuration. If code
+     * generation plugin configuration not exists, it will be created.
      * </p>
      */
-    public void importWsdl(String wsdlLocation) {
+    public void addImportLocation(String wsdlLocation) {
 
 	// Get plugin template
 	Element pluginElement = XmlUtils.findFirstElement(
@@ -729,8 +739,8 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 		.notNull(codegenWsPlugin,
 			"Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
-	// Access executions > execution > configuration > wsdlOptions element
-	// configuration and wsdlOptions are created if not exists
+	// Access executions > execution > configuration > wsdlOptions element.
+	// Configuration and wsdlOptions are created if not exists.
 	Element executions = XmlUtils.findFirstElementByName("executions",
 		codegenWsPlugin);
 	Element execution = XmlUtils.findFirstElementByName("execution",
@@ -750,13 +760,14 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	    configuration.appendChild(wsdlOptions);
 	}
 	
+	// Create new wsdl element and append it to the XML tree
 	Element wsdlOption = pom.createElement("wsdlOption");
 	Element wsdl = pom.createElement("wsdl");
 	wsdl.setTextContent(wsdlLocation);
-	
 	wsdlOption.appendChild(wsdl);
 	wsdlOptions.appendChild(wsdlOption);
 	
+	// Write new XML to disk
 	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
     }
 

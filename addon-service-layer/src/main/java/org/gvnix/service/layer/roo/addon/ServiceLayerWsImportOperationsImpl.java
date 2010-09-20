@@ -18,13 +18,19 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebServiceProxy;
 
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
@@ -95,23 +101,32 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
      */
     public void importService(JavaType serviceClass, String wsdlLocation) {
 
-	// Install Ws import configuration requirements, if not installed 
+	// Install import WS configuration requirements, if not installed 
 	serviceLayerWsConfigService.install(CommunicationSense.IMPORT);
 
+	// Service class path
 	String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
 		serviceClass.getFullyQualifiedTypeName().replace('.', '/')
 			.concat(".java"));
 
+	// If class not exists, create it
 	if (!fileManager.exists(fileLocation)) {
-	    logger.log(Level.INFO, "New service class created: "
-		    + serviceClass.getSimpleTypeName());
 	    
 	    // Create service class with Service Annotation.
 	    javaParserService.createServiceClass(serviceClass);
+	    logger.log(Level.INFO, "New service class created: "
+		    + serviceClass.getSimpleTypeName());
 	}
 	
-	serviceLayerWsConfigService.importWsdl(wsdlLocation);
-
+	// Add wsdl location
+	serviceLayerWsConfigService.addImportLocation(wsdlLocation);
+	
+	// Add the import definition annotation and attributes to the class
+	List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
+	annotationAttributeValues.add(new StringAttributeValue(
+		new JavaSymbolName("wsdlLocation"), wsdlLocation));
+	annotationsService.addJavaTypeAnnotation(serviceClass, GvNIXWebServiceProxy.class.getName(), annotationAttributeValues);
+	
 	// Add GvNixAnnotations to the project.
 	annotationsService.addGvNIXAnnotationsDependency();
     }

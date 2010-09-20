@@ -29,7 +29,6 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
-import org.springframework.roo.classpath.javaparser.details.JavaParserAnnotationMetadata;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
@@ -154,14 +153,23 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 		    .convertPackageToTargetNamespace(serviceClass.getPackage()
 			    .toString());
 
-	// Check if address name value is not blank and set service name if
-	// isn't defined.
+	// Check address name not blank and set service name if not defined.
 	addressName = StringUtils.hasText(addressName) ? StringUtils
 		.capitalize(addressName) : serviceClass.getSimpleTypeName();
 
-	// Define Web Service Annotations.
-	updateClassAsWebService(serviceClass, serviceName, portTypeName,
-		targetNamespace);
+	// Define @GvNIXWebService annotation and attributes.
+	// Check port type attribute name format and add attributes to a list.
+	List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+	portTypeName = StringUtils.hasText(portTypeName) ? portTypeName
+		: serviceName.concat("PortType");
+	gvNixAnnotationAttributes.add(new StringAttributeValue(
+		new JavaSymbolName("name"), portTypeName));
+	gvNixAnnotationAttributes.add(new StringAttributeValue(
+		new JavaSymbolName("targetNamespace"), targetNamespace));
+	gvNixAnnotationAttributes.add(new StringAttributeValue(
+		new JavaSymbolName("serviceName"), serviceName));
+	annotationsService.addJavaTypeAnnotation(serviceClass,
+		GvNIXWebService.class.getName(), gvNixAnnotationAttributes);
 
 	// Update CXF XML
 	serviceLayerWsConfigService.exportClass(serviceClass, serviceName,
@@ -471,87 +479,6 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
     }
 
     /**
-     * Update an existing class to a web service.
-     * 
-     * <p>
-     * Adds @GvNIXWebService annotation to the class.
-     * </p>
-     * 
-     * @param serviceClass
-     *            class to export.
-     * @param serviceName
-     *            Name to publish the Web Service.
-     * @param portTypeName
-     *            Name to define the portType.
-     * @param targetNamespace
-     *            Namespace name for the service.
-     */
-    private void updateClassAsWebService(JavaType serviceClass,
-	    String serviceName, String portTypeName, String targetNamespace) {
-
-	// Load class details. If class not found an exception will be raised.
-	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
-		.getClassOrInterface(serviceClass);
-
-	// Checks if it's mutable
-	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-		tmpServiceDetails, "Can't modify " + tmpServiceDetails.getName());
-
-	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
-
-	List<? extends AnnotationMetadata> serviceAnnotations = serviceDetails
-		.getTypeAnnotations();
-	
-	// Checks if is @GvNIXWebService annotation defined.
-	// TODO: The annotation can't be updated yet.
-	Assert
-		.isTrue(
-			!javaParserService
-				.isAnnotationIntroduced(
-					"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService",
-					serviceDetails),
-			"The annotation @GvNIXWebService can't be updated yet with service command.");
-
-	// @Service and @GvNIXWebService annotation.
-	AnnotationMetadata gvNixWebServiceAnnotation = null;
-
-	// @GvNIXWebService Annotation attributes.
-	List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-
-	// Checks name parameter to define PortType.
-	portTypeName = StringUtils.hasText(portTypeName) ? portTypeName
-		: serviceName.concat("PortType");
-
-	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("name"), portTypeName));
-
-	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("targetNamespace"), targetNamespace));
-
-	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("serviceName"), serviceName));
-
-	for (AnnotationMetadata tmpAnnotationMetadata : serviceAnnotations) {
-
-	    if (tmpAnnotationMetadata.getAnnotationType()
-		    .getFullyQualifiedTypeName().equals(
-			    GvNIXWebService.class.getName())) {
-
-		serviceDetails.removeTypeAnnotation(new JavaType(
-			GvNIXWebService.class.getName()));
-	    }
-
-	}
-
-	// Define GvNIXWebService annotation.
-	gvNixWebServiceAnnotation = new DefaultAnnotationMetadata(new JavaType(
-		GvNIXWebService.class.getName()), gvNixAnnotationAttributes);
-
-	// Adds GvNIXWebService to the entity
-	serviceDetails.addTypeAnnotation(gvNixWebServiceAnnotation);
-    }
-
-    /**
      * Checks correct namespace URI format. Suffix 'http://'.
      * 
      * <p>
@@ -569,4 +496,5 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	}
 	return true;
     }
+    
 }

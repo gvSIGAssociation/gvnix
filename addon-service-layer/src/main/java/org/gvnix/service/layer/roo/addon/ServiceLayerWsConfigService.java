@@ -23,6 +23,11 @@ import org.springframework.roo.model.JavaType;
 /**
  * Service to manage the Web Services.
  * 
+ * <p>
+ * It is required to check the configuration with install(CommunicationSense)
+ * before executing any operation.
+ * </p>
+ * 
  * @author Ricardo García ( rgarcia at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -44,7 +49,7 @@ public interface ServiceLayerWsConfigService {
     public enum CommunicationSense { EXPORT, IMPORT };
 
     /**
-     * Install and configure Web Service library on a project.
+     * Install and configure Web Service library, if not already installed.
      * 
      * @param type Communication type
      */
@@ -87,11 +92,11 @@ public interface ServiceLayerWsConfigService {
 	    String addressName);
     
     /**
-     * Add codegen plugin configuration, if not exists, and adds a wsdl location.
+     * Add a wsdl location to import.
      * 
      * @param wsdlLocation
      *            WSDL file location.
      */
-    public void importWsdl(String wsdlLocation);
+    public void addImportLocation(String wsdlLocation);
     
 }
