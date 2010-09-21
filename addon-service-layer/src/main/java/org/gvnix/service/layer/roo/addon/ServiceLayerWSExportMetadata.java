@@ -83,6 +83,10 @@ public class ServiceLayerWSExportMetadata extends
 	// '@WebMethod(exclude = true)'
 	updateMethodWithoutGvNIXAnnotation();
 
+	// TODO: Update RooEntities involved in Annotated Operations with
+	// @GvNIXWebMethod.
+
+
 	// Create a representation of the desired output ITD
 	itdTypeDetails = builder.build();
 

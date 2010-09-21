@@ -570,6 +570,40 @@ public class JavaParserServiceImpl implements JavaParserService {
     /**
      * {@inheritDoc}
      * 
+     */
+    public List<JavaType> getMethodExceptionList(JavaType serviceClass,
+	    JavaSymbolName methodName) {
+	// Load class details. If class not found an exception will be raised.
+	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
+		.getClassOrInterface(serviceClass);
+
+	// Checks if it's mutable
+	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+		tmpServiceDetails, "Can't modify "
+			+ tmpServiceDetails.getName());
+
+	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
+
+	List<? extends MethodMetadata> methodList = serviceDetails
+		.getDeclaredMethods();
+
+	List<JavaType> throwList = new ArrayList<JavaType>();
+
+	for (MethodMetadata methodMetadata : methodList) {
+	    if (methodMetadata.getMethodName().equals(methodName)) {
+
+		throwList = methodMetadata.getThrowsTypes();
+		break;
+	    }
+	}
+	
+
+	return throwList;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * <p>
      * Checks if annotation is defined in as DeclaredType.
      * </p>

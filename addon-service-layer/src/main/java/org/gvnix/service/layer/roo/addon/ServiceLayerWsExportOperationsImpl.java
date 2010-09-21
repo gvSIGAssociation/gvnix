@@ -252,6 +252,15 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 
     }
 
+    /**
+     * Returns method return JavaType.
+     * 
+     * @param serviceClass
+     *            where the method is defined.
+     * @param methodName
+     *            to search.
+     * @return {@link JavaType}
+     */
     private JavaType returnJavaType(JavaType serviceClass,
 	    JavaSymbolName methodName) {
 

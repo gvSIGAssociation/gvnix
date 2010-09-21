@@ -151,4 +151,17 @@ public interface JavaParserService {
      */
     public boolean isAnnotationIntroduced(String annotation,
 	    ClassOrInterfaceTypeDetails governorTypeDetails);
+
+    /**
+     * Returns method exceptions throw list.
+     * 
+     * @param serviceClass
+     *            where the method is defined.
+     * @param methodName
+     *            to search.
+     * @return {@link List} of {@link JavaType} Exception that are defined in
+     *         method. Empty list if there is no exception defined.
+     */
+    public List<JavaType> getMethodExceptionList(JavaType serviceClass,
+	    JavaSymbolName methodName);
 }

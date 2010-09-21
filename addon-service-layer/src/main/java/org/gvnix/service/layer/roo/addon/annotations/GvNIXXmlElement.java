@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 
 /**
  * <p>
- * GvNix Annotation to identify related entity to the service class.
+ * GvNix Annotation to identify GvNIX Xml Elements used in service's operations.
  * </p>
  * 
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -32,8 +32,10 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface GvNIXEntityService {
+public @interface GvNIXXmlElement {
 
-    Class<?> rooEntity();
+    String name() default "";
+
+    String namespace() default "";
 
 }
