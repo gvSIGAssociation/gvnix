@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
@@ -145,12 +146,6 @@ public class JavaParserServiceImpl implements JavaParserService {
 		paramTypes, paramNames, annotationList, throwsTypes, body);
 	mutableTypeDetails.addMethod(operationMetadata);
 
-	for (MethodMetadata methodMetadata : mutableTypeDetails
-		.getDeclaredMethods()) {
-
-	    methodMetadata.getAnnotations();
-	}
-
     }
 
     /**
@@ -196,15 +191,14 @@ public class JavaParserServiceImpl implements JavaParserService {
 	    if (methodMetadata.getMethodName().toString().compareTo(
 		    method.toString()) == 0) {
 
-		Assert
-			.isTrue(
-				!isAnnotationIntroducedInMethod(
-					"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod",
-					methodMetadata), "The method '"
-					+ method.toString()
-					+ "' has been annotated with '@org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod' before.");
-		
-		methodAnnotationList.addAll(javaParserMethodMetadata.getAnnotations());
+		Assert.isTrue(!isAnnotationIntroducedInMethod(
+			GvNIXWebMethod.class.getName(), methodMetadata),
+			"The method '" + method.toString()
+				+ "' has been annotated with '@"
+				+ GvNIXWebMethod.class.getName() + "' before.");
+
+		methodAnnotationList.addAll(javaParserMethodMetadata
+			.getAnnotations());
 		methodAnnotationList.addAll(annotationMetadataUpdateList);
 
 		operationMetadata = new DefaultMethodMetadata(targetId,

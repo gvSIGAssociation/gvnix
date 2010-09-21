@@ -161,6 +161,10 @@ public class ServiceLayerCommands implements CommandMarker {
      * ``--requestWrapperName``: Name to define the Request Wrapper Object.</li>
      * <li>
      * ``--requestWrapperNamespace``: Namespace of the Request Wrapper Object.</li>
+     * <li>
+     * ``--exceptionName``: Name to define method exception if exists.</li>
+     * <li>
+     * ``--exceptionNamespace``: Namespace of method exception if exists.</li>
      * </ul>
      */
     @CliCommand(value = "service export operation", help = "Publish a method as Web Service Operation.")
@@ -173,7 +177,9 @@ public class ServiceLayerCommands implements CommandMarker {
 	    @CliOption(key = "responseWrapperName", mandatory = false, help = "Name to define the Response Wrapper Object.") String responseWrapperName,
 	    @CliOption(key = "responseWrapperNamespace", mandatory = false, help = "Namespace of the Response Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String responseWrapperNamespace,
 	    @CliOption(key = "requestWrapperName", mandatory = false, help = "Name to define the Request Wrapper Object.") String requestWrapperName,
-	    @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String requestWrapperNamespace) {
+	    @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String requestWrapperNamespace,
+	    @CliOption(key = "exceptionName", mandatory = false, help = "Name to define method exception if exists.") String exceptionName,
+	    @CliOption(key = "exceptionNamespace", mandatory = false, help = "Namespace of method exception if exists. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String exceptionNamespace) {
 
 	if (StringUtils.hasText(resultNamespace)) {
 	    Assert
@@ -198,10 +204,18 @@ public class ServiceLayerCommands implements CommandMarker {
 			    "Name space for ResponsetWrapper is not correctly defined. It must have URI format.");
 	}
 
+	if (StringUtils.hasText(exceptionNamespace)) {
+	    Assert
+		    .isTrue(StringUtils.startsWithIgnoreCase(
+			    exceptionNamespace, "http://"),
+			    "Name space for Exception is not correctly defined. It must have URI format.");
+	}
+
 	serviceLayerWsExportOperations.exportOperation(serviceClass,
 		methodName, operationName, resultName, resultNamespace,
 		responseWrapperName, responseWrapperNamespace,
-		requestWrapperName, requestWrapperNamespace);
+		requestWrapperName, requestWrapperNamespace, exceptionName,
+		exceptionNamespace);
     }
 
     @CliAvailabilityIndicator("service import ws")

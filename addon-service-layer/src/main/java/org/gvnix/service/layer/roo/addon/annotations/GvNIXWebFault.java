@@ -31,7 +31,15 @@ import java.lang.annotation.*;
  *         Transport</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target( { ElementType.TYPE, ElementType.METHOD })
 public @interface GvNIXWebFault {
+
+    String name() default "";
+
+    Class<?> type() default void.class;
+
+    String targetNamespace() default "";
+
+    String faultBean() default "";
 
 }

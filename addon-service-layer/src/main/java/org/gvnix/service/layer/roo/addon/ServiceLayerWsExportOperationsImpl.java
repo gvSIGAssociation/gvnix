@@ -24,7 +24,9 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
+import org.springframework.roo.addon.finder.FinderMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.details.*;
@@ -189,10 +191,11 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
      * 
      */
     public void exportOperation(JavaType serviceClass,
-	    JavaSymbolName methodName, String operationName, String resutlName,
+	    JavaSymbolName methodName, String operationName, String resultName,
 	    String resultNamespace, String responseWrapperName,
 	    String responseWrapperNamespace, String requestWrapperName,
-	    String requestWrapperNamespace) {
+	    String requestWrapperNamespace, String exceptionName,
+	    String exceptionNamespace) {
 
 	Assert.notNull(serviceClass, "Java type required");
 	Assert.notNull(methodName, "Operation name required");
@@ -205,9 +208,24 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	}
 
 	// Check if method exists in the class.
-	Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName),
-		"The method: '" + methodName + " doesn't exists in the class '"
-			+ serviceClass.getFullyQualifiedTypeName() + "'.");
+	Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName,
+		GvNIXWebMethod.class.getName()), "The method: '" + methodName
+		+ " doesn't exists in the class '"
+		+ serviceClass.getFullyQualifiedTypeName() + "'.");
+
+	// Check if method has return type.
+	JavaType returnType = returnJavaType(serviceClass, methodName);
+
+	if (returnType.equals(JavaType.VOID_OBJECT)
+		|| returnType.equals(JavaType.VOID_PRIMITIVE)) {
+	    resultName = null;
+	} else if (!StringUtils.hasText(resultName)) {
+
+	    resultName = "return";
+	}
+
+	// TODO: Check if method throws an Exception.
+
 
 	// Checks correct namespace format.
 	Assert
@@ -225,7 +243,7 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 
 	// Create annotations to selected Method
 	List<AnnotationMetadata> annotationMetadataUpdateList = getAnnotationsToExportOperation(
-		serviceClass, methodName, operationName, resutlName,
+		serviceClass, methodName, operationName, resultName,
 		resultNamespace, responseWrapperName, responseWrapperNamespace,
 		requestWrapperName, requestWrapperNamespace);
 
@@ -233,6 +251,39 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 		annotationMetadataUpdateList);
 
     }
+
+    private JavaType returnJavaType(JavaType serviceClass,
+	    JavaSymbolName methodName) {
+
+	JavaType returnType = new JavaType(JavaType.VOID_OBJECT.toString());
+
+	// Load class details. If class not found an exception will be raised.
+	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
+		.getClassOrInterface(serviceClass);
+
+	// Checks if it's mutable
+	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+		tmpServiceDetails, "Can't modify "
+			+ tmpServiceDetails.getName());
+
+	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
+	
+	List<? extends MethodMetadata> methodList = serviceDetails
+		.getDeclaredMethods();
+
+	for (MethodMetadata methodMetadata : methodList) {
+	    if (methodMetadata.getMethodName().equals(methodName)) {
+		if (methodMetadata.getReturnType() != null) {
+		    returnType = methodMetadata.getReturnType();
+		    break;
+		}
+
+	    }
+	}
+
+	return returnType;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -267,8 +318,7 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	// org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod
 	annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 	AnnotationMetadata gvNIXWebMethod = new DefaultAnnotationMetadata(
-		new JavaType(
-			"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod"),
+		new JavaType(GvNIXWebMethod.class.getName()),
 		annotationAttributeValueList);
 
 	annotationMetadataList.add(gvNIXWebMethod);
@@ -363,35 +413,46 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	annotationMetadataList.add(responseWrapper);
 
 	// javax.jws.WebResult
-	// TODO: Comprobar webResult name.
-	annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+	// Check result value
+	if (resutlName != null) {
+	    annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-	localNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
-		"name"), resutlName);
-	annotationAttributeValueList.add(localNameAttributeValue);
+	    localNameAttributeValue = new StringAttributeValue(
+		    new JavaSymbolName("name"), resutlName);
+	    annotationAttributeValueList.add(localNameAttributeValue);
 
-	resultNamespace = StringUtils.hasText(resultNamespace) ? resultNamespace
-		: serviceLayerWsConfigService
-			.convertPackageToTargetNamespace(serviceClass
-				.getPackage().getFullyQualifiedPackageName());
+	    resultNamespace = StringUtils.hasText(resultNamespace) ? resultNamespace
+		    : serviceLayerWsConfigService
+			    .convertPackageToTargetNamespace(serviceClass
+				    .getPackage()
+				    .getFullyQualifiedPackageName());
 
-	targetNamespaceAttributeValue = new StringAttributeValue(
-		new JavaSymbolName("targetNamespace"), resultNamespace);
-	annotationAttributeValueList.add(targetNamespaceAttributeValue);
+	    targetNamespaceAttributeValue = new StringAttributeValue(
+		    new JavaSymbolName("targetNamespace"), resultNamespace);
+	    annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-	BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(new JavaSymbolName("header"), false);
-	annotationAttributeValueList.add(headerAttributeValue);
+	    BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
+		    new JavaSymbolName("header"), false);
+	    annotationAttributeValueList.add(headerAttributeValue);
 
-	StringAttributeValue partNameAttributeValue = new StringAttributeValue(
-		new JavaSymbolName("partName"), "parameters");
+	    StringAttributeValue partNameAttributeValue = new StringAttributeValue(
+		    new JavaSymbolName("partName"), "parameters");
 
-	annotationAttributeValueList.add(partNameAttributeValue);
+	    annotationAttributeValueList.add(partNameAttributeValue);
 
-	AnnotationMetadata webResult = new DefaultAnnotationMetadata(
-		new JavaType("javax.jws.WebResult"),
-		annotationAttributeValueList);
+	    AnnotationMetadata webResult = new DefaultAnnotationMetadata(
+		    new JavaType("javax.jws.WebResult"),
+		    annotationAttributeValueList);
 
-	annotationMetadataList.add(webResult);
+	    annotationMetadataList.add(webResult);
+	}
+	else {
+	    // @Oneway - not require a response from the service.
+	    AnnotationMetadata oneway = new DefaultAnnotationMetadata(
+		    new JavaType("javax.jws.Oneway"),
+		    new ArrayList<AnnotationAttributeValue<?>>());
+	    annotationMetadataList.add(oneway);
+	}
 
 	return annotationMetadataList;
     }
@@ -429,18 +490,16 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
     }
 
     /**
-     * Check if the method methodName exists in serviceClass and is not
-     * annotated before with @GvNIXWebMethod.
-     * <p>
-     * TODO: Check if method exists in the class.
-     * </p>
+     * {@inheritDoc}
      * 
-     * @param serviceClass
-     * @param methodName
-     * @return
+     * <p>
+     * Check if method exists in the class.
+     * </p>
      */
-    private boolean isMethodAvailableToExport(JavaType serviceClass,
-	    JavaSymbolName methodName) {
+    public boolean isMethodAvailableToExport(JavaType serviceClass,
+	    JavaSymbolName methodName, String annotationName) {
+
+	boolean exists = true;
 
 	// Load class details. If class not found an exception will be raised.
 	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
@@ -453,29 +512,23 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
 	
 	List<? extends MethodMetadata> methodList = serviceDetails.getDeclaredMethods();
-	List<AnnotationMetadata> annotationMethodList;
 
 	for (MethodMetadata methodMetadata : methodList) {
 	    if (methodMetadata.getMethodName().equals(methodName)) {
 
-		annotationMethodList = methodMetadata.getAnnotations();
-		for (AnnotationMetadata annotationMetadata : annotationMethodList) {
-		    Assert
-			    .isTrue(
-				    annotationMetadata
-					    .getAnnotationType()
-					    .getFullyQualifiedTypeName()
-					    .compareTo(
-						    "org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod") != 0,
-				    "The method '"
-					    + methodName
-					    + "' has been annotated with @GvNIXWebMethod before, you could update annotation parameters inside its class.");
-		}
-		return true;
+		exists = javaParserService.isAnnotationIntroducedInMethod(GvNIXWebMethod.class.getName(), methodMetadata);
+		Assert
+			.isTrue(
+				exists == false,
+				"The method '"
+					+ methodName
+					+ "' has been annotated with @"
+					+ annotationName
+					+ " before, you could update annotation parameters inside its class.");
 	    }
 	}
 
-	return false;
+	return true;
     }
 
     /**

@@ -20,6 +20,7 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.List;
 
+import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -79,13 +80,19 @@ public interface ServiceLayerWsExportOperations {
      *            Name to define the Request Wrapper Object.
      * @param requestWrapperNamespace
      *            Namespace of the Request Wrapper Object.
+     * @param exceptionName
+     *            Name to define the exception in method if exists.
+     * @param exceptionNamespace
+     *            Namespace of method exception if exists.
+     * 
      * 
      */
     public void exportOperation(JavaType serviceClass,
 	    JavaSymbolName methodName, String operationName, String resutlName,
 	    String resultNamespace, String responseWrapperName,
 	    String responseWrapperNamespace, String requestWrapperName,
-	    String requestWrapperNamespace);
+	    String requestWrapperNamespace, String exceptionName,
+	    String exceptionNamespace);
 
     /**
      * Creates the list of annotations with the values defined.
@@ -115,4 +122,21 @@ public interface ServiceLayerWsExportOperations {
 	    String operationName, String resutlName, String resultNamespace,
 	    String responseWrapperName, String responseWrapperNamespace,
 	    String requestWrapperName, String requestWrapperNamespace);
+
+    /**
+     * Check if the method methodName exists in serviceClass and is not
+     * annotated before with annotationName.
+     * 
+     * @param serviceClass
+     *            to check if method exists
+     * @param methodName
+     *            method to check if exists and is annotation defined.
+     * @param annotationName
+     *            to search in method.
+     * 
+     * @return true if method exists and annotation is not defined.
+     */
+    public boolean isMethodAvailableToExport(JavaType serviceClass,
+	    JavaSymbolName methodName, String annotationName);
+
 }
