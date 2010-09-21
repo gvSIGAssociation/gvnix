@@ -20,12 +20,16 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebServiceProxy;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
+import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
@@ -46,11 +50,19 @@ import org.springframework.roo.support.util.Assert;
 public class ServiceLayerWSImportMetadata extends
 	AbstractItdTypeDetailsProvidingMetadataItem {
 
+    private static Logger logger = Logger
+	    .getLogger(ServiceLayerWSImportMetadataNotificationListener.class
+		    .getName());
+    
     private static final String WEB_SERVICE_TYPE_STRING = ServiceLayerWSImportMetadata.class
 	    .getName();    
     private static final String WEB_SERVICE_TYPE = MetadataIdentificationUtils
 	    .create(WEB_SERVICE_TYPE_STRING);
-
+    
+    // From annotation
+    @AutoPopulate
+    private String wsdlLocation;
+    
     public ServiceLayerWSImportMetadata(String identifier, JavaType aspectName,
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata) {
 
@@ -69,6 +81,10 @@ public class ServiceLayerWSImportMetadata extends
 			GvNIXWebServiceProxy.class.getName()));
 
 	if (annotationMetadata != null) {
+	    
+	    // Populate wsdlLocation property class from annotation attribute
+	    AutoPopulationUtils.populate(this, annotationMetadata);
+	    logger.log(Level.FINE, "wsdlLocation=" + wsdlLocation);
 
 	    // TODO Completar
 	    InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
