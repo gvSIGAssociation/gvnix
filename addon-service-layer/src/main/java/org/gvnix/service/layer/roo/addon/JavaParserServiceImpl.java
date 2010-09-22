@@ -43,7 +43,6 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.DefaultAnnotationMetadata;
 import org.springframework.roo.classpath.javaparser.JavaParserMutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.javaparser.JavaParserUtils;
-import org.springframework.roo.classpath.javaparser.details.JavaParserAnnotationMetadata;
 import org.springframework.roo.classpath.javaparser.details.JavaParserMethodMetadata;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;

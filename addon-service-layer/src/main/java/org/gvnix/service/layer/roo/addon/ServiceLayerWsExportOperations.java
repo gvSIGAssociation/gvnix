@@ -20,7 +20,6 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.List;
 
-import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;

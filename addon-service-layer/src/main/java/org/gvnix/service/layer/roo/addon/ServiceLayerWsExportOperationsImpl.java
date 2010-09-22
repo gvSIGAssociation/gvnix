@@ -26,7 +26,6 @@ import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
-import org.springframework.roo.addon.finder.FinderMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.details.*;

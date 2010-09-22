@@ -15,7 +15,6 @@ import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
