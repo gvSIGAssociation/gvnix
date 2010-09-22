@@ -334,14 +334,14 @@ public class ServiceLayerWsExportOperationsImpl implements
 		return true;
 	    }
 
-	    if (javaType.getPackage().toString().startsWith("java.lang.")) {
+	    if (javaType.getFullyQualifiedTypeName().startsWith("java.lang")) {
 		return true;
 	    }
 
 	    ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
 		    .get(ProjectMetadata.getProjectIdentifier());
 
-	    if (javaType.getPackage().toString().startsWith(
+	    if (javaType.getFullyQualifiedTypeName().startsWith(
 		    projectMetadata.getTopLevelPackage().toString())) {
 
 		// MetadataID
