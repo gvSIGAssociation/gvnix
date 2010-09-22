@@ -20,6 +20,7 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.List;
 
+import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -33,7 +34,18 @@ import org.springframework.roo.model.JavaType;
  *         Transport</a>
  */
 public interface ServiceLayerWsExportOperations {
-    
+
+    /**
+     * Method parameter type to check.
+     * <ul>
+     * <li>RETURN: output method parameter.</li>
+     * <li>PARAMETER: input method parameter.</li>
+     * </ul>
+     */
+    public enum MethodParameterType {
+	RETURN, PARAMETER
+    };
+
     /**
      * Is service layer web service export command available on Roo console ? 
      * 
@@ -150,4 +162,37 @@ public interface ServiceLayerWsExportOperations {
      */
     public void checkAuthorizedJavaTypesInOperation(JavaType serviceClass,
 	    JavaSymbolName methodName);
+
+    /**
+     * Check id JavaType is defined in common collection type Set.
+     * 
+     * @param javaType
+     *            to check.
+     * @return true if exists.
+     */
+    public boolean isNotAllowedCollectionType(JavaType javaType);
+
+    /**
+     * Check id JavaType is allowed type to be used in a service operation.
+     * 
+     * @param javaType
+     *            of the parameter.
+     * @param methodParameterType
+     *            return or input parameters to check.
+     * @return true if it's all correct.
+     * 
+     */
+    public boolean isJavaTypeAllowed(JavaType javaType,
+	    MethodParameterType methodParameterType);
+
+    /**
+     * Adds @GvNIXXmlElement annotation to an Entity class.
+     * 
+     * @param javaType
+     *            to retrieve values.
+     * @param mutableTypeDetails
+     *            class to update with annotation.
+     */
+    public void addGvNIXXmlElementAnnotation(JavaType javaType,
+	    MutableClassOrInterfaceTypeDetails mutableTypeDetails);
 }

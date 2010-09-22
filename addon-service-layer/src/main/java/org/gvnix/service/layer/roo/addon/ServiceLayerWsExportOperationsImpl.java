@@ -24,10 +24,9 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
-import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod;
-import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
+import org.gvnix.service.layer.roo.addon.annotations.*;
+import org.springframework.roo.addon.entity.RooEntity;
+import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
@@ -50,7 +49,8 @@ import com.sun.org.apache.xerces.internal.impl.XMLEntityManager.Entity;
  */
 @Component
 @Service
-public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportOperations {
+public class ServiceLayerWsExportOperationsImpl implements
+	ServiceLayerWsExportOperations {
 
     private static Logger logger = Logger
 	    .getLogger(ServiceLayerWsExportOperations.class.getName());
@@ -71,7 +71,18 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
     private AnnotationsService annotationsService;
     @Reference
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
-    
+
+    private static final Set<String> notAllowedCollectionTypes = new HashSet<String>();
+
+    static {
+	notAllowedCollectionTypes.add(Set.class.getName());
+	notAllowedCollectionTypes.add(Map.class.getName());
+	notAllowedCollectionTypes.add(HashMap.class.getName());
+	notAllowedCollectionTypes.add(TreeMap.class.getName());
+	notAllowedCollectionTypes.add(Vector.class.getName());
+	notAllowedCollectionTypes.add(HashSet.class.getName());
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -215,6 +226,7 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 		+ serviceClass.getFullyQualifiedTypeName() + "'.");
 
 	// TODO: Check authorized JavaTypes in operation.
+	checkAuthorizedJavaTypesInOperation(serviceClass, methodName);
 
 	// Check if method has return type.
 	JavaType returnType = returnJavaType(serviceClass, methodName);
@@ -262,17 +274,6 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
     /**
      * {@inheritDoc}
      * 
-     * <p>
-     * Allowed input/output parameters:
-     * </p>
-     * <ul>
-     * <li>
-     * Java basic types or basic objects.</li>
-     * <li>
-     * Project {@link Entity}. Adds @GvNIXXmlElement annotation to Entity.</li>
-     * <li>
-     * Collections that don't implement/extend: Map, Set, Tree.</li>
-     * </ul>
      * 
      * <p>
      * If exists any disallowed JavaType in operation:
@@ -292,7 +293,139 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	Assert.isTrue(methodToCheck != null, "The method: '" + methodName
 		+ " doesn't exists in the class '"
 		+ serviceClass.getFullyQualifiedTypeName() + "'.");
-	// TODO:
+
+	// Check Return type
+	JavaType returnType = methodToCheck.getReturnType();
+
+	isJavaTypeAllowed(returnType, MethodParameterType.RETURN);
+
+	// Check Input Parameters
+	List<AnnotatedJavaType> inputParametersList = methodToCheck
+		.getParameterTypes();
+
+	for (AnnotatedJavaType annotatedJavaType : inputParametersList) {
+	    isJavaTypeAllowed(annotatedJavaType.getJavaType(),
+		    MethodParameterType.PARAMETER);
+	}
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Check allowed input/output parameters:
+     * </p>
+     * <ul>
+     * <li>
+     * Java basic types or basic objects.</li>
+     * <li>
+     * Project {@link Entity}. Adds @GvNIXXmlElement annotation to Entity.</li>
+     * <li>
+     * Collections that don't implement/extend: Map, Set, Tree.</li>
+     * </ul>
+     */
+    public boolean isJavaTypeAllowed(JavaType javaType,
+	    MethodParameterType methodParameterType) {
+
+	// Exists
+	if (javaType != null) {
+
+	    // Check if is primitive value.
+	    if (javaType.isPrimitive()) {
+		return true;
+	    }
+
+	    if (javaType.getPackage().toString().startsWith("java.lang.")) {
+		return true;
+	    }
+
+	    ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+		    .get(ProjectMetadata.getProjectIdentifier());
+
+	    if (javaType.getPackage().toString().startsWith(
+		    projectMetadata.getTopLevelPackage().toString())) {
+
+		// MetadataID
+		String targetId = PhysicalTypeIdentifier.createIdentifier(
+			javaType, Path.SRC_MAIN_JAVA);
+
+		// Obtain the physical type and itd mutable details
+		PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+			.get(targetId);
+		Assert.notNull(ptm, "Java source class doesn't exists.");
+
+		PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
+		Assert.notNull(ptd,
+			"Java source code details unavailable for type "
+				+ PhysicalTypeIdentifier
+					.getFriendlyName(targetId));
+		Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+			ptd, "Java source code is immutable for type "
+				+ PhysicalTypeIdentifier
+					.getFriendlyName(targetId));
+		MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
+
+		// Check if is a RooEntity
+		AnnotationMetadata rooEntitynnotationMetadata = MemberFindingUtils
+			.getTypeAnnotation(mutableTypeDetails, new JavaType(
+				RooEntity.class.getName()));
+
+		if (rooEntitynnotationMetadata != null) {
+		    addGvNIXXmlElementAnnotation(javaType, mutableTypeDetails);
+		    return true;
+		}
+	    }
+
+	    // Check if is not an allowed collection
+	    Assert
+		    .isTrue(
+			    isNotAllowedCollectionType(javaType) == false,
+			    "The '"
+				    + methodParameterType
+				    + "' type '"
+				    + javaType.getFullyQualifiedTypeName()
+				    + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nIs a disallowed collection.");
+
+	}
+
+	return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public void addGvNIXXmlElementAnnotation(JavaType javaType,
+	    MutableClassOrInterfaceTypeDetails mutableTypeDetails) {
+
+	// Add @GvNIXXmlElement annotation.
+	List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+	StringAttributeValue nameStringAttributeValue = new StringAttributeValue(
+		new JavaSymbolName("name"), javaType.getSimpleTypeName());
+
+	annotationAttributeValueList.add(nameStringAttributeValue);
+
+	StringAttributeValue namespaceStringAttributeValue = new StringAttributeValue(
+		new JavaSymbolName("namespace"), serviceLayerWsConfigService
+			.convertPackageToTargetNamespace(javaType.getPackage()
+				.toString()));
+
+	annotationAttributeValueList.add(namespaceStringAttributeValue);
+
+	AnnotationMetadata typeAnnotationMetadata = new DefaultAnnotationMetadata(
+		new JavaType(GvNIXXmlElement.class.getName()),
+		annotationAttributeValueList);
+
+	AnnotationMetadata oldTypeAnnotationMetadata = MemberFindingUtils
+		.getTypeAnnotation(mutableTypeDetails, new JavaType(
+			GvNIXXmlElement.class.getName()));
+
+	if (oldTypeAnnotationMetadata != null) {
+	    mutableTypeDetails.removeTypeAnnotation(new JavaType(
+		    GvNIXXmlElement.class.getName()));
+	}
+
+	mutableTypeDetails.addTypeAnnotation(typeAnnotationMetadata);
     }
 
     /**
@@ -322,7 +455,6 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 
 	return returnType;
     }
-
 
     /**
      * {@inheritDoc}
@@ -396,12 +528,11 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 
 	requestWrapperNamespace = StringUtils.hasText(requestWrapperNamespace) ? requestWrapperNamespace
 		: serviceLayerWsConfigService
-		.convertPackageToTargetNamespace(serviceClass.getPackage()
-			.getFullyQualifiedPackageName());
+			.convertPackageToTargetNamespace(serviceClass
+				.getPackage().getFullyQualifiedPackageName());
 
 	StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
-		new JavaSymbolName("targetNamespace"),
-		requestWrapperNamespace);
+		new JavaSymbolName("targetNamespace"), requestWrapperNamespace);
 	annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
 	String className = serviceClass.getPackage()
@@ -484,8 +615,7 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 		    annotationAttributeValueList);
 
 	    annotationMetadataList.add(webResult);
-	}
-	else {
+	} else {
 	    // @Oneway - not require a response from the service.
 	    AnnotationMetadata oneway = new DefaultAnnotationMetadata(
 		    new JavaType("javax.jws.Oneway"),
@@ -578,5 +708,26 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	}
 	return true;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The list of not allowed collections is defined as static in this class.
+     * </p>
+     * <p>
+     * Not allow sorted collections.
+     * </p>
+     * <ul>
+     * <li>Set</li>
+     * <li>Map</li>
+     * <li>TreeMap</li>
+     * <li>Vector</li>
+     * <li>HashSet</li>
+     * </ul>
+     */
+    public boolean isNotAllowedCollectionType(JavaType javaType) {
+	return notAllowedCollectionTypes.contains(javaType
+		.getFullyQualifiedTypeName());
+    }
+
 }
