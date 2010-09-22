@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
+import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.*;
@@ -31,7 +32,6 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 
 /**
  * <p>
@@ -51,8 +51,11 @@ public class ServiceLayerWSExportXmlElementMetadata extends
     private static final String XML_ELEMENT_TYPE = MetadataIdentificationUtils
 	    .create(XML_ELEMENT_STRING);
 
+    private EntityMetadata entityMetadata;
+
     public ServiceLayerWSExportXmlElementMetadata(String identifier, JavaType aspectName,
-	    PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
+	    EntityMetadata entityMetadata) {
 	super(identifier, aspectName, governorPhysicalTypeMetadata);
 
 	Assert.isTrue(isValid(identifier), "Metadata identification string '"
@@ -69,20 +72,54 @@ public class ServiceLayerWSExportXmlElementMetadata extends
 
 	if (gvNIXXmlElementAnnotationMetadata != null) {
 
-	    String[] propOrder = { "id", "version" };
-	    
-	    // TODO Comprobar el uso de AutoPopulationUtils.populate(this,
-	    // annotation) para añadir las anotaciones
-	    
-	    // Type annotations
-	    List<AnnotationMetadata> annotationTypeList = getXmlElementTypeAnnotation(
-		    gvNIXXmlElementAnnotationMetadata, propOrder);
-	    
-	    for (AnnotationMetadata annotationMetadata : annotationTypeList) {
-		    builder.addTypeAnnotation(annotationMetadata);
-	    }
-	    // Field Annotations
+	    // Fields from Entity MetaData.
+	    List<FieldMetadata> entityFieldList = new ArrayList<FieldMetadata>();
 
+	    if (entityMetadata != null && entityMetadata.isValid()) {
+		this.entityMetadata = entityMetadata;
+		entityFieldList.add(entityMetadata.getIdentifierField());
+		entityFieldList.add(entityMetadata.getVersionField());
+	    }
+
+	    // Field list.
+	    List<FieldMetadata> fieldList = MemberFindingUtils
+		    .getDeclaredFields(governorTypeDetails);
+
+	    // Field @XmlTransient annotations.
+	    List<FieldMetadata> fieldmetadataTransientList = getPersistencetRelationshipFields();
+
+	    // Field @XmlElement annotations.
+	    List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
+
+	    // Add Entity fields
+	    fieldMetadataElementList.addAll(entityFieldList);
+
+	    for (FieldMetadata fieldMetadata : fieldList) {
+		if (!fieldmetadataTransientList.contains(fieldMetadata)) {
+		    fieldMetadataElementList.add(fieldMetadata);
+		}
+	    }
+
+	    // Type annotations.
+	    List<AnnotationMetadata> annotationTypeList = getXmlElementTypeAnnotation(
+		    gvNIXXmlElementAnnotationMetadata, fieldMetadataElementList);
+
+	    for (AnnotationMetadata annotationMetadata : annotationTypeList) {
+		builder.addTypeAnnotation(annotationMetadata);
+	    }
+
+	    // Declared XmlTransient field annotations.
+	    List<DeclaredFieldAnnotationDetails> declaredFieldXmlTransientFieldList = getXmlTransientFieldAnnotations(fieldmetadataTransientList);
+
+	    for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlTransientFieldList) {
+		builder.addFieldAnnotation(declaredFieldAnnotationDetails);
+	    }
+
+	    // Declared XmlElement field annotations
+	    List<DeclaredFieldAnnotationDetails> declaredFieldXmlElementFieldList = getXmlElementFieldAnnotations(fieldMetadataElementList);
+	    for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlElementFieldList) {
+		builder.addFieldAnnotation(declaredFieldAnnotationDetails);
+	    }
 	}
 
 	// Create a representation of the desired output ITD
@@ -91,17 +128,126 @@ public class ServiceLayerWSExportXmlElementMetadata extends
     }
 
     /**
+     * Converts {@link FieldMetadata} {@link List} to
+     * {@link DeclaredFieldAnnotationDetails} {@link List} using @XmlTransient
+     * annotation.
+     * 
+     * @param fieldMetadataElementList
+     *            list to convert.
+     * @return All the annotated @XmlTransient fields (never null, but may be
+     *         empty).
+     */
+    public List<DeclaredFieldAnnotationDetails> getXmlTransientFieldAnnotations(
+	    List<FieldMetadata> fieldMetadataElementList) {
+
+	List<DeclaredFieldAnnotationDetails> annotationXmlTransientFieldList = new ArrayList<DeclaredFieldAnnotationDetails>();
+
+	// Void list, annotation doesn't need attribute values.
+	List<AnnotationAttributeValue<?>> attributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+	// Creates the annotation.
+	AnnotationMetadata xmlTransientAnnotation = new DefaultAnnotationMetadata(new JavaType("javax.xml.bind.annotation.XmlTransient"), attributeValueList);
+
+	DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
+	
+	for (FieldMetadata fieldMetadata : fieldMetadataElementList) {
+
+	    declaredFieldAnnotationDetails = new DeclaredFieldAnnotationDetails(fieldMetadata, xmlTransientAnnotation);
+	    annotationXmlTransientFieldList.add(declaredFieldAnnotationDetails);
+	}
+
+	return annotationXmlTransientFieldList;
+    }
+
+    /**
+     * Converts {@link FieldMetadata} {@link List} to
+     * {@link DeclaredFieldAnnotationDetails} {@link List} using @XmlElement
+     * annotation.
+     * 
+     * @param fieldTransientList
+     *            list to convert.
+     * @return All the annotated @XmlElement fields (never null, but may be
+     *         empty).
+     */
+    public List<DeclaredFieldAnnotationDetails> getXmlElementFieldAnnotations(
+	    List<FieldMetadata> fieldTransientList) {
+
+	List<DeclaredFieldAnnotationDetails> annotationXmlElementFieldList = new ArrayList<DeclaredFieldAnnotationDetails>();
+
+	// Void list, annotation doesn't need attribute values.
+	List<AnnotationAttributeValue<?>> attributeValueList;
+	AnnotationMetadata xmlTransientAnnotation;
+	StringAttributeValue nameStringAttributeValue;
+
+	DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
+
+	for (FieldMetadata fieldMetadata : fieldTransientList) {
+
+	    attributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+	    nameStringAttributeValue = new StringAttributeValue(
+		    new JavaSymbolName("name"), fieldMetadata.getFieldName()
+			    .getSymbolName());
+	    attributeValueList.add(nameStringAttributeValue);
+
+	    // Creates the annotation.
+	    xmlTransientAnnotation = new DefaultAnnotationMetadata(
+		    new JavaType("javax.xml.bind.annotation.XmlElement"),
+		    attributeValueList);
+	    declaredFieldAnnotationDetails = new DeclaredFieldAnnotationDetails(
+		    fieldMetadata, xmlTransientAnnotation);
+	    annotationXmlElementFieldList.add(declaredFieldAnnotationDetails);
+	}
+
+	return annotationXmlElementFieldList;
+    }
+
+    /**
+     * Retrieves all related fields annotated with @OneToMany, @ManyToOne,
+     * 
+     * @OneToOne, related to persistence.
+     * 
+     * @return {@link List} of annotated {@link FieldMetadata}.
+     */
+    public List<FieldMetadata> getPersistencetRelationshipFields() {
+
+	List<FieldMetadata> relationFieldList = new ArrayList<FieldMetadata>();
+
+	// Retrieve the fields that are defined as OneToMany relationship.
+	List<FieldMetadata> oneToManyFieldMetadataList = MemberFindingUtils
+		.getFieldsWithAnnotation(governorTypeDetails, new JavaType(
+			"javax.persistence.OneToMany"));
+
+	relationFieldList.addAll(oneToManyFieldMetadataList);
+
+	// Retrieve the fields that are defined as ManyToOne relationship.
+	List<FieldMetadata> manyToOneFieldMetadataList = MemberFindingUtils
+		.getFieldsWithAnnotation(governorTypeDetails, new JavaType(
+			"javax.persistence.ManyToOne"));
+
+	relationFieldList.addAll(manyToOneFieldMetadataList);
+
+	// Retrieve the fields that are defined as OneToOne relationship.
+	List<FieldMetadata> oneToOneFieldMetadataList = MemberFindingUtils
+		.getFieldsWithAnnotation(governorTypeDetails, new JavaType(
+			"javax.persistence.OneToOne"));
+
+	relationFieldList.addAll(oneToOneFieldMetadataList);
+
+	return relationFieldList;
+
+    }
+
+    /**
      * Method to create Type Annotations.
      * 
      * @param gvNIXXmlElementAnnotationMetadata
      *            with info to build AspectJ annotations.
-     * @param propOrder
-     *            properties to be annotated.
+     * @param fieldElementList
+     *            fields order to be published.
      * @return {@link List} of {@link AnnotationMetadata} to build the ITD.
      */
     public List<AnnotationMetadata> getXmlElementTypeAnnotation(
 	    AnnotationMetadata gvNIXXmlElementAnnotationMetadata,
-	    String[] propOrder) {
+	    List<FieldMetadata> fieldElementList) {
 
 	// Annotation list.
 	List<AnnotationMetadata> annotationTypeList = new ArrayList<AnnotationMetadata>();
@@ -134,9 +280,10 @@ public class ServiceLayerWSExportXmlElementMetadata extends
 
 	StringAttributeValue propOrderAttributeValue;
 	
-	for (int i=0; i<propOrder.length ; i++) {
+	for (FieldMetadata fieldMetadata : fieldElementList) {
 	    propOrderAttributeValue = new StringAttributeValue(
-		    new JavaSymbolName("ignored"), propOrder[i]);
+		    new JavaSymbolName("ignored"), fieldMetadata.getFieldName()
+			    .getSymbolName());
 	    propOrderList.add(propOrderAttributeValue);
 	}
 

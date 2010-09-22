@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
@@ -86,9 +87,27 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
 	    String itdFilename) {
 
+	// We know governor type details are non-null and can be safely cast
+
+	// Work out the MIDs of the other metadata we depend on
+	JavaType javaType = ServiceLayerWSExportXmlElementMetadata
+		.getJavaType(metadataIdentificationString);
+	Path path = ServiceLayerWSExportXmlElementMetadata
+		.getPath(metadataIdentificationString);
+	String entityMetadataKey = EntityMetadata.createIdentifier(javaType,
+		path);
+
+	// We need to lookup the metadata we depend on
+	EntityMetadata entityMetadata = (EntityMetadata) metadataService
+		.get(entityMetadataKey);
+
+	// We need to be informed if our dependent metadata changes
+	metadataDependencyRegistry.registerDependency(entityMetadataKey,
+		metadataIdentificationString);
+
 	ServiceLayerWSExportXmlElementMetadata serviceLayerWSExportXmlElementMetadata = new ServiceLayerWSExportXmlElementMetadata(
 		metadataIdentificationString, aspectName,
-		governorPhysicalTypeMetadata);
+		governorPhysicalTypeMetadata, entityMetadata);
 
 	return serviceLayerWSExportXmlElementMetadata;
     }
