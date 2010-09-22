@@ -572,31 +572,16 @@ public class JavaParserServiceImpl implements JavaParserService {
      */
     public List<JavaType> getMethodExceptionList(JavaType serviceClass,
 	    JavaSymbolName methodName) {
-	// Load class details. If class not found an exception will be raised.
-	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
-		.getClassOrInterface(serviceClass);
-
-	// Checks if it's mutable
-	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-		tmpServiceDetails, "Can't modify "
-			+ tmpServiceDetails.getName());
-
-	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
-
-	List<? extends MethodMetadata> methodList = serviceDetails
-		.getDeclaredMethods();
 
 	List<JavaType> throwList = new ArrayList<JavaType>();
 
-	for (MethodMetadata methodMetadata : methodList) {
-	    if (methodMetadata.getMethodName().equals(methodName)) {
+	MethodMetadata methodMetadata = getMethodByNameInClass(serviceClass,
+		methodName);
 
-		throwList = methodMetadata.getThrowsTypes();
-		break;
-	    }
+	if (methodMetadata != null) {
+	    throwList = methodMetadata.getThrowsTypes();
 	}
 	
-
 	return throwList;
     }
 
@@ -616,6 +601,38 @@ public class JavaParserServiceImpl implements JavaParserService {
 	return result != null;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Search the method by name.
+     * </p>
+     */
+    public MethodMetadata getMethodByNameInClass(JavaType serviceClass,
+	    JavaSymbolName methodName) {
+	// Load class details. If class not found an exception will be raised.
+	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
+		.getClassOrInterface(serviceClass);
+
+	// Checks if it's mutable
+	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+		tmpServiceDetails, "Can't modify "
+			+ tmpServiceDetails.getName());
+
+	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
+
+	List<? extends MethodMetadata> methodList = serviceDetails
+		.getDeclaredMethods();
+
+	for (MethodMetadata methodMetadata : methodList) {
+	    if (methodMetadata.getMethodName().equals(methodName)) {
+		return methodMetadata;
+	    }
+	}
+
+	return null;
+
+    }
     /**
      * {@inheritDoc}
      * 

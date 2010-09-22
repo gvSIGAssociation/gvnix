@@ -164,4 +164,17 @@ public interface JavaParserService {
      */
     public List<JavaType> getMethodExceptionList(JavaType serviceClass,
 	    JavaSymbolName methodName);
+
+    /**
+     * Returns MethodMetadata in selected class.
+     * 
+     * @param serviceClass
+     *            to search the method.
+     * @param methodName
+     *            to retrieve method.
+     * @return Method with methodName in serviceClass. If method doesn't exists
+     *         in serviceClass returns null.
+     */
+    public MethodMetadata getMethodByNameInClass(JavaType serviceClass,
+	    JavaSymbolName methodName);
 }

@@ -138,4 +138,16 @@ public interface ServiceLayerWsExportOperations {
     public boolean isMethodAvailableToExport(JavaType serviceClass,
 	    JavaSymbolName methodName, String annotationName);
 
+    /**
+     * Checks if JavaTypes input/output parameters involved in operation are
+     * permitted to be published in web service.
+     * 
+     * @param serviceClass
+     *            to check if the method is correct to be published.
+     * @param methodName
+     *            method to check if input/output parameters ara permitted to be
+     *            publish in web service.
+     */
+    public void checkAuthorizedJavaTypesInOperation(JavaType serviceClass,
+	    JavaSymbolName methodName);
 }

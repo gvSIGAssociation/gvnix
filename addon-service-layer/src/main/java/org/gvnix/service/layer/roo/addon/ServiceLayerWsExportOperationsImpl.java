@@ -38,6 +38,8 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
 import org.springframework.roo.support.util.*;
 
+import com.sun.org.apache.xerces.internal.impl.XMLEntityManager.Entity;
+
 /**
  * Addon for Handle Service Layer
  * 
@@ -212,8 +214,14 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 		+ " doesn't exists in the class '"
 		+ serviceClass.getFullyQualifiedTypeName() + "'.");
 
+	// TODO: Check authorized JavaTypes in operation.
+
 	// Check if method has return type.
 	JavaType returnType = returnJavaType(serviceClass, methodName);
+
+	Assert.isTrue(returnType != null, "The method: '" + methodName
+		+ " doesn't exists in the class '"
+		+ serviceClass.getFullyQualifiedTypeName() + "'.");
 
 	if (returnType.equals(JavaType.VOID_OBJECT)
 		|| returnType.equals(JavaType.VOID_PRIMITIVE)) {
@@ -252,6 +260,42 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Allowed input/output parameters:
+     * </p>
+     * <ul>
+     * <li>
+     * Java basic types or basic objects.</li>
+     * <li>
+     * Project {@link Entity}. Adds @GvNIXXmlElement annotation to Entity.</li>
+     * <li>
+     * Collections that don't implement/extend: Map, Set, Tree.</li>
+     * </ul>
+     * 
+     * <p>
+     * If exists any disallowed JavaType in operation:
+     * </p>
+     * <p>
+     * Cancel all the process and show a message explaining that it's not
+     * possible to publish this operation because the parameter can't be
+     * Marshalled according Ws-I standards.
+     * </p>
+     */
+    public void checkAuthorizedJavaTypesInOperation(JavaType serviceClass,
+	    JavaSymbolName methodName) {
+
+	MethodMetadata methodToCheck = javaParserService
+		.getMethodByNameInClass(serviceClass, methodName);
+
+	Assert.isTrue(methodToCheck != null, "The method: '" + methodName
+		+ " doesn't exists in the class '"
+		+ serviceClass.getFullyQualifiedTypeName() + "'.");
+	// TODO:
+    }
+
+    /**
      * Returns method return JavaType.
      * 
      * @param serviceClass
@@ -265,28 +309,15 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 
 	JavaType returnType = new JavaType(JavaType.VOID_OBJECT.toString());
 
-	// Load class details. If class not found an exception will be raised.
-	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
-		.getClassOrInterface(serviceClass);
+	MethodMetadata methodMetadata = javaParserService
+		.getMethodByNameInClass(serviceClass, methodName);
 
-	// Checks if it's mutable
-	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-		tmpServiceDetails, "Can't modify "
-			+ tmpServiceDetails.getName());
+	if (methodMetadata == null) {
+	    return null;
+	}
 
-	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
-	
-	List<? extends MethodMetadata> methodList = serviceDetails
-		.getDeclaredMethods();
-
-	for (MethodMetadata methodMetadata : methodList) {
-	    if (methodMetadata.getMethodName().equals(methodName)) {
-		if (methodMetadata.getReturnType() != null) {
-		    returnType = methodMetadata.getReturnType();
-		    break;
-		}
-
-	    }
+	if (methodMetadata.getReturnType() != null) {
+	    returnType = methodMetadata.getReturnType();
 	}
 
 	return returnType;
@@ -508,33 +539,23 @@ public class ServiceLayerWsExportOperationsImpl implements ServiceLayerWsExportO
 	    JavaSymbolName methodName, String annotationName) {
 
 	boolean exists = true;
+	MethodMetadata methodMetadata = javaParserService
+		.getMethodByNameInClass(serviceClass, methodName);
 
-	// Load class details. If class not found an exception will be raised.
-	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
-		.getClassOrInterface(serviceClass);
-
-	// Checks if it's mutable
-	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-		tmpServiceDetails, "Can't modify " + tmpServiceDetails.getName());
-
-	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
-	
-	List<? extends MethodMetadata> methodList = serviceDetails.getDeclaredMethods();
-
-	for (MethodMetadata methodMetadata : methodList) {
-	    if (methodMetadata.getMethodName().equals(methodName)) {
-
-		exists = javaParserService.isAnnotationIntroducedInMethod(GvNIXWebMethod.class.getName(), methodMetadata);
-		Assert
-			.isTrue(
-				exists == false,
-				"The method '"
-					+ methodName
-					+ "' has been annotated with @"
-					+ annotationName
-					+ " before, you could update annotation parameters inside its class.");
-	    }
+	if (methodMetadata == null) {
+	    return false;
 	}
+
+	exists = javaParserService.isAnnotationIntroducedInMethod(
+		GvNIXWebMethod.class.getName(), methodMetadata);
+	Assert
+		.isTrue(
+			exists == false,
+			"The method '"
+				+ methodName
+				+ "' has been annotated with @"
+				+ annotationName
+				+ " before, you could update annotation parameters inside its class.");
 
 	return true;
     }
