@@ -35,7 +35,9 @@ import org.w3c.dom.Element;
  */
 public class WsdlParserUtilsTest {
 
-    public static final String TEMPCONVERT_WSDL = "http://www.w3schools.com/webservices/tempconvert.asmx?WSDL";
+    public static final String TEMP_CONVERT_WSDL = "http://www.w3schools.com/webservices/tempconvert.asmx?WSDL";
+    public static final String EMAIL_VALIDATION_V2_WSDL = "http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl";
+    public static final String EMAIL_VALIDATION_V1_WSDL = "http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl";
 
     /**
      * Checks method
@@ -70,9 +72,17 @@ public class WsdlParserUtilsTest {
     @Test
     public void testGetServiceClassPath() throws Exception {
 	
-	Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMPCONVERT_WSDL);
+	Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
 	Element root = wsdl.getDocumentElement();
 	assertEquals("org.tempuri.TempConvert", WsdlParserUtils.getServiceClassPath(root));
+	
+	wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V1_WSDL);
+	root = wsdl.getDocumentElement();
+	assertEquals("com.xwebservices.ws.xwebemailvalidation.XWebEmailValidation", WsdlParserUtils.getServiceClassPath(root));
+	
+	wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
+	root = wsdl.getDocumentElement();
+	assertEquals("com.xwebservices.ws.xwebemailvalidation.emailvalidation.v2.EmailValidation", WsdlParserUtils.getServiceClassPath(root));
     }
     
     /**
@@ -84,9 +94,17 @@ public class WsdlParserUtilsTest {
     @Test
     public void testGetPortTypeClassPath() throws Exception {
 	
-	Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMPCONVERT_WSDL);
+	Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
 	Element root = wsdl.getDocumentElement();
 	assertEquals("org.tempuri.TempConvertSoap", WsdlParserUtils.getPortTypeClassPath(root));
+	
+	wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V1_WSDL);
+	root = wsdl.getDocumentElement();
+	assertEquals("com.xwebservices.ws.xwebemailvalidation.XWebEmailValidationSoap", WsdlParserUtils.getPortTypeClassPath(root));
+	
+	wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
+	root = wsdl.getDocumentElement();
+	assertEquals("com.xwebservices.ws.xwebemailvalidation.emailvalidation.v2.XWebEmailValidationInterface", WsdlParserUtils.getPortTypeClassPath(root));
     }
     
 }

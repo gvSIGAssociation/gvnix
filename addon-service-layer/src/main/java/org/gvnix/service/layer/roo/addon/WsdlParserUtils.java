@@ -24,7 +24,6 @@ import java.util.StringTokenizer;
 
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -49,6 +48,7 @@ public class WsdlParserUtils {
 	    .substring(0, SOAP_12_NAMESPACE.length() - 1);
 
     public static final String HTTP_PROTOCOL_PREFIX = "http://";
+    public static final String URN_PROTOCOL_PREFIX = "urn:";
     public static final String XML_NAMESPACE_PREFIX = "xmlns:";
     public static final String NAMESPACE_SEPARATOR = ":";
     public static final String URL_SEPARATOR = "/";
@@ -82,41 +82,56 @@ public class WsdlParserUtils {
      * Constructs a valid java package path from target namespace of root wsdl.
      * 
      * <p>
-     * Package ends with the package separator.
+     * Package ends with the package separator. If target namespace has not a
+     * compatible prefix, empty string will be returned.
      * </p>
      * 
      * @param root
      *            Root element of the wsdl
-     * @return Equivalent java package or empty if no target namespace.
+     * @return Equivalent java package or empty
      */
     public static String getTargetNamespaceRelatedPackage(Element root) {
-	
+
 	Assert.notNull(root, "Wsdl root element required");
 
-	// Get the namespace attribute from root wsdl
-	String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
+	// Get the namespace attribute from root wsdl in lower case
+	String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE).toLowerCase();
 
-	// Remove http prefix and final url separator from namespace
+	// First string separator and second one
+	String separator1 = null;
+	String separator2 = null;
+
 	if (namespace.startsWith(HTTP_PROTOCOL_PREFIX)) {
 
+	    // Remove http prefix and final url separator from namespace
 	    namespace = namespace.substring(HTTP_PROTOCOL_PREFIX.length());
-	}
-	if (namespace.endsWith(URL_SEPARATOR)) {
+	    if (namespace.endsWith(URL_SEPARATOR)) {
 
-	    namespace = namespace.substring(0, namespace.length() - 1);
+		namespace = namespace.substring(0, namespace.length() - 1);
+	    }
+
+	    separator1 = URL_SEPARATOR;
+	    separator2 = DOMAIN_SEPARATOR;
+	    
+	} else if (namespace.startsWith(URN_PROTOCOL_PREFIX)) {
+
+	    // Remove urn prefix from namespace
+	    namespace = namespace.substring(URN_PROTOCOL_PREFIX.length());
+
+	    separator1 = ":";
+	    separator2 = "-";
 	}
 
 	// Revert namespace and replace url and domain with package separator
 	String path = "";
-	
+
 	// Url tokens
-	StringTokenizer urlTokens = new StringTokenizer(namespace,
-		URL_SEPARATOR);
+	StringTokenizer urlTokens = new StringTokenizer(namespace, separator1);
 	if (urlTokens.hasMoreTokens()) {
 
 	    // Domain is the first token of the Url
 	    StringTokenizer domainTokens = new StringTokenizer(urlTokens
-		    .nextToken(), DOMAIN_SEPARATOR);
+		    .nextToken(), separator2);
 	    while (domainTokens.hasMoreTokens()) {
 
 		path = domainTokens.nextToken() + PACKAGE_SEPARATOR + path;
@@ -198,7 +213,7 @@ public class WsdlParserUtils {
      */
     public static Element getReferencedElement(Element root,
 	    List<Element> elements, String reference) {
-	
+
 	Assert.notNull(root, "Wsdl root element required");
 	Assert.notNull(elements, "Elements list required");
 	Assert.notNull(reference, "Reference required");
@@ -238,12 +253,12 @@ public class WsdlParserUtils {
 	String path = getTargetNamespaceRelatedPackage(root);
 
 	// Find a compatible service name
-	String name = findFirstCompatibleService(root);
+	String name = findFirstCompatibleServiceName(root);
 
 	// Class path is the concat of path and name
 	return path + name;
     }
-    
+
     /**
      * Get the path to the generated port type class.
      * 
@@ -259,8 +274,8 @@ public class WsdlParserUtils {
 	String path = getTargetNamespaceRelatedPackage(root);
 
 	// Find a compatible port type name
-	String name = findFirstCompatiblePortType(root);
-	
+	String name = findFirstCompatiblePortTypeName(root);
+
 	// Class path is the concat of path and name
 	return path + name;
     }
@@ -276,8 +291,8 @@ public class WsdlParserUtils {
      *            Root element of wsdl
      * @return First compatible service name
      */
-    private static String findFirstCompatibleService(Element root) {
-	
+    private static String findFirstCompatibleServiceName(Element root) {
+
 	Assert.notNull(root, "Wsdl root element required");
 
 	Element port = findFirstCompatiblePort(root);
@@ -285,9 +300,7 @@ public class WsdlParserUtils {
 	// Get the path to the service class defined by the wsdl
 	Element service = ((Element) port.getParentNode());
 	String name = service.getAttribute(NAME_ATTRIBUTE);
-	Assert
-		.hasText(name,
-			"The web service to import has no name attribute on the service element");
+	Assert.hasText(name, "No name attribute in service element");
 
 	return name;
     }
@@ -303,21 +316,38 @@ public class WsdlParserUtils {
      *            Root element of wsdl
      * @return First compatible port element
      */
-    private static Element findFirstCompatiblePort(Element root) {
-	
+    public static Element findFirstCompatiblePort(Element root) {
+
 	Assert.notNull(root, "Wsdl root element required");
-	
+
 	// Find a compatible address element
 	Element address = findFirstCompatibleAddress(root);
-	Assert
-		.notNull(
-			address,
-			"The web service to import is not compatible with supported SOAP 1.1 and 1.2 protocols");
+	Assert.notNull(address, "No compatible SOAP 1.1 or 1.2 protocol");
 
 	// Get the port element defined by the wsdl
 	Element port = ((Element) address.getParentNode());
-	
+
 	return port;
+    }
+    
+
+    /**
+     * Find the first compatible port element name of the root.
+     * 
+     * <p>
+     * Compatible port should be SOAP protocol version 1.1 and 1.2.
+     * </p>
+     * 
+     * @param root
+     *            Root element of wsdl
+     * @return First compatible port element name
+     */
+    public static String findFirstCompatiblePortName(Element root) {
+
+	Assert.notNull(root, "Wsdl root element required");
+
+	// Get the the port element name
+	return findFirstCompatiblePort(root).getAttribute(NAME_ATTRIBUTE);
     }
 
     /**
@@ -331,33 +361,22 @@ public class WsdlParserUtils {
      *            Root element of wsdl
      * @return First compatible port type name
      */
-    private static String findFirstCompatiblePortType(Element root) {
-	
+    private static String findFirstCompatiblePortTypeName(Element root) {
+
 	Assert.notNull(root, "Wsdl root element required");
-	
+
 	Element binding = findFirstCompatibleBinding(root);
 
 	// Find all port types elements
-	List<Element> portTypes = XmlUtils.findElements(
-		WsdlParserUtils.PORT_TYPES_XPATH, root);
-	Assert.notEmpty(portTypes,
-		"The web service to import has not a valid port type format");
-	String portTypeReference = binding
-		.getAttribute(WsdlParserUtils.TYPE_ATTRIBUTE);
-	Assert
-		.hasText(portTypeReference,
-			"The web service to import has no type attribute on the binding element");
-	Element portType = WsdlParserUtils.getReferencedElement(root,
-		portTypes, portTypeReference);
-	Assert
-		.notNull(portType,
-			"The web service to import has not a valid port type reference");
-	String portTypeName = portType
-		.getAttribute(WsdlParserUtils.NAME_ATTRIBUTE);
-	Assert
-		.hasText(portTypeName,
-			"The web service to import has no name attribute on the port type element");
-	
+	List<Element> portTypes = XmlUtils.findElements(PORT_TYPES_XPATH, root);
+	Assert.notEmpty(portTypes, "No valid port type format");
+	String portTypeRef = binding.getAttribute(TYPE_ATTRIBUTE);
+	Assert.hasText(portTypeRef, "No type attribute in binding element");
+	Element portType = getReferencedElement(root, portTypes, portTypeRef);
+	Assert.notNull(portType, "No valid port type reference");
+	String portTypeName = portType.getAttribute(NAME_ATTRIBUTE);
+	Assert.hasText(portTypeName, "No name attribute in port type element");
+
 	return portTypeName;
     }
 
@@ -373,26 +392,19 @@ public class WsdlParserUtils {
      * @return First compatible binding element
      */
     private static Element findFirstCompatibleBinding(Element root) {
-	
+
 	Assert.notNull(root, "Wsdl root element required");
-	
+
 	// Find all binding elements
-	List<Element> bindings = XmlUtils.findElements(
-		WsdlParserUtils.BINDINGS_XPATH, root);
-	Assert.notEmpty(bindings,
-		"The web service to import has not a valid binding format");
-	
+	List<Element> bindings = XmlUtils.findElements(BINDINGS_XPATH, root);
+	Assert.notEmpty(bindings, "No valid binding format");
+
 	Element port = findFirstCompatiblePort(root);
-	String bindingReference = port
-		.getAttribute(WsdlParserUtils.BINDING_ATTRIBUTE);
-	Assert
-		.hasText(bindingReference,
-			"The web service to import has no binding attribute on the port element");
-	Element binding = WsdlParserUtils.getReferencedElement(root, bindings,
-		bindingReference);
-	Assert.notNull(binding,
-		"The web service to import has not a valid binding reference");
-	
+	String bindingRef = port.getAttribute(BINDING_ATTRIBUTE);
+	Assert.hasText(bindingRef, "No binding attribute in port element");
+	Element binding = getReferencedElement(root, bindings, bindingRef);
+	Assert.notNull(binding, "No valid binding reference");
+
 	return binding;
     }
 
@@ -414,7 +426,7 @@ public class WsdlParserUtils {
     private static String getNamespaceURI(Element root, String namespace) {
 
 	Assert.notNull(root, "Wsdl root element required");
-	
+
 	String namespaceURI = null;
 
 	if (namespace != null && namespace.length() > 0) {
@@ -444,7 +456,7 @@ public class WsdlParserUtils {
      * @return Prefix of the name or empty if not
      */
     protected static String getNamespace(String elementName) {
-	
+
 	Assert.notNull(elementName, "Element name required");
 
 	String prefix = "";
@@ -473,10 +485,11 @@ public class WsdlParserUtils {
      * @return Sufix of the name or name if not
      */
     protected static String getLocalName(String elementName) {
-	
+
 	Assert.notNull(elementName, "Element name required");
 
-	return elementName.replaceFirst(getNamespace(elementName) + NAMESPACE_SEPARATOR, "");
+	return elementName.replaceFirst(getNamespace(elementName)
+		+ NAMESPACE_SEPARATOR, "");
     }
 
 }

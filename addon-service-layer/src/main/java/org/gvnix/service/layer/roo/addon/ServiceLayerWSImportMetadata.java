@@ -21,7 +21,6 @@ package org.gvnix.service.layer.roo.addon;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -134,22 +133,22 @@ public class ServiceLayerWSImportMetadata extends
 	// Parse the wsdl location to a DOM document
 	Document wsdl = XmlUtils.getDocumentBuilder().parse(wsdlLocation);
 	Element root = wsdl.getDocumentElement();
-	Assert.notNull(root,
-		"The web service to import has not a valid document format");
+	Assert.notNull(root, "No valid document format");
 
 	// Get the path to the generated service class
 	String servicePath = WsdlParserUtils.getServiceClassPath(root);
 
 	// Get the path to the generated port type class
 	String portTypePath = WsdlParserUtils.getPortTypeClassPath(root);
-	
+
+	// Get the the port element name
+	String portName = WsdlParserUtils.findFirstCompatiblePortName(root);
+
 	// TODO Completar
 	InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
-	body.appendFormalLine("// Auto generated testing method");
-	body.appendFormalLine(servicePath + " tc = new " + servicePath + "();");
-	body.appendFormalLine(portTypePath
-		+ " port = tc.getTempConvertSoap12();");
-	body.appendFormalLine("return port.celsiusToFahrenheit(\"1\");");
+	body.appendFormalLine(servicePath + " s = new " + servicePath + "();");
+	body.appendFormalLine(portTypePath + " p = s.get" + portName + "();");
+	body.appendFormalLine("return \"\";");
 	MethodMetadata result = new DefaultMethodMetadata(getId(),
 		Modifier.PUBLIC, new JavaSymbolName("unusedTestMethod"),
 		new JavaType(String.class.getName()),
