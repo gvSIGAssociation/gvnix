@@ -312,11 +312,11 @@ public class ServiceLayerWsExportOperationsImpl implements
     /**
      * {@inheritDoc}
      * <p>
-     * Check allowed input/output parameters:
+     * Check allowed JavaType:
      * </p>
      * <ul>
      * <li>
-     * Java basic types or basic objects.</li>
+     * Java basic types and basic objects.</li>
      * <li>
      * Project {@link Entity}. Adds @GvNIXXmlElement annotation to Entity.</li>
      * <li>
@@ -328,6 +328,33 @@ public class ServiceLayerWsExportOperationsImpl implements
 
 	// Exists
 	if (javaType != null) {
+
+	    // Check if javaType is a collection.
+	    // Collection
+	    List<JavaType> parameterList = javaType.getParameters();
+	    if (!parameterList.isEmpty()) {
+		
+	    // 1) yes - check if is allowed
+	    // Check if is not an allowed collection
+		// 1.1) yes - recursive with its javaType.
+		// 1.2) no - error.
+
+	    Assert
+		    .isTrue(
+			    isNotAllowedCollectionType(javaType) == false,
+			    "The '"
+				    + methodParameterType
+				    + "' type '"
+				    + javaType.getFullyQualifiedTypeName()
+				    + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection.");
+
+		// Check collection's parameter.
+		return isJavaTypeAllowed(parameterList.get(0),
+			methodParameterType);
+
+	    }
+
+	    // 2) no continue.
 
 	    // Check if is primitive value.
 	    if (javaType.isPrimitive()) {
@@ -369,21 +396,12 @@ public class ServiceLayerWsExportOperationsImpl implements
 			.getTypeAnnotation(mutableTypeDetails, new JavaType(
 				RooEntity.class.getName()));
 
+		// TODO: Aunque no sea RooEntity añadir la anotación ?
 		if (rooEntitynnotationMetadata != null) {
 		    addGvNIXXmlElementAnnotation(javaType, mutableTypeDetails);
 		    return true;
 		}
 	    }
-
-	    // Check if is not an allowed collection
-	    Assert
-		    .isTrue(
-			    isNotAllowedCollectionType(javaType) == false,
-			    "The '"
-				    + methodParameterType
-				    + "' type '"
-				    + javaType.getFullyQualifiedTypeName()
-				    + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nIs a disallowed collection.");
 
 	}
 
