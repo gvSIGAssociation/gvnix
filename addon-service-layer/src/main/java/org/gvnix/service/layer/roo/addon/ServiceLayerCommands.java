@@ -63,7 +63,7 @@ public class ServiceLayerCommands implements CommandMarker {
     @CliCommand(value = "service operation", help = "Adds a new Operation to existing Service")
     public void addServiceOperation(
 	    @CliOption(key = { "", "name" }, mandatory = true, help = "The name of the operation to add") JavaSymbolName operationName,
-	    @CliOption(key = "return", mandatory = false, unspecifiedDefaultValue = "__NULL__", help = "The Java type this operation returns") JavaType returnType,
+	    @CliOption(key = "return", mandatory = false, unspecifiedDefaultValue = "__NULL__", optionContext = "java-all,project", help = "The Java type this operation returns") JavaType returnType,
 	    @CliOption(key = "params", mandatory = false, help = "The parameters of the operation. They must be introduced separated by commas without blank spaces.") String paramNames,
 	    @CliOption(key = "types", mandatory = false, help = "The Java types of the given parameters. They must be introduced separated by commas without blank spaces.") JavaTypeList paramTypes,
 	    @CliOption(key = "service", mandatory = true, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the service to receive this field") JavaType className) {
