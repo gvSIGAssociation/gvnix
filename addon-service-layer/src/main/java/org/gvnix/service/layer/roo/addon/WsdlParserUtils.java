@@ -211,7 +211,7 @@ public class WsdlParserUtils {
      *            Reference to be searched
      * @return Element found or null if not
      */
-    public static Element getReferencedElement(Element root,
+    private static Element getReferencedElement(Element root,
 	    List<Element> elements, String reference) {
 
 	Assert.notNull(root, "Wsdl root element required");

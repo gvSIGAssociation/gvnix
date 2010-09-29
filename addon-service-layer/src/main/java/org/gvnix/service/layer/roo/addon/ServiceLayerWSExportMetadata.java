@@ -18,7 +18,6 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,9 +69,6 @@ public class ServiceLayerWSExportMetadata extends
 	if (annotationMetadata != null) {
 
 	    // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
-	    
-	    // TODO Comprobar el uso de AutoPopulationUtils.populate(this, annotation) para añadir las anotaciones
-
 	    builder
 		    .addTypeAnnotation(getWebServiceAnnotation(annotationMetadata));
 

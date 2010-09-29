@@ -118,7 +118,7 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
 		    + serviceClass.getSimpleTypeName());
 	}
 	
-	// Add wsdl location
+	// Add wsdl location to pom.xml
 	serviceLayerWsConfigService.addImportLocation(wsdlLocation);
 	
 	// Add the import definition annotation and attributes to the class

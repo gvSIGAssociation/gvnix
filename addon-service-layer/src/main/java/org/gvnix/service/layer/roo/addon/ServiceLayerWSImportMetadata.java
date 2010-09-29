@@ -18,9 +18,20 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import japa.parser.JavaParser;
+import japa.parser.ParseException;
+import japa.parser.ast.CompilationUnit;
+import japa.parser.ast.body.BodyDeclaration;
+import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.MethodDeclaration;
+import japa.parser.ast.body.Parameter;
+import japa.parser.ast.body.TypeDeclaration;
+
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,6 +108,9 @@ public class ServiceLayerWSImportMetadata extends
 
 		// Create methods on Aspect file related to this wsdl location
 		createAspectMethods();
+		
+		// TODO Add wsdl location to pom.xml here instead of on command
+//		serviceLayerWsConfigService.addImportLocation(wsdlLocation);
 
 	    } catch (SAXException e) {
 
@@ -144,6 +158,48 @@ public class ServiceLayerWSImportMetadata extends
 	// Get the the port element name
 	String portName = WsdlParserUtils.findFirstCompatiblePortName(root);
 
+	
+	
+	
+	
+	
+	try {
+
+	    File file = new File("./target/generated-sources/cxf", portTypePath
+		    .replace(".", "/").concat(".java"));
+	    CompilationUnit unit = JavaParser.parse(file);
+	    List<TypeDeclaration> types = unit.getTypes();
+	    if (types != null && !types.isEmpty()
+		    && types.get(0) instanceof ClassOrInterfaceDeclaration) {
+		List<BodyDeclaration> members = ((ClassOrInterfaceDeclaration) types
+			.get(0)).getMembers();
+		if (members != null) {
+		    for (BodyDeclaration member : members) {
+			if (member instanceof MethodDeclaration) {
+
+			    logger.log(Level.INFO, "Name: "
+				    + ((MethodDeclaration) member).getName());
+			    List<Parameter> parameters = ((MethodDeclaration) member)
+				    .getParameters();
+			    for (Parameter parameter : parameters) {
+				logger.log(Level.INFO, "Parameter: "
+					+ parameter.getType() + " "
+					+ parameter.getId());
+			    }
+			    logger.log(Level.INFO, "Type: "
+				    + ((MethodDeclaration) member).getType());
+			}
+		    }
+		}
+	    }
+	} catch (ParseException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+	
+	
+	
+	
 	// TODO Completar
 	InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
 	body.appendFormalLine(servicePath + " s = new " + servicePath + "();");
