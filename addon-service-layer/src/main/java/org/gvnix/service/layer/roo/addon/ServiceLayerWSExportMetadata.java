@@ -75,13 +75,16 @@ public class ServiceLayerWSExportMetadata extends
 	    builder.addTypeAnnotation(getSoapBindingAnnotation());
 	}
 
-	// Update methods without GvNIXWebMethod annotation with
-	// '@WebMethod(exclude = true)'
-	updateMethodWithoutGvNIXAnnotation();
+	// TODO: Add method annotations.
+
+	// TODO: Add @GvNIXWebFault annotation to related exceptions.
 
 	// TODO: Update RooEntities involved in Annotated Operations with
 	// @GvNIXWebMethod.
 
+	// Update methods without GvNIXWebMethod annotation with
+	// '@WebMethod(exclude = true)'
+	updateMethodWithoutGvNIXAnnotation();
 
 	// Create a representation of the desired output ITD
 	itdTypeDetails = builder.build();

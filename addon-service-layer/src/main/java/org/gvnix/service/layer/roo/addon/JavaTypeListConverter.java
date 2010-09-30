@@ -92,6 +92,8 @@ public class JavaTypeListConverter implements Converter {
 	String tmpExistingData = existingDataToComplete(existingData);
 	String completeExistingDataList = convertInputIntoPrefixCompletion(existingData);
 
+	if (optionContext != null && optionContext.contains("java")) {
+
 	// Compare Java Basic Types.
 	completeJavaSpecificPaths(completions, existingData, optionContext,
 		completeExistingDataList, tmpExistingData);
@@ -99,6 +101,12 @@ public class JavaTypeListConverter implements Converter {
 	// Compare Project Java Types.
 	completeProjectSpecificPaths(completions, existingData,
 		completeExistingDataList, tmpExistingData);
+
+	} else if (optionContext != null
+		&& optionContext.contains("exceptions")) {
+
+	    // TODO: Nothing to do.
+	}
 
 	return false;
     }

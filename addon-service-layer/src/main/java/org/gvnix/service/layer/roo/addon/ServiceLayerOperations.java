@@ -61,9 +61,12 @@ public interface ServiceLayerOperations {
      *            List of JavaType for each input parameter.
      * @param paramNameList
      *            List of names for each input parameter.
+     * @param exceptionList
+     *            List of exceptions that throws the operation.
      */
     public void addServiceOperation(JavaSymbolName operationName,
-	    JavaType returnType, JavaType className, List<JavaType> paramTypeList,
-	    List<String> paramNameList);
+	    JavaType returnType, JavaType className,
+	    List<JavaType> paramTypeList, List<String> paramNameList,
+	    List<JavaType> exceptionList);
 
 }

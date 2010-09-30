@@ -98,7 +98,8 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
      */
     public void addServiceOperation(JavaSymbolName operationName,
 	    JavaType returnType, JavaType className,
-	    List<JavaType> paramTypeList, List<String> paramNameList) {
+	    List<JavaType> paramTypeList, List<String> paramNameList,
+	    List<JavaType> exceptionList) {
 
 	InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
@@ -137,7 +138,7 @@ public class ServiceLayerOperationsImpl implements ServiceLayerOperations {
 	}
 
 	javaParserService.createMethod(operationName, returnType, className,
-		Modifier.PUBLIC, new ArrayList<JavaType>(),
+		Modifier.PUBLIC, exceptionList,
 		new ArrayList<AnnotationMetadata>(), parameterTypeList,
 		parameterNameList, bodyBuilder.getOutput());
     }

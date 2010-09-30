@@ -34,12 +34,12 @@ import java.lang.annotation.*;
 @Target( { ElementType.TYPE, ElementType.METHOD })
 public @interface GvNIXWebFault {
 
-    String name() default "";
+    String name();
 
     Class<?> type() default void.class;
 
-    String targetNamespace() default "";
+    String targetNamespace();
 
-    String faultBean() default "";
+    String faultBean();
 
 }

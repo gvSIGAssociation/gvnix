@@ -64,34 +64,38 @@ public class ServiceLayerCommands implements CommandMarker {
     public void addServiceOperation(
 	    @CliOption(key = { "", "name" }, mandatory = true, help = "The name of the operation to add") JavaSymbolName operationName,
 	    @CliOption(key = "return", mandatory = false, unspecifiedDefaultValue = "__NULL__", optionContext = "java-all,project", help = "The Java type this operation returns") JavaType returnType,
-	    @CliOption(key = "params", mandatory = false, help = "The parameters of the operation. They must be introduced separated by commas without blank spaces.") String paramNames,
-	    @CliOption(key = "types", mandatory = false, help = "The Java types of the given parameters. They must be introduced separated by commas without blank spaces.") JavaTypeList paramTypes,
-	    @CliOption(key = "service", mandatory = true, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the service to receive this field") JavaType className) {
+	    @CliOption(key = "paramNames", mandatory = false, help = "The parameters of the operation. They must be introduced separated by commas without blank spaces.") String paramNames,
+	    @CliOption(key = "paramTypes", mandatory = false, optionContext = "java", help = "The Java types of the given parameters. They must be introduced separated by commas without blank spaces.") JavaTypeList paramTypesList,
+	    @CliOption(key = "service", mandatory = true, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the service to receive this field") JavaType className,
+	    @CliOption(key = "exceptions", mandatory = false, optionContext = "exceptions", help = "The Exceptions defined for the operation. They must be introduced separated by commas without blank spaces.") JavaTypeList exceptionTypes) {
 
 	String[] paramNameArray;
 	List<String> paramNameList = new ArrayList<String>();
-	boolean existsParamTypes = paramTypes != null;
+	List<JavaType> paramTypes = new ArrayList<JavaType>();
+	List<JavaType> exceptionList = new ArrayList<JavaType>();
 
-	if (existsParamTypes && paramTypes.getJavaTypes().size() > 0) {
+	boolean existsParamTypes = paramTypesList != null;
+
+	if (existsParamTypes && paramTypesList.getJavaTypes().size() > 0) {
 	    Assert.isTrue(StringUtils.hasText(paramNames),
 		    "You must provide parameter names to create the method.");
 
 	} else if (StringUtils.hasText(paramNames)) {
 	    Assert.isTrue(existsParamTypes
-		    && paramTypes.getJavaTypes().size() > 0,
+		    && paramTypesList.getJavaTypes().size() > 0,
 		    "You must provide parameter Types to create the method.");
 
 	}
 
 	if (StringUtils.hasText(paramNames)
-		&& paramTypes.getJavaTypes().size() > 0) {
+		&& paramTypesList.getJavaTypes().size() > 0) {
 
 	    paramNameArray = StringUtils
 		    .commaDelimitedListToStringArray(paramNames);
 
 	    Assert
 		    .isTrue(
-			    paramTypes.getJavaTypes().size() == paramNameArray.length,
+			    paramTypesList.getJavaTypes().size() == paramNameArray.length,
 			    "The method parameter types must have the same number of parameter names to create the method.");
 
 	    for (int i = 0; i <= paramNameArray.length - 1; i++) {
@@ -99,15 +103,21 @@ public class ServiceLayerCommands implements CommandMarker {
 		paramNameList.add(paramNameArray[i]);
 	    }
 
-	    serviceLayerOperations.addServiceOperation(operationName,
-		    returnType, className, paramTypes.getJavaTypes(),
-		    paramNameList);
+	    paramTypes = paramTypesList.getJavaTypes();
+
 	} else {
 
-	    serviceLayerOperations.addServiceOperation(operationName,
-		    returnType, className, new ArrayList<JavaType>(),
-		    paramNameList);
+	    paramTypes = new ArrayList<JavaType>();
 	}
+
+	// Exceptions.
+	if (!exceptionTypes.getJavaTypes().isEmpty()) {
+	    exceptionList = exceptionTypes.getJavaTypes();
+	}
+
+	serviceLayerOperations.addServiceOperation(operationName, returnType,
+		className, paramTypes, paramNameList, exceptionList);
+
     }
 
     @CliAvailabilityIndicator("service export ws")
@@ -177,9 +187,7 @@ public class ServiceLayerCommands implements CommandMarker {
 	    @CliOption(key = "responseWrapperName", mandatory = false, help = "Name to define the Response Wrapper Object.") String responseWrapperName,
 	    @CliOption(key = "responseWrapperNamespace", mandatory = false, help = "Namespace of the Response Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String responseWrapperNamespace,
 	    @CliOption(key = "requestWrapperName", mandatory = false, help = "Name to define the Request Wrapper Object.") String requestWrapperName,
-	    @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String requestWrapperNamespace,
-	    @CliOption(key = "exceptionName", mandatory = false, help = "Name to define method exception if exists.") String exceptionName,
-	    @CliOption(key = "exceptionNamespace", mandatory = false, help = "Namespace of method exception if exists. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String exceptionNamespace) {
+	    @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.layer.service.test.gvnix.org/'. It must have URI format.") String requestWrapperNamespace) {
 
 	if (StringUtils.hasText(resultNamespace)) {
 	    Assert
@@ -204,18 +212,10 @@ public class ServiceLayerCommands implements CommandMarker {
 			    "Name space for ResponsetWrapper is not correctly defined. It must have URI format.");
 	}
 
-	if (StringUtils.hasText(exceptionNamespace)) {
-	    Assert
-		    .isTrue(StringUtils.startsWithIgnoreCase(
-			    exceptionNamespace, "http://"),
-			    "Name space for Exception is not correctly defined. It must have URI format.");
-	}
-
 	serviceLayerWsExportOperations.exportOperation(serviceClass,
 		methodName, operationName, resultName, resultNamespace,
 		responseWrapperName, responseWrapperNamespace,
-		requestWrapperName, requestWrapperNamespace, exceptionName,
-		exceptionNamespace);
+		requestWrapperName, requestWrapperNamespace);
     }
 
     @CliAvailabilityIndicator("service import ws")

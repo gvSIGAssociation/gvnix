@@ -91,19 +91,13 @@ public interface ServiceLayerWsExportOperations {
      *            Name to define the Request Wrapper Object.
      * @param requestWrapperNamespace
      *            Namespace of the Request Wrapper Object.
-     * @param exceptionName
-     *            Name to define the exception in method if exists.
-     * @param exceptionNamespace
-     *            Namespace of method exception if exists.
-     * 
      * 
      */
     public void exportOperation(JavaType serviceClass,
 	    JavaSymbolName methodName, String operationName, String resutlName,
 	    String resultNamespace, String responseWrapperName,
 	    String responseWrapperNamespace, String requestWrapperName,
-	    String requestWrapperNamespace, String exceptionName,
-	    String exceptionNamespace);
+	    String requestWrapperNamespace);
 
     /**
      * Creates the list of annotations with the values defined.

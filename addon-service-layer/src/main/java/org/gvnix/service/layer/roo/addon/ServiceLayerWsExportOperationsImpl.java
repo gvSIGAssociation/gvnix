@@ -206,8 +206,7 @@ public class ServiceLayerWsExportOperationsImpl implements
 	    JavaSymbolName methodName, String operationName, String resultName,
 	    String resultNamespace, String responseWrapperName,
 	    String responseWrapperNamespace, String requestWrapperName,
-	    String requestWrapperNamespace, String exceptionName,
-	    String exceptionNamespace) {
+	    String requestWrapperNamespace) {
 
 	Assert.notNull(serviceClass, "Java type required");
 	Assert.notNull(methodName, "Operation name required");
