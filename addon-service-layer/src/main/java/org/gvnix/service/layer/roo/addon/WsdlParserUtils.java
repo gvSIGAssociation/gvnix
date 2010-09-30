@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.StringUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
 
@@ -253,7 +254,8 @@ public class WsdlParserUtils {
 	String path = getTargetNamespaceRelatedPackage(root);
 
 	// Find a compatible service name
-	String name = findFirstCompatibleServiceName(root);
+	String name = StringUtils
+		.capitalize(findFirstCompatibleServiceName(root));
 
 	// Class path is the concat of path and name
 	return path + name;
@@ -274,7 +276,8 @@ public class WsdlParserUtils {
 	String path = getTargetNamespaceRelatedPackage(root);
 
 	// Find a compatible port type name
-	String name = findFirstCompatiblePortTypeName(root);
+	String name = StringUtils
+		.capitalize(findFirstCompatiblePortTypeName(root));
 
 	// Class path is the concat of path and name
 	return path + name;

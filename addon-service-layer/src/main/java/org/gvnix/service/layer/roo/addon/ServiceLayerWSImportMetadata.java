@@ -26,10 +26,10 @@ import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.Parameter;
 import japa.parser.ast.body.TypeDeclaration;
+import japa.parser.ast.expr.NameExpr;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -48,6 +48,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.StringUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -105,6 +106,9 @@ public class ServiceLayerWSImportMetadata extends
 	    logger.log(Level.FINE, "Wsdl location = " + wsdlLocation);
 
 	    try {
+		
+		// TODO Check
+		mvn();
 
 		// Create methods on Aspect file related to this wsdl location
 		createAspectMethods();
@@ -121,6 +125,11 @@ public class ServiceLayerWSImportMetadata extends
 
 		Assert.state(false,
 			"There is no connection to the web service to import");
+		
+	    } catch (ParseException e) {
+
+		Assert.state(false,
+			"Generated web service client has errors");
 	    }
 
 	    logger.log(Level.INFO, "Web service has been imported");
@@ -129,7 +138,30 @@ public class ServiceLayerWSImportMetadata extends
 	// Create a representation of the desired output ITD
 	itdTypeDetails = builder.build();
     }
+    
+	/**
+	 * 
+	 * @throws IOException
+	 */
+	public void mvn() throws IOException {
 
+		String cmd = null;
+		if (File.separatorChar == '\\') {
+			cmd = "mvn.bat " + "generate-sources";
+		} else {
+			cmd = "mvn " + "generate-sources";
+		}
+		
+		// TODO "./" works in Windows ?
+		Process p = Runtime.getRuntime().exec(cmd, null, new File("./"));
+
+		try {
+			p.waitFor();
+		} catch (InterruptedException e) {
+			throw new IllegalStateException(e);
+		}
+		
+	}
     /**
      * Create methods on Aspect file related to this wsdl location.
      * 
@@ -141,8 +173,11 @@ public class ServiceLayerWSImportMetadata extends
      *             No connection to the wsdl location
      * @throws SAXException
      *             Invalid wsdl format
+     * @throws ParseException
+     *             Generated Java client parse error
      */
-    private void createAspectMethods() throws SAXException, IOException {
+    private void createAspectMethods() throws SAXException, IOException,
+	    ParseException {
 
 	// Parse the wsdl location to a DOM document
 	Document wsdl = XmlUtils.getDocumentBuilder().parse(wsdlLocation);
@@ -158,60 +193,123 @@ public class ServiceLayerWSImportMetadata extends
 	// Get the the port element name
 	String portName = WsdlParserUtils.findFirstCompatiblePortName(root);
 
-	
-	
-	
-	
-	
-	try {
-
-	    File file = new File("./target/generated-sources/cxf", portTypePath
-		    .replace(".", "/").concat(".java"));
-	    CompilationUnit unit = JavaParser.parse(file);
-	    List<TypeDeclaration> types = unit.getTypes();
-	    if (types != null && !types.isEmpty()
-		    && types.get(0) instanceof ClassOrInterfaceDeclaration) {
-		List<BodyDeclaration> members = ((ClassOrInterfaceDeclaration) types
-			.get(0)).getMembers();
+	// Get
+	File file = new File("./target/generated-sources/cxf", portTypePath
+		.replace(".", "/").concat(".java"));
+	CompilationUnit unit = JavaParser.parse(file);
+	List<TypeDeclaration> types = unit.getTypes();
+	if (types != null && !types.isEmpty()) {
+	    TypeDeclaration type = types.get(0);
+	    if (type instanceof ClassOrInterfaceDeclaration) {
+		List<BodyDeclaration> members = type.getMembers();
 		if (members != null) {
 		    for (BodyDeclaration member : members) {
 			if (member instanceof MethodDeclaration) {
+			    
+			    
 
-			    logger.log(Level.INFO, "Name: "
-				    + ((MethodDeclaration) member).getName());
-			    List<Parameter> parameters = ((MethodDeclaration) member)
-				    .getParameters();
-			    for (Parameter parameter : parameters) {
-				logger.log(Level.INFO, "Parameter: "
-					+ parameter.getType() + " "
-					+ parameter.getId());
+			    MethodDeclaration method = (MethodDeclaration) member;
+
+			    logger.log(Level.INFO, "Name: " + method.getName());
+			    List<Parameter> parameters = method.getParameters();
+			    List<AnnotatedJavaType> javaTypes = new ArrayList<AnnotatedJavaType>();
+			    List<JavaSymbolName> javaNames = new ArrayList<JavaSymbolName>();
+			    if (parameters != null) {
+				for (Parameter parameter : parameters) {
+				    logger.log(Level.INFO, "Parameter: "
+					    + parameter.getType() + " "
+					    + parameter.getId());
+				    javaTypes.add(new AnnotatedJavaType(
+					    new JavaType(parameter.getType()
+						    .toString()), null));
+				    javaNames.add(new JavaSymbolName(parameter
+					    .getId().toString()));
+				}
 			    }
-			    logger.log(Level.INFO, "Type: "
-				    + ((MethodDeclaration) member).getType());
+			    logger.log(Level.INFO, "Type: " + method.getType());
+
+			    List<NameExpr> throwsList = method.getThrows();
+			    List<JavaType> throwsTypes = new ArrayList<JavaType>();
+			    if (throwsList != null) {
+
+				for (NameExpr nameExpr : throwsList) {
+
+				    throwsTypes.add(new JavaType(nameExpr
+					    .toString()));
+				}
+			    }
+
+			    // TODO Completar
+			    InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
+			    body.appendFormalLine(servicePath + " s = new "
+				    + servicePath + "();");
+			    body.appendFormalLine(portTypePath + " p = s.get"
+				    + StringUtils.capitalize(portName) + "();");
+			    StringBuilder invocation = new StringBuilder();
+			    invocation.append("p." + method.getName() + "(");
+			    boolean first = true;
+			    if (parameters != null) {
+				if (!first) {
+				    invocation.append(" ,");
+				}
+				for (Parameter parameter : parameters) {
+				    invocation.append(parameter.getId());
+				}
+				first = false;
+			    }
+			    invocation.append(")");
+			    body.appendFormalLine("return " + invocation + ";");
+			    
+			    JavaType returnType = null; 
+			    try {
+				
+				// TODO ¿ What happends if method return null or object ?
+				returnType = new JavaType(method.getType().toString());
+			    }
+			    catch (IllegalArgumentException e) {
+				
+				if (method.getType().toString().equals("boolean")) {
+				    returnType = new JavaType(Boolean.class.getName(), 0, DataType.PRIMITIVE, null, null);
+				}
+				else if (method.getType().toString().equals("char")) {
+				    returnType = new JavaType(Character.class.getName(), 0, DataType.PRIMITIVE, null, null);
+				}
+				else if (method.getType().toString().equals("byte")) {
+				    returnType = new JavaType(Byte.class.getName(), 0, DataType.PRIMITIVE, null, null);
+				}
+				else if (method.getType().toString().equals("short")) {
+				    returnType = new JavaType(Short.class.getName(), 0, DataType.PRIMITIVE, null, null);
+				}
+				else if (method.getType().toString().equals("int")) {
+				    returnType = new JavaType(Integer.class.getName(), 0, DataType.PRIMITIVE, null, null);
+				}
+				else if (method.getType().toString().equals("long")) {
+				    returnType = new JavaType(Long.class.getName(), 0, DataType.PRIMITIVE, null, null);
+				}
+				else if (method.getType().toString().equals("float")) {
+				    returnType = new JavaType(Float.class.getName(), 0, DataType.PRIMITIVE, null, null);
+				}
+				else if (method.getType().toString().equals("double")) {
+				    returnType = new JavaType(Double.class.getName(), 0, DataType.PRIMITIVE, null, null);
+				}
+				else {
+				    throw new IllegalStateException("Unsupported primitive '" + method.getType().toString() + "'");    
+				}
+			    }
+			    
+			    MethodMetadata result = new DefaultMethodMetadata(
+				    getId(), method.getModifiers(),
+				    new JavaSymbolName(method.getName()),
+				    returnType,
+				    javaTypes, javaNames,
+				    new ArrayList<AnnotationMetadata>(),
+				    throwsTypes, body.getOutput());
+			    builder.addMethod(result);
 			}
 		    }
 		}
 	    }
-	} catch (ParseException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
 	}
-	
-	
-	
-	
-	// TODO Completar
-	InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
-	body.appendFormalLine(servicePath + " s = new " + servicePath + "();");
-	body.appendFormalLine(portTypePath + " p = s.get" + portName + "();");
-	body.appendFormalLine("return \"\";");
-	MethodMetadata result = new DefaultMethodMetadata(getId(),
-		Modifier.PUBLIC, new JavaSymbolName("unusedTestMethod"),
-		new JavaType(String.class.getName()),
-		new ArrayList<AnnotatedJavaType>(),
-		new ArrayList<JavaSymbolName>(),
-		new ArrayList<AnnotationMetadata>(), null, body.getOutput());
-	builder.addMethod(result);
     }
 
     public static String getMetadataIdentiferType() {
