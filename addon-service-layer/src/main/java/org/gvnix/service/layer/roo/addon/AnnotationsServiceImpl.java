@@ -2,6 +2,8 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -38,6 +40,9 @@ public class AnnotationsServiceImpl implements AnnotationsService {
     @Reference
     private ClasspathOperations classpathOperations;
 
+    private static Logger logger = Logger.getLogger(AnnotationsService.class
+	    .getName());
+
     /**
      * {@inheritDoc}
      */
@@ -71,27 +76,19 @@ public class AnnotationsServiceImpl implements AnnotationsService {
 		typeDetails, "Can't modify " + typeDetails.getName());
 	MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) typeDetails;
 
-	List<? extends AnnotationMetadata> typeAnnotations = mutableTypeDetails
-		.getTypeAnnotations();
-
 	// Check annotation defined.
-	// TODO: The annotation can't be updated yet.
-	Assert.isTrue(!javaParserService.isAnnotationIntroduced(annotation,
-		mutableTypeDetails), "The annotation " + annotation
-		+ " can't be updated yet with service command.");
-
-	// Add annotation
-	for (AnnotationMetadata typeAnnotation : typeAnnotations) {
-
-	    if (typeAnnotation.getAnnotationType().getFullyQualifiedTypeName()
-		    .equals(annotation)) {
-
-		mutableTypeDetails
-			.removeTypeAnnotation(new JavaType(annotation));
-	    }
+	// The annotation can't be updated.
+	if (javaParserService.isAnnotationIntroduced(annotation,
+		mutableTypeDetails)) {
+	    logger.log(Level.INFO, "The annotation " + annotation
+		    + " is already defined in '"
+		    + serviceClass.getFullyQualifiedTypeName() + "'.");
+	    return;
 	}
-
-	// If no attributes, create an empty list to avoid null error
+	    
+	// Add annotation
+	// If attributes are null, create an empty list to avoid
+	// NullPointerException
 	if (annotationAttributeValues == null) {
 
 	    annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
@@ -101,7 +98,7 @@ public class AnnotationsServiceImpl implements AnnotationsService {
 	AnnotationMetadata defaultAnnotationMetadata = new DefaultAnnotationMetadata(
 		new JavaType(annotation), annotationAttributeValues);
 
-	// Adds GvNIXWebService to the entity
+	// Adds annotation to the entity
 	mutableTypeDetails.addTypeAnnotation(defaultAnnotationMetadata);
     }
 

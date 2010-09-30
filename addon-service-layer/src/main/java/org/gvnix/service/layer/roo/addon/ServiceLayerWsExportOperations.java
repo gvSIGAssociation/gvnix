@@ -185,14 +185,4 @@ public interface ServiceLayerWsExportOperations {
     public boolean isJavaTypeAllowed(JavaType javaType,
 	    MethodParameterType methodParameterType);
 
-    /**
-     * Adds @GvNIXXmlElement annotation to an Entity class.
-     * 
-     * @param javaType
-     *            to retrieve values.
-     * @param mutableTypeDetails
-     *            class to update with annotation.
-     */
-    public void addGvNIXXmlElementAnnotation(JavaType javaType,
-	    MutableClassOrInterfaceTypeDetails mutableTypeDetails);
 }

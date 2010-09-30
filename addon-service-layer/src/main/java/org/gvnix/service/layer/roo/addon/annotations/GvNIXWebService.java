@@ -34,11 +34,11 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 public @interface GvNIXWebService {
 
-    String name() default "";
+    String name();
 
-    String targetNamespace() default "";
+    String targetNamespace();
 
-    String serviceName() default "";
+    String serviceName();
 
-    String address() default "";
+    String address();
 }

@@ -333,24 +333,29 @@ public class ServiceLayerWsExportOperationsImpl implements
 	    // Collection
 	    List<JavaType> parameterList = javaType.getParameters();
 	    if (!parameterList.isEmpty()) {
-		
-	    // 1) yes - check if is allowed
-	    // Check if is not an allowed collection
+
+		// 1) yes - check if is allowed
+		// Check if is not an allowed collection
 		// 1.1) yes - recursive with its javaType.
 		// 1.2) no - error.
 
-	    Assert
-		    .isTrue(
-			    isNotAllowedCollectionType(javaType) == false,
-			    "The '"
-				    + methodParameterType
-				    + "' type '"
-				    + javaType.getFullyQualifiedTypeName()
-				    + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection.");
+		Assert
+			.isTrue(
+				isNotAllowedCollectionType(javaType) == false,
+				"The '"
+					+ methodParameterType
+					+ "' type '"
+					+ javaType.getFullyQualifiedTypeName()
+					+ "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection.");
 
 		// Check collection's parameter.
-		return isJavaTypeAllowed(parameterList.get(0),
-			methodParameterType);
+		boolean parameterAllowed = true;
+		for (JavaType parameterJavaType : parameterList) {
+		    parameterAllowed = parameterAllowed
+			    && isJavaTypeAllowed(parameterJavaType,
+				    methodParameterType);
+		}
+		return parameterAllowed;
 
 	    }
 
@@ -398,7 +403,29 @@ public class ServiceLayerWsExportOperationsImpl implements
 
 		// TODO: Aunque no sea RooEntity añadir la anotación ?
 		if (rooEntitynnotationMetadata != null) {
-		    addGvNIXXmlElementAnnotation(javaType, mutableTypeDetails);
+
+		    // Add @GvNIXXmlElement annotation.
+		    List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+		    StringAttributeValue nameStringAttributeValue = new StringAttributeValue(
+			    new JavaSymbolName("name"), StringUtils
+				    .uncapitalize(javaType.getSimpleTypeName()));
+
+		    annotationAttributeValueList.add(nameStringAttributeValue);
+
+		    StringAttributeValue namespaceStringAttributeValue = new StringAttributeValue(
+			    new JavaSymbolName("namespace"),
+			    serviceLayerWsConfigService
+				    .convertPackageToTargetNamespace(javaType
+					    .getPackage().toString()));
+
+		    annotationAttributeValueList
+			    .add(namespaceStringAttributeValue);
+
+		    annotationsService.addJavaTypeAnnotation(mutableTypeDetails
+			    .getName(), GvNIXXmlElement.class.getName(),
+			    annotationAttributeValueList);
+
 		    return true;
 		}
 	    }
@@ -406,44 +433,6 @@ public class ServiceLayerWsExportOperationsImpl implements
 	}
 
 	return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     */
-    public void addGvNIXXmlElementAnnotation(JavaType javaType,
-	    MutableClassOrInterfaceTypeDetails mutableTypeDetails) {
-
-	// Add @GvNIXXmlElement annotation.
-	List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-	StringAttributeValue nameStringAttributeValue = new StringAttributeValue(
-		new JavaSymbolName("name"), javaType.getSimpleTypeName());
-
-	annotationAttributeValueList.add(nameStringAttributeValue);
-
-	StringAttributeValue namespaceStringAttributeValue = new StringAttributeValue(
-		new JavaSymbolName("namespace"), serviceLayerWsConfigService
-			.convertPackageToTargetNamespace(javaType.getPackage()
-				.toString()));
-
-	annotationAttributeValueList.add(namespaceStringAttributeValue);
-
-	AnnotationMetadata typeAnnotationMetadata = new DefaultAnnotationMetadata(
-		new JavaType(GvNIXXmlElement.class.getName()),
-		annotationAttributeValueList);
-
-	AnnotationMetadata oldTypeAnnotationMetadata = MemberFindingUtils
-		.getTypeAnnotation(mutableTypeDetails, new JavaType(
-			GvNIXXmlElement.class.getName()));
-
-	if (oldTypeAnnotationMetadata != null) {
-	    mutableTypeDetails.removeTypeAnnotation(new JavaType(
-		    GvNIXXmlElement.class.getName()));
-	}
-
-	mutableTypeDetails.addTypeAnnotation(typeAnnotationMetadata);
     }
 
     /**
