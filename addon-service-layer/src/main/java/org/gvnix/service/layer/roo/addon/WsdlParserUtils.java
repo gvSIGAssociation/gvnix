@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -53,10 +54,14 @@ public class WsdlParserUtils {
     public static final String XML_NAMESPACE_PREFIX = "xmlns:";
     public static final String NAMESPACE_SEPARATOR = ":";
     public static final String URL_SEPARATOR = "/";
-    public static final String FILE_SEPARATOR = "/";
+    public static final String FILE_SEPARATOR = File.separator;
     public static final String DOMAIN_SEPARATOR = ".";
     public static final String XPATH_SEPARATOR = "/";
     public static final String PACKAGE_SEPARATOR = ".";
+    
+    public static final String TARGET_GENERATED_SOURCES_PATH = "."
+	    + FILE_SEPARATOR + "target" + FILE_SEPARATOR + "generated-sources"
+	    + FILE_SEPARATOR + "cxf";
 
     public static final String DEFINITIONS_ELEMENT = "definitions";
     public static final String BINDING_ELEMENT = "binding";
@@ -281,6 +286,33 @@ public class WsdlParserUtils {
 
 	// Class path is the concat of path and name
 	return path + name;
+    }
+
+    /**
+     * Convert the path to a type to the java file path.
+     * 
+     * @param classPath
+     *            Path to the class
+     * @return Path to the java file
+     */
+    public static String convertTypePathToJavaPath(String classPath) {
+	
+	Assert.hasText(classPath, "Text in class path required");
+
+	return classPath.replace(PACKAGE_SEPARATOR, FILE_SEPARATOR).concat(".java");
+    }
+    
+    /**
+     * Get the file on path in generated sources folder.
+     * 
+     * @param path Searched path
+     * @return File to path
+     */
+    public static File getGeneratedJavaFile(String path) {
+	
+	Assert.hasText(path, "Text in path required");
+	
+	return new File(TARGET_GENERATED_SOURCES_PATH, path);
     }
 
     /**

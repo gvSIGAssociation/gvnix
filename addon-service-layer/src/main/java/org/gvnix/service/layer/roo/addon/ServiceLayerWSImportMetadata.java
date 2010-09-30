@@ -108,7 +108,7 @@ public class ServiceLayerWSImportMetadata extends
 	    try {
 		
 		// TODO Check
-		mvn();
+		generateSources();
 
 		// Create methods on Aspect file related to this wsdl location
 		createAspectMethods();
@@ -138,36 +138,41 @@ public class ServiceLayerWSImportMetadata extends
 	// Create a representation of the desired output ITD
 	itdTypeDetails = builder.build();
     }
-    
-	/**
-	 * 
-	 * @throws IOException
-	 */
-	public void mvn() throws IOException {
 
-		String cmd = null;
-		if (File.separatorChar == '\\') {
-			cmd = "mvn.bat " + "generate-sources";
-		} else {
-			cmd = "mvn " + "generate-sources";
-		}
-		
-		// TODO "./" works in Windows ?
-		Process p = Runtime.getRuntime().exec(cmd, null, new File("./"));
+    /**
+     * Maven generate sources. 
+     * 
+     * @throws IOException Error on maven generate sources execution
+     */
+    public void generateSources() throws IOException {
 
-		try {
-			p.waitFor();
-		} catch (InterruptedException e) {
-			throw new IllegalStateException(e);
-		}
-		
+	// Create windows or linux command
+	String cmd = null;
+	if (File.separatorChar == '\\') {
+	    
+	    cmd = "mvn.bat " + "generate-sources";
+	    
+	} else {
+	    
+	    cmd = "mvn " + "generate-sources";
 	}
+
+	// Execute command
+	Process p = Runtime.getRuntime().exec(cmd, null, new File("." + File.separator));
+
+	try {
+
+	    // Wait command to end
+	    p.waitFor();
+	    
+	} catch (InterruptedException e) {
+	    
+	    throw new IllegalStateException(e);
+	}
+    }
+
     /**
      * Create methods on Aspect file related to this wsdl location.
-     * 
-     * <p>
-     * Compatible address should be SOAP protocol version 1.1 and 1.2.
-     * </p>
      * 
      * @throws IOException
      *             No connection to the wsdl location
@@ -193,125 +198,203 @@ public class ServiceLayerWSImportMetadata extends
 	// Get the the port element name
 	String portName = WsdlParserUtils.findFirstCompatiblePortName(root);
 
-	// Get
-	File file = new File("./target/generated-sources/cxf", portTypePath
-		.replace(".", "/").concat(".java"));
+	// Get the port type Java file
+	String javaPath = WsdlParserUtils
+		.convertTypePathToJavaPath(portTypePath);
+	File file = WsdlParserUtils.getGeneratedJavaFile(javaPath);
+
+	// Parse the port type Java file
 	CompilationUnit unit = JavaParser.parse(file);
+
+	// Get the first class or interface Java type
 	List<TypeDeclaration> types = unit.getTypes();
-	if (types != null && !types.isEmpty()) {
+	if (types != null) {
 	    TypeDeclaration type = types.get(0);
 	    if (type instanceof ClassOrInterfaceDeclaration) {
+		
+		// Get all methods
 		List<BodyDeclaration> members = type.getMembers();
 		if (members != null) {
 		    for (BodyDeclaration member : members) {
 			if (member instanceof MethodDeclaration) {
-			    
-			    
 
-			    MethodDeclaration method = (MethodDeclaration) member;
-
-			    logger.log(Level.INFO, "Name: " + method.getName());
-			    List<Parameter> parameters = method.getParameters();
-			    List<AnnotatedJavaType> javaTypes = new ArrayList<AnnotatedJavaType>();
-			    List<JavaSymbolName> javaNames = new ArrayList<JavaSymbolName>();
-			    if (parameters != null) {
-				for (Parameter parameter : parameters) {
-				    logger.log(Level.INFO, "Parameter: "
-					    + parameter.getType() + " "
-					    + parameter.getId());
-				    javaTypes.add(new AnnotatedJavaType(
-					    new JavaType(parameter.getType()
-						    .toString()), null));
-				    javaNames.add(new JavaSymbolName(parameter
-					    .getId().toString()));
-				}
-			    }
-			    logger.log(Level.INFO, "Type: " + method.getType());
-
-			    List<NameExpr> throwsList = method.getThrows();
-			    List<JavaType> throwsTypes = new ArrayList<JavaType>();
-			    if (throwsList != null) {
-
-				for (NameExpr nameExpr : throwsList) {
-
-				    throwsTypes.add(new JavaType(nameExpr
-					    .toString()));
-				}
-			    }
-
-			    // TODO Completar
-			    InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
-			    body.appendFormalLine(servicePath + " s = new "
-				    + servicePath + "();");
-			    body.appendFormalLine(portTypePath + " p = s.get"
-				    + StringUtils.capitalize(portName) + "();");
-			    StringBuilder invocation = new StringBuilder();
-			    invocation.append("p." + method.getName() + "(");
-			    boolean first = true;
-			    if (parameters != null) {
-				if (!first) {
-				    invocation.append(" ,");
-				}
-				for (Parameter parameter : parameters) {
-				    invocation.append(parameter.getId());
-				}
-				first = false;
-			    }
-			    invocation.append(")");
-			    body.appendFormalLine("return " + invocation + ";");
-			    
-			    JavaType returnType = null; 
-			    try {
-				
-				// TODO ¿ What happends if method return null or object ?
-				returnType = new JavaType(method.getType().toString());
-			    }
-			    catch (IllegalArgumentException e) {
-				
-				if (method.getType().toString().equals("boolean")) {
-				    returnType = new JavaType(Boolean.class.getName(), 0, DataType.PRIMITIVE, null, null);
-				}
-				else if (method.getType().toString().equals("char")) {
-				    returnType = new JavaType(Character.class.getName(), 0, DataType.PRIMITIVE, null, null);
-				}
-				else if (method.getType().toString().equals("byte")) {
-				    returnType = new JavaType(Byte.class.getName(), 0, DataType.PRIMITIVE, null, null);
-				}
-				else if (method.getType().toString().equals("short")) {
-				    returnType = new JavaType(Short.class.getName(), 0, DataType.PRIMITIVE, null, null);
-				}
-				else if (method.getType().toString().equals("int")) {
-				    returnType = new JavaType(Integer.class.getName(), 0, DataType.PRIMITIVE, null, null);
-				}
-				else if (method.getType().toString().equals("long")) {
-				    returnType = new JavaType(Long.class.getName(), 0, DataType.PRIMITIVE, null, null);
-				}
-				else if (method.getType().toString().equals("float")) {
-				    returnType = new JavaType(Float.class.getName(), 0, DataType.PRIMITIVE, null, null);
-				}
-				else if (method.getType().toString().equals("double")) {
-				    returnType = new JavaType(Double.class.getName(), 0, DataType.PRIMITIVE, null, null);
-				}
-				else {
-				    throw new IllegalStateException("Unsupported primitive '" + method.getType().toString() + "'");    
-				}
-			    }
-			    
-			    MethodMetadata result = new DefaultMethodMetadata(
-				    getId(), method.getModifiers(),
-				    new JavaSymbolName(method.getName()),
-				    returnType,
-				    javaTypes, javaNames,
-				    new ArrayList<AnnotationMetadata>(),
-				    throwsTypes, body.getOutput());
-			    builder.addMethod(result);
+			    createAspectMethod(servicePath, portTypePath,
+				    portName, (MethodDeclaration) member);
 			}
 		    }
 		}
 	    }
 	}
     }
+    
+    /**
+     * Create method on Aspect file related to method object.
+     * 
+     * @param servicePath Path to the service type
+     * @param portTypePath Path to the port type type
+     * @param portName Name of port name
+     * @param method Method to create on AspectJ
+     */
+    private void createAspectMethod(String servicePath, String portTypePath,
+	    String portName, MethodDeclaration method) {
 
+	// List to store method parameters types and names
+	List<AnnotatedJavaType> javaTypes = new ArrayList<AnnotatedJavaType>();
+	List<JavaSymbolName> javaNames = new ArrayList<JavaSymbolName>();
+	
+	// Get method parameters and store it on types and names list
+	List<Parameter> parameters = method.getParameters();
+	if (parameters != null) {
+	    for (Parameter parameter : parameters) {
+		
+		javaTypes.add(new AnnotatedJavaType(new JavaType(parameter
+			.getType().toString()), null));
+		javaNames.add(new JavaSymbolName(parameter.getId().toString()));
+	    }
+	}
+
+	// List to store throws
+	List<JavaType> throwsTypes = new ArrayList<JavaType>();
+	
+	// Get throws and store it on throws list
+	List<NameExpr> throwsList = method.getThrows();
+	if (throwsList != null) {
+	    for (NameExpr nameExpr : throwsList) {
+
+		throwsTypes.add(new JavaType(nameExpr.toString()));
+	    }
+	}
+
+	// Create the method body
+	InvocableMemberBodyBuilder body = createAspectMethodBody(servicePath,
+		portTypePath, portName, method, parameters);
+
+	// Get the method return type
+	String methodType = method.getType().toString();
+	JavaType returnType = null;
+	try {
+
+	    // TODO ¿ What happends if method returns null or object ?
+	    returnType = new JavaType(methodType);
+	    
+	} catch (IllegalArgumentException e) {
+
+	    returnType = getPrimitiveJavaType(methodType);
+	}
+
+	// Create the method metadata with previous information
+	MethodMetadata result = new DefaultMethodMetadata(getId(), method
+		.getModifiers(), new JavaSymbolName(method.getName()),
+		returnType, javaTypes, javaNames,
+		new ArrayList<AnnotationMetadata>(), throwsTypes, body
+			.getOutput());
+	
+	// Build the method
+	builder.addMethod(result);
+    }
+
+    /**
+     * Create method on Aspect file related to method object.
+     * 
+     * @param servicePath Path to the service type
+     * @param portTypePath Path to the port type type
+     * @param portName Name of port name
+     * @param method Method to create on AspectJ
+     */
+    private InvocableMemberBodyBuilder createAspectMethodBody(
+	    String servicePath, String portTypePath, String portName,
+	    MethodDeclaration method, List<Parameter> parameters) {
+	
+	InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
+	
+	// Create the service
+	body.appendFormalLine(servicePath + " s = new " + servicePath + "();");
+	
+	// Get the port type from service
+	body.appendFormalLine(portTypePath + " p = s.get"
+		+ StringUtils.capitalize(portName) + "();");
+	
+	// Invoke the port type method with params
+	StringBuilder invocation = new StringBuilder();
+	invocation.append("p." + method.getName() + "(");
+	boolean first = true;
+	if (parameters != null) {
+	    if (!first) {
+		
+		invocation.append(" ,");
+	    }
+	    for (Parameter parameter : parameters) {
+		
+		invocation.append(parameter.getId());
+	    }
+	    first = false;
+	}
+	invocation.append(")");
+	
+	// Return the method invocation
+	body.appendFormalLine("return " + invocation + ";");
+	
+	return body;
+    }
+
+    /**
+     * Get the primitive java type related to primitive type name.
+     * 
+     * @param type Primitive type name
+     * @return Primitive java type
+     */
+    private JavaType getPrimitiveJavaType(String type) {
+
+	JavaType primitive;
+
+	if ("boolean".equals(type)) {
+	    
+	    primitive = new JavaType(Boolean.class.getName(), 0,
+		    DataType.PRIMITIVE, null, null);
+	    
+	} else if ("char".equals(type)) {
+	    
+	    primitive = new JavaType(Character.class.getName(), 0,
+		    DataType.PRIMITIVE, null, null);
+	    
+	} else if ("byte".equals(type)) {
+	    
+	    primitive = new JavaType(Byte.class.getName(), 0,
+		    DataType.PRIMITIVE, null, null);
+	    
+	} else if ("short".equals(type)) {
+	    
+	    primitive = new JavaType(Short.class.getName(), 0,
+		    DataType.PRIMITIVE, null, null);
+	    
+	} else if ("int".equals(type)) {
+	    
+	    primitive = new JavaType(Integer.class.getName(), 0,
+		    DataType.PRIMITIVE, null, null);
+	    
+	} else if ("long".equals(type)) {
+	    
+	    primitive = new JavaType(Long.class.getName(), 0,
+		    DataType.PRIMITIVE, null, null);
+	    
+	} else if ("float".equals(type)) {
+	    
+	    primitive = new JavaType(Float.class.getName(), 0,
+		    DataType.PRIMITIVE, null, null);
+	    
+	} else if ("double".equals(type)) {
+	    
+	    primitive = new JavaType(Double.class.getName(), 0,
+		    DataType.PRIMITIVE, null, null);
+	    
+	} else {
+	    
+	    throw new IllegalStateException("Unsupported primitive " + type);
+	}
+
+	return primitive;
+    }
+    
     public static String getMetadataIdentiferType() {
 	return WEB_SERVICE_TYPE;
     }

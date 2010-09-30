@@ -21,7 +21,9 @@ service class --class org.gvnix.test.service.layer.project.services.Clase
 service operation --name returnString --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String
 service export ws --class org.gvnix.test.service.layer.project.services.Clase
 service export operation --class org.gvnix.test.service.layer.project.services.Clase --method returnString --resultName resultado
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy50 --wsdl http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy1 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy2 --wsdl http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy3 --wsdl http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy4 --wsdl http://ws.cdyne.com/WeatherWS/Weather.asmx?wsdl
 perform eclipse
 perform assembly
