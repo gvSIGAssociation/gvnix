@@ -106,7 +106,67 @@ More information:
 Use Case
 =========
 
-TODO:
+TRANSLATE:
+
++Publicar clase como servicio web.+
+
+Obligatorios todos los atributos de la anotación de gvNIX.
+
+* Cambiar el paquete o el nombre de la clase. Si se hace un refactor en Eclipse actualiza automáticamente todo lo referenciado con el nombre de la clase **menos** el pom.xml. Hay que tener en cuenta que cambia en la anotación **@GvNIXWebService** el serviceName y Address por el nuevo si coinciden los nombres igual que el archivo de configuración.
+
+  * Controlado por el targetNamespace definido en la anotación **@GvNIXWebSErvice** para que no cambie el contrato.
+  * Controlado por portType. No cambia el contrato.
+* Actualizar si ha variado el nombre de la clase o del paquete. Cambiar para que no cambie el contrato y no existan errores de compilación:
+
+  * Archivo de configuración xml de cxf. Atributo class donde está instanciado el servicio.
+
+    * Control de la publicación de un servicio en el archivo xml.
+
+      * Buscar el bean que contenga la clase. No cambia el contrato.
+      * Buscar el bean que contenga el id de publicación con el nombre definido por el serviceName. No cambia el contrato.
+  * pom.xml referencia a la clase. Dirección donde se encuentra la clase.
+
+    * Cambiar la ejecución del plugin de java2ws por el nuevo paquete/nombre de la clase.
+  * Namespace **NO** se cambia para no cambiar el contrato de servicio. Si se cambia es conscientemente en la anotación **@GvNIXWebService**
+* En la publicación controlar en el comando si el archivo de configuración existe, para así cuando se genera el metadato definir/comprobar el bean.
+
++Publicar operación.+
+
+Obligatorios todos los atributos de la anotación de gvNIX si se añade manualmente la anotación a la clase.
+
+* Cambiar nombre del método
+
+  * Controlado con el atributo operationName. No cambia el contrato.
+* Cambiar parámetro/s de entrada.
+
+  * Cambiar tipo: Debe controlar el cambio la anotación con el tipo de parametro para no regenerar el Aj con las anotaciones asociadas a los parámetros de entrada **@GvNIXWebParam**. No cambia el contrato.
+  * Cambiar nombre: Controlado por el atributo name de la anotación **@WebParam**, no varía el contrato de servicio si se cambia el nombre en java.
+* Cambiar parámetros de salida.
+
+  * Debe controlar el cambio la anotación con el tipo de returnType para **no regenerar** el Aj si no coincide. No cambia el contrato.
+
+Estas comprobaciones se han de hacer al generar el metadato. El metadato relacionado con la publicación del servicio y de las operaciones de éste.
+
+Nota:
+  Si a alguna operación se actualiza o se publica manualmente usando la anotación **@GvNIXWebMethod** y no cumple algún requisito, se muestra un mensaje donde apunta que no va a ser publicada debido a que no cumple el estándar y no se genera le AspectJ asociado, por lo tanto no existe el servicio web hasta que no esté correctamente formado.
+
++Publicar Objetos para la comunicación.+
+
+Obligatorios todos los atributos de la anotación de gvNIX.
+
+* Anotados con **@GvNIXXmlElement** para generar el metadato utilizando los atributos de la anotación (name y namespace).
+* Si se cambia el paquete o el nombre de la clase, no varía ya que el contrato depende del name y el namespace definido.
+
++Publicar excepción.+
+
+Obligatorios todos los atributos de la anotación de gvNIX.
+
+* Cambiar el nombre/paquete de la excepción.
+
+  * Comprobar con el valor del atributo faultBean de la anotación **@GvNIXWebFault**, si no coinciden error, es decir no generará el AspectJ asociado para publicar la excepción. Para actualizar se ha de cambiar el valor de faultBean por el nuevo valor del paquete/clase.
+  * Si no se comprueba, lanzará un error al compilar el proyecto debido a que el fichero AspectJ no encontrará la clase de la excepción a la que se refiere.
+  * Estará controlado por el metadato asociado a la excepción que únicamente comprueba las excepciones definidas del proyecto.
+
  
 Analysis
 =========
@@ -137,10 +197,10 @@ service operation:
 
         * Created the class **JavaTypeList** to retrieve the parameter types and manage with the converter *JavaTypeListConverter**.
 
-Publish web service
+Export a web service
 -------------------------
 
-Commmando to publish a service class as a web service.
+Command to publish a service class as a web service.
 
 service export ws:
 
@@ -148,50 +208,36 @@ service export ws:
 * Add CXF dependecies into pom.xml.
 * Add jax-ws build into the pom.xml to check the correct service contract generated before it will be published in compilation goal.
 * Add web service definition to CXF config file. Create the file if doesn't exists.
-* Crete AspectJ file. Associated metadata to service class within CXF annotations: 
+* Create AspectJ file. Associated metadata to service class within CXF annotations: 
 
     * Define @WebService and @SOAPBinding to the published class setting the *@GvNIXWebService* annotation attributes into corresponding CXF annotation properties or default ones.
     * Annotate with *@WebMethod(exclude = true)* all class methods that aren't defined with *@GvNixWebMethod*.
 
-Publicar un método como una operación de un servicio web
+Export a method as web service operation
 ---------------------------------------------------------
 
-Comando para publicar un método como operación.
+Command to publish a method as web service operation.
 
 service operation:
 
-* Generar o Regenerar el archivo AspectJ asociado a la clase en la que se encuentra el método que se ha de publicar con la anotación **@GvNixWebService** si contienen algún método anotado con **@GvNixWebMethod** para así generar un método en el archivo AspectJ con las anotaciones necesarias para pubilcarse como operación. Se añade la excepción _java.lang.Exception_ para controlar las excepciones en tiempo de ejecución si contiene ninguna definida.
+* Modify method in Class where is defined with **@GvNIXWebMethod** annotation with its mandatory parameters or defined in inter-operability web service standards by default. 
 
-    * Si se ha de regenerar el AspectJ se mantiene con los mismos datos obtenidos al publicar la clase como servicio web.
-* Definición de los parámetros:
+  * Create or Modify associated AspectJ file with the new published method. Rebuild with defined values in gVNIX annotations. Associated Metadata generates AspectJ file.
+  * Checks if GvNIX annotation is well formed before generate Metadata, if is incorrect shows a message and deletes metadata.
+* Add @GvNIXWebFault annotation to method _Exceptions_ if are defined in the project. If Exception are imported create a declaration in an AspectJ file. Associated Metadata generates AspectJ file. 
 
-    * class: *obligatorio* clase de la que se han de publicar un método como operación de un servicio.
-    * method: *obligatorio* nombre del método que se va a publicar como operación del servicio (autocompletado de los métodos publicados como servicio, o si se trata de una entidad los de ésta).
-    * operationName: nombre con el que se va a definir la operación.
-    * webResultType: tipo de clase que va a devolver el método, void por defecto para comprobar que no va a variar el contrato de servicio.
-    * resultName: nombre asignado a la propiedad _name_ de la anotación @WebResult.
-    * resultNamespace: namespace utilizado para @WebResult.
-    * responseWrapperName: name para @ResponseWrapper
-    * responseWrapperNamespace: namespace utilizado para @ResponseWrapper.
-    * requestWrapperName: name para @RequestWrapper
-    * requestWrapperNamespace: namespace utilizado para @RequestWrapper.
-* Los únicos parámetros obligatorios son method y class ya que a partir de los cuales se ha de seleccionar el método a publicar.
-* Esta anotación se asigna al método de la clase del servicio con los parámetros utilizados y los definidos por defecto si no se introducen, siguiendo los estándares para los servicios web.
-* Anotar la excepción _Exception_ mediente un fichero AspectJ para que pueda utilizarse en la operación. Si el método utiliza otras excepciones de aplicación, anotarlas para que el monitor del Addon capte los cambios y genere el fichero AspectJ correspondiente.
+  * Checks if GvNIX annotation is well formed before generate Metadata, if is incorrect shows a message and deletes metadata.
+* Checks **Allowed Parameters** involved in operation.
 
-    * Si la excepción que utiliza el método no se encuentra dentro del proyecto se genera un fichero AspectJ para anotarla como **@WebFault** y no se añade ninguna anotación a la clase.
-* Crea el método en la clase AspectJ correspondiente con los mismos parámetros de entrada y salida y la excepción correspondiente.
-
-* Se definen en la anotaciones de GvNix (*@GvNixWebService* y *@GvNixWebMethod*) los parámetros necesarios para regenerar el archivo aspectJ cuando haya que actualizar debido que se publique o elimine algún método como operación.
-* Se asigna la anotación *@GvNixXmlElement* a las entidades que se utilicen como parámetros de entrada o salida de la operación.
-
-    * Las entidades anotadas con *@GvNixXmlElement* se les asocia un fichero aj para anotar mediante JAXB, los atributos de relaciones se anotan con *@XmlTransient* y los demás atributos con *@XmlElement*. Se comprueba que estén dentro de +los tipos conocidos de datos+. Una lista que contendrá el Addon para las entidades de la aplicación y los definidos por nosotros, si no se encuentran en ninguna de ambas listas se anotarán como *@XmlTransient*.
+  * If there is a not allowed parameters (input/output) doesn't publish the operation. See: supported data types.
 
 Supported data types
 --------------------------
 
 Data types: Basic Data
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+Checks which are supported data types that accomplish web service interoperability defined by the Add-on.
 
 All basic data are supported in web services:
 
@@ -210,54 +256,24 @@ And Basic Objects:
 Data types: Collections
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Al añadir un Map o un Set a la entidad y anotarla para hacer la serialización a XML hay que declararlos de la siguiente manera inicializados::
+Collections that don't accomplish with web service interoperability::
 
-    private Set<String> lista = new java.util.HashSet<String>();
-    private Map<String, Integer> mapping = new java.util.HashMap<String, Integer>();
-
-Las colecciones que son listas **Set** si que se pueden definir como @XmlElement.
-Aunque se convierten en listas para el cliente en el orden que se han establecido en Set.
-
-* java.util.List::
-
-    <xs:element maxOccurs="unbounded" minOccurs="0" name="lista" nillable="true" type="xs:string"/>
-
-* javautil.Map como lista de elementos compuestos, entonces en el cliente generaría una clase compuesta de dos atributos key y value::
-
-    <xs:element name="mapping">
-      <xs:complexType>
-        <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
-            <xs:complexType>
-              <xs:sequence>
-                <xs:element minOccurs="0" name="key" type="xs:string"/>
-                <xs:element minOccurs="0" name="value" type="xs:int"/>
-              </xs:sequence>
-            </xs:complexType>
-          </xs:element>
-        </xs:sequence>
-      </xs:complexType>
-    </xs:element>
-
-**Conclusión:**
-
-**No** habrá que dejar que se utilice Map como colección (Map es la interfaz, es decir, cualquier colección que implemente Map) debido a que **NO** se puede asegurar la funcionalidad de un Map en los servicios web, por lo tanto no se va a permitir que tomen partido en las operaciones de un servicio.
-
-Colecciones excludidas:
-
-* Map<K, V>:  Ya que están ordenadas por un valor determinado.
+* Set
+* Map
+* HashMap
+* TreeMap
+* Vector
+* HashSet
 
 Data types: Project entities
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Maneja cualquier tipo de clase entidad que esté definida en nuestro proyecto.
-Reestricción de monitorización de Roo del paquete principal del proyecto. 
-Si se utilizan Clases con otro paquete que no pertence al principal del proyecto se ha de tener en cuenta que para instanciar las clases se ha de añadir una anotación para que *Spring 3.0.3* lo cargue automáticamente como el ejemplo en el fichero de configuración *webcmvc-config.xml*, pero se debería definir en el *applicationContext.xml* ya que el proyecto no hace falta que sea un proyecto web::
+Entities defined in the project.
+Where a method uses an Entity in operation, the Add-on adds **@GvNIXXmlElement** annotation to the entity to generate a metadata that builds a correct xml format to be sent in web service operation as input/output parameter.
+* The fields are checked if they accomplish with web service interoperability.
 
-    <!-- The controllers are autodetected POJOs labeled with the @Controller annotation. -->
-    <context:component-scan base-package="org.gvnix.test.project" use-default-filters="false">
-      <context:include-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
-    </context:component-scan>
+  * Fields with a database relationship annotation are defined as **@XmlTransient** elements which are not sent in the operation as part of the Entity. 
+  * The other ones are defined as **@XmlElement** with ``name`` attribute.
 
 Commands
 =========
@@ -285,6 +301,7 @@ Parameters:
   * ``--return`` Type of the returning method object. Default void.
   * ``--paramNames`` Method parameter input names.
   * ``--paramTypes`` Method parameter input types.
+  * ``--exceptions`` Method exceptions that can be thrown.
 
 service export ws
 ------------------
