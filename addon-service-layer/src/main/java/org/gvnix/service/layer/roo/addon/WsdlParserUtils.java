@@ -50,6 +50,7 @@ public class WsdlParserUtils {
 	    .substring(0, SOAP_12_NAMESPACE.length() - 1);
 
     public static final String HTTP_PROTOCOL_PREFIX = "http://";
+    public static final String WWW_PROTOCOL_PREFIX = "www.";
     public static final String URN_PROTOCOL_PREFIX = "urn:";
     public static final String XML_NAMESPACE_PREFIX = "xmlns:";
     public static final String NAMESPACE_SEPARATOR = ":";
@@ -114,6 +115,12 @@ public class WsdlParserUtils {
 	    if (namespace.endsWith(URL_SEPARATOR)) {
 
 		namespace = namespace.substring(0, namespace.length() - 1);
+	    }
+	    
+	    // Remove www prefix
+	    if (namespace.startsWith(WWW_PROTOCOL_PREFIX)) {
+		
+		namespace = namespace.substring(WWW_PROTOCOL_PREFIX.length());
 	    }
 
 	    separator1 = URL_SEPARATOR;
@@ -259,8 +266,7 @@ public class WsdlParserUtils {
 	String path = getTargetNamespaceRelatedPackage(root);
 
 	// Find a compatible service name
-	String name = StringUtils
-		.capitalize(findFirstCompatibleServiceName(root));
+	String name = findFirstCompatibleServiceClassName(root);
 
 	// Class path is the concat of path and name
 	return path + name;
@@ -281,11 +287,22 @@ public class WsdlParserUtils {
 	String path = getTargetNamespaceRelatedPackage(root);
 
 	// Find a compatible port type name
-	String name = StringUtils
-		.capitalize(findFirstCompatiblePortTypeName(root));
+	String name = findFirstCompatiblePortTypeClassName(root);
 
 	// Class path is the concat of path and name
 	return path + name;
+    }
+    
+    /**
+     * Get the port type Java file
+     * 
+     * @param root
+     *            Wsdl root element
+     * @return Java file
+     */
+    public static File getPortTypeJavaFile(Element root) {
+
+	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root)));
     }
 
     /**
@@ -295,7 +312,7 @@ public class WsdlParserUtils {
      *            Path to the class
      * @return Path to the java file
      */
-    public static String convertTypePathToJavaPath(String classPath) {
+    private static String convertTypePathToJavaPath(String classPath) {
 	
 	Assert.hasText(classPath, "Text in class path required");
 
@@ -308,7 +325,7 @@ public class WsdlParserUtils {
      * @param path Searched path
      * @return File to path
      */
-    public static File getGeneratedJavaFile(String path) {
+    private static File getGeneratedJavaFile(String path) {
 	
 	Assert.hasText(path, "Text in path required");
 	
@@ -316,7 +333,7 @@ public class WsdlParserUtils {
     }
 
     /**
-     * Find the first compatible service name of the root.
+     * Find the first compatible service related class name of the root.
      * 
      * <p>
      * Compatible service should be SOAP protocol version 1.1 and 1.2.
@@ -324,9 +341,9 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Root element of wsdl
-     * @return First compatible service name
+     * @return First compatible service class name
      */
-    private static String findFirstCompatibleServiceName(Element root) {
+    private static String findFirstCompatibleServiceClassName(Element root) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
@@ -337,7 +354,7 @@ public class WsdlParserUtils {
 	String name = service.getAttribute(NAME_ATTRIBUTE);
 	Assert.hasText(name, "No name attribute in service element");
 
-	return name;
+	return convertNameToJavaFormat(name);
     }
 
     /**
@@ -364,10 +381,9 @@ public class WsdlParserUtils {
 
 	return port;
     }
-    
 
     /**
-     * Find the first compatible port element name of the root.
+     * Find the first compatible port related class name of the root.
      * 
      * <p>
      * Compatible port should be SOAP protocol version 1.1 and 1.2.
@@ -375,18 +391,18 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Root element of wsdl
-     * @return First compatible port element name
+     * @return First compatible port element class name
      */
-    public static String findFirstCompatiblePortName(Element root) {
+    public static String findFirstCompatiblePortClassName(Element root) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
 	// Get the the port element name
-	return findFirstCompatiblePort(root).getAttribute(NAME_ATTRIBUTE);
+	return convertNameToJavaFormat(findFirstCompatiblePort(root).getAttribute(NAME_ATTRIBUTE));
     }
 
     /**
-     * Find the first compatible port type name of the root.
+     * Find the first compatible port type class name of the root.
      * 
      * <p>
      * Compatible port type should be SOAP protocol version 1.1 and 1.2.
@@ -394,9 +410,9 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Root element of wsdl
-     * @return First compatible port type name
+     * @return First compatible port type class name
      */
-    private static String findFirstCompatiblePortTypeName(Element root) {
+    private static String findFirstCompatiblePortTypeClassName(Element root) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
@@ -412,7 +428,7 @@ public class WsdlParserUtils {
 	String portTypeName = portType.getAttribute(NAME_ATTRIBUTE);
 	Assert.hasText(portTypeName, "No name attribute in port type element");
 
-	return portTypeName;
+	return convertNameToJavaFormat(portTypeName);
     }
 
     /**
@@ -525,6 +541,20 @@ public class WsdlParserUtils {
 
 	return elementName.replaceFirst(getNamespace(elementName)
 		+ NAMESPACE_SEPARATOR, "");
+    }
+    
+    /**
+     * Converts a wsdl name to a valid Java format.
+     * 
+     * @param name
+     *            A wsdl name
+     * @return Valid java name
+     */
+    private static String convertNameToJavaFormat(String name) {
+
+	Assert.notNull(name, "Name required");
+
+	return StringUtils.capitalize(name).replaceAll("-", "");
     }
 
 }

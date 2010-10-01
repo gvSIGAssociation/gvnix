@@ -25,5 +25,8 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy2 --wsdl http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy3 --wsdl http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy4 --wsdl http://ws.cdyne.com/WeatherWS/Weather.asmx?wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy5 --wsdl http://soatest.parasoft.com/calculator.wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy6 --wsdl http://www.ripedevelopment.com/webservices/LocalTime.asmx?WSDL
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy7 --wsdl http://labs.safelayer.com/demo/wsdl/DigitalEncryption.wsdl
 perform eclipse
 perform assembly

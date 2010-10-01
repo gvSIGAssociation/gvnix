@@ -195,13 +195,11 @@ public class ServiceLayerWSImportMetadata extends
 	// Get the path to the generated port type class
 	String portTypePath = WsdlParserUtils.getPortTypeClassPath(root);
 
-	// Get the the port element name
-	String portName = WsdlParserUtils.findFirstCompatiblePortName(root);
+	// Get the the port element class name
+	String portName = WsdlParserUtils.findFirstCompatiblePortClassName(root);
 
 	// Get the port type Java file
-	String javaPath = WsdlParserUtils
-		.convertTypePathToJavaPath(portTypePath);
-	File file = WsdlParserUtils.getGeneratedJavaFile(javaPath);
+	File file = WsdlParserUtils.getPortTypeJavaFile(root);
 
 	// Parse the port type Java file
 	CompilationUnit unit = JavaParser.parse(file);
@@ -246,8 +244,8 @@ public class ServiceLayerWSImportMetadata extends
 	List<Parameter> parameters = method.getParameters();
 	if (parameters != null) {
 	    for (Parameter parameter : parameters) {
-		
-		javaTypes.add(new AnnotatedJavaType(new JavaType(parameter
+
+		javaTypes.add(new AnnotatedJavaType(getJavaTypeByName(parameter
 			.getType().toString()), null));
 		javaNames.add(new JavaSymbolName(parameter.getId().toString()));
 	    }
@@ -271,17 +269,8 @@ public class ServiceLayerWSImportMetadata extends
 
 	// Get the method return type
 	String methodType = method.getType().toString();
-	JavaType returnType = null;
-	try {
-
-	    // TODO ¿ What happends if method returns null or object ?
-	    returnType = new JavaType(methodType);
+	JavaType returnType = getJavaTypeByName(methodType);
 	    
-	} catch (IllegalArgumentException e) {
-
-	    returnType = getPrimitiveJavaType(methodType);
-	}
-
 	// Create the method metadata with previous information
 	MethodMetadata result = new DefaultMethodMetadata(getId(), method
 		.getModifiers(), new JavaSymbolName(method.getName()),
@@ -311,23 +300,22 @@ public class ServiceLayerWSImportMetadata extends
 	body.appendFormalLine(servicePath + " s = new " + servicePath + "();");
 	
 	// Get the port type from service
-	body.appendFormalLine(portTypePath + " p = s.get"
-		+ StringUtils.capitalize(portName) + "();");
+	body.appendFormalLine(portTypePath + " p = s.get" + portName + "();");
 	
 	// Invoke the port type method with params
 	StringBuilder invocation = new StringBuilder();
 	invocation.append("p." + method.getName() + "(");
-	boolean first = true;
 	if (parameters != null) {
-	    if (!first) {
-		
-		invocation.append(" ,");
-	    }
+
+	    boolean first = true;
 	    for (Parameter parameter : parameters) {
-		
+		if (!first) {
+
+		    invocation.append(", ");
+		}
 		invocation.append(parameter.getId());
+		first = false;
 	    }
-	    first = false;
 	}
 	invocation.append(")");
 	
@@ -338,61 +326,76 @@ public class ServiceLayerWSImportMetadata extends
     }
 
     /**
-     * Get the primitive java type related to primitive type name.
+     * Get object type or primitive java type related to primitive type name.
      * 
-     * @param type Primitive type name
-     * @return Primitive java type
+     * <p>
+     * TODO ¿ What happends if method returns null or object ?
+     * </p>
+     * 
+     * @param name
+     *            Type name
+     * @return Java type
      */
-    private JavaType getPrimitiveJavaType(String type) {
+    private JavaType getJavaTypeByName(String name) {
 
-	JavaType primitive;
+	JavaType type;
 
-	if ("boolean".equals(type)) {
+	try {
+
+	    // Types
+	    type = new JavaType(name);
+
+	} catch (IllegalArgumentException e) {
+
+	    // Primitives
 	    
-	    primitive = new JavaType(Boolean.class.getName(), 0,
-		    DataType.PRIMITIVE, null, null);
-	    
-	} else if ("char".equals(type)) {
-	    
-	    primitive = new JavaType(Character.class.getName(), 0,
-		    DataType.PRIMITIVE, null, null);
-	    
-	} else if ("byte".equals(type)) {
-	    
-	    primitive = new JavaType(Byte.class.getName(), 0,
-		    DataType.PRIMITIVE, null, null);
-	    
-	} else if ("short".equals(type)) {
-	    
-	    primitive = new JavaType(Short.class.getName(), 0,
-		    DataType.PRIMITIVE, null, null);
-	    
-	} else if ("int".equals(type)) {
-	    
-	    primitive = new JavaType(Integer.class.getName(), 0,
-		    DataType.PRIMITIVE, null, null);
-	    
-	} else if ("long".equals(type)) {
-	    
-	    primitive = new JavaType(Long.class.getName(), 0,
-		    DataType.PRIMITIVE, null, null);
-	    
-	} else if ("float".equals(type)) {
-	    
-	    primitive = new JavaType(Float.class.getName(), 0,
-		    DataType.PRIMITIVE, null, null);
-	    
-	} else if ("double".equals(type)) {
-	    
-	    primitive = new JavaType(Double.class.getName(), 0,
-		    DataType.PRIMITIVE, null, null);
-	    
-	} else {
-	    
-	    throw new IllegalStateException("Unsupported primitive " + type);
+	    if ("boolean".equals(name)) {
+
+		type = new JavaType(Boolean.class.getName(), 0,
+			DataType.PRIMITIVE, null, null);
+
+	    } else if ("char".equals(name)) {
+
+		type = new JavaType(Character.class.getName(), 0,
+			DataType.PRIMITIVE, null, null);
+
+	    } else if ("byte".equals(name)) {
+
+		type = new JavaType(Byte.class.getName(), 0,
+			DataType.PRIMITIVE, null, null);
+
+	    } else if ("short".equals(name)) {
+
+		type = new JavaType(Short.class.getName(), 0,
+			DataType.PRIMITIVE, null, null);
+
+	    } else if ("int".equals(name)) {
+
+		type = new JavaType(Integer.class.getName(), 0,
+			DataType.PRIMITIVE, null, null);
+
+	    } else if ("long".equals(name)) {
+
+		type = new JavaType(Long.class.getName(), 0,
+			DataType.PRIMITIVE, null, null);
+
+	    } else if ("float".equals(name)) {
+
+		type = new JavaType(Float.class.getName(), 0,
+			DataType.PRIMITIVE, null, null);
+
+	    } else if ("double".equals(name)) {
+
+		type = new JavaType(Double.class.getName(), 0,
+			DataType.PRIMITIVE, null, null);
+
+	    } else {
+
+		throw new IllegalStateException("Unsupported primitive " + name);
+	    }
 	}
 
-	return primitive;
+	return type;
     }
     
     public static String getMetadataIdentiferType() {
