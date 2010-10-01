@@ -111,7 +111,8 @@ public class ServiceLayerCommands implements CommandMarker {
 	}
 
 	// Exceptions.
-	if (!exceptionTypes.getJavaTypes().isEmpty()) {
+	if (exceptionTypes != null
+		&& !exceptionTypes.getJavaTypes().isEmpty()) {
 	    exceptionList = exceptionTypes.getJavaTypes();
 	}
 
