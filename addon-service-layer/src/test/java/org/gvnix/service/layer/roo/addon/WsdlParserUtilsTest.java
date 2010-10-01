@@ -20,6 +20,8 @@ package org.gvnix.service.layer.roo.addon;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+
 import org.junit.Test;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -38,6 +40,12 @@ public class WsdlParserUtilsTest {
     public static final String TEMP_CONVERT_WSDL = "http://www.w3schools.com/webservices/tempconvert.asmx?WSDL";
     public static final String EMAIL_VALIDATION_V2_WSDL = "http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl";
     public static final String EMAIL_VALIDATION_V1_WSDL = "http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl";
+    public static final String TEMP_CONVERT_MODIFIED_LOCAL_WSDL = "tempconvert.wsdl";
+
+    public static final String SRC_TEST_RESOURCES_PATH = "."
+	    + WsdlParserUtils.FILE_SEPARATOR + "src"
+	    + WsdlParserUtils.FILE_SEPARATOR + "test"
+	    + WsdlParserUtils.FILE_SEPARATOR + "resources";
 
     /**
      * Checks method
@@ -65,6 +73,24 @@ public class WsdlParserUtilsTest {
     
     /**
      * Checks method
+     * {@link WsdlParserUtils#getTargetNamespaceRelatedPackage()}
+     * 
+     * @throws Exception
+     */
+    public void testGetTargetNamespaceRelatedPackage() throws Exception {
+	
+	Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
+	Element root = wsdl.getDocumentElement();
+	assertEquals("org.tempuri.TempConvert.", WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
+	
+	File file = new File(SRC_TEST_RESOURCES_PATH, TEMP_CONVERT_MODIFIED_LOCAL_WSDL);
+	wsdl = XmlUtils.getDocumentBuilder().parse(file);
+	root = wsdl.getDocumentElement();
+	assertEquals("org.te3m_pu_ri._8080.kk.id_1_r_e.sf_fs_d_p$y_f_s_d_s_d_q_w.jds_23.", WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
+    }
+    
+    /**
+     * Checks method
      * {@link WsdlParserUtils#getServiceClassPath()}
      * 
      * @throws Exception
@@ -83,6 +109,11 @@ public class WsdlParserUtilsTest {
 	wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
 	root = wsdl.getDocumentElement();
 	assertEquals("com.xwebservices.ws.xwebemailvalidation.emailvalidation.v2.EmailValidation", WsdlParserUtils.getServiceClassPath(root));
+	
+//	File file = new File(SRC_TEST_RESOURCES_PATH, TEMP_CONVERT_MODIFIED_LOCAL_WSDL);
+//	wsdl = XmlUtils.getDocumentBuilder().parse(file);
+//	root = wsdl.getDocumentElement();
+//	assertEquals("org.te3m_pu_ri._8080.kk.id_1_r_e.sf_fs_d_p$y_f_s_d_s_d_q_w.jds_23.TEMP_002fC_0023ONe_0040R_002bT$GE_003dR_002aG_0027E_00282_00293_002c4_002f2_0025R", WsdlParserUtils.getServiceClassPath(root));
     }
     
     /**

@@ -35,6 +35,10 @@ import org.w3c.dom.Element;
  * Compatible address should be SOAP protocol version 1.1 and 1.2.
  * </p>
  * 
+ * <p>
+ * Compatible namespace protocol should be nothing, http or urn.
+ * </p>
+ * 
  * @author Mario Martínez Sánchez( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -147,12 +151,12 @@ public class WsdlParserUtils {
 		    .nextToken(), separator2);
 	    while (domainTokens.hasMoreTokens()) {
 
-		path = domainTokens.nextToken() + PACKAGE_SEPARATOR + path;
+		path = domainTokens.nextToken().replaceAll("[^a-zA-Z0-9$]", "_") + PACKAGE_SEPARATOR + path;
 	    }
 
 	    while (urlTokens.hasMoreTokens()) {
 
-		path = path + urlTokens.nextToken() + PACKAGE_SEPARATOR;
+		path = path + urlTokens.nextToken().replaceAll("[^a-zA-Z0-9$]", "_") + PACKAGE_SEPARATOR;
 	    }
 	}
 
@@ -554,7 +558,9 @@ public class WsdlParserUtils {
 
 	Assert.notNull(name, "Name required");
 
-	return StringUtils.capitalize(name).replaceAll("-", "");
+	String result = StringUtils.capitalize(name).replace("-", "").replace("_", "").replace(":", "").replace(".", "");
+
+	return result;
     }
 
 }
