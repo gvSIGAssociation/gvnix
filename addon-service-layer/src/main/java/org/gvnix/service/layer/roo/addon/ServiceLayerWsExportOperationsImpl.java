@@ -182,6 +182,8 @@ public class ServiceLayerWsExportOperationsImpl implements
 		new JavaSymbolName("targetNamespace"), targetNamespace));
 	gvNixAnnotationAttributes.add(new StringAttributeValue(
 		new JavaSymbolName("serviceName"), serviceName));
+	gvNixAnnotationAttributes.add(new StringAttributeValue(
+		new JavaSymbolName("address"), addressName));
 	annotationsService.addJavaTypeAnnotation(serviceClass,
 		GvNIXWebService.class.getName(), gvNixAnnotationAttributes);
 
@@ -224,7 +226,7 @@ public class ServiceLayerWsExportOperationsImpl implements
 		+ " doesn't exists in the class '"
 		+ serviceClass.getFullyQualifiedTypeName() + "'.");
 
-	// TODO: Check authorized JavaTypes in operation.
+	// Check authorized JavaTypes in operation.
 	checkAuthorizedJavaTypesInOperation(serviceClass, methodName);
 
 	// Check if method has return type.
@@ -243,7 +245,7 @@ public class ServiceLayerWsExportOperationsImpl implements
 	}
 
 	// TODO: Check if method throws an Exception.
-
+	// checkMethodExceptions(serviceClass, methodName);
 
 	// Checks correct namespace format.
 	Assert
@@ -268,6 +270,136 @@ public class ServiceLayerWsExportOperationsImpl implements
 	javaParserService.updateMethodAnnotations(serviceClass, methodName,
 		annotationMetadataUpdateList);
 
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Add web services annotations to each founded exception.
+     * </p>
+     * <p>
+     * Two types of exceptions and two ways to define annotations:
+     * </p>
+     * <ul>
+     * <li>
+     * Exceptions defined in the project.
+     * <p>
+     * Add @GvNIXWebFault annotation to Exception.
+     * </p>
+     * </li>
+     * <li>
+     * Exceptions imported into the project.
+     * <p>
+     * Add web service fault annotation using AspectJ template.
+     * </p>
+     * </li>
+     * </ul>
+     */
+    public boolean checkMethodExceptions(JavaType serviceClass,
+	    JavaSymbolName methodName) {
+
+	MethodMetadata methodToCheck = javaParserService
+		.getMethodByNameInClass(serviceClass, methodName);
+
+	Assert.isTrue(methodToCheck != null, "The method: '" + methodName
+		+ " doesn't exists in the class '"
+		+ serviceClass.getFullyQualifiedTypeName() + "'.");
+
+	List<JavaType> throwsTypes = methodToCheck.getThrowsTypes();
+
+	String fileLocation;
+
+	boolean extendsThrowable = true;
+
+	for (JavaType throwType : throwsTypes) {
+
+	    extendsThrowable = extendsThrowable(throwType);
+
+
+	    Assert
+		    .isTrue(
+			    extendsThrowable,
+			    "The '"
+				    + throwType.getFullyQualifiedTypeName()
+				    + "' class doesn't extend from 'java.lang.Throwable' in method '"
+				    + methodName + "' from class '"
+				    + serviceClass.getFullyQualifiedTypeName()
+				    + "'.\nIt can't be used as Exception in method to be thrown.");
+
+	    fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		    throwType.getFullyQualifiedTypeName().replace('.', '/')
+			    .concat(".java"));
+
+	    // Exception defined in the project or imported.
+	    if (fileManager.exists(fileLocation)) {
+
+		// Load class or interface details.
+		// If class not found an exception will be raised.
+		ClassOrInterfaceTypeDetails typeDetails = classpathOperations
+			.getClassOrInterface(throwType);
+
+		// Check and get mutable instance
+		Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+			typeDetails, "Can't modify " + typeDetails.getName());
+		MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) typeDetails;
+
+		List<AnnotationAttributeValue<?>> gvNIXWebFaultAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+		gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
+			new JavaSymbolName("name"), StringUtils
+				.uncapitalize(throwType.getSimpleTypeName())));
+		gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
+			new JavaSymbolName("targetNamespace"), serviceLayerWsConfigService.convertPackageToTargetNamespace(throwType.getPackage().toString())));
+		gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
+			new JavaSymbolName("faultBean"), throwType.getFullyQualifiedTypeName()));
+
+		// Define annotation.
+		AnnotationMetadata gvNIXWebFaultAnnotation = new DefaultAnnotationMetadata(
+			new JavaType(GvNIXWebFault.class.getName()),
+			gvNIXWebFaultAnnotationAttributes);
+
+		mutableTypeDetails.addTypeAnnotation(gvNIXWebFaultAnnotation);
+
+	    } else {
+
+		// TODO: If annotation is imported to project. Add to an AspectJ
+		// file type annotation declaration.
+	    }
+
+	}
+
+	return true;
+    }
+
+    /**
+     * Check if throwType extends from 'java.lang.Throwable' class.
+     * 
+     * @param throwType
+     * @return true if class extends from 'java.lang.Throwable' or false if is
+     *         not a Throwable class.
+     */
+    private boolean extendsThrowable(JavaType throwType) {
+
+	if (throwType.getFullyQualifiedTypeName().contentEquals(
+		"java.lang.Throwable")) {
+	    return true;
+	}
+	try {
+	    Object exceptionToCheck = Class.forName(throwType
+		    .getFullyQualifiedTypeName());
+
+	    if (exceptionToCheck == null) {
+		return false;
+	    }
+
+	    return extendsThrowable(new JavaType(exceptionToCheck.getClass()
+		    .getSuperclass().getName()));
+
+	} catch (ClassNotFoundException e) {
+	    logger.log(Level.WARNING, "The exception class: '"
+		    + throwType.getFullyQualifiedTypeName()
+		    + "' doesn't exist.");
+	    return false;
+	}
     }
 
     /**

@@ -56,7 +56,6 @@ public class ServiceLayerWSExportExceptionMetadata extends
 	    JavaType aspectName,
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata) {
 	super(identifier, aspectName, governorPhysicalTypeMetadata);
-	// TODO Auto-generated constructor stub
 
 	Assert.isTrue(isValid(identifier), "Metadata identification string '"
 		+ identifier + "' does not appear to be a valid");

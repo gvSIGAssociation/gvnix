@@ -179,4 +179,16 @@ public interface ServiceLayerWsExportOperations {
     public boolean isJavaTypeAllowed(JavaType javaType,
 	    MethodParameterType methodParameterType);
 
+    /**
+     * Check method exceptions to publish in service operation.
+     * 
+     * @param serviceClass
+     *            where the method is defined.
+     * @param methodName
+     *            to check its exceptions.
+     * @return true if the exceptions are published correctly or false if the
+     *         exceptions don't exists or are incorrect.
+     */
+    public boolean checkMethodExceptions(JavaType serviceClass,
+	    JavaSymbolName methodName);
 }
