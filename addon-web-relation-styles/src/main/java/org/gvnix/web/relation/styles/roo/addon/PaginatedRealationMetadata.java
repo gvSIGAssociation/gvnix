@@ -26,8 +26,7 @@ import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.*;
-import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
@@ -85,9 +84,8 @@ public class PaginatedRealationMetadata extends
 
 	    String relationName;
 	    StringBuilder methodName;
-	    String entityName = governorTypeDetails.getName()
-		    .getSimpleTypeName();
-	    
+	    String entityName = null;
+
 	    for (FieldMetadata fieldMetadata : fieldMetadataList) {
 
 		methodName = new StringBuilder();
@@ -113,6 +111,37 @@ public class PaginatedRealationMetadata extends
 		    }
 		    relationSet = relationSet.getParameters().get(0);
 		}
+
+		// Retrieve Annotation 'mappedBy' attribute value name.
+		StringAttributeValue mappedByAttributeValue;
+		for (AnnotationMetadata annotation : fieldMetadata
+			.getAnnotations()) {
+		    if (annotation.getAnnotationType().compareTo(
+			    new JavaType("javax.persistence.OneToMany")) == 0) {
+
+			mappedByAttributeValue = ((StringAttributeValue) annotation
+				.getAttribute(new JavaSymbolName("mappedBy")));
+
+			Assert.isTrue(mappedByAttributeValue != null,
+				"There must be defined 'mappedBy' attribute in @OneToMany field'"
+					+ fieldMetadata.getFieldName()
+						.getReadableSymbolName()
+					+ "' in class '"
+					+ governorTypeDetails.getName()
+						.getFullyQualifiedTypeName()
+					+ "'.");
+
+			entityName = mappedByAttributeValue.getValue();
+		    }
+		}
+
+		Assert.isTrue(entityName != null,
+			"There must be defined 'mappedBy' attribute in @OneToMany field'"
+				+ fieldMetadata.getFieldName()
+					.getReadableSymbolName()
+				+ "' in class '"
+				+ governorTypeDetails.getName()
+					.getFullyQualifiedTypeName() + "'.");
 
 		MethodMetadata getEntityRelatedEntriesMethod = getEntityRelatedEntriesMethod(
 			methodName.toString(), entityName, relationSet);
