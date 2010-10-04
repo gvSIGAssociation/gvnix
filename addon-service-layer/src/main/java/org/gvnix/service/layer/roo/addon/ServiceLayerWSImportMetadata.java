@@ -48,7 +48,6 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -106,15 +105,30 @@ public class ServiceLayerWSImportMetadata extends
 	    logger.log(Level.FINE, "Wsdl location = " + wsdlLocation);
 
 	    try {
-		
-		// TODO Check
-		generateSources();
 
-		// Create methods on Aspect file related to this wsdl location
-		createAspectMethods();
-		
-		// TODO Add wsdl location to pom.xml here instead of on command
-//		serviceLayerWsConfigService.addImportLocation(wsdlLocation);
+		// Parse the wsdl location to a DOM document
+		Document wsdl = XmlUtils.getDocumentBuilder().parse(
+			wsdlLocation);
+		Element root = wsdl.getDocumentElement();
+		Assert.notNull(root, "No valid document format");
+
+		if (WsdlParserUtils.isRpcEncoded(root)) {
+		    
+		    // TODO Use Axis library to be compatible with Rpc/encoded
+		    Assert.state(false,
+			    "TODO Currently rpc/encoded wsdls not supported");
+
+		} else {
+
+		    // Generate source code client clases
+		    generateSources();
+
+		    // Create Aspect methods related to this wsdl location
+		    createAspectMethods(root);
+
+		    // TODO Add wsdl location to pom.xml here instead on command
+		    // serviceLayerWsConfigService.addImportLocation(wsdlLocation);
+		}
 
 	    } catch (SAXException e) {
 
@@ -140,9 +154,12 @@ public class ServiceLayerWSImportMetadata extends
     }
 
     /**
-     * Maven generate sources. 
+     * Maven generate sources.
      * 
-     * @throws IOException Error on maven generate sources execution
+     * TODO Check on windows environment.
+     * 
+     * @throws IOException
+     *             Error on maven generate sources execution
      */
     public void generateSources() throws IOException {
 
@@ -174,6 +191,8 @@ public class ServiceLayerWSImportMetadata extends
     /**
      * Create methods on Aspect file related to this wsdl location.
      * 
+     * @param root
+     *            Root element of the wsdl document
      * @throws IOException
      *             No connection to the wsdl location
      * @throws SAXException
@@ -181,13 +200,8 @@ public class ServiceLayerWSImportMetadata extends
      * @throws ParseException
      *             Generated Java client parse error
      */
-    private void createAspectMethods() throws SAXException, IOException,
+    private void createAspectMethods(Element root) throws SAXException, IOException,
 	    ParseException {
-
-	// Parse the wsdl location to a DOM document
-	Document wsdl = XmlUtils.getDocumentBuilder().parse(wsdlLocation);
-	Element root = wsdl.getDocumentElement();
-	Assert.notNull(root, "No valid document format");
 
 	// Get the path to the generated service class
 	String servicePath = WsdlParserUtils.getServiceClassPath(root);

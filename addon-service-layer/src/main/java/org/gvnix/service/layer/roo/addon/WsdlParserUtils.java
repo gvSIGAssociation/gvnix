@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
@@ -79,6 +80,7 @@ public class WsdlParserUtils {
     public static final String NAME_ATTRIBUTE = "name";
     public static final String BINDING_ATTRIBUTE = "binding";
     public static final String TYPE_ATTRIBUTE = "type";
+    public static final String STYLE_ATTRIBUTE = "style";
 
     public static final String BINDINGS_XPATH = XPATH_SEPARATOR
 	    + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + BINDING_ELEMENT;
@@ -88,6 +90,12 @@ public class WsdlParserUtils {
 	    + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + SERVICE_ELEMENT
 	    + XPATH_SEPARATOR + PORT_ELEMENT + XPATH_SEPARATOR
 	    + ADDRESS_ELEMENT;
+    public static final String CHILD_BINDINGS_XPATH = XPATH_SEPARATOR
+	    + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + BINDING_ELEMENT
+	    + XPATH_SEPARATOR + BINDING_ELEMENT;
+
+    private static Logger logger = Logger.getLogger(WsdlParserUtils.class
+	    .getName());
 
     /**
      * Constructs a valid java package path from target namespace of root wsdl.
@@ -645,6 +653,53 @@ public class WsdlParserUtils {
 	}
 
 	return (new String(ostr));
+    }
+
+    /**
+     * @param root
+     * @return
+     */
+    public static boolean isRpcEncoded(Element root) {
+
+	Assert.notNull(root, "Wsdl root element required");
+	
+	// Find binding element
+	Element binding = findFirstCompatibleBinding(root);
+
+	// Find all child bindings
+	List<Element> childs = XmlUtils.findElements(CHILD_BINDINGS_XPATH, root);
+	Assert.notEmpty(childs, "No valid child bindings format");
+	
+	// Get child binding related to binding element
+	for (Element child : childs) {
+	    
+	    // Get child parent binding element name
+	    Element parentBinding = ((Element)child.getParentNode());
+	    String name = parentBinding.getAttribute(NAME_ATTRIBUTE);
+	    Assert.hasText(name, "No name attribute in child binding element");
+	    
+	    // If parent binding has the same name as binding
+	    if (name.equals(binding.getAttribute(NAME_ATTRIBUTE))) {
+		
+		// Check RPC style
+		String style = child.getAttribute(STYLE_ATTRIBUTE);
+		Assert.hasText(name, "No style attribute in child binding element");
+		if ("rpc".equalsIgnoreCase(style)) {
+		    
+		    return true;
+		}
+	    }
+	    
+	    /*
+	     * TODO To be completed like next condition for each operation:
+	     * 
+	     *  (bindingStyle = RPC | operationStyle == RPC) & (inputUse = ENCODED | outputUse = ENCODED)
+	     * 
+	     * If any operation match previous condition, then is rpc encoded
+	     */
+	}
+	
+	return false;
     }
 
 }
