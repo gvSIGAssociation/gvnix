@@ -77,11 +77,12 @@ public class WsdlParserUtilsTest {
      * 
      * @throws Exception
      */
+    @Test
     public void testGetTargetNamespaceRelatedPackage() throws Exception {
 	
 	Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
 	Element root = wsdl.getDocumentElement();
-	assertEquals("org.tempuri.TempConvert.", WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
+	assertEquals("org.tempuri.", WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
 	
 	File file = new File(SRC_TEST_RESOURCES_PATH, TEMP_CONVERT_MODIFIED_LOCAL_WSDL);
 	wsdl = XmlUtils.getDocumentBuilder().parse(file);
@@ -110,10 +111,10 @@ public class WsdlParserUtilsTest {
 	root = wsdl.getDocumentElement();
 	assertEquals("com.xwebservices.ws.xwebemailvalidation.emailvalidation.v2.EmailValidation", WsdlParserUtils.getServiceClassPath(root));
 	
-//	File file = new File(SRC_TEST_RESOURCES_PATH, TEMP_CONVERT_MODIFIED_LOCAL_WSDL);
-//	wsdl = XmlUtils.getDocumentBuilder().parse(file);
-//	root = wsdl.getDocumentElement();
-//	assertEquals("org.te3m_pu_ri._8080.kk.id_1_r_e.sf_fs_d_p$y_f_s_d_s_d_q_w.jds_23.TEMP_002fC_0023ONe_0040R_002bT$GE_003dR_002aG_0027E_00282_00293_002c4_002f2_0025R", WsdlParserUtils.getServiceClassPath(root));
+	File file = new File(SRC_TEST_RESOURCES_PATH, TEMP_CONVERT_MODIFIED_LOCAL_WSDL);
+	wsdl = XmlUtils.getDocumentBuilder().parse(file);
+	root = wsdl.getDocumentElement();
+	assertEquals("org.te3m_pu_ri._8080.kk.id_1_r_e.sf_fs_d_p$y_f_s_d_s_d_q_w.jds_23.TEMP_002fC_0023ONe_0040R_002bT$GE_003dR_002aG_0027E_00282_00293_002c4_002f2_0025Rmm12Mm", WsdlParserUtils.getServiceClassPath(root));
     }
     
     /**

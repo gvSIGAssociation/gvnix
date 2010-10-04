@@ -140,7 +140,7 @@
       </wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
-  <wsdl:service name="T-e_m:p/C#o.ne@r+t$g-e=r*g'e(2)3,4/2%r">
+  <wsdl:service name="T-e_m:p/C#o.ne@r+t$g-e=r*g'e(2)3,4/2%rmm12mm">
     <wsdl:port name="TempConvertSoap" binding="tns:TempConvertSoap">
       <soap:address location="http://www.w3schools.com/webservices/tempconvert.asmx"/>
     </wsdl:port>

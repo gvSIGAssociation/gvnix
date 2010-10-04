@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
 
@@ -63,6 +62,7 @@ public class WsdlParserUtils {
     public static final String DOMAIN_SEPARATOR = ".";
     public static final String XPATH_SEPARATOR = "/";
     public static final String PACKAGE_SEPARATOR = ".";
+    public static final String PORT_SEPARATOR = ":";
     
     public static final String TARGET_GENERATED_SOURCES_PATH = "."
 	    + FILE_SEPARATOR + "target" + FILE_SEPARATOR + "generated-sources"
@@ -108,9 +108,10 @@ public class WsdlParserUtils {
 	// Get the namespace attribute from root wsdl in lower case
 	String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE).toLowerCase();
 
-	// First string separator and second one
+	// Namespace separators
 	String separator1 = null;
 	String separator2 = null;
+	String separator3 = null;
 
 	if (namespace.startsWith(HTTP_PROTOCOL_PREFIX)) {
 
@@ -129,6 +130,7 @@ public class WsdlParserUtils {
 
 	    separator1 = URL_SEPARATOR;
 	    separator2 = DOMAIN_SEPARATOR;
+	    separator3 = PORT_SEPARATOR;
 	    
 	} else if (namespace.startsWith(URN_PROTOCOL_PREFIX)) {
 
@@ -145,15 +147,38 @@ public class WsdlParserUtils {
 	// Url tokens
 	StringTokenizer urlTokens = new StringTokenizer(namespace, separator1);
 	if (urlTokens.hasMoreTokens()) {
+	    
+	    String urlToken = urlTokens.nextToken();
+	    
+	    // Port tokens
+	    StringTokenizer portTokens = null;
+	    if (separator3 != null) {
+
+		// First token is domain and second one the port
+		portTokens = new StringTokenizer(urlToken,
+			separator3);
+		urlToken = portTokens.nextToken();
+	    }
 
 	    // Domain is the first token of the Url
-	    StringTokenizer domainTokens = new StringTokenizer(urlTokens
-		    .nextToken(), separator2);
+	    StringTokenizer domainTokens = new StringTokenizer(urlToken,
+		    separator2);
 	    while (domainTokens.hasMoreTokens()) {
 
 		path = domainTokens.nextToken().replaceAll("[^a-zA-Z0-9$]", "_") + PACKAGE_SEPARATOR + path;
 	    }
 
+	    // Port token
+	    if (separator3 != null) {
+		while (portTokens.hasMoreTokens()) {
+		    
+		    path = path + "_"
+			    + portTokens.nextToken().replaceAll(
+				    "[^a-zA-Z0-9$]", "_") + PACKAGE_SEPARATOR;
+		}
+	    }
+
+	    // Url tokens
 	    while (urlTokens.hasMoreTokens()) {
 
 		path = path + urlTokens.nextToken().replaceAll("[^a-zA-Z0-9$]", "_") + PACKAGE_SEPARATOR;
@@ -546,9 +571,15 @@ public class WsdlParserUtils {
 	return elementName.replaceFirst(getNamespace(elementName)
 		+ NAMESPACE_SEPARATOR, "");
     }
-    
+
     /**
      * Converts a wsdl name to a valid Java format.
+     * 
+     * <p>
+     * Valid chars are letters, numbers and $. '-', '_', ':' and '.' chars are
+     * replaced with none. Other chars are replaced by unicode value with format
+     * "_002f". New words in name always will be start by uppercase. 
+     * </p>
      * 
      * @param name
      *            A wsdl name
@@ -558,9 +589,62 @@ public class WsdlParserUtils {
 
 	Assert.notNull(name, "Name required");
 
-	String result = StringUtils.capitalize(name).replace("-", "").replace("_", "").replace(":", "").replace(".", "");
+	StringBuffer ostr = new StringBuffer();
 
-	return result;
+	// First character, uppercase
+	boolean upper = true;
+	for (int i = 0; i < name.length(); i++) {
+
+	    char ch = name.charAt(i);
+
+	    // Letter, number or $
+	    if ((ch >= 'a') && (ch <= 'z') || (ch >= 'A') && (ch <= 'Z')
+		    || (ch >= '0') && (ch <= '9') || ch == '$') {
+
+		if (upper) {
+
+		    ostr.append(Character.toUpperCase(ch));
+
+		} else {
+
+		    ostr.append(ch);
+		}
+
+		if ((ch >= '0') && (ch <= '9') || ch == '$') {
+
+		    // Next character to number or $ will be uppercase
+		    upper = true;
+
+		} else {
+
+		    upper = false;
+		}
+	    } else {
+
+		// Next characters will be replace by none, others to Unicode
+		if (ch != '-' && ch != '_' && ch != ':' && ch != '.') {
+
+		    // Unicode prefix
+		    ostr.append("_");
+
+		    // Unicode value
+		    String hex = Integer.toHexString(name.charAt(i) & 0xFFFF);
+		    for (int j = 0; j < 4 - hex.length(); j++) {
+
+			// Prepend zeros because unicode requires 4 digits
+			ostr.append("0");
+		    }
+
+		    // Standard unicode format
+		    ostr.append(hex.toLowerCase());
+		}
+
+		// Next character will be uppercase
+		upper = true;
+	    }
+	}
+
+	return (new String(ostr));
     }
 
 }
