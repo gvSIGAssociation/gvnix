@@ -75,19 +75,17 @@ public class ServiceLayerWSExportMetadataNotificationListener implements
 				.getMetadataClass(ServiceLayerWSExportMetadata
 					.getMetadataIdentiferType()))) {
 
-	    // Show info
-	    logger
-		    .log(
-			    Level.WARNING,
-			    "The Service contract has been changed.\n You have to use the command 'service operation' to update the web service contract.");
-
-
 	    // Get upstreamDepency Class to check.
 	    ClassOrInterfaceTypeDetails governorTypeDetails = getJavaType(upstreamDependency);
 
 	    AnnotationMetadata gvNIXWebServiceAnnotation = MemberFindingUtils
 		    .getTypeAnnotation(governorTypeDetails, new JavaType(
 			    GvNIXWebService.class.getName()));
+
+	    // Show info
+	    logger.log(Level.WARNING,
+		    "Check correct format to export the web service class: '"
+			    + governorTypeDetails.getName() + "'");
 
 	    serviceLayerWsConfigService.exportClass(governorTypeDetails
 		    .getName(), gvNIXWebServiceAnnotation);

@@ -184,6 +184,9 @@ public class ServiceLayerWsExportOperationsImpl implements
 		new JavaSymbolName("serviceName"), serviceName));
 	gvNixAnnotationAttributes.add(new StringAttributeValue(
 		new JavaSymbolName("address"), addressName));
+	gvNixAnnotationAttributes.add(new StringAttributeValue(
+		new JavaSymbolName("fullyQualifiedTypeName"), serviceClass
+			.getFullyQualifiedTypeName()));
 	annotationsService.addJavaTypeAnnotation(serviceClass,
 		GvNIXWebService.class.getName(), gvNixAnnotationAttributes);
 

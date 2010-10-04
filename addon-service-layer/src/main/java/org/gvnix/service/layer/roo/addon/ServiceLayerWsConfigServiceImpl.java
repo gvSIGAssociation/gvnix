@@ -495,7 +495,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * Define a Web Service class in cxf configuration file to be published.
      * <p>
      * <p>
-     * Update cxf file if its necessary to avoid changes in WSDL contract.
+     * Update cxf file if its necessary to avoid changes in WSDL contract checking type annotation values from service class.
      * </p>
      */
     public void exportClass(JavaType className,
@@ -551,8 +551,9 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	Element root = cxfXml.getDocumentElement();
 
 	// Check if service exists in configuration file.
+	boolean updateService = true;
 
-	// 1) Check if class and id exists.
+	// 1) Check if class and id exists in bean.
 	Element classAndIdService = XmlUtils.findFirstElement("/beans/bean[@id='"
 		+ serviceName.getValue().concat("Impl") + "' and @class='"
 			+ fullyQualifiedTypeName.getValue() + "']", root);
@@ -561,61 +562,134 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 	if (classAndIdService != null) {
 	    logger.log(Level.INFO, "The service '" + serviceName.getValue()
 		    + "' is already set in cxf config file.");
-	    return;
+	    updateService = false;
 	}
 
-	// 2) Check if class exists.
-	Element classService = XmlUtils.findFirstElement("/beans/bean[@class='"
-		+ fullyQualifiedTypeName.getValue() + "']", root);
 
-	if (classService != null) {
+	if (updateService) {
+	    // 2) Check if class exists.
+	    Element classService = XmlUtils.findFirstElement(
+		    "/beans/bean[@class='" + fullyQualifiedTypeName.getValue()
+			    + "']", root);
 
-	    // Update bean with new Id attribute.
-	    Element updateClassService = classService;
-	    updateClassService.setAttribute("id", serviceName.getValue().concat(
-		    "Impl"));
+	    if (classService != null) {
+
+		// Update bean with new Id attribute.
+		Element updateClassService = classService;
+		updateClassService.setAttribute("id", serviceName.getValue()
+			.concat("Impl"));
+
+		classService.getParentNode().replaceChild(updateClassService,
+			classService);
+		logger.log(Level.INFO, "The service '" + serviceName.getValue()
+			+ "' has updated 'id' attribute in cxf config file.");
+	    }
+
+	    // 3) Check if id exists.
+	    Element idService = XmlUtils.findFirstElement("/beans/bean[@id='"
+		    + serviceName.getValue().concat("Impl") + "']", root);
+
+	    if (idService != null) {
+
+		// Update bean with new class attribute.
+		Element updateIdService = idService;
+		updateIdService.setAttribute("class", fullyQualifiedTypeName
+			.getValue());
+
+		idService.getParentNode().replaceChild(updateIdService,
+			idService);
+		logger.log(Level.INFO, "The service '" + serviceName.getValue()
+					+ "' has updated 'class' attribute in cxf config file.");
+	    }
+
+	    Element bean;
+	    // Check id and class values to create a new bean.
+	    if (classService == null && idService == null) {
+
+		bean = cxfXml.createElement("bean");
+		bean.setAttribute("id", serviceName.getValue().concat("Impl"));
+		bean.setAttribute("class", fullyQualifiedTypeName.getValue());
+
+		root.appendChild(bean);
+	    }
+	}
+
+	boolean updateEndpoint = true;
+
+	// Check if endpoint exists in the configuration file.
+	Element jaxwsBean = XmlUtils.findFirstElement(
+		"/beans/endpoint[@address='/" + address.getValue()
+			+ "' and @id='" + serviceName.getValue() + "']", root);
+
+	// 1) Check if exists with id and address.
+	if (jaxwsBean != null) {
+
+	    logger.log(Level.INFO, "The endpoint '" + serviceName.getValue()
+		    + "' is already set in cxf config file.");
+	    updateEndpoint = false;
+	}
+
+	if (updateEndpoint) {
+
+	    // 2) Check if exists a bean with annotation address value and
+	    // updates id attribute with annotation serviceName value.
+	    Element addressEndpoint = XmlUtils.findFirstElement(
+		    "/beans/endpoint[@address='/" + address.getValue() + "']",
+		    root);
+
+	    if (addressEndpoint != null) {
+
+		// Update bean with new Id attribute.
+		Element updateAddressEndpoint = addressEndpoint;
+		updateAddressEndpoint.setAttribute("id", serviceName.getValue());
+
+		addressEndpoint.getParentNode().replaceChild(
+			updateAddressEndpoint, addressEndpoint);
+		logger.log(Level.INFO, "The endpoint bean '"
+			+ serviceName.getValue()
+			+ "' has updated 'id' attribute in cxf config file.");
+	    }
+
+	    Element idEndpoint = XmlUtils.findFirstElement(
+		    "/beans/endpoint[@id='" + serviceName.getValue() + "']",
+		    root);
+
+	    // 3) Check if exists a bean with annotation serviceName value in id
+	    // attribute and updates address attribute with annotation address
+	    // value.
+	    if (idEndpoint != null) {
+
+		// Update bean with new Id attribute.
+		Element updateIdEndpoint = idEndpoint;
+		updateIdEndpoint.setAttribute("address", "/".concat(serviceName
+			.getValue()));
+
+		idEndpoint.getParentNode().replaceChild(updateIdEndpoint,
+			idEndpoint);
+		logger.log(Level.INFO, "The endpoint bean '"
+			+ serviceName.getValue()
+					+ "' has updated 'address' attribute in cxf config file.");
+	    }
 	    
-	    classService.getParentNode().replaceChild(updateClassService,
-		    classService);
-	    logger.log(Level.INFO, "The service '" + serviceName.getValue()
-		    + "' has been updated its 'id' in cxf config file.");
+	    Element endpoint;
+	    // Check values to create new endpoint bean.
+	    if (addressEndpoint == null && idEndpoint == null) {
+		
+		endpoint = cxfXml.createElement("jaxws:endpoint");
+		endpoint.setAttribute("id", serviceName.getValue());
+		endpoint.setAttribute("implementor", "#".concat(
+			serviceName.getValue()).concat("Impl"));
+		endpoint
+			.setAttribute("address", "/".concat(address.getValue()));
+		root.appendChild(endpoint);
+	    }
+
 	}
 
-	// 3) Check if id exists.
-	Element idService = XmlUtils.findFirstElement("/beans/bean[@id='"
-		+ serviceName.getValue().concat("Impl") + "']", root);
-
-	if (idService != null) {
-	    
-	    // Update bean with new class attribute.
-
-	    Element updateIdService = idService;
-	    updateIdService.setAttribute("class", fullyQualifiedTypeName
-		    .getValue());
-
-	    idService.getParentNode().replaceChild(updateIdService, idService);
-	    logger.log(Level.INFO, "The service '" + serviceName.getValue()
-		    + "' has been updated its 'class' in cxf config file.");
+	// Update configuration file.
+	if (updateService || updateEndpoint) {
+	    XmlUtils.writeXml(cxfXmlMutableFile.getOutputStream(), cxfXml);
 	}
-
-	// Check id and class values to update.
-	if (classService == null && idService == null) {
-
-	    Element bean = cxfXml.createElement("bean");
-	    bean.setAttribute("id", serviceName.getValue().concat("Impl"));
-	    bean.setAttribute("class", fullyQualifiedTypeName.getValue());
-
-	    Element endpoint = cxfXml.createElement("jaxws:endpoint");
-	    endpoint.setAttribute("id", serviceName.getValue());
-	    endpoint.setAttribute("implementor", "#".concat(
-		    serviceName.getValue()).concat("Impl"));
-	    endpoint.setAttribute("address", "/".concat(address.getValue()));
-
-	    root.appendChild(bean);
-	    root.appendChild(endpoint);
-	}
-
-	XmlUtils.writeXml(cxfXmlMutableFile.getOutputStream(), cxfXml);
     }
 
     /**
