@@ -66,7 +66,7 @@ public class ServiceLayerCommands implements CommandMarker {
 	    @CliOption(key = "return", mandatory = false, unspecifiedDefaultValue = "__NULL__", optionContext = "java-all,project", help = "The Java type this operation returns") JavaType returnType,
 	    @CliOption(key = "paramNames", mandatory = false, help = "The parameters of the operation. They must be introduced separated by commas without blank spaces.") String paramNames,
 	    @CliOption(key = "paramTypes", mandatory = false, optionContext = "java", help = "The Java types of the given parameters. They must be introduced separated by commas without blank spaces.") JavaTypeList paramTypesList,
-	    @CliOption(key = "service", mandatory = true, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the service to receive this field") JavaType className,
+	    @CliOption(key = "service", mandatory = true, optionContext = "update,project", help = "The name of the service to receive this field") JavaType className,
 	    @CliOption(key = "exceptions", mandatory = false, optionContext = "exceptions", help = "The Exceptions defined for the operation. They must be introduced separated by commas without blank spaces.") JavaTypeList exceptionTypes) {
 
 	String[] paramNameArray;

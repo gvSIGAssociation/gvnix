@@ -188,8 +188,8 @@ public class ServiceLayerWsExportOperationsImpl implements
 		GvNIXWebService.class.getName(), gvNixAnnotationAttributes);
 
 	// Update CXF XML
-	serviceLayerWsConfigService.exportClass(serviceClass, serviceName,
-		addressName);
+	// serviceLayerWsConfigService.exportClass(serviceClass, serviceName,
+	// addressName);
 
 	// Define Jax-WS plugin and creates and execution build for this service
 	// to generate the wsdl file to check errors before deploy.

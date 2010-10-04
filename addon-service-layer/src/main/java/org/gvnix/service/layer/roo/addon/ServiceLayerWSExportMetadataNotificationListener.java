@@ -18,13 +18,24 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.beaninfo.BeanInfoMetadata;
+import org.springframework.roo.addon.entity.EntityMetadata;
+import org.springframework.roo.addon.mvc.jsp.JspMetadata;
+import org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.details.*;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.metadata.*;
+import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.support.util.Assert;
 
 /**
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -32,6 +43,8 @@ import org.springframework.roo.metadata.*;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
+@Component(immediate = true)
+@Service
 public class ServiceLayerWSExportMetadataNotificationListener implements
 	MetadataNotificationListener {
 
@@ -40,6 +53,12 @@ public class ServiceLayerWSExportMetadataNotificationListener implements
 
     @Reference
     private MetadataDependencyRegistry metadataDependencyRegistry;
+
+    @Reference
+    private ServiceLayerWsConfigService serviceLayerWsConfigService;
+
+    @Reference
+    private MetadataService metadataService;
 
     protected void activate(ComponentContext context) {
 	metadataDependencyRegistry.addNotificationListener(this);
@@ -50,11 +69,10 @@ public class ServiceLayerWSExportMetadataNotificationListener implements
      */
     public void notify(String upstreamDependency, String downstreamDependency) {
 
-
 	if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
 		.equals(
 			MetadataIdentificationUtils
-				.getMetadataClass(PhysicalTypeIdentifier
+				.getMetadataClass(ServiceLayerWSExportMetadata
 					.getMetadataIdentiferType()))) {
 
 	    // Show info
@@ -62,7 +80,55 @@ public class ServiceLayerWSExportMetadataNotificationListener implements
 		    .log(
 			    Level.WARNING,
 			    "The Service contract has been changed.\n You have to use the command 'service operation' to update the web service contract.");
+
+
+	    // Get upstreamDepency Class to check.
+	    ClassOrInterfaceTypeDetails governorTypeDetails = getJavaType(upstreamDependency);
+
+	    AnnotationMetadata gvNIXWebServiceAnnotation = MemberFindingUtils
+		    .getTypeAnnotation(governorTypeDetails, new JavaType(
+			    GvNIXWebService.class.getName()));
+
+	    serviceLayerWsConfigService.exportClass(governorTypeDetails
+		    .getName(), gvNIXWebServiceAnnotation);
+
 	}
+
+    }
+
+
+    /**
+     * Retrieves the JavaType related to upstreamDependency Metadata.
+     * 
+     * @param upstreamDependency
+     *            {@link ServiceLayerWSExportMetadata} to retrieve JavaType.
+     * 
+     * @return {@link JavaType} related.
+     */
+    private ClassOrInterfaceTypeDetails getJavaType(String upstreamDependency) {
+
+	JavaType javaType = ServiceLayerWSExportMetadata
+		.getJavaType(upstreamDependency);
+
+	Path webPath = ServiceLayerWSExportMetadata.getPath(upstreamDependency);
+
+	String serviceLayerWSExportMetadataKey = ServiceLayerWSExportMetadata
+		.createIdentifier(
+		javaType, webPath);
+
+	ServiceLayerWSExportMetadata serviceLayerWSExportMetadata = (ServiceLayerWSExportMetadata) metadataService
+		.get(serviceLayerWSExportMetadataKey);
+
+	DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) serviceLayerWSExportMetadata
+		.getItdTypeDetails();
+
+	Assert.isTrue(defaultItdTypeDetails != null, "Metadata related to '"
+		+ upstreamDependency + "' doesn't exist.");
+
+	return defaultItdTypeDetails.getGovernor();
+    }
+
+    public void setJax2WsPomConfiguration() {
 
     }
 

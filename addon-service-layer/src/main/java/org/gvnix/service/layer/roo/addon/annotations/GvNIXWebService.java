@@ -41,4 +41,6 @@ public @interface GvNIXWebService {
     String serviceName();
 
     String address();
+
+    String fullyQualifiedTypeName();
 }

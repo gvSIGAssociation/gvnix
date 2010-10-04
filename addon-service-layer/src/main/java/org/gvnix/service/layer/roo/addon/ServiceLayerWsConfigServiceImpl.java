@@ -28,7 +28,10 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 
 import org.apache.felix.scr.annotations.*;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
@@ -110,7 +113,7 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
     }
 
     /**
-     * Check if library is properly configurated in a project.
+     * Checks if library is properly configured in a project.
      * 
      * <p>
      * Checks these types:
@@ -122,7 +125,8 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * Cxf configuration file exists</li>
      * </ul>
      * 
-     * @param type Communication type
+     * @param type
+     *            Communication type
      * @return true or false if it's configurated
      */
     private boolean isCxfInstalled(CommunicationSense type) {
@@ -212,12 +216,13 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * Check if Cxf dependencies are set in project's pom.xml.
      * 
      * <p>
-     * Search if the dependencies defined in xml Addon file dependencies-export.xml are
-     * set in pom.xml.
+     * Search if the dependencies defined in xml Addon file
+     * dependencies-export.xml are set in pom.xml.
      * </p>
      * 
-     * @param type Communication type
-     * @return true if all dependecies are set in pom.xml
+     * @param type
+     *            Communication type
+     * @return true if all dependencies are set in pom.xml
      */
     protected boolean isCxfDependenciesInstalled(CommunicationSense type) {
 
@@ -489,9 +494,45 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * <p>
      * Define a Web Service class in cxf configuration file to be published.
      * <p>
+     * <p>
+     * Update cxf file if its necessary to avoid changes in WSDL contract.
+     * </p>
      */
-    public void exportClass(JavaType className, String serviceName,
-	    String addressName) {
+    public void exportClass(JavaType className,
+	    AnnotationMetadata annotationMetadata) {
+
+	Assert.isTrue(annotationMetadata != null, "Annotation '"
+		+ annotationMetadata.getAnnotationType()
+			.getFullyQualifiedTypeName() + "' in class '"
+		+ className.getFullyQualifiedTypeName()
+		+ "'must not be null to check cxf xml configuration file.");
+
+	StringAttributeValue serviceName = (StringAttributeValue) annotationMetadata
+		.getAttribute(new JavaSymbolName("serviceName"));
+
+	Assert.isTrue(serviceName != null
+		&& StringUtils.hasText(serviceName.getValue()),
+		"Annotation attribute 'serviceName.getValue()' in "
+			+ className.getFullyQualifiedTypeName()
+			+ "' must be defined.");
+
+	StringAttributeValue address = (StringAttributeValue) annotationMetadata
+		.getAttribute(new JavaSymbolName("address"));
+
+	Assert.isTrue(address != null
+		&& StringUtils.hasText(address.getValue()),
+		"Annotation attribute 'address.getValue()' in "
+			+ className.getFullyQualifiedTypeName()
+			+ "' must be defined.");
+
+	StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) annotationMetadata
+		.getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
+
+	Assert.isTrue(fullyQualifiedTypeName != null
+		&& StringUtils.hasText(fullyQualifiedTypeName.getValue()),
+		"Annotation attribute 'fullyQualifiedTypeName.getValue()' in "
+			+ className.getFullyQualifiedTypeName()
+			+ "' must be defined.");
 
 	String cxfXmlPath = getCxfConfigurationFilePath();
 	Assert.isTrue(fileManager.exists(cxfXmlPath),
@@ -509,28 +550,70 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 
 	Element root = cxfXml.getDocumentElement();
 
-	Element createdService = XmlUtils.findFirstElement("/beans/bean[@id='"
-		+ serviceName + "']", root);
+	// Check if service exists in configuration file.
+
+	// 1) Check if class and id exists.
+	Element classAndIdService = XmlUtils.findFirstElement("/beans/bean[@id='"
+		+ serviceName.getValue().concat("Impl") + "' and @class='"
+			+ fullyQualifiedTypeName.getValue() + "']", root);
 
 	// Service is already published.
-	if (createdService != null) {
-	    logger.log(Level.INFO, "The service '" + serviceName
+	if (classAndIdService != null) {
+	    logger.log(Level.INFO, "The service '" + serviceName.getValue()
 		    + "' is already set in cxf config file.");
 	    return;
 	}
 
-	Element bean = cxfXml.createElement("bean");
-	bean.setAttribute("id", serviceName.concat("Impl"));
-	bean.setAttribute("class", className.getFullyQualifiedTypeName());
+	// 2) Check if class exists.
+	Element classService = XmlUtils.findFirstElement("/beans/bean[@class='"
+		+ fullyQualifiedTypeName.getValue() + "']", root);
 
-	Element endpoint = cxfXml.createElement("jaxws:endpoint");
-	endpoint.setAttribute("id", serviceName);
-	endpoint.setAttribute("implementor", "#".concat(serviceName).concat(
-		"Impl"));
-	endpoint.setAttribute("address", "/".concat(addressName));
+	if (classService != null) {
 
-	root.appendChild(bean);
-	root.appendChild(endpoint);
+	    // Update bean with new Id attribute.
+	    Element updateClassService = classService;
+	    updateClassService.setAttribute("id", serviceName.getValue().concat(
+		    "Impl"));
+	    
+	    classService.getParentNode().replaceChild(updateClassService,
+		    classService);
+	    logger.log(Level.INFO, "The service '" + serviceName.getValue()
+		    + "' has been updated its 'id' in cxf config file.");
+	}
+
+	// 3) Check if id exists.
+	Element idService = XmlUtils.findFirstElement("/beans/bean[@id='"
+		+ serviceName.getValue().concat("Impl") + "']", root);
+
+	if (idService != null) {
+	    
+	    // Update bean with new class attribute.
+
+	    Element updateIdService = idService;
+	    updateIdService.setAttribute("class", fullyQualifiedTypeName
+		    .getValue());
+
+	    idService.getParentNode().replaceChild(updateIdService, idService);
+	    logger.log(Level.INFO, "The service '" + serviceName.getValue()
+		    + "' has been updated its 'class' in cxf config file.");
+	}
+
+	// Check id and class values to update.
+	if (classService == null && idService == null) {
+
+	    Element bean = cxfXml.createElement("bean");
+	    bean.setAttribute("id", serviceName.getValue().concat("Impl"));
+	    bean.setAttribute("class", fullyQualifiedTypeName.getValue());
+
+	    Element endpoint = cxfXml.createElement("jaxws:endpoint");
+	    endpoint.setAttribute("id", serviceName.getValue());
+	    endpoint.setAttribute("implementor", "#".concat(
+		    serviceName.getValue()).concat("Impl"));
+	    endpoint.setAttribute("address", "/".concat(address.getValue()));
+
+	    root.appendChild(bean);
+	    root.appendChild(endpoint);
+	}
 
 	XmlUtils.writeXml(cxfXmlMutableFile.getOutputStream(), cxfXml);
     }

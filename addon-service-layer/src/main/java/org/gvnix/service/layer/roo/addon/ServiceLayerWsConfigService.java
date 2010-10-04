@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaType;
 
 /**
@@ -58,15 +59,13 @@ public interface ServiceLayerWsConfigService {
     /**
      * Publish a class as Web Service.
      * 
-     * @param serviceClass
-     *            class to be configured as Web Service.
-     * @param serviceName
-     *            Name to publish the Web Service.
-     * @param addressName
-     *            Address to access the service.
+     * @param className
+     *            to be published as Web Service.
+     * @param annotationMetadata
+     *            with all necessary values to define a Web Service.
      */
-    public void exportClass(JavaType serviceClass, String serviceName,
-	    String addressName);
+    public void exportClass(JavaType className,
+	    AnnotationMetadata annotationMetadata);
 
     /**
      * Converts package name to a Target Namespace.
