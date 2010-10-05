@@ -28,8 +28,7 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 
 import org.apache.felix.scr.annotations.*;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
+import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -38,8 +37,7 @@ import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.*;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 
 /**
  * Utilities to manage the CXF web services library.
@@ -55,7 +53,8 @@ import org.w3c.dom.Element;
  */
 @Component(immediate = true)
 @Service
-public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigService {
+public class ServiceLayerWsConfigServiceImpl implements
+        ServiceLayerWsConfigService {
 
     @Reference
     private MetadataService metadataService;
@@ -68,9 +67,9 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
 
     private static final String DOCTYPE_PUBLIC = "-//tuckey.org//DTD UrlRewrite 3.0//EN";
     private static final String DOCTYPE_SYSTEM = "http://tuckey.org/res/dtds/urlrewrite3.0.dtd";
-    
+
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerWsConfigService.class.getName());
+            .getLogger(ServiceLayerWsConfigService.class.getName());
 
     /**
      * {@inheritDoc}
@@ -83,33 +82,34 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * cxf configuration file.
      * </p>
      * 
-     * @param type Communication type
+     * @param type
+     *            Communication type
      */
     public void install(CommunicationSense type) {
 
-	// Check if it's already installed.
-	if (isCxfInstalled(type)) {
-	    // Nothing to do
-	    return;
-	}
+        // Check if it's already installed.
+        if (isCxfInstalled(type)) {
+            // Nothing to do
+            return;
+        }
 
-	// Add dependencies to project
-	installCxfDependencies(type);
-	
-	if (type == CommunicationSense.EXPORT) {
+        // Add dependencies to project
+        installCxfDependencies(type);
 
-	    // Create CXF config file src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
-	    installCxfConfigurationFile();
+        if (type == CommunicationSense.EXPORT) {
 
-	    // Update src/main/webapp/WEB-INF/web.xml :
-	    // - Add CXFServlet and map it to /services/*
-	    // - Add cxf-PROJECT_NAME.xml to Spring Context Loader
-	    installCxfWebConfigurationFile();
+            // Create CXF config file src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
+            installCxfConfigurationFile();
 
-	    // TODO: comprobar si ya se ha actualizado el fichero urlrewrite.
-	    // Setup URL rewrite to avoid to filter requests to WebServices
-	    installCxfUrlRewriteConfigurationFile();
-	}
+            // Update src/main/webapp/WEB-INF/web.xml :
+            // - Add CXFServlet and map it to /services/*
+            // - Add cxf-PROJECT_NAME.xml to Spring Context Loader
+            installCxfWebConfigurationFile();
+
+            // TODO: comprobar si ya se ha actualizado el fichero urlrewrite.
+            // Setup URL rewrite to avoid to filter requests to WebServices
+            installCxfUrlRewriteConfigurationFile();
+        }
     }
 
     /**
@@ -130,18 +130,19 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * @return true or false if it's configurated
      */
     private boolean isCxfInstalled(CommunicationSense type) {
-	
-	// TODO Are not checked Web and Url Rewrite configuration files, check it ?
-	
-	boolean cxfInstalled = isCxfDependenciesInstalled(type);
-	
-	if (type == CommunicationSense.EXPORT) {
 
-	    cxfInstalled = cxfInstalled
-		    && fileManager.exists(getCxfConfigurationFilePath());
-	}
-	
-	return cxfInstalled;
+        // TODO Are not checked Web and Url Rewrite configuration files, check
+        // it ?
+
+        boolean cxfInstalled = isCxfDependenciesInstalled(type);
+
+        if (type == CommunicationSense.EXPORT) {
+
+            cxfInstalled = cxfInstalled
+                    && fileManager.exists(getCxfConfigurationFilePath());
+        }
+
+        return cxfInstalled;
     }
 
     /**
@@ -155,13 +156,13 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      */
     private String getCxfConfigurationFilePath() {
 
-	String cxfFile = "WEB-INF/cxf-".concat(getProjectName()).concat(".xml");
+        String cxfFile = "WEB-INF/cxf-".concat(getProjectName()).concat(".xml");
 
-	// Checks for src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
-	String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		cxfFile);
+        // Checks for src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
+        String cxfXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                cxfFile);
 
-	return cxfXmlPath;
+        return cxfXmlPath;
     }
 
     /**
@@ -170,15 +171,15 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * @return Project Name.
      */
     private String getProjectName() {
-	// Project ID
-	String prjId = ProjectMetadata.getProjectIdentifier();
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(prjId);
-	Assert.isTrue(projectMetadata != null, "Project metadata required");
+        // Project ID
+        String prjId = ProjectMetadata.getProjectIdentifier();
+        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+                .get(prjId);
+        Assert.isTrue(projectMetadata != null, "Project metadata required");
 
-	String projectName = projectMetadata.getProjectName();
+        String projectName = projectMetadata.getProjectName();
 
-	return projectName;
+        return projectName;
     }
 
     /**
@@ -187,29 +188,28 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      */
     private void installCxfConfigurationFile() {
 
-	String cxfXmlPath = getCxfConfigurationFilePath();
+        String cxfXmlPath = getCxfConfigurationFilePath();
 
-	if (fileManager.exists(cxfXmlPath)) {
-	    
-	    // File exists, nothing to do
-	    return;
-	}
+        if (fileManager.exists(cxfXmlPath)) {
 
-	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
-		"cxf-template.xml");
-	MutableFile cxfXmlMutableFile = fileManager.createFile(cxfXmlPath);
-	
-	try {
-	    
-	    FileCopyUtils.copy(templateInputStream, cxfXmlMutableFile
-		    .getOutputStream());
-	} 
-	catch (Exception e) {
-	    
-	    throw new IllegalStateException(e);
-	}
+            // File exists, nothing to do
+            return;
+        }
 
-	fileManager.scan();
+        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+                "cxf-template.xml");
+        MutableFile cxfXmlMutableFile = fileManager.createFile(cxfXmlPath);
+
+        try {
+
+            FileCopyUtils.copy(templateInputStream, cxfXmlMutableFile
+                    .getOutputStream());
+        } catch (Exception e) {
+
+            throw new IllegalStateException(e);
+        }
+
+        fileManager.scan();
     }
 
     /**
@@ -226,53 +226,54 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      */
     protected boolean isCxfDependenciesInstalled(CommunicationSense type) {
 
-	boolean cxfDependenciesExists = true;
+        boolean cxfDependenciesExists = true;
 
-	ProjectMetadata project = (ProjectMetadata) metadataService
-		.get(ProjectMetadata.getProjectIdentifier());
-	if (project == null) {
-	    return false;
-	}
+        ProjectMetadata project = (ProjectMetadata) metadataService
+                .get(ProjectMetadata.getProjectIdentifier());
+        if (project == null) {
+            return false;
+        }
 
-	// Dependencies elements are defined as:
-	// <dependency org="org.apache.cxf" name="cxf-rt-bindings-soap"
-	// rev="2.2.6" />
-	List<Element> cxfDependenciesList = getCxfRequiredDependencies(type);
+        // Dependencies elements are defined as:
+        // <dependency org="org.apache.cxf" name="cxf-rt-bindings-soap"
+        // rev="2.2.6" />
+        List<Element> cxfDependenciesList = getCxfRequiredDependencies(type);
 
-	Dependency cxfDependency;
+        Dependency cxfDependency;
 
-	for (Element element : cxfDependenciesList) {
+        for (Element element : cxfDependenciesList) {
 
-	    cxfDependency = new Dependency(element);
-	    cxfDependenciesExists = cxfDependenciesExists
-		    && project.isDependencyRegistered(cxfDependency);
-	}
+            cxfDependency = new Dependency(element);
+            cxfDependenciesExists = cxfDependenciesExists
+                    && project.isDependencyRegistered(cxfDependency);
+        }
 
-	return cxfDependenciesExists;
+        return cxfDependenciesExists;
     }
-    
+
     /**
-     * Get the file name of the Cxf required dependencies of certain type. 
+     * Get the file name of the Cxf required dependencies of certain type.
      * 
-     * @param type Type of required dependencies
+     * @param type
+     *            Type of required dependencies
      * @return File name
      */
     private String getCxfRequiredDependenciesFileName(CommunicationSense type) {
-	
-	StringBuffer name = new StringBuffer("dependencies-");
-	
-	switch (type) {
-	    case EXPORT:
-		name.append("export");
-		break;
-	    case IMPORT:
-		name.append("import");
-		break;
-	}
-	
-	name.append(".xml");
-	
-	return name.toString();
+
+        StringBuffer name = new StringBuffer("dependencies-");
+
+        switch (type) {
+        case EXPORT:
+            name.append("export");
+            break;
+        case IMPORT:
+            name.append("import");
+            break;
+        }
+
+        name.append(".xml");
+
+        return name.toString();
     }
 
     /**
@@ -282,58 +283,60 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * Get addon dependencies defined in dependencies-export.xml
      * </p>
      * 
-     * @param type Communication type
+     * @param type
+     *            Communication type
      * @return List of addon dependencies as xml elements
      */
     protected List<Element> getCxfRequiredDependencies(CommunicationSense type) {
 
-	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
-		getCxfRequiredDependenciesFileName(type));
-	Assert.notNull(templateInputStream,
-		"Can't adquire dependencies file " + type);
+        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+                getCxfRequiredDependenciesFileName(type));
+        Assert.notNull(templateInputStream, "Can't adquire dependencies file "
+                + type);
 
-	Document dependencyDoc;
-	try {
+        Document dependencyDoc;
+        try {
 
-	    dependencyDoc = XmlUtils.getDocumentBuilder().parse(
-		    templateInputStream);
-	} catch (Exception e) {
+            dependencyDoc = XmlUtils.getDocumentBuilder().parse(
+                    templateInputStream);
+        } catch (Exception e) {
 
-	    throw new IllegalStateException(e);
-	}
+            throw new IllegalStateException(e);
+        }
 
-	Element dependencies = (Element) dependencyDoc.getFirstChild();
+        Element dependencies = (Element) dependencyDoc.getFirstChild();
 
-	return XmlUtils.findElements("/dependencies/cxf/dependency",
-		dependencies);
+        return XmlUtils.findElements("/dependencies/cxf/dependency",
+                dependencies);
     }
 
     /**
      * Add addon dependencies to project dependencies if necessary.
      * 
-     * @param type Communication type
+     * @param type
+     *            Communication type
      */
     private void installCxfDependencies(CommunicationSense type) {
 
-	// If dependencies are installed continue.
-	if (isCxfDependenciesInstalled(type)) {
-	    
-	    return;
-	}
-	
-	// Add project properties as cxf version
-	// TODO Check cxf version property before ?
-	List<Element> projectProperties = XmlUtils.findElements(
-		"/configuration/gvnix/properties/*", XmlUtils.getConfiguration(
-			this.getClass(), "properties.xml"));
-	for (Element property : projectProperties) {
-	    projectOperations.addProperty(new Property(property));
-	}
+        // If dependencies are installed continue.
+        if (isCxfDependenciesInstalled(type)) {
 
-	List<Element> cxfDependencies = getCxfRequiredDependencies(type);
-	for (Element dependency : cxfDependencies) {
-	    projectOperations.dependencyUpdate(new Dependency(dependency));
-	}
+            return;
+        }
+
+        // Add project properties as cxf version
+        // TODO Check cxf version property before ?
+        List<Element> projectProperties = XmlUtils.findElements(
+                "/configuration/gvnix/properties/*", XmlUtils.getConfiguration(
+                        this.getClass(), "properties.xml"));
+        for (Element property : projectProperties) {
+            projectOperations.addProperty(new Property(property));
+        }
+
+        List<Element> cxfDependencies = getCxfRequiredDependencies(type);
+        for (Element dependency : cxfDependencies) {
+            projectOperations.dependencyUpdate(new Dependency(dependency));
+        }
     }
 
     /**
@@ -345,122 +348,122 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * </ul>
      */
     private void installCxfWebConfigurationFile() {
-	
-	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		"WEB-INF/web.xml");
-	Assert.isTrue(fileManager.exists(webXmlPath), "web.xml not found");
 
-	MutableFile webXmlMutableFile = null;
-	Document webXml;
-	try {
+        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "WEB-INF/web.xml");
+        Assert.isTrue(fileManager.exists(webXmlPath), "web.xml not found");
 
-	    webXmlMutableFile = fileManager.updateFile(webXmlPath);
-	    webXml = XmlUtils.getDocumentBuilder().parse(
-		    webXmlMutableFile.getInputStream());
+        MutableFile webXmlMutableFile = null;
+        Document webXml;
+        try {
 
-	} catch (Exception e) {
+            webXmlMutableFile = fileManager.updateFile(webXmlPath);
+            webXml = XmlUtils.getDocumentBuilder().parse(
+                    webXmlMutableFile.getInputStream());
 
-	    throw new IllegalStateException(e);
-	}
-	
-	Element root = webXml.getDocumentElement();
+        } catch (Exception e) {
 
-	if (null != XmlUtils
-		.findFirstElement(
-			"/web-app/servlet[servlet-class='org.apache.cxf.transport.servlet.CXFServlet']",
-			root)) {
-	    // cxf servlet already installed, nothing to do
-	    return;
-	}
+            throw new IllegalStateException(e);
+        }
 
-	// Insert servlet def
-	Element firstServletMapping = XmlUtils.findRequiredElement(
-		"/web-app/servlet-mapping", root);
+        Element root = webXml.getDocumentElement();
 
-	Element servlet = webXml.createElement("servlet");
-	Element servletName = webXml.createElement("servlet-name");
+        if (null != XmlUtils
+                .findFirstElement(
+                        "/web-app/servlet[servlet-class='org.apache.cxf.transport.servlet.CXFServlet']",
+                        root)) {
+            // cxf servlet already installed, nothing to do
+            return;
+        }
 
-	// TODO: Create command parameter to set the servlet name
-	servletName.setTextContent("CXFServlet");
-	servlet.appendChild(servletName);
-	Element servletClass = webXml.createElement("servlet-class");
-	servletClass
-		.setTextContent("org.apache.cxf.transport.servlet.CXFServlet");
-	servlet.appendChild(servletClass);
-	root.insertBefore(servlet, firstServletMapping.getPreviousSibling());
+        // Insert servlet def
+        Element firstServletMapping = XmlUtils.findRequiredElement(
+                "/web-app/servlet-mapping", root);
 
-	// Insert servlet mapping
-	Element servletMapping = webXml.createElement("servlet-mapping");
-	Element servletName2 = webXml.createElement("servlet-name");
-	servletName2.setTextContent("CXFServlet");
-	servletMapping.appendChild(servletName2);
+        Element servlet = webXml.createElement("servlet");
+        Element servletName = webXml.createElement("servlet-name");
 
-	// TODO: Create command parameter to set the servlet mapping
-	Element urlMapping = webXml.createElement("url-pattern");
-	urlMapping.setTextContent("/services/*");
-	servletMapping.appendChild(urlMapping);
-	root.insertBefore(servletMapping, firstServletMapping);
+        // TODO: Create command parameter to set the servlet name
+        servletName.setTextContent("CXFServlet");
+        servlet.appendChild(servletName);
+        Element servletClass = webXml.createElement("servlet-class");
+        servletClass
+                .setTextContent("org.apache.cxf.transport.servlet.CXFServlet");
+        servlet.appendChild(servletClass);
+        root.insertBefore(servlet, firstServletMapping.getPreviousSibling());
 
-	// Project Name
-	String prjName = getProjectName();
+        // Insert servlet mapping
+        Element servletMapping = webXml.createElement("servlet-mapping");
+        Element servletName2 = webXml.createElement("servlet-name");
+        servletName2.setTextContent("CXFServlet");
+        servletMapping.appendChild(servletName2);
 
-	String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
-	
-	Element contextConfigLocation = XmlUtils
-		.findFirstElement(
-			"/web-app/context-param[param-name='contextConfigLocation']/param-value",
-			root);
-	String paramValueContent = contextConfigLocation.getTextContent();
-	contextConfigLocation.setTextContent(cxfFile.concat(" ").concat(
-		paramValueContent));
+        // TODO: Create command parameter to set the servlet mapping
+        Element urlMapping = webXml.createElement("url-pattern");
+        urlMapping.setTextContent("/services/*");
+        servletMapping.appendChild(urlMapping);
+        root.insertBefore(servletMapping, firstServletMapping);
 
-	XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);
+        // Project Name
+        String prjName = getProjectName();
+
+        String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
+
+        Element contextConfigLocation = XmlUtils
+                .findFirstElement(
+                        "/web-app/context-param[param-name='contextConfigLocation']/param-value",
+                        root);
+        String paramValueContent = contextConfigLocation.getTextContent();
+        contextConfigLocation.setTextContent(cxfFile.concat(" ").concat(
+                paramValueContent));
+
+        XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);
     }
 
     /**
      * Update url rewrite rules.
      */
     private void installCxfUrlRewriteConfigurationFile() {
-	List<Element> rules = getCxfUrlRewriteRequiredRules();
+        List<Element> rules = getCxfUrlRewriteRequiredRules();
 
-	// Open file and append rules before the first element
-	String xmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		"WEB-INF/urlrewrite.xml");
-	Assert.isTrue(fileManager.exists(xmlPath), "urlrewrite.xml not found");
+        // Open file and append rules before the first element
+        String xmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "WEB-INF/urlrewrite.xml");
+        Assert.isTrue(fileManager.exists(xmlPath), "urlrewrite.xml not found");
 
-	MutableFile xmlMutableFile = null;
-	Document urlXml;
+        MutableFile xmlMutableFile = null;
+        Document urlXml;
 
-	try {
-	    xmlMutableFile = fileManager.updateFile(xmlPath);
-	    urlXml = XmlUtils.getDocumentBuilder().parse(
-		    xmlMutableFile.getInputStream());
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
-	}
-	Element root = urlXml.getDocumentElement();
+        try {
+            xmlMutableFile = fileManager.updateFile(xmlPath);
+            urlXml = XmlUtils.getDocumentBuilder().parse(
+                    xmlMutableFile.getInputStream());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        Element root = urlXml.getDocumentElement();
 
-	for (Element rule : rules) {
+        for (Element rule : rules) {
 
-	    // Create rule in dest doc
-	    Element rewRule = (Element) urlXml.adoptNode(rule);
+            // Create rule in dest doc
+            Element rewRule = (Element) urlXml.adoptNode(rule);
 
-	    root.insertBefore(rewRule, root.getFirstChild());
+            root.insertBefore(rewRule, root.getFirstChild());
 
-	}
+        }
 
-	// Define DTD
-	Transformer xformer;
-	try {
-	    xformer = XmlUtils.createIndentingTransformer();
-	} catch (Exception ex) {
-	    throw new IllegalStateException(ex);
-	}
+        // Define DTD
+        Transformer xformer;
+        try {
+            xformer = XmlUtils.createIndentingTransformer();
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+        }
 
-	xformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC);
-	xformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM);
+        xformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC);
+        xformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM);
 
-	XmlUtils.writeXml(xformer, xmlMutableFile.getOutputStream(), urlXml);
+        XmlUtils.writeXml(xformer, xmlMutableFile.getOutputStream(), urlXml);
     }
 
     /**
@@ -469,23 +472,23 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * @return List of addon rewrite rules
      */
     private List<Element> getCxfUrlRewriteRequiredRules() {
-	
-	InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
-		"urlrewrite-rules.xml");
-	Assert.notNull(templateInputStream,
-		"Could not adquire urlrewrite-rules.xml file");
-	
-	Document dependencyDoc;
-	try {
-	    dependencyDoc = XmlUtils.getDocumentBuilder().parse(
-		    templateInputStream);
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
-	}
 
-	Element root = (Element) dependencyDoc.getFirstChild();
+        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+                "urlrewrite-rules.xml");
+        Assert.notNull(templateInputStream,
+                "Could not adquire urlrewrite-rules.xml file");
 
-	return XmlUtils.findElements("/urlrewrite-rules/cxf/rule", root);
+        Document dependencyDoc;
+        try {
+            dependencyDoc = XmlUtils.getDocumentBuilder().parse(
+                    templateInputStream);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+
+        Element root = (Element) dependencyDoc.getFirstChild();
+
+        return XmlUtils.findElements("/urlrewrite-rules/cxf/rule", root);
     }
 
     /**
@@ -495,201 +498,362 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * Define a Web Service class in cxf configuration file to be published.
      * <p>
      * <p>
-     * Update cxf file if its necessary to avoid changes in WSDL contract checking type annotation values from service class.
+     * Update cxf file if its necessary to avoid changes in WSDL contract
+     * checking type annotation values from service class.
+     * </p>
+     * <p>
+     * Update annotation class if Class name or package changes.
      * </p>
      */
-    public void exportClass(JavaType className,
-	    AnnotationMetadata annotationMetadata) {
+    public boolean exportClass(JavaType className,
+            AnnotationMetadata annotationMetadata) {
 
-	Assert.isTrue(annotationMetadata != null, "Annotation '"
-		+ annotationMetadata.getAnnotationType()
-			.getFullyQualifiedTypeName() + "' in class '"
-		+ className.getFullyQualifiedTypeName()
-		+ "'must not be null to check cxf xml configuration file.");
+        Assert.isTrue(annotationMetadata != null, "Annotation '"
+                + annotationMetadata.getAnnotationType()
+                        .getFullyQualifiedTypeName() + "' in class '"
+                + className.getFullyQualifiedTypeName()
+                + "'must not be null to check cxf xml configuration file.");
 
-	StringAttributeValue serviceName = (StringAttributeValue) annotationMetadata
-		.getAttribute(new JavaSymbolName("serviceName"));
+        // Update web service configuration file.
+        boolean updateGvNIXWebServiceAnnotation = updateConfiguration(
+                className, annotationMetadata);
 
-	Assert.isTrue(serviceName != null
-		&& StringUtils.hasText(serviceName.getValue()),
-		"Annotation attribute 'serviceName.getValue()' in "
-			+ className.getFullyQualifiedTypeName()
-			+ "' must be defined.");
+        return updateGvNIXWebServiceAnnotation;
+    }
 
-	StringAttributeValue address = (StringAttributeValue) annotationMetadata
-		.getAttribute(new JavaSymbolName("address"));
+    /**
+     * Updates web services configuration file.
+     * 
+     * @param className
+     *            to export.
+     * @param annotationMetadata
+     *            values from web service class to set in configuration file.
+     * 
+     * @return true if annotation from className has to be updated because of
+     *         changes in package or class name.
+     * 
+     */
+    private boolean updateConfiguration(JavaType className,
+            AnnotationMetadata annotationMetadata) {
 
-	Assert.isTrue(address != null
-		&& StringUtils.hasText(address.getValue()),
-		"Annotation attribute 'address.getValue()' in "
-			+ className.getFullyQualifiedTypeName()
-			+ "' must be defined.");
+        StringAttributeValue serviceName = (StringAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("serviceName"));
 
-	StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) annotationMetadata
-		.getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
+        Assert.isTrue(serviceName != null
+                && StringUtils.hasText(serviceName.getValue()),
+                "Annotation attribute 'serviceName.getValue()' in "
+                        + className.getFullyQualifiedTypeName()
+                        + "' must be defined.");
 
-	Assert.isTrue(fullyQualifiedTypeName != null
-		&& StringUtils.hasText(fullyQualifiedTypeName.getValue()),
-		"Annotation attribute 'fullyQualifiedTypeName.getValue()' in "
-			+ className.getFullyQualifiedTypeName()
-			+ "' must be defined.");
+        StringAttributeValue address = (StringAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("address"));
 
-	String cxfXmlPath = getCxfConfigurationFilePath();
-	Assert.isTrue(fileManager.exists(cxfXmlPath),
-		"Cxf configuration file not found, export again the service.");
+        Assert.isTrue(address != null
+                && StringUtils.hasText(address.getValue()),
+                "Annotation attribute 'address.getValue()' in "
+                        + className.getFullyQualifiedTypeName()
+                        + "' must be defined.");
 
-	MutableFile cxfXmlMutableFile = null;
-	Document cxfXml;
-	try {
-	    cxfXmlMutableFile = fileManager.updateFile(cxfXmlPath);
-	    cxfXml = XmlUtils.getDocumentBuilder().parse(
-		    cxfXmlMutableFile.getInputStream());
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
-	}
+        StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
 
-	Element root = cxfXml.getDocumentElement();
+        Assert.isTrue(fullyQualifiedTypeName != null
+                && StringUtils.hasText(fullyQualifiedTypeName.getValue()),
+                "Annotation attribute 'fullyQualifiedTypeName.getValue()' in "
+                        + className.getFullyQualifiedTypeName()
+                        + "' must be defined.");
 
-	// Check if service exists in configuration file.
-	boolean updateService = true;
+        String cxfXmlPath = getCxfConfigurationFilePath();
+        Assert.isTrue(fileManager.exists(cxfXmlPath),
+                "Cxf configuration file not found, export again the service.");
 
-	// 1) Check if class and id exists in bean.
-	Element classAndIdService = XmlUtils.findFirstElement("/beans/bean[@id='"
-		+ serviceName.getValue().concat("Impl") + "' and @class='"
-			+ fullyQualifiedTypeName.getValue() + "']", root);
+        MutableFile cxfXmlMutableFile = null;
+        Document cxfXml;
+        try {
+            cxfXmlMutableFile = fileManager.updateFile(cxfXmlPath);
+            cxfXml = XmlUtils.getDocumentBuilder().parse(
+                    cxfXmlMutableFile.getInputStream());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
 
-	// Service is already published.
-	if (classAndIdService != null) {
-	    logger.log(Level.INFO, "The service '" + serviceName.getValue()
-		    + "' is already set in cxf config file.");
-	    updateService = false;
-	}
+        Element root = cxfXml.getDocumentElement();
 
+        boolean updateFullyQualifiedTypeName = false;
 
-	if (updateService) {
-	    // 2) Check if class exists.
-	    Element classService = XmlUtils.findFirstElement(
-		    "/beans/bean[@class='" + fullyQualifiedTypeName.getValue()
-			    + "']", root);
+        // Check if class name and annotation class name are different.
+        if (!className.getFullyQualifiedTypeName().contentEquals(
+                fullyQualifiedTypeName.getValue())) {
+            updateFullyQualifiedTypeName = true;
+        }
 
-	    if (classService != null) {
+        // Check if service exists in configuration file.
+        boolean updateService = true;
 
-		// Update bean with new Id attribute.
-		Element updateClassService = classService;
-		updateClassService.setAttribute("id", serviceName.getValue()
-			.concat("Impl"));
+        // 1) Check if class and id exists in bean.
+        Element classAndIdService = XmlUtils.findFirstElement(
+                "/beans/bean[@id='" + serviceName.getValue().concat("Impl")
+                        + "' and @class='"
+                        + className.getFullyQualifiedTypeName() + "']", root);
 
-		classService.getParentNode().replaceChild(updateClassService,
-			classService);
-		logger.log(Level.INFO, "The service '" + serviceName.getValue()
-			+ "' has updated 'id' attribute in cxf config file.");
-	    }
+        // Service is already published.
+        if (classAndIdService != null) {
+            logger.log(Level.INFO, "The service '" + serviceName.getValue()
+                    + "' is already set in cxf config file.");
+            updateService = false;
+        }
 
-	    // 3) Check if id exists.
-	    Element idService = XmlUtils.findFirstElement("/beans/bean[@id='"
-		    + serviceName.getValue().concat("Impl") + "']", root);
+        if (updateService) {
 
-	    if (idService != null) {
+            // 2) Check if class exists or it hasn't changed.
+            Element classService = null;
 
-		// Update bean with new class attribute.
-		Element updateIdService = idService;
-		updateIdService.setAttribute("class", fullyQualifiedTypeName
-			.getValue());
+            if (updateFullyQualifiedTypeName) {
 
-		idService.getParentNode().replaceChild(updateIdService,
-			idService);
-		logger.log(Level.INFO, "The service '" + serviceName.getValue()
-					+ "' has updated 'class' attribute in cxf config file.");
-	    }
+                // Check if exists with class name.
+                classService = XmlUtils.findFirstElement(
+                        "/beans/bean[@class='"
+                                + className.getFullyQualifiedTypeName() + "']",
+                        root);
 
-	    Element bean;
-	    // Check id and class values to create a new bean.
-	    if (classService == null && idService == null) {
+                if (classService != null) {
 
-		bean = cxfXml.createElement("bean");
-		bean.setAttribute("id", serviceName.getValue().concat("Impl"));
-		bean.setAttribute("class", fullyQualifiedTypeName.getValue());
+                    // Update bean with new Id attribute.
+                    Element updateClassService = classService;
+                    String idValue = classService.getAttribute("id");
 
-		root.appendChild(bean);
-	    }
-	}
+                    if (!StringUtils.hasText(idValue)
+                            || !idValue.contentEquals(serviceName.getValue()
+                                    .concat("Impl"))) {
+                        updateClassService.setAttribute("id", serviceName
+                                .getValue().concat("Impl"));
 
-	boolean updateEndpoint = true;
+                        classService.getParentNode().replaceChild(
+                                updateClassService, classService);
+                        logger
+                                .log(
+                                        Level.INFO,
+                                        "The service '"
+                                                + serviceName.getValue()
+                                                + "' has updated 'id' attribute in cxf config file.");
+                    }
 
-	// Check if endpoint exists in the configuration file.
-	Element jaxwsBean = XmlUtils.findFirstElement(
-		"/beans/endpoint[@address='/" + address.getValue()
-			+ "' and @id='" + serviceName.getValue() + "']", root);
+                } else {
 
-	// 1) Check if exists with id and address.
-	if (jaxwsBean != null) {
+                    // Check if exists with fullyQualifiedTypeName.
+                    classService = XmlUtils.findFirstElement(
+                            "/beans/bean[@class='"
+                                    + fullyQualifiedTypeName.getValue() + "']",
+                            root);
 
-	    logger.log(Level.INFO, "The endpoint '" + serviceName.getValue()
-		    + "' is already set in cxf config file.");
-	    updateEndpoint = false;
-	}
+                    if (classService != null) {
 
-	if (updateEndpoint) {
+                        Element updateClassService = classService;
+                        String idValue = classService.getAttribute("id");
 
-	    // 2) Check if exists a bean with annotation address value and
-	    // updates id attribute with annotation serviceName value.
-	    Element addressEndpoint = XmlUtils.findFirstElement(
-		    "/beans/endpoint[@address='/" + address.getValue() + "']",
-		    root);
+                        updateClassService.setAttribute("class", className
+                                .getFullyQualifiedTypeName());
 
-	    if (addressEndpoint != null) {
+                        if (!StringUtils.hasText(idValue)
+                                || !idValue.contentEquals(serviceName
+                                        .getValue().concat("Impl"))) {
+                            updateClassService.setAttribute("id", serviceName
+                                    .getValue().concat("Impl"));
 
-		// Update bean with new Id attribute.
-		Element updateAddressEndpoint = addressEndpoint;
-		updateAddressEndpoint.setAttribute("id", serviceName.getValue());
+                            logger
+                                    .log(
+                                            Level.INFO,
+                                            "The service '"
+                                                    + serviceName.getValue()
+                                                    + "' has updated 'id' attribute in cxf config file.");
+                        }
 
-		addressEndpoint.getParentNode().replaceChild(
-			updateAddressEndpoint, addressEndpoint);
-		logger.log(Level.INFO, "The endpoint bean '"
-			+ serviceName.getValue()
-			+ "' has updated 'id' attribute in cxf config file.");
-	    }
+                        classService.getParentNode().replaceChild(
+                                updateClassService, classService);
+                        logger
+                                .log(
+                                        Level.INFO,
+                                        "The service '"
+                                                + serviceName.getValue()
+                                                + "' has updated 'class' attribute in cxf config file.");
+                    }
 
-	    Element idEndpoint = XmlUtils.findFirstElement(
-		    "/beans/endpoint[@id='" + serviceName.getValue() + "']",
-		    root);
+                }
+            } else {
 
-	    // 3) Check if exists a bean with annotation serviceName value in id
-	    // attribute and updates address attribute with annotation address
-	    // value.
-	    if (idEndpoint != null) {
+                // Check if exists with class name.
+                classService = XmlUtils.findFirstElement("/beans/bean[@class='"
+                        + className.getFullyQualifiedTypeName() + "']", root);
 
-		// Update bean with new Id attribute.
-		Element updateIdEndpoint = idEndpoint;
-		updateIdEndpoint.setAttribute("address", "/".concat(serviceName
-			.getValue()));
+                if (classService != null) {
 
-		idEndpoint.getParentNode().replaceChild(updateIdEndpoint,
-			idEndpoint);
-		logger.log(Level.INFO, "The endpoint bean '"
-			+ serviceName.getValue()
-					+ "' has updated 'address' attribute in cxf config file.");
-	    }
-	    
-	    Element endpoint;
-	    // Check values to create new endpoint bean.
-	    if (addressEndpoint == null && idEndpoint == null) {
-		
-		endpoint = cxfXml.createElement("jaxws:endpoint");
-		endpoint.setAttribute("id", serviceName.getValue());
-		endpoint.setAttribute("implementor", "#".concat(
-			serviceName.getValue()).concat("Impl"));
-		endpoint
-			.setAttribute("address", "/".concat(address.getValue()));
-		root.appendChild(endpoint);
-	    }
+                    // Update bean with new Id attribute.
+                    Element updateClassService = classService;
+                    String idValue = classService.getAttribute("id");
 
-	}
+                    if (!StringUtils.hasText(idValue)
+                            || !idValue.contentEquals(serviceName.getValue()
+                                    .concat("Impl"))) {
+                        updateClassService.setAttribute("id", serviceName
+                                .getValue().concat("Impl"));
 
-	// Update configuration file.
-	if (updateService || updateEndpoint) {
-	    XmlUtils.writeXml(cxfXmlMutableFile.getOutputStream(), cxfXml);
-	}
+                        classService.getParentNode().replaceChild(
+                                updateClassService, classService);
+                        logger
+                                .log(
+                                        Level.INFO,
+                                        "The service '"
+                                                + serviceName.getValue()
+                                                + "' has updated 'id' attribute in cxf config file.");
+                    }
+                }
+            }
+
+            // 3) Check if id exists.
+            Element idService = XmlUtils.findFirstElement("/beans/bean[@id='"
+                    + serviceName.getValue().concat("Impl") + "']", root);
+
+            if (idService != null) {
+
+                // Update bean with new class attribute.
+                Element updateIdService = idService;
+                String classNameAttribute = idService.getAttribute("class");
+
+                if (!StringUtils.hasText(classNameAttribute)
+                        || !classNameAttribute.contentEquals(className
+                                .getFullyQualifiedTypeName())) {
+                    updateIdService.setAttribute("class", className
+                            .getFullyQualifiedTypeName());
+                    idService.getParentNode().replaceChild(updateIdService,
+                            idService);
+                    logger
+                            .log(
+                                    Level.INFO,
+                                    "The service '"
+                                            + serviceName.getValue()
+                                            + "' has updated 'class' attribute in cxf config file.");
+                }
+
+            }
+
+            Element bean;
+            // Check id and class values to create a new bean.
+            if (classService == null && idService == null) {
+
+                bean = cxfXml.createElement("bean");
+                bean.setAttribute("id", serviceName.getValue().concat("Impl"));
+                bean.setAttribute("class", className
+                        .getFullyQualifiedTypeName());
+
+                root.appendChild(bean);
+            }
+        }
+
+        boolean updateEndpoint = true;
+
+        // Check if endpoint exists in the configuration file.
+        Element jaxwsBean = XmlUtils.findFirstElement(
+                "/beans/endpoint[@address='/" + address.getValue()
+                        + "' and @id='" + serviceName.getValue() + "']", root);
+
+        // 1) Check if exists with id and address.
+        if (jaxwsBean != null) {
+
+            logger.log(Level.INFO, "The endpoint '" + serviceName.getValue()
+                    + "' is already set in cxf config file.");
+            updateEndpoint = false;
+        }
+
+        if (updateEndpoint) {
+
+            // 2) Check if exists a bean with annotation address value and
+            // updates id attribute with annotation serviceName value.
+            Element addressEndpoint = XmlUtils.findFirstElement(
+                    "/beans/endpoint[@address='/" + address.getValue() + "']",
+                    root);
+
+            if (addressEndpoint != null) {
+
+                // Update bean with new Id attribute.
+                Element updateAddressEndpoint = addressEndpoint;
+                String idAttribute = addressEndpoint.getAttribute("id");
+
+                if (!StringUtils.hasText(idAttribute)
+                        || !idAttribute.contentEquals(serviceName.getValue())) {
+
+                    updateAddressEndpoint.setAttribute("id", serviceName
+                            .getValue());
+                    updateAddressEndpoint.setAttribute("implementor", "#"
+                            .concat(serviceName.getValue()).concat("Impl"));
+
+                    addressEndpoint.getParentNode().replaceChild(
+                            updateAddressEndpoint, addressEndpoint);
+                    logger
+                            .log(
+                                    Level.INFO,
+                                    "The endpoint bean '"
+                                            + serviceName.getValue()
+                                            + "' has updated 'id' attribute in cxf config file.");
+
+                }
+
+            }
+
+            Element idEndpoint = XmlUtils.findFirstElement(
+                    "/beans/endpoint[@id='" + serviceName.getValue() + "']",
+                    root);
+
+            // 3) Check if exists a bean with annotation address value in id
+            // attribute and updates address attribute with annotation address
+            // value.
+            if (idEndpoint != null) {
+
+                // Update bean with new Id attribute.
+                Element updateIdEndpoint = idEndpoint;
+                
+                String addressAttribute = idEndpoint.getAttribute("address");
+
+                if (!StringUtils.hasText(addressAttribute)
+                        || !addressAttribute.contentEquals("/"
+                                .concat(address.getValue()))) {
+
+                    updateIdEndpoint.setAttribute("address", "/".concat(address
+                            .getValue()));
+
+                    idEndpoint.getParentNode().replaceChild(updateIdEndpoint,
+                            idEndpoint);
+                    logger
+                            .log(
+                                    Level.INFO,
+                                    "The endpoint bean '"
+                                            + serviceName.getValue()
+                                            + "' has updated 'address' attribute in cxf config file.");
+
+                }
+
+            }
+
+            Element endpoint;
+            // Check values to create new endpoint bean.
+            if (addressEndpoint == null && idEndpoint == null) {
+
+                endpoint = cxfXml.createElement("jaxws:endpoint");
+                endpoint.setAttribute("id", serviceName.getValue());
+                endpoint.setAttribute("implementor", "#".concat(
+                        serviceName.getValue()).concat("Impl"));
+                endpoint
+                        .setAttribute("address", "/".concat(address.getValue()));
+                root.appendChild(endpoint);
+            }
+
+        }
+
+        // Update configuration file.
+        if (updateService || updateEndpoint) {
+            XmlUtils.writeXml(cxfXmlMutableFile.getOutputStream(), cxfXml);
+        }
+
+        return updateFullyQualifiedTypeName;
     }
 
     /**
@@ -702,27 +866,27 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      */
     public String convertPackageToTargetNamespace(String packageName) {
 
-	// If there isn't package name in the class, return a blank String.
-	if (!StringUtils.hasText(packageName)) {
-	    return "";
-	}
+        // If there isn't package name in the class, return a blank String.
+        if (!StringUtils.hasText(packageName)) {
+            return "";
+        }
 
-	String[] delimitedString = StringUtils.delimitedListToStringArray(
-		packageName, ".");
-	List<String> revertedList = new ArrayList<String>();
+        String[] delimitedString = StringUtils.delimitedListToStringArray(
+                packageName, ".");
+        List<String> revertedList = new ArrayList<String>();
 
-	String revertedString;
+        String revertedString;
 
-	for (int i = delimitedString.length - 1; i >= 0; i--) {
-	    revertedList.add(delimitedString[i]);
-	}
+        for (int i = delimitedString.length - 1; i >= 0; i--) {
+            revertedList.add(delimitedString[i]);
+        }
 
-	revertedString = StringUtils.collectionToDelimitedString(revertedList,
-		".");
+        revertedString = StringUtils.collectionToDelimitedString(revertedList,
+                ".");
 
-	revertedString = "http://".concat(revertedString).concat("/");
+        revertedString = "http://".concat(revertedString).concat("/");
 
-	return revertedString;
+        return revertedString;
 
     }
 
@@ -738,117 +902,177 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      * </p>
      */
     public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName,
-	    String addressName) {
+            String addressName, String fullyQualifiedTypeName) {
 
-	Element pluginElement = XmlUtils.findFirstElement(
-		"/jaxws-plugin/plugin", XmlUtils.getConfiguration(this
-			.getClass(), "dependencies-export-jaxws-plugin.xml"));
+        // Update plugin with execution configuration.
+        String pomPath = getPomFilePath();
+        Assert.isTrue(pomPath != null,
+                "Cxf configuration file not found, export again the service.");
 
-	projectOperations.buildPluginUpdate(new Plugin(pluginElement));
+        MutableFile pomMutableFile = null;
+        Document pom;
+        try {
+            pomMutableFile = fileManager.updateFile(pomPath);
+            pom = XmlUtils.getDocumentBuilder().parse(
+                    pomMutableFile.getInputStream());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
 
-	// Update plugin with execution configuration.
-	String pomPath = getPomFilePath();
-	Assert.isTrue(pomPath != null,
-		"Cxf configuration file not found, export again the service.");
+        Element root = pom.getDocumentElement();
 
-	MutableFile pomMutableFile = null;
-	Document pom;
-	try {
-	    pomMutableFile = fileManager.updateFile(pomPath);
-	    pom = XmlUtils.getDocumentBuilder().parse(
-		    pomMutableFile.getInputStream());
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
-	}
+        Element jaxWsPlugin = XmlUtils
+                .findFirstElement(
+                        "/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-java2ws-plugin']",
+                        root);
 
-	Element root = pom.getDocumentElement();
+        if (jaxWsPlugin == null) {
 
-	Element jaxWsPlugin = XmlUtils.findFirstElement(
-			"/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-java2ws-plugin']",
-		root);
+            logger
+                    .log(Level.INFO,
+                            "Jax-Ws plugin is not defined in the pom.xml. Installing in project.");
+            // Installs jax2ws plugin.
+            installJaxwsBuildPlugin();
+        }
 
-	Assert
-		.notNull(jaxWsPlugin,
-			"Jax-Ws plugin is not defined in the pom.xml, relaunch again this command.");
+        boolean classNameChanged = false;
 
-	// Checks if already exists the execution.
-	Element serviceExecution = XmlUtils
-		.findFirstElement(
-			"/project/build/plugins/plugin/executions/execution/configuration[className='"
-				+ serviceClass.getFullyQualifiedTypeName()
-				+ "']", root);
+        if (!serviceClass.getFullyQualifiedTypeName().contentEquals(
+                fullyQualifiedTypeName)) {
+            classNameChanged = true;
+        }
 
-	if (serviceExecution != null) {
-	    logger.log(Level.INFO, "Wsdl generation with CXF plugin for '"
-		    + serviceName + " service, it's already configured.");
-	    return;
-	}
+        // Checks if already exists the execution.
+        Element serviceExecution = XmlUtils
+                .findFirstElement(
+                        "/project/build/plugins/plugin/executions/execution/configuration[className='"
+                                + serviceClass.getFullyQualifiedTypeName()
+                                + "']", root);
 
-	// Execution
-	serviceExecution = pom.createElement("execution");
+        if (serviceExecution != null) {
+            logger.log(Level.INFO, "Wsdl generation with CXF plugin for '"
+                    + serviceName + " service, it's already configured.");
+            return;
+        }
 
-	String gerenateServiceName = StringUtils.uncapitalize(serviceName);
+        if (classNameChanged) {
+            serviceExecution = XmlUtils.findFirstElement(
+                    "/project/build/plugins/plugin/executions/execution/configuration[className='"
+                            + fullyQualifiedTypeName + "']", root);
 
-	Element id = pom.createElement("id");
-	id.setTextContent("generate-gvnix-service-".concat(gerenateServiceName)
-		.concat("-wsdl"));
+            // Update with serviceClass.getFullyQualifiedTypeName().
+            if (serviceExecution != null && serviceExecution.hasChildNodes()) {
 
-	serviceExecution.appendChild(id);
-	Element phase = pom.createElement("phase");
-	phase.setTextContent("compile");
+                Node updateServiceExecution;
+                updateServiceExecution = (serviceExecution.getFirstChild() != null) ? serviceExecution
+                        .getFirstChild().getNextSibling()
+                        : null;
+                
+                while (updateServiceExecution != null) {
 
-	serviceExecution.appendChild(phase);
+                    if (updateServiceExecution.getNodeName().contentEquals(
+                            "className")) {
+                        updateServiceExecution.setTextContent(serviceClass
+                                .getFullyQualifiedTypeName());
+                        XmlUtils
+                                .writeXml(pomMutableFile.getOutputStream(), pom);
+                        logger
+                                .log(
+                                        Level.INFO,
+                                        "Wsdl generation with CXF plugin for '"
+                                                + serviceName
+                                                + " service, updated className attribute for '"
+                                                + serviceClass
+                                                        .getFullyQualifiedTypeName()
+                                                + "'.");
+                        return;
+                    }
 
-	// Configuration
-	Element configuration = pom.createElement("configuration");
-	Element className = pom.createElement("className");
-	className.setTextContent(serviceClass.getFullyQualifiedTypeName());
-	Element outputFile = pom.createElement("outputFile");
-	outputFile
-		.setTextContent("${project.basedir}/src/test/resources/generated/wsdl/"
-			.concat(addressName).concat(".wsdl"));
-	Element genWsdl = pom.createElement("genWsdl");
-	genWsdl.setTextContent("true");
-	Element verbose = pom.createElement("verbose");
-	verbose.setTextContent("true");
+                    // Check next node.
+                    updateServiceExecution = serviceExecution
+                            .getNextSibling();
 
-	configuration.appendChild(className);
-	configuration.appendChild(outputFile);
-	configuration.appendChild(genWsdl);
-	configuration.appendChild(verbose);
+                }
 
-	serviceExecution.appendChild(configuration);
+            }
+        }
 
-	// Goals
-	Element goals = pom.createElement("goals");
-	Element goal = pom.createElement("goal");
-	goal.setTextContent("java2ws");
-	goals.appendChild(goal);
+        // Execution
+        serviceExecution = pom.createElement("execution");
 
-	serviceExecution.appendChild(goals);
+        String gerenateServiceName = StringUtils.uncapitalize(serviceName);
 
-	// Checks if already exists the execution.
-	Element oldExecutions = XmlUtils.findFirstElementByName("executions",
-		jaxWsPlugin);
+        Element id = pom.createElement("id");
+        id.setTextContent("generate-gvnix-service-".concat(gerenateServiceName)
+                .concat("-wsdl"));
 
-	Element newExecutions;
+        serviceExecution.appendChild(id);
+        Element phase = pom.createElement("phase");
+        phase.setTextContent("compile");
 
-	// To Update execution definitions It must be replaced in pom.xml to
-	// maintain the format.
-	if (oldExecutions != null) {
-	    newExecutions = oldExecutions;
-	    newExecutions.appendChild(serviceExecution);
-	    oldExecutions.getParentNode().replaceChild(oldExecutions,
-		    newExecutions);
-	} else {
-	    newExecutions = pom.createElement("executions");
-	    newExecutions.appendChild(serviceExecution);
+        serviceExecution.appendChild(phase);
 
-	    jaxWsPlugin.appendChild(newExecutions);
-	}
+        // Configuration
+        Element configuration = pom.createElement("configuration");
+        Element className = pom.createElement("className");
+        className.setTextContent(serviceClass.getFullyQualifiedTypeName());
+        Element outputFile = pom.createElement("outputFile");
+        outputFile
+                .setTextContent("${project.basedir}/src/test/resources/generated/wsdl/"
+                        .concat(addressName).concat(".wsdl"));
+        Element genWsdl = pom.createElement("genWsdl");
+        genWsdl.setTextContent("true");
+        Element verbose = pom.createElement("verbose");
+        verbose.setTextContent("true");
 
+        configuration.appendChild(className);
+        configuration.appendChild(outputFile);
+        configuration.appendChild(genWsdl);
+        configuration.appendChild(verbose);
 
-	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+        serviceExecution.appendChild(configuration);
+
+        // Goals
+        Element goals = pom.createElement("goals");
+        Element goal = pom.createElement("goal");
+        goal.setTextContent("java2ws");
+        goals.appendChild(goal);
+
+        serviceExecution.appendChild(goals);
+
+        // Checks if already exists the execution.
+        Element oldExecutions = XmlUtils.findFirstElementByName("executions",
+                jaxWsPlugin);
+
+        Element newExecutions;
+
+        // To Update execution definitions It must be replaced in pom.xml to
+        // maintain the format.
+        if (oldExecutions != null) {
+            newExecutions = oldExecutions;
+            newExecutions.appendChild(serviceExecution);
+            oldExecutions.getParentNode().replaceChild(oldExecutions,
+                    newExecutions);
+        } else {
+            newExecutions = pom.createElement("executions");
+            newExecutions.appendChild(serviceExecution);
+
+            jaxWsPlugin.appendChild(newExecutions);
+        }
+
+        XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void installJaxwsBuildPlugin() {
+        Element pluginElement = XmlUtils.findFirstElement(
+                "/jaxws-plugin/plugin", XmlUtils.getConfiguration(this
+                        .getClass(), "dependencies-export-jaxws-plugin.xml"));
+
+        projectOperations.buildPluginUpdate(new Plugin(pluginElement));
+
     }
 
     /**
@@ -861,71 +1085,72 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      */
     public void addImportLocation(String wsdlLocation) {
 
-	// Get plugin template
-	Element pluginElement = XmlUtils.findFirstElement(
-		"/codegen-plugin/plugin", XmlUtils.getConfiguration(this
-			.getClass(), "dependencies-import-codegen-plugin.xml"));
+        // Get plugin template
+        Element pluginElement = XmlUtils.findFirstElement(
+                "/codegen-plugin/plugin", XmlUtils.getConfiguration(this
+                        .getClass(), "dependencies-import-codegen-plugin.xml"));
 
-	// Add plugin
-	projectOperations.buildPluginUpdate(new Plugin(pluginElement));
+        // Add plugin
+        projectOperations.buildPluginUpdate(new Plugin(pluginElement));
 
-	// Get pom.xml
-	String pomPath = getPomFilePath();
-	Assert.notNull(pomPath, "pom.xml configuration file not found.");
+        // Get pom.xml
+        String pomPath = getPomFilePath();
+        Assert.notNull(pomPath, "pom.xml configuration file not found.");
 
-	// Get a mutable pom.xml reference to modify it
-	MutableFile pomMutableFile = null;
-	Document pom;
-	try {
-	    pomMutableFile = fileManager.updateFile(pomPath);
-	    pom = XmlUtils.getDocumentBuilder().parse(
-		    pomMutableFile.getInputStream());
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
-	}
+        // Get a mutable pom.xml reference to modify it
+        MutableFile pomMutableFile = null;
+        Document pom;
+        try {
+            pomMutableFile = fileManager.updateFile(pomPath);
+            pom = XmlUtils.getDocumentBuilder().parse(
+                    pomMutableFile.getInputStream());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
 
-	Element root = pom.getDocumentElement();
+        Element root = pom.getDocumentElement();
 
-	// Get plugin element
-	Element codegenWsPlugin = XmlUtils.findFirstElement(
-		"/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']",
-		root);
+        // Get plugin element
+        Element codegenWsPlugin = XmlUtils
+                .findFirstElement(
+                        "/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']",
+                        root);
 
-	// If plugin element not exists, message error
-	Assert
-		.notNull(codegenWsPlugin,
-			"Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+        // If plugin element not exists, message error
+        Assert
+                .notNull(codegenWsPlugin,
+                        "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
-	// Access executions > execution > configuration > wsdlOptions element.
-	// Configuration and wsdlOptions are created if not exists.
-	Element executions = XmlUtils.findFirstElementByName("executions",
-		codegenWsPlugin);
-	Element execution = XmlUtils.findFirstElementByName("execution",
-		executions);
-	Element configuration = XmlUtils.findFirstElementByName("configuration",
-		execution);
-	if (configuration == null) {
-	
-	    configuration = pom.createElement("configuration");
-	    execution.appendChild(configuration);
-	}
-	Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
-		configuration);
-	if (wsdlOptions == null) {
-		
-	    wsdlOptions = pom.createElement("wsdlOptions");
-	    configuration.appendChild(wsdlOptions);
-	}
-	
-	// Create new wsdl element and append it to the XML tree
-	Element wsdlOption = pom.createElement("wsdlOption");
-	Element wsdl = pom.createElement("wsdl");
-	wsdl.setTextContent(wsdlLocation);
-	wsdlOption.appendChild(wsdl);
-	wsdlOptions.appendChild(wsdlOption);
-	
-	// Write new XML to disk
-	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+        // Access executions > execution > configuration > wsdlOptions element.
+        // Configuration and wsdlOptions are created if not exists.
+        Element executions = XmlUtils.findFirstElementByName("executions",
+                codegenWsPlugin);
+        Element execution = XmlUtils.findFirstElementByName("execution",
+                executions);
+        Element configuration = XmlUtils.findFirstElementByName(
+                "configuration", execution);
+        if (configuration == null) {
+
+            configuration = pom.createElement("configuration");
+            execution.appendChild(configuration);
+        }
+        Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
+                configuration);
+        if (wsdlOptions == null) {
+
+            wsdlOptions = pom.createElement("wsdlOptions");
+            configuration.appendChild(wsdlOptions);
+        }
+
+        // Create new wsdl element and append it to the XML tree
+        Element wsdlOption = pom.createElement("wsdlOption");
+        Element wsdl = pom.createElement("wsdl");
+        wsdl.setTextContent(wsdlLocation);
+        wsdlOption.appendChild(wsdl);
+        wsdlOptions.appendChild(wsdlOption);
+
+        // Write new XML to disk
+        XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
     }
 
     /**
@@ -940,27 +1165,26 @@ public class ServiceLayerWsConfigServiceImpl implements ServiceLayerWsConfigServ
      */
     private String getPomFilePath() {
 
-	// Project ID
-	String prjId = ProjectMetadata.getProjectIdentifier();
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(prjId);
-	Assert.isTrue(projectMetadata != null, "Project metadata required");
+        // Project ID
+        String prjId = ProjectMetadata.getProjectIdentifier();
+        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+                .get(prjId);
+        Assert.isTrue(projectMetadata != null, "Project metadata required");
 
-	String pomFileName = "pom.xml";
+        String pomFileName = "pom.xml";
 
-	// Checks for pom.xml
-	String pomPath = pathResolver.getIdentifier(Path.ROOT,
-		pomFileName);
+        // Checks for pom.xml
+        String pomPath = pathResolver.getIdentifier(Path.ROOT, pomFileName);
 
-	boolean pomInstalled = fileManager.exists(pomPath);
+        boolean pomInstalled = fileManager.exists(pomPath);
 
-	if (pomInstalled) {
+        if (pomInstalled) {
 
-	    return pomPath;
-	} else {
+            return pomPath;
+        } else {
 
-	    return null;
-	}
+            return null;
+        }
     }
 
 }

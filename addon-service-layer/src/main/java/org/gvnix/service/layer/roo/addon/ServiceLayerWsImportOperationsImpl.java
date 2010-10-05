@@ -125,7 +125,9 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
 	List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
 	annotationAttributeValues.add(new StringAttributeValue(
 		new JavaSymbolName("wsdlLocation"), wsdlLocation));
-	annotationsService.addJavaTypeAnnotation(serviceClass, GvNIXWebServiceProxy.class.getName(), annotationAttributeValues);
+	annotationsService.addJavaTypeAnnotation(serviceClass,
+		GvNIXWebServiceProxy.class.getName(),
+		annotationAttributeValues, false);
 	
 	// Add GvNixAnnotations to the project.
 	annotationsService.addGvNIXAnnotationsDependency();

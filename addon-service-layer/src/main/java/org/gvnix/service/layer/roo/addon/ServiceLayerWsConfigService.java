@@ -63,8 +63,10 @@ public interface ServiceLayerWsConfigService {
      *            to be published as Web Service.
      * @param annotationMetadata
      *            with all necessary values to define a Web Service.
+     * 
+     * @return true if className has changed to update annotation.
      */
-    public void exportClass(JavaType className,
+    public boolean exportClass(JavaType className,
 	    AnnotationMetadata annotationMetadata);
 
     /**
@@ -77,8 +79,8 @@ public interface ServiceLayerWsConfigService {
     public String convertPackageToTargetNamespace(String packageName);
 
     /**
-     * Create Jax-WS plugin configuration in pom.xml to generate the wsdl from a
-     * Service.
+     * Configure Web Service class to generate wsdl contract in jax2ws plugin in
+     * pom.xml.
      * 
      * @param serviceClass
      *            Service to generate Wsdl.
@@ -86,9 +88,11 @@ public interface ServiceLayerWsConfigService {
      *            Service name for wsdl file.
      * @param addressName
      *            Address to access the service.
+     * @param fullyQualifiedTypeName
+     *            class name location defined in annotation.
      */
     public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName,
-	    String addressName);
+	    String addressName, String fullyQualifiedTypeName);
     
     /**
      * Add a wsdl location to import.
@@ -97,5 +101,9 @@ public interface ServiceLayerWsConfigService {
      *            WSDL file location.
      */
     public void addImportLocation(String wsdlLocation);
-    
+
+    /**
+     * Create Jax-WS plugin configuration in pom.xml.
+     */
+    public void installJaxwsBuildPlugin();
 }

@@ -33,8 +33,11 @@ public interface AnnotationsService {
      *            Annotation class full name, null if not
      * @param annotationAttributeValues
      *            Attribute list for the annotation
+     * @param forceUpdate
+     *            overrides annotation value if is true.
      */
     public void addJavaTypeAnnotation(JavaType serviceClass, String annotation,
-	    List<AnnotationAttributeValue<?>> annotationAttributeValues);
+	    List<AnnotationAttributeValue<?>> annotationAttributeValues,
+	    boolean forceUpdate);
 
 }

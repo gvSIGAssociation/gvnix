@@ -229,6 +229,7 @@ public class ServiceLayerWsConfigServiceImplTest {
     public void testConvertPackageToTargetNamespace() throws Exception {
 
 	String packageName = "org.gvnix.service.layer.roo.addon";
+	String targetNamespaceExpected = "http://addon.roo.layer.service.gvnix.org/";
 
 	String targetNamespaceResult;
 	/*
@@ -240,6 +241,10 @@ public class ServiceLayerWsConfigServiceImplTest {
 	Assert.isTrue(targetNamespaceResult != null
 		&& targetNamespaceResult.length() != 0,
 		"The method doesn't work properly.");
+
+	assertTrue("The namespace is not well generated", targetNamespaceResult
+		.contains(targetNamespaceExpected));
+
     }
 
 }

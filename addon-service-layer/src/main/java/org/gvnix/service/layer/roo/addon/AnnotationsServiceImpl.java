@@ -64,7 +64,8 @@ public class AnnotationsServiceImpl implements AnnotationsService {
      * {@inheritDoc}
      */
     public void addJavaTypeAnnotation(JavaType serviceClass, String annotation,
-	    List<AnnotationAttributeValue<?>> annotationAttributeValues) {
+	    List<AnnotationAttributeValue<?>> annotationAttributeValues,
+	    boolean forceUpdate) {
 
 	// Load class or interface details.
 	// If class not found an exception will be raised.
@@ -80,10 +81,22 @@ public class AnnotationsServiceImpl implements AnnotationsService {
 	// The annotation can't be updated.
 	if (javaParserService.isAnnotationIntroduced(annotation,
 		mutableTypeDetails)) {
-	    logger.log(Level.INFO, "The annotation " + annotation
-		    + " is already defined in '"
-		    + serviceClass.getFullyQualifiedTypeName() + "'.");
-	    return;
+
+	    if (forceUpdate) {
+		logger.log(Level.INFO, "The annotation " + annotation
+			+ " is already defined in '"
+			+ serviceClass.getFullyQualifiedTypeName()
+			+ "' and will be updated.");
+
+		mutableTypeDetails
+			.removeTypeAnnotation(new JavaType(annotation));
+	    } else {
+		logger.log(Level.INFO, "The annotation " + annotation
+			+ " is already defined in '"
+			+ serviceClass.getFullyQualifiedTypeName() + "'.");
+		return;
+
+	    }
 	}
 	    
 	// Add annotation

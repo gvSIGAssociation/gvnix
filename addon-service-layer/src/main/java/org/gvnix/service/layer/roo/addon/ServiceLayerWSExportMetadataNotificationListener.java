@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,14 +26,10 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.beaninfo.BeanInfoMetadata;
-import org.springframework.roo.addon.entity.EntityMetadata;
-import org.springframework.roo.addon.mvc.jsp.JspMetadata;
-import org.springframework.roo.addon.web.mvc.controller.WebScaffoldMetadata;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.metadata.*;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
@@ -59,6 +56,9 @@ public class ServiceLayerWSExportMetadataNotificationListener implements
 
     @Reference
     private MetadataService metadataService;
+
+    @Reference
+    private AnnotationsService annotationsService;
 
     protected void activate(ComponentContext context) {
 	metadataDependencyRegistry.addNotificationListener(this);
@@ -87,8 +87,54 @@ public class ServiceLayerWSExportMetadataNotificationListener implements
 		    "Check correct format to export the web service class: '"
 			    + governorTypeDetails.getName() + "'");
 
-	    serviceLayerWsConfigService.exportClass(governorTypeDetails
+	    // Update CXF XML
+	    boolean updateGvNIXWebServiceAnnotation = serviceLayerWsConfigService
+		    .exportClass(governorTypeDetails
 		    .getName(), gvNIXWebServiceAnnotation);
+
+	    // Define Jax-WS plugin and creates and execution build for this
+	    // service
+	    // to generate the wsdl file to check errors before deploy.
+
+	    // Check values to generate Jax2Ws build plugin.
+	    StringAttributeValue serviceName = (StringAttributeValue) gvNIXWebServiceAnnotation
+		    .getAttribute(new JavaSymbolName("serviceName"));
+
+	    StringAttributeValue address = (StringAttributeValue) gvNIXWebServiceAnnotation
+		    .getAttribute(new JavaSymbolName("address"));
+
+	    StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) gvNIXWebServiceAnnotation
+            .getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
+
+            serviceLayerWsConfigService.jaxwsBuildPlugin(governorTypeDetails
+                    .getName(), serviceName.getValue(), address.getValue(),
+                    fullyQualifiedTypeName.getValue());
+
+	    // Update Annotation because Java Class or package has changed.
+	    if (updateGvNIXWebServiceAnnotation) {
+
+		List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+		gvNixAnnotationAttributes
+			.add((StringAttributeValue) gvNIXWebServiceAnnotation
+				.getAttribute(new JavaSymbolName("name")));
+		gvNixAnnotationAttributes
+			.add((StringAttributeValue) gvNIXWebServiceAnnotation
+				.getAttribute(new JavaSymbolName(
+					"targetNamespace")));
+		gvNixAnnotationAttributes
+			.add((StringAttributeValue) gvNIXWebServiceAnnotation
+				.getAttribute(new JavaSymbolName("serviceName")));
+		gvNixAnnotationAttributes
+			.add((StringAttributeValue) gvNIXWebServiceAnnotation
+				.getAttribute(new JavaSymbolName("address")));
+		gvNixAnnotationAttributes.add(new StringAttributeValue(
+			new JavaSymbolName("fullyQualifiedTypeName"),
+			governorTypeDetails.getName()
+				.getFullyQualifiedTypeName()));
+		annotationsService.addJavaTypeAnnotation(governorTypeDetails
+			.getName(), GvNIXWebService.class.getName(),
+			gvNixAnnotationAttributes, true);
+	    }
 
 	}
 
