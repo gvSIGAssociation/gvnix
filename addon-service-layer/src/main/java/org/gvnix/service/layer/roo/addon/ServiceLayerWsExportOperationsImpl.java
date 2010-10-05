@@ -242,7 +242,7 @@ public class ServiceLayerWsExportOperationsImpl implements
             resultName = "return";
         }
 
-        // TODO: Check if method throws an Exception.
+        // Check if method throws an Exception.
         checkMethodExceptions(serviceClass, methodName);
 
         // Checks correct namespace format.

@@ -71,11 +71,53 @@ public class ServiceLayerWSExportExceptionMetadata extends
 
 	if (annotationMetadata != null) {
 
-	    // Add @javax.jws.WebFault annotation to ITD.
-	    AnnotationMetadata webFaultAnnotationMetadata = getTypeAnnotation(annotationMetadata);
-	    if (webFaultAnnotationMetadata!= null) {
-		builder.addTypeAnnotation(webFaultAnnotationMetadata);
-	    }
+            // Check if are correct annotation attributes.
+            boolean correctNamespace = false;
+            boolean correctFaultBean = false;
+
+            // Check targetNamespace.
+	    StringAttributeValue namespaceAttributeValue = (StringAttributeValue)annotationMetadata.getAttribute(new JavaSymbolName("targetNamespace"));
+	    
+            correctNamespace = (namespaceAttributeValue != null)
+                    && checkNamespaceFormat(namespaceAttributeValue.getValue());
+
+            if (!correctNamespace) {
+                logger
+                        .log(
+                                Level.WARNING,
+                                "@GvNIXWebFault annotation attribute value 'targetNamespace' in '"
+                                        + governorTypeDetails.getName()
+                                        + "' must be well formed.\ni.e.: http://my.example.com/");
+            }
+
+            // Check faultBean.
+            StringAttributeValue faultBeanAttributeValue = (StringAttributeValue) annotationMetadata
+                    .getAttribute(new JavaSymbolName("faultBean"));
+
+            correctFaultBean = (faultBeanAttributeValue != null)
+                    && governorTypeDetails.getName()
+                    .getFullyQualifiedTypeName().contentEquals(
+                            faultBeanAttributeValue.getValue());
+            
+            if (!correctFaultBean) {
+                logger
+                        .log(
+                                Level.WARNING,
+                                "@GvNIXWebFault annotation attribute value 'faultBean' in '"
+                                        + governorTypeDetails.getName()
+                                        + "' must have the same value that class complete name.\ni.e.: '"
+                                        + governorTypeDetails.getName()
+                                                .getFullyQualifiedTypeName()
+                                        + "'");
+            }
+
+            if (correctNamespace && correctFaultBean) {
+                // Add @javax.jws.WebFault annotation to ITD.
+                AnnotationMetadata webFaultAnnotationMetadata = getTypeAnnotation(annotationMetadata);
+                if (webFaultAnnotationMetadata != null) {
+                    builder.addTypeAnnotation(webFaultAnnotationMetadata);
+                }
+            }
 
 	}
 
@@ -192,6 +234,21 @@ public class ServiceLayerWSExportExceptionMetadata extends
 		.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
 
 	return result == null;
+    }
+
+    /**
+     * Checks correct namespace URI format. Suffix 'http://'.
+     * 
+     * @param namespace
+     *            string to check as correct namespace.
+     * 
+     * @return true if has correct URI format.
+     */
+    private boolean checkNamespaceFormat(String namespace) {
+        if (StringUtils.hasText(namespace)) {
+            return StringUtils.startsWithIgnoreCase(namespace, "http://");
+        }
+        return false;
     }
 
     public static String getMetadataIdentiferType() {
