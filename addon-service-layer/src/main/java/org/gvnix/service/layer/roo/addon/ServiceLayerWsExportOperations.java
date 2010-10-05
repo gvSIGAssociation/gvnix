@@ -170,7 +170,7 @@ public interface ServiceLayerWsExportOperations {
      * Check id JavaType is allowed type to be used in a service operation.
      * 
      * @param javaType
-     *            of the parameter.
+     *            of the parameter. Can't be null.
      * @param methodParameterType
      *            return or input parameters to check.
      * @return true if it's all correct.

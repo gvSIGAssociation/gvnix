@@ -50,10 +50,10 @@ import com.sun.org.apache.xerces.internal.impl.XMLEntityManager.Entity;
 @Component
 @Service
 public class ServiceLayerWsExportOperationsImpl implements
-	ServiceLayerWsExportOperations {
+        ServiceLayerWsExportOperations {
 
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerWsExportOperations.class.getName());
+            .getLogger(ServiceLayerWsExportOperations.class.getName());
 
     @Reference
     private FileManager fileManager;
@@ -75,12 +75,12 @@ public class ServiceLayerWsExportOperationsImpl implements
     private static final Set<String> notAllowedCollectionTypes = new HashSet<String>();
 
     static {
-	notAllowedCollectionTypes.add(Set.class.getName());
-	notAllowedCollectionTypes.add(Map.class.getName());
-	notAllowedCollectionTypes.add(HashMap.class.getName());
-	notAllowedCollectionTypes.add(TreeMap.class.getName());
-	notAllowedCollectionTypes.add(Vector.class.getName());
-	notAllowedCollectionTypes.add(HashSet.class.getName());
+        notAllowedCollectionTypes.add(Set.class.getName());
+        notAllowedCollectionTypes.add(Map.class.getName());
+        notAllowedCollectionTypes.add(HashMap.class.getName());
+        notAllowedCollectionTypes.add(TreeMap.class.getName());
+        notAllowedCollectionTypes.add(Vector.class.getName());
+        notAllowedCollectionTypes.add(HashSet.class.getName());
     }
 
     /*
@@ -91,19 +91,19 @@ public class ServiceLayerWsExportOperationsImpl implements
      */
     public boolean isProjectAvailable() {
 
-	if (getPathResolver() == null) {
+        if (getPathResolver() == null) {
 
-	    return false;
-	}
+            return false;
+        }
 
-	String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		"/WEB-INF/web.xml");
-	if (!fileManager.exists(webXmlPath)) {
+        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "/WEB-INF/web.xml");
+        if (!fileManager.exists(webXmlPath)) {
 
-	    return false;
-	}
+            return false;
+        }
 
-	return true;
+        return true;
     }
 
     /**
@@ -111,14 +111,14 @@ public class ServiceLayerWsExportOperationsImpl implements
      */
     private PathResolver getPathResolver() {
 
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(ProjectMetadata.getProjectIdentifier());
-	if (projectMetadata == null) {
+        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+                .get(ProjectMetadata.getProjectIdentifier());
+        if (projectMetadata == null) {
 
-	    return null;
-	}
+            return null;
+        }
 
-	return projectMetadata.getPathResolver();
+        return projectMetadata.getPathResolver();
     }
 
     /**
@@ -131,71 +131,71 @@ public class ServiceLayerWsExportOperationsImpl implements
      * 
      */
     public void exportService(JavaType serviceClass, String serviceName,
-	    String portTypeName, String targetNamespace, String addressName) {
+            String portTypeName, String targetNamespace, String addressName) {
 
-	// Checks if Cxf is configured in the project and installs it if it's
-	// not available.
-	serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
+        // Checks if Cxf is configured in the project and installs it if it's
+        // not available.
+        serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
 
-	String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
-		serviceClass.getFullyQualifiedTypeName().replace('.', '/')
-			.concat(".java"));
+        String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+                serviceClass.getFullyQualifiedTypeName().replace('.', '/')
+                        .concat(".java"));
 
-	if (!fileManager.exists(fileLocation)) {
-	    logger.log(Level.INFO, "Crea la nueva clase de servicio: "
-		    + serviceClass.getSimpleTypeName()
-		    + " para publicarla como servicio web.");
-	    // Create service class with Service Annotation.
-	    javaParserService.createServiceClass(serviceClass);
+        if (!fileManager.exists(fileLocation)) {
+            logger.log(Level.INFO, "Crea la nueva clase de servicio: "
+                    + serviceClass.getSimpleTypeName()
+                    + " para publicarla como servicio web.");
+            // Create service class with Service Annotation.
+            javaParserService.createServiceClass(serviceClass);
 
-	}
+        }
 
-	// Checks serviceName parameter to publish the web service.
-	serviceName = StringUtils.hasText(serviceName) ? serviceName
-		: serviceClass.getSimpleTypeName();
+        // Checks serviceName parameter to publish the web service.
+        serviceName = StringUtils.hasText(serviceName) ? serviceName
+                : serviceClass.getSimpleTypeName();
 
-	// Checks correct namespace format.
-	checkNamespaceFormat(targetNamespace);
-	Assert
-		.isTrue(
-			checkNamespaceFormat(targetNamespace),
-			"The namespace for Target Namespace has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+        // Checks correct namespace format.
+        checkNamespaceFormat(targetNamespace);
+        Assert
+                .isTrue(
+                        checkNamespaceFormat(targetNamespace),
+                        "The namespace for Target Namespace has to start with 'http://'.\ni.e.: http://name.of.namespace/");
 
-	// Namespace for the web service.
-	targetNamespace = StringUtils.hasText(targetNamespace) ? targetNamespace
-		: serviceLayerWsConfigService
-		    .convertPackageToTargetNamespace(serviceClass.getPackage()
-			    .toString());
+        // Namespace for the web service.
+        targetNamespace = StringUtils.hasText(targetNamespace) ? targetNamespace
+                : serviceLayerWsConfigService
+                        .convertPackageToTargetNamespace(serviceClass
+                                .getPackage().toString());
 
-	// Check address name not blank and set service name if not defined.
-	addressName = StringUtils.hasText(addressName) ? StringUtils
-		.capitalize(addressName) : serviceClass.getSimpleTypeName();
+        // Check address name not blank and set service name if not defined.
+        addressName = StringUtils.hasText(addressName) ? StringUtils
+                .capitalize(addressName) : serviceClass.getSimpleTypeName();
 
-	// Define @GvNIXWebService annotation and attributes.
-	// Check port type attribute name format and add attributes to a list.
-	List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-	portTypeName = StringUtils.hasText(portTypeName) ? portTypeName
-		: serviceName.concat("PortType");
-	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("name"), portTypeName));
-	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("targetNamespace"), targetNamespace));
-	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("serviceName"), serviceName));
-	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("address"), addressName));
-	gvNixAnnotationAttributes.add(new StringAttributeValue(
-		new JavaSymbolName("fullyQualifiedTypeName"), serviceClass
-			.getFullyQualifiedTypeName()));
-	annotationsService.addJavaTypeAnnotation(serviceClass,
-		GvNIXWebService.class.getName(), gvNixAnnotationAttributes,
-		false);
+        // Define @GvNIXWebService annotation and attributes.
+        // Check port type attribute name format and add attributes to a list.
+        List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        portTypeName = StringUtils.hasText(portTypeName) ? portTypeName
+                : serviceName.concat("PortType");
+        gvNixAnnotationAttributes.add(new StringAttributeValue(
+                new JavaSymbolName("name"), portTypeName));
+        gvNixAnnotationAttributes.add(new StringAttributeValue(
+                new JavaSymbolName("targetNamespace"), targetNamespace));
+        gvNixAnnotationAttributes.add(new StringAttributeValue(
+                new JavaSymbolName("serviceName"), serviceName));
+        gvNixAnnotationAttributes.add(new StringAttributeValue(
+                new JavaSymbolName("address"), addressName));
+        gvNixAnnotationAttributes.add(new StringAttributeValue(
+                new JavaSymbolName("fullyQualifiedTypeName"), serviceClass
+                        .getFullyQualifiedTypeName()));
+        annotationsService.addJavaTypeAnnotation(serviceClass,
+                GvNIXWebService.class.getName(), gvNixAnnotationAttributes,
+                false);
 
-	// Installs jax2ws plugin in project.
-	serviceLayerWsConfigService.installJaxwsBuildPlugin();
+        // Installs jax2ws plugin in project.
+        serviceLayerWsConfigService.installJaxwsBuildPlugin();
 
-	// Add GvNixAnnotations to the project.
-	annotationsService.addGvNIXAnnotationsDependency();
+        // Add GvNixAnnotations to the project.
+        annotationsService.addGvNIXAnnotationsDependency();
     }
 
     /**
@@ -203,70 +203,70 @@ public class ServiceLayerWsExportOperationsImpl implements
      * 
      */
     public void exportOperation(JavaType serviceClass,
-	    JavaSymbolName methodName, String operationName, String resultName,
-	    String resultNamespace, String responseWrapperName,
-	    String responseWrapperNamespace, String requestWrapperName,
-	    String requestWrapperNamespace) {
+            JavaSymbolName methodName, String operationName, String resultName,
+            String resultNamespace, String responseWrapperName,
+            String responseWrapperNamespace, String requestWrapperName,
+            String requestWrapperNamespace) {
 
-	Assert.notNull(serviceClass, "Java type required");
-	Assert.notNull(methodName, "Operation name required");
+        Assert.notNull(serviceClass, "Java type required");
+        Assert.notNull(methodName, "Operation name required");
 
-	// Check if serviceClass is a Web Service. If doesn't exist shows an
-	// error.
-	if (!isWebServiceClass(serviceClass)) {
-	    // Export as a service.
-	    exportService(serviceClass, null, null, null, null);
-	}
+        // Check if serviceClass is a Web Service. If doesn't exist shows an
+        // error.
+        if (!isWebServiceClass(serviceClass)) {
+            // Export as a service.
+            exportService(serviceClass, null, null, null, null);
+        }
 
-	// Check if method exists in the class.
-	Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName,
-		GvNIXWebMethod.class.getName()), "The method: '" + methodName
-		+ " doesn't exists in the class '"
-		+ serviceClass.getFullyQualifiedTypeName() + "'.");
+        // Check if method exists in the class.
+        Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName,
+                GvNIXWebMethod.class.getName()), "The method: '" + methodName
+                + " doesn't exists in the class '"
+                + serviceClass.getFullyQualifiedTypeName() + "'.");
 
-	// Check authorized JavaTypes in operation.
-	checkAuthorizedJavaTypesInOperation(serviceClass, methodName);
+        // Check authorized JavaTypes in operation.
+        checkAuthorizedJavaTypesInOperation(serviceClass, methodName);
 
-	// Check if method has return type.
-	JavaType returnType = returnJavaType(serviceClass, methodName);
+        // Check if method has return type.
+        JavaType returnType = returnJavaType(serviceClass, methodName);
 
-	Assert.isTrue(returnType != null, "The method: '" + methodName
-		+ " doesn't exists in the class '"
-		+ serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert.isTrue(returnType != null, "The method: '" + methodName
+                + " doesn't exists in the class '"
+                + serviceClass.getFullyQualifiedTypeName() + "'.");
 
-	if (returnType.equals(JavaType.VOID_OBJECT)
-		|| returnType.equals(JavaType.VOID_PRIMITIVE)) {
-	    resultName = null;
-	} else if (!StringUtils.hasText(resultName)) {
+        if (returnType.equals(JavaType.VOID_OBJECT)
+                || returnType.equals(JavaType.VOID_PRIMITIVE)) {
+            resultName = null;
+        } else if (!StringUtils.hasText(resultName)) {
 
-	    resultName = "return";
-	}
+            resultName = "return";
+        }
 
-	// TODO: Check if method throws an Exception.
-	// checkMethodExceptions(serviceClass, methodName);
+        // TODO: Check if method throws an Exception.
+        checkMethodExceptions(serviceClass, methodName);
 
-	// Checks correct namespace format.
-	Assert
-		.isTrue(
-			checkNamespaceFormat(resultNamespace),
-			"The namespace for result has to start with 'http://'.\ni.e.: http://name.of.namespace/");
-	Assert
-		.isTrue(
-			checkNamespaceFormat(requestWrapperNamespace),
-			"The namespace for Request Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
-	Assert
-		.isTrue(
-			checkNamespaceFormat(responseWrapperNamespace),
-			"The namespace for Response Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+        // Checks correct namespace format.
+        Assert
+                .isTrue(
+                        checkNamespaceFormat(resultNamespace),
+                        "The namespace for result has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+        Assert
+                .isTrue(
+                        checkNamespaceFormat(requestWrapperNamespace),
+                        "The namespace for Request Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+        Assert
+                .isTrue(
+                        checkNamespaceFormat(responseWrapperNamespace),
+                        "The namespace for Response Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
 
-	// Create annotations to selected Method
-	List<AnnotationMetadata> annotationMetadataUpdateList = getAnnotationsToExportOperation(
-		serviceClass, methodName, operationName, resultName,
-		resultNamespace, responseWrapperName, responseWrapperNamespace,
-		requestWrapperName, requestWrapperNamespace);
+        // Create annotations to selected Method
+        List<AnnotationMetadata> annotationMetadataUpdateList = getAnnotationsToExportOperation(
+                serviceClass, methodName, operationName, resultName,
+                resultNamespace, responseWrapperName, responseWrapperNamespace,
+                requestWrapperName, requestWrapperNamespace);
 
-	javaParserService.updateMethodAnnotations(serviceClass, methodName,
-		annotationMetadataUpdateList);
+        javaParserService.updateMethodAnnotations(serviceClass, methodName,
+                annotationMetadataUpdateList);
 
     }
 
@@ -294,79 +294,117 @@ public class ServiceLayerWsExportOperationsImpl implements
      * </ul>
      */
     public boolean checkMethodExceptions(JavaType serviceClass,
-	    JavaSymbolName methodName) {
+            JavaSymbolName methodName) {
 
-	MethodMetadata methodToCheck = javaParserService
-		.getMethodByNameInClass(serviceClass, methodName);
+        MethodMetadata methodToCheck = javaParserService
+                .getMethodByNameInClass(serviceClass, methodName);
 
-	Assert.isTrue(methodToCheck != null, "The method: '" + methodName
-		+ " doesn't exists in the class '"
-		+ serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert.isTrue(methodToCheck != null, "The method: '" + methodName
+                + " doesn't exists in the class '"
+                + serviceClass.getFullyQualifiedTypeName() + "'.");
 
-	List<JavaType> throwsTypes = methodToCheck.getThrowsTypes();
+        List<JavaType> throwsTypes = methodToCheck.getThrowsTypes();
 
-	String fileLocation;
+        String fileLocation;
 
-	boolean extendsThrowable = true;
+        boolean extendsThrowable = true;
 
-	for (JavaType throwType : throwsTypes) {
+        for (JavaType throwType : throwsTypes) {
 
-	    extendsThrowable = extendsThrowable(throwType);
+            extendsThrowable = checkExceptionExtension(throwType);
 
+            Assert
+                    .isTrue(
+                            extendsThrowable,
+                            "The '"
+                                    + throwType.getFullyQualifiedTypeName()
+                                    + "' class doesn't extend from 'java.lang.Throwable' in method '"
+                                    + methodName
+                                    + "' from class '"
+                                    + serviceClass.getFullyQualifiedTypeName()
+                                    + "'.\nIt can't be used as Exception in method to be thrown.");
 
-	    Assert
-		    .isTrue(
-			    extendsThrowable,
-			    "The '"
-				    + throwType.getFullyQualifiedTypeName()
-				    + "' class doesn't extend from 'java.lang.Throwable' in method '"
-				    + methodName + "' from class '"
-				    + serviceClass.getFullyQualifiedTypeName()
-				    + "'.\nIt can't be used as Exception in method to be thrown.");
+            fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+                    throwType.getFullyQualifiedTypeName().replace('.', '/')
+                            .concat(".java"));
 
-	    fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
-		    throwType.getFullyQualifiedTypeName().replace('.', '/')
-			    .concat(".java"));
+            // Exception defined in the project or imported.
+            if (fileManager.exists(fileLocation)) {
 
-	    // Exception defined in the project or imported.
-	    if (fileManager.exists(fileLocation)) {
+                List<AnnotationAttributeValue<?>> gvNIXWebFaultAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+                gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
+                        new JavaSymbolName("name"), StringUtils
+                                .uncapitalize(throwType.getSimpleTypeName())));
+                gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
+                        new JavaSymbolName("targetNamespace"),
+                        serviceLayerWsConfigService
+                                .convertPackageToTargetNamespace(throwType
+                                        .getPackage().toString())));
+                gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
+                        new JavaSymbolName("faultBean"), throwType
+                                .getFullyQualifiedTypeName()));
 
-		// Load class or interface details.
-		// If class not found an exception will be raised.
-		ClassOrInterfaceTypeDetails typeDetails = classpathOperations
-			.getClassOrInterface(throwType);
+                // Define annotation.
+                annotationsService.addJavaTypeAnnotation(throwType,
+                        GvNIXWebFault.class.getName(),
+                        gvNIXWebFaultAnnotationAttributes, false);
 
-		// Check and get mutable instance
-		Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-			typeDetails, "Can't modify " + typeDetails.getName());
-		MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) typeDetails;
+            } else {
+                // TODO: Add definition to AspectJ file.
+            }
 
-		List<AnnotationAttributeValue<?>> gvNIXWebFaultAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-		gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-			new JavaSymbolName("name"), StringUtils
-				.uncapitalize(throwType.getSimpleTypeName())));
-		gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-			new JavaSymbolName("targetNamespace"), serviceLayerWsConfigService.convertPackageToTargetNamespace(throwType.getPackage().toString())));
-		gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-			new JavaSymbolName("faultBean"), throwType.getFullyQualifiedTypeName()));
+        }
 
-		// Define annotation.
-		AnnotationMetadata gvNIXWebFaultAnnotation = new DefaultAnnotationMetadata(
-			new JavaType(GvNIXWebFault.class.getName()),
-			gvNIXWebFaultAnnotationAttributes);
-
-		mutableTypeDetails.addTypeAnnotation(gvNIXWebFaultAnnotation);
-
-	    } else {
-
-		// TODO: If annotation is imported to project. Add to an AspectJ
-		// file type annotation declaration.
-	    }
-
-	}
-
-	return true;
+        return true;
     }
+
+    /**
+     * Check for each method exception if its extended classes are extending
+     * from 'java.jang.Throwable'.
+     * 
+     * @param throwType
+     *            for check.
+     * @return true if is an Exception.
+     */
+    private boolean checkExceptionExtension(JavaType throwType) {
+
+        String fileLocation;
+        boolean extendsThrowable = false;
+
+        fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA, throwType
+                .getFullyQualifiedTypeName().replace('.', '/').concat(".java"));
+
+        // Exception defined in the project or imported.
+        if (fileManager.exists(fileLocation)) {
+
+            // Load class or interface details.
+            // If class not found an exception will be raised.
+            ClassOrInterfaceTypeDetails typeDetails = classpathOperations
+                    .getClassOrInterface(throwType);
+
+            // Check and get mutable instance
+            Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+                    typeDetails, "Can't modify " + typeDetails.getName());
+            MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) typeDetails;
+
+            for (JavaType extendedJavaType : mutableTypeDetails
+                    .getExtendsTypes()) {
+
+                // Check for each extended class.
+                extendsThrowable = checkExceptionExtension(extendedJavaType);
+
+            }
+
+        } else {
+
+            // Check if extends from 'java.lang.Throwable'.
+            extendsThrowable = extendsThrowable(throwType);
+
+        }
+
+        return extendsThrowable;
+    }
+
 
     /**
      * Check if throwType extends from 'java.lang.Throwable' class.
@@ -377,27 +415,27 @@ public class ServiceLayerWsExportOperationsImpl implements
      */
     private boolean extendsThrowable(JavaType throwType) {
 
-	if (throwType.getFullyQualifiedTypeName().contentEquals(
-		"java.lang.Throwable")) {
-	    return true;
-	}
-	try {
-	    Object exceptionToCheck = Class.forName(throwType
-		    .getFullyQualifiedTypeName());
+        if (throwType.getFullyQualifiedTypeName().contentEquals(
+                "java.lang.Throwable")) {
+            return true;
+        }
+        try {
+            Class<?> exceptionToCheck = Class.forName(throwType
+                    .getFullyQualifiedTypeName());
 
-	    if (exceptionToCheck == null) {
-		return false;
-	    }
+            if (exceptionToCheck.getSuperclass() == null) {
+                return false;
+            }
 
-	    return extendsThrowable(new JavaType(exceptionToCheck.getClass()
-		    .getSuperclass().getName()));
+            return extendsThrowable(new JavaType(exceptionToCheck
+                    .getSuperclass().getName()));
 
-	} catch (ClassNotFoundException e) {
-	    logger.log(Level.WARNING, "The exception class: '"
-		    + throwType.getFullyQualifiedTypeName()
-		    + "' doesn't exist.");
-	    return false;
-	}
+        } catch (ClassNotFoundException e) {
+            logger.log(Level.WARNING, "The exception class: '"
+                    + throwType.getFullyQualifiedTypeName()
+                    + "' doesn't exist.");
+            return false;
+        }
     }
 
     /**
@@ -414,28 +452,28 @@ public class ServiceLayerWsExportOperationsImpl implements
      * </p>
      */
     public void checkAuthorizedJavaTypesInOperation(JavaType serviceClass,
-	    JavaSymbolName methodName) {
+            JavaSymbolName methodName) {
 
-	MethodMetadata methodToCheck = javaParserService
-		.getMethodByNameInClass(serviceClass, methodName);
+        MethodMetadata methodToCheck = javaParserService
+                .getMethodByNameInClass(serviceClass, methodName);
 
-	Assert.isTrue(methodToCheck != null, "The method: '" + methodName
-		+ " doesn't exists in the class '"
-		+ serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert.isTrue(methodToCheck != null, "The method: '" + methodName
+                + " doesn't exists in the class '"
+                + serviceClass.getFullyQualifiedTypeName() + "'.");
 
-	// Check Return type
-	JavaType returnType = methodToCheck.getReturnType();
+        // Check Return type
+        JavaType returnType = methodToCheck.getReturnType();
 
-	isJavaTypeAllowed(returnType, MethodParameterType.RETURN);
+        isJavaTypeAllowed(returnType, MethodParameterType.RETURN);
 
-	// Check Input Parameters
-	List<AnnotatedJavaType> inputParametersList = methodToCheck
-		.getParameterTypes();
+        // Check Input Parameters
+        List<AnnotatedJavaType> inputParametersList = methodToCheck
+                .getParameterTypes();
 
-	for (AnnotatedJavaType annotatedJavaType : inputParametersList) {
-	    isJavaTypeAllowed(annotatedJavaType.getJavaType(),
-		    MethodParameterType.PARAMETER);
-	}
+        for (AnnotatedJavaType annotatedJavaType : inputParametersList) {
+            isJavaTypeAllowed(annotatedJavaType.getJavaType(),
+                    MethodParameterType.PARAMETER);
+        }
     }
 
     /**
@@ -453,115 +491,111 @@ public class ServiceLayerWsExportOperationsImpl implements
      * </ul>
      */
     public boolean isJavaTypeAllowed(JavaType javaType,
-	    MethodParameterType methodParameterType) {
+            MethodParameterType methodParameterType) {
 
-	// Exists
-	if (javaType != null) {
+        // Is not null.
+        Assert.isTrue(javaType != null,
+                "JavaType of method parameter can't be 'null'.");
 
-	    // Check if javaType is a collection.
-	    // Collection
-	    List<JavaType> parameterList = javaType.getParameters();
-	    if (!parameterList.isEmpty()) {
+        // Check if javaType is a collection.
+        // Collection
+        List<JavaType> parameterList = javaType.getParameters();
+        if (!parameterList.isEmpty()) {
 
-		// 1) yes - check if is allowed
-		// Check if is not an allowed collection
-		// 1.1) yes - recursive with its javaType.
-		// 1.2) no - error.
+            // 1) yes - check if is allowed
+            // Check if is not an allowed collection
+            // 1.1) yes - recursive with its javaType.
+            // 1.2) no - error.
 
-		Assert
-			.isTrue(
-				isNotAllowedCollectionType(javaType) == false,
-				"The '"
-					+ methodParameterType
-					+ "' type '"
-					+ javaType.getFullyQualifiedTypeName()
-					+ "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection.");
+            Assert
+                    .isTrue(
+                            isNotAllowedCollectionType(javaType) == false,
+                            "The '"
+                                    + methodParameterType
+                                    + "' type '"
+                                    + javaType.getFullyQualifiedTypeName()
+                                    + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection.");
 
-		// Check collection's parameter.
-		boolean parameterAllowed = true;
-		for (JavaType parameterJavaType : parameterList) {
-		    parameterAllowed = parameterAllowed
-			    && isJavaTypeAllowed(parameterJavaType,
-				    methodParameterType);
-		}
-		return parameterAllowed;
+            // Check collection's parameter.
+            boolean parameterAllowed = true;
+            for (JavaType parameterJavaType : parameterList) {
+                parameterAllowed = parameterAllowed
+                        && isJavaTypeAllowed(parameterJavaType,
+                                methodParameterType);
+            }
+            return parameterAllowed;
 
-	    }
+        }
 
-	    // 2) no continue.
+        // 2) no continue.
 
-	    // Check if is primitive value.
-	    if (javaType.isPrimitive()) {
-		return true;
-	    }
+        // Check if is primitive value.
+        if (javaType.isPrimitive()) {
+            return true;
+        }
 
-	    if (javaType.getFullyQualifiedTypeName().startsWith("java.lang")) {
-		return true;
-	    }
+        if (javaType.getFullyQualifiedTypeName().startsWith("java.lang")) {
+            return true;
+        }
 
-	    ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		    .get(ProjectMetadata.getProjectIdentifier());
+        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+                .get(ProjectMetadata.getProjectIdentifier());
 
-	    if (javaType.getFullyQualifiedTypeName().startsWith(
-		    projectMetadata.getTopLevelPackage().toString())) {
+        if (javaType.getFullyQualifiedTypeName().startsWith(
+                projectMetadata.getTopLevelPackage().toString())) {
 
-		// MetadataID
-		String targetId = PhysicalTypeIdentifier.createIdentifier(
-			javaType, Path.SRC_MAIN_JAVA);
+            // MetadataID
+            String targetId = PhysicalTypeIdentifier.createIdentifier(javaType,
+                    Path.SRC_MAIN_JAVA);
 
-		// Obtain the physical type and itd mutable details
-		PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
-			.get(targetId);
-		Assert.notNull(ptm, "Java source class doesn't exists.");
+            // Obtain the physical type and itd mutable details
+            PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+                    .get(targetId);
+            Assert.notNull(ptm, "Java source class doesn't exists.");
 
-		PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
-		Assert.notNull(ptd,
-			"Java source code details unavailable for type "
-				+ PhysicalTypeIdentifier
-					.getFriendlyName(targetId));
-		Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-			ptd, "Java source code is immutable for type "
-				+ PhysicalTypeIdentifier
-					.getFriendlyName(targetId));
-		MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
+            PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
+            Assert.notNull(ptd,
+                    "Java source code details unavailable for type "
+                            + PhysicalTypeIdentifier.getFriendlyName(targetId));
+            Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, ptd,
+                    "Java source code is immutable for type "
+                            + PhysicalTypeIdentifier.getFriendlyName(targetId));
+            MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
 
-		// Check if is a RooEntity
-		AnnotationMetadata rooEntitynnotationMetadata = MemberFindingUtils
-			.getTypeAnnotation(mutableTypeDetails, new JavaType(
-				RooEntity.class.getName()));
+            // Check if is a RooEntity
+            AnnotationMetadata rooEntitynnotationMetadata = MemberFindingUtils
+                    .getTypeAnnotation(mutableTypeDetails, new JavaType(
+                            RooEntity.class.getName()));
 
-		// TODO: Aunque no sea RooEntity añadir la anotación ?
-		if (rooEntitynnotationMetadata != null) {
+            // TODO: Aunque no sea RooEntity añadir la anotación ?
+            if (rooEntitynnotationMetadata != null) {
 
-		    // Add @GvNIXXmlElement annotation.
-		    List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+                // Add @GvNIXXmlElement annotation.
+                List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-		    StringAttributeValue nameStringAttributeValue = new StringAttributeValue(
-			    new JavaSymbolName("name"), StringUtils
-				    .uncapitalize(javaType.getSimpleTypeName()));
+                StringAttributeValue nameStringAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("name"), StringUtils
+                                .uncapitalize(javaType.getSimpleTypeName()));
 
-		    annotationAttributeValueList.add(nameStringAttributeValue);
+                annotationAttributeValueList.add(nameStringAttributeValue);
 
-		    StringAttributeValue namespaceStringAttributeValue = new StringAttributeValue(
-			    new JavaSymbolName("namespace"),
-			    serviceLayerWsConfigService
-				    .convertPackageToTargetNamespace(javaType
-					    .getPackage().toString()));
+                StringAttributeValue namespaceStringAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("namespace"),
+                        serviceLayerWsConfigService
+                                .convertPackageToTargetNamespace(javaType
+                                        .getPackage().toString()));
 
-		    annotationAttributeValueList
-			    .add(namespaceStringAttributeValue);
+                annotationAttributeValueList.add(namespaceStringAttributeValue);
 
-		    annotationsService.addJavaTypeAnnotation(mutableTypeDetails
-			    .getName(), GvNIXXmlElement.class.getName(),
-			    annotationAttributeValueList, false);
+                annotationsService.addJavaTypeAnnotation(mutableTypeDetails
+                        .getName(), GvNIXXmlElement.class.getName(),
+                        annotationAttributeValueList, false);
 
-		    return true;
-		}
-	    }
+                return true;
+            }
+        }
 
-	}
-
-	return true;
+        return true;
     }
 
     /**
@@ -574,22 +608,22 @@ public class ServiceLayerWsExportOperationsImpl implements
      * @return {@link JavaType}
      */
     private JavaType returnJavaType(JavaType serviceClass,
-	    JavaSymbolName methodName) {
+            JavaSymbolName methodName) {
 
-	JavaType returnType = new JavaType(JavaType.VOID_OBJECT.toString());
+        JavaType returnType = new JavaType(JavaType.VOID_OBJECT.toString());
 
-	MethodMetadata methodMetadata = javaParserService
-		.getMethodByNameInClass(serviceClass, methodName);
+        MethodMetadata methodMetadata = javaParserService
+                .getMethodByNameInClass(serviceClass, methodName);
 
-	if (methodMetadata == null) {
-	    return null;
-	}
+        if (methodMetadata == null) {
+            return null;
+        }
 
-	if (methodMetadata.getReturnType() != null) {
-	    returnType = methodMetadata.getReturnType();
-	}
+        if (methodMetadata.getReturnType() != null) {
+            returnType = methodMetadata.getReturnType();
+        }
 
-	return returnType;
+        return returnType;
     }
 
     /**
@@ -614,152 +648,152 @@ public class ServiceLayerWsExportOperationsImpl implements
      * </ul>
      */
     public List<AnnotationMetadata> getAnnotationsToExportOperation(
-	    JavaType serviceClass, JavaSymbolName methodName,
-	    String operationName, String resutlName, String resultNamespace,
-	    String responseWrapperName, String responseWrapperNamespace,
-	    String requestWrapperName, String requestWrapperNamespace) {
+            JavaType serviceClass, JavaSymbolName methodName,
+            String operationName, String resutlName, String resultNamespace,
+            String responseWrapperName, String responseWrapperNamespace,
+            String requestWrapperName, String requestWrapperNamespace) {
 
-	List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
-	List<AnnotationAttributeValue<?>> annotationAttributeValueList;
+        List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
+        List<AnnotationAttributeValue<?>> annotationAttributeValueList;
 
-	// org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod
-	annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-	AnnotationMetadata gvNIXWebMethod = new DefaultAnnotationMetadata(
-		new JavaType(GvNIXWebMethod.class.getName()),
-		annotationAttributeValueList);
+        // org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod
+        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        AnnotationMetadata gvNIXWebMethod = new DefaultAnnotationMetadata(
+                new JavaType(GvNIXWebMethod.class.getName()),
+                annotationAttributeValueList);
 
-	annotationMetadataList.add(gvNIXWebMethod);
+        annotationMetadataList.add(gvNIXWebMethod);
 
-	// javax.jws.WebMethod
-	annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-	operationName = StringUtils.hasText(operationName) ? operationName
-		: methodName.getSymbolName();
+        // javax.jws.WebMethod
+        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        operationName = StringUtils.hasText(operationName) ? operationName
+                : methodName.getSymbolName();
 
-	StringAttributeValue operationNameAttributeValue = new StringAttributeValue(
-		new JavaSymbolName("operationName"), operationName);
-	annotationAttributeValueList.add(operationNameAttributeValue);
+        StringAttributeValue operationNameAttributeValue = new StringAttributeValue(
+                new JavaSymbolName("operationName"), operationName);
+        annotationAttributeValueList.add(operationNameAttributeValue);
 
-	StringAttributeValue actionAttribuetValue = new StringAttributeValue(
-		new JavaSymbolName("action"), "");
-	annotationAttributeValueList.add(actionAttribuetValue);
+        StringAttributeValue actionAttribuetValue = new StringAttributeValue(
+                new JavaSymbolName("action"), "");
+        annotationAttributeValueList.add(actionAttribuetValue);
 
-	BooleanAttributeValue excludeAttribuetValue = new BooleanAttributeValue(
-		new JavaSymbolName("exclude"), false);
-	annotationAttributeValueList.add(excludeAttribuetValue);
+        BooleanAttributeValue excludeAttribuetValue = new BooleanAttributeValue(
+                new JavaSymbolName("exclude"), false);
+        annotationAttributeValueList.add(excludeAttribuetValue);
 
-	AnnotationMetadata webMethod = new DefaultAnnotationMetadata(
-		new JavaType("javax.jws.WebMethod"),
-		annotationAttributeValueList);
+        AnnotationMetadata webMethod = new DefaultAnnotationMetadata(
+                new JavaType("javax.jws.WebMethod"),
+                annotationAttributeValueList);
 
-	annotationMetadataList.add(webMethod);
+        annotationMetadataList.add(webMethod);
 
-	// javax.xml.ws.RequestWrapper
-	annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        // javax.xml.ws.RequestWrapper
+        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-	requestWrapperName = StringUtils.hasText(requestWrapperName) ? requestWrapperName
-		: operationName;
-	StringAttributeValue localNameAttributeValue = new StringAttributeValue(
-		new JavaSymbolName("localName"), requestWrapperName);
-	annotationAttributeValueList.add(localNameAttributeValue);
+        requestWrapperName = StringUtils.hasText(requestWrapperName) ? requestWrapperName
+                : operationName;
+        StringAttributeValue localNameAttributeValue = new StringAttributeValue(
+                new JavaSymbolName("localName"), requestWrapperName);
+        annotationAttributeValueList.add(localNameAttributeValue);
 
-	requestWrapperNamespace = StringUtils.hasText(requestWrapperNamespace) ? requestWrapperNamespace
-		: serviceLayerWsConfigService
-			.convertPackageToTargetNamespace(serviceClass
-				.getPackage().getFullyQualifiedPackageName());
+        requestWrapperNamespace = StringUtils.hasText(requestWrapperNamespace) ? requestWrapperNamespace
+                : serviceLayerWsConfigService
+                        .convertPackageToTargetNamespace(serviceClass
+                                .getPackage().getFullyQualifiedPackageName());
 
-	StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
-		new JavaSymbolName("targetNamespace"), requestWrapperNamespace);
-	annotationAttributeValueList.add(targetNamespaceAttributeValue);
+        StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
+                new JavaSymbolName("targetNamespace"), requestWrapperNamespace);
+        annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-	String className = serviceClass.getPackage()
-		.getFullyQualifiedPackageName().concat(".").concat(
-			StringUtils.capitalize(requestWrapperName).concat(
-				"RequestWrapper"));
-	StringAttributeValue classNameAttributeValue = new StringAttributeValue(
-		new JavaSymbolName("className"), className);
-	annotationAttributeValueList.add(classNameAttributeValue);
+        String className = serviceClass.getPackage()
+                .getFullyQualifiedPackageName().concat(".").concat(
+                        StringUtils.capitalize(requestWrapperName).concat(
+                                "RequestWrapper"));
+        StringAttributeValue classNameAttributeValue = new StringAttributeValue(
+                new JavaSymbolName("className"), className);
+        annotationAttributeValueList.add(classNameAttributeValue);
 
-	AnnotationMetadata requestWrapper = new DefaultAnnotationMetadata(
-		new JavaType("javax.xml.ws.RequestWrapper"),
-		annotationAttributeValueList);
+        AnnotationMetadata requestWrapper = new DefaultAnnotationMetadata(
+                new JavaType("javax.xml.ws.RequestWrapper"),
+                annotationAttributeValueList);
 
-	annotationMetadataList.add(requestWrapper);
+        annotationMetadataList.add(requestWrapper);
 
-	// javax.xml.ws.ResponseWrapper
-	annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        // javax.xml.ws.ResponseWrapper
+        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-	responseWrapperName = StringUtils.hasText(responseWrapperName) ? responseWrapperName
-		: operationName.concat("Response");
+        responseWrapperName = StringUtils.hasText(responseWrapperName) ? responseWrapperName
+                : operationName.concat("Response");
 
-	localNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
-		"localName"), responseWrapperName);
-	annotationAttributeValueList.add(localNameAttributeValue);
+        localNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
+                "localName"), responseWrapperName);
+        annotationAttributeValueList.add(localNameAttributeValue);
 
-	responseWrapperNamespace = StringUtils
-		.hasText(responseWrapperNamespace) ? responseWrapperNamespace
-		: serviceLayerWsConfigService
-			.convertPackageToTargetNamespace(serviceClass
-				.getPackage().getFullyQualifiedPackageName());
+        responseWrapperNamespace = StringUtils
+                .hasText(responseWrapperNamespace) ? responseWrapperNamespace
+                : serviceLayerWsConfigService
+                        .convertPackageToTargetNamespace(serviceClass
+                                .getPackage().getFullyQualifiedPackageName());
 
-	targetNamespaceAttributeValue = new StringAttributeValue(
-		new JavaSymbolName("targetNamespace"), responseWrapperNamespace);
-	annotationAttributeValueList.add(targetNamespaceAttributeValue);
+        targetNamespaceAttributeValue = new StringAttributeValue(
+                new JavaSymbolName("targetNamespace"), responseWrapperNamespace);
+        annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-	className = serviceClass.getPackage().getFullyQualifiedPackageName()
-		.concat(".")
-		.concat(StringUtils.capitalize(responseWrapperName));
-	classNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
-		"className"), className);
-	annotationAttributeValueList.add(classNameAttributeValue);
+        className = serviceClass.getPackage().getFullyQualifiedPackageName()
+                .concat(".")
+                .concat(StringUtils.capitalize(responseWrapperName));
+        classNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
+                "className"), className);
+        annotationAttributeValueList.add(classNameAttributeValue);
 
-	AnnotationMetadata responseWrapper = new DefaultAnnotationMetadata(
-		new JavaType("javax.xml.ws.ResponseWrapper"),
-		annotationAttributeValueList);
+        AnnotationMetadata responseWrapper = new DefaultAnnotationMetadata(
+                new JavaType("javax.xml.ws.ResponseWrapper"),
+                annotationAttributeValueList);
 
-	annotationMetadataList.add(responseWrapper);
+        annotationMetadataList.add(responseWrapper);
 
-	// javax.jws.WebResult
-	// Check result value
-	if (resutlName != null) {
-	    annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        // javax.jws.WebResult
+        // Check result value
+        if (resutlName != null) {
+            annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-	    localNameAttributeValue = new StringAttributeValue(
-		    new JavaSymbolName("name"), resutlName);
-	    annotationAttributeValueList.add(localNameAttributeValue);
+            localNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("name"), resutlName);
+            annotationAttributeValueList.add(localNameAttributeValue);
 
-	    resultNamespace = StringUtils.hasText(resultNamespace) ? resultNamespace
-		    : serviceLayerWsConfigService
-			    .convertPackageToTargetNamespace(serviceClass
-				    .getPackage()
-				    .getFullyQualifiedPackageName());
+            resultNamespace = StringUtils.hasText(resultNamespace) ? resultNamespace
+                    : serviceLayerWsConfigService
+                            .convertPackageToTargetNamespace(serviceClass
+                                    .getPackage()
+                                    .getFullyQualifiedPackageName());
 
-	    targetNamespaceAttributeValue = new StringAttributeValue(
-		    new JavaSymbolName("targetNamespace"), resultNamespace);
-	    annotationAttributeValueList.add(targetNamespaceAttributeValue);
+            targetNamespaceAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("targetNamespace"), resultNamespace);
+            annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-	    BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
-		    new JavaSymbolName("header"), false);
-	    annotationAttributeValueList.add(headerAttributeValue);
+            BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
+                    new JavaSymbolName("header"), false);
+            annotationAttributeValueList.add(headerAttributeValue);
 
-	    StringAttributeValue partNameAttributeValue = new StringAttributeValue(
-		    new JavaSymbolName("partName"), "parameters");
+            StringAttributeValue partNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("partName"), "parameters");
 
-	    annotationAttributeValueList.add(partNameAttributeValue);
+            annotationAttributeValueList.add(partNameAttributeValue);
 
-	    AnnotationMetadata webResult = new DefaultAnnotationMetadata(
-		    new JavaType("javax.jws.WebResult"),
-		    annotationAttributeValueList);
+            AnnotationMetadata webResult = new DefaultAnnotationMetadata(
+                    new JavaType("javax.jws.WebResult"),
+                    annotationAttributeValueList);
 
-	    annotationMetadataList.add(webResult);
-	} else {
-	    // @Oneway - not require a response from the service.
-	    AnnotationMetadata oneway = new DefaultAnnotationMetadata(
-		    new JavaType("javax.jws.Oneway"),
-		    new ArrayList<AnnotationAttributeValue<?>>());
-	    annotationMetadataList.add(oneway);
-	}
+            annotationMetadataList.add(webResult);
+        } else {
+            // @Oneway - not require a response from the service.
+            AnnotationMetadata oneway = new DefaultAnnotationMetadata(
+                    new JavaType("javax.jws.Oneway"),
+                    new ArrayList<AnnotationAttributeValue<?>>());
+            annotationMetadataList.add(oneway);
+        }
 
-	return annotationMetadataList;
+        return annotationMetadataList;
     }
 
     /**
@@ -772,26 +806,26 @@ public class ServiceLayerWsExportOperationsImpl implements
      *         {@link ServiceLayerWSExportMetadata}.
      */
     private boolean isWebServiceClass(JavaType serviceClass) {
-	String id = physicalTypeMetadataProvider.findIdentifier(serviceClass);
+        String id = physicalTypeMetadataProvider.findIdentifier(serviceClass);
 
-	Assert.notNull(id, "Cannot locate source for '"
-		+ serviceClass.getFullyQualifiedTypeName() + "'");
+        Assert.notNull(id, "Cannot locate source for '"
+                + serviceClass.getFullyQualifiedTypeName() + "'");
 
-	// Go and get the service layer ws metadata to export selected method.
-	JavaType javaType = PhysicalTypeIdentifier.getJavaType(id);
-	Path path = PhysicalTypeIdentifier.getPath(id);
-	String entityMid = ServiceLayerWSExportMetadata.createIdentifier(
-		javaType, path);
+        // Go and get the service layer ws metadata to export selected method.
+        JavaType javaType = PhysicalTypeIdentifier.getJavaType(id);
+        Path path = PhysicalTypeIdentifier.getPath(id);
+        String entityMid = ServiceLayerWSExportMetadata.createIdentifier(
+                javaType, path);
 
-	// Get the service layer ws metadata.
-	ServiceLayerWSExportMetadata serviceLayerWSExportMetadata = (ServiceLayerWSExportMetadata) metadataService
-		.get(entityMid);
+        // Get the service layer ws metadata.
+        ServiceLayerWSExportMetadata serviceLayerWSExportMetadata = (ServiceLayerWSExportMetadata) metadataService
+                .get(entityMid);
 
-	if (serviceLayerWSExportMetadata == null) {
-	    return false;
-	} else {
-	    return true;
-	}
+        if (serviceLayerWSExportMetadata == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -802,28 +836,28 @@ public class ServiceLayerWsExportOperationsImpl implements
      * </p>
      */
     public boolean isMethodAvailableToExport(JavaType serviceClass,
-	    JavaSymbolName methodName, String annotationName) {
+            JavaSymbolName methodName, String annotationName) {
 
-	boolean exists = true;
-	MethodMetadata methodMetadata = javaParserService
-		.getMethodByNameInClass(serviceClass, methodName);
+        boolean exists = true;
+        MethodMetadata methodMetadata = javaParserService
+                .getMethodByNameInClass(serviceClass, methodName);
 
-	if (methodMetadata == null) {
-	    return false;
-	}
+        if (methodMetadata == null) {
+            return false;
+        }
 
-	exists = javaParserService.isAnnotationIntroducedInMethod(
-		GvNIXWebMethod.class.getName(), methodMetadata);
-	Assert
-		.isTrue(
-			exists == false,
-			"The method '"
-				+ methodName
-				+ "' has been annotated with @"
-				+ annotationName
-				+ " before, you could update annotation parameters inside its class.");
+        exists = javaParserService.isAnnotationIntroducedInMethod(
+                GvNIXWebMethod.class.getName(), methodMetadata);
+        Assert
+                .isTrue(
+                        exists == false,
+                        "The method '"
+                                + methodName
+                                + "' has been annotated with @"
+                                + annotationName
+                                + " before, you could update annotation parameters inside its class.");
 
-	return true;
+        return true;
     }
 
     /**
@@ -839,10 +873,10 @@ public class ServiceLayerWsExportOperationsImpl implements
      * @return true if is blank or if has correct URI format.
      */
     private boolean checkNamespaceFormat(String namespace) {
-	if (StringUtils.hasText(namespace)) {
-	    return StringUtils.startsWithIgnoreCase(namespace, "http://");
-	}
-	return true;
+        if (StringUtils.hasText(namespace)) {
+            return StringUtils.startsWithIgnoreCase(namespace, "http://");
+        }
+        return true;
     }
 
     /**
@@ -862,8 +896,8 @@ public class ServiceLayerWsExportOperationsImpl implements
      * </ul>
      */
     public boolean isNotAllowedCollectionType(JavaType javaType) {
-	return notAllowedCollectionTypes.contains(javaType
-		.getFullyQualifiedTypeName());
+        return notAllowedCollectionTypes.contains(javaType
+                .getFullyQualifiedTypeName());
     }
 
 }
