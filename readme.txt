@@ -31,7 +31,7 @@ To start with gvNIX you need:
 
 * A *nix machine (Windows users should be OK if they write a .bat)
 * JDK 5.0 or above ( http://java.sun.com/javase/downloads/index.jsp )
-* Maven 2.0.9 or above ( http://maven.apache.org/download.html )
+* Maven 2.0.9 or above [use only 2.0.x versions, not 2.2.x versions] ( http://maven.apache.org/download.html )
 * Internet access so that Maven can download required dependencies
 * Git client, http://en.wikipedia.org/wiki/Git_%28software%29
 
@@ -98,7 +98,7 @@ Write doc
 ==========
 
 * Download and install XMLmind XML Editor Personal Edition ( http://www.xmlmind.com/xmleditor/download.shtml )
-* Use your preferred DocBook editor (i.e. XMLmind) to open ``src/site/docbook/reference/index.xml`` and contribute your knowledge
+* Use the previous editor to open ``src/site/docbook/reference/index.xml`` and contribute with your knowledge.
 
 Package gvNIX
 ================

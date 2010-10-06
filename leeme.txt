@@ -33,7 +33,7 @@ Para empezar con gvNIX necesitas:
 
 * Una máquina Unix (usuarios de Windows deberían poder usar gvNIX creando sus propios scripts .bat)
 * JDK 5.0 o superior ( http://java.sun.com/javase/downloads/index.jsp )
-* Maven 2.0.9 o superior ( http://maven.apache.org/download.html )
+* Maven 2.0.9 o superior [pero sólo las versiones 2.0.x, no las 2.2.x] ( http://maven.apache.org/download.html )
 * Cliente git, http://en.wikipedia.org/wiki/Git_%28software%29
 * Subversion
 * Acceso a Internet
@@ -83,7 +83,7 @@ JDK
 --------
 
 Por defecto, el equipo de desarrollo de gvNIX utiliza la versión 1.5.0_7 del JDK, pero puede utilizarse cualquier versión JDK 5.0 o superior.
-Se recomienda realizar hacer siempre la instalación siguiendo estos pasos:
+Se recomienda realizar siempre la instalación siguiendo estos pasos:
 
 #. Descargar el JDK 1.5.0_7 de http://java.sun.com/products/archive/
 
@@ -144,7 +144,7 @@ Se pueden investigar las carpetas contenidas dentro del jdk, siendo las más imp
 Apache Maven 2
 -----------------
 
-#. Descargarlo con la última actualización 2.X.X (en el momento de elaboración de este documento, la 2.0.9):
+#. Descargarlo con la última actualización 2.0.X (en el momento de elaboración de este documento, la 2.0.11):
 
         http://maven.apache.org/download.html
 
@@ -154,7 +154,7 @@ Apache Maven 2
 
 #. Establecer las siguientes variables de entorno añadiendo las siguientes líneas en el fichero $HOME/.bash_devel::
 
-        export M2_HOME=$HOME/software/java/apache-maven-2.X.X
+        export M2_HOME=$HOME/software/java/apache-maven-2.0.X
         export M2=$M2_HOME/bin
         export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
         export PATH=$M2:$PATH
@@ -169,12 +169,12 @@ Podemos comprobar que todo ha ido correctamente ejecutando en nuestra consola ya
 
 .. admonition:: Nota
 
-        Reemplazar 2.X.X por el número de actualización.
+        Reemplazar 2.0.X por el número de versión descargada.
 
 Cliente Git
 --------------
 
-Installation using aptitude or apt.
+Para instalarlo puedes usar *aptitude* or *apt*.
 
 * Aptitude
 
@@ -348,8 +348,7 @@ Escribir documentación
 ======================
 
 * Descargar e instalar el editor XML XMLmind Edición Personal ( http://www.xmlmind.com/xmleditor/download.shtml )
-* Usa tu editor de DocBook (por ejemplo, XMLmind) para abrir 
-  ``src/site/docbook/reference/index.xml`` y contribuir tu conocimiento.
+* Usa ese editor para abrir ``src/site/docbook/reference/index.xml`` y contribuir con tu conocimiento.
 
 Anexo
 =====
