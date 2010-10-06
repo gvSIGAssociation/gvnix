@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<book version="5.0" xml:id="spring-roo-reference-guide" 
+<book version="5.0" xml:id="spring-roo-reference-guide" xml:lang="es"
       xmlns="http://docbook.org/ns/docbook"
       xmlns:xlink="http://www.w3.org/1999/xlink"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:ns5="http://www.w3.org/1998/Math/MathML"
       xmlns:ns4="http://www.w3.org/2000/svg"
       xmlns:ns3="http://www.w3.org/1999/xhtml"
-      xmlns:ns="http://docbook.org/ns/docbook" 
-      xml:lang="es">
+      xmlns:ns="http://docbook.org/ns/docbook">
   <info>
     <title xml:lang="es">gvNIX - Documentación de referencia</title>
 
@@ -57,21 +56,21 @@
 
     <partintro>
       <para xml:lang="es">En esta sección veremos paso a paso cómo desarrollar
-      una aplicación web desde 0 para mostrar cómo utilizar gvNIX en cualquier
-      proyecto web. Algunas de las características de gvNIX que se muestran
-      son:</para>
+      una aplicación web desde cero para mostrar cómo utilizar gvNIX en
+      cualquier proyecto web. Algunas de las características de gvNIX que se
+      muestran son:</para>
 
       <itemizedlist>
         <listitem>
-          <para>Crear un nuevo proyecto</para>
+          <para>Crear un nuevo proyecto.</para>
         </listitem>
 
         <listitem>
-          <para>Gestión de acceso a datos</para>
+          <para>Gestión de acceso a datos.</para>
         </listitem>
 
         <listitem>
-          <para>Gestión del modelo de entidades</para>
+          <para>Gestión del modelo de entidades.</para>
 
           <itemizedlist>
             <listitem>
@@ -82,19 +81,23 @@
         </listitem>
 
         <listitem>
-          <para>Gestión de la capa web</para>
+          <para>Gestión de la capa web.</para>
         </listitem>
 
         <listitem>
-          <para>Desarrollo con Eclipse</para>
+          <para>Desarrollo con Eclipse.</para>
         </listitem>
       </itemizedlist>
     </partintro>
 
     <xi:include href="guia-desarrollo_crear-app.xml" />
+
     <xi:include href="guia-desarrollo_acceso-datos.xml" />
+
     <xi:include href="guia-desarrollo_entidades.xml" />
+
     <xi:include href="guia-desarrollo_capa-web.xml" />
+
     <xi:include href="guia-desarrollo_eclipse.xml" />
   </part>
 
@@ -102,43 +105,53 @@
     <title xml:lang="es">Desarrollo avanzado con gvNIX</title>
 
     <partintro>
-      <para xml:lang="es">En esta sección veremos cómo ampliar 
-      una aplicación web básica creada con gvNIX para cumplir con los
-      requerimientos de cualquier proyecto real.</para>
+      <para xml:lang="es">En esta sección veremos cómo ampliar una aplicación
+      web básica creada con gvNIX para cumplir con los requerimientos de
+      cualquier proyecto real.</para>
 
-      <para xml:lang="es">Revisaremos las características distintivas de gvNIX 
-      enfocadas al desarrollo de funcionalidades próximas al usuario final:</para>
+      <para xml:lang="es">Revisaremos las características distintivas de gvNIX
+      enfocadas al desarrollo de funcionalidades próximas al usuario
+      final:</para>
 
       <itemizedlist>
         <listitem>
           <para>Control de concurrencia</para>
         </listitem>
+
         <listitem>
           <para>Gestión de temas</para>
         </listitem>
+
         <listitem>
           <para>Gestión de excepciones</para>
         </listitem>
+
         <listitem>
           <para>Gestión de la estructura de páginas</para>
         </listitem>
+
         <listitem>
           <para>Soporte para JSP 2.0</para>
         </listitem>
+
         <listitem>
           <para>Gestión de la visualización de relaciones</para>
         </listitem>
+
         <listitem>
           <para>Gestión de transformación de cadenas</para>
         </listitem>
+
         <listitem>
           <para>Control de acceso</para>
         </listitem>
       </itemizedlist>
     </partintro>
-<!--
+
+    <!--
     <xi:include href="resumen-addons.xml" />
 -->
+
     <xi:include href="addon-theme-manager.xml" />
 
     <xi:include href="addon-web-menu.xml" />
@@ -174,7 +187,7 @@
       <para xml:lang="es">Documentación adicional</para>
     </partintro>
 
-    <para xml:lang="es">TBC Integración con MOSKitt <!-- (vore com s'explica en Roo integració amb STS) --></para>
+    <para xml:lang="es">TBC Integración con MOSKitt<!-- (vore com s'explica en Roo integració amb STS) --></para>
 
     <xi:include href="apendice-comandos.xml" />
 

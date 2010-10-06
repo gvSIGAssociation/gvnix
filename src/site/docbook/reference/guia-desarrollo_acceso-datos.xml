@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="guia-desarrollo-acceso-datos" 
+<chapter version="5.0" xml:id="guia-desarrollo-acceso-datos" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook"
-         xml:lang="es">
-
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Gestión del acceso a datos</title>
 
   <section xml:lang="es">
@@ -21,7 +19,8 @@
     trata con relaciones y conjuntos, con el paradigma orientado a objetos,
     que trata con objetos, atributos y asociaciones de unos con otros. Esta
     problemática es la que se conoce como <emphasis>desajuste
-    objeto-relacional</emphasis> (object-relational impedance mismatch).</para>
+    objeto-relacional</emphasis> (object-relational impedance
+    mismatch).</para>
 
     <important>
       <title xml:lang="es">Desajuste objeto-relacional</title>
@@ -42,13 +41,12 @@
       con todavía más objetos?</para>
 
       <para xml:lang="es">Como se observa, el desajuste entre el paradigma
-      orientado a objetos y el modelo relacional se amplia muy rápidamente 
-      con modelos de
-      objetos de cierta complejidad. Y hay muchas más cosas a considerar como
-      la carga lenta, las referencias circulares, la caché, etc. De hecho, se
-      han realizado estudios que demuestran que el 35% del código de una
-      aplicación se produce para mepear datos entre la aplicación y la base de
-      datos.</para>
+      orientado a objetos y el modelo relacional se amplia muy rápidamente con
+      modelos de objetos de cierta complejidad. Y hay muchas más cosas a
+      considerar como la carga lenta, las referencias circulares, la caché,
+      etc. De hecho, se han realizado estudios que demuestran que el 35% del
+      código de una aplicación se produce para mapear datos entre la
+      aplicación y la base de datos.</para>
     </important>
 
     <para xml:lang="es">La técnica y herramientas <emphasis>ORM</emphasis>
@@ -142,230 +140,227 @@ roo&gt;</programlisting>
 
     <para xml:lang="es">En cualquier punto del ciclo de vida de una aplicación
     puede surgir la necesidad de cambiar de base de datos (paso de desarrollo
-    a producción, nuevo sistema con mejor rendimiento, etc), para estos
-    casos gvNIX ofrece una serie de comandos que simplificarán la 
-    actualización de la configuración de acceso a la base de datos:</para>
+    a producción, nuevo sistema con mejor rendimiento, etc), para estos casos
+    gvNIX ofrece una serie de comandos que simplificarán la actualización de
+    la configuración de acceso a la base de datos:</para>
 
-      <itemizedlist>
-        <listitem>
-          <para><command>persistence setup</command></para>
-        </listitem>
+    <itemizedlist>
+      <listitem>
+        <para><command>persistence setup</command></para>
+      </listitem>
 
-        <listitem>
-          <para><command>database properties</command></para>
-        </listitem>
-      </itemizedlist>
+      <listitem>
+        <para><command>database properties</command></para>
+      </listitem>
+    </itemizedlist>
 
-      <section>
-        <title>persistence setup</title>
+    <section>
+      <title>persistence setup</title>
 
-        <para xml:lang="es">Configurar el acceso a datos.
-        Entre los parámetros necesitaremos la herramienta ORM y la base 
-        de datos a usar.</para>
+      <para xml:lang="es">Configurar el acceso a datos. Entre los parámetros
+      necesitaremos la herramienta ORM y la base de datos a usar.</para>
 
-        <para xml:lang="es">Los parámetros que admite este comando son:</para>
+      <para xml:lang="es">Los parámetros que admite este comando son:</para>
 
-        <variablelist>
-          <varlistentry>
-            <term>--provider</term>
+      <variablelist>
+        <varlistentry>
+          <term>--provider</term>
 
-            <listitem>
-              <para xml:lang="es">Identificador de la herramienta ORM. 
-              Los valores posibles son:</para>
+          <listitem>
+            <para xml:lang="es">Identificador de la herramienta ORM. Los
+            valores posibles son:</para>
 
-              <variablelist>
-                <varlistentry>
-                  <term>DATANUCLEUS</term>
-
-                  <listitem>
-                    <para><link xlink:href="http://www.datanucleus.org/">Data
-                    Nucleus</link></para>
-                  </listitem>
-                </varlistentry>
-
-                <varlistentry>
-                  <term>ECLIPSELINK</term>
-
-                  <listitem>
-                    <para><link
-                    xlink:href="http://www.eclipse.org/eclipselink/">EclipseLink</link></para>
-                  </listitem>
-                </varlistentry>
-
-                <varlistentry>
-                  <term>HIBERNATE</term>
-
-                  <listitem>
-                    <para><link
-                    xlink:href="http://www.hibernate.org/">Hibernate</link></para>
-                  </listitem>
-                </varlistentry>
-
-                <varlistentry>
-                  <term>OPENJPA</term>
-
-                  <listitem>
-                    <para><link
-                    xlink:href="http://openjpa.apache.org/">OpenJPA</link></para>
-                  </listitem>
-                </varlistentry>
-              </variablelist>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term>--database</term>
-
-            <listitem>
-              <para xml:lang="es">Identificador de la base de datos.
-              Los valores posibles son:</para>
-
-              <itemizedlist>
-                <listitem>
-                  <para>DB2<emphasis>. Debido a que los drivers JDBC no están
-                  disponibles en ningún repositorio Maven, en caso de utilizar
-                  DB2 habrá que instalar manualmente el driver 
-                  JDBC.</emphasis></para>
-                </listitem>
+            <variablelist>
+              <varlistentry>
+                <term>DATANUCLEUS</term>
 
                 <listitem>
-                  <para>DERBY</para>
+                  <para><link xlink:href="http://www.datanucleus.org/">Data
+                  Nucleus</link></para>
                 </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>ECLIPSELINK</term>
 
                 <listitem>
-                  <para>GOOGLE_APP_ENGINE</para>
+                  <para><link
+                  xlink:href="http://www.eclipse.org/eclipselink/">EclipseLink</link></para>
                 </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>HIBERNATE</term>
 
                 <listitem>
-                  <para>H2_IN_MEMORY</para>
+                  <para><link
+                  xlink:href="http://www.hibernate.org/">Hibernate</link></para>
                 </listitem>
+              </varlistentry>
+
+              <varlistentry>
+                <term>OPENJPA</term>
 
                 <listitem>
-                  <para>HYPERSONIC_IN_MEMORY</para>
+                  <para><link
+                  xlink:href="http://openjpa.apache.org/">OpenJPA</link></para>
                 </listitem>
+              </varlistentry>
+            </variablelist>
+          </listitem>
+        </varlistentry>
 
-                <listitem>
-                  <para>HYPERSONIC_PERSISTENT</para>
-                </listitem>
+        <varlistentry>
+          <term>--database</term>
 
-                <listitem>
-                  <para>MSSQL</para>
-                </listitem>
+          <listitem>
+            <para xml:lang="es">Identificador de la base de datos. Los valores
+            posibles son:</para>
 
-                <listitem>
-                  <para>ORACLE<emphasis>. Debido a que los drivers JDBC no están
-                  disponibles en ningún repositorio Maven, en caso de utilizar
-                  Oracle habrá que instalar manualmente el driver 
-                  JDBC.</emphasis></para>
-                </listitem>
+            <itemizedlist>
+              <listitem>
+                <para>DB2<emphasis>. Debido a que los drivers JDBC no están
+                disponibles en ningún repositorio Maven, en caso de utilizar
+                DB2 habrá que instalar manualmente el driver
+                JDBC.</emphasis></para>
+              </listitem>
 
-                <listitem>
-                  <para>POSTGRES</para>
-                </listitem>
+              <listitem>
+                <para>DERBY.</para>
+              </listitem>
 
-                <listitem>
-                  <para>SYBASE</para>
-                </listitem>
-              </itemizedlist>
-            </listitem>
-          </varlistentry>
+              <listitem>
+                <para>GOOGLE_APP_ENGINE.</para>
+              </listitem>
 
-          <varlistentry>
-            <term>--applicationId</term>
+              <listitem>
+                <para>H2_IN_MEMORY.</para>
+              </listitem>
 
-            <listitem>
-              <para xml:lang="es">Identificación de aplicación en Google App
-              Engine (sólo usado para esta base de datos).</para>
-            </listitem>
-          </varlistentry>
+              <listitem>
+                <para>HYPERSONIC_IN_MEMORY.</para>
+              </listitem>
 
-          <varlistentry>
-            <term>--jndiDataSource</term>
+              <listitem>
+                <para>HYPERSONIC_PERSISTENT.</para>
+              </listitem>
 
-            <listitem>
-              <para xml:lang="es">Fuente de datos JNDI a usar.</para>
-            </listitem>
-          </varlistentry>
+              <listitem>
+                <para>MSSQL.</para>
+              </listitem>
 
-          <varlistentry>
-            <term>--databaseName</term>
+              <listitem>
+                <para>ORACLE<emphasis>. Debido a que los drivers JDBC no están
+                disponibles en ningún repositorio Maven, en caso de utilizar
+                Oracle habrá que instalar manualmente el driver
+                JDBC.</emphasis></para>
+              </listitem>
 
-            <listitem>
-              <para xml:lang="es">Nombre de la base de datos.</para>
-            </listitem>
-          </varlistentry>
+              <listitem>
+                <para>POSTGRES.</para>
+              </listitem>
 
-          <varlistentry>
-            <term>--userName</term>
+              <listitem>
+                <para>SYBASE.</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </varlistentry>
 
-            <listitem>
-              <para xml:lang="es">Nombre del usuario para la conexión.</para>
-            </listitem>
-          </varlistentry>
+        <varlistentry>
+          <term>--applicationId</term>
 
-          <varlistentry>
-            <term>--password</term>
+          <listitem>
+            <para xml:lang="es">Identificación de aplicación en Google App
+            Engine (sólo usado para esta base de datos).</para>
+          </listitem>
+        </varlistentry>
 
-            <listitem>
-              <para xml:lang="es">Contraseña del usuario de la
-              conexión.</para>
-            </listitem>
-          </varlistentry>
-        </variablelist>
+        <varlistentry>
+          <term>--jndiDataSource</term>
 
-        <para xml:lang="es">Dependiendo del tipo de base de datos 
-        pueden ser necesarios unos u otros parámetros y puede o no ser
-        necesario instrucciones adicionales para la configuración del 
-        acceso a datos. Se recomienda usar el completado de comandos con
-        <emphasis>TAB</emphasis> para que gvNIX nos indique qué nos hace
-        falta en función de nuestro contexto.</para>
-      </section>
+          <listitem>
+            <para xml:lang="es">Fuente de datos JNDI a usar.</para>
+          </listitem>
+        </varlistentry>
 
-      <section>
-        <title>database properties</title>
+        <varlistentry>
+          <term>--databaseName</term>
 
-        <para xml:lang="es">Permite la
-        consulta, eliminación y actualización de las propiedades de conexión a
-        la base de datos (a diferencia del comando anterior que configura el
-        sistema de persitencia en su totalidad). Estas propiedades se 
-        almacenan el fichero
-        <filename>src/main/resources/META-INF/spring/database.properties</filename>
-        de la aplicación.</para>
+          <listitem>
+            <para xml:lang="es">Nombre de la base de datos.</para>
+          </listitem>
+        </varlistentry>
 
-        <para xml:lang="es">Opciones:</para>
+        <varlistentry>
+          <term>--userName</term>
 
-        <variablelist>
-          <varlistentry>
-            <term>database properties list</term>
+          <listitem>
+            <para xml:lang="es">Nombre del usuario para la conexión.</para>
+          </listitem>
+        </varlistentry>
 
-            <listitem>
-              <para xml:lang="es">Lista las propiedades de configuración de la
-              base de datos.</para>
-            </listitem>
-          </varlistentry>
+        <varlistentry>
+          <term>--password</term>
 
-          <varlistentry>
-            <term>database properties remove</term>
+          <listitem>
+            <para xml:lang="es">Contraseña del usuario de la conexión.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
 
-            <listitem>
-              <para xml:lang="es">Elimina una propiedad de la configuración.
-              Requiere un único parámetro <parameter>--key</parameter> para
-              especificar la clave a eliminar.</para>
-            </listitem>
-          </varlistentry>
+      <para xml:lang="es">Dependiendo del tipo de base de datos pueden ser
+      necesarios unos u otros parámetros y puede o no ser necesario
+      instrucciones adicionales para la configuración del acceso a datos. Se
+      recomienda usar el completado de comandos con <emphasis>TAB</emphasis>
+      para que gvNIX nos indique qué nos hace falta en función de nuestro
+      contexto.</para>
+    </section>
 
-          <varlistentry>
-            <term>database properties set</term>
+    <section>
+      <title>database properties</title>
 
-            <listitem>
-              <para xml:lang="es">Crea o actualiza una de las propiedades la
-              configuración. Requiere un parámetro
-              <parameter>--key</parameter> con el nombre de la propiedad y un
-              <parameter>--value</parameter> con el valor a establecer.</para>
-            </listitem>
-          </varlistentry>
-        </variablelist>
-      </section>
+      <para xml:lang="es">Permite la consulta, eliminación y actualización de
+      las propiedades de conexión a la base de datos (a diferencia del comando
+      anterior que configura el sistema de persitencia en su totalidad). Estas
+      propiedades se almacenan el fichero
+      <filename>src/main/resources/META-INF/spring/database.properties</filename>
+      de la aplicación.</para>
+
+      <para xml:lang="es">Opciones:</para>
+
+      <variablelist>
+        <varlistentry>
+          <term>database properties list</term>
+
+          <listitem>
+            <para xml:lang="es">Lista las propiedades de configuración de la
+            base de datos.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>database properties remove</term>
+
+          <listitem>
+            <para xml:lang="es">Elimina una propiedad de la configuración.
+            Requiere un único parámetro <parameter>--key</parameter> para
+            especificar la clave a eliminar.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>database properties set</term>
+
+          <listitem>
+            <para xml:lang="es">Crea o actualiza una de las propiedades la
+            configuración. Requiere un parámetro <parameter>--key</parameter>
+            con el nombre de la propiedad y un <parameter>--value</parameter>
+            con el valor a establecer.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </section>
 
     <section>
       <title>Ejemplo: Conectar con PostgreSQL</title>
@@ -466,33 +461,33 @@ roo&gt; </programlisting>
       </orderedlist>
 
       <para xml:lang="es">Una vez hecho, la siguiente vez que arranquemos la
-      aplicación usará la base de datos que le hemos configurado.
-      </para>
+      aplicación usará la base de datos que le hemos configurado.</para>
     </section>
 
     <section xml:id="guia-desarrollo_acceso-datos_actualizacion-esquema">
-        <title>Actualización automática del esquema</title>
-        <para xml:lang="es">Recordar que por defecto se crea el esquema de
-        base de datos necesario para el modelo de entidades creado con gvNIX, 
-        por lo que si conectamos nuestra aplicación con una base de datos
-        existente <emphasis>debemos</emphasis> revisar la configuración del 
-        sistema de persistencia antes de pasar al siguiente capítulo.</para>
-        <para xml:lang="es">
-        <emphasis>Si conectamos a una base de datos existente se debe 
-        deshabilitar la actualización automática del esquema</emphasis>:
-        </para>
+      <title>Actualización automática del esquema</title>
+
+      <para xml:lang="es">Recordar que por defecto se crea el esquema de base
+      de datos necesario para el modelo de entidades creado con gvNIX, por lo
+      que si conectamos nuestra aplicación con una base de datos existente
+      <emphasis>debemos</emphasis> revisar la configuración del sistema de
+      persistencia antes de pasar al siguiente capítulo.</para>
+
+      <para xml:lang="es"><emphasis>Si conectamos a una base de datos
+      existente se debe deshabilitar la actualización automática del
+      esquema</emphasis>:</para>
 
       <itemizedlist>
         <listitem>
-          <para xml:lang="es">Editar el archivo 
-        <filename>src/main/resources/META-INF/persistence.xml</filename> 
-          </para>
+          <para xml:lang="es">Editar el archivo
+          <filename>src/main/resources/META-INF/persistence.xml</filename></para>
         </listitem>
+
         <listitem>
           <para xml:lang="es">Borrar o comentar la propiedad
           <emphasis>hibernate.hbm2ddl.auto</emphasis>:</para>
-          <programlisting>
-&lt;-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
+
+          <programlisting>&lt;-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
         </listitem>
       </itemizedlist>
     </section>
@@ -500,7 +495,8 @@ roo&gt; </programlisting>
     <section xml:id="guia-desarrollo_gestion-acceso-datos_multiples-fuentes-datos">
       <title xml:lang="es">Múltiples fuentes de datos</title>
 
-      <para><emphasis role="bold">TBC</emphasis></para>
+      <para><emphasis>TBC</emphasis></para>
+
       <!-- 
       <para>En este <link
       xlink:href="http://forum.springsource.org/showpost.php?p=289577&amp;postcount=4">post

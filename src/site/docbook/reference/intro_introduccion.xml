@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="introduccion" 
+<chapter version="5.0" xml:id="introduccion" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook"
-         xml:lang="es">
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title>Introducción</title>
 
   <section xml:id="introduccion_que-es-gvnix">
@@ -69,7 +68,7 @@
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Realimentación: Añade valor durante todo el ciclo
+        <para xml:lang="es">Realimentación: añade valor durante todo el ciclo
         de vida.</para>
       </listitem>
 
@@ -92,7 +91,7 @@
       </listitem>
 
       <listitem>
-        <para>Aprovecha el conocimiento: No necesita más conocimiento que el
+        <para>Aprovecha el conocimiento: no necesita más conocimiento que el
         necesario para el desarrollo de aplicaciones JEE.</para>
       </listitem>
     </itemizedlist>
@@ -107,26 +106,27 @@
     <para xml:lang="es">La arquitectura de Roo se subdivide en 2 grandes
     bloques: el entorno de desarrollo y el entorno de ejecución</para>
 
-        <itemizedlist>
-          <listitem>
-    <para xml:lang="es">El entorno de desarrollo incorpora distintas
-    herramientas enfocadas al desarrollo rápido de aplicaciones Java. La
-    característica más importante del entorno de desarrollo es que no
-    introduce ningún tipo de librería propia de Roo, de tal forma que en
-    tiempo de ejecución no añade sobre coste de rendimiento a las
-    aplicaciones.</para>
-          </listitem>
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">El entorno de desarrollo incorpora distintas
+        herramientas enfocadas al desarrollo rápido de aplicaciones Java. La
+        característica más importante del entorno de desarrollo es que no
+        introduce ningún tipo de librería propia de Roo, de tal forma que en
+        tiempo de ejecución no añade sobre coste de rendimiento a las
+        aplicaciones.</para>
+      </listitem>
 
-          <listitem>
-    <para xml:lang="es">El entorno de ejecución es un entorno típico de
-    aplicaciones basadas en Spring 3: acceso a bases de datos relacionales
-    usando el API Java Persistence (JPA), inyección de dependencias, gestión
-    de transacciones propia de Spring, pruebas unitarias con JUnit,
-    configuración Maven para construir las aplicaciones y vistas JSP usando
-    Spring MVC como front-end. Este tipo de aplicaciones basadas en Spring son
-    probablemente las aplicaciones Java más modernas.</para>
-          </listitem>
-        </itemizedlist>
+      <listitem>
+        <para xml:lang="es">El entorno de ejecución es un entorno típico de
+        aplicaciones basadas en Spring 3: acceso a bases de datos relacionales
+        usando el API Java Persistence (JPA), inyección de dependencias,
+        gestión de transacciones propia de Spring, pruebas unitarias con
+        JUnit, configuración Maven para construir las aplicaciones y vistas
+        JSP usando Spring MVC como front-end. Este tipo de aplicaciones
+        basadas en Spring son probablemente las aplicaciones Java más
+        modernas.</para>
+      </listitem>
+    </itemizedlist>
 
     <para xml:lang="es">Mientras la mayoría de gente se centrará en el
     desarrollo de aplicaciones web basadas en Spring MVC, es importante
@@ -158,9 +158,9 @@
     una capa DAO, capas de servicios, capa de dominio y una capa de control.
     En una aplicación típica de Roo solo se usa una <link
     linkend="guia-desarrollo_gestion-entidades">capa de Entidad</link> (que es
-    similar a la cama de dominio) y una <link
-    linkend="guia-desarrollo_web">capa Web</link>. Como se indica en la lista
-    anterior, si fuera necesario se podría añadir una capa de
+    similar a la capa de dominio) y una <link
+    linkend="guia-desarrollo_capa-web">capa Web</link>. Como se indica en la
+    lista anterior, si fuera necesario se podría añadir una capa de
     Servicios.</para>
 
     <para xml:lang="es">Aquí podemos ver un diagrama de los componentes de la
@@ -181,9 +181,9 @@
     <title xml:lang="es">El intérprete de comandos</title>
 
     <para>Para que el entorno empiece a funcionar, hay que arrancar un
-    intérprete de comandos (Roo shell) con el que interactuaremos con el
-    entorno de desarrollo. Este intérprete de comandos tiene dos funciones
-    básicas:</para>
+    intérprete de comandos (<emphasis>Roo shell</emphasis>) con el que
+    interactuaremos con el entorno de desarrollo. Este intérprete de comandos
+    tiene dos funciones básicas:</para>
 
     <itemizedlist>
       <listitem>
@@ -250,11 +250,12 @@ roo&gt;</programlisting>
               <term xml:lang="es">Add-ons</term>
 
               <listitem>
-                <para xml:lang="es">Componentes que automáticamente monitorizan 
-                y realizan cambios en nuestro proyecto.</para>
-                <para>También ofrecen un conjunto de comandos para que 
-                los desarrolladores puedan realizar operaciones 
-                a través del intérprete de comandos.</para>
+                <para xml:lang="es">Componentes que automáticamente
+                monitorizan y realizan cambios en nuestro proyecto.</para>
+
+                <para>También ofrecen un conjunto de comandos para que los
+                desarrolladores puedan realizar operaciones a través del
+                intérprete de comandos.</para>
               </listitem>
             </varlistentry>
 
@@ -271,8 +272,8 @@ roo&gt;</programlisting>
               <term xml:lang="es">STS: SpringSource Tool Suite</term>
 
               <listitem>
-                <para xml:lang="es">Plugin/Aplicación Eclipse de SpringSource 
-                para trabajar con proyectos Spring. Entre otras, dispone de 
+                <para xml:lang="es">Plugin/Aplicación Eclipse de SpringSource
+                para trabajar con proyectos Spring. Entre otras, dispone de
                 herramientas para trabajar con Roo.</para>
               </listitem>
             </varlistentry>
@@ -293,11 +294,12 @@ roo&gt;</programlisting>
         </listitem>
       </varlistentry>
     </variablelist>
-  <section>
-    <title xml:lang="es">Generación de código</title>
 
-    <para xml:lang="es">TBC</para>
-  </section>
+    <section>
+      <title xml:lang="es">Generación de código</title>
+
+      <para xml:lang="es"><emphasis>TBC</emphasis></para>
+    </section>
   </section>
 
   <section>
@@ -309,17 +311,18 @@ roo&gt;</programlisting>
 
     <itemizedlist>
       <listitem>
-        <para xml:lang="es">Comandos <emphasis>hint</emphasis> y 
-        <emphasis>help</emphasis>: Guían al usuario sobre
-        la forma de proceder</para>
+        <para xml:lang="es">Comandos <emphasis>hint</emphasis> y
+        <emphasis>help</emphasis>: Guían al usuario sobre la forma de
+        proceder</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es"><emphasis>TAB</emphasis> para completar 
+        <para xml:lang="es"><emphasis>TAB</emphasis> para completar
         prácticamente cualquier comando.</para>
-        <para>Pulsando <emphasis>TAB</emphasis> Roo sugiere que hacer a 
-        continuación, que comando se puede utilizar a continuación, incluso 
-        pulsando algún caracter qué comandos que empiezan por ese caracter se 
+
+        <para>Pulsando <emphasis>TAB</emphasis> Roo sugiere que hacer a
+        continuación, que comando se puede utilizar a continuación, incluso
+        pulsando algún caracter qué comandos que empiezan por ese caracter se
         pueden utilizar.</para>
       </listitem>
 
@@ -330,19 +333,18 @@ roo&gt;</programlisting>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Ejecución de <emphasis>scripts</emphasis>:
-        Se puede guardar una secuencia de comandos en un archivo de texto y 
-        ejecutarlos en bloque cuantas veces se necesite. Por ejemplo, 
-        podemos hacer un guión para crear una aplicación completa y ejecutarlo 
-        en el intérprete de Roo.</para>
+        <para xml:lang="es">Ejecución de <emphasis>scripts</emphasis>: Se
+        puede guardar una secuencia de comandos en un archivo de texto y
+        ejecutarlos en bloque cuantas veces se necesite. Por ejemplo, podemos
+        hacer un guión para crear una aplicación completa y ejecutarlo en el
+        intérprete de Roo.</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Funcionamiento predictivo y conservador:
-        Al ejecutarse en segundo plano debe ser un entorno conservador en el 
-        sentido que si no cambia nada en el proyecto no debe tocar nada, el 
-        desarrollador no debe perder nunca el control del proyecto.
-        </para>
+        <para xml:lang="es">Funcionamiento predictivo y conservador: Al
+        ejecutarse en segundo plano debe ser un entorno conservador en el
+        sentido que si no cambia nada en el proyecto no debe tocar nada, el
+        desarrollador no debe perder nunca el control del proyecto.</para>
       </listitem>
     </itemizedlist>
   </section>

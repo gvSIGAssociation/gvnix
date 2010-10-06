@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="instalacion"
+<chapter version="5.0" xml:id="instalacion" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook" 
-         xml:lang="es">
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Instalación de gvNIX</title>
 
   <section xml:id="instalacion_requisitos">
@@ -19,12 +18,18 @@
 
     <itemizedlist>
       <listitem>
-        <para>Java JDK 5 o 6.</para>
+        <para>Java JDK 5 o 6. <link
+        xlink:href="http://www.oracle.com/technetwork/java/javase/downloads/jdk6-jsp-136632.html">http://www.oracle.com/technetwork/java/javase/downloads/jdk6-jsp-136632.html</link></para>
       </listitem>
 
       <listitem>
-        <para>Maven 2.0.9 o superior, incluida en el <emphasis>PATH</emphasis>
-        del sistema.</para>
+        <para xlink:href="http://maven.apache.org/">Maven 2.0.9 o superior,
+        incluida en el <emphasis>PATH</emphasis> del sistema. <link
+        xlink:href="http://maven.apache.org/">http://maven.apache.org/</link></para>
+
+        <para xlink:href="http://maven.apache.org/"><emphasis
+        role="bold">Importante</emphasis>: usar las versiones de Maven 2.0.x,
+        no las 2.2.x.</para>
       </listitem>
 
       <listitem>
@@ -63,7 +68,7 @@
 
         <itemizedlist>
           <listitem>
-            <para>Ejemplo para sistemas *nix y Apple:</para>
+            <para>Ejemplo para sistemas Unix y Apple:</para>
 
             <programlisting>bash:~$ cd gvNIX-0.3.0
 bash:~/gvNIX-0.3.0$ export PATH=$PWD/bin:$PATH</programlisting>
@@ -77,14 +82,14 @@ bash:~/gvNIX-0.3.0$ export PATH=$PWD/bin:$PATH</programlisting>
 
     <itemizedlist>
       <listitem>
-        <para>Cambia al directorio del proyecto Java</para>
+        <para>Cambia al directorio del proyecto Java:</para>
 
         <programlisting>bash:~$ cd ~/project-directory</programlisting>
       </listitem>
 
       <listitem>
         <para>Ejecuta el intérprete de comando de gvNIX para interactuar con
-        el proyecto Java</para>
+        el proyecto Java:</para>
 
         <programlisting>bash:~/project-directory$ gvnix</programlisting>
       </listitem>

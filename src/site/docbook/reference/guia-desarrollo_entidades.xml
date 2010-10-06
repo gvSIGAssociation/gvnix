@@ -1,33 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="guia-desarrollo_gestion-entidades" 
-         xmlns="http://docbook.org/ns/docbook"
+<chapter version="5.0" xml:id="guia-desarrollo_gestion-entidades"
+         xml:lang="es" xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook"
-         xml:lang="es">
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Gestión de entidades</title>
 
-    <para xml:lang="es">Las entidades del modelo del dominio son uno de los
-    elementos más importantes de gvNIX.
-    </para>
+  <para xml:lang="es">Las entidades del modelo del dominio son uno de los
+  elementos más importantes de gvNIX.</para>
 
-      <para xml:lang="es">En Java una entidad se corresponde con una clase, 
-      definida en un archivo 
-      <filename>.java</filename>.</para> 
-      <para>Además de de la lógica de negocio, cada clase contiene una serie de 
-      anotaciones de clase y de atributos que forman parte de la metainformación
-      que permite a gvNIX realizar acciones automáticas.</para>
+  <para xml:lang="es">En Java una entidad se corresponde con una clase,
+  definida en un archivo <filename>.java</filename>.</para>
 
-<example><title>Una clase Java</title>
-<programlistingco>
-<areaspec>
-<area id="ex.annot.class" coords='1'/>
-<area id="ex.annot.attri" coords='7'/>
-</areaspec>
-        <programlisting>@Entity
+  <para>Además de la lógica de negocio, cada clase contiene una serie de
+  anotaciones de clase y de atributos que forman parte de la metainformación
+  que permite a gvNIX realizar acciones automáticas.</para>
+
+  <example>
+    <title>Una clase Java</title>
+
+    <programlistingco>
+      <areaspec>
+        <area coords="1" id="ex.annot.class"></area>
+
+        <area coords="7" id="ex.annot.attri"></area>
+      </areaspec>
+
+      <programlisting>@Entity
 @RooJavaBean
 @RooToString
 @RooEntity
@@ -40,342 +42,356 @@ public class Entity1 {
         @Size(max = 20)
         private String appellidos;
 }</programlisting>
-<calloutlist>
-<callout arearefs="ex.annot.class">
-<para>
-Anotación de clase
-</para>
-</callout>
-<callout arearefs="ex.annot.attri">
-<para>
-Anotación de atributo
-</para>
-</callout>
-</calloutlist>
-</programlistingco>
-      </example>
-      <para xml:lang="es">gvNIX añadirá todos los métodos
-      estándar necesarios para completar la definición de entidad, como los de
-      persistencia (almacenamiento y recuperación). Como se vió en la sección
-      de generación de código se crearán una serie de archivos 
-      <filename>.aj</filename>
-      que en tiempo de compilación se incluyen a la clase de forma 
-      transparente.</para>
 
-      <para xml:lang="es">Si por algún motivo necesitamos <emphasis
-      >personalizar el comportamiento</emphasis> de alguno de los
-      <emphasis>métodos estándar que genera Roo</emphasis>,
-      simplemente tenemos que <emphasis>definirlos en el en la
-      clase java</emphasis>. Cuando el framework detecta el cambio actualiza 
-      el fichero <filename>*_Roo_*.aj</filename> para eliminar esta
-      definición.</para>
+      <calloutlist>
+        <callout arearefs="ex.annot.class">
+          <para>Anotación de clase</para>
+        </callout>
 
-      <para xml:lang="es">Existen formas de crear una entidad:</para>
+        <callout arearefs="ex.annot.attri">
+          <para>Anotación de atributo</para>
+        </callout>
+      </calloutlist>
+    </programlistingco>
+  </example>
+
+  <para xml:lang="es">gvNIX añadirá todos los métodos estándar necesarios para
+  completar la definición de entidad, como los de persistencia (almacenamiento
+  y recuperación). Como se vió en la sección de generación de código se
+  crearán una serie de archivos <filename>.aj</filename> que en tiempo de
+  compilación se incluyen a la clase de forma transparente.</para>
+
+  <para xml:lang="es">Si por algún motivo necesitamos <emphasis>personalizar
+  el comportamiento</emphasis> de alguno de los <emphasis>métodos estándar que
+  genera Roo</emphasis>, simplemente tenemos que <emphasis>definirlos en la
+  clase java</emphasis>. Cuando el framework detecta el cambio actualiza el
+  fichero <filename>*_Roo_*.aj</filename> para eliminar esta
+  definición.</para>
+
+  <para xml:lang="es">Existen formas de crear una entidad:</para>
+
+  <orderedlist>
+    <listitem>
+      <para xml:lang="es">Usando el intérprete de comandos.</para>
+    </listitem>
+
+    <listitem>
+      <para xml:lang="es">Usando nuestro IDE habitual.</para>
+    </listitem>
+  </orderedlist>
+
+  <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando">
+    <title xml:lang="es">Crear una entidad con el intérprete de
+    comandos</title>
+
+    <para xml:lang="es">Desde el intérprete de comandos podemos crear
+    entidades de forma sencilla con los comandos: <command>entity</command> y
+    <command>field</command>.</para>
+
+    <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_entity">
+      <title xml:lang="es">Comando entity</title>
+
+      <para xml:lang="es">Este comando crea una nueva entidad en nuestro
+      proyecto. Requiere como mínimo definir el parámetro
+      <parameter>--class</parameter> para especificar el nombre y el paquete
+      de la nueva clase En este parámetro podemos utilizar el carácter
+      <literal>~</literal> como abreviatura de el paquete base del
+      proyecto.</para>
+
+      <para xml:lang="es">Entre los parámetros disponibles podemos
+      destacar:</para>
+
+      <variablelist>
+        <varlistentry>
+          <term xml:lang="es">--class</term>
+
+          <listitem>
+            <para xml:lang="es">Nombre de la clase java para la entidad
+            (incluido su paquete) (recordar que se puede usar el
+            <literal>~</literal> para especificar el paquete base de la
+            aplicación).</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">--identifierType</term>
+
+          <listitem>
+            <para xml:lang="es">Permite definir el tipo (clase java) de
+            identificador (clave primaria) que usará esta entidad.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">--identifierField</term>
+
+          <listitem>
+            <para xml:lang="es">Nombre del <emphasis>campo en la
+            entidad</emphasis> (no en BBDD) que se usará para el
+            identificador.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">--identifierColumn</term>
+
+          <listitem>
+            <para xml:lang="es">Nombre de la <emphasis>columna de la
+            BBDD</emphasis> donde almacenar el valor de clave primaria.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">--table</term>
+
+          <listitem>
+            <para xml:lang="es">Nombre de la <emphasis>tabla de la
+            BBDD</emphasis> donde almacenar los datos para esta
+            entidad.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">--testAutomatically</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>TBC</emphasis></para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+
+      <para xml:lang="es">El resto de las opciones podemos verlas usando el
+      autocompletado de la consola de roo o usando el comando <command>help
+      entity</command>.</para>
+
+      <important>
+        <title xml:lang="es">Enlazar modelo de entidades con base de datos
+        existente</title>
+
+        <para xml:lang="es">Notar que los parámetros
+        <command>--identifierColumn</command> y <command>--table</command>
+        permiten que en tiempo de creación podemos indicar que la entidad sea
+        persistente sobre un modelo relacional creado con anterioridad.</para>
+      </important>
+
+      <important>
+        <title xml:lang="es">Eliminar y modificar entidades</title>
+
+        <para xml:lang="es">No se pueden eliminar o modificar las entidades
+        desde línea de comandos. Esto se debe realizar usando el IDE. Para más
+        información ver la sección <link
+        linkend="guia-desarrollo_gestion-entidades_definicion_modificar-modelo">Modificar
+        una entidad</link>.</para>
+      </important>
+    </section>
+
+    <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_field">
+      <title xml:lang="es">Comando field</title>
+
+      <para xml:lang="es">No existe un comando <command>field</command>
+      propiamente dicho, pero es el nombre de un grupo de comando para añadir
+      campos a una entidad. Los comandos finales se forma con el
+      <command>field {tipo}</command> donde <parameter>{tipo}</parameter> es
+      el tipo de dato que va almacenar. Así tenemos los siguientes:</para>
+
+      <variablelist>
+        <varlistentry>
+          <term xml:lang="es">field string</term>
+
+          <listitem xml:lang="es">
+            <para>Crea un campo de tipo cadena.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">field boolean</term>
+
+          <listitem xml:lang="es">
+            <para>Crea un campo de tipo booleano.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">field date</term>
+
+          <listitem xml:lang="es">
+            <para>Crea un campo de tipo fecha.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">field email template</term>
+
+          <listitem xml:lang="es">
+            <para>Crea un campo con una plantilla preparada para almacenar
+            direcciones de correo electrónico.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">field enum</term>
+
+          <listitem xml:lang="es">
+            <para>Crea un campo de tipo enumerado.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">field number</term>
+
+          <listitem xml:lang="es">
+            <para>Crea un campo de tipo numérico (es posible especificarle el
+            tipo mediante el parámetro <parameter>--type</parameter>).</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">field reference</term>
+
+          <listitem xml:lang="es">
+            <para>Crea un campo que será una referencia a otra entidad.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">field set</term>
+
+          <listitem xml:lang="es">
+            <para>Crea un campo que devolverá una lista de elementos de una
+            entidad relacionados con este elemento.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term xml:lang="es">field other</term>
+
+          <listitem xml:lang="es">
+            <para>Crea un campo de otro tipo no registrado.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+
+      <para>Cada uno de estos comandos admiten algunos parámetros que son
+      comunes entre ellos o muy específicos. Entre los comunes (para la
+      mayoría) podemos encontrar los siguientes:</para>
+
+      <variablelist>
+        <varlistentry>
+          <term>--fieldName</term>
+
+          <listitem>
+            <para xml:lang="es">Nombre del campo que vamos a generar.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--class</term>
+
+          <listitem>
+            <para xml:lang="es">Clase entidad donde vamos a crear el campo.
+            Admite el uso de <literal>~</literal> y tiene autocompletado. No
+            es necesario especificar si acabamos de crear una entidad.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--notNull y --nullRequired</term>
+
+          <listitem>
+            <para xml:lang="es">Especifica el comportamiento de campo antes
+            los valores nulos.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--column</term>
+
+          <listitem>
+            <para xml:lang="es">Nombre de la columna en BBDD donde se
+            almacenará el valor.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--sizeMax y --sizeMin</term>
+
+          <listitem>
+            <para xml:lang="es">Limitaciones de tamaño.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+
+      <para xml:lang="es">Existen más opciones dependiendo del tipo de dato,
+      para más información ver la ayuda de la consola.</para>
+
+      <important>
+        <title xml:lang="es">Enlazar modelo de entidades con base de datos
+        existente</title>
+
+        <para xml:lang="es">Notar que el parámetro <command>--column</command>
+        permiten que en tiempo de creación podemos indicar que la entidad sea
+        persistente sobre un modelo relacional creado con anterioridad.</para>
+      </important>
+
+      <important>
+        <title xml:lang="es">Eliminar y modificar campos</title>
+
+        <para xml:lang="es">No se pueden eliminar o modificar los campos desde
+        línea de comandos. Esto se debe realizar usando el IDE. Para más
+        información ver la sección <link
+        linkend="guia-desarrollo_gestion-entidades_definicion_modificar-modelo">Modificar
+        una entidad</link>.</para>
+      </important>
+    </section>
+
+    <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_field_ejemplos">
+      <title xml:lang="es">Proyecto ejemplo</title>
+
+      <para xml:lang="es">El modelo del dominio del proyecto de la aplicación
+      de venta de pizzas lo crearemos con la siguiente secuencia de
+      comandos:</para>
 
       <orderedlist>
         <listitem>
-          <para xml:lang="es">Usando el intérprete de comandos.</para>
+          <para xml:lang="es">Topping:</para>
+
+          <programlisting>roo&gt; <command>entity --class ~.domain.Topping --testAutomatically</command>
+~.domain.Topping roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+                </programlisting>
         </listitem>
 
         <listitem>
-          <para xml:lang="es">Usando nuestro IDE habitual.</para>
-        </listitem>
-      </orderedlist>
+          <para xml:lang="es">Base:</para>
 
-      <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando">
-        <title xml:lang="es">Crear una entidad con el intérprete de comandos</title>
-
-        <para xml:lang="es">Desde el intérprete de comandos podemos crear
-        entidades de forma sencilla con los comandos:
-        <command>entity</command> y 
-        <command>field</command>.
-        </para>
-
-        <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_entity">
-          <title xml:lang="es">Comando entity</title>
-
-          <para xml:lang="es">Este comando crea una nueva entidad en nuestro
-          proyecto. Requiere como mínimo definir el parámetro
-          <parameter>--class</parameter> para especificar el nombre y el
-          paquete de la nueva clase En este parámetro podemos utilizar el
-          carácter <literal>~</literal> como abreviatura de el paquete base
-          del proyecto.</para>
-
-          <para xml:lang="es">Entre los parámetros disponibles podemos
-          destacar:</para>
-
-          <variablelist>
-            <varlistentry>
-              <term xml:lang="es">--class</term>
-
-              <listitem>
-                <para xml:lang="es">Nombre de la clase java para la entidad
-                (incluido su paquete) (recordar que se puede usar el
-                <literal>~</literal> para especificar el paquete base de la
-                aplicación).</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">--identifierType</term>
-
-              <listitem>
-                <para xml:lang="es">Permite definir el tipo (clase java) de
-                identificador (clave primaria) que usará esta entidad.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">--identifierField</term>
-
-              <listitem>
-                <para xml:lang="es">Nombre del <emphasis>campo en la
-                entidad</emphasis> (no en BBDD) que se usará para el
-                identificador.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">--identifierColumn</term>
-
-              <listitem>
-                <para xml:lang="es">Nombre de la <emphasis>columna de la
-                BBDD</emphasis> donde almacenar el valor de clave
-                primaria.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">--table</term>
-
-              <listitem>
-                <para xml:lang="es">Nombre de la <emphasis>tabla de la
-                BBDD</emphasis> donde almacenar los datos para esta
-                entidad.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">--testAutomatically</term>
-              <listitem>
-                <para xml:lang="es">TBC</para>
-              </listitem>
-            </varlistentry>
-          </variablelist>
-
-          <para xml:lang="es">El resto de las opciones podemos verlas usando
-          el autocompletado de la consola de roo o usando el comando
-          <command>help entity</command>.</para>
-
-        <important>
-          <title xml:lang="es">Enlazar modelo de entidades con base de datos
-          existente</title>
-          <para xml:lang="es">Notar que los parámetros 
-          <command>--identifierColumn</command> y <command>--table</command> 
-          permiten que en tiempo de creación podemos indicar que la entidad 
-          sea persistente sobre un modelo relacional 
-          creado con anterioridad.
-          </para>
-        </important>
-
-        </section>
-
-        <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_field">
-          <title xml:lang="es">Comando field</title>
-
-          <para xml:lang="es">No existe un comando <command>field</command>
-          propiamente dicho, pero es el nombre de un grupo de comando para
-          añadir campos a una entidad. Los comandos finales se forma con el
-          <command>field {tipo}</command> donde <parameter>{tipo}</parameter>
-          es el tipo de dato que va almacenar. Así tenemos los
-          siguientes:</para>
-
-          <variablelist>
-            <varlistentry>
-              <term xml:lang="es">field string</term>
-
-              <listitem xml:lang="es">
-                <para>Crea un campo de tipo cadena.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">field boolean</term>
-
-              <listitem xml:lang="es">
-                <para>Crea un campo de tipo booleano.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">field date</term>
-
-              <listitem xml:lang="es">
-                <para>Crea un campo de tipo fecha.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">field email template</term>
-
-              <listitem xml:lang="es">
-                <para>Crea un campo con una plantilla preparada para almacenar
-                direcciones de correo electrónico.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">field enum</term>
-
-              <listitem xml:lang="es">
-                <para>Crea un campo de tipo enumerado.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">field number</term>
-
-              <listitem xml:lang="es">
-                <para>Crea un campo de tipo numérico (es posible especificarle
-                el tipo mediante el parámetro
-                <parameter>--type</parameter>).</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">field reference</term>
-
-              <listitem xml:lang="es">
-                <para>Crea un campo que será una referencia a otra
-                entidad.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">field set</term>
-
-              <listitem xml:lang="es">
-                <para>Crea un campo que devolverá una lista de elementos de
-                una entidad relacionados con este elemento.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">field other</term>
-
-              <listitem xml:lang="es">
-                <para>Crea un campo de otro tipo no registrado.</para>
-              </listitem>
-            </varlistentry>
-          </variablelist>
-
-          <para>Cada uno de estos comandos admiten algunos parámetros que son
-          comunes entre ellos o muy específicos. Entre los comunes (para la
-          mayoría) podemos encontrar los siguientes:</para>
-
-          <variablelist>
-            <varlistentry>
-              <term>--fieldName</term>
-
-              <listitem>
-                <para xml:lang="es">Nombre del campo que vamos a
-                generar.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term>--class</term>
-
-              <listitem>
-                <para xml:lang="es">Clase entidad donde vamos a crear el
-                campo. Admite el uso de <literal>~</literal> y tiene
-                autocompletado. No es necesario especificar si acabamos de
-                crear una entidad.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term>--notNull y --nullRequired</term>
-
-              <listitem>
-                <para xml:lang="es">Especifica el comportamiento de campo
-                antes los valores nulos.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term>--column</term>
-
-              <listitem>
-                <para xml:lang="es">Nombre de la columna en BBDD donde se
-                almacenará el valor.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term>--sizeMax y --sizeMin</term>
-
-              <listitem>
-                <para xml:lang="es">Limitaciones de tamaño.</para>
-              </listitem>
-            </varlistentry>
-          </variablelist>
-
-          <para xml:lang="es">Existe mas opciones dependiendo del tipo de
-          dato, para mas información ver la ayuda de la consola.</para>
-
-        <important>
-          <title xml:lang="es">Enlazar modelo de entidades con base de datos
-          existente</title>
-          <para xml:lang="es">Notar que el parámetro 
-          <command>--column</command> 
-          permiten que en tiempo de creación podemos indicar que la entidad 
-          sea persistente sobre un modelo relacional 
-          creado con anterioridad.
-          </para>
-        </important>
-        </section>
-
-          <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-con-comando_field_ejemplos">
-            <title xml:lang="es">Proyecto ejemplo</title>
-
-            <para xml:lang="es">El modelo del dominio del proyecto 
-            de la aplicación de venta de pizzas lo crearemos con la siguiente
-            secuencia de comandos:</para>
-
-            <orderedlist>
-              <listitem>
-                <para xml:lang="es">Topping</para>
-
-                <programlisting>roo&gt; <command>entity --class ~.domain.Topping --testAutomatically</command>
-~.domain.Topping roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
-                </programlisting>
-              </listitem>
-              <listitem>
-                <para xml:lang="es">Base</para>
-
-                <programlisting>~.domain.Topping roo&gt; <command>entity --class ~.domain.Base --testAutomatically</command>
+          <programlisting>~.domain.Topping roo&gt; <command>entity --class ~.domain.Base --testAutomatically</command>
 ~.domain.Base roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
                 </programlisting>
-              </listitem>
-              <listitem>
-                <para xml:lang="es">Pizza</para>
+        </listitem>
 
-                <programlisting>~.domain.Base roo&gt; <command>entity --class ~.domain.Pizza --testAutomatically</command>
+        <listitem>
+          <para xml:lang="es">Pizza:</para>
+
+          <programlisting>~.domain.Base roo&gt; <command>entity --class ~.domain.Pizza --testAutomatically</command>
 ~.domain.Pizza roo&gt; <command>field string --fieldName name --notNull --sizeMin 2 
 --comment "Nombre de la pizza" --column pizza_nombre --regexp [A-Za-z0-9].*</command>
 ~.domain.Pizza roo&gt; <command>field number --fieldName price --type java.lang.Float</command>
 ~.domain.Pizza roo&gt; <command>field set --fieldName toppings --element ~.domain.Topping</command>
 ~.domain.Pizza roo&gt; <command>field reference --fieldName base --type ~.domain.Base</command>
                 </programlisting>
-                <para xml:lang="es">Esta secuencia de comandos genera la siguiente clase Java:</para>
-<programlistingco>
-<areaspec>
-<area id="ex.regexp" coords='10'/>
-<area id="ex.set" coords='16'/>
-<area id="ex.entity" coords='21'/>
-</areaspec>
-                <programlisting>@Entity
+
+          <para xml:lang="es">Esta secuencia de comandos genera la siguiente
+          clase Java:</para>
+
+          <programlistingco>
+            <areaspec>
+              <area coords="10" id="ex.regexp"></area>
+
+              <area coords="16" id="ex.set"></area>
+
+              <area coords="21" id="ex.entity"></area>
+            </areaspec>
+
+            <programlisting>@Entity
 @RooJavaBean
 @RooToString
 @RooEntity
@@ -397,167 +413,169 @@ public class Pizza {
     @JoinColumn
     private Base base;
 }</programlisting>
-<calloutlist>
-<callout arearefs="ex.regexp">
-<para>
-Validación del texto
-</para>
-</callout>
-<callout arearefs="ex.set">
-<para xml:lang="es">Asociación con un conjunto de entidades</para>
-</callout>
-<callout arearefs="ex.entity">
-<para xml:lang="es">Asociación con otra entidad</para>
-</callout>
-</calloutlist>
-</programlistingco>
-              </listitem>
-              <listitem>
-                <para xml:lang="es">PizzaOrder</para>
 
-                <programlisting>~.domain.Pizza roo&gt; <command>entity --class ~.domain.PizzaOrder --testAutomatically</command>
+            <calloutlist>
+              <callout arearefs="ex.regexp">
+                <para>Validación del texto</para>
+              </callout>
+
+              <callout arearefs="ex.set">
+                <para xml:lang="es">Asociación con un conjunto de
+                entidades</para>
+              </callout>
+
+              <callout arearefs="ex.entity">
+                <para xml:lang="es">Asociación con otra entidad</para>
+              </callout>
+            </calloutlist>
+          </programlistingco>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">PizzaOrder:</para>
+
+          <programlisting>~.domain.Pizza roo&gt; <command>entity --class ~.domain.PizzaOrder --testAutomatically</command>
 ~.domain.PizzaOrder roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
 ~.domain.PizzaOrder roo&gt; <command>field string --fieldName address --notNull --sizeMax 30</command>
 ~.domain.PizzaOrder roo&gt; <command>field number --fieldName total --type java.lang.Float</command>
 ~.domain.PizzaOrder roo&gt; <command>field date --fieldName deliveryDate --type java.util.Date</command>
 ~.domain.PizzaOrder roo&gt; <command>field set --fieldName pizzas --element ~.domain.Pizza</command>
                 </programlisting>
-              </listitem>
-            </orderedlist>
-            <para>En este punto, se ha completado la versión inicial del modelo del dominio</para>
-          </section>
-      </section>
+        </listitem>
+      </orderedlist>
 
-      <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-a-mano">
-        <title xml:lang="es">Crear una entidad con un IDE</title>
+      <para>En este punto, se ha completado la versión inicial del modelo del
+      dominio</para>
+    </section>
+  </section>
 
-        <para xml:lang="es">Como hemos visto en el punto anterior el código
-        Java generado no tiene ningún elemento particular de Roo, por lo que 
-        crear
-        nuestro modelo del dominio con cualquier IDE consiste en codificar
-        las clases Java con las anotaciones que permiten a Roo
-        monitorizar y generar código.</para>
+  <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-a-mano">
+    <title xml:lang="es">Crear una entidad con un IDE</title>
 
-        <para>Es importante destacar que el objetivo de utilizar anotaciones
-        de Roo es permitir que nuestro proyecto también se pueda gestionar 
-        (automáticamente o por el desarrollador)  
-        con el intérprete de comandos, de esta forma, podemos codificar clases
-        con nuestro IDE y arrancando el intérprete de comandos de Roo se 
-        generará toda la infraestructura necesaria para la persistencia, 
-        validación, etc</para>
+    <para xml:lang="es">Como hemos visto en el punto anterior el código Java
+    generado no tiene ningún elemento particular de Roo, por lo que crear
+    nuestro modelo del dominio con cualquier IDE consiste en codificar las
+    clases Java con las anotaciones que permiten a Roo monitorizar y generar
+    código.</para>
 
-        <para xml:lang="es">Entre las anteriores anotaciones que podemos
-        utilizar en la codificación de nuestro modelo, podemos destacar:</para>
+    <para>Es importante destacar que el objetivo de utilizar anotaciones de
+    Roo es permitir que nuestro proyecto también se pueda gestionar
+    (automáticamente o por el desarrollador) con el intérprete de comandos, de
+    esta forma, podemos codificar clases con nuestro IDE y arrancando el
+    intérprete de comandos de Roo se generará toda la infraestructura
+    necesaria para la persistencia, validación, etc</para>
 
-        <variablelist>
-          <varlistentry>
-            <term>@Entity</term>
+    <para xml:lang="es">Entre las anteriores anotaciones que podemos utilizar
+    en la codificación de nuestro modelo, podemos destacar:</para>
 
-            <listitem>
-              <para xml:lang="es">Anotación JPA que identifica esta clase como
-              persistente.</para>
-            </listitem>
-          </varlistentry>
+    <variablelist>
+      <varlistentry>
+        <term>@Entity</term>
 
-          <varlistentry>
-            <term>@RooJavaBean</term>
+        <listitem>
+          <para xml:lang="es">Anotación JPA que identifica esta clase como
+          persistente.</para>
+        </listitem>
+      </varlistentry>
 
-            <listitem>
-              <para xml:lang="es">Anotación que informa a Roo que debe generar
-              los getter/setter que falten para acceder modificar los valores
-              de nuestros campos. Si alguno estuviese generado, el framework
-              no lo generará.</para>
-            </listitem>
-          </varlistentry>
+      <varlistentry>
+        <term>@RooJavaBean</term>
 
-          <varlistentry>
-            <term>@RooToString</term>
+        <listitem>
+          <para xml:lang="es">Anotación que informa a Roo que debe generar los
+          getter/setter que falten para acceder modificar los valores de
+          nuestros campos. Si alguno estuviese generado, el framework no lo
+          generará.</para>
+        </listitem>
+      </varlistentry>
 
-            <listitem>
-              <para xml:lang="es">Anotación que informa a Roo que debe genera
-              un método automático <methodname>toString()</methodname> para
-              esta clase. Este método se genera a partir de las propiedades de
-              la clase.</para>
-            </listitem>
-          </varlistentry>
+      <varlistentry>
+        <term>@RooToString</term>
 
-          <varlistentry>
-            <term>@RooEntity</term>
+        <listitem>
+          <para xml:lang="es">Anotación que informa a Roo que debe genera un
+          método automático <methodname>toString()</methodname> para esta
+          clase. Este método se genera a partir de las propiedades de la
+          clase.</para>
+        </listitem>
+      </varlistentry>
 
-            <listitem>
-              <para xml:lang="es">Anotación que informa Roo que esta clase es
-              una entidad. Esta anotación genera todos lo métodos necesarios
-              de persistencia y manejo básicos necesario para manejar la
-              entidad.</para>
-            </listitem>
-          </varlistentry>
-        </variablelist>
+      <varlistentry>
+        <term>@RooEntity</term>
 
-        <important>
-          <para>gvNIX solo reconoce las <emphasis>anotaciones de
-          las propiedades</emphasis> que se encuentren <emphasis>en la
-          declaración de la propiedad</emphasis> de la clase, 
-          <emphasis>no en los métodos accesores (getter/setter)</emphasis>
-          </para>
-        </important>
+        <listitem>
+          <para xml:lang="es">Anotación que informa Roo que esta clase es una
+          entidad. Esta anotación genera todos lo métodos necesarios de
+          persistencia y manejo básicos necesario para manejar la
+          entidad.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
 
-        <important>
-          <para>gvNIX solo distinguirá como entidad las 
-          <emphasis>clases correctamente anotadas</emphasis> y que estén 
-          <emphasis>dentro del paquete base de la aplicación (o
-          subpaquetes)</emphasis>.</para>
-        </important>
+    <important>
+      <para>gvNIX solo reconoce las <emphasis>anotaciones de las
+      propiedades</emphasis> que se encuentren <emphasis>en la declaración de
+      la propiedad</emphasis> de la clase, <emphasis>no en los métodos
+      accesores (getter/setter)</emphasis></para>
+    </important>
 
-        <para>Consultar el <link
-        xlink:href="http://static.springsource.org/spring-roo/org.springframework.roo.annotations/apidocs/">API de las anotaciones</link> para un detalle 
-        exhaustivo de las anotaciones y parámetros disponibles.</para>
+    <important>
+      <para>gvNIX solo distinguirá como entidad las <emphasis>clases
+      correctamente anotadas</emphasis> y que estén <emphasis>dentro del
+      paquete base de la aplicación (o subpaquetes)</emphasis>.</para>
+    </important>
 
-      </section>
+    <para>Consultar el <link
+    xlink:href="http://static.springsource.org/spring-roo/org.springframework.roo.annotations/apidocs/">API
+    de las anotaciones</link> para un detalle exhaustivo de las anotaciones y
+    parámetros disponibles.</para>
+  </section>
 
-      <section xml:id="guia-desarrollo_gestion-entidades_definicion_modificar-modelo">
-        <title xml:lang="es">Modificar una entidad</title>
+  <section xml:id="guia-desarrollo_gestion-entidades_definicion_modificar-modelo">
+    <title xml:lang="es">Modificar una entidad</title>
 
-        <para xml:lang="es">A diferencia de la creación de entidades, la
-        modificación del modelo del dominio sólo puede hacerse utilizando
-        nuestro IDE habitual.</para>
+    <para xml:lang="es">A diferencia de la creación de entidades, la
+    modificación del modelo del dominio sólo puede hacerse utilizando nuestro
+    IDE habitual.</para>
 
-        <variablelist>
-          <varlistentry>
-            <term>Eliminar una entidad</term>
-            <listitem>
-        <para xml:lang="es">Borrar 
-        el fichero <filename>.java</filename> de la clase Java y
-        automáticamente se detectará el cambio y se limpiarán todos los
-        elementos relacionados: ficheros {entidad}_Roo_*.aj, controladores
-        asociados, elementos de menú, etc.</para>
-            </listitem>
-          </varlistentry>
+    <variablelist>
+      <varlistentry>
+        <term>Eliminar una entidad</term>
 
-          <varlistentry>
-            <term>Eliminar un atributo</term>
-            <listitem>
-        <para xml:lang="es">
-        Borrarlo de la
-        clase Java y todos los componentes
-        relacionados serán actualizados automáticamente.</para>
-            </listitem>
-          </varlistentry>
+        <listitem>
+          <para xml:lang="es">Borrar el fichero <filename>.java</filename> de
+          la clase Java y automáticamente se detectará el cambio y se
+          limpiarán todos los elementos relacionados: ficheros
+          {entidad}_Roo_*.aj, controladores asociados, elementos de menú,
+          etc.</para>
+        </listitem>
+      </varlistentry>
 
-          <varlistentry>
-            <term>Modificar un atributo</term>
-            <listitem>
-        <para xml:lang="es">
-        TBC</para>
-            </listitem>
-          </varlistentry>
-        </variablelist>
-      </section>
+      <varlistentry>
+        <term>Eliminar un atributo</term>
 
-      <section xml:id="guia-desarrollo_gestion-entidades_definicion_identificadores-compuestos">
-        <title xml:lang="es">Identificadores compuestos</title>
+        <listitem>
+          <para xml:lang="es">Borrarlo de la clase Java y todos los
+          componentes relacionados serán actualizados automáticamente.</para>
+        </listitem>
+      </varlistentry>
 
-        <para>TBC</para>
-<!--
+      <varlistentry>
+        <term>Modificar un atributo</term>
+
+        <listitem>
+          <para xml:lang="es"><emphasis>TBC</emphasis></para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="guia-desarrollo_gestion-entidades_definicion_identificadores-compuestos">
+    <title xml:lang="es">Identificadores compuestos</title>
+
+    <para><emphasis>TBC</emphasis></para>
+
+    <!--
         <para xml:lang="es">Ahora mismo no está completo el soporte para
         identificadores que estén compuestos de mas de un campo.</para>
 
@@ -575,30 +593,30 @@ Validación del texto
           </listitem>
         </itemizedlist>
 -->
-    </section>
+  </section>
 
-    <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente">
-      <title xml:lang="es">Enlazar modelo de entidades con base de datos
-      existente</title>
+  <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente">
+    <title xml:lang="es">Enlazar modelo de entidades con base de datos
+    existente</title>
 
-      <para xml:lang="es">Una vez hemos desarrollado el modelo de entidades 
-      de nuestra aplicación, puede ocurrir que la persistencia deba 
-      realizarse sobre un modelo relacional concreto, en estos casos podemos
-      utilizar nuestro IDE para modificar las clases Java y plasmar la
-      información necesaria que permitirá a gvNIX actualizar el sistema
-      de persistencia.
-      </para>
+    <para xml:lang="es">Una vez hemos desarrollado el modelo de entidades de
+    nuestra aplicación, puede ocurrir que la persistencia deba realizarse
+    sobre un modelo relacional concreto, en estos casos podemos utilizar
+    nuestro IDE para modificar las clases Java y plasmar la información
+    necesaria que permitirá a gvNIX actualizar el sistema de
+    persistencia.</para>
 
-      <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_tablas">
-        <title>Usar una tabla concreta</title>
+    <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_tablas">
+      <title>Usar una tabla concreta</title>
 
-        <para>Con la anotación de clase 
-        <classname><link
-        xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/Table.html">@Table</link></classname>
-        podemos indicar el nombre de la tabla donde se guardarán los objetos 
-        de la clase.</para>
+      <para>Con la anotación de clase <classname><link
+      xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/Table.html">@Table</link></classname>
+      podemos indicar el nombre de la tabla donde se guardarán los objetos de
+      la clase.</para>
 
-<example><title>Uso de la anotación</title>
+      <example>
+        <title>Uso de la anotación</title>
+
         <programlisting>@Entity
 @RooJavaBean
 @RooToString
@@ -608,85 +626,91 @@ public class Entity1 {
 
     private String field1;
 }</programlisting>
-</example>
-      </section>
+      </example>
+    </section>
 
-      <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_columnas">
-        <title>Usar una columna concreta</title>
+    <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_columnas">
+      <title>Usar una columna concreta</title>
 
-        <para>
-        Existen varias anotaciones que permiten definir la correspondencia 
-        entre atributos de una entidad y las columnas de la tabla.</para>
+      <para>Existen varias anotaciones que permiten definir la correspondencia
+      entre atributos de una entidad y las columnas de la tabla.</para>
 
-        <para>Las más importantes son:</para>
+      <para>Las más importantes son:</para>
 
-        <variablelist>
-          <varlistentry>
-            <term><classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/Column.html">@Column</link></classname></term>
+      <variablelist>
+        <varlistentry>
+          <term><classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/Column.html">@Column</link></classname></term>
 
-            <listitem>
-              <para>Indicar en qué columna de la base de datos se almacenará
-              el valor del atributo. Si se omite este anotación se usan
-              ajustes por defecto.</para>
-            </listitem>
-          </varlistentry>
+          <listitem>
+            <para>Indicar en qué columna de la base de datos se almacenará el
+            valor del atributo. Si se omite este anotación se usan ajustes por
+            defecto.</para>
+          </listitem>
+        </varlistentry>
 
-          <varlistentry>
-            <term><classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/Transient.html">@Transient</link></classname></term>
+        <varlistentry>
+          <term><classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/Transient.html">@Transient</link></classname></term>
 
-            <listitem>
-              <para>Indica que el atributo de la clase Java no tiene
-              representación en la tabla (no será cargado ni
-              almacenado).</para>
-            </listitem>
-          </varlistentry>
+          <listitem>
+            <para>Indica que el atributo de la clase Java no tiene
+            representación en la tabla (no será cargado ni almacenado).</para>
+          </listitem>
+        </varlistentry>
 
-          <varlistentry>
-            <term><classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/JoinColumn.html">@JoinColumn</link></classname>,
-            <classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/JoinColumns.html">@JoinColumns</link></classname>,
-            <classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OneToOne.html">@OneToOne</link></classname>,
-            <classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/ManyToOne.html">@ManyToOne</link></classname></term>
+        <varlistentry>
+          <term><classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/JoinColumn.html">@JoinColumn</link></classname>,
+          <classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/JoinColumns.html">@JoinColumns</link></classname>,
+          <classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OneToOne.html">@OneToOne</link></classname>,
+          <classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/ManyToOne.html">@ManyToOne</link></classname></term>
 
-            <listitem>
-              <para>Definir la correspondencia de una asociación
-              <emphasis>N-1</emphasis></para>
-            </listitem>
-          </varlistentry>
+          <listitem>
+            <para>Definir la correspondencia de una asociación
+            <emphasis>N-1.</emphasis></para>
+          </listitem>
+        </varlistentry>
 
-          <varlistentry>
-            <term><classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/JoinTable.html">@JoinTable</link></classname>,
-            <classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OneToMany.html">@OneToMany</link></classname>,
-            <classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/ManyToMany.html">@ManyToMany</link></classname>,
-            <classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OrderBy.html">@OrderBy</link></classname></term>
+        <varlistentry>
+          <term><classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/JoinTable.html">@JoinTable</link></classname>,
+          <classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OneToMany.html">@OneToMany</link></classname>,
+          <classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/ManyToMany.html">@ManyToMany</link></classname>,
+          <classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OrderBy.html">@OrderBy</link></classname></term>
 
-            <listitem>
-              <para>Definir la correspondencia de una asociación 
-              <emphasis>1-N</emphasis> o <emphasis>N-M</emphasis></para>
-            </listitem>
-          </varlistentry>
-        </variablelist>
+          <listitem>
+            <para>Definir la correspondencia de una asociación
+            <emphasis>1-N</emphasis> o <emphasis>N-M.</emphasis></para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
 
-<example><title>Uso de las anotaciones</title>
-<programlistingco>
-<areaspec>
-<area id="ex.annot.field" coords='8'/>
-<area id="ex.annot.trans" coords='11'/>
-<area id="ex.annot.preci" coords='13'/>
-<area id="ex.annot.many" coords='16'/>
-<area id="ex.annot.join" coords='17'/>
-<area id="ex.annot.one" coords='20'/>
-</areaspec>
-        <programlisting>@Entity
+      <example>
+        <title>Uso de las anotaciones</title>
+
+        <programlistingco>
+          <areaspec>
+            <area coords="8" id="ex.annot.field"></area>
+
+            <area coords="11" id="ex.annot.trans"></area>
+
+            <area coords="13" id="ex.annot.preci"></area>
+
+            <area coords="16" id="ex.annot.many"></area>
+
+            <area coords="17" id="ex.annot.join"></area>
+
+            <area coords="20" id="ex.annot.one"></area>
+          </areaspec>
+
+          <programlisting>@Entity
 @RooJavaBean
 @RooToString
 @RooEntity
@@ -708,37 +732,43 @@ public class Entity1 {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "entity1")
     private Set&lt;Price&gt; prices = new java.util.HashSet&lt;Price&gt;();
 }</programlisting>
-<calloutlist>
-<callout arearefs="ex.annot.field">
-<para>Este campo se cargará y almacenará en la columna
-<literal>field1</literal> de la tabla
-<literal>ENT1</literal></para>
-</callout>
-<callout arearefs="ex.annot.trans">
+
+          <calloutlist>
+            <callout arearefs="ex.annot.field">
+              <para>Este campo se cargará y almacenará en la columna
+              <literal>field1</literal> de la tabla
+              <literal>ENT1</literal></para>
+            </callout>
+
+            <callout arearefs="ex.annot.trans">
               <para>Este campo no se tendrá en cuenta en la carga y guardado
               de la base de datos.</para>
-</callout>
-<callout arearefs="ex.annot.preci">
+            </callout>
+
+            <callout arearefs="ex.annot.preci">
               <para>Este campo numérico se cargará y almacenará en la columna
               <literal>ORDER_COST</literal> de la tabla
               <literal>ENT1</literal>, usando los valores de
               <emphasis>precisión</emphasis> y <emphasis>escala</emphasis>
               especificados.</para>
-</callout>
-<callout arearefs="ex.annot.many">
+            </callout>
+
+            <callout arearefs="ex.annot.many">
               <para>Declara que la propiedad tiene origen en una relación
               <emphasis>n-1</emphasis>, con la entidad
               <classname>Customer</classname>. La tablas de esta entidad y sus
               columnas se tomarán de las declaraciones que se hayan hecho en
               esa entidad.</para>
-</callout>
-<callout arearefs="ex.annot.join">
+            </callout>
+
+            <callout arearefs="ex.annot.join">
               <para>Especifica que la columna de clave ajena en la tabla
               <literal>ENT1</literal> para esta relación (con
               <classname>Customer</classname>) es
               <literal>CUSTOMER_ID</literal></para>
-</callout>
-<callout arearefs="ex.annot.one">
+            </callout>
+
+            <callout arearefs="ex.annot.one">
               <para>Declara que el campo <literal>prices</literal> es una
               relación <emphasis>1-n</emphasis> con la entidad
               <literal>Price</literal>. También declara que los cambios de
@@ -746,28 +776,30 @@ public class Entity1 {
               <literal>Price</literal>. El campo (propiedad en la clase java)
               que estable la clave ajena en <literal>Price</literal> se llama
               <literal>entity1</literal>.</para>
-</callout>
-</calloutlist>
-</programlistingco>
-</example>
-      </section>
+            </callout>
+          </calloutlist>
+        </programlistingco>
+      </example>
+    </section>
 
-      <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_clave-primaria">
-        <title>Clave primaria</title>
+    <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_clave-primaria">
+      <title>Clave primaria</title>
 
-        <para>Por defecto, se genera un campo Id (propiedad en la clase java),
-        de tipo <classname>java.lang.Long</classname>, como identificador
-        (clave primaria) de la entidad. Para adaptarlo a nuestras necesidades:
-        </para>
+      <para>Por defecto, se genera un campo Id (propiedad en la clase java),
+      de tipo <classname>java.lang.Long</classname>, como identificador (clave
+      primaria) de la entidad. Para adaptarlo a nuestras necesidades:</para>
 
-        <orderedlist>
-          <listitem>
-            <para>Configurar la anotación <classname><link
-            linkend="guia-desarrollo_gestion-entidades_definicion_crear-a-mano_anotacion-rooentity">@RooEntity</link></classname> para ajustar el nombre del
-            campo, tipo y nombre de columna en la tabla.
-            </para>
+      <orderedlist>
+        <listitem>
+          <para>Configurar la anotación <classname><link
+          linkend="guia-desarrollo_gestion-entidades_definicion_crear-a-mano_anotacion-rooentity"><link
+          xlink:href="http://static.springsource.org/spring-roo/org.springframework.roo.annotations/apidocs/org/springframework/roo/addon/entity/RooEntity.html">@RooEntity</link></link></classname>
+          para ajustar el nombre del campo, tipo y nombre de columna en la
+          tabla.</para>
 
-<example><title>Uso de las anotaciones</title>
+          <example>
+            <title>Uso de las anotaciones</title>
+
             <programlisting>@Entity
 @RooJavaBean
 @RooToString
@@ -778,15 +810,15 @@ public class Entity1 {
     private String field1;
 
 }</programlisting>
-</example>
-          </listitem>
+          </example>
+        </listitem>
 
-          <listitem>
-            <para>Añadir manualmente el campo en la clase java. La declaración
-            se detectará por el framework que no la generará automáticamente.
-            Un ejemplo de esto:</para>
+        <listitem>
+          <para>Añadir manualmente el campo en la clase java. La declaración
+          se detectará por el framework que no la generará automáticamente. Un
+          ejemplo de esto:</para>
 
-            <programlisting>@Entity
+          <programlisting>@Entity
 @RooJavaBean
 @RooToString
 @RooEntity
@@ -809,37 +841,35 @@ public class Entity1 {
 
 }</programlisting>
 
-            <para>Si se declara el campo de identificador en la clase java,
-            también es necesario añadir sus métodos <emphasis>get y
-            set</emphasis> manualmente.</para>
+          <para>Si se declara el campo de identificador en la clase java,
+          también es necesario añadir sus métodos <emphasis>get y
+          set</emphasis> manualmente.</para>
 
-            <para>Para más información sobre las anotaciones JPA (como
-            <classname><link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/GeneratedValue.html">@GeneratedValue</link></classname>
-            ) consultar el <link
-            xlink:href="http://java.sun.com/javaee/5/docs/api/index.html?javax/persistence/package-summary.html">API</link>.</para>
-          </listitem>
-        </orderedlist>
-      </section>
+          <para>Para más información sobre las anotaciones JPA (como
+          <classname><link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/GeneratedValue.html">@GeneratedValue</link></classname>
+          ) consultar el <link
+          xlink:href="http://java.sun.com/javaee/5/docs/api/index.html?javax/persistence/package-summary.html">API</link>.</para>
+        </listitem>
+      </orderedlist>
+    </section>
 
-      <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_campo-control-optimista">
-        <title>Campo para el control de concurrencia optimista.</title>
+    <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_campo-control-optimista">
+      <title>Campo para el control de concurrencia optimista.</title>
 
-        <para>Por defecto, se genera un campo de control de concurrencia
-        optimista llamado <literal>version</literal> de tipo
-        <classname>java.lang.Integer</classname>. Para ajustarlo disponemos de
-        tres opciones:</para>
+      <para>Por defecto, se genera un campo de control de concurrencia
+      optimista llamado <literal>version</literal> de tipo
+      <classname>java.lang.Integer</classname>. Para ajustarlo disponemos de
+      tres opciones:</para>
 
-        <orderedlist>
-          <listitem>
-            <para>Configurar la anotación <link
-            linkend="guia-desarrollo_gestion-entidades_definicion_crear-a-mano_anotacion-rooentity">anotación
-            <classname>@RooEntity</classname></link> ajustar el nombre del
-            campo, y tipo. Si dejamos el nombre de campo a <emphasis>cadena
-            vacía</emphasis> (<literal>""</literal>) no se generará ningún
-            campo. Un ejemplo de esto:</para>
+      <orderedlist>
+        <listitem>
+          <para>Configurar la anotación @RooEntity, ajustar el nombre del
+          campo, y tipo. Si dejamos el nombre de campo a <emphasis>cadena
+          vacía</emphasis> (<literal>""</literal>) no se generará ningún
+          campo. Un ejemplo de esto:</para>
 
-            <programlisting>@Entity
+          <programlisting>@Entity
 @RooJavaBean
 @RooToString
 @RooEntity(versionField="version", 
@@ -850,10 +880,10 @@ public class Entity1 {
 
 }</programlisting>
 
-            <para>Otro ejemplo desactivando el control de concurrencia
-            optimista:</para>
+          <para>Otro ejemplo desactivando el control de concurrencia
+          optimista:</para>
 
-            <programlisting>@Entity
+          <programlisting>@Entity
 @RooJavaBean
 @RooToString
 @RooEntity(versionField="")
@@ -862,14 +892,14 @@ public class Entity1 {
     private String field1;
 
 }</programlisting>
-          </listitem>
+        </listitem>
 
-          <listitem>
-            <para>Añadir manualmente el campo en la clase java. La declaración
-            se detectará por el framework que no la generará automáticamente.
-            Un ejemplo de esto:</para>
+        <listitem>
+          <para>Añadir manualmente el campo en la clase java. La declaración
+          se detectará por el framework que no la generará automáticamente. Un
+          ejemplo de esto:</para>
 
-            <programlisting>@Entity
+          <programlisting>@Entity
 @RooJavaBean
 @RooToString
 @RooEntity
@@ -890,16 +920,16 @@ public class Entity1 {
     private String field1;
 
 }</programlisting>
-          </listitem>
+        </listitem>
 
-          <listitem>
-            <para>Usar el control de concurrencia optimista de gvNIX. Para
-            ello se debe usar el comando <command><link
-            linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
-            checksum set</link></command>. Con este comando la clase se
-            quedará así:</para>
+        <listitem>
+          <para>Usar el control de concurrencia optimista de gvNIX. Para ello
+          se debe usar el comando <command><link
+          linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
+          checksum set</link></command>. Con este comando la clase se quedará
+          así:</para>
 
-            <programlisting>@Entity
+          <programlisting>@Entity
 @RooJavaBean
 @RooToString
 @RooEntity
@@ -920,33 +950,34 @@ public class Entity1 {
     private String field1;
 
 }</programlisting>
-          </listitem>
-        </orderedlist>
-      </section>
-
-      <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">
-        <title xml:lang="es">Regeneración de la Base de datos en cada
-        arranque.</title>
-
-        <para xml:lang="es">Recordar que por defecto, la configuración de Roo <emphasis
-        role="bold">reconstruye la base de datos en cada ejecución de la
-        aplicación</emphasis>. Cuando usamos una base de datos existente o
-        compartida debemos cambiar este comportamiento.</para>
-
-        <para xml:lang="es">Modificar el fichero
-        <filename>src/main/resources/META-INF/persistence.xml</filename>
-        y comentar la siguiente linea:</para>
-
-        <programlisting>    &lt;!-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
-      </section>
+        </listitem>
+      </orderedlist>
     </section>
 
-    <section xml:id="guia-desarrollo_gestion-entidades_ingenieria-inversa">
-      <title xml:lang="es">Ingeniería inversa de entidades</title>
+    <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">
+      <title xml:lang="es">Regeneración de la Base de datos en cada
+      arranque.</title>
 
-      <para xml:lang="es">TBC</para>
-<!--
-      <para xml:lang="es">En en proyecto de Spring Roo tiene planeado añadir
+      <para xml:lang="es">Recordar que por defecto, la configuración de Roo
+      <emphasis role="bold">reconstruye la base de datos en cada ejecución de
+      la aplicación</emphasis>. Cuando usamos una base de datos existente o
+      compartida debemos cambiar este comportamiento.</para>
+
+      <para xml:lang="es">Modificar el fichero
+      <filename>src/main/resources/META-INF/persistence.xml</filename> y
+      comentar la siguiente linea:</para>
+
+      <programlisting>    &lt;!-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
+    </section>
+  </section>
+
+  <section xml:id="guia-desarrollo_gestion-entidades_ingenieria-inversa">
+    <title xml:lang="es">Ingeniería inversa de entidades</title>
+
+    <para xml:lang="es"><emphasis>TBC</emphasis></para>
+
+    <!--
+      <para xml:lang="es">En el proyecto de Spring Roo se tiene planeado añadir
       soporte para soportar ingeniería inversa de entidades. En un principio
       nosotros sugerimos el uso de Hiberate Tools para realizar la tarea, pero
       desde el proyecto pretenden dar un soporte nativo a ello.</para>
@@ -956,18 +987,18 @@ public class Entity1 {
       información en: <link
       xlink:href="https://jira.springsource.org/browse/ROO-435">ROO-435</link>.</para>
 -->
-    </section>
+  </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_test-integracion">
     <title xml:lang="es">Pruebas unitarias</title>
 
-    <para xml:lang="es">En la creación de entidades, especificando el parámetro 
-    <command>--testAutomatically</command> se generarán automáticamente
-    las plantillas de pruebas unitarias que nos permitirán validar el buen
-    funcionamiento de nuestro código.</para>
-    
-    <para>Para ejecutar los test
-    utilizaremos el comando <command>perform tests</command>:</para>
+    <para xml:lang="es">En la creación de entidades, especificando el
+    parámetro <command>--testAutomatically</command> se generarán
+    automáticamente las plantillas de pruebas unitarias que nos permitirán
+    validar el buen funcionamiento de nuestro código.</para>
+
+    <para>Para ejecutar los test utilizaremos el comando <command>perform
+    tests</command>:</para>
 
     <programlisting>~.domain.PizzaOrder roo&gt; <command>perform test</command>
 <computeroutput>[Thread-4] [INFO] Scanning for projects...
@@ -1003,6 +1034,4 @@ public class Entity1 {
 [Thread-4] [INFO] ------------------------------------------------------------------------</computeroutput>
 ~.domain.PizzaOrder roo&gt;</programlisting>
   </section>
-  </chapter>
-
-
+</chapter>

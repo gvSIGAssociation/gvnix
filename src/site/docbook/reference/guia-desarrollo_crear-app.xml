@@ -17,11 +17,11 @@
 
   <itemizedlist>
     <listitem>
-      <para>Los clientes pueden hacer pedidos por la web</para>
+      <para>Los clientes pueden hacer pedidos por la web.</para>
     </listitem>
 
     <listitem>
-      <para>Los empleados crean pedidos recibidos por teléfono</para>
+      <para>Los empleados crean pedidos recibidos por teléfono.</para>
     </listitem>
 
     <listitem>
@@ -51,8 +51,8 @@
       <para>La arquitectura por capas es un patrón que gvNIX se encarga de
       aplicar por nosotros, sin embargo, debemos conocer las capas generadas
       por gvNIX porque este conocimiento será de utilidad a la hora de hacer
-      nuestros desarrollos. Repasar el diagrama de arquitectura del entorno de
-      ejecución en la sección TBC.</para>
+      nuestros desarrollos. <emphasis>Repasar el diagrama de arquitectura del
+      entorno de ejecución en la sección TBC</emphasis>.</para>
     </listitem>
   </itemizedlist>
 

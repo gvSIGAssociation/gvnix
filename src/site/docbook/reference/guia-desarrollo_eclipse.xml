@@ -1,19 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="guia-desarrollo-eclipse" 
+<chapter version="5.0" xml:id="guia-desarrollo-eclipse" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook"
-         xml:lang="es">
-
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Desarrollo con Eclipse</title>
 
   <section xml:id="guia-desarrollo_eclipse-instalar">
-    <title xml:id="es">Instalar STS</title>
-    <para>TBC</para>
+    <title xml:id="es">Prerrequisitos</title>
+
+    <para><emphasis><emphasis>Necesitas lo
+    siguiente:</emphasis></emphasis></para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Descargar Eclipse IDE for Java EE Developers, versión Galileo
+        SR2 (3.5.2): <link
+        xlink:href="http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/galileosr2">http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/galileosr2</link></para>
+      </listitem>
+
+      <listitem>
+        <para>Crear la variable de classpath de Eclipse M2_REPO, para
+        ello:</para>
+
+        <orderedlist>
+          <listitem>
+            <para><emphasis role="bold"><emphasis><literal>Window &gt;
+            Preferences &gt; Java &gt; Build Path &gt; Classpath
+            Variables</literal></emphasis></emphasis>, botón
+            <emphasis><emphasis><literal>New...</literal></emphasis></emphasis>.</para>
+          </listitem>
+
+          <listitem>
+            <para>Ponemos los siguientes valores:</para>
+
+            <itemizedlist>
+              <listitem>
+                <para><emphasis><emphasis><literal>Name</literal></emphasis></emphasis>
+                =
+                <emphasis><emphasis><literal>M2_REPO</literal></emphasis></emphasis>.</para>
+              </listitem>
+
+              <listitem>
+                <para><emphasis><emphasis><literal>Path</literal></emphasis></emphasis>
+                = directorio correspondiente al repositorio de Maven
+                (normalmente en Linux: ~/.m2/repository)</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+
+          <listitem>
+            <para><emphasis>Ok</emphasis> para crear la variable, y
+            <emphasis>Ok</emphasis> de nuevo para cerrar la ventana de
+            preferencias y guardar cambios.</para>
+          </listitem>
+        </orderedlist>
+      </listitem>
+
+      <listitem>
+        <para>Activa la opción <emphasis><emphasis><literal>Enable Window &gt;
+        Preferences &gt; General &gt; Workspace &gt; Refresh
+        Automatically</literal></emphasis></emphasis>.</para>
+      </listitem>
+    </itemizedlist>
 
     <para>Para utilizar Eclipse como IDE de desarrollo de los proyectos gvNIX
     se recomienda utilizar la extensión <link
@@ -23,7 +75,7 @@
     <para>Entre otras funcionalidades incorpora un intérprete de comandos de
     Roo que permite ejecutar órdenes sin necesidad de salir de Eclipse.</para>
 
-    <para>Existen 2 distribuciones del STS:</para>
+    <para>Existen 2 distribuciones del STS (se recomienda la segunda):</para>
 
     <orderedlist>
       <listitem>
@@ -32,7 +84,7 @@
       </listitem>
 
       <listitem>
-        <para>Instalación como plugin de nuestro Eclipse: Para instalar el
+        <para>Instalación como plugin de nuestro Eclipse: para instalar el
         plugin STS sigue las instrucciones del punto "UPDATE SITE
         INSTALLATION" del documento <link
         xlink:href="http://dist.springsource.com/release/STS/doc/STS-installation_instructions.pdf">Spring
@@ -44,8 +96,8 @@
   <section xml:id="guia-desarrollo_eclipse-usasrº">
     <title xml:id="es">Utilizar Eclipse como IDE</title>
 
-    <para xml:lang="es">Para crear una estructura de proyecto Eclipse hay
-    que utilizar el comando <command>perform eclipse</command>:</para>
+    <para xml:lang="es">Para crear una estructura de proyecto Eclipse hay que
+    utilizar el comando <command>perform eclipse</command>:</para>
 
     <programlisting>~.domain.PizzaOrder roo&gt; <command>perform eclipse</command>
 <computeroutput>[Thread-6] Warning: JAVA_HOME environment variable is not set.
@@ -74,7 +126,10 @@
 
     <para xml:lang="es">Ahora se ha de importar al entorno de trabajo mediante
     <command>File -&gt; Import -&gt; Existing Projects into
-    workSpace</command>.</para>
+    workSpace</command>. Si aparece el mensaje <emphasis>Turn Weaving Service
+    on?</emphasis>, marca la casilla <emphasis>Don't ask again until next
+    upgrade</emphasis> y clic en <emphasis>Yes</emphasis> (tendrás que
+    reiniciar Eclipse).</para>
 
     <para xml:lang="es">También es posible borrar la configuración de eclipse
     ejecutando el comando <command>mvn eclipse:clean</command>. Para regenerar
@@ -84,7 +139,8 @@
 
   <section xml:id="guia-desarrollo_eclipse-pruebas-unitarias">
     <title xml:id="es">Desarollo de pruebas unitarias</title>
-    <para>TBC</para>
+
+    <para><emphasis>TBC</emphasis></para>
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse">
@@ -95,11 +151,10 @@
     cambios en caliente sobre la aplicación.</para>
 
     <para xml:lang="es">Para ello, debemos tener la aplicación importada en un
-    <emphasis>workspace</emphasis> de Eclipse (ver como hacerlo <link
-    linkend="guia-desarrollo_aplicacion-base_usar-eclipse">aquí</link>) y
-    configurar el servidor dónde queremos ejecutarlo. Eclipse es capaz de
-    gestionar distinto tipos de servidores, generando sus propios directorio y
-    ficheros de configuración.</para>
+    <emphasis>workspace</emphasis> de Eclipse y configurar el servidor dónde
+    queremos ejecutarlo. Eclipse es capaz de gestionar distinto tipos de
+    servidores, generando sus propios directorio y ficheros de
+    configuración.</para>
 
     <para xml:lang="es">Para prepara un servido seguiremos los siguiente
     pasos:</para>
@@ -117,8 +172,8 @@
         </listitem>
 
         <listitem>
-          <para>Abra la opción del menú <literal>Window/Show
-          view/Other...</literal>.</para>
+          <para>Abra la opción del menú <literal>Window &gt; Show view &gt;
+          Other..</literal>..</para>
         </listitem>
 
         <listitem>
@@ -143,9 +198,9 @@
       para arrancarlo con ficheros de configuración que almacena en el propio
       workspace.</para>
 
-      <para xml:lang="es">En este caso, vamos a preparar el entorno para Tomcat
-      6 (para Tomcat 5.5 ver <link linkend="addon-web-mvc-jsp-2.0">Add-on Web
-      MVC JSP 2.0</link>).</para>
+      <para xml:lang="es">En este caso, vamos a preparar el entorno para
+      Tomcat 6 (para Tomcat 5.5 ver <link
+      linkend="addon-web-mvc-jsp-2.0">Add-on Web MVC JSP 2.0</link>).</para>
 
       <para xml:lang="es">Asumimos que disponemos de una instalación de Tomcat
       6 en nuestra máquina, no importa que esté configurada o no, y seguiremos
@@ -154,12 +209,12 @@
       <orderedlist>
         <listitem>
           <para xml:lang="es">Abrir el diálogo de preferencias de Eclipse
-          desde el menú <literal>Window/Preferences</literal>.</para>
+          desde el menú <literal>Window &gt; Preferences</literal>.</para>
         </listitem>
 
         <listitem>
           <para xml:lang="es">Ir al Panel de configuración de los entornos de
-          servidor que se encuentra en <literal>Server/Runtime
+          servidor que se encuentra en <literal>Server &gt;Runtime
           environments</literal>.</para>
         </listitem>
 
@@ -172,6 +227,43 @@
           <para xml:lang="es">Seleccione <literal>Apache Tomcat v6.0</literal>
           de la lista de tipos y pulse el botón
           <literal>Next</literal>.</para>
+
+          <para xml:lang="es">En el caso en que no aparezca ningún tipo de
+          servidor o no aparezcan los de Apache Tomcat se ha de realizar lo
+          siguiente:</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>Ir a <literal>Help &gt; Install New
+              Software...</literal>.</para>
+            </listitem>
+
+            <listitem>
+              <para>Desmarcar la casilla "<emphasis>Hide items that are
+              already installed.</emphasis>"</para>
+            </listitem>
+
+            <listitem>
+              <para>En "<emphasis>Work With</emphasis>" seleccionar el sitio
+              "<emphasis>Eclipse Web Tools Platform Repository</emphasis> -
+              <emphasis>http://download.eclipse.org/webtools/updates/</emphasis>"
+              (si no aparece, añadirlo usando el botón
+              <literal>Add...</literal>.)</para>
+            </listitem>
+
+            <listitem>
+              <para> En el listado de software desplegar <literal>Web Tools
+              Platform Tests (WST Tests)</literal> (si hay más de un
+              <emphasis>WST Tests</emphasis> seleccionar el de la última
+              versión).</para>
+            </listitem>
+
+            <listitem>
+              <para>Instalar (seleccionándolos) <literal>WST Server
+              tests</literal> y <literal>JST Server Tests</literal> (si ya
+              están instalado aparecerá su icono en gris) </para>
+            </listitem>
+          </itemizedlist>
         </listitem>
 
         <listitem>
@@ -198,22 +290,19 @@
     <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_crear-servidor">
       <title xml:lang="es">Crear una configuración de Servidor</title>
 
-      <para xml:lang="es">Una configuración de servidor se compone del <link
-      linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_crear-entorno-ejecucion">entrono
-      de ejecución</link>, una o varias aplicaciones a arrancar y una
-      configuración del servicio (puertos, parámetros de memoria, recursos,
-      variables...). Eclipse permite crear todas las configuraciones que
-      necesitemos con las combinaciones posibles.</para>
+      <para xml:lang="es">Una configuración de servidor se compone del entorno
+      de ejecución, una o varias aplicaciones a arrancar y una configuración
+      del servicio (puertos, parámetros de memoria, recursos, variables...).
+      Eclipse permite crear todas las configuraciones que necesitemos con las
+      combinaciones posibles.</para>
 
       <para xml:lang="es">Para crear una nueva configuración siga los pasos
       siguientes:</para>
 
       <orderedlist>
         <listitem>
-          <para xml:lang="es">En <link
-          linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_mostrar-vista-servidores">vista
-          de servidores</link>, pulsar botón derecho sobre el fondo y
-          seleccionar <literal>New/Server</literal>.</para>
+          <para xml:lang="es">En vista de servidores, pulsar botón derecho
+          sobre el fondo y seleccionar <literal>New/Server</literal>.</para>
         </listitem>
 
         <listitem>
@@ -228,9 +317,8 @@
         </listitem>
 
         <listitem>
-          <para xml:lang="es">Seleccione el <link
-          linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_crear-entorno-ejecucion">entrono
-          de ejecución</link> que debe usar el servidor.</para>
+          <para xml:lang="es">Seleccione el entorno de ejecución que debe usar
+          el servidor.</para>
         </listitem>
 
         <listitem>
@@ -245,10 +333,8 @@
 
       <para xml:lang="es">Puede ser necesario ajustar algunas opciones de la
       configuración del servidor. Para poder acceder a dichas opciones hay que
-      seleccionar el servidor desde la <link
-      linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_mostrar-vista-servidores">vista
-      de servidores</link> y, con el botón derecho del ratón sobre el pulsar
-      <literal>Open</literal>.</para>
+      seleccionar el servidor desde la vista de servidores y, con el botón
+      derecho del ratón sobre el pulsar <literal>Open</literal>.</para>
 
       <para xml:lang="es">Desde el panel abierto podremos gestionar:</para>
 
@@ -281,5 +367,4 @@
       </itemizedlist>
     </section>
   </section>
-
 </chapter>

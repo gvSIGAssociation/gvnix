@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="primeros-pasos"
+<chapter version="5.0" xml:id="primeros-pasos" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook" 
-         xml:lang="es">
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Primeros pasos con gvNIX</title>
 
   <section xml:id="primeros-pasos_primer-paso">
@@ -20,8 +19,8 @@
     exhaustiva de todos los pasos.</para>
 
     <para xml:lang="es">Ejecutar los comandos del siguiente ejemplo. Notar que
-    los comandos (bash o roo) se han resaltado en negrita para facilitar su
-    localización:</para>
+    los comandos (<emphasis>bash</emphasis> o <emphasis>roo</emphasis>) se han
+    resaltado en negrita para facilitar su localización:</para>
 
     <programlisting>bash$ <emphasis role="bold">mkdir tenminutes</emphasis>
 bash$ <emphasis role="bold">cd tenminutes</emphasis>
@@ -76,7 +75,7 @@ Once JPA is installed, type 'hint' and ENTER for the next suggestion.</programli
 
     <para xml:lang="es">En este punto ya tiene un proyecto Maven de aplicación
     web preparado. Si usa Java 5 tendrá que añadir las referencias a las
-    librerías JAXB con con los siguientes comandos:</para>
+    librerías JAXB con los siguientes comandos:</para>
 
     <programlisting>com.tenminutes roo&gt; <emphasis role="bold">dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1</emphasis>
 javax.xml.bind roo&gt; <emphasis role="bold">dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3</emphasis></programlisting>
@@ -125,11 +124,11 @@ bash$ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
     <orderedlist>
       <listitem>
         <para>Abrir una nueva ventana de intérprete de comandos del
-        sistema</para>
+        sistema.</para>
       </listitem>
 
       <listitem>
-        <para>Cambiar al directorio del proyecto</para>
+        <para>Cambiar al directorio del proyecto.</para>
       </listitem>
 
       <listitem>
@@ -139,7 +138,7 @@ bash$ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
 
       <listitem>
         <para>Ahora debaría ver su FireFox ejecutando los test de Selenium
-        generados</para>
+        generados.</para>
       </listitem>
     </orderedlist>
 
