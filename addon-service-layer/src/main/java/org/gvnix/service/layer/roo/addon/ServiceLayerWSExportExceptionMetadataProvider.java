@@ -41,18 +41,18 @@ import org.springframework.roo.project.Path;
 @Component(immediate = true)
 @Service
 public class ServiceLayerWSExportExceptionMetadataProvider extends
-	AbstractItdMetadataProvider {
+        AbstractItdMetadataProvider {
 
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerWSExportExceptionMetadataProvider.class
-		    .getName());
+            .getLogger(ServiceLayerWSExportExceptionMetadataProvider.class
+                    .getName());
 
     protected void activate(ComponentContext context) {
-	// Ensure we're notified of all metadata related to physical Java types,
-	// in particular their initial creation
-	metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
-		.getMetadataIdentiferType(), getProvidesType());
-	addMetadataTrigger(new JavaType(GvNIXWebFault.class.getName()));
+        // Ensure we're notified of all metadata related to physical Java types,
+        // in particular their initial creation
+        metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
+                .getMetadataIdentiferType(), getProvidesType());
+        addMetadataTrigger(new JavaType(GvNIXWebFault.class.getName()));
     }
 
     /*
@@ -63,8 +63,8 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
      * org.springframework.roo.project.Path)
      */
     protected String createLocalIdentifier(JavaType javaType, Path path) {
-	return ServiceLayerWSExportExceptionMetadata.createIdentifier(javaType,
-		path);
+        return ServiceLayerWSExportExceptionMetadata.createIdentifier(javaType,
+                path);
     }
 
     /*
@@ -74,14 +74,14 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
      * getGovernorPhysicalTypeIdentifier(java.lang.String)
      */
     protected String getGovernorPhysicalTypeIdentifier(
-	    String metadataIdentificationString) {
-	JavaType javaType = ServiceLayerWSExportExceptionMetadata
-		.getJavaType(metadataIdentificationString);
-	Path path = ServiceLayerWSExportExceptionMetadata
-		.getPath(metadataIdentificationString);
-	String physicalTypeIdentifier = PhysicalTypeIdentifier
-		.createIdentifier(javaType, path);
-	return physicalTypeIdentifier;
+            String metadataIdentificationString) {
+        JavaType javaType = ServiceLayerWSExportExceptionMetadata
+                .getJavaType(metadataIdentificationString);
+        Path path = ServiceLayerWSExportExceptionMetadata
+                .getPath(metadataIdentificationString);
+        String physicalTypeIdentifier = PhysicalTypeIdentifier
+                .createIdentifier(javaType, path);
+        return physicalTypeIdentifier;
     }
 
     /*
@@ -93,32 +93,33 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
      * org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
      */
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
-	    String metadataIdentificationString, JavaType aspectName,
-	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
-	    String itdFilename) {
-	// TODO Auto-generated method stub
+            String metadataIdentificationString, JavaType aspectName,
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            String itdFilename) {
 
-	// Work out the MIDs of the other metadata we depend on
-	JavaType javaType = ServiceLayerWSExportExceptionMetadata
-		.getJavaType(metadataIdentificationString);
-	Path path = ServiceLayerWSExportExceptionMetadata
-		.getPath(metadataIdentificationString);
+        // Work out the MIDs of the other metadata we depend on
+        JavaType javaType = ServiceLayerWSExportExceptionMetadata
+                .getJavaType(metadataIdentificationString);
+        Path path = ServiceLayerWSExportExceptionMetadata
+                .getPath(metadataIdentificationString);
 
-	ServiceLayerWSExportExceptionMetadata exceptionMetadata = new ServiceLayerWSExportExceptionMetadata(
-		metadataIdentificationString, aspectName,
-		governorPhysicalTypeMetadata);
-	
-	if (exceptionMetadata.getItdTypeDetails().getTypeAnnotations()
-		.isEmpty()) {
-	    logger.log(Level.WARNING,
-		    "The annotation @GvNIXWebFault is not declared correctly for '"
-			    + governorPhysicalTypeMetadata
-				    .getPhysicalTypeDetails().getName()
-					    .getFullyQualifiedTypeName()
-				    + "'.\nThis will delete its ITD untill the annotation is defined correctly.");
-	}
+        ServiceLayerWSExportExceptionMetadata exceptionMetadata = new ServiceLayerWSExportExceptionMetadata(
+                metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata);
 
-	return exceptionMetadata;
+        if (exceptionMetadata.getItdTypeDetails().getTypeAnnotations()
+                .isEmpty()) {
+            logger
+                    .log(
+                            Level.WARNING,
+                            "The annotation @GvNIXWebFault is not declared correctly for '"
+                                    + governorPhysicalTypeMetadata
+                                            .getPhysicalTypeDetails().getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "'.\nThis will not export the Exception to be used in Web Service.\n@WebParam annotation will be deleted untill the annotation is defined correctly.");
+        }
+
+        return exceptionMetadata;
     }
 
     /*
@@ -128,7 +129,7 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
      * getItdUniquenessFilenameSuffix()
      */
     public String getItdUniquenessFilenameSuffix() {
-	return "GvNIX_WebFault";
+        return "GvNIX_WebFault";
     }
 
     /*
@@ -137,7 +138,7 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
      * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
      */
     public String getProvidesType() {
-	return ServiceLayerWSExportExceptionMetadata.getMetadataIdentiferType();
+        return ServiceLayerWSExportExceptionMetadata.getMetadataIdentiferType();
     }
 
 }

@@ -26,4 +26,5 @@ import javax.xml.ws.WebFault;
  */
 privileged aspect ${project_name}_Web_Faults_gvnix_service_layer {
 
+
 }
