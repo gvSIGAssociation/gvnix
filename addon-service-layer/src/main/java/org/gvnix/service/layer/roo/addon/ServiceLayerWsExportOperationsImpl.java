@@ -18,7 +18,9 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,6 +73,10 @@ public class ServiceLayerWsExportOperationsImpl implements
     private AnnotationsService annotationsService;
     @Reference
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+
+    private static final String ITD_TEMPLATE = "Web_Faults_gvnix_service_layer.aj_template";
+
+    private static final String ITD_FILE_NAME = "_Web_Faults_gvnix_service_layer.aj";
 
     private static final Set<String> notAllowedCollectionTypes = new HashSet<String>();
 
@@ -328,21 +334,21 @@ public class ServiceLayerWsExportOperationsImpl implements
                     throwType.getFullyQualifiedTypeName().replace('.', '/')
                             .concat(".java"));
 
+            List<AnnotationAttributeValue<?>> gvNIXWebFaultAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+            gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
+                    new JavaSymbolName("name"), StringUtils
+                            .uncapitalize(throwType.getSimpleTypeName())));
+            gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
+                    new JavaSymbolName("targetNamespace"),
+                    serviceLayerWsConfigService
+                            .convertPackageToTargetNamespace(throwType
+                                    .getPackage().toString())));
+            gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
+                    new JavaSymbolName("faultBean"), throwType
+                            .getFullyQualifiedTypeName()));
+
             // Exception defined in the project or imported.
             if (fileManager.exists(fileLocation)) {
-
-                List<AnnotationAttributeValue<?>> gvNIXWebFaultAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-                gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-                        new JavaSymbolName("name"), StringUtils
-                                .uncapitalize(throwType.getSimpleTypeName())));
-                gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-                        new JavaSymbolName("targetNamespace"),
-                        serviceLayerWsConfigService
-                                .convertPackageToTargetNamespace(throwType
-                                        .getPackage().toString())));
-                gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-                        new JavaSymbolName("faultBean"), throwType
-                                .getFullyQualifiedTypeName()));
 
                 // Define annotation.
                 annotationsService.addJavaTypeAnnotation(throwType,
@@ -351,11 +357,130 @@ public class ServiceLayerWsExportOperationsImpl implements
 
             } else {
                 // TODO: Add definition to AspectJ file.
+                exportImportedException(throwType,
+                        gvNIXWebFaultAnnotationAttributes);
             }
 
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Creates AspectJ template if not exists.
+     * </p>
+     * <p>
+     * Updates with exceptionClass annotation values.
+     * </p>
+     */
+    public void exportImportedException(JavaType exceptionClass,
+            List<AnnotationAttributeValue<?>> annotationAttributeValues) {
+
+        String template;
+        try {
+            template = FileCopyUtils.copyToString(new InputStreamReader(this
+                    .getClass().getResourceAsStream(ITD_TEMPLATE)));
+        } catch (IOException ioe) {
+            throw new IllegalStateException(
+                    "Unable load ITD web fault definitions template", ioe);
+        }
+
+        Map<String, String> params = new HashMap<String, String>();
+
+        String topLevelPath = "";
+        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+                .get(ProjectMetadata.getProjectIdentifier());
+
+        Assert.isTrue(projectMetadata != null, "Project is not available.");
+
+        topLevelPath = projectMetadata.getTopLevelPackage()
+                .getFullyQualifiedPackageName();
+
+        // Adds project base package name.
+        params.put("project_base_package", topLevelPath);
+
+        String aspectName = StringUtils.capitalize(projectMetadata
+                .getProjectName());
+
+        int splitIndex = aspectName.indexOf("-");
+        if (splitIndex != -1 && splitIndex != 0) {
+
+            aspectName = aspectName.substring(0, splitIndex);
+        }
+
+        // Adds aspect name.
+        params.put("project_name", aspectName);
+
+        // Adds entity class
+        template = replaceParams(template, params);
+
+        // 2) Exists template ?
+        String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+                topLevelPath.concat(".exceptions.").replace('.', '/').concat(
+                        aspectName).concat(
+                        ITD_FILE_NAME));
+
+        if (!fileManager.exists(fileLocation)) {
+            // Create file.
+            fileManager
+                    .createOrUpdateTextFileIfRequired(fileLocation, template);
+        }
+
+        // 3) Add web Fault.
+        String webFaultDeclaration = "declare @type: ${exception_class_name}: @WebFault(name = \"${name}\", targetNamespace = \"${targetNamespace}\", faultBean = \"${faultBean}\");";
+
+        Map<String, String> exceptionDeclaration = new HashMap<String, String>();
+        exceptionDeclaration.put("exception_class_name", exceptionClass
+                .getFullyQualifiedTypeName());
+
+        for (AnnotationAttributeValue<?> annotationAttributeValue : annotationAttributeValues) {
+            exceptionDeclaration.put(annotationAttributeValue.getName()
+                    .toString(),
+                            annotationAttributeValue.getValue().toString());
+        }
+        
+        webFaultDeclaration = replaceParams(webFaultDeclaration,
+                exceptionDeclaration);
+
+        // Update file with definition.
+        String fileContents;
+        try {
+            fileContents = FileCopyUtils.copyToString(new FileReader(
+                    fileLocation));
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not get the file:\t'"
+                    + fileLocation + "'", e.getCause());
+        }
+
+        // Check if Exception has already been defined.
+        if (!fileContents.contains(webFaultDeclaration)) {
+            String updatedFilecontents;
+            
+            int eOFindex = fileContents.lastIndexOf("}");
+            
+            updatedFilecontents = fileContents.substring(0, eOFindex).concat(webFaultDeclaration).concat("\n}");
+            
+            fileManager.createOrUpdateTextFileIfRequired(fileLocation,
+                    updatedFilecontents);
+
+        } else {
+            logger.info("Exception '"
+                    + exceptionClass.getFullyQualifiedTypeName()
+                    + "' has already been exported as @WebFault.");
+        }
+
+
+    }
+
+    private String replaceParams(String template, Map<String, String> params) {
+        for (Entry<String, String> entry : params.entrySet()) {
+            template = StringUtils.replace(template, "${" + entry.getKey()
+                    + "}", entry.getValue());
+        }
+        return template;
     }
 
     /**

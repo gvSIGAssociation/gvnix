@@ -21,6 +21,7 @@ package org.gvnix.service.layer.roo.addon;
 import java.util.List;
 
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -191,4 +192,15 @@ public interface ServiceLayerWsExportOperations {
      */
     public boolean checkMethodExceptions(JavaType serviceClass,
 	    JavaSymbolName methodName);
+
+    /**
+     * Adds a declaration of @WebFault to exceptionClass in AspectJ file.
+     * 
+     * @param exceptionClass
+     *            to export as web service exception.
+     * @param annotationAttributeValues
+     *            defined for annotation.
+     */
+    public void exportImportedException(JavaType exceptionClass,
+            List<AnnotationAttributeValue<?>> annotationAttributeValues);
 }
