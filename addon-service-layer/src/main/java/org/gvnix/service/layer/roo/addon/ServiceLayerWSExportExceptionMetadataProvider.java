@@ -21,8 +21,8 @@ package org.gvnix.service.layer.roo.addon;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebFault;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -42,6 +42,11 @@ import org.springframework.roo.project.Path;
 @Service
 public class ServiceLayerWSExportExceptionMetadataProvider extends
         AbstractItdMetadataProvider {
+
+    @Reference
+    private ServiceLayerWsExportOperations serviceLayerWsExportOperations;
+    @Reference
+    private ServiceLayerWsConfigService serviceLayerWsConfigService;
 
     private static Logger logger = Logger
             .getLogger(ServiceLayerWSExportExceptionMetadataProvider.class
@@ -97,26 +102,34 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
 
-        // Work out the MIDs of the other metadata we depend on
-        JavaType javaType = ServiceLayerWSExportExceptionMetadata
-                .getJavaType(metadataIdentificationString);
-        Path path = ServiceLayerWSExportExceptionMetadata
-                .getPath(metadataIdentificationString);
+        ServiceLayerWSExportExceptionMetadata exceptionMetadata = null;
 
-        ServiceLayerWSExportExceptionMetadata exceptionMetadata = new ServiceLayerWSExportExceptionMetadata(
-                metadataIdentificationString, aspectName,
-                governorPhysicalTypeMetadata);
+        if (serviceLayerWsExportOperations != null
+                && serviceLayerWsConfigService
+                        .isCxfInstalled(CommunicationSense.EXPORT)) {
 
-        if (exceptionMetadata.getItdTypeDetails().getTypeAnnotations()
-                .isEmpty()) {
-            logger
-                    .log(
-                            Level.WARNING,
-                            "The annotation @GvNIXWebFault is not declared correctly for '"
-                                    + governorPhysicalTypeMetadata
-                                            .getPhysicalTypeDetails().getName()
-                                            .getFullyQualifiedTypeName()
-                                    + "'.\nThis will not export the Exception to be used in Web Service.\n@WebParam annotation will be deleted untill the annotation is defined correctly.");
+            // Work out the MIDs of the other metadata we depend on
+            JavaType javaType = ServiceLayerWSExportExceptionMetadata
+                    .getJavaType(metadataIdentificationString);
+            Path path = ServiceLayerWSExportExceptionMetadata
+                    .getPath(metadataIdentificationString);
+
+            exceptionMetadata = new ServiceLayerWSExportExceptionMetadata(
+                    metadataIdentificationString, aspectName,
+                    governorPhysicalTypeMetadata);
+
+            if (exceptionMetadata.getItdTypeDetails().getTypeAnnotations()
+                    .isEmpty()) {
+                logger
+                        .log(
+                                Level.WARNING,
+                                "The annotation @GvNIXWebFault is not declared correctly for '"
+                                        + governorPhysicalTypeMetadata
+                                                .getPhysicalTypeDetails()
+                                                .getName()
+                                                .getFullyQualifiedTypeName()
+                                        + "'.\nThis will not export the Exception to be used in Web Service.\n@WebParam annotation will be deleted untill the annotation is defined correctly.");
+            }
         }
 
         return exceptionMetadata;

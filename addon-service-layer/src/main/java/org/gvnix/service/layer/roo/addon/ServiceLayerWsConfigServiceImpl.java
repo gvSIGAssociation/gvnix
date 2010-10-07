@@ -539,7 +539,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         Assert.isTrue(serviceName != null
                 && StringUtils.hasText(serviceName.getValue()),
-                "Annotation attribute 'serviceName.getValue()' in "
+                "Annotation attribute 'serviceName' in "
                         + className.getFullyQualifiedTypeName()
                         + "' must be defined.");
 
@@ -548,7 +548,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         Assert.isTrue(address != null
                 && StringUtils.hasText(address.getValue()),
-                "Annotation attribute 'address.getValue()' in "
+                "Annotation attribute 'address' in "
                         + className.getFullyQualifiedTypeName()
                         + "' must be defined.");
 
@@ -557,7 +557,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         Assert.isTrue(fullyQualifiedTypeName != null
                 && StringUtils.hasText(fullyQualifiedTypeName.getValue()),
-                "Annotation attribute 'fullyQualifiedTypeName.getValue()' in "
+                "Annotation attribute 'fullyQualifiedTypeName' in "
                         + className.getFullyQualifiedTypeName()
                         + "' must be defined.");
 
