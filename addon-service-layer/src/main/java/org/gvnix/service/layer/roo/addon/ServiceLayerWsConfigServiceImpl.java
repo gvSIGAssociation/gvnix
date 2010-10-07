@@ -113,7 +113,8 @@ public class ServiceLayerWsConfigServiceImpl implements
     }
 
     /**
-     * Checks if library is properly configured in a project.
+     * 
+     * {@inheritDoc}
      * 
      * <p>
      * Checks these types:
@@ -125,11 +126,8 @@ public class ServiceLayerWsConfigServiceImpl implements
      * Cxf configuration file exists</li>
      * </ul>
      * 
-     * @param type
-     *            Communication type
-     * @return true or false if it's configurated
      */
-    private boolean isCxfInstalled(CommunicationSense type) {
+    public boolean isCxfInstalled(CommunicationSense type) {
 
         // TODO Are not checked Web and Url Rewrite configuration files, check
         // it ?

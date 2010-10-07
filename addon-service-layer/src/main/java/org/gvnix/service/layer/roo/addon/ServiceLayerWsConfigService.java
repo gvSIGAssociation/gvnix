@@ -106,4 +106,13 @@ public interface ServiceLayerWsConfigService {
      * Create Jax-WS plugin configuration in pom.xml.
      */
     public void installJaxwsBuildPlugin();
+
+    /**
+     * Checks if library is properly configured in a project.
+     * 
+     * @param type
+     *            Communication type
+     * @return true or false if it's configurated
+     */
+    public boolean isCxfInstalled(CommunicationSense type);
 }

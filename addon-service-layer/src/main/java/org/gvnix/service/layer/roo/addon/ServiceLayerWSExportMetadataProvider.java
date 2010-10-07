@@ -18,17 +18,25 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.*;
+import org.springframework.roo.classpath.details.*;
+import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.support.util.Assert;
 
 /**
  * <p>
@@ -44,6 +52,13 @@ import org.springframework.roo.project.Path;
 @Component(immediate = true)
 @Service
 public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataProvider {
+
+    @Reference
+    private ServiceLayerWSExportValidationService serviceLayerWSExportValidationService;
+    @Reference
+    private ServiceLayerWsConfigService serviceLayerWsConfigService;
+    @Reference
+    private AnnotationsService annotationsService;
 
     private static Logger logger = Logger
 	    .getLogger(ServiceLayerWSExportMetadataProvider.class.getName());
@@ -85,11 +100,131 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
 	    String itdFilename) {
 
-	ServiceLayerWSExportMetadata serviceLayerMetadata = new ServiceLayerWSExportMetadata(
-		metadataIdentificationString, aspectName,
-		governorPhysicalTypeMetadata);
+        ServiceLayerWSExportMetadata serviceLayerMetadata = null;
 
-	return serviceLayerMetadata;
+        if (serviceLayerWsConfigService
+                        .isCxfInstalled(CommunicationSense.EXPORT)) {
+
+            // TODO: Check if Web Service definition is correct.
+            PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
+                    .getPhysicalTypeDetails();
+            
+            ClassOrInterfaceTypeDetails governorTypeDetails;
+            if (physicalTypeDetails == null
+                    || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+                // There is a problem
+                return null;
+            } else {
+                // We have reliable physical type details
+                governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
+            }
+
+            // Get upstreamDepency Class to check.
+
+            AnnotationMetadata gvNIXWebServiceAnnotation = MemberFindingUtils
+                    .getTypeAnnotation(governorTypeDetails, new JavaType(
+                            GvNIXWebService.class.getName()));
+
+            // Show info
+            logger.log(Level.WARNING,
+                    "Check correct format to export the web service class: '"
+                            + governorTypeDetails.getName() + "'");
+
+            // Update CXF XML
+            boolean updateGvNIXWebServiceAnnotation = serviceLayerWsConfigService
+                    .exportClass(governorTypeDetails.getName(),
+                            gvNIXWebServiceAnnotation);
+
+            // Define Jax-WS plugin and creates and execution build for this
+            // service
+            // to generate the wsdl file to check errors before deploy.
+
+            // Check values to generate Jax2Ws build plugin.
+            StringAttributeValue serviceName = (StringAttributeValue) gvNIXWebServiceAnnotation
+                    .getAttribute(new JavaSymbolName("serviceName"));
+
+            StringAttributeValue address = (StringAttributeValue) gvNIXWebServiceAnnotation
+                    .getAttribute(new JavaSymbolName("address"));
+
+            StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) gvNIXWebServiceAnnotation
+                    .getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
+
+            serviceLayerWsConfigService.jaxwsBuildPlugin(governorTypeDetails
+                    .getName(), serviceName.getValue(), address.getValue(),
+                    fullyQualifiedTypeName.getValue());
+
+            // TODO: Check method annotations
+            List<? extends MethodMetadata> methodList = governorTypeDetails
+                    .getDeclaredMethods();
+
+            for (MethodMetadata methodMetadata : methodList) {
+
+                AnnotationMetadata gvNixWebMethodAnnotation = MemberFindingUtils.getAnnotationOfType(methodMetadata
+                        .getAnnotations(), new JavaType(GvNIXWebMethod.class
+                        .getName()));
+                        
+                if (gvNixWebMethodAnnotation != null) {
+
+                    // Check INPUT/OUTPUT parameters
+                    serviceLayerWSExportValidationService
+                            .checkAuthorizedJavaTypesInOperation(
+                                    governorTypeDetails.getName(),
+                                    methodMetadata.getMethodName());
+
+                    // Check and update exceptions.
+                    serviceLayerWSExportValidationService
+                            .checkMethodExceptions(
+                            governorTypeDetails.getName(), methodMetadata
+                                    .getMethodName());
+                    
+                    // Check if attributes are defined in class.
+                    Assert.isTrue(!gvNixWebMethodAnnotation.getAttributeNames()
+                            .isEmpty(), "The annotation @GvNIXWebMethod for '"
+                            + methodMetadata.getMethodName()
+                            + "' method in class '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' must have all its attributes defined.");
+
+                    // TODO: Check if attributes are correct to export method to
+                    // web service annotation in ITD.
+
+                }
+            }
+
+            // Update Annotation because Java Class or package has changed.
+            if (updateGvNIXWebServiceAnnotation) {
+
+                List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+                gvNixAnnotationAttributes
+                        .add((StringAttributeValue) gvNIXWebServiceAnnotation
+                                .getAttribute(new JavaSymbolName("name")));
+                gvNixAnnotationAttributes
+                        .add((StringAttributeValue) gvNIXWebServiceAnnotation
+                                .getAttribute(new JavaSymbolName(
+                                        "targetNamespace")));
+                gvNixAnnotationAttributes
+                        .add((StringAttributeValue) gvNIXWebServiceAnnotation
+                                .getAttribute(new JavaSymbolName("serviceName")));
+                gvNixAnnotationAttributes
+                        .add((StringAttributeValue) gvNIXWebServiceAnnotation
+                                .getAttribute(new JavaSymbolName("address")));
+                gvNixAnnotationAttributes.add(new StringAttributeValue(
+                        new JavaSymbolName("fullyQualifiedTypeName"),
+                        governorTypeDetails.getName()
+                                .getFullyQualifiedTypeName()));
+                annotationsService.addJavaTypeAnnotation(governorTypeDetails
+                        .getName(), GvNIXWebService.class.getName(),
+                        gvNixAnnotationAttributes, true);
+            }
+
+            serviceLayerMetadata = new ServiceLayerWSExportMetadata(
+                    metadataIdentificationString, aspectName,
+                    governorPhysicalTypeMetadata);
+
+        }
+
+        return serviceLayerMetadata;
     }
 
     /* (non-Javadoc)
