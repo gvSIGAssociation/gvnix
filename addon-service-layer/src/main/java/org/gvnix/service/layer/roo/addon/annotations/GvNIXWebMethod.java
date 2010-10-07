@@ -35,22 +35,24 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface GvNIXWebMethod {
 
-    String method() default "";
-
-    String operationName() default "";
+    String operationName();
 
     Class<?> webResultType() default void.class;
 
-    String resutlName() default "";
+    String resultName() default "void";
 
-    String resultNamespace() default "";
+    String resultNamespace();
 
-    String responseWrapperName() default "";
+    String requestWrapperName();
 
-    String responseWrapperNamespace() default "";
+    String requestWrapperNamespace();
 
-    String requestWrapperName() default "";
+    String requestWrapperClassName();
 
-    String requestWrapperNamespace() default "";
+    String responseWrapperName();
+
+    String responseWrapperNamespace();
+
+    String responseWrapperClassName();
 
 }

@@ -146,8 +146,6 @@ public class ServiceLayerWsExportOperationsImpl implements
                 : serviceClass.getSimpleTypeName();
 
         // Checks correct namespace format.
-        serviceLayerWSExportValidationService
-                .checkNamespaceFormat(targetNamespace);
         Assert
                 .isTrue(
                         serviceLayerWSExportValidationService

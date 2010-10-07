@@ -20,7 +20,9 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -31,6 +33,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * <p>
@@ -43,54 +46,65 @@ import org.springframework.roo.support.util.Assert;
  *         Transport</a>
  */
 public class ServiceLayerWSExportMetadata extends
-	AbstractItdTypeDetailsProvidingMetadataItem {
+        AbstractItdTypeDetailsProvidingMetadataItem {
 
     private static final String WEB_SERVICE_TYPE_STRING = ServiceLayerWSExportMetadata.class
-	    .getName();
+            .getName();
     private static final String WEB_SERVICE_TYPE = MetadataIdentificationUtils
-	    .create(WEB_SERVICE_TYPE_STRING);
+            .create(WEB_SERVICE_TYPE_STRING);
+
+    private static Logger logger = Logger
+            .getLogger(ServiceLayerWSExportMetadata.class.getName());
 
     public ServiceLayerWSExportMetadata(String identifier, JavaType aspectName,
-	    PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-	super(identifier, aspectName, governorPhysicalTypeMetadata);
+            PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+        super(identifier, aspectName, governorPhysicalTypeMetadata);
 
-	Assert.isTrue(isValid(identifier), "Metadata identification string '"
-		+ identifier + "' does not appear to be a valid");
+        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+                + identifier + "' does not appear to be a valid");
 
-	if (!isValid()) {
-	    return;
-	}
+        if (!isValid()) {
+            return;
+        }
 
-	// Create the metadata.
-	AnnotationMetadata annotationMetadata = MemberFindingUtils
-		.getTypeAnnotation(governorTypeDetails, new JavaType(
-				GvNIXWebService.class.getName()));
+        // Create the metadata.
+        AnnotationMetadata annotationMetadata = MemberFindingUtils
+                .getTypeAnnotation(governorTypeDetails, new JavaType(
+                        GvNIXWebService.class.getName()));
 
-	if (annotationMetadata != null) {
+        if (annotationMetadata != null) {
 
-	    // Checks correct annotation definition in class to generate or
-	    // delete ITD file.
+            // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
+            builder
+                    .addTypeAnnotation(getWebServiceAnnotation(annotationMetadata));
 
-	    // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
-	    builder
-		    .addTypeAnnotation(getWebServiceAnnotation(annotationMetadata));
+            builder.addTypeAnnotation(getSoapBindingAnnotation());
 
-	    builder.addTypeAnnotation(getSoapBindingAnnotation());
+            List<MethodMetadata> methodMetadataList = MemberFindingUtils
+                    .getMethods(governorTypeDetails);
 
-	    // TODO: Add method annotations.
+            for (MethodMetadata methodMetadata : methodMetadataList) {
 
-	    // TODO: Add @GvNIXWebFault annotation to related exceptions.
+                AnnotationMetadata methodAnnotation = MemberFindingUtils
+                        .getAnnotationOfType(methodMetadata.getAnnotations(),
+                                new JavaType(GvNIXWebMethod.class.getName()));
 
-	    // TODO: Update RooEntities involved in Annotated Operations with
-	    // @GvNIXWebMethod.
+                if (methodAnnotation != null) {
 
-	    // Update methods without GvNIXWebMethod annotation with
-	    // '@WebMethod(exclude = true)'
-	    updateMethodWithoutGvNIXAnnotation();
-	}
+                    // Update ITD with Web Services annotations declarations.
+                    updateMethodWithGvNIXAnnotation(methodMetadata,
+                            methodAnnotation);
+                }
 
-	// Create a representation of the desired output ITD
-	itdTypeDetails = builder.build();
+            }
+
+            // Update methods without @GvNIXWebMethod annotation with
+            // '@WebMethod(exclude = true)'
+            updateMethodWithoutGvNIXAnnotation();
+        }
+
+        // Create a representation of the desired output ITD
+        itdTypeDetails = builder.build();
 
     }
 
@@ -104,35 +118,36 @@ public class ServiceLayerWSExportMetadata extends
      * @return the annotation is already exists or will be created, or null if
      *         it will not be created (required)
      */
-    public AnnotationMetadata getWebServiceAnnotation(AnnotationMetadata annotationMetadata) {
+    public AnnotationMetadata getWebServiceAnnotation(
+            AnnotationMetadata annotationMetadata) {
 
-	JavaType javaType = new JavaType("javax.jws.WebService");
+        JavaType javaType = new JavaType("javax.jws.WebService");
 
-	if (isAnnotationIntroduced("javax.jws.WebService")) {
+        if (isAnnotationIntroduced("javax.jws.WebService")) {
 
-	    List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+            List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-	    StringAttributeValue nameAttributeValue = (StringAttributeValue) annotationMetadata
-		    .getAttribute(new JavaSymbolName("name"));
+            StringAttributeValue nameAttributeValue = (StringAttributeValue) annotationMetadata
+                    .getAttribute(new JavaSymbolName("name"));
 
-	    annotationAttributeValueList.add(nameAttributeValue);
+            annotationAttributeValueList.add(nameAttributeValue);
 
-	    StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) annotationMetadata
-		    .getAttribute(new JavaSymbolName("targetNamespace"));
+            StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) annotationMetadata
+                    .getAttribute(new JavaSymbolName("targetNamespace"));
 
-	    annotationAttributeValueList.add(targetNamespaceAttributeValue);
+            annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-	    StringAttributeValue serviceNameAttributeValue = (StringAttributeValue) annotationMetadata
-		    .getAttribute(new JavaSymbolName("serviceName"));
+            StringAttributeValue serviceNameAttributeValue = (StringAttributeValue) annotationMetadata
+                    .getAttribute(new JavaSymbolName("serviceName"));
 
-	    annotationAttributeValueList.add(serviceNameAttributeValue);
+            annotationAttributeValueList.add(serviceNameAttributeValue);
 
-	    return new DefaultAnnotationMetadata(javaType,
-		    annotationAttributeValueList);
-	}
+            return new DefaultAnnotationMetadata(javaType,
+                    annotationAttributeValueList);
+        }
 
-	return MemberFindingUtils.getDeclaredTypeAnnotation(
-		governorTypeDetails, javaType);
+        return MemberFindingUtils.getDeclaredTypeAnnotation(
+                governorTypeDetails, javaType);
     }
 
     /**
@@ -143,40 +158,40 @@ public class ServiceLayerWSExportMetadata extends
      *         it will not be created (required)
      */
     public AnnotationMetadata getSoapBindingAnnotation() {
-	JavaType javaType = new JavaType("javax.jws.soap.SOAPBinding");
+        JavaType javaType = new JavaType("javax.jws.soap.SOAPBinding");
 
-	if (isAnnotationIntroduced("javax.jws.soap.SOAPBinding")) {
+        if (isAnnotationIntroduced("javax.jws.soap.SOAPBinding")) {
 
-	    List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+            List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-	    EnumAttributeValue enumStyleAttributeValue = new EnumAttributeValue(
-		    new JavaSymbolName("style"), new EnumDetails(new JavaType(
-			    "javax.jws.soap.SOAPBinding.Style"),
-			    new JavaSymbolName("DOCUMENT")));
+            EnumAttributeValue enumStyleAttributeValue = new EnumAttributeValue(
+                    new JavaSymbolName("style"), new EnumDetails(new JavaType(
+                            "javax.jws.soap.SOAPBinding.Style"),
+                            new JavaSymbolName("DOCUMENT")));
 
-	    annotationAttributeValueList.add(enumStyleAttributeValue);
+            annotationAttributeValueList.add(enumStyleAttributeValue);
 
-	    EnumAttributeValue enumUseAttributeValue = new EnumAttributeValue(
-		    new JavaSymbolName("use"), new EnumDetails(new JavaType(
-			    "javax.jws.soap.SOAPBinding.Use"),
-			    new JavaSymbolName("LITERAL")));
+            EnumAttributeValue enumUseAttributeValue = new EnumAttributeValue(
+                    new JavaSymbolName("use"), new EnumDetails(new JavaType(
+                            "javax.jws.soap.SOAPBinding.Use"),
+                            new JavaSymbolName("LITERAL")));
 
-	    annotationAttributeValueList.add(enumUseAttributeValue);
+            annotationAttributeValueList.add(enumUseAttributeValue);
 
-	    EnumAttributeValue enumparameterStyleAttributeValue = new EnumAttributeValue(
-		    new JavaSymbolName("parameterStyle"),
-		    new EnumDetails(new JavaType(
-			    "javax.jws.soap.SOAPBinding.ParameterStyle"),
-			    new JavaSymbolName("WRAPPED")));
+            EnumAttributeValue enumparameterStyleAttributeValue = new EnumAttributeValue(
+                    new JavaSymbolName("parameterStyle"),
+                    new EnumDetails(new JavaType(
+                            "javax.jws.soap.SOAPBinding.ParameterStyle"),
+                            new JavaSymbolName("WRAPPED")));
 
-	    annotationAttributeValueList.add(enumparameterStyleAttributeValue);
+            annotationAttributeValueList.add(enumparameterStyleAttributeValue);
 
-	    return new DefaultAnnotationMetadata(javaType,
-		    annotationAttributeValueList);
-	}
+            return new DefaultAnnotationMetadata(javaType,
+                    annotationAttributeValueList);
+        }
 
-	return MemberFindingUtils.getDeclaredTypeAnnotation(
-		governorTypeDetails, javaType);
+        return MemberFindingUtils.getDeclaredTypeAnnotation(
+                governorTypeDetails, javaType);
     }
 
     /**
@@ -188,11 +203,168 @@ public class ServiceLayerWSExportMetadata extends
      * @return true if it will be introduced, false otherwise
      */
     public boolean isAnnotationIntroduced(String annotation) {
-	JavaType javaType = new JavaType(annotation);
-	AnnotationMetadata result = MemberFindingUtils
-		.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+        JavaType javaType = new JavaType(annotation);
+        AnnotationMetadata result = MemberFindingUtils
+                .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
 
-	return result == null;
+        return result == null;
+    }
+
+    /**
+     * Update methods with @GvNIXWebMethod annotation to ITD.
+     * 
+     * @param methodMetadata
+     *            method to assign ITD declarations.
+     * @param methodAnnotation
+     *            Annotations to generate ITD declaration.
+     */
+    public void updateMethodWithGvNIXAnnotation(MethodMetadata methodMetadata,
+            AnnotationMetadata methodAnnotation) {
+
+        List<AnnotationAttributeValue<?>> annotationAttributeValueList;
+
+        // javax.jws.WebMethod
+        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+        StringAttributeValue operationNameAttributeValue = (StringAttributeValue) methodAnnotation
+        .getAttribute(new JavaSymbolName("operationName"));
+        
+        annotationAttributeValueList.add(operationNameAttributeValue);
+
+        StringAttributeValue actionAttribuetValue = new StringAttributeValue(
+                new JavaSymbolName("action"), "");
+        annotationAttributeValueList.add(actionAttribuetValue);
+
+        BooleanAttributeValue excludeAttribuetValue = new BooleanAttributeValue(
+                new JavaSymbolName("exclude"), false);
+        annotationAttributeValueList.add(excludeAttribuetValue);
+
+        AnnotationMetadata webMethod = new DefaultAnnotationMetadata(
+                new JavaType("javax.jws.WebMethod"),
+                annotationAttributeValueList);
+
+        // Add to AspectJ.
+        builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                methodMetadata, webMethod));
+
+        // javax.xml.ws.RequestWrapper
+        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+        StringAttributeValue localNameAttributeValue = new StringAttributeValue(
+                new JavaSymbolName("localName"),
+                ((StringAttributeValue) methodAnnotation
+                        .getAttribute(new JavaSymbolName("requestWrapperName")))
+                        .getValue());
+        annotationAttributeValueList.add(localNameAttributeValue);
+
+        StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
+                new JavaSymbolName("targetNamespace"),
+                ((StringAttributeValue) methodAnnotation
+                        .getAttribute(new JavaSymbolName(
+                                "requestWrapperNamespace"))).getValue());
+        annotationAttributeValueList.add(targetNamespaceAttributeValue);
+
+        StringAttributeValue classNameAttributeValue = new StringAttributeValue(
+                new JavaSymbolName("className"),
+                ((StringAttributeValue) methodAnnotation
+                        .getAttribute(new JavaSymbolName(
+                                "requestWrapperClassName"))).getValue());
+        annotationAttributeValueList.add(classNameAttributeValue);
+
+        AnnotationMetadata requestWrapper = new DefaultAnnotationMetadata(
+                new JavaType("javax.xml.ws.RequestWrapper"),
+                annotationAttributeValueList);
+
+        // Add to AspectJ.
+        builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                methodMetadata, requestWrapper));
+
+        // javax.xml.ws.ResponseWrapper
+        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+        localNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
+                "localName"), ((StringAttributeValue) methodAnnotation
+                .getAttribute(new JavaSymbolName("responseWrapperName")))
+                .getValue());
+        annotationAttributeValueList.add(localNameAttributeValue);
+
+        targetNamespaceAttributeValue = new StringAttributeValue(
+                new JavaSymbolName("targetNamespace"),
+                ((StringAttributeValue) methodAnnotation
+                        .getAttribute(new JavaSymbolName(
+                                "responseWrapperNamespace"))).getValue());
+        annotationAttributeValueList.add(targetNamespaceAttributeValue);
+
+        classNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
+                "className"), ((StringAttributeValue) methodAnnotation
+                .getAttribute(new JavaSymbolName("responseWrapperClassName")))
+                .getValue());
+        annotationAttributeValueList.add(classNameAttributeValue);
+
+        AnnotationMetadata responseWrapper = new DefaultAnnotationMetadata(
+                new JavaType("javax.xml.ws.ResponseWrapper"),
+                annotationAttributeValueList);
+
+        // Add to AspectJ.
+        builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                methodMetadata, responseWrapper));
+
+        // javax.jws.WebResult
+        // Check result value
+        StringAttributeValue resutlNameAttributeValue = (StringAttributeValue) methodAnnotation
+                .getAttribute(new JavaSymbolName("resultName"));
+        
+        ClassAttributeValue resultTypeAttributeValue = (ClassAttributeValue)methodAnnotation.getAttribute(new JavaSymbolName("webResultType"));
+
+        if ((resutlNameAttributeValue != null && !resutlNameAttributeValue
+                .getValue().contains("void"))
+                && (resultTypeAttributeValue != null && !resultTypeAttributeValue
+                        .getValue().getFullyQualifiedTypeName().contains(
+                                JavaType.VOID_PRIMITIVE
+                                        .getFullyQualifiedTypeName()))) {
+            annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+            localNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("name"), resutlNameAttributeValue
+                            .getValue());
+            annotationAttributeValueList.add(localNameAttributeValue);
+
+            StringAttributeValue gvNIxWebResultTargetNamespace = (StringAttributeValue) methodAnnotation
+            .getAttribute(new JavaSymbolName("resultNamespace"));
+            
+            targetNamespaceAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("targetNamespace"),
+                    gvNIxWebResultTargetNamespace.getValue());
+
+            annotationAttributeValueList.add(targetNamespaceAttributeValue);
+
+            BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
+                    new JavaSymbolName("header"), false);
+            annotationAttributeValueList.add(headerAttributeValue);
+
+            StringAttributeValue partNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("partName"), "parameters");
+
+            annotationAttributeValueList.add(partNameAttributeValue);
+
+            AnnotationMetadata webResult = new DefaultAnnotationMetadata(
+                    new JavaType("javax.jws.WebResult"),
+                    annotationAttributeValueList);
+
+            // Add to AspectJ.
+            builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                    methodMetadata, webResult));
+
+        } else {
+            // @Oneway - not require a response from the service.
+            AnnotationMetadata oneway = new DefaultAnnotationMetadata(
+                    new JavaType("javax.jws.Oneway"),
+                    new ArrayList<AnnotationAttributeValue<?>>());
+            // Add to AspectJ.
+            builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                    methodMetadata, oneway));
+        }
+
     }
 
     /**
@@ -201,76 +373,76 @@ public class ServiceLayerWSExportMetadata extends
      */
     public void updateMethodWithoutGvNIXAnnotation() {
 
-	List<MethodMetadata> methodMetadataList = MemberFindingUtils
-		.getMethods(governorTypeDetails);
+        List<MethodMetadata> methodMetadataList = MemberFindingUtils
+                .getMethods(governorTypeDetails);
 
-	List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
-	attributes.add(new BooleanAttributeValue(new JavaSymbolName("exclude"),
-		true));
+        List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
+        attributes.add(new BooleanAttributeValue(new JavaSymbolName("exclude"),
+                true));
 
-	AnnotationMetadata methodAnnotation = new DefaultAnnotationMetadata(
-		new JavaType("javax.jws.WebMethod"), attributes);
+        AnnotationMetadata methodAnnotation = new DefaultAnnotationMetadata(
+                new JavaType("javax.jws.WebMethod"), attributes);
 
-	List<AnnotationMetadata> methodAnnotationList;
+        List<AnnotationMetadata> methodAnnotationList;
 
-	DefaultAnnotationMetadata defaultAnnotationMetadata = new DefaultAnnotationMetadata(
-		new JavaType(
-			"org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod"),
-		new ArrayList<AnnotationAttributeValue<?>>());
+        DefaultAnnotationMetadata defaultAnnotationMetadata = new DefaultAnnotationMetadata(
+                new JavaType(
+                        "org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod"),
+                new ArrayList<AnnotationAttributeValue<?>>());
 
-	boolean exclude = true;
-	for (MethodMetadata md : methodMetadataList) {
+        boolean exclude = true;
+        for (MethodMetadata md : methodMetadataList) {
 
-	    methodAnnotationList = md.getAnnotations();
+            methodAnnotationList = md.getAnnotations();
 
-	    if (methodAnnotationList.size() == 0) {
+            if (methodAnnotationList.size() == 0) {
 
-		builder
-			.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
-				md, methodAnnotation));
-	    } else {
-		for (AnnotationMetadata annotationMetadata : methodAnnotationList) {
+                builder
+                        .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                                md, methodAnnotation));
+            } else {
+                for (AnnotationMetadata annotationMetadata : methodAnnotationList) {
 
-		    if (annotationMetadata.getAnnotationType().equals(
-			    defaultAnnotationMetadata.getAnnotationType())) {
-			exclude = false;
-			break;
-		    }
+                    if (annotationMetadata.getAnnotationType().equals(
+                            defaultAnnotationMetadata.getAnnotationType())) {
+                        exclude = false;
+                        break;
+                    }
 
-		}
+                }
 
-		if (exclude) {
-		    builder
-			    .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
-				    md, methodAnnotation));
-		}
-	    }
-	}
+                if (exclude) {
+                    builder
+                            .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                                    md, methodAnnotation));
+                }
+            }
+        }
 
     }
 
     public static String getMetadataIdentiferType() {
-	return WEB_SERVICE_TYPE;
+        return WEB_SERVICE_TYPE;
     }
 
     public static boolean isValid(String metadataIdentificationString) {
-	return PhysicalTypeIdentifierNamingUtils.isValid(
-		WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
+        return PhysicalTypeIdentifierNamingUtils.isValid(
+                WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
     }
 
     public static final JavaType getJavaType(String metadataIdentificationString) {
-	return PhysicalTypeIdentifierNamingUtils.getJavaType(
-		WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
+        return PhysicalTypeIdentifierNamingUtils.getJavaType(
+                WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
     }
 
     public static final Path getPath(String metadataIdentificationString) {
-	return PhysicalTypeIdentifierNamingUtils.getPath(
-		WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
+        return PhysicalTypeIdentifierNamingUtils.getPath(
+                WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
     }
 
     public static final String createIdentifier(JavaType javaType, Path path) {
-	return PhysicalTypeIdentifierNamingUtils.createIdentifier(
-		WEB_SERVICE_TYPE_STRING, javaType, path);
+        return PhysicalTypeIdentifierNamingUtils.createIdentifier(
+                WEB_SERVICE_TYPE_STRING, javaType, path);
     }
 
 }
