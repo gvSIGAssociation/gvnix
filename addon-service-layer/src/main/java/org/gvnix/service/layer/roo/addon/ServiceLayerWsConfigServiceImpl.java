@@ -1185,4 +1185,43 @@ public class ServiceLayerWsConfigServiceImpl implements
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Check if exists a project and if it has web.xml configuration file.
+     * </p>
+     */
+    public boolean isProjectAvailable() {
+
+        if (getPathResolver() == null) {
+
+            return false;
+        }
+
+        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "/WEB-INF/web.xml");
+        if (!fileManager.exists(webXmlPath)) {
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return the path resolver or null if there is no user project
+     */
+    private PathResolver getPathResolver() {
+
+        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+                .get(ProjectMetadata.getProjectIdentifier());
+        if (projectMetadata == null) {
+
+            return null;
+        }
+
+        return projectMetadata.getPathResolver();
+    }
+
 }

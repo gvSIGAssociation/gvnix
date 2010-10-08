@@ -103,8 +103,12 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
 
         ServiceLayerWSExportMetadata serviceLayerMetadata = null;
 
-        if (serviceLayerWsConfigService
-                        .isCxfInstalled(CommunicationSense.EXPORT)) {
+        if (serviceLayerWsConfigService.isProjectAvailable()) {
+
+            // Install configuration to export services if it's not installed.
+            serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
+            // Installs jax2ws plugin in project.
+            serviceLayerWsConfigService.installJaxwsBuildPlugin();
 
             // Check if Web Service definition is correct.
             PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata

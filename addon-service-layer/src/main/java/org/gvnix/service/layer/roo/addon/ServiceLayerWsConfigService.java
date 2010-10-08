@@ -115,4 +115,12 @@ public interface ServiceLayerWsConfigService {
      * @return true or false if it's configurated
      */
     public boolean isCxfInstalled(CommunicationSense type);
+
+    /**
+     * Is this a web project ?
+     * 
+     * @return true if this is a web project.
+     */
+    boolean isProjectAvailable();
+
 }

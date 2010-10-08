@@ -21,6 +21,7 @@ package org.gvnix.service.layer.roo.addon;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
@@ -45,6 +46,9 @@ import org.springframework.roo.project.Path;
 @Component(immediate = true)
 @Service
 public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdMetadataProvider {
+
+    @Reference
+    private ServiceLayerWsConfigService serviceLayerWsConfigService;
 
     private static Logger logger = Logger
 	    .getLogger(ServiceLayerWSExportXmlElementMetadataProvider.class.getName());
@@ -87,6 +91,15 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
 	    String itdFilename) {
 
+        ServiceLayerWSExportXmlElementMetadata serviceLayerWSExportXmlElementMetadata = null;
+        
+        if (serviceLayerWsConfigService.isProjectAvailable()) {
+            
+        // Install configuration to export services if it's not installed.
+        serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
+        // Installs jax2ws plugin in project.
+        serviceLayerWsConfigService.installJaxwsBuildPlugin();
+
 	// We know governor type details are non-null and can be safely cast
 
 	// Work out the MIDs of the other metadata we depend on
@@ -105,10 +118,12 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
 	metadataDependencyRegistry.registerDependency(entityMetadataKey,
 		metadataIdentificationString);
 
-	ServiceLayerWSExportXmlElementMetadata serviceLayerWSExportXmlElementMetadata = new ServiceLayerWSExportXmlElementMetadata(
+	serviceLayerWSExportXmlElementMetadata = new ServiceLayerWSExportXmlElementMetadata(
 		metadataIdentificationString, aspectName,
 		governorPhysicalTypeMetadata, entityMetadata);
 
+        }
+        
 	return serviceLayerWSExportXmlElementMetadata;
     }
 

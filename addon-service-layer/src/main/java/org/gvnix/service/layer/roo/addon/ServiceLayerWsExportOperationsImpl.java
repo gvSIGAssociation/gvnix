@@ -74,11 +74,8 @@ public class ServiceLayerWsExportOperationsImpl implements
     @Reference
     private ServiceLayerWSExportValidationService serviceLayerWSExportValidationService;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @seeorg.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations#
-     * isProjectAvailable()
+    /**
+     * {@inheritDoc}
      */
     public boolean isProjectAvailable() {
 

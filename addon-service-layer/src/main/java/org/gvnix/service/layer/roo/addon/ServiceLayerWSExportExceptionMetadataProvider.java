@@ -44,8 +44,6 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
         AbstractItdMetadataProvider {
 
     @Reference
-    private ServiceLayerWsExportOperations serviceLayerWsExportOperations;
-    @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
 
     private static Logger logger = Logger
@@ -104,9 +102,12 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
 
         ServiceLayerWSExportExceptionMetadata exceptionMetadata = null;
 
-        if (serviceLayerWsExportOperations != null
-                && serviceLayerWsConfigService
-                        .isCxfInstalled(CommunicationSense.EXPORT)) {
+        if (serviceLayerWsConfigService.isProjectAvailable()) {
+
+            // Install configuration to export services if it's not installed.
+            serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
+            // Installs jax2ws plugin in project.
+            serviceLayerWsConfigService.installJaxwsBuildPlugin();
 
             // Work out the MIDs of the other metadata we depend on
             JavaType javaType = ServiceLayerWSExportExceptionMetadata
