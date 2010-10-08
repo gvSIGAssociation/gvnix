@@ -41,7 +41,7 @@ public @interface GvNIXWebMethod {
 
     String resultName() default "void";
 
-    String resultNamespace();
+    String resultNamespace() default "";
 
     String requestWrapperName();
 

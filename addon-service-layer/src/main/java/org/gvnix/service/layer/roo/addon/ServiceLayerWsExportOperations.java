@@ -107,8 +107,10 @@ public interface ServiceLayerWsExportOperations {
      *            Method to export.
      * @param operationName
      *            Name of the method to be showed as a Web Service operation.
-     * @param resutlName
+     * @param resultName
      *            Method result name.
+     * @param returnType
+     *            JavaType class to return.
      * @param resultNamespace
      *            Namespace of the result type.
      * @param responseWrapperName
@@ -122,10 +124,11 @@ public interface ServiceLayerWsExportOperations {
      * 
      */
     public List<AnnotationMetadata> getAnnotationsToExportOperation(
-	    JavaType serviceClass, JavaSymbolName methodName,
-	    String operationName, String resutlName, String resultNamespace,
-	    String responseWrapperName, String responseWrapperNamespace,
-	    String requestWrapperName, String requestWrapperNamespace);
+            JavaType serviceClass, JavaSymbolName methodName,
+            String operationName, String resultName, JavaType returnType,
+            String resultNamespace, String responseWrapperName,
+            String responseWrapperNamespace, String requestWrapperName,
+            String requestWrapperNamespace);
 
     /**
      * Check if the method methodName exists in serviceClass and is not

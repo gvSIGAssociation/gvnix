@@ -281,7 +281,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
             int eOFindex = fileContents.lastIndexOf("}");
 
             updatedFilecontents = fileContents.substring(0, eOFindex).concat(
-                    webFaultDeclaration).concat("\n}");
+                    "    ").concat(webFaultDeclaration).concat("\n\n}");
 
             fileManager.createOrUpdateTextFileIfRequired(fileLocation,
                     updatedFilecontents);
@@ -377,7 +377,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
         }
         try {
             
-            Class<?> classToCheck = ClassUtils.forName(javaType
+            Class<?> classToCheck = Class.forName(javaType
                     .getFullyQualifiedTypeName());
 
             if (classToCheck.getSuperclass() == null) {
@@ -394,7 +394,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                             + javaType.getFullyQualifiedTypeName()
                             + "' doesn't exist while checking if extends '"
                             + extendedJavaType
-                            + "'.\nClasses that are not from JDK and project can't be used in in Web Services.");
+                            + "'.\nClasses that are not from JDK or project can't be used in Web Services.");
         }
     }
 
@@ -416,11 +416,10 @@ public class ServiceLayerWSExportValidationServiceImpl implements
             return true;
         }
         try {
-            Class<?> classToCheck = ClassUtils.forName(javaType
+            Class<?> classToCheck = Class.forName(javaType
                     .getFullyQualifiedTypeName());
 
-            Class<?>[] interfaceArray = ClassUtils
-                    .getAllInterfacesForClass(classToCheck);
+            Class<?>[] interfaceArray = classToCheck.getInterfaces();
 
             if (interfaceArray.length == 0) {
                 return false;
@@ -511,9 +510,15 @@ public class ServiceLayerWSExportValidationServiceImpl implements
         Assert.isTrue(javaType != null, "JavaType '" + methodParameterType
                 + "' type can't be 'null'.");
 
-        // It's a collection ?
-        if (extendsJavaType(javaType, ITERABLE)
-                || extendsJavaType(javaType, MAP)) {
+        String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+                javaType.getFullyQualifiedTypeName().replace('.', '/').concat(
+                        ".java"));
+
+        // It's an imported collection or map ?
+        // FIX: Only permits to check classes imported into project that are loaded in system classLloader.
+        if (!fileManager.exists(fileLocation) && (!javaType.getParameters().isEmpty() 
+                ||implementsJavaType(javaType, ITERABLE)
+                || implementsJavaType(javaType, MAP))) {
 
             // Check if javaType is an available collection.
             Assert
@@ -543,7 +548,6 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                             && isJavaTypeAllowed(parameterJavaType,
                                     methodParameterType);
                 }
-
             }
             return parameterAllowed;
         }
@@ -558,10 +562,6 @@ public class ServiceLayerWSExportValidationServiceImpl implements
         if (javaType.getFullyQualifiedTypeName().startsWith("java.lang")) {
             return true;
         }
-
-        String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
-                javaType.getFullyQualifiedTypeName().replace('.', '/').concat(
-                        ".java"));
 
         if (fileManager.exists(fileLocation)) {
 

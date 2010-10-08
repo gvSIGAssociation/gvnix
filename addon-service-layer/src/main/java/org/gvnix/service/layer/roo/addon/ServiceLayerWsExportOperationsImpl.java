@@ -228,7 +228,7 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         if (returnType.equals(JavaType.VOID_OBJECT)
                 || returnType.equals(JavaType.VOID_PRIMITIVE)) {
-            resultName = null;
+            resultName = "void";
         } else if (!StringUtils.hasText(resultName)) {
 
             resultName = "return";
@@ -257,7 +257,7 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         // Create annotations to selected Method
         List<AnnotationMetadata> annotationMetadataUpdateList = getAnnotationsToExportOperation(
-                serviceClass, methodName, operationName, resultName,
+        serviceClass, methodName, operationName, resultName, returnType,
                 resultNamespace, responseWrapperName, responseWrapperNamespace,
                 requestWrapperName, requestWrapperNamespace);
 
@@ -304,36 +304,42 @@ public class ServiceLayerWsExportOperationsImpl implements
      * Annotations to create:
      * </p>
      * <ul>
-     * <li>@GvNIXWebMethod()</li>
-     * <li>@WebMethod(operationName = "operationName", action = "", exclude =
-     * false)</li>
-     * <li>@RequestWrapper(localName = "requestWrapperName", targetNamespace =
-     * "requestWrapperNamespace", className = "")</li>
-     * <li>@ResponseWrapper(localName = "responseWrapperName", targetNamespace =
-     * "responseWrapperNamespace", className = "")</li>
-     * <li>@WebResult(name = "resutlName", targetNamespace = "resultNamespace",
-     * header = false, partName = "parameters")</li>
+     * <li>@GvNIXWebMethod with params:</li>
+     * <ul>
+     * <li>operationName</li>
+     * <li>
+     * webResultType</li>
+     * <li>
+     * resultName</li>
+     * <li>
+     * resultNamespace</li>
+     * <li>
+     * requestWrapperName</li>
+     * <li>
+     * requestWrapperNamespace</li>
+     * <li>
+     * requestWrapperClassName</li>
+     * <li>
+     * responseWrapperName</li>
+     * <li>
+     * responseWrapperNamespace</li>
+     * <li>
+     * responseWrapperClassName</li>
+     * <li>
+     * <ul>
      * </ul>
      */
     public List<AnnotationMetadata> getAnnotationsToExportOperation(
             JavaType serviceClass, JavaSymbolName methodName,
-            String operationName, String resutlName, String resultNamespace,
-            String responseWrapperName, String responseWrapperNamespace,
-            String requestWrapperName, String requestWrapperNamespace) {
+            String operationName, String resultName, JavaType returnType,
+            String resultNamespace, String responseWrapperName,
+            String responseWrapperNamespace, String requestWrapperName,
+            String requestWrapperNamespace) {
 
         List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
-        List<AnnotationAttributeValue<?>> annotationAttributeValueList;
-
-        // org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod
-        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-        AnnotationMetadata gvNIXWebMethod = new DefaultAnnotationMetadata(
-                new JavaType(GvNIXWebMethod.class.getName()),
-                annotationAttributeValueList);
-
-        annotationMetadataList.add(gvNIXWebMethod);
+        List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
         // javax.jws.WebMethod
-        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
         operationName = StringUtils.hasText(operationName) ? operationName
                 : methodName.getSymbolName();
 
@@ -341,27 +347,11 @@ public class ServiceLayerWsExportOperationsImpl implements
                 new JavaSymbolName("operationName"), operationName);
         annotationAttributeValueList.add(operationNameAttributeValue);
 
-        StringAttributeValue actionAttribuetValue = new StringAttributeValue(
-                new JavaSymbolName("action"), "");
-        annotationAttributeValueList.add(actionAttribuetValue);
-
-        BooleanAttributeValue excludeAttribuetValue = new BooleanAttributeValue(
-                new JavaSymbolName("exclude"), false);
-        annotationAttributeValueList.add(excludeAttribuetValue);
-
-        AnnotationMetadata webMethod = new DefaultAnnotationMetadata(
-                new JavaType("javax.jws.WebMethod"),
-                annotationAttributeValueList);
-
-        annotationMetadataList.add(webMethod);
-
         // javax.xml.ws.RequestWrapper
-        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
         requestWrapperName = StringUtils.hasText(requestWrapperName) ? requestWrapperName
                 : operationName;
         StringAttributeValue localNameAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("localName"), requestWrapperName);
+                new JavaSymbolName("requestWrapperName"), requestWrapperName);
         annotationAttributeValueList.add(localNameAttributeValue);
 
         requestWrapperNamespace = StringUtils.hasText(requestWrapperNamespace) ? requestWrapperNamespace
@@ -370,7 +360,8 @@ public class ServiceLayerWsExportOperationsImpl implements
                                 .getPackage().getFullyQualifiedPackageName());
 
         StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("targetNamespace"), requestWrapperNamespace);
+                new JavaSymbolName("requestWrapperNamespace"),
+                requestWrapperNamespace);
         annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
         String className = serviceClass.getPackage()
@@ -378,23 +369,16 @@ public class ServiceLayerWsExportOperationsImpl implements
                         StringUtils.capitalize(requestWrapperName).concat(
                                 "RequestWrapper"));
         StringAttributeValue classNameAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("className"), className);
+                new JavaSymbolName("requestWrapperClassName"), className);
         annotationAttributeValueList.add(classNameAttributeValue);
 
-        AnnotationMetadata requestWrapper = new DefaultAnnotationMetadata(
-                new JavaType("javax.xml.ws.RequestWrapper"),
-                annotationAttributeValueList);
-
-        annotationMetadataList.add(requestWrapper);
 
         // javax.xml.ws.ResponseWrapper
-        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
         responseWrapperName = StringUtils.hasText(responseWrapperName) ? responseWrapperName
                 : operationName.concat("Response");
 
         localNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
-                "localName"), responseWrapperName);
+                "responseWrapperName"), responseWrapperName);
         annotationAttributeValueList.add(localNameAttributeValue);
 
         responseWrapperNamespace = StringUtils
@@ -404,29 +388,24 @@ public class ServiceLayerWsExportOperationsImpl implements
                                 .getPackage().getFullyQualifiedPackageName());
 
         targetNamespaceAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("targetNamespace"), responseWrapperNamespace);
+                new JavaSymbolName("responseWrapperNamespace"),
+                responseWrapperNamespace);
         annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
         className = serviceClass.getPackage().getFullyQualifiedPackageName()
                 .concat(".")
                 .concat(StringUtils.capitalize(responseWrapperName));
         classNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
-                "className"), className);
+                "responseWrapperClassName"), className);
         annotationAttributeValueList.add(classNameAttributeValue);
 
-        AnnotationMetadata responseWrapper = new DefaultAnnotationMetadata(
-                new JavaType("javax.xml.ws.ResponseWrapper"),
-                annotationAttributeValueList);
-
-        annotationMetadataList.add(responseWrapper);
-
-        // javax.jws.WebResult
         // Check result value
-        if (resutlName != null) {
-            annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        if ((resultName != null && returnType != null)
+                && !(returnType.equals(JavaType.VOID_PRIMITIVE) || (returnType
+                        .equals(JavaType.VOID_PRIMITIVE)))) {
 
             localNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("name"), resutlName);
+                    new JavaSymbolName("resultName"), resultName);
             annotationAttributeValueList.add(localNameAttributeValue);
 
             resultNamespace = StringUtils.hasText(resultNamespace) ? resultNamespace
@@ -436,30 +415,32 @@ public class ServiceLayerWsExportOperationsImpl implements
                                     .getFullyQualifiedPackageName());
 
             targetNamespaceAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("targetNamespace"), resultNamespace);
+                    new JavaSymbolName("resultNamespace"), resultNamespace);
             annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-            BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
-                    new JavaSymbolName("header"), false);
-            annotationAttributeValueList.add(headerAttributeValue);
+            ClassAttributeValue resultTypeAttributeValue = new ClassAttributeValue(
+                    new JavaSymbolName("webResultType"), returnType);
+            annotationAttributeValueList.add(resultTypeAttributeValue);
 
-            StringAttributeValue partNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("partName"), "parameters");
-
-            annotationAttributeValueList.add(partNameAttributeValue);
-
-            AnnotationMetadata webResult = new DefaultAnnotationMetadata(
-                    new JavaType("javax.jws.WebResult"),
-                    annotationAttributeValueList);
-
-            annotationMetadataList.add(webResult);
         } else {
-            // @Oneway - not require a response from the service.
-            AnnotationMetadata oneway = new DefaultAnnotationMetadata(
-                    new JavaType("javax.jws.Oneway"),
-                    new ArrayList<AnnotationAttributeValue<?>>());
-            annotationMetadataList.add(oneway);
+
+            localNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("resultName"), "void");
+            annotationAttributeValueList.add(localNameAttributeValue);
+            
+            ClassAttributeValue resultTypeAttributeValue = new ClassAttributeValue(
+                    new JavaSymbolName("webResultType"),
+                    JavaType.VOID_PRIMITIVE);
+            annotationAttributeValueList.add(resultTypeAttributeValue);
         }
+
+        // Create annotation.
+        // org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod
+        AnnotationMetadata gvNIXWebMethod = new DefaultAnnotationMetadata(
+                new JavaType(GvNIXWebMethod.class.getName()),
+                annotationAttributeValueList);
+
+        annotationMetadataList.add(gvNIXWebMethod);
 
         return annotationMetadataList;
     }
