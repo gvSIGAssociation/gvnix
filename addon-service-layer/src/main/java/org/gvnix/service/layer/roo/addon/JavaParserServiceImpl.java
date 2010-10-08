@@ -593,12 +593,19 @@ public class JavaParserServiceImpl implements JavaParserService {
      * </p>
      */
     public boolean isAnnotationIntroduced(String annotation,
-	    ClassOrInterfaceTypeDetails governorTypeDetails) {
-	JavaType javaType = new JavaType(annotation);
-	AnnotationMetadata result = MemberFindingUtils
-		.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+            ClassOrInterfaceTypeDetails governorTypeDetails) {
+        JavaType javaType = new JavaType(annotation);
+        boolean isDefined = false;
+        for (AnnotationMetadata annotationMetadata : governorTypeDetails
+                .getTypeAnnotations()) {
 
-	return result != null;
+            isDefined = annotationMetadata.getAnnotationType().equals(javaType);
+            if (isDefined) {
+                return isDefined;
+            }
+        }
+
+        return isDefined;
     }
 
     /**
