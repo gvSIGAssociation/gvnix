@@ -47,4 +47,14 @@ public interface ServiceLayerWsImportOperations {
      */
     public void importService(JavaType className, String wsdlLocation);
 
+    /**
+     * Adds the gvNIX import annotation with some wsdl location in a class.
+     * 
+     * @param className
+     *            class to add annotation.
+     * @param wsdlLocation
+     *            contract wsdl url to import.
+     */
+    public void addImportAnnotation(JavaType className, String wsdlLocation);
+
 }

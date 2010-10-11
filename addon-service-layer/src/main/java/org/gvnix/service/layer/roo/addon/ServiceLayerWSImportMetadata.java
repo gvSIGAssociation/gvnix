@@ -69,7 +69,7 @@ public class ServiceLayerWSImportMetadata extends
 	AbstractItdTypeDetailsProvidingMetadataItem {
 
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerWSImportMetadataNotificationListener.class
+	    .getLogger(ServiceLayerWSImportMetadata.class
 		    .getName());
 
     private static final String WEB_SERVICE_TYPE_STRING = ServiceLayerWSImportMetadata.class

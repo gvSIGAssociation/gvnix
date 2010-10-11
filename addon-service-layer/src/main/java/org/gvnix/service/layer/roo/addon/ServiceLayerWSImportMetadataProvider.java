@@ -21,10 +21,16 @@ package org.gvnix.service.layer.roo.addon;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebServiceProxy;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 
@@ -43,6 +49,10 @@ import org.springframework.roo.project.Path;
 @Service
 public class ServiceLayerWSImportMetadataProvider extends
 	AbstractItdMetadataProvider {
+    
+    // TODO Be careful because ServiceLayerWsImportOperations is not inmediate
+    @Reference
+    private ServiceLayerWsImportOperations serviceLayerWsImportOperations;
 
     protected void activate(ComponentContext context) {
 
@@ -97,11 +107,48 @@ public class ServiceLayerWSImportMetadataProvider extends
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
 	    String itdFilename) {
 
-	ServiceLayerWSImportMetadata serviceLayerMetadata = new ServiceLayerWSImportMetadata(
-		metadataIdentificationString, aspectName,
-		governorPhysicalTypeMetadata);
+	ServiceLayerWSImportMetadata metadata = null;
 
-	return serviceLayerMetadata;
+	// Import service if project has required prerequisites
+	if (serviceLayerWsImportOperations.isProjectAvailable()) {
+
+	    // Check if Web Service definition is correct.
+	    PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
+		    .getPhysicalTypeDetails();
+
+	    ClassOrInterfaceTypeDetails governorTypeDetails;
+	    if (physicalTypeDetails == null
+		    || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+
+		// There is a problem
+		return null;
+
+	    } else {
+
+		// We have reliable physical type details
+		governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
+	    }
+
+	    // Get upstreamDepency Class to check.
+	    AnnotationMetadata annotation = MemberFindingUtils
+		    .getTypeAnnotation(governorTypeDetails, new JavaType(
+			    GvNIXWebServiceProxy.class.getName()));
+
+	    // Wsdl location
+	    StringAttributeValue url = (StringAttributeValue) annotation
+		    .getAttribute(new JavaSymbolName("wsdlLocation"));
+
+	    // Generate service infraestructure to import the service
+	    serviceLayerWsImportOperations.importService(governorTypeDetails
+		    .getName(), url.getValue());
+
+	    // Create metadata
+	    metadata = new ServiceLayerWSImportMetadata(
+		    metadataIdentificationString, aspectName,
+		    governorPhysicalTypeMetadata);
+	}
+
+	return metadata;
     }
 
     /*

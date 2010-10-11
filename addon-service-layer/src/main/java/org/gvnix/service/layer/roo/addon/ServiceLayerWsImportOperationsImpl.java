@@ -91,18 +91,28 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
 
     /**
      * {@inheritDoc}
-     * 
-     * <p>
-     * If the class to import the web service doesn't exist it will be created
-     * automatically in 'src/main/java' directory inside the package defined.
-     * </p>
-     * 
-     * @param serviceClass
      */
     public void importService(JavaType serviceClass, String wsdlLocation) {
 
 	// Install import WS configuration requirements, if not installed 
 	serviceLayerWsConfigService.install(CommunicationSense.IMPORT);
+
+	// Add wsdl location to pom.xml
+	serviceLayerWsConfigService.addImportLocation(wsdlLocation);
+	
+	// Add GvNixAnnotations to the project.
+	annotationsService.addGvNIXAnnotationsDependency();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * If the class to add annotation doesn't exist it will be created
+     * automatically in 'src/main/java' directory inside the package defined.
+     * </p>
+     */
+    public void addImportAnnotation(JavaType serviceClass, String wsdlLocation) {
 
 	// Service class path
 	String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
@@ -117,9 +127,6 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
 	    logger.log(Level.INFO, "New service class created: "
 		    + serviceClass.getSimpleTypeName());
 	}
-	
-	// Add wsdl location to pom.xml
-	serviceLayerWsConfigService.addImportLocation(wsdlLocation);
 	
 	// Add the import definition annotation and attributes to the class
 	List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();

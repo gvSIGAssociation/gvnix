@@ -230,7 +230,7 @@ public class ServiceLayerCommands implements CommandMarker {
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to import or create") JavaType serviceClass,
 	    @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
 
-	serviceLayerWsImportOperations.importService(serviceClass, url);
+	serviceLayerWsImportOperations.addImportAnnotation(serviceClass, url);
     }
 
 }
