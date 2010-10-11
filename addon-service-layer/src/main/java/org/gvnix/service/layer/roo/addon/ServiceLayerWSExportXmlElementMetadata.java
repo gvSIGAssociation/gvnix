@@ -20,6 +20,8 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.springframework.roo.addon.entity.EntityMetadata;
@@ -52,6 +54,9 @@ public class ServiceLayerWSExportXmlElementMetadata extends
 	    .create(XML_ELEMENT_STRING);
 
     private EntityMetadata entityMetadata;
+
+    private static Logger logger = Logger
+            .getLogger(ServiceLayerWSExportXmlElementMetadata.class.getName());
 
     public ServiceLayerWSExportXmlElementMetadata(String identifier, JavaType aspectName,
 	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -86,7 +91,7 @@ public class ServiceLayerWSExportXmlElementMetadata extends
 		    .getDeclaredFields(governorTypeDetails);
 
 	    // Field @XmlTransient annotations.
-	    List<FieldMetadata> fieldmetadataTransientList = getPersistencetRelationshipFields();
+	    List<FieldMetadata> fieldmetadataTransientList = getPersistenceRelationshipFields();
 
 	    // Field @XmlElement annotations.
 	    List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
@@ -207,7 +212,7 @@ public class ServiceLayerWSExportXmlElementMetadata extends
      * 
      * @return {@link List} of annotated {@link FieldMetadata}.
      */
-    public List<FieldMetadata> getPersistencetRelationshipFields() {
+    public List<FieldMetadata> getPersistenceRelationshipFields() {
 
 	List<FieldMetadata> relationFieldList = new ArrayList<FieldMetadata>();
 
@@ -216,23 +221,38 @@ public class ServiceLayerWSExportXmlElementMetadata extends
 		.getFieldsWithAnnotation(governorTypeDetails, new JavaType(
 			"javax.persistence.OneToMany"));
 
-	relationFieldList.addAll(oneToManyFieldMetadataList);
-
+        relationFieldList.addAll(oneToManyFieldMetadataList);
+	
 	// Retrieve the fields that are defined as ManyToOne relationship.
 	List<FieldMetadata> manyToOneFieldMetadataList = MemberFindingUtils
 		.getFieldsWithAnnotation(governorTypeDetails, new JavaType(
 			"javax.persistence.ManyToOne"));
 
-	relationFieldList.addAll(manyToOneFieldMetadataList);
+        relationFieldList.addAll(manyToOneFieldMetadataList);
 
 	// Retrieve the fields that are defined as OneToOne relationship.
 	List<FieldMetadata> oneToOneFieldMetadataList = MemberFindingUtils
 		.getFieldsWithAnnotation(governorTypeDetails, new JavaType(
 			"javax.persistence.OneToOne"));
+	
+        relationFieldList.addAll(oneToOneFieldMetadataList);
 
-	relationFieldList.addAll(oneToOneFieldMetadataList);
+        List<? extends FieldMetadata> declaredFieldList = governorTypeDetails
+                .getDeclaredFields();
 
-	return relationFieldList;
+        // Transient collection fields.
+        for (FieldMetadata fieldMetadata : declaredFieldList) {
+
+            // Exclude field that implements Iterable interface.
+            if (implementsJavaType(fieldMetadata.getFieldType(),
+                    Iterable.class.getName())
+                    && !relationFieldList.contains(fieldMetadata)) {
+
+                relationFieldList.add(fieldMetadata);
+            }
+        }
+
+        return relationFieldList;
 
     }
 
@@ -345,6 +365,58 @@ public class ServiceLayerWSExportXmlElementMetadata extends
 		.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
 
 	return result == null;
+    }
+
+    /**
+     * Check if javaType implements from 'extendedJavaType' class.
+     * 
+     * @param javaType
+     *            to check if implements from type.
+     * @param implmentedJavaType
+     *            Java type to check.
+     * @return true if class implements from implementedJavaType or false if is
+     *         not implementing.
+     */
+    private boolean implementsJavaType(JavaType javaType,
+            String implmentedJavaType) {
+
+        if (javaType.getFullyQualifiedTypeName().contentEquals(
+                implmentedJavaType)) {
+            return true;
+        }
+        try {
+            Class<?> classToCheck = Class.forName(javaType
+                    .getFullyQualifiedTypeName());
+
+            Class<?>[] interfaceArray = classToCheck.getInterfaces();
+
+            if (interfaceArray.length == 0) {
+                return false;
+            } else {
+
+                Class<?> interfaceToCheck;
+                boolean implementsJavaType = false;
+                for (int i = 0; i < interfaceArray.length; i++) {
+                    interfaceToCheck = interfaceArray[i];
+
+                    implementsJavaType = implementsJavaType(new JavaType(
+                            interfaceToCheck.getName()), implmentedJavaType);
+
+                    if (implementsJavaType) {
+                        return implementsJavaType;
+                    }
+                }
+                return implementsJavaType;
+            }
+
+        } catch (ClassNotFoundException e) {
+            logger.log(Level.WARNING, "The class: '"
+                    + javaType.getFullyQualifiedTypeName()
+                    + "' doesn't exist while checking if extends '"
+                    + implmentedJavaType + "'.");
+            return false;
+        }
+
     }
 
     public static String getMetadataIdentiferType() {

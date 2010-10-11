@@ -39,10 +39,11 @@ public interface ServiceLayerWsExportOperations {
      * <ul>
      * <li>RETURN: output method parameter.</li>
      * <li>PARAMETER: input method parameter.</li>
+     * <li>XMLENTITY: project entity/class.</li>
      * </ul>
      */
     public enum MethodParameterType {
-	RETURN, PARAMETER
+        RETURN, PARAMETER, XMLENTITY
     };
 
     /**

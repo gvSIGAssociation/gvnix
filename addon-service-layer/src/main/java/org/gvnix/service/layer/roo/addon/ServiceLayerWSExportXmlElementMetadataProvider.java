@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations.MethodParameterType;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
@@ -49,6 +50,8 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
 
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
+    @Reference
+    private ServiceLayerWSExportValidationService serviceLayerWSExportValidationService;
 
     private static Logger logger = Logger
 	    .getLogger(ServiceLayerWSExportXmlElementMetadataProvider.class.getName());
@@ -94,33 +97,37 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
         ServiceLayerWSExportXmlElementMetadata serviceLayerWSExportXmlElementMetadata = null;
         
         if (serviceLayerWsConfigService.isProjectAvailable()) {
-            
-        // Install configuration to export services if it's not installed.
-        serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
-        // Installs jax2ws plugin in project.
-        serviceLayerWsConfigService.installJaxwsBuildPlugin();
 
-	// We know governor type details are non-null and can be safely cast
+            // Install configuration to export services if it's not installed.
+            serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
+            // Installs jax2ws plugin in project.
+            serviceLayerWsConfigService.installJaxwsBuildPlugin();
 
-	// Work out the MIDs of the other metadata we depend on
-	JavaType javaType = ServiceLayerWSExportXmlElementMetadata
-		.getJavaType(metadataIdentificationString);
-	Path path = ServiceLayerWSExportXmlElementMetadata
-		.getPath(metadataIdentificationString);
-	String entityMetadataKey = EntityMetadata.createIdentifier(javaType,
-		path);
+            // We know governor type details are non-null and can be safely cast
 
-	// We need to lookup the metadata we depend on
-	EntityMetadata entityMetadata = (EntityMetadata) metadataService
-		.get(entityMetadataKey);
+            // Work out the MIDs of the other metadata we depend on
+            JavaType javaType = ServiceLayerWSExportXmlElementMetadata
+                    .getJavaType(metadataIdentificationString);
+            Path path = ServiceLayerWSExportXmlElementMetadata
+                    .getPath(metadataIdentificationString);
+            String entityMetadataKey = EntityMetadata.createIdentifier(
+                    javaType, path);
 
-	// We need to be informed if our dependent metadata changes
-	metadataDependencyRegistry.registerDependency(entityMetadataKey,
-		metadataIdentificationString);
+            // We need to lookup the metadata we depend on
+            EntityMetadata entityMetadata = (EntityMetadata) metadataService
+                    .get(entityMetadataKey);
 
-	serviceLayerWSExportXmlElementMetadata = new ServiceLayerWSExportXmlElementMetadata(
-		metadataIdentificationString, aspectName,
-		governorPhysicalTypeMetadata, entityMetadata);
+            // We need to be informed if our dependent metadata changes
+            metadataDependencyRegistry.registerDependency(entityMetadataKey,
+                    metadataIdentificationString);
+
+            if (serviceLayerWSExportValidationService.isJavaTypeAllowed(
+                    javaType, MethodParameterType.XMLENTITY, javaType)) {
+
+                serviceLayerWSExportXmlElementMetadata = new ServiceLayerWSExportXmlElementMetadata(
+                        metadataIdentificationString, aspectName,
+                        governorPhysicalTypeMetadata, entityMetadata);
+            }
 
         }
         

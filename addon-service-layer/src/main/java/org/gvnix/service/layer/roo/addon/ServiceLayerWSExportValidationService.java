@@ -62,11 +62,14 @@ public interface ServiceLayerWSExportValidationService {
      *            of the parameter. Can't be null.
      * @param methodParameterType
      *            return or input parameters to check.
+     * @param serviceClass
+     *            where is used the element.
+     * 
      * @return true if it's all correct.
      * 
      */
     public boolean isJavaTypeAllowed(JavaType javaType,
-            MethodParameterType methodParameterType);
+            MethodParameterType methodParameterType, JavaType serviceClass);
 
     /**
      * Check method exceptions to publish in service operation.

@@ -477,7 +477,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
         // Check Return type
         JavaType returnType = methodToCheck.getReturnType();
 
-        isJavaTypeAllowed(returnType, MethodParameterType.RETURN);
+        isJavaTypeAllowed(returnType, MethodParameterType.RETURN, serviceClass);
 
         // Check Input Parameters
         List<AnnotatedJavaType> inputParametersList = methodToCheck
@@ -485,7 +485,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
 
         for (AnnotatedJavaType annotatedJavaType : inputParametersList) {
             isJavaTypeAllowed(annotatedJavaType.getJavaType(),
-                    MethodParameterType.PARAMETER);
+                    MethodParameterType.PARAMETER, serviceClass);
         }
     }
 
@@ -504,7 +504,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
      * </ul>
      */
     public boolean isJavaTypeAllowed(JavaType javaType,
-            MethodParameterType methodParameterType) {
+            MethodParameterType methodParameterType, JavaType serviceClass) {
 
         // Is not null.
         Assert.isTrue(javaType != null, "JavaType '" + methodParameterType
@@ -528,7 +528,9 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                                     + methodParameterType
                                     + "' type '"
                                     + javaType.getFullyQualifiedTypeName()
-                                    + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection.");
+                                    + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection defined in: '"
+                                    + serviceClass.getFullyQualifiedTypeName()
+                                    + "'.");
 
             boolean parameterAllowed = true;
 
@@ -546,7 +548,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                 for (JavaType parameterJavaType : parameterList) {
                     parameterAllowed = parameterAllowed
                             && isJavaTypeAllowed(parameterJavaType,
-                                    methodParameterType);
+                                    methodParameterType, serviceClass);
                 }
             }
             return parameterAllowed;
@@ -583,37 +585,44 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                             + PhysicalTypeIdentifier.getFriendlyName(targetId));
             MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
 
-            // Check if is a RooEntity
-            AnnotationMetadata rooEntitynnotationMetadata = MemberFindingUtils
-                    .getTypeAnnotation(mutableTypeDetails, new JavaType(
-                            RooEntity.class.getName()));
+            // Add @GvNIXXmlElement annotation.
+            List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-            // TODO: Aunque no sea RooEntity añadir la anotación ?
-            if (rooEntitynnotationMetadata != null) {
+            StringAttributeValue nameStringAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("name"), StringUtils
+                            .uncapitalize(javaType.getSimpleTypeName()));
 
-                // Add @GvNIXXmlElement annotation.
-                List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+            annotationAttributeValueList.add(nameStringAttributeValue);
 
-                StringAttributeValue nameStringAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("name"), StringUtils
-                                .uncapitalize(javaType.getSimpleTypeName()));
+            StringAttributeValue namespaceStringAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("namespace"),
+                    serviceLayerWsConfigService
+                            .convertPackageToTargetNamespace(javaType
+                                    .getPackage().toString()));
 
-                annotationAttributeValueList.add(nameStringAttributeValue);
+            List<? extends FieldMetadata> declaredFieldList = mutableTypeDetails
+                    .getDeclaredFields();
 
-                StringAttributeValue namespaceStringAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("namespace"),
-                        serviceLayerWsConfigService
-                                .convertPackageToTargetNamespace(javaType
-                                        .getPackage().toString()));
+            boolean isJAvaTypeAllowed = true;
 
-                annotationAttributeValueList.add(namespaceStringAttributeValue);
+            for (FieldMetadata fieldMetadata : declaredFieldList) {
 
-                annotationsService.addJavaTypeAnnotation(mutableTypeDetails
-                        .getName(), GvNIXXmlElement.class.getName(),
-                        annotationAttributeValueList, false);
-
-                return true;
+                // Checks fields from a class to export as xml elements.
+                isJAvaTypeAllowed = isJavaTypeAllowed(fieldMetadata
+                        .getFieldType(), methodParameterType, serviceClass);
+                if (!isJAvaTypeAllowed) {
+                    return false;
+                }
             }
+
+            annotationAttributeValueList.add(namespaceStringAttributeValue);
+
+            annotationsService.addJavaTypeAnnotation(mutableTypeDetails
+                    .getName(), GvNIXXmlElement.class.getName(),
+                    annotationAttributeValueList, false);
+
+            return isJAvaTypeAllowed;
+
         }
 
         return true;
