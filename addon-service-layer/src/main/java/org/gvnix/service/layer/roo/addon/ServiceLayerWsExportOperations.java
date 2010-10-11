@@ -20,6 +20,7 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.List;
 
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -123,6 +124,8 @@ public interface ServiceLayerWsExportOperations {
      * @param requestWrapperNamespace
      *            Namespace of the Request Wrapper Object.
      * 
+     * @return Annotation list for method methodName.
+     * 
      */
     public List<AnnotationMetadata> getAnnotationsToExportOperation(
             JavaType serviceClass, JavaSymbolName methodName,
@@ -146,4 +149,15 @@ public interface ServiceLayerWsExportOperations {
      */
     public boolean isMethodAvailableToExport(JavaType serviceClass,
 	    JavaSymbolName methodName, String annotationName);
+
+    /**
+     * Creates the list of annotations for each method input parameter with
+     * values defined.
+     * 
+     * @param serviceClass
+     * @param methodName
+     * @return Annotation
+     */
+    public List<AnnotatedJavaType> getMethodParameterAnnotations(
+            JavaType serviceClass, JavaSymbolName methodName);
 }

@@ -34,8 +34,8 @@ import java.lang.annotation.*;
 @Target(ElementType.PARAMETER)
 public @interface GvNIXWebParam {
 
-    String name() default "";
+    String name();
 
-    Class<?> type() default void.class;
+    Class<?> type();
 
 }

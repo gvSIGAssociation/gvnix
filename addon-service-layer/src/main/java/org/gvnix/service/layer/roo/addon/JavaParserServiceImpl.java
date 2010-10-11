@@ -154,7 +154,10 @@ public class JavaParserServiceImpl implements JavaParserService {
      * Adds Web Service annotation to selected method.
      * </p>
      */
-    public void updateMethodAnnotations(JavaType className, JavaSymbolName method, List<AnnotationMetadata> annotationMetadataUpdateList) {
+    public void updateMethodAnnotations(JavaType className,
+            JavaSymbolName method,
+            List<AnnotationMetadata> annotationMetadataUpdateList,
+            List<AnnotatedJavaType> annotationWebParamMetadataList) {
 
 	// MetadataID
 	String targetId = PhysicalTypeIdentifier.createIdentifier(className,
@@ -204,7 +207,7 @@ public class JavaParserServiceImpl implements JavaParserService {
 			javaParserMethodMetadata.getModifier(),
 			javaParserMethodMetadata.getMethodName(),
 			javaParserMethodMetadata.getReturnType(),
-			javaParserMethodMetadata.getParameterTypes(),
+                        annotationWebParamMetadataList,
 			javaParserMethodMetadata.getParameterNames(),
 			methodAnnotationList,
 			javaParserMethodMetadata.getThrowsTypes(),

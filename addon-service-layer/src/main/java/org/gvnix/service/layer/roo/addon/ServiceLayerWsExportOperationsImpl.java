@@ -33,8 +33,7 @@ import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;
-import org.springframework.roo.model.JavaSymbolName;
-import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.*;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
 import org.springframework.roo.support.util.*;
@@ -254,12 +253,17 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         // Create annotations to selected Method
         List<AnnotationMetadata> annotationMetadataUpdateList = getAnnotationsToExportOperation(
-        serviceClass, methodName, operationName, resultName, returnType,
-                resultNamespace, responseWrapperName, responseWrapperNamespace,
-                requestWrapperName, requestWrapperNamespace);
+                serviceClass, methodName, operationName, resultName,
+                returnType, resultNamespace, responseWrapperName,
+                responseWrapperNamespace, requestWrapperName,
+                requestWrapperNamespace);
+
+        // TODO: parameter @GvNIXWebParam && @WebParam annotations.
+        List<AnnotatedJavaType> annotationWebParamMetadataList = getMethodParameterAnnotations(
+                serviceClass, methodName);
 
         javaParserService.updateMethodAnnotations(serviceClass, methodName,
-                annotationMetadataUpdateList);
+                annotationMetadataUpdateList, annotationWebParamMetadataList);
 
     }
 
@@ -369,7 +373,6 @@ public class ServiceLayerWsExportOperationsImpl implements
                 new JavaSymbolName("requestWrapperClassName"), className);
         annotationAttributeValueList.add(classNameAttributeValue);
 
-
         // javax.xml.ws.ResponseWrapper
         responseWrapperName = StringUtils.hasText(responseWrapperName) ? responseWrapperName
                 : operationName.concat("Response");
@@ -424,7 +427,7 @@ public class ServiceLayerWsExportOperationsImpl implements
             localNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("resultName"), "void");
             annotationAttributeValueList.add(localNameAttributeValue);
-            
+
             ClassAttributeValue resultTypeAttributeValue = new ClassAttributeValue(
                     new JavaSymbolName("webResultType"),
                     JavaType.VOID_PRIMITIVE);
@@ -506,4 +509,103 @@ public class ServiceLayerWsExportOperationsImpl implements
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public List<AnnotatedJavaType> getMethodParameterAnnotations(
+            JavaType serviceClass, JavaSymbolName methodName) {
+
+        List<AnnotatedJavaType> annotatedWebParameterList = new ArrayList<AnnotatedJavaType>();
+
+        MethodMetadata methodMetadata = javaParserService
+                .getMethodByNameInClass(serviceClass, methodName);
+
+        List<AnnotatedJavaType> parameterTypesList = methodMetadata
+                .getParameterTypes();
+
+        List<JavaSymbolName> parameterNamesList = methodMetadata
+                .getParameterNames();
+
+        AnnotatedJavaType parameterWithAnnotations;
+        List<AnnotationMetadata> parameterAnnotationList;
+        
+        // @WebParam default values.
+        StringAttributeValue partNameAttributeValue = new StringAttributeValue(
+                new JavaSymbolName("partName"), "parameters");
+
+        EnumAttributeValue modeAttributeValue = new EnumAttributeValue(
+                new JavaSymbolName("mode"), new EnumDetails(new JavaType(
+                        "javax.jws.WebParam.Mode"), new JavaSymbolName("IN")));
+
+        BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
+                new JavaSymbolName("header"), false);
+
+        for (AnnotatedJavaType parameterType : parameterTypesList) {
+        
+            parameterAnnotationList = new ArrayList<AnnotationMetadata>();
+
+            // @GvNIXWebParam
+            List<AnnotationAttributeValue<?>> gvNIXWebParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+            int index = parameterTypesList.indexOf(parameterType);
+            
+            JavaSymbolName parameterName = parameterNamesList.get(index);
+            
+            StringAttributeValue nameWebParamAttributeValue = new StringAttributeValue(new JavaSymbolName("name"), parameterName.getSymbolName());
+
+            gvNIXWebParamAttributeValueList.add(nameWebParamAttributeValue);
+
+            ClassAttributeValue typeClassAttributeValue = new ClassAttributeValue(new JavaSymbolName("type"), parameterType.getJavaType());
+
+            gvNIXWebParamAttributeValueList.add(typeClassAttributeValue);
+
+            AnnotationMetadata gvNixWebParamAnnotationMetadata = new DefaultAnnotationMetadata(
+                    new JavaType(GvNIXWebParam.class.getName()),
+                    gvNIXWebParamAttributeValueList);
+
+            parameterAnnotationList.add(gvNixWebParamAnnotationMetadata);
+            
+            // @WebParam
+
+            List<AnnotationAttributeValue<?>> webParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+            /*
+             * @WebParam(name = "fecha", partName = "parameters",
+             * targetNamespace =
+             * "http://services.web.project.test.gvnix.org/types", mode =
+             * Mode.IN, header = false)
+             */
+            webParamAttributeValueList.add(nameWebParamAttributeValue);
+
+            StringAttributeValue targetNamespace = new StringAttributeValue(
+                    new JavaSymbolName("targetNamespace"), serviceLayerWsConfigService
+                            .convertPackageToTargetNamespace(parameterType
+                                    .getJavaType().getPackage()
+                                    .getFullyQualifiedPackageName()));
+
+            webParamAttributeValueList.add(targetNamespace);
+
+            webParamAttributeValueList.add(partNameAttributeValue);
+            
+            webParamAttributeValueList.add(modeAttributeValue);
+            
+            webParamAttributeValueList.add(headerAttributeValue);
+
+            AnnotationMetadata webParamAnnotationMetadata = new DefaultAnnotationMetadata(
+                    new JavaType("javax.jws.WebParam"),
+                    webParamAttributeValueList);
+
+            parameterAnnotationList.add(webParamAnnotationMetadata);
+
+            // Add annotation list to parameter.
+            parameterWithAnnotations = new AnnotatedJavaType(parameterType
+                    .getJavaType(), parameterAnnotationList);
+            
+            annotatedWebParameterList.add(parameterWithAnnotations);
+
+        }
+
+        return annotatedWebParameterList;
+    }
 }
