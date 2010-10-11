@@ -78,8 +78,8 @@
       <term>code/tcon</term>
 
       <listitem>
-        <para> Este es un ejemplo de un directorio de una librería o
-        componente <emphasis>no add-on</emphasis>.</para>
+        <para>Este es un ejemplo de un directorio de una librería o componente
+        <emphasis>no add-on</emphasis>.</para>
       </listitem>
     </varlistentry>
 
@@ -87,8 +87,8 @@
       <term>code/annotations</term>
 
       <listitem>
-        <para>Meta-proyecto para la generación de librería con las anotaciones
-        necesarias para los add-ons.</para>
+        <para>Meta-proyecto para la generación de librerías con las
+        anotaciones necesarias para los add-ons.</para>
       </listitem>
     </varlistentry>
 

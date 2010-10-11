@@ -83,12 +83,12 @@
     <listitem>
       <para>Una clase <classname>PropertyName</classname>: Clase de ejemplo de
       declaración/registro de propiedades de tipo enumerados disponibles para
-      la linea de comando con autocompletados. Para mostrar las opciones
+      la línea de comando con autocompletados. Para mostrar las opciones
       inicializadas en la clase de un parámetro asociado al comando.</para>
     </listitem>
   </orderedlist>
 
-  <para>Si vamos a trabajar con eclipse podemos ejecutar:</para>
+  <para>Si vamos a trabajar con Eclipse podemos ejecutar:</para>
 
   <itemizedlist>
     <listitem>
@@ -108,7 +108,7 @@
     <title xml:lang="es">Declaración y uso de componente-servicios
     OSGi</title>
 
-    <para>El framework rueda sobre la implementación OSGi <link
+    <para>El framework funciona sobre la implementación OSGi <link
     xlink:href="http://felix.apache.org/">Apache Felix</link>. Todos los
     servicios (excepto algunas utilidades que se acceden a través de métodos
     estáticos) están declarados como componente-servicio OSGi.</para>
@@ -663,7 +663,7 @@ public class MyServiceUser{
       clase, no es imprescindible que sea un servicio.</para>
 
       <para xml:lang="es">Para el desarrollo de los tests mediante Mocks
-      utilizaremos la librería EasyMock: </para>
+      utilizaremos la librería EasyMock:</para>
 
       <para xml:lang="es"><link
       xlink:href="http://www.easymock.org/">http://www.easymock.org/</link></para>

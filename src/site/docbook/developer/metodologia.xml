@@ -20,7 +20,7 @@
 
     <listitem>
       <para>Crear el documento <filename>readme.rst</filename> dentro de esta
-      carpeta donde informaremos brevemente el propósito de la
+      carpeta donde informaremos brevemente del propósito de la
       funcionalidad.</para>
     </listitem>
 
@@ -75,16 +75,16 @@
       <para>Actualizar (si es necesario) la documentación de la funcionalidad
       con el resultado del Add-on. Por ejemplo, si ya han cambiado los
       comandos a implementar, puntos a tener en cuenta en el desarrollo,
-      etc...</para>
+      etc.</para>
     </listitem>
 
     <listitem>
-      <para>Desarrollar la funcionalidad con la experiencia de que la prueba
+      <para>Desarrollar la funcionalidad con la experiencia que dé la prueba
       de concepto.</para>
     </listitem>
   </orderedlist>
 
-  <para>En caso de que el add-on evolucione y es necesario realizar una prueba
-  de concepto, no reutilizar la prueba anterior. Crear una prueba a partir el
-  resultado actual de el add-on o desde cero.</para>
+  <para>En caso de que el add-on evolucione y sea necesario realizar una
+  prueba de concepto, no reutilizar la prueba anterior. Crear una prueba a
+  partir el resultado actual del add-on o desde cero.</para>
 </chapter>

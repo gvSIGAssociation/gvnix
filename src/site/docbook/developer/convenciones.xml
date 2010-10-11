@@ -11,7 +11,7 @@
   <section xml:id="convenciones_nombres-comandos" xml:lang="es">
     <title xml:lang="es">Nombres de los comandos</title>
 
-    <para xml:lang="es">TBC</para>
+    <para xml:lang="es"><emphasis>TBC</emphasis></para>
 
     <para xml:lang="es">(de roo-addon-desarrollo.rst)</para>
 
@@ -84,10 +84,11 @@ web binding setup // Comando de gvNIX</programlisting>
     <section xml:id="convenciones_paquetes_codigo-generado" xml:lang="es">
       <title>Código generado</title>
 
-      <para xml:lang="es">El código generado DEBE ubicarse dentro del paquete
-      raíz del proyecto. Los add-ons deberán utilizar las utilidades de Roo
-      para que las clases generadas se creen dentro de la estructura de
-      paquetes del proyecto.</para>
+      <para xml:lang="es">El código generado <emphasis
+      role="bold">DEBE</emphasis> ubicarse dentro del paquete raíz del
+      proyecto. Los add-ons deberán utilizar las utilidades de Roo para que
+      las clases generadas se creen dentro de la estructura de paquetes del
+      proyecto.</para>
 
       <para xml:lang="es">Por ejemplo, si el proyecto se creó con el comando
       Roo <command>project --topLevelPackage es.gv.cit.pizzashop</command>,
@@ -97,8 +98,8 @@ web binding setup // Comando de gvNIX</programlisting>
       una estructura similar a la de la funcionalidad implementada.</para>
 
       <para>Por ejemplo, si implementamos un sistema de autenticación para un
-      entorno específico con Spring Security seguir una estructura similar a
-      la planteada por Spring Security. Ejemplo:</para>
+      entorno específico con Spring Security, entonces seguir una estructura
+      similar a la planteada por Spring Security. Ejemplo:</para>
 
       <programlisting>es.gv.cit.pizzashop.security.authentication.wscit</programlisting>
     </section>
@@ -150,7 +151,7 @@ web binding setup // Comando de gvNIX</programlisting>
 
     <para>El texto original de la licencia se encuentra en <link
     xlink:href="http://www.gnu.org/licenses/gpl-3.0.txt">http://www.gnu.org/licenses/gpl-3.0.txt</link>.
-    Guia de referencia: <link
+    Guía de referencia: <link
     xlink:href="http://www.gnu.org/licenses/quick-guide-gplv3.html">http://www.gnu.org/licenses/quick-guide-gplv3.html</link>.</para>
 
     <para>Licencia a integrar en las cabeceras de las clases java:</para>

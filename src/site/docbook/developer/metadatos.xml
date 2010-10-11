@@ -88,7 +88,7 @@
 
       <listitem>
         <para>Una que implementa a <classname>ItdMetadataProvider</classname>:
-        Maneja y registra información del metadato y el ITD.</para>
+        maneja y registra información del metadato y el ITD.</para>
       </listitem>
 
       <listitem>
@@ -123,9 +123,10 @@
   <section xml:id="metadatos_dependencias" xml:lang="es">
     <title xml:lang="es">Dependencias entre metadatos</title>
 
-    <para xml:lang="es">Muchas veces, para manejar nuestros *metadatos*
-    dependerán de otros *metadatos* registrados en la aplicación. Esto se
-    puede gestionar de dos formas distintas:</para>
+    <para xml:lang="es">Muchas veces, para manejar nuestros
+    <emphasis>metadatos</emphasis> dependerán de otros
+    <emphasis>metadatos</emphasis> registrados en la aplicación. Esto se puede
+    gestionar de dos formas distintas:</para>
 
     <orderedlist>
       <listitem>
@@ -219,7 +220,7 @@
     dependencias registradas.</para>
 
     <para>Debido a esto, la conclusión que podemos sacar es que, si nuestro
-    add-on genera metadatos y, esos metadatos producen algún tipo de producto,
+    add-on genera metadatos y esos metadatos producen algún tipo de producto,
     <emphasis role="bold">siempre</emphasis> nos tendremos que asegurar que
     nuestro producto sea el correcto <emphasis role="bold">sin esperar ni
     pretender tener ningún tipos de control sobre el orden de
