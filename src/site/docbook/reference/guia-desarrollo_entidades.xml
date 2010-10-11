@@ -525,6 +525,16 @@ public class Pizza {
       paquete base de la aplicación (o subpaquetes)</emphasis>.</para>
     </important>
 
+    <important>
+      <para>Notar que para usar las anotaciones hay que importar sus
+      clases:</para>
+
+      <programlisting>import javax.persistence.Entity;
+import org.springframework.roo.addon.javabean.RooJavaBean;
+import org.springframework.roo.addon.entity.RooEntity;
+import org.springframework.roo.addon.tostring.RooToString;</programlisting>
+    </important>
+
     <para>Consultar el <link
     xlink:href="http://static.springsource.org/spring-roo/org.springframework.roo.annotations/apidocs/">API
     de las anotaciones</link> para un detalle exhaustivo de las anotaciones y
