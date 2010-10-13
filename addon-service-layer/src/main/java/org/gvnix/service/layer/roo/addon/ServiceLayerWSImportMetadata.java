@@ -112,23 +112,22 @@ public class ServiceLayerWSImportMetadata extends
 		Element root = wsdl.getDocumentElement();
 		Assert.notNull(root, "No valid document format");
 
-		if (WsdlParserUtils.isRpcEncoded(root)) {
-		    
-		    // TODO Use Axis library to be compatible with Rpc/encoded
-		    Assert.state(false,
-			    "TODO Currently rpc/encoded wsdls not supported");
-
-		} else {
-
-		    // Generate source code client clases
-		    generateSources();
+		// Generate source code client clases with CXF
+		if (generateSources() == 0) {
 
 		    // Create Aspect methods related to this wsdl location
 		    createAspectMethods(root);
-
-		    // TODO Add wsdl location to pom.xml here instead on command
-		    // serviceLayerWsConfigService.addImportLocation(wsdlLocation);
 		}
+		else {
+		    
+		    // The wsdl is RPC/encoded
+		    // TODO Use Axis library to be compatible with Rpc/encoded
+		    Assert.state(false,
+			    "TODO Currently rpc/encoded wsdls not supported");
+		}
+
+		// TODO Add wsdl location to pom.xml here instead on command
+		// serviceLayerWsConfigService.addImportLocation(wsdlLocation);
 
 	    } catch (SAXException e) {
 
@@ -156,12 +155,17 @@ public class ServiceLayerWSImportMetadata extends
     /**
      * Maven generate sources.
      * 
+     * <p>
+     * If return value is not 0, the service can be Rpc/encoded.
+     * </p>
+     * 
      * TODO Check on windows environment.
      * 
+     * @return exit value, the value 0 indicates normal termination
      * @throws IOException
      *             Error on maven generate sources execution
      */
-    public void generateSources() throws IOException {
+    public int generateSources() throws IOException {
 
 	// Create windows or linux command
 	String cmd = null;
@@ -186,6 +190,8 @@ public class ServiceLayerWSImportMetadata extends
 	    
 	    throw new IllegalStateException(e);
 	}
+	
+	return p.exitValue();
     }
 
     /**

@@ -129,6 +129,7 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
 	}
 	
 	// Add the import definition annotation and attributes to the class
+	// TODO Use addJavaTypeAnnotation method of AnnotationsService ?
 	List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
 	annotationAttributeValues.add(new StringAttributeValue(
 		new JavaSymbolName("wsdlLocation"), wsdlLocation));

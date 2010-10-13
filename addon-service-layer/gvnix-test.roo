@@ -43,5 +43,6 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy5 --wsdl http://soatest.parasoft.com/calculator.wsdl
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy6 --wsdl http://www.ripedevelopment.com/webservices/LocalTime.asmx?WSDL
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy7 --wsdl http://labs.safelayer.com/demo/wsdl/DigitalEncryption.wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy8 --wsdl http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL
 perform eclipse
 perform assembly
