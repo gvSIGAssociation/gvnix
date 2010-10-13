@@ -20,6 +20,7 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.springframework.roo.model.JavaSymbolName;
@@ -27,6 +28,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.*;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Addon for Handle Service Layer
@@ -39,6 +41,8 @@ import org.springframework.roo.support.util.StringUtils;
 @Component
 @Service
 public class ServiceLayerCommands implements CommandMarker {
+
+    private static final Logger logger = HandlerUtils.getLogger(SimpleParser.class);
 
     @Reference
     private ServiceLayerOperations serviceLayerOperations;
@@ -53,14 +57,14 @@ public class ServiceLayerCommands implements CommandMarker {
 	return serviceLayerOperations.isProjectAvailable();
     }
 
-    @CliCommand(value = "service class", help = "Creates a Service class int the project.")
+    @CliCommand(value = "service class", help = "Creates a new Service class in SRC_MAIN_JAVA.")
     public void createServiceClass(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to create") JavaType serviceClass) {
 
 	serviceLayerOperations.createServiceClass(serviceClass);
     }
 
-    @CliCommand(value = "service operation", help = "Adds a new Operation to existing Service")
+    @CliCommand(value = "service operation", help = "Adds a new method to existing Service")
     public void addServiceOperation(
 	    @CliOption(key = { "", "name" }, mandatory = true, help = "The name of the operation to add") JavaSymbolName operationName,
 	    @CliOption(key = "return", mandatory = false, unspecifiedDefaultValue = "__NULL__", optionContext = "java-all,project", help = "The Java type this operation returns") JavaType returnType,
@@ -121,13 +125,13 @@ public class ServiceLayerCommands implements CommandMarker {
 
     }
 
-    @CliAvailabilityIndicator("service export ws")
+    @CliAvailabilityIndicator("service define ws")
     public boolean isServiceExportAvailable() {
 
 	return serviceLayerWsExportOperations.isProjectAvailable();
     }
 
-    @CliCommand(value = "service export ws", help = "Exports a Service class to Web Service. If the class doesn't exists the Addon will create it.")
+    @CliCommand(value = "service define ws", help = "Defines a service endpoint interface (SEI) that will be mapped to a PortType in service contract. If target class doesn't exist the add-on will create it.")
     public void serviceExport(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass,
 	    @CliOption(key = "serviceName", mandatory = false, help = "Name to publish the Web Service.") String serviceName,
@@ -137,6 +141,8 @@ public class ServiceLayerCommands implements CommandMarker {
 
 	serviceLayerWsExportOperations.exportService(serviceClass, serviceName,
 		portTypeName, targetNamespace, addressName);
+        logger.warning("** IMPORTANT: Use 'service export operation' command (without the quotes) to publish service operations **".concat(System.getProperty("line.separator")));
+
     }
 
     @CliAvailabilityIndicator("service export operation")
@@ -178,7 +184,7 @@ public class ServiceLayerCommands implements CommandMarker {
      * ``--exceptionNamespace``: Namespace of method exception if exists.</li>
      * </ul>
      */
-    @CliCommand(value = "service export operation", help = "Publish a method as Web Service Operation.")
+    @CliCommand(value = "service export operation", help = "Publish a class method as web service operation in a PortType.")
     public void serviceExportOperation(
 	    @CliOption(key = "class", mandatory = true, help = "Name of the service class to export a method.") JavaType serviceClass,
 	    @CliOption(key = "method", mandatory = true, help = "Method to export as Web Service Operation.") JavaSymbolName methodName,

@@ -4,7 +4,7 @@
 
 :Project:   gvNIX. Spring Roo based RAD tool
 :Copyright: Conselleria d'Infraestructures i Transport - Generalitat Valenciana
-:Author:    [ ... ]
+:Author:    DiSiD TECHNOLOGIES, S.L.
 :Revision:  $Rev$
 :Date:      $Date$
 
@@ -44,11 +44,9 @@ Commands
 
 * service operation --class clase --name nombreOperacion --return clase:
 
-* service parameter --class clase --method nombreOperacion --name nombreParametro --type clase:
+* service define ws --class clase --name nombreServicio:
 
-* service export ws --class clase --name nombreServicio:
-
-* service export operation ws --class clase --method nombreMetodoEntidad --name nombreAPublicar: 
+* service export operation --class clase --method nombreMetodoEntidad --name nombreAPublicar: 
 
 * service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
 
