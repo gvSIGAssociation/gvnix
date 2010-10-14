@@ -23,8 +23,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import javax.xml.transform.*;
-
+import org.springframework.roo.addon.mvc.jsp.TilesOperations;
+import org.springframework.roo.addon.mvc.jsp.TilesOperationsImpl;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.metadata.MetadataService;
@@ -48,6 +48,9 @@ import org.apache.felix.scr.annotations.*;
 public class WebExceptionHandlerOperationsImpl implements
 	WebExceptionHandlerOperations {
 
+    @Reference
+    private TilesOperations tilesOperations;
+
     private static Logger logger = Logger
 	    .getLogger(WebExceptionHandlerOperationsImpl.class.getName());
 
@@ -56,9 +59,6 @@ public class WebExceptionHandlerOperationsImpl implements
     private static final String ENGLISH_LANGUAGE_FILENAME = "/WEB-INF/i18n/messages.properties";
 
     private static final String LANGUAGE_FILENAMES = "WEB-INF/i18n/messages**.properties";
-
-    private static final String DOCTYPE_PUBLIC = "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN";
-    private static final String DOCTYPE_SYSTEM = "http://tiles.apache.org/dtds/tiles-config_2_1.dtd";
 
     @Reference
     private FileManager fileManager;
@@ -473,55 +473,10 @@ public class WebExceptionHandlerOperationsImpl implements
 		"WEB-INF/views/views.xml");
 	Assert.isTrue(fileManager.exists(webXmlPath), "views.xml not found");
 
-	MutableFile webXmlMutableFile = null;
-	Document webXml;
+        String jspxPath = "/WEB-INF/views/" + exceptionViewName + ".jspx";
 
-	try {
-	    webXmlMutableFile = fileManager.updateFile(webXmlPath);
-	    webXml = XmlUtils.getDocumentBuilder().parse(
-		    webXmlMutableFile.getInputStream());
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
-	}
-	Element root = webXml.getDocumentElement();
-
-	// Compare views bean.
-	Element viewToCheck = XmlUtils.findFirstElement(
-		"/tiles-definitions/definition[@name='" + exceptionViewName
-			+ "']", root);
-
-	// Exists the ExceptionView.
-	if (viewToCheck != null) {
-	    return;
-	}
-
-	// New Exception Mapping to the jspx.
-	Element viewJspxException = webXml.createElement("definition");
-	viewJspxException.setAttribute("name", exceptionViewName);
-	viewJspxException.setAttribute("extends", "public");
-
-	String jspxPath = "/WEB-INF/views/" + exceptionViewName + ".jspx";
-
-	Element putAttribute = webXml.createElement("put-attribute");
-	putAttribute.setAttribute("name", "body");
-	putAttribute.setAttribute("value", jspxPath);
-
-	viewJspxException.appendChild(putAttribute);
-
-	root.appendChild(viewJspxException);
-
-	// Define DTD
-	Transformer xformer;
-	try {
-	    xformer = XmlUtils.createIndentingTransformer();
-	} catch (Exception ex) {
-	    throw new IllegalStateException(ex);
-	}
-
-	xformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC);
-	xformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM);
-
-	XmlUtils.writeXml(xformer, webXmlMutableFile.getOutputStream(), webXml);
+        tilesOperations.addViewDefinition("", exceptionViewName,
+                TilesOperationsImpl.PUBLIC_TEMPLATE, jspxPath);
 
     }
 
@@ -539,37 +494,7 @@ public class WebExceptionHandlerOperationsImpl implements
 		"WEB-INF/views/views.xml");
 	Assert.isTrue(fileManager.exists(webXmlPath), "views.xml not found");
 
-	MutableFile webXmlMutableFile = null;
-	Document webXml;
-
-	try {
-	    webXmlMutableFile = fileManager.updateFile(webXmlPath);
-	    webXml = XmlUtils.getDocumentBuilder().parse(
-		    webXmlMutableFile.getInputStream());
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
-	}
-	Element root = webXml.getDocumentElement();
-
-	Element viewToRemove = XmlUtils.findFirstElement(
-		"/tiles-definitions/definition[@name='" + exceptionViewName
-			+ "']", root);
-
-	viewToRemove.getParentNode().removeChild(viewToRemove);
-
-	// Define DTD
-	Transformer xformer;
-	try {
-	    xformer = XmlUtils.createIndentingTransformer();
-	} catch (Exception ex) {
-	    throw new IllegalStateException(ex);
-	}
-
-	xformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC);
-	xformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM);
-
-	XmlUtils.writeXml(xformer, webXmlMutableFile.getOutputStream(), webXml);
-
+        tilesOperations.removeViewDefinition(exceptionViewName, "");
     }
 
     /**

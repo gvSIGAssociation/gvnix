@@ -98,23 +98,30 @@
                 <type>bundle</type>
             </dependency>
             <dependency>
-			<groupId>org.springframework.roo</groupId>
-			<artifactId>org.springframework.roo.bootstrap</artifactId>
-			<version>${roo.version}</version>
-			<scope>provided</scope>
-		</dependency>
-        <dependency>
-            <groupId>org.springframework.roo</groupId>
-            <artifactId>org.springframework.roo.shell</artifactId>
-            <version>${roo.version}</version>
-            <type>bundle</type>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.roo</groupId>
-            <artifactId>org.springframework.roo.support</artifactId>
-            <version>${roo.version}</version>
-            <type>bundle</type>
-        </dependency>
+              <groupId>org.springframework.roo</groupId>
+              <artifactId>org.springframework.roo.bootstrap</artifactId>
+              <version>${roo.version}</version>
+              <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.roo</groupId>
+                <artifactId>org.springframework.roo.shell</artifactId>
+                <version>${roo.version}</version>
+                <type>bundle</type>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.roo</groupId>
+                <artifactId>org.springframework.roo.support</artifactId>
+                <version>${roo.version}</version>
+                <type>bundle</type>
+            </dependency>
+            <dependency>
+              <groupId>org.springframework.roo</groupId>
+              <artifactId>org.springframework.roo.addon.web.mvc.jsp</artifactId>
+              <version>${roo.version}</version>
+              <type>bundle</type>
+            </dependency>
+
 		<!-- Other modules (if any) -->
 
     <!-- Unit Test dependencies -->
