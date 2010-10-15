@@ -18,9 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
+import java.util.*;
 import java.util.logging.Logger;
 
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
@@ -46,89 +44,96 @@ import org.springframework.roo.support.util.Assert;
  *         Transport</a>
  */
 public class ServiceLayerWSExportXmlElementMetadata extends
-	AbstractItdTypeDetailsProvidingMetadataItem {
+        AbstractItdTypeDetailsProvidingMetadataItem {
+
+    private static final Set<String> notAllowedIntefaceCollectionTypes = new HashSet<String>();
+
+    static {
+        notAllowedIntefaceCollectionTypes.add(Map.class.getName());
+    }
 
     private static final String XML_ELEMENT_STRING = ServiceLayerWSExportXmlElementMetadata.class
-	    .getName();
+            .getName();
     private static final String XML_ELEMENT_TYPE = MetadataIdentificationUtils
-	    .create(XML_ELEMENT_STRING);
+            .create(XML_ELEMENT_STRING);
 
     private EntityMetadata entityMetadata;
 
     private static Logger logger = Logger
             .getLogger(ServiceLayerWSExportXmlElementMetadata.class.getName());
 
-    public ServiceLayerWSExportXmlElementMetadata(String identifier, JavaType aspectName,
-	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
-	    EntityMetadata entityMetadata) {
-	super(identifier, aspectName, governorPhysicalTypeMetadata);
+    public ServiceLayerWSExportXmlElementMetadata(String identifier,
+            JavaType aspectName,
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            EntityMetadata entityMetadata) {
+        super(identifier, aspectName, governorPhysicalTypeMetadata);
 
-	Assert.isTrue(isValid(identifier), "Metadata identification string '"
-		+ identifier + "' does not appear to be a valid");
+        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+                + identifier + "' does not appear to be a valid");
 
-	if (!isValid()) {
-	    return;
-	}
+        if (!isValid()) {
+            return;
+        }
 
-	// Create the metadata.
-	AnnotationMetadata gvNIXXmlElementAnnotationMetadata = MemberFindingUtils
-		.getTypeAnnotation(governorTypeDetails, new JavaType(
-				GvNIXXmlElement.class.getName()));
+        // Create the metadata.
+        AnnotationMetadata gvNIXXmlElementAnnotationMetadata = MemberFindingUtils
+                .getTypeAnnotation(governorTypeDetails, new JavaType(
+                        GvNIXXmlElement.class.getName()));
 
-	if (gvNIXXmlElementAnnotationMetadata != null) {
+        if (gvNIXXmlElementAnnotationMetadata != null) {
 
-	    // Fields from Entity MetaData.
-	    List<FieldMetadata> entityFieldList = new ArrayList<FieldMetadata>();
+            // Fields from Entity MetaData.
+            List<FieldMetadata> entityFieldList = new ArrayList<FieldMetadata>();
 
-	    if (entityMetadata != null && entityMetadata.isValid()) {
-		this.entityMetadata = entityMetadata;
-		entityFieldList.add(entityMetadata.getIdentifierField());
-		entityFieldList.add(entityMetadata.getVersionField());
-	    }
+            if (entityMetadata != null && entityMetadata.isValid()) {
+                this.entityMetadata = entityMetadata;
+                entityFieldList.add(entityMetadata.getIdentifierField());
+                entityFieldList.add(entityMetadata.getVersionField());
+            }
 
-	    // Field list.
-	    List<FieldMetadata> fieldList = MemberFindingUtils
-		    .getDeclaredFields(governorTypeDetails);
+            // Field list.
+            List<FieldMetadata> fieldList = MemberFindingUtils
+                    .getDeclaredFields(governorTypeDetails);
 
-	    // Field @XmlTransient annotations.
-	    List<FieldMetadata> fieldmetadataTransientList = getPersistenceRelationshipFields();
+            // Field @XmlTransient annotations.
+            List<FieldMetadata> fieldmetadataTransientList = getPersistenceRelationshipFields();
 
-	    // Field @XmlElement annotations.
-	    List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
+            // Field @XmlElement annotations.
+            List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
 
-	    // Add Entity fields
-	    fieldMetadataElementList.addAll(entityFieldList);
+            // Add Entity fields
+            fieldMetadataElementList.addAll(entityFieldList);
 
-	    for (FieldMetadata fieldMetadata : fieldList) {
-		if (!fieldmetadataTransientList.contains(fieldMetadata)) {
-		    fieldMetadataElementList.add(fieldMetadata);
-		}
-	    }
+            for (FieldMetadata fieldMetadata : fieldList) {
+                if (!fieldmetadataTransientList.contains(fieldMetadata)) {
+                    fieldMetadataElementList.add(fieldMetadata);
+                }
+            }
 
-	    // Type annotations.
-	    List<AnnotationMetadata> annotationTypeList = getXmlElementTypeAnnotation(
-		    gvNIXXmlElementAnnotationMetadata, fieldMetadataElementList);
+            // Type annotations.
+            List<AnnotationMetadata> annotationTypeList = getXmlElementTypeAnnotation(
+                    gvNIXXmlElementAnnotationMetadata, fieldMetadataElementList);
 
-	    for (AnnotationMetadata annotationMetadata : annotationTypeList) {
-		builder.addTypeAnnotation(annotationMetadata);
-	    }
+            for (AnnotationMetadata annotationMetadata : annotationTypeList) {
+                builder.addTypeAnnotation(annotationMetadata);
+            }
 
-	    // Declared XmlTransient field annotations.
-	    List<DeclaredFieldAnnotationDetails> declaredFieldXmlTransientFieldList = getXmlTransientFieldAnnotations(fieldmetadataTransientList);
+            // Declared XmlTransient field annotations.
+            List<DeclaredFieldAnnotationDetails> declaredFieldXmlTransientFieldList = getXmlTransientFieldAnnotations(fieldmetadataTransientList);
 
-	    for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlTransientFieldList) {
-		builder.addFieldAnnotation(declaredFieldAnnotationDetails);
-	    }
+            for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlTransientFieldList) {
+                builder.addFieldAnnotation(declaredFieldAnnotationDetails);
+            }
 
-	    // Declared XmlElement field annotations
-	    List<DeclaredFieldAnnotationDetails> declaredFieldXmlElementFieldList = getXmlElementFieldAnnotations(fieldMetadataElementList);
-	    for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlElementFieldList) {
-		builder.addFieldAnnotation(declaredFieldAnnotationDetails);
-	    }
-	}
+            // Declared XmlElement field annotations
+            List<DeclaredFieldAnnotationDetails> declaredFieldXmlElementFieldList = getXmlElementFieldAnnotations(fieldMetadataElementList);
+            for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlElementFieldList) {
+                builder.addFieldAnnotation(declaredFieldAnnotationDetails);
+            }
+        }
 
-	// Create a representation of the desired output ITD
-	itdTypeDetails = builder.build();
+        // Create a representation of the desired output ITD
+        itdTypeDetails = builder.build();
 
     }
 
@@ -143,24 +148,27 @@ public class ServiceLayerWSExportXmlElementMetadata extends
      *         empty).
      */
     public List<DeclaredFieldAnnotationDetails> getXmlTransientFieldAnnotations(
-	    List<FieldMetadata> fieldMetadataElementList) {
+            List<FieldMetadata> fieldMetadataElementList) {
 
-	List<DeclaredFieldAnnotationDetails> annotationXmlTransientFieldList = new ArrayList<DeclaredFieldAnnotationDetails>();
+        List<DeclaredFieldAnnotationDetails> annotationXmlTransientFieldList = new ArrayList<DeclaredFieldAnnotationDetails>();
 
-	// Void list, annotation doesn't need attribute values.
-	List<AnnotationAttributeValue<?>> attributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-	// Creates the annotation.
-	AnnotationMetadata xmlTransientAnnotation = new DefaultAnnotationMetadata(new JavaType("javax.xml.bind.annotation.XmlTransient"), attributeValueList);
+        // Void list, annotation doesn't need attribute values.
+        List<AnnotationAttributeValue<?>> attributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        // Creates the annotation.
+        AnnotationMetadata xmlTransientAnnotation = new DefaultAnnotationMetadata(
+                new JavaType("javax.xml.bind.annotation.XmlTransient"),
+                attributeValueList);
 
-	DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
-	
-	for (FieldMetadata fieldMetadata : fieldMetadataElementList) {
+        DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
 
-	    declaredFieldAnnotationDetails = new DeclaredFieldAnnotationDetails(fieldMetadata, xmlTransientAnnotation);
-	    annotationXmlTransientFieldList.add(declaredFieldAnnotationDetails);
-	}
+        for (FieldMetadata fieldMetadata : fieldMetadataElementList) {
 
-	return annotationXmlTransientFieldList;
+            declaredFieldAnnotationDetails = new DeclaredFieldAnnotationDetails(
+                    fieldMetadata, xmlTransientAnnotation);
+            annotationXmlTransientFieldList.add(declaredFieldAnnotationDetails);
+        }
+
+        return annotationXmlTransientFieldList;
     }
 
     /**
@@ -174,35 +182,35 @@ public class ServiceLayerWSExportXmlElementMetadata extends
      *         empty).
      */
     public List<DeclaredFieldAnnotationDetails> getXmlElementFieldAnnotations(
-	    List<FieldMetadata> fieldTransientList) {
+            List<FieldMetadata> fieldTransientList) {
 
-	List<DeclaredFieldAnnotationDetails> annotationXmlElementFieldList = new ArrayList<DeclaredFieldAnnotationDetails>();
+        List<DeclaredFieldAnnotationDetails> annotationXmlElementFieldList = new ArrayList<DeclaredFieldAnnotationDetails>();
 
-	// Void list, annotation doesn't need attribute values.
-	List<AnnotationAttributeValue<?>> attributeValueList;
-	AnnotationMetadata xmlTransientAnnotation;
-	StringAttributeValue nameStringAttributeValue;
+        // Void list, annotation doesn't need attribute values.
+        List<AnnotationAttributeValue<?>> attributeValueList;
+        AnnotationMetadata xmlTransientAnnotation;
+        StringAttributeValue nameStringAttributeValue;
 
-	DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
+        DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
 
-	for (FieldMetadata fieldMetadata : fieldTransientList) {
+        for (FieldMetadata fieldMetadata : fieldTransientList) {
 
-	    attributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-	    nameStringAttributeValue = new StringAttributeValue(
-		    new JavaSymbolName("name"), fieldMetadata.getFieldName()
-			    .getSymbolName());
-	    attributeValueList.add(nameStringAttributeValue);
+            attributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+            nameStringAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("name"), fieldMetadata.getFieldName()
+                            .getSymbolName());
+            attributeValueList.add(nameStringAttributeValue);
 
-	    // Creates the annotation.
-	    xmlTransientAnnotation = new DefaultAnnotationMetadata(
-		    new JavaType("javax.xml.bind.annotation.XmlElement"),
-		    attributeValueList);
-	    declaredFieldAnnotationDetails = new DeclaredFieldAnnotationDetails(
-		    fieldMetadata, xmlTransientAnnotation);
-	    annotationXmlElementFieldList.add(declaredFieldAnnotationDetails);
-	}
+            // Creates the annotation.
+            xmlTransientAnnotation = new DefaultAnnotationMetadata(
+                    new JavaType("javax.xml.bind.annotation.XmlElement"),
+                    attributeValueList);
+            declaredFieldAnnotationDetails = new DeclaredFieldAnnotationDetails(
+                    fieldMetadata, xmlTransientAnnotation);
+            annotationXmlElementFieldList.add(declaredFieldAnnotationDetails);
+        }
 
-	return annotationXmlElementFieldList;
+        return annotationXmlElementFieldList;
     }
 
     /**
@@ -240,16 +248,52 @@ public class ServiceLayerWSExportXmlElementMetadata extends
         List<? extends FieldMetadata> declaredFieldList = governorTypeDetails
                 .getDeclaredFields();
 
+        boolean notAllowed;
+
         // Transient collection fields.
         for (FieldMetadata fieldMetadata : declaredFieldList) {
 
-            // Exclude field that implements Iterable interface.
-            if (implementsJavaType(fieldMetadata.getFieldType(),
-                    Iterable.class.getName())
-                    && !relationFieldList.contains(fieldMetadata)) {
+            for (String notAllowedInterfaceCollection : notAllowedIntefaceCollectionTypes) {
 
-                relationFieldList.add(fieldMetadata);
+                try {
+
+                    notAllowed = implementsJavaType(fieldMetadata
+                            .getFieldType(), notAllowedInterfaceCollection);
+
+                    // Add field that implements disallowed collection
+                    // interface.
+                    if (notAllowed
+                            && !relationFieldList.contains(fieldMetadata)) {
+                        logger
+                                .warning("The field '"
+                                        + fieldMetadata.getFieldType()
+                                                .getFullyQualifiedTypeName()
+                                        + "' in class '"
+                                        + governorTypeDetails.getName()
+                                                .getFullyQualifiedTypeName()
+                                        + "' is annotated with @XmlTransient because is a collection that does not satisfy web services interoperatibily rules.");
+                        relationFieldList.add(fieldMetadata);
+
+                    }
+
+                } catch (ClassNotFoundException e) {
+
+                    if (!relationFieldList.contains(fieldMetadata)) {
+                        logger
+                                .warning("The field '"
+                                        + fieldMetadata.getFieldType()
+                                                .getFullyQualifiedTypeName()
+                                        + "' in class '"
+                                        + governorTypeDetails.getName()
+                                                .getFullyQualifiedTypeName()
+                                        + "' is annotated with @XmlTransient because doesn't exist while checking if implement an unallowed collection in for web services interoperatibily rules.");
+
+                        relationFieldList.add(fieldMetadata);
+                    }
+                }
+
             }
+
         }
 
         return relationFieldList;
@@ -266,88 +310,87 @@ public class ServiceLayerWSExportXmlElementMetadata extends
      * @return {@link List} of {@link AnnotationMetadata} to build the ITD.
      */
     public List<AnnotationMetadata> getXmlElementTypeAnnotation(
-	    AnnotationMetadata gvNIXXmlElementAnnotationMetadata,
-	    List<FieldMetadata> fieldElementList) {
+            AnnotationMetadata gvNIXXmlElementAnnotationMetadata,
+            List<FieldMetadata> fieldElementList) {
 
-	// Annotation list.
-	List<AnnotationMetadata> annotationTypeList = new ArrayList<AnnotationMetadata>();
+        // Annotation list.
+        List<AnnotationMetadata> annotationTypeList = new ArrayList<AnnotationMetadata>();
 
-	// @XmlRootElement
-	List<AnnotationAttributeValue<?>> xmlRootElementAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        // @XmlRootElement
+        List<AnnotationAttributeValue<?>> xmlRootElementAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-	JavaType xmlRootElement = new JavaType(
-		"javax.xml.bind.annotation.XmlRootElement");
-	
-	StringAttributeValue nameAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
-		.getAttribute(new JavaSymbolName("name"));
-	xmlRootElementAnnotationAttributeValueList.add(nameAttributeValue);
+        JavaType xmlRootElement = new JavaType(
+                "javax.xml.bind.annotation.XmlRootElement");
 
-	StringAttributeValue namespaceAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
-		.getAttribute(new JavaSymbolName("namespace"));
-	xmlRootElementAnnotationAttributeValueList.add(namespaceAttributeValue);
+        StringAttributeValue nameAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("name"));
+        xmlRootElementAnnotationAttributeValueList.add(nameAttributeValue);
 
-	AnnotationMetadata xmlRootElementAnnotation = new DefaultAnnotationMetadata(
-		xmlRootElement, xmlRootElementAnnotationAttributeValueList);
+        StringAttributeValue namespaceAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("namespace"));
+        xmlRootElementAnnotationAttributeValueList.add(namespaceAttributeValue);
 
-	annotationTypeList.add(xmlRootElementAnnotation);
+        AnnotationMetadata xmlRootElementAnnotation = new DefaultAnnotationMetadata(
+                xmlRootElement, xmlRootElementAnnotationAttributeValueList);
 
-	// @XmlType
-	List<AnnotationAttributeValue<?>> xmlTypeAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        annotationTypeList.add(xmlRootElementAnnotation);
 
-	JavaType xmlType = new JavaType("javax.xml.bind.annotation.XmlType");
+        // @XmlType
+        List<AnnotationAttributeValue<?>> xmlTypeAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-	List<StringAttributeValue> propOrderList = new ArrayList<StringAttributeValue>();
+        JavaType xmlType = new JavaType("javax.xml.bind.annotation.XmlType");
 
-	StringAttributeValue propOrderAttributeValue;
-	
-	for (FieldMetadata fieldMetadata : fieldElementList) {
-	    propOrderAttributeValue = new StringAttributeValue(
-		    new JavaSymbolName("ignored"), fieldMetadata.getFieldName()
-			    .getSymbolName());
-	    propOrderList.add(propOrderAttributeValue);
-	}
+        List<StringAttributeValue> propOrderList = new ArrayList<StringAttributeValue>();
 
-	ArrayAttributeValue<StringAttributeValue> propOrderAttributeList = new ArrayAttributeValue<StringAttributeValue>(
-		new JavaSymbolName(
-		"propOrder"), propOrderList);
+        StringAttributeValue propOrderAttributeValue;
 
-	xmlTypeAnnotationAttributeValueList.add(propOrderAttributeList);
+        for (FieldMetadata fieldMetadata : fieldElementList) {
+            propOrderAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("ignored"), fieldMetadata.getFieldName()
+                            .getSymbolName());
+            propOrderList.add(propOrderAttributeValue);
+        }
 
-	StringAttributeValue xmlTypeNameAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
-		.getAttribute(new JavaSymbolName("name"));
-	xmlTypeAnnotationAttributeValueList.add(xmlTypeNameAttributeValue);
+        ArrayAttributeValue<StringAttributeValue> propOrderAttributeList = new ArrayAttributeValue<StringAttributeValue>(
+                new JavaSymbolName("propOrder"), propOrderList);
 
-	StringAttributeValue xmlTypeNamespaceAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
-		.getAttribute(new JavaSymbolName("namespace"));
-	xmlTypeAnnotationAttributeValueList.add(xmlTypeNamespaceAttributeValue);
+        xmlTypeAnnotationAttributeValueList.add(propOrderAttributeList);
 
-	AnnotationMetadata xmlTypeRootElementAnnotation = new DefaultAnnotationMetadata(
-		xmlType, xmlTypeAnnotationAttributeValueList);
+        StringAttributeValue xmlTypeNameAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("name"));
+        xmlTypeAnnotationAttributeValueList.add(xmlTypeNameAttributeValue);
 
-	annotationTypeList.add(xmlTypeRootElementAnnotation);
+        StringAttributeValue xmlTypeNamespaceAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("namespace"));
+        xmlTypeAnnotationAttributeValueList.add(xmlTypeNamespaceAttributeValue);
 
-	// @XmlAccessorType
-	List<AnnotationAttributeValue<?>> xmlAccessorTypeAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        AnnotationMetadata xmlTypeRootElementAnnotation = new DefaultAnnotationMetadata(
+                xmlType, xmlTypeAnnotationAttributeValueList);
 
-	JavaType xmlAccessorType = new JavaType(
-		"javax.xml.bind.annotation.XmlAccessorType");
+        annotationTypeList.add(xmlTypeRootElementAnnotation);
 
-	EnumDetails xmlAccessTypeEnumDetails = new EnumDetails(new JavaType(
-		"javax.xml.bind.annotation.XmlAccessType"), new JavaSymbolName(
-		"FIELD"));
+        // @XmlAccessorType
+        List<AnnotationAttributeValue<?>> xmlAccessorTypeAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-	EnumAttributeValue xmlAccessTypeAttributeValue = new EnumAttributeValue(
-		new JavaSymbolName("value"),
-		xmlAccessTypeEnumDetails);
+        JavaType xmlAccessorType = new JavaType(
+                "javax.xml.bind.annotation.XmlAccessorType");
 
-	xmlAccessorTypeAnnotationAttributeValueList
-		.add(xmlAccessTypeAttributeValue);
-	
-	AnnotationMetadata xmlAccessorTypeAnnotation = new DefaultAnnotationMetadata(xmlAccessorType, xmlAccessorTypeAnnotationAttributeValueList);
+        EnumDetails xmlAccessTypeEnumDetails = new EnumDetails(new JavaType(
+                "javax.xml.bind.annotation.XmlAccessType"), new JavaSymbolName(
+                "FIELD"));
 
-	annotationTypeList.add(xmlAccessorTypeAnnotation);
+        EnumAttributeValue xmlAccessTypeAttributeValue = new EnumAttributeValue(
+                new JavaSymbolName("value"), xmlAccessTypeEnumDetails);
 
-	return annotationTypeList;
+        xmlAccessorTypeAnnotationAttributeValueList
+                .add(xmlAccessTypeAttributeValue);
+
+        AnnotationMetadata xmlAccessorTypeAnnotation = new DefaultAnnotationMetadata(
+                xmlAccessorType, xmlAccessorTypeAnnotationAttributeValueList);
+
+        annotationTypeList.add(xmlAccessorTypeAnnotation);
+
+        return annotationTypeList;
 
     }
 
@@ -360,11 +403,11 @@ public class ServiceLayerWSExportXmlElementMetadata extends
      * @return true if it will be introduced, false otherwise
      */
     public boolean isAnnotationIntroduced(String annotation) {
-	JavaType javaType = new JavaType(annotation);
-	AnnotationMetadata result = MemberFindingUtils
-		.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+        JavaType javaType = new JavaType(annotation);
+        AnnotationMetadata result = MemberFindingUtils
+                .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
 
-	return result == null;
+        return result == null;
     }
 
     /**
@@ -376,71 +419,64 @@ public class ServiceLayerWSExportXmlElementMetadata extends
      *            Java type to check.
      * @return true if class implements from implementedJavaType or false if is
      *         not implementing.
+     * @throws ClassNotFoundException
+     *             when the class doesn't exist.
      */
     private boolean implementsJavaType(JavaType javaType,
-            String implmentedJavaType) {
+            String implmentedJavaType) throws ClassNotFoundException {
 
         if (javaType.getFullyQualifiedTypeName().contentEquals(
                 implmentedJavaType)) {
             return true;
         }
-        try {
-            Class<?> classToCheck = Class.forName(javaType
-                    .getFullyQualifiedTypeName());
+        Class<?> classToCheck = Class.forName(javaType
+                .getFullyQualifiedTypeName());
 
-            Class<?>[] interfaceArray = classToCheck.getInterfaces();
+        Class<?>[] interfaceArray = classToCheck.getInterfaces();
 
-            if (interfaceArray.length == 0) {
-                return false;
-            } else {
-
-                Class<?> interfaceToCheck;
-                boolean implementsJavaType = false;
-                for (int i = 0; i < interfaceArray.length; i++) {
-                    interfaceToCheck = interfaceArray[i];
-
-                    implementsJavaType = implementsJavaType(new JavaType(
-                            interfaceToCheck.getName()), implmentedJavaType);
-
-                    if (implementsJavaType) {
-                        return implementsJavaType;
-                    }
-                }
-                return implementsJavaType;
-            }
-
-        } catch (ClassNotFoundException e) {
-            logger.log(Level.WARNING, "The class: '"
-                    + javaType.getFullyQualifiedTypeName()
-                    + "' doesn't exist while checking if extends '"
-                    + implmentedJavaType + "'.");
+        if (interfaceArray.length == 0) {
             return false;
+        } else {
+
+            Class<?> interfaceToCheck;
+            boolean implementsJavaType = false;
+            for (int i = 0; i < interfaceArray.length; i++) {
+                interfaceToCheck = interfaceArray[i];
+
+                implementsJavaType = implementsJavaType(new JavaType(
+                        interfaceToCheck.getName()), implmentedJavaType);
+
+                if (implementsJavaType) {
+                    return implementsJavaType;
+                }
+            }
+            return implementsJavaType;
         }
 
     }
 
     public static String getMetadataIdentiferType() {
-	return XML_ELEMENT_TYPE;
+        return XML_ELEMENT_TYPE;
     }
 
     public static boolean isValid(String metadataIdentificationString) {
-	return PhysicalTypeIdentifierNamingUtils.isValid(
-		XML_ELEMENT_STRING, metadataIdentificationString);
+        return PhysicalTypeIdentifierNamingUtils.isValid(XML_ELEMENT_STRING,
+                metadataIdentificationString);
     }
 
     public static final JavaType getJavaType(String metadataIdentificationString) {
-	return PhysicalTypeIdentifierNamingUtils.getJavaType(
-		XML_ELEMENT_STRING, metadataIdentificationString);
+        return PhysicalTypeIdentifierNamingUtils.getJavaType(
+                XML_ELEMENT_STRING, metadataIdentificationString);
     }
 
     public static final Path getPath(String metadataIdentificationString) {
-	return PhysicalTypeIdentifierNamingUtils.getPath(
-		XML_ELEMENT_STRING, metadataIdentificationString);
+        return PhysicalTypeIdentifierNamingUtils.getPath(XML_ELEMENT_STRING,
+                metadataIdentificationString);
     }
 
     public static final String createIdentifier(JavaType javaType, Path path) {
-	return PhysicalTypeIdentifierNamingUtils.createIdentifier(
-		XML_ELEMENT_STRING, javaType, path);
+        return PhysicalTypeIdentifierNamingUtils.createIdentifier(
+                XML_ELEMENT_STRING, javaType, path);
     }
 
 }

@@ -28,7 +28,6 @@ import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations.MethodParameterType;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
-import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
@@ -78,14 +77,11 @@ public class ServiceLayerWSExportValidationServiceImpl implements
     static {
         notAllowedClassCollectionTypes.add(HashMap.class.getName());
         notAllowedClassCollectionTypes.add(TreeMap.class.getName());
-        notAllowedClassCollectionTypes.add(Vector.class.getName());
-        notAllowedClassCollectionTypes.add(HashSet.class.getName());
     }
 
     private static final Set<String> notAllowedIntefaceCollectionTypes = new HashSet<String>();
 
     static {
-        notAllowedIntefaceCollectionTypes.add(Set.class.getName());
         notAllowedIntefaceCollectionTypes.add(Map.class.getName());
     }
 
@@ -477,15 +473,39 @@ public class ServiceLayerWSExportValidationServiceImpl implements
         // Check Return type
         JavaType returnType = methodToCheck.getReturnType();
 
-        isJavaTypeAllowed(returnType, MethodParameterType.RETURN, serviceClass);
+        Assert
+                .isTrue(
+                        isJavaTypeAllowed(returnType,
+                                MethodParameterType.RETURN, serviceClass),
+                        "The '"
+                                + MethodParameterType.RETURN
+                                + "' type '"
+                                + returnType.getFullyQualifiedTypeName()
+                                + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
+                                + "\nDefined in: '"
+                                + serviceClass.getFullyQualifiedTypeName()
+                                + "'.");
 
         // Check Input Parameters
         List<AnnotatedJavaType> inputParametersList = methodToCheck
                 .getParameterTypes();
 
         for (AnnotatedJavaType annotatedJavaType : inputParametersList) {
-            isJavaTypeAllowed(annotatedJavaType.getJavaType(),
-                    MethodParameterType.PARAMETER, serviceClass);
+
+            Assert
+                    .isTrue(
+                            isJavaTypeAllowed(annotatedJavaType.getJavaType(),
+                                    MethodParameterType.PARAMETER, serviceClass),
+                            "The '"
+                                    + MethodParameterType.PARAMETER
+                                    + "' type '"
+                                    + annotatedJavaType.getJavaType()
+                                            .getFullyQualifiedTypeName()
+                                    + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
+                                    + "\nDefined in: '"
+                                    + serviceClass.getFullyQualifiedTypeName()
+                                    + "'.");
+
         }
     }
 
@@ -521,16 +541,21 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                 || implementsJavaType(javaType, MAP))) {
 
             // Check if javaType is an available collection.
-            Assert
-                    .isTrue(
-                            isNotAllowedCollectionType(javaType) == false,
-                            "The '"
-                                    + methodParameterType
-                                    + "' type '"
-                                    + javaType.getFullyQualifiedTypeName()
-                                    + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection defined in: '"
-                                    + serviceClass.getFullyQualifiedTypeName()
-                                    + "'.");
+            if (isNotAllowedCollectionType(javaType)) {
+                logger
+                        .log(
+                                Level.WARNING,
+                                "The '"
+                                        + methodParameterType
+                                        + "' type '"
+                                        + javaType.getFullyQualifiedTypeName()
+                                        + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection defined in: '"
+                                        + serviceClass
+                                                .getFullyQualifiedTypeName()
+                                        + "'.");
+
+                return false;
+            }
 
             boolean parameterAllowed = true;
 
@@ -600,31 +625,22 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                             .convertPackageToTargetNamespace(javaType
                                     .getPackage().toString()));
 
-            List<? extends FieldMetadata> declaredFieldList = mutableTypeDetails
-                    .getDeclaredFields();
-
-            boolean isJAvaTypeAllowed = true;
-
-            for (FieldMetadata fieldMetadata : declaredFieldList) {
-
-                // Checks fields from a class to export as xml elements.
-                isJAvaTypeAllowed = isJavaTypeAllowed(fieldMetadata
-                        .getFieldType(), methodParameterType, serviceClass);
-                if (!isJAvaTypeAllowed) {
-                    return false;
-                }
-            }
-
             annotationAttributeValueList.add(namespaceStringAttributeValue);
 
             annotationsService.addJavaTypeAnnotation(mutableTypeDetails
                     .getName(), GvNIXXmlElement.class.getName(),
                     annotationAttributeValueList, false);
 
-            return isJAvaTypeAllowed;
+            return true;
 
         }
 
+        logger.log(Level.INFO, "The " + methodParameterType
+                + " parameter type: '" + javaType.getFullyQualifiedTypeName()
+                                + "' in method '' from class '"
+                                + serviceClass.getFullyQualifiedTypeName()
+                                + "' does not belong to project class definitions and its not mapped to be used in web service operation.");
+        
         return true;
     }
 

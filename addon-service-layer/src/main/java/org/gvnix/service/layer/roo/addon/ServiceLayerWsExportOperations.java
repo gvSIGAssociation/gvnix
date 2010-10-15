@@ -20,8 +20,7 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.List;
 
-import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
@@ -160,4 +159,25 @@ public interface ServiceLayerWsExportOperations {
      */
     public List<AnnotatedJavaType> getMethodParameterAnnotations(
             JavaType serviceClass, JavaSymbolName methodName);
+
+    /**
+     * Creates the list of annotations attribute values to export a web service
+     * class.
+     * 
+     * @param serviceClass
+     *            to be exported.
+     * @param serviceName
+     *            Name of the service.
+     * @param portTypeName
+     *            Port type name.
+     * @param targetNamespace
+     *            defined.
+     * @param addressName
+     *            to publish the service.
+     * 
+     * @return List of annotation attribute values to update.
+     */
+    public List<AnnotationAttributeValue<?>> exportServiceAnnotationAttributes(
+            JavaType serviceClass, String serviceName, String portTypeName,
+            String targetNamespace, String addressName);
 }

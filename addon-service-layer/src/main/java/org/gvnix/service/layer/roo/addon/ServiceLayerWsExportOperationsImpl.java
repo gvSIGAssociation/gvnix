@@ -18,27 +18,21 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.*;
-import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
-import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.*;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
 import org.springframework.roo.support.util.*;
-
-import com.sun.org.apache.xerces.internal.impl.XMLEntityManager.Entity;
 
 /**
  * Addon for Handle Service Layer
@@ -137,6 +131,64 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         }
 
+        List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = exportServiceAnnotationAttributes(
+                serviceClass, serviceName, portTypeName, targetNamespace,
+                addressName);
+
+        annotationsService.addJavaTypeAnnotation(serviceClass,
+                GvNIXWebService.class.getName(), gvNixAnnotationAttributes,
+                false);
+
+        // Installs jax2ws plugin in project.
+        serviceLayerWsConfigService.installJaxwsBuildPlugin();
+
+        // Add GvNixAnnotations to the project.
+        annotationsService.addGvNIXAnnotationsDependency();
+    }
+
+    /**
+     * Creates @GvNIXWebService annotation with default attributes.
+     * 
+     * @param serviceClass
+     * 
+     * @return @GvNIXWebService default annotation.
+     */
+    private AnnotationMetadata getDefaultGvNIXWebServiceAnnotation(
+            JavaType serviceClass) {
+
+        // Checks serviceName parameter to publish the web service.
+        String serviceName =  serviceClass.getSimpleTypeName();
+
+        // Namespace for the web service.
+        String targetNamespace = serviceLayerWsConfigService
+                        .convertPackageToTargetNamespace(serviceClass
+                                .getPackage().toString());
+
+        // Check address name not blank and set service name if not defined.
+        String addressName = serviceClass.getSimpleTypeName();
+
+        String portTypeName = serviceName.concat("PortType");
+
+        // Define @GvNIXWebService annotation and attributes.
+        // Check port type attribute name format and add attributes to a list.
+        List<AnnotationAttributeValue<?>> gvNixWebServiceAnnotationAttributes = exportServiceAnnotationAttributes(
+                serviceClass, serviceName, portTypeName, targetNamespace,
+                addressName);
+
+        // Create @GvNIXWebService with attributes.
+        AnnotationMetadata defaultAnnotationMetadata = new DefaultAnnotationMetadata(
+                new JavaType(GvNIXWebService.class.getName()),
+                gvNixWebServiceAnnotationAttributes);
+
+        return defaultAnnotationMetadata;
+    }
+
+
+    /**
+     */
+    public List<AnnotationAttributeValue<?>> exportServiceAnnotationAttributes(
+            JavaType serviceClass, String serviceName, String portTypeName,
+            String targetNamespace, String addressName) {
         // Checks serviceName parameter to publish the web service.
         serviceName = StringUtils.hasText(serviceName) ? serviceName
                 : serviceClass.getSimpleTypeName();
@@ -174,15 +226,7 @@ public class ServiceLayerWsExportOperationsImpl implements
         gvNixAnnotationAttributes.add(new StringAttributeValue(
                 new JavaSymbolName("fullyQualifiedTypeName"), serviceClass
                         .getFullyQualifiedTypeName()));
-        annotationsService.addJavaTypeAnnotation(serviceClass,
-                GvNIXWebService.class.getName(), gvNixAnnotationAttributes,
-                false);
-
-        // Installs jax2ws plugin in project.
-        serviceLayerWsConfigService.installJaxwsBuildPlugin();
-
-        // Add GvNixAnnotations to the project.
-        annotationsService.addGvNIXAnnotationsDependency();
+        return gvNixAnnotationAttributes;
     }
 
     /**
@@ -222,8 +266,10 @@ public class ServiceLayerWsExportOperationsImpl implements
                 + " doesn't exists in the class '"
                 + serviceClass.getFullyQualifiedTypeName() + "'.");
 
-        if (returnType.equals(JavaType.VOID_OBJECT)
-                || returnType.equals(JavaType.VOID_PRIMITIVE)) {
+        boolean isReturnTypeVoid = returnType.equals(JavaType.VOID_OBJECT)
+                || returnType.equals(JavaType.VOID_PRIMITIVE);
+
+        if (isReturnTypeVoid) {
             resultName = "void";
         } else if (!StringUtils.hasText(resultName)) {
 
@@ -235,21 +281,25 @@ public class ServiceLayerWsExportOperationsImpl implements
                 serviceClass, methodName);
 
         // Checks correct namespace format.
-        Assert
-                .isTrue(
-                        serviceLayerWSExportValidationService
-                                .checkNamespaceFormat(resultNamespace),
-                        "The namespace for result has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+        if (!isReturnTypeVoid) {
+
+            Assert
+                    .isTrue(
+                            serviceLayerWSExportValidationService
+                                    .checkNamespaceFormat(resultNamespace),
+                            "The namespace for result has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+            Assert
+                    .isTrue(
+                            serviceLayerWSExportValidationService
+                                    .checkNamespaceFormat(responseWrapperNamespace),
+                            "The namespace for Response Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+        }
+
         Assert
                 .isTrue(
                         serviceLayerWSExportValidationService
                                 .checkNamespaceFormat(requestWrapperNamespace),
                         "The namespace for Request Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
-        Assert
-                .isTrue(
-                        serviceLayerWSExportValidationService
-                                .checkNamespaceFormat(responseWrapperNamespace),
-                        "The namespace for Response Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
 
         // Create annotations to selected Method
         List<AnnotationMetadata> annotationMetadataUpdateList = getAnnotationsToExportOperation(
@@ -258,7 +308,7 @@ public class ServiceLayerWsExportOperationsImpl implements
                 responseWrapperNamespace, requestWrapperName,
                 requestWrapperNamespace);
 
-        // TODO: parameter @GvNIXWebParam && @WebParam annotations.
+        // Add @GvNIXWebParam & @WebParam parameter annotations.
         List<AnnotatedJavaType> annotationWebParamMetadataList = getMethodParameterAnnotations(
                 serviceClass, methodName);
 
@@ -348,65 +398,51 @@ public class ServiceLayerWsExportOperationsImpl implements
                 new JavaSymbolName("operationName"), operationName);
         annotationAttributeValueList.add(operationNameAttributeValue);
 
-        // javax.xml.ws.RequestWrapper
-        requestWrapperName = StringUtils.hasText(requestWrapperName) ? requestWrapperName
-                : operationName;
-        StringAttributeValue localNameAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("requestWrapperName"), requestWrapperName);
-        annotationAttributeValueList.add(localNameAttributeValue);
+        MethodMetadata methodMetadata = javaParserService
+                .getMethodByNameInClass(serviceClass, methodName);
 
-        requestWrapperNamespace = StringUtils.hasText(requestWrapperNamespace) ? requestWrapperNamespace
-                : serviceLayerWsConfigService
-                        .convertPackageToTargetNamespace(serviceClass
-                                .getPackage().getFullyQualifiedPackageName());
+        // Check input parameters.
+        if (!methodMetadata.getParameterTypes().isEmpty()
+                && !methodMetadata.getParameterNames().isEmpty()) {
 
-        StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("requestWrapperNamespace"),
-                requestWrapperNamespace);
-        annotationAttributeValueList.add(targetNamespaceAttributeValue);
+            // javax.xml.ws.RequestWrapper
+            requestWrapperName = StringUtils.hasText(requestWrapperName) ? requestWrapperName
+                    : operationName;
+            StringAttributeValue requestWrapperNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("requestWrapperName"),
+                    requestWrapperName);
+            annotationAttributeValueList.add(requestWrapperNameAttributeValue);
 
-        String className = serviceClass.getPackage()
-                .getFullyQualifiedPackageName().concat(".").concat(
-                        StringUtils.capitalize(requestWrapperName).concat(
-                                "RequestWrapper"));
-        StringAttributeValue classNameAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("requestWrapperClassName"), className);
-        annotationAttributeValueList.add(classNameAttributeValue);
+            requestWrapperNamespace = StringUtils
+                    .hasText(requestWrapperNamespace) ? requestWrapperNamespace
+                    : serviceLayerWsConfigService
+                            .convertPackageToTargetNamespace(serviceClass
+                                    .getPackage()
+                                    .getFullyQualifiedPackageName());
 
-        // javax.xml.ws.ResponseWrapper
-        responseWrapperName = StringUtils.hasText(responseWrapperName) ? responseWrapperName
-                : operationName.concat("Response");
+            StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("requestWrapperNamespace"),
+                    requestWrapperNamespace);
+            annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-        localNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
-                "responseWrapperName"), responseWrapperName);
-        annotationAttributeValueList.add(localNameAttributeValue);
+            String className = serviceClass.getPackage()
+                    .getFullyQualifiedPackageName().concat(".").concat(
+                            StringUtils.capitalize(requestWrapperName).concat(
+                                    "RequestWrapper"));
+            StringAttributeValue classNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("requestWrapperClassName"), className);
+            annotationAttributeValueList.add(classNameAttributeValue);
 
-        responseWrapperNamespace = StringUtils
-                .hasText(responseWrapperNamespace) ? responseWrapperNamespace
-                : serviceLayerWsConfigService
-                        .convertPackageToTargetNamespace(serviceClass
-                                .getPackage().getFullyQualifiedPackageName());
-
-        targetNamespaceAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("responseWrapperNamespace"),
-                responseWrapperNamespace);
-        annotationAttributeValueList.add(targetNamespaceAttributeValue);
-
-        className = serviceClass.getPackage().getFullyQualifiedPackageName()
-                .concat(".")
-                .concat(StringUtils.capitalize(responseWrapperName));
-        classNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
-                "responseWrapperClassName"), className);
-        annotationAttributeValueList.add(classNameAttributeValue);
+        }
 
         // Check result value
         if ((resultName != null && returnType != null)
                 && !(returnType.equals(JavaType.VOID_PRIMITIVE) || (returnType
                         .equals(JavaType.VOID_PRIMITIVE)))) {
 
-            localNameAttributeValue = new StringAttributeValue(
+            StringAttributeValue resultNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("resultName"), resultName);
-            annotationAttributeValueList.add(localNameAttributeValue);
+            annotationAttributeValueList.add(resultNameAttributeValue);
 
             resultNamespace = StringUtils.hasText(resultNamespace) ? resultNamespace
                     : serviceLayerWsConfigService
@@ -414,7 +450,7 @@ public class ServiceLayerWsExportOperationsImpl implements
                                     .getPackage()
                                     .getFullyQualifiedPackageName());
 
-            targetNamespaceAttributeValue = new StringAttributeValue(
+            StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("resultNamespace"), resultNamespace);
             annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
@@ -422,9 +458,37 @@ public class ServiceLayerWsExportOperationsImpl implements
                     new JavaSymbolName("webResultType"), returnType);
             annotationAttributeValueList.add(resultTypeAttributeValue);
 
+            // javax.xml.ws.ResponseWrapper
+            responseWrapperName = StringUtils.hasText(responseWrapperName) ? responseWrapperName
+                    : operationName.concat("Response");
+
+            StringAttributeValue responseWrapperNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("responseWrapperName"),
+                    responseWrapperName);
+            annotationAttributeValueList.add(responseWrapperNameAttributeValue);
+
+            responseWrapperNamespace = StringUtils
+                    .hasText(responseWrapperNamespace) ? responseWrapperNamespace
+                    : serviceLayerWsConfigService
+                            .convertPackageToTargetNamespace(serviceClass
+                                    .getPackage()
+                                    .getFullyQualifiedPackageName());
+
+            targetNamespaceAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("responseWrapperNamespace"),
+                    responseWrapperNamespace);
+            annotationAttributeValueList.add(targetNamespaceAttributeValue);
+
+            String className = serviceClass.getPackage()
+                    .getFullyQualifiedPackageName().concat(".").concat(
+                            StringUtils.capitalize(responseWrapperName));
+            StringAttributeValue classNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("responseWrapperClassName"), className);
+            annotationAttributeValueList.add(classNameAttributeValue);
+
         } else {
 
-            localNameAttributeValue = new StringAttributeValue(
+            StringAttributeValue localNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("resultName"), "void");
             annotationAttributeValueList.add(localNameAttributeValue);
 
@@ -526,6 +590,10 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         List<JavaSymbolName> parameterNamesList = methodMetadata
                 .getParameterNames();
+
+        if (parameterTypesList.isEmpty() && parameterNamesList.isEmpty()) {
+            return annotatedWebParameterList;
+        }
 
         AnnotatedJavaType parameterWithAnnotations;
         List<AnnotationMetadata> parameterAnnotationList;

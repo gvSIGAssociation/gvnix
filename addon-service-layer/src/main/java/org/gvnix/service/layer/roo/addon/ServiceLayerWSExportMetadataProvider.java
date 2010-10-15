@@ -109,6 +109,8 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
             serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
             // Installs jax2ws plugin in project.
             serviceLayerWsConfigService.installJaxwsBuildPlugin();
+            // Add GvNixAnnotations to the project.
+            annotationsService.addGvNIXAnnotationsDependency();
 
             // Check if Web Service definition is correct.
             PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
@@ -410,158 +412,181 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
         StringAttributeValue resultName = (StringAttributeValue) gvNixWebMethodAnnotation
                 .getAttribute(new JavaSymbolName("resultName"));
 
-        Assert
-                .isTrue(
-                        resultName != null
-                                && StringUtils.hasText(resultName
-                                        .getValue()),
-                        "Attribute 'resultName' in annotation @GvNIXWebMethod defined in method '"
-                                + methodMetadata.getMethodName()
-                                + "' in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to be defined to export as Web Service operation.");
+        // Check only if method has return type different than Void.
+        if (!webResultType
+                .getValue()
+                .getFullyQualifiedTypeName()
+                .contentEquals(
+                JavaType.VOID_OBJECT.getFullyQualifiedTypeName())
+                && !webResultType
+                .getValue()
+                .getFullyQualifiedTypeName()
+                        .contentEquals(
+                                JavaType.VOID_PRIMITIVE
+                                        .getFullyQualifiedTypeName())) {
 
-        // resultNamespace
-        StringAttributeValue resultNamespace = (StringAttributeValue) gvNixWebMethodAnnotation
-                .getAttribute(new JavaSymbolName("resultNamespace"));
+            Assert
+                    .isTrue(
+                            resultName != null
+                                    && StringUtils.hasText(resultName
+                                            .getValue()),
+                            "Attribute 'resultName' in annotation @GvNIXWebMethod defined in method '"
+                                    + methodMetadata.getMethodName()
+                                    + "' in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to be defined to export as Web Service operation.");
 
-        Assert
-                .isTrue(
-                        resultNamespace != null
-                                && StringUtils.hasText(resultNamespace
-                                        .getValue()),
-                        "Attribute 'resultNamespace' in annotation @GvNIXWebMethod defined in method '"
-                                + methodMetadata.getMethodName()
-                                + "' in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to be defined to export as Web Service operation.");
+            // resultNamespace
+            StringAttributeValue resultNamespace = (StringAttributeValue) gvNixWebMethodAnnotation
+                    .getAttribute(new JavaSymbolName("resultNamespace"));
 
+            Assert
+                    .isTrue(
+                            resultNamespace != null
+                                    && StringUtils.hasText(resultNamespace
+                                            .getValue()),
+                            "Attribute 'resultNamespace' in annotation @GvNIXWebMethod defined in method '"
+                                    + methodMetadata.getMethodName()
+                                    + "' in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to be defined to export as Web Service operation.");
 
-        Assert
-                .isTrue(
-                        serviceLayerWSExportValidationService
-                                .checkNamespaceFormat(resultNamespace
-                                        .getValue()),
-                        "Attribute 'resultNamespace' in annotation @GvNIXWebMethod defined in method '"
-                                + methodMetadata.getMethodName()
-                                + "' in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+            Assert
+                    .isTrue(
+                            serviceLayerWSExportValidationService
+                                    .checkNamespaceFormat(resultNamespace
+                                            .getValue()),
+                            "Attribute 'resultNamespace' in annotation @GvNIXWebMethod defined in method '"
+                                    + methodMetadata.getMethodName()
+                                    + "' in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
 
-        // requestWrapperName
-        StringAttributeValue requestWrapperName = (StringAttributeValue) gvNixWebMethodAnnotation
-                .getAttribute(new JavaSymbolName("requestWrapperName"));
+            // responseWrapperName
+            StringAttributeValue responseWrapperName = (StringAttributeValue) gvNixWebMethodAnnotation
+                    .getAttribute(new JavaSymbolName("responseWrapperName"));
 
-        Assert
-                .isTrue(
-                        requestWrapperName != null
-                                && StringUtils.hasText(requestWrapperName
-                                        .getValue()),
-                        "Attribute 'requestWrapperName' in annotation @GvNIXWebService defined in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to be defined to export as Web Service operation.");
+            Assert
+                    .isTrue(
+                            responseWrapperName != null
+                                    && StringUtils.hasText(responseWrapperName
+                                            .getValue()),
+                            "Attribute 'responseWrapperName' in annotation @GvNIXWebService defined in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to be defined to export as Web Service operation.");
 
-        // requestWrapperNamespace
-        StringAttributeValue requestWrapperNamespace = (StringAttributeValue) gvNixWebMethodAnnotation
-                .getAttribute(new JavaSymbolName("requestWrapperNamespace"));
+            // responseWrapperNamespace
+            StringAttributeValue responseWrapperNamespace = (StringAttributeValue) gvNixWebMethodAnnotation
+                    .getAttribute(new JavaSymbolName("responseWrapperNamespace"));
 
-        Assert
-                .isTrue(
-                        requestWrapperNamespace != null
-                                && StringUtils.hasText(requestWrapperNamespace
-                                        .getValue()),
-                        "Attribute 'requestWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
-                                + methodMetadata.getMethodName()
-                                + "' in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to be defined to export as Web Service operation.");
+            Assert
+                    .isTrue(
+                            responseWrapperNamespace != null
+                                    && StringUtils
+                                            .hasText(responseWrapperNamespace
+                                                    .getValue()),
+                            "Attribute 'responseWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
+                                    + methodMetadata.getMethodName()
+                                    + "' in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to be defined to export as Web Service operation.");
 
-        Assert
-                .isTrue(
-                        serviceLayerWSExportValidationService
-                                .checkNamespaceFormat(requestWrapperNamespace
-                                        .getValue()),
-                        "Attribute 'requestWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
-                                + methodMetadata.getMethodName()
-                                + "' in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+            Assert
+                    .isTrue(
+                            serviceLayerWSExportValidationService
+                                    .checkNamespaceFormat(responseWrapperNamespace
+                                            .getValue()),
+                            "Attribute 'responseWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
+                                    + methodMetadata.getMethodName()
+                                    + "' in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+            // responseWrapperClassName
+            StringAttributeValue responseWrapperClassName = (StringAttributeValue) gvNixWebMethodAnnotation
+                    .getAttribute(new JavaSymbolName("responseWrapperClassName"));
 
-        // requestWrapperClassName
-        StringAttributeValue requestWrapperClassName = (StringAttributeValue) gvNixWebMethodAnnotation
-                .getAttribute(new JavaSymbolName("requestWrapperClassName"));
+            Assert
+                    .isTrue(
+                            responseWrapperClassName != null
+                                    && StringUtils
+                                            .hasText(responseWrapperClassName
+                                                    .getValue()),
+                            "Attribute 'responseWrapperClassName' in annotation @GvNIXWebService defined in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to be defined to export as Web Service operation.");
 
-        Assert
-                .isTrue(
-                        requestWrapperClassName != null
-                                && StringUtils.hasText(requestWrapperClassName
-                                        .getValue()),
-                        "Attribute 'requestWrapperClassName' in annotation @GvNIXWebService defined in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to be defined to export as Web Service operation.");
+        }
 
-        // responseWrapperName
-        StringAttributeValue responseWrapperName = (StringAttributeValue) gvNixWebMethodAnnotation
-                .getAttribute(new JavaSymbolName("responseWrapperName"));
+        // Check if method has input parameters.
+        if (!methodMetadata.getParameterTypes().isEmpty()
+                && !methodMetadata.getParameterNames().isEmpty()) {
 
-        Assert
-                .isTrue(
-                        responseWrapperName != null
-                                && StringUtils.hasText(responseWrapperName
-                                        .getValue()),
-                        "Attribute 'responseWrapperName' in annotation @GvNIXWebService defined in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to be defined to export as Web Service operation.");
+            // requestWrapperName
+            StringAttributeValue requestWrapperName = (StringAttributeValue) gvNixWebMethodAnnotation
+                    .getAttribute(new JavaSymbolName("requestWrapperName"));
 
-        // responseWrapperNamespace
-        StringAttributeValue responseWrapperNamespace = (StringAttributeValue) gvNixWebMethodAnnotation
-                .getAttribute(new JavaSymbolName("responseWrapperNamespace"));
+            Assert
+                    .isTrue(
+                            requestWrapperName != null
+                                    && StringUtils.hasText(requestWrapperName
+                                            .getValue()),
+                            "Attribute 'requestWrapperName' in annotation @GvNIXWebService defined in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to be defined to export as Web Service operation.");
 
-        Assert
-                .isTrue(
-                        responseWrapperNamespace != null
-                                && StringUtils.hasText(responseWrapperNamespace
-                                        .getValue()),
-                        "Attribute 'responseWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
-                                + methodMetadata.getMethodName()
-                                + "' in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to be defined to export as Web Service operation.");
+            // requestWrapperNamespace
+            StringAttributeValue requestWrapperNamespace = (StringAttributeValue) gvNixWebMethodAnnotation
+                    .getAttribute(new JavaSymbolName("requestWrapperNamespace"));
 
+            Assert
+                    .isTrue(
+                            requestWrapperNamespace != null
+                                    && StringUtils
+                                            .hasText(requestWrapperNamespace
+                                                    .getValue()),
+                            "Attribute 'requestWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
+                                    + methodMetadata.getMethodName()
+                                    + "' in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to be defined to export as Web Service operation.");
 
-        Assert
-                .isTrue(
-                        serviceLayerWSExportValidationService
-                                .checkNamespaceFormat(responseWrapperNamespace
-                                        .getValue()),
-                        "Attribute 'responseWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
-                                + methodMetadata.getMethodName()
-                                + "' in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
-        // responseWrapperClassName
-        StringAttributeValue responseWrapperClassName = (StringAttributeValue) gvNixWebMethodAnnotation
-                .getAttribute(new JavaSymbolName("responseWrapperClassName"));
+            Assert
+                    .isTrue(
+                            serviceLayerWSExportValidationService
+                                    .checkNamespaceFormat(requestWrapperNamespace
+                                            .getValue()),
+                            "Attribute 'requestWrapperNamespace' in annotation @GvNIXWebMethod defined in method '"
+                                    + methodMetadata.getMethodName()
+                                    + "' in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
 
-        Assert
-                .isTrue(
-                        responseWrapperClassName != null
-                                && StringUtils.hasText(responseWrapperClassName
-                                        .getValue()),
-                        "Attribute 'responseWrapperClassName' in annotation @GvNIXWebService defined in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to be defined to export as Web Service operation.");
+            // requestWrapperClassName
+            StringAttributeValue requestWrapperClassName = (StringAttributeValue) gvNixWebMethodAnnotation
+                    .getAttribute(new JavaSymbolName("requestWrapperClassName"));
+
+            Assert
+                    .isTrue(
+                            requestWrapperClassName != null
+                                    && StringUtils
+                                            .hasText(requestWrapperClassName
+                                                    .getValue()),
+                            "Attribute 'requestWrapperClassName' in annotation @GvNIXWebService defined in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to be defined to export as Web Service operation.");
+        }
+
 
     }
 

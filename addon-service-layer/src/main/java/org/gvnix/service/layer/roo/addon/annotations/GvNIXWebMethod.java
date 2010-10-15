@@ -37,22 +37,22 @@ public @interface GvNIXWebMethod {
 
     String operationName();
 
-    Class<?> webResultType() default void.class;
+    Class<?> webResultType();
 
     String resultName() default "void";
 
     String resultNamespace() default "";
 
-    String requestWrapperName();
+    String requestWrapperName() default "";
 
-    String requestWrapperNamespace();
+    String requestWrapperNamespace() default "";
 
-    String requestWrapperClassName();
+    String requestWrapperClassName() default "";
 
-    String responseWrapperName();
+    String responseWrapperName() default "";
 
-    String responseWrapperNamespace();
+    String responseWrapperNamespace() default "";
 
-    String responseWrapperClassName();
+    String responseWrapperClassName() default "";
 
 }

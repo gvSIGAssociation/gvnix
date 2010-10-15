@@ -24,10 +24,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-
 import org.apache.felix.scr.annotations.*;
+import org.springframework.roo.addon.web.mvc.controller.UrlRewriteOperations;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
@@ -64,9 +62,8 @@ public class ServiceLayerWsConfigServiceImpl implements
     private PathResolver pathResolver;
     @Reference
     private ProjectOperations projectOperations;
-
-    private static final String DOCTYPE_PUBLIC = "-//tuckey.org//DTD UrlRewrite 3.0//EN";
-    private static final String DOCTYPE_SYSTEM = "http://tuckey.org/res/dtds/urlrewrite3.0.dtd";
+    @Reference
+    private UrlRewriteOperations urlRewriteOperations;
 
     private static Logger logger = Logger
             .getLogger(ServiceLayerWsConfigService.class.getName());
@@ -429,39 +426,19 @@ public class ServiceLayerWsConfigServiceImpl implements
                 "WEB-INF/urlrewrite.xml");
         Assert.isTrue(fileManager.exists(xmlPath), "urlrewrite.xml not found");
 
-        MutableFile xmlMutableFile = null;
-        Document urlXml;
+        Document urlRewriteDoc = urlRewriteOperations.getUrlRewriteDocument();
 
-        try {
-            xmlMutableFile = fileManager.updateFile(xmlPath);
-            urlXml = XmlUtils.getDocumentBuilder().parse(
-                    xmlMutableFile.getInputStream());
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        Element root = urlXml.getDocumentElement();
+        Element root = urlRewriteDoc.getDocumentElement();
 
         for (Element rule : rules) {
 
             // Create rule in dest doc
-            Element rewRule = (Element) urlXml.adoptNode(rule);
+            Element rewRule = (Element) urlRewriteDoc.adoptNode(rule);
 
             root.insertBefore(rewRule, root.getFirstChild());
-
         }
 
-        // Define DTD
-        Transformer xformer;
-        try {
-            xformer = XmlUtils.createIndentingTransformer();
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-
-        xformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, DOCTYPE_PUBLIC);
-        xformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, DOCTYPE_SYSTEM);
-
-        XmlUtils.writeXml(xformer, xmlMutableFile.getOutputStream(), urlXml);
+        urlRewriteOperations.writeUrlRewriteDocument(urlRewriteDoc);
     }
 
     /**

@@ -45,6 +45,8 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
 
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
+    @Reference
+    private AnnotationsService annotationsService;
 
     private static Logger logger = Logger
             .getLogger(ServiceLayerWSExportExceptionMetadataProvider.class
@@ -108,6 +110,8 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
             serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
             // Installs jax2ws plugin in project.
             serviceLayerWsConfigService.installJaxwsBuildPlugin();
+            // Add GvNixAnnotations to the project.
+            annotationsService.addGvNIXAnnotationsDependency();
 
             // Work out the MIDs of the other metadata we depend on
             JavaType javaType = ServiceLayerWSExportExceptionMetadata

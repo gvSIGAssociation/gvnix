@@ -52,6 +52,8 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
     @Reference
     private ServiceLayerWSExportValidationService serviceLayerWSExportValidationService;
+    @Reference
+    private AnnotationsService annotationsService;
 
     private static Logger logger = Logger
 	    .getLogger(ServiceLayerWSExportXmlElementMetadataProvider.class.getName());
@@ -102,6 +104,8 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
             serviceLayerWsConfigService.install(CommunicationSense.EXPORT);
             // Installs jax2ws plugin in project.
             serviceLayerWsConfigService.installJaxwsBuildPlugin();
+            // Add GvNixAnnotations to the project.
+            annotationsService.addGvNIXAnnotationsDependency();
 
             // We know governor type details are non-null and can be safely cast
 
@@ -121,13 +125,9 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
             metadataDependencyRegistry.registerDependency(entityMetadataKey,
                     metadataIdentificationString);
 
-            if (serviceLayerWSExportValidationService.isJavaTypeAllowed(
-                    javaType, MethodParameterType.XMLENTITY, javaType)) {
-
-                serviceLayerWSExportXmlElementMetadata = new ServiceLayerWSExportXmlElementMetadata(
-                        metadataIdentificationString, aspectName,
-                        governorPhysicalTypeMetadata, entityMetadata);
-            }
+            serviceLayerWSExportXmlElementMetadata = new ServiceLayerWSExportXmlElementMetadata(
+                    metadataIdentificationString, aspectName,
+                    governorPhysicalTypeMetadata, entityMetadata);
 
         }
         

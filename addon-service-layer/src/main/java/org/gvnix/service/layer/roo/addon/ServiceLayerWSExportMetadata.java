@@ -247,67 +247,42 @@ public class ServiceLayerWSExportMetadata extends
         builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
                 methodMetadata, webMethod));
 
-        // javax.xml.ws.RequestWrapper
-        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+        if (!methodMetadata.getParameterTypes().isEmpty()
+                && !methodMetadata.getParameterNames().isEmpty()) {
 
-        StringAttributeValue localNameAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("localName"),
-                ((StringAttributeValue) methodAnnotation
-                        .getAttribute(new JavaSymbolName("requestWrapperName")))
-                        .getValue());
-        annotationAttributeValueList.add(localNameAttributeValue);
+            // javax.xml.ws.RequestWrapper
+            annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-        StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("targetNamespace"),
-                ((StringAttributeValue) methodAnnotation
-                        .getAttribute(new JavaSymbolName(
-                                "requestWrapperNamespace"))).getValue());
-        annotationAttributeValueList.add(targetNamespaceAttributeValue);
+            StringAttributeValue localNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("localName"),
+                    ((StringAttributeValue) methodAnnotation
+                            .getAttribute(new JavaSymbolName(
+                                    "requestWrapperName"))).getValue());
+            annotationAttributeValueList.add(localNameAttributeValue);
 
-        StringAttributeValue classNameAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("className"),
-                ((StringAttributeValue) methodAnnotation
-                        .getAttribute(new JavaSymbolName(
-                                "requestWrapperClassName"))).getValue());
-        annotationAttributeValueList.add(classNameAttributeValue);
+            StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("targetNamespace"),
+                    ((StringAttributeValue) methodAnnotation
+                            .getAttribute(new JavaSymbolName(
+                                    "requestWrapperNamespace"))).getValue());
+            annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-        AnnotationMetadata requestWrapper = new DefaultAnnotationMetadata(
-                new JavaType("javax.xml.ws.RequestWrapper"),
-                annotationAttributeValueList);
+            StringAttributeValue classNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("className"),
+                    ((StringAttributeValue) methodAnnotation
+                            .getAttribute(new JavaSymbolName(
+                                    "requestWrapperClassName"))).getValue());
+            annotationAttributeValueList.add(classNameAttributeValue);
 
-        // Add to AspectJ.
-        builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
-                methodMetadata, requestWrapper));
+            AnnotationMetadata requestWrapper = new DefaultAnnotationMetadata(
+                    new JavaType("javax.xml.ws.RequestWrapper"),
+                    annotationAttributeValueList);
 
-        // javax.xml.ws.ResponseWrapper
-        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+            // Add to AspectJ.
+            builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                    methodMetadata, requestWrapper));
 
-        localNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
-                "localName"), ((StringAttributeValue) methodAnnotation
-                .getAttribute(new JavaSymbolName("responseWrapperName")))
-                .getValue());
-        annotationAttributeValueList.add(localNameAttributeValue);
-
-        targetNamespaceAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("targetNamespace"),
-                ((StringAttributeValue) methodAnnotation
-                        .getAttribute(new JavaSymbolName(
-                                "responseWrapperNamespace"))).getValue());
-        annotationAttributeValueList.add(targetNamespaceAttributeValue);
-
-        classNameAttributeValue = new StringAttributeValue(new JavaSymbolName(
-                "className"), ((StringAttributeValue) methodAnnotation
-                .getAttribute(new JavaSymbolName("responseWrapperClassName")))
-                .getValue());
-        annotationAttributeValueList.add(classNameAttributeValue);
-
-        AnnotationMetadata responseWrapper = new DefaultAnnotationMetadata(
-                new JavaType("javax.xml.ws.ResponseWrapper"),
-                annotationAttributeValueList);
-
-        // Add to AspectJ.
-        builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
-                methodMetadata, responseWrapper));
+        }
 
         // javax.jws.WebResult
         // Check result value
@@ -322,9 +297,10 @@ public class ServiceLayerWSExportMetadata extends
                         .getValue().getFullyQualifiedTypeName().contains(
                                 JavaType.VOID_PRIMITIVE
                                         .getFullyQualifiedTypeName()))) {
+
             annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-            localNameAttributeValue = new StringAttributeValue(
+            StringAttributeValue localNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("name"), resutlNameAttributeValue
                             .getValue());
             annotationAttributeValueList.add(localNameAttributeValue);
@@ -332,7 +308,7 @@ public class ServiceLayerWSExportMetadata extends
             StringAttributeValue gvNIxWebResultTargetNamespace = (StringAttributeValue) methodAnnotation
             .getAttribute(new JavaSymbolName("resultNamespace"));
             
-            targetNamespaceAttributeValue = new StringAttributeValue(
+            StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("targetNamespace"),
                     gvNIxWebResultTargetNamespace.getValue());
 
@@ -354,6 +330,38 @@ public class ServiceLayerWSExportMetadata extends
             // Add to AspectJ.
             builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
                     methodMetadata, webResult));
+
+            // javax.xml.ws.ResponseWrapper
+            annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+            localNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("localName"),
+                    ((StringAttributeValue) methodAnnotation
+                            .getAttribute(new JavaSymbolName(
+                                    "responseWrapperName"))).getValue());
+            annotationAttributeValueList.add(localNameAttributeValue);
+
+            targetNamespaceAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("targetNamespace"),
+                    ((StringAttributeValue) methodAnnotation
+                            .getAttribute(new JavaSymbolName(
+                                    "responseWrapperNamespace"))).getValue());
+            annotationAttributeValueList.add(targetNamespaceAttributeValue);
+
+            StringAttributeValue classNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("className"),
+                    ((StringAttributeValue) methodAnnotation
+                            .getAttribute(new JavaSymbolName(
+                                    "responseWrapperClassName"))).getValue());
+            annotationAttributeValueList.add(classNameAttributeValue);
+
+            AnnotationMetadata responseWrapper = new DefaultAnnotationMetadata(
+                    new JavaType("javax.xml.ws.ResponseWrapper"),
+                    annotationAttributeValueList);
+
+            // Add to AspectJ.
+            builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                    methodMetadata, responseWrapper));
 
         } else {
             // @Oneway - not require a response from the service.
