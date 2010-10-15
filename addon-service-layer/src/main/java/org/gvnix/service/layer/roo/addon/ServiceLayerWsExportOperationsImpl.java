@@ -249,6 +249,9 @@ public class ServiceLayerWsExportOperationsImpl implements
             exportService(serviceClass, null, null, null, null);
         }
 
+        String webServiceTargetNamespace = serviceLayerWSExportValidationService
+                .getWebServiceDefaultNamespace(serviceClass);
+
         // Check if method exists in the class.
         Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName,
                 GvNIXWebMethod.class.getName()), "The method: '" + methodName
@@ -276,9 +279,9 @@ public class ServiceLayerWsExportOperationsImpl implements
             resultName = "return";
         }
 
-        // Check if method throws an Exception.
+        // Check if method throws an Exception and update.
         serviceLayerWSExportValidationService.checkMethodExceptions(
-                serviceClass, methodName);
+                serviceClass, methodName, webServiceTargetNamespace);
 
         // Checks correct namespace format.
         if (!isReturnTypeVoid) {
@@ -306,11 +309,11 @@ public class ServiceLayerWsExportOperationsImpl implements
                 serviceClass, methodName, operationName, resultName,
                 returnType, resultNamespace, responseWrapperName,
                 responseWrapperNamespace, requestWrapperName,
-                requestWrapperNamespace);
+                requestWrapperNamespace, webServiceTargetNamespace);
 
         // Add @GvNIXWebParam & @WebParam parameter annotations.
         List<AnnotatedJavaType> annotationWebParamMetadataList = getMethodParameterAnnotations(
-                serviceClass, methodName);
+                serviceClass, methodName, webServiceTargetNamespace);
 
         javaParserService.updateMethodAnnotations(serviceClass, methodName,
                 annotationMetadataUpdateList, annotationWebParamMetadataList);
@@ -385,7 +388,7 @@ public class ServiceLayerWsExportOperationsImpl implements
             String operationName, String resultName, JavaType returnType,
             String resultNamespace, String responseWrapperName,
             String responseWrapperNamespace, String requestWrapperName,
-            String requestWrapperNamespace) {
+            String requestWrapperNamespace, String webServiceTargetNamespace) {
 
         List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
         List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
@@ -415,10 +418,7 @@ public class ServiceLayerWsExportOperationsImpl implements
 
             requestWrapperNamespace = StringUtils
                     .hasText(requestWrapperNamespace) ? requestWrapperNamespace
-                    : serviceLayerWsConfigService
-                            .convertPackageToTargetNamespace(serviceClass
-                                    .getPackage()
-                                    .getFullyQualifiedPackageName());
+                    : webServiceTargetNamespace;
 
             StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("requestWrapperNamespace"),
@@ -445,10 +445,7 @@ public class ServiceLayerWsExportOperationsImpl implements
             annotationAttributeValueList.add(resultNameAttributeValue);
 
             resultNamespace = StringUtils.hasText(resultNamespace) ? resultNamespace
-                    : serviceLayerWsConfigService
-                            .convertPackageToTargetNamespace(serviceClass
-                                    .getPackage()
-                                    .getFullyQualifiedPackageName());
+                    : webServiceTargetNamespace;
 
             StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("resultNamespace"), resultNamespace);
@@ -469,10 +466,7 @@ public class ServiceLayerWsExportOperationsImpl implements
 
             responseWrapperNamespace = StringUtils
                     .hasText(responseWrapperNamespace) ? responseWrapperNamespace
-                    : serviceLayerWsConfigService
-                            .convertPackageToTargetNamespace(serviceClass
-                                    .getPackage()
-                                    .getFullyQualifiedPackageName());
+                    : webServiceTargetNamespace;
 
             targetNamespaceAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("responseWrapperNamespace"),
@@ -578,7 +572,8 @@ public class ServiceLayerWsExportOperationsImpl implements
      * 
      */
     public List<AnnotatedJavaType> getMethodParameterAnnotations(
-            JavaType serviceClass, JavaSymbolName methodName) {
+            JavaType serviceClass, JavaSymbolName methodName,
+            String webServiceTargetNamespace) {
 
         List<AnnotatedJavaType> annotatedWebParameterList = new ArrayList<AnnotatedJavaType>();
 
@@ -647,10 +642,8 @@ public class ServiceLayerWsExportOperationsImpl implements
             webParamAttributeValueList.add(nameWebParamAttributeValue);
 
             StringAttributeValue targetNamespace = new StringAttributeValue(
-                    new JavaSymbolName("targetNamespace"), serviceLayerWsConfigService
-                            .convertPackageToTargetNamespace(parameterType
-                                    .getJavaType().getPackage()
-                                    .getFullyQualifiedPackageName()));
+                    new JavaSymbolName("targetNamespace"),
+                    webServiceTargetNamespace);
 
             webParamAttributeValueList.add(targetNamespace);
 

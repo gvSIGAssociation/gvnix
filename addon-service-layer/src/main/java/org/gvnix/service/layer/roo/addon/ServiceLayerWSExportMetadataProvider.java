@@ -25,8 +25,7 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
-import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod;
-import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService;
+import org.gvnix.service.layer.roo.addon.annotations.*;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
@@ -52,7 +51,8 @@ import org.springframework.roo.support.util.StringUtils;
  */
 @Component(immediate = true)
 @Service
-public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataProvider {
+public class ServiceLayerWSExportMetadataProvider extends
+        AbstractItdMetadataProvider {
 
     @Reference
     private ServiceLayerWSExportValidationService serviceLayerWSExportValidationService;
@@ -62,44 +62,56 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
     private AnnotationsService annotationsService;
 
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerWSExportMetadataProvider.class.getName());
+            .getLogger(ServiceLayerWSExportMetadataProvider.class.getName());
 
     protected void activate(ComponentContext context) {
-	// Ensure we're notified of all metadata related to physical Java types,
-	// in particular their initial creation
-	metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
-		.getMetadataIdentiferType(), getProvidesType());
-	addMetadataTrigger(new JavaType(GvNIXWebService.class.getName()));
+        // Ensure we're notified of all metadata related to physical Java types,
+        // in particular their initial creation
+        metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
+                .getMetadataIdentiferType(), getProvidesType());
+        addMetadataTrigger(new JavaType(GvNIXWebService.class.getName()));
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#createLocalIdentifier(org.springframework.roo.model.JavaType, org.springframework.roo.project.Path)
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
+     * createLocalIdentifier(org.springframework.roo.model.JavaType,
+     * org.springframework.roo.project.Path)
      */
     protected String createLocalIdentifier(JavaType javaType, Path path) {
-	return ServiceLayerWSExportMetadata.createIdentifier(javaType, path);
+        return ServiceLayerWSExportMetadata.createIdentifier(javaType, path);
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getGovernorPhysicalTypeIdentifier(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
+     * getGovernorPhysicalTypeIdentifier(java.lang.String)
      */
     protected String getGovernorPhysicalTypeIdentifier(
-	    String metadataIdentificationString) {
-	JavaType javaType = ServiceLayerWSExportMetadata
-		.getJavaType(metadataIdentificationString);
-	Path path = ServiceLayerWSExportMetadata
-		.getPath(metadataIdentificationString);
-	String physicalTypeIdentifier = PhysicalTypeIdentifier
-		.createIdentifier(javaType, path);
-	return physicalTypeIdentifier;
+            String metadataIdentificationString) {
+        JavaType javaType = ServiceLayerWSExportMetadata
+                .getJavaType(metadataIdentificationString);
+        Path path = ServiceLayerWSExportMetadata
+                .getPath(metadataIdentificationString);
+        String physicalTypeIdentifier = PhysicalTypeIdentifier
+                .createIdentifier(javaType, path);
+        return physicalTypeIdentifier;
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getMetadata(java.lang.String, org.springframework.roo.model.JavaType, org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getMetadata
+     * (java.lang.String, org.springframework.roo.model.JavaType,
+     * org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
      */
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
-	    String metadataIdentificationString, JavaType aspectName,
-	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
-	    String itdFilename) {
+            String metadataIdentificationString, JavaType aspectName,
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            String itdFilename) {
 
         ServiceLayerWSExportMetadata serviceLayerMetadata = null;
 
@@ -115,7 +127,7 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
             // Check if Web Service definition is correct.
             PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
                     .getPhysicalTypeDetails();
-            
+
             ClassOrInterfaceTypeDetails governorTypeDetails;
             if (physicalTypeDetails == null
                     || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
@@ -134,6 +146,12 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
             // Check @GvNIXWebService annotation attributes.
             checkGvNIXWebServiceAnnotationAttributes(gvNIXWebServiceAnnotation,
                     governorTypeDetails);
+
+            // Default Web Service target Namespace.
+            StringAttributeValue webServiceTargetNamespaceAttributeValue = (StringAttributeValue) gvNIXWebServiceAnnotation
+                    .getAttribute(new JavaSymbolName("targetNamespace"));
+            String webServiceTargetNamespace = webServiceTargetNamespaceAttributeValue
+                    .getValue();
 
             // Show info
             logger.log(Level.WARNING,
@@ -167,10 +185,10 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
 
             for (MethodMetadata methodMetadata : methodList) {
 
-                AnnotationMetadata gvNixWebMethodAnnotation = MemberFindingUtils.getAnnotationOfType(methodMetadata
-                        .getAnnotations(), new JavaType(GvNIXWebMethod.class
-                        .getName()));
-                        
+                AnnotationMetadata gvNixWebMethodAnnotation = MemberFindingUtils
+                        .getAnnotationOfType(methodMetadata.getAnnotations(),
+                                new JavaType(GvNIXWebMethod.class.getName()));
+
                 if (gvNixWebMethodAnnotation != null) {
 
                     // Check INPUT/OUTPUT parameters
@@ -181,10 +199,10 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
 
                     // Check and update exceptions.
                     serviceLayerWSExportValidationService
-                            .checkMethodExceptions(
-                            governorTypeDetails.getName(), methodMetadata
-                                    .getMethodName());
-                    
+                            .checkMethodExceptions(governorTypeDetails
+                                    .getName(), methodMetadata.getMethodName(),
+                                    webServiceTargetNamespace);
+
                     // Check if attributes are defined in class.
                     Assert.isTrue(!gvNixWebMethodAnnotation.getAttributeNames()
                             .isEmpty(), "The annotation @GvNIXWebMethod for '"
@@ -200,6 +218,10 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
                             gvNixWebMethodAnnotation, governorTypeDetails,
                             methodMetadata);
 
+                    // Checks @WebParam and @GvNIXWebParam attributes for each
+                    // input parameter in method.
+                    checkGvNIXWebParamsAnnotationAttributes(
+                            governorTypeDetails, methodMetadata);
 
                 }
             }
@@ -416,11 +438,8 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
         if (!webResultType
                 .getValue()
                 .getFullyQualifiedTypeName()
-                .contentEquals(
-                JavaType.VOID_OBJECT.getFullyQualifiedTypeName())
-                && !webResultType
-                .getValue()
-                .getFullyQualifiedTypeName()
+                .contentEquals(JavaType.VOID_OBJECT.getFullyQualifiedTypeName())
+                && !webResultType.getValue().getFullyQualifiedTypeName()
                         .contentEquals(
                                 JavaType.VOID_PRIMITIVE
                                         .getFullyQualifiedTypeName())) {
@@ -587,21 +606,208 @@ public class ServiceLayerWSExportMetadataProvider extends AbstractItdMetadataPro
                                     + "' has to be defined to export as Web Service operation.");
         }
 
+    }
+
+    /**
+     * Checks @GvNIXWebParam annotation attribute values in input method
+     * parameters to avoid changes in service contract.
+     * 
+     * @param governorTypeDetails
+     *            Service Class.
+     * @param methodMetadata
+     *            Method to check parameters.
+     */
+    public void checkGvNIXWebParamsAnnotationAttributes(
+            ClassOrInterfaceTypeDetails governorTypeDetails,
+            MethodMetadata methodMetadata) {
+
+        List<AnnotatedJavaType> annotatedInputParameters = methodMetadata
+                .getParameterTypes();
+
+        if (annotatedInputParameters.isEmpty()) {
+            // There aren't input parameters in method.
+            return;
+        }
+
+        List<AnnotationMetadata> parameterAnnotationList;
+        AnnotationMetadata gvNixWebParamAnnotation;
+        AnnotationMetadata webParamAnnotation;
+
+        StringAttributeValue gvNixWebParamNameAttributeValue;
+        StringAttributeValue webParamNameAttributeValue;
+        ClassAttributeValue gvNIxWebParamTypeAttributeValue;
+        StringAttributeValue targetNamespaceAttribute;
+
+        for (AnnotatedJavaType inputParameter : annotatedInputParameters) {
+
+            parameterAnnotationList = inputParameter.getAnnotations();
+
+            Assert.isTrue(parameterAnnotationList != null
+                    && !parameterAnnotationList.isEmpty(),
+                    "Must be set @GvNIXWebParam and @WebParam annotations to: "
+                            + inputParameter.getJavaType()
+                                    .getFullyQualifiedTypeName()
+                            + " in method: '"
+                            + methodMetadata.getMethodName()
+                            + " defined in class: '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' to be exported as web Service operation.");
+
+            gvNixWebParamAnnotation = MemberFindingUtils
+                    .getAnnotationOfType(parameterAnnotationList, new JavaType(
+                            GvNIXWebParam.class.getName()));
+
+            Assert.isTrue(gvNixWebParamAnnotation != null,
+                    "Must be set @GvNIXWebParam annotation to: "
+                            + inputParameter.getJavaType()
+                                    .getFullyQualifiedTypeName()
+                            + " in method: '"
+                            + methodMetadata.getMethodName()
+                            + " defined in class: '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' to be exported as web Service operation.");
+
+            gvNIxWebParamTypeAttributeValue = (ClassAttributeValue) gvNixWebParamAnnotation
+                    .getAttribute(new JavaSymbolName("type"));
+
+            Assert.isTrue(gvNIxWebParamTypeAttributeValue != null && gvNIxWebParamTypeAttributeValue.getValue() != null,
+                    "Must be set 'type' attribute in @GvNIXWebParam annotation to: "
+                            + inputParameter.getJavaType()
+                                    .getFullyQualifiedTypeName()
+                            + " in method: '"
+                            + methodMetadata.getMethodName()
+                            + " defined in class: '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' to be exported as web Service operation.");
+
+            // Check if is the same class type as parameter type.
+            Assert
+                    .isTrue(
+                            inputParameter
+                                    .getJavaType()
+                                    .getFullyQualifiedTypeName()
+                                    .contentEquals(
+                                            gvNIxWebParamTypeAttributeValue
+                                                    .getValue()
+                                                    .getFullyQualifiedTypeName()),
+                            "The 'type' attribute in @GvNIXWebParam annotation to: "
+                                    + inputParameter.getJavaType()
+                                            .getFullyQualifiedTypeName()
+                                    + " in method: '"
+                                    + methodMetadata.getMethodName()
+                                    + " defined in class: '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' is different than parameter Java type. This would change web service contract."
+                                    + "\nIf you want to change the web service contract you must define the same Java type in 'type' attribute in @GvNIXWebParam annotation.");
+
+
+            gvNixWebParamNameAttributeValue = (StringAttributeValue) gvNixWebParamAnnotation
+                    .getAttribute(new JavaSymbolName("name"));
+
+            Assert.isTrue(gvNixWebParamNameAttributeValue != null && StringUtils.hasText(gvNixWebParamNameAttributeValue.getValue()),
+                    "Must be set 'name' attribute in @GvNIXWebParam annotation to: "
+                            + inputParameter.getJavaType()
+                                    .getFullyQualifiedTypeName()
+                            + " in method: '"
+                            + methodMetadata.getMethodName()
+                            + " defined in class: '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' to be exported as web Service operation.");
+
+            webParamAnnotation = MemberFindingUtils
+                    .getAnnotationOfType(parameterAnnotationList, new JavaType(
+                            "javax.jws.WebParam"));
+
+            Assert.isTrue(webParamAnnotation != null,
+                    "Must be set @WebParam annotation to: "
+                            + inputParameter.getJavaType()
+                                    .getFullyQualifiedTypeName()
+                            + " in method: '"
+                            + methodMetadata.getMethodName()
+                            + " defined in class: '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' to be exported as web Service operation.");
+
+            webParamNameAttributeValue = (StringAttributeValue) webParamAnnotation
+                    .getAttribute(new JavaSymbolName("name"));
+
+            Assert.isTrue(webParamNameAttributeValue != null && StringUtils.hasText(webParamNameAttributeValue.getValue()),
+                    "Must be set 'name' attribute in @WebParam annotation to: "
+                            + inputParameter.getJavaType()
+                                    .getFullyQualifiedTypeName()
+                            + " in method: '"
+                            + methodMetadata.getMethodName()
+                            + " defined in class: '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' to be exported as web Service operation.");
+
+            Assert
+                    .isTrue(
+                            webParamNameAttributeValue.getValue()
+                                    .contentEquals(
+                                            gvNixWebParamNameAttributeValue
+                                                    .getValue()),
+                            "The 'name' attribute in @GvNIXWebParam and @WebParam annotation to: "
+                                    + inputParameter.getJavaType()
+                                            .getFullyQualifiedTypeName()
+                                    + " in method: '"
+                                    + methodMetadata.getMethodName()
+                                    + " defined in class: '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' are different. This would change web service contract."
+                                    + "\nIf you want to change the web service contract you must define the same 'name' attribute in @GvNIXWebParam and @WebParam annotation.");
+
+            targetNamespaceAttribute = (StringAttributeValue) webParamAnnotation
+                    .getAttribute(new JavaSymbolName("targetNamespace"));
+
+            if (targetNamespaceAttribute != null) {
+
+                Assert
+                        .isTrue(
+                                serviceLayerWSExportValidationService
+                                        .checkNamespaceFormat(targetNamespaceAttribute
+                                                .getValue()),
+                                "Attribute 'targetNamespace' in annotation @WebParam annotation to: "
+                                        + inputParameter.getJavaType()
+                                                .getFullyQualifiedTypeName()
+                                        + " in method: '"
+                                        + methodMetadata.getMethodName()
+                                        + " defined in class: '"
+                                        + governorTypeDetails.getName()
+                                                .getFullyQualifiedTypeName()
+                                        + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+
+            }
+
+        }
 
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.itd.ItdMetadataProvider#getItdUniquenessFilenameSuffix()
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.ItdMetadataProvider#
+     * getItdUniquenessFilenameSuffix()
      */
     public String getItdUniquenessFilenameSuffix() {
-	return "GvNix_WebService";
+        return "GvNix_WebService";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
      */
     public String getProvidesType() {
-	return ServiceLayerWSExportMetadata.getMetadataIdentiferType();
+        return ServiceLayerWSExportMetadata.getMetadataIdentiferType();
     }
 
 }

@@ -26,8 +26,7 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations.MethodParameterType;
-import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebFault;
-import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
+import org.gvnix.service.layer.roo.addon.annotations.*;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
@@ -116,7 +115,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
      * </ul>
      */
     public boolean checkMethodExceptions(JavaType serviceClass,
-            JavaSymbolName methodName) {
+            JavaSymbolName methodName, String webServiceTargetNamespace) {
 
         MethodMetadata methodToCheck = javaParserService
                 .getMethodByNameInClass(serviceClass, methodName);
@@ -156,9 +155,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                             .uncapitalize(throwType.getSimpleTypeName())));
             gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
                     new JavaSymbolName("targetNamespace"),
-                    serviceLayerWsConfigService
-                            .convertPackageToTargetNamespace(throwType
-                                    .getPackage().toString())));
+                    webServiceTargetNamespace));
             gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
                     new JavaSymbolName("faultBean"), throwType
                             .getFullyQualifiedTypeName()));
@@ -715,6 +712,55 @@ public class ServiceLayerWSExportValidationServiceImpl implements
         }
 
         return notAllowed;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public String getWebServiceDefaultNamespace(JavaType serviceClass) {
+
+        // Retrieve Web Service target Namespace value.
+        ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = classpathOperations
+                .getClassOrInterface(serviceClass);
+
+        // Check and get mutable instance
+        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+                classOrInterfaceTypeDetails, "Can't modify "
+                        + classOrInterfaceTypeDetails.getName());
+
+        AnnotationMetadata gvNixWebServiceAnnotaionMetadata = MemberFindingUtils
+                .getTypeAnnotation(classOrInterfaceTypeDetails, new JavaType(
+                        GvNIXWebService.class.getName()));
+
+        Assert.isTrue(gvNixWebServiceAnnotaionMetadata != null,
+                "Launch command 'service define ws --class "
+                        + serviceClass.getFullyQualifiedTypeName()
+                        + "' to export class to Web Service.");
+
+        StringAttributeValue webServiceTargetNamespaceAttributeValue = (StringAttributeValue) gvNixWebServiceAnnotaionMetadata
+                .getAttribute(new JavaSymbolName("targetNamespace"));
+
+        Assert
+                .isTrue(
+                        webServiceTargetNamespaceAttributeValue != null
+                                && StringUtils
+                                        .hasText(webServiceTargetNamespaceAttributeValue
+                                                .getValue()),
+                        "You must define 'targetNamespace' annotation attribute in @GvNIXWebService in class: '"
+                                + serviceClass.getFullyQualifiedTypeName()
+                                + "'.");
+
+        String webServiceTargetNamespace = webServiceTargetNamespaceAttributeValue
+                .getValue();
+
+        Assert
+                .isTrue(
+                        checkNamespaceFormat(webServiceTargetNamespace),
+                        "Attribute 'targetNamespace' in @GvNIXWebService for Web Service class '"
+                                + serviceClass.getFullyQualifiedTypeName()
+                                + "'has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+        return webServiceTargetNamespace;
     }
 
 }

@@ -113,15 +113,17 @@ public interface ServiceLayerWsExportOperations {
      * @param returnType
      *            JavaType class to return.
      * @param resultNamespace
-     *            Namespace of the result type.
+     *            Result type Namespace.
      * @param responseWrapperName
      *            Name to define the Response Wrapper Object.
      * @param responseWrapperNamespace
-     *            Namespace of the Response Wrapper Object.
+     *            Response Wrapper Object Namespace.
      * @param requestWrapperName
      *            Name to define the Request Wrapper Object.
      * @param requestWrapperNamespace
-     *            Namespace of the Request Wrapper Object.
+     *            Request Wrapper Object Namespace.
+     * @param webServiceTargetNamespace
+     *            Web Service Namespace.
      * 
      * @return Annotation list for method methodName.
      * 
@@ -131,7 +133,7 @@ public interface ServiceLayerWsExportOperations {
             String operationName, String resultName, JavaType returnType,
             String resultNamespace, String responseWrapperName,
             String responseWrapperNamespace, String requestWrapperName,
-            String requestWrapperNamespace);
+            String requestWrapperNamespace, String webServiceTargetNamespace);
 
     /**
      * Check if the method methodName exists in serviceClass and is not
@@ -154,11 +156,16 @@ public interface ServiceLayerWsExportOperations {
      * values defined.
      * 
      * @param serviceClass
+     *            Service to export operation
      * @param methodName
+     *            Method to update with annotations.
+     * @param webServiceTargetNamespace
+     *            Web Service Namespace.
      * @return Annotation
      */
     public List<AnnotatedJavaType> getMethodParameterAnnotations(
-            JavaType serviceClass, JavaSymbolName methodName);
+            JavaType serviceClass, JavaSymbolName methodName,
+            String webServiceTargetNamespace);
 
     /**
      * Creates the list of annotations attribute values to export a web service

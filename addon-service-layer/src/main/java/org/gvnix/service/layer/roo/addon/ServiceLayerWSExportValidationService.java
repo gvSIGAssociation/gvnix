@@ -78,11 +78,14 @@ public interface ServiceLayerWSExportValidationService {
      *            where the method is defined.
      * @param methodName
      *            to check its exceptions.
+     * @param webServiceTargetNamespace
+     *            Web Service Namespace.
+     * 
      * @return true if the exceptions are published correctly or false if the
      *         exceptions don't exists or are incorrect.
      */
     public boolean checkMethodExceptions(JavaType serviceClass,
-            JavaSymbolName methodName);
+            JavaSymbolName methodName, String webServiceTargetNamespace);
 
     /**
      * Adds a declaration of @WebFault to exceptionClass in AspectJ file.
@@ -106,4 +109,14 @@ public interface ServiceLayerWSExportValidationService {
      */
     public boolean checkNamespaceFormat(String namespace);
 
+    /**
+     * Check if serviceClass has defined @GvNIXWebService annotation with valid
+     * 'targetNamespace' attribute and returns it if is correct.
+     * 
+     * @param serviceClass
+     *            Web Service class to check correct target Namespace and return
+     *            as result.
+     * @return targetNamespace attribute from annotation @GvNIXWebService.
+     */
+    public String getWebServiceDefaultNamespace(JavaType serviceClass);
 }
