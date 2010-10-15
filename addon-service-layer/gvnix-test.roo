@@ -23,7 +23,7 @@ service class --class org.gvnix.test.service.layer.project.services.Clase
 // No return type.
 service operation --name checkString --service org.gvnix.test.service.layer.project.services.Clase
 // Export Class as web service.
-service export ws --class org.gvnix.test.service.layer.project.services.Clase
+service define ws --class org.gvnix.test.service.layer.project.services.Clase
 // Throwing an exception exception. 
 service operation --name returnString --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --exceptions java.lang.Exception
 service export operation --class org.gvnix.test.service.layer.project.services.ClaseCambiada --method returnString --resultName resultado
