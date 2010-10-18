@@ -18,20 +18,24 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
-import org.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations.MethodParameterType;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.*;
+import org.springframework.roo.classpath.details.*;
+import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.support.util.Assert;
 
 /**
  * <p>
@@ -51,9 +55,11 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
     @Reference
-    private ServiceLayerWSExportValidationService serviceLayerWSExportValidationService;
-    @Reference
     private AnnotationsService annotationsService;
+
+    private List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
+
+    private List<FieldMetadata> fieldMetadataTransientList = new ArrayList<FieldMetadata>();
 
     private static Logger logger = Logger
 	    .getLogger(ServiceLayerWSExportXmlElementMetadataProvider.class.getName());
@@ -117,6 +123,20 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
             String entityMetadataKey = EntityMetadata.createIdentifier(
                     javaType, path);
 
+            // Check if Web Service definition is correct.
+            PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
+                    .getPhysicalTypeDetails();
+
+            ClassOrInterfaceTypeDetails governorTypeDetails;
+            if (physicalTypeDetails == null
+                    || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+                // There is a problem
+                return null;
+            } else {
+                // We have reliable physical type details
+                governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
+            }
+            
             // We need to lookup the metadata we depend on
             EntityMetadata entityMetadata = (EntityMetadata) metadataService
                     .get(entityMetadataKey);
@@ -125,13 +145,97 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
             metadataDependencyRegistry.registerDependency(entityMetadataKey,
                     metadataIdentificationString);
 
+            // Fields from Entity MetaData.
+            List<FieldMetadata> entityFieldList = new ArrayList<FieldMetadata>();
+
+            if (entityMetadata != null && entityMetadata.isValid()) {
+                entityFieldList.add(entityMetadata.getIdentifierField());
+                entityFieldList.add(entityMetadata.getVersionField());
+            }
+
+            // Redefine field lists.
+            fieldMetadataElementList = new ArrayList<FieldMetadata>();
+            fieldMetadataTransientList = new ArrayList<FieldMetadata>();
+
+            // Add Entity fields
+            fieldMetadataElementList.addAll(entityFieldList);
+
+            AnnotationMetadata gvNixXmlElementAnnotationMetadata = MemberFindingUtils
+                    .getTypeAnnotation(governorTypeDetails,
+                    new JavaType(GvNIXXmlElement.class.getName()));
+
+            // Field @XmlElement and @XmlTransient annotations lists.
+            setTransientAndElementFields(governorTypeDetails,
+                    gvNixXmlElementAnnotationMetadata);
+
+            // Create metaData with field list values.
             serviceLayerWSExportXmlElementMetadata = new ServiceLayerWSExportXmlElementMetadata(
                     metadataIdentificationString, aspectName,
-                    governorPhysicalTypeMetadata, entityMetadata);
+                    governorPhysicalTypeMetadata, entityMetadata,
+                    fieldMetadataElementList, fieldMetadataTransientList);
 
         }
         
 	return serviceLayerWSExportXmlElementMetadata;
+    }
+
+    /**
+     * Retrieves all related fields annotated with @OneToMany, @ManyToOne,
+     * 
+     * @OneToOne, related to persistence and not allowed Collection fields.
+     * 
+     * @param governorTypeDetails
+     *            class to get fields to check.
+     * @param gvNixXmlElementAnnotationMetadata
+     *            to check element values.
+     * @return {@link List} of annotated {@link FieldMetadata}.
+     */
+    public void setTransientAndElementFields(
+            ClassOrInterfaceTypeDetails governorTypeDetails,
+            AnnotationMetadata gvNixXmlElementAnnotationMetadata) {
+
+        // Retrieve Array attribute element
+        ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue = (ArrayAttributeValue) gvNixXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("elementList"));
+
+        Assert
+                .isTrue(
+                        elementListArrayAttributeValue != null,
+                        "Attribute 'elementList' in '@GvNIXXmlElement' annotation must be defined.\nArray with field names of '"
+                                + governorTypeDetails.getName()
+                                        .getFullyQualifiedTypeName()
+                                + "' to be used in Web Service operation.\nIf you want to publish all fields set the attribute value: 'elementList = {\"\"}'");
+
+        List<StringAttributeValue> elementListStringValue = elementListArrayAttributeValue
+                .getValue();
+
+        // Unsupported collection.
+        List<? extends FieldMetadata> declaredFieldList = governorTypeDetails
+                .getDeclaredFields();
+
+        boolean containsValue;
+
+        // Check fields from collection.
+        for (FieldMetadata fieldMetadata : declaredFieldList) {
+
+            containsValue = true;
+
+            for (StringAttributeValue value : elementListStringValue) {
+
+                containsValue = value.getValue().contentEquals(
+                        fieldMetadata.getFieldName().getSymbolName());
+
+                if (containsValue) {
+                    fieldMetadataElementList.add(fieldMetadata);
+                    break;
+                }
+            }
+            
+            if (!containsValue) {
+                fieldMetadataTransientList.add(fieldMetadata);
+            }
+        }
+
     }
 
     /* (non-Javadoc)

@@ -21,7 +21,9 @@ package org.gvnix.service.layer.roo.addon;
 import java.util.List;
 
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations.MethodParameterType;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
@@ -119,4 +121,28 @@ public interface ServiceLayerWSExportValidationService {
      * @return targetNamespace attribute from annotation @GvNIXWebService.
      */
     public String getWebServiceDefaultNamespace(JavaType serviceClass);
+
+    /**
+     * Retrieves all fields with aren't annotated with
+     * <ul>
+     * <li>@OneToMany</li>
+     * <li>@ManyToOne</li>
+     * <li>@OneToOne</li>
+     * </ul>
+     * or are not:
+     * <ul>
+     * <li>Unsupported Collections.</li>
+     * <li>Project Objects.</li>
+     * </ul>
+     * 
+     * @param governorTypeDetails
+     *            class to get fields to check.
+     * @param gvNixxmlElementAnnotationMetadata
+     *            to check element values.
+     * @return {@link ArrayAttributeValue} with fields to be published as
+     *         '@XmlElement.'
+     */
+    public ArrayAttributeValue<StringAttributeValue> getElementFields(
+            ClassOrInterfaceTypeDetails governorTypeDetails,
+            MethodParameterType methodParameterType);
 }

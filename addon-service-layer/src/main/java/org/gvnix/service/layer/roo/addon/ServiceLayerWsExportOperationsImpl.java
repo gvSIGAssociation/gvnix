@@ -630,22 +630,21 @@ public class ServiceLayerWsExportOperationsImpl implements
             parameterAnnotationList.add(gvNixWebParamAnnotationMetadata);
             
             // @WebParam
-
             List<AnnotationAttributeValue<?>> webParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-            /*
-             * @WebParam(name = "fecha", partName = "parameters",
-             * targetNamespace =
-             * "http://services.web.project.test.gvnix.org/types", mode =
-             * Mode.IN, header = false)
-             */
             webParamAttributeValueList.add(nameWebParamAttributeValue);
 
-            StringAttributeValue targetNamespace = new StringAttributeValue(
-                    new JavaSymbolName("targetNamespace"),
-                    webServiceTargetNamespace);
+            if (!parameterType.getJavaType().isPrimitive()
+                    && !parameterType.getJavaType().isCommonCollectionType()
+                    && !parameterType.getJavaType().getFullyQualifiedTypeName()
+                            .startsWith("java.lang")) {
 
-            webParamAttributeValueList.add(targetNamespace);
+                StringAttributeValue targetNamespace = new StringAttributeValue(
+                        new JavaSymbolName("targetNamespace"),
+                        webServiceTargetNamespace);
+
+                webParamAttributeValueList.add(targetNamespace);
+            }
 
             webParamAttributeValueList.add(partNameAttributeValue);
             

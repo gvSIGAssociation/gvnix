@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations.MethodParameterType;
 import org.gvnix.service.layer.roo.addon.annotations.*;
+import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
@@ -392,7 +393,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
     }
 
     /**
-     * Check if javaType implements from 'extendedJavaType' class.
+     * Check if javaType implements from 'implmentedJavaType' class.
      * 
      * @param javaType
      *            to check if implements from type.
@@ -589,6 +590,11 @@ public class ServiceLayerWSExportValidationServiceImpl implements
 
         if (fileManager.exists(fileLocation)) {
 
+            // If it's an entity field set as not allow.
+            if (methodParameterType.equals(MethodParameterType.XMLENTITY)) {
+                return false;
+            }
+
             // MetadataID
             String targetId = PhysicalTypeIdentifier.createIdentifier(javaType,
                     Path.SRC_MAIN_JAVA);
@@ -624,6 +630,11 @@ public class ServiceLayerWSExportValidationServiceImpl implements
 
             annotationAttributeValueList.add(namespaceStringAttributeValue);
 
+            // Create attribute elementList for allowed javaType fields.
+            ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue = getElementFields(
+                    mutableTypeDetails, methodParameterType);
+            annotationAttributeValueList.add(elementListArrayAttributeValue);
+
             annotationsService.addJavaTypeAnnotation(mutableTypeDetails
                     .getName(), GvNIXXmlElement.class.getName(),
                     annotationAttributeValueList, false);
@@ -632,6 +643,9 @@ public class ServiceLayerWSExportValidationServiceImpl implements
 
         }
 
+        // TODO: Create an Aj file to declare objects that doesn't belong to
+        // project. In Roo next version fix it with Classpath loaders.
+
         logger.log(Level.INFO, "The " + methodParameterType
                 + " parameter type: '" + javaType.getFullyQualifiedTypeName()
                                 + "' in method '' from class '"
@@ -639,6 +653,99 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                                 + "' does not belong to project class definitions and its not mapped to be used in web service operation.");
         
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public ArrayAttributeValue<StringAttributeValue> getElementFields(
+            ClassOrInterfaceTypeDetails governorTypeDetails,
+            MethodParameterType methodParameterType) {
+
+        List<FieldMetadata> fieldMetadataTransientList = new ArrayList<FieldMetadata>();
+        List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
+
+        List<FieldMetadata> tmpFieldMetadataElementList = new ArrayList<FieldMetadata>();
+
+        String identifier = EntityMetadata.createIdentifier(governorTypeDetails
+                .getName(), Path.SRC_MAIN_JAVA);
+
+        // Obtain the entity metadata type and itd mutable details.
+        EntityMetadata entityMetadata = (EntityMetadata) metadataService
+                .get(identifier);
+
+        // Check if exists add id and version fields.
+        if (entityMetadata != null && entityMetadata.isValid()) {
+            fieldMetadataElementList.add(entityMetadata.getIdentifierField());
+            fieldMetadataElementList.add(entityMetadata.getVersionField());
+        }
+
+        // Retrieve the fields that are defined as OneToMany relationship.
+        List<FieldMetadata> oneToManyFieldMetadataList = MemberFindingUtils
+                .getFieldsWithAnnotation(governorTypeDetails, new JavaType(
+                        "javax.persistence.OneToMany"));
+
+        fieldMetadataTransientList.addAll(oneToManyFieldMetadataList);
+
+        // Retrieve the fields that are defined as ManyToOne relationship.
+        List<FieldMetadata> manyToOneFieldMetadataList = MemberFindingUtils
+                .getFieldsWithAnnotation(governorTypeDetails, new JavaType(
+                        "javax.persistence.ManyToOne"));
+
+        fieldMetadataTransientList.addAll(manyToOneFieldMetadataList);
+
+        // Retrieve the fields that are defined as OneToOne relationship.
+        List<FieldMetadata> oneToOneFieldMetadataList = MemberFindingUtils
+                .getFieldsWithAnnotation(governorTypeDetails, new JavaType(
+                        "javax.persistence.OneToOne"));
+
+        fieldMetadataTransientList.addAll(oneToOneFieldMetadataList);
+
+        // Unsupported collection.
+        List<? extends FieldMetadata> declaredFieldList = governorTypeDetails
+                .getDeclaredFields();
+
+        // Remove checked fields from collection.
+        fieldMetadataElementList.addAll(declaredFieldList);
+        fieldMetadataElementList.removeAll(fieldMetadataTransientList);
+        tmpFieldMetadataElementList.addAll(fieldMetadataElementList);
+
+        boolean notAllowed;
+
+        // Transient collection fields.
+        for (FieldMetadata fieldMetadata : tmpFieldMetadataElementList) {
+
+            notAllowed = isJavaTypeAllowed(fieldMetadata.getFieldType(),
+                    MethodParameterType.XMLENTITY, governorTypeDetails
+                            .getName());
+
+            // Add field that implements disallowed collection
+            // interface.
+            if (!notAllowed) {
+                fieldMetadataElementList.remove(fieldMetadata);
+            }
+        }
+
+        // Create array Attribute.
+        StringAttributeValue propOrderAttributeValue;
+        List<StringAttributeValue> propOrderList = new ArrayList<StringAttributeValue>();
+
+        for (FieldMetadata fieldMetadata : fieldMetadataElementList) {
+            propOrderAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("ignored"), fieldMetadata.getFieldName()
+                            .getSymbolName());
+
+            if (!propOrderList.contains(propOrderAttributeValue)) {
+                propOrderList.add(propOrderAttributeValue);
+            }
+        }
+
+        ArrayAttributeValue<StringAttributeValue> propOrderAttributeList = new ArrayAttributeValue<StringAttributeValue>(
+                new JavaSymbolName("elementList"), propOrderList);
+
+        return propOrderAttributeList;
+
     }
 
     /**

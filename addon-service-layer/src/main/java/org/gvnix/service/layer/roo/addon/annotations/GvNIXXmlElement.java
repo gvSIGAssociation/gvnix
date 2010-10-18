@@ -38,4 +38,6 @@ public @interface GvNIXXmlElement {
 
     String namespace() default "";
 
+    String[] elementList() default { "" };
+
 }

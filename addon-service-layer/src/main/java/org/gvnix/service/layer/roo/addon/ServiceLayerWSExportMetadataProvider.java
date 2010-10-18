@@ -768,22 +768,32 @@ public class ServiceLayerWSExportMetadataProvider extends
             targetNamespaceAttribute = (StringAttributeValue) webParamAnnotation
                     .getAttribute(new JavaSymbolName("targetNamespace"));
 
-            if (targetNamespaceAttribute != null) {
+            if (!inputParameter.getJavaType().isPrimitive()
+                    && !inputParameter.getJavaType().isCommonCollectionType()
+                    && !inputParameter.getJavaType()
+                            .getFullyQualifiedTypeName()
+                            .startsWith("java.lang")) {
 
-                Assert
-                        .isTrue(
-                                serviceLayerWSExportValidationService
-                                        .checkNamespaceFormat(targetNamespaceAttribute
-                                                .getValue()),
-                                "Attribute 'targetNamespace' in annotation @WebParam annotation to: "
-                                        + inputParameter.getJavaType()
-                                                .getFullyQualifiedTypeName()
-                                        + " in method: '"
-                                        + methodMetadata.getMethodName()
-                                        + " defined in class: '"
-                                        + governorTypeDetails.getName()
-                                                .getFullyQualifiedTypeName()
-                                        + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+                if (targetNamespaceAttribute != null) {
+
+                    Assert
+                            .isTrue(
+                                    serviceLayerWSExportValidationService
+                                            .checkNamespaceFormat(targetNamespaceAttribute
+                                                    .getValue()),
+                                    "Attribute 'targetNamespace' in annotation @WebParam annotation to: "
+                                            + inputParameter
+                                                    .getJavaType()
+                                                    .getFullyQualifiedTypeName()
+                                            + " in method: '"
+                                            + methodMetadata.getMethodName()
+                                            + " defined in class: '"
+                                            + governorTypeDetails
+                                                    .getName()
+                                                    .getFullyQualifiedTypeName()
+                                            + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+
+                }
 
             }
 

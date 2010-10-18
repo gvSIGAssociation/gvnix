@@ -57,15 +57,15 @@ public class ServiceLayerWSExportXmlElementMetadata extends
     private static final String XML_ELEMENT_TYPE = MetadataIdentificationUtils
             .create(XML_ELEMENT_STRING);
 
-    private EntityMetadata entityMetadata;
-
     private static Logger logger = Logger
             .getLogger(ServiceLayerWSExportXmlElementMetadata.class.getName());
 
     public ServiceLayerWSExportXmlElementMetadata(String identifier,
             JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            EntityMetadata entityMetadata) {
+            EntityMetadata entityMetadata,
+            List<FieldMetadata> fieldMetadataElementList,
+            List<FieldMetadata> fieldmetadataTransientList) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
@@ -81,34 +81,6 @@ public class ServiceLayerWSExportXmlElementMetadata extends
                         GvNIXXmlElement.class.getName()));
 
         if (gvNIXXmlElementAnnotationMetadata != null) {
-
-            // Fields from Entity MetaData.
-            List<FieldMetadata> entityFieldList = new ArrayList<FieldMetadata>();
-
-            if (entityMetadata != null && entityMetadata.isValid()) {
-                this.entityMetadata = entityMetadata;
-                entityFieldList.add(entityMetadata.getIdentifierField());
-                entityFieldList.add(entityMetadata.getVersionField());
-            }
-
-            // Field list.
-            List<FieldMetadata> fieldList = MemberFindingUtils
-                    .getDeclaredFields(governorTypeDetails);
-
-            // Field @XmlTransient annotations.
-            List<FieldMetadata> fieldmetadataTransientList = getPersistenceRelationshipFields();
-
-            // Field @XmlElement annotations.
-            List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
-
-            // Add Entity fields
-            fieldMetadataElementList.addAll(entityFieldList);
-
-            for (FieldMetadata fieldMetadata : fieldList) {
-                if (!fieldmetadataTransientList.contains(fieldMetadata)) {
-                    fieldMetadataElementList.add(fieldMetadata);
-                }
-            }
 
             // Type annotations.
             List<AnnotationMetadata> annotationTypeList = getXmlElementTypeAnnotation(
@@ -211,93 +183,6 @@ public class ServiceLayerWSExportXmlElementMetadata extends
         }
 
         return annotationXmlElementFieldList;
-    }
-
-    /**
-     * Retrieves all related fields annotated with @OneToMany, @ManyToOne,
-     * 
-     * @OneToOne, related to persistence.
-     * 
-     * @return {@link List} of annotated {@link FieldMetadata}.
-     */
-    public List<FieldMetadata> getPersistenceRelationshipFields() {
-
-	List<FieldMetadata> relationFieldList = new ArrayList<FieldMetadata>();
-
-	// Retrieve the fields that are defined as OneToMany relationship.
-	List<FieldMetadata> oneToManyFieldMetadataList = MemberFindingUtils
-		.getFieldsWithAnnotation(governorTypeDetails, new JavaType(
-			"javax.persistence.OneToMany"));
-
-        relationFieldList.addAll(oneToManyFieldMetadataList);
-	
-	// Retrieve the fields that are defined as ManyToOne relationship.
-	List<FieldMetadata> manyToOneFieldMetadataList = MemberFindingUtils
-		.getFieldsWithAnnotation(governorTypeDetails, new JavaType(
-			"javax.persistence.ManyToOne"));
-
-        relationFieldList.addAll(manyToOneFieldMetadataList);
-
-	// Retrieve the fields that are defined as OneToOne relationship.
-	List<FieldMetadata> oneToOneFieldMetadataList = MemberFindingUtils
-		.getFieldsWithAnnotation(governorTypeDetails, new JavaType(
-			"javax.persistence.OneToOne"));
-	
-        relationFieldList.addAll(oneToOneFieldMetadataList);
-
-        List<? extends FieldMetadata> declaredFieldList = governorTypeDetails
-                .getDeclaredFields();
-
-        boolean notAllowed;
-
-        // Transient collection fields.
-        for (FieldMetadata fieldMetadata : declaredFieldList) {
-
-            for (String notAllowedInterfaceCollection : notAllowedIntefaceCollectionTypes) {
-
-                try {
-
-                    notAllowed = implementsJavaType(fieldMetadata
-                            .getFieldType(), notAllowedInterfaceCollection);
-
-                    // Add field that implements disallowed collection
-                    // interface.
-                    if (notAllowed
-                            && !relationFieldList.contains(fieldMetadata)) {
-                        logger
-                                .warning("The field '"
-                                        + fieldMetadata.getFieldType()
-                                                .getFullyQualifiedTypeName()
-                                        + "' in class '"
-                                        + governorTypeDetails.getName()
-                                                .getFullyQualifiedTypeName()
-                                        + "' is annotated with @XmlTransient because is a collection that does not satisfy web services interoperatibily rules.");
-                        relationFieldList.add(fieldMetadata);
-
-                    }
-
-                } catch (ClassNotFoundException e) {
-
-                    if (!relationFieldList.contains(fieldMetadata)) {
-                        logger
-                                .warning("The field '"
-                                        + fieldMetadata.getFieldType()
-                                                .getFullyQualifiedTypeName()
-                                        + "' in class '"
-                                        + governorTypeDetails.getName()
-                                                .getFullyQualifiedTypeName()
-                                        + "' is annotated with @XmlTransient because doesn't exist while checking if implement an unallowed collection in for web services interoperatibily rules.");
-
-                        relationFieldList.add(fieldMetadata);
-                    }
-                }
-
-            }
-
-        }
-
-        return relationFieldList;
-
     }
 
     /**
@@ -408,51 +293,6 @@ public class ServiceLayerWSExportXmlElementMetadata extends
                 .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
 
         return result == null;
-    }
-
-    /**
-     * Check if javaType implements from 'extendedJavaType' class.
-     * 
-     * @param javaType
-     *            to check if implements from type.
-     * @param implmentedJavaType
-     *            Java type to check.
-     * @return true if class implements from implementedJavaType or false if is
-     *         not implementing.
-     * @throws ClassNotFoundException
-     *             when the class doesn't exist.
-     */
-    private boolean implementsJavaType(JavaType javaType,
-            String implmentedJavaType) throws ClassNotFoundException {
-
-        if (javaType.getFullyQualifiedTypeName().contentEquals(
-                implmentedJavaType)) {
-            return true;
-        }
-        Class<?> classToCheck = Class.forName(javaType
-                .getFullyQualifiedTypeName());
-
-        Class<?>[] interfaceArray = classToCheck.getInterfaces();
-
-        if (interfaceArray.length == 0) {
-            return false;
-        } else {
-
-            Class<?> interfaceToCheck;
-            boolean implementsJavaType = false;
-            for (int i = 0; i < interfaceArray.length; i++) {
-                interfaceToCheck = interfaceArray[i];
-
-                implementsJavaType = implementsJavaType(new JavaType(
-                        interfaceToCheck.getName()), implmentedJavaType);
-
-                if (implementsJavaType) {
-                    return implementsJavaType;
-                }
-            }
-            return implementsJavaType;
-        }
-
     }
 
     public static String getMetadataIdentiferType() {
