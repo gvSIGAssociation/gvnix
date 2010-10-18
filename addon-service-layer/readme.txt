@@ -60,4 +60,11 @@ TBC
 How to install
 ===============
 
-TBC
+Important:
+
+You must update **JavaParserMethodMetadata** class in ``gvnix/trunk/code/roo/classpath-javaparser`` ROO Add-on with patch **issue_3879_JavaParserMethodMetadata.patch** in::
+
+http://projects.disid.com/issues/3879
+
+And then, run ``mvn clean install`` in roo sources directory to use this update.
+
