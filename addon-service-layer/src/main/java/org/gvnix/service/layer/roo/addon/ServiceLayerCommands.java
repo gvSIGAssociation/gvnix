@@ -145,7 +145,7 @@ public class ServiceLayerCommands implements CommandMarker {
 
     }
 
-    @CliAvailabilityIndicator("service export operation")
+    @CliAvailabilityIndicator( { "service export operation, service list operation" })
     public boolean isServiceExportOperationAvailable() {
 
 	return serviceLayerWsExportOperations.isProjectAvailable();
@@ -223,6 +223,14 @@ public class ServiceLayerCommands implements CommandMarker {
 		methodName, operationName, resultName, resultNamespace,
 		responseWrapperName, responseWrapperNamespace,
 		requestWrapperName, requestWrapperNamespace);
+    }
+
+    @CliCommand(value = "service list operation", help = "Shows available methods to export as web service operation in selected class.")
+    public String serviceExportOperationList(
+            @CliOption(key = "class", mandatory = true, help = "Name of the service class to list methods available to export as web service operations.") JavaType serviceClass) {
+
+        return serviceLayerWsExportOperations
+                .getAvailableServiceOperationsToExport(serviceClass);
     }
 
     @CliAvailabilityIndicator("service import ws")

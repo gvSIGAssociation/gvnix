@@ -28,6 +28,7 @@ import org.gvnix.service.layer.roo.addon.annotations.*;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.*;
 import org.springframework.roo.process.manager.FileManager;
@@ -66,6 +67,8 @@ public class ServiceLayerWsExportOperationsImpl implements
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     @Reference
     private ServiceLayerWSExportValidationService serviceLayerWSExportValidationService;
+    @Reference
+    private ClasspathOperations classpathOperations;
 
     /**
      * {@inheritDoc}
@@ -516,13 +519,13 @@ public class ServiceLayerWsExportOperationsImpl implements
         String id = physicalTypeMetadataProvider.findIdentifier(serviceClass);
 
         Assert.notNull(id, "Cannot locate source for '"
-                + serviceClass.getFullyQualifiedTypeName() + "'");
+                + serviceClass.getFullyQualifiedTypeName() + "'.");
 
         // Go and get the service layer ws metadata to export selected method.
         JavaType javaType = PhysicalTypeIdentifier.getJavaType(id);
         Path path = PhysicalTypeIdentifier.getPath(id);
         String entityMid = ServiceLayerWSExportMetadata.createIdentifier(
-                javaType, path);
+                serviceClass, path);
 
         // Get the service layer ws metadata.
         ServiceLayerWSExportMetadata serviceLayerWSExportMetadata = (ServiceLayerWSExportMetadata) metadataService
@@ -668,4 +671,91 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         return annotatedWebParameterList;
     }
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     *'serviceClass' must be annotated with @GvNIXWebService.
+     * </p>
+     * <p>
+     * Retrieves method names which aren't annotated with @GvNIXWebMethod.
+     * </p>
+     */
+    public String getAvailableServiceOperationsToExport(JavaType serviceClass) {
+
+        StringBuilder methodListStringBuilder = new StringBuilder();
+
+        if (!isWebServiceClass(serviceClass)) {
+
+            // If class is not defined as web service.
+            methodListStringBuilder
+                    .append("Class '"
+                            + serviceClass.getFullyQualifiedTypeName()
+                            + "' is not defined as Web Service.\nUse the command 'service define ws --class "
+                            + serviceClass.getFullyQualifiedTypeName()
+                            + "' to export as web service.");
+
+            return methodListStringBuilder.toString();
+        }
+
+        String id = physicalTypeMetadataProvider.findIdentifier(serviceClass);
+
+        Assert.notNull(id, "Cannot locate source for '"
+                + serviceClass.getFullyQualifiedTypeName() + "'.");
+
+        ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
+                .getClassOrInterface(serviceClass);
+
+        // Checks if it's mutable
+        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+                tmpServiceDetails, "Can't modify "
+                        + tmpServiceDetails.getName());
+
+        MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
+
+        List<? extends MethodMetadata> methodList = serviceDetails
+                .getDeclaredMethods();
+
+        // If there aren't any methods in class.
+        if (methodList == null || methodList.isEmpty()) {
+
+            methodListStringBuilder
+                    .append("Class '"
+                            + serviceClass.getFullyQualifiedTypeName()
+                    + "' has not defined any method.");
+
+            return methodListStringBuilder.toString();
+        }
+
+        boolean isAnnotationIntroduced;
+
+        for (MethodMetadata methodMetadata : methodList) {
+
+            isAnnotationIntroduced = javaParserService
+                    .isAnnotationIntroducedInMethod(GvNIXWebMethod.class
+                            .getName(), methodMetadata);
+
+            if (!isAnnotationIntroduced) {
+                if (!StringUtils.hasText(methodListStringBuilder.toString())) {
+                    methodListStringBuilder
+                            .append("Method list to export as web service operation in '"
+                                    + serviceClass.getFullyQualifiedTypeName()
+                                    + "':\n");
+                }
+                methodListStringBuilder.append(methodMetadata.getMethodName()
+                        .getSymbolName());
+            }
+
+        }
+
+        // If there aren't defined any methods available to export.
+        if (!StringUtils.hasText(methodListStringBuilder.toString())) {
+            methodListStringBuilder.append("Class '"
+                    + serviceClass.getFullyQualifiedTypeName()
+                            + "' hasn't got any available method to export as web service operations.");
+        }
+
+        return methodListStringBuilder.toString();
+    }
+
 }

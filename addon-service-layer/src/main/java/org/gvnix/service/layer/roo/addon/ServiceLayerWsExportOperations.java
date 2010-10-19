@@ -187,4 +187,14 @@ public interface ServiceLayerWsExportOperations {
     public List<AnnotationAttributeValue<?>> exportServiceAnnotationAttributes(
             JavaType serviceClass, String serviceName, String portTypeName,
             String targetNamespace, String addressName);
+
+    /**
+     * List methods available to export as web service operations.
+     * 
+     * @param serviceClass
+     *            class to search available methods to export as web service
+     *            operations.
+     */
+    public String getAvailableServiceOperationsToExport(JavaType serviceClass);
+
 }
