@@ -742,8 +742,10 @@ public class ServiceLayerWsExportOperationsImpl implements
                                     + serviceClass.getFullyQualifiedTypeName()
                                     + "':\n");
                 }
-                methodListStringBuilder.append(methodMetadata.getMethodName()
-                        .getSymbolName());
+                methodListStringBuilder
+                        .append("\t* "
+                                + methodMetadata.getMethodName()
+                                        .getSymbolName() + "\n");
             }
 
         }

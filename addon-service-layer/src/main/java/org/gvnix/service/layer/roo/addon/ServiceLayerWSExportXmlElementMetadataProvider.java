@@ -57,6 +57,8 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
     @Reference
     private AnnotationsService annotationsService;
 
+    private EntityMetadata entityMetadata;
+
     private List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
 
     private List<FieldMetadata> fieldMetadataTransientList = new ArrayList<FieldMetadata>();
@@ -138,27 +140,16 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
             }
             
             // We need to lookup the metadata we depend on
-            EntityMetadata entityMetadata = (EntityMetadata) metadataService
+            entityMetadata = (EntityMetadata) metadataService
                     .get(entityMetadataKey);
 
             // We need to be informed if our dependent metadata changes
             metadataDependencyRegistry.registerDependency(entityMetadataKey,
                     metadataIdentificationString);
 
-            // Fields from Entity MetaData.
-            List<FieldMetadata> entityFieldList = new ArrayList<FieldMetadata>();
-
-            if (entityMetadata != null && entityMetadata.isValid()) {
-                entityFieldList.add(entityMetadata.getIdentifierField());
-                entityFieldList.add(entityMetadata.getVersionField());
-            }
-
             // Redefine field lists.
             fieldMetadataElementList = new ArrayList<FieldMetadata>();
             fieldMetadataTransientList = new ArrayList<FieldMetadata>();
-
-            // Add Entity fields
-            fieldMetadataElementList.addAll(entityFieldList);
 
             AnnotationMetadata gvNixXmlElementAnnotationMetadata = MemberFindingUtils
                     .getTypeAnnotation(governorTypeDetails,
@@ -209,32 +200,45 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
         List<StringAttributeValue> elementListStringValue = elementListArrayAttributeValue
                 .getValue();
 
-        // Unsupported collection.
-        List<? extends FieldMetadata> declaredFieldList = governorTypeDetails
-                .getDeclaredFields();
-
         boolean containsValue;
 
-        // Check fields from collection.
-        for (FieldMetadata fieldMetadata : declaredFieldList) {
+        List<FieldMetadata> declaredFieldList = new ArrayList<FieldMetadata>();
+        List<FieldMetadata> tmpDeclaredFieldList = new ArrayList<FieldMetadata>();
 
+        // Fields from Entity MetaData.
+        if (entityMetadata != null && entityMetadata.isValid()) {
+            declaredFieldList.add(entityMetadata.getIdentifierField());
+            declaredFieldList.add(entityMetadata.getVersionField());
+        }
+
+        for (FieldMetadata fieldMetadata : governorTypeDetails
+                .getDeclaredFields()) {
+
+            if (!declaredFieldList.contains(fieldMetadata)) {
+                declaredFieldList.add(fieldMetadata);
+            }
+        }
+
+        tmpDeclaredFieldList.addAll(declaredFieldList);
+
+        // Check fields from collection.
+        for (StringAttributeValue value : elementListStringValue) {
             containsValue = true;
 
-            for (StringAttributeValue value : elementListStringValue) {
+            for (FieldMetadata fieldMetadata : tmpDeclaredFieldList) {
 
                 containsValue = value.getValue().contentEquals(
                         fieldMetadata.getFieldName().getSymbolName());
 
                 if (containsValue) {
                     fieldMetadataElementList.add(fieldMetadata);
+                    declaredFieldList.remove(fieldMetadata);
                     break;
                 }
             }
-            
-            if (!containsValue) {
-                fieldMetadataTransientList.add(fieldMetadata);
-            }
         }
+
+        fieldMetadataTransientList.addAll(declaredFieldList);
 
     }
 

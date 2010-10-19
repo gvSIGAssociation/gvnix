@@ -707,7 +707,12 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                 .getDeclaredFields();
 
         // Remove checked fields from collection.
-        fieldMetadataElementList.addAll(declaredFieldList);
+        for (FieldMetadata declaredField : declaredFieldList) {
+            if (!fieldMetadataElementList.contains(declaredField)) {
+                fieldMetadataElementList.add(declaredField);
+            }
+        }
+
         fieldMetadataElementList.removeAll(fieldMetadataTransientList);
         tmpFieldMetadataElementList.addAll(fieldMetadataElementList);
 
