@@ -114,7 +114,7 @@ public class ServiceLayerWsConfigServiceImplTest {
 	Dependency dependency;
 
 	List<Element> dependencyList = serviceLayerWsConfigServiceImpl
-		.getCxfRequiredDependencies(CommunicationSense.EXPORT);
+		.getRequiredDependencies(CommunicationSense.EXPORT);
 
 	for (Element element : dependencyList) {
 

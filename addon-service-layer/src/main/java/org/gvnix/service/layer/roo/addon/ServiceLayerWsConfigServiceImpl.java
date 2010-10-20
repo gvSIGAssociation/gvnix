@@ -234,7 +234,7 @@ public class ServiceLayerWsConfigServiceImpl implements
         // Dependencies elements are defined as:
         // <dependency org="org.apache.cxf" name="cxf-rt-bindings-soap"
         // rev="2.2.6" />
-        List<Element> cxfDependenciesList = getCxfRequiredDependencies(type);
+        List<Element> cxfDependenciesList = getRequiredDependencies(type);
 
         Dependency cxfDependency;
 
@@ -280,14 +280,14 @@ public class ServiceLayerWsConfigServiceImpl implements
      * Get Addon dependencies list to install.
      * 
      * <p>
-     * Get addon dependencies defined in dependencies-export.xml
+     * Get addon dependencies defined in dependencies-XXXX.xml
      * </p>
      * 
      * @param type
      *            Communication type
      * @return List of addon dependencies as xml elements
      */
-    protected List<Element> getCxfRequiredDependencies(CommunicationSense type) {
+    protected List<Element> getRequiredDependencies(CommunicationSense type) {
 	
 	// TODO Unify distinct dependencies files in only one
 
@@ -324,18 +324,37 @@ public class ServiceLayerWsConfigServiceImpl implements
         if (isDependenciesInstalled(type)) {
 
             return;
-        }
+	}
 
-        // Add project properties as cxf version
-        // TODO Check cxf version property before ?
-        List<Element> projectProperties = XmlUtils.findElements(
-                "/configuration/gvnix/properties/*", XmlUtils.getConfiguration(
-                        this.getClass(), "properties.xml"));
+	// Add project properties, as versions
+	List<Element> projectProperties = new ArrayList<Element>();
+	
+	switch (type) {
+	
+	case IMPORT:
+	case EXPORT:
+
+	    projectProperties = XmlUtils
+		    .findElements("/configuration/gvnix/properties/*",
+			    XmlUtils.getConfiguration(this.getClass(),
+				    "properties.xml"));
+	    break;
+
+	case IMPORT_RPC_ENCODED:
+
+	    // TODO Check cxf version property before ?
+	    projectProperties = XmlUtils.findElements(
+		    "/configuration/gvnix/properties/*", XmlUtils
+			    .getConfiguration(this.getClass(),
+				    "properties-axis.xml"));
+	    break;
+	}
+
         for (Element property : projectProperties) {
             projectOperations.addProperty(new Property(property));
         }
 
-        List<Element> cxfDependencies = getCxfRequiredDependencies(type);
+        List<Element> cxfDependencies = getRequiredDependencies(type);
         for (Element dependency : cxfDependencies) {
             projectOperations.dependencyUpdate(new Dependency(dependency));
         }
@@ -1061,90 +1080,192 @@ public class ServiceLayerWsConfigServiceImpl implements
      * {@inheritDoc}
      * 
      * <p>
-     * Adds a wsdl location to the codegen plugin configuration. If code
+     * Adds a wsdl location to the plugin configuration. If code
      * generation plugin configuration not exists, it will be created.
      * </p>
      */
-    public void addImportLocation(String wsdlLocation) {
+    public void addImportLocation(String wsdlLocation, CommunicationSense type) {
 
-        // Get plugin template
-        Element pluginElement = XmlUtils.findFirstElement(
-                "/codegen-plugin/plugin", XmlUtils.getConfiguration(this
-                        .getClass(), "dependencies-import-codegen-plugin.xml"));
+	switch (type) {
 
-        // Add plugin
-        projectOperations.buildPluginUpdate(new Plugin(pluginElement));
+	case IMPORT:
 
-        // Get pom.xml
-        String pomPath = getPomFilePath();
-        Assert.notNull(pomPath, "pom.xml configuration file not found.");
+	    addImportLocationDocument(wsdlLocation);
+	    break;
 
-        // Get a mutable pom.xml reference to modify it
-        MutableFile pomMutableFile = null;
-        Document pom;
-        try {
-            pomMutableFile = fileManager.updateFile(pomPath);
-            pom = XmlUtils.getDocumentBuilder().parse(
-                    pomMutableFile.getInputStream());
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+	case IMPORT_RPC_ENCODED:
 
-        Element root = pom.getDocumentElement();
+	    addImportLocationRpc(wsdlLocation);
+	    break;
+	}
+    }
 
-        // Get plugin element
-        Element codegenWsPlugin = XmlUtils
-                .findFirstElement(
-                        "/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']",
-                        root);
+    /**
+     * Add a wsdl location to import of document type.
+     * 
+     * <p>
+     * Adds a wsdl location to the codegen plugin configuration. If code
+     * generation plugin configuration not exists, it will be created.
+     * </p>
+     * 
+     * @param wsdlLocation
+     *            WSDL file location
+     */
+    private void addImportLocationDocument(String wsdlLocation) {
 
-        // If plugin element not exists, message error
-        Assert
-                .notNull(codegenWsPlugin,
-                        "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+	// Get plugin template
+	Element plugin = XmlUtils.findFirstElement("/codegen-plugin/plugin",
+		XmlUtils.getConfiguration(this.getClass(),
+			"dependencies-import-codegen-plugin.xml"));
 
-        // Access executions > execution > configuration > wsdlOptions element.
-        // Configuration and wsdlOptions are created if not exists.
-        Element executions = XmlUtils.findFirstElementByName("executions",
-                codegenWsPlugin);
-        Element execution = XmlUtils.findFirstElementByName("execution",
-                executions);
-        Element configuration = XmlUtils.findFirstElementByName(
-                "configuration", execution);
-        if (configuration == null) {
+	// Add plugin
+	projectOperations.buildPluginUpdate(new Plugin(plugin));
 
-            configuration = pom.createElement("configuration");
-            execution.appendChild(configuration);
-        }
-        Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
-                configuration);
-        if (wsdlOptions == null) {
+	// Get pom.xml
+	String pomPath = getPomFilePath();
+	Assert.notNull(pomPath, "pom.xml configuration file not found.");
 
-            wsdlOptions = pom.createElement("wsdlOptions");
-            configuration.appendChild(wsdlOptions);
-        }
+	// Get a mutable pom.xml reference to modify it
+	MutableFile pomMutableFile = null;
+	Document pom;
+	try {
+	    pomMutableFile = fileManager.updateFile(pomPath);
+	    pom = XmlUtils.getDocumentBuilder().parse(
+		    pomMutableFile.getInputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
 
-        // Create new wsdl element and append it to the XML tree
-        Element wsdlOption = pom.createElement("wsdlOption");
-        Element wsdl = pom.createElement("wsdl");
-        wsdl.setTextContent(wsdlLocation);
-        wsdlOption.appendChild(wsdl);
-        wsdlOptions.appendChild(wsdlOption);
+	Element root = pom.getDocumentElement();
 
-        // Write new XML to disk
-        XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+	// Get plugin element
+	Element codegenWsPlugin = XmlUtils
+		.findFirstElement(
+			"/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']",
+			root);
+
+	// If plugin element not exists, message error
+	Assert
+		.notNull(codegenWsPlugin,
+			"Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+
+	// Access executions > execution > configuration > wsdlOptions element.
+	// Configuration and wsdlOptions are created if not exists.
+	Element executions = XmlUtils.findFirstElementByName("executions",
+		codegenWsPlugin);
+	Element execution = XmlUtils.findFirstElementByName("execution",
+		executions);
+	Element configuration = XmlUtils.findFirstElementByName(
+		"configuration", execution);
+	if (configuration == null) {
+
+	    configuration = pom.createElement("configuration");
+	    execution.appendChild(configuration);
+	}
+	Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
+		configuration);
+	if (wsdlOptions == null) {
+
+	    wsdlOptions = pom.createElement("wsdlOptions");
+	    configuration.appendChild(wsdlOptions);
+	}
+
+	// Create new wsdl element and append it to the XML tree
+	Element wsdlOption = pom.createElement("wsdlOption");
+	Element wsdl = pom.createElement("wsdl");
+	wsdl.setTextContent(wsdlLocation);
+	wsdlOption.appendChild(wsdl);
+	wsdlOptions.appendChild(wsdlOption);
+
+	// Write new XML to disk
+	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+    }
+
+    /**
+     * Add a wsdl location to import of document type.
+     * 
+     * <p>
+     * Adds a wsdl location to the axistools plugin configuration. If code
+     * generation plugin configuration not exists, it will be created.
+     * </p>
+     * 
+     * @param wsdlLocation
+     *            WSDL file location
+     */
+    private void addImportLocationRpc(String wsdlLocation) {
+
+	// Get plugin template
+	Element plugin = XmlUtils.findFirstElement("/axistools-plugin/plugin",
+		XmlUtils.getConfiguration(this.getClass(),
+			"dependencies-import-axistools-plugin.xml"));
+
+	// Add plugin
+	projectOperations.buildPluginUpdate(new Plugin(plugin));
+
+	// Get pom.xml
+	String pomPath = getPomFilePath();
+	Assert.notNull(pomPath, "pom.xml configuration file not found.");
+
+	// Get a mutable pom.xml reference to modify it
+	MutableFile pomMutableFile = null;
+	Document pom;
+	try {
+	    pomMutableFile = fileManager.updateFile(pomPath);
+	    pom = XmlUtils.getDocumentBuilder().parse(
+		    pomMutableFile.getInputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
+	}
+
+	Element root = pom.getDocumentElement();
+
+	// Get plugin element
+	Element axistoolsPlugin = XmlUtils
+		.findFirstElement(
+			"/project/build/plugins/plugin[groupId='org.codehaus.mojo' and artifactId='axistools-maven-plugin']",
+			root);
+
+	// If plugin element not exists, message error
+	Assert
+		.notNull(axistoolsPlugin,
+			"Axistools plugin is not defined in the pom.xml, relaunch again this command.");
+
+	// Access configuration > urls element.
+	// Configuration and urls are created if not exists.
+	Element configuration = XmlUtils.findFirstElementByName(
+		"configuration", axistoolsPlugin);
+	if (configuration == null) {
+
+	    configuration = pom.createElement("configuration");
+	    axistoolsPlugin.appendChild(configuration);
+	}
+	Element urls = XmlUtils.findFirstElementByName("urls", configuration);
+	if (urls == null) {
+
+	    urls = pom.createElement("urls");
+	    configuration.appendChild(urls);
+	}
+
+	// Create new url element and append it to the XML tree
+	Element url = pom.createElement("url");
+	url.setTextContent(wsdlLocation);
+	urls.appendChild(url);
+
+	// Write new XML to disk
+	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void importService(JavaType serviceClass, String wsdlLocation) {
+    public void importService(JavaType serviceClass, String wsdlLocation,
+	    CommunicationSense type) {
 
 	// Install import WS configuration requirements, if not installed 
-	install(CommunicationSense.IMPORT);
+	install(type);
 
 	// Add wsdl location to pom.xml
-	addImportLocation(wsdlLocation);
+	addImportLocation(wsdlLocation, type);
 	
 	// Add GvNixAnnotations to the project.
 	annotationsService.addGvNIXAnnotationsDependency();

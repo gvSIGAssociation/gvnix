@@ -1,5 +1,8 @@
+
 project --topLevelPackage org.gvnix.test.service.layer.project --java 5 --projectName service-layer-test
+
 persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
+
 entity --class ~.domain.Person --testAutomatically
 field string --fieldName name --notNull
 field number --fieldName edad --type java.lang.Integer 
@@ -13,36 +16,53 @@ entity --class org.gvnix.test.service.layer.project.domain.Car --testAutomatical
 field string --fieldName name --notNull
 field reference --fieldName person --type org.gvnix.test.service.layer.project.domain.Person
 focus --class ~.domain.Person
-field set --fieldName coches --element org.gvnix.test.service.layer.project.domain.Car --cardinality ONE_TO_MANY --mappedBy person 
+field set --fieldName coches --element org.gvnix.test.service.layer.project.domain.Car --cardinality ONE_TO_MANY --mappedBy person
+
 dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1
 dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3
+
 controller all --package org.gvnix.test.service.layer.project.web
+
 // Create Service Class.
 service class --class org.gvnix.test.service.layer.project.services.Clase
+
 // Create Service Operations.
 // No return type.
 service operation --name checkString --service org.gvnix.test.service.layer.project.services.Clase
+
 // Export Class as web service.
 service define ws --class org.gvnix.test.service.layer.project.services.Clase
+
 // Throwing an exception exception. 
 service operation --name returnString --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --exceptions java.lang.Exception
 service export operation --class org.gvnix.test.service.layer.project.services.ClaseCambiada --method returnString --resultName resultado
+
 // Throwing an incorrect exception. Can't be publish as service operation.
 service operation --name wrongException --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --exceptions org.test.FakeClass
-service export operation --class org.gvnix.test.service.layer.project.services.Clase --method wrongException 
+service export operation --class org.gvnix.test.service.layer.project.services.Clase --method wrongException
+ 
 // Operation with correct input parameters
 service operation --name inputParameters --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --paramTypes java.lang.Integer,java.lang.String --paramNames number,name
 service export operation --class org.gvnix.test.service.layer.project.services.Clase --method inputParameters
+
 // Operation with incorrect input parameters can¡t be exported as web service operation.
 service operation --name incorrectInputParameters --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --paramTypes java.util.Map,java.lang.String --paramNames map,name
 service export operation --class org.gvnix.test.service.layer.project.services.Clase --method incorrectInputParameters
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy1 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy2 --wsdl http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy3 --wsdl http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy4 --wsdl http://ws.cdyne.com/WeatherWS/Weather.asmx?wsdl
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy5 --wsdl http://soatest.parasoft.com/calculator.wsdl
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy6 --wsdl http://www.ripedevelopment.com/webservices/LocalTime.asmx?WSDL
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy7 --wsdl http://labs.safelayer.com/demo/wsdl/DigitalEncryption.wsdl
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy8 --wsdl http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL
+
+// Import Document Style web services 
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy01 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy02 --wsdl http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy03 --wsdl http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy04 --wsdl http://ws.cdyne.com/WeatherWS/Weather.asmx?wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy05 --wsdl http://soatest.parasoft.com/calculator.wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy06 --wsdl http://www.ripedevelopment.com/webservices/LocalTime.asmx?WSDL
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy07 --wsdl http://labs.safelayer.com/demo/wsdl/DigitalEncryption.wsdl
+
+// Import RPC Style web services
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy08 --wsdl http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy09 --wsdl http://soamoa.org:9292/artistRegistry?WSDL
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy10 --wsdl http://www.aswinanand.com/sendsms.php?wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy11 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
+
 perform eclipse
 perform assembly

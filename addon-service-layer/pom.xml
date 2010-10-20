@@ -178,6 +178,7 @@
         <filtering>false</filtering>
         <excludes>
           <exclude>**/roo/addon/properties.xml</exclude>
+          <exclude>**/roo/addon/properties-axis.xml</exclude>
         </excludes>
       </resource>
       <resource>
@@ -185,6 +186,7 @@
         <filtering>true</filtering>
         <includes>
           <include>**/roo/addon/properties.xml</include>
+          <include>**/roo/addon/properties-axis.xml</include>
         </includes>
       </resource>
     </resources>

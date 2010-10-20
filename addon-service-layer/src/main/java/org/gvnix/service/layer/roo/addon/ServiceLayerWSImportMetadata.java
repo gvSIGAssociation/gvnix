@@ -111,24 +111,23 @@ public class ServiceLayerWSImportMetadata extends
 			wsdlLocation);
 		Element root = wsdl.getDocumentElement();
 		Assert.notNull(root, "No valid document format");
+		
+		// The wsdl is RPC or Document style 
+		if (WsdlParserUtils.isRpcEncoded(root)) {
 
-		// Generate source code client clases with CXF
-		if (generateSources() == 0) {
+		    // Generate source code client clases with CXF
+		    generateSources();
+		    
+		    // TODO Create Axis Aspect Methods
+		}
+		else {
+		    
+		    // Generate source code client clases with Axis
+		    generateSources();
 
 		    // Create Aspect methods related to this wsdl location
 		    createAspectMethods(root);
 		}
-		else {
-		    
-		    // The wsdl is RPC/encoded
-		    // TODO Use Axis library to be compatible with Rpc/encoded
-		    Assert.state(false,
-			    "TODO Currently rpc/encoded wsdls not supported");
-		}
-
-		// TODO Add wsdl location to pom.xml here instead on command
-		// serviceLayerWsConfigService.addImportLocation(wsdlLocation);
-
 	    } catch (SAXException e) {
 
 		Assert.state(false,

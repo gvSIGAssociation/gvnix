@@ -98,19 +98,24 @@ public interface ServiceLayerWsConfigService {
      * Add a wsdl location to import.
      * 
      * @param wsdlLocation
-     *            WSDL file location.
+     *            WSDL file location
+     * @param type
+     *            Communication sense type
      */
-    public void addImportLocation(String wsdlLocation);
+    public void addImportLocation(String wsdlLocation, CommunicationSense type);
 
     /**
      * Imports a Web Service to class.
      * 
      * @param className
-     *            class to import.
+     *            class to import
      * @param wsdlLocation
-     *            contract wsdl url to import.
+     *            contract wsdl url to import
+     * @param type
+     *            Communication sense type
      */
-    public void importService(JavaType className, String wsdlLocation);
+    public void importService(JavaType className, String wsdlLocation,
+	    CommunicationSense type);
 
     /**
      * Create Jax-WS plugin configuration in pom.xml.

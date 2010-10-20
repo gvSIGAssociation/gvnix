@@ -18,7 +18,10 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.io.IOException;
+
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebServiceProxy;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
@@ -33,6 +36,11 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.XmlUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
  * <p>
@@ -136,15 +144,43 @@ public class ServiceLayerWSImportMetadataProvider extends
 	    // Wsdl location
 	    StringAttributeValue url = (StringAttributeValue) annotation
 		    .getAttribute(new JavaSymbolName("wsdlLocation"));
+	    
+	    try {
+		
+		// Parse the wsdl location to a DOM document
+		Document wsdl = XmlUtils.getDocumentBuilder().parse(
+			url.getValue());
+		Element root = wsdl.getDocumentElement();
+		Assert.notNull(root, "No valid document format");
 
-	    // Generate service infraestructure to import the service
-	    serviceLayerWsConfigService.importService(governorTypeDetails
-		    .getName(), url.getValue());
+		if (WsdlParserUtils.isRpcEncoded(root)) {
+		    
+		    // Generate service infraestructure to import the service
+		    serviceLayerWsConfigService.importService(
+			    governorTypeDetails.getName(), url.getValue(), CommunicationSense.IMPORT_RPC_ENCODED);
+		}
+		else {
 
-	    // Create metadata
-	    metadata = new ServiceLayerWSImportMetadata(
-		    metadataIdentificationString, aspectName,
-		    governorPhysicalTypeMetadata);
+		    // Generate service infraestructure to import the service
+		    serviceLayerWsConfigService.importService(
+			    governorTypeDetails.getName(), url.getValue(), CommunicationSense.IMPORT);
+		}
+
+		// Create metadata
+		metadata = new ServiceLayerWSImportMetadata(
+			metadataIdentificationString, aspectName,
+			governorPhysicalTypeMetadata);
+	    } catch (SAXException e) {
+
+		Assert.state(false,
+			"The format of the web service to import has errors");
+
+	    } 
+	    catch (IOException e) {
+
+		Assert.state(false,
+			"There is no connection to the web service to import");
+	    }
 	}
 
 	return metadata;
