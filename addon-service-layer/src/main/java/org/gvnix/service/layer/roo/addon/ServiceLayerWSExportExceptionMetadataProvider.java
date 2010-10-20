@@ -104,7 +104,7 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
 
         ServiceLayerWSExportExceptionMetadata exceptionMetadata = null;
 
-        if (serviceLayerWsConfigService.isProjectAvailable()) {
+        if (serviceLayerWsConfigService.isProjectWebAvailable()) {
 
             // Install configuration to export services if it's not installed.
             serviceLayerWsConfigService.install(CommunicationSense.EXPORT);

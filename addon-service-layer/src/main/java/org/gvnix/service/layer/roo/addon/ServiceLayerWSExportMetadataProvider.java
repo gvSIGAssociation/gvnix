@@ -115,7 +115,7 @@ public class ServiceLayerWSExportMetadataProvider extends
 
         ServiceLayerWSExportMetadata serviceLayerMetadata = null;
 
-        if (serviceLayerWsConfigService.isProjectAvailable()) {
+        if (serviceLayerWsConfigService.isProjectWebAvailable()) {
 
             // Install configuration to export services if it's not installed.
             serviceLayerWsConfigService.install(CommunicationSense.EXPORT);

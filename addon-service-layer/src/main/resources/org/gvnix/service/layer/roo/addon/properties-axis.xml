@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+  <gvnix>
+    <properties>
+      <gvnix.version>${gvnix.version}</gvnix.version>
+      <axis.version>1.4</axis.version>
+    </properties>
+  </gvnix>
+</configuration>

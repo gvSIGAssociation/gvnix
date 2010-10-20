@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<axistools-plugin>
+	<plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>axistools-maven-plugin</artifactId>
+		<version>1.4</version>
+		<configuration>
+			<urls>
+		    </urls>
+		</configuration>
+		<executions>
+			<execution>
+				<goals>
+					<goal>wsdl2java</goal>
+				</goals>
+			</execution>
+		</executions>
+	</plugin>
+</axistools-plugin>

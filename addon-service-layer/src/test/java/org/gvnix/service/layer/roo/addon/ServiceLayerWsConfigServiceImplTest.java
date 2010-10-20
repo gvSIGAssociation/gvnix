@@ -126,7 +126,7 @@ public class ServiceLayerWsConfigServiceImplTest {
 	replay(metadataService, projectMetadata);
 
 	areCxfDependenciesInstalledResult = serviceLayerWsConfigServiceImpl
-		.isCxfDependenciesInstalled(CommunicationSense.EXPORT);
+		.isDependenciesInstalled(CommunicationSense.EXPORT);
 
 	assertTrue("There is one or more dependencies not set.",
 		areCxfDependenciesInstalledResult);
@@ -160,7 +160,7 @@ public class ServiceLayerWsConfigServiceImplTest {
 	replay(metadataService, projectMetadata);
 
 	areCxfDependenciesInstalledResult = serviceLayerWsConfigServiceImpl
-		.isCxfDependenciesInstalled(CommunicationSense.EXPORT);
+		.isDependenciesInstalled(CommunicationSense.EXPORT);
 
 	assertFalse("There are all dependencies set.",
 		areCxfDependenciesInstalledResult);

@@ -49,10 +49,9 @@ import org.springframework.roo.project.Path;
 @Service
 public class ServiceLayerWSImportMetadataProvider extends
 	AbstractItdMetadataProvider {
-    
-    // TODO Be careful because ServiceLayerWsImportOperations is not inmediate
+
     @Reference
-    private ServiceLayerWsImportOperations serviceLayerWsImportOperations;
+    private ServiceLayerWsConfigService serviceLayerWsConfigService;
 
     protected void activate(ComponentContext context) {
 
@@ -110,7 +109,7 @@ public class ServiceLayerWSImportMetadataProvider extends
 	ServiceLayerWSImportMetadata metadata = null;
 
 	// Import service if project has required prerequisites
-	if (serviceLayerWsImportOperations.isProjectAvailable()) {
+	if (serviceLayerWsConfigService.isProjectAvailable()) {
 
 	    // Check if Web Service definition is correct.
 	    PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
@@ -139,7 +138,7 @@ public class ServiceLayerWSImportMetadataProvider extends
 		    .getAttribute(new JavaSymbolName("wsdlLocation"));
 
 	    // Generate service infraestructure to import the service
-	    serviceLayerWsImportOperations.importService(governorTypeDetails
+	    serviceLayerWsConfigService.importService(governorTypeDetails
 		    .getName(), url.getValue());
 
 	    // Create metadata

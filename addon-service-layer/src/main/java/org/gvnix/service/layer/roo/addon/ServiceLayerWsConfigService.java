@@ -47,7 +47,7 @@ public interface ServiceLayerWsConfigService {
      * <li>IMPORT: From external systems to this.</li>
      * </ul>
      */
-    public enum CommunicationSense { EXPORT, IMPORT };
+    public enum CommunicationSense { EXPORT, IMPORT, IMPORT_RPC_ENCODED };
 
     /**
      * Install and configure Web Service library, if not already installed.
@@ -103,6 +103,16 @@ public interface ServiceLayerWsConfigService {
     public void addImportLocation(String wsdlLocation);
 
     /**
+     * Imports a Web Service to class.
+     * 
+     * @param className
+     *            class to import.
+     * @param wsdlLocation
+     *            contract wsdl url to import.
+     */
+    public void importService(JavaType className, String wsdlLocation);
+
+    /**
      * Create Jax-WS plugin configuration in pom.xml.
      */
     public void installJaxwsBuildPlugin();
@@ -110,16 +120,27 @@ public interface ServiceLayerWsConfigService {
     /**
      * Checks if library is properly configured in a project.
      * 
+     * <p>
+     * Library dependencies can be different depending of communication sense.
+     * </p>
+     * 
      * @param type
      *            Communication type
      * @return true or false if it's configurated
      */
-    public boolean isCxfInstalled(CommunicationSense type);
+    public boolean isLibraryInstalled(CommunicationSense type);
 
     /**
      * Is this a web project ?
      * 
      * @return true if this is a web project.
+     */
+    boolean isProjectWebAvailable();
+    
+    /**
+     * Is this a project ?
+     * 
+     * @return true if this is a project.
      */
     boolean isProjectAvailable();
 

@@ -64,7 +64,9 @@ public class ServiceLayerWsConfigServiceImpl implements
     private ProjectOperations projectOperations;
     @Reference
     private UrlRewriteOperations urlRewriteOperations;
-
+    @Reference
+    private AnnotationsService annotationsService;
+    
     private static Logger logger = Logger
             .getLogger(ServiceLayerWsConfigService.class.getName());
 
@@ -85,13 +87,14 @@ public class ServiceLayerWsConfigServiceImpl implements
     public void install(CommunicationSense type) {
 
         // Check if it's already installed.
-        if (isCxfInstalled(type)) {
+        if (isLibraryInstalled(type)) {
+            
             // Nothing to do
             return;
         }
 
         // Add dependencies to project
-        installCxfDependencies(type);
+        installDependencies(type);
 
         if (type == CommunicationSense.EXPORT) {
 
@@ -124,12 +127,11 @@ public class ServiceLayerWsConfigServiceImpl implements
      * </ul>
      * 
      */
-    public boolean isCxfInstalled(CommunicationSense type) {
+    public boolean isLibraryInstalled(CommunicationSense type) {
 
-        // TODO Are not checked Web and Url Rewrite configuration files, check
-        // it ?
+	// TODO Check Web and Url Rewrite configuration files on IMPORT ?
 
-        boolean cxfInstalled = isCxfDependenciesInstalled(type);
+        boolean cxfInstalled = isDependenciesInstalled(type);
 
         if (type == CommunicationSense.EXPORT) {
 
@@ -208,18 +210,18 @@ public class ServiceLayerWsConfigServiceImpl implements
     }
 
     /**
-     * Check if Cxf dependencies are set in project's pom.xml.
+     * Check if dependencies are set in project's pom.xml.
      * 
      * <p>
-     * Search if the dependencies defined in xml Addon file
-     * dependencies-export.xml are set in pom.xml.
+     * Search if the dependencies defined in addon sense type xml file
+     * (dependencies-*.xml) are set in pom.xml.
      * </p>
      * 
      * @param type
      *            Communication type
      * @return true if all dependencies are set in pom.xml
      */
-    protected boolean isCxfDependenciesInstalled(CommunicationSense type) {
+    protected boolean isDependenciesInstalled(CommunicationSense type) {
 
         boolean cxfDependenciesExists = true;
 
@@ -264,6 +266,9 @@ public class ServiceLayerWsConfigServiceImpl implements
         case IMPORT:
             name.append("import");
             break;
+        case IMPORT_RPC_ENCODED:
+            name.append("import-axis");
+            break;
         }
 
         name.append(".xml");
@@ -283,6 +288,8 @@ public class ServiceLayerWsConfigServiceImpl implements
      * @return List of addon dependencies as xml elements
      */
     protected List<Element> getCxfRequiredDependencies(CommunicationSense type) {
+	
+	// TODO Unify distinct dependencies files in only one
 
         InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
                 getCxfRequiredDependenciesFileName(type));
@@ -301,8 +308,8 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         Element dependencies = (Element) dependencyDoc.getFirstChild();
 
-        return XmlUtils.findElements("/dependencies/cxf/dependency",
-                dependencies);
+	// TODO If only one dependencies file: /dependencies/XXXXX/dependency
+	return XmlUtils.findElements("/dependencies/dependency", dependencies);
     }
 
     /**
@@ -311,10 +318,10 @@ public class ServiceLayerWsConfigServiceImpl implements
      * @param type
      *            Communication type
      */
-    private void installCxfDependencies(CommunicationSense type) {
+    private void installDependencies(CommunicationSense type) {
 
         // If dependencies are installed continue.
-        if (isCxfDependenciesInstalled(type)) {
+        if (isDependenciesInstalled(type)) {
 
             return;
         }
@@ -1129,6 +1136,21 @@ public class ServiceLayerWsConfigServiceImpl implements
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public void importService(JavaType serviceClass, String wsdlLocation) {
+
+	// Install import WS configuration requirements, if not installed 
+	install(CommunicationSense.IMPORT);
+
+	// Add wsdl location to pom.xml
+	addImportLocation(wsdlLocation);
+	
+	// Add GvNixAnnotations to the project.
+	annotationsService.addGvNIXAnnotationsDependency();
+    }
+    
+    /**
      * Check if pom.xml file exists in the project and return the path.
      * 
      * <p>
@@ -1169,7 +1191,7 @@ public class ServiceLayerWsConfigServiceImpl implements
      * Check if exists a project and if it has web.xml configuration file.
      * </p>
      */
-    public boolean isProjectAvailable() {
+    public boolean isProjectWebAvailable() {
 
         if (getPathResolver() == null) {
 
@@ -1184,6 +1206,18 @@ public class ServiceLayerWsConfigServiceImpl implements
         }
 
         return true;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Check if exists a project.
+     * </p>
+     */
+    public boolean isProjectAvailable() {
+
+	return getPathResolver() != null;
     }
 
     /**

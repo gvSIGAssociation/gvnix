@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dependencies>
-  <cxf>
-    <dependency org="org.apache.cxf" name="cxf-rt-frontend-jaxws" rev="${cxf.version}" />
-    <dependency org="org.apache.cxf" name="cxf-rt-transports-http" rev="${cxf.version}">
-      <exclusions>
-        <exclusion org="org.springframework" name="spring-web" />
-      </exclusions>
-    </dependency>
-  </cxf>
+	<dependency org="org.apache.cxf" name="cxf-rt-frontend-jaxws" rev="${cxf.version}" />
+	<dependency org="org.apache.cxf" name="cxf-rt-transports-http" rev="${cxf.version}">
+	<exclusions>
+		<exclusion org="org.springframework" name="spring-web" />
+	</exclusions>
+	</dependency>
 </dependencies>

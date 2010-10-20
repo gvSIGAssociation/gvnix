@@ -55,55 +55,23 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
     @Reference
     private PathResolver pathResolver;
     @Reference
-    private MetadataService metadataService;
-    @Reference
-    private ServiceLayerWsConfigService serviceLayerWsConfigService;
-    @Reference
     private JavaParserService javaParserService;
     @Reference
     private AnnotationsService annotationsService;
+    @Reference
+    private ServiceLayerWsConfigService serviceLayerWsConfigService;
     
     /*
      * (non-Javadoc)
      * 
-     * @seeorg.gvnix.service.layer.roo.addon.ServiceLayerWsImportOperations#
+     * @see org.gvnix.service.layer.roo.addon.ServiceLayerWsImportOperations#
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
 
-	return getPathResolver() != null;
+	return serviceLayerWsConfigService.isProjectAvailable();
     }
 
-    /**
-     * @return the path resolver or null if there is no user project
-     */
-    private PathResolver getPathResolver() {
-
-	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-		.get(ProjectMetadata.getProjectIdentifier());
-	if (projectMetadata == null) {
-
-	    return null;
-	}
-
-	return projectMetadata.getPathResolver();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void importService(JavaType serviceClass, String wsdlLocation) {
-
-	// Install import WS configuration requirements, if not installed 
-	serviceLayerWsConfigService.install(CommunicationSense.IMPORT);
-
-	// Add wsdl location to pom.xml
-	serviceLayerWsConfigService.addImportLocation(wsdlLocation);
-	
-	// Add GvNixAnnotations to the project.
-	annotationsService.addGvNIXAnnotationsDependency();
-    }
-    
     /**
      * {@inheritDoc}
      * 
@@ -129,7 +97,6 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
 	}
 	
 	// Add the import definition annotation and attributes to the class
-	// TODO Use addJavaTypeAnnotation method of AnnotationsService ?
 	List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
 	annotationAttributeValues.add(new StringAttributeValue(
 		new JavaSymbolName("wsdlLocation"), wsdlLocation));

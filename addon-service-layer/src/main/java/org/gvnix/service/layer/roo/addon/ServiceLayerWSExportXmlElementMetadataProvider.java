@@ -106,7 +106,7 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
 
         ServiceLayerWSExportXmlElementMetadata serviceLayerWSExportXmlElementMetadata = null;
         
-        if (serviceLayerWsConfigService.isProjectAvailable()) {
+        if (serviceLayerWsConfigService.isProjectWebAvailable()) {
 
             // Install configuration to export services if it's not installed.
             serviceLayerWsConfigService.install(CommunicationSense.EXPORT);

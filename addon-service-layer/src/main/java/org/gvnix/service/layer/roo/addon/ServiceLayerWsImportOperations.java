@@ -38,16 +38,6 @@ public interface ServiceLayerWsImportOperations {
     boolean isProjectAvailable();
 
     /**
-     * Imports a Web Service to class.
-     * 
-     * @param className
-     *            class to import.
-     * @param wsdlLocation
-     *            contract wsdl url to import.
-     */
-    public void importService(JavaType className, String wsdlLocation);
-
-    /**
      * Adds the gvNIX import annotation with some wsdl location in a class.
      * 
      * @param className
