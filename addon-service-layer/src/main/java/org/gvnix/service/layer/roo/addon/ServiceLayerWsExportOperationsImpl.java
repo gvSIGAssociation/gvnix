@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.*;
+import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
@@ -134,6 +135,25 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         }
 
+        ClassOrInterfaceTypeDetails typeDetails = classpathOperations
+                .getClassOrInterface(serviceClass);
+
+        String identifier = EntityMetadata.createIdentifier(typeDetails
+                .getName(), Path.SRC_MAIN_JAVA);
+
+        EntityMetadata entityMetadata = (EntityMetadata) metadataService
+                .get(identifier);
+
+        Assert
+                .isTrue(
+                        entityMetadata == null,
+                        "You can't export an Entity as a Web Service."
+                                + "\nIf you want to publish some Entity method as Web Service operation:"
+                                + "\n\t1)Create a new Service class using 'service class' command."
+                                + "\n\t2)Create an operation inside the class manually or using the command 'service operation'."
+                                + "\n\t3)Define the logic calling Entity method."
+                                + "\n\t4)Export operation as Web Service operation using 'serivce export operation'.\n");
+
         List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = exportServiceAnnotationAttributes(
                 serviceClass, serviceName, portTypeName, targetNamespace,
                 addressName);
@@ -160,12 +180,12 @@ public class ServiceLayerWsExportOperationsImpl implements
             JavaType serviceClass) {
 
         // Checks serviceName parameter to publish the web service.
-        String serviceName =  serviceClass.getSimpleTypeName();
+        String serviceName = serviceClass.getSimpleTypeName();
 
         // Namespace for the web service.
         String targetNamespace = serviceLayerWsConfigService
-                        .convertPackageToTargetNamespace(serviceClass
-                                .getPackage().toString());
+                .convertPackageToTargetNamespace(serviceClass.getPackage()
+                        .toString());
 
         // Check address name not blank and set service name if not defined.
         String addressName = serviceClass.getSimpleTypeName();
@@ -185,7 +205,6 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         return defaultAnnotationMetadata;
     }
-
 
     /**
      */
@@ -595,7 +614,7 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         AnnotatedJavaType parameterWithAnnotations;
         List<AnnotationMetadata> parameterAnnotationList;
-        
+
         // @WebParam default values.
         StringAttributeValue partNameAttributeValue = new StringAttributeValue(
                 new JavaSymbolName("partName"), "parameters");
@@ -608,21 +627,23 @@ public class ServiceLayerWsExportOperationsImpl implements
                 new JavaSymbolName("header"), false);
 
         for (AnnotatedJavaType parameterType : parameterTypesList) {
-        
+
             parameterAnnotationList = new ArrayList<AnnotationMetadata>();
 
             // @GvNIXWebParam
             List<AnnotationAttributeValue<?>> gvNIXWebParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
             int index = parameterTypesList.indexOf(parameterType);
-            
+
             JavaSymbolName parameterName = parameterNamesList.get(index);
-            
-            StringAttributeValue nameWebParamAttributeValue = new StringAttributeValue(new JavaSymbolName("name"), parameterName.getSymbolName());
+
+            StringAttributeValue nameWebParamAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("name"), parameterName.getSymbolName());
 
             gvNIXWebParamAttributeValueList.add(nameWebParamAttributeValue);
 
-            ClassAttributeValue typeClassAttributeValue = new ClassAttributeValue(new JavaSymbolName("type"), parameterType.getJavaType());
+            ClassAttributeValue typeClassAttributeValue = new ClassAttributeValue(
+                    new JavaSymbolName("type"), parameterType.getJavaType());
 
             gvNIXWebParamAttributeValueList.add(typeClassAttributeValue);
 
@@ -631,7 +652,7 @@ public class ServiceLayerWsExportOperationsImpl implements
                     gvNIXWebParamAttributeValueList);
 
             parameterAnnotationList.add(gvNixWebParamAnnotationMetadata);
-            
+
             // @WebParam
             List<AnnotationAttributeValue<?>> webParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
@@ -650,9 +671,9 @@ public class ServiceLayerWsExportOperationsImpl implements
             }
 
             webParamAttributeValueList.add(partNameAttributeValue);
-            
+
             webParamAttributeValueList.add(modeAttributeValue);
-            
+
             webParamAttributeValueList.add(headerAttributeValue);
 
             AnnotationMetadata webParamAnnotationMetadata = new DefaultAnnotationMetadata(
@@ -664,14 +685,14 @@ public class ServiceLayerWsExportOperationsImpl implements
             // Add annotation list to parameter.
             parameterWithAnnotations = new AnnotatedJavaType(parameterType
                     .getJavaType(), parameterAnnotationList);
-            
+
             annotatedWebParameterList.add(parameterWithAnnotations);
 
         }
 
         return annotatedWebParameterList;
     }
-    
+
     /**
      * {@inheritDoc}
      * <p>
@@ -719,9 +740,8 @@ public class ServiceLayerWsExportOperationsImpl implements
         // If there aren't any methods in class.
         if (methodList == null || methodList.isEmpty()) {
 
-            methodListStringBuilder
-                    .append("Class '"
-                            + serviceClass.getFullyQualifiedTypeName()
+            methodListStringBuilder.append("Class '"
+                    + serviceClass.getFullyQualifiedTypeName()
                     + "' has not defined any method.");
 
             return methodListStringBuilder.toString();
@@ -752,8 +772,9 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         // If there aren't defined any methods available to export.
         if (!StringUtils.hasText(methodListStringBuilder.toString())) {
-            methodListStringBuilder.append("Class '"
-                    + serviceClass.getFullyQualifiedTypeName()
+            methodListStringBuilder
+                    .append("Class '"
+                            + serviceClass.getFullyQualifiedTypeName()
                             + "' hasn't got any available method to export as web service operations.");
         }
 
