@@ -145,4 +145,12 @@ public interface ServiceLayerWSExportValidationService {
     public ArrayAttributeValue<StringAttributeValue> getElementFields(
             ClassOrInterfaceTypeDetails governorTypeDetails,
             MethodParameterType methodParameterType);
+
+    /**
+     * Check if serviceClass is a Roo Entity.
+     * 
+     * @param serviceClass
+     * @return true if is not a Roo Entity.
+     */
+    public boolean checkIsNotRooEntity(JavaType serviceClass);
 }

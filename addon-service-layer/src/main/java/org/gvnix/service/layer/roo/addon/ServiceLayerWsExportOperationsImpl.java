@@ -135,20 +135,13 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         }
 
-        ClassOrInterfaceTypeDetails typeDetails = classpathOperations
-                .getClassOrInterface(serviceClass);
-
-        String identifier = EntityMetadata.createIdentifier(typeDetails
-                .getName(), Path.SRC_MAIN_JAVA);
-
-        EntityMetadata entityMetadata = (EntityMetadata) metadataService
-                .get(identifier);
-
+        // Check if serviceClass is not a Roo Entity.
         Assert
                 .isTrue(
-                        entityMetadata == null,
+                        serviceLayerWSExportValidationService
+                                .checkIsNotRooEntity(serviceClass),
                         "You can't export an Entity as a Web Service."
-                                + "\nIf you want to publish some Entity method as Web Service operation:"
+                                + "\nIf you want to publish an Entity method as Web Service operation:"
                                 + "\n\t1)Create a new Service class using 'service class' command."
                                 + "\n\t2)Create an operation inside the class manually or using the command 'service operation'."
                                 + "\n\t3)Define the logic calling Entity method."

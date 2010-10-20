@@ -881,4 +881,22 @@ public class ServiceLayerWSExportValidationServiceImpl implements
         return webServiceTargetNamespace;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public boolean checkIsNotRooEntity(JavaType serviceClass) {
+
+        ClassOrInterfaceTypeDetails typeDetails = classpathOperations
+                .getClassOrInterface(serviceClass);
+
+        String identifier = EntityMetadata.createIdentifier(typeDetails
+                .getName(), Path.SRC_MAIN_JAVA);
+
+        EntityMetadata entityMetadata = (EntityMetadata) metadataService
+                .get(identifier);
+
+        return entityMetadata == null;
+    }
+
 }

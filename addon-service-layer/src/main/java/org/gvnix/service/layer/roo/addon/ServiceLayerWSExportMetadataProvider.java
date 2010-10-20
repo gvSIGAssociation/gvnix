@@ -138,6 +138,22 @@ public class ServiceLayerWSExportMetadataProvider extends
                 governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
             }
 
+            // Check if class is not a Roo Entity.
+            Assert
+                    .isTrue(
+                            serviceLayerWSExportValidationService
+                                    .checkIsNotRooEntity(governorTypeDetails
+                                            .getName()),
+                            "You can't export an Entity as a Web Service.Remove '@GvNIXWebService' annotation from class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "'."
+                                    + "\nIf you want to publish an Entity method as Web Service operation:"
+                                    + "\n\t1)Create a new Service class using 'service class' command."
+                                    + "\n\t2)Create an operation inside the class manually or using the command 'service operation'."
+                                    + "\n\t3)Define the logic calling Entity method."
+                                    + "\n\t4)Export operation as Web Service operation using 'serivce export operation'.\n");
+            
             // Get upstreamDepency Class to check.
             AnnotationMetadata gvNIXWebServiceAnnotation = MemberFindingUtils
                     .getTypeAnnotation(governorTypeDetails, new JavaType(
