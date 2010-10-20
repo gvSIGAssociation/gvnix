@@ -14,6 +14,7 @@ import org.springframework.roo.classpath.details.annotations.AnnotationAttribute
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.DefaultAnnotationMetadata;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.ProjectOperations;
@@ -39,6 +40,8 @@ public class AnnotationsServiceImpl implements AnnotationsService {
     private JavaParserService javaParserService;
     @Reference
     private ClasspathOperations classpathOperations;
+    @Reference
+    private MetadataService metadataService;
 
     private static Logger logger = Logger.getLogger(AnnotationsService.class
 	    .getName());
@@ -113,6 +116,10 @@ public class AnnotationsServiceImpl implements AnnotationsService {
 
 	// Adds annotation to the entity
 	mutableTypeDetails.addTypeAnnotation(defaultAnnotationMetadata);
+	
+	// Delete from chache to update class values.
+        metadataService.evict(typeDetails.getDeclaredByMetadataId());
+
     }
 
 }

@@ -584,7 +584,13 @@ public class ServiceLayerWSExportValidationServiceImpl implements
             return true;
         }
 
+        // Java Types in 'java.lang' package that aren't collections.
         if (javaType.getFullyQualifiedTypeName().startsWith("java.lang")) {
+            return true;
+        }
+
+        // Java Types in 'java.util' package that aren't collections like Date.
+        if (javaType.getFullyQualifiedTypeName().startsWith("java.util")) {
             return true;
         }
 
