@@ -34,10 +34,10 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 public @interface GvNIXXmlElement {
 
-    String name() default "";
+    String name();
 
-    String namespace() default "";
+    String namespace();
 
-    String[] elementList() default { "" };
+    String[] elementList();
 
 }

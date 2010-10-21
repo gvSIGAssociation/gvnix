@@ -425,12 +425,12 @@ public class ServiceLayerWSExportMetadataProvider extends
         Assert
                 .isTrue(
                         webResultType != null,
-                        "Attribute 'webResultType' in annotation @GvNIXWebMethod defined in method '"
+                        "Attribute 'webResultType' in annotation @GvNIXWebMethod has to be defined in method '"
                                 + methodMetadata.getMethodName()
                                 + "' in class '"
                                 + governorTypeDetails.getName()
                                         .getFullyQualifiedTypeName()
-                                + "' has to be defined to export as Web Service operation.");
+                                + "' even if it's 'void' Java Type to export as Web Service operation.");
 
         // Check if webResultType has the same value than method returnType.
         Assert

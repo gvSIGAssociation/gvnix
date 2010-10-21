@@ -25,12 +25,18 @@ import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebFault;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.*;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -45,6 +51,8 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
 
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
+    @Reference
+    private ServiceLayerWSExportValidationService serviceLayerWSExportValidationService;
     @Reference
     private AnnotationsService annotationsService;
 
@@ -113,31 +121,113 @@ public class ServiceLayerWSExportExceptionMetadataProvider extends
             // Add GvNixAnnotations to the project.
             annotationsService.addGvNIXAnnotationsDependency();
 
-            // Work out the MIDs of the other metadata we depend on
-            JavaType javaType = ServiceLayerWSExportExceptionMetadata
-                    .getJavaType(metadataIdentificationString);
-            Path path = ServiceLayerWSExportExceptionMetadata
-                    .getPath(metadataIdentificationString);
+            // Check if Web Service definition is correct.
+            PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
+                    .getPhysicalTypeDetails();
 
-            exceptionMetadata = new ServiceLayerWSExportExceptionMetadata(
-                    metadataIdentificationString, aspectName,
-                    governorPhysicalTypeMetadata);
+            ClassOrInterfaceTypeDetails governorTypeDetails;
+            if (physicalTypeDetails == null
+                    || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+                // There is a problem
+                return null;
+            } else {
+                // We have reliable physical type details
+                governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
+            }
 
-            if (exceptionMetadata.getItdTypeDetails().getTypeAnnotations()
-                    .isEmpty()) {
-                logger
-                        .log(
-                                Level.WARNING,
-                                "The annotation @GvNIXWebFault is not declared correctly for '"
-                                        + governorPhysicalTypeMetadata
-                                                .getPhysicalTypeDetails()
-                                                .getName()
-                                                .getFullyQualifiedTypeName()
-                                        + "'.\nThis will not export the Exception to be used in Web Service.\n@WebParam annotation will be deleted untill the annotation is defined correctly.");
+            AnnotationMetadata annotationMetadata = MemberFindingUtils
+                    .getTypeAnnotation(governorTypeDetails, new JavaType(
+                            GvNIXWebFault.class.getName()));
+
+            boolean correctGvNIXWebFaultAnnotation = checkGvNixWebFaultAnnotationAttributes(
+                    governorTypeDetails, annotationMetadata);
+
+            if (correctGvNIXWebFaultAnnotation) {
+
+                exceptionMetadata = new ServiceLayerWSExportExceptionMetadata(
+                        metadataIdentificationString, aspectName,
+                        governorPhysicalTypeMetadata);
+
+                if (exceptionMetadata.getItdTypeDetails().getTypeAnnotations()
+                        .isEmpty()) {
+                    logger
+                            .log(
+                                    Level.WARNING,
+                                    "The annotation @GvNIXWebFault is not declared correctly for '"
+                                            + governorPhysicalTypeMetadata
+                                                    .getPhysicalTypeDetails()
+                                                    .getName()
+                                                    .getFullyQualifiedTypeName()
+                                            + "'.\nThis will not export the Exception to be used in Web Service.\n@WebParam annotation will be deleted untill the annotation is defined correctly.");
+                }
             }
         }
 
         return exceptionMetadata;
+    }
+
+    /**
+     * Check if @GvNIXWebFault annotation attributes are correct.
+     *  
+     * @param governorTypeDetails
+     * @param annotationMetadata
+     * @return
+     */
+    private boolean checkGvNixWebFaultAnnotationAttributes(
+            ClassOrInterfaceTypeDetails governorTypeDetails,
+            AnnotationMetadata annotationMetadata) {
+
+        // Check if are correct annotation attributes.
+        boolean correctName = false;
+        boolean correctNamespace = false;
+        boolean correctFaultBean = false;
+
+        // Check name.
+        StringAttributeValue nameAttributeValue = (StringAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("name"));
+
+        correctName = (nameAttributeValue != null)
+                && StringUtils.hasText(nameAttributeValue.getValue());
+
+        Assert.isTrue(correctName,
+                "@GvNIXWebFault annotation attribute value 'name' in '"
+                        + governorTypeDetails.getName() + "' must be defined.");
+
+        // Check targetNamespace.
+        StringAttributeValue namespaceAttributeValue = (StringAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("targetNamespace"));
+
+        correctNamespace = (namespaceAttributeValue != null)
+                && StringUtils.hasText(namespaceAttributeValue.getValue())
+                && serviceLayerWSExportValidationService
+                        .checkNamespaceFormat(namespaceAttributeValue
+                                .getValue());
+
+        Assert
+                .isTrue(
+                        correctNamespace,
+                        "@GvNIXWebFault annotation attribute value 'targetNamespace' in '"
+                                + governorTypeDetails.getName()
+                                + "' must be well formed.\ni.e.: http://my.example.com/");
+
+        // Check faultBean.
+        StringAttributeValue faultBeanAttributeValue = (StringAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("faultBean"));
+
+        correctFaultBean = (faultBeanAttributeValue != null)
+                && StringUtils.hasText(faultBeanAttributeValue.getValue())
+                && governorTypeDetails.getName().getFullyQualifiedTypeName()
+                        .contentEquals(faultBeanAttributeValue.getValue());
+
+        Assert
+                .isTrue(
+                        correctFaultBean,
+                        "@GvNIXWebFault annotation attribute value 'faultBean' in '"
+                                + governorTypeDetails.getName()
+                                + "' must have the same value that class complete name.\ni.e.: '"
+                                + governorTypeDetails.getName()
+                                        .getFullyQualifiedTypeName() + "'");
+        return true;
     }
 
     /*

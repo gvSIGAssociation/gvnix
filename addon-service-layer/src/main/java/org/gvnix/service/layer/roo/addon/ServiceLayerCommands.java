@@ -178,10 +178,6 @@ public class ServiceLayerCommands implements CommandMarker {
      * ``--requestWrapperName``: Name to define the Request Wrapper Object.</li>
      * <li>
      * ``--requestWrapperNamespace``: Namespace of the Request Wrapper Object.</li>
-     * <li>
-     * ``--exceptionName``: Name to define method exception if exists.</li>
-     * <li>
-     * ``--exceptionNamespace``: Namespace of method exception if exists.</li>
      * </ul>
      */
     @CliCommand(value = "service export operation", help = "Publish a class method as web service operation in a PortType.")

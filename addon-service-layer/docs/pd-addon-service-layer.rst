@@ -106,9 +106,12 @@ More information:
 Use Case
 =========
 
+TODO:
+
 TRANSLATE:
 
 +Publicar clase como servicio web.+
+----------------------------------------
 
 Obligatorios todos los atributos de la anotación de gvNIX.
 
@@ -131,6 +134,7 @@ Obligatorios todos los atributos de la anotación de gvNIX.
 * En la publicación controlar en el comando si el archivo de configuración existe, para así cuando se genera el metadato definir/comprobar el bean.
 
 +Publicar operación.+
+-----------------------
 
 Obligatorios todos los atributos de la anotación de gvNIX si se añade manualmente la anotación a la clase.
 
@@ -151,14 +155,14 @@ Nota:
   Si a alguna operación se actualiza o se publica manualmente usando la anotación **@GvNIXWebMethod** y no cumple algún requisito, se muestra un mensaje donde apunta que no va a ser publicada debido a que no cumple el estándar y no se genera le AspectJ asociado, por lo tanto no existe el servicio web hasta que no esté correctamente formado.
 
 +Publicar Objetos para la comunicación.+
-
+------------------------------------------
 Obligatorios todos los atributos de la anotación de gvNIX.
 
 * Anotados con **@GvNIXXmlElement** para generar el metadato utilizando los atributos de la anotación (name y namespace).
 * Si se cambia el paquete o el nombre de la clase, no varía ya que el contrato depende del name y el namespace definido.
 
 +Publicar excepción.+
-
+-----------------------
 Obligatorios todos los atributos de la anotación de gvNIX.
 
 * Cambiar el nombre/paquete de la excepción.
@@ -167,7 +171,88 @@ Obligatorios todos los atributos de la anotación de gvNIX.
   * Si no se comprueba, lanzará un error al compilar el proyecto debido a que el fichero AspectJ no encontrará la clase de la excepción a la que se refiere.
   * Estará controlado por el metadato asociado a la excepción que únicamente comprueba las excepciones definidas del proyecto.
 
- 
+Create a web service defining annotations in clases.
+======================================================
+
+Publish Web Service Class
+---------------------------
+
+Define *@GvNIXWebService* annotation in class to export as Web Service.
+
+Mandatory ``attributes`` to export a class as Web Service:
+
+  * ``name``: Name for Web Service Port Type definition in WSDL.
+  * ``targetNamespace``: Namespace for Web Service in WSDL. i.e.: ``targetNamespace= "http://services.project.layer.service.test.gvnix.org/"``. 
+  * ``serviceName``: Service name to publish the service in WSDL.
+  * ``address``: Address to access to the service in application.
+  * ``fullyQualifiedTypeName``: Java fully qualified type name to control if changes the package or class name to avoid updating service contract. i.e.: ``fullyQualifiedTypeName= =org.gvnix.test.service.layer.project.services.Clase"``.
+
+Publish Web Service operation
+------------------------------
+
+Define *@GvNIXWebMethod* annotation in method to export as Web Service Operation.
+
+Mandatory ``attributes`` for a method with or without input/output parameters:
+
+  * ``operationName``: Define an operation name to be published.
+  * ``webResultType``: Return Java type. i.e.: Return type String: ``webResultType = String.class`` if it's void: ``webResultType = void.class``.
+
+Mandatory ``attributes`` for a method with input parameters:
+
+  * ``requestWrapperName``: Request Wrapper Name in WSDL.
+  * ``requestWrapperNamespace``: Request Wrapper Namespace in WSDL.
+  * ``requestWrapperClassName``: Fully qualified name for Request Wrapper class. i.e. ``requestWrapperClassName = "org.example.wrapper.RequestWrapper"``.
+
+Also you have to define *@GvNIXWebParam* and *@WebParam* annotations for each input parameter:
+
+@GvNIXWebParam mandatory ``attributes``:
+
+  * ``name``: The name of attribute in WSDL.
+  * ``type``: Parameter's Java type. i.e.: type String: ``type = String.class``.
+
+@WebParam ``attributes``:
+
+  * ``name``: The same name of attribute name for *@GvNIXWebParam*. The name of attribute in WSDL.
+  * ``partName``: Allways set ``partName = "parameters".
+  * ``mode``: Allways set ``mode = Mode.IN``.
+  * ``header``: Allways set ``header = false``.
+
+Mandatory ``attributes`` for a method with return type different than void:
+
+  * ``resultName``: Name for result type in WSDL.
+  * ``resultNamespace``: Result Namespace in WSDL.
+  * ``responseWrapperName``: Response Wrapper Name in WSDL.
+  * ``responseWrapperNamespace``:  Namespace for Response Wrapper in WSDL.
+  * ``responseWrapperClassName``: Fully qualified name for Response Wrapper class. i.e. ``responseWrapperClassName = "org.example.wrapper.ResponseWrapper"``.
+
+Define Java Object in Web Service Operations.
+---------------------------------------------
+
+To define a Java Object which is used in a Web Service Operation as input parameter or return type define *@GvNIXXmlElement* annotation to export the class in XSD into WSDL.
+
+Mandatory ``attributes`` to export a class to XSD schema:
+
+  * ``name``: Name define Object in XSD schema in WSDL.
+  * ``namespace``: Object Namespace in XSD schema in WSDL.
+  * ``elementList``: Array of field names to be exported as XSD in WSDL schema. i.e.: ``elementList = {"name", "age"}``. The fields that are not defined in array are declared as ``@XmlTransient``.
+
+Publish Web Fault
+--------------------
+
+To export and define a Web Fault that is thrown in Web Service Operation you have to define *@GvNIXWebFault* annotation to selected Exception Class.
+
+   .. admonition:: Requirements
+
+       The exception must exist in the project.
+
+Mandatory ``attributes``:
+
+  * ``name``: Name for Web Fault in WSDL.
+  * ``targetNamespace``: Namespace for Web Fault in WSDL.
+  * ``faultBean``: Fully qualified name for this Exception class. i.e. ``faultBean = "org.example.exception.TestException"``.
+
+This Generates AspectJ file to annotate the exception defined with *@WebFault* values.
+
 Analysis
 =========
 
@@ -258,12 +343,9 @@ Data types: Collections
 
 Collections that don't accomplish with web service interoperability::
 
-* Set
 * Map
 * HashMap
 * TreeMap
-* Vector
-* HashSet
 
 Data types: Project entities
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -303,7 +385,7 @@ Parameters:
   * ``--paramTypes`` Method parameter input types.
   * ``--exceptions`` Method exceptions that can be thrown.
 
-service export ws
+service define ws
 ------------------
 
 Exports a Class to a Web Service.
@@ -314,6 +396,15 @@ Parameters:
   * ``--name`` Name to define the portType.
   * ``--serviceName`` Name to publish the Web Service.
   * ``--targetNamespace`` Namespace name for the service.
+
+service operation list 
+----------------------------
+
+List all method from Web Service class that are not exported as Web Service Operation.
+
+Parameters:
+
+  * ``--class`` (mandatory) Class to search methods that are not exported.
 
 service export operation ws 
 ----------------------------

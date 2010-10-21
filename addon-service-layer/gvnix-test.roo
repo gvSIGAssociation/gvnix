@@ -23,29 +23,31 @@ dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3
 
 controller all --package org.gvnix.test.service.layer.project.web
 
-// Create Service Class.
+// [CORRECT] Create Service Class.
 service class --class org.gvnix.test.service.layer.project.services.Clase
 
-// Create Service Operations.
-// No return type.
+// [CORRECT] Create service operations without return type. 
 service operation --name checkString --service org.gvnix.test.service.layer.project.services.Clase
 
-// Export Class as web service.
+// [CORRECT] Export Class as web service.
 service define ws --class org.gvnix.test.service.layer.project.services.Clase
 
-// Throwing an exception exception. 
-service operation --name returnString --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --exceptions java.lang.Exception
-service export operation --class org.gvnix.test.service.layer.project.services.ClaseCambiada --method returnString --resultName resultado
+// [ERROR] Export Entity Class as web service. Can't be Exported yet. Waiting for AspectJ Update.
+service define ws --class org.gvnix.test.service.layer.project.domain.Car
 
-// Throwing an incorrect exception. Can't be publish as service operation.
-service operation --name wrongException --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --exceptions org.test.FakeClass
+// [CORRECT] Create and Export operation Throwing an exception exception. 
+service operation --name returnString --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --exceptions java.lang.Exception
+service export operation --class org.gvnix.test.service.layer.project.services.Clase --method returnString --resultName resultado
+
+// [ERROR] Create operation throwing an incorrect exception, can't be exported as service operation.
+service operation --name wrongException --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --exceptions org.gvnix.test.service.layer.project.exceptions.FakeClassException
 service export operation --class org.gvnix.test.service.layer.project.services.Clase --method wrongException
  
-// Operation with correct input parameters
+// [CORRECT] Create and Export operation with correct input parameters.
 service operation --name inputParameters --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --paramTypes java.lang.Integer,java.lang.String --paramNames number,name
 service export operation --class org.gvnix.test.service.layer.project.services.Clase --method inputParameters
 
-// Operation with incorrect input parameters can¡t be exported as web service operation.
+// [ERROR] Create and Export operation with incorrect input parameters, can't be exported as web service operation.
 service operation --name incorrectInputParameters --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --paramTypes java.util.Map,java.lang.String --paramNames map,name
 service export operation --class org.gvnix.test.service.layer.project.services.Clase --method incorrectInputParameters
 

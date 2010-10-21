@@ -641,8 +641,8 @@ public class JavaParserServiceImpl implements JavaParserService {
 	}
 
 	return null;
-
     }
+
     /**
      * {@inheritDoc}
      * 

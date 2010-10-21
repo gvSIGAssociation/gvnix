@@ -36,6 +36,7 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * <p>
@@ -50,10 +51,13 @@ import org.springframework.roo.support.util.Assert;
  */
 @Component(immediate = true)
 @Service
-public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdMetadataProvider {
+public class ServiceLayerWSExportXmlElementMetadataProvider extends
+        AbstractItdMetadataProvider {
 
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
+    @Reference
+    private ServiceLayerWSExportValidationService serviceLayerWSExportValidationService;
     @Reference
     private AnnotationsService annotationsService;
 
@@ -64,48 +68,61 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
     private List<FieldMetadata> fieldMetadataTransientList = new ArrayList<FieldMetadata>();
 
     private static Logger logger = Logger
-	    .getLogger(ServiceLayerWSExportXmlElementMetadataProvider.class.getName());
+            .getLogger(ServiceLayerWSExportXmlElementMetadataProvider.class
+                    .getName());
 
     protected void activate(ComponentContext context) {
-	// Ensure we're notified of all metadata related to physical Java types,
-	// in particular their initial creation
-	metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
-		.getMetadataIdentiferType(), getProvidesType());
-	addMetadataTrigger(new JavaType(GvNIXXmlElement.class.getName()));
+        // Ensure we're notified of all metadata related to physical Java types,
+        // in particular their initial creation
+        metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
+                .getMetadataIdentiferType(), getProvidesType());
+        addMetadataTrigger(new JavaType(GvNIXXmlElement.class.getName()));
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#createLocalIdentifier(org.springframework.roo.model.JavaType, org.springframework.roo.project.Path)
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
+     * createLocalIdentifier(org.springframework.roo.model.JavaType,
+     * org.springframework.roo.project.Path)
      */
     protected String createLocalIdentifier(JavaType javaType, Path path) {
-	return ServiceLayerWSExportXmlElementMetadata.createIdentifier(
-		javaType, path);
+        return ServiceLayerWSExportXmlElementMetadata.createIdentifier(
+                javaType, path);
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getGovernorPhysicalTypeIdentifier(java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
+     * getGovernorPhysicalTypeIdentifier(java.lang.String)
      */
     protected String getGovernorPhysicalTypeIdentifier(
-	    String metadataIdentificationString) {
-	JavaType javaType = ServiceLayerWSExportXmlElementMetadata
-		.getJavaType(metadataIdentificationString);
-	Path path = ServiceLayerWSExportXmlElementMetadata
-		.getPath(metadataIdentificationString);
-	String physicalTypeIdentifier = PhysicalTypeIdentifier
-		.createIdentifier(javaType, path);
-	return physicalTypeIdentifier;
+            String metadataIdentificationString) {
+        JavaType javaType = ServiceLayerWSExportXmlElementMetadata
+                .getJavaType(metadataIdentificationString);
+        Path path = ServiceLayerWSExportXmlElementMetadata
+                .getPath(metadataIdentificationString);
+        String physicalTypeIdentifier = PhysicalTypeIdentifier
+                .createIdentifier(javaType, path);
+        return physicalTypeIdentifier;
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getMetadata(java.lang.String, org.springframework.roo.model.JavaType, org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getMetadata
+     * (java.lang.String, org.springframework.roo.model.JavaType,
+     * org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
      */
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
-	    String metadataIdentificationString, JavaType aspectName,
-	    PhysicalTypeMetadata governorPhysicalTypeMetadata,
-	    String itdFilename) {
+            String metadataIdentificationString, JavaType aspectName,
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            String itdFilename) {
 
         ServiceLayerWSExportXmlElementMetadata serviceLayerWSExportXmlElementMetadata = null;
-        
+
         if (serviceLayerWsConfigService.isProjectWebAvailable()) {
 
             // Install configuration to export services if it's not installed.
@@ -138,7 +155,7 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
                 // We have reliable physical type details
                 governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
             }
-            
+
             // We need to lookup the metadata we depend on
             entityMetadata = (EntityMetadata) metadataService
                     .get(entityMetadataKey);
@@ -152,8 +169,8 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
             fieldMetadataTransientList = new ArrayList<FieldMetadata>();
 
             AnnotationMetadata gvNixXmlElementAnnotationMetadata = MemberFindingUtils
-                    .getTypeAnnotation(governorTypeDetails,
-                    new JavaType(GvNIXXmlElement.class.getName()));
+                    .getTypeAnnotation(governorTypeDetails, new JavaType(
+                            GvNIXXmlElement.class.getName()));
 
             // Field @XmlElement and @XmlTransient annotations lists.
             setTransientAndElementFields(governorTypeDetails,
@@ -166,14 +183,16 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
                     fieldMetadataElementList, fieldMetadataTransientList);
 
         }
-        
-	return serviceLayerWSExportXmlElementMetadata;
+
+        return serviceLayerWSExportXmlElementMetadata;
     }
 
     /**
-     * Retrieves all related fields annotated with @OneToMany, @ManyToOne,
-     * 
-     * @OneToOne, related to persistence and not allowed Collection fields.
+     * Check correct format for annotation attribute values and define which
+     * fields will be exported in XSD schema.
+     * <p>
+     * Fields defined in 'elementList' annotation attribute will be exported.
+     * </p>
      * 
      * @param governorTypeDetails
      *            class to get fields to check.
@@ -181,9 +200,47 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
      *            to check element values.
      * @return {@link List} of annotated {@link FieldMetadata}.
      */
-    public void setTransientAndElementFields(
+    private void setTransientAndElementFields(
             ClassOrInterfaceTypeDetails governorTypeDetails,
             AnnotationMetadata gvNixXmlElementAnnotationMetadata) {
+
+        StringAttributeValue nameStringAtrributeValue = (StringAttributeValue) gvNixXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("name"));
+
+        Assert
+                .isTrue(
+                        nameStringAtrributeValue != null
+                                && StringUtils.hasText(nameStringAtrributeValue
+                                        .getValue()),
+                        "Attribute 'operationName' in annotation @GvNIXXmlElement defined in class '"
+                                + governorTypeDetails.getName()
+                                        .getFullyQualifiedTypeName()
+                                + "' has to be defined to export in XSD schema in WSDL.");
+
+        // resultNamespace
+        StringAttributeValue namespaceStringAttributeValue = (StringAttributeValue) gvNixXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("namespace"));
+
+        Assert
+                .isTrue(
+                        namespaceStringAttributeValue != null
+                                && StringUtils
+                                        .hasText(namespaceStringAttributeValue
+                                                .getValue()),
+                        "Attribute 'resultNamespace' in annotation @GvNIXXmlElement defined in class '"
+                                + governorTypeDetails.getName()
+                                        .getFullyQualifiedTypeName()
+                                + "' has to be defined to export in XSD schema in WSDL.");
+
+        Assert
+                .isTrue(
+                        serviceLayerWSExportValidationService
+                                .checkNamespaceFormat(namespaceStringAttributeValue
+                                        .getValue()),
+                        "Attribute 'namespace' in annotation @GvNIXXmlElement defined in class '"
+                                + governorTypeDetails.getName()
+                                        .getFullyQualifiedTypeName()
+                                + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
 
         // Retrieve Array attribute element
         ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue = (ArrayAttributeValue) gvNixXmlElementAnnotationMetadata
@@ -242,19 +299,24 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends AbstractItdM
 
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.itd.ItdMetadataProvider#getItdUniquenessFilenameSuffix()
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.ItdMetadataProvider#
+     * getItdUniquenessFilenameSuffix()
      */
     public String getItdUniquenessFilenameSuffix() {
-	return "GvNix_XmlElement";
+        return "GvNix_XmlElement";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
      */
     public String getProvidesType() {
-	return ServiceLayerWSExportXmlElementMetadata
-		.getMetadataIdentiferType();
+        return ServiceLayerWSExportXmlElementMetadata
+                .getMetadataIdentiferType();
     }
 
 }

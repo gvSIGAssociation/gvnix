@@ -69,57 +69,11 @@ public class ServiceLayerWSExportExceptionMetadata extends
 		.getTypeAnnotation(governorTypeDetails, new JavaType(
 			GvNIXWebFault.class.getName()));
 
-	if (annotationMetadata != null) {
-
-            // Check if are correct annotation attributes.
-            boolean correctNamespace = false;
-            boolean correctFaultBean = false;
-
-            // Check targetNamespace.
-	    StringAttributeValue namespaceAttributeValue = (StringAttributeValue)annotationMetadata.getAttribute(new JavaSymbolName("targetNamespace"));
-	    
-            correctNamespace = (namespaceAttributeValue != null)
-                    && checkNamespaceFormat(namespaceAttributeValue.getValue());
-
-            if (!correctNamespace) {
-                logger
-                        .log(
-                                Level.WARNING,
-                                "@GvNIXWebFault annotation attribute value 'targetNamespace' in '"
-                                        + governorTypeDetails.getName()
-                                        + "' must be well formed.\ni.e.: http://my.example.com/");
-            }
-
-            // Check faultBean.
-            StringAttributeValue faultBeanAttributeValue = (StringAttributeValue) annotationMetadata
-                    .getAttribute(new JavaSymbolName("faultBean"));
-
-            correctFaultBean = (faultBeanAttributeValue != null)
-                    && governorTypeDetails.getName()
-                    .getFullyQualifiedTypeName().contentEquals(
-                            faultBeanAttributeValue.getValue());
-            
-            if (!correctFaultBean) {
-                logger
-                        .log(
-                                Level.WARNING,
-                                "@GvNIXWebFault annotation attribute value 'faultBean' in '"
-                                        + governorTypeDetails.getName()
-                                        + "' must have the same value that class complete name.\ni.e.: '"
-                                        + governorTypeDetails.getName()
-                                                .getFullyQualifiedTypeName()
-                                        + "'");
-            }
-
-            if (correctNamespace && correctFaultBean) {
-                // Add @javax.jws.WebFault annotation to ITD.
-                AnnotationMetadata webFaultAnnotationMetadata = getTypeAnnotation(annotationMetadata);
-                if (webFaultAnnotationMetadata != null) {
-                    builder.addTypeAnnotation(webFaultAnnotationMetadata);
-                }
-            }
-
-	}
+        // Add @javax.jws.WebFault annotation to ITD.
+        AnnotationMetadata webFaultAnnotationMetadata = getTypeAnnotation(annotationMetadata);
+        if (webFaultAnnotationMetadata != null) {
+            builder.addTypeAnnotation(webFaultAnnotationMetadata);
+        }
 
 	// Create a representation of the desired output ITD
 	itdTypeDetails = builder.build();
@@ -145,69 +99,16 @@ public class ServiceLayerWSExportExceptionMetadata extends
 	    StringAttributeValue nameAttributeValue = (StringAttributeValue) annotationMetadata
 		    .getAttribute(new JavaSymbolName("name"));
 
-	    if (nameAttributeValue == null) {
-		logger.log(Level.WARNING,
-			"Attribute 'name' in annotation @GvNIXWebFault from class '"
-				+ governorPhysicalTypeMetadata
-					.getPhysicalTypeDetails().getName()
-					.getFullyQualifiedTypeName()
-				+ "' is not defined.");
-		return null;
-	    }
-
 	    annotationAttributeValueList.add(nameAttributeValue);
 
 	    StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) annotationMetadata
 		    .getAttribute(new JavaSymbolName("targetNamespace"));
 
-	    if (targetNamespaceAttributeValue == null) {
-		logger.log(Level.WARNING,
-			"Attribute 'targetNamespace' in annotation @GvNIXWebFault from class '"
-				+ governorPhysicalTypeMetadata
-					.getPhysicalTypeDetails().getName()
-					.getFullyQualifiedTypeName()
-				+ "' is not defined.");
-
-		return null;
-	    } else if (!StringUtils.startsWithIgnoreCase(
-		    targetNamespaceAttributeValue.getValue(), "http://")) {
-
-		logger
-			.log(
-				Level.WARNING,
-				"Attribute 'targetNamespace' for annotation @GvNIXWebFault in class '"
-			+ governorPhysicalTypeMetadata.getPhysicalTypeDetails()
-				.getName().getFullyQualifiedTypeName()
-			+ "' not correctly defined. It must have URI format.");
-		return null;
-	    }
 
 	    annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
 	    StringAttributeValue faultBeanAttributeValue = (StringAttributeValue) annotationMetadata
 		    .getAttribute(new JavaSymbolName("faultBean"));
-
-	    if (faultBeanAttributeValue == null) {
-		logger.log(Level.WARNING,
-			"Attribute 'faultBean' in annotation @GvNIXWebFault from class '"
-				+ governorPhysicalTypeMetadata
-					.getPhysicalTypeDetails().getName()
-					.getFullyQualifiedTypeName()
-				+ "' is not defined.");
-		return null;
-	    } else if (!governorPhysicalTypeMetadata.getPhysicalTypeDetails()
-		    .getName().getFullyQualifiedTypeName().contentEquals(
-			    faultBeanAttributeValue.getValue())) {
-
-		logger
-			.log(
-				Level.WARNING,
-				"Attribute 'faultBean' for annotation @GvNIXWebFault in class '"
-			+ governorPhysicalTypeMetadata.getPhysicalTypeDetails()
-				.getName().getFullyQualifiedTypeName()
-			+ "' not correctly defined. It must be java absolute name (i.e. 'java.lang.String').");
-		return null;
-	    }
 
 	    annotationAttributeValueList.add(faultBeanAttributeValue);
 
