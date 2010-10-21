@@ -171,7 +171,7 @@ Obligatorios todos los atributos de la anotación de gvNIX.
   * Si no se comprueba, lanzará un error al compilar el proyecto debido a que el fichero AspectJ no encontrará la clase de la excepción a la que se refiere.
   * Estará controlado por el metadato asociado a la excepción que únicamente comprueba las excepciones definidas del proyecto.
 
-Create a web service defining annotations in clases.
+Create a web service defining annotations in classes.
 ======================================================
 
 Publish Web Service Class
