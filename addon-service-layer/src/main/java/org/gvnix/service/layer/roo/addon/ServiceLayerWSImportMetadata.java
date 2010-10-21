@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebServiceProxy;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -111,23 +112,20 @@ public class ServiceLayerWSImportMetadata extends
 			wsdlLocation);
 		Element root = wsdl.getDocumentElement();
 		Assert.notNull(root, "No valid document format");
+
+		// Generate source code client clases with Axis
+		generateSources();
 		
-		// The wsdl is RPC or Document style 
+		// Create Aspect methods related to this wsdl location
 		if (WsdlParserUtils.isRpcEncoded(root)) {
 
-		    // Generate source code client clases with CXF
-		    generateSources();
-		    
-		    // TODO Create Axis Aspect Methods
+		    createAspectMethods(root, CommunicationSense.IMPORT_RPC_ENCODED);
 		}
 		else {
 		    
-		    // Generate source code client clases with Axis
-		    generateSources();
-
-		    // Create Aspect methods related to this wsdl location
-		    createAspectMethods(root);
+		    createAspectMethods(root, CommunicationSense.IMPORT);
 		}
+
 	    } catch (SAXException e) {
 
 		Assert.state(false,
@@ -198,6 +196,8 @@ public class ServiceLayerWSImportMetadata extends
      * 
      * @param root
      *            Root element of the wsdl document
+     * @param type
+     *            Communication sense type
      * @throws IOException
      *             No connection to the wsdl location
      * @throws SAXException
@@ -205,12 +205,17 @@ public class ServiceLayerWSImportMetadata extends
      * @throws ParseException
      *             Generated Java client parse error
      */
-    private void createAspectMethods(Element root) throws SAXException, IOException,
-	    ParseException {
+    private void createAspectMethods(Element root, CommunicationSense sense)
+	    throws SAXException, IOException, ParseException {
 
 	// Get the path to the generated service class
 	String servicePath = WsdlParserUtils.getServiceClassPath(root);
-
+	if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
+	    
+	    // Rpc generated service source ends with this string
+	    servicePath = WsdlParserUtils.getServiceClassPath(root).concat("Locator");
+	}
+	
 	// Get the path to the generated port type class
 	String portTypePath = WsdlParserUtils.getPortTypeClassPath(root);
 
@@ -218,7 +223,7 @@ public class ServiceLayerWSImportMetadata extends
 	String portName = WsdlParserUtils.findFirstCompatiblePortClassName(root);
 
 	// Get the port type Java file
-	File file = WsdlParserUtils.getPortTypeJavaFile(root);
+	File file = WsdlParserUtils.getPortTypeJavaFile(root, sense);
 
 	// Parse the port type Java file
 	CompilationUnit unit = JavaParser.parse(file);
@@ -236,24 +241,30 @@ public class ServiceLayerWSImportMetadata extends
 			if (member instanceof MethodDeclaration) {
 
 			    createAspectMethod(servicePath, portTypePath,
-				    portName, (MethodDeclaration) member);
+				    portName, (MethodDeclaration) member, sense);
 			}
 		    }
 		}
 	    }
 	}
     }
-    
+
     /**
      * Create method on Aspect file related to method object.
      * 
-     * @param servicePath Path to the service type
-     * @param portTypePath Path to the port type type
-     * @param portName Name of port name
-     * @param method Method to create on AspectJ
+     * @param servicePath
+     *            Path to the service type
+     * @param portTypePath
+     *            Path to the port type type
+     * @param portName
+     *            Name of port name
+     * @param method
+     *            Method to create on AspectJ
+     * @param type
+     *            Communication sense type
      */
     private void createAspectMethod(String servicePath, String portTypePath,
-	    String portName, MethodDeclaration method) {
+	    String portName, MethodDeclaration method, CommunicationSense sense) {
 
 	// List to store method parameters types and names
 	List<AnnotatedJavaType> javaTypes = new ArrayList<AnnotatedJavaType>();
@@ -282,14 +293,20 @@ public class ServiceLayerWSImportMetadata extends
 	    }
 	}
 
-	// Create the method body
-	InvocableMemberBodyBuilder body = createAspectMethodBody(servicePath,
-		portTypePath, portName, method, parameters);
-
 	// Get the method return type
 	String methodType = method.getType().toString();
 	JavaType returnType = getJavaTypeByName(methodType);
-	    
+	
+	// Rpc Encoded generated clients includes this Exception by default
+	if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
+
+	    throwsTypes.add(new JavaType("javax.xml.rpc.ServiceException"));
+	}
+
+	// Create the method body
+	InvocableMemberBodyBuilder body = createAspectMethodBody(servicePath,
+		portTypePath, portName, method, parameters, returnType);
+
 	// Create the method metadata with previous information
 	MethodMetadata result = new DefaultMethodMetadata(getId(), method
 		.getModifiers(), new JavaSymbolName(method.getName()),
@@ -304,14 +321,19 @@ public class ServiceLayerWSImportMetadata extends
     /**
      * Create method on Aspect file related to method object.
      * 
-     * @param servicePath Path to the service type
-     * @param portTypePath Path to the port type type
-     * @param portName Name of port name
-     * @param method Method to create on AspectJ
+     * @param servicePath
+     *            Path to the service type
+     * @param portTypePath
+     *            Path to the port type type
+     * @param portName
+     *            Name of port name
+     * @param method
+     *            Method to create on AspectJ
      */
     private InvocableMemberBodyBuilder createAspectMethodBody(
 	    String servicePath, String portTypePath, String portName,
-	    MethodDeclaration method, List<Parameter> parameters) {
+	    MethodDeclaration method, List<Parameter> parameters,
+	    JavaType returnType) {
 	
 	InvocableMemberBodyBuilder body = new InvocableMemberBodyBuilder();
 	
@@ -338,18 +360,21 @@ public class ServiceLayerWSImportMetadata extends
 	}
 	invocation.append(")");
 	
-	// Return the method invocation
-	body.appendFormalLine("return " + invocation + ";");
+	// Method invocation
+	String returnLine = "";
+	if (!returnType.equals(JavaType.VOID_PRIMITIVE)) {
+	    
+	    // Add return directive if not void
+	    returnLine = returnLine.concat("return ");
+	}
+	returnLine = returnLine.concat(invocation + ";");
+	body.appendFormalLine(returnLine);
 	
 	return body;
     }
 
     /**
      * Get object type or primitive java type related to primitive type name.
-     * 
-     * <p>
-     * TODO ¿ What happends if method returns null or object ?
-     * </p>
      * 
      * @param name
      *            Type name
@@ -361,57 +386,96 @@ public class ServiceLayerWSImportMetadata extends
 
 	try {
 
-	    // Types
+	    // Object types
 	    type = new JavaType(name);
 
 	} catch (IllegalArgumentException e) {
 
-	    // Primitives
-	    
-	    if ("boolean".equals(name)) {
+	    if (getJavaClassPrimitiveByName(name) != null) {
 
-		type = new JavaType(Boolean.class.getName(), 0,
+		// Primitive types
+		type = new JavaType(
+			getJavaClassPrimitiveByName(name).getName(), 0,
 			DataType.PRIMITIVE, null, null);
 
-	    } else if ("char".equals(name)) {
+	    } else if ("void".equals(name)) {
 
-		type = new JavaType(Character.class.getName(), 0,
-			DataType.PRIMITIVE, null, null);
+		// Void type
+		type = JavaType.VOID_PRIMITIVE;
 
-	    } else if ("byte".equals(name)) {
+	    } else if (name.trim().endsWith("[]")) {
 
-		type = new JavaType(Byte.class.getName(), 0,
-			DataType.PRIMITIVE, null, null);
+		// If an array, analyze array dimensions quantity
+		int i = 0;
+		while (name.trim().endsWith("[]")) {
 
-	    } else if ("short".equals(name)) {
+		    name = name.trim().substring(0, name.trim().length() - 2);
+		    i++;
+		}
 
-		type = new JavaType(Short.class.getName(), 0,
-			DataType.PRIMITIVE, null, null);
+		try {
 
-	    } else if ("int".equals(name)) {
+		    // Array of object types
+		    type = new JavaType(name, i, null, null, null);
+		    
+		} catch (IllegalArgumentException iae) {
 
-		type = new JavaType(Integer.class.getName(), 0,
-			DataType.PRIMITIVE, null, null);
-
-	    } else if ("long".equals(name)) {
-
-		type = new JavaType(Long.class.getName(), 0,
-			DataType.PRIMITIVE, null, null);
-
-	    } else if ("float".equals(name)) {
-
-		type = new JavaType(Float.class.getName(), 0,
-			DataType.PRIMITIVE, null, null);
-
-	    } else if ("double".equals(name)) {
-
-		type = new JavaType(Double.class.getName(), 0,
-			DataType.PRIMITIVE, null, null);
+		    // Array of primitive types
+		    type = new JavaType(getJavaClassPrimitiveByName(name)
+			    .getName(), i, null, null, null);
+		}
 
 	    } else {
 
-		throw new IllegalStateException("Unsupported primitive " + name);
+		throw new IllegalStateException("Unsupported type " + name);
 	    }
+	}
+
+	return type;
+    }
+
+    /**
+     * Get the primitive class related to a primitive type name.
+     * 
+     * @param name
+     *            Type name
+     * @return Java class
+     */
+    private Class getJavaClassPrimitiveByName(String name) {
+
+	Class type = null;
+
+	if ("boolean".equals(name)) {
+
+	    type = Boolean.class;
+
+	} else if ("char".equals(name)) {
+
+	    type = Character.class;
+
+	} else if ("byte".equals(name)) {
+
+	    type = Byte.class;
+
+	} else if ("short".equals(name)) {
+
+	    type = Short.class;
+
+	} else if ("int".equals(name)) {
+
+	    type = Integer.class;
+
+	} else if ("long".equals(name)) {
+
+	    type = Long.class;
+
+	} else if ("float".equals(name)) {
+
+	    type = Float.class;
+
+	} else if ("double".equals(name)) {
+
+	    type = Double.class;
 	}
 
 	return type;

@@ -41,6 +41,7 @@ public class WsdlParserUtilsTest {
     public static final String EMAIL_VALIDATION_V2_WSDL = "http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl";
     public static final String EMAIL_VALIDATION_V1_WSDL = "http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl";
     public static final String TEMP_CONVERT_MODIFIED_LOCAL_WSDL = "tempconvert.wsdl";
+    public static final String KK_WEB_SERVICE_ENG_WSDL = "http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl";
 
     public static final String SRC_TEST_RESOURCES_PATH = "."
 	    + WsdlParserUtils.FILE_SEPARATOR + "src"
@@ -137,6 +138,10 @@ public class WsdlParserUtilsTest {
 	wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
 	root = wsdl.getDocumentElement();
 	assertEquals("com.xwebservices.ws.xwebemailvalidation.emailvalidation.v2.XWebEmailValidationInterface", WsdlParserUtils.getPortTypeClassPath(root));
+	
+	wsdl = XmlUtils.getDocumentBuilder().parse(KK_WEB_SERVICE_ENG_WSDL);
+	root = wsdl.getDocumentElement();
+	assertEquals("com.konakart.ws.KKWSEngIf", WsdlParserUtils.getPortTypeClassPath(root));
     }
     
 }

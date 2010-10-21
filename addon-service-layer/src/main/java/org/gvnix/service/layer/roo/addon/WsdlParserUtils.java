@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
@@ -68,6 +69,9 @@ public class WsdlParserUtils {
     public static final String TARGET_GENERATED_SOURCES_PATH = "."
 	    + FILE_SEPARATOR + "target" + FILE_SEPARATOR + "generated-sources"
 	    + FILE_SEPARATOR + "cxf";
+    public static final String TARGET_GENERATED_SOURCES_RPC_PATH = "."
+	    + FILE_SEPARATOR + "target" + FILE_SEPARATOR + "generated-sources"
+	    + FILE_SEPARATOR + "axistools" + FILE_SEPARATOR + "wsdl2java";
 
     public static final String DEFINITIONS_ELEMENT = "definitions";
     public static final String BINDING_ELEMENT = "binding";
@@ -335,11 +339,13 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Wsdl root element
+     * @param type
+     *            Communication sense type
      * @return Java file
      */
-    public static File getPortTypeJavaFile(Element root) {
+    public static File getPortTypeJavaFile(Element root, CommunicationSense type) {
 
-	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root)));
+	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root)), type);
     }
 
     /**
@@ -362,11 +368,24 @@ public class WsdlParserUtils {
      * @param path Searched path
      * @return File to path
      */
-    private static File getGeneratedJavaFile(String path) {
+    private static File getGeneratedJavaFile(String path, CommunicationSense type) {
 	
 	Assert.hasText(path, "Text in path required");
 	
-	return new File(TARGET_GENERATED_SOURCES_PATH, path);
+	String target = "";
+	switch (type) {
+	case IMPORT:
+	    
+	    target = TARGET_GENERATED_SOURCES_PATH;
+	    break;
+
+	case IMPORT_RPC_ENCODED:
+	    
+	    target = TARGET_GENERATED_SOURCES_RPC_PATH;
+	    break;
+	}
+	
+	return new File(target, path);
     }
 
     /**
