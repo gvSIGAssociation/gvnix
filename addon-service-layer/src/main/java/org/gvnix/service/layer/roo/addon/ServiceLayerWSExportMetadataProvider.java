@@ -18,8 +18,8 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Modifier;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,8 +30,8 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
-import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
-import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.itd.*;
+import org.springframework.roo.metadata.*;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
@@ -138,22 +138,6 @@ public class ServiceLayerWSExportMetadataProvider extends
                 governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
             }
 
-            // Check if class is not a Roo Entity.
-            Assert
-                    .isTrue(
-                            serviceLayerWSExportValidationService
-                                    .checkIsNotRooEntity(governorTypeDetails
-                                            .getName()),
-                            "You can't export an Entity as a Web Service.Remove '@GvNIXWebService' annotation from class '"
-                                    + governorTypeDetails.getName()
-                                            .getFullyQualifiedTypeName()
-                                    + "'."
-                                    + "\nIf you want to publish an Entity method as Web Service operation:"
-                                    + "\n\t1)Create a new Service class using 'service class' command."
-                                    + "\n\t2)Create an operation inside the class manually or using the command 'service operation'."
-                                    + "\n\t3)Define the logic calling Entity method."
-                                    + "\n\t4)Export operation as Web Service operation using 'serivce export operation'.\n");
-            
             // Get upstreamDepency Class to check.
             AnnotationMetadata gvNIXWebServiceAnnotation = MemberFindingUtils
                     .getTypeAnnotation(governorTypeDetails, new JavaType(
@@ -195,11 +179,19 @@ public class ServiceLayerWSExportMetadataProvider extends
                     .getName(), serviceName.getValue(), address.getValue(),
                     fullyQualifiedTypeName.getValue());
 
-            // Check method signature and annotations.
-            List<? extends MethodMetadata> methodList = governorTypeDetails
-                    .getDeclaredMethods();
+            // Like BeanInfoMetdadaProvider to get all related metadata.
+            // TODO: Update in ROO-1.1.0 with new defined service.
 
-            for (MethodMetadata methodMetadata : methodList) {
+            // Create a list of metadata which the metadata should look for
+            // accessors within
+            List<MemberHoldingTypeDetails> memberHoldingTypeDetails = getMemberHoldingDetails(governorTypeDetails,
+                    governorPhysicalTypeMetadata, metadataIdentificationString);
+
+            // Get public methods to check.
+            List<MethodMetadata> methodMetadataList = getPublicAccessors(memberHoldingTypeDetails);
+
+            // Check method signature and annotations.
+            for (MethodMetadata methodMetadata : methodMetadataList) {
 
                 AnnotationMetadata gvNixWebMethodAnnotation = MemberFindingUtils
                         .getAnnotationOfType(methodMetadata.getAnnotations(),
@@ -270,7 +262,7 @@ public class ServiceLayerWSExportMetadataProvider extends
 
             serviceLayerMetadata = new ServiceLayerWSExportMetadata(
                     metadataIdentificationString, aspectName,
-                    governorPhysicalTypeMetadata);
+                    governorPhysicalTypeMetadata, methodMetadataList);
 
         }
 
@@ -670,9 +662,9 @@ public class ServiceLayerWSExportMetadataProvider extends
                                     .getFullyQualifiedTypeName()
                             + "' to be exported as web Service operation.");
 
-            gvNixWebParamAnnotation = MemberFindingUtils
-                    .getAnnotationOfType(parameterAnnotationList, new JavaType(
-                            GvNIXWebParam.class.getName()));
+            gvNixWebParamAnnotation = MemberFindingUtils.getAnnotationOfType(
+                    parameterAnnotationList, new JavaType(GvNIXWebParam.class
+                            .getName()));
 
             Assert.isTrue(gvNixWebParamAnnotation != null,
                     "Must be set @GvNIXWebParam annotation to: "
@@ -688,7 +680,8 @@ public class ServiceLayerWSExportMetadataProvider extends
             gvNIxWebParamTypeAttributeValue = (ClassAttributeValue) gvNixWebParamAnnotation
                     .getAttribute(new JavaSymbolName("type"));
 
-            Assert.isTrue(gvNIxWebParamTypeAttributeValue != null && gvNIxWebParamTypeAttributeValue.getValue() != null,
+            Assert.isTrue(gvNIxWebParamTypeAttributeValue != null
+                    && gvNIxWebParamTypeAttributeValue.getValue() != null,
                     "Must be set 'type' attribute in @GvNIXWebParam annotation to: "
                             + inputParameter.getJavaType()
                                     .getFullyQualifiedTypeName()
@@ -720,11 +713,12 @@ public class ServiceLayerWSExportMetadataProvider extends
                                     + "' is different than parameter Java type. This would change web service contract."
                                     + "\nIf you want to change the web service contract you must define the same Java type in 'type' attribute in @GvNIXWebParam annotation.");
 
-
             gvNixWebParamNameAttributeValue = (StringAttributeValue) gvNixWebParamAnnotation
                     .getAttribute(new JavaSymbolName("name"));
 
-            Assert.isTrue(gvNixWebParamNameAttributeValue != null && StringUtils.hasText(gvNixWebParamNameAttributeValue.getValue()),
+            Assert.isTrue(gvNixWebParamNameAttributeValue != null
+                    && StringUtils.hasText(gvNixWebParamNameAttributeValue
+                            .getValue()),
                     "Must be set 'name' attribute in @GvNIXWebParam annotation to: "
                             + inputParameter.getJavaType()
                                     .getFullyQualifiedTypeName()
@@ -753,7 +747,9 @@ public class ServiceLayerWSExportMetadataProvider extends
             webParamNameAttributeValue = (StringAttributeValue) webParamAnnotation
                     .getAttribute(new JavaSymbolName("name"));
 
-            Assert.isTrue(webParamNameAttributeValue != null && StringUtils.hasText(webParamNameAttributeValue.getValue()),
+            Assert.isTrue(webParamNameAttributeValue != null
+                    && StringUtils.hasText(webParamNameAttributeValue
+                            .getValue()),
                     "Must be set 'name' attribute in @WebParam annotation to: "
                             + inputParameter.getJavaType()
                                     .getFullyQualifiedTypeName()
@@ -815,6 +811,130 @@ public class ServiceLayerWSExportMetadataProvider extends
 
         }
 
+    }
+
+    /**
+     * Retrieve all related ITDs to {@link ClassOrInterfaceTypeDetails} with all
+     * information.
+     * 
+     * @param governorTypeDetails
+     *            Class to retrieve all related ITD information.
+     * @param governorPhysicalTypeMetadata Physical Metadata.
+     * @param metadataIdentificationString Identify this Metadata.
+     * 
+     * @return List of {@link MemberHoldingTypeDetails} information.
+     */
+    public List<MemberHoldingTypeDetails> getMemberHoldingDetails(
+            ClassOrInterfaceTypeDetails governorTypeDetails,
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            String metadataIdentificationString) {
+
+        // Create a list of discovered members
+        // BeanInfoMetadataProviderImpl.class.getName()
+        List<MemberHoldingTypeDetails> memberHoldingTypeDetails = new ArrayList<MemberHoldingTypeDetails>();
+
+        // Build a List representing the class hierarchy, where the first
+        // element is the absolute superclass
+        List<ClassOrInterfaceTypeDetails> cidHierarchy = new ArrayList<ClassOrInterfaceTypeDetails>();
+        while (governorTypeDetails != null) {
+            cidHierarchy.add(0, governorTypeDetails); // note to the top of the
+            // list
+            governorTypeDetails = governorTypeDetails.getSuperclass();
+        }
+
+        // Now we add this governor, plus all of its superclasses
+        for (ClassOrInterfaceTypeDetails currentClass : cidHierarchy) {
+            memberHoldingTypeDetails.add(currentClass);
+
+            // Add metadata representing accessors offered by other ITDs
+            for (MetadataProvider provider : metadataService
+                    .getRegisteredProviders()) {
+                // We're only interested in ITD providers which provide
+                // accessors
+                if (this.equals(provider)
+                        || !(provider instanceof ItdRoleAwareMetadataProvider)
+                        || !((ItdRoleAwareMetadataProvider) provider)
+                                .getRoles().contains(
+                                        ItdProviderRole.ACCESSOR_MUTATOR)) {
+                    continue;
+                }
+
+                // Determine the key the ITD provider uses for this particular
+                // type
+                String key = ((ItdMetadataProvider) provider)
+                        .getIdForPhysicalJavaType(currentClass
+                                .getDeclaredByMetadataId());
+                Assert
+                        .isTrue(MetadataIdentificationUtils
+                                .isIdentifyingInstance(key),
+                                "ITD metadata provider '" + provider
+                                        + "' returned an illegal key ('" + key
+                                        + "'");
+
+                // Register a dependency, as we need to know whenever an ITD
+                // changes its contents
+                // Only need to bother for our governor, though - superclasses
+                // trickle down to governor anyway, so we find out that way
+                if (currentClass.equals(governorPhysicalTypeMetadata
+                        .getPhysicalTypeDetails())) {
+                    // Dealing with governor at the moment, so we should
+                    // register
+                    metadataDependencyRegistry.registerDependency(key,
+                            metadataIdentificationString);
+                }
+
+                // Get the metadata and ensure we have ITD type details
+                // available
+                MetadataItem metadataItem = metadataService.get(key);
+                if (metadataItem == null || !metadataItem.isValid()) {
+                    continue;
+                }
+                Assert
+                        .isInstanceOf(
+                                ItdTypeDetailsProvidingMetadataItem.class,
+                                metadataItem,
+                                "ITD metadata provider '"
+                                        + provider
+                                        + "' failed to return the correct metadata type");
+                ItdTypeDetailsProvidingMetadataItem itdTypeDetailsMd = (ItdTypeDetailsProvidingMetadataItem) metadataItem;
+                if (itdTypeDetailsMd.getItdTypeDetails() == null) {
+                    continue;
+                }
+
+                metadataDependencyRegistry.registerDependency(key,
+                        metadataIdentificationString);
+
+                // Include its accessors
+                memberHoldingTypeDetails.add(itdTypeDetailsMd
+                        .getItdTypeDetails());
+            }
+        }
+
+        return memberHoldingTypeDetails;
+    }
+
+    /**
+     * Get public methods from associated {@link MemberHoldingTypeDetails} list.
+     * 
+     * @param memberHoldingTypeDetails
+     *            to get all public methods defined.
+     * @return list of public methods {@link MethodMetadata}.
+     */
+    public List<MethodMetadata> getPublicAccessors(
+            List<MemberHoldingTypeDetails> memberHoldingTypeDetails) {
+
+        // We keep these in a TreeMap so the methods are output in alphabetic
+        // order
+        List<MethodMetadata> sortedByDetectionOrder = new ArrayList<MethodMetadata>();
+
+        for (MemberHoldingTypeDetails holder : memberHoldingTypeDetails) {
+            for (MethodMetadata method : holder.getDeclaredMethods()) {
+                if (Modifier.isPublic(method.getModifier())) {
+                    sortedByDetectionOrder.add(method);
+                }
+            }
+        }
+        return sortedByDetectionOrder;
     }
 
     /*

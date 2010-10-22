@@ -33,7 +33,6 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 
 /**
  * <p>
@@ -57,7 +56,8 @@ public class ServiceLayerWSExportMetadata extends
             .getLogger(ServiceLayerWSExportMetadata.class.getName());
 
     public ServiceLayerWSExportMetadata(String identifier, JavaType aspectName,
-            PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            List<MethodMetadata> methodMetadataList) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
@@ -80,8 +80,8 @@ public class ServiceLayerWSExportMetadata extends
 
             builder.addTypeAnnotation(getSoapBindingAnnotation());
 
-            List<MethodMetadata> methodMetadataList = MemberFindingUtils
-                    .getMethods(governorTypeDetails);
+            // Methods to exclude from web service.
+            List<MethodMetadata> methodMetadataListToExclude = new ArrayList<MethodMetadata>();
 
             for (MethodMetadata methodMetadata : methodMetadataList) {
 
@@ -95,12 +95,16 @@ public class ServiceLayerWSExportMetadata extends
                     updateMethodWithGvNIXAnnotation(methodMetadata,
                             methodAnnotation);
                 }
+                else {
+                    // Exclude from Web Service.
+                    methodMetadataListToExclude.add(methodMetadata);
+                }
 
             }
 
             // Update methods without @GvNIXWebMethod annotation with
             // '@WebMethod(exclude = true)'
-            updateMethodWithoutGvNIXAnnotation();
+            updateMethodWithoutGvNIXAnnotation(methodMetadataListToExclude);
         }
 
         // Create a representation of the desired output ITD
@@ -227,8 +231,8 @@ public class ServiceLayerWSExportMetadata extends
         annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
         StringAttributeValue operationNameAttributeValue = (StringAttributeValue) methodAnnotation
-        .getAttribute(new JavaSymbolName("operationName"));
-        
+                .getAttribute(new JavaSymbolName("operationName"));
+
         annotationAttributeValueList.add(operationNameAttributeValue);
 
         StringAttributeValue actionAttribuetValue = new StringAttributeValue(
@@ -288,8 +292,9 @@ public class ServiceLayerWSExportMetadata extends
         // Check result value
         StringAttributeValue resutlNameAttributeValue = (StringAttributeValue) methodAnnotation
                 .getAttribute(new JavaSymbolName("resultName"));
-        
-        ClassAttributeValue resultTypeAttributeValue = (ClassAttributeValue)methodAnnotation.getAttribute(new JavaSymbolName("webResultType"));
+
+        ClassAttributeValue resultTypeAttributeValue = (ClassAttributeValue) methodAnnotation
+                .getAttribute(new JavaSymbolName("webResultType"));
 
         if ((resutlNameAttributeValue != null && !resutlNameAttributeValue
                 .getValue().contains("void"))
@@ -306,8 +311,8 @@ public class ServiceLayerWSExportMetadata extends
             annotationAttributeValueList.add(localNameAttributeValue);
 
             StringAttributeValue gvNIxWebResultTargetNamespace = (StringAttributeValue) methodAnnotation
-            .getAttribute(new JavaSymbolName("resultNamespace"));
-            
+                    .getAttribute(new JavaSymbolName("resultNamespace"));
+
             StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("targetNamespace"),
                     gvNIxWebResultTargetNamespace.getValue());
@@ -378,11 +383,11 @@ public class ServiceLayerWSExportMetadata extends
     /**
      * Update methods without @GvNIXWebMethod annotation with @WebMethod(exclude
      * = true).
+     * 
+     * @param methodMetadataListToExclude
+     *            methods to exclude from Web Service.
      */
-    public void updateMethodWithoutGvNIXAnnotation() {
-
-        List<MethodMetadata> methodMetadataList = MemberFindingUtils
-                .getMethods(governorTypeDetails);
+    public void updateMethodWithoutGvNIXAnnotation(List<MethodMetadata> methodMetadataListToExclude) {
 
         List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
         attributes.add(new BooleanAttributeValue(new JavaSymbolName("exclude"),
@@ -391,39 +396,16 @@ public class ServiceLayerWSExportMetadata extends
         AnnotationMetadata methodAnnotation = new DefaultAnnotationMetadata(
                 new JavaType("javax.jws.WebMethod"), attributes);
 
-        List<AnnotationMetadata> methodAnnotationList;
+        for (MethodMetadata md : methodMetadataListToExclude) {
 
-        DefaultAnnotationMetadata defaultAnnotationMetadata = new DefaultAnnotationMetadata(
-                new JavaType(
-                        "org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod"),
-                new ArrayList<AnnotationAttributeValue<?>>());
+            AnnotationMetadata gvNIXWebMethodMethodAnnotation = MemberFindingUtils
+                    .getAnnotationOfType(md.getAnnotations(), new JavaType(
+                            GvNIXWebMethod.class.getName()));
 
-        boolean exclude = true;
-        for (MethodMetadata md : methodMetadataList) {
-
-            methodAnnotationList = md.getAnnotations();
-
-            if (methodAnnotationList.size() == 0) {
-
+            if (gvNIXWebMethodMethodAnnotation == null) {
                 builder
-                        .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
-                                md, methodAnnotation));
-            } else {
-                for (AnnotationMetadata annotationMetadata : methodAnnotationList) {
-
-                    if (annotationMetadata.getAnnotationType().equals(
-                            defaultAnnotationMetadata.getAnnotationType())) {
-                        exclude = false;
-                        break;
-                    }
-
-                }
-
-                if (exclude) {
-                    builder
-                            .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
-                                    md, methodAnnotation));
-                }
+                .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                        md, methodAnnotation));
             }
         }
 

@@ -135,18 +135,6 @@ public class ServiceLayerWsExportOperationsImpl implements
 
         }
 
-        // Check if serviceClass is not a Roo Entity.
-        Assert
-                .isTrue(
-                        serviceLayerWSExportValidationService
-                                .checkIsNotRooEntity(serviceClass),
-                        "You can't export an Entity as a Web Service."
-                                + "\nIf you want to publish an Entity method as Web Service operation:"
-                                + "\n\t1)Create a new Service class using 'service class' command."
-                                + "\n\t2)Create an operation inside the class manually or using the command 'service operation'."
-                                + "\n\t3)Define the logic calling Entity method."
-                                + "\n\t4)Export operation as Web Service operation using 'serivce export operation'.\n");
-
         List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = exportServiceAnnotationAttributes(
                 serviceClass, serviceName, portTypeName, targetNamespace,
                 addressName);
