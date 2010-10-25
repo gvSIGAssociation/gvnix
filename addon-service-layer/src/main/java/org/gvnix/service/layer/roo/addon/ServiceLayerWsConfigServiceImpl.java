@@ -599,7 +599,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         // Service is already published.
         if (classAndIdService != null) {
-            logger.log(Level.INFO, "The service '" + serviceName.getValue()
+            logger.log(Level.FINE, "The service '" + serviceName.getValue()
                     + "' is already set in cxf config file.");
             updateService = false;
         }
@@ -760,7 +760,7 @@ public class ServiceLayerWsConfigServiceImpl implements
         // 1) Check if exists with id and address.
         if (jaxwsBean != null) {
 
-            logger.log(Level.INFO, "The endpoint '" + serviceName.getValue()
+            logger.log(Level.FINE, "The endpoint '" + serviceName.getValue()
                     + "' is already set in cxf config file.");
             updateEndpoint = false;
         }
@@ -951,7 +951,7 @@ public class ServiceLayerWsConfigServiceImpl implements
                                 + "']", root);
 
         if (serviceExecution != null) {
-            logger.log(Level.INFO, "Wsdl generation with CXF plugin for '"
+            logger.log(Level.FINE, "Wsdl generation with CXF plugin for '"
                     + serviceName + " service, it's already configured.");
             return;
         }

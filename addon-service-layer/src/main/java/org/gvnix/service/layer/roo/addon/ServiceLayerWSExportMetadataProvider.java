@@ -154,7 +154,7 @@ public class ServiceLayerWSExportMetadataProvider extends
                     .getValue();
 
             // Show info
-            logger.log(Level.WARNING,
+            logger.log(Level.FINE,
                     "Check correct format to export the web service class: '"
                             + governorTypeDetails.getName() + "'");
 
@@ -184,8 +184,9 @@ public class ServiceLayerWSExportMetadataProvider extends
 
             // Create a list of metadata which the metadata should look for
             // accessors within
-            List<MemberHoldingTypeDetails> memberHoldingTypeDetails = getMemberHoldingDetails(governorTypeDetails,
-                    governorPhysicalTypeMetadata, metadataIdentificationString);
+            List<MemberHoldingTypeDetails> memberHoldingTypeDetails = getMemberHoldingDetails(
+                    governorTypeDetails, governorPhysicalTypeMetadata,
+                    metadataIdentificationString);
 
             // Get public methods to check.
             List<MethodMetadata> methodMetadataList = getPublicAccessors(memberHoldingTypeDetails);
@@ -819,8 +820,10 @@ public class ServiceLayerWSExportMetadataProvider extends
      * 
      * @param governorTypeDetails
      *            Class to retrieve all related ITD information.
-     * @param governorPhysicalTypeMetadata Physical Metadata.
-     * @param metadataIdentificationString Identify this Metadata.
+     * @param governorPhysicalTypeMetadata
+     *            Physical Metadata.
+     * @param metadataIdentificationString
+     *            Identify this Metadata.
      * 
      * @return List of {@link MemberHoldingTypeDetails} information.
      */
@@ -849,13 +852,10 @@ public class ServiceLayerWSExportMetadataProvider extends
             // Add metadata representing accessors offered by other ITDs
             for (MetadataProvider provider : metadataService
                     .getRegisteredProviders()) {
-                // We're only interested in ITD providers which provide
-                // accessors
+
+                // We're only interested in all ITD providers
                 if (this.equals(provider)
-                        || !(provider instanceof ItdRoleAwareMetadataProvider)
-                        || !((ItdRoleAwareMetadataProvider) provider)
-                                .getRoles().contains(
-                                        ItdProviderRole.ACCESSOR_MUTATOR)) {
+                        || !(provider instanceof ItdRoleAwareMetadataProvider)) {
                     continue;
                 }
 
@@ -871,31 +871,17 @@ public class ServiceLayerWSExportMetadataProvider extends
                                         + "' returned an illegal key ('" + key
                                         + "'");
 
-                // Register a dependency, as we need to know whenever an ITD
-                // changes its contents
-                // Only need to bother for our governor, though - superclasses
-                // trickle down to governor anyway, so we find out that way
-                if (currentClass.equals(governorPhysicalTypeMetadata
-                        .getPhysicalTypeDetails())) {
-                    // Dealing with governor at the moment, so we should
-                    // register
-                    metadataDependencyRegistry.registerDependency(key,
-                            metadataIdentificationString);
-                }
-
                 // Get the metadata and ensure we have ITD type details
                 // available
                 MetadataItem metadataItem = metadataService.get(key);
                 if (metadataItem == null || !metadataItem.isValid()) {
                     continue;
                 }
-                Assert
-                        .isInstanceOf(
-                                ItdTypeDetailsProvidingMetadataItem.class,
-                                metadataItem,
-                                "ITD metadata provider '"
-                                        + provider
-                                        + "' failed to return the correct metadata type");
+                
+                if (!(metadataItem instanceof ItdTypeDetailsProvidingMetadataItem)) {
+                    continue;
+                }
+                
                 ItdTypeDetailsProvidingMetadataItem itdTypeDetailsMd = (ItdTypeDetailsProvidingMetadataItem) metadataItem;
                 if (itdTypeDetailsMd.getItdTypeDetails() == null) {
                     continue;
@@ -929,7 +915,8 @@ public class ServiceLayerWSExportMetadataProvider extends
 
         for (MemberHoldingTypeDetails holder : memberHoldingTypeDetails) {
             for (MethodMetadata method : holder.getDeclaredMethods()) {
-                if (Modifier.isPublic(method.getModifier())) {
+                if (Modifier.isPublic(method.getModifier())
+                        && !Modifier.isStatic(method.getModifier())) {
                     sortedByDetectionOrder.add(method);
                 }
             }
