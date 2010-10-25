@@ -281,7 +281,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                     updatedFilecontents);
 
         } else {
-            logger.info("Exception '"
+            logger.log(Level.FINE, "Exception '"
                     + exceptionClass.getFullyQualifiedTypeName()
                     + "' has already been exported as @WebFault.");
         }

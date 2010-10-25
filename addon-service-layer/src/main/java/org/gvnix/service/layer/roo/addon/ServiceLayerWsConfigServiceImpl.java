@@ -86,6 +86,9 @@ public class ServiceLayerWsConfigServiceImpl implements
      */
     public void install(CommunicationSense type) {
 
+        // Check if properties are set in pom.xml
+        addProjectProperties(type);
+        
         // Check if it's already installed.
         if (isLibraryInstalled(type)) {
             
@@ -320,44 +323,52 @@ public class ServiceLayerWsConfigServiceImpl implements
      */
     private void installDependencies(CommunicationSense type) {
 
-        // If dependencies are installed continue.
-        if (isDependenciesInstalled(type)) {
+        // If dependencies are installed.
+        boolean isInstalled = isDependenciesInstalled(type);
+        
+        // Add project properties values. 
+	addProjectProperties(type);
 
-            return;
-	}
+        if (!isInstalled) {
+            List<Element> cxfDependencies = getRequiredDependencies(type);
+            for (Element dependency : cxfDependencies) {
+                projectOperations.dependencyUpdate(new Dependency(dependency));
+            }
+        }
+    }
 
-	// Add project properties, as versions
-	List<Element> projectProperties = new ArrayList<Element>();
-	
-	switch (type) {
-	
-	case IMPORT:
-	case EXPORT:
+    /**
+     * {@inheritDoc}
+     */
+    public void addProjectProperties(CommunicationSense type) {
 
-	    projectProperties = XmlUtils
-		    .findElements("/configuration/gvnix/properties/*",
-			    XmlUtils.getConfiguration(this.getClass(),
-				    "properties.xml"));
-	    break;
+        // Add project properties, as versions
+        List<Element> projectProperties = new ArrayList<Element>();
+        
+        switch (type) {
+        
+        case IMPORT:
+        case EXPORT:
 
-	case IMPORT_RPC_ENCODED:
+            projectProperties = XmlUtils
+        	    .findElements("/configuration/gvnix/properties/*",
+        		    XmlUtils.getConfiguration(this.getClass(),
+        			    "properties.xml"));
+            break;
 
-	    // TODO Check cxf version property before ?
-	    projectProperties = XmlUtils.findElements(
-		    "/configuration/gvnix/properties/*", XmlUtils
-			    .getConfiguration(this.getClass(),
-				    "properties-axis.xml"));
-	    break;
-	}
+        case IMPORT_RPC_ENCODED:
 
-        for (Element property : projectProperties) {
-            projectOperations.addProperty(new Property(property));
+            // TODO Check cxf version property before ?
+            projectProperties = XmlUtils.findElements(
+        	    "/configuration/gvnix/properties/*", XmlUtils
+        		    .getConfiguration(this.getClass(),
+        			    "properties-axis.xml"));
+            break;
         }
 
-        List<Element> cxfDependencies = getRequiredDependencies(type);
-        for (Element dependency : cxfDependencies) {
-            projectOperations.dependencyUpdate(new Dependency(dependency));
-        }
+            for (Element property : projectProperties) {
+                projectOperations.addProperty(new Property(property));
+            }
     }
 
     /**

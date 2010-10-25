@@ -94,7 +94,7 @@ public class AnnotationsServiceImpl implements AnnotationsService {
 		mutableTypeDetails
 			.removeTypeAnnotation(new JavaType(annotation));
 	    } else {
-		logger.log(Level.INFO, "The annotation " + annotation
+		logger.log(Level.FINE, "The annotation " + annotation
 			+ " is already defined in '"
 			+ serviceClass.getFullyQualifiedTypeName() + "'.");
 		return;

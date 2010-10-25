@@ -149,4 +149,10 @@ public interface ServiceLayerWsConfigService {
      */
     boolean isProjectAvailable();
 
+    /**
+     * Add project properties values to pom.xml.
+     * 
+     * @param type of {@link CommunicationSense}
+     */
+    public void addProjectProperties(CommunicationSense type);
 }
