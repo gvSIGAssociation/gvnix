@@ -60,10 +60,11 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
     public void exportWSDL(String url) {
 
         // 1) TODO: Check if WSDL is RPC enconded and copy file to project.
-        Document wsdl = getWSDLFile(url);
+        Document wsdl = checkWSDLFile(url);
 
         // 2) TODO: Configure plugin cxf to generate java code using WSDL.
-
+        serviceLayerWsConfigService.addImportLocation(url, CommunicationSense.EXPORT_WSDL);
+        
         // 3) TODO: Run maven generate-sources command.
 
         // 4) TODO: Check generate classes.
@@ -83,7 +84,7 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
      * If WSDL is Document/Literal return Xml Document from WSDl.
      * </p>
      */
-    public Document getWSDLFile(String url) {
+    public Document checkWSDLFile(String url) {
 
         Document wsdl = null;
         try {

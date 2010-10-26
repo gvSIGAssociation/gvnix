@@ -45,10 +45,10 @@ public interface ServiceLayerWSExportWSDLOperations {
     public void exportWSDL(String url);
     
     /**
-     * Retrieve WSDL to export into {@link Document}.
+     * Check correct WSDL encoding and retrieve WSDL to export into {@link Document}.
      * 
      * @param url from WSDL file to export.
      * @return Xml document from WSDL.
      */
-    public Document getWSDLFile(String url);
+    public Document checkWSDLFile(String url);
 }

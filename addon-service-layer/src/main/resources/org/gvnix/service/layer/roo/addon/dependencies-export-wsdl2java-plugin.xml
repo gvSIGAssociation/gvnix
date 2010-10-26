@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<cxf-codegen>
+  <cxf-codegen-plugin>
+    <plugin>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-codegen-plugin</artifactId>
+      <version>${cxf.version}</version>
+      <executions>
+          <execution>
+              <id>generate-sources</id>
+              <phase>generate-sources</phase>
+              <configuration>
+                  <wsdlOptions>
+                  </wsdlOptions>
+              </configuration>
+              <goals>
+                  <goal>wsdl2java</goal>
+              </goals>
+          </execution>
+      </executions>
+    </plugin>
+  </cxf-codegen-plugin>
+  <cxf-codegen-execution>
+          <wsdlOption>
+            <wsdl></wsdl>
+            <extraargs>
+              <extraarg>-impl</extraarg>
+            </extraargs>
+          </wsdlOption>
+  </cxf-codegen-execution>
+</cxf-codegen>

@@ -66,5 +66,8 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy10 --wsdl http://www.aswinanand.com/sendsms.php?wsdl
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy11 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
 
+// Export WSDL 2 Java
+service export wsdl --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
+
 perform eclipse
 perform assembly

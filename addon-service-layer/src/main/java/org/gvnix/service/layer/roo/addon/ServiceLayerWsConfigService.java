@@ -44,10 +44,12 @@ public interface ServiceLayerWsConfigService {
      * Sense of the Communication.
      * <ul>
      * <li>EXPORT: From this to external systems.</li>
+     * <li>EXPORT_WSDL: From external systems to this WSDL2JAVA.</li>
      * <li>IMPORT: From external systems to this.</li>
+     * <li>IMPORT_RPC_ENCODED: From external systems to this RPC Encoded.</li>
      * </ul>
      */
-    public enum CommunicationSense { EXPORT, IMPORT, IMPORT_RPC_ENCODED };
+    public enum CommunicationSense { EXPORT, EXPORT_WSDL, IMPORT, IMPORT_RPC_ENCODED };
 
     /**
      * Install and configure Web Service library, if not already installed.

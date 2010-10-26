@@ -20,7 +20,6 @@ package org.gvnix.service.layer.roo.addon;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebFault;
