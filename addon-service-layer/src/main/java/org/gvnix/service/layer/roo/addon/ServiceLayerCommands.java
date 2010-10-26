@@ -258,6 +258,6 @@ public class ServiceLayerCommands implements CommandMarker {
     public void serviceExportWsdl(
             @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
 
-        serviceLayerWSExportWSDLOperations.exportWSDL(url);
+        serviceLayerWSExportWSDLOperations.exportWSDL2Java(url);
     }
 }

@@ -18,8 +18,6 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import org.w3c.dom.Document;
-
 /**
  * Addon for Handle Service Layer
  * 
@@ -42,13 +40,6 @@ public interface ServiceLayerWSExportWSDLOperations {
      * 
      * @param url from WSDL file to export.
      */
-    public void exportWSDL(String url);
+    public void exportWSDL2Java(String url);
     
-    /**
-     * Check correct WSDL encoding and retrieve WSDL to export into {@link Document}.
-     * 
-     * @param url from WSDL file to export.
-     * @return Xml document from WSDL.
-     */
-    public Document checkWSDLFile(String url);
 }

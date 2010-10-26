@@ -20,6 +20,7 @@ package org.gvnix.service.layer.roo.addon;
 
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaType;
+import org.w3c.dom.Document;
 
 /**
  * Service to manage the Web Services.
@@ -118,6 +119,22 @@ public interface ServiceLayerWsConfigService {
      */
     public void importService(JavaType className, String wsdlLocation,
 	    CommunicationSense type);
+    
+    /**
+     * Exports WSDL to java.
+     * 
+     * @param wsdlLocation contract wsdl url to export.
+     * @param type Communication sense type.
+     */
+    public void exportWSDLWebService(String wsdlLocation, CommunicationSense type);
+
+    /**
+     * Check correct WSDL encoding and retrieve WSDL to export into {@link Document}.
+     * 
+     * @param url from WSDL file to export.
+     * @return Xml document from WSDL.
+     */
+    public Document checkWSDLFile(String url);
 
     /**
      * Create Jax-WS plugin configuration in pom.xml.

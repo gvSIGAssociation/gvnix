@@ -18,16 +18,10 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 /**
  * Addon for Handle Service Layer
@@ -57,65 +51,16 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
      * {@inheritDoc}
      * 
      */
-    public void exportWSDL(String url) {
+    public void exportWSDL2Java(String url) {
 
-        // 1) TODO: Check if WSDL is RPC enconded and copy file to project.
-        Document wsdl = checkWSDLFile(url);
+        // Check WSDL, configure plugin and generate sources.
+        serviceLayerWsConfigService.exportWSDLWebService(url,
+                CommunicationSense.EXPORT_WSDL);
 
-        // 2) TODO: Configure plugin cxf to generate java code using WSDL.
-        serviceLayerWsConfigService.addImportLocation(url, CommunicationSense.EXPORT_WSDL);
-        
-        // 3) TODO: Run maven generate-sources command.
-
-        // 4) TODO: Check generate classes.
+        // 4) TODO: Check generated classes.
 
         // 5) TODO: Convert java classes with gvNIX annotations.
 
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * <p>
-     * Check if WSDL is RPC Encoded.
-     * </p>
-     * 
-     * <p>
-     * If WSDL is Document/Literal return Xml Document from WSDl.
-     * </p>
-     */
-    public Document checkWSDLFile(String url) {
-
-        Document wsdl = null;
-        try {
-
-            // Parse the wsdl location to a DOM document
-            wsdl = XmlUtils.getDocumentBuilder().parse(url);
-            Element root = wsdl.getDocumentElement();
-            Assert.notNull(root, "No valid document format");
-
-            if (WsdlParserUtils.isRpcEncoded(root)) {
-
-                // TODO: No RPC Encoded WSDL. log message.
-                logger
-                        .warning("This Wsdl '"
-                                + url
-                                + "' is RPC Encoded and is not supported by the Add-on.");
-                return null;
-            }
-
-        } catch (SAXException e) {
-
-            Assert.state(false,
-                    "The format of the web service to import has errors");
-
-        } catch (IOException e) {
-
-            Assert.state(false,
-                    "There is no connection to the web service to import");
-        }
-
-        return wsdl;
     }
 
 }

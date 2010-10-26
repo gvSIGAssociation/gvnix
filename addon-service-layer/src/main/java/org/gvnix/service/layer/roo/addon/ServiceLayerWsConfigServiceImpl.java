@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.springframework.roo.addon.web.mvc.controller.UrlRewriteOperations;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.metadata.MetadataService;
@@ -36,6 +38,7 @@ import org.springframework.roo.project.*;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.*;
 import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
 /**
  * Utilities to manage the CXF web services library.
@@ -348,6 +351,13 @@ public class ServiceLayerWsConfigServiceImpl implements
         switch (type) {
 
         case IMPORT:
+
+            projectProperties = XmlUtils
+                    .findElements("/configuration/gvnix/properties/*",
+                            XmlUtils.getConfiguration(this.getClass(),
+                                    "properties.xml"));
+            break;
+
         case EXPORT:
 
             projectProperties = XmlUtils
@@ -1102,6 +1112,9 @@ public class ServiceLayerWsConfigServiceImpl implements
      */
     public void addImportLocation(String wsdlLocation, CommunicationSense type) {
 
+        // Project properties to pom.xml
+        addProjectProperties(type);
+
         switch (type) {
 
         case IMPORT:
@@ -1115,9 +1128,10 @@ public class ServiceLayerWsConfigServiceImpl implements
             break;
 
         case EXPORT:
-            // TODO: Refactor method name to use for all CommunicationSense to set each plugin.
+            // TODO: Refactor method name to use for all CommunicationSense to
+            // set each plugin.
             break;
-            
+
         case EXPORT_WSDL:
             // TODO: Export Wsdl2Java
             addExportLocationDocument(wsdlLocation);
@@ -1196,15 +1210,15 @@ public class ServiceLayerWsConfigServiceImpl implements
             configuration.appendChild(wsdlOptions);
         }
 
-        Element wsdlOption = XmlUtils.findFirstElement("wsdlOption[wsdl ='"+wsdlLocation+"']",
-                wsdlOptions);
+        Element wsdlOption = XmlUtils.findFirstElement("wsdlOption[wsdl ='"
+                + wsdlLocation + "']", wsdlOptions);
 
         if (wsdlOption == null) {
             // Create new wsdl element and append it to the XML tree
             wsdlOption = pom.createElement("wsdlOption");
             Element wsdl = pom.createElement("wsdl");
             wsdl.setTextContent(wsdlLocation);
-            
+
             Element extraArgs = pom.createElement("extraargs");
             Element extraArg = pom.createElement("extraarg");
             extraArg.setTextContent("-impl");
@@ -1389,6 +1403,69 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         // Add GvNixAnnotations to the project.
         annotationsService.addGvNIXAnnotationsDependency();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Check correct WSDL format
+     * </p>
+     * <p>
+     * Configure plugin to generate sources
+     * </p>
+     * <p>
+     * Generate java sources
+     * </p>
+     */
+    public void exportWSDLWebService(String wsdlLocation, CommunicationSense type) {
+
+        // 1) Check if WSDL is RPC enconded and copy file to project.
+        Document wsdl = checkWSDLFile(wsdlLocation);
+
+        // 2) TODO: Configure plugin cxf to generate java code using WSDL.
+        addImportLocation(wsdlLocation, type);
+
+        // 3) TODO: Run maven generate-sources command.
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Check if WSDL is RPC Encoded.
+     * </p>
+     * 
+     * <p>
+     * If WSDL is Document/Literal return Xml Document from WSDl.
+     * </p>
+     */
+    public Document checkWSDLFile(String url) {
+
+        Document wsdl = null;
+        try {
+
+            // Parse the wsdl location to a DOM document
+            wsdl = XmlUtils.getDocumentBuilder().parse(url);
+            Element root = wsdl.getDocumentElement();
+            Assert.notNull(root, "No valid document format");
+
+            Assert.state(WsdlParserUtils.isRpcEncoded(root), "This Wsdl '"
+                    + url
+                    + "' is RPC Encoded and is not supported by the Add-on.");
+
+        } catch (SAXException e) {
+
+            Assert.state(false,
+                    "The format of the web service '"+url+"' to export has errors.");
+
+        } catch (IOException e) {
+
+            Assert.state(false,
+                    "There is no connection to the web service '"+url+"' to export.");
+        }
+
+        return wsdl;
     }
 
     /**
