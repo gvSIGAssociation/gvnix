@@ -1231,6 +1231,11 @@ public class ServiceLayerWsConfigServiceImpl implements
 
             // Write new XML to disk
             XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+        } else {
+            logger
+                    .info("The wsdl '"
+                            + wsdlLocation
+                            + "' to export has been defined before in CXF plugin execution in pom.xml.");
         }
     }
 
@@ -1418,7 +1423,8 @@ public class ServiceLayerWsConfigServiceImpl implements
      * Generate java sources
      * </p>
      */
-    public void exportWSDLWebService(String wsdlLocation, CommunicationSense type) {
+    public void exportWSDLWebService(String wsdlLocation,
+            CommunicationSense type) {
 
         // 1) Check if WSDL is RPC enconded and copy file to project.
         Document wsdl = checkWSDLFile(wsdlLocation);
@@ -1450,19 +1456,19 @@ public class ServiceLayerWsConfigServiceImpl implements
             Element root = wsdl.getDocumentElement();
             Assert.notNull(root, "No valid document format");
 
-            Assert.state(WsdlParserUtils.isRpcEncoded(root), "This Wsdl '"
+            Assert.isTrue(!WsdlParserUtils.isRpcEncoded(root), "This Wsdl '"
                     + url
                     + "' is RPC Encoded and is not supported by the Add-on.");
 
         } catch (SAXException e) {
 
-            Assert.state(false,
-                    "The format of the web service '"+url+"' to export has errors.");
+            Assert.state(false, "The format of the web service '" + url
+                    + "' to export has errors.");
 
         } catch (IOException e) {
 
-            Assert.state(false,
-                    "There is no connection to the web service '"+url+"' to export.");
+            Assert.state(false, "There is no connection to the web service '"
+                    + url + "' to export.");
         }
 
         return wsdl;
