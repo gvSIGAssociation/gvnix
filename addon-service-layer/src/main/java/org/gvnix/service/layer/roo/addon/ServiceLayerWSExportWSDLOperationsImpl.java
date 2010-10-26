@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
+import org.springframework.roo.file.monitor.*;
 
 /**
  * Addon for Handle Service Layer
@@ -38,6 +39,8 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
 
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
+    @Reference
+    private NotifiableFileMonitorService fileMonitorService;
 
     private static Logger logger = Logger
             .getLogger(ServiceLayerWSExportWSDLOperationsImpl.class.getName());
@@ -59,7 +62,17 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
 
         // 4) TODO: Check generated classes.
 
+        // DirectoryMonitoringRequest directoryMonitoringRequest = new
+        // DirectoryMonitoringRequest(
+        // new File(themesDirectory), true, (MonitoringRequest
+        // .getInitialMonitoringRequest(themesDirectory))
+        // .getNotifyOn());
+        //
+        // fileMonitorService.add(directoryMonitoringRequest);
+        // fileMonitorService.scanAll();
+
         // 5) TODO: Convert java classes with gvNIX annotations.
+        // Using ServiceLayerWSExportWSDLListener
 
     }
 
