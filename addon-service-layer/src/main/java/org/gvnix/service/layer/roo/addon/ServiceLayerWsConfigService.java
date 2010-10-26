@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
@@ -43,6 +44,17 @@ import org.w3c.dom.Document;
  */
 public interface ServiceLayerWsConfigService {
     
+    /**
+     * <ul>
+     * <li>XML_ELEMENT: Associated with @GvNIXXmlElement annotation.</li>
+     * <li>WEB_FAULT: Associated with @GvNIXWebFault annotation.</li>
+     * <li>WEB_SERVICE: Associated with @GvNIXWebService annotation.</li>
+     * </ul>
+     */
+    public enum GvNIXAnnotationType {
+        XML_ELEMENT, WEB_FAULT, WEB_SERVICE
+    };
+
     /**
      * Sense of the Communication.
      * <ul>
@@ -148,6 +160,16 @@ public interface ServiceLayerWsConfigService {
      * @throws IOException
      */
     public void mvn(String parameters) throws IOException;
+
+    /**
+     * Updates list of files generated to update with '@GvNIX' annotations.
+     * 
+     * @param file
+     *            scanned to add to list.
+     * @param gvNIXAnnotationType
+     *            to select the list where add the file.
+     */
+    public void addFileToUpdateAnnotation(File file, GvNIXAnnotationType gvNIXAnnotationType);
 
     /**
      * Create Jax-WS plugin configuration in pom.xml.

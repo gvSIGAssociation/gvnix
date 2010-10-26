@@ -71,6 +71,10 @@ public class ServiceLayerWsConfigServiceImpl implements
     @Reference
     private MavenOperations mavenOperations;
 
+    private List<File> gVNIXXmlElementList = new ArrayList<File>();
+    private List<File> gVNIXWebFaultList = new ArrayList<File>();
+    private List<File> gVNIXXmlWebServiceList = new ArrayList<File>();
+
     protected static Logger logger = Logger
             .getLogger(ServiceLayerWsConfigService.class.getName());
 
@@ -1557,6 +1561,29 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         }
 
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public void addFileToUpdateAnnotation(File file,
+            GvNIXAnnotationType gvNIXAnnotationType) {
+
+        switch (gvNIXAnnotationType) {
+
+        case XML_ELEMENT:
+            gVNIXXmlElementList.add(file);
+            break;
+
+        case WEB_FAULT:
+            gVNIXWebFaultList.add(file);
+            break;
+
+        case WEB_SERVICE:
+            gVNIXXmlWebServiceList.add(file);
+            break;
+        }
     }
 
     /**

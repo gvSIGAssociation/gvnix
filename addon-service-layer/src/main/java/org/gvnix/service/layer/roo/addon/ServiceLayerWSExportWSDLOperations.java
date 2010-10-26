@@ -29,17 +29,23 @@ package org.gvnix.service.layer.roo.addon;
 public interface ServiceLayerWSExportWSDLOperations {
 
     /**
-     * Is service layer command available on Roo console ? 
+     * Is service layer command available on Roo console ?
      * 
      * @return Service layer command available on Roo console
      */
     boolean isProjectAvailable();
 
     /**
-     * Export WSDL Web Service Contract First to Java code using GvNIX annotations.
+     * Export WSDL Web Service Contract First to Java code using GvNIX
+     * annotations.
      * 
-     * @param url from WSDL file to export.
+     * @param url
+     *            from WSDL file to export.
      */
     public void exportWSDL2Java(String url);
-    
+
+    /**
+     * Create new files with '@GvNIX' annotations in SRC_MAIN_JAVA.
+     */
+    public void updateAnnotationsToGvNIX();
 }

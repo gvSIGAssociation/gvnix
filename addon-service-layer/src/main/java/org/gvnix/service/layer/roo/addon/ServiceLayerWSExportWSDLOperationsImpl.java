@@ -65,7 +65,7 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
         serviceLayerWsConfigService.exportWSDLWebService(url,
                 CommunicationSense.EXPORT_WSDL);
 
-        // 4) TODO: Check generated classes.
+        // 4) Check generated classes.
         String generateSourcesDirectory = pathResolver.getIdentifier(Path.ROOT,
                 "target/generated-sources/cxf/");
         DirectoryMonitoringRequest directoryMonitoringRequest = new DirectoryMonitoringRequest(
@@ -76,9 +76,24 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
         fileMonitorService.add(directoryMonitoringRequest);
         fileMonitorService.scanAll();
 
+        // Remove Directory listener.
+        fileMonitorService.remove(directoryMonitoringRequest);
+
         // 5) TODO: Convert java classes with gvNIX annotations.
         // Using ServiceLayerWSExportWSDLListener
+        updateAnnotationsToGvNIX();
+        
+    }
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Check the files listed in Arrays in this class.
+     * </p>
+     * TODO:
+     */
+    public void updateAnnotationsToGvNIX() {
 
     }
-
+    
 }
