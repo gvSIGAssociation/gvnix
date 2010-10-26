@@ -18,11 +18,14 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.springframework.roo.file.monitor.*;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
 
 /**
  * Addon for Handle Service Layer
@@ -41,7 +44,9 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
     @Reference
     private NotifiableFileMonitorService fileMonitorService;
-
+    @Reference
+    private PathResolver pathResolver;
+    
     private static Logger logger = Logger
             .getLogger(ServiceLayerWSExportWSDLOperationsImpl.class.getName());
 
@@ -61,15 +66,15 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
                 CommunicationSense.EXPORT_WSDL);
 
         // 4) TODO: Check generated classes.
+        String generateSourcesDirectory = pathResolver.getIdentifier(Path.ROOT,
+                "target/generated-sources/cxf/");
+        DirectoryMonitoringRequest directoryMonitoringRequest = new DirectoryMonitoringRequest(
+                new File(generateSourcesDirectory), true, (MonitoringRequest
+                        .getInitialMonitoringRequest(generateSourcesDirectory))
+                        .getNotifyOn());
 
-        // DirectoryMonitoringRequest directoryMonitoringRequest = new
-        // DirectoryMonitoringRequest(
-        // new File(themesDirectory), true, (MonitoringRequest
-        // .getInitialMonitoringRequest(themesDirectory))
-        // .getNotifyOn());
-        //
-        // fileMonitorService.add(directoryMonitoringRequest);
-        // fileMonitorService.scanAll();
+        fileMonitorService.add(directoryMonitoringRequest);
+        fileMonitorService.scanAll();
 
         // 5) TODO: Convert java classes with gvNIX annotations.
         // Using ServiceLayerWSExportWSDLListener

@@ -57,8 +57,8 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
     public void onFileEvent(FileEvent fileEvent) {
         // TODO Auto-generated method stub
 
-        if (this.generateSourcesDirectory.contains(fileEvent.getFileDetails()
-                .getFile().getAbsolutePath())) {
+        if (fileEvent.getFileDetails().getFile().getAbsolutePath().contains(
+                this.generateSourcesDirectory)) {
             logger.info(fileEvent.getFileDetails().getFile().getAbsolutePath());
         }
     }
