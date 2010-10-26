@@ -18,6 +18,8 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.io.IOException;
+
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaType;
 import org.w3c.dom.Document;
@@ -51,6 +53,8 @@ public interface ServiceLayerWsConfigService {
      * </ul>
      */
     public enum CommunicationSense { EXPORT, EXPORT_WSDL, IMPORT, IMPORT_RPC_ENCODED };
+    
+    static final String GENERATE_SOURCES = "clean generate-sources";
 
     /**
      * Install and configure Web Service library, if not already installed.
@@ -135,6 +139,15 @@ public interface ServiceLayerWsConfigService {
      * @return Xml document from WSDL.
      */
     public Document checkWSDLFile(String url);
+    
+    /**
+     * Run maven command with parameters.
+     * 
+     * @param parameters to run with maven.
+     * 
+     * @throws IOException
+     */
+    public void mvn(String parameters) throws IOException;
 
     /**
      * Create Jax-WS plugin configuration in pom.xml.

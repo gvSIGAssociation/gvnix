@@ -18,15 +18,14 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
-import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
+import org.springframework.roo.addon.maven.MavenOperations;
 import org.springframework.roo.addon.web.mvc.controller.UrlRewriteOperations;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.metadata.MetadataService;
@@ -69,8 +68,10 @@ public class ServiceLayerWsConfigServiceImpl implements
     private UrlRewriteOperations urlRewriteOperations;
     @Reference
     private AnnotationsService annotationsService;
+    @Reference
+    private MavenOperations mavenOperations;
 
-    private static Logger logger = Logger
+    protected static Logger logger = Logger
             .getLogger(ServiceLayerWsConfigService.class.getName());
 
     /**
@@ -1433,6 +1434,13 @@ public class ServiceLayerWsConfigServiceImpl implements
         addImportLocation(wsdlLocation, type);
 
         // 3) TODO: Run maven generate-sources command.
+        try {
+            mvn(GENERATE_SOURCES);
+        } catch (IOException e) {
+            Assert.state(false,
+                    "There is an error generating java sources with '"
+                            + wsdlLocation + "'.\n" + e.getMessage());
+        }
     }
 
     /**
@@ -1472,6 +1480,83 @@ public class ServiceLayerWsConfigServiceImpl implements
         }
 
         return wsdl;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mvn(String parameters) throws IOException {
+
+        File root = new File(mavenOperations.getProjectRoot());
+        Assert.isTrue(root.isDirectory() && root.exists(),
+                "Project root does not currently exist as a directory ('"
+                        + root.getCanonicalPath() + "')");
+
+        String cmd = null;
+        if (File.separatorChar == '\\') {
+            cmd = "mvn.bat " + parameters;
+        } else {
+            cmd = "mvn " + parameters;
+        }
+
+        Process p = Runtime.getRuntime().exec(cmd, null, root);
+
+        // Ensure separate threads are used for logging, as per ROO-652
+        LoggingInputStream input = new LoggingInputStream(p.getInputStream());
+        LoggingInputStream errors = new LoggingInputStream(p.getErrorStream());
+
+        input.start();
+        errors.start();
+
+        try {
+            p.waitFor();
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private class LoggingInputStream extends Thread {
+
+        private BufferedReader inputStream;
+
+        public LoggingInputStream(InputStream inputStream) {
+            this.inputStream = new BufferedReader(new InputStreamReader(
+                    inputStream));
+        }
+
+        @Override
+        public void run() {
+            String line;
+            try {
+                while ((line = inputStream.readLine()) != null) {
+                    if (line.startsWith("[ERROR]")) {
+                        logger.severe(line);
+                    } else if (line.startsWith("[WARNING]")) {
+                        logger.warning(line);
+                    } else {
+                        logger.info(line);
+                    }
+                }
+            } catch (IOException ioe) {
+                if (ioe.getMessage().contains("No such file or directory") || // for
+                        // *nix/Mac
+                        ioe.getMessage().contains("CreateProcess error=2")) // for
+                // Windows
+                {
+                    logger
+                            .severe("Could not locate Maven executable; please ensure mvn command is in your path");
+                }
+            } finally {
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException ignore) {
+                    }
+                }
+            }
+
+        }
+
     }
 
     /**
