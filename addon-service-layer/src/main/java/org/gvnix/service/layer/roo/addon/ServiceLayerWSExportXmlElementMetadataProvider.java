@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations.MethodParameterType;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
@@ -252,15 +253,12 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
                         "Attribute 'elementList' in '@GvNIXXmlElement' annotation must be defined.\nArray with field names of '"
                                 + governorTypeDetails.getName()
                                         .getFullyQualifiedTypeName()
-                                + "' to be used in Web Service operation.\nIf you want to publish all fields set the attribute value: 'elementList = {\"\"}'");
+                                + "' to be used in Web Service operation.\nIf you don't want to publish any fields set the attribute value: 'elementList = {\"\"}'");
 
         List<StringAttributeValue> elementListStringValue = elementListArrayAttributeValue
                 .getValue();
 
-        boolean containsValue;
-
         List<FieldMetadata> declaredFieldList = new ArrayList<FieldMetadata>();
-        List<FieldMetadata> tmpDeclaredFieldList = new ArrayList<FieldMetadata>();
 
         // Fields from Entity MetaData.
         if (entityMetadata != null && entityMetadata.isValid()) {
@@ -276,26 +274,49 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
             }
         }
 
-        tmpDeclaredFieldList.addAll(declaredFieldList);
-
+        boolean containsValue;
+        boolean allowed;
         // Check fields from collection.
         for (StringAttributeValue value : elementListStringValue) {
             containsValue = true;
+            allowed = false;
 
-            for (FieldMetadata fieldMetadata : tmpDeclaredFieldList) {
+            for (FieldMetadata fieldMetadata : declaredFieldList) {
 
                 containsValue = value.getValue().contentEquals(
                         fieldMetadata.getFieldName().getSymbolName());
 
                 if (containsValue) {
+
+                    allowed = serviceLayerWSExportValidationService
+                            .isJavaTypeAllowed(fieldMetadata.getFieldType(),
+                                    MethodParameterType.XMLENTITY,
+                                    governorTypeDetails.getName());
+
+                    Assert
+                            .isTrue(
+                                    allowed,
+                                    "The field type '"
+                                            + fieldMetadata
+                                                    .getFieldType()
+                                                    .getFullyQualifiedTypeName()
+                                            + "' is not allow to be used in web a service operation "
+                                            + "because it does not satisfy web services "
+                                            + "interoperatibily rules.\nThis is a disallowed collection defined in: '"
+                                            + governorTypeDetails
+                                                    .getName()
+                                                    .getFullyQualifiedTypeName()
+                                            + "'.");
+
                     fieldMetadataElementList.add(fieldMetadata);
-                    declaredFieldList.remove(fieldMetadata);
                     break;
+
+                }
+                else {
+                    fieldMetadataTransientList.add(fieldMetadata);
                 }
             }
         }
-
-        fieldMetadataTransientList.addAll(declaredFieldList);
 
     }
 

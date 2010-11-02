@@ -18,6 +18,13 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import japa.parser.JavaParser;
+import japa.parser.ParseException;
+import japa.parser.ast.CompilationUnit;
+import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.TypeDeclaration;
+import japa.parser.ast.expr.*;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.GvNIXAnnotationType;
 import org.springframework.roo.addon.maven.MavenOperations;
 import org.springframework.roo.addon.web.mvc.controller.UrlRewriteOperations;
 import org.springframework.roo.classpath.details.annotations.*;
@@ -38,6 +46,8 @@ import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
+
+import sun.management.FileSystem;
 
 /**
  * Utilities to manage the CXF web services library.
@@ -70,6 +80,8 @@ public class ServiceLayerWsConfigServiceImpl implements
     private AnnotationsService annotationsService;
     @Reference
     private MavenOperations mavenOperations;
+
+    private static final String executionId = "generate-sources-";
 
     private List<File> gVNIXXmlElementList = new ArrayList<File>();
     private List<File> gVNIXWebFaultList = new ArrayList<File>();
@@ -984,7 +996,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         if (serviceExecution != null) {
             logger.log(Level.FINE, "Wsdl generation with CXF plugin for '"
-                    + serviceName + " service, it's already configured.");
+                    + serviceName + " service, has been configured before.");
             return;
         }
 
@@ -1022,7 +1034,7 @@ public class ServiceLayerWsConfigServiceImpl implements
                     }
 
                     // Check next node.
-                    updateServiceExecution = serviceExecution.getNextSibling();
+                    updateServiceExecution = updateServiceExecution.getNextSibling();
 
                 }
 
@@ -1194,54 +1206,133 @@ public class ServiceLayerWsConfigServiceImpl implements
                 .notNull(codegenWsPlugin,
                         "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
+        // Checks if already exists the execution.
+        Element wsdlExecution = XmlUtils
+                .findFirstElement(
+                        "/project/build/plugins/plugin/executions/execution/configuration/wsdlOptions/wsdlOption[wsdl='"
+                                + wsdlLocation + "']", root);
+
+        if (wsdlExecution != null) {
+            logger
+                    .fine("The wsdl '"
+                            + wsdlLocation
+                            + "' to export has been defined before in CXF wsdl2java plugin execution in pom.xml.");
+            return;
+        }
+
         // Access executions > execution > configuration > wsdlOptions element.
         // Configuration and wsdlOptions are created if not exists.
-        Element executions = XmlUtils.findFirstElementByName("executions",
+        Element execution = pom.createElement("execution");
+
+        // Create name for id.
+        int lastSlashIndex = wsdlLocation.lastIndexOf("/");
+        String wsdlName = wsdlLocation.substring(lastSlashIndex + 1);
+        wsdlName = StringUtils.delete(wsdlName, ".wsdl");
+        wsdlName = StringUtils.uncapitalize(wsdlName);
+
+        Element id = pom.createElement("id");
+        id.setTextContent(executionId.concat(wsdlName));
+        execution.appendChild(id);
+
+        Element phase = pom.createElement("phase");
+        phase.setTextContent("generate-sources");
+        execution.appendChild(phase);
+
+        Element goals = pom.createElement("goals");
+        Element goal = pom.createElement("goal");
+        goal.setTextContent("wsdl2java");
+        goals.appendChild(goal);
+        execution.appendChild(goals);
+
+        Element configuration = pom.createElement("configuration");
+        execution.appendChild(configuration);
+
+        Element wsdlOptions = pom.createElement("wsdlOptions");
+        configuration.appendChild(wsdlOptions);
+
+        Element wsdlOption = pom.createElement("wsdlOption");
+
+        Element wsdl = pom.createElement("wsdl");
+        wsdl.setTextContent(wsdlLocation);
+
+        Element extraArgs = pom.createElement("extraargs");
+        Element extraArg = pom.createElement("extraarg");
+        extraArg.setTextContent("-impl");
+        extraArgs.appendChild(extraArg);
+
+        wsdlOption.appendChild(wsdl);
+        wsdlOption.appendChild(extraArgs);
+
+        wsdlOptions.appendChild(wsdlOption);
+
+        // Checks if exists executions.
+        Element oldExecutions = XmlUtils.findFirstElementByName("executions",
                 codegenWsPlugin);
-        Element execution = XmlUtils.findFirstElementByName("execution",
-                executions);
-        Element configuration = XmlUtils.findFirstElementByName(
-                "configuration", execution);
-        if (configuration == null) {
 
-            configuration = pom.createElement("configuration");
-            execution.appendChild(configuration);
-        }
-        Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
-                configuration);
-        if (wsdlOptions == null) {
+        Element newExecutions;
 
-            wsdlOptions = pom.createElement("wsdlOptions");
-            configuration.appendChild(wsdlOptions);
-        }
+        // To Update execution definitions It must be replaced in pom.xml to
+        // maintain the format.
+        if (oldExecutions != null) {
+            newExecutions = oldExecutions;
 
-        Element wsdlOption = XmlUtils.findFirstElement("wsdlOption[wsdl ='"
-                + wsdlLocation + "']", wsdlOptions);
+            // Change phase to 'none'
+            if (newExecutions.hasChildNodes()) {
 
-        if (wsdlOption == null) {
-            // Create new wsdl element and append it to the XML tree
-            wsdlOption = pom.createElement("wsdlOption");
-            Element wsdl = pom.createElement("wsdl");
-            wsdl.setTextContent(wsdlLocation);
+                Element newPhase = pom.createElement("phase");
+                newPhase.setTextContent("none");
 
-            Element extraArgs = pom.createElement("extraargs");
-            Element extraArg = pom.createElement("extraarg");
-            extraArg.setTextContent("-impl");
-            extraArgs.appendChild(extraArg);
+                Node updateException;
+                updateException = (newExecutions.getFirstChild() != null) ? newExecutions
+                        .getFirstChild().getNextSibling()
+                        : null;
 
-            wsdlOption.appendChild(wsdl);
-            wsdlOption.appendChild(extraArgs);
+                while (updateException != null) {
 
-            wsdlOptions.appendChild(wsdlOption);
+                    Node updatePhase;
 
-            // Write new XML to disk
-            XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+                    if (updateException.hasChildNodes()) {
+
+                        updatePhase = (updateException.getFirstChild() != null) ? updateException
+                                .getFirstChild().getNextSibling()
+                                : null;
+
+                                boolean exists = false;
+                                
+                        while (updatePhase != null && !exists) {
+
+                            if (updatePhase.getNodeName().contentEquals("phase")) {
+                                updatePhase.setTextContent("none");
+                                exists = true;
+                            }
+                            
+                            updatePhase = updatePhase.getNextSibling();
+                        }
+                        
+                        if (!exists) {
+                            updateException.appendChild(newPhase);
+                        }
+                    }
+
+                    // Check next node.
+                    updateException = updateException.getNextSibling();
+
+                }
+            }
+
+            newExecutions.appendChild(execution);
+            oldExecutions.getParentNode().replaceChild(oldExecutions,
+                    newExecutions);
         } else {
-            logger
-                    .info("The wsdl '"
-                            + wsdlLocation
-                            + "' to export has been defined before in CXF plugin execution in pom.xml.");
+            newExecutions = pom.createElement("executions");
+            newExecutions.appendChild(execution);
+
+            codegenWsPlugin.appendChild(newExecutions);
         }
+
+        // Write new XML to disk
+        XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+
     }
 
     /**
@@ -1584,6 +1675,119 @@ public class ServiceLayerWsConfigServiceImpl implements
             gVNIXXmlWebServiceList.add(file);
             break;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Create files from {@link File} lists:
+     * </p>
+     * <ul>
+     * <li>gVNIXXmlElementList</li>
+     * <li>gVNIXWebFaultList</li>
+     * <li>gVNIXXmlWebServiceList</li>
+     * </ul>
+     * 
+     * <p>
+     * Creates GvNIX annotations attributes from defined attributes in files.
+     * </p>
+     */
+    public void generateGvNIXWebServiceFiles() {
+
+    }
+
+    /**
+     * Generates java files with '@GvNIXXmlElement' values.
+     */
+    protected void generateGvNIXXmlElements() {
+
+        AnnotationMetadata gvNixXmlElementAnnotationMetadata;
+
+        List<AnnotationAttributeValue<?>> gvNixXmlElementAnnoationAttributeValues;
+
+        // name
+        StringAttributeValue nameStringAttributeValue;
+        // namespace
+        StringAttributeValue namespaceStringAttributeValue;
+        // element list
+        List<StringAttributeValue> elementListStringAttributeValues = new ArrayList<StringAttributeValue>();
+
+        ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue;
+
+        for (File xmlElementFile : gVNIXXmlElementList) {
+
+            // Parse Java file.
+            CompilationUnit unit;
+            try {
+                unit = JavaParser.parse(xmlElementFile);
+
+                // Get the first class or interface Java type
+                List<TypeDeclaration> types = unit.getTypes();
+                if (types != null) {
+                    TypeDeclaration type = types.get(0);
+                    if (type instanceof ClassOrInterfaceDeclaration) {
+
+                        // Get all annotations.
+                        gvNixXmlElementAnnoationAttributeValues = analyzeAnnotations(type
+                                .getAnnotations());
+
+                    }
+                }
+
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                Assert.state(false,
+                        "Generated web service java file has errors:\n"
+                                + e.getMessage());
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                Assert.state(false,
+                        "Generated web service java file has errors:\n"
+                                + e.getMessage());
+
+            }
+
+        }
+    }
+
+    public List<AnnotationAttributeValue<?>> analyzeAnnotations(
+            List<AnnotationExpr> annotationExprList) {
+
+        // Attribute value list.
+        List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
+
+        for (AnnotationExpr annotationExpr : annotationExprList) {
+
+            AbstractAnnotationAttributeValue annotationAttributeValue;
+
+            if (annotationExpr instanceof NormalAnnotationExpr) {
+
+                NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
+
+                if (normalAnnotationExpr.getName().getName().contains(
+                        ServiceLayerWSExportWSDLListener.xmlRootElement)) {
+
+                }
+                if (normalAnnotationExpr.getName().getName().contains(
+                        ServiceLayerWSExportWSDLListener.xmlAccessorType)) {
+
+                }
+
+            } else if (annotationExpr instanceof SingleMemberAnnotationExpr) {
+
+                SingleMemberAnnotationExpr singleMemberAnnotationExpr = (SingleMemberAnnotationExpr) annotationExpr;
+
+                if (singleMemberAnnotationExpr.getName().getName().contains(
+                        ServiceLayerWSExportWSDLListener.xmlAccessorType)) {
+
+                }
+            }
+
+        }
+        return annotationAttributeValues;
     }
 
     /**

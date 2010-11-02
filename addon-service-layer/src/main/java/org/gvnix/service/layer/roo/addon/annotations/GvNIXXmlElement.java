@@ -36,7 +36,7 @@ public @interface GvNIXXmlElement {
 
     String name();
 
-    String namespace();
+    String namespace() default "##default";
 
     String[] elementList();
 

@@ -36,6 +36,7 @@ import org.springframework.roo.file.monitor.event.FileEvent;
 import org.springframework.roo.file.monitor.event.FileEventListener;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.support.util.Assert;
 
 /**
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -51,7 +52,7 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
     static final String webService = "WebService";
     static final String xmlRootElement = "XmlRootElement";
-    static final String xmlType = "XmlType";
+    static final String xmlAccessorType = "XmlAccessorType";
     static final String webFault = "WebFault";
 
     @Reference
@@ -76,13 +77,13 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
      * (org.springframework.roo.file.monitor.event.FileEvent)
      */
     public void onFileEvent(FileEvent fileEvent) {
-        // TODO Auto-generated method stub
+
         File file = fileEvent.getFileDetails().getFile();
 
         if (file.getAbsolutePath().contains(this.generateSourcesDirectory)
                 && !file.isDirectory()) {
 
-            // Parse the port type Java file
+            // Parse Java file.
             CompilationUnit unit;
             try {
                 unit = JavaParser.parse(file);
@@ -93,7 +94,7 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
                     TypeDeclaration type = types.get(0);
                     if (type instanceof ClassOrInterfaceDeclaration) {
 
-                        logger.info(fileEvent.getFileDetails().getFile()
+                        logger.fine(fileEvent.getFileDetails().getFile()
                                 .getAbsolutePath());
 
                         // Get all annotations.
@@ -103,7 +104,7 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
                         // Check annotation types.
                         for (AnnotationExpr annotationExpr : annotations) {
 
-                            if (analizeAnnotations(file, annotationExpr)) {
+                            if (analyzeAnnotations(file, annotationExpr)) {
                                 break;
                             }
 
@@ -113,10 +114,17 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
             } catch (ParseException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                Assert.state(false,
+                        "Generated web service java file has errors:\n"
+                                + e.getMessage());
+
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+                Assert.state(false,
+                        "Generated web service java file has errors:\n"
+                                + e.getMessage());
+
             }
 
         }
@@ -134,15 +142,15 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
      * @return true if has found selected annotation.
      * 
      */
-    public boolean analizeAnnotations(File file, AnnotationExpr annotationExpr) {
+    public boolean analyzeAnnotations(File file, AnnotationExpr annotationExpr) {
 
         if (annotationExpr instanceof NormalAnnotationExpr) {
 
             NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
 
-            if (normalAnnotationExpr.getName().getName().contains(xmlType)
+            if (normalAnnotationExpr.getName().getName().contains(xmlRootElement)
                     || normalAnnotationExpr.getName().getName().contains(
-                            xmlRootElement)) {
+                            xmlAccessorType)) {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.XML_ELEMENT);
@@ -165,9 +173,9 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
             MarkerAnnotationExpr markerAnnotationExpr = (MarkerAnnotationExpr) annotationExpr;
 
-            if (markerAnnotationExpr.getName().getName().contains(xmlType)
+            if (markerAnnotationExpr.getName().getName().contains(xmlRootElement)
                     || markerAnnotationExpr.getName().getName().contains(
-                            xmlRootElement)) {
+                            xmlAccessorType)) {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.XML_ELEMENT);
@@ -190,10 +198,9 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
             SingleMemberAnnotationExpr singleMemberAnnotationExpr = (SingleMemberAnnotationExpr) annotationExpr;
 
-            if (singleMemberAnnotationExpr.getName().getName()
-                    .contains(xmlType)
+            if (singleMemberAnnotationExpr.getName().getName().contains(xmlRootElement)
                     || singleMemberAnnotationExpr.getName().getName().contains(
-                            xmlRootElement)) {
+                            xmlAccessorType)) {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.XML_ELEMENT);

@@ -26,7 +26,6 @@ import japa.parser.ast.expr.*;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.Type;
 
-
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -34,13 +33,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.GvNIXAnnotationType;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
-import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.DefaultAnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.javaparser.JavaParserMutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.javaparser.JavaParserUtils;
 import org.springframework.roo.classpath.javaparser.details.JavaParserMethodMetadata;
@@ -63,8 +60,8 @@ import org.springframework.roo.support.util.Assert;
 @Service
 public class JavaParserServiceImpl implements JavaParserService {
 
-    private static Logger logger = Logger
-    .getLogger(JavaParserServiceImpl.class.getName());
+    private static Logger logger = Logger.getLogger(JavaParserServiceImpl.class
+            .getName());
 
     @Reference
     private MetadataService metadataService;
@@ -77,7 +74,6 @@ public class JavaParserServiceImpl implements JavaParserService {
     @Reference
     private PathResolver pathResolver;
 
-    
     /**
      * {@inheritDoc}
      * 
@@ -87,22 +83,74 @@ public class JavaParserServiceImpl implements JavaParserService {
      */
     public void createServiceClass(JavaType serviceClass) {
 
-	// Service class
-	String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
-		serviceClass, Path.SRC_MAIN_JAVA);
+        // Service class
+        String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
+                serviceClass, Path.SRC_MAIN_JAVA);
 
-	// Service annotations
-	List<AnnotationMetadata> serviceAnnotations = new ArrayList<AnnotationMetadata>();
-	serviceAnnotations.add(new DefaultAnnotationMetadata(new JavaType(
-		"org.springframework.stereotype.Service"),
-		new ArrayList<AnnotationAttributeValue<?>>()));
+        // Service annotations
+        List<AnnotationMetadata> serviceAnnotations = new ArrayList<AnnotationMetadata>();
+        serviceAnnotations.add(new DefaultAnnotationMetadata(new JavaType(
+                "org.springframework.stereotype.Service"),
+                new ArrayList<AnnotationAttributeValue<?>>()));
 
-	ClassOrInterfaceTypeDetails serviceDetails = new DefaultClassOrInterfaceTypeDetails(
-		declaredByMetadataId, serviceClass, Modifier.PUBLIC,
-		PhysicalTypeCategory.CLASS, null, null, null, null, null,
-		null, serviceAnnotations, null);
+        ClassOrInterfaceTypeDetails serviceDetails = new DefaultClassOrInterfaceTypeDetails(
+                declaredByMetadataId, serviceClass, Modifier.PUBLIC,
+                PhysicalTypeCategory.CLASS, null, null, null, null, null, null,
+                serviceAnnotations, null);
 
-	classpathOperations.generateClassFile(serviceDetails);
+        classpathOperations.generateClassFile(serviceDetails);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Only creates the class if not exists in project.
+     * </p>
+     */
+    public void createGvNIXWebServiceClass(JavaType javaType,
+            List<AnnotationMetadata> typeAnnotationList,
+            GvNIXAnnotationType gvNIXAnnotationType,
+            List<FieldMetadata> declaredFieldList,
+            List<MethodMetadata> declaredMethodList) {
+
+        // Metadata Id.
+        String declaredByMetadataId = null;
+
+        switch (gvNIXAnnotationType) {
+
+        case XML_ELEMENT:
+            declaredByMetadataId = ServiceLayerWSExportXmlElementMetadata
+                    .createIdentifier(javaType, Path.SRC_MAIN_JAVA);
+            break;
+
+        case WEB_FAULT:
+            declaredByMetadataId = ServiceLayerWSExportExceptionMetadata
+                    .createIdentifier(javaType, Path.SRC_MAIN_JAVA);
+            break;
+
+        case WEB_SERVICE:
+            declaredByMetadataId = ServiceLayerWSExportMetadata
+                    .createIdentifier(javaType, Path.SRC_MAIN_JAVA);
+            break;
+        }
+
+        // Determine the canonical filename
+        String physicalLocationCanonicalPath = classpathOperations.getPhysicalLocationCanonicalPath(declaredByMetadataId);
+        
+        // Check the file doesn't already exist
+        if (!fileManager.exists(physicalLocationCanonicalPath)) {
+
+            // Create class.
+            ClassOrInterfaceTypeDetails serviceDetails = new DefaultClassOrInterfaceTypeDetails(
+                    declaredByMetadataId, javaType, Modifier.PUBLIC,
+                    PhysicalTypeCategory.CLASS, null, declaredFieldList,
+                    declaredMethodList, null, null, null, typeAnnotationList,
+                    null);
+
+            classpathOperations.generateClassFile(serviceDetails);
+
+        }
     }
 
     /**
@@ -113,37 +161,37 @@ public class JavaParserServiceImpl implements JavaParserService {
      * </p>
      */
     public void createMethod(JavaSymbolName methodName, JavaType returnType,
-	    JavaType targetType, int modifier, List<JavaType> throwsTypes,
-	    List<AnnotationMetadata> annotationList,
-	    List<AnnotatedJavaType> paramTypes,
-	    List<JavaSymbolName> paramNames, String body) {
+            JavaType targetType, int modifier, List<JavaType> throwsTypes,
+            List<AnnotationMetadata> annotationList,
+            List<AnnotatedJavaType> paramTypes,
+            List<JavaSymbolName> paramNames, String body) {
 
-	Assert.notNull(paramTypes, "Param type mustn't be null");
-	Assert.notNull(paramNames, "Param name mustn't be null");
+        Assert.notNull(paramTypes, "Param type mustn't be null");
+        Assert.notNull(paramNames, "Param name mustn't be null");
 
-	// MetadataID
-	String targetId = PhysicalTypeIdentifier.createIdentifier(targetType,
-		Path.SRC_MAIN_JAVA);
+        // MetadataID
+        String targetId = PhysicalTypeIdentifier.createIdentifier(targetType,
+                Path.SRC_MAIN_JAVA);
 
-	// Obtain the physical type and itd mutable details
-	PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
-		.get(targetId);
-	Assert.notNull(ptm, "Java source class doesn't exists.");
+        // Obtain the physical type and itd mutable details
+        PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+                .get(targetId);
+        Assert.notNull(ptm, "Java source class doesn't exists.");
 
-	PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
-	Assert.notNull(ptd, "Java source code details unavailable for type "
-		+ PhysicalTypeIdentifier.getFriendlyName(targetId));
-	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, ptd,
-		"Java source code is immutable for type "
-			+ PhysicalTypeIdentifier.getFriendlyName(targetId));
-	MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
+        PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
+        Assert.notNull(ptd, "Java source code details unavailable for type "
+                + PhysicalTypeIdentifier.getFriendlyName(targetId));
+        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, ptd,
+                "Java source code is immutable for type "
+                        + PhysicalTypeIdentifier.getFriendlyName(targetId));
+        MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
 
-	// create method
-	MethodMetadata operationMetadata = new DefaultMethodMetadata(targetId,
-		modifier, methodName,
-		(returnType == null ? JavaType.VOID_PRIMITIVE : returnType),
-		paramTypes, paramNames, annotationList, throwsTypes, body);
-	mutableTypeDetails.addMethod(operationMetadata);
+        // create method
+        MethodMetadata operationMetadata = new DefaultMethodMetadata(targetId,
+                modifier, methodName,
+                (returnType == null ? JavaType.VOID_PRIMITIVE : returnType),
+                paramTypes, paramNames, annotationList, throwsTypes, body);
+        mutableTypeDetails.addMethod(operationMetadata);
 
     }
 
@@ -159,114 +207,113 @@ public class JavaParserServiceImpl implements JavaParserService {
             List<AnnotationMetadata> annotationMetadataUpdateList,
             List<AnnotatedJavaType> annotationWebParamMetadataList) {
 
-	// MetadataID
-	String targetId = PhysicalTypeIdentifier.createIdentifier(className,
-		Path.SRC_MAIN_JAVA);
+        // MetadataID
+        String targetId = PhysicalTypeIdentifier.createIdentifier(className,
+                Path.SRC_MAIN_JAVA);
 
-	// Obtain the physical type and itd mutable details
-	PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
-		.get(targetId);
-	PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
-	Assert.notNull(ptd, "Java source code details unavailable for type "
-		+ PhysicalTypeIdentifier.getFriendlyName(targetId));
-	Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
-		ptd, "Java source code is immutable for type "
-			+ PhysicalTypeIdentifier.getFriendlyName(targetId));
+        // Obtain the physical type and itd mutable details
+        PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+                .get(targetId);
+        PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
+        Assert.notNull(ptd, "Java source code details unavailable for type "
+                + PhysicalTypeIdentifier.getFriendlyName(targetId));
+        Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
+                ptd, "Java source code is immutable for type "
+                        + PhysicalTypeIdentifier.getFriendlyName(targetId));
 
-	JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
+        JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
 
-	// Update method
-	List<? extends MethodMetadata> methodsList = mutableTypeDetails
-		.getDeclaredMethods();
+        // Update method
+        List<? extends MethodMetadata> methodsList = mutableTypeDetails
+                .getDeclaredMethods();
 
-	JavaParserMethodMetadata javaParserMethodMetadata;
+        JavaParserMethodMetadata javaParserMethodMetadata;
 
-	List<MethodMetadata> updatedMethodList = new ArrayList<MethodMetadata>();
-	List<AnnotationMetadata> methodAnnotationList = new ArrayList<AnnotationMetadata>();
-	
-	MethodMetadata operationMetadata;
+        List<MethodMetadata> updatedMethodList = new ArrayList<MethodMetadata>();
+        List<AnnotationMetadata> methodAnnotationList = new ArrayList<AnnotationMetadata>();
 
-	for (MethodMetadata methodMetadata : methodsList) {
+        MethodMetadata operationMetadata;
 
-	    javaParserMethodMetadata = (JavaParserMethodMetadata) methodMetadata;
+        for (MethodMetadata methodMetadata : methodsList) {
 
-	    if (methodMetadata.getMethodName().toString().compareTo(
-		    method.toString()) == 0) {
+            javaParserMethodMetadata = (JavaParserMethodMetadata) methodMetadata;
 
-		Assert.isTrue(!isAnnotationIntroducedInMethod(
-			GvNIXWebMethod.class.getName(), methodMetadata),
-			"The method '" + method.toString()
-				+ "' has been annotated with '@"
-				+ GvNIXWebMethod.class.getName() + "' before.");
+            if (methodMetadata.getMethodName().toString().compareTo(
+                    method.toString()) == 0) {
 
-		methodAnnotationList.addAll(javaParserMethodMetadata
-			.getAnnotations());
-		methodAnnotationList.addAll(annotationMetadataUpdateList);
+                Assert.isTrue(!isAnnotationIntroducedInMethod(
+                        GvNIXWebMethod.class.getName(), methodMetadata),
+                        "The method '" + method.toString()
+                                + "' has been annotated with '@"
+                                + GvNIXWebMethod.class.getName() + "' before.");
 
-		operationMetadata = new DefaultMethodMetadata(targetId,
-			javaParserMethodMetadata.getModifier(),
-			javaParserMethodMetadata.getMethodName(),
-			javaParserMethodMetadata.getReturnType(),
+                methodAnnotationList.addAll(javaParserMethodMetadata
+                        .getAnnotations());
+                methodAnnotationList.addAll(annotationMetadataUpdateList);
+
+                operationMetadata = new DefaultMethodMetadata(targetId,
+                        javaParserMethodMetadata.getModifier(),
+                        javaParserMethodMetadata.getMethodName(),
+                        javaParserMethodMetadata.getReturnType(),
                         annotationWebParamMetadataList,
-			javaParserMethodMetadata.getParameterNames(),
-			methodAnnotationList,
-			javaParserMethodMetadata.getThrowsTypes(),
-			javaParserMethodMetadata.getBody()
-				.substring(
-					javaParserMethodMetadata.getBody()
-						.indexOf("{") + 1,
-					javaParserMethodMetadata.getBody()
-						.indexOf("}")));
+                        javaParserMethodMetadata.getParameterNames(),
+                        methodAnnotationList, javaParserMethodMetadata
+                                .getThrowsTypes(), javaParserMethodMetadata
+                                .getBody().substring(
+                                        javaParserMethodMetadata.getBody()
+                                                .indexOf("{") + 1,
+                                        javaParserMethodMetadata.getBody()
+                                                .indexOf("}")));
 
-	    } else {
-		operationMetadata = new DefaultMethodMetadata(targetId,
-			javaParserMethodMetadata.getModifier(),
-			javaParserMethodMetadata.getMethodName(),
-			javaParserMethodMetadata.getReturnType(),
-			javaParserMethodMetadata.getParameterTypes(),
-			javaParserMethodMetadata.getParameterNames(),
-			javaParserMethodMetadata.getAnnotations(),
-			javaParserMethodMetadata.getThrowsTypes(),
-			javaParserMethodMetadata.getBody()
-				.substring(
-					javaParserMethodMetadata.getBody()
-						.indexOf("{") + 1,
-					javaParserMethodMetadata.getBody()
-						.indexOf("}")));
+            } else {
+                operationMetadata = new DefaultMethodMetadata(targetId,
+                        javaParserMethodMetadata.getModifier(),
+                        javaParserMethodMetadata.getMethodName(),
+                        javaParserMethodMetadata.getReturnType(),
+                        javaParserMethodMetadata.getParameterTypes(),
+                        javaParserMethodMetadata.getParameterNames(),
+                        javaParserMethodMetadata.getAnnotations(),
+                        javaParserMethodMetadata.getThrowsTypes(),
+                        javaParserMethodMetadata.getBody()
+                                .substring(
+                                        javaParserMethodMetadata.getBody()
+                                                .indexOf("{") + 1,
+                                        javaParserMethodMetadata.getBody()
+                                                .indexOf("}")));
 
-	    }
-	    updatedMethodList.add(operationMetadata);
+            }
+            updatedMethodList.add(operationMetadata);
 
-	}
+        }
 
-	List<ConstructorMetadata> contructorList = new ArrayList<ConstructorMetadata>();
-	contructorList.addAll(mutableTypeDetails.getDeclaredConstructors());
+        List<ConstructorMetadata> contructorList = new ArrayList<ConstructorMetadata>();
+        contructorList.addAll(mutableTypeDetails.getDeclaredConstructors());
 
-	List<FieldMetadata> fieldMetadataList = new ArrayList<FieldMetadata>();
-	fieldMetadataList.addAll(mutableTypeDetails.getDeclaredFields());
+        List<FieldMetadata> fieldMetadataList = new ArrayList<FieldMetadata>();
+        fieldMetadataList.addAll(mutableTypeDetails.getDeclaredFields());
 
-	List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
-	annotationMetadataList.addAll(mutableTypeDetails.getTypeAnnotations());
+        List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
+        annotationMetadataList.addAll(mutableTypeDetails.getTypeAnnotations());
 
-	// Replicates the values from the original class.
-	ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = new DefaultClassOrInterfaceTypeDetails(
-		mutableTypeDetails.getDeclaredByMetadataId(),
-		mutableTypeDetails.getName(),
-		mutableTypeDetails.getModifier(),
-		mutableTypeDetails.getPhysicalTypeCategory(),
-		contructorList,
-		fieldMetadataList,
-		updatedMethodList,
-		mutableTypeDetails.getSuperclass(),
-		mutableTypeDetails.getExtendsTypes(),
-		mutableTypeDetails.getImplementsTypes(),
-		annotationMetadataList,
-		(mutableTypeDetails.getPhysicalTypeCategory() == PhysicalTypeCategory.ENUMERATION) ? mutableTypeDetails
-			.getEnumConstants()
-			: null);
+        // Replicates the values from the original class.
+        ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = new DefaultClassOrInterfaceTypeDetails(
+                mutableTypeDetails.getDeclaredByMetadataId(),
+                mutableTypeDetails.getName(),
+                mutableTypeDetails.getModifier(),
+                mutableTypeDetails.getPhysicalTypeCategory(),
+                contructorList,
+                fieldMetadataList,
+                updatedMethodList,
+                mutableTypeDetails.getSuperclass(),
+                mutableTypeDetails.getExtendsTypes(),
+                mutableTypeDetails.getImplementsTypes(),
+                annotationMetadataList,
+                (mutableTypeDetails.getPhysicalTypeCategory() == PhysicalTypeCategory.ENUMERATION) ? mutableTypeDetails
+                        .getEnumConstants()
+                        : null);
 
-	// Updates the class in file system.
-	updateClass(classOrInterfaceTypeDetails);
+        // Updates the class in file system.
+        updateClass(classOrInterfaceTypeDetails);
     }
 
     /**
@@ -282,132 +329,132 @@ public class JavaParserServiceImpl implements JavaParserService {
      */
     @Deprecated
     public void updateWithJavaDoc(JavaType className, JavaSymbolName method,
-	    String paramName, JavaType paramType) throws ParseException {
+            String paramName, JavaType paramType) throws ParseException {
 
-	String targetId = PhysicalTypeIdentifier.createIdentifier(className,
-		Path.SRC_MAIN_JAVA);
+        String targetId = PhysicalTypeIdentifier.createIdentifier(className,
+                Path.SRC_MAIN_JAVA);
 
-	String javaIdentifier = physicalTypeMetadataProvider
-		.findIdentifier(className);
-	javaIdentifier = javaIdentifier.substring(
-		javaIdentifier.indexOf("?") + 1).replace('.', '/');
+        String javaIdentifier = physicalTypeMetadataProvider
+                .findIdentifier(className);
+        javaIdentifier = javaIdentifier.substring(
+                javaIdentifier.indexOf("?") + 1).replace('.', '/');
 
-	String fileIdentifier = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
-		javaIdentifier.concat(".java"));
+        String fileIdentifier = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+                javaIdentifier.concat(".java"));
 
-	// Retrieve class file to update.
-	CompilationUnit compilationUnit;
+        // Retrieve class file to update.
+        CompilationUnit compilationUnit;
 
-	compilationUnit = JavaParser.parse(fileManager
-		.getInputStream(fileIdentifier));
+        compilationUnit = JavaParser.parse(fileManager
+                .getInputStream(fileIdentifier));
 
-	// Obtain the physical type and itd mutable details
-	PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
-		.get(targetId);
-	PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
-	Assert.notNull(ptd, "Java source code details unavailable for type "
-		+ PhysicalTypeIdentifier.getFriendlyName(targetId));
-	Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
-		ptd, "Java source code is immutable for type "
-			+ PhysicalTypeIdentifier.getFriendlyName(targetId));
+        // Obtain the physical type and itd mutable details
+        PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+                .get(targetId);
+        PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
+        Assert.notNull(ptd, "Java source code details unavailable for type "
+                + PhysicalTypeIdentifier.getFriendlyName(targetId));
+        Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
+                ptd, "Java source code is immutable for type "
+                        + PhysicalTypeIdentifier.getFriendlyName(targetId));
 
-	JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
+        JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
 
-	ClassOrInterfaceDeclaration clazz = null;
+        ClassOrInterfaceDeclaration clazz = null;
 
-	for (TypeDeclaration classType : compilationUnit.getTypes()) {
-	    if (classType instanceof ClassOrInterfaceDeclaration) {
-		clazz = (ClassOrInterfaceDeclaration) classType;
-		break;
-	    }
-	}
+        for (TypeDeclaration classType : compilationUnit.getTypes()) {
+            if (classType instanceof ClassOrInterfaceDeclaration) {
+                clazz = (ClassOrInterfaceDeclaration) classType;
+                break;
+            }
+        }
 
-	if (clazz == null) {
-	    return;
-	}
+        if (clazz == null) {
+            return;
+        }
 
-	List<BodyDeclaration> members = clazz.getMembers();
+        List<BodyDeclaration> members = clazz.getMembers();
 
-	MethodDeclaration methodToUpdate = null;
+        MethodDeclaration methodToUpdate = null;
 
-	for (BodyDeclaration bodyMember : members) {
+        for (BodyDeclaration bodyMember : members) {
 
-	    if (bodyMember instanceof MethodDeclaration) {
+            if (bodyMember instanceof MethodDeclaration) {
 
-		methodToUpdate = (MethodDeclaration) bodyMember;
+                methodToUpdate = (MethodDeclaration) bodyMember;
 
-		if (methodToUpdate.getName().equals(method.getSymbolName())) {
+                if (methodToUpdate.getName().equals(method.getSymbolName())) {
 
-		    List<Parameter> methodParameters = methodToUpdate
-			    .getParameters();
+                    List<Parameter> methodParameters = methodToUpdate
+                            .getParameters();
 
-		    // Compute the parameter type
-		    Type parameterType = null;
-		    if (paramType.isPrimitive()) {
-			parameterType = JavaParserUtils.getType(paramType);
-		    } else {
-			NameExpr importedType = JavaParserUtils
-				.importTypeIfRequired(mutableTypeDetails
-					.getEnclosingTypeName(),
-					mutableTypeDetails.getImports(),
-					paramType);
+                    // Compute the parameter type
+                    Type parameterType = null;
+                    if (paramType.isPrimitive()) {
+                        parameterType = JavaParserUtils.getType(paramType);
+                    } else {
+                        NameExpr importedType = JavaParserUtils
+                                .importTypeIfRequired(mutableTypeDetails
+                                        .getEnclosingTypeName(),
+                                        mutableTypeDetails.getImports(),
+                                        paramType);
 
-			ClassOrInterfaceType cit = JavaParserUtils
-				.getClassOrInterfaceType(importedType);
+                        ClassOrInterfaceType cit = JavaParserUtils
+                                .getClassOrInterfaceType(importedType);
 
-			parameterType = cit;
-		    }
+                        parameterType = cit;
+                    }
 
-		    // TODO: Añadir anotaciones
-		    /*
-		     * p.setAnnotations(parameterAnnotations);
-		     */
-		    List<AnnotationExpr> methodAnnotationList = new ArrayList<AnnotationExpr>();
-		    methodAnnotationList.addAll(methodToUpdate.getAnnotations());
-		    
+                    // TODO: Añadir anotaciones
+                    /*
+                     * p.setAnnotations(parameterAnnotations);
+                     */
+                    List<AnnotationExpr> methodAnnotationList = new ArrayList<AnnotationExpr>();
+                    methodAnnotationList
+                            .addAll(methodToUpdate.getAnnotations());
 
-		    List<MemberValuePair> memberList = new ArrayList<MemberValuePair>();
-		    MemberValuePair annotationAttribute = new MemberValuePair();
-		    annotationAttribute.setName("nuevo");
-		    annotationAttribute.setValue(new NameExpr("nombre"));
+                    List<MemberValuePair> memberList = new ArrayList<MemberValuePair>();
+                    MemberValuePair annotationAttribute = new MemberValuePair();
+                    annotationAttribute.setName("nuevo");
+                    annotationAttribute.setValue(new NameExpr("nombre"));
 
-		    memberList.add(annotationAttribute);
-		    
-		    NormalAnnotationExpr annotationExpr = new NormalAnnotationExpr(
-			    new NameExpr("GvNIXWebService"), memberList);
-		    
-		    methodAnnotationList.add(annotationExpr);
+                    memberList.add(annotationAttribute);
 
-		    methodToUpdate.setAnnotations(methodAnnotationList);
+                    NormalAnnotationExpr annotationExpr = new NormalAnnotationExpr(
+                            new NameExpr("GvNIXWebService"), memberList);
 
-		    methodParameters.add(new Parameter(parameterType,
-			    new VariableDeclaratorId(paramName)));
+                    methodAnnotationList.add(annotationExpr);
 
-		    break;
-		}
+                    methodToUpdate.setAnnotations(methodAnnotationList);
 
-	    }
-	}
+                    methodParameters.add(new Parameter(parameterType,
+                            new VariableDeclaratorId(paramName)));
 
-	try {
+                    break;
+                }
 
-	    fileManager.delete(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
-		    javaIdentifier.concat(".java")));
+            }
+        }
 
-	    JavaParserMutableClassOrInterfaceTypeDetails details = new JavaParserMutableClassOrInterfaceTypeDetails(
-		    compilationUnit, clazz, fileManager, mutableTypeDetails
-			    .getDeclaredByMetadataId(), javaIdentifier,
-		    className, metadataService, physicalTypeMetadataProvider);
+        try {
 
-	    classpathOperations.generateClassFile(details);
+            fileManager.delete(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+                    javaIdentifier.concat(".java")));
 
-	} catch (CloneNotSupportedException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+            JavaParserMutableClassOrInterfaceTypeDetails details = new JavaParserMutableClassOrInterfaceTypeDetails(
+                    compilationUnit, clazz, fileManager, mutableTypeDetails
+                            .getDeclaredByMetadataId(), javaIdentifier,
+                    className, metadataService, physicalTypeMetadataProvider);
+
+            classpathOperations.generateClassFile(details);
+
+        } catch (CloneNotSupportedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -417,134 +464,134 @@ public class JavaParserServiceImpl implements JavaParserService {
      */
     @Deprecated
     public void updateMethodParameters(JavaType className,
-	    JavaSymbolName method, String paramName, JavaType paramType) {
+            JavaSymbolName method, String paramName, JavaType paramType) {
 
-	// TODO: Probar 'MethodDeclaration' ya que permite la creación con
-	// javadoc.
+        // TODO: Probar 'MethodDeclaration' ya que permite la creación con
+        // javadoc.
 
-	// MetadataID
-	String targetId = PhysicalTypeIdentifier.createIdentifier(className,
-		Path.SRC_MAIN_JAVA);
+        // MetadataID
+        String targetId = PhysicalTypeIdentifier.createIdentifier(className,
+                Path.SRC_MAIN_JAVA);
 
-	// Obtain the physical type and itd mutable details
-	PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
-		.get(targetId);
-	PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
-	Assert.notNull(ptd, "Java source code details unavailable for type "
-		+ PhysicalTypeIdentifier.getFriendlyName(targetId));
-	Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
-		ptd, "Java source code is immutable for type "
-			+ PhysicalTypeIdentifier.getFriendlyName(targetId));
+        // Obtain the physical type and itd mutable details
+        PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+                .get(targetId);
+        PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
+        Assert.notNull(ptd, "Java source code details unavailable for type "
+                + PhysicalTypeIdentifier.getFriendlyName(targetId));
+        Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
+                ptd, "Java source code is immutable for type "
+                        + PhysicalTypeIdentifier.getFriendlyName(targetId));
 
-	JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
+        JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
 
-	// Update method
-	List<? extends MethodMetadata> methodsList = mutableTypeDetails
-		.getDeclaredMethods();
+        // Update method
+        List<? extends MethodMetadata> methodsList = mutableTypeDetails
+                .getDeclaredMethods();
 
-	// Create param type.
-	AnnotatedJavaType annotatedJavaType = new AnnotatedJavaType(paramType,
-		null);
+        // Create param type.
+        AnnotatedJavaType annotatedJavaType = new AnnotatedJavaType(paramType,
+                null);
 
-	// Create param name.
-	JavaSymbolName parameterName = new JavaSymbolName(paramName);
+        // Create param name.
+        JavaSymbolName parameterName = new JavaSymbolName(paramName);
 
-	JavaParserMethodMetadata javaParserMethodMetadata;
+        JavaParserMethodMetadata javaParserMethodMetadata;
 
-	List<MethodMetadata> updatedMethodList = new ArrayList<MethodMetadata>();
-	List<AnnotatedJavaType> parameterTypelist = new ArrayList<AnnotatedJavaType>();
-	List<JavaSymbolName> parameterNamelist = new ArrayList<JavaSymbolName>();
+        List<MethodMetadata> updatedMethodList = new ArrayList<MethodMetadata>();
+        List<AnnotatedJavaType> parameterTypelist = new ArrayList<AnnotatedJavaType>();
+        List<JavaSymbolName> parameterNamelist = new ArrayList<JavaSymbolName>();
 
-	MethodMetadata operationMetadata;
+        MethodMetadata operationMetadata;
 
-	for (MethodMetadata methodMetadata : methodsList) {
+        for (MethodMetadata methodMetadata : methodsList) {
 
-	    javaParserMethodMetadata = (JavaParserMethodMetadata) methodMetadata;
+            javaParserMethodMetadata = (JavaParserMethodMetadata) methodMetadata;
 
-	    if (methodMetadata.getMethodName().toString().compareTo(
-		    method.toString()) == 0) {
+            if (methodMetadata.getMethodName().toString().compareTo(
+                    method.toString()) == 0) {
 
-		Assert.isTrue(!javaParserMethodMetadata.getParameterNames()
-			.contains(parameterName),
-			"There couldn't be two parameters with same name: '"
-				+ parameterName + "' in the method "
-				+ methodMetadata.getMethodName());
+                Assert.isTrue(!javaParserMethodMetadata.getParameterNames()
+                        .contains(parameterName),
+                        "There couldn't be two parameters with same name: '"
+                                + parameterName + "' in the method "
+                                + methodMetadata.getMethodName());
 
-		for (JavaSymbolName tmpParameterName : javaParserMethodMetadata
-			.getParameterNames()) {
-		    parameterNamelist.add(tmpParameterName);
-		}
-		parameterNamelist.add(parameterName);
+                for (JavaSymbolName tmpParameterName : javaParserMethodMetadata
+                        .getParameterNames()) {
+                    parameterNamelist.add(tmpParameterName);
+                }
+                parameterNamelist.add(parameterName);
 
-		for (AnnotatedJavaType tmpParameterType : javaParserMethodMetadata
-			.getParameterTypes()) {
-		    parameterTypelist.add(tmpParameterType);
-		}
-		parameterTypelist.add(annotatedJavaType);
+                for (AnnotatedJavaType tmpParameterType : javaParserMethodMetadata
+                        .getParameterTypes()) {
+                    parameterTypelist.add(tmpParameterType);
+                }
+                parameterTypelist.add(annotatedJavaType);
 
-		operationMetadata = new DefaultMethodMetadata(targetId,
-			javaParserMethodMetadata.getModifier(),
-			javaParserMethodMetadata.getMethodName(),
-			javaParserMethodMetadata.getReturnType(),
-			parameterTypelist, parameterNamelist,
-			javaParserMethodMetadata.getAnnotations(),
-			javaParserMethodMetadata.getThrowsTypes(),
-			javaParserMethodMetadata.getBody()
-				.substring(
-					javaParserMethodMetadata.getBody()
-						.indexOf("{") + 1,
-					javaParserMethodMetadata.getBody()
-						.indexOf("}")));
+                operationMetadata = new DefaultMethodMetadata(targetId,
+                        javaParserMethodMetadata.getModifier(),
+                        javaParserMethodMetadata.getMethodName(),
+                        javaParserMethodMetadata.getReturnType(),
+                        parameterTypelist, parameterNamelist,
+                        javaParserMethodMetadata.getAnnotations(),
+                        javaParserMethodMetadata.getThrowsTypes(),
+                        javaParserMethodMetadata.getBody()
+                                .substring(
+                                        javaParserMethodMetadata.getBody()
+                                                .indexOf("{") + 1,
+                                        javaParserMethodMetadata.getBody()
+                                                .indexOf("}")));
 
-	    } else {
-		operationMetadata = new DefaultMethodMetadata(targetId,
-			javaParserMethodMetadata.getModifier(),
-			javaParserMethodMetadata.getMethodName(),
-			javaParserMethodMetadata.getReturnType(),
-			javaParserMethodMetadata.getParameterTypes(),
-			javaParserMethodMetadata.getParameterNames(),
-			javaParserMethodMetadata.getAnnotations(),
-			javaParserMethodMetadata.getThrowsTypes(),
-			javaParserMethodMetadata.getBody()
-				.substring(
-					javaParserMethodMetadata.getBody()
-						.indexOf("{") + 1,
-					javaParserMethodMetadata.getBody()
-						.indexOf("}")));
+            } else {
+                operationMetadata = new DefaultMethodMetadata(targetId,
+                        javaParserMethodMetadata.getModifier(),
+                        javaParserMethodMetadata.getMethodName(),
+                        javaParserMethodMetadata.getReturnType(),
+                        javaParserMethodMetadata.getParameterTypes(),
+                        javaParserMethodMetadata.getParameterNames(),
+                        javaParserMethodMetadata.getAnnotations(),
+                        javaParserMethodMetadata.getThrowsTypes(),
+                        javaParserMethodMetadata.getBody()
+                                .substring(
+                                        javaParserMethodMetadata.getBody()
+                                                .indexOf("{") + 1,
+                                        javaParserMethodMetadata.getBody()
+                                                .indexOf("}")));
 
-	    }
-	    updatedMethodList.add(operationMetadata);
+            }
+            updatedMethodList.add(operationMetadata);
 
-	}
+        }
 
-	List<ConstructorMetadata> contructorList = new ArrayList<ConstructorMetadata>();
-	contructorList.addAll(mutableTypeDetails.getDeclaredConstructors());
+        List<ConstructorMetadata> contructorList = new ArrayList<ConstructorMetadata>();
+        contructorList.addAll(mutableTypeDetails.getDeclaredConstructors());
 
-	List<FieldMetadata> fieldMetadataList = new ArrayList<FieldMetadata>();
-	fieldMetadataList.addAll(mutableTypeDetails.getDeclaredFields());
+        List<FieldMetadata> fieldMetadataList = new ArrayList<FieldMetadata>();
+        fieldMetadataList.addAll(mutableTypeDetails.getDeclaredFields());
 
-	List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
-	annotationMetadataList.addAll(mutableTypeDetails.getTypeAnnotations());
+        List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
+        annotationMetadataList.addAll(mutableTypeDetails.getTypeAnnotations());
 
-	// Replicates the values from the original class.
-	ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = new DefaultClassOrInterfaceTypeDetails(
-		mutableTypeDetails.getDeclaredByMetadataId(),
-		mutableTypeDetails.getName(),
-		mutableTypeDetails.getModifier(),
-		mutableTypeDetails.getPhysicalTypeCategory(),
-		contructorList,
-		fieldMetadataList,
-		updatedMethodList,
-		mutableTypeDetails.getSuperclass(),
-		mutableTypeDetails.getExtendsTypes(),
-		mutableTypeDetails.getImplementsTypes(),
-		annotationMetadataList,
-		(mutableTypeDetails.getPhysicalTypeCategory() == PhysicalTypeCategory.ENUMERATION) ? mutableTypeDetails
-			.getEnumConstants()
-			: null);
+        // Replicates the values from the original class.
+        ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = new DefaultClassOrInterfaceTypeDetails(
+                mutableTypeDetails.getDeclaredByMetadataId(),
+                mutableTypeDetails.getName(),
+                mutableTypeDetails.getModifier(),
+                mutableTypeDetails.getPhysicalTypeCategory(),
+                contructorList,
+                fieldMetadataList,
+                updatedMethodList,
+                mutableTypeDetails.getSuperclass(),
+                mutableTypeDetails.getExtendsTypes(),
+                mutableTypeDetails.getImplementsTypes(),
+                annotationMetadataList,
+                (mutableTypeDetails.getPhysicalTypeCategory() == PhysicalTypeCategory.ENUMERATION) ? mutableTypeDetails
+                        .getEnumConstants()
+                        : null);
 
-	// Updates the class in file system.
-	updateClass(classOrInterfaceTypeDetails);
+        // Updates the class in file system.
+        updateClass(classOrInterfaceTypeDetails);
     }
 
     /**
@@ -555,18 +602,18 @@ public class JavaParserServiceImpl implements JavaParserService {
      * </p>
      */
     public boolean isAnnotationIntroducedInMethod(String annotation,
-	    MethodMetadata methodMetadata) {
+            MethodMetadata methodMetadata) {
 
-	List<AnnotationMetadata> annotationMethodList = methodMetadata
-		.getAnnotations();
+        List<AnnotationMetadata> annotationMethodList = methodMetadata
+                .getAnnotations();
 
-	for (AnnotationMetadata annotationMetadata : annotationMethodList) {
-	    if (annotationMetadata.getAnnotationType()
-		    .getFullyQualifiedTypeName().compareTo(annotation) == 0) {
-		return true;
-	    }
-	}
-	return false;
+        for (AnnotationMetadata annotationMetadata : annotationMethodList) {
+            if (annotationMetadata.getAnnotationType()
+                    .getFullyQualifiedTypeName().compareTo(annotation) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -574,18 +621,18 @@ public class JavaParserServiceImpl implements JavaParserService {
      * 
      */
     public List<JavaType> getMethodExceptionList(JavaType serviceClass,
-	    JavaSymbolName methodName) {
+            JavaSymbolName methodName) {
 
-	List<JavaType> throwList = new ArrayList<JavaType>();
+        List<JavaType> throwList = new ArrayList<JavaType>();
 
-	MethodMetadata methodMetadata = getMethodByNameInClass(serviceClass,
-		methodName);
+        MethodMetadata methodMetadata = getMethodByNameInClass(serviceClass,
+                methodName);
 
-	if (methodMetadata != null) {
-	    throwList = methodMetadata.getThrowsTypes();
-	}
-	
-	return throwList;
+        if (methodMetadata != null) {
+            throwList = methodMetadata.getThrowsTypes();
+        }
+
+        return throwList;
     }
 
     /**
@@ -619,28 +666,28 @@ public class JavaParserServiceImpl implements JavaParserService {
      * </p>
      */
     public MethodMetadata getMethodByNameInClass(JavaType serviceClass,
-	    JavaSymbolName methodName) {
-	// Load class details. If class not found an exception will be raised.
-	ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
-		.getClassOrInterface(serviceClass);
+            JavaSymbolName methodName) {
+        // Load class details. If class not found an exception will be raised.
+        ClassOrInterfaceTypeDetails tmpServiceDetails = classpathOperations
+                .getClassOrInterface(serviceClass);
 
-	// Checks if it's mutable
-	Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-		tmpServiceDetails, "Can't modify "
-			+ tmpServiceDetails.getName());
+        // Checks if it's mutable
+        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+                tmpServiceDetails, "Can't modify "
+                        + tmpServiceDetails.getName());
 
-	MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
+        MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
 
-	List<? extends MethodMetadata> methodList = serviceDetails
-		.getDeclaredMethods();
+        List<? extends MethodMetadata> methodList = serviceDetails
+                .getDeclaredMethods();
 
-	for (MethodMetadata methodMetadata : methodList) {
-	    if (methodMetadata.getMethodName().equals(methodName)) {
-		return methodMetadata;
-	    }
-	}
+        for (MethodMetadata methodMetadata : methodList) {
+            if (methodMetadata.getMethodName().equals(methodName)) {
+                return methodMetadata;
+            }
+        }
 
-	return null;
+        return null;
     }
 
     /**
@@ -653,22 +700,22 @@ public class JavaParserServiceImpl implements JavaParserService {
      * 
      */
     public void updateClass(
-	    ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails) {
+            ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails) {
 
-	// TODO: Comprobar si ha variado el contenido para no hacer operaciones
-	// innecesarias.
+        // TODO: Comprobar si ha variado el contenido para no hacer operaciones
+        // innecesarias.
 
-	// TODO: 'ClassOrInterfaceDeclaration' mantiene el javaDoc.
+        // TODO: 'ClassOrInterfaceDeclaration' mantiene el javaDoc.
 
-	String javaIdentifier = physicalTypeMetadataProvider
-		.findIdentifier(classOrInterfaceTypeDetails.getName());
-	javaIdentifier = javaIdentifier.substring(
-		javaIdentifier.indexOf("?") + 1).replaceAll("\\.", "/");
+        String javaIdentifier = physicalTypeMetadataProvider
+                .findIdentifier(classOrInterfaceTypeDetails.getName());
+        javaIdentifier = javaIdentifier.substring(
+                javaIdentifier.indexOf("?") + 1).replaceAll("\\.", "/");
 
-	fileManager.delete(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
-		javaIdentifier.concat(".java")));
+        fileManager.delete(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+                javaIdentifier.concat(".java")));
 
-	classpathOperations.generateClassFile(classOrInterfaceTypeDetails);
+        classpathOperations.generateClassFile(classOrInterfaceTypeDetails);
 
     }
 }

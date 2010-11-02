@@ -22,8 +22,8 @@ import japa.parser.ParseException;
 
 import java.util.List;
 
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.MethodMetadata;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.GvNIXAnnotationType;
+import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
@@ -180,4 +180,19 @@ public interface JavaParserService {
      */
     public MethodMetadata getMethodByNameInClass(JavaType serviceClass,
 	    JavaSymbolName methodName);
+    
+    /**
+     * Create GvNIX annotated class.
+     * 
+     * @param javaType class.
+     * @param typeAnnotationList class annotation list.
+     * @param gvNIXAnnotationType to create Metadata ID.
+     * @param declaredFieldList class field list
+     * @param declaredMethodList class method list.
+     */
+    public void createGvNIXWebServiceClass(JavaType javaType,
+            List<AnnotationMetadata> typeAnnotationList,
+            GvNIXAnnotationType gvNIXAnnotationType,
+            List<FieldMetadata> declaredFieldList,
+            List<MethodMetadata> declaredMethodList);
 }

@@ -6,25 +6,26 @@
       <artifactId>cxf-codegen-plugin</artifactId>
       <version>${cxf.version}</version>
       <executions>
-          <execution>
-              <id>generate-sources</id>
-              <configuration>
-                  <wsdlOptions>
-                  </wsdlOptions>
-              </configuration>
-              <goals>
-                  <goal>wsdl2java</goal>
-              </goals>
-          </execution>
       </executions>
     </plugin>
   </cxf-codegen-plugin>
   <cxf-codegen-execution>
-          <wsdlOption>
-            <wsdl></wsdl>
-            <extraargs>
-              <extraarg>-impl</extraarg>
-            </extraargs>
-          </wsdlOption>
+    <execution>
+        <id></id>
+        <phase>generate-sources</phase>
+        <goals>
+            <goal>wsdl2java</goal>
+        </goals>
+    <configuration>
+            <wsdlOptions>
+              <wsdlOption>
+                <wsdl></wsdl>
+                <extraargs>
+                  <extraarg>-impl</extraarg>
+                </extraargs>
+              </wsdlOption>
+            </wsdlOptions>
+        </configuration>
+    </execution>
   </cxf-codegen-execution>
 </cxf-codegen>

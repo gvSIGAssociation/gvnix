@@ -172,6 +172,12 @@ public interface ServiceLayerWsConfigService {
     public void addFileToUpdateAnnotation(File file, GvNIXAnnotationType gvNIXAnnotationType);
 
     /**
+     * Creates java files in 'src/main/java' from with gvNIX Web Service Annotations. 
+     * 
+     */
+    public void generateGvNIXWebServiceFiles();
+    
+    /**
      * Create Jax-WS plugin configuration in pom.xml.
      */
     public void installJaxwsBuildPlugin();
