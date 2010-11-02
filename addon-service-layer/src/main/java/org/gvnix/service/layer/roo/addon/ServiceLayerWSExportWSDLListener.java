@@ -21,7 +21,8 @@ package org.gvnix.service.layer.roo.addon;
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.*;
+import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.expr.*;
 
 import java.io.File;
@@ -32,8 +33,11 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.GvNIXAnnotationType;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.file.monitor.event.FileEvent;
 import org.springframework.roo.file.monitor.event.FileEventListener;
+import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.Assert;
@@ -53,12 +57,19 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
     static final String webService = "WebService";
     static final String xmlRootElement = "XmlRootElement";
     static final String xmlAccessorType = "XmlAccessorType";
+    static final String xmlType = "XmlType";
     static final String webFault = "WebFault";
 
     @Reference
     private PathResolver pathResolver;
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
     protected static Logger logger = Logger
             .getLogger(ServiceLayerWSExportWSDLListener.class.getName());
@@ -100,7 +111,7 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
                         // Get all annotations.
                         List<AnnotationExpr> annotations = type
                                 .getAnnotations();
-
+                        
                         // Check annotation types.
                         for (AnnotationExpr annotationExpr : annotations) {
 
@@ -148,7 +159,8 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
             NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
 
-            if (normalAnnotationExpr.getName().getName().contains(xmlRootElement)
+            if (normalAnnotationExpr.getName().getName().contains(
+                    xmlRootElement)
                     || normalAnnotationExpr.getName().getName().contains(
                             xmlAccessorType)) {
 
@@ -173,7 +185,8 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
             MarkerAnnotationExpr markerAnnotationExpr = (MarkerAnnotationExpr) annotationExpr;
 
-            if (markerAnnotationExpr.getName().getName().contains(xmlRootElement)
+            if (markerAnnotationExpr.getName().getName().contains(
+                    xmlRootElement)
                     || markerAnnotationExpr.getName().getName().contains(
                             xmlAccessorType)) {
 
@@ -198,7 +211,8 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
             SingleMemberAnnotationExpr singleMemberAnnotationExpr = (SingleMemberAnnotationExpr) annotationExpr;
 
-            if (singleMemberAnnotationExpr.getName().getName().contains(xmlRootElement)
+            if (singleMemberAnnotationExpr.getName().getName().contains(
+                    xmlRootElement)
                     || singleMemberAnnotationExpr.getName().getName().contains(
                             xmlAccessorType)) {
 

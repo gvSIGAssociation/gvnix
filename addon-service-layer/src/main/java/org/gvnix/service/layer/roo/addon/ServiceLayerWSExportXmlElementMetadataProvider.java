@@ -213,7 +213,7 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
                         nameStringAtrributeValue != null
                                 && StringUtils.hasText(nameStringAtrributeValue
                                         .getValue()),
-                        "Attribute 'operationName' in annotation @GvNIXXmlElement defined in class '"
+                        "Attribute 'name' in annotation @GvNIXXmlElement defined in class '"
                                 + governorTypeDetails.getName()
                                         .getFullyQualifiedTypeName()
                                 + "' has to be defined to export in XSD schema in WSDL.");
@@ -228,7 +228,7 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
                                 && StringUtils
                                         .hasText(namespaceStringAttributeValue
                                                 .getValue()),
-                        "Attribute 'resultNamespace' in annotation @GvNIXXmlElement defined in class '"
+                        "Attribute 'namespace' in annotation @GvNIXXmlElement defined in class '"
                                 + governorTypeDetails.getName()
                                         .getFullyQualifiedTypeName()
                                 + "' has to be defined to export in XSD schema in WSDL.");

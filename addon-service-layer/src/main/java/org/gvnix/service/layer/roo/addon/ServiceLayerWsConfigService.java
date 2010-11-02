@@ -18,9 +18,13 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.expr.AnnotationExpr;
+
 import java.io.File;
 import java.io.IOException;
 
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaType;
 import org.w3c.dom.Document;
@@ -43,7 +47,7 @@ import org.w3c.dom.Document;
  *         Transport</a>
  */
 public interface ServiceLayerWsConfigService {
-    
+
     /**
      * <ul>
      * <li>XML_ELEMENT: Associated with @GvNIXXmlElement annotation.</li>
@@ -64,14 +68,17 @@ public interface ServiceLayerWsConfigService {
      * <li>IMPORT_RPC_ENCODED: From external systems to this RPC Encoded.</li>
      * </ul>
      */
-    public enum CommunicationSense { EXPORT, EXPORT_WSDL, IMPORT, IMPORT_RPC_ENCODED };
-    
+    public enum CommunicationSense {
+        EXPORT, EXPORT_WSDL, IMPORT, IMPORT_RPC_ENCODED
+    };
+
     static final String GENERATE_SOURCES = "clean generate-sources";
 
     /**
      * Install and configure Web Service library, if not already installed.
      * 
-     * @param type Communication type
+     * @param type
+     *            Communication type
      */
     public void install(CommunicationSense type);
 
@@ -86,7 +93,7 @@ public interface ServiceLayerWsConfigService {
      * @return true if className has changed to update annotation.
      */
     public boolean exportClass(JavaType className,
-	    AnnotationMetadata annotationMetadata);
+            AnnotationMetadata annotationMetadata);
 
     /**
      * Converts package name to a Target Namespace.
@@ -111,8 +118,8 @@ public interface ServiceLayerWsConfigService {
      *            class name location defined in annotation.
      */
     public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName,
-	    String addressName, String fullyQualifiedTypeName);
-    
+            String addressName, String fullyQualifiedTypeName);
+
     /**
      * Add a wsdl location to import.
      * 
@@ -134,28 +141,34 @@ public interface ServiceLayerWsConfigService {
      *            Communication sense type
      */
     public void importService(JavaType className, String wsdlLocation,
-	    CommunicationSense type);
-    
+            CommunicationSense type);
+
     /**
      * Exports WSDL to java.
      * 
-     * @param wsdlLocation contract wsdl url to export.
-     * @param type Communication sense type.
+     * @param wsdlLocation
+     *            contract wsdl url to export.
+     * @param type
+     *            Communication sense type.
      */
-    public void exportWSDLWebService(String wsdlLocation, CommunicationSense type);
+    public void exportWSDLWebService(String wsdlLocation,
+            CommunicationSense type);
 
     /**
-     * Check correct WSDL encoding and retrieve WSDL to export into {@link Document}.
+     * Check correct WSDL encoding and retrieve WSDL to export into
+     * {@link Document}.
      * 
-     * @param url from WSDL file to export.
+     * @param url
+     *            from WSDL file to export.
      * @return Xml document from WSDL.
      */
     public Document checkWSDLFile(String url);
-    
+
     /**
      * Run maven command with parameters.
      * 
-     * @param parameters to run with maven.
+     * @param parameters
+     *            to run with maven.
      * 
      * @throws IOException
      */
@@ -169,14 +182,29 @@ public interface ServiceLayerWsConfigService {
      * @param gvNIXAnnotationType
      *            to select the list where add the file.
      */
-    public void addFileToUpdateAnnotation(File file, GvNIXAnnotationType gvNIXAnnotationType);
+    public void addFileToUpdateAnnotation(File file,
+            GvNIXAnnotationType gvNIXAnnotationType);
 
     /**
-     * Creates java files in 'src/main/java' from with gvNIX Web Service Annotations. 
+     * Creates java files in 'src/main/java' from with gvNIX Web Service
+     * Annotations.
      * 
      */
     public void generateGvNIXWebServiceFiles();
-    
+
+    /**
+     * Convert annotation values from {@link AnnotationExpr} list to
+     * {@link GvNIXAnnotationType} annotation attributes values.
+     * 
+     * @param classOrInterfaceDeclaration
+     *            to retrieve values from annotations and convert to
+     *            {@link GvNIXXmlElement} values.
+     * 
+     * @return {@link AnnotationMetadata} to define in class.
+     */
+    public AnnotationMetadata getGvNIXXmlElementAnnotations(
+            ClassOrInterfaceDeclaration classOrInterfaceDeclaration);
+
     /**
      * Create Jax-WS plugin configuration in pom.xml.
      */
@@ -201,7 +229,7 @@ public interface ServiceLayerWsConfigService {
      * @return true if this is a web project.
      */
     boolean isProjectWebAvailable();
-    
+
     /**
      * Is this a project ?
      * 
@@ -212,7 +240,8 @@ public interface ServiceLayerWsConfigService {
     /**
      * Add project properties values to pom.xml.
      * 
-     * @param type of {@link CommunicationSense}
+     * @param type
+     *            of {@link CommunicationSense}
      */
     public void addProjectProperties(CommunicationSense type);
 }

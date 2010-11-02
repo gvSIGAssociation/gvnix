@@ -21,8 +21,8 @@ package org.gvnix.service.layer.roo.addon;
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
-import japa.parser.ast.body.TypeDeclaration;
+import japa.parser.ast.PackageDeclaration;
+import japa.parser.ast.body.*;
 import japa.parser.ast.expr.*;
 
 import java.io.*;
@@ -32,9 +32,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
-import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.GvNIXAnnotationType;
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.springframework.roo.addon.maven.MavenOperations;
 import org.springframework.roo.addon.web.mvc.controller.UrlRewriteOperations;
+import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
@@ -46,8 +48,6 @@ import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
-
-import sun.management.FileSystem;
 
 /**
  * Utilities to manage the CXF web services library.
@@ -80,6 +80,8 @@ public class ServiceLayerWsConfigServiceImpl implements
     private AnnotationsService annotationsService;
     @Reference
     private MavenOperations mavenOperations;
+    @Reference
+    private JavaParserService javaParserService;
 
     private static final String executionId = "generate-sources-";
 
@@ -1034,7 +1036,8 @@ public class ServiceLayerWsConfigServiceImpl implements
                     }
 
                     // Check next node.
-                    updateServiceExecution = updateServiceExecution.getNextSibling();
+                    updateServiceExecution = updateServiceExecution
+                            .getNextSibling();
 
                 }
 
@@ -1297,18 +1300,19 @@ public class ServiceLayerWsConfigServiceImpl implements
                                 .getFirstChild().getNextSibling()
                                 : null;
 
-                                boolean exists = false;
-                                
+                        boolean exists = false;
+
                         while (updatePhase != null && !exists) {
 
-                            if (updatePhase.getNodeName().contentEquals("phase")) {
+                            if (updatePhase.getNodeName()
+                                    .contentEquals("phase")) {
                                 updatePhase.setTextContent("none");
                                 exists = true;
                             }
-                            
+
                             updatePhase = updatePhase.getNextSibling();
                         }
-                        
+
                         if (!exists) {
                             updateException.appendChild(newPhase);
                         }
@@ -1695,6 +1699,12 @@ public class ServiceLayerWsConfigServiceImpl implements
      */
     public void generateGvNIXWebServiceFiles() {
 
+        // TODO: Create @GvNIXXmlElement files.
+        generateGvNIXXmlElements();
+
+        // TODO: Create @GvNIXWebFault files.
+
+        // TODO: Create @GvNIXWebService files.
     }
 
     /**
@@ -1704,34 +1714,61 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         AnnotationMetadata gvNixXmlElementAnnotationMetadata;
 
+        List<AnnotationMetadata> gvNixAnnoationList;
+
         List<AnnotationAttributeValue<?>> gvNixXmlElementAnnoationAttributeValues;
 
-        // name
-        StringAttributeValue nameStringAttributeValue;
-        // namespace
-        StringAttributeValue namespaceStringAttributeValue;
-        // element list
-        List<StringAttributeValue> elementListStringAttributeValues = new ArrayList<StringAttributeValue>();
-
-        ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue;
+        // GvNIXXmlElement annotation.
+        AnnotationMetadata gvNixXmlElementAnnotation;
+        AnnotationExpr annotationExpr;
 
         for (File xmlElementFile : gVNIXXmlElementList) {
 
             // Parse Java file.
             CompilationUnit unit;
+            PackageDeclaration packageDeclaration;
+            JavaType javaType;
+            String declaredByMetadataId;
+
+            gvNixAnnoationList = new ArrayList<AnnotationMetadata>();
             try {
                 unit = JavaParser.parse(xmlElementFile);
+                packageDeclaration = unit.getPackage();
+
+                String packageName = packageDeclaration.getName().toString();
 
                 // Get the first class or interface Java type
                 List<TypeDeclaration> types = unit.getTypes();
                 if (types != null) {
                     TypeDeclaration type = types.get(0);
+                    ClassOrInterfaceDeclaration classOrInterfaceDeclaration;
                     if (type instanceof ClassOrInterfaceDeclaration) {
 
-                        // Get all annotations.
-                        gvNixXmlElementAnnoationAttributeValues = analyzeAnnotations(type
-                                .getAnnotations());
+                        javaType = new JavaType(packageName.concat(".").concat(
+                                type.getName()));
 
+                        classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
+
+                        // Get all annotations.
+                        gvNixXmlElementAnnotation = getGvNIXXmlElementAnnotations(classOrInterfaceDeclaration);
+
+                        for (BodyDeclaration bodyDeclaration : classOrInterfaceDeclaration
+                                .getMembers()) {
+                        }
+
+                        gvNixAnnoationList.add(gvNixXmlElementAnnotation);
+                        // TODO: Retrieve correct values.
+                        List<FieldMetadata> fieldMetadataList = new ArrayList<FieldMetadata>();
+                        List<MethodMetadata> methodMetadataList = new ArrayList<MethodMetadata>();
+
+                        javaParserService.createGvNIXWebServiceClass(javaType,
+                                gvNixAnnoationList,
+                                GvNIXAnnotationType.XML_ELEMENT,
+                                fieldMetadataList, methodMetadataList);
+
+                        // javaParserService.createGvNIXWebServiceClass(javaType,
+                        // typeAnnotationList, gvNIXAnnotationType, type.get,
+                        // declaredMethodList)
                     }
                 }
 
@@ -1753,26 +1790,99 @@ public class ServiceLayerWsConfigServiceImpl implements
         }
     }
 
-    public List<AnnotationAttributeValue<?>> analyzeAnnotations(
-            List<AnnotationExpr> annotationExprList) {
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Searches for Jaxb annotations in {@link ClassOrInterfaceDeclaration} to
+     * convert values to {@link GvNIXXmlElement}.
+     * </p>
+     */
+    public AnnotationMetadata getGvNIXXmlElementAnnotations(
+            ClassOrInterfaceDeclaration classOrInterfaceDeclaration) {
+
+        AnnotationMetadata gvNIXXmlElementAnnotationMetadata;
+
+        List<AnnotationExpr> annotationExprList = classOrInterfaceDeclaration
+                .getAnnotations();
 
         // Attribute value list.
         List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
 
-        for (AnnotationExpr annotationExpr : annotationExprList) {
+        // name
+        StringAttributeValue nameStringAttributeValue = null;
+        StringAttributeValue xmlTypeNameStringAttributeValue = null;
+        // namespace
+        StringAttributeValue namespaceStringAttributeValue = null;
+        // element list values
+        List<StringAttributeValue> elementListStringAttributeValues = new ArrayList<StringAttributeValue>();
+        ArrayAttributeValue<AnnotationAttributeValue<?>> elementListArrayAttributeValue;
 
-            AbstractAnnotationAttributeValue annotationAttributeValue;
+        boolean existNameInXmlElement = false;
+
+        for (AnnotationExpr annotationExpr : annotationExprList) {
 
             if (annotationExpr instanceof NormalAnnotationExpr) {
 
                 NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
 
+                /*
+                 * @XmlType(name = "", propOrder = { "fahrenheit" })
+                 * 
+                 * @XmlRootElement(name = "FahrenheitToCelsius")
+                 */
                 if (normalAnnotationExpr.getName().getName().contains(
                         ServiceLayerWSExportWSDLListener.xmlRootElement)) {
 
-                }
-                if (normalAnnotationExpr.getName().getName().contains(
-                        ServiceLayerWSExportWSDLListener.xmlAccessorType)) {
+                    // TODO: Retrieve values.
+                    for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
+
+                        if (pair.getName().contentEquals("name")) {
+                            nameStringAttributeValue = new StringAttributeValue(
+                                    new JavaSymbolName("name"), ((StringLiteralExpr) pair.getValue()).getValue());
+
+                            annotationAttributeValues
+                                    .add(nameStringAttributeValue);
+                            existNameInXmlElement = true;
+                            break;
+                        }
+
+                    }
+
+                } else if (normalAnnotationExpr.getName().getName().contains(
+                        ServiceLayerWSExportWSDLListener.xmlType)) {
+
+                    for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
+
+                        if (pair.getName().contentEquals("name")
+                                && !existNameInXmlElement) {
+
+                            if (StringUtils.hasText(pair.getValue().toString())) {
+
+                                nameStringAttributeValue = new StringAttributeValue(
+                                        new JavaSymbolName("name"), pair
+                                                .getValue().toString());
+
+                                annotationAttributeValues
+                                        .add(nameStringAttributeValue);
+                                break;
+                            }
+                        } else if (pair.getName().contentEquals("propOrder")) {
+
+                            // Arraye pair.getValue();
+
+                        } else if (pair.getName().contentEquals("namespace")) {
+
+                            namespaceStringAttributeValue = new StringAttributeValue(
+                                    new JavaSymbolName("namespace"), pair
+                                            .getValue().toString());
+
+                            annotationAttributeValues
+                                    .add(namespaceStringAttributeValue);
+
+                        }
+
+                    }
 
                 }
 
@@ -1787,7 +1897,13 @@ public class ServiceLayerWsConfigServiceImpl implements
             }
 
         }
-        return annotationAttributeValues;
+
+        // Create annotation.
+        gvNIXXmlElementAnnotationMetadata = new DefaultAnnotationMetadata(
+                new JavaType(GvNIXXmlElement.class.getName()),
+                annotationAttributeValues);
+
+        return gvNIXXmlElementAnnotationMetadata;
     }
 
     /**

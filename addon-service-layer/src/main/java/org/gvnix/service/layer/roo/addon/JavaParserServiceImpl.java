@@ -115,29 +115,13 @@ public class JavaParserServiceImpl implements JavaParserService {
             List<MethodMetadata> declaredMethodList) {
 
         // Metadata Id.
-        String declaredByMetadataId = null;
-
-        switch (gvNIXAnnotationType) {
-
-        case XML_ELEMENT:
-            declaredByMetadataId = ServiceLayerWSExportXmlElementMetadata
-                    .createIdentifier(javaType, Path.SRC_MAIN_JAVA);
-            break;
-
-        case WEB_FAULT:
-            declaredByMetadataId = ServiceLayerWSExportExceptionMetadata
-                    .createIdentifier(javaType, Path.SRC_MAIN_JAVA);
-            break;
-
-        case WEB_SERVICE:
-            declaredByMetadataId = ServiceLayerWSExportMetadata
-                    .createIdentifier(javaType, Path.SRC_MAIN_JAVA);
-            break;
-        }
+        String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
+                javaType, Path.SRC_MAIN_JAVA);
 
         // Determine the canonical filename
-        String physicalLocationCanonicalPath = classpathOperations.getPhysicalLocationCanonicalPath(declaredByMetadataId);
-        
+        String physicalLocationCanonicalPath = classpathOperations
+                .getPhysicalLocationCanonicalPath(declaredByMetadataId);
+
         // Check the file doesn't already exist
         if (!fileManager.exists(physicalLocationCanonicalPath)) {
 
