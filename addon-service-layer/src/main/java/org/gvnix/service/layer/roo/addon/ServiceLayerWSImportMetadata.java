@@ -152,6 +152,8 @@ public class ServiceLayerWSImportMetadata extends
     /**
      * Maven generate sources.
      * 
+     * TODO: Use org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigServiceImpl.mvn(String) instead of this.
+     * 
      * <p>
      * If return value is not 0, the service can be Rpc/encoded.
      * </p>

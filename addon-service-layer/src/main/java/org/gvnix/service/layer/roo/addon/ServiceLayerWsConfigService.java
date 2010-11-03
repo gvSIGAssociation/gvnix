@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import japa.parser.ast.PackageDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.expr.AnnotationExpr;
 
@@ -200,10 +201,17 @@ public interface ServiceLayerWsConfigService {
      *            to retrieve values from annotations and convert to
      *            {@link GvNIXXmlElement} values.
      * 
+     * @param javaType
+     *            to check java values.
+     * 
+     * @param packageDeclaration
+     *            package values.
+     * 
      * @return {@link AnnotationMetadata} to define in class.
      */
     public AnnotationMetadata getGvNIXXmlElementAnnotations(
-            ClassOrInterfaceDeclaration classOrInterfaceDeclaration);
+            ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
+            JavaType javaType, PackageDeclaration packageDeclaration);
 
     /**
      * Create Jax-WS plugin configuration in pom.xml.
