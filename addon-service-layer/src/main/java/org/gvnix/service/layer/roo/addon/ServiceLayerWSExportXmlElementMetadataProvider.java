@@ -265,7 +265,7 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
             declaredFieldList.add(entityMetadata.getIdentifierField());
             declaredFieldList.add(entityMetadata.getVersionField());
         }
-
+        // TODO: Check duplicated files
         for (FieldMetadata fieldMetadata : governorTypeDetails
                 .getDeclaredFields()) {
 
@@ -277,11 +277,12 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
         boolean containsValue;
         boolean allowed;
         // Check fields from collection.
-        for (StringAttributeValue value : elementListStringValue) {
+        for (FieldMetadata fieldMetadata : declaredFieldList) {
+
             containsValue = true;
             allowed = false;
 
-            for (FieldMetadata fieldMetadata : declaredFieldList) {
+            for (StringAttributeValue value : elementListStringValue) {
 
                 containsValue = value.getValue().contentEquals(
                         fieldMetadata.getFieldName().getSymbolName());
@@ -312,9 +313,10 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
                     break;
 
                 }
-                else {
-                    fieldMetadataTransientList.add(fieldMetadata);
-                }
+            }
+
+            if (!allowed) {
+                fieldMetadataTransientList.add(fieldMetadata);
             }
         }
 
