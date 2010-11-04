@@ -33,6 +33,7 @@ import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.metadata.MetadataItem;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
@@ -157,9 +158,13 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
                 governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
             }
 
+            // Reset entityMetadata.
+            entityMetadata = null;
             // We need to lookup the metadata we depend on
-            entityMetadata = (EntityMetadata) metadataService
-                    .get(entityMetadataKey);
+            MetadataItem item = metadataService.get(entityMetadataKey);
+            if (item != null) {
+                entityMetadata = (EntityMetadata) item;
+            }
 
             // We need to be informed if our dependent metadata changes
             metadataDependencyRegistry.registerDependency(entityMetadataKey,
@@ -275,12 +280,10 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
         }
 
         boolean containsValue;
-        boolean allowed;
         // Check fields from collection.
         for (FieldMetadata fieldMetadata : declaredFieldList) {
 
-            containsValue = true;
-            allowed = false;
+            containsValue = false;
 
             for (StringAttributeValue value : elementListStringValue) {
 
@@ -289,33 +292,13 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
 
                 if (containsValue) {
 
-                    allowed = serviceLayerWSExportValidationService
-                            .isJavaTypeAllowed(fieldMetadata.getFieldType(),
-                                    MethodParameterType.XMLENTITY,
-                                    governorTypeDetails.getName());
-
-                    Assert
-                            .isTrue(
-                                    allowed,
-                                    "The field type '"
-                                            + fieldMetadata
-                                                    .getFieldType()
-                                                    .getFullyQualifiedTypeName()
-                                            + "' is not allow to be used in web a service operation "
-                                            + "because it does not satisfy web services "
-                                            + "interoperatibily rules.\nThis is a disallowed collection defined in: '"
-                                            + governorTypeDetails
-                                                    .getName()
-                                                    .getFullyQualifiedTypeName()
-                                            + "'.");
-
                     fieldMetadataElementList.add(fieldMetadata);
                     break;
 
                 }
             }
 
-            if (!allowed) {
+            if (!containsValue) {
                 fieldMetadataTransientList.add(fieldMetadata);
             }
         }

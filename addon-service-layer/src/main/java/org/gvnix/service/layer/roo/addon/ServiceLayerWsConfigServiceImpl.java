@@ -1781,7 +1781,7 @@ public class ServiceLayerWsConfigServiceImpl implements
                         // CompilationUnitServices to create the class.
                         compilationUnitServices = new ServiceLayerWSCompilationUnit(
                                 new JavaPackage(compilationUnit.getPackage()
-                                        .getName().getName()), javaType,
+                                        .getName().toString()), javaType,
                                 compilationUnit.getImports(),
                                 new ArrayList<TypeDeclaration>());
 

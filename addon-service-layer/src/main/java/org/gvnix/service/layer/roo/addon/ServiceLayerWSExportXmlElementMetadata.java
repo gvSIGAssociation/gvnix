@@ -241,8 +241,13 @@ public class ServiceLayerWSExportXmlElementMetadata extends
 
         xmlTypeAnnotationAttributeValueList.add(propOrderAttributeList);
 
-        StringAttributeValue xmlTypeNameAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
-                .getAttribute(new JavaSymbolName("name"));
+        // TODO: Name is not necessary to @XmlType
+
+        // StringAttributeValue xmlTypeNameAttributeValue =
+        // (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
+        // .getAttribute(new JavaSymbolName("name"));
+        StringAttributeValue xmlTypeNameAttributeValue = new StringAttributeValue(new JavaSymbolName("name"), "");
+        
         xmlTypeAnnotationAttributeValueList.add(xmlTypeNameAttributeValue);
 
         StringAttributeValue xmlTypeNamespaceAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
