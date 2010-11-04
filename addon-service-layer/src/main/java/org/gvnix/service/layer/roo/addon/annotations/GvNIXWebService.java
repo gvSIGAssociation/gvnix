@@ -43,4 +43,6 @@ public @interface GvNIXWebService {
     String address();
 
     String fullyQualifiedTypeName();
+    
+    boolean exported();
 }

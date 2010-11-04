@@ -229,6 +229,8 @@ public class ServiceLayerWsExportOperationsImpl implements
         gvNixAnnotationAttributes.add(new StringAttributeValue(
                 new JavaSymbolName("fullyQualifiedTypeName"), serviceClass
                         .getFullyQualifiedTypeName()));
+        gvNixAnnotationAttributes.add(new BooleanAttributeValue(
+                new JavaSymbolName("exported"), false));
         return gvNixAnnotationAttributes;
     }
 

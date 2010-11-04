@@ -191,6 +191,9 @@ public class ServiceLayerWSExportMetadataProvider extends
             // Get public methods to check.
             List<MethodMetadata> methodMetadataList = getPublicAccessors(memberHoldingTypeDetails);
 
+            BooleanAttributeValue exported = (BooleanAttributeValue) gvNIXWebServiceAnnotation
+                    .getAttribute(new JavaSymbolName("exported"));
+
             // Check method signature and annotations.
             for (MethodMetadata methodMetadata : methodMetadataList) {
 
@@ -200,19 +203,25 @@ public class ServiceLayerWSExportMetadataProvider extends
 
                 if (gvNixWebMethodAnnotation != null) {
 
-                    // Check INPUT/OUTPUT parameters
-                    serviceLayerWSExportValidationService
-                            .checkAuthorizedJavaTypesInOperation(
-                                    governorTypeDetails.getName(),
-                                    methodMetadata.getMethodName());
+                    // If the web service has been exported from WSDL, the
+                    // parameters hasn't to be checked
+                    if (!exported.getValue()) {
 
-                    // Check and update exceptions.
-                    serviceLayerWSExportValidationService
-                            .checkMethodExceptions(governorTypeDetails
-                                    .getName(), methodMetadata.getMethodName(),
-                                    webServiceTargetNamespace);
+                        // Check INPUT/OUTPUT parameters
+                        serviceLayerWSExportValidationService
+                                .checkAuthorizedJavaTypesInOperation(
+                                        governorTypeDetails.getName(),
+                                        methodMetadata.getMethodName());
 
-                    // Check if attributes are defined in class.
+                        // Check and update exceptions.
+                        serviceLayerWSExportValidationService
+                                .checkMethodExceptions(governorTypeDetails
+                                        .getName(), methodMetadata
+                                        .getMethodName(),
+                                        webServiceTargetNamespace);
+                    }
+
+                    // Check if attributes are defined in method.
                     Assert.isTrue(!gvNixWebMethodAnnotation.getAttributeNames()
                             .isEmpty(), "The annotation @GvNIXWebMethod for '"
                             + methodMetadata.getMethodName()
@@ -877,11 +886,11 @@ public class ServiceLayerWSExportMetadataProvider extends
                 if (metadataItem == null || !metadataItem.isValid()) {
                     continue;
                 }
-                
+
                 if (!(metadataItem instanceof ItdTypeDetailsProvidingMetadataItem)) {
                     continue;
                 }
-                
+
                 ItdTypeDetailsProvidingMetadataItem itdTypeDetailsMd = (ItdTypeDetailsProvidingMetadataItem) metadataItem;
                 if (itdTypeDetailsMd.getItdTypeDetails() == null) {
                     continue;

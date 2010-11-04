@@ -613,6 +613,12 @@ public class ServiceLayerWsConfigServiceImpl implements
                         + className.getFullyQualifiedTypeName()
                         + "' must be defined.");
 
+        BooleanAttributeValue exported = (BooleanAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("exported"));
+
+        Assert.isTrue(exported != null, "Annotation attribute 'exported' in "
+                + className.getFullyQualifiedTypeName() + "' must be defined.");
+
         String cxfXmlPath = getCxfConfigurationFilePath();
         Assert.isTrue(fileManager.exists(cxfXmlPath),
                 "Cxf configuration file not found, export again the service.");
