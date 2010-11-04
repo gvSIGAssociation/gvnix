@@ -84,7 +84,7 @@ public class ServiceLayerWsConfigServiceImpl implements
     @Reference
     private JavaParserService javaParserService;
 
-    private static final String executionId = "generate-sources-";
+    private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
 
     private List<File> gVNIXXmlElementList;
     private List<File> gVNIXWebFaultList;
@@ -1211,45 +1211,34 @@ public class ServiceLayerWsConfigServiceImpl implements
                         "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Checks if already exists the execution.
-        Element wsdlExecution = XmlUtils
+        Element oldGenerateSourcesCxfServer = XmlUtils
                 .findFirstElement(
-                        "/project/build/plugins/plugin/executions/execution/configuration/wsdlOptions/wsdlOption[wsdl='"
-                                + wsdlLocation + "']", root);
+                        "/project/build/plugins/plugin/executions/execution[id='"+CXF_WSDL2JAVA_EXECUTION_ID+"']", root);
 
-        if (wsdlExecution != null) {
-            logger
-                    .fine("The wsdl '"
-                            + wsdlLocation
-                            + "' to export has been defined before in CXF wsdl2java plugin execution in pom.xml.");
-            return;
-        }
-
-        // Access executions > execution > configuration > wsdlOptions element.
-        // Configuration and wsdlOptions are created if not exists.
-        Element execution = pom.createElement("execution");
+        // Access executions > execution.
+        Element newGenerateSourcesCxfServer = pom.createElement("execution");
 
         // Create name for id.
-        int lastSlashIndex = wsdlLocation.lastIndexOf("/");
-        String wsdlName = wsdlLocation.substring(lastSlashIndex + 1);
-        wsdlName = StringUtils.delete(wsdlName, ".wsdl");
-        wsdlName = StringUtils.uncapitalize(wsdlName);
-
         Element id = pom.createElement("id");
-        id.setTextContent(executionId.concat(wsdlName));
-        execution.appendChild(id);
+        id.setTextContent(CXF_WSDL2JAVA_EXECUTION_ID);
+        newGenerateSourcesCxfServer.appendChild(id);
 
         Element phase = pom.createElement("phase");
         phase.setTextContent("generate-sources");
-        execution.appendChild(phase);
+        newGenerateSourcesCxfServer.appendChild(phase);
 
         Element goals = pom.createElement("goals");
         Element goal = pom.createElement("goal");
         goal.setTextContent("wsdl2java");
         goals.appendChild(goal);
-        execution.appendChild(goals);
+        newGenerateSourcesCxfServer.appendChild(goals);
 
         Element configuration = pom.createElement("configuration");
-        execution.appendChild(configuration);
+        newGenerateSourcesCxfServer.appendChild(configuration);
+
+        Element sourceRoot = pom.createElement("sourceRoot");
+        sourceRoot.setTextContent("${basedir}/target/generated-sources/cxf/server");
+        configuration.appendChild(sourceRoot);
 
         Element wsdlOptions = pom.createElement("wsdlOptions");
         configuration.appendChild(wsdlOptions);
@@ -1277,62 +1266,24 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         // To Update execution definitions It must be replaced in pom.xml to
         // maintain the format.
-        if (oldExecutions != null) {
-            newExecutions = oldExecutions;
+        if (oldGenerateSourcesCxfServer != null) {
 
-            // Change phase to 'none'
-            if (newExecutions.hasChildNodes()) {
-
-                Element newPhase = pom.createElement("phase");
-                newPhase.setTextContent("none");
-
-                Node updateException;
-                updateException = (newExecutions.getFirstChild() != null) ? newExecutions
-                        .getFirstChild().getNextSibling()
-                        : null;
-
-                while (updateException != null) {
-
-                    Node updatePhase;
-
-                    if (updateException.hasChildNodes()) {
-
-                        updatePhase = (updateException.getFirstChild() != null) ? updateException
-                                .getFirstChild().getNextSibling()
-                                : null;
-
-                        boolean exists = false;
-
-                        while (updatePhase != null && !exists) {
-
-                            if (updatePhase.getNodeName()
-                                    .contentEquals("phase")) {
-                                updatePhase.setTextContent("none");
-                                exists = true;
-                            }
-
-                            updatePhase = updatePhase.getNextSibling();
-                        }
-
-                        if (!exists) {
-                            updateException.appendChild(newPhase);
-                        }
-                    }
-
-                    // Check next node.
-                    updateException = updateException.getNextSibling();
-
-                }
-            }
-
-            newExecutions.appendChild(execution);
-            oldExecutions.getParentNode().replaceChild(oldExecutions,
-                    newExecutions);
+            oldGenerateSourcesCxfServer.getParentNode().replaceChild(oldGenerateSourcesCxfServer,
+                    newGenerateSourcesCxfServer);
         } else {
+            
+            if (oldExecutions == null) {
             newExecutions = pom.createElement("executions");
-            newExecutions.appendChild(execution);
+            newExecutions.appendChild(newGenerateSourcesCxfServer);
 
             codegenWsPlugin.appendChild(newExecutions);
+
+            } else {
+
+                newExecutions = oldExecutions;
+                newExecutions.appendChild(newGenerateSourcesCxfServer);
+                oldExecutions.getParentNode().replaceChild(newExecutions, oldExecutions);
+            }
         }
 
         // Write new XML to disk
@@ -1530,7 +1481,7 @@ public class ServiceLayerWsConfigServiceImpl implements
         // 1) Check if WSDL is RPC enconded and copy file to project.
         Document wsdl = checkWSDLFile(wsdlLocation);
 
-        // 2) TODO: Configure plugin cxf to generate java code using WSDL.
+        // 2) Configure plugin cxf to generate java code using WSDL.
         addImportLocation(wsdlLocation, type);
 
         // 3) Reset File List
@@ -1538,7 +1489,7 @@ public class ServiceLayerWsConfigServiceImpl implements
         gVNIXWebFaultList = new ArrayList<File>();
         gVNIXXmlWebServiceList = new ArrayList<File>();
 
-        // 3) TODO: Run maven generate-sources command.
+        // 3) Run maven generate-sources command.
         try {
             mvn(GENERATE_SOURCES);
         } catch (IOException e) {
@@ -1546,6 +1497,10 @@ public class ServiceLayerWsConfigServiceImpl implements
                     "There is an error generating java sources with '"
                             + wsdlLocation + "'.\n" + e.getMessage());
         }
+        
+        // Remove plugin execution
+        removeCxfWsdl2JavaPluginExecution();
+        
     }
 
     /**
@@ -1667,6 +1622,62 @@ public class ServiceLayerWsConfigServiceImpl implements
     /**
      * {@inheritDoc}
      * 
+     * <p>
+     * Search the execution element using id defined in CXF_WSDL2JAVA_EXECUTION_ID
+     * field.
+     * </p>
+     */
+    public void removeCxfWsdl2JavaPluginExecution() {
+
+        // Get pom.xml
+        String pomPath = getPomFilePath();
+        Assert.notNull(pomPath, "pom.xml configuration file not found.");
+
+        // Get a mutable pom.xml reference to modify it
+        MutableFile pomMutableFile = null;
+        Document pom;
+        try {
+            pomMutableFile = fileManager.updateFile(pomPath);
+            pom = XmlUtils.getDocumentBuilder().parse(
+                    pomMutableFile.getInputStream());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+
+        Element root = pom.getDocumentElement();
+
+        // Get plugin element
+        Element codegenWsPlugin = XmlUtils
+                .findFirstElement(
+                        "/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']",
+                        root);
+
+        // If plugin element not exists, message error
+        Assert
+                .notNull(codegenWsPlugin,
+                        "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+
+        // Checks if already exists the execution.
+        Element oldGenerateSourcesCxfServer = XmlUtils.findFirstElement(
+                "/project/build/plugins/plugin/executions/execution[id='"
+                        + CXF_WSDL2JAVA_EXECUTION_ID + "']", root);
+
+        if (oldGenerateSourcesCxfServer != null) {
+
+            // Remove existing execution.
+            oldGenerateSourcesCxfServer.getParentNode().removeChild(
+                    oldGenerateSourcesCxfServer);
+
+            // Write new XML to disk.
+            XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      */
     public void addFileToUpdateAnnotation(File file,
             GvNIXAnnotationType gvNIXAnnotationType) {
@@ -1718,8 +1729,11 @@ public class ServiceLayerWsConfigServiceImpl implements
      */
     protected void generateGvNIXXmlElements() {
 
-        AnnotationMetadata rooEntityAnnotationMetadata = new DefaultAnnotationMetadata(new JavaType("org.springframework.roo.addon.javabean.RooJavaBean"), new ArrayList<AnnotationAttributeValue<?>>());
-        
+        AnnotationMetadata rooEntityAnnotationMetadata = new DefaultAnnotationMetadata(
+                new JavaType(
+                        "org.springframework.roo.addon.javabean.RooJavaBean"),
+                new ArrayList<AnnotationAttributeValue<?>>());
+
         List<AnnotationMetadata> gvNixAnnoationList;
 
         // GvNIXXmlElement annotation.
@@ -1734,7 +1748,7 @@ public class ServiceLayerWsConfigServiceImpl implements
             String declaredByMetadataId;
             // CompilationUnitServices to create the class in fileSystem.
             ServiceLayerWSCompilationUnit compilationUnitServices;
-            
+
             gvNixAnnoationList = new ArrayList<AnnotationMetadata>();
             try {
                 compilationUnit = JavaParser.parse(xmlElementFile);
@@ -1754,8 +1768,8 @@ public class ServiceLayerWsConfigServiceImpl implements
 
                         classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
 
-                        declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
-                                javaType, Path.SRC_MAIN_JAVA);
+                        declaredByMetadataId = PhysicalTypeIdentifier
+                                .createIdentifier(javaType, Path.SRC_MAIN_JAVA);
 
                         // TODO: Retrieve correct values.
                         // Get field declarations.
@@ -1802,7 +1816,9 @@ public class ServiceLayerWsConfigServiceImpl implements
                         gvNixAnnoationList.add(rooEntityAnnotationMetadata);
 
                         // TODO: Get all annotations.
-                        gvNixXmlElementAnnotation = getGvNIXXmlElementAnnotations(classOrInterfaceDeclaration, javaType, packageDeclaration);
+                        gvNixXmlElementAnnotation = getGvNIXXmlElementAnnotations(
+                                classOrInterfaceDeclaration, javaType,
+                                packageDeclaration);
                         gvNixAnnoationList.add(gvNixXmlElementAnnotation);
 
                         javaParserService.createGvNIXWebServiceClass(javaType,
@@ -1840,7 +1856,8 @@ public class ServiceLayerWsConfigServiceImpl implements
      * </p>
      */
     public AnnotationMetadata getGvNIXXmlElementAnnotations(
-            ClassOrInterfaceDeclaration classOrInterfaceDeclaration, JavaType javaType, PackageDeclaration packageDeclaration) {
+            ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
+            JavaType javaType, PackageDeclaration packageDeclaration) {
 
         AnnotationMetadata gvNIXXmlElementAnnotationMetadata;
 
@@ -1975,11 +1992,11 @@ public class ServiceLayerWsConfigServiceImpl implements
         if (!existsPropOrder) {
 
             StringAttributeValue stringAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("ignored"),"");
+                    new JavaSymbolName("ignored"), "");
 
             elementListStringAttributeValues = new ArrayList<StringAttributeValue>();
             elementListStringAttributeValues.add(stringAttributeValue);
-            
+
             elementListArrayAttributeValue = new ArrayAttributeValue<StringAttributeValue>(
                     new JavaSymbolName("elementList"),
                     elementListStringAttributeValues);
@@ -2010,14 +2027,14 @@ public class ServiceLayerWsConfigServiceImpl implements
                         .getQualifier();
 
                 packageName = baseQualifiedNameExpr.getQualifier().toString();
-                
+
                 baseName = baseQualifiedNameExpr.getName();
             }
-            
+
             String namespace = convertPackageToTargetNamespace(packageName);
 
-            namespace = namespace.concat(baseName)
-                    .concat("/").concat(packageDeclaration.getName().getName());
+            namespace = namespace.concat(baseName).concat("/").concat(
+                    packageDeclaration.getName().getName());
 
             namespaceStringAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("namespace"), namespace);
@@ -2034,8 +2051,7 @@ public class ServiceLayerWsConfigServiceImpl implements
     }
 
     // Check correct values for @GvNIXXmlElement
-    
-    
+
     /**
      * Check if pom.xml file exists in the project and return the path.
      * 

@@ -11,12 +11,13 @@
   </cxf-codegen-plugin>
   <cxf-codegen-execution>
     <execution>
-        <id></id>
-        <phase>generate-sources</phase>
-        <goals>
-            <goal>wsdl2java</goal>
-        </goals>
-    <configuration>
+      <id>generate-sources-cxf-server</id>
+      <phase>generate-sources</phase>
+      <goals>
+          <goal>wsdl2java</goal>
+      </goals>
+      <configuration>
+        <sourceRoot>${basedir}/target/generated-sources/cxf/server</sourceRoot>
             <wsdlOptions>
               <wsdlOption>
                 <wsdl></wsdl>
@@ -25,7 +26,7 @@
                 </extraargs>
               </wsdlOption>
             </wsdlOptions>
-        </configuration>
+      </configuration>
     </execution>
   </cxf-codegen-execution>
 </cxf-codegen>

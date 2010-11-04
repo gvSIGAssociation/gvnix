@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.springframework.roo.file.monitor.*;
-import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 
@@ -47,8 +46,8 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
     private NotifiableFileMonitorService fileMonitorService;
     @Reference
     private PathResolver pathResolver;
-    @Reference
-    private FileManager fileManager;
+
+    private static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
 
     private static Logger logger = Logger
             .getLogger(ServiceLayerWSExportWSDLOperationsImpl.class.getName());
@@ -68,10 +67,10 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
         serviceLayerWsConfigService.exportWSDLWebService(url,
                 CommunicationSense.EXPORT_WSDL);
 
-        // 4) Check generated classes.
+        // Check generated classes.
         String generateSourcesDirectory = pathResolver.getIdentifier(Path.ROOT,
-                "target/generated-sources/cxf/");
-        
+                GENERATED_CXF_SOURCES_DIR);
+
         DirectoryMonitoringRequest directoryMonitoringRequest = new DirectoryMonitoringRequest(
                 new File(generateSourcesDirectory), true, (MonitoringRequest
                         .getInitialMonitoringRequest(generateSourcesDirectory))
@@ -86,9 +85,9 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
         // 5) TODO: Convert java classes with gvNIX annotations.
         // Using ServiceLayerWSExportWSDLListener
         updateAnnotationsToGvNIX();
-        
+
     }
-    
+
     /**
      * {@inheritDoc}
      * <p>
@@ -100,5 +99,5 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
 
         serviceLayerWsConfigService.generateGvNIXWebServiceFiles();
     }
-    
+
 }

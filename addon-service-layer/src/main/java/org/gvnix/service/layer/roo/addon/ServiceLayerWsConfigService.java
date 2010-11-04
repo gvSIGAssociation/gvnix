@@ -187,6 +187,11 @@ public interface ServiceLayerWsConfigService {
             GvNIXAnnotationType gvNIXAnnotationType);
 
     /**
+     * Remove Cxf wsdl2java plugin execution from pom.xml
+     */
+    public void removeCxfWsdl2JavaPluginExecution();
+
+    /**
      * Creates java files in 'src/main/java' from with gvNIX Web Service
      * Annotations.
      * 

@@ -71,13 +71,15 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
     @Reference
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
+    private static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
+
     protected static Logger logger = Logger
             .getLogger(ServiceLayerWSExportWSDLListener.class.getName());
 
     protected void activate(ComponentContext context) {
 
         this.generateSourcesDirectory = pathResolver.getIdentifier(Path.ROOT,
-                "target/generated-sources/cxf/");
+                GENERATED_CXF_SOURCES_DIR);
     }
 
     /*
