@@ -206,8 +206,8 @@ public interface ServiceLayerWsConfigService {
      *            to retrieve values from annotations and convert to
      *            {@link GvNIXXmlElement} values.
      * 
-     * @param javaType
-     *            to check java values.
+     * @param fileDirectory
+     *            to retrieve namespace values generated.
      * 
      * @param packageDeclaration
      *            package values.
@@ -216,7 +216,7 @@ public interface ServiceLayerWsConfigService {
      */
     public AnnotationMetadata getGvNIXXmlElementAnnotations(
             ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
-            JavaType javaType, PackageDeclaration packageDeclaration);
+            String fileDirectory, PackageDeclaration packageDeclaration);
 
     /**
      * Create Jax-WS plugin configuration in pom.xml.

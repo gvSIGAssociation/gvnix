@@ -37,7 +37,6 @@ import org.springframework.roo.addon.web.mvc.controller.UrlRewriteOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
-import org.springframework.roo.classpath.javaparser.CompilationUnitServices;
 import org.springframework.roo.classpath.javaparser.details.JavaParserFieldMetadata;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.*;
@@ -85,6 +84,8 @@ public class ServiceLayerWsConfigServiceImpl implements
     private JavaParserService javaParserService;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
+
+    private static final String SCHEMA_PACKAGE_INFO = "package-info.java";
 
     private List<File> gVNIXXmlElementList;
     private List<File> gVNIXWebFaultList;
@@ -1217,9 +1218,9 @@ public class ServiceLayerWsConfigServiceImpl implements
                         "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Checks if already exists the execution.
-        Element oldGenerateSourcesCxfServer = XmlUtils
-                .findFirstElement(
-                        "/project/build/plugins/plugin/executions/execution[id='"+CXF_WSDL2JAVA_EXECUTION_ID+"']", root);
+        Element oldGenerateSourcesCxfServer = XmlUtils.findFirstElement(
+                "/project/build/plugins/plugin/executions/execution[id='"
+                        + CXF_WSDL2JAVA_EXECUTION_ID + "']", root);
 
         // Access executions > execution.
         Element newGenerateSourcesCxfServer = pom.createElement("execution");
@@ -1243,7 +1244,8 @@ public class ServiceLayerWsConfigServiceImpl implements
         newGenerateSourcesCxfServer.appendChild(configuration);
 
         Element sourceRoot = pom.createElement("sourceRoot");
-        sourceRoot.setTextContent("${basedir}/target/generated-sources/cxf/server");
+        sourceRoot
+                .setTextContent("${basedir}/target/generated-sources/cxf/server");
         configuration.appendChild(sourceRoot);
 
         Element wsdlOptions = pom.createElement("wsdlOptions");
@@ -1274,21 +1276,22 @@ public class ServiceLayerWsConfigServiceImpl implements
         // maintain the format.
         if (oldGenerateSourcesCxfServer != null) {
 
-            oldGenerateSourcesCxfServer.getParentNode().replaceChild(oldGenerateSourcesCxfServer,
-                    newGenerateSourcesCxfServer);
+            oldGenerateSourcesCxfServer.getParentNode().replaceChild(
+                    oldGenerateSourcesCxfServer, newGenerateSourcesCxfServer);
         } else {
-            
-            if (oldExecutions == null) {
-            newExecutions = pom.createElement("executions");
-            newExecutions.appendChild(newGenerateSourcesCxfServer);
 
-            codegenWsPlugin.appendChild(newExecutions);
+            if (oldExecutions == null) {
+                newExecutions = pom.createElement("executions");
+                newExecutions.appendChild(newGenerateSourcesCxfServer);
+
+                codegenWsPlugin.appendChild(newExecutions);
 
             } else {
 
                 newExecutions = oldExecutions;
                 newExecutions.appendChild(newGenerateSourcesCxfServer);
-                oldExecutions.getParentNode().replaceChild(newExecutions, oldExecutions);
+                oldExecutions.getParentNode().replaceChild(newExecutions,
+                        oldExecutions);
             }
         }
 
@@ -1503,10 +1506,10 @@ public class ServiceLayerWsConfigServiceImpl implements
                     "There is an error generating java sources with '"
                             + wsdlLocation + "'.\n" + e.getMessage());
         }
-        
+
         // Remove plugin execution
         removeCxfWsdl2JavaPluginExecution();
-        
+
     }
 
     /**
@@ -1629,8 +1632,8 @@ public class ServiceLayerWsConfigServiceImpl implements
      * {@inheritDoc}
      * 
      * <p>
-     * Search the execution element using id defined in CXF_WSDL2JAVA_EXECUTION_ID
-     * field.
+     * Search the execution element using id defined in
+     * CXF_WSDL2JAVA_EXECUTION_ID field.
      * </p>
      */
     public void removeCxfWsdl2JavaPluginExecution() {
@@ -1745,8 +1748,14 @@ public class ServiceLayerWsConfigServiceImpl implements
         // GvNIXXmlElement annotation.
         AnnotationMetadata gvNixXmlElementAnnotation;
 
+        String fileDirectory = null;
+        int lastPathSepratorIndex = 0;
         for (File xmlElementFile : gVNIXXmlElementList) {
 
+            fileDirectory = xmlElementFile.getAbsolutePath();
+            lastPathSepratorIndex = fileDirectory.lastIndexOf(File.separator);
+            fileDirectory = fileDirectory.substring(0, lastPathSepratorIndex + 1);
+            
             // Parse Java file.
             CompilationUnit compilationUnit;
             PackageDeclaration packageDeclaration;
@@ -1823,7 +1832,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 
                         // TODO: Get all annotations.
                         gvNixXmlElementAnnotation = getGvNIXXmlElementAnnotations(
-                                classOrInterfaceDeclaration, javaType,
+                                classOrInterfaceDeclaration, fileDirectory,
                                 packageDeclaration);
                         gvNixAnnoationList.add(gvNixXmlElementAnnotation);
 
@@ -1863,7 +1872,7 @@ public class ServiceLayerWsConfigServiceImpl implements
      */
     public AnnotationMetadata getGvNIXXmlElementAnnotations(
             ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
-            JavaType javaType, PackageDeclaration packageDeclaration) {
+            String fileDirectory, PackageDeclaration packageDeclaration) {
 
         AnnotationMetadata gvNIXXmlElementAnnotationMetadata;
 
@@ -1875,14 +1884,12 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         // name
         StringAttributeValue nameStringAttributeValue = null;
-        StringAttributeValue xmlTypeNameStringAttributeValue = null;
         // namespace
         StringAttributeValue namespaceStringAttributeValue = null;
         // element list values
         List<StringAttributeValue> elementListStringAttributeValues = new ArrayList<StringAttributeValue>();
         ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue;
 
-        boolean existsNameInXmlElement = false;
         boolean existsNamespace = false;
         boolean existsPropOrder = false;
 
@@ -1969,8 +1976,8 @@ public class ServiceLayerWsConfigServiceImpl implements
                         } else if (pair.getName().contentEquals("namespace")) {
 
                             namespaceStringAttributeValue = new StringAttributeValue(
-                                    new JavaSymbolName("namespace"), pair
-                                            .getValue().toString());
+                                    new JavaSymbolName("namespace"),((StringLiteralExpr) pair.getValue())
+                                    .getValue());
 
                             annotationAttributeValues
                                     .add(namespaceStringAttributeValue);
@@ -2012,40 +2019,64 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         if (!existsNamespace) {
 
-            QualifiedNameExpr projectQualifiedNameExpr = (QualifiedNameExpr) packageDeclaration
-                    .getName();
+            String filePackageInfo = fileDirectory.concat(SCHEMA_PACKAGE_INFO);
+            File packageInfoFile = new File(filePackageInfo);
+            CompilationUnit compilationUnit;
 
-            String packageName = "";
-            String baseName = "";
+            String namespace = "";
+            try {
 
-            if (projectQualifiedNameExpr.getQualifier() instanceof NameExpr) {
+                compilationUnit = JavaParser.parse(packageInfoFile);
 
-                NameExpr baseNameExpr = (NameExpr) projectQualifiedNameExpr
-                        .getQualifier();
+                List<AnnotationExpr> packageAnnotations = compilationUnit
+                        .getPackage().getAnnotations();
 
-                packageName = baseNameExpr.getName();
+                boolean exists = false;
+                for (AnnotationExpr packageAnnotationExpr : packageAnnotations) {
 
-                baseName = projectQualifiedNameExpr.getName();
+                    if (packageAnnotationExpr instanceof NormalAnnotationExpr) {
 
-            } else if (projectQualifiedNameExpr.getQualifier() instanceof QualifiedNameExpr) {
+                        NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) packageAnnotationExpr;
 
-                QualifiedNameExpr baseQualifiedNameExpr = (QualifiedNameExpr) projectQualifiedNameExpr
-                        .getQualifier();
+                        if (normalAnnotationExpr.getName().toString().contains(
+                                "javax.xml.bind.annotation.XmlSchema")) {
 
-                packageName = baseQualifiedNameExpr.getQualifier().toString();
+                            List<MemberValuePair> pairs = normalAnnotationExpr
+                                    .getPairs();
 
-                baseName = baseQualifiedNameExpr.getName();
+                            for (MemberValuePair memberValuePair : pairs) {
+
+                                if (memberValuePair.getName().contentEquals(
+                                        "namespace")) {
+                                    namespace = ((StringLiteralExpr) memberValuePair
+                                            .getValue()).getValue();
+                                    exists = true;
+                                    break;
+                                }
+
+                            }
+
+                        }
+                    }
+
+                    if (exists) {
+                        break;
+                    }
+                }
+
+                namespaceStringAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("namespace"), namespace);
+
+                annotationAttributeValues.add(namespaceStringAttributeValue);
+
+            } catch (ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
 
-            String namespace = convertPackageToTargetNamespace(packageName);
-
-            namespace = namespace.concat(baseName).concat("/").concat(
-                    packageDeclaration.getName().getName());
-
-            namespaceStringAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("namespace"), namespace);
-
-            annotationAttributeValues.add(namespaceStringAttributeValue);
         }
 
         // Create annotation.
