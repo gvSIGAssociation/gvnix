@@ -33,11 +33,8 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.GvNIXAnnotationType;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.file.monitor.event.FileEvent;
 import org.springframework.roo.file.monitor.event.FileEventListener;
-import org.springframework.roo.metadata.MetadataService;
-import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.Assert;
@@ -64,12 +61,6 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
     private PathResolver pathResolver;
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
-    @Reference
-    private FileManager fileManager;
-    @Reference
-    private MetadataService metadataService;
-    @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
     private static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
 
@@ -80,6 +71,9 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
         this.generateSourcesDirectory = pathResolver.getIdentifier(Path.ROOT,
                 GENERATED_CXF_SOURCES_DIR);
+
+        // Reset generated file lists.
+        serviceLayerWsConfigService.resetGeneratedFilesList();
     }
 
     /*
@@ -117,7 +111,10 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
                         // Check annotation types.
                         for (AnnotationExpr annotationExpr : annotations) {
 
-                            analyzeAnnotations(file, annotationExpr);
+                            if (analyzeAnnotations(file, annotationExpr)) {
+                                break;
+                            }
+
                         }
                     }
                 }
@@ -147,8 +144,10 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
      * @param file
      *            file to Add to priority list.
      * 
+     * @return true if has found selected annotation.
+     * 
      */
-    public void analyzeAnnotations(File file, AnnotationExpr annotationExpr) {
+    public boolean analyzeAnnotations(File file, AnnotationExpr annotationExpr) {
 
         if (annotationExpr instanceof NormalAnnotationExpr) {
 
@@ -161,19 +160,19 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.XML_ELEMENT);
-                return;
+                return true;
             } else if (normalAnnotationExpr.getName().getName().contains(
                     webFault)) {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.WEB_FAULT);
-                return;
+                return true;
             } else if (normalAnnotationExpr.getName().getName().contains(
                     webService)) {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.WEB_SERVICE);
-                return;
+                return true;
             }
 
         } else if (annotationExpr instanceof MarkerAnnotationExpr) {
@@ -187,19 +186,19 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.XML_ELEMENT);
-                return;
+                return true;
             } else if (markerAnnotationExpr.getName().getName().contains(
                     webFault)) {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.WEB_FAULT);
-                return;
+                return true;
             } else if (markerAnnotationExpr.getName().getName().contains(
                     webService)) {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.WEB_SERVICE);
-                return;
+                return true;
             }
 
         } else if (annotationExpr instanceof SingleMemberAnnotationExpr) {
@@ -213,22 +212,23 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.XML_ELEMENT);
-                return;
+                return true;
             } else if (singleMemberAnnotationExpr.getName().getName().contains(
                     webFault)) {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.WEB_FAULT);
-                return;
+                return true;
             } else if (singleMemberAnnotationExpr.getName().getName().contains(
                     webService)) {
 
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.WEB_SERVICE);
-                return;
+                return true;
             }
         }
 
+        return false;
     }
 
 }

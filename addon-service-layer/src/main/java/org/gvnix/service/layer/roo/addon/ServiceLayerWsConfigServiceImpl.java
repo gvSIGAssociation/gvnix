@@ -38,6 +38,7 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.javaparser.details.JavaParserFieldMetadata;
+import org.springframework.roo.file.monitor.*;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.*;
 import org.springframework.roo.process.manager.FileManager;
@@ -82,14 +83,16 @@ public class ServiceLayerWsConfigServiceImpl implements
     private MavenOperations mavenOperations;
     @Reference
     private JavaParserService javaParserService;
+    @Reference
+    private NotifiableFileMonitorService fileMonitorService;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
 
     private static final String SCHEMA_PACKAGE_INFO = "package-info.java";
 
-    private List<File> gVNIXXmlElementList;
-    private List<File> gVNIXWebFaultList;
-    private List<File> gVNIXXmlWebServiceList;
+    private List<File> gVNIXXmlElementList = new ArrayList<File>();
+    private List<File> gVNIXWebFaultList = new ArrayList<File>();
+    private List<File> gVNIXXmlWebServiceList = new ArrayList<File>();
 
     protected static Logger logger = Logger
             .getLogger(ServiceLayerWsConfigService.class.getName());
@@ -1494,10 +1497,8 @@ public class ServiceLayerWsConfigServiceImpl implements
         addImportLocation(wsdlLocation, type);
 
         // 3) Reset File List
-        gVNIXXmlElementList = new ArrayList<File>();
-        gVNIXWebFaultList = new ArrayList<File>();
-        gVNIXXmlWebServiceList = new ArrayList<File>();
-
+        resetGeneratedFilesList();
+        
         // 3) Run maven generate-sources command.
         try {
             mvn(GENERATE_SOURCES);
@@ -1510,6 +1511,27 @@ public class ServiceLayerWsConfigServiceImpl implements
         // Remove plugin execution
         removeCxfWsdl2JavaPluginExecution();
 
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public void monitoringGeneratedSourcesDirectory(String directoryToMonitoring) {
+
+        String generateSourcesDirectory = pathResolver.getIdentifier(Path.ROOT,
+                directoryToMonitoring);
+
+        DirectoryMonitoringRequest directoryMonitoringRequest = new DirectoryMonitoringRequest(
+                new File(generateSourcesDirectory), true, (MonitoringRequest
+                        .getInitialMonitoringRequest(generateSourcesDirectory))
+                        .getNotifyOn());
+
+        fileMonitorService.add(directoryMonitoringRequest);
+        fileMonitorService.scanAll();
+
+        // Remove Directory listener.
+        fileMonitorService.remove(directoryMonitoringRequest);
     }
 
     /**
@@ -1734,6 +1756,17 @@ public class ServiceLayerWsConfigServiceImpl implements
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     */
+    public void resetGeneratedFilesList() {
+        //  Reset File List
+        gVNIXXmlElementList = new ArrayList<File>();
+        gVNIXWebFaultList = new ArrayList<File>();
+        gVNIXXmlWebServiceList = new ArrayList<File>();
+    }
+
+    /**
      * Generates java files with '@GvNIXXmlElement' values.
      */
     protected void generateGvNIXXmlElements() {
@@ -1830,7 +1863,7 @@ public class ServiceLayerWsConfigServiceImpl implements
                         // ROO entity to generate getters and setters methods.
                         gvNixAnnoationList.add(rooEntityAnnotationMetadata);
 
-                        // TODO: Get all annotations.
+                        // Get all annotations.
                         gvNixXmlElementAnnotation = getGvNIXXmlElementAnnotations(
                                 classOrInterfaceDeclaration, fileDirectory,
                                 packageDeclaration);
@@ -1845,16 +1878,14 @@ public class ServiceLayerWsConfigServiceImpl implements
                 }
 
             } catch (ParseException e) {
-                // TODO Auto-generated catch block
                 Assert.state(false,
-                        "Generated web service java file has errors:\n"
+                        "Generated Xml Element service java file '"+xmlElementFile.getAbsolutePath()+"' has errors:\n"
                                 + e.getMessage());
 
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 Assert.state(false,
-                        "Generated web service java file has errors:\n"
+                        "Generated Xml Element service java file '"+xmlElementFile.getAbsolutePath()+"' has errors:\n"
                                 + e.getMessage());
 
             }
@@ -2070,11 +2101,16 @@ public class ServiceLayerWsConfigServiceImpl implements
                 annotationAttributeValues.add(namespaceStringAttributeValue);
 
             } catch (ParseException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                Assert.state(false,
+                        "Generated Xml Element service java file '"+classOrInterfaceDeclaration.getName()+"' has errors:\n"
+                                + e.getMessage());
+
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
+                Assert.state(false,
+                        "Generated Xml Element service java file '"+classOrInterfaceDeclaration.getName()+"' has errors:\n"
+                                + e.getMessage());
+
             }
 
         }

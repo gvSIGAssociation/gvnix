@@ -199,6 +199,19 @@ public interface ServiceLayerWsConfigService {
     public void generateGvNIXWebServiceFiles();
 
     /**
+     * Monitoring CXF Web Service generated sources directory.
+     * 
+     * @param directoryToMonitoring
+     *            directory to look up for CXF Web Service generated java files.
+     */
+    public void monitoringGeneratedSourcesDirectory(String directoryToMonitoring);
+
+    /**
+     * Reset Web Service generated file lists.
+     */
+    public void resetGeneratedFilesList();
+    
+    /**
      * Convert annotation values from {@link AnnotationExpr} list to
      * {@link GvNIXAnnotationType} annotation attributes values.
      * 
