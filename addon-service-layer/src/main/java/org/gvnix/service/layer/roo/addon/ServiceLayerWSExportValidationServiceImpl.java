@@ -529,7 +529,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                 + "' type can't be 'null'.");
 
         String fileLocation = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
-                javaType.getFullyQualifiedTypeName().replace('.', '/').concat(
+                javaType.getFullyQualifiedTypeName().replace('.', File.separatorChar).concat(
                         ".java"));
 
         // It's an imported collection or map ?
@@ -722,18 +722,18 @@ public class ServiceLayerWSExportValidationServiceImpl implements
         fieldMetadataElementList.removeAll(fieldMetadataTransientList);
         tmpFieldMetadataElementList.addAll(fieldMetadataElementList);
 
-        boolean notAllowed;
+        boolean isAllowed;
 
         // Transient collection fields.
         for (FieldMetadata fieldMetadata : tmpFieldMetadataElementList) {
 
-            notAllowed = isJavaTypeAllowed(fieldMetadata.getFieldType(),
+            isAllowed = isJavaTypeAllowed(fieldMetadata.getFieldType(),
                     MethodParameterType.XMLENTITY, governorTypeDetails
                             .getName());
 
             // Add field that implements disallowed collection
             // interface.
-            if (!notAllowed) {
+            if (!isAllowed) {
                 fieldMetadataElementList.remove(fieldMetadata);
             }
         }

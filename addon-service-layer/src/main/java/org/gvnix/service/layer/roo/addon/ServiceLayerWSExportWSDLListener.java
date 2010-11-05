@@ -123,13 +123,11 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
                 }
 
             } catch (ParseException e) {
-                // TODO Auto-generated catch block
                 Assert.state(false,
                         "Generated web service java file has errors:\n"
                                 + e.getMessage());
 
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 Assert.state(false,
                         "Generated web service java file has errors:\n"
