@@ -24,9 +24,16 @@ TODO: Confirmar la info del doc de CXF (addon cxf).
 Introducción
 =============
 
+Configuration will be defined in the classes with gvNIX Annotations and generated source will be published in AspectJ files from this annotations.
+
 **DOCUMENTO EN DESARROLLO**
 
 TBC: Objetivo del addon
+
+Prerequisites
+=============
+
+See td-contract-first-from-java.rst
 
 Requirements
 =============
@@ -60,55 +67,22 @@ Requirements are in priority order:
 Additionally, There are some limitations on wsdl generation from Java.
 Another requirements are to solve or avoid this limitations too.
 
-Limitations
------------
-
-TBC: 
-
-These limitations would be resolved. There are sorted by relevance:
-
-#. Fragility
-
-   Each time you change your Java contract and redeploy it, there might be subsequent changes to the web service contract. 
-
-#. Unportable types
-
-   You must use some common and interlingual class libraries format to communicate between muliple platforms.
-   This problem is also present when working on the client side.
-
-#. Cyclic graphs
-
-   Cyclic graphs, like Flight refers to the Passengers which refers to the Flight again, are quite common in Java.
-   One way to solve this problem is to use references to objects, but the standard way to use these references in SOAP (RPC/encoded) has been deprecated in favor of document/literal (see WS-I Basic Profile). 
-
-#. Performance
-
-   When Java is automatically transformed into XML, there is no way to be sure as to what is sent across the wire.
-   An object might reference another object, etc. which will result in slow response times. 
-
-#. Versioning
-
-   Even though a contract must remain constant for as long as possible, they do need to be changed sometimes.
-
-#. XSD extensions
-
-   In XSD, you can extend a data type by restricting it.
-   The regular expression restriction is lost in the conversion process to Java, because Java does not allow for these sorts of extensions.
-
-#. Reusability
-
-   Defining your schema in a separate file allows you to reuse that file in different scenarios.
-   
-More information:
-
-* http://static.springsource.org/spring-ws/sites/2.0/reference/html/why-contract-first.html
-
 Use Case
 =========
 
 TODO:
 
 TRANSLATE:
+
+Addon Annotations
+-------------------
+
+Anotaciones definidas por el Addon para la gestión de servicios web:
+
+* @GvNIXWebFault: Anotación para definir las anotaciones utilizadas como excepciones en las operaciones de un servicio web.
+* @GvNIXWebMethod: Anotación para identificar el método a publicar como operación de un servicio web.
+* @GvNIXWebService: Anotación para identificar la clase publicada como servicio web.
+* @GvNIXWebParam: Anotación asociada la los parámetros del método que se publica como operación de un servicio.
 
 +Publicar clase como servicio web.+
 ----------------------------------------
@@ -213,7 +187,7 @@ Also you have to define *@GvNIXWebParam* and *@WebParam* annotations for each in
 @WebParam ``attributes``:
 
   * ``name``: The same name of attribute name for *@GvNIXWebParam*. The name of attribute in WSDL.
-  * ``partName``: Allways set ``partName = "parameters".
+  * ``partName``: Allways set ``partName = "parameters"``.
   * ``mode``: Allways set ``mode = Mode.IN``.
   * ``header``: Allways set ``header = false``.
 
@@ -285,13 +259,47 @@ service operation:
 Export a web service
 -------------------------
 
-Command to publish a service class as a web service.
+Command to publish a ¿ service class ? as a web service.
 
 service export ws:
 
 * Add *@GvNixWebService* annotation with the command attributes (name, targetNamespace, etc) or if they hadn't been defined set default values.
 * Add CXF dependecies into pom.xml.
-* Add jax-ws build into the pom.xml to check the correct service contract generated before it will be published in compilation goal.
+* Add jax-ws build into the pom.xml to check the correct service contract generated in compilation before it will be published in execution::
+
+        <plugin>
+          <groupId>org.apache.cxf</groupId>
+          <artifactId>cxf-java2ws-plugin</artifactId>
+          <version>${cxf.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.cxf</groupId>
+              <artifactId>cxf-rt-frontend-jaxws</artifactId>
+              <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.cxf</groupId>
+              <artifactId>cxf-rt-frontend-simple</artifactId>
+              <version>${cxf.version}</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <id>generate-car-service-wsdl</id>
+              <phase>compile</phase>
+              <configuration>
+                <className>org.gvnix.test.project.web.services.CarService</className>
+                <outputFile>${project.basedir}/src/test/resources/generated/wsdl/CarService.wsdl</outputFile>
+                <genWsdl>true</genWsdl>
+                <verbose>true</verbose>
+              </configuration>
+              <goals>
+                <goal>java2ws</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
 * Add web service definition to CXF config file. Create the file if doesn't exists.
 * Create AspectJ file. Associated metadata to service class within CXF annotations: 
 
@@ -305,7 +313,7 @@ Command to publish a method as web service operation.
 
 service operation:
 
-* Modify method in Class where is defined with **@GvNIXWebMethod** annotation with its mandatory parameters or defined in inter-operability web service standards by default. 
+* Modify method in Class where is defined with **@GvNIXWebMethod** annotation with its mandatory parameters or ¿ defined in inter-operability web service standards by default ?. 
 
   * Create or Modify associated AspectJ file with the new published method. Rebuild with defined values in gVNIX annotations. Associated Metadata generates AspectJ file.
   * Checks if GvNIX annotation is well formed before generate Metadata, if is incorrect shows a message and deletes metadata.
@@ -315,7 +323,8 @@ service operation:
 * Checks **Allowed Parameters** involved in operation.
 
   * If there is a not allowed parameters (input/output) doesn't publish the operation. See: supported data types.
-
+  * Adds **GvNIXXmlElement** annotation to object parameters, if not exists already 
+  
 Supported data types
 --------------------------
 
@@ -439,7 +448,7 @@ Creates a service class to act as a proxy for the Web Service defined in wsdl.
 
 Parameters:
 
-  * ``--endPoint`` Class to act as a proxy.
+  * ``--class`` (mandatory) Class to act as a proxy.
   * ``--wsdl`` (mandatory) Location of the remote Web Service.
 
 service entity
@@ -460,6 +469,10 @@ Commands Availability
 
 Proof of Concept
 =================
+
+Proof of concept repository location:
+
+* https://svn.disid.com/svn/disid/proof/gvnix/cxf-web-service
 
 TBC: The location of the project will be updated when the shell is built
 

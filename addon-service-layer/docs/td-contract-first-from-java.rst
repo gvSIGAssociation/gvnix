@@ -18,38 +18,8 @@ http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
 Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 
 94105, USA.
 
-Requirements
-============
-
-Requirements are in priority order:
-
-* Web service servers creation without write wsdl and xsd.
-  Use contract first model, but generate contract (wsdl + xsd) from Java with a DSL language as Java Annotations and/or AspectJ.
-  
-  A change in the source code should not affect the generated service contract (wsdl + xsd). 
-  If a code change makes inconsistent the relationship with the service annotations, would be required to generate a compilation or startup error.
-
-* Using SOAP binding document / literal versus RPC / encoded servers generated, because RPC is obsolete by WS-I Basic Profile.
-
-* Allow web service servers generation on the service layer o entity layer of Roo.
-
-* Not use interfaces related to the implementation on service layer and entitity layer web service servers generation.
-
-* Web service framework installation will be automatic when client or server generation is required. 
-
-* Allow the generation of local services, withour web service support (Spring @Service).
-
-* Generate web service clients and servers easily.
-
-* Support web services clients generation compatible with JAX-RPC web service servers standar.
-
-* Web services clients and servers generation would be executable on FUSE ESB / Servicemix environments.
-
-Additionally, There are some limitations on wsdl generation from Java.
-Another requirements are to solve or avoid this limitations too.
-
 Limitations
------------
+===========
 
 These limitations would be resolved. There are sorted by relevance:
 
@@ -198,7 +168,6 @@ Limitations solution
    * Properties order
    * Each property name
    * Each property type
-   * Each property type compatibility
    
    Use JAX-B annotations.
    
@@ -206,7 +175,12 @@ Limitations solution
  	
    Allow only a list of specific types that has no conversion problems. For example, let String, but not allow TreeMap.
    
-   We may also need to define the mapping of certain types of data that is not completely accurate, for example, the Date in Java provides the time and XML (https://jaxb.dev.java.net/guide/Using_different_datatypes.html).
+   We may also need to define the mapping of certain types of data that is not completely accurate, for example, the Date in Java provides the time and XML no (https://jaxb.dev.java.net/guide/Using_different_datatypes.html).
+   
+   More info:
+   
+   * `XSD 1.0 type hierarchy`_
+   * `XSD 1.1 type hierarchy`_
 
 #. Cyclic graphs
 
@@ -245,10 +219,6 @@ More information:
 Design
 ======
 
-Proof of concept repository location:
-
-* https://svn.disid.com/svn/disid/proof/spring_roo/gvnix-cxf-web-service
-
 Developing a service
 --------------------
 
@@ -277,9 +247,9 @@ JAX-WS relies on the annotation feature of Java 5. The JAX-WS annotations are us
 JAX-WS annotations
 ------------------
 
-Paquetes base javax.xml.ws, javax.jws.
+Base packages javax.xml.ws, javax.jws.
 
-* @WebFault ( name="NoSuchCustomer" ): Nos permite independizar el nombre de la clase de excepción del nombre del dato a transmitir.
+* @WebFault ( name="NoSuchCustomer" ): Allows us to independize the name of the exception class of the data name to be transmitted.
 
     * name: Specifies the local name of the fault element.
     * targetNamespace: Specifies the namespace under which the fault element is defined. The default value is the target namespace of the SEI.
@@ -287,7 +257,7 @@ Paquetes base javax.xml.ws, javax.jws.
     
   The name property is required.
 
-* @WebService: Marca una clase como servicio
+* @WebService: Mark a class as web service.
 
 	* name: Specifies the name of the service interface. This property is mapped to the name attribute of the wsdl:portType element that defines the service's interface in a WSDL contract. The default is to append PortType to the name of the implementation class.
 	* targetNamespace: Specifies the target namespace under which the service is defined. If this property is not specified, the target namespace is derived from the package name.
@@ -296,7 +266,7 @@ Paquetes base javax.xml.ws, javax.jws.
 	* endpointInterface: Specifies the full name of the SEI that the implementation class implements. This property is only used when the attribute is used on a service implementation class. Note: Not allowed on the SEI
 	* portName: Specifies the name of the endpoint at which the service is published. This property is mapped to the name attribute of the wsdl:port element that specifies the endpoint details for a published service. The default is the append Port to the name of the service's implementation class. Note: Not allowed on the SEI
 
-* @WebParam ( name="name" ): Necesario para que Java no pierda el nombre de un parámetro web y así evitar que en el wsdl contenda arg0 en lugar del nombre deseado.
+* @WebParam ( name="name" ): Required for Java does not lose the name of a web parameter and thus prevent constains arg0 in wsdl instead of the desired name. 
 
     * name: Specifies the name of the parameter as it appears in the WSDL. For RPC bindings, this is name of the wsdl:part representing the parameter. For document bindings, this is the local name of the XML element representing the parameter. Per the JAX-WS specification, the default is argN, where N is replaced with the zero-based argument index (i.e., arg0, arg1, etc.)
     * targetNamespace: Specifies the namespace for the parameter. It is only used with document bindings where the parameter maps to an XML element. The defaults is to use the service's namespace.
@@ -308,24 +278,24 @@ Paquetes base javax.xml.ws, javax.jws.
     
       Specifies if the parameter is passed as part of the SOAP header.
     
-    * partName: Specifies the value of the name attribute of the wsdl:part element for the parameter when the binding is document. Default parametes.
+    * partName: Specifies the value of the name attribute of the wsdl:part element for the parameter when the binding is document. Default parameters.
 
-  Los primeros son los valores por defecto.
+  The first values are the default.
   
-* @WebResult del paquete the javax.jws: Allows you to specify the properties of the generated wsdl:part that is generated for the method's return value.
+* @WebResult of javax.jws package: Allows you to specify the properties of the generated wsdl:part that is generated for the method's return value.
 
     * name: Specifies the name of the return value as it appears in the WSDL. For RPC bindings, this is name of the wsdl:part representing the return value. For document bindings, this is the local name of the XML element representing the return value. The default value is return.
     * targetNamespace: Specifies the namespace for the return value. It is only used with document bindings where the return value maps to an XML element. The defaults is to use the service's namespace.
     * header: Specifies if the return value is passed as part of the SOAP header.
-    * partName: Specifies the value of the name attribute of the wsdl:part element for the return value when the binding is document. Default parametes.
+    * partName: Specifies the value of the name attribute of the wsdl:part element for the return value when the binding is document. Default parameters.
 
-* @WebMethod del paquete javax.jws: Provides the information that is normally represented in the wsdl:operation element describing the operation to which the method is associated. Sus propiedades son:
+* @WebMethod of javax.jws package: Provides the information that is normally represented in the wsdl:operation element describing the operation to which the method is associated. Sus propiedades son:
 
     * operationName: Specifies the value of the associated wsdl:operation element's name. The default value is the name of the method.
     * action: Specifies the value of the soapAction attribute of the soap:operation element generated for the method. The default value is an empty string.
     * exclude: Specifies if the method should be excluded from the service interface. The default is false.
 
-* @SOAPBinding del paquete javax.jws.soap: Provee información sobre como se relaciona el servicio con SOAP. Si no se especifica se toma document/literal. Pueden definirse las siguientes propiedades:
+* @SOAPBinding of javax.jws.soap package: Provee información sobre como se relaciona el servicio con SOAP. Si no se especifica se toma document/literal. Pueden definirse las siguientes propiedades:
 
     * style: Style.DOCUMENT, Style.RPC
     
@@ -339,28 +309,30 @@ Paquetes base javax.xml.ws, javax.jws.
     
       Specifies how the method parameters, which correspond to message parts in a WSDL contract, are placed into the SOAP message body. A parameter style of BARE means that each parameter is placed into the message body as a child element of the message root. A parameter style of WRAPPED means that all of the input parameters are wrapped into a single element on a request message and that all of the output parameters are wrapped into a single element in the response message. If you set the style to RPC you must use the WRAPPED parameter style.
 
-  Los primeros son los valores por defecto.
+  The first values are the default.
 
-*  @RequestWrapper y @ResponseWrapper del paquete javax.xml.ws: Java class that implements the wrapper bean for the method parameters that are included in the request or response message in a remote invocation. It is also used to specify the element names, and namespaces, used by the runtime when marshalling and unmarshalling the messages. Propiedades:
+*  @RequestWrapper y @ResponseWrapper of javax.xml.ws package: Java class that implements the wrapper bean for the method parameters that are included in the request or response message in a remote invocation.
+   It is also used to specify the element names, and namespaces, used by the runtime when marshalling and unmarshalling the messages.
+   Properties:
 
-      o localName: Specifies the local name of the wrapper element in the XML representation of the message. The default value is the name of the method or the value of the @WebMethod annotation's operationName property.
-      o targetNamespace: Specifies the namespace under which the XML wrapper element is defined. The default value is the target namespace of the SEI.
-      o className: Specifies the full name of the Java class that implements the wrapper element.
+      * localName: Specifies the local name of the wrapper element in the XML representation of the message. The default value is the name of the method or the value of the @WebMethod annotation's operationName property.
+      * targetNamespace: Specifies the namespace under which the XML wrapper element is defined. The default value is the target namespace of the SEI.
+      * className: Specifies the full name of the Java class that implements the wrapper element.
       
    Tip: Only the className property is required.
    
-   Se define en la variable className una clase a crear automáticamente que será el objeto contenedor donde se guardan los parámetros que se envían o se devuelven.
+   className variable defines a class that will be created automatically to store the parameters that are sent or returned.
 
-   Ejemplo::
+   Example::
 
     @ResponseWrapper(targetNamespace="http://demo.iona.com/types",
                    className="org.eric.demo.Quote")
                    
-* @Oneway del paquete javax.jws: Methods in the SEI that will not require a response from the service. It can optimize the execution of the method by not waiting for a response
+* @Oneway of javax.jws package: Methods in the SEI that will not require a response from the service. It can optimize the execution of the method by not waiting for a response
 
 * JAX-WS tools:
 
- * Utiliza el plugin de maven cxf-java2ws-plugin para generar el wsdl.
+ * Use the CXF maven plugin maven-plugin-java2ws to generate the wsdl.
 
 * JAX-WS specification: http://www.jcp.org/en/jsr/detail?id=224
 
@@ -371,7 +343,7 @@ Paquetes base javax.xml.ws, javax.jws.
 JAX-B annotations
 -----------------
 
-Paquete base javax.xml.bind.annotation.
+Base package javax.xml.bind.annotation.
 
 * The @XmlRootElement annotation notifies JAXB that the annotated class is the root element of the XML document. If this annotation is missing, JAXB will throw an exception.
 
@@ -390,9 +362,9 @@ Paquete base javax.xml.bind.annotation.
    <element>value</element>
    
   * name
-  * required=true: Evita la opcionalidad de los elementos que se aplica por defecto.
+  * required=true: Avoid the optionality of elements that is applied by default.
 
-API de la anotaciones de JAXB: http://download.oracle.com/javaee/5/api/javax/xml/bind/annotation/package-summary.html
+JAXB annotations API: http://download.oracle.com/javaee/5/api/javax/xml/bind/annotation/package-summary.html
 
 * It generates a wrapper element around the collections of delivery addresses. Without them you could see various <deliveryAddresses> elements.
   With the code above, you get one <delivery> element that wraps various <address> elements::
@@ -428,7 +400,7 @@ API de la anotaciones de JAXB: http://download.oracle.com/javaee/5/api/javax/xml
    @XmlJavaTypeAdapter(DateAdapter.class)
    private Date dateOfBirth;
 
-* @XmlAccessorType(XmlAccessType.FIELD): De esta forma pueden crearse tipos de datos primarios, arrays de primitivas o clases.
+* @XmlAccessorType(XmlAccessType.FIELD): In this way you can create primitive data types, arrays of primitives or classes.
 
 * @XmlSchema
 
@@ -562,78 +534,25 @@ Anotar todas las entidades de la aplicación al "instalar" el Add-on de servicio
 Addon commands
 ---------------
 
-* service class --class:
-
-  - ``class``: Nombre de la nueva clase servicio.
-
-    Crear una clase para gestionar servicios. Añadiría las anotaciones de Spring que necesitase ``@Service``.
-    
-    Hay que pensar si alguna más (puede que del propio add-on). Ninguna ya que es una clase de Servicio no Servicio Web.
-
-* service operation --class clase --name nombreOperacion --return clase:
-
-  - ``class``: Clase @Service a la que se va a añadir el método nuevo.
-  - ``name``: nombre del método.
-  - ``return``: Objeto que devuelve el método.
-
-    Sólo está activo para las clases anotadas con ``@Service`` (Autocompletado).
-    
-    Si la clase viene de una entidad se mostrarán los nombres de los métodos que se pueden publicar. La clase estará anotada con @GvNixEntityService y no hará falta definir los parámetros de entrada ni los de salida, toma como plantilla el método de la clase definido en el fichero aj de la entidad.
-    
-    Un método, que devolverá (o no) un tipo en concreto. Habría que ver como concretar la especificación del tipo devuelto cuando es Map, Collection, Set, etc...).
-
-* service parameter --class clase --method nombreOperacion --name nombreParametro --type clase:
-
-  - ``class``: Clase ``@Service`` que no sea ``@GvNixEntityService`` que se va a añadir el parámetro al método.
-  - ``method``: nombre del método que se va a editar.
-  - ``name``: parámetro que se va a añadir al método.
-  - ``type``: Tipo del parámetro.
-
-    Añade un parámetro de entrada a un método de una clase servicio (o de entidad). 
-    
-    Habría que ver como concretar la especificación del parámetro cuando es Map, Collection, Set, etc...).
-
-* service export ws --class clase --name nombreServicio:
-
-  - ``class``: clase que se va a publicar como servicio web. Anotar la clase con ``@GvNixWebService``.
-  - ``name``: nombre que se le va dar al servicio a definir.
-
-    Generará lo necesario para que esta clase (dependiendo si --name se define) sea accesible externamente. 
-    
-    Definirá en el pom.xml la generación en la fase de compilación del fichero wsdl para comprobar el correcto funcionamiento antes de ser publicado. Ver último punto del apartado `TODO`_.
-    
-    La clase debería poder ser una clase de servicio o una entidad (habría que ver opciones u otro comando para publicar CRUD). Publicar el CRUD como servicio ?
-
-    **Duda:** 
-      Se deberían añadir las anotaciones JAXB al crear cualquier servicio web a todas las clases que se encuentren en el paquete ...domain al crear el primer servicio.
-
-    **TODO:**
-      Tendríamos que ver como implementar esto para que permitiese exportar de distintas formas (por ejemplo si es un proyecto ESB o no, etc). 
-      Este comando requerirá mucho más análisis.
-
 * service export operation ws --class clase --method nombreMetodoEntidad --name nombreAPublicar: 
 
-  - ``clase``: Clase anotada con ``@GvNixEntityService``.
-  - ``method``: nombre del método de la clase que se quiere publicar.
-  - ``name``: nombre con el que se quiere publicar el método de la clase.
+TODO: Move to pd-addon-service-layer.rst, if updated and interesting.
 
-    Publicar como operación de un servicio web un método definido en la clase de servicio concreta.
-    
-    Anota un método definido en la clase del Servicio como operación del servicio web.
+  - ``clase``: ¿ Clase anotada con ``@GvNixEntityService`` ?
+
+    Publicar como operación de un servicio web un método definido en la ¿ clase de servicio concreta ?.
     
     Sólo está activo para clases que se han publicado como servicios ``@GvNixWebService`` en el paquete service (Autocompletado).
     
-    Asigna la anotación @GvNixWebMethod al método que se va a publicar.
-    
     **Parámetros:**
-      Los parámetros del método si los tiene se anotan con ``@WebParam`` y los valores por defecto, es decir los que se han declarado en el método.
+      Los parámetros del método si los tiene se anotan con ``@WebParam`` y ¿ los valores por defecto ?, es decir los que se han declarado en el método.
     
     **Importante:** 
-      Si no se define ni method ni name se aplica a todos los métodos con los valores por defecto.
+      ¿ Si no se define ni method ni name se aplica a todos los métodos con los valores por defecto. ?
 
 * service export ws --wsdl url2wsdl:
 
-  - ``wsdl``: localización del archivo wsdl.
+TODO: Move to pd-addon-service-layer.rst, if updated and interesting.
 
     Generará generará una clase de servicio a partir de su definición en wsdl. 
     
@@ -641,9 +560,11 @@ Addon commands
     
     Este comando es el mismo que el anterior pero con sólo el parámetro de la descripción del contrato. 
     
-    Como paquete y clase se usará el namespace que haya definido en el contrato. Este comando requerirá mucho más análisis.
+    ¿ Como paquete y clase se usará el namespace que haya definido en el contrato ? . Este comando requerirá mucho más análisis.
 
 * service entity --class nombreClase:
+
+TODO: Move to pd-addon-service-layer.rst, if updated and interesting.
 
   - ``class``: Entidad que a partir de la que se va a crear el servicio.
 
@@ -653,14 +574,11 @@ Addon commands
 
 * service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
 
-  - ``endPoint`` urlOPropiedad
-  - ``wsdl`` url
+TODO: Move to pd-addon-service-layer.rst, if updated and interesting.
 
-    Creará a una clase de servicio que hará de proxy de las operaciones que publica un Web Service remoto. 
-    
     El parámetro endPoint sería opcional y debería poder ser una propiedad configurable desde los profiles (esto será útil para configura accesos a los servicios de desarrollo/pre-producción/producción). 
     
-    La clase y el paquete a generar se usará el namespace del contrato del servicio.
+    ¿ La clase y el paquete a generar se usará el namespace del contrato del servicio. ?
 
 Posibles mejoras el add-on cd CXF:
 
@@ -672,21 +590,9 @@ Posibles mejoras el add-on cd CXF:
       * Mejorar la forma de Buscar la implementación del servicio para añadirle la operación, ya que se podría añadir una operación a cualquier servicio existente.
             * Comandos ``service operation`` y ``service parameter``.
 
-Addon Annotations
--------------------
-
-Anotaciones definidas por el Addon para la gestión de servicios web:
-
-* @GvNIXWebFault: Anotación para definir las anotaciones utilizadas como excepciones en las operaciones de un servicio web.
-* @GvNIXWebMethod: Anotación para identificar el método a publicar como operación de un servicio web.
-* @GvNIXWebService: Anotación para identificar la clase publicada como servicio web.
-* @GvNIXWebParam: Anotación asociada la los parámetros del método que se publica como operación de un servicio.
-
 TODO
 ====
 
-* Publish an operation as web service with AJs or with Annotations
-    * Publish with AJs and Annotations.
 * Validate the generated contract with the WS-I Basic Profile standar (http://www.ws-i.org). Parece que, en general, se sigue la versión 1.1 de este estándar.
     * No usar interfaces ya que se crea el servicio como tal y la clase AspectJ se encarga de publicarlo como servicio web.
 * WSDL and XSD documentation generation on the contract.
@@ -700,42 +606,22 @@ TODO
 * Web services unit testing.
 * Para el tema del namespace es posible que sea necesario añadir monitorizaciones adicionales al NotifiableFileMonitorService, ya que seguramente las clases de los servicios no estén dentro de directorio del paquete base de la aplicación.
     * Como que no estén dentro del paquete base? es para crear la clase, se puede crear en cualquier paquete, puede que no haya entendido este punto.
-* Una opción muy interesante sería poder hacer una prueba de generación del servicio utilizando el plugin para maven **java2ws** ya que por defecto se ejecuta en el arranque o primera petición del servicio.
-    * He estado haciendo las pruebas arrancando la aplicación, debido a que de esta manera también podía probar el servicio mediante web-services-explorer de eclipse.
-    * Se ha añadido el plugin para generar el wsdl en la fase de compilación.
 
-    * Configuración en el pom.xml del proyecto::
-    
-        <!-- CXF java2Ws plugin to generate wsdl  -->
-        <plugin>
-          <groupId>org.apache.cxf</groupId>
-          <artifactId>cxf-java2ws-plugin</artifactId>
-          <version>${cxf.version}</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.apache.cxf</groupId>
-              <artifactId>cxf-rt-frontend-jaxws</artifactId>
-              <version>${cxf.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.apache.cxf</groupId>
-              <artifactId>cxf-rt-frontend-simple</artifactId>
-              <version>${cxf.version}</version>
-            </dependency>
-          </dependencies>
-          <executions>
-            <execution>
-              <id>generate-car-service-wsdl</id>
-              <phase>compile</phase>
-              <configuration>
-                <className>org.gvnix.test.project.web.services.CarService</className>
-                <outputFile>${project.basedir}/src/test/resources/generated/wsdl/CarService.wsdl</outputFile>
-                <genWsdl>true</genWsdl>
-                <verbose>true</verbose>
-              </configuration>
-              <goals>
-                <goal>java2ws</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
+References
+==========
+
+* `XSD 1.0 Datatypes`_ 
+
+.. _XSD 1.0 Datatypes: http://www.w3.org/TR/xmlschema-2/
+
+* `XSD 1.0 type hierarchy`_ 
+
+.. _XSD 1.0 type hierarchy: http://www.w3.org/TR/xmlschema-2/type-hierarchy.gif
+
+* `XSD 1.1 Datatypes`_
+
+.. _XSD 1.1 Datatypes: http://www.w3.org/TR/xmlschema11-2/ 
+
+* `XSD 1.1 type hierarchy`_
+
+.. _XSD 1.1 type hierarchy: http://www.w3.org/TR/xmlschema11-2/type-hierarchy-200901.svg
