@@ -142,7 +142,7 @@ public class ServiceLayerWSImportMetadata extends
 			"Generated web service client has errors");
 	    }
 
-	    logger.log(Level.INFO, "Web service has been imported");
+	    logger.log(Level.FINE, "Web service has been imported");
 	}
 
 	// Create a representation of the desired output ITD
@@ -211,15 +211,15 @@ public class ServiceLayerWSImportMetadata extends
 	    throws SAXException, IOException, ParseException {
 
 	// Get the path to the generated service class
-	String servicePath = WsdlParserUtils.getServiceClassPath(root);
+	String servicePath = WsdlParserUtils.getServiceClassPath(root, sense);
 	if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
 	    
 	    // Rpc generated service source ends with this string
-	    servicePath = WsdlParserUtils.getServiceClassPath(root).concat("Locator");
+	    servicePath = WsdlParserUtils.getServiceClassPath(root, sense).concat("Locator");
 	}
 	
 	// Get the path to the generated port type class
-	String portTypePath = WsdlParserUtils.getPortTypeClassPath(root);
+	String portTypePath = WsdlParserUtils.getPortTypeClassPath(root, sense);
 
 	// Get the the port element class name
 	String portName = WsdlParserUtils.findFirstCompatiblePortClassName(root);

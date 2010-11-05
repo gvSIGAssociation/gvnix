@@ -92,8 +92,8 @@ public class ServiceLayerWsImportOperationsImpl implements ServiceLayerWsImportO
 	    
 	    // Create service class with Service Annotation.
 	    javaParserService.createServiceClass(serviceClass);
-	    logger.log(Level.INFO, "New service class created: "
-		    + serviceClass.getSimpleTypeName());
+	    logger.log(Level.FINE, "New service class created: "
+		    + serviceClass.getFullyQualifiedTypeName());
 	}
 	
 	// Add the import definition annotation and attributes to the class

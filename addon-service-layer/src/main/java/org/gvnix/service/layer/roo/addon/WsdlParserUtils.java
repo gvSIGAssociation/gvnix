@@ -111,14 +111,22 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Root element of the wsdl
+     * @param type
+     *            Communication sense type
      * @return Equivalent java package or empty
      */
-    public static String getTargetNamespaceRelatedPackage(Element root) {
+    public static String getTargetNamespaceRelatedPackage(Element root, CommunicationSense sense) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
 	// Get the namespace attribute from root wsdl in lower case
-	String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE).toLowerCase();
+	String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
+
+	// If required, convert namespace to lowercase
+	if (!CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)) {
+	    
+	    namespace = namespace.toLowerCase();
+	}
 
 	// Namespace separators
 	String separator1 = null;
@@ -297,14 +305,16 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Wsdl root element
+     * @param type
+     *            Communication sense type
      * @return Path to the class
      */
-    public static String getServiceClassPath(Element root) {
+    public static String getServiceClassPath(Element root, CommunicationSense sense) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
 	// Build the classpath related to the namespace
-	String path = getTargetNamespaceRelatedPackage(root);
+	String path = getTargetNamespaceRelatedPackage(root, sense);
 
 	// Find a compatible service name
 	String name = findFirstCompatibleServiceClassName(root);
@@ -318,14 +328,16 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Wsdl root element
+     * @param type
+     *            Communication sense type
      * @return Path to the class
      */
-    public static String getPortTypeClassPath(Element root) {
+    public static String getPortTypeClassPath(Element root, CommunicationSense sense) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
 	// Build the classpath related to the namespace
-	String path = getTargetNamespaceRelatedPackage(root);
+	String path = getTargetNamespaceRelatedPackage(root, sense);
 
 	// Find a compatible port type name
 	String name = findFirstCompatiblePortTypeClassName(root);
@@ -341,11 +353,13 @@ public class WsdlParserUtils {
      *            Wsdl root element
      * @param type
      *            Communication sense type
+     * @param type
+     *            Communication sense type
      * @return Java file
      */
     public static File getPortTypeJavaFile(Element root, CommunicationSense type) {
 
-	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root)), type);
+	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root, type)), type);
     }
 
     /**
@@ -624,9 +638,9 @@ public class WsdlParserUtils {
 
 	    char ch = name.charAt(i);
 
-	    // Letter, number or $
+	    // Letter, number, $ or _
 	    if ((ch >= 'a') && (ch <= 'z') || (ch >= 'A') && (ch <= 'Z')
-		    || (ch >= '0') && (ch <= '9') || ch == '$') {
+		    || (ch >= '0') && (ch <= '9') || ch == '$' || ch == '_') {
 
 		if (upper) {
 
@@ -649,7 +663,7 @@ public class WsdlParserUtils {
 	    } else {
 
 		// Next characters will be replace by none, others to Unicode
-		if (ch != '-' && ch != '_' && ch != ':' && ch != '.') {
+		if (ch != '-' && ch != ':' && ch != '.') {
 
 		    // Unicode prefix
 		    ostr.append("_");
