@@ -93,6 +93,7 @@ Obligatorios todos los atributos de la anotación de gvNIX.
 
   * Controlado por el targetNamespace definido en la anotación **@GvNIXWebSErvice** para que no cambie el contrato.
   * Controlado por portType. No cambia el contrato.
+  * Comprobar los parámetros permitidos en los métodos con el atributo ``exported = true``. 
 * Actualizar si ha variado el nombre de la clase o del paquete. Cambiar para que no cambie el contrato y no existan errores de compilación:
 
   * Archivo de configuración xml de cxf. Atributo class donde está instanciado el servicio.
@@ -160,6 +161,7 @@ Mandatory ``attributes`` to export a class as Web Service:
   * ``serviceName``: Service name to publish the service in WSDL.
   * ``address``: Address to access to the service in application.
   * ``fullyQualifiedTypeName``: Java fully qualified type name to control if changes the package or class name to avoid updating service contract. i.e.: ``fullyQualifiedTypeName= =org.gvnix.test.service.layer.project.services.Clase"``.
+  * ``exported``: Check method input/output parameters when is published as operation if its false. If it's exported this service has been generated from ``wsdl``.
 
 Publish Web Service operation
 ------------------------------
