@@ -23,21 +23,22 @@ import japa.parser.ParseException;
 import japa.parser.ast.*;
 import japa.parser.ast.body.*;
 import japa.parser.ast.expr.*;
+import japa.parser.ast.type.ClassOrInterfaceType;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.springframework.roo.addon.maven.MavenOperations;
 import org.springframework.roo.addon.web.mvc.controller.UrlRewriteOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
-import org.springframework.roo.classpath.javaparser.details.JavaParserFieldMetadata;
+import org.springframework.roo.classpath.javaparser.details.*;
 import org.springframework.roo.file.monitor.*;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.*;
@@ -1748,11 +1749,13 @@ public class ServiceLayerWsConfigServiceImpl implements
     public void generateGvNIXWebServiceFiles() {
 
         // TODO: Create @GvNIXXmlElement files.
-        generateGvNIXXmlElements();
+        generateGvNIXXmlElementsClasses();
 
         // TODO: Create @GvNIXWebFault files.
-
+        generateGvNIXWebFaultClasses();
+        
         // TODO: Create @GvNIXWebService files.
+        generateGvNIXWebServiceClasses();
     }
 
     /**
@@ -1767,16 +1770,16 @@ public class ServiceLayerWsConfigServiceImpl implements
     }
 
     /**
-     * Generates java files with '@GvNIXXmlElement' values.
+     * {@inheritDoc}
      */
-    protected void generateGvNIXXmlElements() {
+    public void generateGvNIXXmlElementsClasses() {
 
         AnnotationMetadata rooEntityAnnotationMetadata = new DefaultAnnotationMetadata(
                 new JavaType(
                         "org.springframework.roo.addon.javabean.RooJavaBean"),
                 new ArrayList<AnnotationAttributeValue<?>>());
 
-        List<AnnotationMetadata> gvNixAnnoationList;
+        List<AnnotationMetadata> gvNixAnnotationList;
 
         // GvNIXXmlElement annotation.
         AnnotationMetadata gvNixXmlElementAnnotation;
@@ -1797,7 +1800,7 @@ public class ServiceLayerWsConfigServiceImpl implements
             // CompilationUnitServices to create the class in fileSystem.
             ServiceLayerWSCompilationUnit compilationUnitServices;
 
-            gvNixAnnoationList = new ArrayList<AnnotationMetadata>();
+            gvNixAnnotationList = new ArrayList<AnnotationMetadata>();
             try {
                 compilationUnit = JavaParser.parse(xmlElementFile);
                 packageDeclaration = compilationUnit.getPackage();
@@ -1822,6 +1825,9 @@ public class ServiceLayerWsConfigServiceImpl implements
                         // TODO: Retrieve correct values.
                         // Get field declarations.
                         List<FieldMetadata> fieldMetadataList = new ArrayList<FieldMetadata>();
+                        List<ConstructorMetadata> constructorMetadataList = new ArrayList<ConstructorMetadata>();
+                        List<MethodMetadata> methodMetadataList = new ArrayList<MethodMetadata>();
+
                         FieldMetadata fieldMetadata;
                         FieldDeclaration tmpFieldDeclaration;
                         FieldDeclaration fieldDeclaration;
@@ -1852,7 +1858,8 @@ public class ServiceLayerWsConfigServiceImpl implements
                                     fieldMetadata = new JavaParserFieldMetadata(
                                             declaredByMetadataId,
                                             fieldDeclaration, var,
-                                            compilationUnitServices, null);
+                                            compilationUnitServices,
+                                            new HashSet<JavaSymbolName>());
 
                                     fieldMetadataList.add(fieldMetadata);
 
@@ -1861,18 +1868,18 @@ public class ServiceLayerWsConfigServiceImpl implements
                         }
 
                         // ROO entity to generate getters and setters methods.
-                        gvNixAnnoationList.add(rooEntityAnnotationMetadata);
+                        gvNixAnnotationList.add(rooEntityAnnotationMetadata);
 
                         // Get all annotations.
-                        gvNixXmlElementAnnotation = getGvNIXXmlElementAnnotations(
-                                classOrInterfaceDeclaration, fileDirectory,
-                                packageDeclaration);
-                        gvNixAnnoationList.add(gvNixXmlElementAnnotation);
+                        gvNixXmlElementAnnotation = getGvNIXXmlElementAnnotation(
+                                classOrInterfaceDeclaration, fileDirectory);
+                        gvNixAnnotationList.add(gvNixXmlElementAnnotation);
 
                         javaParserService.createGvNIXWebServiceClass(javaType,
-                                gvNixAnnoationList,
+                                gvNixAnnotationList,
                                 GvNIXAnnotationType.XML_ELEMENT,
-                                fieldMetadataList, null);
+                                fieldMetadataList, methodMetadataList,
+                                constructorMetadataList, new ArrayList<JavaType>());
 
                     }
                 }
@@ -1895,15 +1902,201 @@ public class ServiceLayerWsConfigServiceImpl implements
 
     /**
      * {@inheritDoc}
+     */
+    public void generateGvNIXWebFaultClasses() {
+
+        List<AnnotationMetadata> gvNixAnnotationList;
+
+        // GvNIXWebFault annotation.
+        AnnotationMetadata gvNIXWebFaultAnnotation;
+
+        for (File webFaultFile : gVNIXWebFaultList) {
+
+            // Parse Java file.
+            CompilationUnit compilationUnit;
+            PackageDeclaration packageDeclaration;
+            JavaType javaType;
+            String declaredByMetadataId;
+            // CompilationUnitServices to create the class in fileSystem.
+            ServiceLayerWSCompilationUnit compilationUnitServices;
+
+            gvNixAnnotationList = new ArrayList<AnnotationMetadata>();
+            try {
+                compilationUnit = JavaParser.parse(webFaultFile);
+                packageDeclaration = compilationUnit.getPackage();
+
+                String packageName = packageDeclaration.getName().toString();
+
+                // Get the first class or interface Java type
+                List<TypeDeclaration> types = compilationUnit.getTypes();
+                if (types != null) {
+                    TypeDeclaration type = types.get(0);
+                    ClassOrInterfaceDeclaration classOrInterfaceDeclaration;
+                    if (type instanceof ClassOrInterfaceDeclaration) {
+
+                        javaType = new JavaType(packageName.concat(".").concat(
+                                type.getName()));
+
+                        classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
+
+                        declaredByMetadataId = PhysicalTypeIdentifier
+                                .createIdentifier(javaType, Path.SRC_MAIN_JAVA);
+
+                        // Retrieve correct values.
+                        // Get field declarations.
+                        List<FieldMetadata> fieldMetadataList = new ArrayList<FieldMetadata>();
+                        List<ConstructorMetadata> constructorMetadataList = new ArrayList<ConstructorMetadata>();
+                        List<MethodMetadata> methodMetadataList = new ArrayList<MethodMetadata>();
+
+                        FieldMetadata fieldMetadata;
+                        FieldDeclaration fieldDeclaration;
+                        MethodMetadata methodMetadata;
+                        MethodMetadata tmpMethodMetadata;
+                        MethodDeclaration methodDeclaration;
+                        ConstructorMetadata constructorMetadata;
+                        ConstructorMetadata tmpConstructorMetadata;
+                        ConstructorDeclaration constructorDeclaration;
+
+                        // Extended classes.
+                        List<JavaType> extendedClassesList = new ArrayList<JavaType>();
+                        List<ClassOrInterfaceType> extendsClasses = classOrInterfaceDeclaration.getExtends();
+                        JavaType extendedJavaType;
+                        for (ClassOrInterfaceType classOrInterfaceType : extendsClasses) {
+                            extendedJavaType = new JavaType(classOrInterfaceType.getName());
+                            extendedClassesList.add(extendedJavaType);
+                        }
+                        
+                        // CompilationUnitServices to create the class.
+                        compilationUnitServices = new ServiceLayerWSCompilationUnit(
+                                new JavaPackage(compilationUnit.getPackage()
+                                        .getName().toString()), javaType,
+                                compilationUnit.getImports(),
+                                new ArrayList<TypeDeclaration>());
+
+                        for (BodyDeclaration bodyDeclaration : classOrInterfaceDeclaration
+                                .getMembers()) {
+
+                            if (bodyDeclaration instanceof FieldDeclaration) {
+
+                                fieldDeclaration = (FieldDeclaration) bodyDeclaration;
+
+                                for (VariableDeclarator var : fieldDeclaration
+                                        .getVariables()) {
+
+                                    fieldMetadata = new JavaParserFieldMetadata(
+                                            declaredByMetadataId,
+                                            fieldDeclaration, var,
+                                            compilationUnitServices,
+                                            new HashSet<JavaSymbolName>());
+
+                                    fieldMetadataList.add(fieldMetadata);
+                                }
+
+                            } else if (bodyDeclaration instanceof ConstructorDeclaration) {
+                                
+                                constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
+                                
+                                tmpConstructorMetadata = new JavaParserConstructorMetadata(
+                                        declaredByMetadataId,
+                                        constructorDeclaration,
+                                        compilationUnitServices,
+                                        new HashSet<JavaSymbolName>());
+                                
+                                constructorMetadata = new DefaultConstructorMetadata(
+                                        declaredByMetadataId,
+                                        tmpConstructorMetadata.getModifier(),
+                                        tmpConstructorMetadata
+                                                .getParameterTypes(),
+                                        tmpConstructorMetadata
+                                                .getParameterNames(),
+                                        tmpConstructorMetadata.getAnnotations(),
+                                        tmpConstructorMetadata
+                                                .getBody()
+                                                .substring(
+                                                        tmpConstructorMetadata
+                                                                .getBody()
+                                                                .indexOf("{") + 1,
+                                                        tmpConstructorMetadata
+                                                                .getBody()
+                                                                .indexOf("}")));
+
+                                constructorMetadataList.add(constructorMetadata);
+                                
+                            } else if (bodyDeclaration instanceof MethodDeclaration) {
+                                
+                                methodDeclaration = (MethodDeclaration) bodyDeclaration;
+                                
+                                tmpMethodMetadata = new JavaParserMethodMetadata(
+                                        declaredByMetadataId,
+                                        methodDeclaration,
+                                        compilationUnitServices,
+                                        new HashSet<JavaSymbolName>());
+                                
+                                methodMetadata = new DefaultMethodMetadata(
+                                        declaredByMetadataId, tmpMethodMetadata
+                                                .getModifier(),
+                                        tmpMethodMetadata.getMethodName(),
+                                        tmpMethodMetadata.getReturnType(),
+                                        tmpMethodMetadata.getParameterTypes(),
+                                        tmpMethodMetadata.getParameterNames(),
+                                        tmpMethodMetadata.getAnnotations(),
+                                        tmpMethodMetadata.getThrowsTypes(),
+                                        tmpMethodMetadata.getBody().substring(
+                                                tmpMethodMetadata.getBody()
+                                                        .indexOf("{") + 1,
+                                                tmpMethodMetadata.getBody()
+                                                        .indexOf("}")));
+                                
+                                methodMetadataList.add(methodMetadata);
+                            }
+                        }
+
+                        // GvNIXWebFault Annotation.Get all annotations.
+                        gvNIXWebFaultAnnotation = getGvNIXWebFaultAnnotation(
+                                classOrInterfaceDeclaration, javaType);
+
+                        gvNixAnnotationList.add(gvNIXWebFaultAnnotation);
+
+                        javaParserService.createGvNIXWebServiceClass(javaType,
+                                gvNixAnnotationList,
+                                GvNIXAnnotationType.WEB_FAULT,
+                                fieldMetadataList, methodMetadataList,
+                                constructorMetadataList, extendedClassesList);
+                    }
+                }
+
+            } catch (ParseException e) {
+                Assert.state(false,
+                        "Generated Xml Element service java file '"+webFaultFile.getAbsolutePath()+"' has errors:\n"
+                                + e.getMessage());
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Assert.state(false,
+                        "Generated Xml Element service java file '"+webFaultFile.getAbsolutePath()+"' has errors:\n"
+                                + e.getMessage());
+
+            }
+
+        }
+    }
+
+    public void generateGvNIXWebServiceClasses() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * <p>
      * Searches for Jaxb annotations in {@link ClassOrInterfaceDeclaration} to
      * convert values to {@link GvNIXXmlElement}.
      * </p>
      */
-    public AnnotationMetadata getGvNIXXmlElementAnnotations(
+    public AnnotationMetadata getGvNIXXmlElementAnnotation(
             ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
-            String fileDirectory, PackageDeclaration packageDeclaration) {
+            String fileDirectory) {
 
         AnnotationMetadata gvNIXXmlElementAnnotationMetadata;
 
@@ -1930,15 +2123,10 @@ public class ServiceLayerWsConfigServiceImpl implements
 
                 NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
 
-                /*
-                 * @XmlType(name = "", propOrder = { "fahrenheit" })
-                 * 
-                 * @XmlRootElement(name = "FahrenheitToCelsius")
-                 */
                 if (normalAnnotationExpr.getName().getName().contains(
                         ServiceLayerWSExportWSDLListener.xmlRootElement)) {
 
-                    // TODO: Retrieve values.
+                    // Retrieve values.
                     for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
 
                         if (pair.getName().contentEquals("name")) {
@@ -2123,7 +2311,78 @@ public class ServiceLayerWsConfigServiceImpl implements
         return gvNIXXmlElementAnnotationMetadata;
     }
 
-    // Check correct values for @GvNIXXmlElement
+    /**
+     * {@inheritDoc}
+     */
+    public AnnotationMetadata getGvNIXWebFaultAnnotation(ClassOrInterfaceDeclaration classOrInterfaceDeclaration, JavaType exceptionType) {
+
+        AnnotationMetadata gvNIXWebFaultAnnotationMetadata;
+        List<AnnotationAttributeValue<?>> gvNIXWebFaultAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+
+        // @WebFault(name = "faultDetail", targetNamespace = "http://apache.org/hello_world_soap_http/types")
+        List<AnnotationExpr> annotationExprList = classOrInterfaceDeclaration
+        .getAnnotations();
+
+        String faultBeanWebFault = exceptionType.getFullyQualifiedTypeName();
+        
+        for (AnnotationExpr annotationExpr : annotationExprList) {
+            
+            if (annotationExpr instanceof NormalAnnotationExpr) {
+
+                NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
+            
+                StringAttributeValue nameStringAttributeValue;
+                
+                StringAttributeValue targetNamespaceStringAttributeValue;
+                
+                // Retrieve values.
+                for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
+
+                    if (pair.getName().contentEquals("name")) {
+
+                        // name
+                        nameStringAttributeValue = new StringAttributeValue(
+                                new JavaSymbolName("name"),
+                                ((StringLiteralExpr) pair.getValue())
+                                        .getValue());
+
+                        gvNIXWebFaultAnnotationAttributes
+                                .add(nameStringAttributeValue);
+                    } else if (pair.getName().contentEquals("targetNamespace")) {
+
+                        // targetNamespace
+                        targetNamespaceStringAttributeValue = new StringAttributeValue(
+                                new JavaSymbolName("targetNamespace"),
+                                ((StringLiteralExpr) pair.getValue())
+                                        .getValue());
+
+                        gvNIXWebFaultAnnotationAttributes
+                                .add(targetNamespaceStringAttributeValue);
+                    }
+
+                }
+            }
+        }
+        
+        // faultBean
+        gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
+                new JavaSymbolName("faultBean"),faultBeanWebFault));
+
+        // Create GvNIXWebFault annotation.
+        gvNIXWebFaultAnnotationMetadata = new DefaultAnnotationMetadata(
+                new JavaType(GvNIXWebFault.class.getName()),
+                gvNIXWebFaultAnnotationAttributes);
+
+        return gvNIXWebFaultAnnotationMetadata;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public AnnotationMetadata getGvNIXWebServiceAnnotation(ClassOrInterfaceDeclaration classOrInterfaceDeclaration) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     /**
      * Check if pom.xml file exists in the project and return the path.

@@ -189,10 +189,15 @@ public interface JavaParserService {
      * @param gvNIXAnnotationType to create Metadata ID.
      * @param declaredFieldList class field list
      * @param declaredMethodList class method list.
+     * @param declaredConstructorList class constructor list.
+     * @param declaredClassList extended classes.
+     * 
      */
     public void createGvNIXWebServiceClass(JavaType javaType,
             List<AnnotationMetadata> typeAnnotationList,
             GvNIXAnnotationType gvNIXAnnotationType,
             List<FieldMetadata> declaredFieldList,
-            List<MethodMetadata> declaredMethodList);
+            List<MethodMetadata> declaredMethodList,
+            List<ConstructorMetadata> declaredConstructorList,
+            List<JavaType> declaredClassList);
 }

@@ -25,7 +25,7 @@ import japa.parser.ast.expr.AnnotationExpr;
 import java.io.File;
 import java.io.IOException;
 
-import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
+import org.gvnix.service.layer.roo.addon.annotations.*;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaType;
 import org.w3c.dom.Document;
@@ -199,6 +199,21 @@ public interface ServiceLayerWsConfigService {
     public void generateGvNIXWebServiceFiles();
 
     /**
+     * Generates java files with '@GvNIXXmlElement' values.
+     */
+    public void generateGvNIXXmlElementsClasses();
+    
+    /**
+     * Generates java files with '@GvNIXWebFault' values.
+     */
+    public void generateGvNIXWebFaultClasses();
+    
+    /**
+     * Generates java files with '@GvNIXWebService' values.
+     */
+    public void generateGvNIXWebServiceClasses();
+    
+    /**
      * Monitoring CXF Web Service generated sources directory.
      * 
      * @param directoryToMonitoring
@@ -212,25 +227,49 @@ public interface ServiceLayerWsConfigService {
     public void resetGeneratedFilesList();
     
     /**
-     * Convert annotation values from {@link AnnotationExpr} list to
-     * {@link GvNIXAnnotationType} annotation attributes values.
+     * Convert annotation @XmlElement values from {@link ClassOrInterfaceDeclaration} to {@link GvNIXXmlElement}.
      * 
      * @param classOrInterfaceDeclaration
-     *            to retrieve values from annotations and convert to
+     *            to retrieve values from @XmlElement annotations and convert to
      *            {@link GvNIXXmlElement} values.
      * 
      * @param fileDirectory
      *            to retrieve namespace values generated.
      * 
-     * @param packageDeclaration
-     *            package values.
-     * 
-     * @return {@link AnnotationMetadata} to define in class.
+     * @return {@link GvNIXXmlElement} to define in class.
      */
-    public AnnotationMetadata getGvNIXXmlElementAnnotations(
+    public AnnotationMetadata getGvNIXXmlElementAnnotation(
             ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
-            String fileDirectory, PackageDeclaration packageDeclaration);
+            String fileDirectory);
 
+    /**
+     * Convert annotation @WebFault values from {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebFault}.
+     * 
+     * @param classOrInterfaceDeclaration
+     *            to retrieve values from @WebFault annotations and convert to
+     *            {@link GvNIXWebFault} values.
+     *
+     * @param exceptionType to retrieve faultBean attribute value {@link GvNIXWebFault}.
+     * 
+     * @return {@link GvNIXWebFault} to define in class.
+     */
+    public AnnotationMetadata getGvNIXWebFaultAnnotation(
+            ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
+            JavaType exceptionType);
+
+    /**
+     * TODO: 
+     * Convert annotation @WebService values from {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebService}.
+     * 
+     * @param classOrInterfaceDeclaration
+     *            to retrieve values from @WebService annotations and convert to
+     *            {@link GvNIXWebService} values.
+     * 
+     * @return {@link GvNIXWebService} to define in class.
+     */
+    public AnnotationMetadata getGvNIXWebServiceAnnotation(
+            ClassOrInterfaceDeclaration classOrInterfaceDeclaration);
+    
     /**
      * Create Jax-WS plugin configuration in pom.xml.
      */

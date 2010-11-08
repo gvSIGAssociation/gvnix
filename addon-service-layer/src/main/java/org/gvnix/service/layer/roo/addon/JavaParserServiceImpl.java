@@ -112,7 +112,9 @@ public class JavaParserServiceImpl implements JavaParserService {
             List<AnnotationMetadata> typeAnnotationList,
             GvNIXAnnotationType gvNIXAnnotationType,
             List<FieldMetadata> declaredFieldList,
-            List<MethodMetadata> declaredMethodList) {
+            List<MethodMetadata> declaredMethodList,
+            List<ConstructorMetadata> declaredConstructorList,
+            List<JavaType> declaredClassList) {
 
         // Metadata Id.
         String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
@@ -128,8 +130,8 @@ public class JavaParserServiceImpl implements JavaParserService {
             // Create class.
             ClassOrInterfaceTypeDetails serviceDetails = new DefaultClassOrInterfaceTypeDetails(
                     declaredByMetadataId, javaType, Modifier.PUBLIC,
-                    PhysicalTypeCategory.CLASS, null, declaredFieldList,
-                    declaredMethodList, null, null, null, typeAnnotationList,
+                    PhysicalTypeCategory.CLASS, declaredConstructorList, declaredFieldList,
+                    declaredMethodList, null, declaredClassList, null, typeAnnotationList,
                     null);
 
             classpathOperations.generateClassFile(serviceDetails);
