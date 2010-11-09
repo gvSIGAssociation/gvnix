@@ -40,6 +40,7 @@ import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.javaparser.details.*;
 import org.springframework.roo.file.monitor.*;
+import org.springframework.roo.file.monitor.event.FileOperation;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.*;
 import org.springframework.roo.process.manager.FileManager;
@@ -1280,8 +1281,8 @@ public class ServiceLayerWsConfigServiceImpl implements
         // maintain the format.
         if (oldGenerateSourcesCxfServer != null) {
 
-            oldGenerateSourcesCxfServer.getParentNode().replaceChild(
-                    oldGenerateSourcesCxfServer, newGenerateSourcesCxfServer);
+            oldGenerateSourcesCxfServer.getParentNode().replaceChild(newGenerateSourcesCxfServer,
+                    oldGenerateSourcesCxfServer);
         } else {
 
             if (oldExecutions == null) {
@@ -1516,17 +1517,19 @@ public class ServiceLayerWsConfigServiceImpl implements
 
     /**
      * {@inheritDoc}
-     * 
+     * <p>Monitoring file creation only.</p>
      */
     public void monitoringGeneratedSourcesDirectory(String directoryToMonitoring) {
 
         String generateSourcesDirectory = pathResolver.getIdentifier(Path.ROOT,
                 directoryToMonitoring);
 
+        // Monitoring only created files.
+        Set<FileOperation> notifyOn = new HashSet<FileOperation>();
+        notifyOn.add(FileOperation.CREATED);
+
         DirectoryMonitoringRequest directoryMonitoringRequest = new DirectoryMonitoringRequest(
-                new File(generateSourcesDirectory), true, (MonitoringRequest
-                        .getInitialMonitoringRequest(generateSourcesDirectory))
-                        .getNotifyOn());
+                new File(generateSourcesDirectory), true, notifyOn);
 
         fileMonitorService.add(directoryMonitoringRequest);
         fileMonitorService.scanAll();
@@ -1696,12 +1699,19 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         if (oldGenerateSourcesCxfServer != null) {
 
-            // Remove existing execution.
-            oldGenerateSourcesCxfServer.getParentNode().removeChild(
-                    oldGenerateSourcesCxfServer);
+            Element wsdlOption = XmlUtils.findFirstElementByName("wsdlOption", oldGenerateSourcesCxfServer);
+            
+            if (wsdlOption != null) {
 
-            // Write new XML to disk.
-            XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+                Element newWsdlOption = pom.createElement("wsdlOption");
+
+                // Remove existing wsdlOption.
+                wsdlOption.getParentNode().replaceChild(newWsdlOption,
+                        wsdlOption);
+
+                // Write new XML to disk.
+                XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+            }
 
         }
 
@@ -1751,7 +1761,7 @@ public class ServiceLayerWsConfigServiceImpl implements
         // TODO: Create @GvNIXXmlElement files.
         generateGvNIXXmlElementsClasses();
 
-        // TODO: Create @GvNIXWebFault files.
+        // Create @GvNIXWebFault files.
         generateGvNIXWebFaultClasses();
         
         // TODO: Create @GvNIXWebService files.
@@ -1771,6 +1781,8 @@ public class ServiceLayerWsConfigServiceImpl implements
 
     /**
      * {@inheritDoc}
+     * 
+     * TODO: Generate @GvNIXXmlFieldElement annotations to declared fields.
      */
     public void generateGvNIXXmlElementsClasses() {
 
@@ -2081,6 +2093,10 @@ public class ServiceLayerWsConfigServiceImpl implements
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     */
     public void generateGvNIXWebServiceClasses() {
         // TODO Auto-generated method stub
         

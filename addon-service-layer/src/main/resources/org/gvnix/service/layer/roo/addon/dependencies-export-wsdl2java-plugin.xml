@@ -18,14 +18,14 @@
       </goals>
       <configuration>
         <sourceRoot>${basedir}/target/generated-sources/cxf/server</sourceRoot>
-            <wsdlOptions>
-              <wsdlOption>
-                <wsdl></wsdl>
-                <extraargs>
-                  <extraarg>-impl</extraarg>
-                </extraargs>
-              </wsdlOption>
-            </wsdlOptions>
+        <wsdlOptions>
+          <wsdlOption>
+            <wsdl></wsdl>
+            <extraargs>
+              <extraarg>-impl</extraarg>
+            </extraargs>
+          </wsdlOption>
+        </wsdlOptions>
       </configuration>
     </execution>
   </cxf-codegen-execution>

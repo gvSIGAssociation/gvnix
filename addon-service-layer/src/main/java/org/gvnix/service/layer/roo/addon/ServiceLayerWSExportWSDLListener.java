@@ -24,6 +24,7 @@ import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.expr.*;
+import japa.parser.ast.type.ClassOrInterfaceType;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +34,7 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.GvNIXAnnotationType;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.file.monitor.event.FileEvent;
-import org.springframework.roo.file.monitor.event.FileEventListener;
+import org.springframework.roo.file.monitor.event.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.Assert;
@@ -51,7 +51,7 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
     private String generateSourcesDirectory;
 
-    static final String webService = "WebService";
+    static final String webService = "javax.jws.WebService";
     static final String xmlRootElement = "XmlRootElement";
     static final String xmlAccessorType = "XmlAccessorType";
     static final String xmlType = "XmlType";
@@ -87,51 +87,55 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
         File file = fileEvent.getFileDetails().getFile();
 
-        if (file.getAbsolutePath().contains(this.generateSourcesDirectory)
-                && !file.isDirectory()) {
+        if (fileEvent.getOperation().compareTo(FileOperation.MONITORING_START) == 0) {
 
-            // Parse Java file.
-            CompilationUnit unit;
-            try {
-                unit = JavaParser.parse(file);
+            if (file.getAbsolutePath().contains(this.generateSourcesDirectory)
+                    && !file.isDirectory()) {
 
-                // Get the first class or interface Java type
-                List<TypeDeclaration> types = unit.getTypes();
-                if (types != null) {
-                    TypeDeclaration type = types.get(0);
-                    if (type instanceof ClassOrInterfaceDeclaration) {
+                // Parse Java file.
+                CompilationUnit unit;
+                try {
+                    unit = JavaParser.parse(file);
 
-                        logger.fine(fileEvent.getFileDetails().getFile()
-                                .getAbsolutePath());
+                    // Get the first class or interface Java type
+                    List<TypeDeclaration> types = unit.getTypes();
+                    if (types != null) {
+                        TypeDeclaration type = types.get(0);
+                        if (type instanceof ClassOrInterfaceDeclaration) {
 
-                        // Get all annotations.
-                        List<AnnotationExpr> annotations = type
-                                .getAnnotations();
-                        
-                        // Check annotation types.
-                        for (AnnotationExpr annotationExpr : annotations) {
+                            logger.fine(fileEvent.getFileDetails().getFile()
+                                    .getAbsolutePath());
 
-                            if (analyzeAnnotations(file, annotationExpr)) {
-                                break;
+                            // Get all annotations.
+                            List<AnnotationExpr> annotations = type
+                                    .getAnnotations();
+
+                            // Check annotation types.
+                            for (AnnotationExpr annotationExpr : annotations) {
+
+                                if (analyzeAnnotations(file, annotationExpr,
+                                        type)) {
+                                    break;
+                                }
+
                             }
-
                         }
                     }
+
+                } catch (ParseException e) {
+                    Assert.state(false,
+                            "Generated web service java file has errors:\n"
+                                    + e.getMessage());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Assert.state(false,
+                            "Generated web service java file has errors:\n"
+                                    + e.getMessage());
+
                 }
 
-            } catch (ParseException e) {
-                Assert.state(false,
-                        "Generated web service java file has errors:\n"
-                                + e.getMessage());
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Assert.state(false,
-                        "Generated web service java file has errors:\n"
-                                + e.getMessage());
-
             }
-
         }
     }
 
@@ -143,11 +147,15 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
      *            to check.
      * @param file
      *            file to Add to priority list.
+     * @param type 
+     *            to check if Web Service class is an interface.
      * 
      * @return true if has found selected annotation.
      * 
      */
-    public boolean analyzeAnnotations(File file, AnnotationExpr annotationExpr) {
+    public boolean analyzeAnnotations(File file, AnnotationExpr annotationExpr, TypeDeclaration type) {
+
+        ClassOrInterfaceDeclaration classOrInterfaceDeclaration;
 
         if (annotationExpr instanceof NormalAnnotationExpr) {
 
@@ -167,11 +175,17 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
                 serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
                         GvNIXAnnotationType.WEB_FAULT);
                 return true;
-            } else if (normalAnnotationExpr.getName().getName().contains(
+            } else if (normalAnnotationExpr.getName().toString().contains(
                     webService)) {
 
-                serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
-                        GvNIXAnnotationType.WEB_SERVICE);
+                classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
+                
+                if (!classOrInterfaceDeclaration.isInterface()) {
+
+                    serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
+                            GvNIXAnnotationType.WEB_SERVICE);
+                }
+
                 return true;
             }
 
@@ -196,8 +210,13 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
             } else if (markerAnnotationExpr.getName().getName().contains(
                     webService)) {
 
-                serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
-                        GvNIXAnnotationType.WEB_SERVICE);
+                classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
+
+                if (!classOrInterfaceDeclaration.isInterface()) {
+
+                    serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
+                            GvNIXAnnotationType.WEB_SERVICE);
+                }
                 return true;
             }
 
@@ -222,8 +241,13 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
             } else if (singleMemberAnnotationExpr.getName().getName().contains(
                     webService)) {
 
-                serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
-                        GvNIXAnnotationType.WEB_SERVICE);
+                classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
+
+                if (!classOrInterfaceDeclaration.isInterface()) {
+
+                    serviceLayerWsConfigService.addFileToUpdateAnnotation(file,
+                            GvNIXAnnotationType.WEB_SERVICE);
+                }
                 return true;
             }
         }
