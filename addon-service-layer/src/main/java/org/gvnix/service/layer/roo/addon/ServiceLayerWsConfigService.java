@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import japa.parser.ParseException;
 import japa.parser.ast.PackageDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.expr.AnnotationExpr;
@@ -57,7 +58,26 @@ public interface ServiceLayerWsConfigService {
      * </ul>
      */
     public enum GvNIXAnnotationType {
-        XML_ELEMENT, WEB_FAULT, WEB_SERVICE
+
+        /**
+         * Web Service Xml Annotation type.
+         */
+        XML_ELEMENT, 
+
+        /**
+         * Web Fault Web Service Annotation type.
+         */
+        WEB_FAULT, 
+        
+        /**
+         * Web Service Annotation type.
+         */
+        WEB_SERVICE, 
+        
+        /**
+         * Web Service Annotation type in interface file.
+         */
+        WEB_SERVICE_INTERFACE
     };
 
     /**
@@ -214,6 +234,20 @@ public interface ServiceLayerWsConfigService {
     public void generateGvNIXWebServiceClasses();
     
     /**
+     * Retrieve Web Service implemented interface from interface list.
+     * 
+     * @param classOrInterfaceDeclaration
+     *            to retrieve its implemented interface.
+     * 
+     * @return {@link ClassOrInterfaceDeclaration} interface that implements
+     *         classOrInterfaceDeclaratio, null if not exists.
+     * @throws IOException 
+     * @throws ParseException 
+     */
+    public ClassOrInterfaceDeclaration getWebServiceInterface(
+            ClassOrInterfaceDeclaration classOrInterfaceDeclaration) throws ParseException, IOException;
+
+    /**
      * Monitoring CXF Web Service generated sources directory.
      * 
      * @param directoryToMonitoring
@@ -243,13 +277,15 @@ public interface ServiceLayerWsConfigService {
             String fileDirectory);
 
     /**
-     * Convert annotation @WebFault values from {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebFault}.
+     * Convert annotation @WebFault values from
+     * {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebFault}.
      * 
      * @param classOrInterfaceDeclaration
      *            to retrieve values from @WebFault annotations and convert to
      *            {@link GvNIXWebFault} values.
-     *
-     * @param exceptionType to retrieve faultBean attribute value {@link GvNIXWebFault}.
+     * 
+     * @param exceptionType
+     *            to retrieve faultBean attribute value {@link GvNIXWebFault}.
      * 
      * @return {@link GvNIXWebFault} to define in class.
      */
@@ -258,17 +294,25 @@ public interface ServiceLayerWsConfigService {
             JavaType exceptionType);
 
     /**
-     * TODO: 
-     * Convert annotation @WebService values from {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebService}.
+     * Convert annotation @WebService values from
+     * {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebService}.
      * 
      * @param classOrInterfaceDeclaration
      *            to retrieve values from @WebService annotations and convert to
      *            {@link GvNIXWebService} values.
      * 
+     * @param implementedInterface
+     *            Web Service interface.
+     * 
+     * @param javaType
+     *            to retrieve mandatory Annotation attributed with its values.
+     * 
      * @return {@link GvNIXWebService} to define in class.
      */
     public AnnotationMetadata getGvNIXWebServiceAnnotation(
-            ClassOrInterfaceDeclaration classOrInterfaceDeclaration);
+            ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
+            ClassOrInterfaceDeclaration implementedInterface,
+            JavaType javaType);
     
     /**
      * Create Jax-WS plugin configuration in pom.xml.

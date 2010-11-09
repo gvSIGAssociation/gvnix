@@ -34,15 +34,51 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 public @interface GvNIXWebService {
 
+    /** 
+     * Web Service portType
+     * 
+     * @return
+     */
     String name();
 
+    /**
+     * Web service namespace.
+     * 
+     * @return
+     */
     String targetNamespace();
 
+    /** 
+     * Web Service Name.
+     * 
+     * @return
+     */
     String serviceName();
 
+    /** 
+     * Address to publish the service.
+     * 
+     * @return
+     */
     String address();
 
+    /**
+     * Java fully qualified name.
+     * <p>
+     * Package + Class name
+     * </p>
+     * 
+     * @return
+     */
     String fullyQualifiedTypeName();
     
+    /**
+     * true if Web Services has been created from wsdl using the Add-on.
+     * <p>
+     * If is false, operation input/output parameters and Exceptions involved have to be checked.
+     * </p>
+     * 
+     * @return
+     */
     boolean exported();
 }

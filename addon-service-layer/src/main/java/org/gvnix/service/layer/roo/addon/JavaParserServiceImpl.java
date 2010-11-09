@@ -249,7 +249,7 @@ public class JavaParserServiceImpl implements JavaParserService {
                                         javaParserMethodMetadata.getBody()
                                                 .indexOf("{") + 1,
                                         javaParserMethodMetadata.getBody()
-                                                .indexOf("}")));
+                                                .lastIndexOf("}")));
 
             } else {
                 operationMetadata = new DefaultMethodMetadata(targetId,
@@ -265,7 +265,7 @@ public class JavaParserServiceImpl implements JavaParserService {
                                         javaParserMethodMetadata.getBody()
                                                 .indexOf("{") + 1,
                                         javaParserMethodMetadata.getBody()
-                                                .indexOf("}")));
+                                                .lastIndexOf("}")));
 
             }
             updatedMethodList.add(operationMetadata);
@@ -527,7 +527,7 @@ public class JavaParserServiceImpl implements JavaParserService {
                                         javaParserMethodMetadata.getBody()
                                                 .indexOf("{") + 1,
                                         javaParserMethodMetadata.getBody()
-                                                .indexOf("}")));
+                                                .lastIndexOf("}")));
 
             } else {
                 operationMetadata = new DefaultMethodMetadata(targetId,
@@ -543,7 +543,7 @@ public class JavaParserServiceImpl implements JavaParserService {
                                         javaParserMethodMetadata.getBody()
                                                 .indexOf("{") + 1,
                                         javaParserMethodMetadata.getBody()
-                                                .indexOf("}")));
+                                                .lastIndexOf("}")));
 
             }
             updatedMethodList.add(operationMetadata);
