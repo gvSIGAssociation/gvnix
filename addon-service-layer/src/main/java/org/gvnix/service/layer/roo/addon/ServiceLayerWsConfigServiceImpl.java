@@ -30,8 +30,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jws.WebService;
-
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.annotations.*;
 import org.springframework.roo.addon.maven.MavenOperations;
@@ -39,7 +37,6 @@ import org.springframework.roo.addon.web.mvc.controller.UrlRewriteOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
-import org.springframework.roo.classpath.javaparser.JavaParserMutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.javaparser.details.*;
 import org.springframework.roo.file.monitor.*;
 import org.springframework.roo.file.monitor.event.FileOperation;
@@ -1063,15 +1060,13 @@ public class ServiceLayerWsConfigServiceImpl implements
         // Execution
         serviceExecution = pom.createElement("execution");
 
-        String gerenateServiceName = StringUtils.uncapitalize(serviceName);
-
         Element id = pom.createElement("id");
-        id.setTextContent("generate-gvnix-service-".concat(gerenateServiceName)
-                .concat("-wsdl"));
+        id.setTextContent("${project.basedir}/src/test/resources/generated/wsdl/"
+                .concat(addressName).concat(".wsdl"));
 
         serviceExecution.appendChild(id);
         Element phase = pom.createElement("phase");
-        phase.setTextContent("compile");
+        phase.setTextContent("test");
 
         serviceExecution.appendChild(phase);
 
@@ -1702,15 +1697,16 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         if (oldGenerateSourcesCxfServer != null) {
 
-            Element wsdlOption = XmlUtils.findFirstElementByName("wsdlOption", oldGenerateSourcesCxfServer);
+            Element executionPhase = XmlUtils.findFirstElementByName("phase", oldGenerateSourcesCxfServer);
             
-            if (wsdlOption != null) {
+            if (executionPhase != null) {
 
-                Element newWsdlOption = pom.createElement("wsdlOption");
+                Element newPhase = pom.createElement("phase");
+                newPhase.setTextContent("none");
 
                 // Remove existing wsdlOption.
-                wsdlOption.getParentNode().replaceChild(newWsdlOption,
-                        wsdlOption);
+                executionPhase.getParentNode().replaceChild(newPhase,
+                        executionPhase);
 
                 // Write new XML to disk.
                 XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
@@ -2693,7 +2689,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 
                         // address
                         addressStringAttributeValue = new StringAttributeValue(
-                                new JavaSymbolName("address"),
+                                new JavaSymbolName("name"),
                                 ((StringLiteralExpr) pair.getValue())
                                         .getValue());
 
@@ -2756,7 +2752,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 
                         // name
                         nameStringAttributeValue = new StringAttributeValue(
-                                new JavaSymbolName("name"),
+                                new JavaSymbolName("address"),
                                 ((StringLiteralExpr) pair.getValue())
                                         .getValue());
 
