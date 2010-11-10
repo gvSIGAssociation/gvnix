@@ -18,38 +18,25 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import japa.parser.JavaParser;
-import japa.parser.ParseException;
-import japa.parser.ast.*;
-import japa.parser.ast.body.*;
-import japa.parser.ast.expr.*;
-import japa.parser.ast.type.ClassOrInterfaceType;
-
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
-import org.gvnix.service.layer.roo.addon.annotations.*;
 import org.springframework.roo.addon.maven.MavenOperations;
 import org.springframework.roo.addon.web.mvc.controller.UrlRewriteOperations;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
-import org.springframework.roo.classpath.javaparser.details.*;
-import org.springframework.roo.file.monitor.*;
-import org.springframework.roo.file.monitor.event.FileOperation;
 import org.springframework.roo.metadata.MetadataService;
-import org.springframework.roo.model.*;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.*;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.*;
 import org.w3c.dom.*;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  * Utilities to manage the CXF web services library.
@@ -82,19 +69,8 @@ public class ServiceLayerWsConfigServiceImpl implements
     private AnnotationsService annotationsService;
     @Reference
     private MavenOperations mavenOperations;
-    @Reference
-    private JavaParserService javaParserService;
-    @Reference
-    private NotifiableFileMonitorService fileMonitorService;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
-
-    private static final String SCHEMA_PACKAGE_INFO = "package-info.java";
-
-    private List<File> gVNIXXmlElementList = new ArrayList<File>();
-    private List<File> gVNIXWebFaultList = new ArrayList<File>();
-    private List<File> gVNIXWebServiceList = new ArrayList<File>();
-    private List<File> gVNIXWebServiceInterfaceList = new ArrayList<File>();
 
     protected static Logger logger = Logger
             .getLogger(ServiceLayerWsConfigService.class.getName());

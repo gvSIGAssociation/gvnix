@@ -23,9 +23,12 @@ import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.*;
+import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaType;
 import org.w3c.dom.Document;
@@ -50,18 +53,18 @@ public interface ServiceLayerWSExportWSDLConfigService {
         /**
          * Web Service Xml Annotation type.
          */
-        XML_ELEMENT, 
+        XML_ELEMENT,
 
         /**
          * Web Fault Web Service Annotation type.
          */
-        WEB_FAULT, 
-        
+        WEB_FAULT,
+
         /**
          * Web Service Annotation type.
          */
-        WEB_SERVICE, 
-        
+        WEB_SERVICE,
+
         /**
          * Web Service Annotation type in interface file.
          */
@@ -86,6 +89,7 @@ public interface ServiceLayerWSExportWSDLConfigService {
      *            directory to look up for CXF Web Service generated java files.
      */
     public void monitoringGeneratedSourcesDirectory(String directoryToMonitoring);
+
     /**
      * Creates java files in 'src/main/java' from with gvNIX Web Service
      * Annotations.
@@ -97,12 +101,12 @@ public interface ServiceLayerWSExportWSDLConfigService {
      * Generates java files with '@GvNIXXmlElement' values.
      */
     public void generateGvNIXXmlElementsClasses();
-    
+
     /**
      * Generates java files with '@GvNIXWebFault' values.
      */
     public void generateGvNIXWebFaultClasses();
-    
+
     /**
      * Generates java files with '@GvNIXWebService' values.
      */
@@ -116,14 +120,16 @@ public interface ServiceLayerWSExportWSDLConfigService {
      * 
      * @return {@link ClassOrInterfaceDeclaration} interface that implements
      *         classOrInterfaceDeclaratio, null if not exists.
-     * @throws IOException 
-     * @throws ParseException 
+     * @throws IOException
+     * @throws ParseException
      */
     public ClassOrInterfaceDeclaration getWebServiceInterface(
-            ClassOrInterfaceDeclaration classOrInterfaceDeclaration) throws ParseException, IOException;
+            ClassOrInterfaceDeclaration classOrInterfaceDeclaration)
+            throws ParseException, IOException;
 
     /**
-     * Convert annotation @XmlElement values from {@link ClassOrInterfaceDeclaration} to {@link GvNIXXmlElement}.
+     * Convert annotation @XmlElement values from
+     * {@link ClassOrInterfaceDeclaration} to {@link GvNIXXmlElement}.
      * 
      * @param classOrInterfaceDeclaration
      *            to retrieve values from @XmlElement annotations and convert to
@@ -173,8 +179,47 @@ public interface ServiceLayerWSExportWSDLConfigService {
      */
     public AnnotationMetadata getGvNIXWebServiceAnnotation(
             ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
-            ClassOrInterfaceDeclaration implementedInterface,
-            JavaType javaType);
+            ClassOrInterfaceDeclaration implementedInterface, JavaType javaType);
+
+    /**
+     * Creates MethodMetadata with GvNIX Annotation values to export as Web
+     * Service Operation.
+     * 
+     * @param methodMetadata
+     * @param defaultNamespace
+     *            from Web Service to set where is not defined in annotations.
+     * @return {@link MethodMetadata} with GvNIX Annotations.
+     */
+    public MethodMetadata getGvNIXWebMethodMetadata(
+            MethodMetadata methodMetadata, String defaultNamespace);
+
+    /**
+     * Define @GvNIXWebMethod annotation using Web Services annotation attribute
+     * values.
+     * 
+     * @param methodMetadata
+     *            to check Web Services annotations.
+     * @param defaultNamespace
+     *            from Web Service to set where is not defined in annotations.
+     * @return {@link GvNIXWebMethod} with Attributes.
+     */
+    public AnnotationMetadata getGvNIXWebMethodAnnotation(
+            MethodMetadata methodMetadata, String defaultNamespace);
+
+    /**
+     * Define @GVNIXWebParam for each input method parameter.
+     * 
+     * @param methodMetadata
+     *            to check for Web Services annotations.
+     * 
+     * @param defaultNamespace
+     *            from Web Service to set where is not defined in annotations.
+     * 
+     * @return {@link List} of {@link AnnotatedJavaType} for each input method
+     *         parameter.
+     */
+    public List<AnnotatedJavaType> getGvNIXWebParamsAnnotations(
+            MethodMetadata methodMetadata, String defaultNamespace);
 
     /**
      * Check correct WSDL encoding and retrieve WSDL to export into

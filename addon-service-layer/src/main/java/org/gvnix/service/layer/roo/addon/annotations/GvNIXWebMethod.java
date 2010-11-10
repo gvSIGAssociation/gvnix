@@ -39,7 +39,7 @@ public @interface GvNIXWebMethod {
 
     Class<?> webResultType();
 
-    String resultName() default "void";
+    String resultName() default "return";
 
     String resultNamespace() default "";
 
