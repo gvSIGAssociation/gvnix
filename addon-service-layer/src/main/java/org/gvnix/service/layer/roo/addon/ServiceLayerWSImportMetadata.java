@@ -113,9 +113,6 @@ public class ServiceLayerWSImportMetadata extends
 		Element root = wsdl.getDocumentElement();
 		Assert.notNull(root, "No valid document format");
 
-		// Generate source code client clases with Axis
-		generateSources();
-		
 		// Create Aspect methods related to this wsdl location
 		if (WsdlParserUtils.isRpcEncoded(root)) {
 
@@ -133,7 +130,7 @@ public class ServiceLayerWSImportMetadata extends
 
 	    } catch (IOException e) {
 
-		Assert.state(false,
+		logger.log(Level.WARNING,
 			"There is no connection to the web service to import");
 		
 	    } catch (ParseException e) {
@@ -147,50 +144,6 @@ public class ServiceLayerWSImportMetadata extends
 
 	// Create a representation of the desired output ITD
 	itdTypeDetails = builder.build();
-    }
-
-    /**
-     * Maven generate sources.
-     * 
-     * TODO: Use org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigServiceImpl.mvn(String) instead of this.
-     * 
-     * <p>
-     * If return value is not 0, the service can be Rpc/encoded.
-     * </p>
-     * 
-     * TODO Check on windows environment.
-     * 
-     * @return exit value, the value 0 indicates normal termination
-     * @throws IOException
-     *             Error on maven generate sources execution
-     */
-    public int generateSources() throws IOException {
-
-	// Create windows or linux command
-	String cmd = null;
-	if (File.separatorChar == '\\') {
-	    
-	    cmd = "mvn.bat " + "generate-sources";
-	    
-	} else {
-	    
-	    cmd = "mvn " + "generate-sources";
-	}
-
-	// Execute command
-	Process p = Runtime.getRuntime().exec(cmd, null, new File("." + File.separator));
-
-	try {
-
-	    // Wait command to end
-	    p.waitFor();
-	    
-	} catch (InterruptedException e) {
-	    
-	    throw new IllegalStateException(e);
-	}
-	
-	return p.exitValue();
     }
 
     /**
@@ -211,15 +164,15 @@ public class ServiceLayerWSImportMetadata extends
 	    throws SAXException, IOException, ParseException {
 
 	// Get the path to the generated service class
-	String servicePath = WsdlParserUtils.getServiceClassPath(root, sense);
+	String servicePath = WsdlParserUtils.getServiceClassPath(root);
 	if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
 	    
 	    // Rpc generated service source ends with this string
-	    servicePath = WsdlParserUtils.getServiceClassPath(root, sense).concat("Locator");
+	    servicePath = WsdlParserUtils.getServiceClassPath(root).concat("Locator");
 	}
 	
 	// Get the path to the generated port type class
-	String portTypePath = WsdlParserUtils.getPortTypeClassPath(root, sense);
+	String portTypePath = WsdlParserUtils.getPortTypeClassPath(root);
 
 	// Get the the port element class name
 	String portName = WsdlParserUtils.findFirstCompatiblePortClassName(root);
@@ -242,7 +195,7 @@ public class ServiceLayerWSImportMetadata extends
 		    for (BodyDeclaration member : members) {
 			if (member instanceof MethodDeclaration) {
 
-			    createAspectMethod(servicePath, portTypePath,
+			    createAspectMethod(root, servicePath, portTypePath,
 				    portName, (MethodDeclaration) member, sense);
 			}
 		    }
@@ -254,6 +207,8 @@ public class ServiceLayerWSImportMetadata extends
     /**
      * Create method on Aspect file related to method object.
      * 
+     * @param root
+     *            Root element of the wsdl document
      * @param servicePath
      *            Path to the service type
      * @param portTypePath
@@ -265,8 +220,9 @@ public class ServiceLayerWSImportMetadata extends
      * @param type
      *            Communication sense type
      */
-    private void createAspectMethod(String servicePath, String portTypePath,
-	    String portName, MethodDeclaration method, CommunicationSense sense) {
+    private void createAspectMethod(Element root, String servicePath,
+	    String portTypePath, String portName, MethodDeclaration method,
+	    CommunicationSense sense) {
 
 	// List to store method parameters types and names
 	List<AnnotatedJavaType> javaTypes = new ArrayList<AnnotatedJavaType>();
@@ -277,8 +233,8 @@ public class ServiceLayerWSImportMetadata extends
 	if (parameters != null) {
 	    for (Parameter parameter : parameters) {
 
-		javaTypes.add(new AnnotatedJavaType(getJavaTypeByName(parameter
-			.getType().toString()), null));
+		javaTypes.add(new AnnotatedJavaType(getJavaTypeByName(root,
+			parameter.getType().toString()), null));
 		javaNames.add(new JavaSymbolName(parameter.getId().toString()));
 	    }
 	}
@@ -297,7 +253,7 @@ public class ServiceLayerWSImportMetadata extends
 
 	// Get the method return type
 	String methodType = method.getType().toString();
-	JavaType returnType = getJavaTypeByName(methodType);
+	JavaType returnType = getJavaTypeByName(root, methodType);
 	
 	// Rpc Encoded generated clients includes this Exception by default
 	if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
@@ -378,26 +334,35 @@ public class ServiceLayerWSImportMetadata extends
     /**
      * Get object type or primitive java type related to primitive type name.
      * 
+     * @param root
+     *            Root element of the wsdl document
      * @param name
      *            Type name
      * @return Java type
      */
-    private JavaType getJavaTypeByName(String name) {
+    private JavaType getJavaTypeByName(Element root, String name) {
 
 	JavaType type;
 
 	try {
 
-	    // Object types
-	    type = new JavaType(name);
+	    // Object types with or without package
+	    if (name.indexOf('.') == -1) {
 
+		// If not package separator, add generated client package
+		type = new JavaType(WsdlParserUtils
+			.getTargetNamespaceRelatedPackage(root)
+			+ name);
+	    } else {
+
+		type = new JavaType(name);
+	    }
 	} catch (IllegalArgumentException e) {
 
 	    if (getJavaClassPrimitiveByName(name) != null) {
 
 		// Primitive types
-		type = new JavaType(
-			getJavaClassPrimitiveByName(name).getName(), 0,
+		type = new JavaType(getJavaClassPrimitiveByName(name), 0,
 			DataType.PRIMITIVE, null, null);
 
 	    } else if ("void".equals(name)) {
@@ -423,8 +388,8 @@ public class ServiceLayerWSImportMetadata extends
 		} catch (IllegalArgumentException iae) {
 
 		    // Array of primitive types
-		    type = new JavaType(getJavaClassPrimitiveByName(name)
-			    .getName(), i, null, null, null);
+		    type = new JavaType(getJavaClassPrimitiveByName(name), i,
+			    null, null, null);
 		}
 
 	    } else {
@@ -437,47 +402,47 @@ public class ServiceLayerWSImportMetadata extends
     }
 
     /**
-     * Get the primitive class related to a primitive type name.
+     * Get the primitive object type name related to a primitive type name.
      * 
      * @param name
      *            Type name
-     * @return Java class
+     * @return Java object type or null
      */
-    private Class getJavaClassPrimitiveByName(String name) {
+    private String getJavaClassPrimitiveByName(String name) {
 
-	Class type = null;
+	String type = null;
 
 	if ("boolean".equals(name)) {
 
-	    type = Boolean.class;
+	    type = Boolean.class.getName();
 
 	} else if ("char".equals(name)) {
 
-	    type = Character.class;
+	    type = Character.class.getName();
 
 	} else if ("byte".equals(name)) {
 
-	    type = Byte.class;
+	    type = Byte.class.getName();
 
 	} else if ("short".equals(name)) {
 
-	    type = Short.class;
+	    type = Short.class.getName();
 
 	} else if ("int".equals(name)) {
 
-	    type = Integer.class;
+	    type = Integer.class.getName();
 
 	} else if ("long".equals(name)) {
 
-	    type = Long.class;
+	    type = Long.class.getName();
 
 	} else if ("float".equals(name)) {
 
-	    type = Float.class;
+	    type = Float.class.getName();
 
 	} else if ("double".equals(name)) {
 
-	    type = Double.class;
+	    type = Double.class.getName();
 	}
 
 	return type;

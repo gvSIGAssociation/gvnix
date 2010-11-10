@@ -1352,8 +1352,8 @@ public class ServiceLayerWsConfigServiceImpl implements
                 .notNull(codegenWsPlugin,
                         "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
-        // Access executions > execution > configuration > wsdlOptions element.
-        // Configuration and wsdlOptions are created if not exists.
+        // Access executions > execution > configuration > wsdlOptions and defaultOptions elements.
+        // Configuration, wsdlOptions and defaultOptions are created if not exists.
         Element executions = XmlUtils.findFirstElementByName("executions",
                 codegenWsPlugin);
         Element execution = XmlUtils.findFirstElementByName("execution",
@@ -1364,6 +1364,17 @@ public class ServiceLayerWsConfigServiceImpl implements
 
             configuration = pom.createElement("configuration");
             execution.appendChild(configuration);
+        }
+        Element defaultOptions = XmlUtils.findFirstElementByName("defaultOptions",
+                configuration);
+        if (defaultOptions == null) {
+
+            defaultOptions = pom.createElement("defaultOptions");
+            configuration.appendChild(defaultOptions);
+            
+            Element extendedSoapHeaders = pom.createElement("extendedSoapHeaders");
+            extendedSoapHeaders.setTextContent("true");
+            defaultOptions.appendChild(extendedSoapHeaders);
         }
         Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
                 configuration);
@@ -1378,7 +1389,37 @@ public class ServiceLayerWsConfigServiceImpl implements
         Element wsdl = pom.createElement("wsdl");
         wsdl.setTextContent(wsdlLocation);
         wsdlOption.appendChild(wsdl);
-        wsdlOptions.appendChild(wsdlOption);
+
+        // Add the package name to generate sources
+	try {
+
+	    // Parse the wsdl location to a DOM document to obtain the targetNamespace
+	    Document document = XmlUtils.getDocumentBuilder().parse(
+		    wsdlLocation);
+	    Element rootElement = document.getDocumentElement();
+	    Assert.notNull(rootElement, "No valid document format");
+
+	    // Configure the packagename to generate client sources
+	    Element packagenames = pom.createElement("packagenames");
+	    Element packagename = pom.createElement("packagename");
+	    String packageName = WsdlParserUtils
+		    .getTargetNamespaceRelatedPackage(rootElement);
+	    packagename.setTextContent(packageName.substring(0, packageName
+		    .length() - 1));
+	    packagenames.appendChild(packagename);
+	    wsdlOption.appendChild(packagenames);
+
+	} catch (IOException e) {
+
+	    logger.log(Level.WARNING,
+		    "There is no connection to the web service to import");
+	} catch (SAXException e) {
+
+	    Assert.state(false,
+		    "The format of the web service to import has errors");
+	}
+
+	wsdlOptions.appendChild(wsdlOption);
 
         // Write new XML to disk
         XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);

@@ -9,6 +9,9 @@
             <id>generate-sources</id>
 			<phase>generate-sources</phase>
             <configuration>
+				<defaultOptions>
+					<extendedSoapHeaders>true</extendedSoapHeaders>
+				</defaultOptions>
                 <wsdlOptions>
                 </wsdlOptions>
             </configuration>

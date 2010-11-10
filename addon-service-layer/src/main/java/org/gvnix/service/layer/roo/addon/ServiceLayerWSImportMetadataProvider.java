@@ -19,6 +19,8 @@
 package org.gvnix.service.layer.roo.addon;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
@@ -60,6 +62,9 @@ public class ServiceLayerWSImportMetadataProvider extends
 
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
+
+    private static Logger logger = Logger
+	    .getLogger(ServiceLayerWSImportMetadataProvider.class.getName());
 
     protected void activate(ComponentContext context) {
 
@@ -154,22 +159,29 @@ public class ServiceLayerWSImportMetadataProvider extends
 		Assert.notNull(root, "No valid document format");
 
 		if (WsdlParserUtils.isRpcEncoded(root)) {
-		    
+
 		    // Generate service infraestructure to import the service
 		    serviceLayerWsConfigService.importService(
-			    governorTypeDetails.getName(), url.getValue(), CommunicationSense.IMPORT_RPC_ENCODED);
+			    governorTypeDetails.getName(), url.getValue(),
+			    CommunicationSense.IMPORT_RPC_ENCODED);
 		}
 		else {
 
 		    // Generate service infraestructure to import the service
 		    serviceLayerWsConfigService.importService(
-			    governorTypeDetails.getName(), url.getValue(), CommunicationSense.IMPORT);
+			    governorTypeDetails.getName(), url.getValue(),
+			    CommunicationSense.IMPORT);
 		}
+
+		// Generate source code client clases with Axis
+		serviceLayerWsConfigService
+			.mvn(ServiceLayerWsConfigService.GENERATE_SOURCES);
 
 		// Create metadata
 		metadata = new ServiceLayerWSImportMetadata(
 			metadataIdentificationString, aspectName,
 			governorPhysicalTypeMetadata);
+		
 	    } catch (SAXException e) {
 
 		Assert.state(false,
@@ -178,7 +190,7 @@ public class ServiceLayerWSImportMetadataProvider extends
 	    } 
 	    catch (IOException e) {
 
-		Assert.state(false,
+		logger.log(Level.WARNING,
 			"There is no connection to the web service to import");
 	    }
 	}

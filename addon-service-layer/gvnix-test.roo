@@ -51,20 +51,40 @@ service export operation --class org.gvnix.test.service.layer.project.services.C
 service operation --name incorrectInputParameters --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --paramTypes java.util.Map,java.lang.String --paramNames map,name
 service export operation --class org.gvnix.test.service.layer.project.services.Clase --method incorrectInputParameters
 
-// Import Document Style web services 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy01 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy02 --wsdl http://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy03 --wsdl http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy04 --wsdl http://ws.cdyne.com/WeatherWS/Weather.asmx?wsdl
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy05 --wsdl http://soatest.parasoft.com/calculator.wsdl
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy06 --wsdl http://www.ripedevelopment.com/webservices/LocalTime.asmx?WSDL
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy07 --wsdl http://labs.safelayer.com/demo/wsdl/DigitalEncryption.wsdl
+// Import Document Style web services: will be generated with CXF
 
-// Import RPC Style web services
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy08 --wsdl http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy09 --wsdl http://soamoa.org:9292/artistRegistry?WSDL
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy10 --wsdl http://www.aswinanand.com/sendsms.php?wsdl
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy11 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
+// [CORRECT] Transport: HTTP,  Operations: 2, Bindings: SOAP, SOAP12, HTTP POST, Use: Literal
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
+
+// [CORRECT] Transport: HTTPS, Operations: 1, Bindings: SOAP, Use: Literal, Implementation: MS .NET, Authentication/Authorization: SOAP Headers (SSL available), Primitive Types
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy01 --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+
+// [CORRECT] Transport: HTTP,  Operations: 1, Bindings: SOAP, Use: Literal, Implementation: MS .NET, Authentication/Authorization: WS-Security, Complex Types,
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy02 --wsdl http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl
+
+// [CORRECT] Transport: HTTP,  Operations: 3, Bindings: SOAP, SOAP12, HTTP GET, HTTP POST, Use: Literal
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy03 --wsdl http://ws.cdyne.com/WeatherWS/Weather.asmx?wsdl
+
+// [CORRECT] Transport: HTTP,  Operations: 4, Bindings: SOAP 1.1, Use: Literal, Implementation: Glue 4.1.2, Messaging Pattern: Synchronous
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy04 --wsdl http://soatest.parasoft.com/calculator.wsdl
+
+// [CORRECT] Transport: HTTP,  Operations: 1, Bindings: SOAP, SOAP12, HTTP GET, HTTP POST, Use: Literal, Implementation: MS .NET
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy05 --wsdl http://www.ripedevelopment.com/webservices/LocalTime.asmx?WSDL
+
+// Import RPC Style web services: will be generated with Axis
+
+// [CORRECT] Transport: HTTP, Bindings: SOAP, Use: Encoded
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy10 --wsdl http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL
+
+// [CORRECT] Transport: HTTP, Operations: 1, Bindings: SOAP, Use: Encoded
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy11 --wsdl http://www.aswinanand.com/sendsms.php?wsdl
+
+// [CORRECT] Transport: HTTP, Operations: 179, Bindings: SOAP, Use: Encoded, Implementation: AXIS
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy12 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
+
+// [ERROR] Invalid http URL and local file
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy20 --wsdl http://this.location/not/exists
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy21 --wsdl file:/this/location/not/exists
 
 // Export WSDL 2 Java
 service export wsdl --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL

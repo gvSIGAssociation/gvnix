@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWSExportWSDLConfigService.GvNIXAnnotationType;
@@ -59,9 +58,6 @@ import org.springframework.roo.support.util.Assert;
 @Component(immediate = true)
 @Service
 public class JavaParserServiceImpl implements JavaParserService {
-
-    private static Logger logger = Logger.getLogger(JavaParserServiceImpl.class
-            .getName());
 
     @Reference
     private MetadataService metadataService;

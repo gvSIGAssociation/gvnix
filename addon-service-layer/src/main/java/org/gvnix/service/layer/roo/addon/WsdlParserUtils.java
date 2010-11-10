@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
 
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.springframework.roo.support.util.Assert;
@@ -98,9 +97,6 @@ public class WsdlParserUtils {
 	    + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + BINDING_ELEMENT
 	    + XPATH_SEPARATOR + BINDING_ELEMENT;
 
-    private static Logger logger = Logger.getLogger(WsdlParserUtils.class
-	    .getName());
-
     /**
      * Constructs a valid java package path from target namespace of root wsdl.
      * 
@@ -111,22 +107,14 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Root element of the wsdl
-     * @param type
-     *            Communication sense type
      * @return Equivalent java package or empty
      */
-    public static String getTargetNamespaceRelatedPackage(Element root, CommunicationSense sense) {
+    public static String getTargetNamespaceRelatedPackage(Element root) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
 	// Get the namespace attribute from root wsdl in lower case
 	String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
-
-	// If required, convert namespace to lowercase
-	if (!CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)) {
-	    
-	    namespace = namespace.toLowerCase();
-	}
 
 	// Namespace separators
 	String separator1 = null;
@@ -305,16 +293,14 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Wsdl root element
-     * @param type
-     *            Communication sense type
      * @return Path to the class
      */
-    public static String getServiceClassPath(Element root, CommunicationSense sense) {
+    public static String getServiceClassPath(Element root) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
 	// Build the classpath related to the namespace
-	String path = getTargetNamespaceRelatedPackage(root, sense);
+	String path = getTargetNamespaceRelatedPackage(root);
 
 	// Find a compatible service name
 	String name = findFirstCompatibleServiceClassName(root);
@@ -332,12 +318,12 @@ public class WsdlParserUtils {
      *            Communication sense type
      * @return Path to the class
      */
-    public static String getPortTypeClassPath(Element root, CommunicationSense sense) {
+    public static String getPortTypeClassPath(Element root) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
 	// Build the classpath related to the namespace
-	String path = getTargetNamespaceRelatedPackage(root, sense);
+	String path = getTargetNamespaceRelatedPackage(root);
 
 	// Find a compatible port type name
 	String name = findFirstCompatiblePortTypeClassName(root);
@@ -359,7 +345,7 @@ public class WsdlParserUtils {
      */
     public static File getPortTypeJavaFile(Element root, CommunicationSense type) {
 
-	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root, type)), type);
+	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root)), type);
     }
 
     /**
