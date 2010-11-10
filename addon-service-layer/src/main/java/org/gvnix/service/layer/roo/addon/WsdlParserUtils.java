@@ -439,6 +439,104 @@ public class WsdlParserUtils {
     }
 
     /**
+     * Check port if Supported port element of the root.
+     * 
+     * <p>
+     * Should exists only one compatible port using SOAP protocol version 1.1 or 1.2.
+     * </p>
+     * 
+     * @param root
+     *            Root element of wsdl
+     * @return Compatible port element
+     */
+    public static Element checkCompatiblePort(Element root) {
+
+        Assert.notNull(root, "Wsdl root element required");
+
+        // Find a compatible address element
+        Element address = checkCompatibleAddress(root);
+        Assert.notNull(address, "No compatible SOAP 1.1 or 1.2 protocol");
+
+        // Get the port element defined by the wsdl
+        Element port = ((Element) address.getParentNode());
+
+        return port;
+    }
+
+    /**
+     * Check compatible address element of the root.
+     * 
+     * <p>
+     * Should exists only one compatible address using SOAP protocol version 1.1 or 1.2.
+     * </p>
+     * 
+     * @param root
+     *            Root element of wsdl.
+     * @return First compatible address element or null if no element.
+     */
+    public static Element checkCompatibleAddress(Element root) {
+
+        Assert.notNull(root, "Wsdl root element required");
+
+        // Find all address elements
+        List<Element> addresses = XmlUtils.findElements(ADDRESSES_XPATH, root);
+
+        // Separate on a list the addresses prefix
+        List<String> prefixes = new ArrayList<String>();
+        for (int i = 0; i < addresses.size(); i++) {
+
+            String nodeName = addresses.get(i).getNodeName();
+            prefixes.add(i, getNamespace(nodeName));
+        }
+
+        // Separate on a list the addresses namespace
+        List<String> namespaces = new ArrayList<String>();
+        for (int i = 0; i < prefixes.size(); i++) {
+
+            namespaces.add(i, getNamespaceURI(root, prefixes.get(i)));
+        }
+
+        // Any namepace is a SOAP namespace with or whitout final slash ?
+        boolean isSoap12Compatible = false;
+        boolean isSoap11Compatible = false;
+        int indexSoap12 = 0;
+        int indexSoap11 = 0;
+        if ((indexSoap12 = namespaces.indexOf(SOAP_12_NAMESPACE)) != -1
+                || (indexSoap12 = namespaces
+                        .indexOf(SOAP_12_NAMESPACE_WITHOUT_SLASH)) != -1) {
+
+            // First preference: SOAP 1.2 protocol
+            isSoap12Compatible = true;
+
+        }
+        if ((indexSoap11 = namespaces.indexOf(SOAP_11_NAMESPACE)) != -1
+                || (indexSoap11 = namespaces
+                        .indexOf(SOAP_11_NAMESPACE_WITHOUT_SLASH)) != -1) {
+
+            if (isSoap12Compatible) {
+                return null;
+            }
+
+            isSoap11Compatible = true;
+            // Second preference: SOAP 1.1 protocol
+
+        }
+
+        int index = 0;
+
+        if (isSoap12Compatible && !isSoap11Compatible) {
+            index = indexSoap12;
+        } else if (isSoap11Compatible && !isSoap12Compatible) {
+            index = indexSoap11;
+        } else {
+            // Other protocols not supported
+            return null;
+        }
+
+        return addresses.get(index);
+    }
+
+    /**
      * Find the first compatible port related class name of the root.
      * 
      * <p>

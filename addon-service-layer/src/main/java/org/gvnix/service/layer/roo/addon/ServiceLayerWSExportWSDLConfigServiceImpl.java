@@ -1506,6 +1506,9 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                     + url
                     + "' is RPC Encoded and is not supported by the Add-on.");
 
+            // Check if is compatible port defined with SOAP12 or SOAP11.
+            WsdlParserUtils.checkCompatiblePort(root);
+
         } catch (SAXException e) {
 
             Assert.state(false, "The format of the web service '" + url

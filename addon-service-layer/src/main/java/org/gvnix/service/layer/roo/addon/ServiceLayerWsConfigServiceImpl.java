@@ -37,6 +37,7 @@ import org.springframework.roo.project.*;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.*;
 import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
 /**
  * Utilities to manage the CXF web services library.
