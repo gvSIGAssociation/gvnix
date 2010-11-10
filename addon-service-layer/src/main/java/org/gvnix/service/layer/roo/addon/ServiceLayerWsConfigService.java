@@ -18,18 +18,10 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import japa.parser.ParseException;
-import japa.parser.ast.PackageDeclaration;
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
-import japa.parser.ast.expr.AnnotationExpr;
-
-import java.io.File;
 import java.io.IOException;
 
-import org.gvnix.service.layer.roo.addon.annotations.*;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaType;
-import org.w3c.dom.Document;
 
 /**
  * Service to manage the Web Services.
@@ -49,36 +41,6 @@ import org.w3c.dom.Document;
  *         Transport</a>
  */
 public interface ServiceLayerWsConfigService {
-
-    /**
-     * <ul>
-     * <li>XML_ELEMENT: Associated with @GvNIXXmlElement annotation.</li>
-     * <li>WEB_FAULT: Associated with @GvNIXWebFault annotation.</li>
-     * <li>WEB_SERVICE: Associated with @GvNIXWebService annotation.</li>
-     * </ul>
-     */
-    public enum GvNIXAnnotationType {
-
-        /**
-         * Web Service Xml Annotation type.
-         */
-        XML_ELEMENT, 
-
-        /**
-         * Web Fault Web Service Annotation type.
-         */
-        WEB_FAULT, 
-        
-        /**
-         * Web Service Annotation type.
-         */
-        WEB_SERVICE, 
-        
-        /**
-         * Web Service Annotation type in interface file.
-         */
-        WEB_SERVICE_INTERFACE
-    };
 
     /**
      * Sense of the Communication.
@@ -165,27 +127,6 @@ public interface ServiceLayerWsConfigService {
             CommunicationSense type);
 
     /**
-     * Exports WSDL to java.
-     * 
-     * @param wsdlLocation
-     *            contract wsdl url to export.
-     * @param type
-     *            Communication sense type.
-     */
-    public void exportWSDLWebService(String wsdlLocation,
-            CommunicationSense type);
-
-    /**
-     * Check correct WSDL encoding and retrieve WSDL to export into
-     * {@link Document}.
-     * 
-     * @param url
-     *            from WSDL file to export.
-     * @return Xml document from WSDL.
-     */
-    public Document checkWSDLFile(String url);
-
-    /**
      * Run maven command with parameters.
      * 
      * @param parameters
@@ -195,125 +136,6 @@ public interface ServiceLayerWsConfigService {
      */
     public void mvn(String parameters) throws IOException;
 
-    /**
-     * Updates list of files generated to update with '@GvNIX' annotations.
-     * 
-     * @param file
-     *            scanned to add to list.
-     * @param gvNIXAnnotationType
-     *            to select the list where add the file.
-     */
-    public void addFileToUpdateAnnotation(File file,
-            GvNIXAnnotationType gvNIXAnnotationType);
-
-    /**
-     * Remove Cxf wsdl2java plugin execution from pom.xml
-     */
-    public void removeCxfWsdl2JavaPluginExecution();
-
-    /**
-     * Creates java files in 'src/main/java' from with gvNIX Web Service
-     * Annotations.
-     * 
-     */
-    public void generateGvNIXWebServiceFiles();
-
-    /**
-     * Generates java files with '@GvNIXXmlElement' values.
-     */
-    public void generateGvNIXXmlElementsClasses();
-    
-    /**
-     * Generates java files with '@GvNIXWebFault' values.
-     */
-    public void generateGvNIXWebFaultClasses();
-    
-    /**
-     * Generates java files with '@GvNIXWebService' values.
-     */
-    public void generateGvNIXWebServiceClasses();
-    
-    /**
-     * Retrieve Web Service implemented interface from interface list.
-     * 
-     * @param classOrInterfaceDeclaration
-     *            to retrieve its implemented interface.
-     * 
-     * @return {@link ClassOrInterfaceDeclaration} interface that implements
-     *         classOrInterfaceDeclaratio, null if not exists.
-     * @throws IOException 
-     * @throws ParseException 
-     */
-    public ClassOrInterfaceDeclaration getWebServiceInterface(
-            ClassOrInterfaceDeclaration classOrInterfaceDeclaration) throws ParseException, IOException;
-
-    /**
-     * Monitoring CXF Web Service generated sources directory.
-     * 
-     * @param directoryToMonitoring
-     *            directory to look up for CXF Web Service generated java files.
-     */
-    public void monitoringGeneratedSourcesDirectory(String directoryToMonitoring);
-
-    /**
-     * Reset Web Service generated file lists.
-     */
-    public void resetGeneratedFilesList();
-    
-    /**
-     * Convert annotation @XmlElement values from {@link ClassOrInterfaceDeclaration} to {@link GvNIXXmlElement}.
-     * 
-     * @param classOrInterfaceDeclaration
-     *            to retrieve values from @XmlElement annotations and convert to
-     *            {@link GvNIXXmlElement} values.
-     * 
-     * @param fileDirectory
-     *            to retrieve namespace values generated.
-     * 
-     * @return {@link GvNIXXmlElement} to define in class.
-     */
-    public AnnotationMetadata getGvNIXXmlElementAnnotation(
-            ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
-            String fileDirectory);
-
-    /**
-     * Convert annotation @WebFault values from
-     * {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebFault}.
-     * 
-     * @param classOrInterfaceDeclaration
-     *            to retrieve values from @WebFault annotations and convert to
-     *            {@link GvNIXWebFault} values.
-     * 
-     * @param exceptionType
-     *            to retrieve faultBean attribute value {@link GvNIXWebFault}.
-     * 
-     * @return {@link GvNIXWebFault} to define in class.
-     */
-    public AnnotationMetadata getGvNIXWebFaultAnnotation(
-            ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
-            JavaType exceptionType);
-
-    /**
-     * Convert annotation @WebService values from
-     * {@link ClassOrInterfaceDeclaration} to {@link GvNIXWebService}.
-     * 
-     * @param classOrInterfaceDeclaration
-     *            to retrieve values from @WebService annotations and convert to
-     *            {@link GvNIXWebService} values.
-     * 
-     * @param implementedInterface
-     *            Web Service interface.
-     * 
-     * @param javaType
-     *            to retrieve mandatory Annotation attributed with its values.
-     * 
-     * @return {@link GvNIXWebService} to define in class.
-     */
-    public AnnotationMetadata getGvNIXWebServiceAnnotation(
-            ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
-            ClassOrInterfaceDeclaration implementedInterface,
-            JavaType javaType);
-    
     /**
      * Create Jax-WS plugin configuration in pom.xml.
      */

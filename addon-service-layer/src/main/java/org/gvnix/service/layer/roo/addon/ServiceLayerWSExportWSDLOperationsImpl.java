@@ -42,6 +42,9 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
 
     @Reference
     private ServiceLayerWsConfigService serviceLayerWsConfigService;
+    @Reference
+    private ServiceLayerWSExportWSDLConfigService serviceLayerWSExportWSDLConfigService;
+
 
     private static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
 
@@ -60,11 +63,11 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
     public void exportWSDL2Java(String url) {
 
         // Check WSDL, configure plugin and generate sources.
-        serviceLayerWsConfigService.exportWSDLWebService(url,
+        serviceLayerWSExportWSDLConfigService.exportWSDLWebService(url,
                 CommunicationSense.EXPORT_WSDL);
 
         // Check generated classes.
-        serviceLayerWsConfigService.monitoringGeneratedSourcesDirectory(GENERATED_CXF_SOURCES_DIR);
+        serviceLayerWSExportWSDLConfigService.monitoringGeneratedSourcesDirectory(GENERATED_CXF_SOURCES_DIR);
 
         // TODO: Convert java classes with gvNIX annotations.
         // Using ServiceLayerWSExportWSDLListener
@@ -77,11 +80,10 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
      * <p>
      * Check the files listed in Arrays in this class.
      * </p>
-     * TODO: Create GvNIXWebFault and GvNIXWebService
      */
     public void updateAnnotationsToGvNIX() {
 
-        serviceLayerWsConfigService.generateGvNIXWebServiceFiles();
+        serviceLayerWSExportWSDLConfigService.generateGvNIXWebServiceFiles();
     }
 
 }

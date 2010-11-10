@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
-import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.GvNIXAnnotationType;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWSExportWSDLConfigService.GvNIXAnnotationType;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod;
 import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;

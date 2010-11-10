@@ -22,7 +22,7 @@ import japa.parser.ParseException;
 
 import java.util.List;
 
-import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.GvNIXAnnotationType;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWSExportWSDLConfigService.GvNIXAnnotationType;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
