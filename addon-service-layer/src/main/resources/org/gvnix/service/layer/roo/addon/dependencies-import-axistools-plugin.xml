@@ -5,6 +5,7 @@
 		<artifactId>axistools-maven-plugin</artifactId>
 		<version>1.4</version>
 		<configuration>
+			<outputDirectory>${project.build.directory}/generated-sources/client</outputDirectory>
 			<urls>
 		    </urls>
 		</configuration>

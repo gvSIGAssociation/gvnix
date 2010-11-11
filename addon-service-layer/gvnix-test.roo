@@ -51,7 +51,7 @@ service export operation --class org.gvnix.test.service.layer.project.services.C
 service operation --name incorrectInputParameters --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --paramTypes java.util.Map,java.lang.String --paramNames map,name
 service export operation --class org.gvnix.test.service.layer.project.services.Clase --method incorrectInputParameters
 
-// Import Document Style web services: will be generated with CXF
+// Import Remote Document Style web services: will be generated with CXF
 
 // [CORRECT] Transport: HTTP,  Operations: 2, Bindings: SOAP, SOAP12, HTTP POST, Use: Literal
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
@@ -71,7 +71,7 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 // [CORRECT] Transport: HTTP,  Operations: 1, Bindings: SOAP, SOAP12, HTTP GET, HTTP POST, Use: Literal, Implementation: MS .NET
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy05 --wsdl http://www.ripedevelopment.com/webservices/LocalTime.asmx?WSDL
 
-// Import RPC Style web services: will be generated with Axis
+// Import Remote RPC Style web services: will be generated with Axis
 
 // [CORRECT] Transport: HTTP, Bindings: SOAP, Use: Encoded
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy10 --wsdl http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL
@@ -82,9 +82,14 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 // [CORRECT] Transport: HTTP, Operations: 179, Bindings: SOAP, Use: Encoded, Implementation: AXIS
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy12 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
 
-// [ERROR] Invalid http URL and local file
+// [ERROR] Remote and local file not existing
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy20 --wsdl http://this.location/not/exists
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy21 --wsdl file:/this/location/not/exists
+
+// [CORRECT] Local WSDL files placed into src/test/resource relative path, the second one has been repeated
+service import ws --class ~.services.ClaseProxy30 --wsdl file:src/test/resources/WSAuth.wsdl
+service import ws --class ~.services.ClaseProxy31 --wsdl file:src/test/resources/tempconvert.wsdl
+service import ws --class ~.services.ClaseProxy32 --wsdl file:src/test/resources/SimacServiciosListener.jws.xml
 
 // Export WSDL 2 Java
 service export wsdl --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL

@@ -67,10 +67,7 @@ public class WsdlParserUtils {
     
     public static final String TARGET_GENERATED_SOURCES_PATH = "."
 	    + FILE_SEPARATOR + "target" + FILE_SEPARATOR + "generated-sources"
-	    + FILE_SEPARATOR + "cxf";
-    public static final String TARGET_GENERATED_SOURCES_RPC_PATH = "."
-	    + FILE_SEPARATOR + "target" + FILE_SEPARATOR + "generated-sources"
-	    + FILE_SEPARATOR + "axistools" + FILE_SEPARATOR + "wsdl2java";
+	    + FILE_SEPARATOR + "client";
 
     public static final String DEFINITIONS_ELEMENT = "definitions";
     public static final String BINDING_ELEMENT = "binding";
@@ -371,21 +368,8 @@ public class WsdlParserUtils {
     private static File getGeneratedJavaFile(String path, CommunicationSense type) {
 	
 	Assert.hasText(path, "Text in path required");
-	
-	String target = "";
-	switch (type) {
-	case IMPORT:
-	    
-	    target = TARGET_GENERATED_SOURCES_PATH;
-	    break;
 
-	case IMPORT_RPC_ENCODED:
-	    
-	    target = TARGET_GENERATED_SOURCES_RPC_PATH;
-	    break;
-	}
-	
-	return new File(target, path);
+	return new File(TARGET_GENERATED_SOURCES_PATH, path);
     }
 
     /**

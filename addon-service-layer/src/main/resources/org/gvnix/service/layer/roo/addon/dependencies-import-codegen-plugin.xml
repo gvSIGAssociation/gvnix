@@ -9,6 +9,7 @@
             <id>generate-sources</id>
 			<phase>generate-sources</phase>
             <configuration>
+            	<sourceRoot>${basedir}/target/generated-sources/client</sourceRoot>
 				<defaultOptions>
 					<extendedSoapHeaders>true</extendedSoapHeaders>
 				</defaultOptions>

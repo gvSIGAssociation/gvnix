@@ -1338,8 +1338,8 @@ public class ServiceLayerWsConfigServiceImpl implements
                 .notNull(codegenWsPlugin,
                         "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
-        // Access executions > execution > configuration > wsdlOptions and defaultOptions elements.
-        // Configuration, wsdlOptions and defaultOptions are created if not exists.
+        // Access executions > execution > configuration > sourceRoot, wsdlOptions and defaultOptions.
+        // Configuration, sourceRoot, wsdlOptions and defaultOptions are created if not exists.
         Element executions = XmlUtils.findFirstElementByName("executions",
                 codegenWsPlugin);
         Element execution = XmlUtils.findFirstElementByName("execution",
@@ -1351,6 +1351,15 @@ public class ServiceLayerWsConfigServiceImpl implements
             configuration = pom.createElement("configuration");
             execution.appendChild(configuration);
         }
+	Element sourceRoot = XmlUtils.findFirstElementByName("sourceRoot",
+		configuration);
+	if (sourceRoot == null) {
+	    
+	    sourceRoot = pom.createElement("sourceRoot");
+	    sourceRoot
+		    .setTextContent("${basedir}/target/generated-sources/client");
+	    configuration.appendChild(sourceRoot);
+	}
         Element defaultOptions = XmlUtils.findFirstElementByName("defaultOptions",
                 configuration);
         if (defaultOptions == null) {
