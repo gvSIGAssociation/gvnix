@@ -639,6 +639,26 @@ public class ServiceLayerWSExportValidationServiceImpl implements
             // Create attribute elementList for allowed javaType fields.
             ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue = getElementFields(
                     mutableTypeDetails, methodParameterType);
+
+            StringAttributeValue xmlTypeNameStringAttributeValue;
+            if (elementListArrayAttributeValue != null
+                    && !elementListArrayAttributeValue.getValue().isEmpty()) {
+
+                xmlTypeNameStringAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("xmlTypename"), javaType
+                                .getSimpleTypeName());
+                annotationAttributeValueList
+                        .add(xmlTypeNameStringAttributeValue);
+
+            }
+            else {
+                
+                xmlTypeNameStringAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("xmlTypename"), "");
+                annotationAttributeValueList
+                        .add(xmlTypeNameStringAttributeValue);
+            }
+
             annotationAttributeValueList.add(elementListArrayAttributeValue);
 
             annotationsService.addJavaTypeAnnotation(mutableTypeDetails

@@ -514,7 +514,7 @@ public class WsdlParserUtils {
                         .indexOf(SOAP_11_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
             if (isSoap12Compatible) {
-                return null;
+                Assert.state(false, "There are defined SOAP 1.1 and 1.2 protocols.\nMust be only one protocol defined.");
             }
 
             isSoap11Compatible = true;

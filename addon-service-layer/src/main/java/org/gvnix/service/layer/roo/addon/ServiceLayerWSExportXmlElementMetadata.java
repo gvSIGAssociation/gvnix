@@ -198,6 +198,8 @@ public class ServiceLayerWSExportXmlElementMetadata extends
             AnnotationMetadata gvNIXXmlElementAnnotationMetadata,
             List<FieldMetadata> fieldElementList) {
 
+        AnnotationAttributeValue<?> tmpAttribute;
+
         // Annotation list.
         List<AnnotationMetadata> annotationTypeList = new ArrayList<AnnotationMetadata>();
 
@@ -207,18 +209,24 @@ public class ServiceLayerWSExportXmlElementMetadata extends
         JavaType xmlRootElement = new JavaType(
                 "javax.xml.bind.annotation.XmlRootElement");
 
-        StringAttributeValue nameAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
+        tmpAttribute = gvNIXXmlElementAnnotationMetadata
                 .getAttribute(new JavaSymbolName("name"));
-        xmlRootElementAnnotationAttributeValueList.add(nameAttributeValue);
+        
+        if (tmpAttribute != null) {
+            StringAttributeValue nameAttributeValue = (StringAttributeValue) tmpAttribute;
 
-        StringAttributeValue namespaceAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
-                .getAttribute(new JavaSymbolName("namespace"));
-        xmlRootElementAnnotationAttributeValueList.add(namespaceAttributeValue);
+            xmlRootElementAnnotationAttributeValueList.add(nameAttributeValue);
 
-        AnnotationMetadata xmlRootElementAnnotation = new DefaultAnnotationMetadata(
-                xmlRootElement, xmlRootElementAnnotationAttributeValueList);
+            StringAttributeValue namespaceAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
+                    .getAttribute(new JavaSymbolName("namespace"));
+            xmlRootElementAnnotationAttributeValueList
+                    .add(namespaceAttributeValue);
 
-        annotationTypeList.add(xmlRootElementAnnotation);
+            AnnotationMetadata xmlRootElementAnnotation = new DefaultAnnotationMetadata(
+                    xmlRootElement, xmlRootElementAnnotationAttributeValueList);
+
+            annotationTypeList.add(xmlRootElementAnnotation);
+        }
 
         // @XmlType
         List<AnnotationAttributeValue<?>> xmlTypeAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
@@ -236,19 +244,24 @@ public class ServiceLayerWSExportXmlElementMetadata extends
             propOrderList.add(propOrderAttributeValue);
         }
 
+        tmpAttribute = gvNIXXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("xmlTypeName"));
+
+        StringAttributeValue xmlTypeNameAttributeValue;
+        if (tmpAttribute != null) {
+            xmlTypeNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("name"), ((StringAttributeValue) tmpAttribute).getValue());
+            xmlTypeAnnotationAttributeValueList.add(xmlTypeNameAttributeValue);
+        } else {
+            xmlTypeNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("name"), "");
+            xmlTypeAnnotationAttributeValueList.add(xmlTypeNameAttributeValue);
+        }
+
         ArrayAttributeValue<StringAttributeValue> propOrderAttributeList = new ArrayAttributeValue<StringAttributeValue>(
                 new JavaSymbolName("propOrder"), propOrderList);
 
         xmlTypeAnnotationAttributeValueList.add(propOrderAttributeList);
-
-        // TODO: Name is not necessary to @XmlType
-
-        // StringAttributeValue xmlTypeNameAttributeValue =
-        // (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
-        // .getAttribute(new JavaSymbolName("name"));
-        StringAttributeValue xmlTypeNameAttributeValue = new StringAttributeValue(new JavaSymbolName("name"), "");
-        
-        xmlTypeAnnotationAttributeValueList.add(xmlTypeNameAttributeValue);
 
         StringAttributeValue xmlTypeNamespaceAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
                 .getAttribute(new JavaSymbolName("namespace"));

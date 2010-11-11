@@ -31,15 +31,16 @@ import java.lang.annotation.*;
  *         Transport</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface GvNIXXmlElement {
+@Target(ElementType.FIELD)
+public @interface GvNIXXmlElementField {
 
-    String name() default "";
-    
-    String xmlTypeName() default "";
+    java.lang.String defaultValue() default "\u0000";
 
-    String namespace();
+    java.lang.String name() default "##default";
 
-    String[] elementList();
+    java.lang.String namespace() default "##default";
 
+    boolean nillable() default false;
+
+    Class<?> type() default Object.class;
 }

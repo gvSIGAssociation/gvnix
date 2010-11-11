@@ -96,14 +96,12 @@ public class ServiceLayerWsConfigServiceImpl implements
         addProjectProperties(type);
 
         // Check if it's already installed.
-        if (isLibraryInstalled(type)) {
+        if (!isLibraryInstalled(type)) {
 
-            // Nothing to do
-            return;
+            // Add dependencies to project
+            installDependencies(type);
         }
 
-        // Add dependencies to project
-        installDependencies(type);
 
         if (type == CommunicationSense.EXPORT) {
 
@@ -477,7 +475,6 @@ public class ServiceLayerWsConfigServiceImpl implements
      * Update url rewrite rules.
      */
     private void installCxfUrlRewriteConfigurationFile() {
-        List<Element> rules = getCxfUrlRewriteRequiredRules();
 
         // Open file and append rules before the first element
         String xmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
@@ -488,13 +485,25 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         Element root = urlRewriteDoc.getDocumentElement();
 
-        for (Element rule : rules) {
+        Element existingRule = XmlUtils.findFirstElement("/urlrewrite/rule[from='/services/**']", root);
 
-            // Create rule in dest doc
-            Element rewRule = (Element) urlRewriteDoc.adoptNode(rule);
-
-            root.insertBefore(rewRule, root.getFirstChild());
+        if (existingRule != null) {
+            // Web Service filter exists.
+            return;
         }
+
+        Element rule = urlRewriteDoc.createElement("rule");
+        rule.setAttribute("enabled", "true");
+        Element from = urlRewriteDoc.createElement("from");
+        from.setTextContent("/services/**");
+        rule.appendChild(from);
+        Element to = urlRewriteDoc.createElement("to");
+        to.setAttribute("last", "true");
+        to.setTextContent("/services/$1");
+        rule.appendChild(to);
+
+        // Create rule in dest doc
+        root.insertBefore(rule, root.getFirstChild());
 
         urlRewriteOperations.writeUrlRewriteDocument(urlRewriteDoc);
     }

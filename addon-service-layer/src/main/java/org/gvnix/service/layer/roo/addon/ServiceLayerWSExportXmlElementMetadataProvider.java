@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
-import org.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations.MethodParameterType;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
@@ -210,33 +209,54 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
             ClassOrInterfaceTypeDetails governorTypeDetails,
             AnnotationMetadata gvNixXmlElementAnnotationMetadata) {
 
-        StringAttributeValue nameStringAtrributeValue = (StringAttributeValue) gvNixXmlElementAnnotationMetadata
+        StringAttributeValue nameStringAtrributeValue = null;
+        StringAttributeValue xmlTypeNameStringAtrributeValue = null;
+
+        AnnotationAttributeValue<?> tmpAttribute = gvNixXmlElementAnnotationMetadata
                 .getAttribute(new JavaSymbolName("name"));
+
+        if (tmpAttribute != null) {
+            nameStringAtrributeValue = (StringAttributeValue) tmpAttribute;
+        }
+
+        tmpAttribute = gvNixXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("xmlTypeName"));
+        if (tmpAttribute != null) {
+            xmlTypeNameStringAtrributeValue = (StringAttributeValue) tmpAttribute;
+        }
 
         Assert
                 .isTrue(
-                        nameStringAtrributeValue != null
+                        (nameStringAtrributeValue != null
                                 && StringUtils.hasText(nameStringAtrributeValue
-                                        .getValue()),
-                        "Attribute 'name' in annotation @GvNIXXmlElement defined in class '"
+                                        .getValue())) || 
+                                        (xmlTypeNameStringAtrributeValue != null
+                                && StringUtils.hasText(xmlTypeNameStringAtrributeValue
+                                        .getValue())),
+                        "Attribute 'name' or 'xmlTypeName' in annotation @GvNIXXmlElement defined in class '"
                                 + governorTypeDetails.getName()
                                         .getFullyQualifiedTypeName()
                                 + "' has to be defined to export in XSD schema in WSDL.");
 
+
         // resultNamespace
-        StringAttributeValue namespaceStringAttributeValue = (StringAttributeValue) gvNixXmlElementAnnotationMetadata
+        StringAttributeValue namespaceStringAttributeValue;
+
+        tmpAttribute = (StringAttributeValue) gvNixXmlElementAnnotationMetadata
                 .getAttribute(new JavaSymbolName("namespace"));
 
         Assert
                 .isTrue(
-                        namespaceStringAttributeValue != null
+                        tmpAttribute != null
                                 && StringUtils
-                                        .hasText(namespaceStringAttributeValue
+                                        .hasText(((StringAttributeValue) tmpAttribute)
                                                 .getValue()),
                         "Attribute 'namespace' in annotation @GvNIXXmlElement defined in class '"
                                 + governorTypeDetails.getName()
                                         .getFullyQualifiedTypeName()
                                 + "' has to be defined to export in XSD schema in WSDL.");
+
+        namespaceStringAttributeValue = (StringAttributeValue) tmpAttribute;
 
         Assert
                 .isTrue(
@@ -287,7 +307,7 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
 
             for (StringAttributeValue value : elementListStringValue) {
 
-                containsValue = value.getValue().contentEquals(
+                containsValue = value.getValue().contains(
                         fieldMetadata.getFieldName().getSymbolName());
 
                 if (containsValue) {
