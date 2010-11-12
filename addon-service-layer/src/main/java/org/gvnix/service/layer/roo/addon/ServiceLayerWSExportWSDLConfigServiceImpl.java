@@ -103,10 +103,10 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
             CommunicationSense type) {
 
         // 1) Check if WSDL is RPC enconded and copy file to project.
-        Document wsdl = checkWSDLFile(wsdlLocation);
+        Document wsdlDocument = checkWSDLFile(wsdlLocation);
 
         // 2) Configure plugin cxf to generate java code using WSDL.
-        serviceLayerWsConfigService.addImportLocation(wsdlLocation, type);
+        serviceLayerWsConfigService.addExportLocation(wsdlLocation, wsdlDocument, type);
 
         // 3) Reset File List
         resetGeneratedFilesList();

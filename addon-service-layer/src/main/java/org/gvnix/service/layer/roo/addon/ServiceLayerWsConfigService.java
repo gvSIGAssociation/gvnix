@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaType;
+import org.w3c.dom.Document;
 
 /**
  * Service to manage the Web Services.
@@ -112,6 +113,19 @@ public interface ServiceLayerWsConfigService {
      *            Communication sense type
      */
     public void addImportLocation(String wsdlLocation, CommunicationSense type);
+
+    /**
+     * Add a wsdl location to export.
+     * 
+     * @param wsdlLocation
+     *            WSDL file location.
+     * @param wsdlDocument
+     *            WSDL file.
+     * @param type
+     *            Communication sense type
+     */
+    public void addExportLocation(String wsdlLocation, Document wsdlDocument,
+            CommunicationSense type);
 
     /**
      * Imports a Web Service to class.

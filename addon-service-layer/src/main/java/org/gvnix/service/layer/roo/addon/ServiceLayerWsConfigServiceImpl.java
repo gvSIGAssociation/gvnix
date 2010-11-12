@@ -1143,6 +1143,24 @@ public class ServiceLayerWsConfigServiceImpl implements
 
             addImportLocationRpc(wsdlLocation);
             break;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Adds a wsdl location to the plugin configuration. If code generation
+     * plugin configuration not exists, it will be created.
+     * </p>
+     */
+    public void addExportLocation(String wsdlLocation, Document wsdlDocument,
+            CommunicationSense type) {
+
+        // Project properties to pom.xml
+        addProjectProperties(type);
+
+        switch (type) {
 
         case EXPORT:
             // TODO: Refactor method name to use for all CommunicationSense to
@@ -1151,23 +1169,24 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         case EXPORT_WSDL:
             // TODO: Export Wsdl2Java
-            addExportLocationDocument(wsdlLocation);
+            addExportWSDLLocationDocument(wsdlLocation, wsdlDocument);
             break;
         }
     }
 
     /**
-     * Add a wsdl location to export wsdl of document type.
-     * 
      * <p>
      * Adds a wsdl location to the codegen plugin configuration. If code
      * generation plugin configuration not exists, it will be created.
      * </p>
      * 
      * @param wsdlLocation
-     *            WSDL file location
+     *            WSDL file location.
+     * @param wsdlDocument
+     *            WSDL file.
      */
-    private void addExportLocationDocument(String wsdlLocation) {
+    private void addExportWSDLLocationDocument(String wsdlLocation,
+            Document wsdlDocument) {
 
         // Get plugin template
         Element plugin = XmlUtils.findFirstElement(
@@ -1253,6 +1272,18 @@ public class ServiceLayerWsConfigServiceImpl implements
         wsdlOption.appendChild(wsdl);
         wsdlOption.appendChild(extraArgs);
 
+        Element rootElement = wsdlDocument.getDocumentElement();
+
+        // Configure the packagename to generate client sources
+        Element packagenames = pom.createElement("packagenames");
+        Element packagename = pom.createElement("packagename");
+        String packageName = WsdlParserUtils
+                .getTargetNamespaceRelatedPackage(rootElement);
+        packagename.setTextContent(packageName.substring(0, packageName
+                .length() - 1));
+        packagenames.appendChild(packagename);
+        wsdlOption.appendChild(packagenames);
+
         wsdlOptions.appendChild(wsdlOption);
 
         // Checks if exists executions.
@@ -1265,8 +1296,8 @@ public class ServiceLayerWsConfigServiceImpl implements
         // maintain the format.
         if (oldGenerateSourcesCxfServer != null) {
 
-            oldGenerateSourcesCxfServer.getParentNode().replaceChild(newGenerateSourcesCxfServer,
-                    oldGenerateSourcesCxfServer);
+            oldGenerateSourcesCxfServer.getParentNode().replaceChild(
+                    newGenerateSourcesCxfServer, oldGenerateSourcesCxfServer);
         } else {
 
             if (oldExecutions == null) {
