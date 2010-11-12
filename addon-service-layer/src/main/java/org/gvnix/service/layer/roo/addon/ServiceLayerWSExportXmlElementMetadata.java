@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElementField;
 import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -114,13 +115,13 @@ public class ServiceLayerWSExportXmlElementMetadata extends
      * {@link DeclaredFieldAnnotationDetails} {@link List} using @XmlTransient
      * annotation.
      * 
-     * @param fieldMetadataElementList
+     * @param fieldTransientList
      *            list to convert.
      * @return All the annotated @XmlTransient fields (never null, but may be
      *         empty).
      */
     public List<DeclaredFieldAnnotationDetails> getXmlTransientFieldAnnotations(
-            List<FieldMetadata> fieldMetadataElementList) {
+            List<FieldMetadata> fieldTransientList) {
 
         List<DeclaredFieldAnnotationDetails> annotationXmlTransientFieldList = new ArrayList<DeclaredFieldAnnotationDetails>();
 
@@ -133,7 +134,7 @@ public class ServiceLayerWSExportXmlElementMetadata extends
 
         DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
 
-        for (FieldMetadata fieldMetadata : fieldMetadataElementList) {
+        for (FieldMetadata fieldMetadata : fieldTransientList) {
 
             declaredFieldAnnotationDetails = new DeclaredFieldAnnotationDetails(
                     fieldMetadata, xmlTransientAnnotation);
@@ -148,13 +149,13 @@ public class ServiceLayerWSExportXmlElementMetadata extends
      * {@link DeclaredFieldAnnotationDetails} {@link List} using @XmlElement
      * annotation.
      * 
-     * @param fieldTransientList
+     * @param fieldMetadataElementList
      *            list to convert.
      * @return All the annotated @XmlElement fields (never null, but may be
      *         empty).
      */
     public List<DeclaredFieldAnnotationDetails> getXmlElementFieldAnnotations(
-            List<FieldMetadata> fieldTransientList) {
+            List<FieldMetadata> fieldMetadataElementList) {
 
         List<DeclaredFieldAnnotationDetails> annotationXmlElementFieldList = new ArrayList<DeclaredFieldAnnotationDetails>();
 
@@ -165,13 +166,34 @@ public class ServiceLayerWSExportXmlElementMetadata extends
 
         DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
 
-        for (FieldMetadata fieldMetadata : fieldTransientList) {
+        AnnotationMetadata gVNIXxmlElementFieldAnnotation;
+        for (FieldMetadata fieldMetadata : fieldMetadataElementList) {
+
+            gVNIXxmlElementFieldAnnotation = MemberFindingUtils
+            .getAnnotationOfType(fieldMetadata.getAnnotations(), new JavaType(
+                    GvNIXXmlElementField.class.getName()));
 
             attributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-            nameStringAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("name"), fieldMetadata.getFieldName()
-                            .getSymbolName());
-            attributeValueList.add(nameStringAttributeValue);
+            
+            if (gVNIXxmlElementFieldAnnotation != null) {
+
+                List<JavaSymbolName> annotationAttributeNames = gVNIXxmlElementFieldAnnotation.getAttributeNames();
+                
+                AnnotationAttributeValue<?> tmpAnnotationAttributeValue;
+
+                for (JavaSymbolName javaSymbolName : annotationAttributeNames) {
+                    tmpAnnotationAttributeValue = gVNIXxmlElementFieldAnnotation.getAttribute(javaSymbolName);
+                    attributeValueList.add(tmpAnnotationAttributeValue);
+                }
+                
+            } else {
+
+                nameStringAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("name"), fieldMetadata
+                                .getFieldName().getSymbolName());
+                attributeValueList.add(nameStringAttributeValue);
+
+            }
 
             // Creates the annotation.
             xmlTransientAnnotation = new DefaultAnnotationMetadata(
@@ -199,6 +221,10 @@ public class ServiceLayerWSExportXmlElementMetadata extends
             List<FieldMetadata> fieldElementList) {
 
         AnnotationAttributeValue<?> tmpAttribute;
+
+        // Boolean exported attribute.
+        BooleanAttributeValue exportedBooleanAttributeValue = (BooleanAttributeValue) gvNIXXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("exported"));
 
         // Annotation list.
         List<AnnotationMetadata> annotationTypeList = new ArrayList<AnnotationMetadata>();

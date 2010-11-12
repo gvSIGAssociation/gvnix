@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsExportOperations.MethodParameterType;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
@@ -209,10 +210,27 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
             ClassOrInterfaceTypeDetails governorTypeDetails,
             AnnotationMetadata gvNixXmlElementAnnotationMetadata) {
 
+        AnnotationAttributeValue<?> tmpAttribute;
+
         StringAttributeValue nameStringAtrributeValue = null;
         StringAttributeValue xmlTypeNameStringAtrributeValue = null;
 
-        AnnotationAttributeValue<?> tmpAttribute = gvNixXmlElementAnnotationMetadata
+        BooleanAttributeValue exportedAttributeValue;
+
+        tmpAttribute = gvNixXmlElementAnnotationMetadata
+                .getAttribute(new JavaSymbolName("exported"));
+
+        Assert
+                .isTrue(
+                        tmpAttribute != null,
+                        "Attribute 'exported' in annotation @GvNIXXmlElement defined in class '"
+                                + governorTypeDetails.getName()
+                                        .getFullyQualifiedTypeName()
+                                + "' has to be defined to export in XSD schema in WSDL.");
+
+        exportedAttributeValue = (BooleanAttributeValue) tmpAttribute;        
+        
+        tmpAttribute = gvNixXmlElementAnnotationMetadata
                 .getAttribute(new JavaSymbolName("name"));
 
         if (tmpAttribute != null) {
@@ -311,6 +329,30 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
                         fieldMetadata.getFieldName().getSymbolName());
 
                 if (containsValue) {
+
+                    if (!exportedAttributeValue.getValue()) {
+                        
+                        Assert
+                                .isTrue(
+                                        serviceLayerWSExportValidationService
+                                                .isJavaTypeAllowed(
+                                                        fieldMetadata
+                                                                .getFieldType(),
+                                                        MethodParameterType.XMLENTITY,
+                                                        governorTypeDetails
+                                                                .getName()),
+                                        "The '"
+                                                + MethodParameterType.XMLENTITY
+                                                + "' type '"
+                                                + fieldMetadata
+                                                        .getFieldType()
+                                                        .getFullyQualifiedTypeName()
+                                                + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed Object defined in: '"
+                                                + governorTypeDetails
+                                                        .getName()
+                                                        .getFullyQualifiedTypeName()
+                                                + "'.");
+                    }
 
                     fieldMetadataElementList.add(fieldMetadata);
                     break;

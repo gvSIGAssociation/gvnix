@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.*;
+import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
@@ -143,6 +144,16 @@ public interface ServiceLayerWSExportWSDLConfigService {
     public AnnotationMetadata getGvNIXXmlElementAnnotation(
             ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
             String fileDirectory);
+
+    /**
+     * Convert field with @XmlElement annotation to field with @GvNIXXmlElementField
+     * with its values.
+     * 
+     * @param fieldMetadata
+     * @return {@link FieldMetadata} with @GvNIXXmlElementField annotation.
+     */
+    public FieldMetadata getGvNIXXmlElementFieldAnnotation(
+            FieldMetadata fieldMetadata);
 
     /**
      * Convert annotation @WebFault values from

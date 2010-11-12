@@ -94,8 +94,8 @@ service import ws --class ~.services.ClaseProxy30 --wsdl src/test/resources/WSAu
 service import ws --class ~.services.ClaseProxy31 --wsdl file:src/test/resources/tempconvert.wsdl
 service import ws --class ~.services.ClaseProxy32 --wsdl src/test/resources/SimacServiciosListener.jws.xml
 
-// Export WSDL 2 Java
-service export wsdl --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
+// [CORRECT] Export WSDL 2 Java
+service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
 
 perform eclipse
 perform assembly

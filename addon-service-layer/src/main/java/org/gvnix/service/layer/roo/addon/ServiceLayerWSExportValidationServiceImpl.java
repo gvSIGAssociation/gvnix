@@ -645,7 +645,7 @@ public class ServiceLayerWSExportValidationServiceImpl implements
                     && !elementListArrayAttributeValue.getValue().isEmpty()) {
 
                 xmlTypeNameStringAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("xmlTypename"), javaType
+                        new JavaSymbolName("xmlTypeName"), javaType
                                 .getSimpleTypeName());
                 annotationAttributeValueList
                         .add(xmlTypeNameStringAttributeValue);
@@ -654,12 +654,17 @@ public class ServiceLayerWSExportValidationServiceImpl implements
             else {
                 
                 xmlTypeNameStringAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("xmlTypename"), "");
+                        new JavaSymbolName("xmlTypeName"), "");
                 annotationAttributeValueList
                         .add(xmlTypeNameStringAttributeValue);
             }
 
             annotationAttributeValueList.add(elementListArrayAttributeValue);
+
+            // Exported attribute value
+            BooleanAttributeValue exportedBooleanAttributeValue = new BooleanAttributeValue(new JavaSymbolName("exported"), false);
+
+            annotationAttributeValueList.add(exportedBooleanAttributeValue);
 
             annotationsService.addJavaTypeAnnotation(mutableTypeDetails
                     .getName(), GvNIXXmlElement.class.getName(),

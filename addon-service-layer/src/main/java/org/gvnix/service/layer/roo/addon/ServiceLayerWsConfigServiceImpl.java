@@ -1279,6 +1279,8 @@ public class ServiceLayerWsConfigServiceImpl implements
         Element packagename = pom.createElement("packagename");
         String packageName = WsdlParserUtils
                 .getTargetNamespaceRelatedPackage(rootElement);
+        
+        packageName = packageName.toLowerCase();
         packagename.setTextContent(packageName.substring(0, packageName
                 .length() - 1));
         packagenames.appendChild(packagename);

@@ -41,5 +41,7 @@ public @interface GvNIXXmlElement {
     String namespace();
 
     String[] elementList();
+    
+    boolean exported();
 
 }

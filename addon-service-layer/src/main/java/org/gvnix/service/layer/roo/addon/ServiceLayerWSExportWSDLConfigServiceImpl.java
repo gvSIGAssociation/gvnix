@@ -261,7 +261,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                                 fieldDeclaration = new FieldDeclaration(
                                         tmpFieldDeclaration.getJavaDoc(),
                                         tmpFieldDeclaration.getModifiers(),
-                                        new ArrayList<AnnotationExpr>(),
+                                        tmpFieldDeclaration.getAnnotations(),
                                         tmpFieldDeclaration.getType(),
                                         tmpFieldDeclaration.getVariables());
 
@@ -274,8 +274,9 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                                             compilationUnitServices,
                                             new HashSet<JavaSymbolName>());
 
-                                    fieldMetadataList.add(fieldMetadata);
+                                    fieldMetadata = getGvNIXXmlElementFieldAnnotation(fieldMetadata);
 
+                                    fieldMetadataList.add(fieldMetadata);
                                 }
                             }
                         }
@@ -565,6 +566,10 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                         MethodMetadata tmpMethodMetadata;
                         MethodDeclaration methodDeclaration;
 
+                        FieldMetadata fieldMetadata;
+                        FieldDeclaration tmpFieldDeclaration;
+                        FieldDeclaration fieldDeclaration;
+
                         // Extended classes.
                         List<JavaType> extendedClassesList = new ArrayList<JavaType>();
 
@@ -590,7 +595,29 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                         for (BodyDeclaration bodyDeclaration : classOrInterfaceDeclaration
                                 .getMembers()) {
 
-                            if (bodyDeclaration instanceof MethodDeclaration) {
+                            if (bodyDeclaration instanceof FieldDeclaration) {
+
+                                tmpFieldDeclaration = (FieldDeclaration) bodyDeclaration;
+                                fieldDeclaration = new FieldDeclaration(
+                                        tmpFieldDeclaration.getJavaDoc(),
+                                        tmpFieldDeclaration.getModifiers(),
+                                        new ArrayList<AnnotationExpr>(),
+                                        tmpFieldDeclaration.getType(),
+                                        tmpFieldDeclaration.getVariables());
+
+                                for (VariableDeclarator var : fieldDeclaration
+                                        .getVariables()) {
+
+                                    fieldMetadata = new JavaParserFieldMetadata(
+                                            declaredByMetadataId,
+                                            fieldDeclaration, var,
+                                            compilationUnitServices,
+                                            new HashSet<JavaSymbolName>());
+
+                                    fieldMetadataList.add(fieldMetadata);
+                                }
+
+                            } else if (bodyDeclaration instanceof MethodDeclaration) {
 
                                 methodDeclaration = (MethodDeclaration) bodyDeclaration;
 
@@ -797,26 +824,20 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
                     for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
 
-                        // TODO: New Attribute to add to XmlType name
+                        if (pair.getName().contentEquals("name")) {
 
-                        // if (pair.getName().contentEquals("name")
-                        // && !existsNameInXmlElement) {
-                        //
-                        // if (StringUtils.hasText(pair.getValue().toString()))
-                        // {
-                        //
-                        // nameStringAttributeValue = new StringAttributeValue(
-                        // new JavaSymbolName("name"),
-                        // ((StringLiteralExpr) pair.getValue())
-                        // .getValue());
-                        //
-                        // annotationAttributeValues
-                        // .add(nameStringAttributeValue);
-                        // break;
-                        // }
-                        // } else
+                            if (StringUtils.hasText(pair.getValue().toString())) {
 
-                        if (pair.getName().contentEquals("propOrder")) {
+                                nameStringAttributeValue = new StringAttributeValue(
+                                        new JavaSymbolName("xmlTypeName"),
+                                        ((StringLiteralExpr) pair.getValue())
+                                                .getValue());
+
+                                annotationAttributeValues
+                                        .add(nameStringAttributeValue);
+                                continue;
+                            }
+                        } else if (pair.getName().contentEquals("propOrder")) {
 
                             // Arraye pair.getValue();
                             ArrayInitializerExpr arrayInitializerExpr = (ArrayInitializerExpr) pair
@@ -842,7 +863,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                                     .add(elementListArrayAttributeValue);
 
                             existsPropOrder = true;
-                            break;
+                            continue;
 
                         } else if (pair.getName().contentEquals("namespace")) {
 
@@ -873,7 +894,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
         }
 
-        // TODO: Check correct values for @GvNIXXmlElement.
+        // Check correct values for @GvNIXXmlElement.
         if (!existsPropOrder) {
 
             StringAttributeValue stringAttributeValue = new StringAttributeValue(
@@ -940,6 +961,8 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                         new JavaSymbolName("namespace"), namespace);
 
                 annotationAttributeValues.add(namespaceStringAttributeValue);
+                
+                
 
             } catch (ParseException e) {
                 Assert.state(false, "Generated Xml Element service java file '"
@@ -956,6 +979,10 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
         }
 
+        // Exported attribute value
+        BooleanAttributeValue exportedBooleanAttributeValue = new BooleanAttributeValue(new JavaSymbolName("exported"), true);
+        annotationAttributeValues.add(exportedBooleanAttributeValue);
+
         // Create annotation.
         gvNIXXmlElementAnnotationMetadata = new DefaultAnnotationMetadata(
                 new JavaType(GvNIXXmlElement.class.getName()),
@@ -964,6 +991,59 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         return gvNIXXmlElementAnnotationMetadata;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Creates {@link FieldMetadata} with @GvNIXXmlElementField annotation even
+     * if not exists @XmlElement.
+     * </p>
+     */
+    public FieldMetadata getGvNIXXmlElementFieldAnnotation(
+            FieldMetadata fieldMetadata) {
+
+        FieldMetadata convertedFieldMetadata;
+        List<AnnotationMetadata> updatedAnnotationMetadataList = new ArrayList<AnnotationMetadata>();
+
+        AnnotationMetadata xmlElementAnnotation = MemberFindingUtils
+        .getAnnotationOfType(fieldMetadata.getAnnotations(), new JavaType(
+                "javax.xml.bind.annotation.XmlElement"));
+
+        AnnotationMetadata gvNIXXmlElementFieldAnnotation;
+        if (xmlElementAnnotation == null) {
+
+            gvNIXXmlElementFieldAnnotation = new DefaultAnnotationMetadata(
+                    new JavaType(GvNIXXmlElementField.class.getName()),
+                    new ArrayList<AnnotationAttributeValue<?>>());
+        }
+        else {
+
+            List<JavaSymbolName> annotationAttributeNames = xmlElementAnnotation.getAttributeNames();
+            
+            AnnotationAttributeValue<?> tmpAnnotationAttributeValue;
+            List<AnnotationAttributeValue<?>> gvNIXXmlElementFieldAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+
+            for (JavaSymbolName javaSymbolName : annotationAttributeNames) {
+                tmpAnnotationAttributeValue = xmlElementAnnotation.getAttribute(javaSymbolName);
+                gvNIXXmlElementFieldAttributes.add(tmpAnnotationAttributeValue);
+            }
+            
+            gvNIXXmlElementFieldAnnotation = new DefaultAnnotationMetadata(
+                    new JavaType(GvNIXXmlElementField.class.getName()),
+                    gvNIXXmlElementFieldAttributes);
+        }
+        
+        updatedAnnotationMetadataList.add(gvNIXXmlElementFieldAnnotation);
+
+        // Create new Field with GvNIXAnnotation.
+        convertedFieldMetadata = new DefaultFieldMetadata(fieldMetadata
+                .getDeclaredByMetadataId(), fieldMetadata.getModifier(),
+                fieldMetadata.getFieldName(), fieldMetadata.getFieldType(),
+                fieldMetadata.getFieldInitializer(),
+                updatedAnnotationMetadataList);
+        
+        return convertedFieldMetadata;
+    }
     /**
      * {@inheritDoc}
      */

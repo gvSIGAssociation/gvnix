@@ -87,10 +87,13 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
         File file = fileEvent.getFileDetails().getFile();
 
-        if (fileEvent.getOperation().compareTo(FileOperation.MONITORING_START) == 0) {
+        if (file.getAbsolutePath().contains(this.generateSourcesDirectory)
+                && !file.isDirectory()) {
 
-            if (file.getAbsolutePath().contains(this.generateSourcesDirectory)
-                    && !file.isDirectory()) {
+            if ((fileEvent.getOperation().compareTo(FileOperation.MONITORING_START) == 0)
+                    || (fileEvent.getOperation().compareTo(FileOperation.CREATED) == 0)
+                    || (fileEvent.getOperation().compareTo(
+                            FileOperation.UPDATED) == 0)) {
 
                 // Parse Java file.
                 CompilationUnit unit;
