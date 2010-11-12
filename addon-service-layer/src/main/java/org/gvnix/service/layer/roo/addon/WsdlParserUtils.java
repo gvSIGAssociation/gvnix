@@ -19,11 +19,15 @@
 package org.gvnix.service.layer.roo.addon;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
-import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
@@ -35,10 +39,6 @@ import org.w3c.dom.Element;
  * Compatible address should be SOAP protocol version 1.1 and 1.2.
  * </p>
  * 
- * <p>
- * Compatible namespace protocol should be nothing, http or urn.
- * </p>
- * 
  * @author Mario Martínez Sánchez( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -46,6 +46,7 @@ import org.w3c.dom.Element;
  */
 public class WsdlParserUtils {
 
+    /** Compatible SOAP 1.1 and SOAP 1.2 namespaces **/
     public static final String SOAP_11_NAMESPACE = "http://schemas.xmlsoap.org/wsdl/soap/";
     public static final String SOAP_11_NAMESPACE_WITHOUT_SLASH = SOAP_11_NAMESPACE
 	    .substring(0, SOAP_11_NAMESPACE.length() - 1);
@@ -53,22 +54,54 @@ public class WsdlParserUtils {
     public static final String SOAP_12_NAMESPACE_WITHOUT_SLASH = SOAP_12_NAMESPACE
 	    .substring(0, SOAP_12_NAMESPACE.length() - 1);
 
-    public static final String HTTP_PROTOCOL_PREFIX = "http://";
-    public static final String WWW_PROTOCOL_PREFIX = "www.";
-    public static final String URN_PROTOCOL_PREFIX = "urn:";
     public static final String XML_NAMESPACE_PREFIX = "xmlns:";
+    
+    /** Character separators in different strings **/
     public static final String NAMESPACE_SEPARATOR = ":";
-    public static final String URL_SEPARATOR = "/";
     public static final String FILE_SEPARATOR = File.separator;
-    public static final String DOMAIN_SEPARATOR = ".";
     public static final String XPATH_SEPARATOR = "/";
     public static final String PACKAGE_SEPARATOR = ".";
-    public static final String PORT_SEPARATOR = ":";
+
+    /** Tokens in a namespace that are treated as package name part separators. */
+    public static final char[] pkgSeparators = {'.', ':'};
+
+    /** Field javaPkgSeparator */
+    public static final char javaPkgSeparator = pkgSeparators[0];
     
+    /**
+     * These are java keywords as specified at the following URL (sorted alphabetically).
+     * http://java.sun.com/docs/books/jls/second_edition/html/lexical.doc.html#229308
+     * Note that false, true, and null are not strictly keywords; they are literal values,
+     * but for the purposes of this array, they can be treated as literals.
+     *    ****** PLEASE KEEP THIS LIST SORTED IN ASCENDING ORDER ******
+     */
+    public static final String keywords[] =
+    {
+        "abstract",  "assert",       "boolean",    "break",      "byte",      "case",
+        "catch",     "char",         "class",      "const",     "continue",
+        "default",   "do",           "double",     "else",      "extends",
+        "false",     "final",        "finally",    "float",     "for",
+        "goto",      "if",           "implements", "import",    "instanceof",
+        "int",       "interface",    "long",       "native",    "new",
+        "null",      "package",      "private",    "protected", "public",
+        "return",    "short",        "static",     "strictfp",  "super",
+        "switch",    "synchronized", "this",       "throw",     "throws",
+        "transient", "true",         "try",        "void",      "volatile",
+        "while"
+    };
+
+    /** Collator for comparing the strings */
+    public static final Collator englishCollator = Collator.getInstance(Locale.ENGLISH);
+
+    /** Use this character as suffix */
+    public static final char keywordPrefix = '_';
+
+    /** Path to client generated sources (axis and cxf) **/
     public static final String TARGET_GENERATED_SOURCES_PATH = "."
 	    + FILE_SEPARATOR + "target" + FILE_SEPARATOR + "generated-sources"
 	    + FILE_SEPARATOR + "client";
 
+    /** WSDL element names used **/
     public static final String DEFINITIONS_ELEMENT = "definitions";
     public static final String BINDING_ELEMENT = "binding";
     public static final String PORT_TYPE_ELEMENT = "portType";
@@ -76,12 +109,14 @@ public class WsdlParserUtils {
     public static final String PORT_ELEMENT = "port";
     public static final String ADDRESS_ELEMENT = "address";
 
+    /** WSDL attribute names used **/
     public static final String TARGET_NAMESPACE_ATTRIBUTE = "targetNamespace";
     public static final String NAME_ATTRIBUTE = "name";
     public static final String BINDING_ATTRIBUTE = "binding";
     public static final String TYPE_ATTRIBUTE = "type";
     public static final String STYLE_ATTRIBUTE = "style";
 
+    /** WSDL xpaths used **/
     public static final String BINDINGS_XPATH = XPATH_SEPARATOR
 	    + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + BINDING_ELEMENT;
     public static final String PORT_TYPES_XPATH = XPATH_SEPARATOR
@@ -98,8 +133,8 @@ public class WsdlParserUtils {
      * Constructs a valid java package path from target namespace of root wsdl.
      * 
      * <p>
-     * Package ends with the package separator. If target namespace has not a
-     * compatible prefix, empty string will be returned.
+     * Package ends with the package separator. Related package is different
+     * when web service is rpc encoded or not.
      * </p>
      * 
      * @param root
@@ -110,87 +145,197 @@ public class WsdlParserUtils {
 
 	Assert.notNull(root, "Wsdl root element required");
 
-	// Get the namespace attribute from root wsdl in lower case
+	// Get the namespace attribute from root wsdl
 	String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
+	Assert.hasText(namespace, "Namespace has no text");
 
-	// Namespace separators
-	String separator1 = null;
-	String separator2 = null;
-	String separator3 = null;
+	String pkg = "";
+	if (isRpcEncoded(root)) {
 
-	if (namespace.startsWith(HTTP_PROTOCOL_PREFIX)) {
+	    // Axis package format
+	    pkg = getTargetNamespaceRelatedPackage(namespace);
 
-	    // Remove http prefix and final url separator from namespace
-	    namespace = namespace.substring(HTTP_PROTOCOL_PREFIX.length());
-	    if (namespace.endsWith(URL_SEPARATOR)) {
+	} else {
 
-		namespace = namespace.substring(0, namespace.length() - 1);
-	    }
-	    
-	    // Remove www prefix
-	    if (namespace.startsWith(WWW_PROTOCOL_PREFIX)) {
-		
-		namespace = namespace.substring(WWW_PROTOCOL_PREFIX.length());
-	    }
-
-	    separator1 = URL_SEPARATOR;
-	    separator2 = DOMAIN_SEPARATOR;
-	    separator3 = PORT_SEPARATOR;
-	    
-	} else if (namespace.startsWith(URN_PROTOCOL_PREFIX)) {
-
-	    // Remove urn prefix from namespace
-	    namespace = namespace.substring(URN_PROTOCOL_PREFIX.length());
-
-	    separator1 = ":";
-	    separator2 = "-";
+	    // Axis package in lower case and replacing slash with u letter.
+	    pkg = getTargetNamespaceRelatedPackage(namespace).toLowerCase();
+	    pkg = pkg.replace('_', 'u');
 	}
 
-	// Revert namespace and replace url and domain with package separator
+	return pkg.concat(".");
+    }
+
+    /**
+     * Constructs a valid java package path from a namespace.
+     * 
+     * <p>
+     * Package ends with the package separator. If target namespace has not a
+     * compatible prefix, empty string will be returned.
+     * </p>
+     * 
+     * @param namespace
+     *            Name space
+     * @return Equivalent java package or empty
+     */
+    private static String getTargetNamespaceRelatedPackage(String namespace) {
+
+	return normalizePackageName((String) makePackageName(namespace),
+		javaPkgSeparator);
+    }
+
+    /**
+     * Method normalizePackageName.
+     * 
+     * @param pkg
+     * @param separator
+     * @return
+     */
+    private static String normalizePackageName(String pkg, char separator) {
+
+	for (int i = 0; i < pkgSeparators.length; i++) {
+	    pkg = pkg.replace(pkgSeparators[i], separator);
+	}
+
+	return pkg;
+    }
+
+    /**
+     * Method makePackageName.
+     * 
+     * @param namespace
+     * @return
+     */
+    public static String makePackageName(String namespace) {
+
+	String hostname = null;
 	String path = "";
 
-	// Url tokens
-	StringTokenizer urlTokens = new StringTokenizer(namespace, separator1);
-	if (urlTokens.hasMoreTokens()) {
-	    
-	    String urlToken = urlTokens.nextToken();
-	    
-	    // Port tokens
-	    StringTokenizer portTokens = null;
-	    if (separator3 != null) {
+	// get the target namespace of the document
+	try {
 
-		// First token is domain and second one the port
-		portTokens = new StringTokenizer(urlToken,
-			separator3);
-		urlToken = portTokens.nextToken();
+	    URL u = new URL(namespace);
+	    hostname = u.getHost();
+	    path = u.getPath();
+
+	} catch (MalformedURLException e) {
+
+	    if (namespace.indexOf(":") > -1) {
+
+		hostname = namespace.substring(namespace.indexOf(":") + 1);
+		if (hostname.indexOf("/") > -1) {
+
+		    hostname = hostname.substring(0, hostname.indexOf("/"));
+		}
+	    } else {
+
+		hostname = namespace;
 	    }
+	}
 
-	    // Domain is the first token of the Url
-	    StringTokenizer domainTokens = new StringTokenizer(urlToken,
-		    separator2);
-	    while (domainTokens.hasMoreTokens()) {
+	// if we didn't file a hostname, bail
+	if (hostname == null) {
+	    return null;
+	}
 
-		path = domainTokens.nextToken().replaceAll("[^a-zA-Z0-9$]", "_") + PACKAGE_SEPARATOR + path;
-	    }
+	// convert illegal java identifier
+	hostname = hostname.replace('-', '_');
+	path = path.replace('-', '_');
 
-	    // Port token
-	    if (separator3 != null) {
-		while (portTokens.hasMoreTokens()) {
-		    
-		    path = path + "_"
-			    + portTokens.nextToken().replaceAll(
-				    "[^a-zA-Z0-9$]", "_") + PACKAGE_SEPARATOR;
+	// chomp off last forward slash in path, if necessary
+	if ((path.length() > 0) && (path.charAt(path.length() - 1) == '/')) {
+	    path = path.substring(0, path.length() - 1);
+	}
+
+	// tokenize the hostname and reverse it
+	StringTokenizer st = new StringTokenizer(hostname, ".:");
+	String[] words = new String[st.countTokens()];
+
+	for (int i = 0; i < words.length; ++i) {
+	    words[i] = st.nextToken();
+	}
+
+	StringBuffer sb = new StringBuffer(namespace.length());
+
+	for (int i = words.length - 1; i >= 0; --i) {
+	    addWordToPackageBuffer(sb, words[i], (i == words.length - 1));
+	}
+
+	// tokenize the path
+	StringTokenizer st2 = new StringTokenizer(path, "/");
+
+	while (st2.hasMoreTokens()) {
+	    addWordToPackageBuffer(sb, st2.nextToken(), false);
+	}
+
+	return sb.toString();
+    }
+
+    /**
+     * Massage word into a form suitable for use in a Java package name.
+     * 
+     * <p>
+     * Append it to the target string buffer with a <tt>.</tt> delimiter if
+     * <tt>word</tt> is not the first word in the package name.
+     * </p>
+     * 
+     * @param sb
+     *            the buffer to append to
+     * @param word
+     *            the word to append
+     * @param firstWord
+     *            a flag indicating whether this is the first word
+     */
+    private static void addWordToPackageBuffer(StringBuffer sb, String word,
+	    boolean firstWord) {
+
+	if (isJavaKeyword(word)) {
+	    word = makeNonJavaKeyword(word);
+	}
+
+	// separate with dot after the first word
+	if (!firstWord) {
+	    sb.append('.');
+	}
+
+	// prefix digits with underscores
+	if (Character.isDigit(word.charAt(0))) {
+	    sb.append('_');
+	}
+
+	// replace periods with underscores
+	if (word.indexOf('.') != -1) {
+	    char[] buf = word.toCharArray();
+
+	    for (int i = 0; i < word.length(); i++) {
+		if (buf[i] == '.') {
+		    buf[i] = '_';
 		}
 	    }
 
-	    // Url tokens
-	    while (urlTokens.hasMoreTokens()) {
-
-		path = path + urlTokens.nextToken().replaceAll("[^a-zA-Z0-9$]", "_") + PACKAGE_SEPARATOR;
-	    }
+	    word = new String(buf);
 	}
 
-	return path;
+	sb.append(word);
+    }
+
+    /**
+     * Checks if the input string is a valid java keyword.
+     * 
+     * @return boolean true/false
+     */
+    public static boolean isJavaKeyword(String keyword) {
+	return (Arrays.binarySearch(keywords, keyword, englishCollator) >= 0);
+    }
+
+    /**
+     * Turn a java keyword string into a non-Java keyword string.
+     * 
+     * <p>
+     * Right now this simply means appending an underscore.
+     * </p>
+     */
+    public static String makeNonJavaKeyword(String keyword) {
+	return keywordPrefix + keyword;
     }
 
     /**
@@ -311,8 +456,6 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Wsdl root element
-     * @param type
-     *            Communication sense type
      * @return Path to the class
      */
     public static String getPortTypeClassPath(Element root) {
@@ -334,15 +477,11 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Wsdl root element
-     * @param type
-     *            Communication sense type
-     * @param type
-     *            Communication sense type
      * @return Java file
      */
-    public static File getPortTypeJavaFile(Element root, CommunicationSense type) {
+    public static File getPortTypeJavaFile(Element root) {
 
-	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root)), type);
+	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root)));
     }
 
     /**
@@ -365,7 +504,7 @@ public class WsdlParserUtils {
      * @param path Searched path
      * @return File to path
      */
-    private static File getGeneratedJavaFile(String path, CommunicationSense type) {
+    private static File getGeneratedJavaFile(String path) {
 	
 	Assert.hasText(path, "Text in path required");
 

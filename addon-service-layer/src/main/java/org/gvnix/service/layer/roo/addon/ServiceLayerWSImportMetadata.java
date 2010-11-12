@@ -178,7 +178,7 @@ public class ServiceLayerWSImportMetadata extends
 	String portName = WsdlParserUtils.findFirstCompatiblePortClassName(root);
 
 	// Get the port type Java file
-	File file = WsdlParserUtils.getPortTypeJavaFile(root, sense);
+	File file = WsdlParserUtils.getPortTypeJavaFile(root);
 
 	// Parse the port type Java file
 	CompilationUnit unit = JavaParser.parse(file);
