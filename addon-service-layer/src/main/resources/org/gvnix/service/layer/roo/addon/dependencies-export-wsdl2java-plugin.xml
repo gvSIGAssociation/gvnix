@@ -18,6 +18,9 @@
       </goals>
       <configuration>
         <sourceRoot>${basedir}/target/generated-sources/cxf/server</sourceRoot>
+        <defaultOptions>
+            <extendedSoapHeaders>true</extendedSoapHeaders>
+        </defaultOptions>
         <wsdlOptions>
           <wsdlOption>
             <wsdl></wsdl>

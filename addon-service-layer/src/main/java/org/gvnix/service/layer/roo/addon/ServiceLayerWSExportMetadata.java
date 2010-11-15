@@ -146,6 +146,12 @@ public class ServiceLayerWSExportMetadata extends
 
             annotationAttributeValueList.add(serviceNameAttributeValue);
 
+            StringAttributeValue portNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("portName"), nameAttributeValue
+                            .getValue());
+
+            annotationAttributeValueList.add(portNameAttributeValue);
+
             return new DefaultAnnotationMetadata(javaType,
                     annotationAttributeValueList);
         }
@@ -227,6 +233,8 @@ public class ServiceLayerWSExportMetadata extends
 
         List<AnnotationAttributeValue<?>> annotationAttributeValueList;
 
+        AnnotationAttributeValue<?> tmpAnnotationAttributeValue;
+
         // javax.jws.WebMethod
         annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
@@ -235,8 +243,21 @@ public class ServiceLayerWSExportMetadata extends
 
         annotationAttributeValueList.add(operationNameAttributeValue);
 
-        StringAttributeValue actionAttribuetValue = new StringAttributeValue(
-                new JavaSymbolName("action"), "");
+        // Check if exists action attribute defined.
+        tmpAnnotationAttributeValue = methodAnnotation
+                .getAttribute(new JavaSymbolName("action"));
+
+        StringAttributeValue actionAttribuetValue;
+        if (tmpAnnotationAttributeValue != null) {
+            actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
+                    "action"),
+                    ((StringAttributeValue) tmpAnnotationAttributeValue)
+                            .getValue());
+        } else {
+            actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
+                    "action"), "");
+        }
+
         annotationAttributeValueList.add(actionAttribuetValue);
 
         BooleanAttributeValue excludeAttribuetValue = new BooleanAttributeValue(

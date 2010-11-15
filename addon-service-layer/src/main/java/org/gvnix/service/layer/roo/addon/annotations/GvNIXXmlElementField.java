@@ -41,6 +41,8 @@ public @interface GvNIXXmlElementField {
     java.lang.String namespace() default "##default";
 
     boolean nillable() default false;
+    
+    boolean required() default false;
 
     Class<?> type() default Object.class;
 }

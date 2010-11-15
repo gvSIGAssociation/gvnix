@@ -1356,6 +1356,23 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         gvNIXWEbMethodAnnotationAttributeValues
                 .add(operationNameStringAttributeValue);
 
+        // Check if exists action attribute value.
+        tmpAttributeValue = webMethodAnnotation
+                .getAttribute(new JavaSymbolName("action"));
+
+        StringAttributeValue actionAttributeValue;
+        if (tmpAttributeValue != null) {
+            actionAttributeValue = new StringAttributeValue(new JavaSymbolName(
+                    "action"),
+                    ((StringAttributeValue) tmpAttributeValue)
+                            .getValue());
+        } else {
+            actionAttributeValue = new StringAttributeValue(new JavaSymbolName(
+                    "action"), "");
+        }
+
+        gvNIXWEbMethodAnnotationAttributeValues.add(actionAttributeValue);
+        
         // @javax.jws.WebResult
         AnnotationMetadata webResultAnnotation = MemberFindingUtils
                 .getAnnotationOfType(methodAnnotations, new JavaType(

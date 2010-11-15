@@ -39,6 +39,8 @@ public @interface GvNIXWebMethod {
 
     Class<?> webResultType();
 
+    String action() default "";
+
     String resultName() default "return";
 
     String resultNamespace() default "";
