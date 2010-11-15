@@ -1256,6 +1256,14 @@ public class ServiceLayerWsConfigServiceImpl implements
                 .setTextContent("${basedir}/target/generated-sources/cxf/server");
         configuration.appendChild(sourceRoot);
 
+        // Soap Headers
+        Element defaultOptions = pom.createElement("defaultOptions");
+
+        Element extendedSoapHeaders = pom.createElement("extendedSoapHeaders");
+        extendedSoapHeaders.setTextContent("true");
+        defaultOptions.appendChild(extendedSoapHeaders);
+        configuration.appendChild(defaultOptions);
+        
         Element wsdlOptions = pom.createElement("wsdlOptions");
         configuration.appendChild(wsdlOptions);
 
