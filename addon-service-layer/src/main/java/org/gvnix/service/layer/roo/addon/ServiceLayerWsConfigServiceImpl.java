@@ -1462,11 +1462,12 @@ public class ServiceLayerWsConfigServiceImpl implements
 
 	} catch (IOException e) {
 
-	    logger.log(Level.WARNING,
+	    throw new IllegalStateException(
 		    "There is no connection to the web service to import");
+
 	} catch (SAXException e) {
 
-	    Assert.state(false,
+	    throw new IllegalStateException(
 		    "The format of the web service to import has errors");
 	}
 

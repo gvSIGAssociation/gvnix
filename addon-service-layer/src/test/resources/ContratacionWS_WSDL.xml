@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions targetNamespace="https://admin.contratapre.gva.es/WebContrataEP/services/ContratacionWS" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="https://admin.contratapre.gva.es/WebContrataEP/services/ContratacionWS" xmlns:intf="https://admin.contratapre.gva.es/WebContrataEP/services/ContratacionWS" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+
+   <message name="suspensionWSRequest">
+
+      <part name="xmlDatosSuspension" type="soapenc:string"/>
+
+   </message>
+
+   <message name="correcionWSResponse">
+
+   </message>
+
+   <message name="desistimientoWSResponse">
+
+   </message>
+
+   <message name="desistimientoWSRequest">
+
+      <part name="xmlDatosDesistimiento" type="soapenc:string"/>
+
+   </message>
+
+   <message name="publicacionWSRequest">
+
+      <part name="xmlDatosPublicacion" type="soapenc:string"/>
+
+   </message>
+
+   <message name="adjudicacionWSResponse">
+
+   </message>
+
+   <message name="publicacionWSResponse">
+
+   </message>
+
+   <message name="desiertoWSResponse">
+
+   </message>
+
+   <message name="suspensionWSResponse">
+
+   </message>
+
+   <message name="desiertoWSRequest">
+
+      <part name="xmlDatosDesierto" type="soapenc:string"/>
+
+   </message>
+
+   <message name="adjudicacionWSRequest">
+
+      <part name="xmlDatosAdjudicacion" type="soapenc:string"/>
+
+   </message>
+
+   <message name="correcionWSRequest">
+
+      <part name="xmlDatosCorrecion" type="soapenc:string"/>
+
+   </message>
+
+   <portType name="ContratacionWS">
+
+      <operation name="publicacionWS" parameterOrder="xmlDatosPublicacion">
+
+         <input message="impl:publicacionWSRequest" name="publicacionWSRequest"/>
+
+         <output message="impl:publicacionWSResponse" name="publicacionWSResponse"/>
+
+      </operation>
+
+      <operation name="correcionWS" parameterOrder="xmlDatosCorrecion">
+
+         <input message="impl:correcionWSRequest" name="correcionWSRequest"/>
+
+         <output message="impl:correcionWSResponse" name="correcionWSResponse"/>
+
+      </operation>
+
+      <operation name="adjudicacionWS" parameterOrder="xmlDatosAdjudicacion">
+
+         <input message="impl:adjudicacionWSRequest" name="adjudicacionWSRequest"/>
+
+         <output message="impl:adjudicacionWSResponse" name="adjudicacionWSResponse"/>
+
+      </operation>
+
+      <operation name="desiertoWS" parameterOrder="xmlDatosDesierto">
+
+         <input message="impl:desiertoWSRequest" name="desiertoWSRequest"/>
+
+         <output message="impl:desiertoWSResponse" name="desiertoWSResponse"/>
+
+      </operation>
+
+      <operation name="suspensionWS" parameterOrder="xmlDatosSuspension">
+
+         <input message="impl:suspensionWSRequest" name="suspensionWSRequest"/>
+
+         <output message="impl:suspensionWSResponse" name="suspensionWSResponse"/>
+
+      </operation>
+
+      <operation name="desistimientoWS" parameterOrder="xmlDatosDesistimiento">
+
+         <input message="impl:desistimientoWSRequest" name="desistimientoWSRequest"/>
+
+         <output message="impl:desistimientoWSResponse" name="desistimientoWSResponse"/>
+
+      </operation>
+
+   </portType>
+
+   <binding name="ContratacionWSSoapBinding" type="impl:ContratacionWS">
+
+      <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <operation name="publicacionWS">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <input name="publicacionWSRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://contrata.everis.es" use="encoded"/>
+
+         </input>
+
+         <output name="publicacionWSResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://admin.contratapre.gva.es/WebContrataEP/services/ContratacionWS" use="encoded"/>
+
+         </output>
+
+      </operation>
+
+      <operation name="correcionWS">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <input name="correcionWSRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://contrata.everis.es" use="encoded"/>
+
+         </input>
+
+         <output name="correcionWSResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://admin.contratapre.gva.es/WebContrataEP/services/ContratacionWS" use="encoded"/>
+
+         </output>
+
+      </operation>
+
+      <operation name="adjudicacionWS">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <input name="adjudicacionWSRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://contrata.everis.es" use="encoded"/>
+
+         </input>
+
+         <output name="adjudicacionWSResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://admin.contratapre.gva.es/WebContrataEP/services/ContratacionWS" use="encoded"/>
+
+         </output>
+
+      </operation>
+
+      <operation name="desiertoWS">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <input name="desiertoWSRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://contrata.everis.es" use="encoded"/>
+
+         </input>
+
+         <output name="desiertoWSResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://admin.contratapre.gva.es/WebContrataEP/services/ContratacionWS" use="encoded"/>
+
+         </output>
+
+      </operation>
+
+      <operation name="suspensionWS">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <input name="suspensionWSRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://contrata.everis.es" use="encoded"/>
+
+         </input>
+
+         <output name="suspensionWSResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://admin.contratapre.gva.es/WebContrataEP/services/ContratacionWS" use="encoded"/>
+
+         </output>
+
+      </operation>
+
+      <operation name="desistimientoWS">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <input name="desistimientoWSRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://contrata.everis.es" use="encoded"/>
+
+         </input>
+
+         <output name="desistimientoWSResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="https://admin.contratapre.gva.es/WebContrataEP/services/ContratacionWS" use="encoded"/>
+
+         </output>
+
+      </operation>
+
+   </binding>
+
+   <service name="ContratacionWSService">
+
+      <port binding="impl:ContratacionWSSoapBinding" name="ContratacionWS">
+
+         <wsdlsoap:address location="https://admin.contratapre.gva.es/WebContrataEP/services/ContratacionWS"/>
+
+      </port>
+
+   </service>
+
+</definitions>

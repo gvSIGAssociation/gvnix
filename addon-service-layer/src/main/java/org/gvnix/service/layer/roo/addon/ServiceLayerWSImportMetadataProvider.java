@@ -188,13 +188,12 @@ public class ServiceLayerWSImportMetadataProvider extends
 		
 	    } catch (SAXException e) {
 
-		Assert.state(false,
+		throw new IllegalStateException(
 			"The format of the web service to import has errors");
 
-	    } 
-	    catch (IOException e) {
+	    } catch (IOException e) {
 
-		logger.log(Level.WARNING,
+		throw new IllegalStateException(
 			"There is no connection to the web service to import");
 	    }
 	}

@@ -105,6 +105,9 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy20 --wsdl http://this.location/not/exists
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy21 --wsdl file:/this/location/not/exists
 
+// [ERROR] No wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy22 --wsdl http://www.google.es
+
 // [ERROR] Required parameters not specified
 service import ws --class --wsdl fdfsdfsd
 service import ws --class dsadasd --wsdl
@@ -113,6 +116,7 @@ service import ws --class --wsdl
 // [CORRECT] Local WSDL files placed into src/test/resource relative path
 service import ws --class ~.services.ClaseProxy30 --wsdl file:src/test/resources/WSAuth.wsdl
 service import ws --class ~.services.ClaseProxy31 --wsdl file:src/test/resources/SimacServiciosListener.jws.xml
+service import ws --class ~.services.ClaseProxy32 --wsdl file:src/test/resources/ContratacionWS_WSDL.xml
 
 // [CORRECT] Export WSDL 2 Java
 service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
