@@ -111,8 +111,9 @@ public interface ServiceLayerWsConfigService {
      *            WSDL file location
      * @param type
      *            Communication sense type
+     * @return wsdl location added, or false if already exists
      */
-    public void addImportLocation(String wsdlLocation, CommunicationSense type);
+    public boolean addImportLocation(String wsdlLocation, CommunicationSense type);
 
     /**
      * Add a wsdl location to export.
@@ -136,8 +137,9 @@ public interface ServiceLayerWsConfigService {
      *            contract wsdl url to import
      * @param type
      *            Communication sense type
+     * @return wsdl location added, or false if already exists
      */
-    public void importService(JavaType className, String wsdlLocation,
+    public boolean importService(JavaType className, String wsdlLocation,
             CommunicationSense type);
 
     /**

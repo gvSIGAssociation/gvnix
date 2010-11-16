@@ -1127,23 +1127,23 @@ public class ServiceLayerWsConfigServiceImpl implements
      * plugin configuration not exists, it will be created.
      * </p>
      */
-    public void addImportLocation(String wsdlLocation, CommunicationSense type) {
+    public boolean addImportLocation(String wsdlLocation, CommunicationSense type) {
+	
+	boolean added;
 
         // Project properties to pom.xml
         addProjectProperties(type);
-
-        switch (type) {
-
-        case IMPORT:
-
-            addImportLocationDocument(wsdlLocation);
-            break;
-
-        case IMPORT_RPC_ENCODED:
-
-            addImportLocationRpc(wsdlLocation);
-            break;
+        
+        if (CommunicationSense.IMPORT_RPC_ENCODED.equals(type)) {
+            
+            added = addImportLocationRpc(wsdlLocation);
         }
+        else {
+            
+            added = addImportLocationDocument(wsdlLocation);
+        }
+        
+        return added;
     }
 
     /**
@@ -1341,7 +1341,7 @@ public class ServiceLayerWsConfigServiceImpl implements
      * @param wsdlLocation
      *            WSDL file location
      */
-    private void addImportLocationDocument(String wsdlLocation) {
+    private boolean addImportLocationDocument(String wsdlLocation) {
 
         // Get plugin template
         Element plugin = XmlUtils.findFirstElement("/codegen-plugin/plugin",
@@ -1378,58 +1378,73 @@ public class ServiceLayerWsConfigServiceImpl implements
         Assert
                 .notNull(codegenWsPlugin,
                         "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+        
+	// The wsdl location already exists ?
+	Element wsdlLocationElement = XmlUtils.findFirstElement(
+		"executions/execution/configuration/wsdlOptions/wsdlOption[wsdl='"
+			+ wsdlLocation + "']", codegenWsPlugin);
 
-        // Access executions > execution > configuration > sourceRoot, wsdlOptions and defaultOptions.
-        // Configuration, sourceRoot, wsdlOptions and defaultOptions are created if not exists.
-        Element executions = XmlUtils.findFirstElementByName("executions",
-                codegenWsPlugin);
-        Element execution = XmlUtils.findFirstElementByName("execution",
-                executions);
-        Element configuration = XmlUtils.findFirstElementByName(
-                "configuration", execution);
-        if (configuration == null) {
+	// If location already added on plugin, do nothing
+	if (wsdlLocationElement != null) {
 
-            configuration = pom.createElement("configuration");
-            execution.appendChild(configuration);
-        }
+	    return false;
+	}
+
+	// Access executions > execution > configuration > sourceRoot,
+	// wsdlOptions and defaultOptions.
+	// Configuration, sourceRoot, wsdlOptions and defaultOptions are
+	// created if not exists.
+	Element executions = XmlUtils.findFirstElementByName("executions",
+		codegenWsPlugin);
+	Element execution = XmlUtils.findFirstElementByName("execution",
+		executions);
+	Element configuration = XmlUtils.findFirstElementByName(
+		"configuration", execution);
+	if (configuration == null) {
+
+	    configuration = pom.createElement("configuration");
+	    execution.appendChild(configuration);
+	}
 	Element sourceRoot = XmlUtils.findFirstElementByName("sourceRoot",
 		configuration);
 	if (sourceRoot == null) {
-	    
+
 	    sourceRoot = pom.createElement("sourceRoot");
 	    sourceRoot
 		    .setTextContent("${basedir}/target/generated-sources/client");
 	    configuration.appendChild(sourceRoot);
 	}
-        Element defaultOptions = XmlUtils.findFirstElementByName("defaultOptions",
-                configuration);
-        if (defaultOptions == null) {
+	Element defaultOptions = XmlUtils.findFirstElementByName(
+		"defaultOptions", configuration);
+	if (defaultOptions == null) {
 
-            defaultOptions = pom.createElement("defaultOptions");
-            configuration.appendChild(defaultOptions);
-            
-            Element extendedSoapHeaders = pom.createElement("extendedSoapHeaders");
-            extendedSoapHeaders.setTextContent("true");
-            defaultOptions.appendChild(extendedSoapHeaders);
-        }
-        Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
-                configuration);
-        if (wsdlOptions == null) {
+	    defaultOptions = pom.createElement("defaultOptions");
+	    configuration.appendChild(defaultOptions);
 
-            wsdlOptions = pom.createElement("wsdlOptions");
-            configuration.appendChild(wsdlOptions);
-        }
+	    Element extendedSoapHeaders = pom
+		    .createElement("extendedSoapHeaders");
+	    extendedSoapHeaders.setTextContent("true");
+	    defaultOptions.appendChild(extendedSoapHeaders);
+	}
+	Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
+		configuration);
+	if (wsdlOptions == null) {
 
-        // Create new wsdl element and append it to the XML tree
-        Element wsdlOption = pom.createElement("wsdlOption");
-        Element wsdl = pom.createElement("wsdl");
-        wsdl.setTextContent(wsdlLocation);
-        wsdlOption.appendChild(wsdl);
+	    wsdlOptions = pom.createElement("wsdlOptions");
+	    configuration.appendChild(wsdlOptions);
+	}
 
-        // Add the package name to generate sources
+	// Create new wsdl element and append it to the XML tree
+	Element wsdlOption = pom.createElement("wsdlOption");
+	Element wsdl = pom.createElement("wsdl");
+	wsdl.setTextContent(wsdlLocation);
+	wsdlOption.appendChild(wsdl);
+
+	// Add the package name to generate sources
 	try {
 
-	    // Parse the wsdl location to a DOM document to obtain the targetNamespace
+	    // Parse the wsdl location to a DOM document to obtain the
+	    // targetNamespace
 	    Document document = XmlUtils.getDocumentBuilder().parse(
 		    wsdlLocation);
 	    Element rootElement = document.getDocumentElement();
@@ -1457,8 +1472,10 @@ public class ServiceLayerWsConfigServiceImpl implements
 
 	wsdlOptions.appendChild(wsdlOption);
 
-        // Write new XML to disk
-        XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+	// Write new XML to disk
+	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+
+	return true;
     }
 
     /**
@@ -1472,7 +1489,7 @@ public class ServiceLayerWsConfigServiceImpl implements
      * @param wsdlLocation
      *            WSDL file location
      */
-    private void addImportLocationRpc(String wsdlLocation) {
+    private boolean addImportLocationRpc(String wsdlLocation) {
 
         // Get plugin template
         Element plugin = XmlUtils.findFirstElement("/axistools-plugin/plugin",
@@ -1510,45 +1527,60 @@ public class ServiceLayerWsConfigServiceImpl implements
                 .notNull(axistoolsPlugin,
                         "Axistools plugin is not defined in the pom.xml, relaunch again this command.");
 
-        // Access configuration > urls element.
-        // Configuration and urls are created if not exists.
-        Element configuration = XmlUtils.findFirstElementByName(
-                "configuration", axistoolsPlugin);
-        if (configuration == null) {
+	// The wsdl location already exists ?
+	Element wsdlLocationElement = XmlUtils.findFirstElement(
+		"configuration/urls[url='" + wsdlLocation + "']",
+		axistoolsPlugin);
 
-            configuration = pom.createElement("configuration");
-            axistoolsPlugin.appendChild(configuration);
-        }
-        Element urls = XmlUtils.findFirstElementByName("urls", configuration);
-        if (urls == null) {
+	// If location already added on plugin, do nothing
+	if (wsdlLocationElement != null) {
 
-            urls = pom.createElement("urls");
-            configuration.appendChild(urls);
-        }
+	    return false;
+	}
 
-        // Create new url element and append it to the XML tree
-        Element url = pom.createElement("url");
-        url.setTextContent(wsdlLocation);
-        urls.appendChild(url);
+	// Access configuration > urls element.
+	// Configuration and urls are created if not exists.
+	Element configuration = XmlUtils.findFirstElementByName(
+		"configuration", axistoolsPlugin);
+	if (configuration == null) {
 
-        // Write new XML to disk
-        XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+	    configuration = pom.createElement("configuration");
+	    axistoolsPlugin.appendChild(configuration);
+	}
+	Element urls = XmlUtils.findFirstElementByName("urls", configuration);
+	if (urls == null) {
+
+	    urls = pom.createElement("urls");
+	    configuration.appendChild(urls);
+	}
+
+	// Create new url element and append it to the XML tree
+	Element url = pom.createElement("url");
+	url.setTextContent(wsdlLocation);
+	urls.appendChild(url);
+
+	// Write new XML to disk
+	XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+	
+	return true;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void importService(JavaType serviceClass, String wsdlLocation,
+    public boolean importService(JavaType serviceClass, String wsdlLocation,
             CommunicationSense type) {
 
         // Install import WS configuration requirements, if not installed
         install(type);
 
         // Add wsdl location to pom.xml
-        addImportLocation(wsdlLocation, type);
+        boolean added = addImportLocation(wsdlLocation, type);
 
         // Add GvNixAnnotations to the project.
         annotationsService.addGvNIXAnnotationsDependency();
+        
+        return added;
     }
 
     /**

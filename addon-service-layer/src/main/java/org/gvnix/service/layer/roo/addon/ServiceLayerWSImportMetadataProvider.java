@@ -158,24 +158,28 @@ public class ServiceLayerWSImportMetadataProvider extends
 		Element root = wsdl.getDocumentElement();
 		Assert.notNull(root, "No valid document format");
 
+		boolean generate;
 		if (WsdlParserUtils.isRpcEncoded(root)) {
 
 		    // Generate service infraestructure to import the service
-		    serviceLayerWsConfigService.importService(
+		    generate = serviceLayerWsConfigService.importService(
 			    governorTypeDetails.getName(), url.getValue(),
 			    CommunicationSense.IMPORT_RPC_ENCODED);
 		}
 		else {
 
 		    // Generate service infraestructure to import the service
-		    serviceLayerWsConfigService.importService(
+		    generate = serviceLayerWsConfigService.importService(
 			    governorTypeDetails.getName(), url.getValue(),
 			    CommunicationSense.IMPORT);
 		}
 
-		// Generate source code client clases with Axis
-		serviceLayerWsConfigService
-			.mvn(ServiceLayerWsConfigService.GENERATE_SOURCES);
+		// Generate source code client clases if necessary
+		if (generate) {
+		    
+		    serviceLayerWsConfigService
+			    .mvn(ServiceLayerWsConfigService.GENERATE_SOURCES);
+		}
 
 		// Create metadata
 		metadata = new ServiceLayerWSImportMetadata(
