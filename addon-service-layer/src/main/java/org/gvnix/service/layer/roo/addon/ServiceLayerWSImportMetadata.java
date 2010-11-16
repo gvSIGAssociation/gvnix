@@ -151,7 +151,7 @@ public class ServiceLayerWSImportMetadata extends
      * 
      * @param root
      *            Root element of the wsdl document
-     * @param type
+     * @param sense
      *            Communication sense type
      * @throws IOException
      *             No connection to the wsdl location
@@ -164,21 +164,16 @@ public class ServiceLayerWSImportMetadata extends
 	    throws SAXException, IOException, ParseException {
 
 	// Get the path to the generated service class
-	String servicePath = WsdlParserUtils.getServiceClassPath(root);
-	if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
-	    
-	    // Rpc generated service source ends with this string
-	    servicePath = WsdlParserUtils.getServiceClassPath(root).concat("Locator");
-	}
-	
+	String servicePath = WsdlParserUtils.getServiceClassPath(root, sense);
+
 	// Get the path to the generated port type class
-	String portTypePath = WsdlParserUtils.getPortTypeClassPath(root);
+	String portTypePath = WsdlParserUtils.getPortTypeClassPath(root, sense);
 
 	// Get the the port element class name
-	String portName = WsdlParserUtils.findFirstCompatiblePortClassName(root);
+	String portName = WsdlParserUtils.findFirstCompatiblePortClassName(root, sense);
 
 	// Get the port type Java file
-	File file = WsdlParserUtils.getPortTypeJavaFile(root);
+	File file = WsdlParserUtils.getPortTypeJavaFile(root, sense);
 
 	// Parse the port type Java file
 	CompilationUnit unit = JavaParser.parse(file);

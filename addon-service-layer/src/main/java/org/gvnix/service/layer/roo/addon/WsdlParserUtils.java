@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
+import java.beans.Introspector;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
@@ -153,12 +155,12 @@ public class WsdlParserUtils {
 	if (isRpcEncoded(root)) {
 
 	    // Axis package format
-	    pkg = getTargetNamespaceRelatedPackage(namespace);
+	    pkg = getTargetNamespaceRelatedPackage(namespace, root);
 
 	} else {
 
 	    // Axis package in lower case and replacing slash with u letter.
-	    pkg = getTargetNamespaceRelatedPackage(namespace).toLowerCase();
+	    pkg = getTargetNamespaceRelatedPackage(namespace, root).toLowerCase();
 	    pkg = pkg.replace('_', 'u');
 	}
 
@@ -175,12 +177,23 @@ public class WsdlParserUtils {
      * 
      * @param namespace
      *            Name space
+     * @param root
+     *            Root element of the wsdl
      * @return Equivalent java package or empty
      */
-    private static String getTargetNamespaceRelatedPackage(String namespace) {
+    private static String getTargetNamespaceRelatedPackage(String namespace, Element root) {
 
-	return normalizePackageName((String) makePackageName(namespace),
-		javaPkgSeparator);
+	String packageName = makePackageName(namespace);
+	String pkg = normalizePackageName(packageName, javaPkgSeparator);
+	String serviceName = findFirstCompatibleServiceElementName(root);
+
+	String localName = getLocalName(serviceName);
+	if (localName.equals(packageName) && packageName.equals(pkg)) {
+	    
+	    pkg += "_pkg";
+	}
+
+	return pkg;
     }
 
     /**
@@ -435,9 +448,11 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Wsdl root element
+     * @param sense
+     *            Communication sense type
      * @return Path to the class
      */
-    public static String getServiceClassPath(Element root) {
+    public static String getServiceClassPath(Element root, CommunicationSense sense) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
@@ -445,10 +460,16 @@ public class WsdlParserUtils {
 	String path = getTargetNamespaceRelatedPackage(root);
 
 	// Find a compatible service name
-	String name = findFirstCompatibleServiceClassName(root);
+	String name = findFirstCompatibleServiceClassName(root, sense);
 
+	if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
+	    
+	    // Rpc generated service source ends with this string
+	    name = name.concat("Locator");
+	}
+	
 	// Class path is the concat of path and name
-	return path + name;
+	return path + capitalizeFirstChar(name);
     }
 
     /**
@@ -456,9 +477,11 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Wsdl root element
+     * @param sense
+     *            Communication sense type
      * @return Path to the class
      */
-    public static String getPortTypeClassPath(Element root) {
+    public static String getPortTypeClassPath(Element root, CommunicationSense sense) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
@@ -466,10 +489,10 @@ public class WsdlParserUtils {
 	String path = getTargetNamespaceRelatedPackage(root);
 
 	// Find a compatible port type name
-	String name = findFirstCompatiblePortTypeClassName(root);
+	String name = findFirstCompatiblePortTypeClassName(root, sense);
 
 	// Class path is the concat of path and name
-	return path + name;
+	return path + capitalizeFirstChar(name);
     }
     
     /**
@@ -477,11 +500,13 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Wsdl root element
+     * @param sense
+     *            Communication sense type
      * @return Java file
      */
-    public static File getPortTypeJavaFile(Element root) {
+    public static File getPortTypeJavaFile(Element root, CommunicationSense sense) {
 
-	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root)));
+	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root, sense)));
     }
 
     /**
@@ -520,10 +545,32 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Root element of wsdl
+     * @param sense
+     *            Communication sense type
      * @return First compatible service class name
      */
-    private static String findFirstCompatibleServiceClassName(Element root) {
+    private static String findFirstCompatibleServiceClassName(Element root, CommunicationSense sense) {
 
+	String name = findFirstCompatibleServiceElementName(root);
+
+	return convertNameToJavaFormat(name, sense);
+    }
+    
+    /**
+     * Find the first compatible service related element name of the root.
+     * 
+     * <p>
+     * Compatible service should be SOAP protocol version 1.1 and 1.2.
+     * </p>
+     * 
+     * @param root
+     *            Root element of wsdl
+     * @param sense
+     *            Communication sense type
+     * @return First compatible service class name
+     */
+    private static String findFirstCompatibleServiceElementName(Element root) {
+	
 	Assert.notNull(root, "Wsdl root element required");
 
 	Element port = findFirstCompatiblePort(root);
@@ -532,8 +579,8 @@ public class WsdlParserUtils {
 	Element service = ((Element) port.getParentNode());
 	String name = service.getAttribute(NAME_ATTRIBUTE);
 	Assert.hasText(name, "No name attribute in service element");
-
-	return convertNameToJavaFormat(name);
+	
+	return name;
     }
 
     /**
@@ -668,14 +715,16 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Root element of wsdl
+     * @param sense
+     *            Communication sense type
      * @return First compatible port element class name
      */
-    public static String findFirstCompatiblePortClassName(Element root) {
+    public static String findFirstCompatiblePortClassName(Element root, CommunicationSense sense) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
 	// Get the the port element name
-	return convertNameToJavaFormat(findFirstCompatiblePort(root).getAttribute(NAME_ATTRIBUTE));
+	return convertNameToJavaFormat(findFirstCompatiblePort(root).getAttribute(NAME_ATTRIBUTE), sense);
     }
 
     /**
@@ -687,9 +736,11 @@ public class WsdlParserUtils {
      * 
      * @param root
      *            Root element of wsdl
+     * @param sense
+     *            Communication sense type
      * @return First compatible port type class name
      */
-    private static String findFirstCompatiblePortTypeClassName(Element root) {
+    private static String findFirstCompatiblePortTypeClassName(Element root, CommunicationSense sense) {
 
 	Assert.notNull(root, "Wsdl root element required");
 
@@ -705,7 +756,7 @@ public class WsdlParserUtils {
 	String portTypeName = portType.getAttribute(NAME_ATTRIBUTE);
 	Assert.hasText(portTypeName, "No name attribute in port type element");
 
-	return convertNameToJavaFormat(portTypeName);
+	return convertNameToJavaFormat(portTypeName, sense);
     }
 
     /**
@@ -824,6 +875,30 @@ public class WsdlParserUtils {
      * Converts a wsdl name to a valid Java format.
      * 
      * <p>
+     * The conversion is different if RPC/Encoded communication sense.
+     * </p>
+     * 
+     * @param name
+     *            A wsdl name
+     * @param sense
+     *            Communication sense type
+     * @return Valid java name
+     */
+    private static String convertNameToJavaFormat(String name,
+	    CommunicationSense sense) {
+
+	if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)) {
+
+	    return convertRpcNameToJavaFormat(name);
+	}
+
+	return convertDocumentNameToJavaFormat(name);
+    }
+
+    /**
+     * Converts a wsdl name to a valid Java format in Document.
+     * 
+     * <p>
      * Valid chars are letters, numbers and $. '-', '_', ':' and '.' chars are
      * replaced with none. Other chars are replaced by unicode value with format
      * "_002f". New words in name always will be start by uppercase. 
@@ -833,7 +908,7 @@ public class WsdlParserUtils {
      *            A wsdl name
      * @return Valid java name
      */
-    private static String convertNameToJavaFormat(String name) {
+    private static String convertDocumentNameToJavaFormat(String name) {
 
 	Assert.notNull(name, "Name required");
 
@@ -894,7 +969,176 @@ public class WsdlParserUtils {
 
 	return (new String(ostr));
     }
-    
+
+    /**
+     * Converts a wsdl name to a valid Java format in RPC.
+     * 
+     * @param name
+     *            A wsdl name
+     * @return Valid java name
+     */
+    private static String convertRpcNameToJavaFormat(String name) {
+
+	String java = new String(name);
+
+	if (!isJavaId(java)) {
+	    java = xmlNameToJavaClass(name);
+	}
+
+	return java;
+    }
+
+    /**
+     * Returns true if the name is a valid java identifier.
+     * 
+     * @param id
+     *            to check
+     * @return boolean true/false
+     **/
+    public static boolean isJavaId(String id) {
+
+	if (id == null || id.equals("") || isJavaKeyword(id))
+	    return false;
+	if (!Character.isJavaIdentifierStart(id.charAt(0)))
+	    return false;
+	for (int i = 1; i < id.length(); i++)
+	    if (!Character.isJavaIdentifierPart(id.charAt(i)))
+		return false;
+
+	return true;
+    }
+
+    /**
+     * Map an XML name to a valid Java identifier w/ capitalized first letter.
+     * 
+     * @param name
+     * @return
+     */
+    public static String xmlNameToJavaClass(String name) {
+
+	return capitalizeFirstChar(xmlNameToJava(name));
+    }
+
+    /**
+     * Capitalize the first character of the name.
+     * 
+     * @param name
+     * @return
+     */
+    public static String capitalizeFirstChar(String name) {
+
+	if ((name == null) || name.equals("")) {
+	    return name;
+	}
+
+	char start = name.charAt(0);
+
+	if (Character.isLowerCase(start)) {
+	    start = Character.toUpperCase(start);
+
+	    return start + name.substring(1);
+	}
+
+	return name;
+    }
+
+    /**
+     * Map an XML name to a Java identifier per the mapping rules of JSR 101 (in
+     * version 1.0 this is "Chapter 20: Appendix: Mapping of XML Names"
+     * 
+     * @param name
+     *            is the xml name
+     * @return the java name per JSR 101 specification
+     */
+    public static String xmlNameToJava(String name) {
+	
+	// protect ourselves from garbage
+	if (name == null || name.equals(""))
+	    return name;
+
+	char[] nameArray = name.toCharArray();
+	int nameLen = name.length();
+	StringBuffer result = new StringBuffer(nameLen);
+	boolean wordStart = false;
+
+	// The mapping indicates to convert first character.
+	int i = 0;
+	while (i < nameLen
+		&& (isPunctuation(nameArray[i]) || !Character
+			.isJavaIdentifierStart(nameArray[i]))) {
+	    i++;
+	}
+	if (i < nameLen) {
+	    // Decapitalization code used to be here, but we use the
+	    // Introspector function now after we filter out all bad chars.
+
+	    result.append(nameArray[i]);
+	    // wordStart = !Character.isLetter(nameArray[i]);
+	    wordStart = !Character.isLetter(nameArray[i])
+		    && nameArray[i] != "_".charAt(0);
+	} else {
+	    // The identifier cannot be mapped strictly according to
+	    // JSR 101
+	    if (Character.isJavaIdentifierPart(nameArray[0])) {
+		result.append("_" + nameArray[0]);
+	    } else {
+		// The XML identifier does not contain any characters
+		// we can map to Java. Using the length of the string
+		// will make it somewhat unique.
+		result.append("_" + nameArray.length);
+	    }
+	}
+
+	// The mapping indicates to skip over
+	// all characters that are not letters or
+	// digits. The first letter/digit
+	// following a skipped character is
+	// upper-cased.
+	for (++i; i < nameLen; ++i) {
+	    char c = nameArray[i];
+
+	    // if this is a bad char, skip it and remember to capitalize next
+	    // good character we encounter
+	    if (isPunctuation(c) || !Character.isJavaIdentifierPart(c)) {
+		wordStart = true;
+		continue;
+	    }
+	    if (wordStart && Character.isLowerCase(c)) {
+		result.append(Character.toUpperCase(c));
+	    } else {
+		result.append(c);
+	    }
+	    // If c is not a character, but is a legal Java
+	    // identifier character, capitalize the next character.
+	    // For example: "22hi" becomes "22Hi"
+	    // wordStart = !Character.isLetter(c);
+	    wordStart = !Character.isLetter(c) && c != "_".charAt(0);
+	}
+
+	// covert back to a String
+	String newName = result.toString();
+
+	// Follow JavaBean rules, but we need to check if the first
+	// letter is uppercase first
+	if (Character.isUpperCase(newName.charAt(0)))
+	    newName = Introspector.decapitalize(newName);
+
+	// check for Java keywords
+	if (isJavaKeyword(newName))
+	    newName = makeNonJavaKeyword(newName);
+
+	return newName;
+    }
+
+    /**
+     * Is this an XML punctuation character?
+     */
+    private static boolean isPunctuation(char c) {
+	
+	return '-' == c || '.' == c || ':' == c || '\u00B7' == c
+		|| '\u0387' == c || '\u06DD' == c || '\u06DE' == c;
+    }
+
     /**
      * Is wsdl document root element rpc encoded ?  
      * 

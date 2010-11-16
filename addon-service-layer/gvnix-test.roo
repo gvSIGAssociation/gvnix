@@ -71,7 +71,7 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 // [CORRECT] Transport: HTTP,  Operations: 1, Bindings: SOAP, SOAP12, HTTP GET, HTTP POST, Use: Literal, Implementation: MS .NET
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy05 --wsdl http://www.ripedevelopment.com/webservices/LocalTime.asmx?WSDL
 
-// [CORRECT]
+// [CORRECT] Transport HTTPS, Operations: 4, Bindings: SOAP, Use: Literal
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy06 --wsdl http://elasticmapreduce.amazonaws.com/doc/2009-03-31/ElasticMapReduce.wsdl
 
 // Import Remote RPC Style web services: will be generated with Axis
@@ -85,14 +85,34 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 // [CORRECT] Transport: HTTP, Operations: 179, Bindings: SOAP, Use: Encoded, Implementation: AXIS
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy12 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
 
+// [CORRECT] Transport: HTTP, Operations: 1, Bindings: SOAP, Use: Encoded, Authentication/Authorization: SOAP Headers (Literal Use)
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy13 --wsdl http://ws.soatrader.com/easycfm.com/1.0/Captcha?WSDL
+
+// [CORRECT] Transport: HTTP, Operations: 1, Bindings: SOAP, Use: Encoded, Implementation: JAX-RPC, Namespace: urn
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy14 --wsdl http://www.comp.rgu.ac.uk/QueryComputing/query?WSDL
+
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy15 --wsdl http://api.eurocv.eu/euroserver.php?wsdl
+
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy16 --wsdl
+
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy17 --wsdl
+
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy18 --wsdl
+
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy19 --wsdl
+
 // [ERROR] Remote and local file not existing
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy20 --wsdl http://this.location/not/exists
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy21 --wsdl file:/this/location/not/exists
 
-// [CORRECT] Local WSDL files placed into src/test/resource relative path, the second one has been repeated
-service import ws --class ~.services.ClaseProxy30 --wsdl src/test/resources/WSAuth.wsdl
-service import ws --class ~.services.ClaseProxy31 --wsdl file:src/test/resources/tempconvert.wsdl
-service import ws --class ~.services.ClaseProxy32 --wsdl src/test/resources/SimacServiciosListener.jws.xml
+// [ERROR] Required parameters not specified
+service import ws --class --wsdl fdfsdfsd
+service import ws --class dsadasd --wsdl
+service import ws --class --wsdl
+
+// [CORRECT] Local WSDL files placed into src/test/resource relative path
+service import ws --class ~.services.ClaseProxy30 --wsdl file:src/test/resources/WSAuth.wsdl
+service import ws --class ~.services.ClaseProxy31 --wsdl file:src/test/resources/SimacServiciosListener.jws.xml
 
 // [CORRECT] Export WSDL 2 Java
 service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl

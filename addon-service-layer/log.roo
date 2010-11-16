@@ -1,8 +1,0 @@
-// Spring Roo 1.1.0.M1 [rev 3a0b8a3] log opened at 2010-08-25 14:02:12
-project --topLevelPackage org.gvnix.service.layer.roo.addon --java 5 --template ROO_ADDON_SIMPLE
-perform eclipse// Spring Roo 1.1.0.M1 [rev 3a0b8a3] log opened at 2010-08-25 14:29:05
-// Spring Roo 1.1.0.M1 [rev 3a0b8a3] log opened at 2010-08-25 14:36:24
-// Spring Roo 1.1.0.M1 [rev 3a0b8a3] log opened at 2010-08-25 14:40:04
-// Spring Roo 1.1.0.M1 [rev 3a0b8a3] log opened at 2010-08-25 14:43:40
-// Spring Roo 1.1.0.M1 [rev 3a0b8a3] log opened at 2010-08-25 14:45:25
-service export ws
