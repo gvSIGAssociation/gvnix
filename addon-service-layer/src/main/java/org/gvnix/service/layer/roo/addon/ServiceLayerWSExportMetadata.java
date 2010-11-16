@@ -72,6 +72,10 @@ public class ServiceLayerWSExportMetadata extends
                 .getTypeAnnotation(governorTypeDetails, new JavaType(
                         GvNIXWebService.class.getName()));
 
+        // Check if Web Service has been exported from WSDL.
+        BooleanAttributeValue exported = (BooleanAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("exported"));
+
         if (annotationMetadata != null) {
 
             // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
@@ -91,11 +95,17 @@ public class ServiceLayerWSExportMetadata extends
 
                 if (methodAnnotation != null) {
 
-                    // Update ITD with Web Services annotations declarations.
-                    updateMethodWithGvNIXAnnotation(methodMetadata,
-                            methodAnnotation);
-                }
-                else {
+                    if (!exported.getValue()) {
+                        // Update ITD with Web Services annotations
+                        // declarations.
+                        updateMethodWithGvNIXAnnotation(methodMetadata,
+                                methodAnnotation);
+                    } else {
+                        // Update method without checking attributes.
+                        updateMethodWithGvNIXAnnotationFromWsdl(methodMetadata,
+                                methodAnnotation);
+                    }
+                } else {
                     // Exclude from Web Service.
                     methodMetadataListToExclude.add(methodMetadata);
                 }
@@ -388,6 +398,234 @@ public class ServiceLayerWSExportMetadata extends
             // Add to AspectJ.
             builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
                     methodMetadata, responseWrapper));
+
+        } else {
+            // @Oneway - not require a response from the service.
+            AnnotationMetadata oneway = new DefaultAnnotationMetadata(
+                    new JavaType("javax.jws.Oneway"),
+                    new ArrayList<AnnotationAttributeValue<?>>());
+            // Add to AspectJ.
+            builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                    methodMetadata, oneway));
+        }
+
+    }
+
+    /**
+     * Update methods with @GvNIXWebMethod annotation when Web Service has been
+     * exported from WSDL file.
+     * 
+     * @param methodMetadata
+     *            method to assign ITD declarations.
+     * @param methodAnnotation
+     *            Annotations to generate ITD declaration.
+     */
+    public void updateMethodWithGvNIXAnnotationFromWsdl(MethodMetadata methodMetadata,
+            AnnotationMetadata methodAnnotation) {
+
+        List<AnnotationAttributeValue<?>> annotationAttributeValueList;
+
+        AnnotationAttributeValue<?> tmpAnnotationAttributeValue;
+
+        // javax.jws.WebMethod
+        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+        StringAttributeValue operationNameAttributeValue = (StringAttributeValue) methodAnnotation
+                .getAttribute(new JavaSymbolName("operationName"));
+
+        annotationAttributeValueList.add(operationNameAttributeValue);
+
+        // Check if exists action attribute defined.
+        tmpAnnotationAttributeValue = methodAnnotation
+                .getAttribute(new JavaSymbolName("action"));
+
+        StringAttributeValue actionAttribuetValue;
+        if (tmpAnnotationAttributeValue != null) {
+            actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
+                    "action"),
+                    ((StringAttributeValue) tmpAnnotationAttributeValue)
+                            .getValue());
+        } else {
+            actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
+                    "action"), "");
+        }
+
+        annotationAttributeValueList.add(actionAttribuetValue);
+
+        BooleanAttributeValue excludeAttribuetValue = new BooleanAttributeValue(
+                new JavaSymbolName("exclude"), false);
+        annotationAttributeValueList.add(excludeAttribuetValue);
+
+        AnnotationMetadata webMethod = new DefaultAnnotationMetadata(
+                new JavaType("javax.jws.WebMethod"),
+                annotationAttributeValueList);
+
+        // Add to AspectJ.
+        builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                methodMetadata, webMethod));
+
+        if (!methodMetadata.getParameterTypes().isEmpty()
+                && !methodMetadata.getParameterNames().isEmpty()) {
+
+            // javax.xml.ws.RequestWrapper
+            annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+            tmpAnnotationAttributeValue = methodAnnotation
+                    .getAttribute(new JavaSymbolName("requestWrapperName"));
+
+            if (tmpAnnotationAttributeValue != null) {
+
+                StringAttributeValue localNameAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("localName"),
+                        ((StringAttributeValue) tmpAnnotationAttributeValue)
+                                .getValue());
+                annotationAttributeValueList.add(localNameAttributeValue);
+
+            }
+
+            tmpAnnotationAttributeValue = methodAnnotation
+                    .getAttribute(new JavaSymbolName("requestWrapperNamespace"));
+
+            if (tmpAnnotationAttributeValue != null) {
+
+                StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("targetNamespace"),
+                        ((StringAttributeValue) tmpAnnotationAttributeValue)
+                                .getValue());
+                annotationAttributeValueList.add(targetNamespaceAttributeValue);
+            }
+
+            tmpAnnotationAttributeValue = methodAnnotation
+                    .getAttribute(new JavaSymbolName("requestWrapperClassName"));
+
+            if (tmpAnnotationAttributeValue != null) {
+
+                StringAttributeValue classNameAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("className"),
+                        ((StringAttributeValue) tmpAnnotationAttributeValue)
+                                .getValue());
+                annotationAttributeValueList.add(classNameAttributeValue);
+
+            }
+
+            if (!annotationAttributeValueList.isEmpty()) {
+                AnnotationMetadata requestWrapper = new DefaultAnnotationMetadata(
+                        new JavaType("javax.xml.ws.RequestWrapper"),
+                        annotationAttributeValueList);
+
+                // Add to AspectJ.
+                builder
+                        .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                                methodMetadata, requestWrapper));
+            }
+
+        }
+
+        // javax.jws.WebResult
+        // Check result value
+        StringAttributeValue resutlNameAttributeValue = (StringAttributeValue) methodAnnotation
+                .getAttribute(new JavaSymbolName("resultName"));
+
+        ClassAttributeValue resultTypeAttributeValue = (ClassAttributeValue) methodAnnotation
+                .getAttribute(new JavaSymbolName("webResultType"));
+
+        if ((resutlNameAttributeValue != null && !resutlNameAttributeValue
+                .getValue().contains("void"))
+                && (resultTypeAttributeValue != null && !resultTypeAttributeValue
+                        .getValue().getFullyQualifiedTypeName().contains(
+                                JavaType.VOID_PRIMITIVE
+                                        .getFullyQualifiedTypeName()))) {
+
+            annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+            StringAttributeValue localNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("name"), resutlNameAttributeValue
+                            .getValue());
+            annotationAttributeValueList.add(localNameAttributeValue);
+
+            tmpAnnotationAttributeValue = methodAnnotation
+                    .getAttribute(new JavaSymbolName("resultNamespace"));
+
+            if (tmpAnnotationAttributeValue != null) {
+
+                StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("targetNamespace"),
+                        ((StringAttributeValue) tmpAnnotationAttributeValue)
+                                .getValue());
+
+                annotationAttributeValueList.add(targetNamespaceAttributeValue);
+            }
+
+            // TODO: Add these attributes to @GvNIXWebMethod.
+            BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
+                    new JavaSymbolName("header"), false);
+            annotationAttributeValueList.add(headerAttributeValue);
+
+            StringAttributeValue partNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("partName"), "parameters");
+
+            annotationAttributeValueList.add(partNameAttributeValue);
+
+            AnnotationMetadata webResult = new DefaultAnnotationMetadata(
+                    new JavaType("javax.jws.WebResult"),
+                    annotationAttributeValueList);
+
+            // Add to AspectJ.
+            builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                    methodMetadata, webResult));
+
+            // javax.xml.ws.ResponseWrapper
+            annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+            tmpAnnotationAttributeValue = methodAnnotation
+                    .getAttribute(new JavaSymbolName("responseWrapperName"));
+
+            if (tmpAnnotationAttributeValue != null) {
+
+                localNameAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("localName"),
+                        ((StringAttributeValue) tmpAnnotationAttributeValue)
+                                .getValue());
+                annotationAttributeValueList.add(localNameAttributeValue);
+
+            }
+            tmpAnnotationAttributeValue = methodAnnotation
+                    .getAttribute(new JavaSymbolName("responseWrapperNamespace"));
+
+            if (tmpAnnotationAttributeValue != null) {
+
+                StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("targetNamespace"),
+                        ((StringAttributeValue) tmpAnnotationAttributeValue)
+                                .getValue());
+                annotationAttributeValueList.add(targetNamespaceAttributeValue);
+
+            }
+
+            tmpAnnotationAttributeValue = methodAnnotation
+                    .getAttribute(new JavaSymbolName("responseWrapperClassName"));
+
+            if (tmpAnnotationAttributeValue != null) {
+
+                StringAttributeValue classNameAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("className"),
+                        ((StringAttributeValue) tmpAnnotationAttributeValue)
+                                .getValue());
+                annotationAttributeValueList.add(classNameAttributeValue);
+
+            }
+
+            if (!annotationAttributeValueList.isEmpty()) {
+
+                AnnotationMetadata responseWrapper = new DefaultAnnotationMetadata(
+                        new JavaType("javax.xml.ws.ResponseWrapper"),
+                        annotationAttributeValueList);
+
+                // Add to AspectJ.
+                builder
+                        .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                                methodMetadata, responseWrapper));
+            }
 
         } else {
             // @Oneway - not require a response from the service.

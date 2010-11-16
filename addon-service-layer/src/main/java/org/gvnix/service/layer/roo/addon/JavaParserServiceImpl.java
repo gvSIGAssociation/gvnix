@@ -110,7 +110,8 @@ public class JavaParserServiceImpl implements JavaParserService {
             List<FieldMetadata> declaredFieldList,
             List<MethodMetadata> declaredMethodList,
             List<ConstructorMetadata> declaredConstructorList,
-            List<JavaType> declaredClassList) {
+            List<JavaType> declaredClassList,
+            PhysicalTypeCategory physicalTypeCategory, List<JavaSymbolName> enumConstantsList) {
 
         // Metadata Id.
         String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
@@ -123,12 +124,17 @@ public class JavaParserServiceImpl implements JavaParserService {
         // Check the file doesn't already exist
         if (!fileManager.exists(physicalLocationCanonicalPath)) {
 
+            if (!physicalTypeCategory.equals(PhysicalTypeCategory.ENUMERATION)) {
+                enumConstantsList = null;
+            }
+
             // Create class.
             ClassOrInterfaceTypeDetails serviceDetails = new DefaultClassOrInterfaceTypeDetails(
                     declaredByMetadataId, javaType, Modifier.PUBLIC,
-                    PhysicalTypeCategory.CLASS, declaredConstructorList, declaredFieldList,
-                    declaredMethodList, null, declaredClassList, null, typeAnnotationList,
-                    null);
+                    physicalTypeCategory, declaredConstructorList,
+                    declaredFieldList, declaredMethodList, null,
+                    declaredClassList, null, typeAnnotationList,
+                    enumConstantsList);
 
             classpathOperations.generateClassFile(serviceDetails);
 

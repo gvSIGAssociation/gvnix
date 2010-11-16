@@ -219,27 +219,33 @@ public class ServiceLayerWSExportMetadataProvider extends
                                         .getName(), methodMetadata
                                         .getMethodName(),
                                         webServiceTargetNamespace);
+
+                        // Check if attributes are defined in method.
+                        Assert
+                                .isTrue(
+                                        !gvNixWebMethodAnnotation
+                                                .getAttributeNames().isEmpty(),
+                                        "The annotation @GvNIXWebMethod for '"
+                                                + methodMetadata
+                                                        .getMethodName()
+                                                + "' method in class '"
+                                                + governorTypeDetails
+                                                        .getName()
+                                                        .getFullyQualifiedTypeName()
+                                                + "' must have all its attributes defined.");
+
+                        // Check if @GvNIXWebMethod attributes are correct to
+                        // export method to web service annotation in ITD.
+                        checkGvNIXWebMethodAnnotationAttributes(
+                                gvNixWebMethodAnnotation, governorTypeDetails,
+                                methodMetadata);
+
+                        // Checks @WebParam and @GvNIXWebParam attributes for
+                        // each
+                        // input parameter in method.
+                        checkGvNIXWebParamsAnnotationAttributes(
+                                governorTypeDetails, methodMetadata);
                     }
-
-                    // Check if attributes are defined in method.
-                    Assert.isTrue(!gvNixWebMethodAnnotation.getAttributeNames()
-                            .isEmpty(), "The annotation @GvNIXWebMethod for '"
-                            + methodMetadata.getMethodName()
-                            + "' method in class '"
-                            + governorTypeDetails.getName()
-                                    .getFullyQualifiedTypeName()
-                            + "' must have all its attributes defined.");
-
-                    // Check if @GvNIXWebMethod attributes are correct to
-                    // export method to web service annotation in ITD.
-                    checkGvNIXWebMethodAnnotationAttributes(
-                            gvNixWebMethodAnnotation, governorTypeDetails,
-                            methodMetadata);
-
-                    // Checks @WebParam and @GvNIXWebParam attributes for each
-                    // input parameter in method.
-                    checkGvNIXWebParamsAnnotationAttributes(
-                            governorTypeDetails, methodMetadata);
 
                 }
             }

@@ -21,8 +21,7 @@ package org.gvnix.service.layer.roo.addon;
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
-import japa.parser.ast.body.TypeDeclaration;
+import japa.parser.ast.body.*;
 import japa.parser.ast.expr.*;
 
 import java.io.File;
@@ -55,6 +54,7 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
     static final String xmlRootElement = "XmlRootElement";
     static final String xmlAccessorType = "XmlAccessorType";
     static final String xmlType = "XmlType";
+    static final String xmlEnum = "XmlEnum";
     static final String webFault = "WebFault";
 
     @Reference
@@ -104,7 +104,8 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
                     List<TypeDeclaration> types = unit.getTypes();
                     if (types != null) {
                         TypeDeclaration type = types.get(0);
-                        if (type instanceof ClassOrInterfaceDeclaration) {
+                        if ((type instanceof ClassOrInterfaceDeclaration) 
+                                || (type instanceof EnumDeclaration)) {
 
                             logger.fine(fileEvent.getFileDetails().getFile()
                                     .getAbsolutePath());
@@ -231,6 +232,11 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
                             GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
                 }
 
+                return true;
+            } else if (markerAnnotationExpr.getName().toString().contentEquals(xmlEnum)) {
+
+                serviceLayerWSExportWSDLConfigService.addFileToUpdateAnnotation(file,
+                        GvNIXAnnotationType.XML_ELEMENT);
                 return true;
             }
 

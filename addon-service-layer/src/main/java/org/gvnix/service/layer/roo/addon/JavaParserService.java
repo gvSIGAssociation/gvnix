@@ -23,6 +23,7 @@ import japa.parser.ParseException;
 import java.util.List;
 
 import org.gvnix.service.layer.roo.addon.ServiceLayerWSExportWSDLConfigService.GvNIXAnnotationType;
+import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
@@ -191,6 +192,8 @@ public interface JavaParserService {
      * @param declaredMethodList class method list.
      * @param declaredConstructorList class constructor list.
      * @param declaredClassList extended classes.
+     * @param physicalTypeCategory of generated class (Enum, Class..)
+     * @param enumConstantsList List of enum fields defined in class.
      * 
      */
     public void createGvNIXWebServiceClass(JavaType javaType,
@@ -199,5 +202,5 @@ public interface JavaParserService {
             List<FieldMetadata> declaredFieldList,
             List<MethodMetadata> declaredMethodList,
             List<ConstructorMetadata> declaredConstructorList,
-            List<JavaType> declaredClassList);
+            List<JavaType> declaredClassList, PhysicalTypeCategory physicalTypeCategory, List<JavaSymbolName> enumConstantsList);
 }

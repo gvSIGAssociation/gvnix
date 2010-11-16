@@ -19,6 +19,8 @@
 package org.gvnix.service.layer.roo.addon;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -798,7 +800,14 @@ public class ServiceLayerWSExportValidationServiceImpl implements
      */
     public boolean checkNamespaceFormat(String namespace) {
         if (StringUtils.hasText(namespace)) {
-            return StringUtils.startsWithIgnoreCase(namespace, "http://");
+
+            try {
+                URI uri = new URI(namespace);
+
+            } catch (URISyntaxException e) {
+                return false;
+            }
+
         }
         return true;
     }

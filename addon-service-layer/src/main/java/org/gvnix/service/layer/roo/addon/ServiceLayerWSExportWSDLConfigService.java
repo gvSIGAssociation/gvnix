@@ -19,7 +19,9 @@
 package org.gvnix.service.layer.roo.addon;
 
 import japa.parser.ParseException;
+import japa.parser.ast.*;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.TypeDeclaration;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,6 +106,18 @@ public interface ServiceLayerWSExportWSDLConfigService {
     public void generateGvNIXXmlElementsClasses();
 
     /**
+     * Generate JavaType class from declaration.
+     * 
+     * @param typeDeclaration class to convert to JavaType.
+     * @param packageDeclaration from class.
+     * @param importDeclarationList imported values.
+     * @param fileDirectory to check 'package-info.java' annotation values.
+     */
+    public void generateJavaTypeFromTypeDeclaration(TypeDeclaration typeDeclaration,
+            PackageDeclaration packageDeclaration,
+            List<ImportDeclaration> importDeclarationList, String fileDirectory);
+
+    /**
      * Generates java files with '@GvNIXWebFault' values.
      */
     public void generateGvNIXWebFaultClasses();
@@ -132,7 +146,7 @@ public interface ServiceLayerWSExportWSDLConfigService {
      * Convert annotation @XmlElement values from
      * {@link ClassOrInterfaceDeclaration} to {@link GvNIXXmlElement}.
      * 
-     * @param classOrInterfaceDeclaration
+     * @param typeDeclaration
      *            to retrieve values from @XmlElement annotations and convert to
      *            {@link GvNIXXmlElement} values.
      * 
@@ -142,7 +156,7 @@ public interface ServiceLayerWSExportWSDLConfigService {
      * @return {@link GvNIXXmlElement} to define in class.
      */
     public AnnotationMetadata getGvNIXXmlElementAnnotation(
-            ClassOrInterfaceDeclaration classOrInterfaceDeclaration,
+            TypeDeclaration typeDeclaration,
             String fileDirectory);
 
     /**

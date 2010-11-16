@@ -43,5 +43,7 @@ public @interface GvNIXXmlElement {
     String[] elementList();
     
     boolean exported();
+    
+    boolean enumElement();
 
 }

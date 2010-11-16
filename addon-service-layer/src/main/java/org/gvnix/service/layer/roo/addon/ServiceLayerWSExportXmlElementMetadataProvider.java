@@ -243,19 +243,20 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
             xmlTypeNameStringAtrributeValue = (StringAttributeValue) tmpAttribute;
         }
 
-        Assert
-                .isTrue(
-                        (nameStringAtrributeValue != null
-                                && StringUtils.hasText(nameStringAtrributeValue
-                                        .getValue())) || 
-                                        (xmlTypeNameStringAtrributeValue != null
-                                && StringUtils.hasText(xmlTypeNameStringAtrributeValue
-                                        .getValue())),
-                        "Attribute 'name' or 'xmlTypeName' in annotation @GvNIXXmlElement defined in class '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName()
-                                + "' has to be defined to export in XSD schema in WSDL.");
-
+        if (!exportedAttributeValue.getValue()) {
+            Assert
+                    .isTrue(
+                            (nameStringAtrributeValue != null && StringUtils
+                                    .hasText(nameStringAtrributeValue
+                                            .getValue()))
+                                    || (xmlTypeNameStringAtrributeValue != null && StringUtils
+                                            .hasText(xmlTypeNameStringAtrributeValue
+                                                    .getValue())),
+                            "Attribute 'name' or 'xmlTypeName' in annotation @GvNIXXmlElement defined in class '"
+                                    + governorTypeDetails.getName()
+                                            .getFullyQualifiedTypeName()
+                                    + "' has to be defined to export in XSD schema in WSDL.");
+        }
 
         // resultNamespace
         StringAttributeValue namespaceStringAttributeValue;

@@ -201,7 +201,7 @@ public class ServiceLayerWsExportOperationsImpl implements
                 .isTrue(
                         serviceLayerWSExportValidationService
                                 .checkNamespaceFormat(targetNamespace),
-                        "The namespace for Target Namespace has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+                        "The namespace for Target Namespace has to be defined using URI fromat.\ni.e.: http://name.of.namespace/");
 
         // Namespace for the web service.
         targetNamespace = StringUtils.hasText(targetNamespace) ? targetNamespace
