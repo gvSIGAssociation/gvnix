@@ -1,0 +1,810 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:types="http://CCAABoletines.xsd" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="urn:WSDLCCAABoletines" targetNamespace="urn:WSDLCCAABoletines">
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="http://CCAABoletines.xsd" elementFormDefault="qualified">
+            <element name="ccaatocia">
+                <complexType>
+                    <sequence>
+                        <element minOccurs="1" maxOccurs="1" name="header" type="types:HEADERTYPE"/>
+                        <element minOccurs="1" maxOccurs="1" name="body" type="types:BODYTYPE"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="ciatoccaa">
+                <complexType>
+                    <sequence>
+                        <element minOccurs="1" maxOccurs="1" name="header" type="types:HEADERTYPE"/>
+                        <element minOccurs="1" maxOccurs="1" name="body" type="types:BODYTYPERES"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <complexType name="BODYTYPE">
+                <sequence>
+                    <element minOccurs="1" maxOccurs="1" name="consulta" type="types:ECONSULTA"/>
+                    <element minOccurs="1" maxOccurs="1" name="usuario" type="types:EUSUARIO"/>
+                </sequence>
+            </complexType>
+            <complexType name="ECONSULTA">
+                <attribute name="fecini" type="date" use="optional"/>
+                <attribute name="fecfin" type="date" use="optional"/>
+                <attribute name="pendiente" type="types:IDPENDIENTE" use="optional"/>
+            </complexType>
+            <complexType name="EUSUARIO">
+                <attribute name="password" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="9"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="identificador" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="9"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+            </complexType>
+            <simpleType name="IDPENDIENTE">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                </restriction>
+            </simpleType>
+            <complexType name="HEADERTYPE">
+                <attribute name="version" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="3"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="versionsender" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="7"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="fecha" type="dateTime" use="required"/>
+            </complexType>
+            <complexType name="BODYTYPERES">
+                <sequence>
+                    <element minOccurs="0" maxOccurs="unbounded" name="control" type="types:ECONTROL"/>
+                </sequence>
+            </complexType>
+            <complexType name="ECONTROL">
+                <sequence>
+                    <element minOccurs="0" maxOccurs="1" name="denunciante" type="types:EDENUNCIANTE"/>
+                    <element minOccurs="1" maxOccurs="1" name="lugarfecha" type="types:ELUGARFECHA"/>
+                    <element minOccurs="0" maxOccurs="unbounded" name="conductor" type="types:ECONDUCTOR"/>
+                    <element minOccurs="1" maxOccurs="1" name="vehiculo" type="types:EVEHICULO"/>
+                    <element minOccurs="0" maxOccurs="1" name="titarrtario" type="types:ETITARRTARIO"/>
+                    <element minOccurs="0" maxOccurs="1" name="denunciascontrol" type="types:EDENUNCIASCONTROL"/>
+                </sequence>
+                <attribute name="numcontrol" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="21"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="nombreficheroVU" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="40"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="ficheroVU" type="base64Binary" use="optional"/>
+            </complexType>
+            <complexType name="EDENUNCIANTE">
+                <attribute name="tip" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="7"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="unidadagente" use="required">
+                    <simpleType>
+                        <restriction base="integer">
+                            <minInclusive value="0"/>
+                            <maxInclusive value="9999"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+            </complexType>
+            <complexType name="ELUGARFECHA">
+                <attribute name="provincia" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="2"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="cabildo" use="optional" type="types:IDCABILDO"/>
+                <attribute name="fechahora" type="dateTime" use="required"/>
+                <attribute name="via" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="35"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="pkilometrico" use="optional">
+                    <simpleType>
+                        <restriction base="float">
+                            <minInclusive value="0.000"/>
+                            <maxInclusive value="9999.999"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="sentido" use="required" type="types:IDSENTIDO"/>
+                <attribute name="origen_pais" use="required" type="types:IDPAIS"/>
+                <attribute name="destino_pais" use="required" type="types:IDPAIS"/>
+                <attribute name="origen_prov" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="2"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="destino_prov" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="2"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="origen_munic" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="50"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="destino_munic" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="50"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+            </complexType>
+            <complexType name="ECONDUCTOR">
+                <attribute name="numconductor" use="required" type="types:IDCONDUCTOR"/>
+                <attribute name="ficheroTC" type="base64Binary" use="optional"/>
+                <attribute name="nombreficheroTC" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="40"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="numtarjeta" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="16"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="paisemisor" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="25"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="nombre" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="35"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="apellidos" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="35"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="dni_cond" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="15"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+            </complexType>
+            <complexType name="EVEHICULO">
+                <attribute name="vehiculoextranj" use="required" type="types:IDVEHEXT"/>
+                <attribute name="paismat" use="optional" type="types:IDPAIS"/>
+                <attribute name="matricula" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="15"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="matriculasemiremolque" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="15"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="tarjetatransp" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="11"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="serie" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="5"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="mma" use="optional">
+                    <simpleType>
+                        <restriction base="integer">
+                            <minInclusive value="0"/>
+                            <maxInclusive value="99999"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="tipotransporte" use="required" type="types:IDTPTRANSP"/>
+                <attribute name="tara_plazas" use="optional">
+                    <simpleType>
+                        <restriction base="integer">
+                            <minInclusive value="0"/>
+                            <maxInclusive value="99999"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="servicio" use="required" type="types:IDSERVICIO"/>
+            </complexType>
+            <complexType name="ETITARRTARIO">
+                <attribute name="titulararrendatario" use="required" type="types:IDTITARR"/>
+                <attribute name="nomrazonsoc_ta" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="60"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="cifnif_ta" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="15"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="domicilio_ta" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="50"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="localidad_ta" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="100"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="provincia_ta" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="2"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="cp_ta" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="5"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="pais_ta" use="optional" type="types:IDPAIS"/>
+            </complexType>
+            <complexType name="EDENUNCIASCONTROL">
+                <sequence>
+                    <element minOccurs="1" maxOccurs="unbounded" name="denunciascond" type="types:EDENUNCIASCOND"/>
+                </sequence>
+                <attribute name="inmovilizado" use="required" type="types:IDINMOVILIZADO"/>
+                <attribute name="motivoinmo" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="250"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+            </complexType>
+            <complexType name="EDENUNCIASCOND">
+                <sequence>
+                    <element minOccurs="1" maxOccurs="unbounded" name="hechosdenunciados" type="types:EHECHOSDENUNCIADOS"/>
+                </sequence>
+                <attribute name="numconductor_de" use="required" type="types:IDCONDUCTOR"/>
+                <attribute name="retirada" use="required" type="types:IDRETIRADA"/>
+            </complexType>
+            <complexType name="EHECHOSDENUNCIADOS">
+                <sequence>
+                    <element minOccurs="0" maxOccurs="1" name="cargaarrendador" type="types:ECARGAARRENDADOR"/>
+                    <element minOccurs="0" maxOccurs="1" name="datos_cobro" type="types:EDATOSCOBRO"/>
+                </sequence>
+                <attribute name="numboletin" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="16"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="fechahora_de" type="dateTime" use="required"/>
+                <attribute name="entedenunciado" use="required" type="types:IDENTEDENUNCIADO"/>
+                <attribute name="codigobaremo" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="6"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="textohechodenunciado" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="1500"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="articulo" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="100"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="entregado" use="required" type="types:IDENTREGADO"/>
+                <attribute name="observaciones" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="256"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+            </complexType>
+            <complexType name="ECARGAARRENDADOR">
+                <attribute name="cargadorarrendador" use="required" type="types:IDCARARR"/>
+                <attribute name="otros" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="25"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="nomrazonsoc_ca" use="required">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="60"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="cifnif_ca" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="15"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="domicilio_ca" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="50"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="localidad_ca" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="100"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="provincia_ca" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="2"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="cp_ca" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="5"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="pais_ca" use="optional" type="types:IDPAIS"/>
+            </complexType>
+            <complexType name="EDATOSCOBRO">
+                <sequence>
+                    <element minOccurs="0" maxOccurs="1" name="tarjeta" type="types:ETARJETA"/>
+                    <element minOccurs="0" maxOccurs="1" name="caucion" type="types:ECAUCION"/>
+                </sequence>
+                <attribute name="importe" use="required">
+                    <simpleType>
+                        <restriction base="float">
+                            <minInclusive value="0.000"/>
+                            <maxInclusive value="999999.99"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="importecobrado" use="optional">
+                    <simpleType>
+                        <restriction base="float">
+                            <minInclusive value="0.000"/>
+                            <maxInclusive value="999999.99"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="importecobrado_me" use="optional">
+                    <simpleType>
+                        <restriction base="float">
+                            <minInclusive value="0.000"/>
+                            <maxInclusive value="9999999.99"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="monedaextranjera" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="25"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="cambio" use="optional">
+                    <simpleType>
+                        <restriction base="float">
+                            <minInclusive value="0.000"/>
+                            <maxInclusive value="999.9999"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="tipocobro" use="required" type="types:IDTIPOCOBRO"/>
+            </complexType>
+            <complexType name="ETARJETA">
+                <attribute name="doitarjeta" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="0"/>
+                            <maxLength value="15"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="numtarjetacredito" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="0"/>
+                            <maxLength value="16"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="caducidadtarjeta" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="0"/>
+                            <maxLength value="4"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="numautoriz" use="optional">
+                    <simpleType>
+                        <restriction base="integer">
+                            <minInclusive value="0"/>
+                            <maxInclusive value="99999999"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="numoper" use="optional">
+                    <simpleType>
+                        <restriction base="integer">
+                            <minInclusive value="0"/>
+                            <maxInclusive value="99999999"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="fechayhoracobro" type="dateTime" use="optional"/>
+            </complexType>
+            <complexType name="ECAUCION">
+                <attribute name="nombre_caucion" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="60"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="cifnif_caucion" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="9"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="domicilio_caucion" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="50"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="localidad_caucion" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="100"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="provincia_caucion" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="2"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+                <attribute name="cp_caucion" use="optional">
+                    <simpleType>
+                        <restriction base="string">
+                            <minLength value="1"/>
+                            <maxLength value="5"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+            </complexType>
+            <simpleType name="IDCABILDO">
+                <restriction base="string">
+                    <enumeration value="61"/>
+                    <enumeration value="62"/>
+                    <enumeration value="63"/>
+                    <enumeration value="64"/>
+                    <enumeration value="65"/>
+                    <enumeration value="66"/>
+                    <enumeration value="67"/>
+                    <enumeration value="71"/>
+                    <enumeration value="72"/>
+                    <enumeration value="73"/>
+                    <enumeration value="74"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDSENTIDO">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDPAIS">
+                <restriction base="string">
+                    <enumeration value="A"/>
+                    <enumeration value="AL"/>
+                    <enumeration value="AND"/>
+                    <enumeration value="ARM"/>
+                    <enumeration value="AZ"/>
+                    <enumeration value="B"/>
+                    <enumeration value="BG"/>
+                    <enumeration value="BIH"/>
+                    <enumeration value="BY"/>
+                    <enumeration value="CH"/>
+                    <enumeration value="CY"/>
+                    <enumeration value="CZ"/>
+                    <enumeration value="D"/>
+                    <enumeration value="DK"/>
+                    <enumeration value="E"/>
+                    <enumeration value="EST"/>
+                    <enumeration value="F"/>
+                    <enumeration value="FIN"/>
+                    <enumeration value="FL"/>
+                    <enumeration value="FR"/>
+                    <enumeration value="UK"/>
+                    <enumeration value="GE"/>
+                    <enumeration value="GR"/>
+                    <enumeration value="H"/>
+                    <enumeration value="HR"/>
+                    <enumeration value="I"/>
+                    <enumeration value="IRL"/>
+                    <enumeration value="IS"/>
+                    <enumeration value="KZ"/>
+                    <enumeration value="L"/>
+                    <enumeration value="LT"/>
+                    <enumeration value="LV"/>
+                    <enumeration value="M"/>
+                    <enumeration value="MC"/>
+                    <enumeration value="MD"/>
+                    <enumeration value="MK"/>
+                    <enumeration value="N"/>
+                    <enumeration value="NL"/>
+                    <enumeration value="P"/>
+                    <enumeration value="PL"/>
+                    <enumeration value="RO"/>
+                    <enumeration value="RSM"/>
+                    <enumeration value="RUS"/>
+                    <enumeration value="S"/>
+                    <enumeration value="SK"/>
+                    <enumeration value="SLO"/>
+                    <enumeration value="TM"/>
+                    <enumeration value="TR"/>
+                    <enumeration value="UA"/>
+                    <enumeration value="V"/>
+                    <enumeration value="YU"/>
+                    <enumeration value="UNK"/>
+                    <enumeration value="EC"/>
+                    <enumeration value="EUR"/>
+                    <enumeration value="WLD"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDCONDUCTOR">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDVEHEXT">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDTPTRANSP">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDSERVICIO">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDTITARR">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDINMOVILIZADO">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                    <enumeration value="2"/>
+                    <enumeration value="3"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDCARARR">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                    <enumeration value="2"/>
+                    <enumeration value="3"/>
+                    <enumeration value="4"/>
+                    <enumeration value="5"/>
+                    <enumeration value="6"/>
+                    <enumeration value="7"/>
+                    <enumeration value="8"/>
+                    <enumeration value="9"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDTIPOCOBRO">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                    <enumeration value="2"/>
+                    <enumeration value="3"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDENTREGADO">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDENTEDENUNCIADO">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                    <enumeration value="2"/>
+                </restriction>
+            </simpleType>
+            <simpleType name="IDRETIRADA">
+                <restriction base="string">
+                    <enumeration value="0"/>
+                    <enumeration value="1"/>
+                    <enumeration value="2"/>
+                    <enumeration value="3"/>
+                    <enumeration value="4"/>
+                </restriction>
+            </simpleType>
+        </schema>
+    </types>
+    <message name="ReqMessage">
+        <part name="message" element="types:ccaatocia"/>
+    </message>
+    <message name="Res_Message">
+        <part name="message" element="types:ciatoccaa"/>
+    </message>
+    <portType name="CCAABoletines">
+        <operation name="processBoletines">
+            <input message="tns:ReqMessage"/>
+            <output message="tns:Res_Message"/>
+        </operation>
+    </portType>
+    <binding name="CCAABoletinesSOAP" type="tns:CCAABoletines">
+        <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="processBoletines">
+            <soap12:operation style="document" soapAction="urn:WSDLCCAABoletines/processBoletines" soapActionRequired="false"/>
+            <input>
+                <soap12:body use="literal" parts="message"/>
+            </input>
+            <output>
+                <soap12:body use="literal" parts="message"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="CCAABoletines">
+        <documentation>Servicio Web de envio de Boletines de denuncia CCAA</documentation>
+        <port name="CCAABoletinesPort" binding="tns:CCAABoletinesSOAP">
+            <soap12:address location="http://10.13.208.131:7777/CCAABoletinesWS/CCAABoletinesPort"/>
+        </port>
+    </service>
+</definitions>
