@@ -27,13 +27,13 @@ import japa.parser.ast.type.ClassOrInterfaceType;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.*;
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod.GvNIXWebMethodParameterStyle;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
@@ -962,6 +962,19 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                         ServiceLayerWSExportWSDLListener.xmlAccessorType)) {
 
                 }
+            } else if (annotationExpr instanceof MarkerAnnotationExpr) {
+                
+                MarkerAnnotationExpr markerAnnotationExpr = (MarkerAnnotationExpr) annotationExpr;
+                if (markerAnnotationExpr.getName().toString().contentEquals(ServiceLayerWSExportWSDLListener.xmlEnum)) {
+                    
+                    // Check if its EnumDeclaration.
+                    BooleanAttributeValue enumElementBooleanAttributeValue = new BooleanAttributeValue(
+                            new JavaSymbolName("enumElement"), true);
+                    annotationAttributeValues.add(enumElementBooleanAttributeValue);
+
+                    continue;
+                }
+
             }
 
         }
@@ -1195,7 +1208,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         List<AnnotationAttributeValue<?>> gvNIXWebServiceAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
 
         /*
-         * TODO: Class:
+         * Class:
          * 
          * @javax.jws.WebService( serviceName = "TempConvert", portName =
          * "TempConvertSoap12", targetNamespace = "http://tempuri.org/",
@@ -1213,6 +1226,14 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
          * @WebService(name = "TempConvertSoap",portName = "TempConvertSoap12",
          * targetNamespace = "http://tempuri.org/", serviceName =
          * "TempConvert");
+         * 
+         * @WebService(targetNamespace =
+         * "http://fps.amazonaws.com/doc/2008-09-17/", name =
+         * "AmazonFPSPortType")
+         * 
+         * @XmlSeeAlso({ObjectFactory.class})
+         * 
+         * @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
          */
 
         /*
@@ -1233,24 +1254,55 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
                 StringAttributeValue addressStringAttributeValue;
 
-                // Retrieve values.
-                for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
+                if (normalAnnotationExpr.getName().getName().contains(
+                        ServiceLayerWSExportWSDLListener.webServiceInterface)) {
 
-                    if (pair.getName().contentEquals("name")) {
+                    // Retrieve values.
+                    for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
 
-                        // address
-                        addressStringAttributeValue = new StringAttributeValue(
-                                new JavaSymbolName("name"),
-                                ((StringLiteralExpr) pair.getValue())
-                                        .getValue());
+                        if (pair.getName().contentEquals("name")) {
 
-                        gvNIXWebServiceAnnotationAttributes
-                                .add(addressStringAttributeValue);
-                        break;
+                            // address
+                            addressStringAttributeValue = new StringAttributeValue(
+                                    new JavaSymbolName("name"),
+                                    ((StringLiteralExpr) pair.getValue())
+                                            .getValue());
+
+                            gvNIXWebServiceAnnotationAttributes
+                                    .add(addressStringAttributeValue);
+                            break;
+                        }
+                    }
+                } else if (normalAnnotationExpr.getName().getName().contains(
+                        ServiceLayerWSExportWSDLListener.soapBinding)) {
+
+                    for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
+
+                        EnumAttributeValue enumparameterStyleAttributeValue = new EnumAttributeValue(
+                                new JavaSymbolName("parameterStyle"),
+                                new EnumDetails(
+                                        new JavaType(
+                                                "org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService.GvNIXWebServiceParameterStyle"),
+                                        new JavaSymbolName("WRAPPED")));
+
+                        if (pair.getName().contentEquals("parameterStyle")) {
+
+                            enumparameterStyleAttributeValue = new EnumAttributeValue(
+                                    new JavaSymbolName("parameterStyle"),
+                                    new EnumDetails(
+                                            new JavaType(
+                                                    "org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService.GvNIXWebServiceParameterStyle"),
+                                            new JavaSymbolName(((FieldAccessExpr) pair.getValue())
+                                                    .getField())));
+
+                            gvNIXWebServiceAnnotationAttributes
+                                    .add(enumparameterStyleAttributeValue);
+                        }
                     }
                 }
             }
         }
+
 
         /*
          * @GvNIXWebService
@@ -1571,6 +1623,29 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
             gvNIXWEbMethodAnnotationAttributeValues
                     .add(responseClassNameAttributeValue);
 
+        }
+
+        // @javax.jws.soap.SOAPBinding
+        AnnotationMetadata sOAPBindingAnnotation = MemberFindingUtils
+                .getAnnotationOfType(methodAnnotations, new JavaType(
+                        "javax.jws.soap.SOAPBinding"));
+
+        if (sOAPBindingAnnotation != null) {
+            
+            EnumAttributeValue sOAPBindingAttributeValue = (EnumAttributeValue) sOAPBindingAnnotation
+            .getAttribute(new JavaSymbolName("parameterStyle"));
+
+            if (sOAPBindingAttributeValue != null) {
+
+                gvNIXWEbMethodAnnotationAttributeValues
+                        .add(new EnumAttributeValue(
+                                new JavaSymbolName("parameterStyle"),
+                                new EnumDetails(
+                                        new JavaType(
+                                                "org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod.GvNIXWebMethodParameterStyle"),
+                                        sOAPBindingAttributeValue.getValue()
+                                                .getField())));
+            }
         }
 
         gvNIXWEbMethodAnnotationMetadata = new DefaultAnnotationMetadata(

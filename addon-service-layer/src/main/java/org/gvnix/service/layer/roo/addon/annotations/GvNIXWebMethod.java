@@ -20,6 +20,8 @@ package org.gvnix.service.layer.roo.addon.annotations;
 
 import java.lang.annotation.*;
 
+import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService.GvNIXWebServiceParameterStyle;
+
 /**
  * <p>
  * GvNix Annotation to identify GvNIX created WebMethods to publish as
@@ -35,9 +37,17 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface GvNIXWebMethod {
 
+    public enum GvNIXWebMethodParameterStyle
+    {
+        BARE, WRAPPED
+    }
+
     String operationName();
 
     Class<?> webResultType();
+
+    // TODO:
+    String webResultPartName() default "parameters";
 
     String action() default "";
 
@@ -56,5 +66,12 @@ public @interface GvNIXWebMethod {
     String responseWrapperNamespace() default "";
 
     String responseWrapperClassName() default "";
+
+    /**
+     * SOAPBinding parameter style for Web Service operation.
+     * 
+     * @return
+     */
+    GvNIXWebMethodParameterStyle parameterStyle() default GvNIXWebMethodParameterStyle.WRAPPED;
 
 }

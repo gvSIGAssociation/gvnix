@@ -44,6 +44,6 @@ public @interface GvNIXXmlElement {
     
     boolean exported();
     
-    boolean enumElement();
+    boolean enumElement() default false;
 
 }

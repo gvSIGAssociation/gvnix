@@ -24,8 +24,7 @@ import java.util.logging.Logger;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.layer.roo.addon.annotations.GvNIXXmlElementField;
 import org.springframework.roo.addon.entity.EntityMetadata;
-import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
@@ -91,6 +90,11 @@ public class ServiceLayerWSExportXmlElementMetadata extends
                 builder.addTypeAnnotation(annotationMetadata);
             }
 
+            // If is Java Enum type
+            if (governorTypeDetails.getPhysicalTypeCategory().equals(PhysicalTypeCategory.ENUMERATION))
+            {
+                logger.severe("Enumerado!!!!!!");
+            }
             // Declared XmlTransient field annotations.
             List<DeclaredFieldAnnotationDetails> declaredFieldXmlTransientFieldList = getXmlTransientFieldAnnotations(fieldmetadataTransientList);
 

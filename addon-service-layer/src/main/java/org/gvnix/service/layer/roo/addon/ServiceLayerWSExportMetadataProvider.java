@@ -271,6 +271,10 @@ public class ServiceLayerWSExportMetadataProvider extends
                         new JavaSymbolName("fullyQualifiedTypeName"),
                         governorTypeDetails.getName()
                                 .getFullyQualifiedTypeName()));
+                gvNixAnnotationAttributes
+                .add((StringAttributeValue) gvNIXWebServiceAnnotation
+                        .getAttribute(new JavaSymbolName("exported")));
+
                 annotationsService.addJavaTypeAnnotation(governorTypeDetails
                         .getName(), GvNIXWebService.class.getName(),
                         gvNixAnnotationAttributes, true);

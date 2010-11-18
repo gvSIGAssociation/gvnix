@@ -188,6 +188,7 @@ public class ServiceLayerWsExportOperationsImpl implements
     }
 
     /**
+     * {@inheritDoc}
      */
     public List<AnnotationAttributeValue<?>> exportServiceAnnotationAttributes(
             JavaType serviceClass, String serviceName, String portTypeName,
@@ -231,6 +232,7 @@ public class ServiceLayerWsExportOperationsImpl implements
                         .getFullyQualifiedTypeName()));
         gvNixAnnotationAttributes.add(new BooleanAttributeValue(
                 new JavaSymbolName("exported"), false));
+
         return gvNixAnnotationAttributes;
     }
 

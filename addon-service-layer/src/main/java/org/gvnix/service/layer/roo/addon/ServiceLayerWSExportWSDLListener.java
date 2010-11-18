@@ -51,6 +51,7 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
 
     static final String webService = "javax.jws.WebService";
     static final String webServiceInterface = "WebService";
+    static final String soapBinding = "SOAPBinding";
     static final String xmlRootElement = "XmlRootElement";
     static final String xmlAccessorType = "XmlAccessorType";
     static final String xmlType = "XmlType";

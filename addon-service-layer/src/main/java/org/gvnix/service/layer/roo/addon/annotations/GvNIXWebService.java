@@ -34,6 +34,11 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 public @interface GvNIXWebService {
 
+    public enum GvNIXWebServiceParameterStyle
+    {
+        BARE, WRAPPED
+    }
+
     /** 
      * Web Service portType
      * 
@@ -81,4 +86,12 @@ public @interface GvNIXWebService {
      * @return
      */
     boolean exported();
+    
+    /**
+     * SOAPBinding parameter style for Web Service.
+     * 
+     * @return
+     */
+    GvNIXWebServiceParameterStyle parameterStyle() default GvNIXWebServiceParameterStyle.WRAPPED;
+
 }

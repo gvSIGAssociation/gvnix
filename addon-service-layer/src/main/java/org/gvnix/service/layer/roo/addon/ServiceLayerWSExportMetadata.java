@@ -79,10 +79,14 @@ public class ServiceLayerWSExportMetadata extends
         if (annotationMetadata != null) {
 
             // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
+            AnnotationMetadata webServiceAnnotationMetadata = getWebServiceAnnotation(annotationMetadata);
+            
             builder
-                    .addTypeAnnotation(getWebServiceAnnotation(annotationMetadata));
+                    .addTypeAnnotation(webServiceAnnotationMetadata);
 
-            builder.addTypeAnnotation(getSoapBindingAnnotation());
+            AnnotationMetadata soapBindingAnnotationMetadata = getSoapBindingAnnotation(annotationMetadata);
+
+            builder.addTypeAnnotation(soapBindingAnnotationMetadata);
 
             // Methods to exclude from web service.
             List<MethodMetadata> methodMetadataListToExclude = new ArrayList<MethodMetadata>();
@@ -174,10 +178,13 @@ public class ServiceLayerWSExportMetadata extends
      * Adds @javax.jws.soap.SOAPBinding annotation to the type, unless it
      * already exists.
      * 
+     * @param annotationMetadata
+     *            to check if exists SOAPBinding parameter type value defined.
+     * 
      * @return the annotation is already exists or will be created, or null if
      *         it will not be created (required)
      */
-    public AnnotationMetadata getSoapBindingAnnotation() {
+    public AnnotationMetadata getSoapBindingAnnotation(AnnotationMetadata annotationMetadata) {
         JavaType javaType = new JavaType("javax.jws.soap.SOAPBinding");
 
         if (isAnnotationIntroduced("javax.jws.soap.SOAPBinding")) {
@@ -198,11 +205,25 @@ public class ServiceLayerWSExportMetadata extends
 
             annotationAttributeValueList.add(enumUseAttributeValue);
 
-            EnumAttributeValue enumparameterStyleAttributeValue = new EnumAttributeValue(
-                    new JavaSymbolName("parameterStyle"),
-                    new EnumDetails(new JavaType(
-                            "javax.jws.soap.SOAPBinding.ParameterStyle"),
-                            new JavaSymbolName("WRAPPED")));
+            EnumAttributeValue enumparameterStyleAttributeValue = (EnumAttributeValue) annotationMetadata
+                    .getAttribute(new JavaSymbolName("parameterStyle"));
+
+            if (enumparameterStyleAttributeValue != null) {
+
+                enumparameterStyleAttributeValue = new EnumAttributeValue(
+                        new JavaSymbolName("parameterStyle"),
+                        new EnumDetails(new JavaType(
+                                "javax.jws.soap.SOAPBinding.ParameterStyle"),
+                                enumparameterStyleAttributeValue.getValue()
+                                        .getField()));
+
+            } else {
+                enumparameterStyleAttributeValue = new EnumAttributeValue(
+                        new JavaSymbolName("parameterStyle"),
+                        new EnumDetails(new JavaType(
+                                "javax.jws.soap.SOAPBinding.ParameterStyle"),
+                                new JavaSymbolName("WRAPPED")));
+            }
 
             annotationAttributeValueList.add(enumparameterStyleAttributeValue);
 
@@ -350,6 +371,7 @@ public class ServiceLayerWSExportMetadata extends
 
             annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
+            // TODO: Check parameters header, partName from WebResult.
             BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
                     new JavaSymbolName("header"), false);
             annotationAttributeValueList.add(headerAttributeValue);

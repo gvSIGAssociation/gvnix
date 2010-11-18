@@ -1269,6 +1269,13 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         Element wsdlOption = pom.createElement("wsdlOption");
 
+        // Check URI correct format
+        if  (StringUtils.startsWithIgnoreCase(wsdlLocation, "file:")) {
+
+            int fileIndex = 5;
+            wsdlLocation = wsdlLocation.substring(fileIndex);
+        }
+
         Element wsdl = pom.createElement("wsdl");
         wsdl.setTextContent(wsdlLocation);
 
