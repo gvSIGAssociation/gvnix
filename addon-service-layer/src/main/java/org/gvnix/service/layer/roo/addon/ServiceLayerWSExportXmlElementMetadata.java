@@ -91,21 +91,22 @@ public class ServiceLayerWSExportXmlElementMetadata extends
             }
 
             // If is Java Enum type
-            if (governorTypeDetails.getPhysicalTypeCategory().equals(PhysicalTypeCategory.ENUMERATION))
-            {
-                logger.severe("Enumerado!!!!!!");
-            }
-            // Declared XmlTransient field annotations.
-            List<DeclaredFieldAnnotationDetails> declaredFieldXmlTransientFieldList = getXmlTransientFieldAnnotations(fieldmetadataTransientList);
+            if (!governorTypeDetails.getPhysicalTypeCategory().equals(
+                    PhysicalTypeCategory.ENUMERATION)) {
 
-            for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlTransientFieldList) {
-                builder.addFieldAnnotation(declaredFieldAnnotationDetails);
-            }
+                // Declared XmlTransient field annotations.
+                List<DeclaredFieldAnnotationDetails> declaredFieldXmlTransientFieldList = getXmlTransientFieldAnnotations(fieldmetadataTransientList);
 
-            // Declared XmlElement field annotations
-            List<DeclaredFieldAnnotationDetails> declaredFieldXmlElementFieldList = getXmlElementFieldAnnotations(fieldMetadataElementList);
-            for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlElementFieldList) {
-                builder.addFieldAnnotation(declaredFieldAnnotationDetails);
+                for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlTransientFieldList) {
+                    builder.addFieldAnnotation(declaredFieldAnnotationDetails);
+                }
+
+                // Declared XmlElement field annotations
+                List<DeclaredFieldAnnotationDetails> declaredFieldXmlElementFieldList = getXmlElementFieldAnnotations(fieldMetadataElementList);
+                for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlElementFieldList) {
+                    builder.addFieldAnnotation(declaredFieldAnnotationDetails);
+                }
+
             }
         }
 
@@ -224,6 +225,8 @@ public class ServiceLayerWSExportXmlElementMetadata extends
             AnnotationMetadata gvNIXXmlElementAnnotationMetadata,
             List<FieldMetadata> fieldElementList) {
 
+        boolean enumerationClass = governorTypeDetails.getPhysicalTypeCategory().equals(PhysicalTypeCategory.ENUMERATION);
+
         AnnotationAttributeValue<?> tmpAttribute;
 
         // Boolean exported attribute.
@@ -318,10 +321,27 @@ public class ServiceLayerWSExportXmlElementMetadata extends
         xmlAccessorTypeAnnotationAttributeValueList
                 .add(xmlAccessTypeAttributeValue);
 
-        AnnotationMetadata xmlAccessorTypeAnnotation = new DefaultAnnotationMetadata(
-                xmlAccessorType, xmlAccessorTypeAnnotationAttributeValueList);
+        if (!enumerationClass) {
+            AnnotationMetadata xmlAccessorTypeAnnotation = new DefaultAnnotationMetadata(
+                    xmlAccessorType,
+                    xmlAccessorTypeAnnotationAttributeValueList);
 
-        annotationTypeList.add(xmlAccessorTypeAnnotation);
+            annotationTypeList.add(xmlAccessorTypeAnnotation);
+        }
+        
+        if (enumerationClass) {
+
+            // @XmlEnum
+            List<AnnotationAttributeValue<?>> xmlEnumAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+            JavaType xmlEnum = new JavaType("javax.xml.bind.annotation.XmlEnum");
+
+            AnnotationMetadata xmlEnumAnnotation = new DefaultAnnotationMetadata(
+                    xmlEnum, xmlEnumAnnotationAttributeValueList);
+
+            annotationTypeList.add(xmlEnumAnnotation);
+
+        }
 
         return annotationTypeList;
 

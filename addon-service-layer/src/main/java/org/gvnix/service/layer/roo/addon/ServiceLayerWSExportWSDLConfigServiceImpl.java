@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.*;
-import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebMethod.GvNIXWebMethodParameterStyle;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
@@ -232,6 +231,36 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
             }
 
         }
+        
+        // Copy 'package-info.java' to Elements package directory
+        String filePackageInfo = fileDirectory.concat(SCHEMA_PACKAGE_INFO);
+        File packageInfoFile = new File(filePackageInfo);
+        if (packageInfoFile.exists()) {
+
+            String absoluteFilePath = packageInfoFile.getAbsolutePath();
+            absoluteFilePath = StringUtils
+                    .delete(
+                            absoluteFilePath,
+                            pathResolver
+                                    .getIdentifier(
+                                            Path.ROOT,
+                                            ServiceLayerWSExportWSDLListener.GENERATED_CXF_SOURCES_DIR));
+
+            String destinyPath = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+                    absoluteFilePath);
+
+            File newPackageInfoFile = new File(destinyPath);
+
+            try {
+                FileCopyUtils.copy(packageInfoFile, newPackageInfoFile);
+                // TODO: Notificación de la creación del archivo 'package-info.java'.
+            } catch (IOException e) {
+                throw new IllegalStateException(
+                        "File 'package-info.java' couldn't be created.");
+            }
+
+        }
+
     }
 
     /**
@@ -277,7 +306,9 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
         List<JavaSymbolName> enumConstants = new ArrayList<JavaSymbolName>();
 
-        if (typeDeclaration instanceof EnumDeclaration) {
+        boolean isEnumDeclaration = typeDeclaration instanceof EnumDeclaration;
+
+        if (isEnumDeclaration) {
             EnumDeclaration enumDeclaration = (EnumDeclaration) typeDeclaration;
             
             physicalTypeCategory = PhysicalTypeCategory.ENUMERATION;
@@ -295,35 +326,88 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
             MethodDeclaration methodDeclaration;
             MethodMetadata tmpMethodMetadata;
             MethodMetadata methodMetadata;
+            ConstructorMetadata constructorMetadata;
+            ConstructorMetadata tmpConstructorMetadata;
+            ConstructorDeclaration constructorDeclaration;
 
             for (BodyDeclaration bodyDeclaration : enumDeclaration.getMembers()) {
-                
+
                 if (bodyDeclaration instanceof MethodDeclaration) {
 
                     methodDeclaration = (MethodDeclaration) bodyDeclaration;
 
                     tmpMethodMetadata = new JavaParserMethodMetadata(
-                            declaredByMetadataId,
-                            methodDeclaration,
+                            declaredByMetadataId, methodDeclaration,
                             compilationUnitServices,
                             new HashSet<JavaSymbolName>());
 
                     methodMetadata = new DefaultMethodMetadata(
                             declaredByMetadataId, tmpMethodMetadata
-                                    .getModifier(),
-                            tmpMethodMetadata.getMethodName(),
-                            tmpMethodMetadata.getReturnType(),
-                            tmpMethodMetadata.getParameterTypes(),
-                            tmpMethodMetadata.getParameterNames(),
-                            tmpMethodMetadata.getAnnotations(),
-                            tmpMethodMetadata.getThrowsTypes(),
-                            tmpMethodMetadata.getBody().substring(
-                                    tmpMethodMetadata.getBody()
-                                            .indexOf("{") + 1,
-                                    tmpMethodMetadata.getBody()
-                                            .lastIndexOf("}")));
+                                    .getModifier(), tmpMethodMetadata
+                                    .getMethodName(), tmpMethodMetadata
+                                    .getReturnType(), tmpMethodMetadata
+                                    .getParameterTypes(), tmpMethodMetadata
+                                    .getParameterNames(), tmpMethodMetadata
+                                    .getAnnotations(), tmpMethodMetadata
+                                    .getThrowsTypes(), tmpMethodMetadata
+                                    .getBody().substring(
+                                            tmpMethodMetadata.getBody()
+                                                    .indexOf("{") + 1,
+                                            tmpMethodMetadata.getBody()
+                                                    .lastIndexOf("}")));
 
                     methodMetadataList.add(methodMetadata);
+
+                } else if (bodyDeclaration instanceof FieldDeclaration) {
+
+                    tmpFieldDeclaration = (FieldDeclaration) bodyDeclaration;
+                    fieldDeclaration = new FieldDeclaration(tmpFieldDeclaration
+                            .getJavaDoc(), tmpFieldDeclaration.getModifiers(),
+                            tmpFieldDeclaration.getAnnotations(),
+                            tmpFieldDeclaration.getType(), tmpFieldDeclaration
+                                    .getVariables());
+
+                    for (VariableDeclarator var : fieldDeclaration
+                            .getVariables()) {
+
+                        fieldMetadata = new JavaParserFieldMetadata(
+                                declaredByMetadataId, fieldDeclaration, var,
+                                compilationUnitServices,
+                                new HashSet<JavaSymbolName>());
+
+                        fieldMetadataList.add(fieldMetadata);
+                    }
+                } else if (bodyDeclaration instanceof ConstructorDeclaration) {
+
+                    constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
+
+                    tmpConstructorMetadata = new JavaParserConstructorMetadata(
+                            declaredByMetadataId,
+                            constructorDeclaration,
+                            compilationUnitServices,
+                            new HashSet<JavaSymbolName>());
+
+                    constructorMetadata = new DefaultConstructorMetadata(
+                            declaredByMetadataId,
+                            tmpConstructorMetadata.getModifier(),
+                            tmpConstructorMetadata
+                                    .getParameterTypes(),
+                            tmpConstructorMetadata
+                                    .getParameterNames(),
+                            tmpConstructorMetadata.getAnnotations(),
+                            tmpConstructorMetadata
+                                    .getBody()
+                                    .substring(
+                                            tmpConstructorMetadata
+                                                    .getBody()
+                                                    .indexOf("{") + 1,
+                                            tmpConstructorMetadata
+                                                    .getBody()
+                                                    .lastIndexOf(
+                                                            "}")));
+
+                    constructorMetadataList
+                            .add(constructorMetadata);
 
                 }
             }
@@ -364,14 +448,17 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
             }
         }
 
-        // ROO entity to generate getters and setters methods.
-        AnnotationMetadata rooEntityAnnotationMetadata = new DefaultAnnotationMetadata(
-                new JavaType(
-                        "org.springframework.roo.addon.javabean.RooJavaBean"),
-                new ArrayList<AnnotationAttributeValue<?>>());
-
         List<AnnotationMetadata> gvNixAnnotationList = new ArrayList<AnnotationMetadata>();
-        gvNixAnnotationList.add(rooEntityAnnotationMetadata);
+
+        // ROO entity to generate getters and setters methods if is not an Enum Type class.
+        if (!isEnumDeclaration) {
+            AnnotationMetadata rooEntityAnnotationMetadata = new DefaultAnnotationMetadata(
+                    new JavaType(
+                            "org.springframework.roo.addon.javabean.RooJavaBean"),
+                    new ArrayList<AnnotationAttributeValue<?>>());
+
+            gvNixAnnotationList.add(rooEntityAnnotationMetadata);
+        }
 
         // GvNIXXmlElement annotation.
         AnnotationMetadata gvNixXmlElementAnnotation = getGvNIXXmlElementAnnotation(
@@ -962,7 +1049,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                         ServiceLayerWSExportWSDLListener.xmlAccessorType)) {
 
                 }
-            } else if (annotationExpr instanceof MarkerAnnotationExpr) {
+            } /* else if (annotationExpr instanceof MarkerAnnotationExpr) {
                 
                 MarkerAnnotationExpr markerAnnotationExpr = (MarkerAnnotationExpr) annotationExpr;
                 if (markerAnnotationExpr.getName().toString().contentEquals(ServiceLayerWSExportWSDLListener.xmlEnum)) {
@@ -975,7 +1062,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                     continue;
                 }
 
-            }
+            } */
 
         }
 
@@ -1065,8 +1152,22 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         }
 
         // Exported attribute value
-        BooleanAttributeValue exportedBooleanAttributeValue = new BooleanAttributeValue(new JavaSymbolName("exported"), true);
+        BooleanAttributeValue exportedBooleanAttributeValue = new BooleanAttributeValue(
+                new JavaSymbolName("exported"), true);
         annotationAttributeValues.add(exportedBooleanAttributeValue);
+
+        // Check if is an Enum class.
+        boolean isEnumDeclaration = typeDeclaration instanceof EnumDeclaration;
+        BooleanAttributeValue enumElementBooleanAttributeValue;
+
+        if (isEnumDeclaration) {
+            enumElementBooleanAttributeValue = new BooleanAttributeValue(
+                    new JavaSymbolName("enumElement"), true);
+        } else {
+            enumElementBooleanAttributeValue = new BooleanAttributeValue(
+                    new JavaSymbolName("enumElement"), false);
+        }
+        annotationAttributeValues.add(enumElementBooleanAttributeValue);
 
         // Create annotation.
         gvNIXXmlElementAnnotationMetadata = new DefaultAnnotationMetadata(

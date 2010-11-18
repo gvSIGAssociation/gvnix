@@ -63,7 +63,7 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
     @Reference
     private ServiceLayerWSExportWSDLConfigService serviceLayerWSExportWSDLConfigService;
 
-    private static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
+    static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
 
     protected static Logger logger = Logger
             .getLogger(ServiceLayerWSExportWSDLListener.class.getName());
