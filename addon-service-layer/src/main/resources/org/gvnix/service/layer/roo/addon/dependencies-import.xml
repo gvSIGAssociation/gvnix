@@ -6,4 +6,6 @@
 		<exclusion org="org.springframework" name="spring-web" />
 	</exclusions>
 	</dependency>
+	<!-- Generated CXF classes uses javax.persistence.Entity -->
+	<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.0.Final" />
 </dependencies>

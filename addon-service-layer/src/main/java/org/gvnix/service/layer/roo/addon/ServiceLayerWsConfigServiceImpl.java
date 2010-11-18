@@ -1350,61 +1350,82 @@ public class ServiceLayerWsConfigServiceImpl implements
      */
     private boolean addImportLocationDocument(String wsdlLocation) {
 
-        // Get plugin template
-        Element plugin = XmlUtils.findFirstElement("/codegen-plugin/plugin",
-                XmlUtils.getConfiguration(this.getClass(),
-                        "dependencies-import-codegen-plugin.xml"));
+	// Get plugin template
+	Element pluginTemplate = XmlUtils.findFirstElement(
+		"/codegen-plugin/plugin", XmlUtils.getConfiguration(this
+			.getClass(), "dependencies-import-codegen-plugin.xml"));
 
-        // Add plugin
-        projectOperations.buildPluginUpdate(new Plugin(plugin));
+	// Add plugin
+	projectOperations.buildPluginUpdate(new Plugin(pluginTemplate));
 
-        // Get pom.xml
-        String pomPath = getPomFilePath();
-        Assert.notNull(pomPath, "pom.xml configuration file not found.");
+	// Get pom.xml
+	String pomPath = getPomFilePath();
+	Assert.notNull(pomPath, "pom.xml configuration file not found.");
 
-        // Get a mutable pom.xml reference to modify it
-        MutableFile pomMutableFile = null;
-        Document pom;
-        try {
-            pomMutableFile = fileManager.updateFile(pomPath);
-            pom = XmlUtils.getDocumentBuilder().parse(
-                    pomMutableFile.getInputStream());
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-
-        Element root = pom.getDocumentElement();
-
-        // Get plugin element
-        Element codegenWsPlugin = XmlUtils
-                .findFirstElement(
-                        "/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']",
-                        root);
-
-        // If plugin element not exists, message error
-        Assert
-                .notNull(codegenWsPlugin,
-                        "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
-        
-	// The wsdl location already exists ?
-	Element wsdlLocationElement = XmlUtils.findFirstElement(
-		"executions/execution/configuration/wsdlOptions/wsdlOption[wsdl='"
-			+ wsdlLocation + "']", codegenWsPlugin);
-
-	// If location already added on plugin, do nothing
-	if (wsdlLocationElement != null) {
-
-	    return false;
+	// Get a mutable pom.xml reference to modify it
+	MutableFile pomMutableFile = null;
+	Document pom;
+	try {
+	    pomMutableFile = fileManager.updateFile(pomPath);
+	    pom = XmlUtils.getDocumentBuilder().parse(
+		    pomMutableFile.getInputStream());
+	} catch (Exception e) {
+	    throw new IllegalStateException(e);
 	}
 
-	// Access executions > execution > configuration > sourceRoot,
-	// wsdlOptions and defaultOptions.
+	Element root = pom.getDocumentElement();
+
+	// Get plugin element
+	Element plugin = XmlUtils
+		.findFirstElement(
+			"/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']",
+			root);
+
+	// If plugin element not exists, message error
+	Assert
+		.notNull(plugin,
+			"Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+
+	// The wsdl location already exists ?
+	Element execution = XmlUtils.findFirstElement(
+		"executions/execution[phase='generate-sources']", plugin);
+
+	// If required execution already exists
+	if (execution != null) {
+
+	    // The wsdl location already exists ?
+	    Element wsdlOptionElement = XmlUtils.findFirstElement(
+		    "configuration/wsdlOptions/wsdlOption[wsdl='"
+			    + wsdlLocation + "']", execution);
+
+	    // If location already added on plugin, do nothing
+	    if (wsdlOptionElement != null) {
+
+		return false;
+	    }
+	} else {
+
+	    Element executions = XmlUtils.findFirstElementByName("executions",
+		    plugin);
+	    execution = pom.createElement("execution");
+	    Element id = pom.createElement("id");
+	    id.setTextContent("generate-sources");
+	    Element phase = pom.createElement("phase");
+	    phase.setTextContent("generate-sources");
+	    execution.appendChild(id);
+	    execution.appendChild(phase);
+	    Element goals = pom.createElement("goals");
+	    Element goal = pom.createElement("goal");
+	    goal.setTextContent("wsdl2java");
+	    goals.appendChild(goal);
+	    execution.appendChild(goals);
+	    executions.appendChild(execution);
+	}
+
+	// Access execution > configuration > sourceRoot, wsdlOptions and
+	// defaultOptions.
 	// Configuration, sourceRoot, wsdlOptions and defaultOptions are
 	// created if not exists.
-	Element executions = XmlUtils.findFirstElementByName("executions",
-		codegenWsPlugin);
-	Element execution = XmlUtils.findFirstElementByName("execution",
-		executions);
 	Element configuration = XmlUtils.findFirstElementByName(
 		"configuration", execution);
 	if (configuration == null) {

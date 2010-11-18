@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dependencies>
 	<dependency org="axis" name="axis" rev="${axis.version}" />
+	<!-- Generated Axis classes uses javax.persistence.Entity -->
+	<dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.0.Final" />
 </dependencies>
