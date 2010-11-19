@@ -277,4 +277,11 @@ public interface ServiceLayerWSExportWSDLConfigService {
      */
     public void resetGeneratedFilesList();
 
+    /** 
+     * Updates package info file location.
+     * 
+     * @param schemaPackageInfoFile File absolute path.
+     */
+    public void setSchemaPackageInfoFile(File schemaPackageInfoFile);
+
 }

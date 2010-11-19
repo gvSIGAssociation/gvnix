@@ -111,7 +111,8 @@ public class JavaParserServiceImpl implements JavaParserService {
             List<MethodMetadata> declaredMethodList,
             List<ConstructorMetadata> declaredConstructorList,
             List<JavaType> declaredClassList,
-            PhysicalTypeCategory physicalTypeCategory, List<JavaSymbolName> enumConstantsList) {
+            PhysicalTypeCategory physicalTypeCategory,
+            List<JavaSymbolName> enumConstantsList) {
 
         // Metadata Id.
         String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(

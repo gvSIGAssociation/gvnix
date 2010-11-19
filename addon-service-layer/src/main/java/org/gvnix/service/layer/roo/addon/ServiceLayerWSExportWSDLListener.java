@@ -36,6 +36,7 @@ import org.springframework.roo.file.monitor.event.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
@@ -57,6 +58,7 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
     static final String xmlType = "XmlType";
     static final String xmlEnum = "XmlEnum";
     static final String webFault = "WebFault";
+    static final String PACKAGE_INFO_FILE = "package-info.java";
 
     @Reference
     private PathResolver pathResolver;
@@ -95,6 +97,11 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
                     || (fileEvent.getOperation().compareTo(FileOperation.CREATED) == 0)
                     || (fileEvent.getOperation().compareTo(
                             FileOperation.UPDATED) == 0)) {
+
+                if (file.getName().contentEquals(PACKAGE_INFO_FILE)) {
+                    serviceLayerWSExportWSDLConfigService.setSchemaPackageInfoFile(file);
+                    return;
+                }
 
                 // Parse Java file.
                 CompilationUnit unit;

@@ -25,19 +25,18 @@ import japa.parser.ast.body.*;
 import japa.parser.ast.expr.*;
 import japa.parser.ast.type.ClassOrInterfaceType;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.*;
-import org.springframework.roo.classpath.PhysicalTypeCategory;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.*;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.javaparser.details.*;
+import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.file.monitor.DirectoryMonitoringRequest;
 import org.springframework.roo.file.monitor.NotifiableFileMonitorService;
 import org.springframework.roo.file.monitor.event.FileOperation;
@@ -74,9 +73,13 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
     private NotifiableFileMonitorService fileMonitorService;
     @Reference
     private JavaParserService javaParserService;
+    @Reference
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    @Reference
+    private ClasspathOperations classpathOperations;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
-    private static final String SCHEMA_PACKAGE_INFO = "package-info.java";
+    private File schemaPackageInfoFile;
 
     private List<File> gVNIXXmlElementList = new ArrayList<File>();
     private List<File> gVNIXWebFaultList = new ArrayList<File>();
@@ -183,12 +186,17 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
     /**
      * {@inheritDoc}
      * 
-     * TODO: Generate @GvNIXXmlFieldElement annotations to declared fields.
+     * Generate @GvNIXXmlFieldElement annotations to declared fields.
      */
     public void generateGvNIXXmlElementsClasses() {
 
         String fileDirectory = null;
         int lastPathSepratorIndex = 0;
+
+        // Parse Java file.
+        CompilationUnit compilationUnit;
+        PackageDeclaration packageDeclaration;
+        List<ImportDeclaration> importDeclarationList;
 
         for (File xmlElementFile : gVNIXXmlElementList) {
 
@@ -198,14 +206,10 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
             fileDirectory = fileDirectory.substring(0,
                     lastPathSepratorIndex + 1);
 
-            // Parse Java file.
-            CompilationUnit compilationUnit;
-            PackageDeclaration packageDeclaration;
-
             try {
                 compilationUnit = JavaParser.parse(xmlElementFile);
                 packageDeclaration = compilationUnit.getPackage();
-                List<ImportDeclaration> importDeclarationList = compilationUnit
+                importDeclarationList = compilationUnit
                         .getImports();
 
                 // Get the first class or interface Java type
@@ -220,49 +224,69 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                 }
 
             } catch (ParseException e) {
-                Assert.state(false, "Generated Xml Element service java file '"
-                        + xmlElementFile.getAbsolutePath() + "' has errors:\n"
-                        + e.getMessage());
 
-            } catch (IOException e) {
-                e.printStackTrace();
-                Assert.state(false, "Generated Xml Element service java file '"
-                        + xmlElementFile.getAbsolutePath() + "' has errors:\n"
-                        + e.getMessage());
-            }
+                throw new IllegalStateException(
+                        "Generated Xml Element service java file '"
+                                + xmlElementFile.getAbsolutePath()
+                                + "' has errors:\n" + e.getMessage());
 
-        }
-
-        // Copy 'package-info.java' to Elements package directory
-        String filePackageInfo = fileDirectory.concat(SCHEMA_PACKAGE_INFO);
-        File packageInfoFile = new File(filePackageInfo);
-        if (packageInfoFile.exists()) {
-
-            String absoluteFilePath = packageInfoFile.getAbsolutePath();
-            absoluteFilePath = StringUtils
-                    .delete(
-                            absoluteFilePath,
-                            pathResolver
-                                    .getIdentifier(
-                                            Path.ROOT,
-                                            ServiceLayerWSExportWSDLListener.GENERATED_CXF_SOURCES_DIR));
-
-            String destinyPath = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
-                    absoluteFilePath);
-
-            File newPackageInfoFile = new File(destinyPath);
-
-            try {
-                FileCopyUtils.copy(packageInfoFile, newPackageInfoFile);
-                // TODO: Notificación de la creación del archivo
-                // 'package-info.java'.
             } catch (IOException e) {
                 throw new IllegalStateException(
-                        "File 'package-info.java' couldn't be created.");
+                        "Generated Xml Element service java file '"
+                                + xmlElementFile.getAbsolutePath()
+                                + "' has errors:\n" + e.getMessage());
             }
 
         }
 
+        // Generate 'package-info.java' to Xml Elements package directory
+        generatePackageInfoFile();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public void generatePackageInfoFile() {
+
+        // Parse Java file.
+        if (schemaPackageInfoFile.exists()) {
+            try {
+
+                String pacakageFileToString = FileCopyUtils
+                        .copyToString(new InputStreamReader(
+                                new FileInputStream(schemaPackageInfoFile)));
+
+                String absoluteFilePath = schemaPackageInfoFile
+                        .getAbsolutePath();
+
+                absoluteFilePath = StringUtils
+                        .delete(
+                                absoluteFilePath,
+                                pathResolver
+                                        .getIdentifier(
+                                                Path.ROOT,
+                                                ServiceLayerWSExportWSDLListener.GENERATED_CXF_SOURCES_DIR));
+
+                String destinyPath = pathResolver.getIdentifier(
+                        Path.SRC_MAIN_JAVA, absoluteFilePath);
+
+                fileManager.createOrUpdateTextFileIfRequired(destinyPath,
+                        pacakageFileToString);
+
+            } catch (FileNotFoundException e) {
+                throw new IllegalStateException(
+                        "Generated 'package-info.java' file '"
+                                + schemaPackageInfoFile.getAbsolutePath()
+                                + "' doesn't exist:\n" + e.getMessage());
+            } catch (IOException e) {
+                throw new IllegalStateException(
+                        "Generated 'package-info.java' file '"
+                                + schemaPackageInfoFile.getAbsolutePath()
+                                + "' has errors:\n" + e.getMessage());
+            }
+        }
     }
 
     /**
@@ -280,7 +304,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         // CompilationUnitServices to create the class in fileSystem.
         ServiceLayerWSCompilationUnit compilationUnitServices;
 
-        // TODO: Retrieve correct values.
+        // Retrieve correct values.
         // Get field declarations.
         List<FieldMetadata> fieldMetadataList = new ArrayList<FieldMetadata>();
         List<ConstructorMetadata> constructorMetadataList = new ArrayList<ConstructorMetadata>();
@@ -668,7 +692,6 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
      * 
      */
     public void generateGvNIXWebServiceClasses() {
-        // TODO Auto-generated method stub
 
         List<AnnotationMetadata> gvNixAnnotationList;
 
@@ -1091,14 +1114,12 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
         if (!existsNamespace) {
 
-            String filePackageInfo = fileDirectory.concat(SCHEMA_PACKAGE_INFO);
-            File packageInfoFile = new File(filePackageInfo);
             CompilationUnit compilationUnit;
 
             String namespace = "";
             try {
 
-                compilationUnit = JavaParser.parse(packageInfoFile);
+                compilationUnit = JavaParser.parse(schemaPackageInfoFile);
 
                 List<AnnotationExpr> packageAnnotations = compilationUnit
                         .getPackage().getAnnotations();
@@ -1981,6 +2002,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         gVNIXWebFaultList = new ArrayList<File>();
         gVNIXWebServiceList = new ArrayList<File>();
         gVNIXWebServiceInterfaceList = new ArrayList<File>();
+        schemaPackageInfoFile = null;
     }
 
     /**
@@ -2015,6 +2037,14 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
             return null;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     */
+    public void setSchemaPackageInfoFile(File schemaPackageInfoFile) {
+        this.schemaPackageInfoFile = schemaPackageInfoFile;
     }
 
 }
