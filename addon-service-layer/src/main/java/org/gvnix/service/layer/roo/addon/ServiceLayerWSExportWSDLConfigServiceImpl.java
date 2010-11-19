@@ -32,11 +32,11 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.*;
-import org.springframework.roo.classpath.*;
+import org.springframework.roo.classpath.PhysicalTypeCategory;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.javaparser.details.*;
-import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.file.monitor.DirectoryMonitoringRequest;
 import org.springframework.roo.file.monitor.NotifiableFileMonitorService;
 import org.springframework.roo.file.monitor.event.FileOperation;
@@ -73,10 +73,6 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
     private NotifiableFileMonitorService fileMonitorService;
     @Reference
     private JavaParserService javaParserService;
-    @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
-    @Reference
-    private ClasspathOperations classpathOperations;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
     private File schemaPackageInfoFile;
