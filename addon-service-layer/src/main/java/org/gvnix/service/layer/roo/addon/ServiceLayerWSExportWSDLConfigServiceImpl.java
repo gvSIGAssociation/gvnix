@@ -191,8 +191,6 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
         // Parse Java file.
         CompilationUnit compilationUnit;
-        PackageDeclaration packageDeclaration;
-        List<ImportDeclaration> importDeclarationList;
 
         for (File xmlElementFile : gVNIXXmlElementList) {
 
@@ -204,17 +202,13 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
             try {
                 compilationUnit = JavaParser.parse(xmlElementFile);
-                packageDeclaration = compilationUnit.getPackage();
-                importDeclarationList = compilationUnit
-                        .getImports();
 
                 // Get the first class or interface Java type
                 List<TypeDeclaration> types = compilationUnit.getTypes();
                 if (types != null) {
                     TypeDeclaration type = types.get(0);
 
-                    generateJavaTypeFromTypeDeclaration(type,
-                            packageDeclaration, importDeclarationList,
+                    generateJavaTypeFromTypeDeclaration(type, compilationUnit,
                             fileDirectory);
 
                 }
@@ -291,14 +285,17 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
      * Generates Declared classes and its inner types.
      * </p>
      */
-    public void generateJavaTypeFromTypeDeclaration(TypeDeclaration typeDeclaration,
-            PackageDeclaration packageDeclaration,
-            List<ImportDeclaration> importDeclarationList, String fileDirectory) {
+    public void generateJavaTypeFromTypeDeclaration(
+            TypeDeclaration typeDeclaration, CompilationUnit compilationUnit,
+            String fileDirectory) {
 
         JavaType javaType;
         String declaredByMetadataId;
         // CompilationUnitServices to create the class in fileSystem.
         ServiceLayerWSCompilationUnit compilationUnitServices;
+
+        PackageDeclaration packageDeclaration = compilationUnit.getPackage();
+        List<ImportDeclaration> importDeclarationList = compilationUnit.getImports();
 
         // Retrieve correct values.
         // Get field declarations.
@@ -322,6 +319,8 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         compilationUnitServices = new ServiceLayerWSCompilationUnit(
                 new JavaPackage(packageName), javaType, importDeclarationList,
                 new ArrayList<TypeDeclaration>());
+
+        List<ClassOrInterfaceDeclaration> innerClassDeclarationList = new ArrayList<ClassOrInterfaceDeclaration>();
 
         // Physical type category by default 'class'.
         PhysicalTypeCategory physicalTypeCategory = PhysicalTypeCategory.CLASS;
@@ -453,6 +452,10 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                     for (VariableDeclarator var : fieldDeclaration
                             .getVariables()) {
 
+                        // Set var initilize to null beacuse if implements an
+                        // interface the class is not well generated.
+                        var.setInit(null);
+
                         fieldMetadata = new JavaParserFieldMetadata(
                                 declaredByMetadataId, fieldDeclaration, var,
                                 compilationUnitServices,
@@ -464,10 +467,11 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                     }
                 } else if (bodyDeclaration instanceof ClassOrInterfaceDeclaration) {
 
+                    innerClassDeclarationList.add((ClassOrInterfaceDeclaration)bodyDeclaration);
+
                     generateJavaTypeFromTypeDeclaration(
                             (TypeDeclaration) bodyDeclaration,
-                            packageDeclaration, importDeclarationList,
-                            fileDirectory);
+                            compilationUnit, fileDirectory);
                 }
 
             }

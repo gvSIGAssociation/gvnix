@@ -109,13 +109,12 @@ public interface ServiceLayerWSExportWSDLConfigService {
      * Generate JavaType class from declaration.
      * 
      * @param typeDeclaration class to convert to JavaType.
-     * @param packageDeclaration from class.
-     * @param importDeclarationList imported values.
+     * @param compilationUnit Values from class to check.
      * @param fileDirectory to check 'package-info.java' annotation values.
      */
-    public void generateJavaTypeFromTypeDeclaration(TypeDeclaration typeDeclaration,
-            PackageDeclaration packageDeclaration,
-            List<ImportDeclaration> importDeclarationList, String fileDirectory);
+    public void generateJavaTypeFromTypeDeclaration(
+            TypeDeclaration typeDeclaration, CompilationUnit compilationUnit,
+            String fileDirectory);
 
     /**
      * Generates java files with '@GvNIXWebFault' values.
