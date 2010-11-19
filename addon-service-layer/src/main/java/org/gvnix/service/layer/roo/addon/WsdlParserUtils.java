@@ -906,9 +906,9 @@ public class WsdlParserUtils {
 
 	    char ch = name.charAt(i);
 
-	    // Letter, number, $ or _
+	    // Letter, number or $
 	    if ((ch >= 'a') && (ch <= 'z') || (ch >= 'A') && (ch <= 'Z')
-		    || (ch >= '0') && (ch <= '9') || ch == '$' || ch == '_') {
+		    || (ch >= '0') && (ch <= '9') || ch == '$') {
 
 		if (upper) {
 
@@ -931,7 +931,7 @@ public class WsdlParserUtils {
 	    } else {
 
 		// Next characters will be replace by none, others to Unicode
-		if (ch != '-' && ch != ':' && ch != '.') {
+		if (ch != '-' && ch != '_' && ch != ':' && ch != '.') {
 
 		    // Unicode prefix
 		    ostr.append("_");

@@ -74,6 +74,12 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 // [CORRECT] Transport HTTPS, Operations: 4, Bindings: SOAP, Use: Literal
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy06 --wsdl http://elasticmapreduce.amazonaws.com/doc/2009-03-31/ElasticMapReduce.wsdl
 
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy07 --wsdl http://footballpool.dataaccess.eu/data/info.wso?WSDL
+
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy08 --wsdl http://ws2.fraudlabs.com/mailboxvalidator.asmx?wsdl
+ 
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy09 --wsdl http://www.thomas-bayer.com/axis2/services/BLZService?wsdl
+
 // Import Remote RPC Style web services: will be generated with Axis
 
 // [CORRECT] Transport: HTTP, Bindings: SOAP, Use: Encoded
