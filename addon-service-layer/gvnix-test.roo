@@ -93,13 +93,24 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy15 --wsdl http://api.eurocv.eu/euroserver.php?wsdl
 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy16 --wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy16 --wsdl http://wiki.vanguardsw.com/bin/ws.dsb?wsdl/Finance/Investing/Portfolio%20Simulation
 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy17 --wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy17 --wsdl http://www.unifiedsoftware.co.uk/freeibanvalidate.wsdl
 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy18 --wsdl
+service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy18 --wsdl http://greg.froh.ca/fun/random_bushism/soap/?wsdl
 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy19 --wsdl
+// Da error al parsear el xml del wsdl: ¿ por encoding latin1 del wsdl ? Premature end of file - The format of the web service to import has errors
+// xmethods no valida el WSDL
+// Web service explorer si que genera el cliente, no se puede probar respuesta pq necesita user
+//service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy16 --wsdl http://api.networkip.net/jaduka/?WSDL
+
+// Da error al generar el cliente con Axis: WSDLException (at /definitions/binding/operation/input): faultCode=INVALID_WSDL: Element '{http://schemas.xmlsoap.org/wsdl/}input' contained unexpected attributes: 'message'
+// xmethods si valida el WSDL
+// Web service explorer si que genera el cliente y responde ok
+//service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy19 --wsdl http://gis.orem.org/GISServices/OremGeocoder.dll/wsdl/IOremGeocoder
+
+// Axis plugin generates the Java code with errors
+//service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy19b --wsdl http://www.boyzoid.com/comp/randomQuote.cfc?wsdl
 
 // [ERROR] Remote and local file not existing
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy20 --wsdl http://this.location/not/exists

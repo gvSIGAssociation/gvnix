@@ -6,17 +6,8 @@
 		<version>1.4</version>
 		<configuration>
 			<outputDirectory>${project.build.directory}/generated-sources/client</outputDirectory>
-			<urls>
-		    </urls>
 		</configuration>
 		<executions>
-			<execution>
-                <id>generate-sources</id>
-                <phase>generate-sources</phase>
-				<goals>
-					<goal>wsdl2java</goal>
-				</goals>
-			</execution>
 		</executions>
 	</plugin>
 </axistools-plugin>

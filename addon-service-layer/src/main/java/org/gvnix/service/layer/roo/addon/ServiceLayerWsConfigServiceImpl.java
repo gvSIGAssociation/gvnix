@@ -1558,7 +1558,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 
 	// The wsdl location already exists ?
 	Element wsdlLocationElement = XmlUtils.findFirstElement(
-		"configuration/urls[url='" + wsdlLocation + "']",
+		"executions/execution/configuration/urls[url='" + wsdlLocation + "']",
 		axistoolsPlugin);
 
 	// If location already added on plugin, do nothing
@@ -1569,18 +1569,61 @@ public class ServiceLayerWsConfigServiceImpl implements
 
 	// Access configuration > urls element.
 	// Configuration and urls are created if not exists.
-	Element configuration = XmlUtils.findFirstElementByName(
-		"configuration", axistoolsPlugin);
-	if (configuration == null) {
+	Element executions = XmlUtils.findFirstElementByName(
+		"executions", axistoolsPlugin);
+	if (executions == null) {
 
-	    configuration = pom.createElement("configuration");
-	    axistoolsPlugin.appendChild(configuration);
+	    executions = pom.createElement("executions");
+	    axistoolsPlugin.appendChild(executions);
 	}
-	Element urls = XmlUtils.findFirstElementByName("urls", configuration);
-	if (urls == null) {
 
-	    urls = pom.createElement("urls");
-	    configuration.appendChild(urls);
+	Element execution = pom.createElement("execution");
+	Element id = pom.createElement("id");
+        id.setTextContent(wsdlLocation);
+	Element phase = pom.createElement("phase");
+	phase.setTextContent("generate-sources");
+	execution.appendChild(id);
+	execution.appendChild(phase);
+	Element goals = pom.createElement("goals");
+	Element goal = pom.createElement("goal");
+	goal.setTextContent("wsdl2java");
+	goals.appendChild(goal);
+	execution.appendChild(goals);
+	executions.appendChild(execution);
+
+	Element configuration = pom.createElement("configuration");
+	execution.appendChild(configuration);
+
+	Element urls = pom.createElement("urls");
+	configuration.appendChild(urls);
+
+	// Add the package name to generate sources
+	try {
+
+	    // Parse the wsdl location to a DOM document to obtain the
+	    // targetNamespace
+	    Document document = XmlUtils.getDocumentBuilder().parse(
+		    wsdlLocation);
+	    Element rootElement = document.getDocumentElement();
+	    Assert.notNull(rootElement, "No valid document format");
+
+	    // Configure the packagename to generate client sources
+	    Element packageSpace = pom.createElement("packageSpace");
+	    String packageName = WsdlParserUtils
+		    .getTargetNamespaceRelatedPackage(rootElement);
+	    packageSpace.setTextContent(packageName.substring(0, packageName
+		    .length() - 1));
+	    configuration.appendChild(packageSpace);
+	    
+	} catch (IOException e) {
+
+	    throw new IllegalStateException(
+		    "There is no connection to the web service to import");
+
+	} catch (SAXException e) {
+
+	    throw new IllegalStateException(
+		    "The format of the web service to import has errors");
 	}
 
 	// Create new url element and append it to the XML tree

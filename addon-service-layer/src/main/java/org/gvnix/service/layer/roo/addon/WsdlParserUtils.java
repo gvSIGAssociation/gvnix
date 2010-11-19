@@ -151,18 +151,8 @@ public class WsdlParserUtils {
 	String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
 	Assert.hasText(namespace, "Namespace has no text");
 
-	String pkg = "";
-	if (isRpcEncoded(root)) {
-
-	    // Axis package format
-	    pkg = getTargetNamespaceRelatedPackage(namespace, root);
-
-	} else {
-
-	    // Axis package in lower case and replacing slash with u letter.
-	    pkg = getTargetNamespaceRelatedPackage(namespace, root).toLowerCase();
-	    pkg = pkg.replace('_', 'u');
-	}
+	String pkg = getTargetNamespaceRelatedPackage(namespace, root).toLowerCase();
+	pkg = pkg.replace('_', 'u');
 
 	return pkg.concat(".");
     }
@@ -183,17 +173,8 @@ public class WsdlParserUtils {
      */
     private static String getTargetNamespaceRelatedPackage(String namespace, Element root) {
 
-	String packageName = makePackageName(namespace);
-	String pkg = normalizePackageName(packageName, javaPkgSeparator);
-	String serviceName = findFirstCompatibleServiceElementName(root);
-
-	String localName = getLocalName(serviceName);
-	if (localName.equals(packageName) && packageName.equals(pkg)) {
-	    
-	    pkg += "_pkg";
-	}
-
-	return pkg;
+	return normalizePackageName(makePackageName(namespace),
+		javaPkgSeparator);
     }
 
     /**
@@ -490,6 +471,11 @@ public class WsdlParserUtils {
 
 	// Find a compatible port type name
 	String name = findFirstCompatiblePortTypeClassName(root, sense);
+	
+	if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense) && name.endsWith("Port")) {
+	 
+	    name = name.concat("_PortType");
+	}
 
 	// Class path is the concat of path and name
 	return path + capitalizeFirstChar(name);
