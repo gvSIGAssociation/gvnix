@@ -106,7 +106,8 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         Document wsdlDocument = checkWSDLFile(wsdlLocation);
 
         // 2) Configure plugin cxf to generate java code using WSDL.
-        serviceLayerWsConfigService.addExportLocation(wsdlLocation, wsdlDocument, type);
+        serviceLayerWsConfigService.addExportLocation(wsdlLocation,
+                wsdlDocument, type);
 
         // 3) Reset File List
         resetGeneratedFilesList();
@@ -188,7 +189,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
         String fileDirectory = null;
         int lastPathSepratorIndex = 0;
-        
+
         for (File xmlElementFile : gVNIXXmlElementList) {
 
             // File directory
@@ -231,7 +232,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
             }
 
         }
-        
+
         // Copy 'package-info.java' to Elements package directory
         String filePackageInfo = fileDirectory.concat(SCHEMA_PACKAGE_INFO);
         File packageInfoFile = new File(filePackageInfo);
@@ -253,7 +254,8 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
             try {
                 FileCopyUtils.copy(packageInfoFile, newPackageInfoFile);
-                // TODO: Notificación de la creación del archivo 'package-info.java'.
+                // TODO: Notificación de la creación del archivo
+                // 'package-info.java'.
             } catch (IOException e) {
                 throw new IllegalStateException(
                         "File 'package-info.java' couldn't be created.");
@@ -323,6 +325,9 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                 enumConstants.add(enumConstantJavaSymbolName);
             }
 
+            // TODO: Expecting ROO to create Enum constant with Annoatition and
+            // Arguments.
+            /* 
             MethodDeclaration methodDeclaration;
             MethodMetadata tmpMethodMetadata;
             MethodMetadata methodMetadata;
@@ -410,7 +415,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                             .add(constructorMetadata);
 
                 }
-            }
+            } */
 
         } else if (typeDeclaration instanceof ClassOrInterfaceDeclaration) {
 
@@ -746,9 +751,12 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                         gvNixAnnotationList.add(gvNIXWebServiceAnnotation);
 
                         // Default Web Service Namespace.
-                        AnnotationAttributeValue<?> targetNamespaceAnnotationAttributeValue = gvNIXWebServiceAnnotation.getAttribute(new JavaSymbolName("targetNamespace"));
-                        String defaultNamespace = ((StringAttributeValue) targetNamespaceAnnotationAttributeValue ).getValue();
-                        
+                        AnnotationAttributeValue<?> targetNamespaceAnnotationAttributeValue = gvNIXWebServiceAnnotation
+                                .getAttribute(new JavaSymbolName(
+                                        "targetNamespace"));
+                        String defaultNamespace = ((StringAttributeValue) targetNamespaceAnnotationAttributeValue)
+                                .getValue();
+
                         // @GvNIXWebMethod annotations.
                         for (BodyDeclaration bodyDeclaration : classOrInterfaceDeclaration
                                 .getMembers()) {
@@ -931,8 +939,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
      * </p>
      */
     public AnnotationMetadata getGvNIXXmlElementAnnotation(
-            TypeDeclaration typeDeclaration,
-            String fileDirectory) {
+            TypeDeclaration typeDeclaration, String fileDirectory) {
 
         AnnotationMetadata gvNIXXmlElementAnnotationMetadata;
 
@@ -1133,19 +1140,17 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                         new JavaSymbolName("namespace"), namespace);
 
                 annotationAttributeValues.add(namespaceStringAttributeValue);
-                
-                
 
             } catch (ParseException e) {
                 Assert.state(false, "Generated Xml Element service java file '"
-                        + typeDeclaration.getName()
-                        + "' has errors:\n" + e.getMessage());
+                        + typeDeclaration.getName() + "' has errors:\n"
+                        + e.getMessage());
 
             } catch (IOException e) {
                 e.printStackTrace();
                 Assert.state(false, "Generated Xml Element service java file '"
-                        + typeDeclaration.getName()
-                        + "' has errors:\n" + e.getMessage());
+                        + typeDeclaration.getName() + "' has errors:\n"
+                        + e.getMessage());
 
             }
 
@@ -1192,8 +1197,8 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         List<AnnotationMetadata> updatedAnnotationMetadataList = new ArrayList<AnnotationMetadata>();
 
         AnnotationMetadata xmlElementAnnotation = MemberFindingUtils
-        .getAnnotationOfType(fieldMetadata.getAnnotations(), new JavaType(
-                "javax.xml.bind.annotation.XmlElement"));
+                .getAnnotationOfType(fieldMetadata.getAnnotations(),
+                        new JavaType("javax.xml.bind.annotation.XmlElement"));
 
         AnnotationMetadata gvNIXXmlElementFieldAnnotation;
         if (xmlElementAnnotation == null) {
@@ -1201,24 +1206,25 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
             gvNIXXmlElementFieldAnnotation = new DefaultAnnotationMetadata(
                     new JavaType(GvNIXXmlElementField.class.getName()),
                     new ArrayList<AnnotationAttributeValue<?>>());
-        }
-        else {
+        } else {
 
-            List<JavaSymbolName> annotationAttributeNames = xmlElementAnnotation.getAttributeNames();
-            
+            List<JavaSymbolName> annotationAttributeNames = xmlElementAnnotation
+                    .getAttributeNames();
+
             AnnotationAttributeValue<?> tmpAnnotationAttributeValue;
             List<AnnotationAttributeValue<?>> gvNIXXmlElementFieldAttributes = new ArrayList<AnnotationAttributeValue<?>>();
 
             for (JavaSymbolName javaSymbolName : annotationAttributeNames) {
-                tmpAnnotationAttributeValue = xmlElementAnnotation.getAttribute(javaSymbolName);
+                tmpAnnotationAttributeValue = xmlElementAnnotation
+                        .getAttribute(javaSymbolName);
                 gvNIXXmlElementFieldAttributes.add(tmpAnnotationAttributeValue);
             }
-            
+
             gvNIXXmlElementFieldAnnotation = new DefaultAnnotationMetadata(
                     new JavaType(GvNIXXmlElementField.class.getName()),
                     gvNIXXmlElementFieldAttributes);
         }
-        
+
         updatedAnnotationMetadataList.add(gvNIXXmlElementFieldAnnotation);
 
         // Create new Field with GvNIXAnnotation.
@@ -1227,9 +1233,10 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                 fieldMetadata.getFieldName(), fieldMetadata.getFieldType(),
                 fieldMetadata.getFieldInitializer(),
                 updatedAnnotationMetadataList);
-        
+
         return convertedFieldMetadata;
     }
+
     /**
      * {@inheritDoc}
      */
@@ -1393,8 +1400,10 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                                     new EnumDetails(
                                             new JavaType(
                                                     "org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService.GvNIXWebServiceParameterStyle"),
-                                            new JavaSymbolName(((FieldAccessExpr) pair.getValue())
-                                                    .getField())));
+                                            new JavaSymbolName(
+                                                    ((FieldAccessExpr) pair
+                                                            .getValue())
+                                                            .getField())));
 
                             gvNIXWebServiceAnnotationAttributes
                                     .add(enumparameterStyleAttributeValue);
@@ -1403,7 +1412,6 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                 }
             }
         }
-
 
         /*
          * @GvNIXWebService
@@ -1504,7 +1512,8 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         // Method annotations.
         List<AnnotationMetadata> gvNIXWebMethodAnnotationMetadataList = new ArrayList<AnnotationMetadata>();
 
-        AnnotationMetadata gvNIXWEbMethodAnnotationMetadata = getGvNIXWebMethodAnnotation(methodMetadata, defaultNamespace);
+        AnnotationMetadata gvNIXWEbMethodAnnotationMetadata = getGvNIXWebMethodAnnotation(
+                methodMetadata, defaultNamespace);
 
         Assert
                 .isTrue(
@@ -1517,7 +1526,8 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                 .add(gvNIXWEbMethodAnnotationMetadata);
 
         // Input Parameters annotations.
-        List<AnnotatedJavaType> annotatedGvNIXWebParameterList = getGvNIXWebParamsAnnotations(methodMetadata, defaultNamespace);
+        List<AnnotatedJavaType> annotatedGvNIXWebParameterList = getGvNIXWebParamsAnnotations(
+                methodMetadata, defaultNamespace);
 
         Assert
                 .isTrue(
@@ -1588,16 +1598,15 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         StringAttributeValue actionAttributeValue;
         if (tmpAttributeValue != null) {
             actionAttributeValue = new StringAttributeValue(new JavaSymbolName(
-                    "action"),
-                    ((StringAttributeValue) tmpAttributeValue)
-                            .getValue());
+                    "action"), ((StringAttributeValue) tmpAttributeValue)
+                    .getValue());
         } else {
             actionAttributeValue = new StringAttributeValue(new JavaSymbolName(
                     "action"), "");
         }
 
         gvNIXWEbMethodAnnotationAttributeValues.add(actionAttributeValue);
-        
+
         // @javax.jws.WebResult
         AnnotationMetadata webResultAnnotation = MemberFindingUtils
                 .getAnnotationOfType(methodAnnotations, new JavaType(
@@ -1606,15 +1615,16 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         ClassAttributeValue resultTypeAttributeValue;
         StringAttributeValue resultNameAttributeValue;
         StringAttributeValue resultNamespaceAttributeValue = null;
-        
+
         if (webResultAnnotation == null) {
 
             resultTypeAttributeValue = new ClassAttributeValue(
                     new JavaSymbolName("webResultType"),
                     JavaType.VOID_PRIMITIVE);
-            
-            resultNameAttributeValue = new StringAttributeValue(new JavaSymbolName("resultName"), "void");
-            
+
+            resultNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("resultName"), "void");
+
         } else {
             resultTypeAttributeValue = new ClassAttributeValue(
                     new JavaSymbolName("webResultType"), methodMetadata
@@ -1633,12 +1643,13 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
             }
 
             AnnotationAttributeValue<?> namespaceAttributeValue = webResultAnnotation
-            .getAttribute(new JavaSymbolName("targetNamespace"));
+                    .getAttribute(new JavaSymbolName("targetNamespace"));
 
             if (namespaceAttributeValue != null) {
                 resultNamespaceAttributeValue = new StringAttributeValue(
                         new JavaSymbolName("resultNamespace"),
-                        ((StringAttributeValue) namespaceAttributeValue).getValue());
+                        ((StringAttributeValue) namespaceAttributeValue)
+                                .getValue());
             } else {
                 resultNamespaceAttributeValue = new StringAttributeValue(
                         new JavaSymbolName("resultNamespace"), defaultNamespace);
@@ -1732,9 +1743,9 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                         "javax.jws.soap.SOAPBinding"));
 
         if (sOAPBindingAnnotation != null) {
-            
+
             EnumAttributeValue sOAPBindingAttributeValue = (EnumAttributeValue) sOAPBindingAnnotation
-            .getAttribute(new JavaSymbolName("parameterStyle"));
+                    .getAttribute(new JavaSymbolName("parameterStyle"));
 
             if (sOAPBindingAttributeValue != null) {
 
