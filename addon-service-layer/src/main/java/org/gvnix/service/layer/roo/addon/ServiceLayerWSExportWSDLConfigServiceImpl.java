@@ -449,13 +449,18 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                     // TODO: ROO Next version to create Inner Classes using
                     // ClassPathOperations.
                     // Fields from Inner Class type defined.
-                    ReferenceType tmpReferenceType = (ReferenceType) tmpFieldDeclaration
-                            .getType();
+                    
+                    if (tmpFieldDeclaration.getType() instanceof ReferenceType) {
+                        ReferenceType tmpReferenceType = (ReferenceType) tmpFieldDeclaration
+                                .getType();
 
-                    if (tmpReferenceType.getType() instanceof ClassOrInterfaceType) {
-                        ClassOrInterfaceType tmpClassOrInterfaceType = (ClassOrInterfaceType) tmpReferenceType.getType();
-                        tmpClassOrInterfaceType.setScope(null);
-                        tmpFieldDeclaration.setType(tmpClassOrInterfaceType);
+                        if (tmpReferenceType.getType() instanceof ClassOrInterfaceType) {
+                            ClassOrInterfaceType tmpClassOrInterfaceType = (ClassOrInterfaceType) tmpReferenceType
+                                    .getType();
+                            tmpClassOrInterfaceType.setScope(null);
+                            tmpFieldDeclaration
+                                    .setType(tmpClassOrInterfaceType);
+                        }
                     }
 
                     fieldDeclaration = new FieldDeclaration(tmpFieldDeclaration

@@ -144,5 +144,8 @@ service import ws --class ~.services.ClaseProxy32 --wsdl http://ws.soatrader.com
 // [CORRECT] Export WSDL 2 Java
 service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
 
+// [CORRECT] Export WSDL 2 Java copy Add-on src/test/resources/AmazonFPS.wsdl file into 'project/src/main/resources/' directory.
+service export ws --wsdl file:src/main/resources/AmazonFPS.wsdl
+
 perform eclipse
 perform assembly
