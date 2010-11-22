@@ -18,15 +18,16 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
 import org.gvnix.service.layer.roo.addon.annotations.*;
-import org.springframework.roo.addon.entity.EntityMetadata;
-import org.springframework.roo.classpath.*;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.details.*;
 import org.springframework.roo.classpath.details.annotations.*;
 import org.springframework.roo.classpath.operations.ClasspathOperations;
@@ -34,7 +35,8 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.*;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.*;
-import org.springframework.roo.support.util.*;
+import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * Addon for Handle Service Layer

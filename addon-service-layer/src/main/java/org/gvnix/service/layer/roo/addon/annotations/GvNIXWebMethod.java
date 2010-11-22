@@ -20,8 +20,6 @@ package org.gvnix.service.layer.roo.addon.annotations;
 
 import java.lang.annotation.*;
 
-import org.gvnix.service.layer.roo.addon.annotations.GvNIXWebService.GvNIXWebServiceParameterStyle;
-
 /**
  * <p>
  * GvNix Annotation to identify GvNIX created WebMethods to publish as

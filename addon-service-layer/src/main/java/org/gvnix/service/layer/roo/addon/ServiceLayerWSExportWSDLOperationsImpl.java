@@ -18,14 +18,10 @@
  */
 package org.gvnix.service.layer.roo.addon;
 
-import java.io.File;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.*;
 import org.gvnix.service.layer.roo.addon.ServiceLayerWsConfigService.CommunicationSense;
-import org.springframework.roo.file.monitor.*;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
 
 /**
  * Addon for Handle Service Layer

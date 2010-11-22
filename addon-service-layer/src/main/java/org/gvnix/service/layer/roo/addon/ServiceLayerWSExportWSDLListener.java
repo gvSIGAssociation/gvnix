@@ -35,8 +35,6 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.file.monitor.event.*;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 
 /**
  * @author Ricardo García Fernández ( rgarcia at disid dot com ) at <a
