@@ -69,8 +69,7 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
         // Check generated classes.
         serviceLayerWSExportWSDLConfigService.monitoringGeneratedSourcesDirectory(GENERATED_CXF_SOURCES_DIR);
 
-        // TODO: Convert java classes with gvNIX annotations.
-        // Using ServiceLayerWSExportWSDLListener
+        // Convert java classes with gvNIX annotations.
         updateAnnotationsToGvNIX();
 
     }

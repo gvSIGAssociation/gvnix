@@ -312,7 +312,7 @@ public class ServiceLayerWSExportXmlElementMetadataProvider extends
                 declaredFieldList.add(entityMetadata.getIdentifierField());
                 declaredFieldList.add(entityMetadata.getVersionField());
             }
-            // TODO: Check duplicated files
+            // Check duplicated fields.
             for (FieldMetadata fieldMetadata : governorTypeDetails
                     .getDeclaredFields()) {
 

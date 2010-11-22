@@ -113,7 +113,6 @@ public class ServiceLayerWsConfigServiceImpl implements
             // - Add cxf-PROJECT_NAME.xml to Spring Context Loader
             installCxfWebConfigurationFile();
 
-            // TODO: comprobar si ya se ha actualizado el fichero urlrewrite.
             // Setup URL rewrite to avoid to filter requests to WebServices
             installCxfUrlRewriteConfigurationFile();
         }
@@ -1168,7 +1167,7 @@ public class ServiceLayerWsConfigServiceImpl implements
             break;
 
         case EXPORT_WSDL:
-            // TODO: Export Wsdl2Java
+            // Export Wsdl2Java
             addExportWSDLLocationDocument(wsdlLocation, wsdlDocument);
             break;
         }

@@ -46,7 +46,6 @@ public @interface GvNIXWebMethod {
 
     Class<?> webResultType();
 
-    // TODO:
     String webResultPartName() default "parameters";
 
     String action() default "";

@@ -61,7 +61,6 @@ public class ServiceLayerWSCompilationUnit implements CompilationUnitServices {
      * @see org.springframework.roo.classpath.javaparser.CompilationUnitServices#flush()
      */
     public void flush() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -69,7 +68,6 @@ public class ServiceLayerWSCompilationUnit implements CompilationUnitServices {
      * @see org.springframework.roo.classpath.javaparser.CompilationUnitServices#getCompilationUnitPackage()
      */
     public JavaPackage getCompilationUnitPackage() {
-        // TODO Auto-generated method stub
         return compilationUnitPackage;
     }
 
@@ -77,7 +75,6 @@ public class ServiceLayerWSCompilationUnit implements CompilationUnitServices {
      * @see org.springframework.roo.classpath.javaparser.CompilationUnitServices#getEnclosingTypeName()
      */
     public JavaType getEnclosingTypeName() {
-        // TODO Auto-generated method stub
         return enclosingTypeName;
     }
 
@@ -85,7 +82,6 @@ public class ServiceLayerWSCompilationUnit implements CompilationUnitServices {
      * @see org.springframework.roo.classpath.javaparser.CompilationUnitServices#getImports()
      */
     public List<ImportDeclaration> getImports() {
-        // TODO Auto-generated method stub
         return imports;
     }
 
@@ -93,7 +89,6 @@ public class ServiceLayerWSCompilationUnit implements CompilationUnitServices {
      * @see org.springframework.roo.classpath.javaparser.CompilationUnitServices#getInnerTypes()
      */
     public List<TypeDeclaration> getInnerTypes() {
-        // TODO Auto-generated method stub
         return innerTypes;
     }
 
