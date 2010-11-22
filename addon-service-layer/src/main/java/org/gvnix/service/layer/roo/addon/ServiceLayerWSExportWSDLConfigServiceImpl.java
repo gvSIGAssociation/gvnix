@@ -24,6 +24,7 @@ import japa.parser.ast.*;
 import japa.parser.ast.body.*;
 import japa.parser.ast.expr.*;
 import japa.parser.ast.type.ClassOrInterfaceType;
+import japa.parser.ast.type.ReferenceType;
 
 import java.io.*;
 import java.util.*;
@@ -344,8 +345,9 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                 enumConstants.add(enumConstantJavaSymbolName);
             }
 
-            // TODO: Expecting ROO to create Enum constant with Annoatition and
+            // TODO: Expecting ROO next versions to create Enum constant with Annotation and
             // Arguments.
+
             /* 
             MethodDeclaration methodDeclaration;
             MethodMetadata tmpMethodMetadata;
@@ -443,6 +445,19 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                 if (bodyDeclaration instanceof FieldDeclaration) {
 
                     tmpFieldDeclaration = (FieldDeclaration) bodyDeclaration;
+
+                    // TODO: ROO Next version to create Inner Classes using
+                    // ClassPathOperations.
+                    // Fields from Inner Class type defined.
+                    ReferenceType tmpReferenceType = (ReferenceType) tmpFieldDeclaration
+                            .getType();
+
+                    if (tmpReferenceType.getType() instanceof ClassOrInterfaceType) {
+                        ClassOrInterfaceType tmpClassOrInterfaceType = (ClassOrInterfaceType) tmpReferenceType.getType();
+                        tmpClassOrInterfaceType.setScope(null);
+                        tmpFieldDeclaration.setType(tmpClassOrInterfaceType);
+                    }
+
                     fieldDeclaration = new FieldDeclaration(tmpFieldDeclaration
                             .getJavaDoc(), tmpFieldDeclaration.getModifiers(),
                             tmpFieldDeclaration.getAnnotations(),
