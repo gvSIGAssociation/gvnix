@@ -1045,9 +1045,11 @@ public class ServiceLayerWsConfigServiceImpl implements
         // Execution
         serviceExecution = pom.createElement("execution");
 
+        String executionID = "${project.basedir}/src/test/resources/generated/wsdl/"
+            .concat(addressName).concat(".wsdl");
+
         Element id = pom.createElement("id");
-        id.setTextContent("${project.basedir}/src/test/resources/generated/wsdl/"
-                .concat(addressName).concat(".wsdl"));
+        id.setTextContent(executionID);
 
         serviceExecution.appendChild(id);
         Element phase = pom.createElement("phase");
@@ -1084,6 +1086,17 @@ public class ServiceLayerWsConfigServiceImpl implements
         serviceExecution.appendChild(goals);
 
         // Checks if already exists the execution.
+        Element oldExecution = XmlUtils.findFirstElement(
+                "/project/build/plugins/plugin/executions/execution[id='"
+                        + executionID + "']", root);        
+
+        if (oldExecution != null) {
+            logger.log(Level.FINE, "Wsdl generation with CXF plugin for '"
+                    + serviceName + " service, has been configured before.");
+            return;
+        }
+
+        // Checks if already exists the executions to update or create.
         Element oldExecutions = XmlUtils.findFirstElementByName("executions",
                 jaxWsPlugin);
 
