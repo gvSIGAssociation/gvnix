@@ -1651,6 +1651,8 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         ClassAttributeValue resultTypeAttributeValue;
         StringAttributeValue resultNameAttributeValue;
         StringAttributeValue resultNamespaceAttributeValue = null;
+        BooleanAttributeValue headerAttributeValue = null;
+        StringAttributeValue partNameAttributeValue = null;
 
         if (webResultAnnotation == null) {
 
@@ -1691,6 +1693,32 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                         new JavaSymbolName("resultNamespace"), defaultNamespace);
             }
 
+            // Parameter webResultHeader.
+            headerAttributeValue = (BooleanAttributeValue) webResultAnnotation
+                    .getAttribute(new JavaSymbolName("header"));
+
+            if (headerAttributeValue == null) {
+                headerAttributeValue = new BooleanAttributeValue(
+                        new JavaSymbolName("webResultHeader"), false);
+            } else {
+                headerAttributeValue = new BooleanAttributeValue(
+                        new JavaSymbolName("webResultHeader"), headerAttributeValue
+                                .getValue());
+            }
+
+            // Parameter webResultPartName.
+            partNameAttributeValue = (StringAttributeValue) webResultAnnotation
+                    .getAttribute(new JavaSymbolName("partName"));
+
+            if (partNameAttributeValue == null) {
+                partNameAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("webResultPartName"), "parameters");
+            } else {
+                partNameAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("webResultPartName"), partNameAttributeValue
+                                .getValue());
+            }
+
         }
 
         gvNIXWEbMethodAnnotationAttributeValues.add(resultTypeAttributeValue);
@@ -1699,6 +1727,13 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         if (resultNamespaceAttributeValue != null) {
             gvNIXWEbMethodAnnotationAttributeValues
                     .add(resultNamespaceAttributeValue);
+        }
+
+        if (headerAttributeValue != null) {
+            gvNIXWEbMethodAnnotationAttributeValues.add(headerAttributeValue);
+        }
+        if (partNameAttributeValue != null) {
+            gvNIXWEbMethodAnnotationAttributeValues.add(partNameAttributeValue);
         }
 
         // @javax.xml.ws.RequestWrapper

@@ -371,14 +371,33 @@ public class ServiceLayerWSExportMetadata extends
 
             annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-            // TODO: Check parameters header, partName from WebResult.
-            BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
-                    new JavaSymbolName("header"), false);
+            // Check parameters header, partName from WebResult.
+            // Parameter webResultHeader.
+            BooleanAttributeValue headerAttributeValue = (BooleanAttributeValue) methodAnnotation
+                    .getAttribute(new JavaSymbolName("webResultHeader"));
+
+            if (headerAttributeValue == null) {
+                headerAttributeValue = new BooleanAttributeValue(
+                        new JavaSymbolName("header"), false);
+            } else {
+                headerAttributeValue = new BooleanAttributeValue(
+                        new JavaSymbolName("header"), headerAttributeValue
+                                .getValue());
+            }
             annotationAttributeValueList.add(headerAttributeValue);
 
-            StringAttributeValue partNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("partName"), "parameters");
+            // Parameter webResultPartName.
+            StringAttributeValue partNameAttributeValue = (StringAttributeValue) methodAnnotation
+                    .getAttribute(new JavaSymbolName("webResultPartName"));
 
+            if (partNameAttributeValue == null) {
+                partNameAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("partName"), "parameters");
+            } else {
+                partNameAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("partName"), partNameAttributeValue
+                                .getValue());
+            }
             annotationAttributeValueList.add(partNameAttributeValue);
 
             AnnotationMetadata webResult = new DefaultAnnotationMetadata(
@@ -578,14 +597,33 @@ public class ServiceLayerWSExportMetadata extends
                 annotationAttributeValueList.add(targetNamespaceAttributeValue);
             }
 
-            // TODO: Add these attributes to @GvNIXWebMethod.
-            BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
-                    new JavaSymbolName("header"), false);
+            // Add these attributes to @GvNIXWebMethod.
+            // Parameter webResultHeader.
+            BooleanAttributeValue headerAttributeValue = (BooleanAttributeValue) methodAnnotation
+                    .getAttribute(new JavaSymbolName("webResultHeader"));
+
+            if (headerAttributeValue == null) {
+                headerAttributeValue = new BooleanAttributeValue(
+                        new JavaSymbolName("header"), false);
+            } else {
+                headerAttributeValue = new BooleanAttributeValue(
+                        new JavaSymbolName("header"), headerAttributeValue
+                                .getValue());
+            }
             annotationAttributeValueList.add(headerAttributeValue);
 
-            StringAttributeValue partNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("partName"), "parameters");
+            // Parameter webResultPartName.
+            StringAttributeValue partNameAttributeValue = (StringAttributeValue) methodAnnotation
+                    .getAttribute(new JavaSymbolName("webResultPartName"));
 
+            if (partNameAttributeValue == null) {
+                partNameAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("partName"), "parameters");
+            } else {
+                partNameAttributeValue = new StringAttributeValue(
+                        new JavaSymbolName("partName"), partNameAttributeValue
+                                .getValue());
+            }
             annotationAttributeValueList.add(partNameAttributeValue);
 
             AnnotationMetadata webResult = new DefaultAnnotationMetadata(
