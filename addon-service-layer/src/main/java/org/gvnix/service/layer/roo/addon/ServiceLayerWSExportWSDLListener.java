@@ -135,13 +135,13 @@ public class ServiceLayerWSExportWSDLListener implements FileEventListener {
                     }
 
                 } catch (ParseException e) {
-                    Assert.state(false,
+                    throw new IllegalStateException(
                             "Generated web service java file has errors:\n"
                                     + e.getMessage());
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Assert.state(false,
+                    throw new IllegalStateException(
                             "Generated web service java file has errors:\n"
                                     + e.getMessage());
 

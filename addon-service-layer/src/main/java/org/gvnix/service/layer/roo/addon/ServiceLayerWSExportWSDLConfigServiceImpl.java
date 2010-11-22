@@ -117,7 +117,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
             serviceLayerWsConfigService
                     .mvn(ServiceLayerWsConfigService.GENERATE_SOURCES);
         } catch (IOException e) {
-            Assert.state(false,
+            throw new IllegalStateException(
                     "There is an error generating java sources with '"
                             + wsdlLocation + "'.\n" + e.getMessage());
         }
@@ -686,14 +686,13 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                 }
 
             } catch (ParseException e) {
-                Assert.state(false,
+                throw new IllegalStateException(
                         "Generated Web Fault service Element java file '"
                                 + webFaultFile.getAbsolutePath()
                                 + "' has errors:\n" + e.getMessage());
 
             } catch (IOException e) {
-                e.printStackTrace();
-                Assert.state(false,
+                throw new IllegalStateException(
                         "Generated Web Fault service Element java file '"
                                 + webFaultFile.getAbsolutePath()
                                 + "' has errors:\n" + e.getMessage());
@@ -898,13 +897,13 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                 }
 
             } catch (ParseException e) {
-                Assert.state(false, "Generated Web Service java file '"
+                throw new IllegalStateException("Generated Web Service java file '"
                         + webServiceFile.getAbsolutePath() + "' has errors:\n"
                         + e.getMessage());
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Assert.state(false, "Generated Web Service java file '"
+                throw new IllegalStateException("Generated Web Service java file '"
                         + webServiceFile.getAbsolutePath() + "' has errors:\n"
                         + e.getMessage());
 
@@ -1178,13 +1177,13 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
                 annotationAttributeValues.add(namespaceStringAttributeValue);
 
             } catch (ParseException e) {
-                Assert.state(false, "Generated Xml Element service java file '"
+                throw new IllegalStateException("Generated Xml Element service java file '"
                         + typeDeclaration.getName() + "' has errors:\n"
                         + e.getMessage());
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Assert.state(false, "Generated Xml Element service java file '"
+                throw new IllegalStateException("Generated Xml Element service java file '"
                         + typeDeclaration.getName() + "' has errors:\n"
                         + e.getMessage());
 
@@ -1938,12 +1937,12 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
         } catch (SAXException e) {
 
-            Assert.state(false, "The format of the web service '" + url
+            throw new IllegalStateException("The format of the web service '" + url
                     + "' to export has errors.");
 
         } catch (IOException e) {
 
-            Assert.state(false, "There is no connection to the web service '"
+            throw new IllegalStateException("There is no connection to the web service '"
                     + url + "' to export.");
         }
 
