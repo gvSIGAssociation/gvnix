@@ -76,7 +76,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
     private JavaParserService javaParserService;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
-    private File schemaPackageInfoFile;
+    private File schemaPackageInfoFile = new File("");
 
     private List<File> gVNIXXmlElementList = new ArrayList<File>();
     private List<File> gVNIXWebFaultList = new ArrayList<File>();
@@ -2056,7 +2056,7 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
         gVNIXWebFaultList = new ArrayList<File>();
         gVNIXWebServiceList = new ArrayList<File>();
         gVNIXWebServiceInterfaceList = new ArrayList<File>();
-        schemaPackageInfoFile = null;
+        schemaPackageInfoFile = new File("");
     }
 
     /**

@@ -1268,12 +1268,18 @@ public class ServiceLayerWsConfigServiceImpl implements
                 .setTextContent("${basedir}/target/generated-sources/cxf/server");
         configuration.appendChild(sourceRoot);
 
-        // Soap Headers
         Element defaultOptions = pom.createElement("defaultOptions");
 
+        // Soap Headers.
         Element extendedSoapHeaders = pom.createElement("extendedSoapHeaders");
         extendedSoapHeaders.setTextContent("true");
         defaultOptions.appendChild(extendedSoapHeaders);
+        
+        // AutoNameResolution to solve naming conflicts.
+        Element autoNameResolution = pom.createElement("autoNameResolution");
+        autoNameResolution.setTextContent("true");
+        defaultOptions.appendChild(autoNameResolution);
+
         configuration.appendChild(defaultOptions);
         
         Element wsdlOptions = pom.createElement("wsdlOptions");
@@ -1465,6 +1471,12 @@ public class ServiceLayerWsConfigServiceImpl implements
 		    .createElement("extendedSoapHeaders");
 	    extendedSoapHeaders.setTextContent("true");
 	    defaultOptions.appendChild(extendedSoapHeaders);
+	    
+            // AutoNameResolution to solve naming conflicts.
+            Element autoNameResolution = pom.createElement("autoNameResolution");
+            autoNameResolution.setTextContent("true");
+            defaultOptions.appendChild(autoNameResolution);
+
 	}
 	Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
 		configuration);
