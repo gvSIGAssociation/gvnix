@@ -163,6 +163,10 @@ Mandatory ``attributes`` to export a class as Web Service:
   * ``fullyQualifiedTypeName``: Java fully qualified type name to control if changes the package or class name to avoid updating service contract. i.e.: ``fullyQualifiedTypeName= =org.gvnix.test.service.layer.project.services.Clase"``.
   * ``exported``: Check method input/output parameters when is published as operation if its false. If it's exported this service has been generated from ``wsdl``.
 
+Other *@GvNIXWebService* ``attributes``:
+
+  * ``parameterStyle``: SOAPBinding parameter style for Web Service.
+
 Publish Web Service operation
 ------------------------------
 
@@ -179,6 +183,12 @@ Mandatory ``attributes`` for a method with input parameters:
   * ``requestWrapperNamespace``: Request Wrapper Namespace in WSDL.
   * ``requestWrapperClassName``: Fully qualified name for Request Wrapper class. i.e. ``requestWrapperClassName = "org.example.wrapper.RequestWrapper"``.
 
+Other *@GvNIXWebMethod* ``attributes``:
+
+  * ``parameterStyle``: SOAPBinding parameter style for Web Service operation.
+  * ``webResultPartName``: Define partName to operation: ``parameters`` or ``body``.
+  * ``webResultHeader``: ``true`` or ``false`` depending if the operation uses result header. False by default.
+
 Also you have to define *@GvNIXWebParam* and *@WebParam* annotations for each input parameter:
 
 @GvNIXWebParam mandatory ``attributes``:
@@ -193,7 +203,7 @@ Also you have to define *@GvNIXWebParam* and *@WebParam* annotations for each in
   * ``mode``: Allways set ``mode = Mode.IN``.
   * ``header``: Allways set ``header = false``.
 
-Mandatory ``attributes`` for a method with return type different than void:
+Mandatory ``attributes`` in *@GvNIXWebMethod* for a method with return type different than void:
 
   * ``resultName``: Name for result type in WSDL.
   * ``resultNamespace``: Result Namespace in WSDL.
@@ -211,6 +221,26 @@ Mandatory ``attributes`` to export a class to XSD schema:
   * ``name``: Name define Object in XSD schema in WSDL.
   * ``namespace``: Object Namespace in XSD schema in WSDL.
   * ``elementList``: Array of field names to be exported as XSD in WSDL schema. i.e.: ``elementList = {"name", "age"}``. The fields that are not defined in array are declared as ``@XmlTransient``.
+
+Other *@GvNIXXmlElement* ``attributes``:
+
+  * ``xmlTypeName``: Name to define in ``@XmlType`` annotation to export into WSDL schema.
+  * ``exported``: If object has been created using ``service export ws`` operation value is true. Check if the field are valid defined types to WSDL.
+  * ``enumElement``: If class is an ``enumeration`` instead of a class.
+
+You can define *@GvNIXXmlElementField* annotation for each *@GvNIXXmlElement*. Is not a ``mandatory`` annotation.This annotation replicates values from *@XmlElement*:
+
+  * ``defaultValue``: Default value of this element.
+
+  * ``name``: Name of the XML Schema element.
+
+  * ``namespace``: Namespace for XML Schema element. i.e.: ``namespace= "http://services.project.layer.service.test.gvnix.org/"``.
+
+  * ``nillable``: Customize the element declaration to be nillable. Schema element declaration with occurance range of 0..1. 
+    
+  * ``required``: Customize the element declaration to be required. Schema element declaration must exists. 
+
+  * ``type``:  The Java class being referenced.
 
 Publish Web Fault
 --------------------
@@ -233,8 +263,12 @@ Analysis
 =========
 
 Monitorizaciones de archivos y procesos internos
+File Monitoring.
 
-TBC: Indicar qué se monitoriza, por ejemplo, crear una clase anotada con *tal* anotación y el proceso asociado, por ejemplo, crea un .aj con *tal cosa*. Este punto será muy útil para la integración con MOSKitt
+Add-on monitorize java files annotated with **@GvNIX...** 
+
+TBC: Indicar qué se monitoriza, por ejemplo, crear una clase anotada con *tal* anotación y el proceso asociado, por ejemplo, crea un .aj con *tal cosa*.
+Este punto será muy útil para la integración con MOSKitt
 
 Analysis for the development of the Add-on displayed by commands.
 
