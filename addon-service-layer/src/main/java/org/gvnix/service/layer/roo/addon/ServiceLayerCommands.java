@@ -247,13 +247,13 @@ public class ServiceLayerCommands implements CommandMarker {
         serviceLayerWsImportOperations.addImportAnnotation(serviceClass, url);
     }
 
-    @CliAvailabilityIndicator("service export wsdl")
+    @CliAvailabilityIndicator("service export ws")
     public boolean isServiceExportWsdl() {
 
         return serviceLayerWSExportWSDLOperations.isProjectAvailable();
     }
 
-    @CliCommand(value = "service export wsdl", help = "Exports a Web Service from WSDL to java code with gvNIX annotations to generate this Web Service in project with dummy methods.")
+    @CliCommand(value = "service export ws", help = "Exports a Web Service from WSDL to java code with gvNIX annotations to generate this Web Service in project with dummy methods.")
     public void serviceExportWsdl(
             @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
 
