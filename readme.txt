@@ -56,6 +56,10 @@ Spring Roo 1.1.0.M1
    bash:~/gvnix/trunk/code$ cd roo
    bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
 
+#. Apply the patch **issue_3879.patch** inside ROO directory after build it::
+
+    bash:~/gvnix/trunk/code/roo$ git apply ../issue_3879.patch
+
 Maven
 ------------
 

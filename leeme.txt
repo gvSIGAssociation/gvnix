@@ -234,9 +234,13 @@ gvNIX está basado en Spring Roo, por este motivo es necesario disponer del cód
 Construir el proyecto
 =======================
 
-#. Dado que gvNIX está basado en Roo, el primer paso es compilar y construir Roo::
+#. Aplicar el parche issue_3879.patch dentro del directorio de ROO::
 
     bash:~/gvnix/trunk/code$ cd roo
+    bash:~/gvnix/trunk/code/roo$ git apply ../issue_3879.patch
+
+#. Dado que gvNIX está basado en Roo, el primer paso es compilar y construir Roo::
+
     bash:~/gvnix/trunk/code/roo$ mvn clean install
    
    Cada vez que actualizes el código fuente del proyecto Roo con el comando ``git pull`` necesitarás volver a construirlo.
