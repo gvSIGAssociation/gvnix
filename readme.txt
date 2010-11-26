@@ -60,6 +60,31 @@ Spring Roo 1.1.0.M1
 
     bash:~/gvnix/trunk/code/roo$ git apply ../issue_3879.patch
 
+#. Shows errors but is well applied::
+
+    ~/projects/svn/gvnix/trunk/code/issue_3879.patch:44: space before tab in indent.
+              JavaParserConstructorMetadata.addConstructor(compilationUnitServices, typeDeclaration.getMembers(), candidate, false, new HashSet<JavaSymbolName>());
+    ~/projects/svn/gvnix/trunk/code/issue_3879.patch:50: space before tab in indent.
+              JavaParserMethodMetadata.addMethod(compilationUnitServices, typeDeclaration.getMembers(), candidate, false, new HashSet<JavaSymbolName>());
+    ~/projects/svn/gvnix/trunk/code/issue_3879.patch:157: trailing whitespace.   
+    error: patch failed: addon-test/src/main/java/org/springframework/roo/addon/test/IntegrationTestMetadata.java:287
+    error: addon-test/src/main/java/org/springframework/roo/addon/test/IntegrationTestMetadata.java: patch does not apply
+    error: patch failed: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/JavaParserMutableClassOrInterfaceTypeDetails.java:513
+    error: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/JavaParserMutableClassOrInterfaceTypeDetails.java: patch does not apply
+    error: patch failed: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserConstructorMetadata.java:248
+    error: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserConstructorMetadata.java: patch does not apply
+    error: patch failed: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserMethodMetadata.java:33
+    error: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserMethodMetadata.java: patch does not apply
+    error: patch failed: classpath/src/main/java/org/springframework/roo/classpath/details/AnnotationMetadataUtils.java:10
+    error: classpath/src/main/java/org/springframework/roo/classpath/details/AnnotationMetadataUtils.java: patch does not apply
+    error: patch failed: classpath/src/main/java/org/springframework/roo/classpath/itd/AbstractItdMetadataProvider.java:245
+    error: classpath/src/main/java/org/springframework/roo/classpath/itd/AbstractItdMetadataProvider.java: patch does not apply
+    error: patch failed: model/src/main/java/org/springframework/roo/model/JavaType.java:114
+    error: model/src/main/java/org/springframework/roo/model/JavaType.java: patch does not apply
+    error: patch failed: pom.xml:213
+    error: pom.xml: patch does not apply
+
+
 Maven
 ------------
 
