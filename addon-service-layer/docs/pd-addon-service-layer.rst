@@ -21,7 +21,7 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introducción - Descripción funcional.
 TODO: Confirmar la info del doc de CXF (addon cxf).
 
-Introducción
+Introduction
 =============
 
 Configuration will be defined in the classes with gvNIX Annotations and generated source will be published in AspectJ files from this annotations.

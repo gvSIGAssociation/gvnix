@@ -37,8 +37,6 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
         ServiceLayerWSExportWSDLOperations {
 
     @Reference
-    private ServiceLayerWsConfigService serviceLayerWsConfigService;
-    @Reference
     private ServiceLayerWSExportWSDLConfigService serviceLayerWSExportWSDLConfigService;
 
 
@@ -49,7 +47,7 @@ public class ServiceLayerWSExportWSDLOperationsImpl implements
 
     public boolean isProjectAvailable() {
 
-        return serviceLayerWsConfigService.isProjectAvailable();
+        return serviceLayerWSExportWSDLConfigService.isProjectAvailable();
     }
 
     /**

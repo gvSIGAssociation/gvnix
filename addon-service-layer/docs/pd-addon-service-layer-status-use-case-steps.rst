@@ -25,8 +25,12 @@ Introduction
 
 Document to define Add-on status and depending features related with ROO that have been fixed temporarily manually.
 
+Web Service export ws
+=======================
+
+--------
 Status
-========
+--------
 
 The project could replicate a Web Service using Contract First definition with these rules:
 
@@ -49,16 +53,18 @@ These features have been fixed in **GVNIX** patch waiting to be resolved by ROO 
   * Inner classes generation using ClassPathOperation from ROO API. ROO Forum: http://forum.springsource.org/showthread.php?t=98379.
   * Allow annotation in enumeration classes. ROO Forum: http://forum.springsource.org/showthread.php?t=98382.
   * NullPointerException creating a constructor in a class. JIRA: https://jira.springframework.org/browse/ROO-1710.
- 
+
+----------------
 Use Case Test
-==============
+----------------
 
 To check the correct Web Service generation using ``service export ws`` command we define the next uses case:
 
   * Create a server generating a java class using WSDL Contract First definition.
 
+--------
 Steps
-======
+--------
 
 Create an application using GvNIX to replicate a Web Service Server using ``Service Layer Add-on``.
 

@@ -149,8 +149,14 @@ public class ServiceLayerCommands implements CommandMarker {
 
     }
 
-    @CliAvailabilityIndicator( { "service export operation, service list operation" })
+    @CliAvailabilityIndicator( "service export operation" )
     public boolean isServiceExportOperationAvailable() {
+
+        return serviceLayerWsExportOperations.isProjectAvailable();
+    }
+
+    @CliAvailabilityIndicator( "service list operation")
+    public boolean isServiceListOperationAvailable() {
 
         return serviceLayerWsExportOperations.isProjectAvailable();
     }

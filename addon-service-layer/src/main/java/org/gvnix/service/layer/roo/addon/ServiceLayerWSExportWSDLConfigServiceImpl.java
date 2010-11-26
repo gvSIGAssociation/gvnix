@@ -88,6 +88,41 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
     /**
      * {@inheritDoc}
+     */
+    public boolean isProjectAvailable() {
+
+        if (getPathResolver() == null) {
+
+            return false;
+        }
+
+        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "/WEB-INF/web.xml");
+        if (!fileManager.exists(webXmlPath)) {
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return the path resolver or null if there is no user project
+     */
+    private PathResolver getPathResolver() {
+
+        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+                .get(ProjectMetadata.getProjectIdentifier());
+        if (projectMetadata == null) {
+
+            return null;
+        }
+
+        return projectMetadata.getPathResolver();
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * <p>
      * Check correct WSDL format
