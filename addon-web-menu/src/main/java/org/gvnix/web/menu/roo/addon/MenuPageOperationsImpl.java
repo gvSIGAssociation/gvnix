@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.web.menu.roo.addon.MenuOperationsImpl.StatusListener;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
@@ -69,7 +68,7 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
     private static Logger logger = Logger
 	    .getLogger(MenuPageOperationsImpl.class.getName());
 
-    private static final String SS_VERSION = "3.0.3.CI-SNAPSHOT";
+    private static final String SS_VERSION = "3.0.3.RELEASE";
 
     private static final Dependency DEPENDENCY_SS_CORE = new Dependency(
 	    "org.springframework.security", "spring-security-core", SS_VERSION);
