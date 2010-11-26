@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.web.menu.roo.addon.MenuOperationsImpl.StatusListener;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
@@ -40,6 +41,9 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.process.manager.event.ProcessManagerStatus;
+import org.springframework.roo.process.manager.event.ProcessManagerStatusListener;
+import org.springframework.roo.process.manager.event.ProcessManagerStatusProvider;
 import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
@@ -83,6 +87,8 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
     private PathResolver pathResolver;
     @Reference
     private ProjectOperations projectOperations;
+    @Reference
+    private ProcessManagerStatusProvider processManagerStatus;
 
     private ComponentContext context;
 
@@ -101,6 +107,8 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
 
     private Long originalMenuOperationsBundleId;
 
+    private UpdateTagxStatusListener updateTagxListener;
+
     protected void activate(ComponentContext context) {
 	this.context = context;
 	this.webXmlFileName = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
@@ -108,6 +116,9 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
 
 	helper = new MenuPageOperationsImplHelper(this, pathResolver,
 		fileManager);
+
+	updateTagxListener = new UpdateTagxStatusListener(this);
+	processManagerStatus.addProcessManagerStatusListener(updateTagxListener);
 
 	if (isActivated()) {
 	    activateMenuOperations();
@@ -120,6 +131,7 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
 	    this.deactivateMenuOperations();
 	    this.cleanupMetadaCache();
 	}
+	processManagerStatus.removeProcessManagerStatusListener(updateTagxListener);
     }
 
     private void cleanupMetadaCache() {
@@ -282,11 +294,19 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
     }
 
     private void createOrUpdateMenuTagx() {
+	updateTagxListener.performOperation();
+    }
+    protected void performCreateOrUpdateMenuTagx() {
 	ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
 		.get(ProjectMetadata.getProjectIdentifier());
 
 	MenuModelMetadata menu = (MenuModelMetadata) metadataService
 		.get(MenuModelMetadata.getMetadataIdentiferFinal());
+
+	if (menu == null){
+	    logger.warning("Can't find MenuModelMetadata: "+MenuModelMetadata.getMetadataIdentiferFinal());
+	    return;
+	}
 
 	Map<String, String> params = new HashMap<String, String>();
 
@@ -305,7 +325,7 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
 	if (isSpringSecurityInstalled()) {
 	    helper.createOrUpdateFileFromResourses(
 		    "WEB-INF/tags/menu/gvnixitem.tagx", "gvnixitem-sec.tagx",
-		    null, new String[] { "<menu:gvnixitem", " xmlns:spring=" });
+		    null, new String[] { "<menu:gvnixitem", " xmlns:spring=", " xmlns:sec=" });
 	} else {
 	    helper.createOrUpdateFileFromResourses(
 		    "WEB-INF/tags/menu/gvnixitem.tagx", "gvnixitem.tagx", null,
@@ -510,7 +530,7 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
 		createModel();
 
 		// Create gvnixmenu.tagx
-		createOrUpdateMenuTagx();
+		performCreateOrUpdateMenuTagx();
 
 		// load old menus registered in menu.jspx
 		loadMenuFromOldMenu();
@@ -1174,5 +1194,38 @@ public class MenuPageOperationsImpl implements MenuPageOperations {
 	    throw new IllegalStateException("Could not output '"
 		    + mutableFile.getCanonicalPath() + "'", ioe);
 	}
+    }
+
+    /**
+     * Listener to update menuitem tagx file.
+     *
+     * We use it because, in activation time, it couldn't have enough
+     * information to perform this operation. So we wait for process finished
+     * to do it.
+     *
+     */
+    class UpdateTagxStatusListener implements ProcessManagerStatusListener {
+
+	MenuPageOperationsImpl menuPageOperations;
+	private boolean performOperation = false;
+
+	public UpdateTagxStatusListener(MenuPageOperationsImpl menuPageOperations) {
+	    super();
+	    this.menuPageOperations = menuPageOperations;
+	}
+
+	public void onProcessManagerStatusChange(
+		ProcessManagerStatus oldStatus, ProcessManagerStatus newStatus) {
+	    if (performOperation && newStatus == ProcessManagerStatus.AVAILABLE) {
+		performOperation = false;
+		menuPageOperations.performCreateOrUpdateMenuTagx();
+	    }
+
+	}
+
+	public void performOperation(){
+	    performOperation = true;
+	}
+
     }
 }
