@@ -176,9 +176,10 @@ public class ServiceLayerWSImportMetadataProvider extends
 
 		// Generate source code client clases if necessary
 		if (generate) {
-		    
-		    serviceLayerWsConfigService
-			    .mvn(ServiceLayerWsConfigService.GENERATE_SOURCES);
+
+		    serviceLayerWsConfigService.mvn(
+			    ServiceLayerWsConfigService.GENERATE_SOURCES,
+			    ServiceLayerWsConfigService.GENERATE_SOURCES_INFO);
 		}
 
 		// Create metadata

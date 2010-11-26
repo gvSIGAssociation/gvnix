@@ -33,6 +33,7 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.process.manager.ProcessManager;
 import org.springframework.roo.project.*;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.*;
@@ -70,6 +71,8 @@ public class ServiceLayerWsConfigServiceImpl implements
     private AnnotationsService annotationsService;
     @Reference
     private MavenOperations mavenOperations;
+    @Reference
+    private ProcessManager processManager;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
 
@@ -1288,11 +1291,7 @@ public class ServiceLayerWsConfigServiceImpl implements
         Element wsdlOption = pom.createElement("wsdlOption");
 
         // Check URI correct format
-        if  (StringUtils.startsWithIgnoreCase(wsdlLocation, "file:")) {
-
-            int fileIndex = 5;
-            wsdlLocation = wsdlLocation.substring(fileIndex);
-        }
+        wsdlLocation = removeFilePrefix(wsdlLocation);
 
         Element wsdl = pom.createElement("wsdl");
         wsdl.setTextContent(wsdlLocation);
@@ -1356,6 +1355,23 @@ public class ServiceLayerWsConfigServiceImpl implements
     }
 
     /**
+     * Remove the "file:" prefix from a location string.
+     * 
+     * @param location Location
+     * @return Location withou prefix
+     */
+    private String removeFilePrefix(String location) {
+	
+	String prefix = "file:";
+        if  (StringUtils.startsWithIgnoreCase(location, prefix)) {
+
+            return location.substring(prefix.length());
+        }
+        
+	return location;
+    }
+
+    /**
      * Add a wsdl location to import of document type.
      * 
      * <p>
@@ -1414,7 +1430,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 	    // The wsdl location already exists ?
 	    Element wsdlOptionElement = XmlUtils.findFirstElement(
 		    "configuration/wsdlOptions/wsdlOption[wsdl='"
-			    + wsdlLocation + "']", execution);
+			    + removeFilePrefix(wsdlLocation) + "']", execution);
 
 	    // If location already added on plugin, do nothing
 	    if (wsdlOptionElement != null) {
@@ -1489,7 +1505,7 @@ public class ServiceLayerWsConfigServiceImpl implements
 	// Create new wsdl element and append it to the XML tree
 	Element wsdlOption = pom.createElement("wsdlOption");
 	Element wsdl = pom.createElement("wsdl");
-	wsdl.setTextContent(wsdlLocation);
+	wsdl.setTextContent(removeFilePrefix(wsdlLocation));
 	wsdlOption.appendChild(wsdl);
 
 	// Add the package name to generate sources
@@ -1682,7 +1698,7 @@ public class ServiceLayerWsConfigServiceImpl implements
     /**
      * {@inheritDoc}
      */
-    public void mvn(String parameters) throws IOException {
+    public void mvn(String parameters, String message) throws IOException {
 
         File root = new File(mavenOperations.getProjectRoot());
         Assert.isTrue(root.isDirectory() && root.exists(),
@@ -1698,16 +1714,30 @@ public class ServiceLayerWsConfigServiceImpl implements
 
         Process p = Runtime.getRuntime().exec(cmd, null, root);
 
-        // Ensure separate threads are used for logging, as per ROO-652
-        LoggingInputStream input = new LoggingInputStream(p.getInputStream());
-        LoggingInputStream errors = new LoggingInputStream(p.getErrorStream());
+        // Show maven command details only in development mode
+        if (processManager.isDevelopmentMode()) {
+            
+            // Ensure separate threads are used for logging, as per ROO-652
+            LoggingInputStream input = new LoggingInputStream(p.getInputStream());
+            LoggingInputStream errors = new LoggingInputStream(p.getErrorStream());
 
-        input.start();
-        errors.start();
+            input.start();
+            errors.start();
+        }
+        else {
+            
+            logger.log(Level.INFO, message + " ...");
+        }
 
         try {
-            p.waitFor();
+            
+	    if (p.waitFor() != 0) {
+
+		throw new IllegalStateException(message + " error !");
+	    }
+            
         } catch (InterruptedException e) {
+            
             throw new IllegalStateException(e);
         }
     }

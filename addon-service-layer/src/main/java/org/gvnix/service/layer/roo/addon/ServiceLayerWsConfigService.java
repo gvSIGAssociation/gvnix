@@ -57,6 +57,8 @@ public interface ServiceLayerWsConfigService {
     };
 
     static final String GENERATE_SOURCES = "clean generate-sources";
+    
+    static final String GENERATE_SOURCES_INFO = "Generating sources";
 
     /**
      * Install and configure Web Service library, if not already installed.
@@ -145,12 +147,17 @@ public interface ServiceLayerWsConfigService {
     /**
      * Run maven command with parameters.
      * 
+     * <p>
+     * On development mode maven details will be showed, else input message.
+     * </p>
+     * 
      * @param parameters
      *            to run with maven.
-     * 
+     * @param message
+     *            Information showed if no development mode.
      * @throws IOException
      */
-    public void mvn(String parameters) throws IOException;
+    public void mvn(String parameters, String message) throws IOException;
 
     /**
      * Create Jax-WS plugin configuration in pom.xml.

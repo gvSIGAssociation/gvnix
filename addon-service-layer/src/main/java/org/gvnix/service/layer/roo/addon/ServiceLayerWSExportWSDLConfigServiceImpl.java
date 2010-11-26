@@ -149,8 +149,9 @@ public class ServiceLayerWSExportWSDLConfigServiceImpl implements
 
         // 3) Run maven generate-sources command.
         try {
-            serviceLayerWsConfigService
-                    .mvn(ServiceLayerWsConfigService.GENERATE_SOURCES);
+	    serviceLayerWsConfigService.mvn(
+		    ServiceLayerWsConfigService.GENERATE_SOURCES,
+		    ServiceLayerWsConfigService.GENERATE_SOURCES_INFO);
         } catch (IOException e) {
             throw new IllegalStateException(
                     "There is an error generating java sources with '"
