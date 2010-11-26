@@ -560,7 +560,7 @@ Anotar todas las entidades de la aplicación al "instalar" el Add-on de servicio
 * Crear el fichero aj para que anote cada uno de los campos de la entidad con @XmlElement y las relaciones, definidas por @OneToMany, @ManyToOne, etc como transient.
 
 Addon commands
---------------
+---------------
 
 * service class --class:
 
@@ -618,6 +618,8 @@ Addon commands
   - ``name``: nombre que se le va dar al servicio a definir.
 
     Generará lo necesario para que esta clase (dependiendo si --name se define) sea accesible externamente. 
+    
+    Definirá en el pom.xml la generación en la fase de compilación del fichero wsdl para comprobar el correcto funcionamiento antes de ser publicado. Ver último punto del apartado `TODO`_.
     
     La clase debería poder ser una clase de servicio o una entidad (habría que ver opciones u otro comando para publicar CRUD). Publicar el CRUD como servicio ?
 
@@ -691,3 +693,39 @@ TODO
 * Una opción muy interesante sería poder hacer una prueba de generación del servicio utilizando el plugin para maven **java2ws** ya que por defecto se ejecuta en el arranque o primera petición del servicio.
     * He estado haciendo las pruebas arrancando la aplicación, debido a que de esta manera también podía probar el servicio mediante web-services-explorer de eclipse.
     * Se ha añadido el plugin para generar el wsdl en la fase de compilación.
+
+    * Configuración en el pom.xml del proyecto::
+    
+        <!-- CXF java2Ws plugin to generate wsdl  -->
+        <plugin>
+          <groupId>org.apache.cxf</groupId>
+          <artifactId>cxf-java2ws-plugin</artifactId>
+          <version>${cxf.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.cxf</groupId>
+              <artifactId>cxf-rt-frontend-jaxws</artifactId>
+              <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.cxf</groupId>
+              <artifactId>cxf-rt-frontend-simple</artifactId>
+              <version>${cxf.version}</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <id>generate-car-service-wsdl</id>
+              <phase>compile</phase>
+              <configuration>
+                <className>org.gvnix.test.project.web.services.CarService</className>
+                <outputFile>${project.basedir}/src/test/resources/generated/wsdl/CarService.wsdl</outputFile>
+                <genWsdl>true</genWsdl>
+                <verbose>true</verbose>
+              </configuration>
+              <goals>
+                <goal>java2ws</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
