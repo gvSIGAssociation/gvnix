@@ -74,60 +74,66 @@ TODO:
 
 TRANSLATE:
 
+Add-on use case publishing a Web Service.
+
 Addon Annotations
 -------------------
 
-Anotaciones definidas por el Addon para la gestión de servicios web:
+Anontations used by the Add-on to manager Web Services:
 
-* @GvNIXWebFault: Anotación para definir las anotaciones utilizadas como excepciones en las operaciones de un servicio web.
-* @GvNIXWebMethod: Anotación para identificar el método a publicar como operación de un servicio web.
-* @GvNIXWebService: Anotación para identificar la clase publicada como servicio web.
-* @GvNIXWebParam: Anotación asociada la los parámetros del método que se publica como operación de un servicio.
+* @GvNIXWebService: Identifies published Web Service class.
+* @GvNIXWebMethod: Defines method exported as Web Servicre Operation inside @GvNIXWebService class.
+* @GvNIXWebFault: Defines Exception classes involved in Web Service Operations.
+* @GvNIXWebParam: Defines input method parameters from Web Service Operation.
+* @GvNIXXmlElement: Identifies Xml Element involved in Web Service Operation as input or returnType.
+* @GvNIXXmlElementField: Field from @GvNIXXlmElement class.
+* @GvNIXWebServiceProxy: Defines Web Service Client endpoint.
 
-+Publicar clase como servicio web.+
-----------------------------------------
++Publish Web Service class+
+-----------------------------
 
-Obligatorios todos los atributos de la anotación de gvNIX.
+Define **@GvNIXWebSErvice** with all attributes because are mandatory to publish the class as Web Service.
 
-* Cambiar el paquete o el nombre de la clase. Si se hace un refactor en Eclipse actualiza automáticamente todo lo referenciado con el nombre de la clase **menos** el pom.xml. Hay que tener en cuenta que cambia en la anotación **@GvNIXWebService** el serviceName y Address por el nuevo si coinciden los nombres igual que el archivo de configuración.
+Annotation ``behavior`` to avoid Web Service Contract::
 
-  * Controlado por el targetNamespace definido en la anotación **@GvNIXWebSErvice** para que no cambie el contrato.
-  * Controlado por portType. No cambia el contrato.
-  * Comprobar los parámetros permitidos en los métodos con el atributo ``exported = true``. 
-* Actualizar si ha variado el nombre de la clase o del paquete. Cambiar para que no cambie el contrato y no existan errores de compilación:
+* Change class name or package. Updates configuration file to avoid compiling errors:
 
-  * Archivo de configuración xml de cxf. Atributo class donde está instanciado el servicio.
+  * targetNamespace in annotation to avoid contract updates.
+  * portType avoid contract updates.
+  * Check avoid parameters in operation using attribute ``exported = true``.
+  * CXF xml configuration file. class attribute.
+    * Control publishing a service in xml file.
 
-    * Control de la publicación de un servicio en el archivo xml.
+      * Search for the bean that contains this class name. Don't change the contract.
+      * Search for the bean that its id matches serviceName attribute. Don't change the contract.
+  * pom.xml cxf plugin class reference. Where class is defined: package + class name.
 
-      * Buscar el bean que contenga la clase. No cambia el contrato.
-      * Buscar el bean que contenga el id de publicación con el nombre definido por el serviceName. No cambia el contrato.
-  * pom.xml referencia a la clase. Dirección donde se encuentra la clase.
+    * Change execution label from java2ws polugin with the new package/class name.
+  * Namespace doesn't change to aviod changes in Web Service Contract. If you would to change it uptade it in **@GvNIXWebService** annotation.
 
-    * Cambiar la ejecución del plugin de java2ws por el nuevo paquete/nombre de la clase.
-  * Namespace **NO** se cambia para no cambiar el contrato de servicio. Si se cambia es conscientemente en la anotación **@GvNIXWebService**
-* En la publicación controlar en el comando si el archivo de configuración existe, para así cuando se genera el metadato definir/comprobar el bean.
-
-+Publicar operación.+
++Publish operation.+
 -----------------------
 
-Obligatorios todos los atributos de la anotación de gvNIX si se añade manualmente la anotación a la clase.
+Must **@GvNIXWebMethod** attributes if you add manually the annotation.
 
-* Cambiar nombre del método
+Annotation ``behavior`` to avoid Web Service Contract::
 
-  * Controlado con el atributo operationName. No cambia el contrato.
-* Cambiar parámetro/s de entrada.
+* Change method name.
 
-  * Cambiar tipo: Debe controlar el cambio la anotación con el tipo de parametro para no regenerar el Aj con las anotaciones asociadas a los parámetros de entrada **@GvNIXWebParam**. No cambia el contrato.
-  * Cambiar nombre: Controlado por el atributo name de la anotación **@WebParam**, no varía el contrato de servicio si se cambia el nombre en java.
-* Cambiar parámetros de salida.
+  * Controled by operationName attribute. Doesn't change the contract.
+* Change input types.
 
-  * Debe controlar el cambio la anotación con el tipo de returnType para **no regenerar** el Aj si no coincide. No cambia el contrato.
+  * Change type: Managed by attribute type in **@GvNIXWebParam**. If there is a change ``only`` in java code, will throw an exception, you have to change it in annotation if you want ot change the WS-Contract.
+  * Change name: Managed by attribute name in **@GvNIXWebParam**. Doesn't changes WS-Contract if only change the name in java code.
+* Change return types.
 
-Estas comprobaciones se han de hacer al generar el metadato. El metadato relacionado con la publicación del servicio y de las operaciones de éste.
+  * Managed with ``webResultType`` attribute in **@GvNIXWebParam**. Has to be the same type as defined in java code.
 
-Nota:
-  Si a alguna operación se actualiza o se publica manualmente usando la anotación **@GvNIXWebMethod** y no cumple algún requisito, se muestra un mensaje donde apunta que no va a ser publicada debido a que no cumple el estándar y no se genera le AspectJ asociado, por lo tanto no existe el servicio web hasta que no esté correctamente formado.
+These behaviors are managed by the MetadataProvider that catches changes in a class annotated with **@GvNIXWebService**. 
+
+.. admonition:: Nota:
+
+    If an operation is updated manually updating attributes in **@GvNIXWebMethod** and doesn't complain with defined rules, gvNIX will throw Exception message to complain with defined interoperabily rules.
 
 +Publicar Objetos para la comunicación.+
 ------------------------------------------
@@ -262,12 +268,12 @@ This Generates AspectJ file to annotate the exception defined with *@WebFault* v
 Analysis
 =========
 
-Monitorizaciones de archivos y procesos internos
 File Monitoring.
 
-Add-on monitorize java files annotated with **@GvNIX...** 
+Add-on monitorize java files annotated with **@GvNIX...**, for each one creates its associated AspectJ file where are the jax-ws annotations defined using @GVNIX annotations attributes.
 
-TBC: Indicar qué se monitoriza, por ejemplo, crear una clase anotada con *tal* anotación y el proceso asociado, por ejemplo, crea un .aj con *tal cosa*.
+  * Checks correct values aof Annotation attributes before generate ja files.
+
 Este punto será muy útil para la integración con MOSKitt
 
 Analysis for the development of the Add-on displayed by commands.
@@ -297,7 +303,7 @@ Export a web service
 
 Command to publish a ¿ service class ? as a web service.
 
-service export ws:
+service define ws:
 
 * Add *@GvNixWebService* annotation with the command attributes (name, targetNamespace, etc) or if they hadn't been defined set default values.
 * Add CXF dependecies into pom.xml.
@@ -508,7 +514,13 @@ Proof of Concept
 
 Proof of concept repository location:
 
-* https://svn.disid.com/svn/disid/proof/gvnix/cxf-web-service
+Web Service export and export wsdl:
+
+* https://svn.disid.com/svn/disid/proof/gvnix/web-service-server-app
+
+Web Service Client:
+
+* https://svn.disid.com/svn/disid/proof/gvnix/bing-search-app
 
 TBC: The location of the project will be updated when the shell is built
 
@@ -516,5 +528,4 @@ Notes
 =======
 
 TBC
-
 
