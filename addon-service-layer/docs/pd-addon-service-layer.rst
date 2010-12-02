@@ -527,5 +527,43 @@ TBC: The location of the project will be updated when the shell is built
 Notes
 =======
 
-TBC
+Referentes a las tareas.
+
+Service Export
+===============
+
+Restricciones comando ``service export ws`` para un WSDL:
+
+  * WSDL 1.0
+  * Soap 1.1 ó Soap 1.2
+  * Document/Literal
+
+Generación XmlElement
+-----------------------
+
+El elemento generado *no* tiene la etiqueta XmlElement ya que no está definido en el contrato del servicio WSDL.
+
+Este tipo de casos, los ha de tratar el Add-on replicando código, o son parte del estándar de la definición de un contrato WSDL contract First ?
+* Buscar info sobre la definición de un objeto en XSD.
+
+Gestionar XmlElement
+-----------------------
+
+Futuras versiones:
+
+* Comnado para gestionar los XmlElement.
+
+Ahora existe para cada **@GvNIXXmlElement** una anotación **@GvNIXXmlElementField** para cada uno de sus campos definidos donde se definen las restricciones del campo.
+
+
+**service define ws**
+
+Tener en cuenta el atributo **exclude** ya que evita que se comprueben los tipos permitidos en las operaciones de un servicio que se quiere publicar, se puede cambiar a mano pero **NO** garantiza la interoperabilidad del Servicio Web.
+
+ROO 1.1.0-RELEASE
+====================
+
+Comprobar la creación de clases y actualización de las mismas.
+Definición de Metadatos y Providers.
+
 

@@ -48,3 +48,10 @@ Set type fields OCC
 In a set field modification (adding or removing relation to current entity) has relation whit current OCC because change are made in set element. But in this case we have to assure that this changes are made in same items version.
 
 We need to proof this checks is performed correctly. Instead we need to develop a solution.
+
+Notes
+-------
+
+Se crea la plantilla de AspectJ debido a que hay que declarar la precedencia en el ITD, por eso no se crean los métodos mediante código java.
+
+Investigar más adelante si ROO da la posibilidad de definir la precedencia mediante una lista.
