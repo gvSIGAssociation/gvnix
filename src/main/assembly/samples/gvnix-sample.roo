@@ -20,3 +20,11 @@ page add --parent /others --name moskitt --destination http://www.moskitt.org/ -
 page add --parent /others --name gvSIG --destination http://www.gvsig.org/ --label gvSIG
 page add --parent /others --name gvhidra --destination http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo/gvhidra-herramienta/ --label gvHIDRA
 exception handler add --exception java.io.IOException --title "Input Output Exception" --description "There were problems sending or receiving data" --language en
+service class --class ~.services.ClaseServicio
+service operation --name checkString --service ~.services.ClaseServicio
+service operation --name inputParameters --service ~.services.ClaseServicio --return java.lang.String --paramTypes java.lang.Integer,java.lang.String --paramNames number,name
+service define ws --class ~.services.ClaseServicio
+service export operation --class ~.services.ClaseServicio --method checkString
+service export operation --class ~.services.ClaseServicio --method inputParameters
+service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
