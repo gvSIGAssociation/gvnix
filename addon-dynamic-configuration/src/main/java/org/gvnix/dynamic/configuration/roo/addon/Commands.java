@@ -1,5 +1,6 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
@@ -11,7 +12,6 @@ import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
 import org.springframework.roo.shell.CommandMarker;
 import org.springframework.roo.shell.converters.StaticFieldConverter;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Sample of a command class. The command class is registered by the Roo shell following an
@@ -30,6 +30,7 @@ public class Commands implements CommandMarker {
 
 	@Reference private Operations operations;
 	@Reference private StaticFieldConverter staticFieldConverter;
+	@Reference private ConfigurationParser configurationParser;
 
 	protected void activate(ComponentContext context) {
 	    staticFieldConverter.add(PropertyName.class);
@@ -68,4 +69,40 @@ public class Commands implements CommandMarker {
 	public void writeHej() {
 		operations.writeTextFile("hej");
 	}
+	
+	
+	
+	
+
+  @CliAvailabilityIndicator("configuration save")
+  public boolean isSave() {
+    
+    return operations.isProjectAvailable() && operations.isSpringConfigFileAvailable("database.properties");
+  }
+
+  @CliCommand(value="configuration save", help="Save the current property values of the dynamic configuration files on a dynamic configuration.")
+  public void save() {
+    
+    Set<String> commands = configurationParser.getEveryCommand();
+    
+    if (commands == null) {
+      System.out.println("Nulo");
+    }
+    
+    System.out.println(commands.size());
+  }
+  
+  @CliAvailabilityIndicator("configuration activate")
+  public boolean isActivate() {
+    
+    return operations.isProjectAvailable() && operations.isSpringConfigFileAvailable("database.properties");
+  }
+
+  @CliCommand(value="configuration activate", help="Set the stored dynamic configuration property values on the dynamic configuration files.")
+  public void activate() {
+    
+  }
+	
+	
+	
 }

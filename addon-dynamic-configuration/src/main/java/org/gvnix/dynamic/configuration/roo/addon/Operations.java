@@ -22,4 +22,16 @@ public interface Operations {
 	boolean isTextFileAvailable(String name);
 
 	void writeTextFile(String name);
+	
+	
+	
+
+  /**
+   * @return true if the name file exists on spring config folder.
+   */
+  boolean isSpringConfigFileAvailable(String name);
+
+  
+  
+  
 }

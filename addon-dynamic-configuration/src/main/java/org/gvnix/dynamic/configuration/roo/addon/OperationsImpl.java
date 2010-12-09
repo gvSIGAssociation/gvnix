@@ -101,4 +101,31 @@ public class OperationsImpl implements Operations{
 		}
 		return projectMetadata.getPathResolver();
 	}
+	
+	
+	
+	
+	
+
+  /**
+   * @return true if the name file exists on spring config folder.
+   */
+  public boolean isSpringConfigFileAvailable(String name) {
+
+    Assert.hasText(name, "File name to check for is required");
+
+    PathResolver pr = getPathResolver();
+    if (pr == null) {
+
+      return false;
+    }
+
+    File file = new File(pr.getIdentifier(Path.SPRING_CONFIG_ROOT, name));
+
+    return file.exists();
+  }
+	
+	
+	
+	
 }
