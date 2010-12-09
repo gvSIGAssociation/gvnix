@@ -323,7 +323,83 @@ Second version commands proposal
 
   * list <profile>: List all property names and values of a required profile name.
   * value <property>: Show all values of required property on all existing profiles.
-  * update <profile> <property> <value>: Actualize a required property of a required profile with some required value. 
+  * update <profile> <property> <value>: Actualize a required property of a required profile with some required value.
+
+Properties command info
+```````````````````````
+
+Keyword:                   properties list
+Description:               Shows the details of a particular properties file
+
+ Keyword:                  name
+ 
+   Help:                   Property file name (including .properties suffix)
+   Mandatory:              true
+   Default if specified:   '__NULL__'
+   Default if unspecified: '__NULL__'
+   
+ Keyword:                  path
+ 
+   Help:                   Source path to property file
+   Mandatory:              true
+   Default if specified:   '__NULL__'
+   Default if unspecified: '__NULL__'
+
+Keyword:                   properties remove
+Description:               Removes a particular properties file property
+
+ Keyword:                  name
+ 
+   Help:                   Property file name (including .properties suffix)
+   Mandatory:              true
+   Default if specified:   '__NULL__'
+   Default if unspecified: '__NULL__'
+   
+ Keyword:                  path
+ 
+   Help:                   Source path to property file
+   Mandatory:              true
+   Default if specified:   '__NULL__'
+   Default if unspecified: '__NULL__'
+   
+ Keyword:                  ** default **
+ Keyword:                  key
+ 
+   Help:                   The property key that should be removed
+   Mandatory:              true
+   Default if specified:   '__NULL__'
+   Default if unspecified: '__NULL__'
+
+Keyword:                   properties set
+Description:               Changes a particular properties file property
+
+ Keyword:                  name
+ 
+   Help:                   Property file name (including .properties suffix)
+   Mandatory:              true
+   Default if specified:   '__NULL__'
+   Default if unspecified: '__NULL__'
+   
+ Keyword:                  path
+ 
+   Help:                   Source path to property file
+   Mandatory:              true
+   Default if specified:   '__NULL__'
+   Default if unspecified: '__NULL__'
+   
+ Keyword:                  key
+ 
+   Help:                   The property key that should be changed
+   Mandatory:              true
+   Default if specified:   '__NULL__'
+   Default if unspecified: '__NULL__'
+   
+ Keyword:                  value
+ 
+   Help:                   The new vale for this property key
+   Mandatory:              true
+   Default if specified:   '__NULL__'
+   Default if unspecified: '__NULL__'
 
 TODO
 ````
