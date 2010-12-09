@@ -1,6 +1,6 @@
-================================
- Profile Addon Technical Design
-================================
+==============================================
+ Dynamic Configuration Addon Technical Design
+==============================================
 
 :Project:   gvNIX. Spring Roo based RAD tool
 :Copyright: Conselleria d'Infraestructures i Transport - Generalitat Valenciana
@@ -17,6 +17,11 @@ Unported License. To view a copy of this license, visit
 http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to 
 Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 
 94105, USA.
+
+Introduction
+============
+
+Dynamic configuration is a system as Profiles on Maven ant Ant build systems to manage diferent variables values by environment.
 
 Requirements
 ============
