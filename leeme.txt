@@ -384,6 +384,8 @@ Anexo
 Configuración proxy
 -------------------
 
+Ver el comando "proxy configuration" de la consola.
+
 Git
 ```
 

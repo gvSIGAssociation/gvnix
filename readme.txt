@@ -173,6 +173,8 @@ Appendix
 Proxy configuration
 ---------------------
 
+See "proxy configuration" command on shell.
+
 Git
 ~~~~
 
