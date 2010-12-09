@@ -25,7 +25,7 @@ Requirements
 * Friendly and easy to use
 * Faster than write profiles directly in some build system (Maven, Ant, ...) 
 * Avoid variables ``${property.name}`` along project files.
-  More readable aproximation is store the value of the variable on currently active profile
+  More readable aproximation is to store the value of variable on currently active profile
 * Current active profile selection
 
 Proposals
@@ -35,7 +35,7 @@ Proposals
 #. Ant profile addon: Modify files managed by other addons replacing some values with variables. Manage the Ant build.xml profiles section with the values related to variables.
 #. OSGi profile addon:
 
- * Define a OSGi component that can be implemented by other addons that would manage their own files with different profile values.
+ * Define a OSGi component that can be implemented by other addons to manage their own files with different profile values.
  * Out of the box, has already implemented some OSGi components to profile some files of a project, like database.properties.
  * When a profile property is changed, related OSGi component will be alerted to change the value in corresponding files.
  * The profiles information is stored on a independent and own file on project resources.  
@@ -102,7 +102,7 @@ TODO
 * Which directories add on resources to do the filtering of the properties defined in the profile ?
 * A resources section can be defined on a profile section ?
 * Use activation to set the active profile ?
-* If active profile setted, ¿ whart hapends if other profile is selected from maven command (-p pre) ? 
+* If active profile setted, ¿ what hapens if other profile is selected from maven command (-p pre) ? 
 
 References
 ``````````
@@ -113,30 +113,75 @@ References
 Ant profile addon
 -----------------
 
-This option is not very interesting because Ant is not the build tool used by default on generated projects.
+This option is not much interesting because Ant is not the build tool used by default on generated projects.
 
 OSGi profile addon
 ------------------
 
-Profile selected on project is only available on the gvNIX environment, on generated project is not possible to change selected profile.
-A very interesting improvement could be allow the generation of Ant and Maven Profiles on their configuration files and replace on profile files values with variables.
-Thus on generated project the profile can be selected too.
+Profile selection is only available on the gvNIX environment, on generated project is not possible to change selected profile.
 
 Profile information (variables and values by environment) can be stored on same file or on separated files (one by environment).
+
+OSGi arquitecture
+`````````````````
+
+The creation of an OSGi component requires to define an interface that must implement the component classes adding the @Component and @Service annotations from org.apache.felix.scr.annotations package.
+To obtain the list of components, use the locateServices("name") method of org.osgi.service.component.ComponentContext OSGi component.
+
+Example:
+
+* Class ``org.springframework.roo.shell.SimpleParser``
+
+  This class manage all available Roo shell commands provided by diferent addons through OSGi components.
+  This class has the @org.apache.felix.scr.annotations.Component and @org.apache.felix.scr.annotations.Service annotations.
+
+  * Class annotation ``@org.apache.felix.scr.annotations.Reference(name="commands", strategy=ReferenceStrategy.LOOKUP, policy=ReferencePolicy.DYNAMIC, referenceInterface=CommandMarker.class, cardinality=ReferenceCardinality.OPTIONAL_MULTIPLE)``
+  
+    Defines references to other services made available to the component.
+    Take notice that attribute ``referenceInterface=CommandMarker.class`` is the Java interface implemented by each command class.
+
+  * Property ``org.osgi.service.component.ComponentContext context``
+  
+    This property is used by the component instance to interact with its execution context including locating services by reference name.
+    
+  * Method ``Object[] objs = context.locateServices("commands");``
+  
+    Returns the service objects for the specified reference name.
+ 
+  * Utility::
+  
+	@SuppressWarnings("unchecked")
+	private <T> Set<T> getSet(String name) {
+		Set<T> result = new HashSet<T>();
+		Object[] objs = context.locateServices(name);
+		if (objs != null) {
+			for (Object o : objs) {
+				result.add((T) o);
+			}
+		}
+		if ("commands".equals(name)) {
+			result.add((T) this);
+		}
+		return result;
+	}
+
+  * For each Object on Set, get all methods with ``java.lang.reflect.Method[] methods = getClass().getMethods();``
+  
+  * To invoke some ``java.lang.reflect.Method``, use reflection with ``invoke`` method
 
 TODO
 ````
 
-* Create a OSGi component requires to define an interface that can be implemented by some class with @Component and @Service from org.apache.felix.scr.annotations ?
-  Then, ¿ how obtain this list of components ? See Roo shell addon and related commands (CommandMarker interface and @CliCommand annotation).   
+* A very interesting improvement could be allow the generation of Ant and Maven Profiles on their configuration files (build.xml ant pom.xml respectively) and replace on profile files values with variables.
+  Thus on generated project the profile can be selected too.
+
+* By default, create a default or current profile with the currently existing values on the project files ?  
 
 Conclusion
 ----------
 
 Maven and ant profile addon proposals are not desired because is not best than manage the profile section manually in configuration files (pom.xml and build.xml, respectively).
 Therefore, OSGi profile addon is a better aproach.
-
-Anyway, is an interesting future option the generation of build systems configuration file (pom.xml, build.xml, ...) to allow profile selection on generated projects. 
 
 Files to include on profiles
 ============================
@@ -149,7 +194,30 @@ There are some important directories on a project:
 #. src/test/resources: Resources with test configuration
 #. src/main/webapp: Web application files
 
-Possible files to include on profiles:
+Possible files to include on first version
+------------------------------------------
+
+* Properties
+ 
+  * src/main/resources/META-INF/spring/database.properties
+
+Possible files to include on second version
+-------------------------------------------
+
+* Java
+
+  * Classes of service layer addon has annotations with attributes values that changed by profile as the imported service URL
+
+Possible files to include on future version
+-------------------------------------------
+
+* Properties
+
+  * src/main/resources/log4j.properties
+
+* Java
+
+  * Java properties
 
 * Xml
  
@@ -160,16 +228,6 @@ Possible files to include on profiles:
   * src/main/webapp/WEB-INF/urlrewrite.xml
   * src/main/webapp/WEB-INF/web.xml
   * src/main/webapp/WEB-INF/spring/webmvc-config.xml
- 
-* Properties
- 
-  * src/main/resources/META-INF/spring/database.properties
-  * src/main/resources/log4j.properties
-
-* Java
-
-  * Classes of service layer addon has annotations with attributes values that changed by profile as the imported service URL
-  * Java properties
 
 This is a non extensive list, it could not have all interesting files.
 
@@ -178,6 +236,50 @@ TODO
 
 * ¿ Include java, resources and/or webapp locations on profiles ?
 * ¿ Include main and/or test locations on profiles ?
+
+Metadata
+========
+
+It will be placed on src/main/resources folder or subfolder and its structure will be:
+
+* OSGi component 1
+
+  * property1 = value1
+  * property2 = value2
+  * ...
+
+* OSGi component 2
+
+  * property1 = value1
+  * property2 = value2
+  * ...
+
+OSGi component
+==============
+
+Example::
+
+  @DynamicConfiguration(file=".../database.properties")
+  class DatabaseDynamicConfiguration implements DynamicConfiguration {
+
+    void write(SomeFileFormat file) {
+    
+      // Update database.properties with values stored on the file in given format 
+    }
+
+    SomeFileFormat read() {
+    
+      // Reads database.properties values and generates a file with given format
+    }
+  }
+
+TODO
+----
+
+* Provide some utils to read/write SomeFileFormat and read/write Properties ?
+* If some profile file updated, some monitor is triggered that overwrite changes ?
+* Two addons can manage the same profile file ? 
+* What happens when a profile monitored file is deleted, renamed or moved ?
 
 Environments
 ============
@@ -193,32 +295,57 @@ The default can be the development environment.
 Commands
 ========
 
-Next are a first commands proposal:
+First version commands proposal
+-------------------------------
 
-* environment profile
+* profile
 
-  * list
-  * add
-  * delete: 
-  * default or set or activate
-  * properties or info
-  * load: Load all files properties defined and their properties and values
-  * save: Save loaded properties and values to a profile
+  * save <name>: Save properties and values to a profile with some required name.
+    When saved, all property names and values are showed and is not set as the ``Active`` profile.
+    The saving action reads the source file performed by its OSGi component and is saved to metadata file on resources. 
+  * activate <name>: Set a required profile name as the currently active profile.
+    When activated, all property names and values are showed.
+    The activate action writes the source file performed by its OSGi component from metadata file on resources.
+    If some change is maded on profile files, thereafter active profile will be the ``Modified`` one.
+
+Second version commands proposal
+--------------------------------
+
+* profile
+
+  * list: List all previously saved profile names.
+    At least, ``Modified`` profile is always present.
+    Active profile is marked with the ``Active`` text next to the profile name.
+    Active profile is the one whose values are equals to profile files values.
+  * delete <name>: Clear a required profile name.
+
+* profile property
+
+  * list <profile>: List all property names and values of a required profile name.
+  * value <property>: Show all values of required property on all existing profiles.
+  * update <profile> <property> <value>: Actualize a required property of a required profile with some required value. 
+
+TODO
+````
+
+* ``Modified`` profile always reads from read method of related OSGi component. 
+* If one profile is active and something is modified on disk, which profile becomes active ?
+* If two profiles has same values, then this profiles will be the ``Active`` profile at same time. 
+
+Future versions commands proposal
+---------------------------------
   
-* environtment property
+* profile property
 
-  * list
-  * add
+  * add: Add new property to all profiles.
   * delete: a property deletion of a profile could required to delete same property in all other profiles  
-  * update
-  * values or info
 
-* environment file
+* profile file
 
-  * list
-  * add: File to add to profile system, no included by default 
-  * delete
-  * properties or info
+  * list: List all files managed by profile addon
+  * add: File to add to profile addon, no included by default 
+  * delete: Remove a file from profile addon
+  * properties or info: Property values of a file
 
 TODO
 ====
