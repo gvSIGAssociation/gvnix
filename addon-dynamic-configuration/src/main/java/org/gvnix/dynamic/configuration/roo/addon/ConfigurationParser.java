@@ -5,6 +5,6 @@ import java.util.Set;
 
 public interface ConfigurationParser {
 
-  public Set<String> getEveryCommand();
+  public Set<Class<? extends Object>> getEveryCommand();
   
 }

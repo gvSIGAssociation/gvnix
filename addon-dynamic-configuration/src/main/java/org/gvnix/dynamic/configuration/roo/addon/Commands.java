@@ -83,7 +83,7 @@ public class Commands implements CommandMarker {
   @CliCommand(value="configuration save", help="Save the current property values of the dynamic configuration files on a dynamic configuration.")
   public void save() {
     
-    Set<String> commands = configurationParser.getEveryCommand();
+    Set<Class<? extends Object>> commands = configurationParser.getEveryCommand();
     
     if (commands == null) {
       System.out.println("Nulo");

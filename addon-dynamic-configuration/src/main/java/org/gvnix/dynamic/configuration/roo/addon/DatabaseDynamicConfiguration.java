@@ -3,11 +3,16 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Service;
+
 
 /**
  * @author mmartinez
  *
  */
+@Component
+@Service
 @DynamicConfiguration(file="database.properties")
 public class DatabaseDynamicConfiguration implements
     PropertyDynamicConfiguration {
