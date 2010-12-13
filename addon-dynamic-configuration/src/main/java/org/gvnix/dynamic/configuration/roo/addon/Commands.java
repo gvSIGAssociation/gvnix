@@ -1,6 +1,7 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
-import java.util.Set;
+import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
@@ -77,25 +78,26 @@ public class Commands implements CommandMarker {
   @CliAvailabilityIndicator("configuration save")
   public boolean isSave() {
     
-    return operations.isProjectAvailable() && operations.isSpringConfigFileAvailable("database.properties");
+    return operations.isProjectAvailable();
   }
 
   @CliCommand(value="configuration save", help="Save the current property values of the dynamic configuration files on a dynamic configuration.")
   public void save() {
     
-    Set<Class<? extends Object>> commands = configurationParser.getEveryCommand();
-    
-    if (commands == null) {
-      System.out.println("Nulo");
+    Properties properties = configurationParser.getProperties();
+    if (properties.isEmpty()) {
+      
+      logger.log(Level.WARNING, "There is no configuration properties to save");
+      return;
     }
     
-    System.out.println(commands.size());
+    logger.log(Level.INFO, properties.toString());
   }
   
   @CliAvailabilityIndicator("configuration activate")
   public boolean isActivate() {
     
-    return operations.isProjectAvailable() && operations.isSpringConfigFileAvailable("database.properties");
+    return operations.isProjectAvailable();
   }
 
   @CliCommand(value="configuration activate", help="Set the stored dynamic configuration property values on the dynamic configuration files.")

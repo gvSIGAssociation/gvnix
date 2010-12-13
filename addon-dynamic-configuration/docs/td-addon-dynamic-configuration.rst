@@ -303,7 +303,7 @@ Commands
 First version commands proposal
 -------------------------------
 
-* profile
+* configuration
 
   * save <name>: Save properties and values to a profile with some required name.
     When saved, all property names and values are showed and is not set as the ``Active`` profile.
@@ -316,7 +316,7 @@ First version commands proposal
 Second version commands proposal
 --------------------------------
 
-* profile
+* configuration
 
   * list: List all previously saved profile names.
     At least, ``Modified`` profile is always present.
@@ -324,7 +324,7 @@ Second version commands proposal
     Active profile is the one whose values are equals to profile files values.
   * delete <name>: Clear a required profile name.
 
-* profile property
+* configuration property
 
   * list <profile>: List all property names and values of a required profile name.
   * value <property>: Show all values of required property on all existing profiles.
@@ -416,12 +416,12 @@ TODO
 Future versions commands proposal
 ---------------------------------
   
-* profile property
+* configuration property
 
   * add: Add new property to all profiles.
   * delete: a property deletion of a profile could required to delete same property in all other profiles  
 
-* profile file
+* configuration file
 
   * list: List all files managed by profile addon
   * add: File to add to profile addon, no included by default 

@@ -22,7 +22,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
 /**
- * Dynamic configuration manager of jdbc database properties.
+ * Dynamic configuration manager of log4j logging properties. 
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -31,7 +31,7 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-@DynamicConfiguration(path=ProjectPath.SPRING_CONFIG_ROOT, relativePath="database.properties")
-public class DatabaseDynamicConfiguration extends PropertiesDynamicConfiguration {
+@DynamicConfiguration(relativePath="src/main/resources/log4j.properties")
+public class Log4jDynamicConfiguration extends PropertiesDynamicConfiguration {
 
 }

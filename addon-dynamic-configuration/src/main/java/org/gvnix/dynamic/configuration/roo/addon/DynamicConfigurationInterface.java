@@ -14,7 +14,7 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
 /**
- * Annotation to mark a class as the manager of a configuration file.
+ * Interface methods required by a manager of a configuration file.
  * <p>
  * The manager class is responsible of read/write dynamic property values.
  * </p>
@@ -24,15 +24,7 @@ package org.gvnix.dynamic.configuration.roo.addon;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public interface PropertyDynamicConfiguration {
-
-  /**
-   * Update database.properties with values stored on the file in given format.
-   * TODO Use SomeFileFormat instead of Objet on file property.
-   * 
-   * @param file Info to be stored on the original file.
-   */
-  void write(Object file);
+public interface DynamicConfigurationInterface {
 
   /**
    * Reads database.properties values and generates a file with given format.
@@ -42,4 +34,12 @@ public interface PropertyDynamicConfiguration {
    */
   Object read();
   
+  /**
+   * Update database.properties with values stored on the file in given format.
+   * TODO Use SomeFileFormat instead of Objet on file property.
+   * 
+   * @param file Info to be stored on the original file.
+   */
+  void write(Object file);
+
 }

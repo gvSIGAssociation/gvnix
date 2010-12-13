@@ -1,10 +1,9 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
-import java.util.Set;
-
+import java.util.Properties;
 
 public interface ConfigurationParser {
 
-  public Set<Class<? extends Object>> getEveryCommand();
+  public Properties getProperties();
   
 }

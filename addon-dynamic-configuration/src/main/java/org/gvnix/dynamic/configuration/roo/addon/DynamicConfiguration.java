@@ -37,6 +37,8 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 public @interface DynamicConfiguration {
 
-    String file();
+    ProjectPath path() default ProjectPath.ROOT;
+    
+    String relativePath();
 
 }
