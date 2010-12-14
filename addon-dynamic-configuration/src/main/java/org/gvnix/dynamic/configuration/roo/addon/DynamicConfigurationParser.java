@@ -21,12 +21,9 @@ package org.gvnix.dynamic.configuration.roo.addon;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,6 +35,9 @@ import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.apache.felix.scr.annotations.ReferencePolicy;
 import org.apache.felix.scr.annotations.ReferenceStrategy;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
@@ -100,10 +100,10 @@ public class DynamicConfigurationParser implements ConfigurationParser {
   /* (non-Javadoc)
    * @see org.gvnix.dynamic.configuration.roo.addon.ConfigurationParser#save(java.lang.String)
    */
-  public Map<String, Set<Entry<Object, Object>>> save(String name) {
+  public Set<DynConfiguration> save(String name) {
     
     // Get the properties of all dynamic properties components 
-    Map<String, Set<Entry<Object, Object>>> properties = getProperties();
+    Set<DynConfiguration> properties = getProperties();
     
     // Get the main configuration file of the dynamic configuration
     String configPath = getDynamicConfigurationFilePath();
@@ -135,15 +135,15 @@ public class DynamicConfigurationParser implements ConfigurationParser {
    * @return Set of entry with key value pairs of properties
    */
   @SuppressWarnings("unchecked")
-  private Map<String, Set<Entry<Object, Object>>> getProperties() {
+  private Set<DynConfiguration> getProperties() {
 
     // Variable to store properties of all dynamic configuration components
-    Map<String, Set<Entry<Object, Object>>> components = new HashMap<String, Set<Entry<Object,Object>>>();
+    Set<DynConfiguration> components = new HashSet<DynConfiguration>();
     
     // Iterate all dynamic configuration components registered
     for (Object o : getComponents()) {
 
-      // If component has not DynamicConfiguration annotation, ignore it
+      // If component has not DynComponent annotation, ignore it
       Class<? extends Object> c = o.getClass();
       DynamicConfiguration a = c.getAnnotation(DynamicConfiguration.class);
       if (a == null) {
@@ -161,9 +161,18 @@ public class DynamicConfigurationParser implements ConfigurationParser {
 
         // Invoke the read method of all components to get its properties
         Method m = (Method) c.getMethod("read", new Class[0]);
-        Set<Entry<Object, Object>> res = (Set<Entry<Object, Object>>) m.invoke(
+        List<DynProperty> res = (List<DynProperty>) m.invoke(
             o, new Object[0]);
-        components.put(c.getName(), res);
+        
+        
+        
+        DynConfiguration dynConfiguration = new DynConfiguration();
+        DynComponent component = new DynComponent(c.getName());
+        dynConfiguration.setComponent(component);
+        dynConfiguration.setProperties(res);
+        
+        
+        components.add(dynConfiguration);
       }
       catch (NoSuchMethodException nsme) {
 
@@ -226,7 +235,7 @@ public class DynamicConfigurationParser implements ConfigurationParser {
   /**
    * Create a new configuration element on the root element with a name.
    * <p>
-   * Configuration will constain the set of key and value properties.
+   * DynConfiguration will constain the set of key and value properties.
    * </p>
    * 
    * @param name New configuration name
@@ -234,7 +243,7 @@ public class DynamicConfigurationParser implements ConfigurationParser {
    * @param root Element to append the child configuration
    */
   private void createConfiguration(String name,
-                                   Map<String, Set<Entry<Object, Object>>> components,
+                                   Set<DynConfiguration> components,
                                    Element root) {
 
     Document document = root.getOwnerDocument();
@@ -242,18 +251,16 @@ public class DynamicConfigurationParser implements ConfigurationParser {
     configuration.setAttribute("name", name);
     root.appendChild(configuration);
 
-    Set<Entry<String, Set<Entry<Object, Object>>>> entries = components.entrySet();
-    for (Entry<String, Set<Entry<Object, Object>>> entry : entries) {
+    for (DynConfiguration entry : components) {
       
       Element component = document.createElement("component");
-      component.setAttribute("id", entry.getKey());
+      component.setAttribute("id", entry.getComponent().getName());
       configuration.appendChild(component);
       
-      Set<Entry<Object, Object>> properties = entry.getValue();
-      for (Entry<Object, Object> property : properties) {
+      for (DynProperty property : entry.getProperties()) {
 
-        Element element = document.createElement(property.getKey().toString());
-        element.setTextContent(property.getValue().toString());
+        Element element = document.createElement(property.getKey());
+        element.setTextContent(property.getValue());
         component.appendChild(element);
       }
     }

@@ -1,14 +1,14 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
@@ -86,19 +86,18 @@ public class Commands implements CommandMarker {
   @CliCommand(value="configuration save", help="Save the current property values of the dynamic configuration files on a named dynamic configuration.")
   public void save(@CliOption(key="name", mandatory=true, help="Name to store as the dynamic configuration") String name) {
     
-    Map<String, Set<Entry<Object, Object>>> components = configurationParser.save(name);
+    Set<DynConfiguration> components = configurationParser.save(name);
     if (components.isEmpty()) {
       
       logger.log(Level.WARNING, "There is no configuration properties to save");
       return;
     }
     
-    Set<Entry<String, Set<Entry<Object, Object>>>> entries = components.entrySet();
-    for (Entry<String, Set<Entry<Object, Object>>> entry : entries) {
-      
-      logger.log(Level.INFO, entry.getKey().substring(entry.getKey().lastIndexOf(".") + 1, entry.getKey().length()));
-      Set<Entry<Object, Object>> properties = entry.getValue();
-      for (Entry<Object, Object> property : properties) {
+    for (DynConfiguration entry : components) {
+
+      String compName = entry.getComponent().getName();
+      logger.log(Level.INFO, compName.substring(compName.lastIndexOf(".") + 1, compName.length()));
+      for (DynProperty property : entry.getProperties()) {
 
         logger.log(Level.INFO, " " + property.getKey() + " = " + property.getValue());
       }

@@ -18,9 +18,9 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
+
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 
 /**
  * Manage components and invoke it to save or activate configurations.
@@ -38,6 +38,6 @@ public interface ConfigurationParser {
    * @param name Name to save it.
    * @return Set of entries with key/value pairs of properties.
    */
-  public Map<String, Set<Entry<Object, Object>>> save(String name);
+  public Set<DynConfiguration> save(String name);
   
 }

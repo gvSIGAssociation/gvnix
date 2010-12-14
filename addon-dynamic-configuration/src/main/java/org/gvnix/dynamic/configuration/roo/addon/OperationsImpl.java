@@ -49,7 +49,7 @@ public class OperationsImpl implements Operations{
 	 * @return a message that will ultimately be displayed on the shell
 	 */
 	public String getProperty(PropertyName propertyName) {
-		Assert.notNull(propertyName, "Property name required");
+		Assert.notNull(propertyName, "DynProperty name required");
 		String internalName = "user.name";
 		if (PropertyName.HOME_DIRECTORY.equals(propertyName)) {
 			internalName = "user.home";

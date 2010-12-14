@@ -18,7 +18,7 @@ public class PropertyName implements Comparable<PropertyName> {
 	public static final PropertyName HOME_DIRECTORY = new PropertyName("Home Directory");
 	
 	private PropertyName(String propertyName) {
-		Assert.hasText(propertyName, "Property name required");
+		Assert.hasText(propertyName, "DynProperty name required");
 		this.propertyName = propertyName;
 	}
 	

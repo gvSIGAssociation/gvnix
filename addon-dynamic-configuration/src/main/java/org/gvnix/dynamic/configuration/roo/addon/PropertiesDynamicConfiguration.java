@@ -19,13 +19,15 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
@@ -34,7 +36,7 @@ import org.springframework.roo.project.PathResolver;
 /**
  * Dynamic configuration base manager of property files.
  * <p>
- * Extends this class with adding the @DynamicConfiguration annotation to manage
+ * Extends this class with adding the @DynComponent annotation to manage
  * new property files.
  * </p>
  * 
@@ -54,20 +56,20 @@ public class PropertiesDynamicConfiguration implements
   /* (non-Javadoc)
    * @see org.gvnix.dynamic.configuration.roo.addon.DynamicConfigurationInterface#read()
    */
-  public Set<Entry<Object, Object>> read() {
+  public List<DynProperty> read() {
     
-    DynamicConfiguration dynamicConfig = this.getClass().getAnnotation(DynamicConfiguration.class);
+    DynamicConfiguration annotation = this.getClass().getAnnotation(DynamicConfiguration.class);
 
-    String canonicalPath = pathResolver.getIdentifier(new Path(dynamicConfig.path().name()), dynamicConfig.relativePath());
+    String canonicalPath = pathResolver.getIdentifier(new Path(annotation.path().name()), annotation.relativePath());
 
-    MutableFile mutableFile = null;
+    MutableFile file = null;
     Properties props = new Properties();
     try {
       
       if (fileManager.exists(canonicalPath)) {
 
-        mutableFile = fileManager.updateFile(canonicalPath);
-        props.load(mutableFile.getInputStream());
+        file = fileManager.updateFile(canonicalPath);
+        props.load(file.getInputStream());
       }
       else {
 
@@ -80,13 +82,19 @@ public class PropertiesDynamicConfiguration implements
     }
 
     // TODO Auto-generated method stub
-    return props.entrySet();
+    List<DynProperty> dynProperties = new ArrayList<DynProperty>();
+    for (Entry<Object, Object> prop : props.entrySet()) {
+      
+      dynProperties.add(new DynProperty(prop.getKey().toString(), prop.getValue().toString()));
+    }
+   
+    return dynProperties;
   }
 
   /* (non-Javadoc)
    * @see org.gvnix.dynamic.configuration.roo.addon.DynamicConfigurationInterface#write(java.lang.Object)
    */
-  public void write(Set<Entry<Object, Object>> file) {
+  public void write(List<DynProperty> dynProperties) {
     
     System.out.println("write database.properties");
     
