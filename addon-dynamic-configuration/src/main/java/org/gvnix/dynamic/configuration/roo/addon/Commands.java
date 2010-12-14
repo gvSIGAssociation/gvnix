@@ -1,5 +1,6 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -85,14 +86,23 @@ public class Commands implements CommandMarker {
   @CliCommand(value="configuration save", help="Save the current property values of the dynamic configuration files on a named dynamic configuration.")
   public void save(@CliOption(key="name", mandatory=true, help="Name to store as the dynamic configuration") String name) {
     
-    Set<Entry<Object, Object>> properties = configurationParser.save(name);
-    if (properties.isEmpty()) {
+    Map<String, Set<Entry<Object, Object>>> components = configurationParser.save(name);
+    if (components.isEmpty()) {
       
       logger.log(Level.WARNING, "There is no configuration properties to save");
       return;
     }
     
-    logger.log(Level.INFO, properties.toString());
+    Set<Entry<String, Set<Entry<Object, Object>>>> entries = components.entrySet();
+    for (Entry<String, Set<Entry<Object, Object>>> entry : entries) {
+      
+      logger.log(Level.INFO, entry.getKey().substring(entry.getKey().lastIndexOf(".") + 1, entry.getKey().length()));
+      Set<Entry<Object, Object>> properties = entry.getValue();
+      for (Entry<Object, Object> property : properties) {
+
+        logger.log(Level.INFO, " " + property.getKey() + " = " + property.getValue());
+      }
+    }
   }
   
   @CliAvailabilityIndicator("configuration activate")

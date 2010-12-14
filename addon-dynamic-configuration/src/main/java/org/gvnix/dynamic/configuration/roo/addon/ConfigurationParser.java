@@ -18,6 +18,7 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -37,6 +38,6 @@ public interface ConfigurationParser {
    * @param name Name to save it.
    * @return Set of entries with key/value pairs of properties.
    */
-  public Set<Entry<Object, Object>> save(String name);
+  public Map<String, Set<Entry<Object, Object>>> save(String name);
   
 }
