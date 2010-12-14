@@ -16,28 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.dynamic.configuration.roo.addon;
+package org.gvnix.dynamic.configuration.roo.addon.config;
 
-import java.util.Set;
-
-import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Service;
+import org.gvnix.dynamic.configuration.roo.addon.DynamicConfiguration;
 
 /**
- * Manage components and invoke it to save or activate configurations.
+ * Dynamic configuration manager of log4j logging properties. 
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public interface ConfigurationParser {
+@Component
+@Service
+@DynamicConfiguration(relativePath="src/main/resources/log4j.properties")
+public class Log4jDynamicConfiguration extends PropertiesDynamicConfiguration {
 
-  /**
-   * Save actual properties and values of all components with a name.
-   * 
-   * @param name Name to save it.
-   * @return Set of entries with key/value pairs of properties.
-   */
-  public Set<DynConfiguration> save(String name);
-  
 }

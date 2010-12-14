@@ -20,6 +20,8 @@ package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.lang.annotation.*;
 
+import org.gvnix.dynamic.configuration.roo.addon.entity.ProjectPath;
+
 /**
  * Annotation to mark a class as the manager of a configuration file with dynamic property values.
  * 

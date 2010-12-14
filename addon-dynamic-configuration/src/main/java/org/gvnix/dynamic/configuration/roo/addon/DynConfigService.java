@@ -44,7 +44,6 @@ import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
 import org.springframework.roo.support.util.TemplateUtils;
 import org.springframework.roo.support.util.XmlUtils;
@@ -53,7 +52,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
- * Manage components and invoke it to save or activate configurations.
+ * Manage components to save or activate dynamic configurations.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -62,10 +61,10 @@ import org.xml.sax.SAXException;
  */
 @Component
 @Service
-@Reference(name="components", strategy=ReferenceStrategy.LOOKUP, policy=ReferencePolicy.DYNAMIC, referenceInterface=DynamicConfigurationInterface.class, cardinality=ReferenceCardinality.OPTIONAL_MULTIPLE)
-public class DynamicConfigurationParser implements ConfigurationParser {
+@Reference(name="components", strategy=ReferenceStrategy.LOOKUP, policy=ReferencePolicy.DYNAMIC, referenceInterface=DefaultDynamicConfiguration.class, cardinality=ReferenceCardinality.OPTIONAL_MULTIPLE)
+public class DynConfigService implements DynConfigServiceInt {
   
-  private static final Logger logger = HandlerUtils.getLogger(DynamicConfigurationParser.class);
+  private static final Logger logger = HandlerUtils.getLogger(DynConfigService.class);
 
   private ComponentContext context;
   
@@ -98,27 +97,27 @@ public class DynamicConfigurationParser implements ConfigurationParser {
   }
   
   /* (non-Javadoc)
-   * @see org.gvnix.dynamic.configuration.roo.addon.ConfigurationParser#save(java.lang.String)
+   * @see org.gvnix.dynamic.configuration.roo.addon.DynConfigServiceInt#save(java.lang.String)
    */
   public Set<DynConfiguration> save(String name) {
     
-    // Get the properties of all dynamic properties components 
-    Set<DynConfiguration> properties = getProperties();
+    // Get all the dynamic configurations 
+    Set<DynConfiguration> configs = getConfigurations();
     
     // Get the main configuration file of the dynamic configuration
-    String configPath = getDynamicConfigurationFilePath();
-    MutableFile file = fileManager.updateFile(configPath);
+    String path = getDynConfigConfigurationPath();
+    MutableFile file = fileManager.updateFile(path);
 
     // Parse the XML configuration file to a Document
     Document document = parse(file);
     
     // Find the configuration of document with requested name
     Element root = document.getDocumentElement();
-    List<Element> dynConf = XmlUtils.findElements("/dynamic-configuration/configuration[@name='" + name + "']", root);
-    if (dynConf == null || dynConf.size() == 0) {
+    List<Element> config = XmlUtils.findElements("/dynamic-configuration/configuration[@name='" + name + "']", root);
+    if (config == null || config.size() == 0) {
       
       // If configuration not exists, create it
-      createConfiguration(name, properties, root);
+      addDynConfigConfiguration(name, configs, root);
       XmlUtils.writeXml(file.getOutputStream(), document);
     }
     else {
@@ -126,82 +125,55 @@ public class DynamicConfigurationParser implements ConfigurationParser {
       // TODO If configuration exists, update it
     }
     
-    return properties;
+    return configs;
   }
 
   /**
-   * Get the properties of all dynamic properties components.
+   * Get all dynamic configurations.
    * 
-   * @return Set of entry with key value pairs of properties
+   * @return Set of dynamic configurations.
    */
   @SuppressWarnings("unchecked")
-  private Set<DynConfiguration> getProperties() {
+  private Set<DynConfiguration> getConfigurations() {
 
-    // Variable to store properties of all dynamic configuration components
-    Set<DynConfiguration> components = new HashSet<DynConfiguration>();
+    // Variable to store all dynamic configurations
+    Set<DynConfiguration> configs = new HashSet<DynConfiguration>();
     
-    // Iterate all dynamic configuration components registered
+    // Iterate all dynamic configurations components registered
     for (Object o : getComponents()) {
-
-      // If component has not DynComponent annotation, ignore it
-      Class<? extends Object> c = o.getClass();
-      DynamicConfiguration a = c.getAnnotation(DynamicConfiguration.class);
-      if (a == null) {
-
-        continue;
-      }
-
-      // Relative path attribute of annotation not empty required
-      String relativePath = a.relativePath();
-      Assert.hasText(relativePath,
-          "File name to apply dynamic configuration required on "
-              + c.getCanonicalName());
-
       try {
 
         // Invoke the read method of all components to get its properties
+        Class<? extends Object> c = o.getClass();
         Method m = (Method) c.getMethod("read", new Class[0]);
         List<DynProperty> res = (List<DynProperty>) m.invoke(
             o, new Object[0]);
-        
-        
-        
+
+        // Create a dynamic configuration object with component and properties
         DynConfiguration dynConfiguration = new DynConfiguration();
         DynComponent component = new DynComponent(c.getName());
         dynConfiguration.setComponent(component);
         dynConfiguration.setProperties(res);
-        
-        
-        components.add(dynConfiguration);
+        configs.add(dynConfiguration);
       }
       catch (NoSuchMethodException nsme) {
 
         logger.log(Level.WARNING,
-            "No read method on dynamic configuration class "
-                + c.getCanonicalName());
-        logger
-            .log(Level.WARNING, "No dynamic configuration will be applied to "
-                + relativePath, nsme);
+            "No read method on dynamic configuration class");
       }
       catch (InvocationTargetException ite) {
 
         logger.log(Level.WARNING,
-            "Cannot invoke read method on dynamic configuration class "
-                + c.getCanonicalName());
-        logger.log(Level.WARNING,
-            "No dynamic configuration will be applied to " + relativePath, ite);
+            "Cannot invoke read method on dynamic configuration class");
       }
       catch (IllegalAccessException iae) {
 
         logger.log(Level.WARNING,
-            "Cannot access read method on dynamic configuration class "
-                + c.getCanonicalName());
-        logger.log(Level.WARNING,
-            "No dynamic configuration will be applied to " + relativePath, iae);
+            "Cannot access read method on dynamic configuration class");
       }
     }
 
-    return components;
+    return configs;
   }
 
   /**
@@ -212,7 +184,7 @@ public class DynamicConfigurationParser implements ConfigurationParser {
    * 
    * @return XML configuration file path
    */
-  private String getDynamicConfigurationFilePath() {
+  private String getDynConfigConfigurationPath() {
 
     String path = pathResolver.getIdentifier(Path.SRC_MAIN_RESOURCES,
         "dynamic-configuration.xml");
@@ -239,11 +211,11 @@ public class DynamicConfigurationParser implements ConfigurationParser {
    * </p>
    * 
    * @param name New configuration name
-   * @param components Set of key and value properties
+   * @param configs Set of dynamic configurations with key and value pairs
    * @param root Element to append the child configuration
    */
-  private void createConfiguration(String name,
-                                   Set<DynConfiguration> components,
+  private void addDynConfigConfiguration(String name,
+                                   Set<DynConfiguration> configs,
                                    Element root) {
 
     Document document = root.getOwnerDocument();
@@ -251,7 +223,7 @@ public class DynamicConfigurationParser implements ConfigurationParser {
     configuration.setAttribute("name", name);
     root.appendChild(configuration);
 
-    for (DynConfiguration entry : components) {
+    for (DynConfiguration entry : configs) {
       
       Element component = document.createElement("component");
       component.setAttribute("id", entry.getComponent().getName());

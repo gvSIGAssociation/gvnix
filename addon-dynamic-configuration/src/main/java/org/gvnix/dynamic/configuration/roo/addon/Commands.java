@@ -33,7 +33,7 @@ public class Commands implements CommandMarker {
 
 	@Reference private Operations operations;
 	@Reference private StaticFieldConverter staticFieldConverter;
-	@Reference private ConfigurationParser configurationParser;
+	@Reference private DynConfigServiceInt dynConfigService;
 
 	protected void activate(ComponentContext context) {
 	    staticFieldConverter.add(PropertyName.class);
@@ -83,27 +83,33 @@ public class Commands implements CommandMarker {
     return operations.isProjectAvailable();
   }
 
-  @CliCommand(value="configuration save", help="Save the current property values of the dynamic configuration files on a named dynamic configuration.")
-  public void save(@CliOption(key="name", mandatory=true, help="Name to store as the dynamic configuration") String name) {
-    
-    Set<DynConfiguration> components = configurationParser.save(name);
-    if (components.isEmpty()) {
-      
-      logger.log(Level.WARNING, "There is no configuration properties to save");
+  @CliCommand(value = "configuration save", help = "Save the current property values of the dynamic configuration files on a named dynamic configuration.")
+  public void save(@CliOption(key = "name", mandatory = true, help = "Name to store as the dynamic configuration") String name) {
+
+    // Save current dynamic configuration and get it
+    Set<DynConfiguration> configs = dynConfigService.save(name);
+    if (configs.isEmpty() || configs.size() == 0) {
+
+      logger.log(Level.WARNING, "There is no dynamic configurations to save");
       return;
     }
-    
-    for (DynConfiguration entry : components) {
 
-      String compName = entry.getComponent().getName();
-      logger.log(Level.INFO, compName.substring(compName.lastIndexOf(".") + 1, compName.length()));
-      for (DynProperty property : entry.getProperties()) {
+    // Show in console the dynamic configuration components ant their properties
+    for (DynConfiguration config : configs) {
 
-        logger.log(Level.INFO, " " + property.getKey() + " = " + property.getValue());
+      // Show only the component final name
+      String comp = config.getComponent().getName();
+      logger.log(Level.INFO, comp.substring(comp.lastIndexOf(".") + 1,
+          comp.length()));
+
+      for (DynProperty prop : config.getProperties()) {
+
+        // Show the property and value with format
+        logger.log(Level.INFO, " " + prop.getKey() + " = " + prop.getValue());
       }
     }
   }
-  
+
   @CliAvailabilityIndicator("configuration activate")
   public boolean isActivate() {
     

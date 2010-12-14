@@ -1,5 +1,4 @@
-package org.gvnix.dynamic.configuration.roo.addon;
-
+package org.gvnix.dynamic.configuration.roo.addon.entity;
 
 public enum ProjectPath {
   

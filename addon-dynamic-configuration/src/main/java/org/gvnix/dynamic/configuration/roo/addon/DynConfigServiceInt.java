@@ -18,20 +18,26 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
+import java.util.Set;
+
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 
 /**
- * Dynamic configuration manager of log4j logging properties. 
+ * Interface to save or activate dynamic configurations.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component
-@Service
-@DynamicConfiguration(relativePath="src/main/resources/log4j.properties")
-public class Log4jDynamicConfiguration extends PropertiesDynamicConfiguration {
+public interface DynConfigServiceInt {
 
+  /**
+   * Save current properties and values of dynamic configurations with a name.
+   * 
+   * @param name Name to save it.
+   * @return Set of dynamic configurations with key/value pairs of properties.
+   */
+  public Set<DynConfiguration> save(String name);
+  
 }

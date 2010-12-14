@@ -20,7 +20,7 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 /**
  * Interface methods required by every manager of a dynamic configuration file.
  * <p>
- * The manager class is responsible of read and write the key and value pairs of
+ * The manager class is responsible of read and write the properties list of
  * the dynamic configuration file.
  * </p>
  * 
@@ -29,17 +29,17 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public interface DynamicConfigurationInterface {
+public interface DefaultDynamicConfiguration {
 
   /**
-   * Reads a configuration file and generates a key/value pairs.
+   * Reads a configuration file and generates a properties list.
    *  
    * @return File info getted from the original file.
    */
   List<DynProperty> read();
 
   /**
-   * Update a configuration file with the values of the key/value pairs.
+   * Update a configuration file with the values of the properties list.
    * 
    * @param file Info to be stored on the original file.
    */

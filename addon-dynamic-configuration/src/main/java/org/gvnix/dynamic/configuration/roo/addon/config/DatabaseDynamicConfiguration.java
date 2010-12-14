@@ -16,10 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.dynamic.configuration.roo.addon;
+package org.gvnix.dynamic.configuration.roo.addon.config;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.dynamic.configuration.roo.addon.DynamicConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.entity.ProjectPath;
 
 /**
  * Dynamic configuration manager of jdbc database properties.

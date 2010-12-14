@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.dynamic.configuration.roo.addon;
+package org.gvnix.dynamic.configuration.roo.addon.config;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ import java.util.Map.Entry;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.dynamic.configuration.roo.addon.DefaultDynamicConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.DynamicConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
@@ -36,8 +38,8 @@ import org.springframework.roo.project.PathResolver;
 /**
  * Dynamic configuration base manager of property files.
  * <p>
- * Extends this class with adding the @DynComponent annotation to manage
- * new property files.
+ * Extends this class adding the @DynComponent annotation to manage new property
+ * files.
  * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
@@ -48,13 +50,13 @@ import org.springframework.roo.project.PathResolver;
 @Component
 @Service
 public class PropertiesDynamicConfiguration implements
-    DynamicConfigurationInterface {
+    DefaultDynamicConfiguration {
   
   @Reference private PathResolver pathResolver;
   @Reference private FileManager fileManager;
 
   /* (non-Javadoc)
-   * @see org.gvnix.dynamic.configuration.roo.addon.DynamicConfigurationInterface#read()
+   * @see org.gvnix.dynamic.configuration.roo.addon.DefaultDynamicConfiguration#read()
    */
   public List<DynProperty> read() {
     
@@ -92,7 +94,7 @@ public class PropertiesDynamicConfiguration implements
   }
 
   /* (non-Javadoc)
-   * @see org.gvnix.dynamic.configuration.roo.addon.DynamicConfigurationInterface#write(java.lang.Object)
+   * @see org.gvnix.dynamic.configuration.roo.addon.DefaultDynamicConfiguration#write(java.lang.Object)
    */
   public void write(List<DynProperty> dynProperties) {
     
