@@ -13,10 +13,14 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
+import java.util.Set;
+import java.util.Map.Entry;
+
 /**
- * Interface methods required by a manager of a configuration file.
+ * Interface methods required by every manager of a dynamic configuration file.
  * <p>
- * The manager class is responsible of read/write dynamic property values.
+ * The manager class is responsible of read and write the key and value pairs of
+ * the dynamic configuration file.
  * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
@@ -27,19 +31,17 @@ package org.gvnix.dynamic.configuration.roo.addon;
 public interface DynamicConfigurationInterface {
 
   /**
-   * Reads database.properties values and generates a file with given format.
-   * TODO Use SomeFileFormat instead of Objet on file property.
-   * 
+   * Reads a configuration file and generates a key/value pairs.
+   *  
    * @return File info getted from the original file.
    */
-  Object read();
-  
+  Set<Entry<Object, Object>> read();
+
   /**
-   * Update database.properties with values stored on the file in given format.
-   * TODO Use SomeFileFormat instead of Objet on file property.
+   * Update a configuration file with the values of the key/value pairs.
    * 
    * @param file Info to be stored on the original file.
    */
-  void write(Object file);
+  void write(Set<Entry<Object, Object>> file);
 
 }

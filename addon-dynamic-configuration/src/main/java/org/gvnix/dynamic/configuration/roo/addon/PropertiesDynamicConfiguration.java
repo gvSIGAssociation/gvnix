@@ -20,6 +20,8 @@ package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -52,7 +54,7 @@ public class PropertiesDynamicConfiguration implements
   /* (non-Javadoc)
    * @see org.gvnix.dynamic.configuration.roo.addon.DynamicConfigurationInterface#read()
    */
-  public Properties read() {
+  public Set<Entry<Object, Object>> read() {
     
     DynamicConfiguration dynamicConfig = this.getClass().getAnnotation(DynamicConfiguration.class);
 
@@ -78,13 +80,13 @@ public class PropertiesDynamicConfiguration implements
     }
 
     // TODO Auto-generated method stub
-    return props;
+    return props.entrySet();
   }
 
   /* (non-Javadoc)
    * @see org.gvnix.dynamic.configuration.roo.addon.DynamicConfigurationInterface#write(java.lang.Object)
    */
-  public void write(Object file) {
+  public void write(Set<Entry<Object, Object>> file) {
     
     System.out.println("write database.properties");
     
