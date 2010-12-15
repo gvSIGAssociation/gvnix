@@ -8,7 +8,6 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
-import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
@@ -97,16 +96,8 @@ public class Commands implements CommandMarker {
     // Show in console the dynamic configuration components ant their properties
     for (DynConfiguration config : configs) {
 
-      // Show only the component final name
-      String comp = config.getComponent().getName();
-      logger.log(Level.INFO, comp.substring(comp.lastIndexOf(".") + 1,
-          comp.length()));
-
-      for (DynProperty prop : config.getProperties()) {
-
-        // Show the property and value with format
-        logger.log(Level.INFO, " " + prop.getKey() + " = " + prop.getValue());
-      }
+      // Show the component name
+      logger.log(Level.INFO, config.toString());
     }
   }
 
@@ -117,10 +108,21 @@ public class Commands implements CommandMarker {
   }
 
   @CliCommand(value="configuration activate", help="Set the named dynamic configuration property values on the dynamic configuration files.")
-  public void activate() {
+  public void activate(@CliOption(key = "name", mandatory = true, help = "Name to store as the dynamic configuration") String name) {
     
+    Set<DynConfiguration> configs = dynConfigService.activate(name);
+    if (configs.isEmpty() || configs.size() == 0) {
+      
+      logger.log(Level.WARNING, "Dynamic configuration is empty, not activated");
+      return;
+    }
+    
+    // Show in console the dynamic configuration components ant their properties
+    for (DynConfiguration config : configs) {
+
+      // Show the component name
+      logger.log(Level.INFO, config.toString());
+    }
   }
-	
-	
 	
 }

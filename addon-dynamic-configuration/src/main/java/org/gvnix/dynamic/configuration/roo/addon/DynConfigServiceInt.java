@@ -33,11 +33,19 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 public interface DynConfigServiceInt {
 
   /**
-   * Save current properties and values of dynamic configurations with a name.
+   * Save current properties and values of dynamic files on configuration.
    * 
-   * @param name Name to save it.
-   * @return Set of dynamic configurations with key/value pairs of properties.
+   * @param name Name to save it
+   * @return Set of dynamic configurations with key/value pairs of properties
    */
   public Set<DynConfiguration> save(String name);
+
+  /**
+   * Write dynamic files with properties and values stored on configuration.
+   * 
+   * @param name Configuration name to activate
+   * @return Set of dynamic configurations with key/value pairs of properties
+   */
+  public Set<DynConfiguration> activate(String name);
   
 }

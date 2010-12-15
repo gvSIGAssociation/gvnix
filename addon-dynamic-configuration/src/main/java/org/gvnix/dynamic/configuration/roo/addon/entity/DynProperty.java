@@ -28,5 +28,10 @@ public class DynProperty {
   public void setValue(String value) {
     this.value = value;
   }
+
+  @Override
+  public String toString() {
+    return "DynProperty [key=" + key + ", value=" + value + "]";
+  }
   
 }

@@ -59,23 +59,20 @@ public class PropertiesDynamicConfiguration implements
    * @see org.gvnix.dynamic.configuration.roo.addon.DefaultDynamicConfiguration#read()
    */
   public List<DynProperty> read() {
-    
-    DynamicConfiguration annotation = this.getClass().getAnnotation(DynamicConfiguration.class);
 
-    String canonicalPath = pathResolver.getIdentifier(new Path(annotation.path().name()), annotation.relativePath());
+    // Get the properties file path from the annotation
+    MutableFile file = getPropertiesFile();
 
-    MutableFile file = null;
-    Properties props = new Properties();
+    List<DynProperty> dynProperties = new ArrayList<DynProperty>();
+
     try {
-      
-      if (fileManager.exists(canonicalPath)) {
 
-        file = fileManager.updateFile(canonicalPath);
-        props.load(file.getInputStream());
-      }
-      else {
+      Properties props = new Properties();
+      props.load(file.getInputStream());
+      for (Entry<Object, Object> prop : props.entrySet()) {
 
-        throw new IllegalStateException("Properties file not found");
+        dynProperties.add(new DynProperty(prop.getKey().toString(), prop
+            .getValue().toString()));
       }
     }
     catch (IOException ioe) {
@@ -83,13 +80,6 @@ public class PropertiesDynamicConfiguration implements
       throw new IllegalStateException(ioe);
     }
 
-    // TODO Auto-generated method stub
-    List<DynProperty> dynProperties = new ArrayList<DynProperty>();
-    for (Entry<Object, Object> prop : props.entrySet()) {
-      
-      dynProperties.add(new DynProperty(prop.getKey().toString(), prop.getValue().toString()));
-    }
-   
     return dynProperties;
   }
 
@@ -97,10 +87,45 @@ public class PropertiesDynamicConfiguration implements
    * @see org.gvnix.dynamic.configuration.roo.addon.DefaultDynamicConfiguration#write(java.lang.Object)
    */
   public void write(List<DynProperty> dynProperties) {
+
+    try {
+
+      Properties props = new Properties();
+      for (DynProperty dynProperty : dynProperties) {
+
+        props.put(dynProperty.getKey(), dynProperty.getValue());
+      }
+
+      // Get the properties file path from the annotation
+      MutableFile file = getPropertiesFile();
+      props.store(file.getOutputStream(), null);
+    }
+    catch (IOException ioe) {
+
+      throw new IllegalStateException(ioe);
+    }
+  }
+
+  /**
+   * Get the properties file path from the annotation.
+   * 
+   * @return Properties file
+   */
+  private MutableFile getPropertiesFile() {
     
-    System.out.println("write database.properties");
-    
-    // TODO Auto-generated method stub
+    DynamicConfiguration annotation = this.getClass().getAnnotation(
+        DynamicConfiguration.class);
+    String path = pathResolver.getIdentifier(
+        new Path(annotation.path().name()), annotation.relativePath());
+
+    if (fileManager.exists(path)) {
+
+      return fileManager.updateFile(path);
+    }
+    else {
+
+      throw new IllegalStateException("Properties file not found");
+    }
   }
 
 }

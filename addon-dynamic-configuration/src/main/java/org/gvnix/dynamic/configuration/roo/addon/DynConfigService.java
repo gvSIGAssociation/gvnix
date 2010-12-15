@@ -21,6 +21,7 @@ package org.gvnix.dynamic.configuration.roo.addon;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,6 +65,9 @@ import org.xml.sax.SAXException;
 @Reference(name="components", strategy=ReferenceStrategy.LOOKUP, policy=ReferencePolicy.DYNAMIC, referenceInterface=DefaultDynamicConfiguration.class, cardinality=ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class DynConfigService implements DynConfigServiceInt {
   
+  private static final String COMPONENT_ELEMENT_NAME = "component";
+  private static final String ID_ATTRIBUTE_NAME = "id";
+
   private static final Logger logger = HandlerUtils.getLogger(DynConfigService.class);
 
   private ComponentContext context;
@@ -127,7 +131,38 @@ public class DynConfigService implements DynConfigServiceInt {
     
     return configs;
   }
+  
 
+  /* (non-Javadoc)
+   * @see org.gvnix.dynamic.configuration.roo.addon.DynConfigServiceInt#activate(java.lang.String)
+   */
+  public Set<DynConfiguration> activate(String name) {
+    
+    Set<DynConfiguration> configs = new HashSet<DynConfiguration>();
+
+    // Get the main configuration file of the dynamic configuration
+    String path = getDynConfigConfigurationPath();
+    MutableFile file = fileManager.updateFile(path);
+
+    // Parse the XML configuration file to a Document
+    Document document = parse(file);
+    
+    // Find the configuration of document with requested name
+    Element root = document.getDocumentElement();
+    List<Element> config = XmlUtils.findElements("/dynamic-configuration/configuration[@name='" + name + "']", root);
+    if (config != null && config.size() > 0) {
+
+      configs = getDynConfigConfiguration(name, config.get(0));
+      setConfigurations(configs);
+    }
+    else {
+      
+      // TODO Required configuration not exists
+    }
+    
+    return configs;
+  }
+  
   /**
    * Get all dynamic configurations.
    * 
@@ -158,22 +193,68 @@ public class DynConfigService implements DynConfigServiceInt {
       }
       catch (NoSuchMethodException nsme) {
 
-        logger.log(Level.WARNING,
+        logger.log(Level.SEVERE,
             "No read method on dynamic configuration class");
       }
       catch (InvocationTargetException ite) {
 
-        logger.log(Level.WARNING,
+        logger.log(Level.SEVERE,
             "Cannot invoke read method on dynamic configuration class");
       }
       catch (IllegalAccessException iae) {
 
-        logger.log(Level.WARNING,
+        logger.log(Level.SEVERE,
             "Cannot access read method on dynamic configuration class");
       }
     }
 
     return configs;
+  }
+
+  /**
+   * Set all dynamic configurations.
+   * 
+   * @param configs Set of dynamic configurations
+   */
+  @SuppressWarnings("unchecked")
+  private void setConfigurations(Set<DynConfiguration> configs) {
+
+    // Iterate all dynamic configurations components registered
+    for (Object o : getComponents()) {
+      try {
+
+        // Invoke the read method of all components to get its properties
+        Class<? extends Object> c = o.getClass();
+
+        for (DynConfiguration config : configs) {
+
+          if (c.getName().equals(config.getComponent().getId())) {
+
+            Class[] p = new Class[1];
+            p[0] = List.class;
+            Method m = (Method) c.getMethod("write", p);
+            Object[] a = new Object[1];
+            a[0] = config.getProperties();
+            m.invoke(o, a);
+          }
+        }
+      }
+      catch (NoSuchMethodException nsme) {
+
+        logger.log(Level.SEVERE,
+            "No write method on dynamic configuration class");
+      }
+      catch (InvocationTargetException ite) {
+
+        logger.log(Level.SEVERE,
+            "Cannot invoke write method on dynamic configuration class");
+      }
+      catch (IllegalAccessException iae) {
+
+        logger.log(Level.SEVERE,
+            "Cannot access write method on dynamic configuration class");
+      }
+    }
   }
 
   /**
@@ -207,7 +288,7 @@ public class DynConfigService implements DynConfigServiceInt {
   /**
    * Create a new configuration element on the root element with a name.
    * <p>
-   * DynConfiguration will constain the set of key and value properties.
+   * DynConfiguration will contain the set of key and value properties.
    * </p>
    * 
    * @param name New configuration name
@@ -225,8 +306,8 @@ public class DynConfigService implements DynConfigServiceInt {
 
     for (DynConfiguration entry : configs) {
       
-      Element component = document.createElement("component");
-      component.setAttribute("id", entry.getComponent().getName());
+      Element component = document.createElement(COMPONENT_ELEMENT_NAME);
+      component.setAttribute(ID_ATTRIBUTE_NAME, entry.getComponent().getId());
       configuration.appendChild(component);
       
       for (DynProperty property : entry.getProperties()) {
@@ -236,6 +317,41 @@ public class DynConfigService implements DynConfigServiceInt {
         component.appendChild(element);
       }
     }
+  }
+
+  /**
+   * Get the configuration element on the root element with a name.
+   * 
+   * @param name Required configuration name
+   * @param configs Set of dynamic configurations with key and value pairs
+   * @param root Element to get the child configuration
+   */
+  private Set<DynConfiguration> getDynConfigConfiguration(String name,
+                                   Element root) {
+    
+    Set<DynConfiguration> configurations = new HashSet<DynConfiguration>();
+
+    List<Element> confs = XmlUtils.findElements(COMPONENT_ELEMENT_NAME, root);
+    for (Element conf : confs) {
+
+      List<DynProperty> properties = new ArrayList<DynProperty>();
+
+      List<Element> props = XmlUtils.findElements("*", conf);
+      for (Element prop : props) {
+
+        DynProperty property = new DynProperty(prop.getTagName(), prop
+            .getTextContent());
+        properties.add(property);
+      }
+      
+      DynConfiguration configuration = new DynConfiguration();
+      configuration.setProperties(properties);
+      DynComponent component = new DynComponent(conf.getAttributes().getNamedItem(ID_ATTRIBUTE_NAME).getNodeValue());
+      configuration.setComponent(component);
+      configurations.add(configuration);
+    }
+
+    return configurations;
   }
 
   /**
