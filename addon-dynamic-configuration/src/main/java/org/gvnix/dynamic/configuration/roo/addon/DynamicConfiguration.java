@@ -42,5 +42,7 @@ public @interface DynamicConfiguration {
     ProjectPath path() default ProjectPath.ROOT;
     
     String relativePath();
+    
+    String name() default "";
 
 }

@@ -42,6 +42,9 @@ public interface DynConfigServiceInt {
 
   /**
    * Write dynamic files with properties and values stored on configuration.
+   * <p>
+   * If dynamic configuration with name not exists, null will be returned.
+   * </p>
    * 
    * @param name Configuration name to activate
    * @return Set of dynamic configurations with key/value pairs of properties

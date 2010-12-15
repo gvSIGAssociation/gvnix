@@ -89,7 +89,7 @@ public class Commands implements CommandMarker {
     Set<DynConfiguration> configs = dynConfigService.save(name);
     if (configs.isEmpty() || configs.size() == 0) {
 
-      logger.log(Level.WARNING, "There is no dynamic configurations to save");
+      logger.log(Level.SEVERE, "There is no dynamic configurations to save");
       return;
     }
 
@@ -111,9 +111,16 @@ public class Commands implements CommandMarker {
   public void activate(@CliOption(key = "name", mandatory = true, help = "Name to store as the dynamic configuration") String name) {
     
     Set<DynConfiguration> configs = dynConfigService.activate(name);
+    
+    if (configs == null) {
+      
+      logger.log(Level.WARNING, "Dynamic configuration not exists with name " + name);
+      return;
+    }
+    
     if (configs.isEmpty() || configs.size() == 0) {
       
-      logger.log(Level.WARNING, "Dynamic configuration is empty, not activated");
+      logger.log(Level.SEVERE, "Dynamic configuration is empty, not activated");
       return;
     }
     

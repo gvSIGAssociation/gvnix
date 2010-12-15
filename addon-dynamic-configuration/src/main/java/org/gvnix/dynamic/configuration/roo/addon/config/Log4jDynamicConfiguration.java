@@ -32,7 +32,7 @@ import org.gvnix.dynamic.configuration.roo.addon.DynamicConfiguration;
  */
 @Component
 @Service
-@DynamicConfiguration(relativePath="src/main/resources/log4j.properties")
+@DynamicConfiguration(name="Logging Services", relativePath="src/main/resources/log4j.properties")
 public class Log4jDynamicConfiguration extends PropertiesDynamicConfiguration {
 
 }
