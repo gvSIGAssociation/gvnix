@@ -18,6 +18,7 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
+import java.util.List;
 import java.util.Set;
 
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
@@ -57,5 +58,10 @@ public interface Operations {
    * @return Set of dynamic configurations with key/value pairs of properties
    */
   public Set<DynConfiguration> activate(String name);
+  
+  /**
+   * Get all saved dynamic configurations. 
+   */
+  Set<String> list();
   
 }

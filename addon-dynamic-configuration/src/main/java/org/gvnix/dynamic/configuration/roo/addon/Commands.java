@@ -46,7 +46,26 @@ public class Commands implements CommandMarker {
 	private static Logger logger = Logger.getLogger(Commands.class.getName());
 
 	@Reference private Operations operations;
+	
+  @CliAvailabilityIndicator("configuration list")
+  public boolean isList() {
+    
+    return operations.isProjectAvailable();
+  }
 
+  @CliCommand(value = "configuration list", help = "List all saved dynamic configurations")
+  public void list() {
+    
+    // TODO Upgrade entity model to consider Configuration with components, name and active properties
+    Set<String> configs = operations.list();
+    
+    // Show in console the configurations list
+    for (String config : configs) {
+
+      logger.log(Level.INFO, config);
+    }
+  }
+  
   @CliAvailabilityIndicator("configuration save")
   public boolean isSave() {
     

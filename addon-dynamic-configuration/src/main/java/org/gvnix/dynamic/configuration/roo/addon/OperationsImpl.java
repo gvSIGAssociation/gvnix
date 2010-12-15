@@ -131,6 +131,29 @@ public class OperationsImpl implements Operations{
 
     return configs;
   }
+  
+  public Set<String> list() {
+    
+    Set<String> configurations = new HashSet<String>();
+    
+    // Get the main configuration file of the dynamic configuration
+    String path = getDynConfigConfigurationPath();
+    MutableFile file = fileManager.updateFile(path);
+
+    // Parse the XML configuration file to a Document
+    Document document = parse(file);
+    
+    // Find the configuration of document with requested name
+    Element root = document.getDocumentElement();
+    
+    List<Element> configs = XmlUtils.findElements(CONFIGURATION_XPATH, root);
+    for (Element config : configs) {
+      
+      configurations.add(config.getAttribute(NAME_ATTRIBUTE_NAME));
+    }
+    
+    return configurations;
+  }
 
 	/**
 	 * @return the path resolver or null if there is no user project
