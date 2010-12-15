@@ -34,8 +34,8 @@ import org.apache.felix.scr.annotations.ReferenceStrategy;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.config.DefaultDynamicConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.config.DynamicConfiguration;
-import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.support.logging.HandlerUtils;
@@ -67,6 +67,7 @@ public class ServicesImpl implements Services {
    * @return Dynamic configuration components
    */
   private Set<Object> getComponents() {
+    
     return getSet("components");
   }
   
@@ -79,24 +80,28 @@ public class ServicesImpl implements Services {
    */
   @SuppressWarnings("unchecked")
   private <T> Set<T> getSet(String name) {
+    
     Set<T> result = new HashSet<T>();
     Object[] objs = context.locateServices(name);
     if (objs != null) {
       for (Object o : objs) {
+        
         result.add((T) o);
       }
     }
+    
     return result;
   }
   
-  /* (non-Javadoc)
-   * @see org.gvnix.dynamic.configuration.roo.addon.Services#getConfigurations()
+  /**
+   * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
-  public Set<DynConfiguration> getConfigurations() {
+  public DynConfiguration getActiveConfiguration() {
 
-    // Variable to store all dynamic configurations
-    Set<DynConfiguration> configs = new HashSet<DynConfiguration>();
+    // Variable to store active dynamic configuration
+    DynConfiguration dynConf = new DynConfiguration();
+    dynConf.setActive(Boolean.TRUE);
     
     // Iterate all dynamic configurations components registered
     for (Object o : getComponents()) {
@@ -112,15 +117,12 @@ public class ServicesImpl implements Services {
         
         // Invoke the read method of all components to get its properties
         Method m = (Method) c.getMethod("read", new Class[0]);
-        List<DynProperty> res = (List<DynProperty>) m.invoke(
+        List<DynProperty> dynProps = (List<DynProperty>) m.invoke(
             o, new Object[0]);
 
         // Create a dynamic configuration object with component and properties
-        DynConfiguration dynConfiguration = new DynConfiguration();
-        DynComponent component = new DynComponent(c.getName(), a.name());
-        dynConfiguration.setComponent(component);
-        dynConfiguration.setProperties(res);
-        configs.add(dynConfiguration);
+        DynComponent dynComp = new DynComponent(c.getName(), a.name(), dynProps);
+        dynConf.addComponent(dynComp);
       }
       catch (NoSuchMethodException nsme) {
 
@@ -139,15 +141,14 @@ public class ServicesImpl implements Services {
       }
     }
 
-    return configs;
+    return dynConf;
   }
 
-
-  /* (non-Javadoc)
-   * @see org.gvnix.dynamic.configuration.roo.addon.Services#setConfigurations(java.util.Set)
+  /**
+   * {@inheritDoc}
    */
   @SuppressWarnings("unchecked")
-  public void setConfigurations(Set<DynConfiguration> configs) {
+  public void setActiveConfiguration(DynConfiguration dynConf) {
 
     // Iterate all dynamic configurations components registered
     for (Object o : getComponents()) {
@@ -162,15 +163,15 @@ public class ServicesImpl implements Services {
         }
         
         // Invoke the read method of all components to get its properties
-        for (DynConfiguration config : configs) {
+        for (DynComponent dynComp : dynConf.getComponents()) {
 
-          if (c.getName().equals(config.getComponent().getId())) {
+          if (c.getName().equals(dynComp.getId())) {
 
-            Class[] p = new Class[1];
-            p[0] = List.class;
-            Method m = (Method) c.getMethod("write", p);
+            Class[] t = new Class[1];
+            t[0] = List.class;
+            Method m = (Method) c.getMethod("write", t);
             Object[] args = new Object[1];
-            args[0] = config.getProperties();
+            args[0] = dynComp.getProperties();
             m.invoke(o, args);
           }
         }

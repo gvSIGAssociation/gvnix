@@ -18,8 +18,6 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
-import java.util.Set;
-
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 
 /**
@@ -33,17 +31,17 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 public interface Services {
 
   /**
-   * Get all dynamic configurations.
+   * Get current files properties as a dynamic configuration.
    * 
-   * @return Set of dynamic configurations.
+   * @return Current dynamic configuration.
    */
-  public Set<DynConfiguration> getConfigurations();
+  public DynConfiguration getActiveConfiguration();
   
   /**
-   * Set all dynamic configurations.
+   * Update files properties from a dynamic configuration.
    * 
-   * @param configs Set of dynamic configurations
+   * @param dynConf Dynamic configuration with properties
    */
-  public void setConfigurations(Set<DynConfiguration> configs);
+  public void setActiveConfiguration(DynConfiguration dynConf);
 
 }

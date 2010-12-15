@@ -1,20 +1,25 @@
 package org.gvnix.dynamic.configuration.roo.addon.entity;
 
+import java.util.List;
+
 public class DynComponent {
   
   private String id;
 
   private String name;
   
+  private List<DynProperty> properties;
+  
   
   public DynComponent() {
     super();
   }
 
-  public DynComponent(String id, String name) {
+  public DynComponent(String id, String name, List<DynProperty> properties) {
     super();
     this.id = id;
     this.name = name;
+    this.properties = properties;
   }
 
   public DynComponent(String name) {
@@ -44,9 +49,31 @@ public class DynComponent {
     this.name = name;
   }
 
+  public List<DynProperty> getProperties() {
+    return properties;
+  }
+
+  
+  public void setProperties(List<DynProperty> properties) {
+    this.properties = properties;
+  }
+
   @Override
   public String toString() {
-    return "DynComponent [id=" + id + "]";
+
+    // Show the component name
+    StringBuffer buffer = new StringBuffer();
+    buffer.append(getName());
+
+    // Show properties
+    for (DynProperty prop : properties) {
+
+      // Show the property and value with format
+      buffer.append("\n");
+      buffer.append(" " + prop.getKey() + " = " + prop.getValue());
+    }
+
+    return buffer.toString();
   }
 
 }

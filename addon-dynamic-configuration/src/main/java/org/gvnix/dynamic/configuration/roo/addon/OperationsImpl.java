@@ -55,8 +55,10 @@ import org.xml.sax.SAXException;
  */
 @Component
 @Service
-public class OperationsImpl implements Operations{
+public class OperationsImpl implements Operations {
 
+  private static final String DYNAMIC_CONFIGURATION_TEMPLATE_NAME = "dynamic-configuration-template.xml";
+  private static final String DYNAMIC_CONFIGURATION_FILE_NAME = "dynamic-configuration.xml";
   private static final String DYNAMIC_CONFIGURATION_ELEMENT_NAME = "dynamic-configuration";
   private static final String CONFIGURATION_ELEMENT_NAME = "configuration";
   private static final String COMPONENT_ELEMENT_NAME = "component";
@@ -73,168 +75,120 @@ public class OperationsImpl implements Operations{
 		return getPathResolver() != null;
 	}
   
-  /* (non-Javadoc)
-   * @see org.gvnix.dynamic.configuration.roo.addon.Operations#save(java.lang.String)
+  /**
+   * {@inheritDoc}
    */
-  public Set<DynConfiguration> save(String name) {
+  public DynConfiguration saveActiveConfiguration(String name) {
     
-    // Get all the dynamic configurations 
-    Set<DynConfiguration> configs = services.getConfigurations();
+    // Get the active configuration 
+    DynConfiguration dynConfig = services.getActiveConfiguration();
+    dynConfig.setName(name);
     
-    // Get the main configuration file of the dynamic configuration
-    String path = getDynConfigConfigurationPath();
+    // Get the XML configuration file as a dom document
+    String path = getConfigurationFilePath();
     MutableFile file = fileManager.updateFile(path);
-
-    // Parse the XML configuration file to a Document
-    Document document = parse(file);
+    Document doc = parse(file);
     
-    // Find the configuration of document with requested name
-    Element root = document.getDocumentElement();
-    List<Element> config = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
+    // Find the dom configuration with requested name
+    Element root = doc.getDocumentElement();
+    List<Element> configs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
         + NAME_ATTRIBUTE_NAME + "='" + name + "']", root);
-    if (config != null && config.size() > 0) {
+    if (configs != null && configs.size() > 0) {
       
       // If configuration already exists, delete it
-      removeDynConfigConfiguration(config.get(0));
+      deleteConfiguration(configs.get(0));
     }
 
     // Create the configuration
-    addDynConfigConfiguration(name, configs, root);
-    XmlUtils.writeXml(file.getOutputStream(), document);
+    addConfiguration(dynConfig, root);
+    XmlUtils.writeXml(file.getOutputStream(), doc);
 
-    return configs;
+    return dynConfig;
   }
   
-  /* (non-Javadoc)
-   * @see org.gvnix.dynamic.configuration.roo.addon.Operations#activate(java.lang.String)
+  /**
+   * {@inheritDoc}
    */
-  public Set<DynConfiguration> activate(String name) {
+  public DynConfiguration setActiveConfiguration(String name) {
     
-    Set<DynConfiguration> configs = null;
+    DynConfiguration dynConfig = null;
 
-    // Get the main configuration file of the dynamic configuration
-    String path = getDynConfigConfigurationPath();
+    // Get the XML configuration file as a dom document
+    String path = getConfigurationFilePath();
     MutableFile file = fileManager.updateFile(path);
-
-    // Parse the XML configuration file to a Document
-    Document document = parse(file);
+    Document doc = parse(file);
     
-    // Find the configuration of document with requested name
-    Element root = document.getDocumentElement();
-    List<Element> config = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
+    // Find the dom configuration with requested name
+    Element root = doc.getDocumentElement();
+    List<Element> configs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
         + NAME_ATTRIBUTE_NAME + "='" + name + "']", root);
-    if (config != null && config.size() > 0) {
+    if (configs != null && configs.size() > 0) {
 
-      configs = getDynConfigConfiguration(name, config.get(0));
-      services.setConfigurations(configs);
+      dynConfig = parseConfiguration(configs.get(0));
+      services.setActiveConfiguration(dynConfig);
     }
 
-    return configs;
+    return dynConfig;
   }
   
-  public Set<String> list() {
+  /**
+   * {@inheritDoc}
+   */
+  public Set<DynConfiguration> findConfigurations() {
     
-    Set<String> configurations = new HashSet<String>();
+    Set<DynConfiguration> dynConfs = new HashSet<DynConfiguration>();
     
-    // Get the main configuration file of the dynamic configuration
-    String path = getDynConfigConfigurationPath();
+    // Get the XML configuration file as a dom document
+    String path = getConfigurationFilePath();
     MutableFile file = fileManager.updateFile(path);
-
-    // Parse the XML configuration file to a Document
     Document document = parse(file);
     
-    // Find the configuration of document with requested name
+    // Find all the dom configurations
     Element root = document.getDocumentElement();
-    
-    List<Element> configs = XmlUtils.findElements(CONFIGURATION_XPATH, root);
-    for (Element config : configs) {
+    List<Element> confs = XmlUtils.findElements(CONFIGURATION_XPATH, root);
+    for (Element conf : confs) {
       
-      configurations.add(config.getAttribute(NAME_ATTRIBUTE_NAME));
+      dynConfs.add(parseConfiguration(conf));
     }
     
-    return configurations;
-  }
-
-	/**
-	 * @return the path resolver or null if there is no user project
-	 */
-	private PathResolver getPathResolver() {
-		ProjectMetadata projectMetadata = (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
-		if (projectMetadata == null) {
-			return null;
-		}
-		return projectMetadata.getPathResolver();
-	}
-
-  /**
-   * Get the main XML configuration file path of dynamic configurations.
-   * <p>
-   * If XML configuration file not exists, create it with a template.
-   * </p>
-   * 
-   * @return XML configuration file path
-   */
-  private String getDynConfigConfigurationPath() {
-
-    String path = pathResolver.getIdentifier(Path.SRC_MAIN_RESOURCES,
-        "dynamic-configuration.xml");
-    if (!fileManager.exists(path)) {
-      try {
-
-        FileCopyUtils.copy(TemplateUtils.getTemplate(getClass(),
-            "dynamic-configuration-template.xml"), fileManager.createFile(
-            path).getOutputStream());
-      }
-      catch (IOException ioe) {
-
-        throw new IllegalStateException(ioe);
-      }
-    }
-    
-    return path;
+    return dynConfs;
   }
 
   /**
-   * Create a new configuration element on the root element with a name.
-   * <p>
-   * DynConfiguration will contain the set of key and value properties.
-   * </p>
+   * Create a new configuration dom element on the root element.
    * 
-   * @param name New configuration name
-   * @param configs Set of dynamic configurations with key and value pairs
-   * @param root Element to append the child configuration
+   * @param configs Dynamic configuration to store on dom configuration
+   * @param root Element to store the dom configuration
    */
-  private void addDynConfigConfiguration(String name,
-                                   Set<DynConfiguration> configs,
-                                   Element root) {
+  private void addConfiguration(DynConfiguration dynConf, Element root) {
 
-    Document document = root.getOwnerDocument();
-    Element configuration = document.createElement(CONFIGURATION_ELEMENT_NAME);
-    configuration.setAttribute(NAME_ATTRIBUTE_NAME, name);
-    root.appendChild(configuration);
+    Document doc = root.getOwnerDocument();
+    Element conf = doc.createElement(CONFIGURATION_ELEMENT_NAME);
+    conf.setAttribute(NAME_ATTRIBUTE_NAME, dynConf.getName());
+    root.appendChild(conf);
 
-    for (DynConfiguration config : configs) {
+    for (DynComponent dynComps : dynConf.getComponents()) {
       
-      Element component = document.createElement(COMPONENT_ELEMENT_NAME);
-      component.setAttribute(ID_ATTRIBUTE_NAME, config.getComponent().getId());
-      component.setAttribute(NAME_ATTRIBUTE_NAME, config.getComponent().getName());
-      configuration.appendChild(component);
+      Element comp = doc.createElement(COMPONENT_ELEMENT_NAME);
+      comp.setAttribute(ID_ATTRIBUTE_NAME, dynComps.getId());
+      comp.setAttribute(NAME_ATTRIBUTE_NAME, dynComps.getName());
+      conf.appendChild(comp);
       
-      for (DynProperty property : config.getProperties()) {
+      for (DynProperty dynProp : dynComps.getProperties()) {
 
-        Element element = document.createElement(property.getKey());
-        element.setTextContent(property.getValue());
-        component.appendChild(element);
+        Element prop = doc.createElement(dynProp.getKey());
+        prop.setTextContent(dynProp.getValue());
+        comp.appendChild(prop);
       }
     }
   }
 
   /**
-   * Delete a existing configuration element.
+   * Drop an existing configuration dom element.
    * 
-   * @param conf Element to remove 
+   * @param conf Dom element to remove 
    */
-  private void removeDynConfigConfiguration(Element conf) {
+  private void deleteConfiguration(Element conf) {
     
     List<Element> comps = XmlUtils.findElements(COMPONENT_ELEMENT_NAME, conf);
     for (Element comp : comps) {
@@ -244,40 +198,64 @@ public class OperationsImpl implements Operations{
   }
 
   /**
-   * Get the configuration element on the root element with a name.
+   * Parse a configuration dom element to a dynamic configuration.
    * 
-   * @param name Required configuration name
-   * @param configs Set of dynamic configurations with key and value pairs
-   * @param root Element to get the child configuration
+   * @param config Configuration dom element
+   * @return Dynamic configuration
    */
-  private Set<DynConfiguration> getDynConfigConfiguration(String name,
-                                   Element root) {
-    
-    Set<DynConfiguration> configurations = new HashSet<DynConfiguration>();
+  private DynConfiguration parseConfiguration(Element config) {
 
-    List<Element> comps = XmlUtils.findElements(COMPONENT_ELEMENT_NAME, root);
+    DynConfiguration dynConfig = new DynConfiguration();
+    dynConfig.setName(config.getAttribute(NAME_ATTRIBUTE_NAME));
+
+    List<Element> comps = XmlUtils.findElements(COMPONENT_ELEMENT_NAME, config);
     for (Element comp : comps) {
 
-      List<DynProperty> properties = new ArrayList<DynProperty>();
+      List<DynProperty> dynProps = new ArrayList<DynProperty>();
 
       List<Element> props = XmlUtils.findElements("*", comp);
       for (Element prop : props) {
 
-        DynProperty property = new DynProperty(prop.getTagName(), prop
+        DynProperty dynProp = new DynProperty(prop.getTagName(), prop
             .getTextContent());
-        properties.add(property);
+        dynProps.add(dynProp);
       }
-      
-      DynConfiguration configuration = new DynConfiguration();
-      configuration.setProperties(properties);
-      DynComponent component = new DynComponent(comp.getAttributes()
+
+      DynComponent dynComp = new DynComponent(comp.getAttributes()
           .getNamedItem(ID_ATTRIBUTE_NAME).getNodeValue(), comp.getAttributes()
-          .getNamedItem(NAME_ATTRIBUTE_NAME).getNodeValue());
-      configuration.setComponent(component);
-      configurations.add(configuration);
+          .getNamedItem(NAME_ATTRIBUTE_NAME).getNodeValue(), dynProps);
+      dynConfig.addComponent(dynComp);
     }
 
-    return configurations;
+    return dynConfig;
+  }
+
+  /**
+   * Get the main XML configuration file path of dynamic configurations.
+   * <p>
+   * If XML configuration file not exists, will be created with a template.
+   * </p>
+   * 
+   * @return dynamic configuration XML file path
+   */
+  private String getConfigurationFilePath() {
+
+    String path = pathResolver.getIdentifier(Path.SRC_MAIN_RESOURCES,
+        DYNAMIC_CONFIGURATION_FILE_NAME);
+    if (!fileManager.exists(path)) {
+      try {
+
+        FileCopyUtils.copy(TemplateUtils.getTemplate(getClass(),
+            DYNAMIC_CONFIGURATION_TEMPLATE_NAME), fileManager.createFile(path)
+            .getOutputStream());
+      }
+      catch (IOException ioe) {
+
+        throw new IllegalStateException(ioe);
+      }
+    }
+
+    return path;
   }
 
   /**
@@ -287,23 +265,38 @@ public class OperationsImpl implements Operations{
    * @return Dom document
    */
   private Document parse(MutableFile file) {
-    
-    Document document;
+
+    Document doc;
     try {
-      
-      DocumentBuilder builder = XmlUtils.getDocumentBuilder();
-      document = builder.parse(file.getInputStream());
-      
-    } catch (SAXException se) {
-      throw new IllegalStateException("Unable to parse the "
-          + file.getCanonicalPath() + " file", se);
-    } catch (IOException ioe) {
-      throw new IllegalStateException("Unable to read the "
-          + file.getCanonicalPath() + " file (reason: " + ioe.getMessage()
-          + ")", ioe);
+
+      DocumentBuilder build = XmlUtils.getDocumentBuilder();
+      doc = build.parse(file.getInputStream());
     }
-    
-    return document;
+    catch (SAXException se) {
+
+      throw new IllegalStateException("Cant parse the configuration file", se);
+    }
+    catch (IOException ioe) {
+
+      throw new IllegalStateException("Cant read the configuration file", ioe);
+    }
+
+    return doc;
+  }
+
+  /**
+   * @return the path resolver or null if there is no user project
+   */
+  private PathResolver getPathResolver() {
+
+    ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+        .get(ProjectMetadata.getProjectIdentifier());
+    if (projectMetadata == null) {
+
+      return null;
+    }
+
+    return projectMetadata.getPathResolver();
   }
 
 }

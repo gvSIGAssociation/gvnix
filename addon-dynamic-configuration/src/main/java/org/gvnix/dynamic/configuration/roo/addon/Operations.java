@@ -18,7 +18,6 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
-import java.util.List;
 import java.util.Set;
 
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
@@ -33,35 +32,37 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
  */
 public interface Operations {
 
-	/**
-	 * Is project available ?
-	 * 
-	 * @return Project avaliability
-	 */
-	boolean isProjectAvailable();
-
   /**
-   * Save current properties and values of dynamic files on configuration.
+   * Is project available ?
    * 
-   * @param name Name to save it
-   * @return Set of dynamic configurations with key/value pairs of properties
+   * @return Project avaliability
    */
-  public Set<DynConfiguration> save(String name);
+  boolean isProjectAvailable();
 
   /**
-   * Write dynamic files with properties and values stored on configuration.
+   * Store files properties as a dynamic configuration with a name.
+   * 
+   * @param name Name for the dynamic configuration
+   * @return Dynamic configuration stored
+   */
+  public DynConfiguration saveActiveConfiguration(String name);
+
+  /**
+   * Update files with the properties of the dynamic configuration.
    * <p>
    * If dynamic configuration with name not exists, null will be returned.
    * </p>
    * 
-   * @param name Configuration name to activate
-   * @return Set of dynamic configurations with key/value pairs of properties
+   * @param name Dynamic configuration name to activate
+   * @return Dynamic configuration activated
    */
-  public Set<DynConfiguration> activate(String name);
-  
+  public DynConfiguration setActiveConfiguration(String name);
+
   /**
-   * Get all saved dynamic configurations. 
+   * Get all stored dynamic configurations.
+   * 
+   * @return List of stored dynamic configurations.
    */
-  Set<String> list();
-  
+  Set<DynConfiguration> findConfigurations();
+
 }

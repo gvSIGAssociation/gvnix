@@ -1,53 +1,56 @@
 package org.gvnix.dynamic.configuration.roo.addon.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DynConfiguration {
 
-  private DynComponent component;
+  private String name;
+  
+  private Boolean active;
+  
+  private Set<DynComponent> components;
 
-  private List<DynProperty> properties;
-  
-  
+
   public DynConfiguration() {
-    
     super();
-    this.component = new DynComponent();
-    this.properties = new ArrayList<DynProperty>();
+    this.components = new HashSet<DynComponent>();
+    active = Boolean.FALSE;
   }
 
-  public DynComponent getComponent() {
-    return component;
+  public String getName() {
+    return name;
   }
 
-  public void setComponent(DynComponent dynComponent) {
-    this.component = dynComponent;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public List<DynProperty> getProperties() {
-    return properties;
+  public Boolean isActive() {
+    return active;
   }
 
-  public void setProperties(List<DynProperty> dynProperties) {
-    this.properties = dynProperties;
+  public void setActive(Boolean active) {
+    this.active = active;
   }
-  
+
+  public Set<DynComponent> getComponents() {
+    return components;
+  }
+
+  public void addComponent(DynComponent component) {
+    components.add(component);
+  }
+
   @Override
   public String toString() {
-
-    // Show the component name
+    
     StringBuffer buffer = new StringBuffer();
-    buffer.append(component.getName());
-
-    // Show properties
-    for (DynProperty prop : properties) {
-
-      // Show the property and value with format
-      buffer.append("\n");
-      buffer.append(" " + prop.getKey() + " = " + prop.getValue());
+    buffer.append(getName());
+    if (active) {
+      buffer.append(" (Active)");
     }
-
+    
     return buffer.toString();
   }
 

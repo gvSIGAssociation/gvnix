@@ -53,15 +53,15 @@ public class PropertiesDynamicConfiguration implements
   @Reference private PathResolver pathResolver;
   @Reference private FileManager fileManager;
 
-  /* (non-Javadoc)
-   * @see org.gvnix.dynamic.configuration.roo.addon.DefaultDynamicConfiguration#read()
+  /**
+   * {@inheritDoc}
    */
   public List<DynProperty> read() {
 
     // Get the properties file path from the annotation
     MutableFile file = getPropertiesFile();
 
-    List<DynProperty> dynProperties = new ArrayList<DynProperty>();
+    List<DynProperty> dynProps = new ArrayList<DynProperty>();
 
     try {
 
@@ -69,7 +69,7 @@ public class PropertiesDynamicConfiguration implements
       props.load(file.getInputStream());
       for (Entry<Object, Object> prop : props.entrySet()) {
 
-        dynProperties.add(new DynProperty(prop.getKey().toString(), prop
+        dynProps.add(new DynProperty(prop.getKey().toString(), prop
             .getValue().toString()));
       }
     }
@@ -78,20 +78,20 @@ public class PropertiesDynamicConfiguration implements
       throw new IllegalStateException(ioe);
     }
 
-    return dynProperties;
+    return dynProps;
   }
 
-  /* (non-Javadoc)
-   * @see org.gvnix.dynamic.configuration.roo.addon.DefaultDynamicConfiguration#write(java.lang.Object)
+  /**
+   * {@inheritDoc}
    */
-  public void write(List<DynProperty> dynProperties) {
+  public void write(List<DynProperty> dynProps) {
 
     try {
 
       Properties props = new Properties();
-      for (DynProperty dynProperty : dynProperties) {
+      for (DynProperty dynProp : dynProps) {
 
-        props.put(dynProperty.getKey(), dynProperty.getValue());
+        props.put(dynProp.getKey(), dynProp.getValue());
       }
 
       // Get the properties file path from the annotation

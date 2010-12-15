@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
@@ -57,12 +58,12 @@ public class Commands implements CommandMarker {
   public void list() {
     
     // TODO Upgrade entity model to consider Configuration with components, name and active properties
-    Set<String> configs = operations.list();
+    Set<DynConfiguration> configs = operations.findConfigurations();
     
     // Show in console the configurations list
-    for (String config : configs) {
+    for (DynConfiguration config : configs) {
 
-      logger.log(Level.INFO, config);
+      logger.log(Level.INFO, config.toString());
     }
   }
   
@@ -72,23 +73,14 @@ public class Commands implements CommandMarker {
     return operations.isProjectAvailable();
   }
 
-  @CliCommand(value = "configuration save", help = "Save the current property values of the dynamic configuration files on a named dynamic configuration.")
-  public void save(@CliOption(key = "name", mandatory = true, help = "Name to store as the dynamic configuration") String name) {
+  @CliCommand(value = "configuration save", help = "Store the files current properties as a configuration")
+  public void save(@CliOption(key = "name", mandatory = true, help = "Name for the configuration to store") String name) {
 
-    // Save current dynamic configuration and get it
-    Set<DynConfiguration> configs = operations.save(name);
-    if (configs.isEmpty() || configs.size() == 0) {
-
-      logger.log(Level.SEVERE, "There is no dynamic configurations to save");
-      return;
-    }
-
-    // Show in console the dynamic configuration components ant their properties
-    for (DynConfiguration config : configs) {
-
-      // Show the component name
-      logger.log(Level.INFO, config.toString());
-    }
+    // Store the active dynamic configuration
+    DynConfiguration dynConf = operations.saveActiveConfiguration(name);
+    
+    // Show the stored dynamic configuration
+    showDynComponents(dynConf);
   }
 
   @CliAvailabilityIndicator("configuration activate")
@@ -97,28 +89,33 @@ public class Commands implements CommandMarker {
     return operations.isProjectAvailable();
   }
 
-  @CliCommand(value="configuration activate", help="Set the named dynamic configuration property values on the dynamic configuration files.")
-  public void activate(@CliOption(key = "name", mandatory = true, help = "Name to store as the dynamic configuration") String name) {
+  @CliCommand(value="configuration activate", help="Update the files with the configuration properties")
+  public void activate(@CliOption(key = "name", mandatory = true, help = "Name of the required configuration") String name) {
     
-    Set<DynConfiguration> configs = operations.activate(name);
+    // Set the selected dynamic configuration as active
+    DynConfiguration dynConf = operations.setActiveConfiguration(name);
     
-    if (configs == null) {
+    // If null, dynamic configuration with this name not exists
+    if (dynConf == null) {
       
       logger.log(Level.WARNING, "Dynamic configuration not exists with name " + name);
       return;
     }
-    
-    if (configs.isEmpty() || configs.size() == 0) {
-      
-      logger.log(Level.SEVERE, "Dynamic configuration is empty, not activated");
-      return;
-    }
-    
-    // Show in console the dynamic configuration components ant their properties
-    for (DynConfiguration config : configs) {
 
-      // Show the component name
-      logger.log(Level.INFO, config.toString());
+    // Show the activated dynamic configuration
+    showDynComponents(dynConf);
+  }
+
+  /**
+   * Show the components of a dynamic configuration on the console.
+   * 
+   * @param dynConf Dynamic configuration to show
+   */
+  private void showDynComponents(DynConfiguration dynConf) {
+
+    for (DynComponent dynComp : dynConf.getComponents()) {
+
+      logger.log(Level.INFO, dynComp.toString());
     }
   }
 	
