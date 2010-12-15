@@ -18,31 +18,32 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
-import java.lang.annotation.*;
+import java.util.Set;
 
-import org.gvnix.dynamic.configuration.roo.addon.entity.ProjectPath;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 
 /**
- * Annotation to mark a class as the manager of a configuration file with dynamic property values.
- * 
- * <p>
- * This annotation can be used in all types of configuration files.
- * Some interfaces exists to easy 
- * </p>
+ * Interface to manage components of dynamic configurations.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface DynamicConfiguration {
+public interface Services {
 
-    ProjectPath path() default ProjectPath.ROOT;
-    
-    String relativePath();
-    
-    String name() default "";
+  /**
+   * Get all dynamic configurations.
+   * 
+   * @return Set of dynamic configurations.
+   */
+  public Set<DynConfiguration> getConfigurations();
+  
+  /**
+   * Set all dynamic configurations.
+   * 
+   * @param configs Set of dynamic configurations
+   */
+  public void setConfigurations(Set<DynConfiguration> configs);
 
 }

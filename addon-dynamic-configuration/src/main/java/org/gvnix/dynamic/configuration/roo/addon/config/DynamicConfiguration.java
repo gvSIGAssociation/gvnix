@@ -16,39 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.dynamic.configuration.roo.addon;
+package org.gvnix.dynamic.configuration.roo.addon.config;
 
-import java.util.Set;
+import java.lang.annotation.*;
 
-import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.entity.ProjectPath;
 
 /**
- * Interface to save or activate dynamic configurations.
+ * Annotation to mark a class as the manager of a configuration file with dynamic property values.
+ * 
+ * <p>
+ * This annotation can be used in all types of configuration files.
+ * Some interfaces exists to easy 
+ * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public interface DynConfigServiceInt {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface DynamicConfiguration {
 
-  /**
-   * Save current properties and values of dynamic files on configuration.
-   * 
-   * @param name Name to save it
-   * @return Set of dynamic configurations with key/value pairs of properties
-   */
-  public Set<DynConfiguration> save(String name);
+    ProjectPath path() default ProjectPath.ROOT;
+    
+    String relativePath();
+    
+    String name() default "";
 
-  /**
-   * Write dynamic files with properties and values stored on configuration.
-   * <p>
-   * If dynamic configuration with name not exists, null will be returned.
-   * </p>
-   * 
-   * @param name Configuration name to activate
-   * @return Set of dynamic configurations with key/value pairs of properties
-   */
-  public Set<DynConfiguration> activate(String name);
-  
 }

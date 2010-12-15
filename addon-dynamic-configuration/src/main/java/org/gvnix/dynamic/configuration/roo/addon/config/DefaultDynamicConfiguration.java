@@ -11,7 +11,7 @@
  * General Public License along with this program. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.dynamic.configuration.roo.addon;
+package org.gvnix.dynamic.configuration.roo.addon.config;
 
 import java.util.List;
 

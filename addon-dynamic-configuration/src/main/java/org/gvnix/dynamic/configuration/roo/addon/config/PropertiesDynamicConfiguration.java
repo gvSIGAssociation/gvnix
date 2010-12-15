@@ -27,8 +27,6 @@ import java.util.Map.Entry;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.dynamic.configuration.roo.addon.DefaultDynamicConfiguration;
-import org.gvnix.dynamic.configuration.roo.addon.DynamicConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;

@@ -20,7 +20,6 @@ package org.gvnix.dynamic.configuration.roo.addon.config;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.dynamic.configuration.roo.addon.DynamicConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.ProjectPath;
 
 /**

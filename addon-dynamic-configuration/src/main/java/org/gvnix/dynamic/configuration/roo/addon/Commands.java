@@ -1,3 +1,21 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.util.Set;
@@ -8,21 +26,18 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
-import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
 import org.springframework.roo.shell.CommandMarker;
-import org.springframework.roo.shell.converters.StaticFieldConverter;
 
 /**
- * Sample of a command class. The command class is registered by the Roo shell following an
- * automatic classpath scan. You can provide simple user presentation-related logic in this
- * class. You can return any objects from each method, or use the logger directly if you'd
- * like to emit messages of different severity (and therefore different colours on 
- * non-Windows systems).
+ * Dynamic configuration console commands.
  * 
- * @since 1.1.0-M1
+ * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 @Component
 @Service
@@ -31,50 +46,6 @@ public class Commands implements CommandMarker {
 	private static Logger logger = Logger.getLogger(Commands.class.getName());
 
 	@Reference private Operations operations;
-	@Reference private StaticFieldConverter staticFieldConverter;
-	@Reference private DynConfigServiceInt dynConfigService;
-
-	protected void activate(ComponentContext context) {
-	    staticFieldConverter.add(PropertyName.class);
-    }
-
-	protected void deactivate(ComponentContext context) {
-		staticFieldConverter.remove(PropertyName.class);
-	}
-	
-	@CliAvailabilityIndicator("welcome property")
-	public boolean isPropertyAvailable() {
-		return true;  // it's safe to always see the properties we expose
-	}
-	
-	@CliCommand(value="welcome property", help="Obtains a pre-defined system property")
-	public String property(@CliOption(key="name", mandatory=false, specifiedDefaultValue="USERNAME", unspecifiedDefaultValue="USERNAME", help="The property name you'd like to display") PropertyName propertyName) {
-		return operations.getProperty(propertyName);
-	}
-	
-	@CliAvailabilityIndicator("welcome write hello")
-	public boolean isWriteHelloAvailable() {
-		return operations.isProjectAvailable() && !operations.isTextFileAvailable("hello");
-	}
-
-	@CliCommand(value="welcome write hello", help="Writes hello.txt in the project root directory")
-	public void writeHello() {
-		operations.writeTextFile("hello");
-	}
-
-	@CliAvailabilityIndicator("welcome write hej")
-	public boolean isWriteHejAvailable() {
-		return operations.isProjectAvailable() && !operations.isTextFileAvailable("hej");
-	}
-
-	@CliCommand(value="welcome write hej", help="Writes hej.txt in the project root directory")
-	public void writeHej() {
-		operations.writeTextFile("hej");
-	}
-	
-	
-	
-	
 
   @CliAvailabilityIndicator("configuration save")
   public boolean isSave() {
@@ -86,7 +57,7 @@ public class Commands implements CommandMarker {
   public void save(@CliOption(key = "name", mandatory = true, help = "Name to store as the dynamic configuration") String name) {
 
     // Save current dynamic configuration and get it
-    Set<DynConfiguration> configs = dynConfigService.save(name);
+    Set<DynConfiguration> configs = operations.save(name);
     if (configs.isEmpty() || configs.size() == 0) {
 
       logger.log(Level.SEVERE, "There is no dynamic configurations to save");
@@ -110,7 +81,7 @@ public class Commands implements CommandMarker {
   @CliCommand(value="configuration activate", help="Set the named dynamic configuration property values on the dynamic configuration files.")
   public void activate(@CliOption(key = "name", mandatory = true, help = "Name to store as the dynamic configuration") String name) {
     
-    Set<DynConfiguration> configs = dynConfigService.activate(name);
+    Set<DynConfiguration> configs = operations.activate(name);
     
     if (configs == null) {
       
