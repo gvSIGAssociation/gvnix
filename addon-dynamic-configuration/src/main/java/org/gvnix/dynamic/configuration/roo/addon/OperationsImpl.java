@@ -82,26 +82,24 @@ public class OperationsImpl implements Operations {
     
     // Get the active configuration 
     DynConfiguration dynConfig = services.getActiveConfiguration();
-    dynConfig.setName(name);
     
     // Get the XML configuration file as a dom document
-    String path = getConfigurationFilePath();
-    MutableFile file = fileManager.updateFile(path);
-    Document doc = parse(file);
+    Document doc = getConfiguration();
     
     // Find the dom configuration with requested name
     Element root = doc.getDocumentElement();
-    List<Element> configs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
+    List<Element> confs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
         + NAME_ATTRIBUTE_NAME + "='" + name + "']", root);
-    if (configs != null && configs.size() > 0) {
+    if (confs != null && confs.size() > 0) {
       
       // If configuration already exists, delete it
-      deleteConfiguration(configs.get(0));
+      deleteConfiguration(confs.get(0));
     }
 
     // Create the configuration
+    dynConfig.setName(name);
     addConfiguration(dynConfig, root);
-    XmlUtils.writeXml(file.getOutputStream(), doc);
+    saveConfiguration(doc);
 
     return dynConfig;
   }
@@ -114,17 +112,15 @@ public class OperationsImpl implements Operations {
     DynConfiguration dynConfig = null;
 
     // Get the XML configuration file as a dom document
-    String path = getConfigurationFilePath();
-    MutableFile file = fileManager.updateFile(path);
-    Document doc = parse(file);
+    Document doc = getConfiguration();
     
     // Find the dom configuration with requested name
     Element root = doc.getDocumentElement();
-    List<Element> configs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
+    List<Element> confs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
         + NAME_ATTRIBUTE_NAME + "='" + name + "']", root);
-    if (configs != null && configs.size() > 0) {
+    if (confs != null && confs.size() > 0) {
 
-      dynConfig = parseConfiguration(configs.get(0));
+      dynConfig = parseConfiguration(confs.get(0));
       services.setActiveConfiguration(dynConfig);
     }
 
@@ -139,9 +135,7 @@ public class OperationsImpl implements Operations {
     Set<DynConfiguration> dynConfs = new HashSet<DynConfiguration>();
     
     // Get the XML configuration file as a dom document
-    String path = getConfigurationFilePath();
-    MutableFile file = fileManager.updateFile(path);
-    Document document = parse(file);
+    Document document = getConfiguration();
     
     // Find all the dom configurations
     Element root = document.getDocumentElement();
@@ -159,20 +153,17 @@ public class OperationsImpl implements Operations {
    */
   public boolean deleteConfiguration(String name) {
     
-    // Get the XML configuration file as a dom document
-    String path = getConfigurationFilePath();
-    MutableFile file = fileManager.updateFile(path);
-    Document doc = parse(file);
+    Document doc = getConfiguration();
     
     // Find the dom configuration with requested name
     Element root = doc.getDocumentElement();
-    List<Element> configs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
+    List<Element> confs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
         + NAME_ATTRIBUTE_NAME + "='" + name + "']", root);
-    if (configs != null && configs.size() > 0) {
+    if (confs != null && confs.size() > 0) {
       
       // If configuration already exists, delete it
-      deleteConfiguration(configs.get(0));
-      XmlUtils.writeXml(file.getOutputStream(), doc);
+      deleteConfiguration(confs.get(0));
+      saveConfiguration(doc);
       
       return true;
     }
@@ -222,7 +213,73 @@ public class OperationsImpl implements Operations {
     }
     conf.getParentNode().removeChild(conf);
   }
+  
+  /**
+   * Get the configuration from disk in a dom document.
+   * 
+   * @return Dom document
+   */
+  private Document getConfiguration() {
 
+    Document doc;
+    try {
+
+      String path = getConfigurationFilePath();
+      DocumentBuilder build = XmlUtils.getDocumentBuilder();
+      doc = build.parse(fileManager.getInputStream(path));
+    }
+    catch (SAXException se) {
+
+      throw new IllegalStateException("Cant parse the configuration file", se);
+    }
+    catch (IOException ioe) {
+
+      throw new IllegalStateException("Cant read the configuration file", ioe);
+    }
+
+    return doc;
+  }
+  
+  /**
+   * Save the configuration to disk from a dom document .
+   * 
+   * @param doc Dom document
+   */
+  void saveConfiguration(Document doc) {
+  
+    String path = getConfigurationFilePath();
+    MutableFile file = fileManager.updateFile(path);
+    XmlUtils.writeXml(file.getOutputStream(), doc);
+  }
+  
+  /**
+   * Get the main XML configuration file path of dynamic configurations.
+   * <p>
+   * If XML configuration file not exists, will be created with a template.
+   * </p>
+   * 
+   * @return dynamic configuration XML file path
+   */
+  private String getConfigurationFilePath() {
+
+    String path = pathResolver.getIdentifier(Path.SRC_MAIN_RESOURCES,
+        DYNAMIC_CONFIGURATION_FILE_NAME);
+    if (!fileManager.exists(path)) {
+      try {
+
+        FileCopyUtils.copy(TemplateUtils.getTemplate(getClass(),
+            DYNAMIC_CONFIGURATION_TEMPLATE_NAME), fileManager.createFile(path)
+            .getOutputStream());
+      }
+      catch (IOException ioe) {
+
+        throw new IllegalStateException(ioe);
+      }
+    }
+
+    return path;
+  }
+  
   /**
    * Parse a configuration dom element to a dynamic configuration.
    * 
@@ -258,60 +315,6 @@ public class OperationsImpl implements Operations {
     return dynConfig;
   }
   
-  /**
-   * Get the main XML configuration file path of dynamic configurations.
-   * <p>
-   * If XML configuration file not exists, will be created with a template.
-   * </p>
-   * 
-   * @return dynamic configuration XML file path
-   */
-  private String getConfigurationFilePath() {
-
-    String path = pathResolver.getIdentifier(Path.SRC_MAIN_RESOURCES,
-        DYNAMIC_CONFIGURATION_FILE_NAME);
-    if (!fileManager.exists(path)) {
-      try {
-
-        FileCopyUtils.copy(TemplateUtils.getTemplate(getClass(),
-            DYNAMIC_CONFIGURATION_TEMPLATE_NAME), fileManager.createFile(path)
-            .getOutputStream());
-      }
-      catch (IOException ioe) {
-
-        throw new IllegalStateException(ioe);
-      }
-    }
-
-    return path;
-  }
-
-  /**
-   * Parse a mutable file into a dom Document.
-   * 
-   * @param file Mutable file
-   * @return Dom document
-   */
-  private Document parse(MutableFile file) {
-
-    Document doc;
-    try {
-
-      DocumentBuilder build = XmlUtils.getDocumentBuilder();
-      doc = build.parse(file.getInputStream());
-    }
-    catch (SAXException se) {
-
-      throw new IllegalStateException("Cant parse the configuration file", se);
-    }
-    catch (IOException ioe) {
-
-      throw new IllegalStateException("Cant read the configuration file", ioe);
-    }
-
-    return doc;
-  }
-
   /**
    * @return the path resolver or null if there is no user project
    */
