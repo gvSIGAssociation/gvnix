@@ -1,21 +1,45 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gvnix.dynamic.configuration.roo.addon.entity;
 
-import java.util.List;
-
+/**
+ * Dynamic configuration component entity.
+ * 
+ * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ */
 public class DynComponent {
   
   private String id;
 
   private String name;
   
-  private List<DynProperty> properties;
+  private DynPropertyList properties;
   
   
   public DynComponent() {
     super();
   }
 
-  public DynComponent(String id, String name, List<DynProperty> properties) {
+  public DynComponent(String id, String name, DynPropertyList properties) {
     super();
     this.id = id;
     this.name = name;
@@ -49,15 +73,19 @@ public class DynComponent {
     this.name = name;
   }
 
-  public List<DynProperty> getProperties() {
+  public DynPropertyList getProperties() {
     return properties;
   }
 
-  
-  public void setProperties(List<DynProperty> properties) {
-    this.properties = properties;
+  public void addProperty(DynProperty property) {
+    properties.add(property);
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * Name and property/value set, each on new line. 
+   */
   @Override
   public String toString() {
 
@@ -75,5 +103,32 @@ public class DynComponent {
 
     return buffer.toString();
   }
+  
+  /**
+   * Two components are equal if their properties are equal.
+   * 
+   * @param obj Component to compare to
+   * @return Component equals
+   */
+  public boolean equals(DynComponent obj) {
 
+    for (DynProperty component : properties) {
+      
+      boolean exist = false;
+      for (DynProperty component2 : obj.getProperties()) {
+        if (component.equals(component2)) {
+          
+          exist = true;
+          break;
+        }
+      }
+      
+      if (!exist) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+  
 }

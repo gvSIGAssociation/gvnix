@@ -19,8 +19,6 @@
 package org.gvnix.dynamic.configuration.roo.addon.config;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.Map.Entry;
 
@@ -28,6 +26,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
@@ -56,12 +55,12 @@ public class PropertiesDynamicConfiguration implements
   /**
    * {@inheritDoc}
    */
-  public List<DynProperty> read() {
+  public DynPropertyList read() {
 
     // Get the properties file path from the annotation
     MutableFile file = getPropertiesFile();
 
-    List<DynProperty> dynProps = new ArrayList<DynProperty>();
+    DynPropertyList dynProps = new DynPropertyList();
 
     try {
 
@@ -84,7 +83,7 @@ public class PropertiesDynamicConfiguration implements
   /**
    * {@inheritDoc}
    */
-  public void write(List<DynProperty> dynProps) {
+  public void write(DynPropertyList dynProps) {
 
     try {
 

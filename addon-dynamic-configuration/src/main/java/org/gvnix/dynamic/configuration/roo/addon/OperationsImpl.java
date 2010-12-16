@@ -19,7 +19,6 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +31,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
@@ -206,12 +206,11 @@ public class OperationsImpl implements Operations {
   private DynConfiguration parseConfiguration(Element config) {
 
     DynConfiguration dynConfig = new DynConfiguration();
-    dynConfig.setName(config.getAttribute(NAME_ATTRIBUTE_NAME));
 
     List<Element> comps = XmlUtils.findElements(COMPONENT_ELEMENT_NAME, config);
     for (Element comp : comps) {
 
-      List<DynProperty> dynProps = new ArrayList<DynProperty>();
+      DynPropertyList dynProps = new DynPropertyList();
 
       List<Element> props = XmlUtils.findElements("*", comp);
       for (Element prop : props) {
@@ -227,9 +226,12 @@ public class OperationsImpl implements Operations {
       dynConfig.addComponent(dynComp);
     }
 
+    dynConfig.setName(config.getAttribute(NAME_ATTRIBUTE_NAME));
+    dynConfig.setActive(dynConfig.equals(services.getActiveConfiguration()));
+
     return dynConfig;
   }
-
+  
   /**
    * Get the main XML configuration file path of dynamic configurations.
    * <p>

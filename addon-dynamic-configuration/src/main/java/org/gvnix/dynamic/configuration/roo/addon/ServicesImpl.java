@@ -21,7 +21,6 @@ package org.gvnix.dynamic.configuration.roo.addon;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +35,7 @@ import org.gvnix.dynamic.configuration.roo.addon.config.DefaultDynamicConfigurat
 import org.gvnix.dynamic.configuration.roo.addon.config.DynamicConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
-import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.support.logging.HandlerUtils;
 
@@ -96,7 +95,6 @@ public class ServicesImpl implements Services {
   /**
    * {@inheritDoc}
    */
-  @SuppressWarnings("unchecked")
   public DynConfiguration getActiveConfiguration() {
 
     // Variable to store active dynamic configuration
@@ -117,8 +115,7 @@ public class ServicesImpl implements Services {
         
         // Invoke the read method of all components to get its properties
         Method m = (Method) c.getMethod("read", new Class[0]);
-        List<DynProperty> dynProps = (List<DynProperty>) m.invoke(
-            o, new Object[0]);
+        DynPropertyList dynProps = (DynPropertyList) m.invoke(o, new Object[0]);
 
         // Create a dynamic configuration object with component and properties
         DynComponent dynComp = new DynComponent(c.getName(), a.name(), dynProps);
@@ -168,7 +165,7 @@ public class ServicesImpl implements Services {
           if (c.getName().equals(dynComp.getId())) {
 
             Class[] t = new Class[1];
-            t[0] = List.class;
+            t[0] = DynPropertyList.class;
             Method m = (Method) c.getMethod("write", t);
             Object[] args = new Object[1];
             args[0] = dynComp.getProperties();

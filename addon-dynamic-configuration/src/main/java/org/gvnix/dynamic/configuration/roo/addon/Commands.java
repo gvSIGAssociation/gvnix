@@ -57,7 +57,6 @@ public class Commands implements CommandMarker {
   @CliCommand(value = "configuration list", help = "List all saved dynamic configurations")
   public void list() {
     
-    // TODO Upgrade entity model to consider Configuration with components, name and active properties
     Set<DynConfiguration> configs = operations.findConfigurations();
     
     // Show in console the configurations list

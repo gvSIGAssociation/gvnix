@@ -13,9 +13,7 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon.config;
 
-import java.util.List;
-
-import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 
 /**
  * Interface methods required by every manager of a dynamic configuration file.
@@ -36,13 +34,13 @@ public interface DefaultDynamicConfiguration {
    *  
    * @return File info getted from the original file.
    */
-  List<DynProperty> read();
+  DynPropertyList read();
 
   /**
    * Update a configuration file with the values of the properties list.
    * 
    * @param file Info to be stored on the original file.
    */
-  void write(List<DynProperty> dynProperties);
+  void write(DynPropertyList dynProperties);
 
 }
