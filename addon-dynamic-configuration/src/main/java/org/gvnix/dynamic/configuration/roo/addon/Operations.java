@@ -33,13 +33,6 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 public interface Operations {
 
   /**
-   * Is project available ?
-   * 
-   * @return Project avaliability
-   */
-  boolean isProjectAvailable();
-
-  /**
    * Store files properties as a dynamic configuration with a name.
    * 
    * @param name Name for the dynamic configuration
@@ -72,5 +65,23 @@ public interface Operations {
    * @return Dynamic configuration to remove
    */
   public boolean deleteConfiguration(String name);
+  
+  /**
+   * Get stored dynamic configuration with a name.
+   * <p>
+   * If dynamic configuration with name not exists, null will be returned.
+   * </p>
+   * 
+   * @param name Name of the dynamic configuration
+   * @return Stored dynamic configuration.
+   */
+  DynConfiguration getConfiguration(String name);
+
+  /**
+   * Is project available ?
+   * 
+   * @return Project avaliability
+   */
+  boolean isProjectAvailable();
 
 }

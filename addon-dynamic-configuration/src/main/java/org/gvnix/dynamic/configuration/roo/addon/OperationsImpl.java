@@ -172,6 +172,28 @@ public class OperationsImpl implements Operations {
   }
   
   /**
+   * {@inheritDoc}
+   */
+  public DynConfiguration getConfiguration(String name) {
+    
+    DynConfiguration dynConf = null;
+    
+    // Get the XML configuration file as a dom document
+    Document document = getConfiguration();
+    
+    // Find the dom configuration with requested name
+    Element root = document.getDocumentElement();
+    List<Element> confs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
+        + NAME_ATTRIBUTE_NAME + "='" + name + "']", root);
+    if (confs != null && confs.size() > 0) {
+      
+      dynConf = parseConfiguration(confs.get(0));
+    }
+    
+    return dynConf;
+  }
+  
+  /**
    * Create a new configuration dom element on the root element.
    * 
    * @param configs Dynamic configuration to store on dom configuration

@@ -35,8 +35,8 @@ import org.springframework.roo.project.PathResolver;
 /**
  * Dynamic configuration base manager of property files.
  * <p>
- * Extends this class adding the @DynComponent annotation to manage new property
- * files.
+ * Extends this class adding the @DynComponent annotation to manage new
+ * properties file values.
  * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a

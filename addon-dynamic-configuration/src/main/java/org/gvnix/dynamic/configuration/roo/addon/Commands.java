@@ -73,7 +73,7 @@ public class Commands implements CommandMarker {
   }
 
   @CliCommand(value="configuration activate", help="Update the files with the configuration properties")
-  public void activate(@CliOption(key = "name", mandatory = true, help = "Name of the required configuration") String name) {
+  public void activate(@CliOption(key = "name", mandatory = true, help = "Name of the configuration") String name) {
     
     // Set the selected dynamic configuration as active
     DynConfiguration dynConf = operations.setActiveConfiguration(name);
@@ -99,6 +99,13 @@ public class Commands implements CommandMarker {
   public void list() {
     
     Set<DynConfiguration> configs = operations.findConfigurations();
+    
+    // If null, dynamic configuration with this name not exists
+    if (configs == null || configs.size() == 0) {
+      
+      logger.log(Level.INFO, "There is no saved configurations");
+      return;
+    }
     
     // Show in console the configurations list
     for (DynConfiguration config : configs) {
@@ -126,6 +133,29 @@ public class Commands implements CommandMarker {
     else {
       logger.log(Level.WARNING, name + " configuration not exists");
     }
+  }
+  
+  @CliAvailabilityIndicator("configuration property list")
+  public boolean isPropertyList() {
+    
+    return operations.isProjectAvailable();
+  }
+
+  @CliCommand(value="configuration property list", help="Show the properties stored in a configuration")
+  public void propertyList(@CliOption(key = "name", mandatory = true, help = "Name of the configuration") String name) {
+    
+    // Get the dynamic configuration
+    DynConfiguration dynConf = operations.getConfiguration(name);
+    
+    // If null, dynamic configuration with this name not exists
+    if (dynConf == null) {
+      
+      logger.log(Level.WARNING, name + " configuration not exists");
+      return;
+    }
+
+    // Show the activated dynamic configuration
+    showDynComponents(dynConf);
   }
   
   /**
