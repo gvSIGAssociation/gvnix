@@ -19,9 +19,7 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 
@@ -30,6 +28,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.springframework.roo.metadata.MetadataService;
@@ -64,7 +63,8 @@ public class OperationsImpl implements Operations {
   private static final String COMPONENT_ELEMENT_NAME = "component";
   private static final String ID_ATTRIBUTE_NAME = "id";
   private static final String NAME_ATTRIBUTE_NAME = "name";
-  private static final String CONFIGURATION_XPATH = "/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME + "/" + CONFIGURATION_ELEMENT_NAME;
+  private static final String CONFIGURATION_XPATH = "/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME + 
+      "/" + CONFIGURATION_ELEMENT_NAME;
 
 	@Reference private MetadataService metadataService;
 	@Reference private Services services;
@@ -120,7 +120,7 @@ public class OperationsImpl implements Operations {
         + NAME_ATTRIBUTE_NAME + "='" + name + "']", root);
     if (confs != null && confs.size() > 0) {
 
-      dynConfig = parseConfiguration(confs.get(0));
+      dynConfig = parseConfiguration(confs.get(0), null);
       services.setActiveConfiguration(dynConfig);
     }
 
@@ -130,9 +130,9 @@ public class OperationsImpl implements Operations {
   /**
    * {@inheritDoc}
    */
-  public Set<DynConfiguration> findConfigurations() {
+  public DynConfigurationList findConfigurations() {
     
-    Set<DynConfiguration> dynConfs = new HashSet<DynConfiguration>();
+    DynConfigurationList dynConfs = new DynConfigurationList();
     
     // Get the XML configuration file as a dom document
     Document document = getConfiguration();
@@ -142,7 +142,7 @@ public class OperationsImpl implements Operations {
     List<Element> confs = XmlUtils.findElements(CONFIGURATION_XPATH, root);
     for (Element conf : confs) {
       
-      dynConfs.add(parseConfiguration(conf));
+      dynConfs.add(parseConfiguration(conf, null));
     }
     
     return dynConfs;
@@ -187,10 +187,35 @@ public class OperationsImpl implements Operations {
         + NAME_ATTRIBUTE_NAME + "='" + name + "']", root);
     if (confs != null && confs.size() > 0) {
       
-      dynConf = parseConfiguration(confs.get(0));
+      dynConf = parseConfiguration(confs.get(0), null);
     }
     
     return dynConf;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public DynConfigurationList getProperties(String name) {
+    
+    DynConfigurationList dynConfs = new DynConfigurationList();
+    
+    // Get the XML configuration file as a dom document
+    Document document = getConfiguration();
+    
+    // Find the dom configuration with requested name
+    Element root = document.getDocumentElement();
+    List<Element> confs = XmlUtils.findElements("/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME + "/*", root);
+    if (confs != null && confs.size() > 0) {
+      
+      for (Element conf : confs) {
+        
+        DynConfiguration dynConf = parseConfiguration(conf, name);
+        dynConfs.add(dynConf);
+      }
+    }
+    
+    return dynConfs;
   }
   
   /**
@@ -267,7 +292,7 @@ public class OperationsImpl implements Operations {
    * 
    * @param doc Dom document
    */
-  void saveConfiguration(Document doc) {
+  private void saveConfiguration(Document doc) {
   
     String path = getConfigurationFilePath();
     MutableFile file = fileManager.updateFile(path);
@@ -305,36 +330,40 @@ public class OperationsImpl implements Operations {
   /**
    * Parse a configuration dom element to a dynamic configuration.
    * 
-   * @param config Configuration dom element
+   * @param conf Configuration dom element
+   * @param name Property name to parse or all if null
    * @return Dynamic configuration
    */
-  private DynConfiguration parseConfiguration(Element config) {
+  private DynConfiguration parseConfiguration(Element conf, String name) {
 
-    DynConfiguration dynConfig = new DynConfiguration();
+    DynConfiguration dynConf = new DynConfiguration();
 
-    List<Element> comps = XmlUtils.findElements(COMPONENT_ELEMENT_NAME, config);
+    List<Element> comps = XmlUtils.findElements(COMPONENT_ELEMENT_NAME, conf);
     for (Element comp : comps) {
 
       DynPropertyList dynProps = new DynPropertyList();
 
       List<Element> props = XmlUtils.findElements("*", comp);
       for (Element prop : props) {
+        
+        if (name == null || prop.getTagName().equals(name)) {
 
-        DynProperty dynProp = new DynProperty(prop.getTagName(), prop
-            .getTextContent());
-        dynProps.add(dynProp);
+          DynProperty dynProp = new DynProperty(prop.getTagName(), prop
+              .getTextContent());
+          dynProps.add(dynProp);
+        }
       }
 
       DynComponent dynComp = new DynComponent(comp.getAttributes()
           .getNamedItem(ID_ATTRIBUTE_NAME).getNodeValue(), comp.getAttributes()
           .getNamedItem(NAME_ATTRIBUTE_NAME).getNodeValue(), dynProps);
-      dynConfig.addComponent(dynComp);
+      dynConf.addComponent(dynComp);
     }
 
-    dynConfig.setName(config.getAttribute(NAME_ATTRIBUTE_NAME));
-    dynConfig.setActive(dynConfig.equals(services.getActiveConfiguration()));
+    dynConf.setName(conf.getAttribute(NAME_ATTRIBUTE_NAME));
+    dynConf.setActive(dynConf.equals(services.getActiveConfiguration()));
 
-    return dynConfig;
+    return dynConf;
   }
   
   /**

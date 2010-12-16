@@ -18,7 +18,6 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +26,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
@@ -57,7 +57,7 @@ public class Commands implements CommandMarker {
   }
 
   @CliCommand(value = "configuration save", help = "Store the files current properties as a configuration")
-  public void save(@CliOption(key = "name", mandatory = true, help = "Name for the configuration to store") String name) {
+  public void save(@CliOption(key = "name", mandatory = true, help = "Configuration name to store") String name) {
 
     // Store the active dynamic configuration
     DynConfiguration dynConf = operations.saveActiveConfiguration(name);
@@ -73,7 +73,7 @@ public class Commands implements CommandMarker {
   }
 
   @CliCommand(value="configuration activate", help="Update the files with the configuration properties")
-  public void activate(@CliOption(key = "name", mandatory = true, help = "Name of the configuration") String name) {
+  public void activate(@CliOption(key = "name", mandatory = true, help = "Configuration name") String name) {
     
     // Set the selected dynamic configuration as active
     DynConfiguration dynConf = operations.setActiveConfiguration(name);
@@ -98,19 +98,19 @@ public class Commands implements CommandMarker {
   @CliCommand(value = "configuration list", help = "List all saved configurations")
   public void list() {
     
-    Set<DynConfiguration> configs = operations.findConfigurations();
+    DynConfigurationList dynConfs = operations.findConfigurations();
     
     // If null, dynamic configuration with this name not exists
-    if (configs == null || configs.size() == 0) {
+    if (dynConfs == null || dynConfs.size() == 0) {
       
       logger.log(Level.INFO, "There is no saved configurations");
       return;
     }
     
     // Show in console the configurations list
-    for (DynConfiguration config : configs) {
+    for (DynConfiguration dynConf : dynConfs) {
 
-      logger.log(Level.INFO, config.toString());
+      logger.log(Level.INFO, dynConf.toString());
     }
   }
   
@@ -121,7 +121,7 @@ public class Commands implements CommandMarker {
   }
 
   @CliCommand(value = "configuration delete", help = "Remove a previously stored configuration")
-  public void delete(@CliOption(key = "name", mandatory = true, help = "Name of the configuration to remove") String name) {
+  public void delete(@CliOption(key = "name", mandatory = true, help = "Configuration name to remove") String name) {
 
     // Store the active dynamic configuration
     boolean deleted = operations.deleteConfiguration(name);
@@ -142,7 +142,7 @@ public class Commands implements CommandMarker {
   }
 
   @CliCommand(value="configuration property list", help="Show the properties stored in a configuration")
-  public void propertyList(@CliOption(key = "name", mandatory = true, help = "Name of the configuration") String name) {
+  public void propertyList(@CliOption(key = "name", mandatory = true, help = "Configuration name") String name) {
     
     // Get the dynamic configuration
     DynConfiguration dynConf = operations.getConfiguration(name);
@@ -158,6 +158,36 @@ public class Commands implements CommandMarker {
     showDynComponents(dynConf);
   }
   
+  @CliAvailabilityIndicator("configuration property values")
+  public boolean isPropertyValues() {
+    
+    return operations.isProjectAvailable();
+  }
+
+  @CliCommand(value="configuration property values", help="Show the property distinct values stored along configurations")
+  public void propertyValues(@CliOption(key = "name", mandatory = true, help = "Property name") String name) {
+    
+    // Get the dynamic configuration
+    DynConfigurationList dynConfs = operations.getProperties(name);
+    
+    // If null, property with this name not exists
+    if (dynConfs == null) {
+      
+      logger.log(Level.WARNING, name + " property not exists");
+      return;
+    }
+
+    for (DynConfiguration dynConf : dynConfs) {
+      
+      logger.log(Level.INFO, dynConf.getName());
+      for (DynComponent dynComp : dynConf.getComponents()) {
+        
+        logger.log(Level.INFO, dynComp.toString());
+      }
+    }
+
+  }
+
   /**
    * Show the components of a dynamic configuration on the console.
    * 

@@ -18,9 +18,8 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
-import java.util.Set;
-
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
 
 /**
  * Dynamic configuration operations interface.
@@ -56,7 +55,7 @@ public interface Operations {
    * 
    * @return List of stored dynamic configurations.
    */
-  Set<DynConfiguration> findConfigurations();
+  public DynConfigurationList findConfigurations();
 
   /**
    * Remove a previously stored configuration.
@@ -75,13 +74,21 @@ public interface Operations {
    * @param name Name of the dynamic configuration
    * @return Stored dynamic configuration.
    */
-  DynConfiguration getConfiguration(String name);
+  public DynConfiguration getConfiguration(String name);
 
   /**
    * Is project available ?
    * 
    * @return Project avaliability
    */
-  boolean isProjectAvailable();
+  public boolean isProjectAvailable();
+  
+  /**
+   * Get the properties stored along configurations with a name.
+   * 
+   * @param name Property name
+   * @return Related properties along distinct configurations
+   */
+  public DynConfigurationList getProperties(String name);
 
 }
