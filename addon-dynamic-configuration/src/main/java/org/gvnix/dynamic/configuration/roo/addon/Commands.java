@@ -35,6 +35,8 @@ import org.springframework.roo.shell.CommandMarker;
 /**
  * Dynamic configuration console commands.
  * 
+ * TODO Add an editor to list configuration names on commands. 
+ * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -47,24 +49,6 @@ public class Commands implements CommandMarker {
 	private static Logger logger = Logger.getLogger(Commands.class.getName());
 
 	@Reference private Operations operations;
-	
-  @CliAvailabilityIndicator("configuration list")
-  public boolean isList() {
-    
-    return operations.isProjectAvailable();
-  }
-
-  @CliCommand(value = "configuration list", help = "List all saved dynamic configurations")
-  public void list() {
-    
-    Set<DynConfiguration> configs = operations.findConfigurations();
-    
-    // Show in console the configurations list
-    for (DynConfiguration config : configs) {
-
-      logger.log(Level.INFO, config.toString());
-    }
-  }
   
   @CliAvailabilityIndicator("configuration save")
   public boolean isSave() {
@@ -97,14 +81,53 @@ public class Commands implements CommandMarker {
     // If null, dynamic configuration with this name not exists
     if (dynConf == null) {
       
-      logger.log(Level.WARNING, "Dynamic configuration not exists with name " + name);
+      logger.log(Level.WARNING, name + " configuration not exists");
       return;
     }
 
     // Show the activated dynamic configuration
     showDynComponents(dynConf);
   }
+  
+  @CliAvailabilityIndicator("configuration list")
+  public boolean isList() {
+    
+    return operations.isProjectAvailable();
+  }
 
+  @CliCommand(value = "configuration list", help = "List all saved configurations")
+  public void list() {
+    
+    Set<DynConfiguration> configs = operations.findConfigurations();
+    
+    // Show in console the configurations list
+    for (DynConfiguration config : configs) {
+
+      logger.log(Level.INFO, config.toString());
+    }
+  }
+  
+  @CliAvailabilityIndicator("configuration delete")
+  public boolean isDelete() {
+    
+    return operations.isProjectAvailable();
+  }
+
+  @CliCommand(value = "configuration delete", help = "Remove a previously stored configuration")
+  public void delete(@CliOption(key = "name", mandatory = true, help = "Name of the configuration to remove") String name) {
+
+    // Store the active dynamic configuration
+    boolean deleted = operations.deleteConfiguration(name);
+    
+    // Show message
+    if (deleted) {
+      logger.log(Level.INFO, name + " configuration deleted");
+    }
+    else {
+      logger.log(Level.WARNING, name + " configuration not exists");
+    }
+  }
+  
   /**
    * Show the components of a dynamic configuration on the console.
    * 

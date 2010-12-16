@@ -153,7 +153,33 @@ public class OperationsImpl implements Operations {
     
     return dynConfs;
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean deleteConfiguration(String name) {
+    
+    // Get the XML configuration file as a dom document
+    String path = getConfigurationFilePath();
+    MutableFile file = fileManager.updateFile(path);
+    Document doc = parse(file);
+    
+    // Find the dom configuration with requested name
+    Element root = doc.getDocumentElement();
+    List<Element> configs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
+        + NAME_ATTRIBUTE_NAME + "='" + name + "']", root);
+    if (configs != null && configs.size() > 0) {
+      
+      // If configuration already exists, delete it
+      deleteConfiguration(configs.get(0));
+      XmlUtils.writeXml(file.getOutputStream(), doc);
+      
+      return true;
+    }
 
+    return false;
+  }
+  
   /**
    * Create a new configuration dom element on the root element.
    * 

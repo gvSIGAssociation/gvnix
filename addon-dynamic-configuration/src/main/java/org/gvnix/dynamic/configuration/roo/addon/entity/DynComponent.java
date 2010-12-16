@@ -91,14 +91,14 @@ public class DynComponent {
 
     // Show the component name
     StringBuffer buffer = new StringBuffer();
-    buffer.append(getName());
+    buffer.append("* " + getName());
 
     // Show properties
     for (DynProperty prop : properties) {
 
       // Show the property and value with format
       buffer.append("\n");
-      buffer.append(" " + prop.getKey() + " = " + prop.getValue());
+      buffer.append("  - " + prop.getKey() + " = " + prop.getValue());
     }
 
     return buffer.toString();

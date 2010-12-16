@@ -65,4 +65,12 @@ public interface Operations {
    */
   Set<DynConfiguration> findConfigurations();
 
+  /**
+   * Remove a previously stored configuration.
+   * 
+   * @param name Name of the dynamic configuration
+   * @return Dynamic configuration to remove
+   */
+  public boolean deleteConfiguration(String name);
+
 }

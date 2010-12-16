@@ -74,10 +74,14 @@ public class DynConfiguration {
   public String toString() {
     
     StringBuffer buffer = new StringBuffer();
-    buffer.append(getName());
+    
     if (active) {
-      buffer.append(" (Active)");
+      buffer.append("(Active) ");
     }
+    else {
+      buffer.append("         ");
+    }
+    buffer.append(getName());
     
     return buffer.toString();
   }
