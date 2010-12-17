@@ -18,7 +18,7 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon.entity;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -29,7 +29,7 @@ import java.util.Iterator;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public class DynConfigurationList extends HashSet<DynConfiguration> {
+public class DynConfigurationList extends ArrayList<DynConfiguration> {
 
   private static final long serialVersionUID = 7339101943396730003L;
 

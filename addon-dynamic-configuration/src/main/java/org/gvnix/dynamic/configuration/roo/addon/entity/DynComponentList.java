@@ -18,17 +18,19 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon.entity;
 
-import java.util.HashSet;;
+import java.util.ArrayList;
 
 /**
  * Dynamic configuration component list entity.
+ * 
+ * TODO Convert Set to List to force same order on every visualization.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public class DynComponentList extends HashSet<DynComponent> {
+public class DynComponentList extends ArrayList<DynComponent> {
 
   private static final long serialVersionUID = 5890548949957755428L;
 

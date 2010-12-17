@@ -123,41 +123,87 @@ public class ConfigurationsImpl implements Configurations {
    * {@inheritDoc}
    */
   public DynConfiguration parseConfiguration(Element conf, String name) {
-    
+
     DynConfiguration dynConf = new DynConfiguration();
 
     // Iterate all child component elements from the configuration element
     List<Element> comps = XmlUtils.findElements(COMPONENT_ELEMENT_NAME, conf);
     for (Element comp : comps) {
 
-      DynPropertyList dynProps = new DynPropertyList();
-
-      // Iterate all child property elements from the component element
-      List<Element> props = XmlUtils.findElements("*", comp);
-      for (Element prop : props) {
-
-        // If property name specified, only it be considered
-        if (name == null || prop.getTagName().equals(name)) {
-
-          // Add new dynamic property
-          DynProperty dynProp = new DynProperty(prop.getTagName(), prop
-              .getTextContent());
-          dynProps.add(dynProp);
-        }
+      DynComponent dynComp = parseComponent(comp, name);
+      if (dynComp != null) {
+        dynConf.addComponent(dynComp);
       }
-
-      // Add new dynamic component
-      DynComponent dynComp = new DynComponent(comp.getAttributes()
-          .getNamedItem(ID_ATTRIBUTE_NAME).getNodeValue(), comp.getAttributes()
-          .getNamedItem(NAME_ATTRIBUTE_NAME).getNodeValue(), dynProps);
-      dynConf.addComponent(dynComp);
     }
 
-    // Set name and active properties on the dynamic configuration
+    // Set name property of dynamic configuration
     dynConf.setName(conf.getAttribute(NAME_ATTRIBUTE_NAME));
-    dynConf.setActive(dynConf.equals(services.getActiveConfiguration()));
-
+    
+    // Set active property of dynamic configuration 
+    if (name == null) {
+      
+      // Compare current dynamic configuration with active dynamic configuration
+      dynConf.setActive(dynConf.equals(services.getActiveConfiguration()));
+    }
+    else {
+      
+      // Current dynamic configuration active if entire dynamic configuration is
+      dynConf.setActive(parseConfiguration(conf, null).isActive());
+    }
+    
     return dynConf;
+  }
+
+  /**
+   * Parse a component element to a dynamic component.
+   * <p>
+   * All component properties will be processed if name is null. If name not
+   * null, only specified property name will be processed.
+   * </p>
+   * 
+   * @param comp Component element
+   * @param name Property name to parse or all if null
+   * @return Dynamic configuration
+   */
+  private DynComponent parseComponent(Element comp, String name) {
+
+    // If property name specified, only it be considered
+    List<Element> props;
+    if (name == null) {
+
+      props = XmlUtils.findElements("*", comp);
+    }
+    else {
+      props = XmlUtils.findElements(name, comp);
+    }
+
+    // Iterate all child property elements from the component element
+    DynPropertyList dynProps = new DynPropertyList();
+    for (Element prop : props) {
+
+      dynProps.add(parseProperty(prop));
+    }
+    
+    if (dynProps.size() == 0) {
+      return null;
+    }
+
+    // Add new dynamic component
+    return new DynComponent(comp.getAttributes()
+        .getNamedItem(ID_ATTRIBUTE_NAME).getNodeValue(), comp.getAttributes()
+        .getNamedItem(NAME_ATTRIBUTE_NAME).getNodeValue(), dynProps);
+  }
+
+  /**
+   * Parse a property element to a dynamic property.
+   * 
+   * @param prop Property element
+   * @return Dynamic property
+   */
+  private DynProperty parseProperty(Element prop) {
+    
+    // Add new dynamic property
+    return new DynProperty(prop.getTagName(), prop.getTextContent());
   }
   
   /**

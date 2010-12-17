@@ -179,13 +179,12 @@ public class Commands implements CommandMarker {
 
     for (DynConfiguration dynConf : dynConfs) {
       
-      logger.log(Level.INFO, dynConf.getName());
+      logger.log(Level.INFO, dynConf.toString());
       for (DynComponent dynComp : dynConf.getComponents()) {
         
         logger.log(Level.INFO, dynComp.toString());
       }
     }
-
   }
 
   /**
