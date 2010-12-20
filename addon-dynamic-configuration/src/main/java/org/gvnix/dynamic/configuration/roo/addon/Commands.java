@@ -27,6 +27,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
@@ -185,6 +186,30 @@ public class Commands implements CommandMarker {
         logger.log(Level.INFO, dynComp.toString());
       }
     }
+  }
+  
+  @CliAvailabilityIndicator("configuration property update")
+  public boolean isPropertyUpdate() {
+    
+    return operations.isProjectAvailable();
+  }
+
+  @CliCommand(value="configuration property update", help="Set a value on a configuration property")
+  public void propertyUpdate(@CliOption(key = "configuration", mandatory = true, help = "Configuration name to update") String configuration,
+                             @CliOption(key = "property", mandatory = true, help = "Property name to update") String property,
+                             @CliOption(key = "value", mandatory = true, help = "Value to set") String value) {
+    
+    // Update the configuration
+    DynProperty dynProperty = operations.updateProperty(configuration, property, value);
+    
+    // If null, property with this name not exists
+    if (dynProperty == null) {
+      
+      logger.log(Level.WARNING, property + " property not exists");
+      return;
+    }
+
+    logger.log(Level.INFO, property + " property updated");
   }
 
   /**

@@ -73,7 +73,7 @@ public class ConfigurationsImpl implements Configurations {
   public void addConfiguration(DynConfiguration dynConf) {
     
     // Obtain the configuration document
-    Document doc = getConfiguration();
+    Document doc = getConfigurationDocument();
     
     // Add new configuration element
     Element conf = doc.createElement(CONFIGURATION_ELEMENT_NAME);
@@ -155,17 +155,9 @@ public class ConfigurationsImpl implements Configurations {
   }
 
   /**
-   * Parse a component element to a dynamic component.
-   * <p>
-   * All component properties will be processed if name is null. If name not
-   * null, only specified property name will be processed.
-   * </p>
-   * 
-   * @param comp Component element
-   * @param name Property name to parse or all if null
-   * @return Dynamic configuration
+   * {@inheritDoc}
    */
-  private DynComponent parseComponent(Element comp, String name) {
+  public DynComponent parseComponent(Element comp, String name) {
 
     // If property name specified, only it be considered
     List<Element> props;
@@ -193,14 +185,11 @@ public class ConfigurationsImpl implements Configurations {
         .getNamedItem(ID_ATTRIBUTE_NAME).getNodeValue(), comp.getAttributes()
         .getNamedItem(NAME_ATTRIBUTE_NAME).getNodeValue(), dynProps);
   }
-
+  
   /**
-   * Parse a property element to a dynamic property.
-   * 
-   * @param prop Property element
-   * @return Dynamic property
+   * {@inheritDoc}
    */
-  private DynProperty parseProperty(Element prop) {
+  public DynProperty parseProperty(Element prop) {
     
     // Add new dynamic property
     return new DynProperty(prop.getTagName(), prop.getTextContent());
@@ -212,7 +201,7 @@ public class ConfigurationsImpl implements Configurations {
   public Element findConfiguration(String name) {
 
     List<Element> confs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
-        + NAME_ATTRIBUTE_NAME + "='" + name + "']", getConfiguration()
+        + NAME_ATTRIBUTE_NAME + "='" + name + "']", getConfigurationDocument()
         .getDocumentElement());
     if (confs == null || confs.size() == 0) {
 
@@ -227,7 +216,7 @@ public class ConfigurationsImpl implements Configurations {
    */
   public List<Element> getAllConfigurations() {
     
-    return XmlUtils.findElements(CONFIGURATION_XPATH, getConfiguration()
+    return XmlUtils.findElements(CONFIGURATION_XPATH, getConfigurationDocument()
         .getDocumentElement());
   }
   
@@ -237,7 +226,35 @@ public class ConfigurationsImpl implements Configurations {
   public List<Element> getAllComponents() {
 
     return XmlUtils.findElements("/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME
-        + "/*", getConfiguration().getDocumentElement());
+        + "/*", getConfigurationDocument().getDocumentElement());
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public Element getProperty(String configuration, String property) {
+
+    // TODO More than one property with same name can exist in different components
+    List<Element> props = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
+        + NAME_ATTRIBUTE_NAME + "='" + configuration + "']" + "/"
+        + COMPONENT_ELEMENT_NAME + "/" + property, getConfigurationDocument()
+        .getDocumentElement());
+    if (props == null || props.size() == 0) {
+
+      return null;
+    }
+
+    return props.get(0);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void saveConfiguration(Element elem) {
+    
+    String path = getConfigurationFilePath();
+    MutableFile file = fileManager.updateFile(path);
+    XmlUtils.writeXml(file.getOutputStream(), elem.getOwnerDocument());
   }
 
   /**
@@ -245,7 +262,7 @@ public class ConfigurationsImpl implements Configurations {
    * 
    * @return Dom document instance of the XML configuration
    */
-  private Document getConfiguration() {
+  private Document getConfigurationDocument() {
 
     Document doc;
     try {
@@ -264,18 +281,6 @@ public class ConfigurationsImpl implements Configurations {
     }
 
     return doc;
-  }
-
-  /**
-   * Save a configuration element on the configuration file.
-   * 
-   * @param conf Configuration element to save
-   */
-  private void saveConfiguration(Element conf) {
-    
-    String path = getConfigurationFilePath();
-    MutableFile file = fileManager.updateFile(path);
-    XmlUtils.writeXml(file.getOutputStream(), conf.getOwnerDocument());
   }
 
   /**

@@ -20,7 +20,9 @@ package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.util.List;
 
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.w3c.dom.Element;
 
 /**
@@ -59,7 +61,35 @@ public interface Configurations {
    * @return Dynamic configuration
    */
   public DynConfiguration parseConfiguration(Element conf, String name);
- 
+
+  /**
+   * Parse a component element to a dynamic component.
+   * <p>
+   * All component properties will be processed if name is null. If name not
+   * null, only specified property name will be processed.
+   * </p>
+   * 
+   * @param comp Component element
+   * @param name Property name to parse or all if null
+   * @return Dynamic configuration
+   */
+  public DynComponent parseComponent(Element comp, String name);
+  
+  /**
+   * Parse a property element to a dynamic property.
+   * 
+   * @param prop Property element
+   * @return Dynamic property
+   */
+  public DynProperty parseProperty(Element prop);
+  
+  /**
+   * Save the document of an element on the configuration file.
+   * 
+   * @param conf Element of the document to save
+   */
+  public void saveConfiguration(Element elem);
+  
   /**
    * Find the first configuration element with given name. 
    * 
@@ -81,5 +111,14 @@ public interface Configurations {
    * @return All configuration elements
    */
   public List<Element> getAllComponents();
-  
+
+  /**
+   * Get a property element from a configuration with some name.
+   * 
+   * @param configuration Configuration name
+   * @param property Property name
+   * @return Dynamic property
+   */
+  public Element getProperty(String configuration, String property);
+
 }

@@ -25,6 +25,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
@@ -160,6 +161,24 @@ public class OperationsImpl implements Operations {
     }
     
     return dynConfs;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public DynProperty updateProperty(String configuration, String property,
+                                    String value) {
+    
+    // Get the required property element to update
+    Element prop = configurations.getProperty(configuration, property);
+    if (prop == null) {
+      return null;
+    }
+    
+    prop.setTextContent(value);
+    configurations.saveConfiguration(prop);
+    
+    return configurations.parseProperty(prop);
   }
 
   /**

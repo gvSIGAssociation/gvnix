@@ -20,6 +20,7 @@ package org.gvnix.dynamic.configuration.roo.addon;
 
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 
 /**
  * Dynamic configuration operations interface.
@@ -77,13 +78,6 @@ public interface Operations {
   public DynConfiguration getConfiguration(String name);
 
   /**
-   * Is project available ?
-   * 
-   * @return Project avaliability
-   */
-  public boolean isProjectAvailable();
-  
-  /**
    * Get the properties stored along configurations with a name.
    * 
    * @param name Property name
@@ -91,4 +85,21 @@ public interface Operations {
    */
   public DynConfigurationList getProperties(String name);
 
+  /**
+   * Set a value on a configuration property.
+   * 
+   * @param configuration Configuration name to update
+   * @param property Property name to update
+   * @param value Value to set
+   * @return Dynamic property updated or null if not exists
+   */
+  public DynProperty updateProperty(String configuration, String property, String value);
+
+  /**
+   * Is project available ?
+   * 
+   * @return Project avaliability
+   */
+  public boolean isProjectAvailable();
+  
 }
