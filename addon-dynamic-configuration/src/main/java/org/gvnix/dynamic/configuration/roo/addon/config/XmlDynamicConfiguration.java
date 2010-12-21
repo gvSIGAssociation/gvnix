@@ -34,6 +34,7 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -62,26 +63,12 @@ public class XmlDynamicConfiguration implements
    * {@inheritDoc}
    */
   public DynPropertyList read() {
-
-    // Get the properties file path from the annotation
+    
     MutableFile file = getXmlFile();
-
+    Document doc = getXmlDocument(file);
+    
     DynPropertyList dynProps = new DynPropertyList();
-    try {
-
-      DocumentBuilder build = XmlUtils.getDocumentBuilder();
-      Document doc = build.parse(fileManager.getInputStream(file
-          .getCanonicalPath()));
-      dynProps.addAll(generateProperties("", doc.getChildNodes()));
-    }
-    catch (SAXException se) {
-
-      throw new IllegalStateException("Cant parse the XML file", se);
-    }
-    catch (IOException ioe) {
-
-      throw new IllegalStateException("Cant read the XML file", ioe);
-    }
+    dynProps.addAll(generateProperties("", doc.getChildNodes()));
 
     return dynProps;
   }
@@ -91,7 +78,65 @@ public class XmlDynamicConfiguration implements
    */
   public void write(DynPropertyList dynProps) {
 
-    // TODO Construct the XML dynamic configuration write method
+    MutableFile file = getXmlFile();
+    Document doc = getXmlDocument(file);
+    Element root = doc.getDocumentElement();
+    for (DynProperty dynProp : dynProps) {
+
+      Element elem = XmlUtils.findFirstElement(dynProp.getKey(), root);
+      elem.setTextContent(dynProp.getValue());
+    }
+
+    XmlUtils.writeXml(file.getOutputStream(), doc);
+  }
+
+  /**
+   * Get the XML mutable file from the annotation.
+   * 
+   * @return XML mutable file
+   */
+  private MutableFile getXmlFile() {
+    
+    DynamicConfiguration annotation = this.getClass().getAnnotation(
+        DynamicConfiguration.class);
+    String path = pathResolver.getIdentifier(
+        new Path(annotation.path().name()), annotation.relativePath());
+
+    if (fileManager.exists(path)) {
+
+      return fileManager.updateFile(path);
+    }
+    else {
+
+      throw new IllegalStateException("XML file not found");
+    }
+  }
+
+  /**
+   * Get a document from a file.
+   * 
+   * @param file Mutable file
+   * @return File document
+   */
+  private Document getXmlDocument(MutableFile file) {
+
+    Document doc = null;
+    try {
+
+      // Get the XML file and parse it to document
+      DocumentBuilder build = XmlUtils.getDocumentBuilder();
+      doc = build.parse(fileManager.getInputStream(file.getCanonicalPath()));
+    }
+    catch (SAXException se) {
+
+      throw new IllegalStateException("Cant parse the XML file", se);
+    }
+    catch (IOException ioe) {
+
+      throw new IllegalStateException("Cant read the XML file", ioe);
+    }
+    
+    return doc;
   }
 
   /**
@@ -116,7 +161,7 @@ public class XmlDynamicConfiguration implements
       String name = node.getNodeName();
       NodeList childs = node.getChildNodes();
       
-      dynProps.addAll(generateProperties(baseName + name, childs));
+      dynProps.addAll(generateProperties(baseName + "/" + name, childs));
       
       if (type == Node.TEXT_NODE && content.trim().length() > 0) {
 
@@ -125,28 +170,6 @@ public class XmlDynamicConfiguration implements
     }
 
     return dynProps;
-  }
-
-  /**
-   * Get the XML mutable file from the annotation.
-   * 
-   * @return XML mutable file
-   */
-  private MutableFile getXmlFile() {
-    
-    DynamicConfiguration annotation = this.getClass().getAnnotation(
-        DynamicConfiguration.class);
-    String path = pathResolver.getIdentifier(
-        new Path(annotation.path().name()), annotation.relativePath());
-
-    if (fileManager.exists(path)) {
-
-      return fileManager.updateFile(path);
-    }
-    else {
-
-      throw new IllegalStateException("XML file not found");
-    }
   }
 
 }

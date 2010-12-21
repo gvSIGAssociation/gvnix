@@ -175,7 +175,7 @@ public class OperationsImpl implements Operations {
       return null;
     }
     
-    prop.setTextContent(value);
+    prop.getChildNodes().item(3).setTextContent(value);
     configurations.saveConfiguration(prop);
     
     return configurations.parseProperty(prop);

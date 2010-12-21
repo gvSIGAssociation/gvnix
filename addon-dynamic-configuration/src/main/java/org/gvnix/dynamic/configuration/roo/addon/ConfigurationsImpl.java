@@ -39,6 +39,9 @@ import org.springframework.roo.support.util.TemplateUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -58,6 +61,9 @@ public class ConfigurationsImpl implements Configurations {
   private static final String DYNAMIC_CONFIGURATION_ELEMENT_NAME = "dynamic-configuration";
   private static final String CONFIGURATION_ELEMENT_NAME = "configuration";
   private static final String COMPONENT_ELEMENT_NAME = "component";
+  private static final String PROPERTY_ELEMENT_NAME = "property";
+  private static final String KEY_ELEMENT_NAME = "key";
+  private static final String VALUE_ELEMENT_NAME = "value";
   private static final String ID_ATTRIBUTE_NAME = "id";
   private static final String NAME_ATTRIBUTE_NAME = "name";
   private static final String CONFIGURATION_XPATH = "/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME + 
@@ -92,9 +98,14 @@ public class ConfigurationsImpl implements Configurations {
       // Iterate all child dynamic properties of the dynamic component
       for (DynProperty dynProp : dynComps.getProperties()) {
 
-        // Add new property element
-        Element prop = doc.createElement(dynProp.getKey());
-        prop.setTextContent(dynProp.getValue());
+        // Add new property element containing key and value elements
+        Element prop = doc.createElement(PROPERTY_ELEMENT_NAME);
+        Element key = doc.createElement(KEY_ELEMENT_NAME);
+        key.setTextContent(dynProp.getKey());
+        prop.appendChild(key);
+        Element value = doc.createElement(VALUE_ELEMENT_NAME);
+        value.setTextContent(dynProp.getValue());
+        prop.appendChild(value);
         comp.appendChild(prop);
       }
     }
@@ -166,7 +177,8 @@ public class ConfigurationsImpl implements Configurations {
       props = XmlUtils.findElements("*", comp);
     }
     else {
-      props = XmlUtils.findElements(name, comp);
+      props = XmlUtils.findElements(PROPERTY_ELEMENT_NAME + "/"
+          + KEY_ELEMENT_NAME + "[text()='" + name + "']/..", comp);
     }
 
     // Iterate all child property elements from the component element
@@ -181,18 +193,22 @@ public class ConfigurationsImpl implements Configurations {
     }
 
     // Add new dynamic component
-    return new DynComponent(comp.getAttributes()
-        .getNamedItem(ID_ATTRIBUTE_NAME).getNodeValue(), comp.getAttributes()
-        .getNamedItem(NAME_ATTRIBUTE_NAME).getNodeValue(), dynProps);
+    NamedNodeMap attributes = comp.getAttributes();
+    return new DynComponent(attributes.getNamedItem(ID_ATTRIBUTE_NAME)
+        .getNodeValue(), attributes.getNamedItem(NAME_ATTRIBUTE_NAME)
+        .getNodeValue(), dynProps);
   }
   
   /**
    * {@inheritDoc}
    */
   public DynProperty parseProperty(Element prop) {
-    
-    // Add new dynamic property
-    return new DynProperty(prop.getTagName(), prop.getTextContent());
+
+    // Create a dynamic property from property element
+    NodeList childs = prop.getChildNodes();
+    Node key = childs.item(1);
+    Node value = childs.item(3);
+    return new DynProperty(key.getTextContent(), value.getTextContent());
   }
   
   /**
@@ -200,15 +216,9 @@ public class ConfigurationsImpl implements Configurations {
    */
   public Element findConfiguration(String name) {
 
-    List<Element> confs = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
+    return XmlUtils.findFirstElement(CONFIGURATION_XPATH + "[@"
         + NAME_ATTRIBUTE_NAME + "='" + name + "']", getConfigurationDocument()
         .getDocumentElement());
-    if (confs == null || confs.size() == 0) {
-
-      return null;
-    }
-
-    return confs.get(0);
   }
   
   /**
@@ -234,17 +244,12 @@ public class ConfigurationsImpl implements Configurations {
    */
   public Element getProperty(String configuration, String property) {
 
-    // TODO More than one property with same name can exist in different components
-    List<Element> props = XmlUtils.findElements(CONFIGURATION_XPATH + "[@"
+    // TODO Several properties with same name can exist in different components
+    return XmlUtils.findFirstElement(CONFIGURATION_XPATH + "[@"
         + NAME_ATTRIBUTE_NAME + "='" + configuration + "']" + "/"
-        + COMPONENT_ELEMENT_NAME + "/" + property, getConfigurationDocument()
-        .getDocumentElement());
-    if (props == null || props.size() == 0) {
-
-      return null;
-    }
-
-    return props.get(0);
+        + COMPONENT_ELEMENT_NAME + "/" + PROPERTY_ELEMENT_NAME + "/"
+        + KEY_ELEMENT_NAME + "[text()='" + property + "']/..",
+        getConfigurationDocument().getDocumentElement());
   }
   
   /**
