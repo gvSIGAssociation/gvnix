@@ -19,7 +19,6 @@
 package org.gvnix.dynamic.configuration.roo.addon.config;
 
 import java.io.IOException;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 
@@ -33,8 +32,10 @@ import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.XmlUtils;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -77,14 +78,45 @@ public class XmlDynamicConfiguration implements
    * {@inheritDoc}
    */
   public void write(DynPropertyList dynProps) {
-
+    
     MutableFile file = getXmlFile();
     Document doc = getXmlDocument(file);
     Element root = doc.getDocumentElement();
     for (DynProperty dynProp : dynProps) {
 
-      Element elem = XmlUtils.findFirstElement(dynProp.getKey(), root);
-      elem.setTextContent(dynProp.getValue());
+      String key = new String (dynProp.getKey());
+      
+      // Remove possible namespaces
+      int end;
+      while ((end = key.indexOf(":")) != -1) {
+        
+        int ini = key.substring(0, end + 1).lastIndexOf("/");
+        int ini2 = key.substring(0, end + 1).lastIndexOf("[@");
+        if (ini > ini2) {
+          String ns = key.substring(ini + 1, end + 1);
+          key = key.replace(ns, "");
+        }
+        else {
+          break;
+        }
+      }
+
+      int index;
+      if ((index = key.indexOf("[@")) != -1) {
+
+        // Set the attribute content
+        Element elem = XmlUtils.findFirstElement(key.substring(0, index), root);
+
+        String attrName = key.substring(index + 2, key.length() - 1);
+        Attr attr = elem.getAttributeNode(attrName);
+        attr.setValue(dynProp.getValue());
+      }
+      else {
+
+        // Set the element content
+        Element elem = XmlUtils.findFirstElement(key, root);
+        elem.setTextContent(dynProp.getValue());
+      }
     }
 
     XmlUtils.writeXml(file.getOutputStream(), doc);
@@ -141,10 +173,12 @@ public class XmlDynamicConfiguration implements
 
   /**
    * Generate a dynamic property list from a list of XML nodes.
+   * <p>
+   * Only TEXT_NODE and ATTRIBUTE_NODE nodes are considered. On ATTRIBUTE_NODE
+   * nodes references neither are considered.
+   * </p>
    * 
-   * TODO Only TEXT_NODE nodes are considered, extend it.
-   * 
-   * @param baseName Parent node name of node list  
+   * @param baseName Parent node name of node list
    * @param nodes XML node list to convert
    * @return Dynamic property list
    */
@@ -161,7 +195,48 @@ public class XmlDynamicConfiguration implements
       String name = node.getNodeName();
       NodeList childs = node.getChildNodes();
       
-      dynProps.addAll(generateProperties(baseName + "/" + name, childs));
+      int pos = 0;
+      int temp = 0;
+      for (int j = 0; j < nodes.getLength(); j++) {
+        
+        if (name.equals(nodes.item(j).getNodeName())) {
+          
+          if (j > i) {
+            
+            pos = temp;
+            break;          
+          }
+          else {
+            temp++;
+          }
+        }
+      }
+      
+      if (temp > 1) {
+        pos = temp;
+      }
+      
+      String xpath;
+      if (pos == 0) {
+        xpath = baseName + "/" + name;
+      }
+      else {
+        xpath = baseName + "/" + name + "[" + pos + "]";
+      }
+      
+      NamedNodeMap attrs = node.getAttributes();
+      if (attrs != null) {
+        for (int j = 0; j < attrs.getLength(); j++) {
+         
+          Node attr = attrs.item(j);
+          String attrName = attr.getNodeName();
+          if (!attrName.equals("ref")) {
+            dynProps.add(new DynProperty(xpath  + "[@" + attrName + "]" , attr.getNodeValue()));
+          }
+        }
+      }
+      
+      dynProps.addAll(generateProperties(xpath, childs));
       
       if (type == Node.TEXT_NODE && content.trim().length() > 0) {
 
