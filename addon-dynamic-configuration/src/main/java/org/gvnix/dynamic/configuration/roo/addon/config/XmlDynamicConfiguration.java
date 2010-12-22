@@ -57,6 +57,13 @@ import org.xml.sax.SAXException;
 public class XmlDynamicConfiguration implements
     DefaultDynamicConfiguration {
   
+  private static final String REF_ATTRIBUTE_NAME = "ref";
+  private static final String XPATH_ELEMENT_SEPARATOR = "/";
+  private static final String XPATH_NAMESPACE_SUFIX = ":";
+  private static final String XPATH_ATTRIBUTE_PREFIX = "@";
+  private static final String XPATH_ARRAY_SUFIX = "]";
+  private static final String XPATH_ARRAY_PREFIX = "[";
+  
   @Reference private PathResolver pathResolver;
   @Reference private FileManager fileManager;
 
@@ -65,11 +72,13 @@ public class XmlDynamicConfiguration implements
    */
   public DynPropertyList read() {
     
+    // Obtain the XML file on DOM document format
     MutableFile file = getXmlFile();
     Document doc = getXmlDocument(file);
     
+    // Create the dynamic properties list from XML document file
     DynPropertyList dynProps = new DynPropertyList();
-    dynProps.addAll(generateProperties("", doc.getChildNodes()));
+    dynProps.addAll(getProperties("", doc.getChildNodes()));
 
     return dynProps;
   }
@@ -78,50 +87,19 @@ public class XmlDynamicConfiguration implements
    * {@inheritDoc}
    */
   public void write(DynPropertyList dynProps) {
-    
+
+    // Obtain the root element of the XML file
     MutableFile file = getXmlFile();
     Document doc = getXmlDocument(file);
     Element root = doc.getDocumentElement();
-    for (DynProperty dynProp : dynProps) {
 
-      String key = new String (dynProp.getKey());
-      
-      // Remove possible namespaces
-      int end;
-      while ((end = key.indexOf(":")) != -1) {
-        
-        int ini = key.substring(0, end + 1).lastIndexOf("/");
-        int ini2 = key.substring(0, end + 1).lastIndexOf("[@");
-        if (ini > ini2) {
-          String ns = key.substring(ini + 1, end + 1);
-          key = key.replace(ns, "");
-        }
-        else {
-          break;
-        }
-      }
+    // Update the root element property values with dynamic properties
+    setProperties(root, dynProps);
 
-      int index;
-      if ((index = key.indexOf("[@")) != -1) {
-
-        // Set the attribute content
-        Element elem = XmlUtils.findFirstElement(key.substring(0, index), root);
-
-        String attrName = key.substring(index + 2, key.length() - 1);
-        Attr attr = elem.getAttributeNode(attrName);
-        attr.setValue(dynProp.getValue());
-      }
-      else {
-
-        // Set the element content
-        Element elem = XmlUtils.findFirstElement(key, root);
-        elem.setTextContent(dynProp.getValue());
-      }
-    }
-
+    // Update the XML file
     XmlUtils.writeXml(file.getOutputStream(), doc);
   }
-
+  
   /**
    * Get the XML mutable file from the annotation.
    * 
@@ -129,11 +107,13 @@ public class XmlDynamicConfiguration implements
    */
   private MutableFile getXmlFile() {
     
+    // Get the file path from the dynamic configuration annotation
     DynamicConfiguration annotation = this.getClass().getAnnotation(
         DynamicConfiguration.class);
     String path = pathResolver.getIdentifier(
         new Path(annotation.path().name()), annotation.relativePath());
 
+    // Check the file or illegal state if not
     if (fileManager.exists(path)) {
 
       return fileManager.updateFile(path);
@@ -182,69 +162,184 @@ public class XmlDynamicConfiguration implements
    * @param nodes XML node list to convert
    * @return Dynamic property list
    */
-  private DynPropertyList generateProperties(String baseName, NodeList nodes) {
+  private DynPropertyList getProperties(String baseName, NodeList nodes) {
 
     DynPropertyList dynProps = new DynPropertyList();
 
+    // Iterate all nodes on list
     for (int i = 0; i < nodes.getLength(); i++) {
 
       Node node = nodes.item(i);
+      
+      // Generate the xpath expression that points to property
+      String xpath = getPropertyXpath(baseName, nodes, i);
+      
+      // Add dynamic properties related to node attributes
+      dynProps.addAll(getPropertyAttributes(node, xpath));
+      
+      // Add dynamic properties related to their childs nodes and attributes 
+      dynProps.addAll(getProperties(xpath, node.getChildNodes()));
 
-      short type = node.getNodeType();
+      // Add dynamic property related to this node
       String content = node.getTextContent();
-      String name = node.getNodeName();
-      NodeList childs = node.getChildNodes();
-      
-      int pos = 0;
-      int temp = 0;
-      for (int j = 0; j < nodes.getLength(); j++) {
-        
-        if (name.equals(nodes.item(j).getNodeName())) {
-          
-          if (j > i) {
-            
-            pos = temp;
-            break;          
-          }
-          else {
-            temp++;
-          }
-        }
-      }
-      
-      if (temp > 1) {
-        pos = temp;
-      }
-      
-      String xpath;
-      if (pos == 0) {
-        xpath = baseName + "/" + name;
-      }
-      else {
-        xpath = baseName + "/" + name + "[" + pos + "]";
-      }
-      
-      NamedNodeMap attrs = node.getAttributes();
-      if (attrs != null) {
-        for (int j = 0; j < attrs.getLength(); j++) {
-         
-          Node attr = attrs.item(j);
-          String attrName = attr.getNodeName();
-          if (!attrName.equals("ref")) {
-            dynProps.add(new DynProperty(xpath  + "[@" + attrName + "]" , attr.getNodeValue()));
-          }
-        }
-      }
-      
-      dynProps.addAll(generateProperties(xpath, childs));
-      
-      if (type == Node.TEXT_NODE && content.trim().length() > 0) {
+      if (node.getNodeType() == Node.TEXT_NODE && content.trim().length() > 0) {
 
         dynProps.add(new DynProperty(baseName, content));
       }
     }
 
     return dynProps;
+  }
+
+  /**
+   * Create the dynamic properties related to this node attributes.
+   * 
+   * @param node Node to add to list
+   * @param xpath Xpath expression of this node
+   * @return Dynamic property list
+   */
+  private DynPropertyList getPropertyAttributes(Node node, String xpath) {
+    
+    DynPropertyList dynProps = new DynPropertyList();
+    
+    // Iterate all node attributes
+    NamedNodeMap attrs = node.getAttributes();
+    if (attrs != null) {
+      for (int j = 0; j < attrs.getLength(); j++) {
+       
+        // Get attribute and it name
+        Node attr = attrs.item(j);
+        String attrName = attr.getNodeName();
+        
+        // Create dynamic property, except attribute references
+        if (!attrName.equals(REF_ATTRIBUTE_NAME)) {
+          dynProps.add(new DynProperty(xpath + XPATH_ARRAY_PREFIX
+              + XPATH_ATTRIBUTE_PREFIX + attrName + XPATH_ARRAY_SUFIX, attr
+              .getNodeValue()));
+        }
+      }
+    }
+    
+    return dynProps;
+  }
+
+  /**
+   * Generate the xpath expression that points to property.
+   * <p>
+   * The xpath expression could be an array or not.
+   * </p>
+   * 
+   * @param baseName Base name of current node
+   * @param nodes List of brother nodes
+   * @param i Index of current node
+   * @return Xpath expression
+   */
+  private String getPropertyXpath(String baseName, NodeList nodes, int i) {
+
+    // Get current node name
+    String name = nodes.item(i).getNodeName();
+    
+    // Iterate brother nodes searching other nodes with same name
+    int index = 0;
+    int temp = 0;
+    for (int j = 0; j < nodes.getLength(); j++) {
+      
+      // If exists a brother node with same name
+      if (name.equals(nodes.item(j).getNodeName())) {
+        
+        // Calculate this node index related to brother nodes with same name
+        if (j > i) {
+          
+          index = temp;
+          break;          
+        }
+        else {
+          temp++;
+        }
+      }
+    }
+    
+    // If temp greater than 1, this node is part of an array on index position
+    if (temp > 1) {
+      index = temp;
+    }
+    
+    if (index == 0) {
+      
+      // Xpath expression of an element
+      return baseName + XPATH_ELEMENT_SEPARATOR + name;
+    }
+    else {
+      
+      // Xpath expression of an element array
+      return baseName + XPATH_ELEMENT_SEPARATOR + name + XPATH_ARRAY_PREFIX
+          + index  + XPATH_ARRAY_SUFIX;
+    }
+  }
+
+  /**
+   * Remove possible namespaces from a xpath expression.
+   * 
+   * @param xpath Xpath expressión with optional namespaces
+   * @return Xpath expresion without namespaces, if exists
+   */
+  private String removeNamespaces(String xpath) {
+    
+    // Find all namespace separators sufix
+    int end;
+    while ((end = xpath.indexOf(XPATH_NAMESPACE_SUFIX)) != -1) {
+      
+      // Namespace starts on element separator if attribute prefix not before
+      String substr = xpath.substring(0, end + 1);
+      int ini = substr.lastIndexOf(XPATH_ELEMENT_SEPARATOR);
+      int ini2 = substr.lastIndexOf(XPATH_ATTRIBUTE_PREFIX);
+      if (ini > ini2) {
+        
+        // Remove namespace substring from xpath
+        xpath = xpath.replace(xpath.substring(ini + 1, end + 1), "");
+      }
+      else {
+        
+        // If attribute prefix before, is an attribute not a namespace
+        break;
+      }
+    }
+    
+    return xpath;
+  }
+
+  /**
+   * Update the root element property values with dynamic properties.
+   * 
+   * @param root Parent element
+   * @param dynProps Dynamic property list
+   */
+  private void setProperties(Element root, DynPropertyList dynProps) {
+    
+    // Iterate all dynamic properties to update 
+    for (DynProperty dynProp : dynProps) {
+
+      // Remove possible namespaces
+      String xpath = removeNamespaces(dynProp.getKey());
+      
+      // If attribute prefix present, there is an attribute else an element
+      int index;
+      if ((index = xpath.indexOf(XPATH_ARRAY_PREFIX + XPATH_ATTRIBUTE_PREFIX)) != -1) {
+
+        // Set the new attribute value through container element
+        Element elem = XmlUtils.findFirstElement(xpath.substring(0, index),
+            root);
+        String name = xpath.substring(index + 2, xpath.length() - 1);
+        Attr attr = elem.getAttributeNode(name);
+        attr.setValue(dynProp.getValue());
+      }
+      else {
+
+        // Set the new element content
+        Element elem = XmlUtils.findFirstElement(xpath, root);
+        elem.setTextContent(dynProp.getValue());
+      }
+    }
   }
 
 }
