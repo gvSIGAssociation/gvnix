@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.osgi.service.component.ComponentContext;
@@ -30,14 +31,19 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.DefaultAnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.support.util.Assert;
 
 /**
  * Abstract dynamic configuration of Java class annotation attributes.
@@ -45,6 +51,9 @@ import org.springframework.roo.project.Path;
  * This component manage the annotation attribute values of certain Java classes
  * with some annotation.
  * </p>
+ * 
+ * TODO Annotations can appear multiple times
+ * TODO Look at String attributes only
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -55,12 +64,13 @@ import org.springframework.roo.project.Path;
 public abstract class AnnotationDynamicConfiguration extends
     AbstractItdMetadataProvider {
 
-  private static final String ANNOTATION_TYPE_STRING = AnnotationDynamicConfiguration.class
+  private static final String TYPE_ID = AnnotationDynamicConfiguration.class
       .getName();
-  private static final String ANNOTATION_TYPE = MetadataIdentificationUtils
-      .create(ANNOTATION_TYPE_STRING);
+
+  private List<PhysicalTypeMetadata> types = new ArrayList<PhysicalTypeMetadata>();
   
-  private List<PhysicalTypeMetadata> typesMetadata = new ArrayList<PhysicalTypeMetadata>();
+  @Reference
+  private ClasspathOperations classpathOperations;
   
   /**
    * Get the java type related to the annotation to include as dynamic configuration.
@@ -86,20 +96,24 @@ public abstract class AnnotationDynamicConfiguration extends
    */
   public DynPropertyList read() {
 
+    // List to include the dynamic property list from types
     DynPropertyList dynProps = new DynPropertyList();
-    for (PhysicalTypeMetadata typeMetadata : typesMetadata) {
+    for (PhysicalTypeMetadata type : types) {
 
-      AnnotationMetadata annotation = MemberFindingUtils
-          .getTypeAnnotation(((ClassOrInterfaceTypeDetails) typeMetadata
-              .getPhysicalTypeDetails()), getAnnotationJavaType());
-      List<JavaSymbolName> attrs = annotation.getAttributeNames();
+      // Get the annotation attributes from type
+      AnnotationMetadata annot = MemberFindingUtils.getTypeAnnotation(
+          ((ClassOrInterfaceTypeDetails) type.getPhysicalTypeDetails()),
+          getAnnotationJavaType());
+      List<JavaSymbolName> attrs = annot.getAttributeNames();
 
+      // Iterate all attributes to create their dynamic configuration
       for (JavaSymbolName attr : attrs) {
-        StringAttributeValue value = (StringAttributeValue) annotation
+
+        // Dynamic property with attribute name and value
+        StringAttributeValue value = (StringAttributeValue) annot
             .getAttribute(new JavaSymbolName(attr.getSymbolName()));
-        dynProps.add(new DynProperty(typeMetadata
-            .getPhysicalLocationCanonicalPath()
-            + "/" + attr.getSymbolName(), value.getValue()));
+        dynProps.add(new DynProperty(type.getPhysicalTypeDetails().getName()
+            + "/" + annot.getAnnotationType() + "/" + attr.getSymbolName(), value.getValue()));
       }
     }
 
@@ -111,18 +125,62 @@ public abstract class AnnotationDynamicConfiguration extends
    */
   public void write(DynPropertyList dynProps) {
 
+    // Iterate all dynamic properties to update java annotation attributes
+    for (DynProperty dynProp : dynProps) {
+
+      // Dynamic property reference key
+      String key = dynProp.getKey();
+
+      // Obtain the java class from key
+      int javaEnd = key.indexOf("/");
+      String javaName = key.substring(0, javaEnd);
+      JavaType javaType = new JavaType(javaName);
+      ClassOrInterfaceTypeDetails javaClass = classpathOperations
+          .getClassOrInterface(javaType);
+
+      // Check and get mutable instance
+      Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, javaClass,
+          "Can't modify " + javaClass.getName());
+      MutableClassOrInterfaceTypeDetails mutableClass = (MutableClassOrInterfaceTypeDetails) javaClass;
+
+      // Iterate all java class annotations 
+      for (AnnotationMetadata annot : mutableClass.getTypeAnnotations()) {
+
+        // If any java class annotation type equals to this class type
+        if (annot.getAnnotationType().equals(getAnnotationJavaType())) {
+
+          // Drop current annotation
+          mutableClass.removeTypeAnnotation(annot.getAnnotationType());
+
+          // Get annotation and attribute name
+          int annotEnd = key.indexOf("/", javaEnd + 1);
+          String annotName = key.substring(javaEnd + 1, annotEnd);
+          String attrName = key.substring(annotEnd + 1, key.length());
+
+          // Add the same annotation with new attribute value
+          List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+          attrs.add(new StringAttributeValue(new JavaSymbolName(attrName),
+              dynProp.getValue()));
+          AnnotationMetadata newAnnot = new DefaultAnnotationMetadata(
+              new JavaType(annotName), attrs);
+          mutableClass.addTypeAnnotation(newAnnot);
+
+          break;
+        }
+      }
+    }
   }
 
   /**
    * {@inheritDoc}
    */
   protected ItdTypeDetailsProvidingMetadataItem getMetadata(
-                                                            String metadataIdentificationString,
-                                                            JavaType aspectName,
-                                                            PhysicalTypeMetadata governorPhysicalTypeMetadata,
-                                                            String itdFilename) {
+                                                            String metadataId,
+                                                            JavaType type,
+                                                            PhysicalTypeMetadata metadata,
+                                                            String file) {
 
-    addTypeMetadata(governorPhysicalTypeMetadata);
+    addTypeMetadata(metadata);
     return null;
   }
 
@@ -131,33 +189,32 @@ public abstract class AnnotationDynamicConfiguration extends
    * 
    * @param Metadata type to register
    */
-  private void addTypeMetadata(PhysicalTypeMetadata typeMetadata) {
+  private void addTypeMetadata(PhysicalTypeMetadata type) {
     
-    if (!this.typesMetadata.contains(typeMetadata)) {
-      this.typesMetadata.add(typeMetadata);
+    if (!this.types.contains(type)) {
+      this.types.add(type);
     }
   }
   
   /**
    * {@inheritDoc}
    */
-  protected String createLocalIdentifier(JavaType javaType, Path path) {
+  protected String createLocalIdentifier(JavaType type, Path path) {
 
-    return PhysicalTypeIdentifierNamingUtils.createIdentifier(
-        ANNOTATION_TYPE_STRING, javaType, path);
+    return PhysicalTypeIdentifierNamingUtils.createIdentifier(TYPE_ID, type,
+        path);
   }
 
   /**
    * {@inheritDoc}
    */
-  protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
+  protected String getGovernorPhysicalTypeIdentifier(String metadataId) {
 
-    JavaType javaType = PhysicalTypeIdentifierNamingUtils.getJavaType(
-        ANNOTATION_TYPE_STRING, metadataIdentificationString);
-    Path path = PhysicalTypeIdentifierNamingUtils.getPath(ANNOTATION_TYPE_STRING,
-        metadataIdentificationString);
+    JavaType type = PhysicalTypeIdentifierNamingUtils.getJavaType(TYPE_ID,
+        metadataId);
+    Path path = PhysicalTypeIdentifierNamingUtils.getPath(TYPE_ID, metadataId);
     String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(
-        javaType, path);
+        type, path);
 
     return physicalTypeIdentifier;
   }
@@ -167,7 +224,7 @@ public abstract class AnnotationDynamicConfiguration extends
    */
   public String getItdUniquenessFilenameSuffix() {
 
-    return ANNOTATION_TYPE_STRING;
+    return TYPE_ID;
   }
 
   /**
@@ -175,7 +232,7 @@ public abstract class AnnotationDynamicConfiguration extends
    */
   public String getProvidesType() {
 
-    return ANNOTATION_TYPE;
+    return MetadataIdentificationUtils.create(TYPE_ID);
   }
 
 }

@@ -41,6 +41,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
 /**
  * Manage components of dynamic configurations.
  * 
+ * TODO What happens if a managed file already not exists on read or write ?
+ * TODO What happens if file properties has been changed on write ?
+ * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
