@@ -31,7 +31,24 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-@DynamicConfiguration(relativePath="pom.xml")
-public class PomDynamicConfiguration extends XmlDynamicConfiguration {
+public class PomDynamicConfiguration extends XmlDynamicConfiguration implements
+    DefaultDynamicConfiguration {
 
+  /**
+   * {@inheritDoc}
+   */
+  public String getName() {
+    
+    return "Project Object Model XML";
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getFilePath() {
+
+    return "pom.xml";
+  }
+  
 }

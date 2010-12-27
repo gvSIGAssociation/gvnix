@@ -23,14 +23,9 @@ import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
-import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -41,10 +36,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * Dynamic configuration base manager of XML files.
+ * Abstract dynamic configuration component of XML files.
  * <p>
- * Extends this class adding the @DynComponent annotation to manage new xml file
- * values.
+ * Extends this class to manage new XML file values.
  * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
@@ -52,10 +46,8 @@ import org.xml.sax.SAXException;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component
-@Service
-public class XmlDynamicConfiguration implements
-    DefaultDynamicConfiguration {
+@Component(componentAbstract = true)
+public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
   
   private static final String REF_ATTRIBUTE_NAME = "ref";
   private static final String XPATH_ELEMENT_SEPARATOR = "/";
@@ -63,9 +55,6 @@ public class XmlDynamicConfiguration implements
   private static final String XPATH_ATTRIBUTE_PREFIX = "@";
   private static final String XPATH_ARRAY_SUFIX = "]";
   private static final String XPATH_ARRAY_PREFIX = "[";
-  
-  @Reference private PathResolver pathResolver;
-  @Reference private FileManager fileManager;
 
   /**
    * {@inheritDoc}
@@ -73,7 +62,7 @@ public class XmlDynamicConfiguration implements
   public DynPropertyList read() {
     
     // Obtain the XML file on DOM document format
-    MutableFile file = getXmlFile();
+    MutableFile file = getFile();
     Document doc = getXmlDocument(file);
     
     // Create the dynamic properties list from XML document file
@@ -89,7 +78,7 @@ public class XmlDynamicConfiguration implements
   public void write(DynPropertyList dynProps) {
 
     // Obtain the root element of the XML file
-    MutableFile file = getXmlFile();
+    MutableFile file = getFile();
     Document doc = getXmlDocument(file);
     Element root = doc.getDocumentElement();
 
@@ -98,30 +87,6 @@ public class XmlDynamicConfiguration implements
 
     // Update the XML file
     XmlUtils.writeXml(file.getOutputStream(), doc);
-  }
-  
-  /**
-   * Get the XML mutable file from the annotation.
-   * 
-   * @return XML mutable file
-   */
-  private MutableFile getXmlFile() {
-    
-    // Get the file path from the dynamic configuration annotation
-    DynamicConfiguration annotation = this.getClass().getAnnotation(
-        DynamicConfiguration.class);
-    String path = pathResolver.getIdentifier(
-        new Path(annotation.path().name()), annotation.relativePath());
-
-    // Check the file or illegal state if not
-    if (fileManager.exists(path)) {
-
-      return fileManager.updateFile(path);
-    }
-    else {
-
-      throw new IllegalStateException("XML file not found");
-    }
   }
 
   /**

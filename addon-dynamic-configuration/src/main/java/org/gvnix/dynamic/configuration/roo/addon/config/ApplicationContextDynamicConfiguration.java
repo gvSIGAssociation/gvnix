@@ -31,7 +31,24 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-@DynamicConfiguration(relativePath="src/main/resources/META-INF/spring/applicationContext.xml")
-public class ApplicationContextDynamicConfiguration extends XmlDynamicConfiguration {
+public class ApplicationContextDynamicConfiguration extends
+    XmlDynamicConfiguration implements DefaultDynamicConfiguration {
+
+  /**
+   * {@inheritDoc}
+   */
+  public String getName() {
+    
+    return "Spring Application Context XML";
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getFilePath() {
+
+    return "src/main/resources/META-INF/spring/applicationContext.xml";
+  }
 
 }

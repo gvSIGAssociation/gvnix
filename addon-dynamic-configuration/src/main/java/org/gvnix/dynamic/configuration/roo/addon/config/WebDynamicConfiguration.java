@@ -31,7 +31,24 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-@DynamicConfiguration(relativePath="src/main/webapp/WEB-INF/web.xml")
-public class WebDynamicConfiguration extends XmlDynamicConfiguration {
+public class WebDynamicConfiguration extends XmlDynamicConfiguration implements
+    DefaultDynamicConfiguration {
 
+  /**
+   * {@inheritDoc}
+   */
+  public String getName() {
+    
+    return "Web Application Descriptor XML";
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getFilePath() {
+
+    return "src/main/webapp/WEB-INF/web.xml";
+  }
+  
 }

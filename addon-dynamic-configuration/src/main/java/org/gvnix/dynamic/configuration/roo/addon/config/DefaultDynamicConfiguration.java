@@ -42,5 +42,12 @@ public interface DefaultDynamicConfiguration {
    * @param file Info to be stored on the original file.
    */
   void write(DynPropertyList dynProperties);
+  
+  /**
+   * Get the dynamic configuration component name.
+   * 
+   * @return Dynamic configuration component name
+   */
+  String getName();
 
 }

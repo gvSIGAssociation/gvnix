@@ -22,10 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
-import org.gvnix.dynamic.configuration.roo.addon.metadata.GvNIXWebServiceKk;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
@@ -42,18 +40,20 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 
 /**
- * Dynamic configuration of {@link GvNIXWebServiceKk} Java annotation.
+ * Abstract dynamic configuration of Java class annotation attributes.
+ * <p>
+ * This component manage the annotation attribute values of certain Java classes
+ * with some annotation.
+ * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component
-@Service
-@DynamicConfiguration(relativePath="kklavaca")
-public class AnnotationDynamicConfiguration extends AbstractItdMetadataProvider
-    implements DefaultDynamicConfiguration {
+@Component(componentAbstract = true)
+public abstract class AnnotationDynamicConfiguration extends
+    AbstractItdMetadataProvider {
 
   private static final String ANNOTATION_TYPE_STRING = AnnotationDynamicConfiguration.class
       .getName();
@@ -61,9 +61,16 @@ public class AnnotationDynamicConfiguration extends AbstractItdMetadataProvider
       .create(ANNOTATION_TYPE_STRING);
   
   private List<PhysicalTypeMetadata> typesMetadata = new ArrayList<PhysicalTypeMetadata>();
+  
+  /**
+   * Get the java type related to the annotation to include as dynamic configuration.
+   * 
+   * @return Annotation java type
+   */
+  protected abstract JavaType getAnnotationJavaType();
 
   /**
-   * Add trigger for classes with GvNIXWebServiceKk annotation.
+   * Add trigger for classes with some annotation.
    * 
    * @param context OSGi context
    */
@@ -71,7 +78,7 @@ public class AnnotationDynamicConfiguration extends AbstractItdMetadataProvider
 
     metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
         .getMetadataIdentiferType(), getProvidesType());
-    addMetadataTrigger(new JavaType(GvNIXWebServiceKk.class.getName()));
+    addMetadataTrigger(getAnnotationJavaType());
   }
 
   /**
@@ -84,8 +91,7 @@ public class AnnotationDynamicConfiguration extends AbstractItdMetadataProvider
 
       AnnotationMetadata annotation = MemberFindingUtils
           .getTypeAnnotation(((ClassOrInterfaceTypeDetails) typeMetadata
-              .getPhysicalTypeDetails()), new JavaType(GvNIXWebServiceKk.class
-              .getName()));
+              .getPhysicalTypeDetails()), getAnnotationJavaType());
       List<JavaSymbolName> attrs = annotation.getAttributeNames();
 
       for (JavaSymbolName attr : attrs) {
@@ -121,7 +127,7 @@ public class AnnotationDynamicConfiguration extends AbstractItdMetadataProvider
   }
 
   /**
-   * Registers classes with {@link GvNIXWebServiceKk} annotation.
+   * Registers classes with some annotation.
    * 
    * @param Metadata type to register
    */
@@ -161,7 +167,7 @@ public class AnnotationDynamicConfiguration extends AbstractItdMetadataProvider
    */
   public String getItdUniquenessFilenameSuffix() {
 
-    return "GvNix_Annotation";
+    return ANNOTATION_TYPE_STRING;
   }
 
   /**

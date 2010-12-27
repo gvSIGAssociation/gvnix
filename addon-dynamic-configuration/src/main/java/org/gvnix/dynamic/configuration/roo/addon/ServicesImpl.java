@@ -32,7 +32,6 @@ import org.apache.felix.scr.annotations.ReferencePolicy;
 import org.apache.felix.scr.annotations.ReferenceStrategy;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.config.DefaultDynamicConfiguration;
-import org.gvnix.dynamic.configuration.roo.addon.config.DynamicConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
@@ -65,7 +64,7 @@ public class ServicesImpl implements Services {
    * 
    * @return Dynamic configuration components
    */
-  private Set<Object> getComponents() {
+  private Set<DefaultDynamicConfiguration> getComponents() {
     
     return getSet("components");
   }
@@ -102,23 +101,16 @@ public class ServicesImpl implements Services {
     dynConf.setActive(Boolean.TRUE);
     
     // Iterate all dynamic configurations components registered
-    for (Object o : getComponents()) {
+    for (DefaultDynamicConfiguration o : getComponents()) {
       try {
         
-        // If component has not DynamicConfiguration annotation, ignore it
-        Class<? extends Object> c = o.getClass();
-        DynamicConfiguration a = c.getAnnotation(DynamicConfiguration.class);
-        if (a == null) {
-
-          continue;
-        }
-        
         // Invoke the read method of all components to get its properties
+        Class<? extends Object> c = o.getClass();
         Method m = (Method) c.getMethod("read", new Class[0]);
         DynPropertyList dynProps = (DynPropertyList) m.invoke(o, new Object[0]);
 
         // Create a dynamic configuration object with component and properties
-        DynComponent dynComp = new DynComponent(c.getName(), a.name(), dynProps);
+        DynComponent dynComp = new DynComponent(c.getName(), o.getName(), dynProps);
         dynConf.addComponent(dynComp);
       }
       catch (NoSuchMethodException nsme) {
@@ -151,15 +143,8 @@ public class ServicesImpl implements Services {
     for (Object o : getComponents()) {
       try {
         
-        // If component has not DynamicConfiguration annotation, ignore it
-        Class<? extends Object> c = o.getClass();
-        DynamicConfiguration a = c.getAnnotation(DynamicConfiguration.class);
-        if (a == null) {
-
-          continue;
-        }
-        
         // Invoke the read method of all components to get its properties
+        Class<? extends Object> c = o.getClass();
         for (DynComponent dynComp : dynConf.getComponents()) {
 
           if (c.getName().equals(dynComp.getId())) {

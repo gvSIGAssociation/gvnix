@@ -20,7 +20,6 @@ package org.gvnix.dynamic.configuration.roo.addon.config;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.dynamic.configuration.roo.addon.entity.ProjectPath;
 
 /**
  * Dynamic configuration manager of jdbc database properties.
@@ -32,7 +31,24 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.ProjectPath;
  */
 @Component
 @Service
-@DynamicConfiguration(path=ProjectPath.SPRING_CONFIG_ROOT, relativePath="database.properties")
-public class DatabaseDynamicConfiguration extends PropertiesDynamicConfiguration {
+public class DatabaseDynamicConfiguration extends
+    PropertiesDynamicConfiguration implements DefaultDynamicConfiguration {
+
+  /**
+   * {@inheritDoc}
+   */
+  public String getName() {
+    
+    return "Database Conection Properties";
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getFilePath() {
+
+    return "src/main/resources/META-INF/spring/database.properties";
+  }
 
 }

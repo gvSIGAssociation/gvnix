@@ -31,7 +31,24 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-@DynamicConfiguration(relativePath="src/main/resources/META-INF/persistence.xml")
-public class PersistenceDynamicConfiguration extends XmlDynamicConfiguration {
+public class PersistenceDynamicConfiguration extends XmlDynamicConfiguration
+    implements DefaultDynamicConfiguration {
 
+  /**
+   * {@inheritDoc}
+   */
+  public String getName() {
+    
+    return "Persistence XML";
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getFilePath() {
+
+    return "src/main/resources/META-INF/persistence.xml";
+  }
+  
 }

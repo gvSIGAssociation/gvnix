@@ -18,31 +18,38 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon.config;
 
-import java.lang.annotation.*;
-
-import org.gvnix.dynamic.configuration.roo.addon.entity.ProjectPath;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Service;
+import org.springframework.roo.model.JavaType;
 
 /**
- * Annotation to mark a class as the manager of a configuration file with dynamic property values.
- * 
- * <p>
- * This annotation can be used in all types of configuration files.
- * Some interfaces exists to easy 
- * </p>
+ * Dynamic configuration manager of GvNIXWebServiceProxy annotation attributes.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface DynamicConfiguration {
-
-    ProjectPath path() default ProjectPath.ROOT;
+@Component
+@Service
+public class GvNIXWebServiceProxyDynamicConfiguration extends
+    AnnotationDynamicConfiguration implements DefaultDynamicConfiguration {
+  
+  /**
+   * {@inheritDoc}
+   */
+  public String getName() {
     
-    String relativePath();
+    return "gvNIX Web Service Proxy Annotations";
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected JavaType getAnnotationJavaType() {
     
-    String name() default "";
+    return new JavaType("org.gvnix.service.layer.roo.addon.annotations.GvNIXWebServiceProxy");
+  }
 
 }

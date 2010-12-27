@@ -23,20 +23,14 @@ import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
-import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
 
 /**
- * Dynamic configuration base manager of property files.
+ * Abstract dynamic configuration component of property files.
  * <p>
- * Extends this class adding the @DynComponent annotation to manage new
- * properties file values.
+ * Extends this class to manage new properties file values.
  * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
@@ -44,21 +38,16 @@ import org.springframework.roo.project.PathResolver;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-@Component
-@Service
-public class PropertiesDynamicConfiguration implements
-    DefaultDynamicConfiguration {
+@Component(componentAbstract = true)
+public abstract class PropertiesDynamicConfiguration extends FileDynamicConfiguration {
   
-  @Reference private PathResolver pathResolver;
-  @Reference private FileManager fileManager;
-
   /**
    * {@inheritDoc}
    */
   public DynPropertyList read() {
 
-    // Get the properties file path from the annotation
-    MutableFile file = getPropertiesFile();
+    // Get the properties file path
+    MutableFile file = getFile();
 
     DynPropertyList dynProps = new DynPropertyList();
 
@@ -93,35 +82,13 @@ public class PropertiesDynamicConfiguration implements
         props.put(dynProp.getKey(), dynProp.getValue());
       }
 
-      // Get the properties file path from the annotation
-      MutableFile file = getPropertiesFile();
+      // Get the properties file path
+      MutableFile file = getFile();
       props.store(file.getOutputStream(), null);
     }
     catch (IOException ioe) {
 
       throw new IllegalStateException(ioe);
-    }
-  }
-
-  /**
-   * Get the properties mutable file from the annotation.
-   * 
-   * @return Properties mutable file
-   */
-  private MutableFile getPropertiesFile() {
-    
-    DynamicConfiguration annotation = this.getClass().getAnnotation(
-        DynamicConfiguration.class);
-    String path = pathResolver.getIdentifier(
-        new Path(annotation.path().name()), annotation.relativePath());
-
-    if (fileManager.exists(path)) {
-
-      return fileManager.updateFile(path);
-    }
-    else {
-
-      throw new IllegalStateException("Properties file not found");
     }
   }
 
