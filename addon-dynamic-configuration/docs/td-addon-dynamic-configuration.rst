@@ -104,7 +104,7 @@ This option is interesting because Maven is the build tool used by default on ge
 TODO
 ````
 
-* Which directories add on resources to do the filtering of the properties defined in the profile ?
+* Which directories to add on resources to do the filtering of the properties defined in the profile ?
 * A resources section can be defined on a profile section ?
 * Use activation to set the active profile ?
 * If active profile setted, ¿ what hapens if other profile is selected from maven command (-p pre) ? 
@@ -174,14 +174,6 @@ Example:
   
   * To invoke some ``java.lang.reflect.Method``, use reflection with ``invoke`` method
 
-TODO
-````
-
-* A very interesting improvement could be allow the generation of Ant and Maven Profiles on their configuration files (build.xml ant pom.xml respectively) and replace on profile files values with variables.
-  Thus on generated project the profile can be selected too.
-
-* By default, create a default or current profile with the currently existing values on the project files ?  
-
 Conclusion
 ----------
 
@@ -219,9 +211,11 @@ Possible files to include on future version
 * Properties
 
   * src/main/resources/log4j.properties
+  * src/main/resources/META-INF/spring/database.properties
 
 * Java
 
+  * Java annotation attributes
   * Java properties
 
 * Xml
@@ -235,12 +229,6 @@ Possible files to include on future version
   * src/main/webapp/WEB-INF/spring/webmvc-config.xml
 
 This is a non extensive list, it could not have all interesting files.
-
-TODO
-----
-
-* ¿ Include java, resources and/or webapp locations on profiles ?
-* ¿ Include main and/or test locations on profiles ?
 
 Metadata
 ========
@@ -264,38 +252,28 @@ OSGi component
 
 Example::
 
-  @DynamicConfiguration(file=".../database.properties")
-  class DatabaseDynamicConfiguration implements DynamicConfiguration {
+  class DatabaseDynamicConfiguration implements DefaultDynamicConfiguration {
 
-    void write(SomeFileFormat file) {
+    DynPropertyList read() {
     
-      // Update database.properties with values stored on the file in given format 
+      // Reads database.properties values and generates an object with given format
     }
-
-    SomeFileFormat read() {
     
-      // Reads database.properties values and generates a file with given format
+    void write(DynPropertyList dynProps) {
+    
+      // Update database.properties with values stored on the object in given format 
     }
   }
 
-TODO
-----
+Abstract components
+-------------------
 
-* Provide some utils to read/write SomeFileFormat and read/write Properties ?
-* If some profile file updated, some monitor is triggered that overwrite changes ?
-* Two addons can manage the same profile file ? 
-* What happens when a profile monitored file is deleted, renamed or moved ?
+There are some OSGi abstract components that can be extended to easy components creation:
 
-Environments
-============
-
-By default, could have some default environments:
-
-* dev: Development
-* pre: Pre-production
-* pro: Production
-
-The default can be the development environment.
+* AnnotationDynamicConfiguration: Provides management of some annotation attributes
+* PropertiesDynamicConfiguration: Provides management of some properties file
+* XmlDynamicConfiguration: Provides management of some XML file
+* FileDynamicConfiguration: Provides access to some file
 
 Commands
 ========
@@ -406,13 +384,6 @@ Description:               Changes a particular properties file property
    Default if specified:   '__NULL__'
    Default if unspecified: '__NULL__'
 
-TODO
-````
-
-* ``Modified`` profile always reads from read method of related OSGi component. 
-* If one profile is active and something is modified on disk, which profile becomes active ?
-* If two profiles has same values, then this profiles will be the ``Active`` profile at same time. 
-
 Future versions commands proposal
 ---------------------------------
   
@@ -431,11 +402,10 @@ Future versions commands proposal
 TODO
 ====
 
-* Analyze Apache Config to load diferent file formats on a same Java configuration object.
-* Generate war package with profile name sufix to distinguish it from different profile wars of same project.
-* Search Roo information about profiles on forum, documentation, etc.
-  If any information exists, to create an entry on Roo forum to comment about the proposal. 
-* What happens if one property exists on a profile and non in others ?
+* Add command to export dynamic configurations to maven or ant system, Its will allow manage dynamic configurations without Roo console.
+  A very interesting improvement could be allow the generation of Ant and Maven Profiles on their configuration files (build.xml ant pom.xml respectively) and replace on profile files values with variables.
+  Thus on generated project the profile can be selected too.
+* Add component to manage dynamic configuration on java properties
 * Some files profile configuration can be standar to every projects, like log4j.properties.
   There is a standard file configuration to production environments.
   For example, log4j.properties on production environmente removes the code line of loggin messages by performance.

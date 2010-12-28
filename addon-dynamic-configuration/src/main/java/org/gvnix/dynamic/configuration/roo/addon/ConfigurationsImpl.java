@@ -244,7 +244,7 @@ public class ConfigurationsImpl implements Configurations {
    */
   public Element getProperty(String configuration, String property) {
 
-    // TODO Several properties with same name can exist in different components
+    // TODO Several properties with same name can exist at different components
     return XmlUtils.findFirstElement(CONFIGURATION_XPATH + "[@"
         + NAME_ATTRIBUTE_NAME + "='" + configuration + "']" + "/"
         + COMPONENT_ELEMENT_NAME + "/" + PROPERTY_ELEMENT_NAME + "/"

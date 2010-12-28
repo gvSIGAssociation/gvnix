@@ -119,8 +119,8 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
   /**
    * Generate a dynamic property list from a list of XML nodes.
    * <p>
-   * Only TEXT_NODE and ATTRIBUTE_NODE nodes are considered. On ATTRIBUTE_NODE
-   * nodes references neither are considered.
+   * Only TEXT_NODE, TEXT_NODE and ATTRIBUTE_NODE nodes are considered. On
+   * ATTRIBUTE_NODE nodes references neither are considered.
    * </p>
    * 
    * @param baseName Parent node name of node list
@@ -135,25 +135,49 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
     for (int i = 0; i < nodes.getLength(); i++) {
 
       Node node = nodes.item(i);
-      
-      // Generate the xpath expression that points to property
-      String xpath = getPropertyXpath(baseName, nodes, i);
-      
-      // Add dynamic properties related to node attributes
-      dynProps.addAll(getPropertyAttributes(node, xpath));
-      
-      // Add dynamic properties related to their childs nodes and attributes 
-      dynProps.addAll(getProperties(xpath, node.getChildNodes()));
 
-      // Add dynamic property related to this node
-      String content = node.getTextContent();
-      if (node.getNodeType() == Node.TEXT_NODE && content.trim().length() > 0) {
+      // Only consider element, text or attribute nodes
+      if (isValidNode(node)) {
 
-        dynProps.add(new DynProperty(baseName, content));
+        // Generate the xpath expression that points to property
+        String xpath = getPropertyXpath(baseName, nodes, i);
+
+        // Add dynamic properties related to node attributes
+        dynProps.addAll(getPropertyAttributes(node, xpath));
+
+        // Add dynamic properties related to their childs nodes and attributes
+        dynProps.addAll(getProperties(xpath, node.getChildNodes()));
+
+        // Add dynamic property related to this node
+        String content = node.getTextContent();
+        if (node.getNodeType() == Node.TEXT_NODE && content.trim().length() > 0) {
+
+          dynProps.add(new DynProperty(baseName, content));
+        }
       }
     }
 
     return dynProps;
+  }
+  
+  /**
+   * The node is a valid type to be generated as dynamic property ?
+   * <p>
+   * TEXT_NODE, TEXT_NODE and ATTRIBUTE_NODE nodes are valid.
+   * </p>
+   * 
+   * @param node Node to check
+   * @return Has valid format
+   */
+  private boolean isValidNode(Node node) { 
+    
+    short type = node.getNodeType();
+    if (type == Node.ELEMENT_NODE || type == Node.TEXT_NODE || type == Node.ATTRIBUTE_NODE) {
+     
+      return true;
+    }
+    
+    return false;
   }
 
   /**
@@ -167,7 +191,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
     
     DynPropertyList dynProps = new DynPropertyList();
     
-    // Iterate all node attributes
+    // Iterate all node attributes, if exists
     NamedNodeMap attrs = node.getAttributes();
     if (attrs != null) {
       for (int j = 0; j < attrs.getLength(); j++) {
@@ -209,8 +233,9 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
     int temp = 0;
     for (int j = 0; j < nodes.getLength(); j++) {
       
-      // If exists a brother node with same name
-      if (name.equals(nodes.item(j).getNodeName())) {
+      // If exists a brother node with same name and is valid
+      Node node = nodes.item(j);
+      if (name.equals(node.getNodeName()) && isValidNode(node)) {
         
         // Calculate this node index related to brother nodes with same name
         if (j > i) {

@@ -16,20 +16,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.dynamic.configuration.roo.addon.entity;
+package org.gvnix.dynamic.configuration.roo.addon.config;
 
-import java.util.ArrayList;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Service;
 
 /**
- * Dynamic configuration component list entity.
+ * Dynamic configuration manager of Web MVC Configuration XML. 
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
-public class DynComponentList extends ArrayList<DynComponent> {
+@Component
+@Service
+public class WebMvcDynamicConfiguration extends XmlDynamicConfiguration implements
+    DefaultDynamicConfiguration {
 
-  private static final long serialVersionUID = 5890548949957755428L;
+  /**
+   * {@inheritDoc}
+   */
+  public String getName() {
+    
+    return "Web MVC Configuration XML";
+  }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getFilePath() {
+
+    return "src/main/webapp/WEB-INF/spring/webmvc-config.xml";
+  }
+  
 }

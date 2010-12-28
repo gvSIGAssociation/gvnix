@@ -35,8 +35,9 @@ import org.springframework.roo.shell.CommandMarker;
 
 /**
  * Dynamic configuration console commands.
- * 
- * TODO Add an editor to list configuration names on commands. 
+ * <ul>
+ * <li>TODO Add an editor to list dynamic configuration names on commands/li>
+ * </ul>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
