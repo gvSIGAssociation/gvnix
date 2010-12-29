@@ -41,11 +41,8 @@ import org.springframework.roo.support.logging.HandlerUtils;
 /**
  * Manage components of dynamic configurations.
  * <ul>
- * <li>TODO What happens if managed file already not exists on read or write ?</li>
- * <li>TODO What happens if properties path has been changed on write ?</li>
  * <li>TODO Analyze more Roo generated files to be managed</li>
  * <li>TODO What happens when two addons manage the same file ?</li>
- * <li>TODO What happens if one property exists on a profile and non in other ?</li>
  * <li>TODO Revert managed file changes when modification fails</li>
  * </ul>
  * 

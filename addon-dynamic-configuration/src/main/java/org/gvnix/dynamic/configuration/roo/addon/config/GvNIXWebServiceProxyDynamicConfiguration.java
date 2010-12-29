@@ -33,7 +33,7 @@ import org.springframework.roo.model.JavaType;
 @Component
 @Service
 public class GvNIXWebServiceProxyDynamicConfiguration extends
-    AnnotationDynamicConfiguration implements DefaultDynamicConfiguration {
+    AnnotationClassDynamicConfiguration implements DefaultDynamicConfiguration {
   
   /**
    * {@inheritDoc}

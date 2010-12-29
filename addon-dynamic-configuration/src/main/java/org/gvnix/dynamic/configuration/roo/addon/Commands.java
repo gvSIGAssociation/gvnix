@@ -36,7 +36,8 @@ import org.springframework.roo.shell.CommandMarker;
 /**
  * Dynamic configuration console commands.
  * <ul>
- * <li>TODO Add an editor to list dynamic configuration names on commands/li>
+ * <li>TODO Add an editor to list dynamic configuration names on commands</li>
+ * <li>TODO No empty modules information should will appear on console</li>
  * </ul>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
@@ -62,10 +63,8 @@ public class Commands implements CommandMarker {
   public void save(@CliOption(key = "name", mandatory = true, help = "Configuration name to store") String name) {
 
     // Store the active dynamic configuration
-    DynConfiguration dynConf = operations.saveActiveConfiguration(name);
-    
-    // Show the stored dynamic configuration
-    showDynComponents(dynConf);
+    operations.saveActiveConfiguration(name);
+    logger.log(Level.INFO, "Configuration saved");
   }
 
   @CliAvailabilityIndicator("configuration activate")
@@ -84,11 +83,11 @@ public class Commands implements CommandMarker {
     if (dynConf == null) {
       
       logger.log(Level.WARNING, name + " configuration not exists");
-      return;
     }
-
-    // Show the activated dynamic configuration
-    showDynComponents(dynConf);
+    else {
+      
+      logger.log(Level.INFO, "Configuration activated");
+    }
   }
   
   @CliAvailabilityIndicator("configuration list")

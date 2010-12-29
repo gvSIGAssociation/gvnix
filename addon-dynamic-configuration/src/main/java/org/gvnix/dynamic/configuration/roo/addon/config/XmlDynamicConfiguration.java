@@ -19,6 +19,8 @@
 package org.gvnix.dynamic.configuration.roo.addon.config;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 
@@ -26,6 +28,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -56,19 +59,28 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
   private static final String XPATH_ARRAY_SUFIX = "]";
   private static final String XPATH_ARRAY_PREFIX = "[";
 
+  private static final Logger logger = HandlerUtils.getLogger(XmlDynamicConfiguration.class);
+
   /**
    * {@inheritDoc}
    */
   public DynPropertyList read() {
     
-    // Obtain the XML file on DOM document format
-    MutableFile file = getFile();
-    Document doc = getXmlDocument(file);
-    
-    // Create the dynamic properties list from XML document file
     DynPropertyList dynProps = new DynPropertyList();
-    dynProps.addAll(getProperties("", doc.getChildNodes()));
+    
+    // Get the XML file path
+    MutableFile file = getFile();
+    
+    // If managed file not exists, nothing to do
+    if (file != null) {
+    
+      // Obtain the XML file on DOM document format
+      Document doc = getXmlDocument(file);
 
+      // Create the dynamic properties list from XML document file
+      dynProps.addAll(getProperties("", doc.getChildNodes()));
+    }
+    
     return dynProps;
   }
 
@@ -76,17 +88,26 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
    * {@inheritDoc}
    */
   public void write(DynPropertyList dynProps) {
-
-    // Obtain the root element of the XML file
+    
+    // Get the XML file path
     MutableFile file = getFile();
-    Document doc = getXmlDocument(file);
-    Element root = doc.getDocumentElement();
+    if (file != null) {
 
-    // Update the root element property values with dynamic properties
-    setProperties(root, dynProps);
+      // Obtain the root element of the XML file
+      Document doc = getXmlDocument(file);
+      Element root = doc.getDocumentElement();
 
-    // Update the XML file
-    XmlUtils.writeXml(file.getOutputStream(), doc);
+      // Update the root element property values with dynamic properties
+      setProperties(root, dynProps);
+
+      // Update the XML file
+      XmlUtils.writeXml(file.getOutputStream(), doc);
+    }
+    else if (!dynProps.isEmpty()) {
+
+      logger.log(Level.WARNING, "File " + getFilePath()
+          + " not exists and there are dynamic properties to set it");
+    }
   }
 
   /**
@@ -319,15 +340,37 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
         // Set the new attribute value through container element
         Element elem = XmlUtils.findFirstElement(xpath.substring(0, index),
             root);
-        String name = xpath.substring(index + 2, xpath.length() - 1);
-        Attr attr = elem.getAttributeNode(name);
-        attr.setValue(dynProp.getValue());
+        if (elem == null) {
+          
+          logger.log(Level.WARNING, "Element " + xpath + " to set attribute value not exists on file");
+        }
+        else {
+          
+          String name = xpath.substring(index + 2, xpath.length() - 1);
+          Attr attr = elem.getAttributeNode(name);
+          if (attr == null) {
+            
+            logger.log(Level.WARNING, "Element attribute " + xpath + " to set value not exists on file");
+          }
+          else {
+            
+            attr.setValue(dynProp.getValue());
+          }
+        }
       }
       else {
 
         // Set the new element content
         Element elem = XmlUtils.findFirstElement(xpath, root);
-        elem.setTextContent(dynProp.getValue());
+        
+        if (elem == null) {
+          
+          logger.log(Level.WARNING, "Element " + xpath + " to set text content not exists on file");
+        }
+        else {
+          
+          elem.setTextContent(dynProp.getValue());
+        }
       }
     }
   }

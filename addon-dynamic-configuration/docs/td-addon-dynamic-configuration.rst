@@ -270,7 +270,7 @@ Abstract components
 
 There are some OSGi abstract components that can be extended to easy components creation:
 
-* AnnotationDynamicConfiguration: Provides management of some annotation attributes
+* AnnotationClassDynamicConfiguration: Provides management of some annotation attributes
 * PropertiesDynamicConfiguration: Provides management of some properties file
 * XmlDynamicConfiguration: Provides management of some XML file
 * FileDynamicConfiguration: Provides access to some file

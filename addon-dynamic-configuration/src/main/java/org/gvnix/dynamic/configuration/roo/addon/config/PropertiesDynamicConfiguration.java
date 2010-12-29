@@ -21,11 +21,14 @@ package org.gvnix.dynamic.configuration.roo.addon.config;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Abstract dynamic configuration component of property files.
@@ -40,25 +43,31 @@ import org.springframework.roo.process.manager.MutableFile;
  */
 @Component(componentAbstract = true)
 public abstract class PropertiesDynamicConfiguration extends FileDynamicConfiguration {
-  
+
+  private static final Logger logger = HandlerUtils.getLogger(PropertiesDynamicConfiguration.class);
+
   /**
    * {@inheritDoc}
    */
   public DynPropertyList read() {
 
-    // Get the properties file path
-    MutableFile file = getFile();
-
     DynPropertyList dynProps = new DynPropertyList();
 
     try {
 
-      Properties props = new Properties();
-      props.load(file.getInputStream());
-      for (Entry<Object, Object> prop : props.entrySet()) {
+      // Get the properties file path
+      MutableFile file = getFile();
+      
+      // If managed file not exists, nothing to do
+      if (file != null) {
+        
+        Properties props = new Properties();
+        props.load(file.getInputStream());
+        for (Entry<Object, Object> prop : props.entrySet()) {
 
-        dynProps.add(new DynProperty(prop.getKey().toString(), prop
-            .getValue().toString()));
+          dynProps.add(new DynProperty(prop.getKey().toString(), prop
+              .getValue().toString()));
+        }
       }
     }
     catch (IOException ioe) {
@@ -76,15 +85,32 @@ public abstract class PropertiesDynamicConfiguration extends FileDynamicConfigur
 
     try {
 
-      Properties props = new Properties();
-      for (DynProperty dynProp : dynProps) {
-
-        props.put(dynProp.getKey(), dynProp.getValue());
-      }
-
       // Get the properties file path
       MutableFile file = getFile();
-      props.store(file.getOutputStream(), null);
+      if (file != null) {
+
+        Properties props = new Properties();
+        props.load(file.getInputStream());
+        for (DynProperty dynProp : dynProps) {
+
+          if (props.containsKey(dynProp.getKey())) {
+            
+            props.put(dynProp.getKey(), dynProp.getValue());
+          }
+          else {
+
+            logger.log(Level.WARNING, "Property key " + dynProp.getKey()
+                + " to put value not exists on file");
+          }
+        }
+
+        props.store(file.getOutputStream(), null);
+      }
+      else if (!dynProps.isEmpty()) {
+
+        logger.log(Level.WARNING, "File " + getFilePath()
+            + " not exists and there are dynamic properties to set it");
+      }
     }
     catch (IOException ioe) {
 

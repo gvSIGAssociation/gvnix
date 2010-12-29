@@ -51,22 +51,20 @@ public abstract class FileDynamicConfiguration {
   public abstract String getFilePath();
 
   /**
-   * Get the properties mutable file.
+   * Get the properties mutable file if exists.
    * 
-   * @return Properties mutable file
+   * @return Properties mutable file or null if not exists
    */
   protected MutableFile getFile() {
 
     String path = pathResolver.getIdentifier(new Path(ProjectPath.ROOT.name()),
         getFilePath());
-    if (fileManager.exists(path)) {
+    if (!fileManager.exists(path)) {
 
-      return fileManager.updateFile(path);
+      return null;
     }
-    else {
 
-      throw new IllegalStateException("File not found");
-    }
+    return fileManager.updateFile(path);
   }
 
 }
