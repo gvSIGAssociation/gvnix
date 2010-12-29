@@ -82,7 +82,7 @@ public class Commands implements CommandMarker {
     // If null, dynamic configuration with this name not exists
     if (dynConf == null) {
       
-      logger.log(Level.WARNING, name + " configuration not exists");
+      logger.log(Level.WARNING, "Configuration not exists");
     }
     else {
       
@@ -129,10 +129,10 @@ public class Commands implements CommandMarker {
     
     // Show message
     if (deleted) {
-      logger.log(Level.INFO, name + " configuration deleted");
+      logger.log(Level.INFO, "Configuration deleted");
     }
     else {
-      logger.log(Level.WARNING, name + " configuration not exists");
+      logger.log(Level.WARNING, "Configuration not exists");
     }
   }
   
@@ -151,7 +151,7 @@ public class Commands implements CommandMarker {
     // If null, dynamic configuration with this name not exists
     if (dynConf == null) {
       
-      logger.log(Level.WARNING, name + " configuration not exists");
+      logger.log(Level.WARNING, "Configuration not exists");
       return;
     }
 
@@ -172,9 +172,9 @@ public class Commands implements CommandMarker {
     DynConfigurationList dynConfs = operations.getProperties(name);
     
     // If null, property with this name not exists
-    if (dynConfs == null) {
+    if (dynConfs == null || dynConfs.size() == 0) {
       
-      logger.log(Level.WARNING, name + " property not exists");
+      logger.log(Level.WARNING, "Property not exists");
       return;
     }
 
@@ -205,11 +205,11 @@ public class Commands implements CommandMarker {
     // If null, property with this name not exists
     if (dynProperty == null) {
       
-      logger.log(Level.WARNING, property + " property not exists");
+      logger.log(Level.WARNING, "Property not exists");
       return;
     }
 
-    logger.log(Level.INFO, property + " property updated");
+    logger.log(Level.INFO, "Property updated");
   }
 
   /**

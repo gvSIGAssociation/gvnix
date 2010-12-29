@@ -35,6 +35,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
  * <p>
  * Extends this class to manage new properties file values.
  * </p>
+ * <ul>
+ * <li>TODO When file is managed, property order is modified and comments removed</li>
+ * </ul>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
