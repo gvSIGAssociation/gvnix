@@ -429,7 +429,7 @@ Creates new operation in the selected class.
 
 Parameters:
 
-  * ``--class`` (mandatory) Class in wich will be created the method.
+  * ``--service`` (mandatory) Class in wich will be created the method.
   * ``--name`` (mandatory) Name of the method to be created.
   * ``--return`` Type of the returning method object. Default void.
   * ``--paramNames`` Method parameter input names.
@@ -444,11 +444,12 @@ Exports a Class to a Web Service.
 Parameters:
 
   * ``--class`` (mandatory) Class to be exported as a Web Service.
-  * ``--name`` Name to define the portType.
   * ``--serviceName`` Name to publish the Web Service.
+  * ``--portTypeName`` Name to define the portType.
+  * ``--addressName`` Address to publish the Web Service in server. Default class name value.
   * ``--targetNamespace`` Namespace name for the service.
 
-service operation list 
+service list operation 
 ----------------------------
 
 List all method from Web Service class that are not exported as Web Service Operation.
@@ -492,15 +493,6 @@ Parameters:
 
   * ``--class`` (mandatory) Class to act as a proxy.
   * ``--wsdl`` (mandatory) Location of the remote Web Service.
-
-service entity
-----------------
-
-Entity Class to export as a Web Service. 
-
-Parameters:
-
-  * ``--class`` Entity to export.
 
 Commands Availability
 ---------------------

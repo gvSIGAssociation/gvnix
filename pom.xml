@@ -45,6 +45,7 @@
         <module>addon-web-mvc-binding</module>
         <module>addon-cit-security</module>
         <module>addon-service-layer</module>
+        <module>addon-dynamic-configuration</module>
         <module>annotations</module>
     </modules>
 
