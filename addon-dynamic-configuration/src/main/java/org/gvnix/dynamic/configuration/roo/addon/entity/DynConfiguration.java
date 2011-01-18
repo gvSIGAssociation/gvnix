@@ -40,6 +40,13 @@ public class DynConfiguration {
     this.components = new DynComponentList();
     active = Boolean.FALSE;
   }
+  
+  public DynConfiguration(String name) {
+    super();
+    this.components = new DynComponentList();
+    active = Boolean.FALSE;
+    this.name = name;
+  }
 
   public String getName() {
     return name;
@@ -76,12 +83,13 @@ public class DynConfiguration {
     StringBuffer buffer = new StringBuffer();
     
     if (active) {
-      buffer.append("(Active) ");
+      buffer.append("      (Active)      ");
     }
     else {
-      buffer.append("         ");
+      buffer.append("                    ");
     }
     buffer.append(getName());
+    buffer.append("\n----------------------------------------");
     
     return buffer.toString();
   }

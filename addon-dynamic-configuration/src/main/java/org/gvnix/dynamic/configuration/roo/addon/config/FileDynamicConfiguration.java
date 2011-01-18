@@ -20,7 +20,6 @@ package org.gvnix.dynamic.configuration.roo.addon.config;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
-import org.gvnix.dynamic.configuration.roo.addon.entity.ProjectPath;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
@@ -57,7 +56,7 @@ public abstract class FileDynamicConfiguration {
    */
   protected MutableFile getFile() {
 
-    String path = pathResolver.getIdentifier(new Path(ProjectPath.ROOT.name()),
+    String path = pathResolver.getIdentifier(Path.ROOT,
         getFilePath());
     if (!fileManager.exists(path)) {
 

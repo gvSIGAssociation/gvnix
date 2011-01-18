@@ -64,12 +64,14 @@ public class ConfigurationsImpl implements Configurations {
   private static final String PROPERTY_ELEMENT_NAME = "property";
   private static final String KEY_ELEMENT_NAME = "key";
   private static final String VALUE_ELEMENT_NAME = "value";
+  private static final String ACTIVE_ELEMENT_NAME = "active";
+  private static final String BASE_ELEMENT_NAME = "base";
   private static final String ID_ATTRIBUTE_NAME = "id";
   private static final String NAME_ATTRIBUTE_NAME = "name";
-  private static final String CONFIGURATION_XPATH = "/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME + 
-      "/" + CONFIGURATION_ELEMENT_NAME;
+  private static final String CONFIGURATION_XPATH = "/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME + "/" + CONFIGURATION_ELEMENT_NAME;
+  private static final String ACTIVE_CONFIGURATION_XPATH = "/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME + "/" + ACTIVE_ELEMENT_NAME;
+  private static final String BASE_CONFIGURATION_XPATH = "/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME + "/" + BASE_ELEMENT_NAME;
 
-	@Reference private Services services;
   @Reference private PathResolver pathResolver;
   @Reference private FileManager fileManager;
   
@@ -89,24 +91,13 @@ public class ConfigurationsImpl implements Configurations {
     // Iterate all child dynamic components of the dynamic configuration
     for (DynComponent dynComps : dynConf.getComponents()) {
       
-      // Add new component element
-      Element comp = doc.createElement(COMPONENT_ELEMENT_NAME);
-      comp.setAttribute(ID_ATTRIBUTE_NAME, dynComps.getId());
-      comp.setAttribute(NAME_ATTRIBUTE_NAME, dynComps.getName());
-      conf.appendChild(comp);
+      Element comp = addComponent(conf, dynComps.getId(), dynComps.getName());
       
       // Iterate all child dynamic properties of the dynamic component
       for (DynProperty dynProp : dynComps.getProperties()) {
 
-        // Add new property element containing key and value elements
-        Element prop = doc.createElement(PROPERTY_ELEMENT_NAME);
-        Element key = doc.createElement(KEY_ELEMENT_NAME);
-        key.setTextContent(dynProp.getKey());
-        prop.appendChild(key);
-        Element value = doc.createElement(VALUE_ELEMENT_NAME);
-        value.setTextContent(dynProp.getValue());
-        prop.appendChild(value);
-        comp.appendChild(prop);
+        // Add new property on component
+        addProperty(comp, dynProp.getKey(), dynProp.getValue());
       }
     }
     
@@ -126,6 +117,12 @@ public class ConfigurationsImpl implements Configurations {
     }
     conf.getParentNode().removeChild(conf);
     
+    // If active configuration, remove the reference on configuration file
+    Element activeConf = isActiveConfiguration(conf);
+    if (activeConf != null) {
+      activeConf.setTextContent("");
+    }
+    
     // Update the configuration file
     saveConfiguration(conf);
   }
@@ -133,7 +130,7 @@ public class ConfigurationsImpl implements Configurations {
   /**
    * {@inheritDoc}
    */
-  public DynConfiguration parseConfiguration(Element conf, String name) {
+  public DynConfiguration parseConfiguration(Element conf, String property) {
 
     DynConfiguration dynConf = new DynConfiguration();
 
@@ -141,7 +138,7 @@ public class ConfigurationsImpl implements Configurations {
     List<Element> comps = XmlUtils.findElements(COMPONENT_ELEMENT_NAME, conf);
     for (Element comp : comps) {
 
-      DynComponent dynComp = parseComponent(comp, name);
+      DynComponent dynComp = parseComponent(comp, property);
       if (dynComp != null) {
         dynConf.addComponent(dynComp);
       }
@@ -149,17 +146,10 @@ public class ConfigurationsImpl implements Configurations {
 
     // Set name property of dynamic configuration
     dynConf.setName(conf.getAttribute(NAME_ATTRIBUTE_NAME));
-    
-    // Set active property of dynamic configuration 
-    if (name == null) {
-      
-      // Compare current dynamic configuration with active dynamic configuration
-      dynConf.setActive(dynConf.equals(services.getActiveConfiguration()));
-    }
-    else {
-      
-      // Current dynamic configuration active if entire dynamic configuration is
-      dynConf.setActive(parseConfiguration(conf, null).isActive());
+
+    // If configuration is active, mark it
+    if (isActiveConfiguration(conf) != null) {
+      dynConf.setActive(true);
     }
     
     return dynConf;
@@ -224,6 +214,15 @@ public class ConfigurationsImpl implements Configurations {
   /**
    * {@inheritDoc}
    */
+  public Element getBaseConfiguration() {
+
+    return XmlUtils.findFirstElement(BASE_CONFIGURATION_XPATH,
+        getConfigurationDocument().getDocumentElement());
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
   public List<Element> getAllConfigurations() {
     
     return XmlUtils.findElements(CONFIGURATION_XPATH, getConfigurationDocument()
@@ -236,7 +235,7 @@ public class ConfigurationsImpl implements Configurations {
   public List<Element> getAllComponents() {
 
     return XmlUtils.findElements("/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME
-        + "/*", getConfigurationDocument().getDocumentElement());
+        + "/" + CONFIGURATION_ELEMENT_NAME, getConfigurationDocument().getDocumentElement());
   }
   
   /**
@@ -260,6 +259,202 @@ public class ConfigurationsImpl implements Configurations {
     String path = getConfigurationFilePath();
     MutableFile file = fileManager.updateFile(path);
     XmlUtils.writeXml(file.getOutputStream(), elem.getOwnerDocument());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public DynConfiguration getActiveConfiguration() {
+    
+    DynConfiguration dynConf = null;
+
+    Element elem = XmlUtils.findFirstElement(ACTIVE_CONFIGURATION_XPATH,
+        getConfigurationDocument().getDocumentElement());
+    if (elem != null) {
+      
+      Element active = findConfiguration(elem.getTextContent());
+      if (active != null) {
+        dynConf = parseConfiguration(active, null);
+      }
+    }
+    
+    return dynConf;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void setActiveConfiguration(String name) {
+    
+    // Get active configuration element
+    Element elem = XmlUtils.findFirstElement(ACTIVE_CONFIGURATION_XPATH,
+        getConfigurationDocument().getDocumentElement());
+    elem.setTextContent(name);
+    saveConfiguration(elem);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void addProperties(String name, String value, String compId, String compName) {
+    
+    // Add property in all stored configurations
+    List<Element> confs = getAllConfigurations();
+    for (Element conf : confs) {
+
+      addProperty(name, value, compId, compName, conf);
+    }
+
+    // Add property in base configuration
+    addProperty(name, "", compId, compName, getBaseConfiguration());
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public void deleteProperties(String name, String component) {
+    
+    // Delete property in all stored configurations
+    List<Element> confs = getAllConfigurations();
+    for (Element conf : confs) {
+
+      deleteProperty(name, component, conf);
+    }
+
+    // Delete property in base configuration
+    deleteProperty(name, component, getBaseConfiguration());
+  }
+
+  /**
+   * Delete a component property name on a configurations.
+   * 
+   * @param name Property name
+   * @param component Component id
+   * @param conf Configuration element
+   */
+  private void deleteProperty(String name, String component, Element conf) {
+    
+    // Find component and property to delete
+    Element comp = getComponent(component, conf);
+    Element prop = XmlUtils.findFirstElement(PROPERTY_ELEMENT_NAME + "/"
+        + KEY_ELEMENT_NAME + "[text()='" + name + "']/..", comp);
+    if (prop != null) {
+      
+      // Remove child property and component if no more properties
+      comp.removeChild(prop);
+      if (XmlUtils.findFirstElement(PROPERTY_ELEMENT_NAME, comp) == null) {
+        
+        conf.removeChild(comp);
+      }
+      
+      // Save configuration
+      saveConfiguration(conf);
+    }
+  }
+  
+  /**
+   * Add a component property with some name and value on a configuration.
+   * 
+   * @param name Property name
+   * @param value Property value
+   * @param compId Component id
+   * @param compId Component name
+   * @param conf Configuration element
+   */
+  private void addProperty(String name, String value, String compId, String compName, Element conf) {
+    
+    // Get component or create it if not exists
+    Element comp = getComponent(compId, conf);
+    if (comp == null) {
+      
+      comp = addComponent(conf, compId, compName);
+    }
+    
+    // Add property on component and save configuration
+    addProperty(comp, name, value);
+    saveConfiguration(conf);
+  }
+  
+  /**
+   * Get a component element with some name from a configuration element.
+   * 
+   * @param id Component identificador
+   * @param conf Configuration element
+   * @return Component element
+   */
+  private Element getComponent(String id, Element conf) {
+    
+    // Find required component of configuration or create if not exists
+    return XmlUtils.findFirstElement(COMPONENT_ELEMENT_NAME + "[@"
+        + ID_ATTRIBUTE_NAME + "='" + id + "']", conf);
+  }
+  
+  /**
+   * Add new property element containing key and value elements on component.
+   * 
+   * @param comp Component where add property
+   * @param key Property key
+   * @param value Property value
+   */
+  private void addProperty(Element comp, String key, String value) {
+
+    // Get document and create property element
+    Document doc = comp.getOwnerDocument();
+    Element propElem = doc.createElement(PROPERTY_ELEMENT_NAME);
+    
+    // Create key
+    Element keyElem = doc.createElement(KEY_ELEMENT_NAME);
+    keyElem.setTextContent(key);
+    propElem.appendChild(keyElem);
+    
+    // Create value
+    Element valueElem = doc.createElement(VALUE_ELEMENT_NAME);
+    valueElem.setTextContent(value);
+    propElem.appendChild(valueElem);
+    
+    // Add property on component
+    comp.appendChild(propElem);
+  }
+
+  /**
+   * Add new component element containing id and name elements on configuration.
+   * 
+   * @param conf Configuration where add component
+   * @param id Component identificator
+   * @param name Component name
+   */
+  private Element addComponent(Element conf, String id, String name) {
+    
+    // Add new component element
+    Document doc = conf.getOwnerDocument();
+    Element comp = doc.createElement(COMPONENT_ELEMENT_NAME);
+    comp.setAttribute(ID_ATTRIBUTE_NAME, id);
+    comp.setAttribute(NAME_ATTRIBUTE_NAME, name);
+    conf.appendChild(comp);
+    return comp;
+  }
+
+  /**
+   * Check if a configuration is the active.
+   * 
+   * @param conf Configuration element
+   * @return Active element or null if is not the active
+   */
+  private Element isActiveConfiguration(Element conf) {
+
+    // Get active configuration element
+    Element activeConf = XmlUtils.findFirstElement(ACTIVE_CONFIGURATION_XPATH,
+        conf.getOwnerDocument().getDocumentElement());
+
+    // Mark the configuration as active if same than this
+    String name = conf.getAttribute(NAME_ATTRIBUTE_NAME);
+
+    if (activeConf != null && activeConf.getTextContent().equals(name)) {
+
+      return activeConf;
+    }
+
+    return null;
   }
 
   /**

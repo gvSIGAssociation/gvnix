@@ -57,10 +57,10 @@ public interface Configurations {
    * </p>
    * 
    * @param conf Configuration element
-   * @param name Property name to parse or all if null
+   * @param property Property name to parse or all if null
    * @return Dynamic configuration
    */
-  public DynConfiguration parseConfiguration(Element conf, String name);
+  public DynConfiguration parseConfiguration(Element conf, String property);
 
   /**
    * Parse a component element to a dynamic component.
@@ -99,6 +99,13 @@ public interface Configurations {
   public Element findConfiguration(String name);
   
   /**
+   * Get the base configuration from configuration.
+   * 
+   * @return Base configuration element
+   */
+  public Element getBaseConfiguration();
+  
+  /**
    * Get all configuration elements. 
    * 
    * @return All configuration elements
@@ -106,9 +113,9 @@ public interface Configurations {
   public List<Element> getAllConfigurations();
 
   /**
-   * Get all component elements. 
+   * Get all component elements or null if not exists.
    * 
-   * @return All configuration elements
+   * @return All configuration elements or null.
    */
   public List<Element> getAllComponents();
 
@@ -120,5 +127,37 @@ public interface Configurations {
    * @return Dynamic property
    */
   public Element getProperty(String configuration, String property);
+  
+  /**
+   * Get current dynamic configuration from configuration file.
+   * 
+   * @return Active dynamic configuration
+   */
+  public DynConfiguration getActiveConfiguration();
+  
+  /**
+   * Set the active configuration on the configuration file.
+   * 
+   * @param name Configuration name
+   */
+  public void setActiveConfiguration(String name);
+
+  /**
+   * Add a component property name and value on stored and base configurations.
+   * 
+   * @param name Property name
+   * @param value Property value
+   * @param compId Component id
+   * @param compName Component name
+   */
+  public void addProperties(String name, String value, String compId, String compName);
+  
+  /**
+   * Delete a component property name on stored and base configurations.
+   * 
+   * @param name Property name
+   * @param component Component id
+   */
+  public void deleteProperties(String name, String component);
 
 }

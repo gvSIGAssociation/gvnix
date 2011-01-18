@@ -96,9 +96,12 @@ public class DynComponent {
     // Show properties
     for (DynProperty prop : properties) {
 
-      // Show the property and value with format
+      // Show the property and value if exists with format
       buffer.append("\n");
-      buffer.append("   - " + prop.getKey() + " = " + prop.getValue());
+      buffer.append("   - " + prop.getKey());
+      if (prop.getValue() != null && prop.getValue().length() > 0) {
+        buffer.append(" = " + prop.getValue());
+      }
     }
 
     return buffer.toString();

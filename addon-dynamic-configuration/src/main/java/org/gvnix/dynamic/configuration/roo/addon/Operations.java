@@ -33,7 +33,10 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 public interface Operations {
 
   /**
-   * Store files properties as a dynamic configuration with a name.
+   * Store new dynamic configuration with base properties.
+   * <p>
+   * If configuration already exists, previous configuration will be deleted.
+   * </p>
    * 
    * @param name Name for the dynamic configuration
    * @return Dynamic configuration stored
@@ -41,10 +44,11 @@ public interface Operations {
   public DynConfiguration saveActiveConfiguration(String name);
 
   /**
-   * Update files with the properties of the dynamic configuration.
-   * <p>
-   * If dynamic configuration with name not exists, null will be returned.
-   * </p>
+   * Link files with the properties of the dynamic configuration.
+   * <ul>
+   * <li>If dynamic configuration with name not exists, null will be returned.</li>
+   * <li>If active property is false, there are pending local changes</li>
+   * </ul>
    * 
    * @param name Dynamic configuration name to activate
    * @return Dynamic configuration activated
@@ -52,9 +56,21 @@ public interface Operations {
   public DynConfiguration setActiveConfiguration(String name);
 
   /**
+   * Unlink files with the properties of the dynamic configuration.
+   * <ul>
+   * <li>If dynamic configuration with name not exists, null will be returned.</li>
+   * <li>If active property is false, there are pending local changes</li>
+   * </ul>
+   * 
+   * @param name Dynamic configuration name to activate
+   * @return Dynamic configuration activated
+   */
+  public DynConfiguration setUnactiveConfiguration(String name);
+
+  /**
    * Get all stored dynamic configurations.
    * 
-   * @return List of stored dynamic configurations.
+   * @return List of stored dynamic configurations or empty if not.
    */
   public DynConfigurationList findConfigurations();
 
@@ -76,24 +92,43 @@ public interface Operations {
    * @return Stored dynamic configuration.
    */
   public DynConfiguration getConfiguration(String name);
+  
+  /**
+   * Get base dynamic configuration.
+   * 
+   * @return Base dynamic configuration.
+   */
+  public DynConfiguration getBaseConfiguration();
 
   /**
-   * Get the properties stored along configurations with a name.
+   * Get the properties stored along configurations with a name or empty.
    * 
    * @param name Property name
-   * @return Related properties along distinct configurations
+   * @return Related properties along distinct configurations or empty
    */
   public DynConfigurationList getProperties(String name);
 
   /**
+   * Get the base dynamic configuration if contains a property name, else empty.
+   * 
+   * @param name Property name
+   * @return Dynamic configuration or empty
+   */
+  public DynConfiguration getBaseProperty(String name);
+
+  /**
    * Set a value on a configuration property.
+   * <p>
+   * If configuration is active, the value is setted on disk too.
+   * </p>
    * 
    * @param configuration Configuration name to update
    * @param property Property name to update
    * @param value Value to set
    * @return Dynamic property updated or null if not exists
    */
-  public DynProperty updateProperty(String configuration, String property, String value);
+  public DynProperty updateProperty(String configuration, String property,
+                                    String value);
 
   /**
    * Is project available ?
@@ -101,5 +136,21 @@ public interface Operations {
    * @return Project avaliability
    */
   public boolean isProjectAvailable();
+
+  /**
+   * Add property with name and value on all configurations.
+   * 
+   * @param name Property name
+   * @return false if already exists
+   */
+  public boolean addProperty(String name);
+  
+  /**
+   * Delete a property with some name on all configurations.
+   * 
+   * @param name Property name
+   * @return false if not exists
+   */
+  public boolean deleteProperty(String name);
   
 }

@@ -18,7 +18,9 @@
  */
 package org.gvnix.dynamic.configuration.roo.addon;
 
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 
 /**
  * Interface to manage components of dynamic configurations.
@@ -35,13 +37,30 @@ public interface Services {
    * 
    * @return Current dynamic configuration.
    */
-  public DynConfiguration getActiveConfiguration();
+  public DynConfiguration getCurrentConfiguration();
+  
+  /**
+   * Get the component with some property name on current configuration. 
+   * 
+   * @param name Property name
+   * @return Dynamic property or null if not exists
+   */
+  public DynComponent getCurrentComponent(String name);
+  
+  /**
+   * Get a property name on current configuration. 
+   * 
+   * @param name Property name
+   * @return Dynamic property or null if not exists
+   */
+  public DynProperty getCurrentProperty(String name);
+  
   
   /**
    * Update files properties from a dynamic configuration.
    * 
    * @param dynConf Dynamic configuration with properties
    */
-  public void setActiveConfiguration(DynConfiguration dynConf);
+  public void setCurrentConfiguration(DynConfiguration dynConf);
 
 }

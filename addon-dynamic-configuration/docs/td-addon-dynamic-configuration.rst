@@ -21,7 +21,7 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introduction
 ============
 
-Dynamic configuration is a system as Profiles on Maven ant Ant build systems to manage diferent variables values by environment.
+Dynamic configuration is a profiles management system as Maven or Ant build to manage diferent variable values by environment.
 
 Requirements
 ============
@@ -180,56 +180,6 @@ Conclusion
 Maven and ant profile addon proposals are not desired because is not best than manage the profile section manually in configuration files (pom.xml and build.xml, respectively).
 Therefore, OSGi profile addon is a better aproach.
 
-Files to include on profiles
-============================
-
-There are some important directories on a project:
-
-#. src/main/java: Java files with main source code
-#. src/test/java: Java files with test source code
-#. src/main/resources: Resources with main configuration
-#. src/test/resources: Resources with test configuration
-#. src/main/webapp: Web application files
-
-Possible files to include on first version
-------------------------------------------
-
-* Properties
- 
-  * src/main/resources/META-INF/spring/database.properties
-
-Possible files to include on second version
--------------------------------------------
-
-* Java
-
-  * Classes of service layer addon has annotations with attributes values that changed by profile as the imported service URL
-
-Possible files to include on future version
--------------------------------------------
-
-* Properties
-
-  * src/main/resources/log4j.properties
-  * src/main/resources/META-INF/spring/database.properties
-
-* Java
-
-  * Java annotation attributes
-  * Java properties
-
-* Xml
- 
-  * pom.xml
-  * build.xml
-  * src/main/resources/META-INF/persistence.xml
-  * src/main/resources/META-INF/spring/applicationContext.xml
-  * src/main/webapp/WEB-INF/urlrewrite.xml
-  * src/main/webapp/WEB-INF/web.xml
-  * src/main/webapp/WEB-INF/spring/webmvc-config.xml
-
-This is a non extensive list, it could not have all interesting files.
-
 Metadata
 ========
 
@@ -275,133 +225,10 @@ There are some OSGi abstract components that can be extended to easy components 
 * XmlDynamicConfiguration: Provides management of some XML file
 * FileDynamicConfiguration: Provides access to some file
 
-Commands
-========
-
-First version commands proposal
--------------------------------
-
-* configuration
-
-  * save <name>: Save properties and values to a profile with some required name.
-    When saved, all property names and values are showed and is not set as the ``Active`` profile.
-    The saving action reads the source file performed by its OSGi component and is saved to metadata file on resources. 
-  * activate <name>: Set a required profile name as the currently active profile.
-    When activated, all property names and values are showed.
-    The activate action writes the source file performed by its OSGi component from metadata file on resources.
-    If some change is maded on profile files, thereafter active profile will be the ``Modified`` one.
-
-Second version commands proposal
---------------------------------
-
-* configuration
-
-  * list: List all previously saved profile names.
-    At least, ``Modified`` profile is always present.
-    Active profile is marked with the ``Active`` text next to the profile name.
-    Active profile is the one whose values are equals to profile files values.
-  * delete <name>: Clear a required profile name.
-
-* configuration property
-
-  * list <profile>: List all property names and values of a required profile name.
-  * value <property>: Show all values of required property on all existing profiles.
-  * update <profile> <property> <value>: Actualize a required property of a required profile with some required value.
-
-Properties command info
-```````````````````````
-
-Keyword:                   properties list
-Description:               Shows the details of a particular properties file
-
- Keyword:                  name
- 
-   Help:                   Property file name (including .properties suffix)
-   Mandatory:              true
-   Default if specified:   '__NULL__'
-   Default if unspecified: '__NULL__'
-   
- Keyword:                  path
- 
-   Help:                   Source path to property file
-   Mandatory:              true
-   Default if specified:   '__NULL__'
-   Default if unspecified: '__NULL__'
-
-Keyword:                   properties remove
-Description:               Removes a particular properties file property
-
- Keyword:                  name
- 
-   Help:                   Property file name (including .properties suffix)
-   Mandatory:              true
-   Default if specified:   '__NULL__'
-   Default if unspecified: '__NULL__'
-   
- Keyword:                  path
- 
-   Help:                   Source path to property file
-   Mandatory:              true
-   Default if specified:   '__NULL__'
-   Default if unspecified: '__NULL__'
-   
- Keyword:                  ** default **
- Keyword:                  key
- 
-   Help:                   The property key that should be removed
-   Mandatory:              true
-   Default if specified:   '__NULL__'
-   Default if unspecified: '__NULL__'
-
-Keyword:                   properties set
-Description:               Changes a particular properties file property
-
- Keyword:                  name
- 
-   Help:                   Property file name (including .properties suffix)
-   Mandatory:              true
-   Default if specified:   '__NULL__'
-   Default if unspecified: '__NULL__'
-   
- Keyword:                  path
- 
-   Help:                   Source path to property file
-   Mandatory:              true
-   Default if specified:   '__NULL__'
-   Default if unspecified: '__NULL__'
-   
- Keyword:                  key
- 
-   Help:                   The property key that should be changed
-   Mandatory:              true
-   Default if specified:   '__NULL__'
-   Default if unspecified: '__NULL__'
-   
- Keyword:                  value
- 
-   Help:                   The new vale for this property key
-   Mandatory:              true
-   Default if specified:   '__NULL__'
-   Default if unspecified: '__NULL__'
-
-Future versions commands proposal
----------------------------------
-  
-* configuration property
-
-  * add: Add new property to all profiles.
-  * delete: a property deletion of a profile could required to delete same property in all other profiles  
-
-* configuration file
-
-  * list: List all files managed by profile addon
-  * add: File to add to profile addon, no included by default 
-  * delete: Remove a file from profile addon
-  * properties or info: Property values of a file
-
 TODO
 ====
 
+* Add an abstract OSGi component to easy component creation to manage Java properties.
 * Add command to export dynamic configurations to maven or ant system, Its will allow manage dynamic configurations without Roo console.
   A very interesting improvement could be allow the generation of Ant and Maven Profiles on their configuration files (build.xml ant pom.xml respectively) and replace on profile files values with variables.
   Thus on generated project the profile can be selected too.
@@ -409,6 +236,14 @@ TODO
 * Some files profile configuration can be standar to every projects, like log4j.properties.
   There is a standard file configuration to production environments.
   For example, log4j.properties on production environmente removes the code line of loggin messages by performance.
+* Future versions commands proposal
+
+ * configuration file
+ 
+  * list: List all files managed by profile addon
+  * add: File to add to profile addon, no included by default 
+  * delete: Remove a file from profile addon
+  * properties or info: Property values of a file
 
 References
 ==========

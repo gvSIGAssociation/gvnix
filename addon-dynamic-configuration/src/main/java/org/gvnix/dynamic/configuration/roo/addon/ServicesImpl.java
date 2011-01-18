@@ -34,6 +34,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.config.DefaultDynamicConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
+import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.support.logging.HandlerUtils;
@@ -99,7 +100,7 @@ public class ServicesImpl implements Services {
   /**
    * {@inheritDoc}
    */
-  public DynConfiguration getActiveConfiguration() {
+  public DynConfiguration getCurrentConfiguration() {
 
     // Variable to store active dynamic configuration
     DynConfiguration dynConf = new DynConfiguration();
@@ -141,8 +142,50 @@ public class ServicesImpl implements Services {
   /**
    * {@inheritDoc}
    */
+  public DynComponent getCurrentComponent(String name) {
+    
+    // TODO Two properties with same name can exist on different components
+
+    // Get current configuration from disk files
+    DynConfiguration dynConf = getCurrentConfiguration();
+    for (DynComponent dynComp : dynConf.getComponents()) {
+
+      // Search the property on the configuration components
+      for (DynProperty dynProp : dynComp.getProperties()) {
+        if (dynProp.getKey().equals(name)) {
+          
+          return dynComp;
+        }
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public DynProperty getCurrentProperty(String name) {
+
+    // Get current component from disk files
+    DynComponent dynComp = getCurrentComponent(name);
+
+      // Search the property on the component
+      for (DynProperty dynProp : dynComp.getProperties()) {
+        if (dynProp.getKey().equals(name)) {
+          
+          return dynProp;
+        }
+      }
+    
+    return null;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
   @SuppressWarnings("unchecked")
-  public void setActiveConfiguration(DynConfiguration dynConf) {
+  public void setCurrentConfiguration(DynConfiguration dynConf) {
 
     // Iterate all dynamic configurations components registered
     for (Object o : getComponents()) {
