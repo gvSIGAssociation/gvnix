@@ -128,7 +128,6 @@ Execute the list command.
 You will get an output similar to::
 
   gvNIX           Installed       Active        Name        Description               
--------------- ---------------- -------------- ----------- -------------------------------
     X                X                          CIT         CIT theme for Roo projects  
     X                X              X           gvNIX       gvNIX base theme            
     X                                           blue        Blue color theme            

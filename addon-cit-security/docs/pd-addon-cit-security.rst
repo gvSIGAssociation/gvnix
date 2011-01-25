@@ -37,7 +37,7 @@ We can split this sections in four parts:
 
 * `Install web service client`_
 * `User model`_
-* `Spring Security Authentication Provider`_
+* `Install Spring Security Authentication Provider`_
 * `Configuration files`_
 
 Install web service client

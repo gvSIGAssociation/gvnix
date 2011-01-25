@@ -102,7 +102,7 @@ The changes have been identified in the proof https://svn.disid.com/svn/disid/pr
 Using cargo maven plugin
 ___________________________________________
 
-To run application with Tomcat 5.5 we need to install cargo maven plugin. We have to add this declaration in ``pom.xml`` file to enable it:
+To run application with Tomcat 5.5 we need to install cargo maven plugin. We have to add this declaration in ``pom.xml`` file to enable it::
 
 		      <plugin>
 		        <groupId>org.codehaus.cargo</groupId>

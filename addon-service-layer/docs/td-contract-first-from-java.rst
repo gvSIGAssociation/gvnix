@@ -606,6 +606,7 @@ TODO
 * Web services unit testing.
 * Para el tema del namespace es posible que sea necesario añadir monitorizaciones adicionales al NotifiableFileMonitorService, ya que seguramente las clases de los servicios no estén dentro de directorio del paquete base de la aplicación.
     * Como que no estén dentro del paquete base? es para crear la clase, se puede crear en cualquier paquete, puede que no haya entendido este punto.
+* urlrewrite.xml not used from Roo 1.1.0.M3
 
 References
 ==========

@@ -121,6 +121,7 @@ Annotation ``behavior`` to avoid Web Service Contract::
 * Change method name.
 
   * Controled by operationName attribute. Doesn't change the contract.
+  
 * Change input types.
 
   * Change type: Managed by attribute type in **@GvNIXWebParam**. If there is a change ``only`` in java code, will throw an exception, you have to change it in annotation if you want ot change the WS-Contract.

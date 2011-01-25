@@ -45,20 +45,20 @@
     <orderedlist>
       <listitem>
         <para>Descomprimir el fichero ZIP de la versión de gvNIX, por ejemplo
-        gvNIX-0.3.0.zip</para>
+        gvNIX-0.5.0.zip</para>
 
         <itemizedlist>
           <listitem>
             <para>Ejemplo para sistemas *nix y Apple:</para>
 
-            <programlisting>bash:~$ unzip gvNIX-0.3.0.zip</programlisting>
+            <programlisting>bash:~$ unzip gvNIX-0.5.0.zip</programlisting>
           </listitem>
         </itemizedlist>
       </listitem>
 
       <listitem>
         <para>Al descomprimir el fichero ZIP se creará un nuevo directorio,
-        por ejemplo gvNIX-0.3.0. En el resto del documento nos referiremos a
+        por ejemplo gvNIX-0.5.0. En el resto del documento nos referiremos a
         este directorio como GVNIX_HOME</para>
       </listitem>
 
@@ -70,8 +70,8 @@
           <listitem>
             <para>Ejemplo para sistemas Unix y Apple:</para>
 
-            <programlisting>bash:~$ cd gvNIX-0.3.0
-bash:~/gvNIX-0.3.0$ export PATH=$PWD/bin:$PATH</programlisting>
+            <programlisting>bash:~$ cd gvNIX-0.5.0
+bash:~/gvNIX-0.5.0$ export PATH=$PWD/bin:$PATH</programlisting>
           </listitem>
         </itemizedlist>
       </listitem>

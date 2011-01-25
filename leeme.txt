@@ -454,3 +454,28 @@ Variables::
   * [groups] Dentro del grupo ``groups`` definir la dirección del repositorio donde accede. Nombre del grupo y dirección.
   * [Nombre del grupo] Definir las propiedades del proxy asociado al grupo (http-proxy-host y http-proxy-port).
 
+Java
+````
+
+En el caso de que se acceda a algún sistema externo desde la propia aplicación:: 
+
+ mvn clean tomcat:run -Dhttp.proxyHost=dirección_proxy -Dhttp.proxyPort=puerto_proxy -Dhttp.nonProxyHosts="host1|host2|192.168.*"
+
+Reemplazar en nonProxyHosts las direcciones que no necesiten acceso a través del proxy.
+
+Eclipse
+```````
+
+Configuración de un proxy en Eclipse:
+
+ * Active Provider: Direct
+ * Entries:
+
+    * HTTP dirección_proxy puerto_proxy
+    * HTTPS dirección_proxy puerto_proxy
+
+  * Bypass:
+  
+     * host1
+     * host2
+     * 192.168.*

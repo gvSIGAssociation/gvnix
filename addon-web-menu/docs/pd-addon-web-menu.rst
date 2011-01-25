@@ -51,7 +51,7 @@ Sort of `Page`_ that has children. It may have a destination URL with the same `
 Menu
 ------
 
-A Set of `Page`_s and `Group`_s.
+A Set of `Page`_'s and `Group`_'s.
 
 Context Menu
 -------------
@@ -77,7 +77,7 @@ This add-on have to install and manage the application menu of Roo projects.
 In general this must to solve this features:
 
 * list menu tree
-* add `Pages`_ with more than two levels
+* add pages with more than two levels
 * remove or hide menu items
 * relocate menu items
 * adds Roo web scaffold menu items automatically
@@ -479,8 +479,8 @@ Shows all information about a page. examples:
 Use cases
 =============
 
-Installation
-----------------
+Installation use case
+---------------------
 
 Developer wants to use new menu in his Roo application. This are the steeps to get it:
 
@@ -522,36 +522,36 @@ Change a page item
 
 Developer wants to change the element ``Main`` to ``My_Main`` and its title to ``app.myMain``:
 
-#. Execute command list to show menu path ``page list --messageCode`` ::
+#. Execute command list to show menu path ``page list --messageCode``::
 
-/Main                    app.main
-/Main/Authors            app.authors
-/Main/Authors/New        app.new
-/Main/Authors/List       app.list
-/Main/Books              app.books
-/Main/Books/New          app.new
-/Main/Books/List         app.list
-/Main/Books/Book_a_book  app.bookabook
-/About_us                app.about
-/About_us/Our_History    app.history
-/About_us/Contact        app.contact
+    /Main                    app.main
+    /Main/Authors            app.authors
+    /Main/Authors/New        app.new
+    /Main/Authors/List       app.list
+    /Main/Books              app.books
+    /Main/Books/New          app.new
+    /Main/Books/List         app.list
+    /Main/Books/Book_a_book  app.bookabook
+    /About_us                app.about
+    /About_us/Our_History    app.history
+    /About_us/Contact        app.contact
 
 
 #. Execute command ``page update --page "/Main" --name My_Main --messageCode "app.myMain``
 
 #. Execute command list to show result ``page list --title`` ::
 
-/My_Main                    app.myMain
-/My_Main/Authors            app.authors
-/My_Main/Authors/New        app.new
-/My_Main/Authors/List       app.list
-/My_Main/Books              app.books
-/My_Main/Books/New          app.new
-/My_Main/Books/List         app.list
-/My_Main/Books/Book_a_book  app.bookabook
-/About_us                   app.about
-/About_us/Our_History       app.history
-/About_us/Contact           app.contact
+    /My_Main                    app.myMain
+    /My_Main/Authors            app.authors
+    /My_Main/Authors/New        app.new
+    /My_Main/Authors/List       app.list
+    /My_Main/Books              app.books
+    /My_Main/Books/New          app.new
+    /My_Main/Books/List         app.list
+    /My_Main/Books/Book_a_book  app.bookabook
+    /About_us                   app.about
+    /About_us/Our_History       app.history
+    /About_us/Contact           app.contact
 
 
 The add-on changed the values in the ``src/main/webapp/WEB-INF/gvnix-menu.xml``.

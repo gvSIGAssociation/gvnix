@@ -48,7 +48,7 @@ Functionality
 Add-on functionality.
 
 Group of tagx for visualization structure.
-----------------------------------
+------------------------------------------
 
 Copy the tagx included in resources folder of the Add-on inside ``WEB-INF/`` project folder::
 
@@ -72,7 +72,9 @@ Create a Metadata
 Metadata for create AspecJ method using entity's properties (1-n relations).
 
 # The metadata creates the search method for paginated related entities.
+
   * Crete AspecJ method for retrieve related entities that are annotated as 1-n relationship.
+  
 # Use DefaultClassOrInterfaceDetail to retrieve the annotation information for the declared relationships.
 
 Create MetadataProvider that listens RooEntity's changes

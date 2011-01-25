@@ -245,6 +245,8 @@ TODO
   * delete: Remove a file from profile addon
   * properties or info: Property values of a file
 
+* urlrewrite.xml not used from Roo 1.1.0.M3
+
 References
 ==========
 
