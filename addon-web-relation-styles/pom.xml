@@ -32,10 +32,15 @@
 		<artifactId>org.gvnix.parent</artifactId>
 		<version>0.7.0-SNAPSHOT</version>
 	</parent>
-	<groupId>org.gvnix</groupId>
 	<artifactId>org.gvnix.web.relation.styles.roo.addon</artifactId>
+  <!-- 
+  Note that if we want the groupId and / or the version of this module 
+  to be the same as its parent, we have to remove the groupId and / or 
+  the version identity of this module POM. 
+  This allows the module to inherit the groupId and / or the version of its 
+  parent POM.
+  -->
 	<packaging>bundle</packaging>
-	<version>0.7.0-SNAPSHOT</version>
 	<name>gvNIX - Addon - Web relation styles</name>
 	<description>gvNIX relation view styles add-on</description>
 	<dependencies>
@@ -146,7 +151,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.roo</groupId>
-            <artifactId>org.springframework.roo.addon.web.controller</artifactId>
+            <artifactId>org.springframework.roo.addon.web.mvc.controller</artifactId>
             <version>${roo.version}</version>
             <type>bundle</type>
         </dependency>
