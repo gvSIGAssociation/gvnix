@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="osgi-api" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Interacción con el contenedor OSGi</title>
+
+  <para xml:lang="es">Los add-ons, como cualquier componente OSGi, disponen de
+  un API para interactuar con el contenedor OSGi. Permitiendo a nuestro código
+  recibir eventos OSGi, reemplazar componentes OSGi, etc.</para>
+
+  <section>
+    <title>Reemplazar componentes de Roo</title>
+
+    <para>En algunos casos podemos necesitar cambiar los componentes que por
+    defecto instala Roo por componentes específicos de gvNIX, por ejemplo, el
+    componente de gestión del menú de la aplicación MVC.</para>
+
+    <para>Pasos para reemplazar componentes OSGi:<orderedlist>
+        <listitem>
+          <para>Activar nuestro componente. Esta operación se realiza
+          automáticamente si anotamos la clase con @Component y
+          @Service</para>
+
+          <para>Es importante destacar que nuestro componente
+          <emphasis>DEBE</emphasis> implementar la misma interfaz del
+          componente al que queremos substituir.</para>
+        </listitem>
+
+        <listitem>
+          <para>Desactivar el componente OSGi utilizando el comando
+          <command>scr disable</command> del shell de Felix (notar que este
+          paso es específico para la versión actual de Roo, podría cambiar en
+          un futuro).</para>
+
+          <para>El siguiente ejemplo muestra cómo obtener la referencia al
+          servicio que queremos reemplazar en base al nombre de la interfaz
+          que implementa y cómo invocar al shell de Felix para desactivar el
+          componente.</para>
+
+          <programlisting>public class PageOperationsImpl implements PageOperations {
+  ...
+  @Reference private ShellService shellService;
+  ...
+  private void disableRooMenuOperations() {
+    ServiceReference rooServiceRef = componentContext.getBundleContext()
+      .getServiceReference(MenuOperations.class.getName());
+
+    Long componentId = (Long) rooServiceRef.getProperty("component.id");
+
+    try {
+      executeFelixCommand("scr disable ".concat(componentId.toString()));
+    }
+    catch (Exception e) {
+      throw new IllegalStateException(
+          "Exception disabling Roo MenuOperationsImpl service", e);
+    }
+  }
+  ...
+  private void executeFelixCommand(String commandLine) throws Exception {
+    LoggingOutputStream sysOut = new LoggingOutputStream(Level.INFO);
+    LoggingOutputStream sysErr = new LoggingOutputStream(Level.SEVERE);
+    sysOut.setSourceClassName(PageOperationsImpl.class.getName());
+    sysErr.setSourceClassName(PageOperationsImpl.class.getName());
+
+    PrintStream printStreamOut = new PrintStream(sysOut);
+    PrintStream printErrOut = new PrintStream(sysErr);
+    try {
+      shellService.executeCommand(commandLine, printStreamOut, printErrOut);
+    }
+    finally {
+      printStreamOut.close();
+      printErrOut.close();
+    }
+  }
+  ...
+}
+
+</programlisting>
+
+          <para>Automáticamente el contenedor OSGi reemplazará las referencias
+          al componente desactivado por una referencia al componente o
+          servicio que cumple con el interfaz que demandan los clientes, en
+          este caso nuestro componente.</para>
+        </listitem>
+      </orderedlist></para>
+  </section>
+</chapter>

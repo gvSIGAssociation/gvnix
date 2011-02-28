@@ -128,17 +128,56 @@ web binding setup // Comando de gvNIX</programlisting>
 
     <para xml:lang="es">Dentro del fichero pom.xml habría que añadir la
     etiqueta <literal>description</literal> dentro de
-    <literal>project</literal> con una breve descripción del add-on.
-    Ejemplo:</para>
+    <literal>project</literal> con una breve descripción del add-on. </para>
+
+    <para xml:lang="es">Ejemplo:</para>
 
     <programlisting>  &lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
   &lt;project ...&gt;
         ....
         ....
-        &lt;name&gt;gvNIX - Addon - Web menu&lt;/name&gt;
-        &lt;description&gt;gvNIX web menu add-on&lt;/description&gt;
+        &lt;name&gt;gvNIX - Spring Roo - Addon - Web MVC Menu&lt;/name&gt;
+        &lt;description&gt;Site structure management for Spring MVC based web layer&lt;/description&gt;
         ....
         ....</programlisting>
+
+    <para>El nombre debe contener:<variablelist>
+        <varlistentry>
+          <term>gvNIX</term>
+
+          <listitem>
+            <para>Identificador del conjunto de add-ons</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>Spring Roo - Addon</term>
+
+          <listitem>
+            <para>Identificador de add-on de Roo</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><emphasis>Nombre del add-on</emphasis></term>
+
+          <listitem>
+            <para>Nombre descriptivo del add-on</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+
+    <para>Esta información sirve para localizar rápidamente los add-ons de
+    gvNIX en el entorno OSGi, por ejemplo al ejecutar el comando
+    <emphasis>osgi ps</emphasis>.</para>
+
+    <para>Es importante que la descripción sea descriptiva del objetivo del
+    add-on (por ejemplo, <emphasis>Site structure management</emphasis>) y
+    debe incluir información sobre la tecnología en la que debe aplicarse (por
+    ejemplo, <emphasis>for Spring MVC based web layer</emphasis>). Este último
+    punto ayudará a los desarrolladores a saber si pueden utilizarlo en
+    determinados add-ons, siguiendo el ejemplo, el add-on de menu no podría
+    utilizarse con una capa web basada en GWT.</para>
   </section>
 
   <section xml:id="convenciones_licencia-addon" xml:lang="es">
@@ -159,7 +198,7 @@ web binding setup // Comando de gvNIX</programlisting>
     <programlisting>/*
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures     
  * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
+ * Copyright (C) 2011 CIT - Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -172,7 +211,7 @@ web binding setup // Comando de gvNIX</programlisting>
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ * along with this program.  If not, see &lt;http://www.gnu.org/copyleft/gpl.html&gt;.
  */</programlisting>
 
     <para>Este es un ejemplo de como debería quedar el fichero
@@ -181,32 +220,32 @@ web binding setup // Comando de gvNIX</programlisting>
     <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
 &lt;project ...&gt;
 ...
-&lt;licenses&gt;
-  &lt;license&gt;
-    &lt;name&gt;GPLv3&lt;/name&gt;
-    &lt;url&gt;http://www.gnu.org/licenses/gpl-3.0.html&lt;/url&gt;
-    &lt;comments&gt;
-    &lt;![CDATA[
-    gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
-    i Transport - Generalitat Valenciana
-    Copyright (C) 2010 CIT - Generalitat Valenciana
+  &lt;licenses&gt;
+    &lt;license&gt;
+      &lt;name&gt;&amp;gt;GNU General Public License (GPL), Version 3.0&lt;/name&gt;
+      &lt;url&gt;http://www.gnu.org/copyleft/gpl.html&lt;/url&gt;
+      &lt;comments&gt;
+      &lt;![CDATA[
+      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+      i Transport - Generalitat Valenciana
+      Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
-    ]]&gt;
-    &lt;/comments&gt;
-  &lt;/license&gt;
-&lt;/licenses&gt;
+      You should have received a copy of the GNU General Public License
+      along with this program.  If not, see &lt;http://www.gnu.org/licenses /&gt;.
+      ]]&gt;
+      &lt;/comments&gt;
+    &lt;/license&gt;
+  &lt;/licenses&gt;
 ...
 &lt;/project&gt;
 </programlisting>

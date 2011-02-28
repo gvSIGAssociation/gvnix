@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<book version="5.0" xml:id="spring-roo-reference-guide"
+<book version="5.0" xml:id="spring-roo-reference-guide" xml:lang="es"
       xmlns="http://docbook.org/ns/docbook"
       xmlns:xlink="http://www.w3.org/1999/xlink"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:ns5="http://www.w3.org/1998/Math/MathML"
       xmlns:ns4="http://www.w3.org/2000/svg"
       xmlns:ns3="http://www.w3.org/1999/xhtml"
-      xmlns:ns="http://docbook.org/ns/docbook"
-      xml:lang="es">
+      xmlns:ns="http://docbook.org/ns/docbook">
   <info>
     <title xml:lang="es">gvNIX - Documentación de desarrollo</title>
 
@@ -38,10 +37,9 @@
     <title xml:lang="es">Introducción al desarrollo de gvNIX</title>
 
     <partintro>
-      <para xml:lang="es">Esta parte de la documentación de introducción
-	      a la arquitectura interna y información básica para 
-	      el desarrollo de gvNIX.
-      </para>
+      <para xml:lang="es">Esta parte de la documentación de introducción a la
+      arquitectura interna y información básica para el desarrollo de
+      gvNIX.</para>
     </partintro>
 
     <xi:include href="arquitectura-interna.xml" />
@@ -53,6 +51,7 @@
 
   <part xml:id="desarrollo-part">
     <title xml:lang="es">Desarrollo de gvNIX</title>
+
     <partintro>
       <para xml:lang="es">Esta parte de la documentación contiene la
       información de desarrollo de gvNIX</para>
@@ -77,18 +76,27 @@
     <xi:include href="compilacion.xml" />
 
     <xi:include href="validacion.xml" />
-
   </part>
+
+  <part>
+    <title>OSGi</title>
+
+    <partintro>
+      <para xml:lang="es">Introducción a OSGi, add-ons como componentes
+      OSGi.</para>
+    </partintro>
+    <xi:include href="osgi-intro.xml" />
+    <xi:include href="osgi-api.xml" />
+  </part>
+
   <part xml:id="recursos-part">
     <title xml:lang="es">Recursos</title>
+
     <partintro>
-      <para xml:lang="es">En esta parte podrá encontrar recursos útiles
-      para el desarrollo de gvNIX</para>
+      <para xml:lang="es">En esta parte podrá encontrar recursos útiles para
+      el desarrollo de gvNIX</para>
     </partintro>
 
-
     <xi:include href="recetas.xml" />
-
   </part>
-
 </book>
