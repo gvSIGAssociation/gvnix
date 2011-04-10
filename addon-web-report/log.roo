@@ -1,0 +1,22 @@
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log opened at 2011-03-04 11:22:44
+addon create advanced --topLevelPackage org.gvnix.web.report.roo.addon --projectName "gvNIX - Addon - Web report" --description "gvNIX report add-on"
+perform eclipse
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log opened at 2011-03-04 11:29:43
+quit
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log closed at 2011-03-04 11:30:00
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log opened at 2011-03-07 16:58:49
+perform eclipse
+quit
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log closed at 2011-03-07 17:38:47
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log opened at 2011-03-07 17:44:53
+perform eclipse
+quit
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log closed at 2011-03-07 17:51:39
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log opened at 2011-03-07 17:51:43
+quit
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log closed at 2011-03-07 18:00:57
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log opened at 2011-03-07 18:01:02
+perform eclipse
+perform eclipse
+quit
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log closed at 2011-03-07 18:28:21

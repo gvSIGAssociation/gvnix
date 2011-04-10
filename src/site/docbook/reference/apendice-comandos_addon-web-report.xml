@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_addon-web-report"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Comandos del Add-on Web Report</title>
+
+  <para xml:lang="es">Para una descripción general ver <link
+  linkend="addon-web-report">Add-on Web Report</link>.</para>
+
+  <table>
+    <title xml:lang="es">Comandos de Add-on Web Report</title>
+
+    <tgroup cols="2">
+      <thead>
+        <colspec colwidth="150" />
+
+        <row>
+          <entry align="center">Comando</entry>
+
+          <entry align="center">Descripción</entry>
+        </row>
+      </thead>
+
+      <tbody>
+        <row>
+          <entry><link linkend="apendice-comandos_addon-web-report_setup">web
+          report setup</link></entry>
+
+          <entry>Configura en el proyecto el soporte para la generación de
+          informes con la librería JasperReports</entry>
+        </row>
+
+        <row>
+          <entry><link linkend="apendice-comandos_addon-web-report_add">web
+          report add</link></entry>
+
+          <entry>Añade un nuevo informe sobre una entidad através de un
+          controller</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <section xml:id="apendice-comandos_addon-web-report_setup">
+    <title>web report setup</title>
+
+    <para xml:lang="es">El comando <emphasis role="bold">sólo está disponible
+    si el proyecto usa Spring MVC</emphasis> en la capa web. El archivo de
+    configuración <emphasis role="bold">webmvc-config.xml</emphasis> debe
+    existir en <emphasis>/WEB-INF/spring</emphasis>.</para>
+
+    <para xml:lang="es">Configura en el proyecto el soporte para la generación
+    de informes mediante JasperReports y su visualización descargándolos desde
+    la aplicación web.</para>
+
+    <para xml:lang="es">Modifca/crea los siguientes archivos:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><emphasis>pom.xml</emphasis>: añade dependencias de
+        JasperReports, Apache POI (para informes en formato Excel) y librería
+        del mismo add-on para dar soporte a la anotación @GvNIXReports.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>webmvc-config.xlm</emphasis>: añade un bean para
+        configurar el sitema de vistas de informes.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>jasper-views.xml</emphasis>: añade definición de
+        vistas por informe.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>jasperfonts</emphasis>: directorio que contiene
+        fuentes True Type que usará JasperReports para confeccionar el
+        informe.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>jasperreports_extension.properties</emphasis>: define
+        donde se encuentran las fuentes a utilizar.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-web-report_add">
+    <title>web report add</title>
+
+    <para xml:lang="es">El comando <emphasis role="bold">está disponible sólo
+    si el proyecto usa Tiles</emphasis> como motor de las vistas web.</para>
+
+    <para xml:lang="es">Añade un nuevo informe sobre una entidad gestionado
+    por un controller.</para>
+
+    <para xml:lang="es"><emphasis role="bold">No permite</emphasis> añadir el
+    mismo informe varias veces sobre la misma entidad/controlle . Para mas
+    información ver <link linkend="addon-web-report">Add-on Web
+    Report</link>.</para>
+
+    <para xml:lang="es">Los parámetros son:<variablelist>
+        <varlistentry>
+          <term>--controller</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [Ruta canónica a la clase del
+            Controlador] [autocompletado]</emphasis></para>
+
+            <para>Ruta canónica a la clase del Controlador de la entidad sobre
+            la que se quiere definir el informe. Admite el uso de ~ para
+            indicar el <emphasis>top level package</emphasis> del
+            proyecto.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--reportName</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [cadena del nombre del
+            informe]</emphasis></para>
+
+            <para>Nombre para identificar el nuevo informe. No admite
+            espacios.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--format</term>
+
+          <listitem>
+            <para><emphasis>[Opcional] [cadena con lista de formatos separado
+            por comas]</emphasis></para>
+
+            <para>Lista de formatos que soporta el nuevo informe o formatos a
+            añadir a un informe ya existente. Los formatos soportados son:
+            pdf, xls, csv y html.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
+</section>

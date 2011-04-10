@@ -29,12 +29,9 @@
   </licenses>
 
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.gvnix</groupId>
-		<artifactId>org.gvnix.parent</artifactId>
-		<version>0.7.0-SNAPSHOT</version>
-	</parent>
+	<groupId>org.gvnix</groupId>
 	<artifactId>org.gvnix.annotations</artifactId>
+	<version>0.7.0-SNAPSHOT</version>
   <!-- 
   Note that if we want the groupId and / or the version of this module 
   to be the same as its parent, we have to remove the groupId and / or 

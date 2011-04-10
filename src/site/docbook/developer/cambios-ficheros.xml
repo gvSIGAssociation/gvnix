@@ -45,4 +45,13 @@
     <para xml:lang="es">[Describir los problemas de enconding encontrados en
     el add-on del tema]</para>
   </section>
+
+  <section>
+    <title>Realizar cambios con posibilidad de deshacer</title>
+
+    <para>TBC</para>
+
+    <para>Ver ejemplo en el capítulo de recetas, sección <emphasis>Realizar
+    cambios en XML con posibilidad de deshacer</emphasis>.</para>
+  </section>
 </chapter>

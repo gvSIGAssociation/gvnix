@@ -15,10 +15,7 @@
     |-- ...
     `-- ...
     code
-    |-- addon-cxf
-    |   |-- pom.xml
-    |   `-- src
-    |-- addon-persistence
+    |-- addon-occ
     |   |-- pom.xml
     |   `-- src
     ...

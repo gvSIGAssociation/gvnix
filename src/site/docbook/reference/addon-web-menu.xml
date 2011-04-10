@@ -140,7 +140,7 @@
     <para xml:lang="es">El uso de el sistema de menús aportado por esta
     herramienta es opcional. Por ello, par ponerlo en marcha es necesario usar
     el comando <command><link
-    linkend="apendice-comandos_addon-web-menu_page-menu-setup">page menu
+    linkend="apendice-comandos_addon-web-menu_page-menu-setup">menu
     setup</link></command>. Este comando añadirá lo siguiente:</para>
 
     <orderedlist>
@@ -180,7 +180,7 @@
 
     <para xml:lang="es">Para más información ver sobre el comando
     <command><link
-    linkend="apendice-comandos_addon-web-menu_page-menu-setup">page menu
+    linkend="apendice-comandos_addon-web-menu_page-menu-setup">menu
     setup</link></command> en el <link
     linkend="apendice-comandos_addon-web-menu">apéndice de comandos de este
     add-on</link>.</para>

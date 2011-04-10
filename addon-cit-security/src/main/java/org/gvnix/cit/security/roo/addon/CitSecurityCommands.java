@@ -20,36 +20,45 @@ package org.gvnix.cit.security.roo.addon;
 
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.*;
-import org.springframework.roo.shell.*;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
+import org.springframework.roo.shell.CliAvailabilityIndicator;
+import org.springframework.roo.shell.CliCommand;
+import org.springframework.roo.shell.CliOption;
+import org.springframework.roo.shell.CommandMarker;
 
 /**
  * Clase que declara los comandos del add-on <b>cit securty</b>
  *
- * @author Jose Manuel Vivó ( jmvivo at disid dot com ) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Jose Manuel Vivó ( jmvivo at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 @Component
 @Service
 public class CitSecurityCommands implements CommandMarker {
 
-    private static Logger logger = Logger.getLogger(CitSecurityCommands.class
-	    .getName());
+  private static Logger logger = Logger.getLogger(CitSecurityCommands.class
+      .getName());
 
-    @Reference
-    private CitSecurityOperations citSecurityOperations;
+  @Reference
+  private CitSecurityOperations citSecurityOperations;
 
-    @CliAvailabilityIndicator("cit security setup")
-    public boolean isSetupAvailable() {
-	return citSecurityOperations.isSetupAvailable();
-    }
+  @CliAvailabilityIndicator("cit security setup")
+  public boolean isSetupAvailable() {
+    return citSecurityOperations.isSetupAvailable()
+            && citSecurityOperations.isSpringMvcTilesProject();
+  }
 
-    @CliCommand(value = "cit security setup", help = "Configura la autenticación de usuarios con el mecanismo de la Consellería de Infraestructuras y Transportes.")
-    public void setup(@CliOption(key="url", mandatory=true, help="URL del servicio de autenticación.") String url,
-	    @CliOption(key = "login", mandatory = true, help = "Usuario de acceso al servicio.") String login,
-	    @CliOption(key = "password", mandatory = true, help = "Clave de acceso al servicio.") String password,
-	    @CliOption(key = "appName", mandatory = true, help = "Nombre de la aplicación para el servicio.") String appName) {
-	citSecurityOperations.setup(url, login, password, appName);
+  @CliCommand(value = "cit security setup", help = "Create and configure the security artifacts needed for users authorization and authentication at Conselleria de Infraestructuras y Transporte.")
+  public void setup(@CliOption(key = "url", mandatory = true, help = "URL del servicio de autenticación.") String url,
+                    @CliOption(key = "login", mandatory = true, help = "Usuario de acceso al servicio.") String login,
+                    @CliOption(key = "password", mandatory = true, help = "Clave de acceso al servicio.") String password,
+                    @CliOption(key = "appName", mandatory = true, help = "Nombre de la aplicación para el servicio.") String appName) {
+    citSecurityOperations.setup(url, login, password, appName);
 
-    }
+  }
 
 }

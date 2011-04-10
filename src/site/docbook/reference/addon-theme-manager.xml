@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="addon-theme-manager"
+<chapter version="5.0" xml:id="addon-theme-manager" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook"
-         xml:lang="es">
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title>Add-on Theme Manager</title>
 
   <para xml:lang="es">Add-on para el manejo de temas visuales.</para>
@@ -88,7 +87,7 @@
 
     <variablelist>
       <varlistentry>
-        <term>theme-cit</term>
+        <term>cit-theme</term>
 
         <listitem>
           <para xml:lang="es">Tema por defecto para la CIT.</para>
@@ -96,7 +95,7 @@
       </varlistentry>
 
       <varlistentry>
-        <term>theme-gvNIX</term>
+        <term>gvNIX-theme</term>
 
         <listitem>
           <para xml:lang="es">Tema de ejemplo con una personalización del

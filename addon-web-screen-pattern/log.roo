@@ -1,0 +1,13 @@
+// Spring Roo 1.1.2.BUILD-SNAPSHOT [rev 1b7fd7b] log opened at 2011-02-07 12:14:22
+d
+addon create advanced --topLevelPackage org.gvnix.web.relation.styles.roo.addon --projectName "gvNIX - Addon - Web relation styles" --description "gvNIX relation view styles add-on"
+quit
+// Spring Roo 1.1.2.BUILD-SNAPSHOT [rev 1b7fd7b] log closed at 2011-02-07 12:21:21
+// Spring Roo 1.1.2.BUILD-SNAPSHOT [rev 1b7fd7b] log opened at 2011-02-07 12:21:51
+perform eclipse
+quit
+// Spring Roo 1.1.2.BUILD-SNAPSHOT [rev 1b7fd7b] log closed at 2011-02-07 12:24:06
+// Spring Roo 1.1.2.BUILD-SNAPSHOT [rev 1b7fd7b] log opened at 2011-02-07 12:25:41
+perform eclipse
+quit
+// Spring Roo 1.1.2.BUILD-SNAPSHOT [rev 1b7fd7b] log closed at 2011-02-07 12:26:02

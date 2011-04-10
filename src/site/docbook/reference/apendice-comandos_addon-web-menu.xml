@@ -28,7 +28,7 @@
       <tbody>
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web-menu_page-menu-setup">page menu
+          linkend="apendice-comandos_addon-web-menu_page-menu-setup">menu
           setup</link></entry>
 
           <entry>Instala el sistema de menú de gvNIX en la aplicación</entry>
@@ -36,7 +36,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web-menu_page-add">page
+          linkend="apendice-comandos_addon-web-menu_page-add">menu entry
           add</link></entry>
 
           <entry>Añade una página</entry>
@@ -44,23 +44,24 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web-menu_page-hide">page
-          hide</link></entry>
+          linkend="apendice-comandos_addon-web-menu_page-hide">menu entry
+          visibility</link></entry>
 
-          <entry>Oculta una página</entry>
+          <entry>Oculta/Muestra una página</entry>
         </row>
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web-menu_page-show">page
-          show</link></entry>
+          linkend="apendice-comandos_addon-web-menu_page-show">menu entry
+          roles</link></entry>
 
-          <entry>Establece como visible una página oculta.</entry>
+          <entry>Establece los roles de los usuarios que pueden visulizar esta
+          entrada</entry>
         </row>
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web-menu_page-remove">page
+          linkend="apendice-comandos_addon-web-menu_page-remove">menu entry
           remove</link></entry>
 
           <entry>Elimina una página</entry>
@@ -68,7 +69,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web-menu_page-move">page
+          linkend="apendice-comandos_addon-web-menu_page-move">menu entry
           move</link></entry>
 
           <entry>Cambia la posición de una página</entry>
@@ -76,7 +77,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web-menu_page-update">page
+          linkend="apendice-comandos_addon-web-menu_page-update">menu entry
           update</link></entry>
 
           <entry>Cambia los valore de una página</entry>
@@ -84,7 +85,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web-menu_page-info">page
+          linkend="apendice-comandos_addon-web-menu_page-info">menu entry
           info</link></entry>
 
           <entry>Muestra información de una página por la consola</entry>
@@ -92,8 +93,8 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web-menu_page-list">page
-          list</link></entry>
+          linkend="apendice-comandos_addon-web-menu_page-list">menu
+          tree</link></entry>
 
           <entry>Lista las páginas actuales por la consola</entry>
         </row>
@@ -102,14 +103,14 @@
   </table>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-menu-setup">
-    <title>page menu setup</title>
+    <title>menu setup</title>
 
     <para xml:lang="es">Instala el sistema de menú de gvNIX en la aplicación
     actual.</para>
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-add">
-    <title>page add</title>
+    <title>menu entry add</title>
 
     <para xml:lang="es">Añade una página. Esta opción <emphasis
     role="bold">sólo crea el elemento de menú</emphasis> asociado. Con este
@@ -122,25 +123,26 @@
 
     <para xml:lang="es">Los parámetros son:<variablelist>
         <varlistentry>
-          <term>--parent</term>
+          <term>--category</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [Valor por defecto: "/"] [Ruta al
-            elemento del menú] [autocompletado]</emphasis></para>
+            <para><emphasis>[Opcional] [Valor por defecto: "/"] [Identificador
+            al elemento del menú] [autocompletado]</emphasis></para>
 
-            <para>Ruta de la página que se usará como padre de la nueva
-            página. Por defecto es la <emphasis>raíz</emphasis>.</para>
+            <para>Identificador del grupo del menú donde queremos incluir la
+            nueva entrada. Por defecto es la <emphasis>raíz</emphasis>.</para>
           </listitem>
         </varlistentry>
 
         <varlistentry>
-          <term>--name</term>
+          <term>--url</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [cadena identificador
-            válido]</emphasis></para>
+            <para><emphasis>[Opcional] [cadena URL del
+            enlace]</emphasis></para>
 
-            <para>Nombre para identificar la página.</para>
+            <para>URL de la página a la que da acceso la entrada del
+            menú.</para>
           </listitem>
         </varlistentry>
 
@@ -169,18 +171,6 @@
         </varlistentry>
 
         <varlistentry>
-          <term>--destination</term>
-
-          <listitem>
-            <para><emphasis>[Opcional] [URL]</emphasis></para>
-
-            <para>Destino del elemento. Pude ser una ruta dentro de la
-            aplicación (ejemplo <code>/entity1s/entity1?id=1</code>) o externa
-            (ejemplo <code>https://www.cit.gva.es</code>) .</para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
           <term>--roles</term>
 
           <listitem>
@@ -195,47 +185,69 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-hide">
-    <title xml:lang="es">page hide</title>
+    <title xml:lang="es">menu entry visibility</title>
 
-    <para xml:lang="es">Cambia la visibilidad del elemento para que no se
-    muestre.</para>
+    <para xml:lang="es">Cambia la visibilidad del elemento.</para>
 
     <para xml:lang="es">Los parámetros son:<variablelist>
         <varlistentry>
-          <term>--page</term>
+          <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Ruta al elemento del menú]
+            <para><emphasis>[Requerido] [Identificador del elemento del menú]
             [autocompletado]</emphasis></para>
 
-            <para>Ruta de la página a cambiar la visibilidad.</para>
+            <para>Identificador de la página a cambiar la visibilidad.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--hidden</term>
+
+          <listitem>
+            <para>[Requerido][true/false]</para>
+
+            <para>Si se especifica su valor por defecto es true (oculta la
+            entrada del menú), si no se especifica el valor por defecto es
+            false (muestra la entrada en el menú).</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-show">
-    <title xml:lang="es">page show</title>
+    <title xml:lang="es">menu entry roles</title>
 
-    <para xml:lang="es">Cambia la visibilidad del elemento para que se
-    muestre.</para>
+    <para xml:lang="es">Establece los roles de los usuarios que pueden
+    visulizar esta entrada.</para>
 
     <para xml:lang="es">Los parámetros son:<variablelist>
         <varlistentry>
-          <term>--page</term>
+          <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Ruta al elemento del menú]
+            <para><emphasis>[Requerido][Identificador del elemento del menú]
             [autocompletado]</emphasis></para>
 
-            <para>Ruta de la página a cambiar la visibilidad.</para>
+            <para>Identificador de la página a cambiar la visibilidad.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--roles</term>
+
+          <listitem>
+            <para>[Requerido][Lista de roles]</para>
+
+            <para>Lista (separados por comas sin espacios) de roles de
+            usuarios que pueden ver esta entrada dle menú.</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-remove">
-    <title xml:lang="es">page remove</title>
+    <title xml:lang="es">menu entry remove</title>
 
     <para xml:lang="es">Elimina un página. Si la página está generada por un
     Add-on externo sólo se cambia la visibilidad a oculto. No permite eliminar
@@ -244,10 +256,10 @@
 
     <para xml:lang="es">Los parámetros son:<variablelist>
         <varlistentry>
-          <term>--page</term>
+          <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Ruta al elemento del menú]
+            <para><emphasis>[Requerido] [Identificador del elemento del menú]
             [autocompletado]</emphasis></para>
 
             <para>Ruta de la página a eliminar.</para>
@@ -268,17 +280,17 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-move">
-    <title xml:lang="es">page move</title>
+    <title xml:lang="es">menu entry move</title>
 
     <para xml:lang="es">Mueve una página, incluidos sus hijos si los tuviese,
     dentro o antes de otra página.</para>
 
     <para xml:lang="es">Los parámetros son:<variablelist>
         <varlistentry>
-          <term>--page</term>
+          <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Ruta al elemento del menú]
+            <para><emphasis>[Requerido] [Identificador del elemento del menú]
             [autocompletado]</emphasis></para>
 
             <para>Ruta de la página a mover.</para>
@@ -289,9 +301,8 @@
           <term>--into</term>
 
           <listitem>
-            <para><emphasis>[Requerido si no se usa <emphasis
-            role="bold">before</emphasis>, excluyente] [Ruta al elemento del
-            menú] [autocompletado]</emphasis></para>
+            <para><emphasis>[Opcional] [Ruta al elemento del menú]
+            [autocompletado]</emphasis></para>
 
             <para>Ruta del elemento donde añadir la página a mover. La página
             se insertará en la última posición de los elementos.</para>
@@ -302,9 +313,8 @@
           <term>--before</term>
 
           <listitem>
-            <para><emphasis>[Requerido si no se usa <emphasis
-            role="bold">into</emphasis>, excluyente] [Ruta al elemento del
-            menú] [autocompletado]</emphasis></para>
+            <para><emphasis>[Opcional] [Ruta al elemento del menú]
+            [autocompletado]</emphasis></para>
 
             <para>Ruta del elemento de referencia donde insertar la página a
             mover. La página se insertará antes del elemento
@@ -315,18 +325,19 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-update">
-    <title xml:lang="es">page update</title>
+    <title xml:lang="es">menu entry update</title>
 
     <para xml:lang="es">Actualiza los valores de una página. Para los valores
     no especificado se mantendrá el valor anterior.</para>
 
     <para xml:lang="es">Los parámetros son:<variablelist>
         <varlistentry>
-          <term>--page</term>
+          <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Valor por defecto: "/"] [Ruta al
-            elemento del menú] [autocompletado]</emphasis></para>
+            <para><emphasis>[Requerido] [Valor por defecto: "/"]
+            [Identificador del elemento del menú]
+            [autocompletado]</emphasis></para>
 
             <para>Ruta de la página que se usará como padre de la nueva
             página. Por defecto es la <emphasis>raíz</emphasis>.</para>
@@ -393,36 +404,61 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-info">
-    <title xml:lang="es">page info</title>
+    <title xml:lang="es">menu entry info</title>
 
     <para xml:lang="es">Muestra por consola la información de una página
     formateada.</para>
 
     <para xml:lang="es">Los parámetros son:<variablelist>
         <varlistentry>
-          <term>--page</term>
+          <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Ruta al elemento del menú]
+            <para><emphasis>[Requerido] [Identificador del elemento del menú]
             [autocompletado]</emphasis></para>
 
             <para>Ruta de la página.</para>
           </listitem>
         </varlistentry>
+
+        <varlistentry>
+          <term>--lang</term>
+
+          <listitem>
+            <para>[Opcional] [Identificador de idioma]</para>
+
+            <para>Muestra los mensajes en el idioma solicitado.</para>
+          </listitem>
+        </varlistentry>
       </variablelist></para>
 
     <para>Estos son ejemplos que muestran la salida del
-    comando:<programlisting>/Main
-  - Label: Main
-  - Children:
-    * Authors
-    * Books
-    * Book_a_book: /bookABook
+    comando:<programlisting>[c_person]
+URL          : No
+Label Code   : menu_category_person_label
+Label        : Person
+Message Code : 
+Message      : 
+Roles        : 
+Hidden       : false
+Children     : 
+               [i_person_new]
+               URL          : /people?form
+               Label Code   : menu_item_person_new_label
+               Label        : Person
+               Message Code : global_menu_new
+               Message      : Create new {0}
+               Roles        : 
+               Hidden       : false
 
-/Main/Book_a_book
-  - Label: Book a book
-  - Destination: /bookABook
-  - roles: [USER]</programlisting></para>
+               [i_person_list]
+               URL          : /people?page=1&amp;size=${empty param.size ? 10 : param.size}
+               Label Code   : menu_item_person_list_label
+               Label        : People
+               Message Code : global_menu_list
+               Message      : List all {0}
+               Roles        : 
+               Hidden       : false</programlisting></para>
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-list">
@@ -433,11 +469,11 @@
 
     <para xml:lang="es">Los parámetros son:<variablelist>
         <varlistentry>
-          <term>--page</term>
+          <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [Valor por defecto "/"] [Ruta al
-            elemento del menú] [autocompletado]</emphasis></para>
+            <para><emphasis>[Opcional] [Valor por defecto "/"] [Identificador
+            del elemento del menú] [autocompletado]</emphasis></para>
 
             <para>Ruta de la página donde empezar el listado. Si no se
             especifica se muestran todas las página del menú.</para>
@@ -469,14 +505,14 @@
         </varlistentry>
 
         <varlistentry>
-          <term>--destination</term>
+          <term>--lang</term>
 
           <listitem>
             <para><emphasis>[Opcional] [Valor por defecto 'false']
             [booleano]</emphasis></para>
 
-            <para>Añadir información del valor <varname>destination</varname>
-            a los elementos del listado.</para>
+            <para>Añadir información del valor <varname>lang</varname> a los
+            elementos del listado.</para>
           </listitem>
         </varlistentry>
 
@@ -494,30 +530,18 @@
       </variablelist></para>
 
     <para>Estos son ejemplos que muestran la salida del
-    comando:<programlisting>roo&gt; <emphasis role="bold">page list</emphasis>
-/Entity2s         
-/Entity2s/Entity2 
-/Entity2s/Entity2s
-/Entity1s         
-/Entity1s/Entity1 
-/Entity1s/Entity1s
-/others           
-/others/gvpontis  
-/others/moskitt   
-/others/gvSIG     
-/others/gvhidra  
+    comando:<programlisting>roo&gt; <emphasis role="bold">menu tree --id c_person</emphasis>
+[c_person]
+URL          : No
+Hidden       : false
+Children     : 
+               [i_person_new]
+               URL          : /people?form
+               Hidden       : false
 
-roo&gt; <emphasis role="bold">page list --destination</emphasis>
-/Entity2s                                                                                                         
-/Entity2s/Entity2   /entity2s?form                                                                                
-/Entity2s/Entity2s  /entity2s?page=${empty param.page ? 1 : param.page}&amp;size=${empty param.size ? 10 : param.size}
-/Entity1s                                                                                                         
-/Entity1s/Entity1   /entity1s?form                                                                                
-/Entity1s/Entity1s  /entity1s?page=${empty param.page ? 1 : param.page}&amp;size=${empty param.size ? 10 : param.size}
-/others                                                                                                           
-/others/gvpontis    http://www.gvpontis.gva.es/                                                                   
-/others/moskitt     http://www.moskitt.org/                                                                       
-/others/gvSIG       http://www.gvsig.org/                                                                         
-/others/gvhidra     http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo/gvhidra-herramienta/    </programlisting></para>
+               [i_person_list]
+               URL          : /people?page=1&amp;size=${empty param.size ? 10 : param.size}
+               Hidden       : false
+</programlisting></para>
   </section>
 </section>

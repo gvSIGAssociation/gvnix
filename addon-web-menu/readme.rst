@@ -35,11 +35,18 @@ Features
 
 This add-ons have this features:
 
-#. Install a new web menu.
-#. Roo shell commands to manage menus.
-#. Some authorization integration.
+#. Roo shell commands to manage web site map
+
+   * Move pages inside, before, after other pages or categories
+   * Hide/Show pages
+   * Change URL, label and message
+
+#. Role based page authorization management
+#. Quick and centralized access to page data: URL, label, message, etc
 
 How to install
 ================
 
-Follow instructions of document https://svn.disid.com/svn/gvcit/gvNIX/roo-addon-roo-1.1.rst .
+TBC
+
+

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<config>
+
+  <comment id="c_jasperReportsXmlViewResolver">
+  <![CDATA[<!-- JasperReports view resolver -->
+  <!--
+    Resolves view names based on the names declared on the declared xml location
+    All our Jasper views are declared inside the specified xml location.
+    Take note of the ordering of this ViewResolver.
+  -->]]>
+  </comment>
+  <bean id="jasperReportsXmlViewResolver" class="org.springframework.web.servlet.view.XmlViewResolver"
+    p:location="/WEB-INF/spring/jasper-views.xml" p:order="0" />
+</config>

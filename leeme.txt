@@ -38,6 +38,11 @@ Para empezar con gvNIX necesitas:
 * Subversion
 * Acceso a Internet
 
+Para compilar ROO 1.1.2+ necesitas:
+
+* JDK 6 o superior
+* Maven 3.0.2
+
 A continuación, se detalla el proceso de instalación y configuración de cada uno de estos requisitos.
 
 Instalación y configuración
@@ -46,26 +51,29 @@ Instalación y configuración
 Configuración del entorno Unix
 -------------------------------
 
-.. admonition:: Directorio de trabajo
+.. admonition:: Variables de entorno
 
-  Nos referiremos a $HOME como nuestro directorio de trabajo. En nuestro ejemplo, se corresponde con el directorio /home/user en donde user es el nombre de nuestro usuario en el sistema.
+  En el documento se hace referencia a los directorios $HOME y $GVNIX_HOME, donde:
 
-Es de gran utilidad que en nuestro entorno estén definidas una serie de variables que nos ayuden en nuestro trabajo diario. Para ello, prepararemos un script donde iremos añadiendo lo que necesitemos. Para la preparación de nuestro script realizaremos la siguiente configuración previa:
+  * $HOME es nuestro directorio de usuario.
+  * $GVNIX_HOME es el directorio que contiene el directorio del código fuente del proyecto gvNIX.
 
-#. Crear en nuestro directorio de trabajo *$HOME* el fichero *.bash_devel*::
+Es de gran utilidad que en nuestro entorno estén definidas una serie de variables que nos ayuden en nuestro trabajo diario, por ejemplo *GVNIX_HOME*, *JAVA_HOME*, etc. 
+
+En entornos Linux, se puede utilizar *$HOME/.bashrc* para definir esas variables y automáticamente se cargarán al abrir una nueva consola. Es una buena práctica definirlas en nuestro propio archivo y cargarlo desde el *.bashrc*, en nuestro caso este archivo lo llamaremos *.bash_devel*:
+
+#. Crear en *$HOME* el fichero *.bash_devel*::
 
     Intérprete de comandos bash:
 
          touch $HOME/.bash_devel
 
-#. Modificar en nuestro directorio de trabajo *$HOME* el fichero *.bashrc* para que ejecute el fichero *.bash_devel* añadiendo al final las siguientes líneas::
+#. Modificar el fichero *$HOME/.bashrc* para que cargue el fichero *.bash_devel*, añadiendo al final las siguientes líneas::
 
 	# Development settings
 	if [ -f ~/.bash_devel ]; then
 	    . ~/.bash_devel
 	fi
-
-El fichero *.bashrc* se ejecuta siempre que se ejecuta el programa *bash*, por ejemplo cuando abrimos una consola nueva, por lo que siempre tendremos disponibles nuestras variables.
 
 Si hemos modificado el fichero *.bash_devel* y ya teníamos la consola abierta los cambios no serán aplicados en esta sesión, pero podemos volver a ejecutar dicho fichero con el comando::
 
@@ -78,6 +86,23 @@ A partir de ahora, cuando abramos una consola de comandos se ejecutará el conte
 .. admonition:: Importante
 
   Cualquier referencia futura que hagamos a establecer una variable de entorno (``export``) deberá añadirse al *.bash_devel*.
+
+Definir la variable de entorno GVNIX_HOME
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Definir la variable de entorno GVNIX_HOME con la ruta al directorio del código fuente (directorio *code*) del proyecto gvNIX.
+
+Ejemplos:
+
+* Si se ha descargado gvNIX de SVN con el comando ``svn co http://webdav.cop.gva.es/svn/gvnix`` en *$HOME/proyectos* definir la variable con::
+
+    export GVNIX_HOME=$HOME/proyectos/gvnix/trunk/code
+
+* Si hemos descargado gvNIX de SVN con el comando ``svn co http://webdav.cop.gva.es/svn/gvnix/trunk/code`` en *$HOME/proyecto-gvnix* definir la variable con::
+
+    export GVNIX_HOME=$HOME/proyecto-gvnix/code
+
+*Recordar añadir GVNIX_HOME al archivo $HOME/.bash_devel*.
 
 JDK
 --------
@@ -224,69 +249,52 @@ gvNIX está basado en Spring Roo, por este motivo es necesario disponer del cód
   Esto habrá descargado la rama raiz de desarrollo, es decir, el código fuente más actual del proyecto Roo.
   En general, durante el desarrollo, trabajaremos con este código fuente más actual de Roo a no ser que se indique lo contrario.
   
-  En algunos casos, podemos requerir una versión de Roo menos actual, por ejemplo, una versión de Roo anterior por requerimiento de gvNIX.
-  Para ello, necesitamos cambiar al directorio de Spring Roo y actualizar a la versión deseada.
-  Por ejemplo a la versión 1.1.0.M1 mediante el código ``3a0b8a399aae14167139c185e4e31355e20d1f25``::
+  Por motivos obvios, gvNIX no utiliza la versión de desarrollo de Roo, utiliza una versión estable (actualmente la 1.1.2.RELEASE). Para compilar gvNIX es necesario tener los fuentes de la versión estable de Roo. 
 
-      bash:~/gvnix/trunk/code$ cd roo
-      bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
+Actualizar el código fuente de Roo a la versión estable::
+
+   Intérprete de comandos:
+
+     cd roo
+     git tag # muestra la lista de tags del repositorio
+     # 1.1.1.RELEASE
+     # 1.1.2.RELEASE
+     # etc ...
+     git checkout 1.1.2.RELEASE # Actualiza al tag 1.1.2.RELEASE
+
+.. note::
+
+  Para actualizar Roo hay que ejecutar ``git pull``
+
+  Si tenemos cambios locales, el comando anterior se queja y no actualiza, para que pueda bajar los cambios hay que ejecutar antes ``git index``.
 
 Construir el proyecto
 =======================
 
-#. Aplicar el parche issue_3879.patch dentro del directorio de ROO::
+#. Compilar y construir Roo
 
-    bash:~/gvnix/trunk/code$ cd roo
-    bash:~/gvnix/trunk/code/roo$ git apply ../issue_3879.patch
+   #. Compilar e instalar el directorio *wrapping*::
 
-#. Muestra los siguientes mensajes de error aunque si que se aplica correctamente::
+        Intérprete de comandos:
 
-    ~/projects/svn/gvnix/trunk/code/issue_3879.patch:44: space before tab in indent.
-              JavaParserConstructorMetadata.addConstructor(compilationUnitServices, typeDeclaration.getMembers(), candidate, false, new HashSet<JavaSymbolName>());
-    ~/projects/svn/gvnix/trunk/code/issue_3879.patch:50: space before tab in indent.
-              JavaParserMethodMetadata.addMethod(compilationUnitServices, typeDeclaration.getMembers(), candidate, false, new HashSet<JavaSymbolName>());
-    ~/projects/svn/gvnix/trunk/code/issue_3879.patch:157: trailing whitespace.   
-    error: patch failed: addon-test/src/main/java/org/springframework/roo/addon/test/IntegrationTestMetadata.java:287
-    error: addon-test/src/main/java/org/springframework/roo/addon/test/IntegrationTestMetadata.java: patch does not apply
-    error: patch failed: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/JavaParserMutableClassOrInterfaceTypeDetails.java:513
-    error: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/JavaParserMutableClassOrInterfaceTypeDetails.java: patch does not apply
-    error: patch failed: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserConstructorMetadata.java:248
-    error: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserConstructorMetadata.java: patch does not apply
-    error: patch failed: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserMethodMetadata.java:33
-    error: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserMethodMetadata.java: patch does not apply
-    error: patch failed: classpath/src/main/java/org/springframework/roo/classpath/details/AnnotationMetadataUtils.java:10
-    error: classpath/src/main/java/org/springframework/roo/classpath/details/AnnotationMetadataUtils.java: patch does not apply
-    error: patch failed: classpath/src/main/java/org/springframework/roo/classpath/itd/AbstractItdMetadataProvider.java:245
-    error: classpath/src/main/java/org/springframework/roo/classpath/itd/AbstractItdMetadataProvider.java: patch does not apply
-    error: patch failed: model/src/main/java/org/springframework/roo/model/JavaType.java:114
-    error: model/src/main/java/org/springframework/roo/model/JavaType.java: patch does not apply
-    error: patch failed: pom.xml:213
-    error: pom.xml: patch does not apply
+         cd $GVNIX_HOME/roo/wrapping
+         mvn clean install
 
-#. Dado que gvNIX está basado en Roo, el primer paso es compilar y construir Roo::
+   #. Compilar e instalar Roo::
 
-    bash:~/gvnix/trunk/code/roo$ mvn clean install
-   
-   Cada vez que actualizes el código fuente del proyecto Roo con el comando ``git pull`` necesitarás volver a construirlo.
+        Intérprete de comandos:
 
-   .. admonition::Error al instalar
+         cd $GVNIX_HOME/roo
+         mvn clean install
 
-     El plugin de Maven *exec-maven-plugin* en su versión 1.2 puede dar problemas al instalar el proyecto, es necesario utilizar la versión 1.1.1
+   Cada vez que actualizes el código fuente del proyecto Roo necesitarás volver a construir Roo y gvNIX.
 
-     En estos casos actualizar el pom.xml como sigue::
+#. Compilar y construir gvNIX::
 
-        ...
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1.1</version>  <!-- Añadir esta línea -->
-                <executions>
-        ...
+    Intérprete de comandos:
 
-#. Construir gvNIX::
-
-    bash:~/gvnix/trunk/code$ mvn clean install
+     cd $GVNIX_HOME
+     mvn clean install
     
    Cada vez que modifiques el proyecto gvNIX o hayas reconstruido el proyecto Roo, necesitarás volver a construir el gvNIX si quieres disponer de dichas modificaciones.
 
@@ -295,22 +303,33 @@ Arrancar la versión gvNIX de desarrollo
 
 Si se accede a internet a través de un proxy se ha de habilitar en la configuración de `Maven`_ (Anexo -> Configruación proxy -> Maven).
 
-#. Empezando con gvNIX
+#. Incluir el directorio ``bin`` del proyecto gvNIX en la variable de entorno PATH::
 
-   * Incluir el directorio ``bin`` de gvNIX en la variable de entorno PATH::
+    Intérprete de comandos:
 
-      bash:~/gvnix/trunk/code$ export PATH=~/gvnix/trunk/code/bin:$PATH
+     # opcion 1
+     cd $GVNIX_HOME
+     export PATH=$PWD/bin:$PATH
 
-     A continuación, escribir el comando anterior en el fichero $HOME/.bash_devel para que
-     esté disponible en el futuro en todas las nuevas consolas que abras.
+     # opcion 2
+     export PATH=$GVNIX_HOME/bin:$PATH
 
-   * Cambiar al directorio existente o nuevo del proyecto Java que quieras desarrollar con gvNIX::
+   En entornos Linux es útil añadir el comando anterior al *$HOME/.bashrc*, en nuestro caso añadirlo al fichero *$HOME/.bash_devel* para que esté disponible en el futuro en todas las nuevas consolas que abras.
 
-      bash:~/gvnix/trunk/code$ cd ~/project-directory
+#. Cambiar al directorio del proyecto y desarrolla con la versión de desarrollo::
 
-   * Ejecutar el intérprete de comandos de gvNIX::
+    Intérprete de comandos:
 
-      bash:~/project-directory$ gvnix-dev
+      cd ~/project-directory
+      gvnix-dev
+
+.. admonition:: Importante
+
+  Después de cada cambio y recompilar gvNIX se *DEBE* borrar el contenido de la *cache*, para ello borrar el contenedor OSGi ubicado en *$GVNIX_HOME/roo/bootstrap/target/osgi*. 
+
+  Es necesario para que el contenedor OSGi cargue los nuevos bundles y no los bundles en cache.
+
+  Al hacer las pruebas con *gvnix-dev* recomendable ejecutar el comando ``dev mode`.
 
 Empaquetar gvNIX
 ================
@@ -380,6 +399,19 @@ Escribir documentación
 
 Anexo
 =====
+
+Desarrollo de add-ons desde Eclipse
+------------------------------------
+
+En el directorio del add-on ejecutar::
+
+  mvn org.apache.maven.plugins:maven-eclipse-plugin:2.6:eclipse
+
+En Eclipse crear un nuevo proyecto Java sobre el directorio del add-on y et-voilà.
+
+.. important::
+
+  Por el momento no usar *mvn eclipse:eclipse* debido a un bug en la versión 2.7 del plugin (http://stackoverflow.com/questions/1397903/setting-project-for-eclipse-using-maven).
 
 Configuración proxy
 -------------------
@@ -454,28 +486,3 @@ Variables::
   * [groups] Dentro del grupo ``groups`` definir la dirección del repositorio donde accede. Nombre del grupo y dirección.
   * [Nombre del grupo] Definir las propiedades del proxy asociado al grupo (http-proxy-host y http-proxy-port).
 
-Java
-````
-
-En el caso de que se acceda a algún sistema externo desde la propia aplicación:: 
-
- mvn clean tomcat:run -Dhttp.proxyHost=dirección_proxy -Dhttp.proxyPort=puerto_proxy -Dhttp.nonProxyHosts="host1|host2|192.168.*"
-
-Reemplazar en nonProxyHosts las direcciones que no necesiten acceso a través del proxy.
-
-Eclipse
-```````
-
-Configuración de un proxy en Eclipse:
-
- * Active Provider: Direct
- * Entries:
-
-    * HTTP dirección_proxy puerto_proxy
-    * HTTPS dirección_proxy puerto_proxy
-
-  * Bypass:
-  
-     * host1
-     * host2
-     * 192.168.*

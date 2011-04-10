@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fontFamilies>
+
+   <fontFamily name="SansSerif">
+       <normal><![CDATA[jasperfonts/FreeSans.ttf]]></normal>
+       <bold><![CDATA[jasperfonts/FreeSansBold.ttf]]></bold>
+       <italic><![CDATA[jasperfonts/FreeSansOblique.ttf]]></italic>
+       <boldItalic><![CDATA[jasperfonts/FreeSansBoldOblique.ttf]]></boldItalic>
+       <pdfEncoding><![CDATA[Cp1252]]></pdfEncoding>
+       <pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+   </fontFamily>
+
+
+</fontFamilies>

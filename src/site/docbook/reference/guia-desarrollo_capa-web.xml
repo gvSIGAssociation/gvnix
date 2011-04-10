@@ -12,14 +12,15 @@
   <para xml:lang="es">La capa web de la aplicación contiene la infraestructura
   necesaria gestionar peticiones HTTP. Actualmente esta capa puede
   desarrollarse con <link
-  href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html">Spring
-  MVC</link> y con <link href="http://code.google.com/webtoolkit/">GWT</link>.
-  Este último, aunque es funcional, todavía está en fase de refinamiento, por
-  lo que en este apartado nos centraremos en cómo se genera la capa web con
-  Spring MVC.</para>
+  xlink:href="http:///spring/docs/3.0.x/spring-framework-reference/html/mvc.html">Spring
+  MVC</link> y con <link
+  xlink:href="http://code.google.com/webtoolkit/">GWT</link>. Este último,
+  aunque es funcional, todavía está en fase de refinamiento, por lo que en
+  este apartado nos centraremos en cómo se genera la capa web con Spring
+  MVC.</para>
 
   <para xml:lang="es">La gestión de peticiones en Spring MVC se basa en los
-  controladores, clases en las que, mediante anotaciones se definen los
+  controladores, clases en las que, mediante anotaciones, se definen los
   métodos que atienden peticiones HTTP.</para>
 
   <para xml:lang="es">Un controlador es una clase Java anotada con
@@ -380,6 +381,288 @@ public class MyController {
         </listitem>
       </orderedlist>
     </section>
+
+    <section>
+      <title>Código generado en las vistas de la capa web</title>
+
+      <para>Cuando gvNIX genera la pare de front-end de la capa web de nuestra
+      aplicación lo hace generando ficheros jspx y tagx. Los ficheros jspx no
+      son más que JSPs que a su vez hacen uso de tags de las librerías JSTL,
+      Spring Framework y otras que se generán también como parte de nuestra
+      aplicación ubicadas en WEB-INF/tags.</para>
+
+      <para>Ya que es una buena práctica la reutilización de código o de
+      componentes de la vista web, gvNIX utiliza el motor de plantillas <link
+      xlink:href="http://tiles.apache.org/">Apache Tiles</link>. Este motor de
+      plantillas permite definir fragmentos que pueden ser integrados en una
+      página completa en tiempo de ejecución, facilitando el desarrollo de la
+      capa de presentación de una forma consistente en toda la
+      aplicación.</para>
+
+      <section>
+        <title>Estructura de archivos de las vistas de la capa web</title>
+
+        <para>Para nuestro proyecto de ejemplo PizzaShop, se ha creado la
+        estructura de directorios y archivos que podemos ver en la imagen
+        siguiente:</para>
+
+        <figure>
+          <title>Estructura archivos Pizza Shop</title>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="images/webinf-tree.png"></imagedata>
+            </imageobject>
+          </mediaobject>
+        </figure>
+
+        <para>de todas las carpetas nos centraremos en <emphasis>layouts, tags
+        y views</emphasis>.</para>
+      </section>
+
+      <section>
+        <title>Motor de plantillas: Tiles</title>
+
+        <para>Dentro de views hay varios ficheros jspx y varias carpetas. De
+        entre los ficheros comentemos la función de
+        <emphasis>views.xm</emphasis>l. Este fichero es el que establece la
+        configuración de vistas que Tiles deberá generar. Tiles se basa en que
+        todas las vistas de una aplicación web son similares, tienen el mismo
+        diseño y estructura, pero cada página está compuesta de distintos
+        trozos que conforman el contenido pero siempre colocados de la misma
+        forma. Al mismo tiempo nos permite modificar ciertos aspectos del
+        diseño para adaptarnos a las necesidades de una vista concreta. Por
+        ejemplo, es común que una página web tenga una cabecera, donde se
+        puede ver el título de la misma, un menú con las distintas secciones
+        que hay en el site, un pie de página y una parte principal con el
+        contenido. Tiles nos brinda la posibilidad de especificar que una
+        disposición de nuestra página contiene estos cuatro bloques, pero por
+        contra en alguna sección o situación (por ejemplo: el usuario de la
+        web está o no logado en la aplicación) queremos que el menú no se
+        muestre.</para>
+
+        <informalexample>
+          <programlisting>&lt;definition name="index" extends="default"&gt;
+  &lt;put-attribute name="body" value="/WEB-INF/views/index.jspx" /&gt;
+&lt;/definition&gt;</programlisting>
+
+          <epigraph>
+            <para><emphasis>Def. index.</emphasis></para>
+          </epigraph>
+        </informalexample>
+
+        <para>El código anterior, extraido de <emphasis>view.xml</emphasis>,
+        define una vista llamada <emphasis>index</emphasis> que se basa en,
+        extiende de, otra vista <emphasis>default</emphasis> y al que se le
+        pasa como atributo <emphasis>body</emphasis> la página definida por el
+        fichero <emphasis>index.jspx.</emphasis> La definición de la vista
+        <emphasis>default</emphasis> nos ayudará a entender esta otra.
+        <emphasis>default</emphasis> se define en el fichero
+        <emphasis>WEB-INF/layouts/layouts.xml</emphasis>.</para>
+
+        <programlisting>&lt;definition name="default" template="/WEB-INF/layouts/default.jspx"&gt;
+  &lt;put-attribute name="header" value="/WEB-INF/views/header.jspx" /&gt;
+  &lt;put-attribute name="menu" value="/WEB-INF/views/menu.jspx" /&gt;
+  &lt;put-attribute name="footer" value="/WEB-INF/views/footer.jspx" /&gt;
+&lt;/definition&gt;</programlisting>
+
+        <para>En la definición de esta vista se indica que la plantilla
+        (<emphasis>template</emphasis>) que va a dibujar está parte de nuestra
+        web está programada en la JSP <emphasis>default.jspx</emphasis>.
+        Además, aquí ya vemos otros fragmentos que van a definir la
+        composición de nuestra vista, la cabecera
+        (<emphasis>header</emphasis>), menú y pie de página
+        (<emphasis>footer</emphasis>), los cuales serán dibujados por las
+        respectivas páginas jspx. Si volvemos a la definición de la vista
+        <emphasis>index</emphasis> del fragmento de código anterior
+        (<emphasis>Def. index</emphasis>), veremos como uniendo los atributos
+        de las dos definiciones tendremos que la vista
+        <emphasis>index</emphasis> se compone de los cuatro fragmentos que
+        habíamos comentado anteriormente: cabecera, menú, pie de página y
+        cuerpo. Así pues, sería sencillo definir una nueva vista con esta
+        misma estructura simplemente indicando que el contenido principal, el
+        cuerpo, viniera definido por otra JSP cualquiera.</para>
+
+        <para>Para acabar de entenderlo veamos el contenido de
+        <emphasis>default.jspx</emphasis>:</para>
+
+        <programlisting>&lt;html xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" 
+ xmlns:tiles="http://tiles.apache.org/tags-tiles" xmlns:spring="http://www.springframework.org/tags" 
+ xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" &gt;  
+
+  &lt;jsp:output doctype-root-element="HTML" doctype-system="about:legacy-compat" /&gt;
+
+  &lt;jsp:directive.page contentType="text/html;charset=UTF-8" /&gt;  
+  &lt;jsp:directive.page pageEncoding="UTF-8" /&gt; 
+
+  &lt;head&gt;
+    &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=8" /&gt;
+
+    <emphasis role="bold">&lt;util:load-scripts /&gt;</emphasis>
+
+    <emphasis role="bold">&lt;spring:message code="application_name" var="app_name"/&gt;</emphasis>
+    &lt;title&gt;&lt;spring:message code="welcome_h3" arguments="${app_name}" /&gt;&lt;/title&gt;
+  &lt;/head&gt;
+
+  &lt;body class="tundra spring"&gt;
+    &lt;div id="wrapper"&gt;
+      <emphasis role="bold">&lt;tiles:insertAttribute name="header" ignore="true" /&gt;</emphasis>
+      &lt;tiles:insertAttribute name="menu" ignore="true" /&gt;   
+      &lt;div id="main"&gt;
+        <emphasis role="bold">&lt;tiles:insertAttribute name="body"/&gt;</emphasis> 
+        &lt;tiles:insertAttribute name="footer" ignore="true"/&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</programlisting>
+
+        <para>En el fragmento de código anterior ya vemos etiquetas de HTML y
+        algunas otras que hemos resaltado en negrita. <emphasis
+        role="bold">&lt;util:load-scripts /&gt;</emphasis> es una etiqueta
+        definida en nuestro propio proyecto, luego comentaremos cual es su
+        finalidad. Las etiquetas <emphasis role="bold">&lt;spring:message
+        .../&gt; </emphasis>son de Spring Framework y sirven para mostrar
+        texto traducido a los distintos idiomas soportados por nuestra
+        aplicación. Por último las <emphasis
+        role="bold">&lt;tiles:insertAttribute ... ignore="true"
+        /&gt;</emphasis> son las propias de Tiles que simplemente lo que hacen
+        es insertar en esa posición de la página JSP el contenido del fichero
+        que se ha especificado en la definición de las vistas como parámetro
+        (<emphasis>head, menu, body, footer</emphasis>). Cabe destacar el
+        atributo <emphasis>ignore</emphasis> que acompaña a alguna de estas
+        etiquetas. El atributo <emphasis>ignore</emphasis> con valor
+        <emphasis>true</emphasis> indica que, si el bloque que debe insertarse
+        en el lugar de esa etiqueta no está establecido en la definición de la
+        vista, lo ignore y siga con el dibujado del resto de la página, por
+        contra, en ausencia de este atributo o con valor
+        <emphasis>false</emphasis>, al dibujar la página, si el bloque a
+        insertar no está definido, se produciría una excepción en tiempo de
+        ejecución y por tanto no se dibujaría la página.</para>
+
+        <para>Ahora ya conocemos el funcionamiento del motor de plantillas
+        usado por gvNIX, veamos, a continuación el resto de directorios y
+        ficheros que componen el front-end de nuestra aplicación.</para>
+      </section>
+
+      <section>
+        <title>Vistas CRUD (Create, Read, Update, Delete)</title>
+
+        <para>Si miramos entre las carpetas contenidas en la carpeta views
+        vemos que hay una carpeta por cada una de las entidades de nuestra
+        lógica de negocio. Cada una de estas carpetas contiene las páginas JSP
+        que dibujarán las vistas para las operaciones de Creación (Create),
+        Lectura (Read), Modificación (Update) y Borrado (Delete). Fijémonos en
+        uno de ellos, por ejemplo <emphasis>bases</emphasis>:</para>
+
+        <programlisting>bases
+|-- create.jspx
+|-- list.jspx
+|-- show.jspx
+|-- update.jspx
+`-- views.xml</programlisting>
+
+        <para>Lo primero a destacar es que también existe un archivo
+        <emphasis>views.xml</emphasis>. En este caso, al igual que el otro del
+        que hemos hablado que está contenido en el directorio
+        <emphasis>WEB-INF/views</emphasis>, también se trata de un archivo de
+        definiciones de vistas. Mirando su contendo vemos que se definen
+        varias vistas que se basan en <emphasis>default</emphasis> que hemos
+        comentado anteriormente pero cada una de ellas define un
+        <emphasis>body</emphasis> con una JSP distinta.</para>
+
+        <para>Parece bastante evidente cual es el cometido de cada una de las
+        JSP:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><emphasis>create.jspx</emphasis> muestra el formulario para
+            crear un nuevo registro de la entidad Base,</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis>list.jspx</emphasis> muestra el listado de todas
+            las bases de pizza existentes,</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis>show.jspx</emphasis> mostrará la información
+            detallada de la base de pizza que hemos seleccionado</para>
+          </listitem>
+
+          <listitem>
+            <para>y por último <emphasis>update.jspx</emphasis> muestra el
+            formulario para realizar la modificación del registro.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>No hay una JSP dedicada al borrado de registros porque gvNIX
+        incluye un botón para borrado en las vistas <emphasis>show</emphasis>
+        y <emphasis>list</emphasis>.</para>
+      </section>
+
+      <section>
+        <title>Componentes de las JSP de las vistas CRUD</title>
+
+        <para>Veamos ahora los componentes que forman las vistas CRUD de
+        nuestro proyecto.</para>
+
+        <note>
+          <para>Se listan los componentes que pueden aparecer en cada vista
+          pero cada uno de estos componentes puede aparecer varias veces
+          dependiendo de los campos a informar.</para>
+        </note>
+
+        <para><emphasis role="bold">create.jspx</emphasis></para>
+
+        <programlisting>&lt;form:create&gt;
+  &lt;field:input/&gt;
+  &lt;field:datetime/&gt;
+  &lt;field:select/&gt;
+&lt;/form:create&gt;
+&lt;form:dependency/&gt;</programlisting>
+
+        <para><emphasis>&lt;form:create/&gt;</emphasis> define un formulario
+        en el que los campos de entrada vienen definidos por las etiquetas
+        <emphasis>&lt;field:xxxx/&gt;</emphasis>. Las etiquetas
+        <emphasis>field</emphasis> generan el código HTML para mostrar campos
+        de texto, selección de fechas o desplegables de selección.</para>
+
+        <para><emphasis role="bold">list.jspx</emphasis></para>
+
+        <programlisting>&lt;page:list&gt;
+  &lt;table:table&gt;
+    &lt;table:column/&gt;
+  &lt;/table:table&gt;
+&lt;/page:list&gt;</programlisting>
+
+        <para><emphasis>&lt;table:table/&gt;</emphasis> generará el HTML de
+        una tabla donde las distintas columnas serán los campos mostrados
+        através de la etiqueta
+        <emphasis>&lt;table:column/&gt;</emphasis>.</para>
+
+        <para><emphasis role="bold">show.jspx</emphasis></para>
+
+        <programlisting>&lt;page:show&gt;
+  &lt;field:display/&gt;
+&lt;/page:show&gt;</programlisting>
+
+        <para>Para mostrar campos del objeto en formato texto en una vesta web
+        usaremos <emphasis>&lt;field:display/&gt;</emphasis>.</para>
+
+        <para><emphasis role="bold">update.jspx</emphasis></para>
+
+        <programlisting>&lt;form:update&gt;
+  &lt;field:input/&gt;
+  &lt;field:datetime/&gt;
+  &lt;field:select/&gt;
+&lt;/form:update&gt;</programlisting>
+
+        <para>Los <emphasis>field</emphasis> que aparecen para la modificación
+        de un registro son los mismos que en el caso del alta de un nuevo
+        registro.</para>
+      </section>
+    </section>
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_test-funcional">
@@ -409,10 +692,6 @@ public class MyController {
     <para>Una vez iniciada la aplicación podemos lanzar las pruebas
     funcionales con la orden <command>mvn selenium:selenese</command></para>
 
-    <para>
-      <emphasis>TBC Ejemplo</emphasis>
-    </para>
-
-     
+    <para><emphasis>TBC Ejemplo</emphasis></para>
   </section>
 </chapter>

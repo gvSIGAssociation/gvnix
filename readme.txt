@@ -5,6 +5,8 @@
 
 Welcome to gvNIX, Spring Roo based RAD tool for Java developers.
 
+TODO: This doc isn't updated
+
 About this doc
 ===============
 
@@ -37,6 +39,47 @@ To start with gvNIX you need:
 
 Setup instructions
 ===================
+
+Obtener la versión base de Roo
+------------------------------
+
+#. Descargar el código fuente del proyecto Roo desde su repositorio en un directorio temporal de nuestro equipo::
+
+       bash> cd /tmp
+       bash> rm -rf roo
+       bash> git clone git://git.springsource.org/roo/roo.git
+       bash> cd roo
+
+#. Consultar en la información técnica del proyecto la versión de Roo que requiere la versión de gvNIX que se desea empaquetar.
+   Por ejemplo, la versión 0.3.0 de gvNIX requiere la versión 1.1.0.M1 de Roo.
+
+#. Para obtener una determinada versión del código fuente de Roo desde su repositorio necesitamos conocer el número de revisión que tiene asociada la versión.  
+   Para identificar el número de revisión de una versión de Roo pueden usarse las siguientes instrucciones::
+       
+       bash> cd /tmp/roo
+       bash> git tag -l
+       
+   Identificar el número de versión de Roo deseado de entre la lista de versiones que aparecerá y que llamaremos <versión Roo>.
+   
+   Por algún motivo desconocido, no está marcada la versión de Roo 1.1.0.M1, cuyo {número de revisión de Roo} es 3a0b8a399aae14167139c185e4e31355e20d1f25. Continuar con el siguiente paso teniendo en cuenta el número de revisión proporcionado.  
+   
+   Ejecutar el siguiente comando para obtener el {número de revisión de Roo}::
+   
+       bash> git show <versión Roo> | head -n 1
+
+   Apuntar el {número de revisión de Roo} que será el código alfanumérico que aparecerá despues de la cadena ``commit``.
+
+#. Descargar el código fuente de Roo de la versión que deseamos utilizar, por ejemplo::
+
+       bash> cd /tmp/roo
+       bash> git checkout {número de revisión de Roo}
+   
+   Reemplazar el {número de revisión de Roo} por el valor obtenido en el paso anterior.
+
+#. Empaquetar la versión base de Roo::
+
+       bash> cd /tmp/roo
+       bash> mvn clean install assembly:assembly
 
 Spring Roo 1.1.0.M1
 -----------------------------
@@ -226,7 +269,7 @@ To configure Maven access through a proxy you have to set the proxy parameters i
     </settings>
 
 SVN
-~~~~
+~~~
 
 To configure SVN access through a http proxy, e.g. your web browser requires a http proxy, add the following lines to '~/.subversion/servers'::
 
@@ -243,3 +286,22 @@ Variables::
   * [groups] Set repository address to access inside group ``groups``. Name and address.
   * [Name] Set group proxy connection properties (http-proxy-host y http-proxy-port).
 
+JDK
+~~~
+
+ $JAVA_HOME/jre/lib/net.properties::
+ 
+  java.net.useSystemProxies=true
+
+TODO
+====
+
+* https://jira.springsource.org/browse/ROO-2097
+
+* Roo refactor at web layer commands:
+
+   web xyz install
+   web xyz scaffold --class
+   web xyz all --package
+
+  https://jira.springsource.org/browse/ROO-2297

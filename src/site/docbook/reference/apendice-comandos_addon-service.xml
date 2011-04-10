@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_addon-service"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Comandos del Add-on Service</title>
+
+  <para xml:lang="es">Para una descripción general ver <link
+  linkend="addon-web-report">Add-on Service</link>.</para>
+
+  <table>
+    <title xml:lang="es">Comandos de Add-on Service</title>
+
+    <tgroup cols="2">
+      <thead>
+        <colspec colwidth="150" />
+
+        <row>
+          <entry align="center">Comando</entry>
+
+          <entry align="center">Descripción</entry>
+        </row>
+      </thead>
+
+      <tbody>
+        <row>
+          <entry><link linkend="apendice-comandos_addon-service_class">service
+          class</link></entry>
+
+          <entry>Crea una clase de Servicio Web nueva en el proyecto</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-service_define_ws">service define
+          ws</link></entry>
+
+          <entry>Define una interfaz del servicio. Si la clase indicada no
+          existe la creará</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-service_operation">service
+          operation</link></entry>
+
+          <entry>Añade una nueva operación a la clase del servicio web</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-service_export_operation">service
+          export operation</link></entry>
+
+          <entry>Publica un método como operación del servicio web en un
+          PortType</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-service_list_operation">service
+          list operation</link></entry>
+
+          <entry>Muestra los métodos que pueden ser exportados como
+          operaciones del servicio web</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-service_export_ws">service export
+          ws</link></entry>
+
+          <entry>Exporta un servicio web desde un WSDL a código Java con
+          anotaciones gvNIX con implementación de métodos de ejemplo.</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-service_import_ws">service import
+          ws</link></entry>
+
+          <entry>Importa un servicio web a una clase Java.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <section xml:id="apendice-comandos_addon-service_class">
+    <title>service class</title>
+
+    <para xml:lang="es">Crea la clase del servicio en
+    SRC_MAIN_JAVA.<variablelist>
+        <varlistentry>
+          <term>--class</term>
+
+          <listitem>
+            <para><emphasis>[Requerido][Ruta canónica de la clase a crear.
+            Admite ~. para denotar el paquete raiz del
+            proyecto]</emphasis></para>
+
+            <para>Nombre de la clase que queremos crear.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-service_define_ws">
+    <title>service define ws</title>
+
+    <para>Define una interfaz de servicio web que será enlazada con un
+    PortType en la definición del servicio. Si la clase de destino no existe,
+    será creada.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>--class</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][Ruta canónica de la clase a crear.
+          Admite ~. para denotar el paquete raiz del
+          proyecto]</emphasis></para>
+
+          <para>Nombre de la clase que queremos crear o exportar.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--serviceName</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][Nombre con el que se quiere publicar el
+          servicio]</emphasis></para>
+
+          <para>Nombre con el que se quiere publicar el servicio.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--portTypeName</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][Nombre del Port Type]</emphasis></para>
+
+          <para>Nombre para el prot type.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--addressName</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][URI del servicio web][Por defecto el
+          nombre de la clase]</emphasis></para>
+
+          <para>Dirección donde se publicará el servicio web en el
+          servidor.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--targetNamespace</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][namespace del servicio]</emphasis></para>
+
+          <para>Namespace del servicio (p.ej.:
+          http://services.project.service.test.gvnix.org/). Debe tener formato
+          URI.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-service_operation">
+    <title>service operation</title>
+
+    <para xml:lang="es">Añade un nuevo método a la clase del servicio
+    web.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>--name</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][Nombre del método]</emphasis></para>
+
+          <para>El nombre de la operación a añadir.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--service</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][Ruta canónica de la clase del servicio.
+          Admite ~. para denotar el paquete raiz del
+          proyecto]</emphasis></para>
+
+          <para>Ruta de la clase que recibe el método.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--return</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][Tipo Java]</emphasis></para>
+
+          <para>Tipo Java que devuelve el método.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--paramNames</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][String separados por comas sin
+          espacios]</emphasis></para>
+
+          <para>Nombre de los parámetros de entrada del método.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--paramTypes</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][Tipos Java, separados por comas sin
+          espacios]</emphasis></para>
+
+          <para>Tipos Java de los parámetros de entrada del método.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--exceptions</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][Tipos Java de las Excepciones, separados
+          por comas sin espacios]</emphasis></para>
+
+          <para>Tipos Java de las Excepciones que puede lanzar el
+          método.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-service_export_operation">
+    <title>service export operation</title>
+
+    <para>Publica un método como operación del servicio web en un
+    PortType.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>--class</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][Ruta canónica de la clase del servicio.
+          Admite ~. para denotar el paquete raiz del
+          proyecto]</emphasis></para>
+
+          <para>Clase del servicio web donde está el método a publicar.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--method</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][Nombre del método]</emphasis></para>
+
+          <para>Nombre del método que se quiere exportar.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--operationName</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][Nombre de la operación]</emphasis></para>
+
+          <para>Nombre con el que se desea que el método sea publicado en el
+          servicio web.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--resultName</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][Nombre del resultado]</emphasis></para>
+
+          <para>Nombre del resultado de la operación.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--resultNamespace</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][namespace del
+          resultado]</emphasis></para>
+
+          <para>Namespace del resultado (p.ej.:
+          http://services.project.service.test.gvnix.org/). Debe tener formato
+          URI.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--responseWrapperName</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][Objeto que envuelve la
+          respuesta]</emphasis></para>
+
+          <para>Nombre que define el objeto que envuelve la respuesta del
+          servicio.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--requestWrapperName</term>
+
+        <listitem>
+          <para><emphasis>[Opcional][Objeto que envuelve la
+          petición]</emphasis></para>
+
+          <para>Nombre que define el objeto que envuelve la petición del
+          servicio.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-service_list_operation">
+    <title>service list operation</title>
+
+    <para>Muestra los métodos de la clase seleccionada que pueden ser
+    exportados como operaciones del servicio web.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>--class</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][Ruta canónica de la clase del servicio.
+          Admite ~. para denotar el paquete raiz del
+          proyecto]</emphasis></para>
+
+          <para>Clase del servicio web donde está el método.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-service_export_ws">
+    <title>service export ws</title>
+
+    <para>Exporta un servicio web desde un WSDL a código Java con anotaciones
+    gvNIX con implementación de métodos de ejemplo.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>--wsdl</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][URL del archivo WSD]</emphasis></para>
+
+          <para>La URL puede ser el path a un archivo en local (file://) o a
+          un WSDL en Internet (http[s]://).</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-service_import_ws">
+    <title>service import ws</title>
+
+    <para>Importa un servicio web a una clase Java como cliente del servicio
+    web a importar.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>--wsld</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][URL del archivo WSD]</emphasis></para>
+
+          <para>La URL puede ser el path a un archivo en local (file://) o a
+          un WSDL en Internet (http[s]://).</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--class</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][Ruta canónica de la clase a crear.
+          Admite ~. para denotar el paquete raiz del
+          proyecto]</emphasis></para>
+
+          <para>Nombre de la clase donde queremos importar el cliente del
+          servicio web. Si no existe la creará.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+</section>

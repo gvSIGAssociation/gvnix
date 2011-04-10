@@ -40,6 +40,19 @@
       <para xml:lang="es">Esta parte de la documentación de introducción a la
       arquitectura interna y información básica para el desarrollo de
       gvNIX.</para>
+
+      <para xml:lang="es">Antes de empezar a trabajar en gvNIX es conveniente
+      leer la siguiente documentación:<itemizedlist>
+          <listitem>
+            <para>Operations, Commands, Utils et all:
+            https://jira.springsource.org/browse/ROO-2066</para>
+          </listitem>
+
+          <listitem>
+            <para>Joey infraestructure:
+            https://jira.springsource.org/browse/ROO-1372</para>
+          </listitem>
+        </itemizedlist></para>
     </partintro>
 
     <xi:include href="arquitectura-interna.xml" />
@@ -76,6 +89,8 @@
     <xi:include href="compilacion.xml" />
 
     <xi:include href="validacion.xml" />
+
+    <xi:include href="distribucion.xml" />
   </part>
 
   <part>
@@ -85,7 +100,9 @@
       <para xml:lang="es">Introducción a OSGi, add-ons como componentes
       OSGi.</para>
     </partintro>
+
     <xi:include href="osgi-intro.xml" />
+
     <xi:include href="osgi-api.xml" />
   </part>
 

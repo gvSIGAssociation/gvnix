@@ -9,7 +9,8 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Gestión del acceso a datos</title>
 
-  <section xml:lang="es">
+  <section xml:id="guia-desarrollo-acceso-datos_persistencia-objetos"
+           xml:lang="es">
     <title xml:lang="es">Persistencia de objetos</title>
 
     <para xml:lang="es">Trabajar en un entorno orientado a objetos con acceso
@@ -488,6 +489,34 @@ roo&gt; </programlisting>
           <emphasis>hibernate.hbm2ddl.auto</emphasis>:</para>
 
           <programlisting>&lt;-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
+
+          <para>Existen cuatro opciones <emphasis>validate, update, create,
+          create-drop</emphasis>. Estas opciones están orientadas a entornos
+          de desarrollo por el "peligro" que ello puede suponer para la
+          integridad de la BBDD.</para>
+
+          <itemizedlist>
+            <listitem>
+              <para><emphasis>validate</emphasis>: valida el esquema pero no
+              modifica su estado.</para>
+            </listitem>
+
+            <listitem>
+              <para><emphasis>update</emphasis>: actualiza el esquema al
+              arrancar la aplicación.</para>
+            </listitem>
+
+            <listitem>
+              <para><emphasis>create</emphasis>: crea el esquema destruyendo
+              la información existente.</para>
+            </listitem>
+
+            <listitem>
+              <para><emphasis>create-drop</emphasis>: hace un
+              <emphasis>drop</emphasis> de las tablas al parar la
+              aplicación.</para>
+            </listitem>
+          </itemizedlist>
         </listitem>
       </itemizedlist>
     </section>

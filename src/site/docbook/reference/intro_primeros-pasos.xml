@@ -29,7 +29,7 @@ bash$ <emphasis role="bold">gvnix</emphasis>
    / __ \/ __ \/ __ \ 
   / /_/ / / / / / / / 
  / _, _/ /_/ / /_/ /  
-/_/ |_|\____/\____/    1.1.0.M1 [rev 3a0b8a3]
+/_/ |_|\____/\____/    1.x.x-RELEASE
 
 
 Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
@@ -74,11 +74,7 @@ As such, you're ready to press ENTER to execute the command.
 Once JPA is installed, type 'hint' and ENTER for the next suggestion.</programlisting>
 
     <para xml:lang="es">En este punto ya tiene un proyecto Maven de aplicación
-    web preparado. Si usa Java 5 tendrá que añadir las referencias a las
-    librerías JAXB con los siguientes comandos:</para>
-
-    <programlisting>com.tenminutes roo&gt; <emphasis role="bold">dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1</emphasis>
-javax.xml.bind roo&gt; <emphasis role="bold">dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3</emphasis></programlisting>
+    web preparado.</para>
 
     <para>Ahora añadiremos el soporte para el manejo de la persistencia de
     datos a traves de JPA. El siguiente ejemplo muestra los comandos que debe
@@ -87,17 +83,56 @@ javax.xml.bind roo&gt; <emphasis role="bold">dependency add --groupId com.sun.xm
 
     <programlisting>com.sun.xml.bind roo&gt; <emphasis role="bold">persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
 Created ...
-com.sun.xml.bind roo&gt; <emphasis role="bold">entity --class ~.Timer --testAutomatically</emphasis>
+com.sun.xml.bind roo&gt;<emphasis role="bold"> entity --class ~.Timer --testAutomatically</emphasis> 
 Created ...
 ~.Timer roo&gt; <emphasis role="bold">field string --fieldName message --notNull</emphasis>
-Managed ...
-~.Timer roo&gt; <emphasis role="bold">controller all --package ~.web</emphasis>
-Created ...
-~.web roo&gt; <emphasis role="bold">selenium test --controller ~.web.TimerController</emphasis>
-Created ...
-~.web roo&gt; <emphasis role="bold">theme install --name theme-cit</emphasis>
-~.web roo&gt; <emphasis role="bold">theme set --name theme-cit</emphasis>
-~.web roo&gt; <emphasis role="bold">perform tests</emphasis>
+Managed ...</programlisting>
+
+    <para xml:lang="es">El comando <emphasis role="bold">persistence
+    setup</emphasis> nos permite configurar la capa de accesso a datos de
+    manera sencilla. <emphasis role="bold">entitiy</emphasis> sirve para crear
+    una nueva entidad y <emphasis role="bold">field</emphasis> crea atributos
+    de la entidad. Veremos estos comandos con un poco más de detalle en la
+    sección <link
+    linkend="guia-desarrollo-acceso-datos_persistencia-objetos">Persistencia
+    de objetos</link> y <link
+    linkend="guia-desarrollo_gestion-entidades_definicion_crear-con-comando">Crear
+    una entidad con el intérprete de comandos</link>, también veremos como
+    generar todas las entidades de nuestra aplicación mediante el proceso de
+    ingenieria inversa conta un esquema de BBDD existente.</para>
+
+    <programlisting>~.Timer roo&gt; <emphasis role="bold">controller all --package ~.web</emphasis>
+Created ...</programlisting>
+
+    <para><emphasis role="bold">controller</emphasis> crea controladores de la
+    capa web que gestionaran la interacción del usuario con la aplicación. Lo
+    veremos en <link linkend="???">Crear la capa web con el intérprete de
+    comandos</link>.</para>
+
+    <programlisting>~.web roo&gt; <emphasis role="bold">selenium test --controller ~.web.TimerController</emphasis>
+Created ...</programlisting>
+
+    <para>Si queremos incluir en el proyecto test de integración tenemos a
+    nuestra disposición el comando <emphasis role="bold">selenium
+    test</emphasis> que generará los scripts necesarios para probar la
+    interfaz web de la aplicación. Mediante <emphasis role="bold">mvn
+    selenium:selenese</emphasis>, estando el servidor de la aplicación
+    corriendo, se ejecutará el conjunto de tests sobre una nueva instancia del
+    navegador FireFox.</para>
+
+    <programlisting>~.web roo&gt; <emphasis role="bold">theme install --id cit-theme</emphasis>
+~.web roo&gt; <emphasis role="bold">theme set --id cit-theme</emphasis></programlisting>
+
+    <para>Mediante el comando <emphasis role="bold">theme</emphasis>, del
+    <emphasis>Add-on Theme Manager</emphasis> propio de gvNIX, podemos
+    configurar el tema visual que presentará la aplicación.</para>
+
+    <programlisting>~.web roo&gt; <command>relationships setup table</command></programlisting>
+
+    <para><emphasis role="bold">relationships setup</emphasis> modifica la
+    visualización de la interfaz para las relaciones entre entidades.</para>
+
+    <programlisting>~.web roo&gt; <emphasis role="bold">perform tests</emphasis>
 ...
 [INFO] BUILD SUCCESSFUL
 ~.web roo&gt; <emphasis role="bold">perform package</emphasis>
@@ -105,16 +140,17 @@ Created ...
 [INFO] BUILD SUCCESSFUL
 ~.web roo&gt; <emphasis role="bold">perform eclipse</emphasis>
 ...
-[INFO] BUILD SUCCESSFUL
-~.web roo&gt; <emphasis role="bold">quit</emphasis>
-bash$ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
+[INFO] BUILD SUCCESSFUL</programlisting>
 
     <para xml:lang="es">El comando <command>perform</command> es una forma
     secilla de ejecutar los comandos de Maven más usuales con el beneficio del
-    autocompletado del intérprete de comandos. El comando <emphasis>perform
-    eclipse</emphasis> crea los archivos que necesita Eclipse para importarlo
-    y a partir de ese momento poder desarrollar desde el propio Eclipse, por
-    ejemplo con el STS instalado.</para>
+    autocompletado del intérprete de comandos. El comando <emphasis
+    role="bold">perform eclipse</emphasis> crea los archivos que necesita
+    Eclipse para importarlo y a partir de ese momento poder desarrollar desde
+    el propio Eclipse, por ejemplo con el STS instalado.</para>
+
+    <programlisting>~.web roo&gt; <emphasis role="bold">quit</emphasis>
+bash$ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
 
     <para xml:lang="es">Con el comando <emphasis role="bold">mvn
     tomcat:run</emphasis> arrancamos un Tomcat con la aplicación web, en este
@@ -137,7 +173,7 @@ bash$ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
       </listitem>
 
       <listitem>
-        <para>Ahora debaría ver su FireFox ejecutando los test de Selenium
+        <para>Ahora debería ver su FireFox ejecutando los test de Selenium
         generados.</para>
       </listitem>
     </orderedlist>

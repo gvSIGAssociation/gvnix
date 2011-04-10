@@ -1,0 +1,87 @@
+package {{=packageName}};
+
+import com.google.gwt.activity.shared.Activity;
+import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.requestfactory.shared.EntityProxyId;
+import com.google.gwt.requestfactory.shared.RequestContext;
+
+import {{=placePackage}}.ProxyPlace;
+import {{=placePackage}}.CreateAndEditProxy;
+import {{=placePackage}}.FindAndEditProxy;
+{{#imports}}import {{=import}};
+{{/imports}}
+/**
+ * Maps {@link ProxyPlace} instances to the {@link Activity} to run.
+ */
+public class {{=className}} {
+  private final {{=requestFactory}} requests;
+  private final PlaceController placeController;
+
+  public {{=className}}({{=requestFactory}} requests, PlaceController placeController) {
+    this.requests = requests;
+    this.placeController = placeController;
+  }
+
+  public Activity getActivity(ProxyPlace place) {
+    switch (place.getOperation()) {
+      case DETAILS:
+        return new {{=detailsActivity}}((EntityProxyId<{{=proxy}}>)place.getProxyId(), requests, 
+          placeController, ScaffoldApp.isMobile() ? {{=mobileDetailsView}}.instance() : {{=detailsView}}.instance());
+
+      case EDIT:
+        return makeEditActivity(place);
+
+      case CREATE:
+        return makeCreateActivity();
+    }
+
+    throw new IllegalArgumentException("Unknown operation "
+        + place.getOperation());
+  }
+
+  @SuppressWarnings("unchecked")
+  private EntityProxyId<{{=proxy}}> coerceId(ProxyPlace place) {
+    return (EntityProxyId<{{=proxy}}>) place.getProxyId();
+  }
+
+  private Activity makeCreateActivity() {
+    {{=editView}}.instance().setCreating(true);
+    final {{=request}} request = requests.{{=nameUncapitalized}}Request();
+    Activity activity = new CreateAndEditProxy<{{=proxy}}>(
+        {{=proxy}}.class, request,
+        ScaffoldApp.isMobile() ? {{=mobileEditView}}.instance() : {{=editView}}.instance(),
+        placeController) {
+      
+      @Override
+      protected RequestContext createSaveRequest({{=proxy}} proxy) {
+        request.persist().using(proxy);
+        return request;
+      }
+    };
+
+    return new {{=editActivityWrapper}}(requests,
+        ScaffoldApp.isMobile() ? {{=mobileEditView}}.instance() : {{=editView}}.instance(),
+        activity, null);
+  }
+
+  private Activity makeEditActivity(ProxyPlace place) {
+    {{=editView}}.instance().setCreating(false);
+    EntityProxyId<{{=proxy}}> proxyId = coerceId(place);
+    Activity activity = new FindAndEditProxy<{{=proxy}}>(proxyId,
+        requests,
+        ScaffoldApp.isMobile() ? {{=mobileEditView}}.instance() : {{=editView}}.instance(),
+        placeController) {
+      
+      @Override
+      protected RequestContext createSaveRequest({{=proxy}} proxy) {
+        {{=request}} request = requests.{{=nameUncapitalized}}Request();
+        request.persist().using(proxy);
+        return request;
+      }
+    };
+
+    return new {{=editActivityWrapper}}(requests,
+        ScaffoldApp.isMobile() ? {{=mobileEditView}}.instance() : {{=editView}}.instance(),
+        activity, proxyId);
+  }
+}

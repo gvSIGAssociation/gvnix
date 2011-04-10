@@ -8,6 +8,9 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Creación de proyecto de add-on</title>
 
+  <para xml:lang="es">TBC: Sección obsoleta. Actualizar a nuevos comandos de
+  ROO 1.1.2</para>
+
   <para xml:lang="es">Estos son los a seguir para prepara un proyecto de
   add-on:</para>
 

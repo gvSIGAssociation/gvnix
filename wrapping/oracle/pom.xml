@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <licenses>
+    <license>
+      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <distribution>repo</distribution>
+      <comments>
+      <![CDATA[
+      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+      i Transport - Generalitat Valenciana
+      Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program. If not, see <http://www.gnu.org/licenses />.
+      ]]>
+      </comments>
+    </license>
+  </licenses>
+
+  <parent>
+    <groupId>org.gvnix</groupId>
+    <artifactId>wrapping</artifactId>
+    <version>0.6.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.gvnix.wrapping</groupId>
+  <version>10.2.0.4.0</version>
+  <artifactId>${pom.groupId}.${pkgArtifactId}</artifactId>
+  <packaging>bundle</packaging>
+  <name>gvNIX - OSGi - Wrapping - ${pkgArtifactId}</name>
+  <description>Oracle JDBC driver classes for use with JDK1.4, driverclass:oracle.jdbc.OracleDriver. This bundle wraps the standard Maven artifact: ${pkgArtifactId}-${pkgVersion}.</description>
+
+  <organization>
+    <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
+  </organization>
+
+  <properties>
+    <pkgArtifactId>ojdbc14</pkgArtifactId>
+    <pkgVersion>10.2.0.4.0</pkgVersion>
+    <pkgVendor>Oracle Corporation</pkgVendor>
+    <pkgDocUrl>http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/index.html</pkgDocUrl>
+    <pkgLicense>http://www.oracle.com/technology/software/htdocs/distlic.html</pkgLicense>
+    <pkgImport>oracle.i18n.*;resolution:=optional,oracle.ons.*;resolution:=optional,oracle.security.pki.*;resolution:=optional,*</pkgImport>
+    <osgiVersion>${pkgVersion}.0001</osgiVersion>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>${pkgArtifactId}</artifactId>
+      <version>${pkgVersion}</version>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+
+</project>

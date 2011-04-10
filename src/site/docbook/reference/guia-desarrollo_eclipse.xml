@@ -17,9 +17,9 @@
 
     <itemizedlist>
       <listitem>
-        <para>Descargar Eclipse IDE for Java EE Developers, versión Galileo
-        SR2 (3.5.2): <link
-        xlink:href="http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/galileosr2">http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/galileosr2</link></para>
+        <para>Descargar Eclipse IDE for Java EE Developers, versión Helios SR1
+        (3.6.1): <link
+        xlink:href="http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/heliossr1">http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/heliossr1</link></para>
       </listitem>
 
       <listitem>
@@ -88,9 +88,22 @@
         plugin STS sigue las instrucciones del punto "UPDATE SITE
         INSTALLATION" del documento <link
         xlink:href="http://dist.springsource.com/release/STS/doc/STS-installation_instructions.pdf">Spring
-        Source Tool Suite 2.3.2 Installation Instructions</link>.</para>
+        Source Tool Suite 2.5.2 Installation Instructions</link>.</para>
       </listitem>
     </orderedlist>
+
+    <important>
+      <para><emphasis role="bold">NOTA:</emphasis> A fecha de 17/02/2011 al
+      seleccionar los paquetes a instalar indicados en el documento
+      STS-2.5.2-Installation y darle a siguiente, falla la validación de
+      dependencias y por tanto no se puede seguir con la instalación del
+      plugin. El problema se puede solucionar según indican en el comentario
+      del <link
+      xlink:href="https://issuetracker.springsource.com/browse/STS-1567?focusedCommentId=37451&amp;page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_37451">Jira
+      de Springsource incidencia STS-1567.</link> Deseleccionar el componente
+      "SpringSource Tool Suite Runtime Error Analysis Support" para continuar
+      con la instalación.</para>
+    </important>
   </section>
 
   <section xml:id="guia-desarrollo_eclipse-usasrº">
@@ -135,6 +148,58 @@
     ejecutando el comando <command>mvn eclipse:clean</command>. Para regenerar
     la configuración de eclipse en un solo comando usar <command>mvn
     eclipse:clean eclipse:eclipse</command>.</para>
+
+    <section>
+      <title>Consola gvNIX / Roo integrada en Eclipse</title>
+
+      <para>El plugin STS que hemos instalado en nuestro IDE nos ofrece la
+      posibilidad de incluir la consola de gvNIX en el propio entrono de
+      desarrollo. Para ello antes tendremos que indicarle a Eclipse donde
+      tenemos instalada la nueva versión de gvNIX.</para>
+
+      <para>En el menú Window &gt; Preferences &gt; Spring &gt; Roo Support.
+      Pulsamos el botón Add y buscamos en el navegador de archivos donde está
+      el directorio gvNIX. Veremos una pantalla similar a esta:</para>
+
+      <figure>
+        <title>Configuaricón del soporte gvNIX en Eclipse</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/preferences_roo.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <para>Dandole a OK en las dos pantallas que tenemos abiertas ya
+      tendremos configurado el soporte para la linea de comandos de gvNIX.
+      Para poder usarlo tendremos que abrir la perspectiva de Spring (Window
+      &gt; Open Perspective &gt; Other &gt; Spring). En la parte inferior de
+      la pantalla tendremos una pestaña Roo Shell.</para>
+
+      <para>Nos pedirá que le indiquemos para que proyectos queremos que esté
+      disponible la línea de comandos (<emphasis>Open Roo Shell for projects
+      ...</emphasis>). Selecionamos el proyecto en el que estamos trabajando y
+      ya podremos empezar a ejecutar comandos.</para>
+
+      <figure>
+        <title>Consola gvNIX en Eclipse</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/eclipse_roo_shell.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <note>
+        <para>Hay que tener en cuenta una pequeña diferencia a la hora de usar
+        la línea de comandos desde Eclipse. Mientras en una consola del
+        sistema usamos la tecla TAB para que nos ayude a completar los
+        comandos, en el IDE usaremos Ctrl+Space que es el atajo por defecto
+        usado en Eclipse.</para>
+      </note>
+    </section>
   </section>
 
   <section xml:id="guia-desarrollo_eclipse-pruebas-unitarias">
@@ -252,7 +317,7 @@
             </listitem>
 
             <listitem>
-              <para> En el listado de software desplegar <literal>Web Tools
+              <para>En el listado de software desplegar <literal>Web Tools
               Platform Tests (WST Tests)</literal> (si hay más de un
               <emphasis>WST Tests</emphasis> seleccionar el de la última
               versión).</para>
@@ -261,7 +326,7 @@
             <listitem>
               <para>Instalar (seleccionándolos) <literal>WST Server
               tests</literal> y <literal>JST Server Tests</literal> (si ya
-              están instalado aparecerá su icono en gris) </para>
+              están instalado aparecerá su icono en gris)</para>
             </listitem>
           </itemizedlist>
         </listitem>
@@ -365,6 +430,52 @@
           externos).</para>
         </listitem>
       </itemizedlist>
+    </section>
+
+    <section>
+      <title>Ejecución de la aplicación en el Servidor</title>
+
+      <para>Una vez configurado el servidor de nuestra aplicación podemos
+      arracar el servidor y probar nuestra aplicación.</para>
+
+      <figure>
+        <title>Vista de servidores disponibles en nuestro workspace de
+        Eclipse</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/eclipse_servers.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <para>En la imagen anterior vemos disponible un servidor Tomcat 6 con
+      nuestra aplicación <emphasis>tenminutes</emphasis> disponible para
+      ejecutar. Con los botones que tenemos a nuestra disposición podemos,
+      arrancar la aplicación en modo debug, arrancar la aplicación de manera
+      normal, arrancar en modo profile, pararlo o re-publicar los cambios que
+      tengamos en la aplicación si estamos haciendo modificaciones.</para>
+
+      <para>Una vez arrancado nuestro servidor podemos navegar por nuestra
+      aplicación bien desde un navegador externo (Firefox) o bien desde un
+      navegador que incorpora Eclipse. Para abrir el navegador interno de
+      Eclipse: Window &gt; Show view &gt; Internal Web Browser.</para>
+
+      <figure>
+        <title>Navegador interno de Eclipse</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/eclipse_browser.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <para>Ejecutar la apliación desde Eclipse puede ser muy útil a la hora
+      de hacer cambios en el proyecto, modificaciones en las vistas, en los
+      objetos de aplicación, bien desde el propio IDE o desde la línea de
+      comandos de gvNIX, ya que automáticamente veremos reflejados los cambios
+      en el navegador.</para>
     </section>
   </section>
 </chapter>

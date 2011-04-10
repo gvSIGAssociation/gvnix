@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <licenses>
+    <license>
+      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <distribution>repo</distribution>
+      <comments>
+      <![CDATA[
+      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+      i Transport - Generalitat Valenciana
+      Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program.  If not, see <http://www.gnu.org/licenses />.
+      ]]>
+      </comments>
+    </license>
+  </licenses>
+  
+  <!-- DiSiD: Add parent pom reference -->
+  <parent>
+    <groupId>org.gvnix</groupId>
+    <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
+    <version>0.7.0-SNAPSHOT</version>
+    <relativePath>../osgi-roo-bundle</relativePath>
+  </parent>
+  
+  <!-- DiSiD: No group specified, there is defined on parent pom
+  <groupId>org.gvnix.occ.roo.addon</groupId>
+  -->
+  
+  <artifactId>org.gvnix.occ.roo.addon</artifactId>
+  <packaging>bundle</packaging>
+  
+  <!-- DiSiD: No version specified, there is defined on parent pom
+  <version>0.1.0.BUILD-SNAPSHOT</version>
+  -->
+  
+  <!-- DiSiD: Add organization name, license and url -->
+  <name>gvNIX - Spring Roo - Addon - Optimistic Concurreny Control</name>
+  <organization>
+    <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
+  </organization>
+  <description>JPA Optimistic Control for Spring Roo. For those applications that starts with an unmodifiable schema and the tables don't have the column 'version' for concurrency control.</description>
+  <url>http://www.gvnix.org</url>
+  
+  <!-- DiSiD: No properties, repositories or plugin repositories; there are defined on parent pom
+  <properties>
+    <roo.version>1.1.2.BUILD-SNAPSHOT</roo.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <google.code.project.name>${project.name}</google.code.project.name>
+    <repo.folder>org/gvnix/occ/roo/addon</repo.folder>
+  </properties>
+  <repositories>
+    <repository>
+      <id>spring-roo-repository</id>
+      <name>Spring Roo Repository</name>
+      <url>http://spring-roo-repository.springsource.org/release</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>spring-roo-repository</id>
+      <name>Spring Roo Repository</name>
+      <url>http://spring-roo-repository.springsource.org/release</url>
+    </pluginRepository>
+  </pluginRepositories>
+  -->
+
+  <!-- DiSiD: Add google code project name and repo folder values -->
+  <properties>
+    <gvnix.version>${parent.version}</gvnix.version>
+    <google.code.project.name>gvnix</google.code.project.name>
+    <repo.folder>org/gvnix/occ/roo/addon</repo.folder>
+  </properties>
+
+  
+  <dependencies>
+  
+    <!-- OSGi -->
+    <!-- DiSiD: No OSGi dependencies, there are defined on parent pom
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <version>4.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <version>4.1.0</version>
+    </dependency>
+    -->
+    
+    <!-- Apache Felix -->
+    <!-- DiSiD: No Felix dependency, there is defined on parent pom
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+    -->
+    
+    <!-- Spring Roo modules -->
+    <!-- DiSiD: No version or type; there are defined on parent pom -->
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.metadata</artifactId>
+      <!--
+      <version>${roo.version}</version>
+      <type>bundle</type>
+      -->
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.process.manager</artifactId>
+      <!--
+      <version>${roo.version}</version>
+      <type>bundle</type>
+      -->
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.project</artifactId>
+      <!--
+      <version>${roo.version}</version>
+      <type>bundle</type>
+      -->
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.support</artifactId>
+      <!--
+      <version>${roo.version}</version>
+      <type>bundle</type>
+      -->
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.shell</artifactId>
+      <!--
+      <version>${roo.version}</version>
+      <type>bundle</type>
+      -->
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.bootstrap</artifactId>
+      <!--
+      <version>${roo.version}</version>
+      <scope>provided</scope>
+      -->
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.model</artifactId>
+      <!--
+      <version>${roo.version}</version>
+      <scope>provided</scope>
+      -->
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.classpath</artifactId>
+      <!--
+      <version>${roo.version}</version>
+      <type>bundle</type>
+      -->
+    </dependency>
+    
+    <!-- DiSiD: Additional Spring Roo modules required by this addon -->
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.addon.entity</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.classpath.javaparser</artifactId>
+    </dependency>
+    
+  </dependencies>
+  
+  <!-- DiSiD: No scm or distribution management; there are included on parent pom
+  <scm>
+    <connection>scm:svn:https://${google.code.project.name}.googlecode.com/svn/trunk</connection>
+    <developerConnection>scm:svn:https://${google.code.project.name}.googlecode.com/svn/trunk</developerConnection>
+    <url>http://code.google.com/p/${google.code.project.name}/source/browse</url>
+  </scm>
+  <distributionManagement>
+    <repository>
+      <id>Google Code</id>
+      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
+    </repository>
+  </distributionManagement>
+  -->
+  
+  <!-- DiSiD: No build section, is included on parent pom
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav-jackrabbit</artifactId>
+        <version>1.0-beta-6</version>
+      </extension>
+    </extensions>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.1</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <outputDirectory>${project.build.directory}/all</outputDirectory>
+          <silent>true</silent>
+          <includeScope>compile</includeScope>
+          <excludeArtifactIds>org.apache.felix.scr.annotations</excludeArtifactIds>
+          <excludeGroupIds>org.osgi</excludeGroupIds>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2-beta-5</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/assembly.xml</descriptor>
+          </descriptors>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <mavenExecutorId>forked-path</mavenExecutorId>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.0.1</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-Copyright>Copyright ${project.organization.name}. All Rights Reserved.</Bundle-Copyright>
+            <Bundle-DocURL>${project.url}</Bundle-DocURL>
+          </instructions>
+          <remoteOBR>true</remoteOBR>
+          <bundleUrl>httppgp://${google.code.project.name}.googlecode.com/svn/repo/${repo.folder}/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar</bundleUrl>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-scr-plugin</artifactId>
+        <version>1.4.2</version>
+        <executions>
+          <execution>
+            <id>generate-scr-scrdescriptor</id>
+            <goals>
+              <goal>scr</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <parseJavaDoc>false</parseJavaDoc>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  -->
+
+  <!-- DiSiD: Add google code distribution management -->
+  <distributionManagement>
+    <repository>
+      <id>Google Code</id>
+      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
+    </repository>
+  </distributionManagement>
+  
+  <build>
+  
+    <!-- DiSiD: Add webdav extension to google code  -->
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav-jackrabbit</artifactId>
+        <version>1.0-beta-6</version>
+      </extension>
+    </extensions>
+    
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/roo/addon/configuration.xml</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/roo/addon/configuration.xml</include>
+        </includes>
+      </resource>
+    </resources>
+
+  </build>
+
+</project>

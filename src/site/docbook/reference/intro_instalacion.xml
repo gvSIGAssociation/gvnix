@@ -28,8 +28,9 @@
         xlink:href="http://maven.apache.org/">http://maven.apache.org/</link></para>
 
         <para xlink:href="http://maven.apache.org/"><emphasis
-        role="bold">Importante</emphasis>: usar las versiones de Maven 2.0.x,
-        no las 2.2.x.</para>
+        role="bold">Importante</emphasis>: usar las versiones de Maven 2.0.x o
+        Maven 3.0.x. La versión Maven 2.2.x falla al descargar alguna
+        dependencia.</para>
       </listitem>
 
       <listitem>
@@ -45,21 +46,21 @@
     <orderedlist>
       <listitem>
         <para>Descomprimir el fichero ZIP de la versión de gvNIX, por ejemplo
-        gvNIX-0.5.0.zip</para>
+        gvNIX-0.6.0.zip</para>
 
         <itemizedlist>
           <listitem>
             <para>Ejemplo para sistemas *nix y Apple:</para>
 
-            <programlisting>bash:~$ unzip gvNIX-0.5.0.zip</programlisting>
+            <programlisting>bash:~$ unzip gvNIX-0.6.0.zip</programlisting>
           </listitem>
         </itemizedlist>
       </listitem>
 
       <listitem>
-        <para>Al descomprimir el fichero ZIP se creará un nuevo directorio,
-        por ejemplo gvNIX-0.5.0. En el resto del documento nos referiremos a
-        este directorio como GVNIX_HOME</para>
+        <para>Al descomprimir el fichero ZIP se creará un nuevo directorio
+        gvNIX-0.6.0. En el resto del documento nos referiremos a este
+        directorio como GVNIX_HOME</para>
       </listitem>
 
       <listitem>
@@ -70,8 +71,8 @@
           <listitem>
             <para>Ejemplo para sistemas Unix y Apple:</para>
 
-            <programlisting>bash:~$ cd gvNIX-0.5.0
-bash:~/gvNIX-0.5.0$ export PATH=$PWD/bin:$PATH</programlisting>
+            <programlisting>bash:~$ cd gvNIX-0.6.0
+bash:~/gvNIX-0.6.0$ export PATH=$PWD/bin:$PATH</programlisting>
           </listitem>
         </itemizedlist>
       </listitem>

@@ -12,7 +12,7 @@
 
     <productname>gvNIX. Spring Roo based RAD tool</productname>
 
-    <releaseinfo>0.5.0</releaseinfo>
+    <releaseinfo>0.6.0</releaseinfo>
 
     <authorgroup>
       <author>
@@ -22,7 +22,7 @@
     </authorgroup>
 
     <legalnotice>
-      <para>Copyright 2010 Conselleria d'Infraestructures i Transport -
+      <para>Copyright 2010, 2011 Conselleria d'Infraestructures i Transport -
       Generalitat Valenciana</para>
 
       <para>This work is licensed under the Creative Commons Attribution-Share
@@ -156,13 +156,19 @@
 
     <xi:include href="addon-web-menu.xml" />
 
-    <xi:include href="addon-persistence.xml" />
+    <xi:include href="addon-occ.xml" />
 
     <xi:include href="addon-web-exception-handler.xml" />
 
     <xi:include href="addon-web-relation-styles.xml" />
 
     <xi:include href="addon-cit-security.xml" />
+
+    <xi:include href="addon-web-report.xml" />
+
+		<xi:include href="addon-service.xml" />
+
+		<xi:include href="addon-web-i18n.xml" />
 
     <xi:include href="addon-web-mvc-jsp-2.0.xml" />
 

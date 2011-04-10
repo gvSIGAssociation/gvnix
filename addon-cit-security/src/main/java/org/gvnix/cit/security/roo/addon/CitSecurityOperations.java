@@ -32,6 +32,14 @@ public interface CitSecurityOperations {
     public boolean isSetupAvailable();
 
     /**
+     * Indicate the project has a web layer based on Spring MVC Tiles.
+     *
+     * @return true if the user installed an Spring MVC Tiles web layer, otherwise
+     *         returns false.
+     */
+    boolean isSpringMvcTilesProject();
+
+    /**
      * Informs if CIT Security is already installed
      *
      */
@@ -39,7 +47,7 @@ public interface CitSecurityOperations {
 
     /**
      * Install CIT Security in this projet
-     * 
+     *
      * @param url
      * @param login
      * @param password

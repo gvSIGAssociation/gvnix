@@ -9,7 +9,7 @@
   <title>Descripción de los Add-ons de gvNIX</title>
 
   <section xml:id="resumen-addons_persistence">
-    <title>Persistence</title>
+    <title>OCC (Optimistic Concurrency Control)</title>
 
     <para>Este Add-on contiene las utilidades realcionadas con la
     persistencia. En este momento incluye:</para>
@@ -38,7 +38,7 @@
       estructura.</para>
 
       <para>Este mecanismo permite usar un sistema de control de concurrencia
-      sin necesidad de alterar la estructura de base de datos. </para>
+      sin necesidad de alterar la estructura de base de datos.</para>
 
       <para>Se basa en el cálculo de una <emphasis role="bold">suma de
       control</emphasis> de los valores de todos los campos persistentes y en
@@ -161,5 +161,23 @@
     Spring Security que utilizado en la Conselleria d'Infraestructures i
     Transport. Para ver más información ver <link
     linkend="addon-cit-security">Add-on CIT Security</link>.</para>
+  </section>
+
+  <section>
+    <title>Web Report</title>
+
+    <para>Instala el soporte para JasperReports en la aplicación y permite
+    definir informes sobre entidades del modelo. Los informes son accesibles
+    desde la web mediante un formulario que se crea para ello. Para más
+    información ver <link linkend="addon-web-report">Add-on Web
+    Report.</link></para>
+  </section>
+
+  <section>
+    <title>Service</title>
+
+    <para>Permite crear servicios web desde cero o importarlos basándose en
+    archivos de descripción de servicios WSDL. Para más información ver <link
+    linkend="apendice-comandos_addon-web-report">Add-on Service.</link></para>
   </section>
 </chapter>

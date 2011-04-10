@@ -1,0 +1,80 @@
+==================================
+ gvNIX Web report add-on
+==================================
+
+:Project:   gvNIX. Spring Roo based RAD tool
+:Copyright: Conselleria d'Infraestructures i Transport - Generalitat Valenciana
+:Author:    DiSiD Technologies, S.L.
+:Revision:  $Rev$
+:Date:      $Date$
+
+This work is licensed under the Creative Commons Attribution-Share Alike 3.0
+Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
+94105, USA.
+
+.. contents::
+   :depth: 2
+   :backlinks: none
+
+.. |date| date::
+
+Introduction
+===============
+
+Add-on giving reports support.
+
+Supported report tools:
+
+# JasperReports
+
+Project contents
+=================
+
+This folder contains add-on sources and documents folder ``docs`` with documentation of this project.
+
+
+Installation Proof
+===================
+
+Install the Add-on.
+--------------------
+
+Install the Add-on in gvNIX/Roo shell with the required commands for 1.1.2-RELEASE version.
+
+Create a web application
+-------------------------
+
+Create a web application with gvNIX/Roo Shell script::
+
+    project --topLevelPackage org.gvnix.test.report
+    persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+    entity --class ~.domain.Person --testAutomatically
+    field string --fieldName name --notNull
+    controller all --package ~.web
+
+Run the application and take a look to the menu entries::
+
+  mvn tomcat:run
+
+Stop tomcat and apply gvNIX report (Install and set gvNIX commands) to the project::
+
+    web report add --controller ~.web.PersonController --reportName samplereport
+
+Run the application and a new menu entry has been added (Person samplereport Report)::
+
+  mvn tomcat:run
+
+The new menu entry gives access to a new form where you can request for a report generation over Person entity. By now,
+only PDF is the output format available for your report.
+
+Stop tomcat and add a new supported format to your existing report through gvNIX/Roo shell::
+
+  web report add --controller ~.web.PersonController --reportName samplereport --format xls,csv
+
+Run the appliation::
+
+  mvn tomcat:run
+
+In the same form page as before the drop-down select has PDF, XLS and CSV as available formats.

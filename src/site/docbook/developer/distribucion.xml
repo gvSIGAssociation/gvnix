@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="validacion" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Distribución de Add-ons</title>
+
+  <para>Los add-ons de gvNIX actualmente son distribuidos en formato binario a
+  través de la web de gvPONTIS
+  (http://www.gvpontis.gva.es/val/gvnix/gvnix-descargas/) tanto por separado
+  como empaquetados todos juntos en una distribución. También se encuentra en
+  la web de gvPONTIS el código fuente de los add-ons, la documentación de cada
+  add-on y la documentación de referencia para el uso de gvNIX.</para>
+
+  <para>Así mismo, también son distribuidos los binarios y los fuentes de los
+  add-ons de gvNIX a través de un repositorio maven situado en un proyecto de
+  google code (http://code.google.com/p/gvnix/).</para>
+
+  <para>La distribución en el repositorio de google code es necesaria por dos
+  motivos:</para>
+
+  <orderedlist>
+    <listitem>
+      <para>Para permitir la descarga automática de los add-ons a través del
+      sistema RooBoot de Roo.</para>
+    </listitem>
+
+    <listitem>
+      <para>Para que los proyecto puedan acceder a sus anotaciones cuando
+      compilan un proyecto que utiliza un add-on.</para>
+    </listitem>
+  </orderedlist>
+
+  <section>
+    <title>Añadir en el proyecto la dependencia al add-on</title>
+
+    <itemizedlist>
+      <listitem>
+        <para>Para que un proyecto en el que se está utilizando un add-on
+        pueda acceder a las anotaciones del add-on deben añadirse dos
+        elementos en el pom del proyecto gestionado con gvNIX:</para>
+
+        <para>El repositorio de gvNIX en googlecode:</para>
+
+        <programlisting>&lt;repository&gt;
+  &lt;id&gt;gvNIX Add-on repository&lt;/id&gt;
+  &lt;name&gt;gvNIX Add-on repository&lt;/name&gt;
+  &lt;url&gt;https://gvnix.googlecode.com/svn/repo&lt;/url&gt;
+&lt;/repository&gt;
+      </programlisting>
+
+        <para>La dependencia al propio add-on para que el proyecto que se está
+        gestionando con gvNIX pueda acceder a las anotaciones del
+        add-on:</para>
+
+        <programlisting>&lt;dependency&gt;
+  &lt;groupId&gt;org.gvnix&lt;/groupId&gt;
+  &lt;artifactId&gt;org.gvnix.name.roo.addon&lt;/artifactId&gt;
+  &lt;version&gt;${gvnix.version}&lt;/version&gt;
+  &lt;type&gt;jar&lt;/type&gt;
+  &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</programlisting>
+      </listitem>
+
+      <listitem>
+        <para>Para definir estos dos elementos se utiliza el fichero
+        src/main/resources/org/gvnix/name/roo/addon/configuration.xml:</para>
+
+        <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;configuration&gt;
+ &lt;gvnix&gt;
+  &lt;dependencies&gt;
+      &lt;dependency&gt;
+          &lt;groupId&gt;org.gvnix&lt;/groupId&gt;
+          &lt;artifactId&gt;org.gvnix.name.roo.addon&lt;/artifactId&gt;
+          &lt;version&gt;${gvnix.version}&lt;/version&gt;
+          &lt;type&gt;jar&lt;/type&gt;
+          &lt;scope&gt;provided&lt;/scope&gt;
+      &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+  &lt;repositories&gt;
+      &lt;repository&gt;
+          &lt;id&gt;gvNIX Add-on repository&lt;/id&gt;
+          &lt;name&gt;gvNIX Add-on repository&lt;/name&gt;
+          &lt;url&gt;https://gvnix.googlecode.com/svn/repo&lt;/url&gt;
+      &lt;/repository&gt;
+  &lt;/repositories&gt;
+ &lt;/gvnix&gt;
+&lt;/configuration&gt;</programlisting>
+
+        <para>Reemplazar la cadena "name" con el valor adecuado, para que se
+        corresponda con el artifactId del add-on.</para>
+      </listitem>
+
+      <listitem>
+        <para>Y la inclusión de la información de este fichero en el pom del
+        proyecto gestionado con gvNIX se realiza a través del siguiente
+        código:</para>
+
+        <programlisting>// Install the add-on Google code repository and dependency needed to
+// get the annotations
+
+Element conf = XmlUtils.getConfiguration(this.getClass(),
+ "configuration.xml");
+
+List&lt;Element&gt; repos = XmlUtils.findElements(
+ "/configuration/gvnix/repositories/repository", conf);
+for (Element repo : repos) {
+
+    projectOperations.addRepository(new Repository(repo));
+}
+
+List&lt;Element&gt; depens = XmlUtils.findElements(
+ "/configuration/gvnix/dependencies/dependency", conf);
+for (Element depen : depens) {
+
+    projectOperations.addDependency(new Dependency(depen));
+}</programlisting>
+
+        <para>Este código suele incluirse en el comando setup del addon o en
+        la primera acción que realice cualquier comando del addon.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title>Configurar repositorio de google code</title>
+
+    <para>Ahora el proyecto gestionado con gvNIX intentará obtener la
+    dependencia del add-on desde el repositorio local de maven y en caso de no
+    encontrarlo lo irá a buscar al repositorio de gvNIX en googlecode. Es por
+    ello que es necesario añadir esta dependencia a dicho repositorio
+    configurando las siguientes secciones en el pom del add-on:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Antes de la sección "dependencies", añadir las propiedades que
+        definen el nombre del proyecto en googlecode y el directorio en el que
+        será almacenada la dependencia:</para>
+
+        <programlisting>&lt;!-- DiSiD: Add google code project name and repo folder values --&gt;
+&lt;properties&gt;
+ ...
+ &lt;google.code.project.name&gt;gvnix&lt;/google.code.project.name&gt;
+ &lt;repo.folder&gt;org/gvnix/name/roo/addon&lt;/repo.folder&gt;
+ ...
+&lt;/properties&gt;</programlisting>
+
+        <para>Reemplazar la cadena "name" con el valor adecuado, para que se
+        corresponda con el artifactId del add-on, separado por '/' en lugar de
+        '.'.</para>
+      </listitem>
+
+      <listitem>
+        <para>Antes de la sección "build", añadir la url del proyecto en
+        googlecode:</para>
+
+        <programlisting>&lt;!-- DiSiD: Add google code distribution management --&gt;
+&lt;distributionManagement&gt;
+ ...
+ &lt;repository&gt;
+  &lt;id&gt;Google Code&lt;/id&gt;
+  &lt;url&gt;dav:https://${google.code.project.name}.googlecode.com/svn/repo&lt;/url&gt;
+ &lt;/repository&gt;
+ ...
+&lt;/distributionManagement&gt;</programlisting>
+      </listitem>
+
+      <listitem>
+        <para>Al principio de la sección "build", añadir la extesión necesaria
+        para utilizar el protocolo que se utiliza para subir la dependencia a
+        googlecode:</para>
+
+        <programlisting>&lt;!-- DiSiD: Add webdav extension to google code  --&gt;
+&lt;extensions&gt;
+ ...
+ &lt;extension&gt;
+  &lt;groupId&gt;org.apache.maven.wagon&lt;/groupId&gt;
+  &lt;artifactId&gt;wagon-webdav-jackrabbit&lt;/artifactId&gt;
+  &lt;version&gt;1.0-beta-6&lt;/version&gt;
+ &lt;/extension&gt;
+ ...
+&lt;/extensions&gt;</programlisting>
+      </listitem>
+
+      <listitem>
+        <para>Al final de la sección "build", activar el filtrado del fichero
+        configuration.xml para que se reemplace la variable ${gvnix.version}
+        por el valor de la versión del add-on:</para>
+
+        <programlisting>&lt;resources&gt;
+ &lt;resource&gt;
+  &lt;directory&gt;src/main/resources&lt;/directory&gt;
+  &lt;filtering&gt;false&lt;/filtering&gt;
+  &lt;excludes&gt;
+   &lt;exclude&gt;**/roo/addon/configuration.xml&lt;/exclude&gt;
+  &lt;/excludes&gt;
+ &lt;/resource&gt;
+ &lt;resource&gt;
+  &lt;directory&gt;src/main/resources&lt;/directory&gt;
+  &lt;filtering&gt;true&lt;/filtering&gt;
+  &lt;includes&gt;
+   &lt;include&gt;**/roo/addon/configuration.xml&lt;/include&gt;
+  &lt;/includes&gt;
+ &lt;/resource&gt;
+&lt;/resources&gt;</programlisting>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title>Subir dependencia a google code</title>
+
+    <itemizedlist>
+      <listitem>
+        <para>En el fichero de configuración de maven
+        ($M2_HOME/conf/settings.xml) deberemos configurar el usuario y la
+        clave que da acceso al proyecto en google code:</para>
+
+        <programlisting>    &lt;server&gt;
+      &lt;id&gt;Google Code&lt;/id&gt;
+      &lt;username&gt;gvnixscm@gmail.com&lt;/username&gt;
+      &lt;password&gt;************&lt;/password&gt;
+    &lt;/server&gt;</programlisting>
+      </listitem>
+
+      <listitem>
+        <para>Ahora ya podemos desplegar el proyecto en google code ejecutando
+        la siguiente orden maven:</para>
+
+        <programlisting>mvn clean deploy</programlisting>
+      </listitem>
+    </itemizedlist>
+  </section>
+</chapter>

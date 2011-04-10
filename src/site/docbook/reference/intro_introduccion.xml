@@ -19,6 +19,12 @@
     funcionalidades de productividad de alto nivel a las prestaciones que ya
     se obtienen con <link xlink:href="http://www.springsource.org/roo">Spring
     Roo</link>.</para>
+
+    <para xml:lang="es">gvNIX está disponible dentro del proyecto de Migración
+    a Software de fuentes abiertas de la Conselleria d'Infraestructures i
+    Transports: <link xlink:href="http://www.gvpontis.gva.es">gvPONTIS</link>.
+    <link
+    xlink:href="http://www.gvpontis.gva.es/val/gvnix/">http://www.gvpontis.gva.es/val/gvnix/</link></para>
   </section>
 
   <section>
@@ -204,8 +210,7 @@
    / __ \/ __ \/ __ \ 
   / /_/ / / / / / / / 
  / _, _/ /_/ / /_/ /  
-/_/ |_|\____/\____/    1.1.0.M1 [rev 3a0b8a3]
-
+/_/ |_|\____/\____/    1.x.x-RELEASE
 
 Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
 roo&gt;</programlisting>

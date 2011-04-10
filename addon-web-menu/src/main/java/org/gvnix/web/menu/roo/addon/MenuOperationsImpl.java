@@ -1,7 +1,7 @@
 /*
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
  * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
+ * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,288 +18,118 @@
  */
 package org.gvnix.web.menu.roo.addon;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.web.menu.MenuOperations;
+import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.model.JavaSymbolName;
-import org.springframework.roo.process.manager.event.ProcessManagerStatus;
-import org.springframework.roo.process.manager.event.ProcessManagerStatusListener;
-import org.springframework.roo.process.manager.event.ProcessManagerStatusProvider;
 import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.XmlUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
- * Starndard Roo menu operation service implementation for gvNIX menu
+ * gvNIX implementation of standard Roo menu operation service.
+ * <p>
+ * This class extends and replace the services that 
+ * {@link org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperationsImpl}
+ * offers.
  *
- *
- * @author Jose Manuel Vivó ( jmvivo at disid dot com ) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Jose Manuel Vivó (jmvivo at disid dot com) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Enrique Ruiz (eruiz at disid dot com) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
  */
+@Component
 @Service
-@Component(immediate = true)
-public class MenuOperationsImpl implements MenuOperations {
+public class MenuOperationsImpl implements MenuOperations { 
 
-    private static Logger logger = Logger.getLogger(MenuOperationsImpl.class
-	    .getName());
-    private ComponentContext context;
+  /**
+   * Use AddonOperations delegate to operations this add-on offers
+   */
+  @Reference private MenuEntryOperations operations;
 
-    @Reference
-    private ProcessManagerStatusProvider processManagerStatus;
+  /** {@inheritDoc} */
+  public void addMenuItem(JavaSymbolName menuCategoryName,
+                          JavaSymbolName menuItemId, String globalMessageCode,
+                          String link, String idPrefix) {
+    operations.addMenuItem(menuCategoryName, menuItemId, globalMessageCode, link,
+        idPrefix);
+  }
 
-    private MenuPageOperations operations;
-    private ServiceReference operationsServiceReference;
+  /** {@inheritDoc} */
+  public void addMenuItem(JavaSymbolName menuCategoryName,
+                          JavaSymbolName menuItemId, String menuItemLabel,
+                          String globalMessageCode, String link, String idPrefix) {
+    operations.addMenuItem(menuCategoryName, menuItemId, menuItemLabel,
+        globalMessageCode, link, idPrefix);
+  }
 
-    private List<DelayedOperation> delayedOperations = new ArrayList<DelayedOperation>();
-    private StatusListener statusListener;
+  public void cleanUpFinderMenuItems(JavaSymbolName menuCategoryName, List<String> allowedFinderMenuIds) {
+    Assert.notNull(menuCategoryName, "Menu category identifier required");
+    Assert.notNull(allowedFinderMenuIds, "List of allowed menu items required");
+    
+    Document document = operations.getMenuDocument();
 
-    protected void activate(ComponentContext context) {
-	this.context = context;
-	statusListener = new StatusListener(this);
-	processManagerStatus.addProcessManagerStatusListener(statusListener);
-	// logger.warning("*** Activated gvNIX MenuOperationsImpl");
+    StringBuilder categoryId = new StringBuilder(
+        MenuEntryOperations.CATEGORY_MENU_ITEM_PREFIX);
+    categoryId.append(menuCategoryName.getSymbolName().toLowerCase());
+
+    // find any menu items under this category which have an id that starts with the menuItemIdPrefix
+    List<Element> elements = XmlUtils.findElements(
+        "//menu-item[@id='".concat(categoryId.toString())
+            .concat("']//menu-item[starts-with(@id, '")
+            .concat(FINDER_MENU_ITEM_PREFIX).concat("')]"),
+        document.getDocumentElement());
+    if(elements.size() == 0) {
+      return;
+    }
+    for (Element element: elements) {
+      if (!allowedFinderMenuIds.contains(element.getAttribute("id"))) {
+        element.getParentNode().removeChild(element);
+      }
+    }
+    operations.writeXMLConfigIfNeeded(document);
+  }
+
+  /**
+   * Attempts to locate a menu item and remove it. 
+   * 
+   * @param menuCategoryName the identifier for the menu category (required)
+   * @param menuItemName the menu item identifier (required)
+   * @param idPrefix the prefix to be used for this menu item (optional, MenuOperations.DEFAULT_MENU_ITEM_PREFIX is default)
+   */
+  public void cleanUpMenuItem(JavaSymbolName menuCategoryName, JavaSymbolName menuItemName, String idPrefix) {
+    Assert.notNull(menuCategoryName, "Menu category identifier required");
+    Assert.notNull(menuItemName, "Menu item id required");
+    
+    if (idPrefix == null || idPrefix.length() == 0) {
+      idPrefix = DEFAULT_MENU_ITEM_PREFIX;
     }
 
-    protected void deactivate(ComponentContext context) {
-	if (operations != null) {
-	    if (operations instanceof MenuPageOperationsImpl) {
-		performDelayed((MenuPageOperationsImpl) operations);
-	    }
+    Document document = operations.getMenuDocument();
 
-	    context.getBundleContext().ungetService(
-		    getOperationsServiceReference());
-	}
-	processManagerStatus.removeProcessManagerStatusListener(statusListener);
-	this.context = null;
+    StringBuilder categoryId = new StringBuilder(
+        MenuEntryOperations.CATEGORY_MENU_ITEM_PREFIX);
+    categoryId.append(menuCategoryName.getSymbolName().toLowerCase());
 
+    StringBuilder itemId = new StringBuilder(idPrefix);
+    itemId.append(menuCategoryName.getSymbolName().toLowerCase())
+      .append("_")
+      .append(menuItemName.getSymbolName().toLowerCase());
+
+    //find menu item under this category if exists 
+    Element element = XmlUtils.findFirstElement(
+        "//menu-item[@id='".concat(categoryId.toString())
+            .concat("']//menu-item[@id='").concat(itemId.toString())
+            .concat("']"), document.getDocumentElement());
+    if(element==null) {
+      return;
+    }
+    else {
+      element.getParentNode().removeChild(element);
     }
 
-    private MenuPageOperations getOperations() {
-	if (operations == null) {
-	    operations = (MenuPageOperations) context.getBundleContext()
-		    .getService(getOperationsServiceReference());
-	}
-	return operations;
-    }
-
-    private ServiceReference getOperationsServiceReference() {
-	if (operationsServiceReference == null) {
-	    operationsServiceReference = context.getBundleContext()
-		    .getServiceReference(MenuPageOperations.class.getName());
-	}
-	return operationsServiceReference;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.springframework.roo.addon.web.menu.MenuOperations#addMenuItem(org
-     * .springframework.roo.model.JavaSymbolName,
-     * org.springframework.roo.model.JavaSymbolName, java.lang.String,
-     * java.lang.String, java.lang.String)
-     */
-    public void addMenuItem(JavaSymbolName menuCategoryName,
-	    JavaSymbolName menuItemName, String globalMessageCode, String link,
-	    String idPrefix) {
-
-	MenuPageOperationsImpl operationsImpl = null;
-	Object operations = getOperations();
-	if (operations != null) {
-	    Assert.isInstanceOf(MenuPageOperationsImpl.class, operations);
-	    operationsImpl = (MenuPageOperationsImpl) operations;
-	}
-
-	if (operationsImpl == null || !operationsImpl.isCorrectlyInstalled()) {
-	    // If we can't perform operation adds it to delayed operations queue
-	    delayedOperations.add(new AddMenuItem(menuCategoryName,
-		    menuItemName, globalMessageCode, link, idPrefix));
-	    return;
-	} else {
-            // performs delayed operations if any
-	    performDelayed(operationsImpl);
-	}
-
-	operationsImpl.addOrUpdatePageFromRooMenuItem(menuCategoryName,
-		menuItemName, globalMessageCode, link, idPrefix);
-    }
-
-    synchronized void performDelayed(MenuPageOperationsImpl operationsImpl) {
-	// TODO Implement a way to perform this periodically
-	Iterator<DelayedOperation> iter = delayedOperations.iterator();
-	if (!iter.hasNext()) {
-	    return;
-	}
-	//logger.warning("*** Delayed operations: "+delayedOperations.size());
-	DelayedOperation cur;
-	while (iter.hasNext()) {
-	    cur = iter.next();
-	    cur.execute(operationsImpl);
-	    iter.remove();
-	}
-	//logger.warning("*** Completed Delayed operations: " + delayedOperations.size());
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.springframework.roo.addon.web.menu.MenuOperations#cleanUpFinderMenuItems
-     * (org.springframework.roo.model.JavaSymbolName, java.util.List)
-     */
-    public void cleanUpFinderMenuItems(JavaSymbolName menuCategoryName,
-	    List<String> allowedFinderMenuIds) {
-
-	MenuPageOperationsImpl operationsImpl = null;
-	Object operations = getOperations();
-	if (operations != null) {
-	    Assert.isInstanceOf(MenuPageOperationsImpl.class, operations);
-	    operationsImpl = (MenuPageOperationsImpl) operations;
-	}
-
-	if (operationsImpl == null || !operationsImpl.isCorrectlyInstalled()) {
-	    // If we can't perform operation adds it to delayed operations queue
-	    delayedOperations.add(new CleanUpFinderMenuItems(menuCategoryName,
-		    allowedFinderMenuIds));
-	    return;
-	} else {
-            // performs delayed operations if any
-	    performDelayed(operationsImpl);
-	}
-
-	operationsImpl.cleanUpRooFinderMenuItems(menuCategoryName,
-		allowedFinderMenuIds);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.springframework.roo.addon.web.menu.MenuOperations#cleanUpMenuItem
-     * (org.springframework.roo.model.JavaSymbolName,
-     * org.springframework.roo.model.JavaSymbolName, java.lang.String)
-     */
-    public void cleanUpMenuItem(JavaSymbolName menuCategoryName,
-	    JavaSymbolName menuItemName, String idPrefix) {
-
-	MenuPageOperationsImpl operationsImpl = null;
-	Object operations = getOperations();
-	if (operations != null) {
-	    Assert.isInstanceOf(MenuPageOperationsImpl.class, operations);
-	    operationsImpl = (MenuPageOperationsImpl) operations;
-	}
-
-	if (operationsImpl == null || !operationsImpl.isCorrectlyInstalled()) {
-	    // If we can't perform operation adds it to delayed operations queue
-	    delayedOperations.add(new CleanUpMenuItem(menuCategoryName,
-		    menuItemName, idPrefix));
-	    return;
-	} else {
-            // performs delayed operations if any
-	    performDelayed(operationsImpl);
-	}
-
-	operationsImpl.cleanUpRooMenuItem(menuCategoryName, menuItemName,
-		idPrefix);
-    }
-
-    abstract class DelayedOperation {
-	abstract void execute(MenuPageOperationsImpl operationsImpl);
-    };
-
-    class CleanUpMenuItem extends DelayedOperation {
-	public CleanUpMenuItem(JavaSymbolName menuCategoryName,
-		JavaSymbolName menuItemName, String idPrefix) {
-	    super();
-	    this.menuCategoryName = menuCategoryName;
-	    this.menuItemName = menuItemName;
-	    this.idPrefix = idPrefix;
-	}
-
-	JavaSymbolName menuCategoryName;
-	JavaSymbolName menuItemName;
-	String idPrefix;
-
-	@Override
-	void execute(MenuPageOperationsImpl operationsImpl) {
-	    operationsImpl.cleanUpRooMenuItem(menuCategoryName, menuItemName,
-		    idPrefix);
-	}
-    }
-
-    class CleanUpFinderMenuItems extends DelayedOperation {
-	public CleanUpFinderMenuItems(JavaSymbolName menuCategoryName,
-		List<String> allowedFinderMenuIds) {
-	    super();
-	    this.menuCategoryName = menuCategoryName;
-	    this.allowedFinderMenuIds = allowedFinderMenuIds;
-	}
-
-	JavaSymbolName menuCategoryName;
-	List<String> allowedFinderMenuIds;
-
-	@Override
-	void execute(MenuPageOperationsImpl operationsImpl) {
-	    operationsImpl.cleanUpRooFinderMenuItems(menuCategoryName,
-		    allowedFinderMenuIds);
-	}
-    }
-
-    class AddMenuItem extends DelayedOperation {
-	public AddMenuItem(JavaSymbolName menuCategoryName,
-		JavaSymbolName menuItemName, String globalMessageCode,
-		String link, String idPrefix) {
-	    super();
-	    this.menuCategoryName = menuCategoryName;
-	    this.menuItemName = menuItemName;
-	    this.globalMessageCode = globalMessageCode;
-	    this.link = link;
-	    this.idPrefix = idPrefix;
-	}
-
-	JavaSymbolName menuCategoryName;
-	JavaSymbolName menuItemName;
-	String globalMessageCode;
-	String link;
-	String idPrefix;
-
-	@Override
-	void execute(MenuPageOperationsImpl operationsImpl) {
-	    operationsImpl.addOrUpdatePageFromRooMenuItem(menuCategoryName,
-		    menuItemName, globalMessageCode, link, idPrefix);
-
-	}
-    }
-
-    class StatusListener implements ProcessManagerStatusListener {
-
-	MenuOperationsImpl menuOperations;
-
-	public StatusListener(MenuOperationsImpl menuOperations) {
-	    super();
-	    this.menuOperations = menuOperations;
-	}
-
-	public void onProcessManagerStatusChange(
-		ProcessManagerStatus oldStatus, ProcessManagerStatus newStatus) {
-	    if (oldStatus == ProcessManagerStatus.STARTING
-		    && newStatus == ProcessManagerStatus.AVAILABLE) {
-
-		MenuPageOperations operations = menuOperations.getOperations();
-		if (!(operations instanceof MenuPageOperationsImpl)) {
-		    return;
-		}
-		// If operations are finished perform delayed operations if any
-		MenuPageOperationsImpl operationsImpl = (MenuPageOperationsImpl) operations;
-		menuOperations.performDelayed(operationsImpl);
-	    }
-
-	}
-
-    }
+    operations.writeXMLConfigIfNeeded(document);
+  }
 }

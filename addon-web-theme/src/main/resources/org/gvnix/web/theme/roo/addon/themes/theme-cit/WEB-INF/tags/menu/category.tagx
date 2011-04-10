@@ -1,0 +1,48 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+	<jsp:output omit-xml-declaration="yes"/>
+	
+	<jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)"/>
+	<jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label for this category (if not set the resource bundle is used)"/>
+	<jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
+	<jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)"/>
+	
+	<c:if test="${empty render or render}">
+
+		<c:if test="${empty label}">
+			<spring:message code="menu_category_${fn:toLowerCase(fn:substringAfter(id,'_'))}_label" var="label" htmlEscape="false"/>
+		</c:if>
+
+    <!-- 
+      Personalizar icono en funcion del texto de "label".
+      Lo ideal seria que el menu incluyera el tipo de pagina para personalizar
+      icono en funcion del tipo.
+    -->
+    <c:choose>
+      <c:when test="${fn:containsIgnoreCase(label, 'listado')}">
+        <spring:url var="logo_menu"
+          value="/resources/images/cit/theme/menu/06.gif" />
+      </c:when>
+      <c:otherwise>
+        <spring:url var="logo_menu"
+          value="/resources/images/cit/theme/menu/43.gif" />
+      </c:otherwise>
+    </c:choose>
+
+	<li id="${fn:escapeXml(id)}" class="OpcionMenu"> 
+      <img title="${fn:escapeXml(label)}" alt="-" src="${logo_menu}" /><![CDATA[&nbsp;]]>
+      <a href="#" class="txtopcion_menu"><c:out value="${label}" /></a>
+      
+      <spring:url var="next" value="/resources/images/cit/theme/imagenes/siguiente2.gif" /> 
+      <img src="${next}" alt=">" class="next" />
+
+      <div id="${fn:escapeXml(label)}" class="OpcionSubMenu">
+        <div class="bd">
+          <ul>
+            <jsp:doBody />
+          </ul>
+        </div>
+      </div>
+	</li>
+	
+	</c:if>
+</jsp:root>

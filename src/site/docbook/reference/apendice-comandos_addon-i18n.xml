@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_addon-web_i18n"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Comandos del Add-on Web MVC i18n</title>
+
+  <para xml:lang="es">Para una descripción general ver <link
+  linkend="addon-web-i18n">Add-on Web MVC i18n</link>.</para>
+
+  <table>
+    <title xml:lang="es">Comandos de Add-on Service</title>
+
+    <tgroup cols="2">
+      <thead>
+        <colspec colwidth="150" />
+
+        <row>
+          <entry align="center">Comando</entry>
+
+          <entry align="center">Descripción</entry>
+        </row>
+      </thead>
+
+      <tbody>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web_i18n_install_language">web mvc
+          install language</link></entry>
+
+          <entry>Instala la internacionalización del idioma.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <section xml:id="apendice-comandos_addon-web_i18n_install_language">
+    <title>web mvc install language</title>
+
+    <para xml:lang="es">Crea la clase del servicio en
+    SRC_MAIN_JAVA.<variablelist>
+        <varlistentry>
+          <term>--code</term>
+
+          <listitem>
+            <para><emphasis>[Requerido][identificador del
+            idioma]</emphasis></para>
+
+            <para>Código del idioma a instalar.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
+</section>

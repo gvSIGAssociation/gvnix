@@ -1,0 +1,92 @@
+<html xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:tiles="http://tiles.apache.org/tags-tiles" xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" >  
+  
+  <jsp:output doctype-root-element="HTML" doctype-system="about:legacy-compat" />
+  
+  <jsp:directive.page contentType="text/html;charset=UTF-8" />  
+    
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=8" />  
+      
+    <util:load-scripts />
+    
+    <spring:message code="application_name" var="app_name" htmlEscape="false"/>
+    <title><spring:message code="welcome_h3" arguments="${app_name}" htmlEscape="false"/></title>
+  </head>
+
+  <body class="final spring home" id="home">
+  <script type="text/javascript"><![CDATA[
+        // Instantiate and render the menu when it is available in the DOM
+        YAHOO.util.Event.onContentReady("showMenu", function () {
+    
+        // Instantiate the menu and corresponding submenus. The first argument passed 
+        // to the constructor is the id of the element in the DOM that represents 
+        // the menu; the second is an object literal representing a set of 
+        // configuration properties for the menu.
+        var oMenu = new YAHOO.widget.Menu("showMenu", { fixedcenter: false, clicktohide: false });
+
+        // Call the "render" method with no arguments since the 
+        // markup for this Menu instance is already exists in the page.
+        oMenu.render();
+        oMenu.show();
+        });
+  ]]></script>
+
+
+<div id="wrapper">
+<div id="header">
+  <tiles:insertAttribute name="header" ignore="true" />
+</div>
+<div id="main" class="clearfix">
+<table>
+  <tbody>
+    <tr>
+      <!-- TODO: I18N para estos mensajes -->
+      <td class="cabecera_modulos"><spring:message code="section_main" htmlEscape="false"/></td>
+      <td class="cabecera_modulos"><spring:message code="section_aux" htmlEscape="false"/></td>
+      <td class="cabecera_modulos"><spring:message code="section_admin" htmlEscape="false"/></td>
+    </tr>
+
+    <tr class="menu_modulos">
+      <td>
+      <table>
+        <tbody>
+          <tr>
+            <td><!-- Importar tagx de menu --> 
+              <tiles:insertAttribute name="menu" ignore="true" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+      <td><!-- Opciones varias --></td>
+      <td>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <spring:url value="/resources/images/cit/theme/herramientasAux/agenda.gif" var="agenda" /> 
+              <img title="Ayuda" alt="Ayuda" src="${agenda}" /><![CDATA[&nbsp;]]>
+              <spring:url value="/resources/ayuda/indice/indice.htm" var="ayuda" /> 
+              <a class="txtopcion_menu" onclick="openWindow('${ayuda}','urlAbs','toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=700,height=500')"
+                href="#"><spring:message code="menu_category_ayuda_label" htmlEscape="false"/></a> 
+              <br />
+              <br />
+              <tiles:insertAttribute name="footer" ignore="true" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+</div>
+<!-- /main -->
+
+<div id="cit-footer"></div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-service" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Add-on Service</title>
+
+  <para xml:lang="es">Add-on que permite generar servidores y clientes de
+  servicios web (WS) de forma automática.</para>
+
+  <section xml:id="addon-persistence_occchecksum">
+    <title>Funcionalidad del Add-on.</title>
+
+    <para>Permite crear servicios web desde cero o importarlos basándose en
+    archivos de descripción de servicios WSDL.</para>
+
+    <section>
+      <title>Creación de servicios</title>
+
+      <para>La creción de servicios se hace mediante el uso de anotaciones y
+      para simplificar esta tarea se puede hacer uso de los comandos que
+      ofrece gvNIX. A medida que se van ejecutando comandos del add-on se va
+      modificando la clase Java añadiendo anotaciones y métodos (operaciones)
+      que conformarán el servicio web que se quiere publicar.</para>
+
+      <para>Lo primero que se necesita es definir una clase Java que contendrá
+      todos los métodos disponibles en el WS. Una vez creada la clase, debemos
+      añadir las operaciones que ofrece el servicio web y exponerlos para que
+      sean accesibles. Con <link
+      linkend="apendice-comandos_addon-service_class">service class</link>
+      declaramos la clase Java que ofrece los servicios.</para>
+
+      <para>De momento nuestro servicio no está definido como tal, es decir,
+      no se puede publicar puesto que aun no tiene ninguna anotación que el
+      framework usará para exponer el servicio. Esto lo coneguimos ejecutanto
+      el comando <link
+      linkend="apendice-comandos_addon-service_define_ws">service define
+      ws</link> que añadirá la anotación
+      <emphasis>@GvNIXWebService</emphasis>. gvNIX generará los componentes
+      necesarios para exponer el servicio web.</para>
+
+      <para>Ahora bien, de momento el servicio tampoco tiene ninguna operación
+      accesible, para ello debemos crearlas añadiendo métodos a la clase Java
+      y exportarlas. Esto lo logramos mediante <link
+      linkend="apendice-comandos_addon-service_operation">service
+      operation</link>, que añade los métodos a la clase y <link
+      linkend="apendice-comandos_addon-service_export_operation">service
+      export operation</link> que añade la anotación
+      <emphasis>@GvNIXWebMethod</emphasis> al método, que informará a gvNIX de
+      que debe generar el código necesario para que la operación esté
+      accesible.</para>
+
+      <programlisting><emphasis role="bold">@GvNIXWebService</emphasis>(name = "MyWebServicePortType", targetNamespace = "http://services.project.layer.service.test.gvnix.org/", serviceName = "MyWebService", 
+                 address = "MyWebService", fullyQualifiedTypeName = "org.gvnix.test.service.layer.project.services.MyWebService", exported = false)
+public class MyWebService {
+
+    <emphasis role="bold">@GvNIXWebMethod</emphasis>(operationName = "sayHello", resultName = "void", webResultType = Void.class)
+    public void sayHello() {
+        return;
+    }
+}</programlisting>
+
+      <para>El comando <link
+      linkend="apendice-comandos_addon-service_list_operation">service list
+      operations</link> muestra qué operaciones existentes en la clase
+      seleccionada están disponibles para ser exportados.</para>
+
+      <para>Existe otra forma para crear servicios. Consiste en generar el
+      servicio basado en un archivo WSDL. Con <link
+      linkend="apendice-comandos_addon-service_export_ws">service export
+      ws</link> indicando la ruta a un archivo WSDL (archivo en local o URL en
+      Internet) generamos una réplica del servicio en la que las operaciones
+      son implementaciones senciallas a modo de ejemplo.</para>
+
+      <para>Para más información sobre estos comandos ver el <link
+      linkend="apendice-comandos_addon-service">apendice de comandos
+      service</link>.</para>
+    </section>
+
+    <section>
+      <title>Creación de clientes</title>
+
+      <para>Podemos generar un cliente para un servicio web existente usando
+      el comando <link
+      linkend="apendice-comandos_addon-service_import_ws">service import
+      ws</link>. Facilitando la ruta a un WSDL, gvNIX generará la clase que
+      contendrá los métdos del cliente.</para>
+    </section>
+  </section>
+</chapter>

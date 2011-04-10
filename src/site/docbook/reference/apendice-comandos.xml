@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="apendice-comandos"
+<chapter version="5.0" xml:id="apendice-comandos" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook" 
-         xml:lang="es">
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Apéndice de Comandos de gvNIX</title>
 
   <section xml:id="apendice-comandos_addon-persistence">
-    <title xml:lang="es">Comandos del Add-on Persistence</title>
+    <title xml:lang="es">Comandos del Add-on OCC</title>
 
     <para xml:lang="es">Para una descripción general ver <link
-    linkend="addon-persistence">Add-on Persistence</link>.</para>
+    linkend="addon-persistence">Add-on OCC</link>.</para>
 
     <table>
-      <title xml:lang="es">Comandos de Add-on Persistence</title>
+      <title xml:lang="es">Comandos de Add-on OCC</title>
 
       <tgroup cols="2">
         <thead>
@@ -200,13 +199,13 @@
 
       <para xml:lang="es">Los parámetros son:<variablelist>
           <varlistentry>
-            <term>--name</term>
+            <term>--id</term>
 
             <listitem>
-              <para><emphasis>[Requerido] [Nombre de tema]
+              <para><emphasis>[Requerido] [Identificador de tema]
               [autocompletado]</emphasis></para>
 
-              <para>Nombre del tema a instalar.</para>
+              <para>Identificador del tema a instalar.</para>
             </listitem>
           </varlistentry>
         </variablelist></para>
@@ -226,13 +225,13 @@
 
       <para xml:lang="es">Los parámetros son:<variablelist>
           <varlistentry>
-            <term>--name</term>
+            <term>--id</term>
 
             <listitem>
-              <para><emphasis>[Requerido] [Nombre de tema]
+              <para><emphasis>[Requerido] [Identificador de tema]
               [autocompletado]</emphasis></para>
 
-              <para>Nombre del tema a establecer.</para>
+              <para>Identificador del tema a establecer.</para>
             </listitem>
           </varlistentry>
         </variablelist></para>
@@ -774,4 +773,10 @@ javax.persistence.OptimisticLockException</programlisting>
         </variablelist></para>
     </section>
   </section>
+	
+  <xi:include href="apendice-comandos_addon-web-report.xml" />
+
+  <xi:include href="apendice-comandos_addon-service.xml" />
+
+  <xi:include href="apendice-comandos_addon-i18n.xml" />
 </chapter>

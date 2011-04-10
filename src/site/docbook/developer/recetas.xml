@@ -132,7 +132,7 @@
   </section>
 
   <section xml:id="recetas_manejo-ficheros-xml">
-    <title>Manejo de fichero XML</title>
+    <title>Ficheros XML</title>
 
     <para>La clase
     <classname>org.springframework.roo.support.util.XmlUtils</classname> tiene
@@ -252,92 +252,227 @@
     </section>
 
     <section xml:id="recetas_manejo-ficheros-xml_actualizar-elemento">
-      <title>Buscar un elemento de un XML para actualizarlo</title>
+      <title>Realizar cambios en XML con posibilidad de deshacer</title>
 
       <para>Este ejemplo se busca dentro del fichero
-      <filename>web.xml</filename> el elemento que define un servlet y lo
-      añade si no existe:</para>
+      <filename>webmvc-config.xml</filename> el bean del tema por defecto y lo
+      cambia el ID del tema actual:</para>
 
-      <programlisting>    String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml");
-    Assert.isTrue(fileManager.exists(webXmlPath),"web.xml not found");
+      <programlisting>  /**
+   * Get and initialize the absolute path for {@code webmvc-config.xml}.
+   * 
+   * @return the absolute path to the file (never null)
+   */
+  public String getMvcConfigFile() {
 
-    MutableFile webXmlMutableFile = null;
-    Document webXml;
+    // resolve absolute path for menu.jspx if it hasn't been resolved yet
+    return getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP,
+          "/WEB-INF/spring/webmvc-config.xml");
+  }
+
+  /**
+   * Open WEB-INF/spring/webmvc-config.xml file and set the default theme
+   * to given theme Id.
+   * &lt;p&gt;
+   * {@link FileManager} is used for safe update.
+   * 
+   * @param id
+   */
+  private void updateDefaultTheme(String themeId) {
+
+    String webMvc = getMvcConfigFile();
+    MutableFile mutableConfigXml = null;
+    Document webConfigDoc;
 
     try {
-           webXmlMutableFile = fileManager.updateFile(webXmlPath);
-           webXml = XmlUtils.getDocumentBuilder().parse(webXmlMutableFile.getInputStream());
-    } catch (Exception e) {
-           throw new IllegalStateException(e);
+      if (fileManager.exists(webMvc)) {
+        mutableConfigXml = fileManager.updateFile(webMvc);
+        webConfigDoc = org.springframework.roo.support.util.XmlUtils
+            .getDocumentBuilder().parse(mutableConfigXml.getInputStream());
+      }
+      else {
+        throw new IllegalStateException("Could not acquire ".concat(webMvc));
+      }
     }
-    Element root = webXml.getDocumentElement();
-
-    if (null != XmlUtils.findFirstElement("/web-app/servlet[servlet-class='org.apache.cxf.transport.servlet.CXFServlet']", root)) {
-            //cxf servlet already installed, nothing to do
-            return;
+    catch (Exception e) {
+      throw new IllegalStateException(e);
     }
 
+    // Get themeResolver bean to change default theme
+    Element resolverElement = org.springframework.roo.support.util.XmlUtils
+        .findFirstElement("//*[@id='themeResolver']",
+            (Element) webConfigDoc.getFirstChild());
 
-    Element firstServletMapping = XmlUtils.findRequiredElement("/web-app/servlet-mapping", root);
+    // throw exception if themeResolver doesn't exist
+    Assert.notNull(resolverElement,
+        "Could not find bean 'themeResolver' in ".concat(webMvc));
 
-    Element servlet = webXml.createElement("servlet");
-    Element servletName = webXml.createElement("servlet-name");
-    servletName.setTextContent("CXFServlet");
-    servlet.appendChild(servletName);
-    Element servletClass = webXml.createElement("servlet-class");
-    servletClass.setTextContent("org.apache.cxf.transport.servlet.CXFServlet");
-    servlet.appendChild(servletClass);
-    root.insertBefore(servlet, firstServletMapping.getPreviousSibling());
+    resolverElement.setAttribute("p:defaultThemeName", themeId);
 
-    Element servletMapping = webXml.createElement("servlet-mapping");
-    Element servletName2 = webXml.createElement("servlet-name");
-    servletName2.setTextContent("CXFServlet");
-    servletMapping.appendChild(servletName2);
-    Element urlMapping = webXml.createElement("url-pattern");
-    urlMapping.setTextContent("/services/*");
-    servletMapping.appendChild(urlMapping);
-    root.insertBefore(servletMapping, firstServletMapping);
-
-    XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);</programlisting>
+    org.springframework.roo.support.util.XmlUtils.writeXml(
+        mutableConfigXml.getOutputStream(), webConfigDoc);
+  }</programlisting>
     </section>
   </section>
 
   <section xml:id="recetas_añadir-dependencia">
-    <title>Añadir dependencias al proyecto</title>
+    <title>Dependencias del proyecto</title>
 
-    <para>En este ejemplo añadiremos dependencias al proyecto a partir de un
-    fichero xml ubicado dentro de los recursos del add-on.</para>
+    <section>
+      <title>Añadir dependencias y propiedades al proyecto</title>
 
-    <para>El fichero de definición puede ser como este:</para>
+      <para>En este ejemplo veremos cómo añadir dependencias y propiedades al
+      proyecto a partir del fichero configuration.xml ubicado dentro de los
+      recursos del add-on, SRC_MAIN_RESOURCES/PACKAGE/.</para>
 
-    <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
-&lt;dependencies&gt;
-     &lt;cxf&gt;
-          &lt;dependency org="org.apache.cxf" name="cxf-api" rev="2.1.3" /&gt;
-          &lt;dependency org="org.apache.cxf" name="cxf-rt-frontend-jaxws" rev="2.1.3" /&gt;
-          &lt;dependency org="org.apache.cxf" name="cxf-rt-transports-http" rev="2.1.3" /&gt;
-          &lt;dependency org="javax.xml.bind" name="jaxb-api" rev="2.1" /&gt;
-     &lt;/cxf&gt;
-&lt;/dependencies&gt;</programlisting>
+      <para>El fichero de definición puede ser como este:</para>
 
-    <para>El siguiente código añade las dependencias al proyecto:</para>
+      <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;configuration&gt;
+  &lt;gvnix&gt;
+    &lt;web-menu&gt;
+      &lt;dependencies&gt;
+        &lt;cxf&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;org.apache.cxf&lt;/groupId&gt;
+        &lt;artifactId&gt;cxf-api&lt;/artifactId&gt;
+        &lt;version&gt;2.1.3&lt;/version&gt;
+      &lt;/dependency&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;org.apache.cxf&lt;/groupId&gt;
+        &lt;artifactId&gt;cxf-rt-frontend-jaxws&lt;/artifactId&gt;
+        &lt;version&gt;2.1.3&lt;/version&gt;
+      &lt;/dependency&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;org.apache.cxf&lt;/groupId&gt;
+        &lt;artifactId&gt;cxf-rt-transports-http&lt;/artifactId&gt;
+        &lt;version&gt;2.1.3&lt;/version&gt;
+      &lt;/dependency&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;javax.xml.bind&lt;/groupId&gt;
+        &lt;artifactId&gt;jaxb-api&lt;/artifactId&gt;
+        &lt;version&gt;2.1&lt;/version&gt;
+      &lt;/dependency&gt;
+        &lt;/cxf&gt;
+      &lt;/dependencies&gt;
+      &lt;properties&gt;
+        &lt;gvnix.version&gt;${project.version}&lt;/gvnix.version&gt;
+      &lt;/properties&gt;
+    &lt;/web-menu&gt;
+  &lt;/gvnix&gt;
+&lt;/configuration&gt;
+</programlisting>
 
-    <programlisting>    InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "dependencies.xml");
-    Assert.notNull(templateInputStream, "Could not acquire dependencies.xml file");
-    Document dependencyDoc;
-    try {
-            dependencyDoc = XmlUtils.getDocumentBuilder().parse(templateInputStream);
-    } catch (Exception e) {
-            throw new IllegalStateException(e);
+      <para>El siguiente código añade las dependencias al proyecto:</para>
+
+      <programlisting>  /** {@inheritDoc} */
+  public void setup() {
+    // Parse the configuration.xml file
+    Element configuration = XmlUtils.getConfiguration(getClass());
+
+    // Add POM properties
+    updatePomProperties(configuration);
+
+    // Add dependencies to POM
+    updateDependencies(configuration);
+
+    // ...
+  }
+
+  /**
+   * Install properties defined in external XML file
+   * @param configuration
+   */
+  private void updatePomProperties(Element configuration) {
+    List&lt;Element&gt; addonProperties = XmlUtils.findElements(
+        "/configuration/gvnix/web-menu/properties/*", configuration);
+    for (Element property : addonProperties) {
+      projectOperations.addProperty(new Property(property));
     }
-    
-    Element dependencies = (Element) dependencyDoc.getFirstChild();
-    
-    
-    List&lt;Element&gt; cxfDependencies = XmlUtils.findElements("/dependencies/cxf/dependency", dependencies);
-    for(Element dependency : cxfDependencies) {
-            projectOperations.dependencyUpdate(new Dependency(dependency));
-    }</programlisting>
+  }
+
+  /**
+   * Install dependencies defined in external XML file
+   * @param configuration
+   */
+  private void updateDependencies(Element configuration) {
+    List&lt;Dependency&gt; dependencies = new ArrayList&lt;Dependency&gt;();
+    List&lt;Element&gt; securityDependencies = XmlUtils.findElements(
+        "/configuration/gvnix/web-menu/dependencies/dependency", configuration);
+    for (Element dependencyElement : securityDependencies) {
+      dependencies.add(new Dependency(dependencyElement));
+    }
+    projectOperations.addDependencies(dependencies);
+  }
+</programlisting>
+    </section>
+
+    <section>
+      <title>Comprobar si existe una dependencia</title>
+
+      <para>En este trozo de código investiga si el proyecto ya incluye una
+      dependencia con una librería en concreto, comprobando también si existe
+      pero con versión distinta:</para>
+
+      <programlisting>  /** {@inheritDoc} */
+  public boolean isSpringSecurityInstalled() {
+
+    if(!isProjectAvailable()) {
+      // no project available yet, we cannot check for SS
+      return false;
+    }
+
+    ProjectMetadata projectMetadata = getProjectMetadata();
+
+    // create Spring Security dependency entity
+    Dependency dep = new Dependency("org.springframework.security",
+        "spring-security-core", "3.0.5.RELEASE");
+
+    // locate Spring Security dependency
+    Set&lt;Dependency&gt; dependencies = projectMetadata
+        .getDependenciesExcludingVersion(dep);
+
+    // if didn't find, Spring Security is not installed
+    if (dependencies.isEmpty()) {
+      return false;
+    }
+    return true;
+  }
+</programlisting>
+    </section>
+  </section>
+
+  <section>
+    <title>Metadatos del proyecto</title>
+
+    <para>Acceso a los metadatos del proyecto desde el metodo
+    <emphasis>activate</emphasis> de un componente OSGi.</para>
+
+    <programlistingco>
+      <areaspec>
+        <area coords="???" xml:id="???"></area>
+      </areaspec>
+
+      <programlisting>public class PageOperationsImpl implements PageOperations {
+
+  /**
+   * Use ProjectMetadataProvider to access project metadata.
+   */
+  @Reference private ProjectMetadataProvider projectMetadataProvider;
+
+  /**
+   * Utility to get {@link ProjectMetadata}.
+   * &lt;p&gt;
+   * This method will thrown if unavailable project metadata.
+   *  
+   * @return ProjectMetadata or null if project isn't available yet
+   */
+  private ProjectMetadata getProjectMetadata() {
+    return (ProjectMetadata) projectMetadataProvider.get(ProjectMetadata.getProjectIdentifier());    
+  }
+}
+</programlisting>
+    </programlistingco>
   </section>
 
   <section xml:id="recetas_crear-listener-filesystem">
@@ -442,6 +577,9 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
 
   <section xml:id="recetas_copia-directorios-recursiva">
     <title>Copiar directorios recursivamente</title>
+
+    <para>TBC: Desactualizado. Actualizar con lo desarrollado en add-web-theme
+    de gvNIX 0.6</para>
 
     <para>Ejemplo sencillo para la copia de un directorio de forma recursiva
     dentro del proyecto específico.</para>
@@ -622,29 +760,6 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
       classpathOperations.generateClassFile(details);
 
   }</programlisting>
-  </section>
-
-  <section>
-    <title xml:base="recetas_comprobar-dependencia">Comprobar si el proyecto
-    tiene registrada una dependencia</title>
-
-    <para>En este trozo de código investiga si el proyecto ya incluye una
-    dependencia con una librería en concreto, comprobando también si existe
-    pero con versión distinta:</para>
-
-    <programlisting>        ProjectMetadata project = (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
-        if (project == null) {
-                return false;
-        }
-
-        Dependency myDependency = new Dependency("GROUP-ID", "ARTIFACT-ID", "VERSION");
-
-        if (project.getDependencies().contains(myDependecy)) {
-                // La depencencia está en el proyecto
-
-        } else if (project.getDependenciesExcludingVersion(myDependecy).size() &gt; 0){
-                // La existe la depencencia, pero con otra versión
-        }</programlisting>
   </section>
 
   <section xml:id="recetas_alterar-comportamiento-metodo">

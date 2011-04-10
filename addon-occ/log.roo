@@ -1,0 +1,7 @@
+// Spring Roo 1.1.2.BUILD-SNAPSHOT [rev 0b7272c] log opened at 2011-02-13 12:16:45
+quit
+// Spring Roo 1.1.2.BUILD-SNAPSHOT [rev 0b7272c] log closed at 2011-02-13 12:17:01
+// Spring Roo 1.1.2.BUILD-SNAPSHOT [rev 0b7272c] log opened at 2011-02-13 12:19:05
+addon create advanced --topLevelPackage org.gvnix.occ.roo.addon --projectName "gvNIX - Addon - Persistence" --description "gvNIX persitence add-on"
+quit
+// Spring Roo 1.1.2.BUILD-SNAPSHOT [rev 0b7272c] log closed at 2011-02-13 12:21:15

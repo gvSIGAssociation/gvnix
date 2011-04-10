@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-web-report" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Add-on Web Report</title>
+
+  <para xml:lang="es">Add-on para añadir soporte para la generación de
+  informes con JasperReports y generar informes de ejemplo como punto de
+  partida para elaborar informes sobre una entidad.</para>
+
+  <section xml:id="addon-theme-manager_descripcion">
+    <title xml:lang="es">Descripción</title>
+
+    <para xml:lang="es">Este add-on permite añadir soporte JasperReports y
+    generar los componentes necesarios para crear informes en la
+    aplicación.</para>
+
+    <para xml:lang="es">Un informe <emphasis
+    role="bold">JasperReports</emphasis> se basa en un archivo de diseño del
+    informe (jrxml) que al procesarse, pasándole una fuente de datos, genera
+    un fichero de salida en un formato determinado incluyendo en él la
+    información disponible en la fuente de datos.</para>
+
+    <para xml:lang="es">El archivo de diseño es un documento XML con un
+    formato determinado que se puede editar de manera sencilla con una
+    herramienta como <link
+    xlink:href="http://jasperforge.org/projects/ireport">iReport</link>.</para>
+
+    <figure>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/ireport.png" />
+        </imageobject>
+      </mediaobject>
+    </figure>
+  </section>
+
+  <section>
+    <title xml:lang="es">Funcionalidad del Add-on.</title>
+
+    <para>El add-on está pensado como punto de partida para la elaboración de
+    informes para la applicación en la que se utiliza. Por tanto ofrece la
+    generación de componentes básicos para desarrollarlos en mayor profundidad
+    por parte del desarrollador de la aplicación.</para>
+
+    <para>JasperReports precisa de una librería para funcionar, el add-on
+    ofrece la configuración de las dependencias de esta librería en el
+    proyecto modificando el pom.xml del mismo.</para>
+
+    <para>Los informes son una vitsta más de nuestra aplicación y por tanto es
+    necesario configurar en <emphasis role="bold">webmvc-config.xml</emphasis>
+    el componente que nos devolverá este nuevo tipo de salida. Esto se hace
+    añadiendo un nuevo <emphasis>bean</emphasis> al archivo de configuración
+    de la capa web.</para>
+
+    <programlisting>&lt;bean id="jasperReportsXmlViewResolver" class="org.springframework.web.servlet.view.XmlViewResolver"
+    p:location="/WEB-INF/spring/<emphasis role="bold">jasper-views.xml</emphasis>" p:order="0" /&gt;</programlisting>
+
+    <para>Este <emphasis>bean</emphasis> indica que usa el fichero
+    <emphasis>jasper-views.xml</emphasis> como fichero de configuración de las
+    nuevas vistas, por tanto el add-on crea este archivo en
+    <emphasis>src/main/webapp/WEB-INF/spring</emphasis>.</para>
+
+    <para>Los informes generados pueden contener textos que se muestran en
+    negrita. JasperReports necesita que las fuentes utilizadas para generar el
+    informe se encuentren en el classpath de la aplicación. Así pues, el
+    add-on se ocupa de copiar en
+    <emphasis>src/main/webapp/WEB-INF/classes</emphasis> un directorio
+    (<emphasis>jasperfonts</emphasis>) que contiene varios archivos de fuentes
+    True Type y el archivo de mapeo de las mismas, archivo
+    <emphasis>gvnix_reportfonts.xml</emphasis>. El archivo
+    <emphasis>src/main/webapp/WEB-INF/classes/jasperreports_extension.properties</emphasis>
+    es el encargado de inidcar a JasperReports que debe usar estas letras pra
+    generar el informe.</para>
+
+    <important>
+      <para>Las fuentes instaladas se instalan para dar un soporte básico al
+      texto en negrita y a modo de ejemplo de como el desarrollador puede
+      utilizar otros tipos de fuentes para los informes que diseñe. Basta con
+      ampliar los <emphasis>fontFamily</emphasis> definidos en el archivo
+      <emphasis>gvnix_reportfonts.xml</emphasis> y copiar los archivos de las
+      fuentes en la misma carpeta <emphasis>jasperfonts</emphasis>. Esta
+      operación se puede simplificar usando una utilidad que ofrece iReport.
+      Desde el menú <emphasis>Herramientas &gt; Opciones: Pestaña
+      Fonts</emphasis> accedemos a esta pantalla:</para>
+
+      <figure>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/iReportFonts.png" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <para>Desde esta pantalla seleccionamos una fuente de la lista de
+      fuentes instaladas y con el botón <emphasis>"Export as
+      extension"</emphasis> nos permitirá crear un archivo JAR que si lo
+      descomprimimos contiene:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Directorio fonts</para>
+
+          <itemizedlist>
+            <listitem>
+              <para>Archivos fuentes TTF.</para>
+            </listitem>
+
+            <listitem>
+              <para>Archivo
+              <emphasis>fontsfamily&lt;IdentificadorAleatorio&gt;.xml</emphasis></para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+
+        <listitem>
+          <para>Archivo
+          <emphasis>jasperreports_extension.properties</emphasis></para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Copiamos los TTF a
+      <emphasis>/WEB-INF/classes/jasperfonts</emphasis> y del archivo
+      <emphasis>fontsfamily&lt;IdentificadorAleatorio&gt;.xml</emphasis>
+      adaptamos el elemento &lt;fontFamily/&gt; para que podamos copiar este
+      elemento al archivo ya instalado en el proyecto
+      <emphasis>gvnix_reportfonts.xml</emphasis> (modificar las rutas para
+      adaptarlos a <emphasis>jasperfonts</emphasis>). El archivo <emphasis>
+      jasperreports_extension.properties</emphasis> podemos obviarlo ya que lo
+      tenemos definido en el proyecto en
+      <emphasis>/WEB-INF/classes.</emphasis></para>
+    </important>
+
+    <para>Las operaciones descritas hasta el momento las realiza el comando
+    del add-on <link linkend="apendice-comandos_addon-web-report_setup">web
+    report setup</link>.</para>
+
+    <para>La generación de informes, como se tratan de una vista más de la
+    aplicación, los ha de atender un Controller. No obstante, los informes
+    muestran información referente a una entidad del modelo de datos de la
+    aplicación, por tanto el Controller debe atender también peticiones
+    referentes a una entidad. Esto, como se comentó en <link
+    linkend="guia-desarrollo_web_definir-controller_a-mano_automatico">CRUDS
+    automático</link>, se indica mediante la anotación
+    <emphasis>@RooWebScaffold</emphasis> y su atributo
+    <emphasis>fromBackingObject.</emphasis> Así pues, no se puede definir un
+    informe en un controller que no tenga la anotación
+    <emphasis>@RooWebScaffold</emphasis>.</para>
+
+    <para>Para definir un informe se puede hacer mediante el comando <link
+    linkend="apendice-comandos_addon-web-report_add">web report add</link> o
+    incluyendo la anotación @GvNIXReports en el código fuente del controller.
+    El comando web report add tiene tres parámetros:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>controller: indica una controller existente en el proyecto. Como
+        se ha comentado anteriormente, este controller ha de tener la
+        anotación <emphasis>@RooWebScaffold</emphasis> y su atributo
+        <emphasis>fromBackingObject</emphasis> informado. Este parámetro es
+        obligatorio y no tiene valor por defecto.</para>
+      </listitem>
+
+      <listitem>
+        <para>reportName: indica el nombre que se le quiere dar al informe. Es
+        un string sin espacios. El valor dado se transforma a minúsculas.
+        También es obligatorio y no tiene valor por defecto.</para>
+      </listitem>
+
+      <listitem>
+        <para>format: El valor puede ser un formato simple
+        (<emphasis>pdf</emphasis> (Portable Document Format) |
+        <emphasis>xls</emphasis> (Excel) | <emphasis>csv</emphasis> (Comma
+        Separated Values) | <emphasis>html</emphasis> (HyperText Markup
+        Language)) o un varios de ellos separados por comas indicando varios
+        formatos soportados para el mismo informe. El parámetro es opcional y
+        su valor por defecto es <emphasis>pdf</emphasis>.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>La anotación tiene como valor un array de strings que definen un
+    informe y los formatos en los que está disponible dicho informe. Así pues,
+    la anotación:</para>
+
+    <programlisting>@GvNIXReports({ "myfirstreport|pdf,xls,csv" })</programlisting>
+
+    <para>define un informe cuyo nombre es <emphasis>myfirstreport</emphasis>
+    y está disponible en los formatos pdf (Portable Document Format), xls
+    (Excel), csv (Comma Separated Values). El add-on también está preparado
+    para soportar formato html (HyperText Markup Language).</para>
+
+    <para>Al lanzar el comando <emphasis>web report add</emphasis>, o anotar
+    la clase del controlador con <emphasis>@GvNIXReports</emphasis>, se
+    realizan una serie de operaciones que finalmente ofrecen la posibilidad de
+    generar un informe de ejemplo solicitandolo desde un formulario de la
+    apliación. Las operaciones son:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Crear la clase Java <emphasis
+        role="bold">CustomJasperReportsMultiFormatView</emphasis>. Si el
+        controlador se encuentra en el paquete
+        <emphasis>com.empresa.aplicacion.web</emphasis>, la nueva clase se
+        creará en el paquete
+        <emphasis>com.empresa.aplicacion.web.servlet.view.jasperreports</emphasis>.
+        Esta clase se instala solo una vez y en sucesivas ejecuciones se
+        comprueba si existe. Esta clase tiene como principal cometido
+        establecer, de manera dinámica, el nombre del archivo del informe que
+        se genera para su descarga.</para>
+      </listitem>
+
+      <listitem>
+        <para>En el archivo <emphasis role="bold">jasper-views.xml</emphasis>
+        se añade la definición de una nueva vista que es el nuevo informe
+        añadido a la aplicación. Se define para ello un bean cuyo id es
+        <emphasis>&lt;fromBackingObject&gt;_&lt;reportname&gt;</emphasis> y
+        <emphasis>CustomJasperReportsMultiFormatView</emphasis> como clase del
+        bean. Si <emphasis>fromBackingObject</emphasis> de
+        <emphasis>@RooWebScaffold</emphasis> tiene como valor
+        <emphasis>User</emphasis> y el nombre definido para el informe es
+        <emphasis>informeusuarios</emphasis>:</para>
+
+        <programlisting>&lt;bean id="user_informeusuarios" 
+   class="com.empresa.aplicacion.web.servlet.view.jasperreports.CustomJasperReportsMultiFormatView"
+   p:url="/WEB-INF/reports/user_informeusuarios.jrxml"
+   p:subReportUrls-ref="subReportUrls"
+   p:subReportDataKeys-ref="subReportDataKeys" /&gt;</programlisting>
+      </listitem>
+
+      <listitem>
+        <para>Crear un archivo de diseño de informe de ejemplo (jrxml) que
+        usa, si tiene tres o más, si no usa tantos como tenga, tres campos de
+        la clase User (siguiendo el ejemplo anterior). El archivo se crea en
+        <emphasis role="bold">src/main/webapp/WEB-INF/reports</emphasis> con
+        el nombre <emphasis>user_informeusuarios.jrxml</emphasis>. Este
+        archivo se referencia desde el <emphasis>bean</emphasis> en
+        <emphasis>jasper-views.xml</emphasis> con el atributo
+        <emphasis>p:url</emphasis>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Crear un formulario web bajo <emphasis
+        role="bold">src/main/webapp/WEB-INF/views/&lt;entidad&gt;
+        </emphasis>con nombre <emphasis>&lt;reportname&gt;.jspx</emphasis>
+        (informeusuarios.jspx siguiendo el ejemplo). Y definir esta nueva
+        vista en <emphasis role="bold">webmvc-config.xml</emphasis>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Crear el ITD
+        <emphasis>&lt;controller&gt;_Roo_GvNIXReport.aj</emphasis> que
+        contiene los métodos que atienden las peticiones relacionadas con el
+        informe añadido. Se añaden dos métodos por informe:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><emphasis>generate&lt;Reportname&gt;Form(..)</emphasis>:
+            devuelve la vista de un formulario web sencillo que permite al
+            usuario seleccionar el formato de salida del informe y solicitar
+            el mismo mediante el botón de submit.</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis>generate&lt;Reportname&gt;(..)</emphasis>: atiende
+            la petición para generar el informe recopilando los datos
+            necesarios que se muestran en él. Para ello invoca el método
+            <emphasis>&lt;fromBackingObject&gt;.find&lt;fromBackingObject&gt;Entires(0,
+            10)</emphasis> a modo de ejemplo de creación del datasource del
+            informe. Los informes que crea el add-on usan como DataSource una
+            lista de objetos del tipo de la entidad a mostrar en el
+            informe.</para>
+
+            <programlisting>@RequestMapping(value = "/reports/informeusuarios", params = "form", method = RequestMethod.GET)
+public String UsuarioController.generateInformeusuariosForm(Model uiModel) {
+    String[] reportFormats =  {"pdf"};
+    Collection&lt;String&gt; reportFormatsList = Arrays.asList(reportFormats);
+    uiModel.addAttribute("report_formats", reportFormatsList);
+    return "users/informeusuarios";
+}
+
+@RequestMapping(value = "/reports/informeusuarios", method = RequestMethod.GET)
+public String VetController.generateInformeusuarios(
+                                  @RequestParam(value = "format", required = true) String format, 
+                                  Model uiModel) {
+    if ( null == format || format.length() &lt;= 0 ) {
+            uiModel.addAttribute("error", "message_format_required");
+            return "users/informeusuarios";
+    }
+    final String REGEX = "(pdf)";
+    Pattern pattern = Pattern.compile(REGEX, Pattern.CASE_INSENSITIVE);
+    Matcher matcher = pattern.matcher(format);
+    if ( !matcher.matches() ) {
+            uiModel.addAttribute("error", "message_format_invalid");
+            return "users/informeusuarios";
+    }
+    Collection&lt;Vet&gt; dataSource = Vet.findVetEntries(0, 10);
+    if (dataSource.isEmpty()) {
+            uiModel.addAttribute("error", "message_emptyresults_noreportgeneration");
+            return "users/informeusuarios";
+    }
+    uiModel.addAttribute("format", format);
+    uiModel.addAttribute("title", "INFORMEUSUARIOS");
+    uiModel.addAttribute("informeusuariosList", dataSource);
+    return "usuario_informeusuarios";
+}</programlisting>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+    </itemizedlist>
+
+    <note>
+      <para>El comando web report add puede ejecutarse varias veces sobre el
+      mismo controller. Si el nombre del informe que se quiere añadir ya
+      existía previamente se tendrán en cuenta los formatos indicados
+      agregandolos a los ya definidos. Si el nombre dado al nuevo informe
+      definido no existía, se añade su definición en la anotación
+      <emphasis>@GvNIXReports</emphasis>.</para>
+
+      <programlisting>@GvNIXReports({ "myfirstreport|pdf,xls,csv", "mysecondreport|pdf" })</programlisting>
+
+      <para>Los valores de la anotación <emphasis role="bold">no son
+      sensibles</emphasis> a mayúsculas por tanto si manualmente se establecen
+      los valores de la anotación como:</para>
+
+      <programlisting>@GvNIXReports({ "myfirstreport|pdf", "myFirstREPORT|xls,csv" })</programlisting>
+
+      <para>es equivalente a:</para>
+
+      <programlisting>@GvNIXReports({ "myfirstreport|pdf,xls,csv" })</programlisting>
+    </note>
+  </section>
+
+  <section>
+    <title xml:lang="es">Futuras versiones</title>
+
+    <para>TBC</para>
+  </section>
+</chapter>

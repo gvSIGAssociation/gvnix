@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-web-i18n" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title>Add-on Web MVC i18n</title>
+
+  <para>Añade soporte para idiomas en el proyecto.</para>
+
+  <section xml:id="addon-web-menu_descripcion">
+    <title>Descripción</title>
+
+    <para xml:lang="es">Este Add-on instala el fichero de traducciones del
+    idioma solicitado en el proyecto.</para>
+
+    <para xml:lang="es">Los idiomas soportados son: de (Alemán), en (Inglés),
+    es (Español), it (Italiano), nl (Holandés), sv (Finlandés), <emphasis
+    role="bold">ca (Valenciano/Catalán)</emphasis>. Este último es el que
+    añade gvNIX con su add-on.</para>
+  </section>
+
+  <section>
+    <title xml:lang="es">Instalar un idioma.</title>
+
+    <para xml:lang="es">Para instalar uno de los idiomas soportados hay que
+    ejecutar el comando web mvc install language.</para>
+
+    <para xml:lang="es">Para mas información sobre los comandos ver <link
+    linkend="apendice-comandos_addon-web-i18n">apéndice de comandos de este
+    add-on</link>.</para>
+  </section>
+</chapter>

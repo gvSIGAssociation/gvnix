@@ -155,7 +155,8 @@ public class Entity1 {
           <term xml:lang="es">--testAutomatically</term>
 
           <listitem>
-            <para xml:lang="es"><emphasis>TBC</emphasis></para>
+            <para xml:lang="es">Genera los test unitarios para esta entidad
+            usando JUnit.</para>
           </listitem>
         </varlistentry>
       </variablelist>
@@ -375,7 +376,7 @@ public class Entity1 {
 ~.domain.Pizza roo&gt; <command>field string --fieldName name --notNull --sizeMin 2 
 --comment "Nombre de la pizza" --column pizza_nombre --regexp [A-Za-z0-9].*</command>
 ~.domain.Pizza roo&gt; <command>field number --fieldName price --type java.lang.Float</command>
-~.domain.Pizza roo&gt; <command>field set --fieldName toppings --element ~.domain.Topping</command>
+~.domain.Pizza roo&gt; <command>field set --fieldName toppings --type ~.domain.Topping</command>
 ~.domain.Pizza roo&gt; <command>field reference --fieldName base --type ~.domain.Base</command>
                 </programlisting>
 
@@ -439,7 +440,7 @@ public class Pizza {
 ~.domain.PizzaOrder roo&gt; <command>field string --fieldName address --notNull --sizeMax 30</command>
 ~.domain.PizzaOrder roo&gt; <command>field number --fieldName total --type java.lang.Float</command>
 ~.domain.PizzaOrder roo&gt; <command>field date --fieldName deliveryDate --type java.util.Date</command>
-~.domain.PizzaOrder roo&gt; <command>field set --fieldName pizzas --element ~.domain.Pizza</command>
+~.domain.PizzaOrder roo&gt; <command>field set --fieldName pizzas --type ~.domain.Pizza</command>
                 </programlisting>
         </listitem>
       </orderedlist>
@@ -451,6 +452,13 @@ public class Pizza {
 
   <section xml:id="guia-desarrollo_gestion-entidades_definicion_crear-a-mano">
     <title xml:lang="es">Crear una entidad con un IDE</title>
+
+    <para>Llegados a este punto recordar que, para pasar a trabajar con
+    Eclipse deberíamos ejecutar, si no lo hemos hecho todavía, el comando
+    <emphasis role="bold">perform eclipse</emphasis> desde la línea de
+    comandos de gvNIX o bien su equivalente maven <emphasis role="bold">mvn
+    eclipse:eclipse</emphasis> desde el interprete de comandos del
+    sistema.</para>
 
     <para xml:lang="es">Como hemos visto en el punto anterior el código Java
     generado no tiene ningún elemento particular de Roo, por lo que crear
@@ -465,8 +473,8 @@ public class Pizza {
     intérprete de comandos de Roo se generará toda la infraestructura
     necesaria para la persistencia, validación, etc</para>
 
-    <para xml:lang="es">Entre las anteriores anotaciones que podemos utilizar
-    en la codificación de nuestro modelo, podemos destacar:</para>
+    <para xml:lang="es">Entre las anotaciones que podemos utilizar en la
+    codificación de nuestro modelo, podemos destacar:</para>
 
     <variablelist>
       <varlistentry>
@@ -574,7 +582,9 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
         <term>Modificar un atributo</term>
 
         <listitem>
-          <para xml:lang="es"><emphasis>TBC</emphasis></para>
+          <para xml:lang="es">Modificar el atributo deseado en la clase Java y
+          gvNIX actualizará los ficheros relacionados para contemplar los
+          cambios.</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -979,12 +989,44 @@ public class Entity1 {
 
       <programlisting>    &lt;!-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
     </section>
+
+    <section>
+      <title>Clase Repartidor para nuestro proyecto de ejemplo</title>
+
+      <programlisting>@RooJavaBean
+@RooToString
+@RooEntity
+public class Repartidor {
+
+    @NotNull
+    @Size(min = 2)
+    private java.lang.String name;
+
+}</programlisting>
+
+      <para>Generamos los test de integración para la nueva entidad y
+      definimos la relación entre PizzaOrder y el Repartidor del pedido.
+      También generamos el controlador que gestionará la nueva entidad.</para>
+
+      <programlisting>roo&gt; <command>test integration --entity ~.domain.Repartidor</command>
+...
+roo&gt; <command>field reference --class ~.domain.PizzaOrder --fieldName repartidor --type ~.domain.Repartidor
+</command>...
+roo&gt; <command>controller scaffold --entity ~.domain.Repartidor --class ~.web.RepartidorController</command>
+...
+</programlisting>
+
+      <para>Podemos volver a lanzar los test de integración para confirmar que
+      todo se ha generado correctamente.</para>
+
+      <programlisting>roo&gt; <command>perform tests
+</command>...
+[INFO] BUILD SUCCESSFUL</programlisting>
+    </section>
   </section>
 
   <section xml:id="guia-desarrollo_gestion-entidades_ingenieria-inversa">
     <title xml:lang="es">Ingeniería inversa de entidades</title>
-
-    <para xml:lang="es"><emphasis>TBC</emphasis></para>
 
     <!--
       <para xml:lang="es">En el proyecto de Spring Roo se tiene planeado añadir
@@ -997,6 +1039,253 @@ public class Entity1 {
       información en: <link
       xlink:href="https://jira.springsource.org/browse/ROO-435">ROO-435</link>.</para>
 -->
+
+    <para xml:lang="es">gvNIX permite la utilización de ingeniería inversa
+    para gestionar las entidades JPA del proyecto, lo cual nos ofrece la
+    opción de, que basado en la metainformación recopilada de la BBDD
+    configurada en nuestro proyecto, nos genere todas las entidades con sus
+    campos de manera automática. El encargado de esta funcionalidad es el
+    Add-on <emphasis>Database Reverse Engineering</emphasis> (DBRE) que se
+    instala en el proyecto mediante el comando <emphasis>addon
+    install</emphasis>.</para>
+
+    <section xml:id="guia-desarrollo_ingenieria-inversa_instalacion">
+      <title>Instalación del Add-on</title>
+
+      <para>El Add-on DBRE soporta la mayoria de las Bases de Datos
+      relacionales que pueden ser gestionadas por gvNIX (MySQL, MS SQL,
+      PostgreSQL). El driver a utilizar lo detecta gvNIX y nos pregunta si
+      queremos descargarlo e instalarlo la primera vez que invocamos los
+      comandos <emphasis>database introspect</emphasis> o <emphasis>database
+      reverse engineer.</emphasis><warning>
+          <para>Si lanzamos este comando con la configuración actual del
+          proyecto que usa HYPERSONIC_IN_MEMORY como BBDD nos indicará que no
+          hay driver disponible para HSQLDB.</para>
+        </warning>Si lo hacemos en un proyecto que tenga MySQL como
+      BBDD:<programlisting>roo&gt; <emphasis role="bold">database introspect --schema no-schema-required</emphasis>
+Located add-on that may offer this JDBC driver
+1 found, sorted by rank; T = trusted developer; R = Roo 1.1 compatible
+<emphasis role="bold">ID T R DESCRIPTION -------------------------------------------------------------
+01 Y Y 5.1.13.0001 #jdbcdriver driverclass:com.mysql.jdbc.Driver. This...</emphasis>
+--------------------------------------------------------------------------------
+[HINT] use 'addon info id --searchResultId ..' to see details about a search result
+[HINT] use 'addon install id --searchResultId ..' to install a specific search result, or
+[HINT] use 'addon install bundle --bundleSymbolicName TAB' to install a specific add-on version
+JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programlisting>ID T R DESCRIPTION ------------------------------------------------------------- 
+01 Y Y 5.1.13.0001 #jdbcdriver driverclass:com.mysql.jdbc.Driver. This...</programlisting>esta
+      sección de la salida del comando database introspect nos indica que hay
+      disponible un driver para el soporte de DBRE y nos sugiere que hacer a
+      continuación (lineas que empiezan con [HINT]).</para>
+
+      <para>Podemos obtener más información sobre el dirver mediante:</para>
+
+      <programlisting>roo&gt; <command>addon info id --searchResultId 01</command></programlisting>
+
+      <para>Donde le estamos diciendo que nos ofreca más información
+      (--searchResultId) del Add-on 01 que nos ha devuelto el comando
+      anterior.</para>
+
+      <para>Para instalarlo se puede hacer usando el id del Add-on o bien su
+      nombre simbólico.<programlisting>roo&gt; <command>addon install id --searchResultId 01</command></programlisting></para>
+
+      <para>o</para>
+
+      <programlisting>roo&gt; <command>addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.mysql-connector-java;&lt;version&gt;</command></programlisting>
+
+      <para>Al instante tendremos disponible el driver JDBC y podremos empezar
+      a usar los comandos <emphasis>database introspect</emphasis> o
+      <emphasis>database reverse.</emphasis></para>
+    </section>
+
+    <section>
+      <title>Comandos del Add-on DBRE</title>
+
+      <para>DBRE ofrece dos comandos: <emphasis>database introspect</emphasis>
+      o <emphasis>database reverse engineer.</emphasis></para>
+
+      <programlisting>roo&gt; <command>database introspect --schema</command> &lt;nombre del esquema&gt; --file &lt;nombre del fichero&gt; --enableViews</programlisting>
+
+      <para>el comando nos mostrará la estructura de la BBDD en formato XML.
+      Es obligatorio indicar el esquema al que nos referimos, para ello
+      presionado la tecla TAB nos mostrará una lista de esquemas de nuestra
+      BBDD. Algunas BBDD no usan el concepto de esquema, MySQL entre ellas,
+      aun así la opción --schema es necesaria y por ello el asistente nos
+      mostraría como esquema "no-schema-required". La opción --file indica que
+      guarde la información también en un fichero determinado y --enableViews
+      especifica que también debe recoger información sobre las vistas.</para>
+
+      <programlisting>roo&gt; <command>database reverse engineer --schema</command> --package --testAutomatically --enableViews --includeTables --excludeTables</programlisting>
+
+      <para>este comando crea las entidades JPA de nuestro proyecto
+      representando las tablas y columnas de nuestra BBDD. Al igual que antes
+      --schema es obligatorio. Podemos usar --package para indicar el nombre
+      del paquete de nuestro proyecto donde crear las clases Java, si no lo
+      hacemos en las siguientes ejecuciones del comando, las clases se crearan
+      en el mismo paquete que en la primera vez.</para>
+
+      <para>Podemos indicarle que genere automáticamente los test de
+      integración para cada una de las nuevas entidades creadas con
+      --testAutomatically.</para>
+
+      <para>Si indicamos la opción --enableViews en este comando, se crearan
+      entidades JPA que representes las vistas que se encuentren en la
+      introspección de la BBDD. Esto solo debería usarse en casos especiales
+      como pueden ser aquellas BBDD que dispongan de disparadores
+      (<emphasis>triggers</emphasis>).</para>
+
+      <para>Podemos filtrar las tablas que se van a tener en cuenta en la
+      operación. --includeTables indicará cuales son las tablas que queremos
+      que sean tenidas en cuenta. Podemos indicar uno o varios nombres de
+      tabla, si indicamos más de uno deberemos indicarlos entre comillas
+      dobles. Se permite el uso de * para hacer matching de uno o varios
+      caracteres en la búsqueda o el uso de ? para indicar un único caracter.
+      De manera opuesta --excludeTables indica que tablas no han de ser
+      tenidas en cuenta durante la ingeniería inversa y admite el mismo uso de
+      * y ?. Por ejemplo:</para>
+
+      <programlisting>roo&gt; database reverse engineer --schema no-schema-required --package ~.domain --includeTables "foo* bar?"</programlisting>
+
+      <para>Con este comando se generarían las entidades de aquellas tablas de
+      la BBDD que tengan como nombre foo&lt;cualquier cosa&gt; y bar&lt;otro
+      caracter más&gt;, por ejemplo 'foo_tabla_cool' y 'bars'.</para>
+
+      <warning>
+        <para>al excluir tables, además de evitar que se creen las entidades
+        de estas tablas se evita tabmién que no se creen las asociaciones y
+        relaciones en otras entidades. Esto se hace para evitar problemas de
+        compilación en el código del proyecto.</para>
+      </warning>
+
+      <para>Como DBRE ofrece ingeniería inversa incremental, se puede ejecutar
+      este comando tantas veces como se necesite y de esta forma gvNIX
+      mantendrá todas las entidades JPA de manera automática.</para>
+
+      <important>
+        <para>Cuando empezamos a usar el Add-on de ingeniería inversa se
+        modifica el fichero META-INF/persistence.xml cambiando el valor de la
+        propiedad <emphasis>hibernate.hbm2ddl.auto</emphasis> por el de
+        validate para evitar que pongamos en peligro la integridad de la BBDD
+        a la que estamos conectados en nuestro proyecto.</para>
+      </important>
+    </section>
+
+    <section>
+      <title>Anotación @RooDbManaged</title>
+
+      <para>Tal y como se ha comentado en la sección <link
+      linkend="guia-desarrollo_gestion-entidades_definicion_crear-a-mano">Crear
+      una entidad con un IDE</link> se hace uso de una serie de anotaciones
+      Java para que gvNIX gestione el código del proyecto. A las anotaciones
+      descritas anteriormente añadimos ahora la anotación @RooDbManaged que se
+      le añade a todas las entidades creadas durante el proceso de ingeniería
+      inversa.</para>
+
+      <programlisting>@RooJavaBean
+@RooToString
+<command>@RooDbManaged</command>(automaticallyDelete = true)
+@RooEntity(table = "pizza")
+public class Pizza {
+}</programlisting>
+
+      <para>El atributo <emphasis>automaticallyDelete</emphasis> que acompaña
+      a la anotación y que toma el valor <emphasis>true</emphasis> indica a
+      gvNIX que puede eliminar la entidad en el caso de que la tabla de la
+      BBDD a la cual hace referencia sea eliminada. Si el atributo toma el
+      valor <emphasis>false</emphasis>, o si cualquier otra parte del código
+      de esta entidad es modificado (elimnamos una anotación, añadimos algún
+      método, ...) la entidad no se eliminará en caso de que la tabla
+      desaparezca de la BBDD.</para>
+    </section>
+
+    <section>
+      <title>Soporte de funcionalidades JPA 2.0</title>
+
+      <para>El Add-on DBRE crea y mantiene claves primarias simples,
+      compuestas y relaciones entre entidades.</para>
+
+      <section>
+        <title>Claves primarias simples</title>
+
+        <para>Para el caso de claves primarias simples DBRE genera un campo
+        identificador en el ITD de la entidad anotado con las anotaciones @Id
+        y @Column tal como se hace al ejecutar el comando
+        <emphasis>entity</emphasis>.</para>
+      </section>
+
+      <section>
+        <title>Claves primarias compuestas</title>
+
+        <para>En este caso DBRE realiza una solución más elaborada. Crea una
+        clase Java que representa la clave primaria anotandala con
+        @RooIdentifier(dbManaged = true) y añade el atributo "identifierType"
+        con el nombre de la clase del identificador a la anotación @RooEntity
+        en la clase de la entidad. Veamos un ejemplo:</para>
+
+        <programlisting>@RooJavaBean
+@RooToString
+@RooDbManaged(automaticallyDelete = true)
+@RooEntity(identifierType = LineItemPK.class, table = "line_item", schema = "order")
+public class LineItem {
+}</programlisting>
+
+        <programlisting>@RooIdentifier(dbManaged = true)
+public class LineItemPK {
+}</programlisting>
+
+        <para>En el ITD de la entidad LineItem existirá un campo anotado con
+        @EmbeddedId del tipo LineItemPK:</para>
+
+        <programlisting>privileged aspect LineItem_Roo_Entity {
+    
+    declare @type: LineItem: @Entity;
+    
+    declare @type: LineItem: @Table(name = "line_item", schema = "order");
+    
+    @PersistenceContext
+    transient EntityManager LineItem.entityManager;
+    
+    @EmbeddedId
+    private LineItemPK LineItem.id;
+    
+    public LineItemPK LineItem.getId() {
+        return this.id;
+    }
+    
+    public void LineItem.setId(LineItemPK id) {
+        this.id = id;
+    }
+
+    ...
+}</programlisting>
+
+        <para>Y en el ITD de la clase que representa la clave compuesta
+        tendremos los campos de la clave primaria con la anotación
+        @Embeddable:</para>
+
+        <programlisting>privileged aspect LineItemPK_Roo_Identifier {
+    
+    declare @type: LineItemPK: @Embeddable;
+    
+    @Column(name = "line_item_id", nullable = false)
+    private BigDecimal LineItemPK.lineItemId;
+    
+    @Column(name = "order_id", nullable = false)
+    private BigDecimal LineItemPK.orderId;
+    
+    public LineItemPK.new(BigDecimal lineItemId, BigDecimal orderId) {
+        super();
+        this.lineItemId = lineItemId;
+        this.orderId = orderId;
+    }
+
+    private LineItemPK.new() {
+        super();
+    }
+
+    ...
+}</programlisting>
+      </section>
+    </section>
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_test-integracion">

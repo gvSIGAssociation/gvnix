@@ -1,4 +1,5 @@
-// Spring Roo 1.0.1.RELEASE [rev 601] log opened at 2010-02-12 13:54:34
-// [failed] project --topLevelPackage org.gvnix.cit.security.roo.addon --java 5 --template ROO_ADDON_SIMPLE  --projectName addon-cit-security
-project --topLevelPackage org.gvnix.cit.security.roo.addon --java 5 --template ROO_ADDON_SIMPLE
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log opened at 2011-03-23 18:08:06
+addon create advanced --topLevelPackage org.gvnix.cit.security.roo.addon --projectName "gvNIX - Addon - CIT - Security" --description "gvNIX CIT Security Add-on"
 perform eclipse
+quit
+// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log closed at 2011-03-23 18:08:34
