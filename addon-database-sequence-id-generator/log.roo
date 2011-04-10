@@ -1,2 +1,0 @@
-// Spring Roo 1.1.0.M1 log opened at 2010-05-10 17:37:50
-project --topLevelPackage org.gvnix.database.sequence.id.generator.roo.addon --java 5 --template ROO_ADDON_SIMPLE 

@@ -1,5 +1,0 @@
-// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log opened at 2011-03-23 18:08:06
-addon create advanced --topLevelPackage org.gvnix.cit.security.roo.addon --projectName "gvNIX - Addon - CIT - Security" --description "gvNIX CIT Security Add-on"
-perform eclipse
-quit
-// Spring Roo 1.1.2.RELEASE [rev fbc33bb] log closed at 2011-03-23 18:08:34

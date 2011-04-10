@@ -26,110 +26,36 @@ This work is licensed under the Creative Commons Attribution-Share Alike 3.0
 Unported License. To view a copy of this license, visit 
 http://creativecommons.org/licenses/by-sa/3.0/
 
+Documentation index
+===================
+
+* On each gvNIX project module you can find technical and user guides at module/docs/ in reStructuredText format and English:
+
+  * td-module.rst: Technical design
+  * ug-module.rst: User guide
+
+* gvNIX work guides are placed at src/site/docbook/ in docbook format and Spanish:
+
+  * reference: Working guide about projects development with gvNIX.
+  * developer: Working guide about gvNIX project development.
+
+* gvNIX project methodology documentation can be found at ../doc in gvMetrica format and Spanish.
+
 Pre-requisites
 ================
 
 To start with gvNIX you need:
 
 * A *nix machine (Windows users should be OK if they write a .bat)
-* JDK 5.0 or above ( http://java.sun.com/javase/downloads/index.jsp )
-* Maven 2.0.9 or above [use only 2.0.x versions, not 2.2.x versions] ( http://maven.apache.org/download.html )
+* JDK 6.0 or above ( http://java.sun.com/javase/downloads/index.jsp )
+* Maven 3.0.1 or above ( http://maven.apache.org/download.html )
 * Internet access so that Maven can download required dependencies
-* Git client, http://en.wikipedia.org/wiki/Git_%28software%29
 
 Setup instructions
 ===================
 
-Obtener la versión base de Roo
-------------------------------
-
-#. Descargar el código fuente del proyecto Roo desde su repositorio en un directorio temporal de nuestro equipo::
-
-       bash> cd /tmp
-       bash> rm -rf roo
-       bash> git clone git://git.springsource.org/roo/roo.git
-       bash> cd roo
-
-#. Consultar en la información técnica del proyecto la versión de Roo que requiere la versión de gvNIX que se desea empaquetar.
-   Por ejemplo, la versión 0.3.0 de gvNIX requiere la versión 1.1.0.M1 de Roo.
-
-#. Para obtener una determinada versión del código fuente de Roo desde su repositorio necesitamos conocer el número de revisión que tiene asociada la versión.  
-   Para identificar el número de revisión de una versión de Roo pueden usarse las siguientes instrucciones::
-       
-       bash> cd /tmp/roo
-       bash> git tag -l
-       
-   Identificar el número de versión de Roo deseado de entre la lista de versiones que aparecerá y que llamaremos <versión Roo>.
-   
-   Por algún motivo desconocido, no está marcada la versión de Roo 1.1.0.M1, cuyo {número de revisión de Roo} es 3a0b8a399aae14167139c185e4e31355e20d1f25. Continuar con el siguiente paso teniendo en cuenta el número de revisión proporcionado.  
-   
-   Ejecutar el siguiente comando para obtener el {número de revisión de Roo}::
-   
-       bash> git show <versión Roo> | head -n 1
-
-   Apuntar el {número de revisión de Roo} que será el código alfanumérico que aparecerá despues de la cadena ``commit``.
-
-#. Descargar el código fuente de Roo de la versión que deseamos utilizar, por ejemplo::
-
-       bash> cd /tmp/roo
-       bash> git checkout {número de revisión de Roo}
-   
-   Reemplazar el {número de revisión de Roo} por el valor obtenido en el paso anterior.
-
-#. Empaquetar la versión base de Roo::
-
-       bash> cd /tmp/roo
-       bash> mvn clean install assembly:assembly
-
-Spring Roo 1.1.0.M1
------------------------------
-
-* Go to gvNIX root directory
-
-* Use your Git client to checkout Spring Roo sources from ``git://git.springsource.org/roo/roo.git`` to gvNIX root directory.
-
-  If your internet connection is defined through a proxy you have to set up the confifuration in `Git`_ (Appendix -> Proxy configuration -> Git).
-
-  Example::
-
-     bash:~/gvnix/trunk/code$ git clone git://git.springsource.org/roo/roo.git
-
-* Change to Spring Roo folder and switch to 1.1.0.M1 version ``3a0b8a399aae14167139c185e4e31355e20d1f25``. Example::
-
-   bash:~/gvnix/trunk/code$ cd roo
-   bash:~/gvnix/trunk/code/roo$ git checkout 3a0b8a399aae14167139c185e4e31355e20d1f25
-
-#. Apply the patch **issue_3879.patch** inside ROO directory after build it::
-
-    bash:~/gvnix/trunk/code/roo$ git apply ../issue_3879.patch
-
-#. Shows errors but is well applied::
-
-    ~/projects/svn/gvnix/trunk/code/issue_3879.patch:44: space before tab in indent.
-              JavaParserConstructorMetadata.addConstructor(compilationUnitServices, typeDeclaration.getMembers(), candidate, false, new HashSet<JavaSymbolName>());
-    ~/projects/svn/gvnix/trunk/code/issue_3879.patch:50: space before tab in indent.
-              JavaParserMethodMetadata.addMethod(compilationUnitServices, typeDeclaration.getMembers(), candidate, false, new HashSet<JavaSymbolName>());
-    ~/projects/svn/gvnix/trunk/code/issue_3879.patch:157: trailing whitespace.   
-    error: patch failed: addon-test/src/main/java/org/springframework/roo/addon/test/IntegrationTestMetadata.java:287
-    error: addon-test/src/main/java/org/springframework/roo/addon/test/IntegrationTestMetadata.java: patch does not apply
-    error: patch failed: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/JavaParserMutableClassOrInterfaceTypeDetails.java:513
-    error: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/JavaParserMutableClassOrInterfaceTypeDetails.java: patch does not apply
-    error: patch failed: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserConstructorMetadata.java:248
-    error: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserConstructorMetadata.java: patch does not apply
-    error: patch failed: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserMethodMetadata.java:33
-    error: classpath-javaparser/src/main/java/org/springframework/roo/classpath/javaparser/details/JavaParserMethodMetadata.java: patch does not apply
-    error: patch failed: classpath/src/main/java/org/springframework/roo/classpath/details/AnnotationMetadataUtils.java:10
-    error: classpath/src/main/java/org/springframework/roo/classpath/details/AnnotationMetadataUtils.java: patch does not apply
-    error: patch failed: classpath/src/main/java/org/springframework/roo/classpath/itd/AbstractItdMetadataProvider.java:245
-    error: classpath/src/main/java/org/springframework/roo/classpath/itd/AbstractItdMetadataProvider.java: patch does not apply
-    error: patch failed: model/src/main/java/org/springframework/roo/model/JavaType.java:114
-    error: model/src/main/java/org/springframework/roo/model/JavaType.java: patch does not apply
-    error: patch failed: pom.xml:213
-    error: pom.xml: patch does not apply
-
-
 Maven
-------------
+-----
 
 * Setup environment variable called MAVEN_OPTS::
 
@@ -183,7 +109,7 @@ home directory::
 This will create the ZIP file ``target/gvNIX-{version}.zip``. To install it read the *gvNIX Reference Guide*.
 
 Need more info?
-================
+===============
 
 For more information generate and read the *gvNIX Reference Guide* (spanish).
 
@@ -195,6 +121,14 @@ For more information generate and read the *gvNIX Reference Guide* (spanish).
 
     target
     `-- site
+        |-- developer
+        |   |-- html
+        |   |   |-- index.html
+        |   |   `-- ...
+        |   |-- html-single
+        |   |   `-- index.html
+        |   `-- pdf
+        |       `-- gvNIX-referencia.pdf
         `-- reference
             |-- html
             |   |-- index.html
@@ -203,95 +137,6 @@ For more information generate and read the *gvNIX Reference Guide* (spanish).
             |   `-- index.html
             `-- pdf
                 `-- gvNIX-referencia.pdf
-
-This reference guide will help you to get started. Useful sections are:
-
-* Instalación de gvNIX
-* Primeros pasos con gvNIX
-* Desarrollo de aplicaciones con gvNIX
-
-Appendix
-=========
-
-Proxy configuration
----------------------
-
-See "proxy configuration" command on shell.
-
-Git
-~~~~
-
-Configure Git access through a proxy.
-
-# Set ``http_proxy`` as an environment variable::
-
-    bash:~$ export http_proxy=http://<username>:<password>@<proxy_ip>:<proxy_port>
-
-# Set ``http.proxy`` using Git config command::
-
-    bash:~$ git config --global http.proxy proxy_addr:proxy_port
-
-# To download the project trhough a proxy you have to use the same command changing the protocol.
-
-    Checkout without proxy (git)::
-
-        bash:~$ git clone git://github.com/doctrine/doctrine2.git doctrine
-
-    Checkout *through a proxy* (use *http* instead of git)::
-
-        bash:~$ git clone http://github.com/doctrine/doctrine2.git doctrine
-
-Maven
-~~~~~~
-
-To configure Maven access through a proxy you have to set the proxy parameters in Maven configuration file $M2_HOME/config/settings.xml. This is an example of the proxy configuration in the file::
-
-    <?xml version="1.0" encoding="UTF-8"?>
-    <settings xmlns="http://maven.apache.org/POM/4.0.0" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                            http://maven.apache.org/xsd/settings-1.0.0.xsd">
-
-        ...
-
-        <proxies>
-            <proxy>
-                <id>optional</id>
-                <active>true</active>
-                <protocol>http</protocol>
-                <host>proxy.somewhere.com</host>
-                <port>8080</port>
-                <username>proxyuser</username>
-                <password>somepassword</password>
-                <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
-            </proxy>
-        </proxies>
-    </settings>
-
-SVN
-~~~
-
-To configure SVN access through a http proxy, e.g. your web browser requires a http proxy, add the following lines to '~/.subversion/servers'::
-
-   [groups]
-   mosuma=svn.mosuma.com
-   [mosuma]
-   http-proxy-host=proxy.ntu.edu.sg
-   http-proxy-port=8080
-
-Groups defines a specific direction to access by svn and then set the proxy values for this group.
-
-Variables::
-
-  * [groups] Set repository address to access inside group ``groups``. Name and address.
-  * [Name] Set group proxy connection properties (http-proxy-host y http-proxy-port).
-
-JDK
-~~~
-
- $JAVA_HOME/jre/lib/net.properties::
- 
-  java.net.useSystemProxies=true
 
 TODO
 ====

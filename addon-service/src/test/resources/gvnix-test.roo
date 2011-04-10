@@ -135,8 +135,8 @@ service import ws --class dsadasd --wsdl
 service import ws --class --wsdl
 
 // [CORRECT] Local WSDL files placed into src/test/resource relative path
-service import ws --class ~.services.ClaseProxy30 --wsdl file:src/test/resources/WSAuth.wsdl
-service import ws --class ~.services.ClaseProxy31 --wsdl file:src/test/resources/SimacServiciosListener.jws.xml
+service import ws --class ~.services.ClaseProxy30 --wsdl file:WSAuth.wsdl
+service import ws --class ~.services.ClaseProxy31 --wsdl file:SimacServiciosListener.jws.xml
 
 // [CORRECT] First create a service class and then import a web service in them. Wsdl already exists.
 service class --class ~.services.ClaseProxy32
@@ -145,8 +145,8 @@ service import ws --class ~.services.ClaseProxy32 --wsdl http://ws.soatrader.com
 // [CORRECT] Export WSDL 2 Java
 service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
 
-// [CORRECT] Export WSDL 2 Java copy Add-on src/test/resources/AmazonFPS.wsdl file into 'project/src/main/resources/' directory.
-service export ws --wsdl file:src/test/resources/AmazonFPS.wsdl
+// [CORRECT] Export WSDL 2 Java copy Add-on AmazonFPS.wsdl file into 'project/src/main/resources/' directory.
+service export ws --wsdl file:AmazonFPS.wsdl
 
 perform eclipse
 perform assembly

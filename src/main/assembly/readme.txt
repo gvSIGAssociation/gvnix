@@ -10,17 +10,6 @@ Transport of Generalitat Valenciana (Spain) http://www.cit.gva.es/.
 
 This gvNIX version (${gvnix.version}) is based on Spring Roo ${roo.version}.
 
-This release contains:
-
-* annotations: Roo and gvNIX annotation jars.
-* bin:         Scripts and libs to run gvNIX
-* bundle:      Roo and gvNIX bundles (add-ons, utils, etc)
-* conf:        Configuration files
-* docs:        gvNIX Documentation available
-* legal:       Licenses and disclaimer files
-* samples:     Roo and gvNIX samples
-* themes:      Packed gvNIX themes
-
 Before gvNIX install you need:
 
 * A *nix machine (Windows users should be OK if they write a .bat)
@@ -34,8 +23,8 @@ Install gvNIX:
 
     cd $HOME 
     # Note: Change VER to gvNIX version number you use
-    unzip gvNIX-VER-SNAPSHOT.zip     # gvNIX-VER-SNAPSHOT dir has been created
-    export GVNIX_HOME="$PWD/gvNIX-VER-SNAPSHOT"  # Recommended
+    unzip gvNIX-VER-RELEASE.zip                 # gvNIX-VER-RELEASE dir has been created
+    export GVNIX_HOME="$PWD/gvNIX-VER-RELEASE"  # Recommended
 
 * Add gvNIX bin directory to your PATH::
 
