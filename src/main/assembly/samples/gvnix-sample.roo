@@ -8,8 +8,8 @@ field string otherField1
 field string otherField2
 occ checksum all
 controller all --package ~.web
-theme install --name theme-gvNIX 
-theme set --name theme-gvNIX 
+theme install --id gvnix 
+theme set --id gvnix 
 service class --class ~.services.ClaseServicio
 service operation --name checkString --service ~.services.ClaseServicio
 service operation --name inputParameters --service ~.services.ClaseServicio --return java.lang.String --paramTypes java.lang.Integer,java.lang.String --paramNames number,name
