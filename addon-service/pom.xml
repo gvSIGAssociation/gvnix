@@ -36,6 +36,7 @@
   </parent>
   
   <artifactId>org.gvnix.service.roo.addon</artifactId>
+  <version>0.7.0</version>
   <packaging>bundle</packaging>
   
   <name>gvNIX - Spring Roo - Addon - Services Management</name>
@@ -207,4 +208,10 @@
     <repo.folder>org/gvnix/service/roo/addon</repo.folder>
   </properties>
 
+
+  <scm>
+    <connection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/tags/org.gvnix.service.roo.addon-0.7.0</connection>
+    <developerConnection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/tags/org.gvnix.service.roo.addon-0.7.0</developerConnection>
+    <url>scm:svn:http://webdav.cop.gva.es/svn/gvnix/tags/org.gvnix.service.roo.addon-0.7.0</url>
+  </scm>
 </project>
