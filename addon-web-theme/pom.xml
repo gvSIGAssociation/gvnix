@@ -44,6 +44,12 @@
   </organization>
   <description>Theme management for Spring MVC based web layer. A Theme is a set of JSP, TAG, CSS, etc that give you the ability to chage application aspect without changing business logic.</description>
   <url>http://www.gvnix.org</url>
+  
+  <properties>
+    <gvnix.version>${parent.version}</gvnix.version>
+    <google.code.project.name>gvnix</google.code.project.name>
+    <repo.folder>org/gvnix/web/theme/roo/addon</repo.folder>
+  </properties>
 
   <dependencies>
     <!-- Apache Felix -->
@@ -138,7 +144,25 @@
   </properties>
   -->
 
+  <!-- DiSiD: Add google code distribution management -->
+  <distributionManagement>
+    <repository>
+      <id>Google Code</id>
+      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
+    </repository>
+  </distributionManagement>
+
   <build>
+  
+    <!-- DiSiD: Add webdav extension to google code  -->
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav-jackrabbit</artifactId>
+        <version>1.0-beta-6</version>
+      </extension>
+    </extensions>
+  
     <resources>
       <resource>
         <directory>src/main/resources</directory>

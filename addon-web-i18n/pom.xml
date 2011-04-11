@@ -42,6 +42,13 @@
   </organization>
   <description>Spain co-official languages support for Spring Roo Web MVC JSP Scaffolding; #mvc,#localization,locale:ca</description>
   <url>http://www.gvnix.org</url>
+  
+  <properties>
+    <gvnix.version>${parent.version}</gvnix.version>
+    <google.code.project.name>gvnix</google.code.project.name>
+    <repo.folder>org/gvnix/web/i18n/roo/addon</repo.folder>
+  </properties>
+  
   <!--
   <repositories>
     <repository>
@@ -206,4 +213,26 @@
     </plugins>
   </build>
   -->
+
+  <!-- DiSiD: Add google code distribution management -->
+  <distributionManagement>
+    <repository>
+      <id>Google Code</id>
+      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
+    </repository>
+  </distributionManagement>
+
+  <build>
+  
+    <!-- DiSiD: Add webdav extension to google code  -->
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav-jackrabbit</artifactId>
+        <version>1.0-beta-6</version>
+      </extension>
+    </extensions>
+    
+  </build>
+
 </project>
