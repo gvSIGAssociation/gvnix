@@ -384,8 +384,7 @@ Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       workspace.</para>
 
       <para xml:lang="es">En este caso, vamos a prepara el entrono para Tomcat
-      6 (para Tomcat 5.5 ver <link linkend="addon-web-mvc-jsp-2.0">Add-on Web
-      MVC JSP 2.0</link>) que es uno de los entornos que se usan
+      6 que es uno de los entornos que se usan
       frecuentemente para arrancar la aplicaciones de Spring Roo.</para>
 
       <para xml:lang="es">Asumimos que disponemos de una instalación de Tomcat

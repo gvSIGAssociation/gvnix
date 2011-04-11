@@ -170,8 +170,6 @@
 
 		<xi:include href="addon-web-i18n.xml" />
 
-    <xi:include href="addon-web-mvc-jsp-2.0.xml" />
-
     <xi:include href="addon-web-mvc-binding.xml" />
   </part>
 

@@ -127,12 +127,6 @@
     problema en algunas instalaciones que usan contenedores de servlets que no
     soportan esta versión de la especificación (como por ejemplo Tomcat
     5.5).</para>
-
-    <para>Este add-on ajusta la configuración de dependencias del proyecto
-    para que las aplicaciones se puedan desplegar sobre un contenedor con
-    soporte para la versión 2.0 de la especificación JSP. Para más información
-    ver <link linkend="addon-web-mvc-jsp-2.0">Add-on Web MVC JSP
-    2.0</link>.</para>
   </section>
 
   <section xml:id="resumen-addons_web-relation-styles">
