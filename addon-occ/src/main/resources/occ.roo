@@ -1,0 +1,8 @@
+
+script clinic.roo
+
+// Set OCC up for Pet entity
+occ checksum set --entity ~.domain.Pet
+
+// (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/)
+

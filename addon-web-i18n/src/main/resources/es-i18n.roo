@@ -1,0 +1,8 @@
+
+script clinic.roo
+
+// Install Valencian/Catalan language
+web mvc install language --code ca
+
+// (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/)
+

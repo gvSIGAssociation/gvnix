@@ -1,0 +1,10 @@
+
+script clinic.roo
+
+// Create Pet report
+web report add --controller ~.web.PetController --reportName petlist
+
+// (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/pets/reports/petlist)
+// (OPTION: customize report query params form, SRC_MAIN_WEBAPP/WEB-INF/views/pets/petlist.jspx)
+// (OPTION: use iReport to customize your new report SRC_MAIN_WEBAPP/WEB-INF/reports/pet_petlist.jrxml)
+

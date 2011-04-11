@@ -1,0 +1,26 @@
+
+script clinic.roo
+
+menu setup
+menu entry info --id c_pet
+
+// Create a category to contain application finders
+menu entry add --label Finders
+
+// Change default ID to Category_ID
+menu entry update --id i_page_finders --nid c_finders
+
+// Move to root level
+menu entry move --id c_finders --before c_seleniumtests
+
+// Move finders to new finders category
+menu entry move --id fi_pet_nameandweight --into c_finders
+menu entry move --id fi_pet_sendremindersandweightlessthan --into c_finders
+menu entry move --id fi_pet_owner --into c_finders
+menu entry move --id fi_pet_typeandnamelike --into c_finders
+menu entry move --id fi_visit_descriptionandvisitdate --into c_finders
+menu entry move --id fi_visit_descriptionlike --into c_finders
+menu entry move --id fi_visit_visitdatebetween --into c_finders
+
+// (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/)
+

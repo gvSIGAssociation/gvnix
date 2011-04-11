@@ -1,0 +1,21 @@
+
+script clinic.roo
+
+// Create service class, then invoke it manually
+service class --class org.gvnix.clinic.service.PetService
+
+// Create service operations without return type. 
+service operation --name findPetByWeight --service org.gvnix.clinic.service.PetService --return java.util.List --paramTypes java.lang.Float --paramNames weight
+
+// Set service to expose via web service.
+service define ws --class org.gvnix.clinic.service.PetService
+
+// Expose operation
+service export operation --class org.gvnix.clinic.service.PetService --method findPetByWeight --resultName pets
+
+// Contract-first approach
+service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+
+// (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/services)
+
+
