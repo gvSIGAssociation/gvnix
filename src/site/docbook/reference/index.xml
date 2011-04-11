@@ -48,7 +48,9 @@
 
     <xi:include href="intro_instalacion.xml" />
 
-    <xi:include href="intro_primeros-pasos.xml" />
+    <xi:include href="guia-desarrollo_eclipse.xml" />
+
+    <xi:include href="intro_ejemplos.xml" />
   </part>
 
   <part xml:id="desarrollo">
@@ -97,8 +99,6 @@
     <xi:include href="guia-desarrollo_entidades.xml" />
 
     <xi:include href="guia-desarrollo_capa-web.xml" />
-
-    <xi:include href="guia-desarrollo_eclipse.xml" />
   </part>
 
   <part xml:id="addons-gvnix">

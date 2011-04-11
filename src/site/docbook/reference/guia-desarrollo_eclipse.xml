@@ -61,6 +61,18 @@
       </listitem>
 
       <listitem>
+        <para>Instalar plugin M2Eclipse para Eclipse
+        (http://m2eclipse.sonatype.org/installing-m2eclipse.html)</para>
+
+        <para>En el menú Help &gt; Install New Software. En el campo de texto
+        "Work with:" indicar que se usará el site:
+        http://m2eclipse.sonatype.org/sites/m2e. A continución se nos mostrará
+        para seleccionar "Maven Integration for Eclipse". Lo selecionamos,
+        pulsamos en siguiente y tras aceptar la licencia del plugin
+        instalamos.</para>
+      </listitem>
+
+      <listitem>
         <para>Activa la opción <emphasis><emphasis><literal>Enable Window &gt;
         Preferences &gt; General &gt; Workspace &gt; Refresh
         Automatically</literal></emphasis></emphasis>.</para>
@@ -88,29 +100,150 @@
         plugin STS sigue las instrucciones del punto "UPDATE SITE
         INSTALLATION" del documento <link
         xlink:href="http://dist.springsource.com/release/STS/doc/STS-installation_instructions.pdf">Spring
-        Source Tool Suite 2.5.2 Installation Instructions</link>.</para>
+        Source Tool Suite Installation Instructions</link>.</para>
       </listitem>
     </orderedlist>
+  </section>
 
-    <important>
-      <para><emphasis role="bold">NOTA:</emphasis> A fecha de 17/02/2011 al
-      seleccionar los paquetes a instalar indicados en el documento
-      STS-2.5.2-Installation y darle a siguiente, falla la validación de
-      dependencias y por tanto no se puede seguir con la instalación del
-      plugin. El problema se puede solucionar según indican en el comentario
-      del <link
-      xlink:href="https://issuetracker.springsource.com/browse/STS-1567?focusedCommentId=37451&amp;page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_37451">Jira
-      de Springsource incidencia STS-1567.</link> Deseleccionar el componente
-      "SpringSource Tool Suite Runtime Error Analysis Support" para continuar
-      con la instalación.</para>
-    </important>
+  <section>
+    <title>Consola gvNIX / Roo integrada en Eclipse</title>
+
+    <para>El plugin STS que hemos instalado en nuestro IDE nos ofrece la
+    posibilidad de incluir la consola de gvNIX en el propio entrono de
+    desarrollo. Para ello antes tendremos que indicarle a Eclipse donde
+    tenemos instalada la nueva versión de gvNIX.</para>
+
+    <para>En el menú Window &gt; Preferences &gt; Spring &gt; Roo Support.
+    Pulsamos el botón Add y buscamos en el navegador de archivos donde está el
+    directorio gvNIX. Veremos una pantalla similar a esta:</para>
+
+    <figure>
+      <title>Configuaricón del soporte gvNIX en Eclipse</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/preferences_roo.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <para>Dandole a OK en las dos pantallas que tenemos abiertas ya tendremos
+    configurado el soporte para la linea de comandos de gvNIX. Para poder
+    usarlo tendremos que abrir la perspectiva de Spring (Window &gt; Open
+    Perspective &gt; Other &gt; Spring). En la parte inferior de la pantalla
+    tendremos una pestaña Roo Shell.</para>
+
+    <para>Nos pedirá que le indiquemos para que proyectos queremos que esté
+    disponible la línea de comandos (<emphasis>Open Roo Shell for projects
+    ...</emphasis>). Selecionamos el proyecto en el que estamos trabajando y
+    ya podremos empezar a ejecutar comandos.</para>
+
+    <figure>
+      <title>Consola gvNIX en Eclipse</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/eclipse_gvNIX_shell.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <note>
+      <para>Hay que tener en cuenta una pequeña diferencia a la hora de usar
+      la línea de comandos desde Eclipse con respecto a la linea de comandos
+      de gvNIX en la consola del sistema. Mientras en una consola del sistema
+      usamos la tecla TAB para que nos ayude a completar los comandos, en el
+      IDE usaremos Ctrl+Space que es el atajo por defecto usado en
+      Eclipse.</para>
+    </note>
   </section>
 
   <section xml:id="guia-desarrollo_eclipse-usasrº">
     <title xml:id="es">Utilizar Eclipse como IDE</title>
 
-    <para xml:lang="es">Para crear una estructura de proyecto Eclipse hay que
-    utilizar el comando <command>perform eclipse</command>:</para>
+    <section xml:id="guia-desarrollo_eclipse-usasrº">
+      <title xml:id="es">Crear proyecto gvNIX/Roo en Eclipse IDE</title>
+
+      <para xml:lang="es">Podemos crear un proyecto gvNIX desde Eclipse a
+      través del menú: <emphasis>File &gt; New &gt; Spring Roo
+      Project</emphasis>:</para>
+
+      <figure>
+        <title>Nuevo proyecto Srping Roo con soporte gvNIX</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/eclipse_new_roo_project.png" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <para xml:lang="es">Ahora añadiremos el soporte para el manejo de la
+      persistencia de datos a traves de JPA. El siguiente ejemplo muestra los
+      comandos que debe usar para configurar el soporte JPA. Recuerde que
+      puede usar Ctrl+Space como ayuda a la escritura en los comandos:</para>
+
+      <para xml:lang="es">En este punto ya tiene un proyecto Maven de
+      aplicación web preparado.</para>
+
+      <programlisting>roo&gt; <emphasis role="bold">persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
+Created ...
+~.Timer roo&gt;<emphasis role="bold"> entity --class ~.Timer --testAutomatically</emphasis> 
+Created ...
+~.Timer roo&gt;<emphasis role="bold"> field string --fieldName message --notNull</emphasis>
+Managed ...</programlisting>
+
+      <para xml:lang="es">El comando <emphasis role="bold">persistence
+      setup</emphasis> nos permite configurar la capa de accesso a datos de
+      manera sencilla. <emphasis role="bold">entitiy</emphasis> sirve para
+      crear una nueva entidad y <emphasis role="bold">field</emphasis> crea
+      atributos de la entidad. Veremos estos comandos con un poco más de
+      detalle en la sección <link
+      linkend="guia-desarrollo-acceso-datos_persistencia-objetos">Persistencia
+      de objetos</link> y <link
+      linkend="guia-desarrollo_gestion-entidades_definicion_crear-con-comando">Crear
+      una entidad con el intérprete de comandos</link>, también veremos como
+      generar todas las entidades de nuestra aplicación mediante el proceso de
+      ingenieria inversa conta un esquema de BBDD existente.</para>
+
+      <programlisting>~.Timer roo&gt; <emphasis role="bold">controller all --package ~.web</emphasis>
+Created ...</programlisting>
+
+      <para><emphasis role="bold">controller</emphasis> crea controladores de
+      la capa web que gestionaran la interacción del usuario con la
+      aplicación. Lo veremos en <link linkend="???">Crear la capa web con el
+      intérprete de comandos</link>.</para>
+
+      <programlisting>~.web roo&gt; <emphasis role="bold">selenium test --controller ~.web.TimerController</emphasis>
+Created ...</programlisting>
+
+      <para>
+        <para>Si queremos incluir en el proyecto test de integración tenemos a
+        nuestra disposición el comando <emphasis role="bold">selenium
+        test</emphasis> que generará los scripts necesarios para probar la
+        interfaz web de la aplicación. Mediante <emphasis role="bold">mvn
+        selenium:selenese</emphasis>, estando el servidor de la aplicación
+        corriendo, se ejecutará el conjunto de tests sobre una nueva instancia
+        del navegador FireFox.</para>
+
+        <programlisting>~.web roo&gt; <emphasis role="bold">theme install --id cit</emphasis>
+~.web roo&gt; <emphasis role="bold">theme set --id cit</emphasis></programlisting>
+
+        <para>Mediante el comando <emphasis role="bold">theme</emphasis>, del
+        <emphasis>Add-on Theme Manager</emphasis> propio de gvNIX, podemos
+        configurar el tema visual que presentará la aplicación.</para>
+      </para>
+    </section>
+
+    <section>
+      <title xml:id="es">Importar proyecto gvNIX a Eclipse IDE</title>
+    </section>
+
+    <para>Como gvNIX/Roo permite crear proyectos desde la linea de comandos,
+    podemos vernos en la situación de que queramos importar un proyecto
+    existente al IDE. Si estamos ejecutando gvNIX en la línea de comandos,
+    bastaría con ejecutar el comando <command>perform eclipse</command> para
+    crear una estructura de proyecto Eclipse:</para>
 
     <programlisting>~.domain.PizzaOrder roo&gt; <command>perform eclipse</command>
 <computeroutput>[Thread-6] Warning: JAVA_HOME environment variable is not set.
@@ -148,58 +281,6 @@
     ejecutando el comando <command>mvn eclipse:clean</command>. Para regenerar
     la configuración de eclipse en un solo comando usar <command>mvn
     eclipse:clean eclipse:eclipse</command>.</para>
-
-    <section>
-      <title>Consola gvNIX / Roo integrada en Eclipse</title>
-
-      <para>El plugin STS que hemos instalado en nuestro IDE nos ofrece la
-      posibilidad de incluir la consola de gvNIX en el propio entrono de
-      desarrollo. Para ello antes tendremos que indicarle a Eclipse donde
-      tenemos instalada la nueva versión de gvNIX.</para>
-
-      <para>En el menú Window &gt; Preferences &gt; Spring &gt; Roo Support.
-      Pulsamos el botón Add y buscamos en el navegador de archivos donde está
-      el directorio gvNIX. Veremos una pantalla similar a esta:</para>
-
-      <figure>
-        <title>Configuaricón del soporte gvNIX en Eclipse</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="images/preferences_roo.png"></imagedata>
-          </imageobject>
-        </mediaobject>
-      </figure>
-
-      <para>Dandole a OK en las dos pantallas que tenemos abiertas ya
-      tendremos configurado el soporte para la linea de comandos de gvNIX.
-      Para poder usarlo tendremos que abrir la perspectiva de Spring (Window
-      &gt; Open Perspective &gt; Other &gt; Spring). En la parte inferior de
-      la pantalla tendremos una pestaña Roo Shell.</para>
-
-      <para>Nos pedirá que le indiquemos para que proyectos queremos que esté
-      disponible la línea de comandos (<emphasis>Open Roo Shell for projects
-      ...</emphasis>). Selecionamos el proyecto en el que estamos trabajando y
-      ya podremos empezar a ejecutar comandos.</para>
-
-      <figure>
-        <title>Consola gvNIX en Eclipse</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="images/eclipse_roo_shell.png"></imagedata>
-          </imageobject>
-        </mediaobject>
-      </figure>
-
-      <note>
-        <para>Hay que tener en cuenta una pequeña diferencia a la hora de usar
-        la línea de comandos desde Eclipse. Mientras en una consola del
-        sistema usamos la tecla TAB para que nos ayude a completar los
-        comandos, en el IDE usaremos Ctrl+Space que es el atajo por defecto
-        usado en Eclipse.</para>
-      </note>
-    </section>
   </section>
 
   <section xml:id="guia-desarrollo_eclipse-pruebas-unitarias">
@@ -215,13 +296,29 @@
     Eclipse y que, además de permitir depurarla, nos permita hacer algunos
     cambios en caliente sobre la aplicación.</para>
 
+    <para xml:lang="es">Para que Eclipse nos permita arrancar la aplicación
+    desde el servidor, nuestro proyecto tienen que tener constancia de que
+    puede usar el plugin de Tomcat. Si hemos creado el proyecto desde Eclipse,
+    nuestro poyecto no tiene esta información. La forma más sencilla de
+    conseguir esto es ejecutando el comando <emphasis role="bold">mvn
+    eclipse:eclipse</emphasis>. Esta operación se puede ejecutar tanto desde
+    Eclipse con la ayuda del plugin <emphasis role="bold">M2Eclipse</emphasis>
+    como desde la linea de comandos del sistema en el directorio raiz del
+    proyecto. En Eclipse desde el menú contextual <emphasis>Run As &gt; Maven
+    build</emphasis> nos mostrará la ventana <emphasis role="bold">Edit
+    configuration</emphasis> en la que podemos indicar como <emphasis
+    role="bold">Goal</emphasis> <emphasis>eclipse:eclipse</emphasis>. Esta
+    configuaración se guardará para próximas veces. Tras ejecutarlo tendremos
+    nuestra aplicación lista para arrancarla en el Tomcat que hemos
+    configurado en el IDE.</para>
+
     <para xml:lang="es">Para ello, debemos tener la aplicación importada en un
     <emphasis>workspace</emphasis> de Eclipse y configurar el servidor dónde
     queremos ejecutarlo. Eclipse es capaz de gestionar distinto tipos de
     servidores, generando sus propios directorio y ficheros de
     configuración.</para>
 
-    <para xml:lang="es">Para prepara un servido seguiremos los siguiente
+    <para xml:lang="es">Para prepara un servidor seguiremos los siguiente
     pasos:</para>
 
     <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_mostrar-vista-servidores">
@@ -434,6 +531,19 @@
     <section>
       <title>Ejecución de la aplicación en el Servidor</title>
 
+      <para>Para que Eclipse nos permita arrancar la aplicación desde el
+      servidor, nuestro projecto tienen que tener constancia de que puede usar
+      el plugin de Tomcat. La forma más sencilla de conseguir esto es
+      ejecutando el comando <emphasis role="bold">mvn
+      eclipse:eclipse</emphasis>. Esta operación se puede ejecutar tanto desde
+      Eclipse con la ayuda del plugin <emphasis
+      role="bold">M2Eclipse</emphasis> como desde la linea de comandos del
+      sistema en el directorio raiz del proyecto. En Eclipse desde el menú
+      contextual <emphasis>Run As &gt; Maven build</emphasis> nos mostrará una
+      ventana en la que podemos seleccionar el goal eclipse:eclipse. Tras
+      ejecutarlo tendremos nuestra aplicación lista para arrancarla en el
+      Tomcat que hemos configurado en el IDE.</para>
+
       <para>Una vez configurado el servidor de nuestra aplicación podemos
       arracar el servidor y probar nuestra aplicación.</para>
 
@@ -476,5 +586,27 @@
       comandos de gvNIX, ya que automáticamente veremos reflejados los cambios
       en el navegador.</para>
     </section>
+  </section>
+
+  <section xml:id="guia-desarrollo_eclipse-importante">
+    <title>IMPORTANTE</title>
+
+    <important>
+      <para><emphasis role="bold">A lo largo de la presente guía de referencia
+      se realizan ejemplos mediante la ejecución de comandos desde la línea de
+      comandos de gvNIX en la consola del sistema. Estos ejemplos pueden
+      ejecutarse igualmente desde la consola gvNIX/Roo que integra el plugin
+      SpringSource Tool Suite de Eclpse.</emphasis></para>
+    </important>
+
+    <important>
+      <para><emphasis role="bold">Los comandos <emphasis>perform</emphasis> de
+      gvNIX/Roo hacen uso de la herraminta Maven. Ya que tenemos instalado en
+      Eclipse el plugin M2Eclipse, estos comandos no pueden ser ejecutados
+      desde la consola gvNIX/Roo. Estos comandos pueden lanzarse desde la
+      consola gvNIX/Roo en la linea de comandos del sistema o bien crear
+      configuraciones de ejecución de tareas Maven desde <emphasis>Run As &gt;
+      Maven build ... </emphasis>en Eclipse.</emphasis></para>
+    </important>
   </section>
 </chapter>

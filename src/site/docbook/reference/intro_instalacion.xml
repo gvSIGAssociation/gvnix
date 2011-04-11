@@ -38,6 +38,115 @@
         proyectos.</para>
       </listitem>
     </itemizedlist>
+
+    <section>
+      <title>Configuración del entorno</title>
+
+      <para>Una vez descargado el archivo de instalación de Java JDK y Maven
+      veamos como configura nuestro entorno de trabajo para usar estas
+      herramientas.</para>
+
+      <note>
+        <para>Las siguientes notas sobre configuración son una recomendación
+        de buenas prácticas. La variable <emphasis>$HOME</emphasis> es el path
+        del directorio de nuestro usuario (por ejemplo:
+        <emphasis>/home/usuario</emphasis>). Supondremos que hemos instalado
+        Java JDK y Maven en:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>Java JDK 1.6 instalada en:
+            <emphasis>/home/usuario/software/java/jdk1.6_0_22</emphasis></para>
+          </listitem>
+
+          <listitem>
+            <para>Maven instalado en:
+            <emphasis>/home/usuario/software/java/apache-maven-3.0.2</emphasis></para>
+          </listitem>
+        </orderedlist>
+      </note>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Varialbles de entorno</emphasis>.</para>
+
+          <para>En entornos Linux, se puede utilizar
+          <emphasis>$HOME/.bashrc</emphasis> para definir esas variables y
+          automáticamente se cargarán al abrir una nueva consola. Es una buena
+          práctica definirlas en nuestro propio archivo y cargarlo desde el
+          <emphasis>.bashrc</emphasis>, en nuestro caso este archivo lo
+          llamaremos <emphasis>.bash_devel</emphasis>.</para>
+
+          <itemizedlist>
+            <listitem>
+              <para><emphasis role="bold">Modificar
+              <emphasis>.bashrc</emphasis> para que cargue el archivo
+              <emphasis>.bash_devel</emphasis></emphasis>:</para>
+
+              <para>Añadir al final del archivo .bashrc las siguientes
+              líneas:</para>
+
+              <programlisting># Development settings
+if [ -f ~/.bash_devel ]; then
+   . ~/.bash_devel
+fi</programlisting>
+            </listitem>
+
+            <listitem>
+              <para><emphasis role="bold">Crear/Modificar
+              <emphasis>.bash_devel</emphasis> para añadir las variables de
+              entorno</emphasis>:</para>
+
+              <programlisting>export JAVA_HOME=$HOME/software/java/jdk1.6_0_22
+
+export M2_HOME=$HOME/software/java/apache-maven-3.0.2
+
+export M2=$M2_HOME/bin
+
+export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512"
+
+export PATH=$JAVA_HOME/bin:$M2:$PATH</programlisting>
+            </listitem>
+          </itemizedlist>
+
+          <para>Con estos cambios cada vez que abramos una consola del sistema
+          tendremos cargadas las variables de entorno. También podemos cargar
+          los cambios en estos ficheros ejecutando el comando
+          <emphasis>source</emphasis>:</para>
+
+          <programlisting>bash:~$ source .bashrc</programlisting>
+
+          <para>recarga el archivo .bashrc por completo. <emphasis>source
+          .bash_devel</emphasis> cargará solo este fichero lo cual es muy útil
+          para cargar nuevas variables de entorno.</para>
+
+          <para>Una vez realizados estos cambios podemos comprobar su
+          funcionamiento: (Ejecutando los comandos siguientes veremos salidas
+          similares a las que se muestran)</para>
+
+          <programlisting>bash:~$ <emphasis role="bold">java -version</emphasis>
+java version "1.6.0_22"
+Java(TM) SE Runtime Environment (build 1.6.0_22-b04)
+Java HotSpot(TM) 64-Bit Server VM (build 17.1-b03, mixed mode)
+bash:~$ <emphasis role="bold">mvn -version</emphasis>
+Apache Maven 3.0.2 (r1056850; 2011-01-09 01:58:10+0100)
+Java version: 1.6.0_22, vendor: Sun Microsystems Inc.
+Java home: /home/usuario/software/java/jdk1.6.0_22/jre
+Default locale: es_ES, platform encoding: UTF-8
+OS name: "linux", version: "2.6.35-28-generic", arch: "amd64", family: "unix"</programlisting>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Maven a través de
+          proxy</emphasis>.</para>
+
+          <para>Es posible que nuestra red de trabajo requiera de la
+          configuración de un Proxy de acesso a internet.</para>
+
+          <para>TBC.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
   </section>
 
   <section xml:id="instalacion_instalacion">
@@ -59,13 +168,14 @@
 
       <listitem>
         <para>Al descomprimir el fichero ZIP se creará un nuevo directorio
-        gvNIX-0.6.0. En el resto del documento nos referiremos a este
-        directorio como GVNIX_HOME</para>
+        <emphasis>gvNIX-0.6.0</emphasis>. En el resto del documento nos
+        referiremos a este directorio como
+        <emphasis>GVNIX_HOME</emphasis></para>
       </listitem>
 
       <listitem>
         <para>Incluir el directorio <emphasis>bin</emphasis> de gvNIX en la
-        variable de entorno PATH</para>
+        variable de entorno <emphasis>PATH</emphasis></para>
 
         <itemizedlist>
           <listitem>
@@ -73,6 +183,21 @@
 
             <programlisting>bash:~$ cd gvNIX-0.6.0
 bash:~/gvNIX-0.6.0$ export PATH=$PWD/bin:$PATH</programlisting>
+
+            <para>Podemos definir la variable <emphasis>GVNIX_HOME</emphasis>
+            en el archivo <emphasis>.bash_devel</emphasis> y así tenerla
+            disponible de manera permanente. Para ello modificamos el archivo
+            para que quede como sigue:</para>
+
+            <programlisting>...
+export GVNIX_HOME=$HOME/software/java/gvNIX-0.6.0
+
+export PATH=$JAVA_HOME/bin:$M2:$GVNIX_HOME/bin:$PATH</programlisting>
+
+            <para>Notar que la última línea es la modificación de la
+            definición de la variable <emphasis>PATH</emphasis>. Recordar
+            recargar el fichero <emphasis>.bash_devel</emphasis> mediante el
+            comando <emphasis>source</emphasis>.</para>
           </listitem>
         </itemizedlist>
       </listitem>
@@ -92,7 +217,7 @@ bash:~/gvNIX-0.6.0$ export PATH=$PWD/bin:$PATH</programlisting>
         <para>Ejecuta el intérprete de comando de gvNIX para interactuar con
         el proyecto Java:</para>
 
-        <programlisting>bash:~/project-directory$ gvnix</programlisting>
+        <programlisting>bash:~/project-directory$ gvnix.sh</programlisting>
       </listitem>
     </itemizedlist>
   </section>

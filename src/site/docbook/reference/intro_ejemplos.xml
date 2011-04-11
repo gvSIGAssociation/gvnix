@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="ejemplos" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Ejemplos gvNIX/Roo</title>
+
+  <para xml:lang="es">En el fichero zip se incluye un directorio
+  <filename>samples</filename> donde se puede encontrar scripts que generan
+  proyectos de aplicaciones de ejemplo.</para>
+
+  <para xml:lang="es">Para ejecutarlo puede realizarlo de la siguiente
+  forma:</para>
+
+  <programlisting>bash$ <emphasis role="bold">mkdir sample</emphasis>
+bash$ <emphasis role="bold">cd sample</emphasis>
+bash:sample$ <emphasis role="bold">gvnix</emphasis>
+roo&gt; <emphasis role="bold">script --file SCRIPT.roo</emphasis>
+project ...
+...
+Milliseconds required:
+~.web roo&gt; <emphasis role="bold">quit</emphasis>
+$ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
+
+  <para>Donde <filename>SCRIPT.roo</filename> es el nombre del fichero de
+  ejemplo que desea ejecutar:</para>
+
+  <variablelist>
+    <varlistentry>
+      <term><filename>clinic.roo</filename></term>
+
+      <listitem>
+        <para>Ejemplo de una aplicación de Clinica Veterinaria.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term><filename>expenses.roo</filename></term>
+
+      <listitem>
+        <para>Ejemplo usando GWT como librería de visualización.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term><filename>wedding.roo</filename></term>
+
+      <listitem>
+        <para>Ejemplo de aplicación con uso de correo electrónico.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+
+  <para>La mayoría de esto ejemplos utilizan bases de datos en memoria por lo
+  que no necesitan configuración adicional. Ejecutar el comando <emphasis
+  role="bold">mvn tomcat:run</emphasis> para poner en marcha la aplicación web
+  ejemplo.</para>
+</chapter>
