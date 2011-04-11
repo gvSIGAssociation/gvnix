@@ -118,13 +118,15 @@ Package gvNIX
 
 * To package the binary release use the following commands::
 
-   bash:~/gvnix/tag/$ svn update
-   bash:~/gvnix/tag/{version}$ ./build.sh -d
+   bash:~/gvnix/tags/$ svn update
+   bash:~/gvnix/tags/{version}$ ./build.sh -d
 
   The ``-d`` option deploy to google code, can be used only by commiters.    
   This will create the ZIP file ``target/gvnix-dist/gvNIX-{version}.zip``.
 
-* Send to publish on gvPONTIS the gvNIX binary zip, the gvNIX source zip, the html single page reference guide, each add-on jar and each add-on user guide on html format.  
+* Send to publish on gvPONTIS the gvNIX binary zip, the gvNIX source zip and the html single page reference guide.
+
+* Update (or create if not exists) the wiki page for each add-on from add-on user guide on html format.  
 
 Source code
 -----------
