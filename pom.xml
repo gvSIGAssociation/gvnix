@@ -65,7 +65,7 @@
   <!-- Note when doing releases: tagBase is set in release plugin configuration 
     below -->
 
-  <!-- DiSiD: Add google code scm and distribution management -->
+  <!-- CIT repository for tag and branch from mvn release:* commands and googlecode repository for upload from mvn deploy command -->
   <scm>
     <connection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/trunk/code</connection>
     <developerConnection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/trunk/code</developerConnection>
@@ -925,6 +925,7 @@
         <artifactId>maven-site-plugin</artifactId>
         <version>2.0-beta-7</version>
       </plugin>
+      <!-- Allow tag and branch creation on CIT repository from mvn release:* commands -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
