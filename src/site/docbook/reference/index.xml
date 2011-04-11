@@ -160,17 +160,14 @@
 
     <xi:include href="addon-web-exception-handler.xml" />
 
-    <xi:include href="addon-web-relation-styles.xml" />
-
     <xi:include href="addon-cit-security.xml" />
 
     <xi:include href="addon-web-report.xml" />
 
-		<xi:include href="addon-service.xml" />
+	<xi:include href="addon-service.xml" />
 
-		<xi:include href="addon-web-i18n.xml" />
+	<xi:include href="addon-web-i18n.xml" />
 
-    <xi:include href="addon-web-mvc-binding.xml" />
   </part>
 
   <part xml:id="desarrollo-addons">
