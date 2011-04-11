@@ -32,7 +32,7 @@
   <groupId>org.gvnix</groupId>
   <artifactId>org.gvnix.root</artifactId>
   <packaging>pom</packaging>
-  <version>0.6.0</version>
+  <version>0.7.0-SNAPSHOT</version>
   <name>gvNIX</name>
   <description>Spring Roo based RAD tool for Conselleria d'Infraestructures i Transport - Generalitat Valenciana</description>
 
@@ -67,9 +67,9 @@
 
   <!-- DiSiD: Add google code scm and distribution management -->
   <scm>
-    <connection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/tags/0.6.0</connection>
-    <developerConnection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/tags/0.6.0</developerConnection>
-    <url>scm:svn:http://webdav.cop.gva.es/svn/gvnix/tags/0.6.0</url>
+    <connection>scm:svn:https://gvnix.googlecode.com/svn/trunk</connection>
+    <developerConnection>scm:svn:https://gvnix.googlecode.com/svn/trunk</developerConnection>
+    <url>http://code.google.com/p/gvnix/source/browse</url>
   </scm>
   <distributionManagement>
     <repository>
