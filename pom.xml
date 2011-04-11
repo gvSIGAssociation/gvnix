@@ -925,6 +925,22 @@
         <artifactId>maven-site-plugin</artifactId>
         <version>2.0-beta-7</version>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <!-- this declaration is optional because we're using standart svn layout -->
+          <tagBase>
+            http://webdav.cop.gva.es/svn/gvnix/tags
+          </tagBase>
+          <!-- this declaration is optional because we're using standart svn layout -->
+          <branchBase>
+            http://webdav.cop.gva.es/svn/gvnix/branches
+          </branchBase>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

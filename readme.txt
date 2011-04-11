@@ -1,14 +1,12 @@
 
-=============================================
+======================================
  gvNIX - RAD tool for Java developers
-=============================================
+======================================
 
 Welcome to gvNIX, Spring Roo based RAD tool for Java developers.
 
-TODO: This doc isn't updated
-
 About this doc
-===============
+==============
 
 These instructions show you how to get started with gvNIX source tree. Note 
 that these instructions are for developers looking to develop gvNIX itself.
@@ -26,8 +24,131 @@ This work is licensed under the Creative Commons Attribution-Share Alike 3.0
 Unported License. To view a copy of this license, visit 
 http://creativecommons.org/licenses/by-sa/3.0/
 
+Pre-requisites
+==============
+
+To start with gvNIX you need:
+
+* A nix machine (Windows users should be OK if they write a .bat)
+* JDK 6.0 or above ( http://java.sun.com/javase/downloads/index.jsp )
+* Maven 3.0.1 or above ( http://maven.apache.org/download.html )
+* Internet access so that Maven can download required dependencies
+
+Setup instructions
+==================
+
+Roo
+---
+
+If you have any questions about MAVEN, GIT, GPG or ECLIPSE setup see the following document::
+
+ roo/readme.txt
+
+Git
+---
+
+Be aware that Roo source code is commited on gvNIX project at ``roo`` folder.
+However, Roo source code can be managed with Git commands like:
+
+* Update:        git pull 
+* List tags:     git tag -l
+* Change to tag: git checkout {version}
+
+Run gvNIX dev
+=============
+
+#. Build Roo::
+
+    bash:~/gvnix/trunk/code/roo$ mvn clean install
+    
+   Roo is only necessary to compile the first time.
+   Only recompile if Roo source code change.
+
+#. Build gvNIX::
+
+    bash:~/gvnix/trunk/code$ mvn clean install
+
+#. Get started with gvNIX
+
+   * Add gvNIX ``bin`` directory to PATH::
+
+      bash:~/gvnix/trunk/code$ PATH=$PWD/bin:$PATH
+      
+     It is recommended that you add this information to you .bashrc script.
+
+   * Change to your Java project directory::
+
+      bash:~/gvnix/trunk/code$ cd ~/project-directory
+
+   * Execute gvNIX shell::
+
+      bash:~/project-directory$ gvnix-dev
+      
+     Or execute gvNIX shell on debug mode::
+     
+      bash:~/project-directory$ gvnix-dev-debug
+
+.. admonition:: Important
+
+   After each change and gvNIX compilation you *must* delete the contents of the *cache*, for it to clear the OSGi container located in *roo/bootstrap/target/osgi*.
+   It is necessary for the container load new OSGi bundles and bundles not in cache::
+   
+    rm -rf roo/bootstrap/target/osgi
+
+Package gvNIX
+=============
+
+* Create the tag for the version we want to build using the following command::
+
+   bash:~/gvnix/trunk/code$ svn update
+   bash:~/gvnix/trunk/code$ mvn release:prepare -Dtag={version}
+   
+  Version formats:
+  
+   * Snapshot: X.Y.Z-SNAPSHOT
+   * Release: X.Y.Z
+
+* If all ok, clean packaging information on the trunk code directory::
+
+   bash:~/gvnix/trunk/code$ mvn release:clean
+   
+  If some errors, revert the changes::
+  
+   bash:~/gvnix/trunk/code$ mvn release:rollback
+
+* To package the binary release use the following commands::
+
+   bash:~/gvnix/tag/$ svn update
+   bash:~/gvnix/tag/{version}$ ./build.sh -d
+
+  The ``-d`` option deploy to google code, can be used only by commiters.    
+  This will create the ZIP file ``target/gvnix-dist/gvNIX-{version}.zip``.
+
+* Send to publish on gvPONTIS the gvNIX binary zip, the gvNIX source zip, the html single page reference guide, each add-on jar and each add-on user guide on html format.  
+
+Source code
+-----------
+
+* Optional, package the source code release use the following command::
+
+   bash:/tmp$ svn export http://webdav.cop.gva.es/svn/gvnix/tags/{version}
+
+  ZIP created folder with name ``gvNIX-{version}-src.zip``::
+  
+   bash:/tmp$ zip -r -9 gvNIX-{version}-src.zip gvNIX-{version}-src/
+
+Branch
+------
+
+* Optional, create a branch for a new development version::
+
+   bash:~/gvnix/trunk/code$ mvn release:branch -DbranchName={version}
+
+Documentation
+=============
+
 Documentation index
-===================
+-------------------
 
 * On each gvNIX project module you can find technical and user guides at module/docs/ in reStructuredText format and English:
 
@@ -41,95 +162,27 @@ Documentation index
 
 * gvNIX project methodology documentation can be found at ../doc in gvMetrica format and Spanish.
 
-Pre-requisites
-================
+Contact us ?
+------------
 
-To start with gvNIX you need:
+* https://gvnix.googlecode.com
+* http://listserv.gva.es/cgi-bin/mailman/listinfo/gvNIX_soporte
+* http://www.gvpontis.gva.es/cast/gvnix
 
-* A *nix machine (Windows users should be OK if they write a .bat)
-* JDK 6.0 or above ( http://java.sun.com/javase/downloads/index.jsp )
-* Maven 3.0.1 or above ( http://maven.apache.org/download.html )
-* Internet access so that Maven can download required dependencies
+Need more info ?
+----------------
 
-Setup instructions
-===================
-
-Maven
------
-
-* Setup environment variable called MAVEN_OPTS::
-
-    bash:~/gvnix/trunk/code$ export MAVEN_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
-
-  If you already have a MAVEN_OPTS, just check it has the memory sizes
-  shown above (or greater).
-
-  On a *nix machines, we recommed to add the setup to your ``.bashrc``::
-
-   bash:~$ echo export MAVEN_OPTS=\"-Xmx1024m -XX:MaxPermSize=512m\" >> ~/.bashrc
-   bash:~$ source ~/.bashrc
-
-Run gvNIX dev
-=================
-
-If you have internet access through a proxy you have to enable in `Maven`_ configuration (Appendix -> Proxy configuration -> Maven).
-
-#. Build gvNIX::
-
-    bash:~/gvnix/trunk/code$ mvn clean install
-
-#. Get started with gvNIX
-
-   * Add gvNIX ``bin`` directory to PATH::
-
-      bash:~/gvnix/trunk/code$ PATH=$PWD/bin:$PATH
-
-   * Change to Java project directory::
-
-      bash:~/gvnix/trunk/code$ cd ~/project-directory
-
-   * Execute gvNIX shell::
-
-      bash:~/project-directory$ gvnix-dev
-
-Write doc
-==========
-
-* Download and install XMLmind XML Editor Personal Edition ( http://www.xmlmind.com/xmleditor/download.shtml )
-* Use the previous editor to open ``src/site/docbook/reference/index.xml`` and contribute with your knowledge.
-
-Package gvNIX
-================
-
-To pack a ready-to-install release use the following command from the gvNIX 
-home directory::
-
-  bash:~/gvnix/trunk/code$ mvn clean install site assembly:assembly
-
-This will create the ZIP file ``target/gvNIX-{version}.zip``. To install it read the *gvNIX Reference Guide*.
-
-Need more info?
-===============
-
-For more information generate and read the *gvNIX Reference Guide* (spanish).
+For more information generate and read the *gvNIX Developer Guide* (Spanish).
 
 # Run the following command from the root checkout location::
 
    bash:~/gvnix/trunk/code$ mvn site
 
-# This will create the guide in the "target/site/reference" directory (in several formats)::
+# This will create the guide in the "target/site/developer" directory (in several formats)::
 
     target
     `-- site
-        |-- developer
-        |   |-- html
-        |   |   |-- index.html
-        |   |   `-- ...
-        |   |-- html-single
-        |   |   `-- index.html
-        |   `-- pdf
-        |       `-- gvNIX-referencia.pdf
-        `-- reference
+        `-- developer
             |-- html
             |   |-- index.html
             |   `-- ...
@@ -137,6 +190,12 @@ For more information generate and read the *gvNIX Reference Guide* (spanish).
             |   `-- index.html
             `-- pdf
                 `-- gvNIX-referencia.pdf
+
+Write doc
+---------
+
+* Download and install XMLmind XML Editor Personal Edition ( http://www.xmlmind.com/xmleditor/download.shtml )
+* Use the previous editor to open ``src/site/docbook/developer/index.xml`` and contribute with your knowledge.
 
 TODO
 ====
