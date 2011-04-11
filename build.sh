@@ -1,9 +1,59 @@
+#!/bin/bash
+#
+# Script to generate gvNIX release
+
+# TODO: Comprobar versión de JDK (1.6+) y MVN (3.0+)
+
+GVNIX_VERSION=0.6.0.RELEASE
+ROO_VERSION=1.1.2.RELEASE
+
+DEPLOY='0';
+TEST='1';
+
+usage() {
+cat << EOF
+usage: $0 options
+
+OPTIONS:
+    -d   Deploy to Google Code
+    -s   Skip tests
+    -h   Show this message
+
+DESCRIPTION:
+    Creates the release ZIP. Automates building deployment ZIPs and deployment.
+
+REQUIRES:
+    roo-deploy.sh
+EOF
+}
+
+while getopts "dsh" OPTION
+do
+    case $OPTION in
+        h)
+            usage
+            exit 1
+            ;;
+        d)
+            DEPLOY='1'
+            ;;
+        s)
+            TEST='0'
+            ;;
+        ?)
+            usage
+            exit
+            ;;
+    esac
+done
 
 # Remove old roo and gvNIX installed dependencies
 rm -rf ~/.m2/repository/org/springframework/roo
 rm -rf ~/.m2/repository/org/gvnix
 
-# Change to Roo distribution
+### ROO PACKAGE
+
+# Change to Roo folder
 cd roo
 
 # Remove bundles Felix cache
@@ -14,19 +64,29 @@ cd wrapping
 mvn clean install
 cd ..
 
-# Test, install, site, assembly and package Roo modules for make gvNIX distribution 
+# Test, install, site, assembly and package Roo modules
 mvn clean install
 cd deployment-support
 mvn clean site
-./roo-deploy.sh -c assembly -tv
+if [ "$TEST" = "1" ]; then
+	./roo-deploy.sh -c assembly -tv
+else 
+	./roo-deploy.sh -c assembly -v
+fi
 cd ..
 mvn clean package
 
-# Change to gvNIX distribution
+### GVNIX PACKAGE
+
+# Change to gvNIX folder
 cd ..
 
 # Install modules, build site documentation, package modules and deploy to google code
-mvn clean install site package deploy 
+if [ "$DEPLOY" = "1" ]; then
+	mvn clean install site package deploy 
+else
+	mvn clean install site package
+fi
 
 # Copy gvNIX build modules together Roo build modules 
 cp target/all/org.gvnix.* roo/target/all
@@ -36,21 +96,35 @@ cd roo/deployment-support
 
 # Build site documentation and execute deployment script
 mvn clean site
-./roo-deploy.sh -c assembly -Tv
+if [ "$TEST" = "1" ]; then
+	./roo-deploy.sh -c assembly -Tv
+else
+	./roo-deploy.sh -c assembly -v
+fi
 
 # Change to gvNIX folder
 cd ../..
 
-# Remove old release, unzip new release, add gvNIX start scripts, rename release to gvNIX, zip release and add release to path
+# Remove old release
 rm -rf /tmp/gvNIX*
-unzip roo/target/roo-deploy/dist/spring-roo-1.1.2.RELEASE.zip -d /tmp
-cp /tmp/spring-roo-1.1.2.RELEASE/bin/roo.sh /tmp/spring-roo-1.1.2.RELEASE/bin/gvnix.sh
-cp /tmp/spring-roo-1.1.2.RELEASE/bin/roo.bat /tmp/spring-roo-1.1.2.RELEASE/bin/gvnix.bat
-mv /tmp/spring-roo-1.1.2.RELEASE /tmp/gvNIX-0.5.0.RELEASE
-zip -9 -r /tmp/gvNIX-0.5.0.RELEASE.zip /tmp/gvNIX-0.5.0.RELEASE
-export PATH=/tmp/gvNIX-0.5.0.RELEASE/bin:$PATH
+
+# Unzip new release, add gvNIX start scripts
+unzip roo/target/roo-deploy/dist/spring-roo-$ROO_VERSION.zip -d /tmp
+cp /tmp/spring-roo-$ROO_VERSION/bin/roo.sh /tmp/spring-roo-$ROO_VERSION/bin/gvnix.sh
+cp /tmp/spring-roo-$ROO_VERSION/bin/roo.bat /tmp/spring-roo-$ROO_VERSION/bin/gvnix.bat
+
+# Rename release to gvNIX, pack it and add installed release to path
+mv /tmp/spring-roo-$ROO_VERSION /tmp/gvNIX-$GVNIX_VERSION
+zip -9 -r /tmp/gvNIX-$GVNIX_VERSION.zip /tmp/gvNIX-$GVNIX_VERSION
+export PATH=/tmp/gvNIX-$GVNIX_VERSION/bin:$PATH
+
+# Copy the release to target dir (avoid to lost it when shutdown)
+mkdir -p target/gvnix-dist
+cp /tmp/gvNIX-$GVNIX_VERSION.zip target/gvnix-dist/
 
 # Info messages
 echo ""
-echo "Build on /tmp and setted on PATH"
-echo "Type roo.sh to start"
+echo "gvNIX release created: ./target/gvnix-dist/gvNIX-$GVNIX_VERSION.zip"
+echo "gvNIX installed on /tmp and setted on PATH for test purpouses."
+echo "Type gvnix.sh to start"
+
