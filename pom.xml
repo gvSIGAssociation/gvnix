@@ -68,7 +68,7 @@
   <!-- DiSiD: Add google code scm and distribution management -->
   <scm>
     <connection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/trunk/code</connection>
-    <developerConnection>scm:svn:https://gvnix.googlecode.com/svn/trunk</developerConnection>
+    <developerConnection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/trunk/code</developerConnection>
     <url>http://code.google.com/p/gvnix/source/browse</url>
   </scm>
   <distributionManagement>
