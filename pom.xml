@@ -44,6 +44,7 @@
   <url>http://www.gvnix.org</url>
 
   <modules>
+    <!-- TODO: Modules order is important for googlecode repository upload (validate it) -->
     <module>osgi-bundle</module>
     <module>osgi-roo-bundle</module>
     <module>addon-web-i18n</module>

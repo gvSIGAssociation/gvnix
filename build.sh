@@ -115,10 +115,12 @@ cp /tmp/spring-roo-$ROO_VERSION/bin/roo.bat /tmp/spring-roo-$ROO_VERSION/bin/gvn
 
 # Rename release to gvNIX, pack it and add installed release to path
 mv /tmp/spring-roo-$ROO_VERSION /tmp/gvNIX-$GVNIX_VERSION
-zip -9 -r /tmp/gvNIX-$GVNIX_VERSION.zip /tmp/gvNIX-$GVNIX_VERSION
+cd /tmp
+zip -9 -r gvNIX-$GVNIX_VERSION.zip gvNIX-$GVNIX_VERSION
 export PATH=/tmp/gvNIX-$GVNIX_VERSION/bin:$PATH
 
 # Copy the release to target dir (avoid to lost it when shutdown)
+cd -
 mkdir -p target/gvnix-dist
 cp /tmp/gvNIX-$GVNIX_VERSION.zip target/gvnix-dist/
 

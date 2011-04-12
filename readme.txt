@@ -121,7 +121,8 @@ Package gvNIX
    bash:~/gvnix/tags/$ svn update
    bash:~/gvnix/tags/{version}$ ./build.sh -d
 
-  The ``-d`` option deploy to google code, can be used only by commiters.    
+  The ``-d`` option deploy to google code, can be used only by commiters.
+  Check if all add-ons are published correctly at http://gvnix.googlecode.com/svn/repo/repository.xml for RooBoot.
   This will create the ZIP file ``target/gvnix-dist/gvNIX-{version}.zip``.
 
 * Send to publish on gvPONTIS the gvNIX binary zip, the gvNIX source zip and the html single page reference guide.
