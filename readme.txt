@@ -203,7 +203,9 @@ Write doc
 TODO
 ====
 
-* https://jira.springsource.org/browse/ROO-2097
+* Remove all @Reference PathResolver declarations from classes and retrieve PathResolver from ProjectMetadata instead
+
+  https://jira.springsource.org/browse/ROO-2097
 
 * Roo refactor at web layer commands:
 
@@ -212,3 +214,8 @@ TODO
    web xyz all --package
 
   https://jira.springsource.org/browse/ROO-2297
+  
+* Support for embedded in Web scaffolding
+
+  http://projects.disid.com/issues/3920  
+  https://jira.springsource.org/browse/ROO-345
