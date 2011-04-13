@@ -159,3 +159,8 @@ New commands
 ------------------------------
 
 Remove the tagx, aspectJ files and the tagx references in jspx from the project.
+
+TODO
+====
+
+* El import de la clase BeanInfoUtils debe referenciar al add-on de classpath.
