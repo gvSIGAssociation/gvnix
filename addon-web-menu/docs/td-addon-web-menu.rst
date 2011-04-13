@@ -111,3 +111,12 @@ Visibility check based on Spring EL (expressions)
 
 Another interesting feature could be add support to use Spring Expression Language for items visibility.
 
+TODO
+====
+
+* Check now to disable menu Roo service:
+ 
+ * http://jira.springframework.org/browse/ROO-918
+ * http://jira.springframework.org/browse/ROO-904
+ * http://forum.springsource.org/showthread.php?t=89522
+ * http://jira.springframework.org/browse/ROO-950
