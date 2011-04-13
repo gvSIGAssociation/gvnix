@@ -215,7 +215,66 @@ TODO
 
   https://jira.springsource.org/browse/ROO-2297
   
-* Support for embedded in Web scaffolding
+* Composite primary key support in MVC scaffolding:
+  
+   https://jira.springsource.org/browse/ROO-1999
 
-  http://projects.disid.com/issues/3920  
-  https://jira.springsource.org/browse/ROO-345
+  Support for embedded in Web scaffolding:
+
+   http://projects.disid.com/issues/3920  
+   https://jira.springsource.org/browse/ROO-345
+  
+  Data-on-demand and integration tests to support composite primary keys
+  
+   https://jira.springsource.org/browse/ROO-2070
+
+* Declare annotation to a method param.
+  Declare annotation - augmentation/overriding and precedence.
+  
+   https://bugs.eclipse.org/bugs/show_bug.cgi?id=313026
+   https://bugs.eclipse.org/bugs/show_bug.cgi?id=321820
+
+* Cache add-on:
+
+	http://blog.springsource.com/2011/02/23/spring-3-1-m1-caching/
+	http://ehcache.org/documentation/overview.html
+	
+	http://ehcache.org/features.html
+	
+	y además se puede integrar con Spring mediante anotaciones
+	
+	http://ehcache.org/recipes/spring-annotations.html
+	
+	aunque el propio hibernate ya lo tienen más que usado.
+	
+	http://ehcache.org/documentation/hibernate.html
+
+* Criteria API:
+	
+	A raíz de este mensaje del foro: http://forum.springsource.org/showpost.php?p=351029&postcount=1
+	
+	http://docs.jboss.org/hibernate/jpamodelgen/1.0/reference/en-US/html_single/
+	
+	JPA 2 defines a new typesafe Criteria API which allows criteria queries to be constructed in a strongly-typed manner, using metamodel objects to provide type safety.
+	
+	http://stackoverflow.com/questions/3037593/how-to-generate-jpa-2-0-metamodel
+	
+	Sip, Sentencias ya utiliza el Criteria API aunque no he llegado a profundizar en el tema del typesafe.
+	
+	Ya q estamos https://jira.springsource.org/browse/ROO-2112 ... votad plis 
+
+* Sería interesante documentar cómo propone Stefan el cambio de JS, no lo vamos a hacer pero es una info que estaría bien conservar. ¿Alguna sugerencia sobre cómo añadir esta pequeña reseña de Stefan?
+
+   https://jira.springsource.org/browse/ROO-2216
+
+* Capa web con sitemesh
+
+   https://jira.springsource.org/browse/ROO-41, 
+
+* Info importante sobre atributos que empiezan por '_', no se incluyen en la generación del hash de 'z'
+
+   https://jira.springsource.org/browse/ROO-2226, 
+
+*  Soporte multipart para forms, welcome file upload.
+
+   https://jira.springsource.org/browse/ROO-2231
