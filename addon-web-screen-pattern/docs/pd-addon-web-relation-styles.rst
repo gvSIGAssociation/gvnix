@@ -164,3 +164,7 @@ TODO
 ====
 
 * El import de la clase BeanInfoUtils debe referenciar al add-on de classpath.
+
+* Forzar altura de la capa contenedora de tabs para que no quede oculta la tabla por debajo.
+  El tamaño no puede ser fijo, pq la tabla puede crecer más aún del tamaño máximo fijado.
+  r148
