@@ -114,7 +114,7 @@ Another interesting feature could be add support to use Spring Expression Langua
 TODO
 ====
 
-* Check now to disable menu Roo service:
+* Check to disable menu Roo service (http://projects.disid.com/issues/3919):
  
  * http://jira.springframework.org/browse/ROO-918
  * http://jira.springframework.org/browse/ROO-904
