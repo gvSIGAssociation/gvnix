@@ -21,221 +21,212 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introducción
 ===============
 
-Crear proyecto con GvNIX integrando un cliente de servicio web.
+We will integrate Bing search in our web application using the Bing WS API.
 
-Prerequisitos
-===============
+Requirements
+-------------
 
-Requerimientos
-=============== 
+* JDK 1.6+
+* Maven 2+
+* gvNIX 0.6.0
+* Eclipse Helios 3.6.0 (optional)
+* Create your own Bing AppID: http://www.bing.com/developers/createapp.aspx (more info at http://www.bing.com/developers/)
 
-Tener instalados los siguientes requerimientos:
+.. admonition:: AppID for DiSiD tests
 
-* JDK-1.5.07
-* Maven 2.0.9
-* GvNIX 0.5.0
-* Eclipse Galileo 3.5.1
+  8DC4F8381BF17A5FE9BF28F7B5AF12F5EA08462F
 
-Caso de uso
-============
+Remote service
+-----------------
 
-Datos del Servicio Web
-------------------------
+Bing WSDL: http://api.bing.net/search.wsdl
 
-Dirección del Servicio Web que vamos a utilizar:
+The parameters below are required to invoke Bing web services:
 
-* http://api.bing.net/search.wsdl
-
-Parámetros necesarios para ejecutar la operación de búsqueda del servicio web proporcionados por Bing:
-
-* AppID = 8DC4F8381BF17A5FE9BF28F7B5AF12F5EA08462F
+* AppID = YOUR_APP_ID
 * Version = 2.2
 
-Creación del proyecto
-=======================
+Create your application
+=========================
 
-Vamos a crear una aplicación que consulte la operación de búsqueda del Servicio Web de Bing.com y muestre los resultados.
+Create a new directory for the project::
 
-Primera parte
-------------------
+  Bash shell:
 
-Crear una aplicación web y generar el cliente del servicio web.
+    mkdir bing-search-app
+    cd bing-search-app
 
-Crear el directorio del proyecto::
+Start gvNIX::
 
-    bash> mkdir bing-search-app
-    bash> cd bing-search-app
+  bing-search-app$ gvnix.sh
+      ____  ____  ____  
+     / __ \/ __ \/ __ \ 
+    / /_/ / / / / / / / 
+   / _, _/ /_/ / /_/ /   1.1.2.RELEASE [rev fbc33bb]
+  /_/ |_|\____/\____/   gvNIX distribution 0.6.0
+  
+  
+  Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
+  roo>
 
-Entrar en la consola de GvNIX::
+Create the project::
 
-    bash> gvnix
+  roo> project --topLevelPackage org.gvnix.search --projectName bing-search-app
 
-Crear un proyecto::
+  Created ROOT/pom.xml
+  Created SRC_MAIN_JAVA
+  Created SRC_MAIN_RESOURCES
+  Created SRC_TEST_JAVA
+  Created SRC_TEST_RESOURCES
+  Created SRC_MAIN_WEBAPP
+  Created SRC_MAIN_RESOURCES/META-INF/spring
+  Created SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
+  Created SRC_MAIN_RESOURCES/log4j.properties
 
-    gvnix> project --topLevelPackage org.gvnix.test.bing.search.app --java 5 --projectName bing-search-app
+  org.gvnix.search roo> 
 
-Añadir las dependencias para jdk1.5::
+Create local service from Bing WSDL that defines the service contract. This local service will act as "service proxy" and will route our local invocations to the remote service::
 
-    gvnix> dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1
-    gvnix> dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3
+  org.gvnix.search roo> service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
 
-Generamos el cliente del servicio web que vamos a utilizar::
+  Created SRC_MAIN_JAVA/org/gvnix/search/service
+  Created SRC_MAIN_JAVA/org/gvnix/search/service/SearchService.java
+  Updated SRC_MAIN_JAVA/org/gvnix/search/service/SearchService.java
+  Updated ROOT/pom.xml [Added repository gvNIX Add-on repository]
+  Updated ROOT/pom.xml [Added dependency org.gvnix:org.gvnix.service.roo.addon:0.6.0]
+  Updated ROOT/pom.xml [Added property 'gvnix.version' with value '0.6.0']
+  Updated ROOT/pom.xml [Added property 'cxf.version' with value '2.2.10']
+  Updated ROOT/pom.xml [Added dependency org.apache.cxf:cxf-rt-frontend-jaxws:${cxf.version}]
+  Updated ROOT/pom.xml [Added dependency org.apache.cxf:cxf-rt-transports-http:${cxf.version}]
+  Updated ROOT/pom.xml [Added dependency org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.0.Final]
+  Updated ROOT/pom.xml [Added plugin cxf-codegen-plugin]
+  Updated ROOT/pom.xml
+  Generating sources ...
+  Created SRC_MAIN_JAVA/org/gvnix/search/service/SearchService_Roo_GvNix_WebServiceProxy.aj
 
-    gvnix> service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
+  org.gvnix.search roo>
 
-Vemos que el resultado por pantalla es el siguiente::
+Internally the add-on uses the Maven *cxf-codegen-plugin* to generate the code needed to invoke the remote service. For easier maintenance the generated code is put in *target/generated-sources/client/*. Don't worry, it will be compiled to *target/classes*.
 
-    Created SRC_MAIN_JAVA/org/gvnix/test/bing/search/app/service
-    Created SRC_MAIN_JAVA/org/gvnix/test/bing/search/app/service/SearchService.java
-    Managed SRC_MAIN_JAVA/org/gvnix/test/bing/search/app/service/SearchService.java
-    Managed ROOT/pom.xml [Added dependency org.gvnix:org.gvnix.annotations:${gvnix.version}]
-    Managed ROOT/pom.xml
-    Managed ROOT/pom.xml [Added dependency org.apache.cxf:cxf-rt-frontend-jaxws:${cxf.version}]
-    Managed ROOT/pom.xml [Added dependency org.apache.cxf:cxf-rt-transports-http:${cxf.version}]
-    Managed ROOT/pom.xml [Added dependency org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.0.Final]
-    Managed ROOT/pom.xml
+Now, generate a new web page in which we will include the search form for our application::
 
-Y ejecuta el plugin de maven **cxf-codegen-plugin** para generar el cliente y añade las operaciones a la clase **SearchService** del proyecto::
+  org.gvnix.search roo> controller class --class ~.web.SearchController
 
-    [Thread-4] Listening for transport dt_socket at address: 4001
-    [Thread-4] [INFO] Scanning for projects...
-    [Thread-4] [INFO] ------------------------------------------------------------------------
-    [Thread-4] [INFO] Building bing-search-app
-    [Thread-4] [INFO]    task-segment: [clean, generate-sources]
-    [Thread-4] [INFO] ------------------------------------------------------------------------
-    [Thread-4] [INFO] [clean:clean]
-    [Thread-4] [INFO] [cxf-codegen:wsdl2java {execution: generate-sources}]
-    [Thread-5] log4j:WARN No appenders could be found for logger (org.apache.cxf.bus.spring.BusApplicationContext).
-    [Thread-5] log4j:WARN Please initialize the log4j system properly.
-    [Thread-5] 24-nov-2010 13:25:45 org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ParameterProcessor processInput
-    [Thread-5] ADVERTENCIA: Can not find the soap binding in your classpath
-    [Thread-5]   Will not generate the extra parameter.
-    [Thread-5] 24-nov-2010 13:25:45 org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ParameterProcessor processInput
-    [Thread-5] ADVERTENCIA: Can not find the soap binding in your classpath
-    [Thread-5]   Will not generate the extra parameter.
-    [Thread-4] [INFO] ------------------------------------------------------------------------
-    [Thread-4] [INFO] BUILD SUCCESSFUL
-    [Thread-4] [INFO] ------------------------------------------------------------------------
-    [Thread-4] [INFO] Total time: 14 seconds
-    [Thread-4] [INFO] Finished at: Wed Nov 24 13:25:45 CET 2010
-    [Thread-4] [INFO] Final Memory: 44M/105M
-    [Thread-4] [INFO] ------------------------------------------------------------------------
-    Created SRC_MAIN_JAVA/org/gvnix/test/bing/search/app/service/SearchService_Roo_GvNix_WebServiceProxy.aj
+  Created SRC_MAIN_JAVA/org/gvnix/search/web
+  Created SRC_MAIN_JAVA/org/gvnix/search/web/SearchController.java
+  Created SRC_MAIN_WEBAPP/WEB-INF/views/search
+  Created SRC_MAIN_WEBAPP/WEB-INF/views/search/index.jspx
+  Created SRC_MAIN_WEBAPP/WEB-INF/spring
+  Created SRC_MAIN_WEBAPP/WEB-INF/spring/webmvc-config.xml
+  Created SRC_MAIN_WEBAPP/WEB-INF/web.xml
+  ...
 
-Creamos un **Controller** para gestionar el cliente desde la aplicación web y añadimos la compatibilidad para ``jsp 2.0``::
+  org.gvnix.search roo>
 
-    gvnix> controller class --class ~.controller.SearchController
-    gvnix> controller jsp2.0 support 
+Create Eclipse specific workspace configuration artifacts::
 
-Vemos que se ha creado la estructura web del proyecto (el directorio ``src/main/webapp``) y las vistas básicas para el ``Controller`` sin funcionalidad que ha creado GvNIX::
+  org.gvnix.search roo> perform eclipse
 
-    src/main/webapp/WEB-INF/views/search/
-    ├── index.jspx
-    └── views.xml
+  [INFO] Scanning for projects...
+  [INFO] Searching repository for plugin with prefix: 'eclipse'.
+  [INFO] -------------------------------------------------------------------
+  [INFO] Building bing-search-app
+  [INFO]    task-segment: [eclipse:clean, eclipse:eclipse]
+  [INFO] -------------------------------------------------------------------
+   ...
 
-Preparamos el proyecto para trabajar en eclipse::
+  org.gvnix.search roo>
 
-    gvnix> perform eclipse
+Open your Eclipse and import the project *File > Import > General > Existing Projects into Workspace*
 
-La aplicación ya está preparada para arrancar, se puede hacer la prueba volviendo al ``bash`` y arrancándola con el plugin de *tomcat*::
+Add the local service reference to our Controller class::
 
-    bash> mvn clean tomcat:run-war
+  @Autowired private SearchService searchService;
 
-Accedemos a la dirección http://localhost:8080/bing-search-app/ .
+Add the handler method that will receive the query string::
 
-Segunda Parte
-------------------
+    @RequestMapping(params = { "find=ByQuery" }, method = RequestMethod.GET, value = "{query}")
+    public String get(@RequestParam("query") String query,
+            ModelMap modelMap, HttpServletRequest request,
+            HttpServletResponse response) {
 
-Integrar el cliente generado con la aplicación web.
-
-Dotar de lógica al ``Controller`` *SearchService*.
-
-    * Inyectamos el cliente con la anotación **@Autowired**::
-    
-        @Autowired
-        private SearchService searchService;
-
-    * Definir un método ``GET`` que obtenga el parámetro de búsqueda **stringQuery** y ejecute el cliente con los parámetros necearios::
-
-        @RequestMapping(params = { "find=ByQuery"}, method = RequestMethod.GET, value = "{stringQuery}")
-        public String get(@RequestParam("stringQuery") String stringQuery, ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
-    
-            if (stringQuery == null || stringQuery.length() == 0) throw new IllegalArgumentException("A Query is required.");
-    
-            SearchRequest parameters = new SearchRequest();
-            SearchRequest2 searchRequestParameters = new SearchRequest2();
-     
-            // AppID=8DC4F8381BF17A5FE9BF28F7B5AF12F5EA08462F&Version=2.2
-            searchRequestParameters.setAppId("8DC4F8381BF17A5FE9BF28F7B5AF12F5EA08462F");
-            searchRequestParameters.setVersion("2.2");
-    
-            // Query.
-            searchRequestParameters.setQuery(stringQuery);
-    
-            // SourceType type.
-            ArrayOfSourceType arrayOfSourceType = new ArrayOfSourceType();
-            List<SourceType> sourcesTypeToUpdate = arrayOfSourceType.getSourceType();
-            sourcesTypeToUpdate.add(SourceType.WEB);
-            searchRequestParameters.setSources(arrayOfSourceType);
-    
-            // Create search.
-            parameters.setParameters(searchRequestParameters);
-            // Launch the search.
-            SearchResponse searchResponse = searchService.search(parameters);
-    
-            List<WebResult> webResult = searchResponse.getParameters().getWeb().getResults().getWebResult();
-            modelMap.addAttribute("webResult", webResult);
-    
-            return "search/list";
+        if (query == null || query.length() == 0) {
+            throw new IllegalArgumentException("A Query is required.");
         }
 
-    * Necesita los valores ``AppID=8DC4F8381BF17A5FE9BF28F7B5AF12F5EA08462F`` y ``Version=2.2`` para certificar la consulta. Esta es una particularidad de esta operación del Servicio Web.  
+        SearchRequest parameters = new SearchRequest();
+        SearchRequest2 searchRequestParameters = new SearchRequest2();
 
-Actualizar la página ``src/main/webapp/WEB-INF/views/search/index.jspx`` generada por GvNIX para que contenga el formulario de búsquedas::
+        searchRequestParameters.setAppId("YOUR_APPID");
+        searchRequestParameters.setVersion("2.2");
 
-    <?xml version="1.0" encoding="UTF-8"?>
-    <div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
-        <jsp:output omit-xml-declaration="yes"/>
-        <form:find finderName="ByQuery" id="ff:formulariobing" path="/search/list">
-            <field:input label="Consulta" disableFormBinding="true" field="stringQuery" id="f:com.microsoft.schemas.livesearch.u2008.u03.search.SearchRequest2.query" required="true" />
-        </form:find>
-    </div>
+        // Query.
+        searchRequestParameters.setQuery(query);
 
-Crear una página jspx para mostrar los resultados. 
+        // SourceType type.
+        ArrayOfSourceType arrayOfSourceType = new ArrayOfSourceType();
+        List<SourceType> sourcesTypeToUpdate = arrayOfSourceType
+                .getSourceType();
+        sourcesTypeToUpdate.add(SourceType.WEB);
+        searchRequestParameters.setSources(arrayOfSourceType);
 
-    * Utilizaremos los tags que proporciona GvNIX para la nueva jspx ``src/main/webapp/WEB-INF/views/search/list.jspx``::
+        // Create search.
+        parameters.setParameters(searchRequestParameters);
+        // Launch the search.
+        SearchResponse searchResponse = searchService.search(parameters);
 
-        <?xml version="1.0" encoding="UTF-8"?>
-        <div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
-            <jsp:output omit-xml-declaration="yes"/>
-            <page:list label="label.webresult.results" id="pl:com.microsoft.schemas.livesearch.u2008.u03.search.SearchResponse.parameters.web.results.webResult" items="${webResult}">
-                <table:table data="${webResult}" typeIdFieldName="title" id="l:com.microsoft.schemas.livesearch.u2008.u03.search.WebResult" path="/cars" z="fNYN/4QCBEFvwKAFzL0J/hI1T4M=">
-        
-                    <table:column id="c:com.microsoft.schemas.livesearch.u2008.u03.search.WebResult.title" property="title" z="/FxqUpZD9TluFywrVRPOLZ94zcA="/>
-        
-                    <table:column id="c:com.microsoft.schemas.livesearch.u2008.u03.search.WebResult.description" property="description" z="/FxqUpZD9TluFywrVRPOLZ94zcA="/>
-        
-                    <table:column id="c:com.microsoft.schemas.livesearch.u2008.u03.search.WebResult.url" property="url" z="/FxqUpZD9TluFywrVRPOLZ94zcA="/>
-        
-                </table:table>
-            </page:list>
-        </div>
+        List<WebResult> webResult = searchResponse.getParameters().getWeb()
+                .getResults().getWebResult();
+        modelMap.addAttribute("webResult", webResult);
+
+        return "search/list";
+    }
+
+Note that *AppID* and *Version* field are required fields for Bing Service only.
+
+Now open ``src/main/webapp/WEB-INF/views/search/index.jspx`` to add the search form to your application::
+
+  <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+  <div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <spring:message code="label_search_index" htmlEscape="false" var="title"/>
+    <form:find finderName="ByQuery" id="ff_bing_search" path="/search/list" z="user-managed">
+      <field:input label="Bing" disableFormBinding="true" field="query" 
+        id="f_com_microsoft_schemas_livesearch_u2008_u03_search_SearchRequest2_query" 
+        required="true" />
+    </form:find>
+  </div>
+
+Create a web page to show the search results, for example ``src/main/webapp/WEB-INF/views/search/list.jspx``::
+
+  <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+  <div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:list label="label.webresult.results" id="pl_com_microsoft_schemas_livesearch_u2008_u03_searchSearchResponse.parameters_web_results_webResult" items="${webResult}">
+      <table:table data="${webResult}" typeIdFieldName="title" id="l_com_microsoft_schemas_livesearch_u2008_u03_search_WebResult" path="/search" z="user-managed">
+        <table:column id="com_microsoft_schemas_livesearch_u2008_u03_search_WebResult_title" property="title" />
+        <table:column id="com_microsoft_schemas_livesearch_u2008_u03_search_WebResult_description" property="description" />
+        <table:column id="com_microsoft_schemas_livesearch_u2008_u03_search_WebResult_url" property="url" />
+      </table:table>
+    </page:list>
+  </div>
     
-    * Instanciar la nueva vista en ``src/main/webapp/WEB-INF/views/search/views.xml``::
+Register the new view at ``src/main/webapp/WEB-INF/views/search/views.xml``::
 
-        <definition extends="default" name="search/list">
-          <put-attribute name="body" value="/WEB-INF/views/search/list.jspx"/>
-        </definition>
+  <definition extends="default" name="search/list">
+    <put-attribute name="body" value="/WEB-INF/views/search/list.jspx"/>
+  </definition>
 
-    * Actualizar el archivo ``src/main/webapp/WEB-INF/i18n/application.properties`` con las etiquetas asociadas a la búsqueda::
-    
-        #WebResult
-        label.formulariobing=Búsqueda en bing
-        label.webresult.results=Resultados de la búsqueda
-        label.com.microsoft.schemas.livesearch.u2008.u03.search.webresult.title=Título
-        label.com.microsoft.schemas.livesearch.u2008.u03.search.webresult.description=Descripción
-        label.com.microsoft.schemas.livesearch.u2008.u03.search.webresult.url=URL
-        label.com.microsoft.schemas.livesearch.u2008.u03.search.searchresponse.parameters.web.results.webresult.plural=Resultados
+Add labels to ``src/main/webapp/WEB-INF/i18n/application.properties``::
+
+  ff_bing_search=Bing search
+  label_webresult_results=Search results
+  label_com_microsoft_schemas_livesearch_u2008_u03_search_webresult_title=Title
+  label_com_microsoft_schemas_livesearch_u2008_u03_search_webresult_description=Description
+  label_com_microsoft_schemas_livesearch_u2008_u03_search_webresult_url=URL
+  label_com_microsoft_schemas_livesearch_u2008_u03_search_searchresponse_parameters_web_results_WebResult_results=Results
 
 Tercera Parte
 ------------------
@@ -247,4 +238,10 @@ Salimos de la consola de GvNIX y lanzamos la aplicación con el plugin de tomcat
     bash> mvn clean tomcat:run-war
 
 Probar el cliente introduciendo la consulta para mostrar los resultados en la lista.
+
+La aplicación ya está preparada para arrancar, se puede hacer la prueba volviendo al ``bash`` y arrancándola con el plugin de *tomcat*::
+
+    bash> mvn clean tomcat:run-war
+
+Accedemos a la dirección http://localhost:8080/bing-search-app/ .
 
