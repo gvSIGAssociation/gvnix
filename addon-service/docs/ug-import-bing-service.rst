@@ -187,61 +187,51 @@ Note that *AppID* and *Version* field are required fields for Bing Service only.
 Now open ``src/main/webapp/WEB-INF/views/search/index.jspx`` to add the search form to your application::
 
   <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-  <div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
-    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
-    <jsp:output omit-xml-declaration="yes"/>
-    <spring:message code="label_search_index" htmlEscape="false" var="title"/>
-    <form:find finderName="ByQuery" id="ff_bing_search" path="/search/list" z="user-managed">
-      <field:input label="Bing" disableFormBinding="true" field="query" 
-        id="f_com_microsoft_schemas_livesearch_u2008_u03_search_SearchRequest2_query" 
-        required="true" />
-    </form:find>
+  <div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+      <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+      <jsp:output omit-xml-declaration="yes"/>
+      <form:find finderName="ByQuery" id="ff_bing_search" path="/search/list" z="user-managed">
+        <field:input label="Bing" disableFormBinding="true" field="query" 
+            id="f_com_microsoft_schemas_livesearch_u2008_u03_search_SearchRequest2_query" 
+            required="true" />
+      </form:find>
   </div>
 
 Create a web page to show the search results, for example ``src/main/webapp/WEB-INF/views/search/list.jspx``::
 
-  <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-  <div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" version="2.0">
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
-    <page:list label="label.webresult.results" id="pl_com_microsoft_schemas_livesearch_u2008_u03_searchSearchResponse.parameters_web_results_webResult" items="${webResult}">
-      <table:table data="${webResult}" typeIdFieldName="title" id="l_com_microsoft_schemas_livesearch_u2008_u03_search_WebResult" path="/search" z="user-managed">
-        <table:column id="com_microsoft_schemas_livesearch_u2008_u03_search_WebResult_title" property="title" />
-        <table:column id="com_microsoft_schemas_livesearch_u2008_u03_search_WebResult_description" property="description" />
-        <table:column id="com_microsoft_schemas_livesearch_u2008_u03_search_WebResult_url" property="url" />
-      </table:table>
+    <page:list label="label.webresult.results" id="pl_com_microsoft_bing_webResult" items="${webResult}">
+      <c:forEach items="${webResult}" var="result">
+        <a href="${result.url}"><c:out value="${result.title}" /></a>
+        <br/>
+        <c:out value="${result.description}" />
+        <br/>
+        <span style="color: green;"><c:out value="${result.url}" /></span>
+        <br/>
+        <br/>
+      </c:forEach>
     </page:list>
-  </div>
-    
+</div>
+
 Register the new view at ``src/main/webapp/WEB-INF/views/search/views.xml``::
 
   <definition extends="default" name="search/list">
     <put-attribute name="body" value="/WEB-INF/views/search/list.jspx"/>
   </definition>
 
-Add labels to ``src/main/webapp/WEB-INF/i18n/application.properties``::
+Update labels at ``src/main/webapp/WEB-INF/i18n/application.properties``::
 
-  ff_bing_search=Bing search
-  label_webresult_results=Search results
-  label_com_microsoft_schemas_livesearch_u2008_u03_search_webresult_title=Title
-  label_com_microsoft_schemas_livesearch_u2008_u03_search_webresult_description=Description
-  label_com_microsoft_schemas_livesearch_u2008_u03_search_webresult_url=URL
-  label_com_microsoft_schemas_livesearch_u2008_u03_search_searchresponse_parameters_web_results_WebResult_results=Results
+  application_name=Bing Search Demo
+  label_search_index=Search at Bing
+  
+  menu_category_controller_label=Controller
+  menu_item_controller__searchindex_id_label=Search at Bing
+  
+  label_bing_search=Bing Search
+  label_com_microsoft_bing_webresult_plural=Bing Results
 
-Tercera Parte
-------------------
-
-Comprobar el funcionamiento de la aplicación
-
-Salimos de la consola de GvNIX y lanzamos la aplicación con el plugin de tomcat::
-
-    bash> mvn clean tomcat:run-war
-
-Probar el cliente introduciendo la consulta para mostrar los resultados en la lista.
-
-La aplicación ya está preparada para arrancar, se puede hacer la prueba volviendo al ``bash`` y arrancándola con el plugin de *tomcat*::
-
-    bash> mvn clean tomcat:run-war
-
-Accedemos a la dirección http://localhost:8080/bing-search-app/ .
+Finally, run ``mvn tomcat:run`` in the root of your project and the application should be available under the URL http://localhost:8080/bing-search-app/
 
