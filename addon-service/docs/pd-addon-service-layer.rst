@@ -559,4 +559,201 @@ ROO 1.1.0-RELEASE
 Comprobar la creación de clases y actualización de las mismas.
 Definición de Metadatos y Providers.
 
+Import
+======
 
+Tipos de servicios:
+
+   1. RPC/encoded
+   2. RPC/literal
+   3. Document/encoded (Nobody follows this style. It is not WS-I compliant)
+   4. Document/literal
+   5. Document/literal wrapped
+   
+Algoritmo que indica cuando es RPC/Encoded, lo pongo como info y lo pasaremos a la doc.
+
+Analizando el elemento binding, será RPC/Encoded si para alguna de las operaciones de dicho binding se cumple la siguiente condición:
+
+ (en soap:binding el style="rpc" o en operation el style="rpc") y (en operation/input/soap:body el use="encoded" o en operation/output/soap:body el use="encoded")
+
+Solo soportaremos SOAP en esta primera versión. Si hay soap y soap12, tomaremos soap12.
+
+CXF
+---
+
+Plugin Maven CXF
+~~~~~~~~~~~~~~~~
+
+Plugin Maven creación cliente WS para CXF
+
+Necesita las dependencias cxf-rt-frontend-jaxws, cxf-rt-transports-http y cxf-rt-transports-http-jetty (esta última si no se utiliza CXFServlet).
+No se añade la dependencia cxf-rt-transports-http-jetty porque estamos usando el CXFServlet. No se ha necesitado añadir ninguna dependencia adicional.
+
+En la configuración del plugin no se especifica ningún valor para la propiedad <sourceRoot>, se acepta el valor por defecto target/generated-sources/cxf.
+
+<plugin>
+    <groupId>org.apache.cxf</groupId>
+    <artifactId>cxf-codegen-plugin</artifactId>
+    <version>${cxf.version}</version>
+    <executions>
+        <execution>
+            <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+            <configuration>
+                ...
+            </configuration>
+            <goals>
+                <goal>wsdl2java</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+
+    * http://cxf.apache.org/docs/using-cxf-with-maven.html
+    * https://cwiki.apache.org/CXF20DOC/maven-cxf-codegen-plugin-wsdl-to-java.html
+
+Crear consumidores
+
+Los consumidores de dos servicios web se crean configurando la ruta a los WSDLs en el plugin cxf-codegen-plugin, dentro de la sección configuration.
+
+                <wsdlOptions>
+                    <wsdlOption>
+                        <wsdl>wsdl1</wsdl>
+                    </wsdlOption>
+                    <wsdlOption>
+                        <wsdl>wsdl2</wsdl>
+                    </wsdlOption>
+                </wsdlOptions>
+
+La ruta al wsdl puede ser local o remota, por ejemplo:
+
+    * src/main/resources/HelloWorld.wsdl
+    * http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
+
+Entonces al ejecutar la fase mvn generate-sources se generará todo el código Java asociado al cliente de los servicios web en la ruta target/generated-sources/cxf. mvn install también realiza la generación de este código.
+
+    * http://cxf.apache.org/docs/developing-a-consumer.html
+    * https://cwiki.apache.org/CXF20DOC/wsdl-to-java.html
+
+Código generado
+~~~~~~~~~~~~~~~
+
+    public String SomeService.someOperation() {
+
+    SOAPService service = new GeneratedService();
+    Greeter port = ss.getGeneratedPort();
+
+    return port.someOperation();
+    }
+
+Este fichero AspectJ será administrado por el addon de service-layer mediante la monitorización de las clases Java que contengan la anotación @GvNIXWebServiceProxy.
+
+Axis
+----
+
+Plugin Maven Axis
+~~~~~~~~~~~~~~~~~
+
+Plugin Maven creación cliente WS para Axis (compatibles con RPC/Encoded):
+
+Añadir la dependencia a la librería:
+
+          <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+          </dependency>
+
+Y configurar el plugin en el pom.xml de Maven:
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>axistools-maven-plugin</artifactId>
+        <version>1.4</version>
+        <configuration>
+          <urls>
+            ...
+          </urls>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>wsdl2java</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+Más info:
+
+http://mojo.codehaus.org/axistools-maven-plugin/examples/simple.html
+http://mojo.codehaus.org/axistools-maven-plugin/usage.html
+
+Crear consumidores
+
+Los consumidores de los servicios web se crean configurando la ruta a los WSDLs en el plugin axistools-maven-plugin, dentro de la sección urls.
+
+            <url>http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL</url>
+
+gvNIX
+-----
+
+Anotación de gvNIX
+~~~~~~~~~~~~~~~~~~
+
+Se ha creado una anotación @GvNIXWebServiceProxy para marcar una clase como cliente proxy que da acceso a las operaciones de un servicio web. Inicialmente, contiene un único atributo wsdlLocation que define de forma obligatoria la ruta en la que se encuentra emplazado el WSDL.
+
+    @GvNIXWebServiceProxy(wsdlLocation = "...")
+
+Integración con gvNIX
+~~~~~~~~~~~~~~~~~~~~~
+
+Se crea una clase vacía a la que se le añade la anotación @GvNIXWebServiceProxy con su atributo obligatorio wsdlLocation.
+
+Además, a la misma clase se le añade la anotación @Service de Spring para seguir la misma estructura que hemos propuesto para todas las clases de servicio.
+
+Ejemplo:
+
+    @GvNIXWebServiceProxy(wsdlLocation = "...")
+    @Service
+    public class SomeService {
+
+Asociado a la anotación @GvNIXWebServiceProxy existe un fichero AspectJ que contiene un método por cada operación del servicio web. Cada uno de estos métodos invoca a las clases Java del cliente del servicio web generadas con anterioridad mediante la aplicación WSDL2Java.
+
+Axis
+----
+
+El aspecto creado tiene la siguiente estructura, originalmente:
+
+    public WSBDC.IWs_bdc_xsd.WSBDC_Wrcterglobal BdcService.wcterglobal(
+        String pUsuario, String pPasword, String pCif, String pNombre,
+        String pBajas, String pSustitutos, String pDocumentales,
+        String pOtros) throws RemoteException, ServiceException  {
+
+    // TODO Deberíamos proporcionar en el constructor, al menos, la URL del WSDL
+
+    WSBDCWebServiciosLocator locator = new WSBDCWebServiciosLocator();
+    Ws_bdcPortType portType = locator.getWs_bdcPort();
+
+    return portType.wcterglobal(pUsuario, pPasword, pCif, pNombre, pBajas,
+        pSustitutos, pDocumentales, pOtros);
+    }
+
+TODO
+====
+
+Service Layer Import:
+
+* Deberíamos proporcionar al invocar al constructor de la clase de servicio del cliente generado en los métodos del AspectJ, al menos, la URL del WSDL.
+* ¿ hay más versiones de SOAP soportadas ?
+* Una posibilidad de futuro sería poder elegir que operaciones del WS se desean generar definiendo los métodos directamente en la clase Java (con una anotación) y en el AspectJ toda la infraestructura de acceso a las clases generadas del cliente.
+* Utilizar como wrapper OSGi las librerías de CXF y Axis que actualmente se invocan desde maven.
+* Analizar el modo en el que podríamos incluir una librería (JAR) en el proyecto ESB, de modo que sería viable JARear las clases del cliente generadas en target e incluirlas como librería tanto en las aplicaciones web (WEB-INF/lib) como en las aplicaciones del ESB.
+* De cara a futuro, es muy interesante la posibilidad de para una clase generada que representa a una entidad de datos que se transmite a través de un servicio pueda añadirse la anotación "RooEntity" (y posiblemente alguna más) para que puedan persistirse facilmente. Esto sería muy interesante también para la importación de servicios, sin embargo ahora mismo no es posible porque estas clases se regeneran en target y por lo tanto si se realizaran cambios estos desaparecerían al recompilar.
+* Ver que hacemos en el caso de que al generar clases (del cliente, servidor, etc.), coincidan varias clases con el mismo nombre en el mismo paquete.
+* Unportable types: You must use some common and interlingual class libraries format to communicate between muliple platforms. This problem is also present when working on the client side.
+* XSD extensions: In XSD, you can extend a data type by restricting it. The regular expression restriction is lost in the conversion process to Java, because Java does not allow for these sorts of extensions.
+* ¿ El cliente debe ser regenerado automáticamente cuando cambie el wsdl o debe permanecer invariable ?
+* Hacer esquema UML con la estructura de clases.
+* Investigar la posibilidad de que una clase no sea definida como un servicio-componente OSGi y sin embargo pueda utilizar otros servicios-componentes OSGi. Se quiere utilizar para la clase ServiceLayerWsConfigService.
+* Sería una buena idea generar una clase de Test para el cliente en el proyecto para así asegurarnos de que funciona siguiendo la metodología de ROO para generar clases de Test con respecto a la BBDD.
