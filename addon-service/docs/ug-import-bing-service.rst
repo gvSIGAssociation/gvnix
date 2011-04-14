@@ -24,27 +24,43 @@ Introducción
 We will integrate Bing search in our web application using the Bing WS API.
 
 Requirements
--------------
+--------------
 
-* JDK 1.6+
-* Maven 2+
-* gvNIX 0.6.0
-* Eclipse Helios 3.6.0 (optional)
-* Create your own Bing AppID: http://www.bing.com/developers/createapp.aspx (more info at http://www.bing.com/developers/)
+ * JDK 1.6+
+ * Maven 2+
+ * _gvNIX - Spring Roo - Addon - Services Management_
+ * Eclipse Helios 3.6.0 (optional)
 
-.. admonition:: AppID for DiSiD tests
+Install Addon Services Management
+--------------------------------------
 
-  8DC4F8381BF17A5FE9BF28F7B5AF12F5EA08462F
+Options:
 
-Remote service
------------------
+ * To install gvNIX 0.6.0 that contains the add-on installed.
+ * OR, to install in Spring Roo 1.1.2 
+  * Trust on PGP KEY ID used to sign the add-on. Note that gvNIX project members have their PGP KEYs IDs published at https://code.google.com/p/gvnix/people/list::
 
-Bing WSDL: http://api.bing.net/search.wsdl
+      pgp trust --keyId 0xC5FC814B
 
-The parameters below are required to invoke Bing web services:
+  * Run the command below::
 
-* AppID = YOUR_APP_ID
-* Version = 2.2
+      addon install bundle --bundleSymbolicName org.gvnix.service.roo.addon
+
+Bing API
+----------
+
+To connect to Bing API you have to register at _Bing Developer Center_ and get the Bing _AppID_ and _Version_, both parameters are required to invoke Bing Web Services. 
+
+.. admonition:: DiSiD tests
+
+  AppID:   8DC4F8381BF17A5FE9BF28F7B5AF12F5EA08462F
+  Version: 2.2
+
+Go to http://www.bing.com/developers/createapp.aspx for registering.
+
+More info at http://www.bing.com/developers/
+
+The Bing WSDL is published at: http://api.bing.net/search.wsdl
 
 Create your application
 =========================
