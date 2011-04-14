@@ -108,3 +108,8 @@ Examples::
 
     cit security setup --url [URL] --appName [APP_NAME] --login [LOGIN] --password [PASSWORD]
 
+TODO
+====
+
+* Review the packages of the WS client and Authentication artifacts
+
