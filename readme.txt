@@ -278,3 +278,9 @@ TODO
 *  Soporte multipart para forms, welcome file upload.
 
    https://jira.springsource.org/browse/ROO-2231
+
+* 1.1.3 introduced a 'web mvc update tags' command which allows the replacement of existing tagx files with an updated version if there is a difference.
+  Obviously, this means Roo will not automatically update tagx files upon version upgrades.
+
+* Currently, clients are required to create a MutableFile instance to read an XML file to convert to a DOM Document.
+  FileManager and XmlUtils will be enhanced to do the work itself reducing the need for so much code in callers.
