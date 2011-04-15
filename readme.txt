@@ -93,6 +93,11 @@ Run gvNIX dev
    
     rm -rf roo/bootstrap/target/osgi
 
+Developing within Eclipse
+==========================
+
+Eclipse can be used to develop gvNIX. Use ``mvn clean eclipse:clean eclipse:eclipse`` to produce Eclipse project files that can be imported via *File > Import > Existing Projects into Workspace*.
+
 Package gvNIX
 =============
 
