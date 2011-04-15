@@ -27,6 +27,9 @@ fi
 export ROO_THEMES="$GVNIX_HOME"/themes
 export ROO_HOME="$GVNIX_HOME"/roo
 
+# Remove osgi cache
+rm -rf "$ROO_HOME"/bootstrap/target/osgi
+
 mkdir -p "$ROO_HOME"/bootstrap/target/osgi/bin
 mkdir -p "$ROO_HOME"/bootstrap/target/osgi/bundle
 mkdir -p "$ROO_HOME"/bootstrap/target/osgi/conf

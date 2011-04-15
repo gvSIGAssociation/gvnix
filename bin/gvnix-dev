@@ -27,13 +27,15 @@ fi
 export ROO_THEMES="$GVNIX_HOME"/themes
 export ROO_HOME="$GVNIX_HOME"/roo
 
+# Remove osgi cache
+rm -rf "$ROO_HOME"/bootstrap/target/osgi
+
 mkdir -p "$ROO_HOME"/bootstrap/target/osgi/bin
 mkdir -p "$ROO_HOME"/bootstrap/target/osgi/bundle
 mkdir -p "$ROO_HOME"/bootstrap/target/osgi/conf
 
 # gvNIX: copy add-ons
 # cp -f `find "$GVNIX_HOME" -name org.gvnix.*.roo.addon-*.jar | grep ".*/target/org.gvnix..*.roo.addon-.*.jar" | grep -v ".*sources[.]jar"` "$ROO_HOME"/bootstrap/target/osgi/bundle
-###cp -f "$GVNIX_HOME"/target/all/org.gvnix.* "$ROO_HOME"/bootstrap/target/osgi/bundle
 cp -f "$GVNIX_HOME"/target/all/org.gvnix.* "$ROO_HOME"/target/all
 
 # gvNIX: copy add-ons dependencies
@@ -94,7 +96,6 @@ fi
 
 # Hop, hop, hop...
 DEBUG=
-#DEBUG="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
 PAUSE=
 #PAUSE="-Droo.pause=true"
 METADATA_TRACE=

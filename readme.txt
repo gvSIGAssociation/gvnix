@@ -86,13 +86,6 @@ Run gvNIX dev
      
     bash:~/project$ gvnix-dev-debug
 
-.. admonition:: Important
-
-   After each change and gvNIX compilation you *must* delete the contents of the *cache*, for it to clear the OSGi container located in *roo/bootstrap/target/osgi*.
-   It is necessary for the container load new OSGi bundles and bundles not in cache::
-   
-    rm -rf roo/bootstrap/target/osgi
-
 Developing within Eclipse
 ==========================
 
