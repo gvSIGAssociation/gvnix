@@ -739,6 +739,13 @@ El aspecto creado tiene la siguiente estructura, originalmente:
         pSustitutos, pDocumentales, pOtros);
     }
 
+Test
+====
+
+Execute next command on a empty folder to validate add-on:
+
+  bash:~/project$ gvnix-dev script --file src/test/resources/gvnix-test.roo
+
 TODO
 ====
 
