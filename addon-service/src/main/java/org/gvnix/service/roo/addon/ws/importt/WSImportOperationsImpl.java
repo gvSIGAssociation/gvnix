@@ -18,26 +18,30 @@
  */
 package org.gvnix.service.roo.addon.ws.importt;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.*;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
 import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceProxy;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
-
 import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.*;
-import org.w3c.dom.Element;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.ProjectOperations;
 
 /**
  * Addon for Handle Web Service Proxy Layer
@@ -137,4 +141,18 @@ public class WSImportOperationsImpl implements WSImportOperations {
         }
     }
 
+    /** {@inheritDoc} **/
+    public List<String> getServiceList() {
+        List<String> classNames = new ArrayList<String>();
+        Set<ClassOrInterfaceTypeDetails> cids = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(new JavaType(
+                        GvNIXWebServiceProxy.class.getName()));
+        for (ClassOrInterfaceTypeDetails cid : cids) {
+            if (Modifier.isAbstract(cid.getModifier())) {
+                continue;
+            }
+            classNames.add(cid.getName().getFullyQualifiedTypeName());
+        }
+        return classNames;
+    }
 }

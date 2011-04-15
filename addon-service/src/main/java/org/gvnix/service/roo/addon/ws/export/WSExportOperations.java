@@ -20,7 +20,9 @@ package org.gvnix.service.roo.addon.ws.export;
 
 import java.util.List;
 
-import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
@@ -196,4 +198,10 @@ public interface WSExportOperations {
      */
     public String getAvailableServiceOperationsToExport(JavaType serviceClass);
 
+    /**
+     * Returns names of classes which imports web services
+     * 
+     * @return
+     */
+    List<String> getServiceList();
 }

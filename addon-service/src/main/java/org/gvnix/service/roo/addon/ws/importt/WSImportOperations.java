@@ -18,6 +18,8 @@
  */
 package org.gvnix.service.roo.addon.ws.importt;
 
+import java.util.List;
+
 import org.springframework.roo.model.JavaType;
 
 /**
@@ -47,4 +49,10 @@ public interface WSImportOperations {
      */
     public void addImportAnnotation(JavaType className, String wsdlLocation);
 
+    /**
+     * Returns names of classes which imports web services
+     * 
+     * @return
+     */
+    List<String> getServiceList();
 }

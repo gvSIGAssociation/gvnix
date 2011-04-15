@@ -18,22 +18,31 @@
  */
 package org.gvnix.service.roo.addon;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.*;
-import org.gvnix.service.roo.addon.ServiceOperations;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.converters.JavaTypeList;
 import org.gvnix.service.roo.addon.ws.export.WSExportOperations;
 import org.gvnix.service.roo.addon.ws.export.WSExportWsdlOperations;
 import org.gvnix.service.roo.addon.ws.importt.WSImportOperations;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.shell.*;
+import org.springframework.roo.shell.CliAvailabilityIndicator;
+import org.springframework.roo.shell.CliCommand;
+import org.springframework.roo.shell.CliOption;
+import org.springframework.roo.shell.CommandMarker;
+import org.springframework.roo.shell.SimpleParser;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
-import org.springframework.roo.support.logging.HandlerUtils;
 
 /**
  * Addon for Handle Service Layer
@@ -263,5 +272,122 @@ public class ServiceCommands implements CommandMarker {
             @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
 
         wSExportWsdlOperations.exportWSDL2Java(url);
+    }
+
+    @CliAvailabilityIndicator("service ws list")
+    public boolean isServiceWsListAvalilable() {
+        return wSImportOperations.isProjectAvailable()
+                || wSExportOperations.isProjectAvailable();
+    }
+
+    @CliCommand(value = "service ws list", help = "Shows a list of import and exports services")
+    public String serviceWsList() {
+
+        // Gets imported services
+        List<String> imported = wSImportOperations.getServiceList();
+
+        // Gets exposed services
+        List<String> exposed = wSExportOperations.getServiceList();
+
+        // Format result
+        return formatWsList(imported, exposed);
+    }
+
+    /**
+     * Format web service list
+     * 
+     * @param importedServices
+     * @param exposedServices
+     * @return
+     */
+    private String formatWsList(List<String> importedServices,
+            List<String> exposedServices) {
+        if ((importedServices == null || importedServices.isEmpty())
+                && (exposedServices == null || exposedServices.isEmpty())) {
+            return "No Web Services services found in application";
+        }
+
+        // Variable for max service name length
+        int maxLength = 0;
+
+        // Generate a shorted set
+        Set<String> services = new TreeSet<String>();
+        if (importedServices != null) {
+            for (String service : importedServices) {
+                services.add(service);
+                if (service.length() > maxLength) {
+                    maxLength = service.length();
+                }
+            }
+        }
+        if (exposedServices != null) {
+            for (String service : exposedServices) {
+                services.add(service);
+                if (service.length() > maxLength) {
+                    maxLength = service.length();
+                }
+            }
+        }
+
+        // Generate out
+        StringWriter writer = new StringWriter();
+        PrintWriter printer = new PrintWriter(writer);
+
+        // Add header
+        printer.print(fitStringTo("Services", maxLength, ' '));
+        printer.print("   ");
+        printer.print("exposed");
+        printer.print("   ");
+        printer.println("import");
+
+        // Add header separator
+        printer.print(fitStringTo("", maxLength + 1, '-'));
+        printer.print(' ');
+        printer.print(fitStringTo("", "exposed".length() + 2, '-'));
+        printer.print(' ');
+        printer.print(fitStringTo("", "import".length() + 2, '-'));
+        printer.println();
+
+        for (String service : services) {
+            printer.print(fitStringTo(service, maxLength, ' '));
+            printer.print("   ");
+
+            if (exposedServices.contains(service)) {
+                printer.print(fitStringTo("", 3, ' '));
+                printer.print('X');
+                printer.print(fitStringTo("", 3, ' '));
+            } else {
+                printer.print(fitStringTo("", 7, ' '));
+            }
+
+            printer.print("   ");
+
+            if (importedServices.contains(service)) {
+                printer.print(fitStringTo("", 2, ' '));
+                printer.print('X');
+                printer.print(fitStringTo("", 3, ' '));
+            } else {
+                printer.print(fitStringTo("", 6, ' '));
+            }
+            printer.println();
+        }
+        return writer.toString();
+    }
+
+    /**
+     * Add <code>character</code> to a <code>string</code> until
+     * <code>length</code>
+     * 
+     * @param string
+     * @param length
+     * @param character
+     * @return
+     */
+    private String fitStringTo(String string, int length, char character) {
+        StringBuilder sb = new StringBuilder(string);
+        while (sb.length() < length) {
+            sb.append(character);
+        }
+        return sb.toString();
     }
 }

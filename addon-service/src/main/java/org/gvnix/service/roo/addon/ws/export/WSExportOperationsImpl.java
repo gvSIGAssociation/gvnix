@@ -18,26 +18,46 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.*;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
 import org.gvnix.service.roo.addon.JavaParserService;
-import org.gvnix.service.roo.addon.annotations.*;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebMethod;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebParam;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
-import org.springframework.roo.classpath.details.*;
-import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
+import org.springframework.roo.classpath.details.annotations.ClassAttributeValue;
+import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.metadata.MetadataService;
-import org.springframework.roo.model.*;
+import org.springframework.roo.model.EnumDetails;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.*;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
 
@@ -780,4 +800,18 @@ public class WSExportOperationsImpl implements WSExportOperations {
         return methodListStringBuilder.toString();
     }
 
+    /** {@inheritDoc} **/
+    public List<String> getServiceList() {
+        List<String> classNames = new ArrayList<String>();
+        Set<ClassOrInterfaceTypeDetails> cids = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(new JavaType(
+                        GvNIXWebService.class.getName()));
+        for (ClassOrInterfaceTypeDetails cid : cids) {
+            if (Modifier.isAbstract(cid.getModifier())) {
+                continue;
+            }
+            classNames.add(cid.getName().getFullyQualifiedTypeName());
+        }
+        return classNames;
+    }
 }
