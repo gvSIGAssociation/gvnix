@@ -742,18 +742,20 @@ El aspecto creado tiene la siguiente estructura, originalmente:
 TODO
 ====
 
-Service Layer Import:
+* Service Layer Import:
 
-* Deberíamos proporcionar al invocar al constructor de la clase de servicio del cliente generado en los métodos del AspectJ, al menos, la URL del WSDL.
-* ¿ hay más versiones de SOAP soportadas ?
-* Una posibilidad de futuro sería poder elegir que operaciones del WS se desean generar definiendo los métodos directamente en la clase Java (con una anotación) y en el AspectJ toda la infraestructura de acceso a las clases generadas del cliente.
-* Utilizar como wrapper OSGi las librerías de CXF y Axis que actualmente se invocan desde maven.
-* Analizar el modo en el que podríamos incluir una librería (JAR) en el proyecto ESB, de modo que sería viable JARear las clases del cliente generadas en target e incluirlas como librería tanto en las aplicaciones web (WEB-INF/lib) como en las aplicaciones del ESB.
-* De cara a futuro, es muy interesante la posibilidad de para una clase generada que representa a una entidad de datos que se transmite a través de un servicio pueda añadirse la anotación "RooEntity" (y posiblemente alguna más) para que puedan persistirse facilmente. Esto sería muy interesante también para la importación de servicios, sin embargo ahora mismo no es posible porque estas clases se regeneran en target y por lo tanto si se realizaran cambios estos desaparecerían al recompilar.
-* Ver que hacemos en el caso de que al generar clases (del cliente, servidor, etc.), coincidan varias clases con el mismo nombre en el mismo paquete.
-* Unportable types: You must use some common and interlingual class libraries format to communicate between muliple platforms. This problem is also present when working on the client side.
-* XSD extensions: In XSD, you can extend a data type by restricting it. The regular expression restriction is lost in the conversion process to Java, because Java does not allow for these sorts of extensions.
-* ¿ El cliente debe ser regenerado automáticamente cuando cambie el wsdl o debe permanecer invariable ?
-* Hacer esquema UML con la estructura de clases.
-* Investigar la posibilidad de que una clase no sea definida como un servicio-componente OSGi y sin embargo pueda utilizar otros servicios-componentes OSGi. Se quiere utilizar para la clase ServiceLayerWsConfigService.
-* Sería una buena idea generar una clase de Test para el cliente en el proyecto para así asegurarnos de que funciona siguiendo la metodología de ROO para generar clases de Test con respecto a la BBDD.
+ * Deberíamos proporcionar al invocar al constructor de la clase de servicio del cliente generado en los métodos del AspectJ, al menos, la URL del WSDL.
+ * ¿ hay más versiones de SOAP soportadas ?
+ * Una posibilidad de futuro sería poder elegir que operaciones del WS se desean generar definiendo los métodos directamente en la clase Java (con una anotación) y en el AspectJ toda la infraestructura de acceso a las clases generadas del cliente.
+ * Utilizar como wrapper OSGi las librerías de CXF y Axis que actualmente se invocan desde maven.
+ * Analizar el modo en el que podríamos incluir una librería (JAR) en el proyecto ESB, de modo que sería viable JARear las clases del cliente generadas en target e incluirlas como librería tanto en las aplicaciones web (WEB-INF/lib) como en las aplicaciones del ESB.
+ * De cara a futuro, es muy interesante la posibilidad de para una clase generada que representa a una entidad de datos que se transmite a través de un servicio pueda añadirse la anotación "RooEntity" (y posiblemente alguna más) para que puedan persistirse facilmente. Esto sería muy interesante también para la importación de servicios, sin embargo ahora mismo no es posible porque estas clases se regeneran en target y por lo tanto si se realizaran cambios estos desaparecerían al recompilar.
+ * Ver que hacemos en el caso de que al generar clases (del cliente, servidor, etc.), coincidan varias clases con el mismo nombre en el mismo paquete.
+ * Unportable types: You must use some common and interlingual class libraries format to communicate between muliple platforms. This problem is also present when working on the client side.
+ * XSD extensions: In XSD, you can extend a data type by restricting it. The regular expression restriction is lost in the conversion process to Java, because Java does not allow for these sorts of extensions.
+ * ¿ El cliente debe ser regenerado automáticamente cuando cambie el wsdl o debe permanecer invariable ?
+ * Hacer esquema UML con la estructura de clases.
+ * Investigar la posibilidad de que una clase no sea definida como un servicio-componente OSGi y sin embargo pueda utilizar otros servicios-componentes OSGi. Se quiere utilizar para la clase ServiceLayerWsConfigService.
+ * Sería una buena idea generar una clase de Test para el cliente en el proyecto para así asegurarnos de que funciona siguiendo la metodología de ROO para generar clases de Test con respecto a la BBDD.
+
+* Al final del comando de export sería interesante mostrar un mensaje en la consola de Roo indicando la ruta HTTP en la que ha quedado publicado el servicio.
