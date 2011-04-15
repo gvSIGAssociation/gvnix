@@ -98,6 +98,8 @@ Developing within Eclipse
 
 Eclipse can be used to develop gvNIX. Use ``mvn clean eclipse:clean eclipse:eclipse`` to produce Eclipse project files that can be imported via *File > Import > Existing Projects into Workspace*.
 
+It is recommended that you create an Eclipse project for each add-on, in spite of creating a project to contain the entire project.
+
 Package gvNIX
 =============
 
