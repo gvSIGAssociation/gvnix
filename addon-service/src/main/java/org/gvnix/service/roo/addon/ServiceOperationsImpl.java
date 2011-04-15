@@ -36,104 +36,107 @@ import org.springframework.roo.support.util.Assert;
 /**
  * Addon for Handle Service Layer
  * 
- * @author Ricardo García at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ * @author Ricardo García at <a href="http://www.disid.com">DiSiD Technologies
+ *         S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria
+ *         d'Infraestructures i Transport</a>
  */
 @Component
 @Service
 public class ServiceOperationsImpl implements ServiceOperations {
 
-    @Reference private MetadataService metadataService;
-    @Reference private JavaParserService javaParserService;
+    @Reference
+    private MetadataService metadataService;
+    @Reference
+    private JavaParserService javaParserService;
 
-  /*
-   * (non-Javadoc)
-   * @see org.gvnix.service.roo.addon.ServiceLayerOperations
-   * isProjectAvailable()
-   */
-  public boolean isProjectAvailable() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.gvnix.service.roo.addon.ServiceLayerOperations
+     * isProjectAvailable()
+     */
+    public boolean isProjectAvailable() {
 
-    return getPathResolver() != null;
-  }
-
-  /**
-   * @return the path resolver or null if there is no user project
-   */
-  private PathResolver getPathResolver() {
-
-    ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-        .get(ProjectMetadata.getProjectIdentifier());
-    if (projectMetadata == null) {
-
-      return null;
+        return getPathResolver() != null;
     }
 
-    return projectMetadata.getPathResolver();
-  }
+    /**
+     * @return the path resolver or null if there is no user project
+     */
+    private PathResolver getPathResolver() {
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * Adds @org.springframework.stereotype.Service annotation to the class.
-   * </p>
-   */
-  public void createServiceClass(JavaType serviceClass) {
+        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+                .get(ProjectMetadata.getProjectIdentifier());
+        if (projectMetadata == null) {
 
-    javaParserService.createServiceClass(serviceClass);
-  }
+            return null;
+        }
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * Creates the body of the new method (the return line), checks the input
-   * parameters if they exists and calls the 'createMethod' method from
-   * {@link JavaParserService} to add into the class.
-   * </p>
-   */
-  public void addServiceOperation(JavaSymbolName operationName,
-                                  JavaType returnType, JavaType className,
-                                  List<JavaType> paramTypeList,
-                                  List<String> paramNameList,
-                                  List<JavaType> exceptionList) {
-
-    InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-
-    // Create some method content to get the user started.
-    String todoMessage = "// TODO: You have to place the method logic here.\n";
-    bodyBuilder.appendFormalLine(todoMessage);
-
-    // If return type != null we must add method body (return null);
-    String returnLine = "return ".concat(returnType == null ? ";" : "null;");
-    bodyBuilder.appendFormalLine(returnLine);
-
-    // Parameter names
-    List<JavaSymbolName> parameterNameList = new ArrayList<JavaSymbolName>();
-    // Parameter types.
-    List<AnnotatedJavaType> parameterTypeList = new ArrayList<AnnotatedJavaType>();
-
-    Assert
-        .isTrue(
-            paramTypeList != null
-                && paramTypeList.size() == paramNameList.size(),
-            "The method parameter types must have the same number of parameter names to create the method.");
-
-    if (paramNameList.size() > 0) {
-      for (String parameterName : paramNameList) {
-        parameterNameList.add(new JavaSymbolName(parameterName));
-      }
+        return projectMetadata.getPathResolver();
     }
 
-    if (paramTypeList != null && paramTypeList.size() > 0) {
-      for (JavaType parameterType : paramTypeList) {
-        parameterTypeList.add(new AnnotatedJavaType(parameterType, null));
-      }
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Adds @org.springframework.stereotype.Service annotation to the class.
+     * </p>
+     */
+    public void createServiceClass(JavaType serviceClass) {
+
+        javaParserService.createServiceClass(serviceClass);
     }
 
-    javaParserService.createMethod(operationName, returnType, className,
-        Modifier.PUBLIC, exceptionList, new ArrayList<AnnotationMetadata>(),
-        parameterTypeList, parameterNameList, bodyBuilder.getOutput());
-  }
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Creates the body of the new method (the return line), checks the input
+     * parameters if they exists and calls the 'createMethod' method from
+     * {@link JavaParserService} to add into the class.
+     * </p>
+     */
+    public void addServiceOperation(JavaSymbolName operationName,
+            JavaType returnType, JavaType className,
+            List<JavaType> paramTypeList, List<String> paramNameList,
+            List<JavaType> exceptionList) {
+
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        // Create some method content to get the user started.
+        String todoMessage = "// TODO: You have to place the method logic here.\n";
+        bodyBuilder.appendFormalLine(todoMessage);
+
+        // If return type != null we must add method body (return null);
+        String returnLine = "return "
+                .concat(returnType == null ? ";" : "null;");
+        bodyBuilder.appendFormalLine(returnLine);
+
+        // Parameter names
+        List<JavaSymbolName> parameterNameList = new ArrayList<JavaSymbolName>();
+        // Parameter types.
+        List<AnnotatedJavaType> parameterTypeList = new ArrayList<AnnotatedJavaType>();
+
+        Assert.isTrue(
+                paramTypeList != null
+                        && paramTypeList.size() == paramNameList.size(),
+                "The method parameter types must have the same number of parameter names to create the method.");
+
+        if (paramNameList.size() > 0) {
+            for (String parameterName : paramNameList) {
+                parameterNameList.add(new JavaSymbolName(parameterName));
+            }
+        }
+
+        if (paramTypeList != null && paramTypeList.size() > 0) {
+            for (JavaType parameterType : paramTypeList) {
+                parameterTypeList
+                        .add(new AnnotatedJavaType(parameterType, null));
+            }
+        }
+
+        javaParserService.createMethod(operationName, returnType, className,
+                Modifier.PUBLIC, exceptionList,
+                new ArrayList<AnnotationMetadata>(), parameterTypeList,
+                parameterNameList, bodyBuilder.getOutput());
+    }
 
 }

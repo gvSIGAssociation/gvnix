@@ -61,155 +61,161 @@ import org.xml.sax.SAXException;
 @Service
 public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
-  @Reference private WSConfigService wSConfigService;
+    @Reference
+    private WSConfigService wSConfigService;
 
-  private static Logger logger = Logger
-      .getLogger(WSImportMetadataProvider.class.getName());
+    private static Logger logger = Logger
+            .getLogger(WSImportMetadataProvider.class.getName());
 
-  protected void activate(ComponentContext context) {
+    protected void activate(ComponentContext context) {
 
-    // Ensure we're notified of all metadata related to physical Java types,
-    // in particular their initial creation
-    metadataDependencyRegistry.registerDependency(
-        PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-    addMetadataTrigger(new JavaType(GvNIXWebServiceProxy.class.getName()));
-  }
-
-  /*
-   * (non-Javadoc)
-   * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
-   * createLocalIdentifier(org.springframework.roo.model.JavaType,
-   * org.springframework.roo.project.Path)
-   */
-  protected String createLocalIdentifier(JavaType javaType, Path path) {
-
-    return WSImportMetadata.createIdentifier(javaType, path);
-  }
-
-  /*
-   * (non-Javadoc)
-   * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
-   * getGovernorPhysicalTypeIdentifier(java.lang.String)
-   */
-  protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
-
-    JavaType javaType = WSImportMetadata
-        .getJavaType(metadataIdentificationString);
-    Path path = WSImportMetadata.getPath(metadataIdentificationString);
-    String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(
-        javaType, path);
-
-    return physicalTypeIdentifier;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getMetadata
-   * (java.lang.String, org.springframework.roo.model.JavaType,
-   * org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
-   */
-  protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString,
-                                                            JavaType aspectName,
-                                                            PhysicalTypeMetadata governorPhysicalTypeMetadata,
-                                                            String itdFilename) {
-
-    WSImportMetadata metadata = null;
-
-    // Import service if project has required prerequisites
-    if (wSConfigService.isProjectAvailable()) {
-
-      // Check if Web Service definition is correct.
-      // DiSiD: Use getMemberHoldingTypeDetails instead of
-      // getPhysicalTypeDetails
-      // PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
-      // .getPhysicalTypeDetails();
-      PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
-          .getMemberHoldingTypeDetails();
-
-      ClassOrInterfaceTypeDetails governorTypeDetails;
-      if (physicalTypeDetails == null
-          || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
-
-        // There is a problem
-        return null;
-
-      }
-      else {
-
-        // We have reliable physical type details
-        governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
-      }
-
-      // Get upstreamDepency Class to check.
-      AnnotationMetadata annotation = MemberFindingUtils.getTypeAnnotation(
-          governorTypeDetails,
-          new JavaType(GvNIXWebServiceProxy.class.getName()));
-
-      // Wsdl location
-      StringAttributeValue url = (StringAttributeValue) annotation
-          .getAttribute(new JavaSymbolName("wsdlLocation"));
-
-      try {
-
-	// Check URL connection and WSDL format 
-        Element root = WsdlParserUtils.validateWsdlUrl(url.getValue());
-
-        boolean generate;
-        if (WsdlParserUtils.isRpcEncoded(root)) {
-
-          // Generate service infraestructure to import the service
-          generate = wSConfigService.importService(
-              governorTypeDetails.getName(), url.getValue(),
-              CommunicationSense.IMPORT_RPC_ENCODED);
-        }
-        else {
-
-          // Generate service infraestructure to import the service
-          generate = wSConfigService.importService(
-              governorTypeDetails.getName(), url.getValue(),
-              CommunicationSense.IMPORT);
-        }
-
-        // Generate source code client clases if necessary
-        if (generate) {
-
-          wSConfigService.mvn(WSConfigService.GENERATE_SOURCES,
-              WSConfigService.GENERATE_SOURCES_INFO);
-        }
-
-        // Create metadata
-        metadata = new WSImportMetadata(metadataIdentificationString,
-            aspectName, governorPhysicalTypeMetadata);
-
-      }
-      catch (IOException e) {
-
-        throw new IllegalStateException(
-            "Error generating web service sources");
-      }
+        // Ensure we're notified of all metadata related to physical Java types,
+        // in particular their initial creation
+        metadataDependencyRegistry.registerDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        addMetadataTrigger(new JavaType(GvNIXWebServiceProxy.class.getName()));
     }
 
-    return metadata;
-  }
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
+     * createLocalIdentifier(org.springframework.roo.model.JavaType,
+     * org.springframework.roo.project.Path)
+     */
+    protected String createLocalIdentifier(JavaType javaType, Path path) {
 
-  /*
-   * (non-Javadoc)
-   * @seeorg.springframework.roo.classpath.itd.ItdMetadataProvider#
-   * getItdUniquenessFilenameSuffix()
-   */
-  public String getItdUniquenessFilenameSuffix() {
+        return WSImportMetadata.createIdentifier(javaType, path);
+    }
 
-    return "GvNix_WebServiceProxy";
-  }
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
+     * getGovernorPhysicalTypeIdentifier(java.lang.String)
+     */
+    protected String getGovernorPhysicalTypeIdentifier(
+            String metadataIdentificationString) {
 
-  /*
-   * (non-Javadoc)
-   * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
-   */
-  public String getProvidesType() {
+        JavaType javaType = WSImportMetadata
+                .getJavaType(metadataIdentificationString);
+        Path path = WSImportMetadata.getPath(metadataIdentificationString);
+        String physicalTypeIdentifier = PhysicalTypeIdentifier
+                .createIdentifier(javaType, path);
 
-    return WSImportMetadata.getMetadataIdentiferType();
-  }
+        return physicalTypeIdentifier;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getMetadata
+     * (java.lang.String, org.springframework.roo.model.JavaType,
+     * org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
+     */
+    protected ItdTypeDetailsProvidingMetadataItem getMetadata(
+            String metadataIdentificationString, JavaType aspectName,
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            String itdFilename) {
+
+        WSImportMetadata metadata = null;
+
+        // Import service if project has required prerequisites
+        if (wSConfigService.isProjectAvailable()) {
+
+            // Check if Web Service definition is correct.
+            // DiSiD: Use getMemberHoldingTypeDetails instead of
+            // getPhysicalTypeDetails
+            // PhysicalTypeDetails physicalTypeDetails =
+            // governorPhysicalTypeMetadata
+            // .getPhysicalTypeDetails();
+            PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
+                    .getMemberHoldingTypeDetails();
+
+            ClassOrInterfaceTypeDetails governorTypeDetails;
+            if (physicalTypeDetails == null
+                    || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+
+                // There is a problem
+                return null;
+
+            } else {
+
+                // We have reliable physical type details
+                governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
+            }
+
+            // Get upstreamDepency Class to check.
+            AnnotationMetadata annotation = MemberFindingUtils
+                    .getTypeAnnotation(governorTypeDetails, new JavaType(
+                            GvNIXWebServiceProxy.class.getName()));
+
+            // Wsdl location
+            StringAttributeValue url = (StringAttributeValue) annotation
+                    .getAttribute(new JavaSymbolName("wsdlLocation"));
+
+            try {
+
+                // Check URL connection and WSDL format
+                Element root = WsdlParserUtils.validateWsdlUrl(url.getValue());
+
+                boolean generate;
+                if (WsdlParserUtils.isRpcEncoded(root)) {
+
+                    // Generate service infraestructure to import the service
+                    generate = wSConfigService.importService(
+                            governorTypeDetails.getName(), url.getValue(),
+                            CommunicationSense.IMPORT_RPC_ENCODED);
+                } else {
+
+                    // Generate service infraestructure to import the service
+                    generate = wSConfigService.importService(
+                            governorTypeDetails.getName(), url.getValue(),
+                            CommunicationSense.IMPORT);
+                }
+
+                // Generate source code client clases if necessary
+                if (generate) {
+
+                    wSConfigService.mvn(WSConfigService.GENERATE_SOURCES,
+                            WSConfigService.GENERATE_SOURCES_INFO);
+                }
+
+                // Create metadata
+                metadata = new WSImportMetadata(metadataIdentificationString,
+                        aspectName, governorPhysicalTypeMetadata);
+
+            } catch (IOException e) {
+
+                throw new IllegalStateException(
+                        "Error generating web service sources");
+            }
+        }
+
+        return metadata;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.ItdMetadataProvider#
+     * getItdUniquenessFilenameSuffix()
+     */
+    public String getItdUniquenessFilenameSuffix() {
+
+        return "GvNix_WebServiceProxy";
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
+     */
+    public String getProvidesType() {
+
+        return WSImportMetadata.getMetadataIdentiferType();
+    }
 
 }

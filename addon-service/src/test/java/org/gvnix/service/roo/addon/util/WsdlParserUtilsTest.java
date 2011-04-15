@@ -47,108 +47,129 @@ public class WsdlParserUtilsTest {
     public static final String ELASTIC_MAP_REDUCE_WSDL = "http://elasticmapreduce.amazonaws.com/doc/2009-03-31/ElasticMapReduce.wsdl";
 
     public static final String SRC_TEST_RESOURCES_PATH = "."
-	    + WsdlParserUtils.FILE_SEPARATOR + "src"
-	    + WsdlParserUtils.FILE_SEPARATOR + "test"
-	    + WsdlParserUtils.FILE_SEPARATOR + "resources";
+            + WsdlParserUtils.FILE_SEPARATOR + "src"
+            + WsdlParserUtils.FILE_SEPARATOR + "test"
+            + WsdlParserUtils.FILE_SEPARATOR + "resources";
 
     /**
-     * Checks method
-     * {@link WsdlParserUtils#getLocalName()}
+     * Checks method {@link WsdlParserUtils#getLocalName()}
      * 
      * @throws Exception
      */
     @Test
     public void testGetLocalName() throws Exception {
 
-	assertEquals("address", WsdlParserUtils.getLocalName("soap:address"));
+        assertEquals("address", WsdlParserUtils.getLocalName("soap:address"));
     }
-    
+
     /**
-     * Checks method
-     * {@link WsdlParserUtils#getNamespace()}
+     * Checks method {@link WsdlParserUtils#getNamespace()}
      * 
      * @throws Exception
      */
     @Test
     public void testGetNamespace() throws Exception {
 
-	assertEquals("soap", WsdlParserUtils.getNamespace("soap:address"));
+        assertEquals("soap", WsdlParserUtils.getNamespace("soap:address"));
     }
-    
+
     /**
-     * Checks method
-     * {@link WsdlParserUtils#getTargetNamespaceRelatedPackage()}
+     * Checks method {@link WsdlParserUtils#getTargetNamespaceRelatedPackage()}
      * 
      * @throws Exception
      */
     @Test
     public void testGetTargetNamespaceRelatedPackage() throws Exception {
-	
-	Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
-	Element root = wsdl.getDocumentElement();
-	assertEquals("org.tempuri.", WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
-	
-	File file = new File(SRC_TEST_RESOURCES_PATH, TEMP_CONVERT_MODIFIED_LOCAL_WSDL);
-	wsdl = XmlUtils.getDocumentBuilder().parse(file);
-	root = wsdl.getDocumentElement();
-	assertEquals("org.te3mupuuri.www.kk.idu1ur.", WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
-	
-	wsdl = XmlUtils.getDocumentBuilder().parse(ELASTIC_MAP_REDUCE_WSDL);
-	root = wsdl.getDocumentElement();
-	assertEquals("com.amazonaws.elasticmapreduce.doc.u2009u03u31.", WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
+
+        Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
+        Element root = wsdl.getDocumentElement();
+        assertEquals("org.tempuri.",
+                WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
+
+        File file = new File(SRC_TEST_RESOURCES_PATH,
+                TEMP_CONVERT_MODIFIED_LOCAL_WSDL);
+        wsdl = XmlUtils.getDocumentBuilder().parse(file);
+        root = wsdl.getDocumentElement();
+        assertEquals("org.te3mupuuri.www.kk.idu1ur.",
+                WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
+
+        wsdl = XmlUtils.getDocumentBuilder().parse(ELASTIC_MAP_REDUCE_WSDL);
+        root = wsdl.getDocumentElement();
+        assertEquals("com.amazonaws.elasticmapreduce.doc.u2009u03u31.",
+                WsdlParserUtils.getTargetNamespaceRelatedPackage(root));
     }
-    
+
     /**
-     * Checks method
-     * {@link WsdlParserUtils#getServiceClassPath()}
+     * Checks method {@link WsdlParserUtils#getServiceClassPath()}
      * 
      * @throws Exception
      */
     @Test
     public void testGetServiceClassPath() throws Exception {
-	
-	Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
-	Element root = wsdl.getDocumentElement();
-	assertEquals("org.tempuri.TempConvert", WsdlParserUtils.getServiceClassPath(root, CommunicationSense.IMPORT));
-	
-	wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V1_WSDL);
-	root = wsdl.getDocumentElement();
-	assertEquals("com.xwebservices.ws.xwebemailvalidation.XWebEmailValidation", WsdlParserUtils.getServiceClassPath(root, CommunicationSense.IMPORT));
-	
-	wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
-	root = wsdl.getDocumentElement();
-	assertEquals("v2.emailvalidation.xwebemailvalidation.wsuxwebservicesucom.EmailValidation", WsdlParserUtils.getServiceClassPath(root, CommunicationSense.IMPORT));
-	
-	File file = new File(SRC_TEST_RESOURCES_PATH, TEMP_CONVERT_MODIFIED_LOCAL_WSDL);
-	wsdl = XmlUtils.getDocumentBuilder().parse(file);
-	root = wsdl.getDocumentElement();
-	assertEquals("org.te3mupuuri.www.kk.idu1ur.TEMP_002fC_0023ONe_0040R_002bT$GE_003dR_002aG_0027E_00282_00293_002c4_002f2_0025Rmm12Mm", WsdlParserUtils.getServiceClassPath(root, CommunicationSense.IMPORT));
+
+        Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
+        Element root = wsdl.getDocumentElement();
+        assertEquals("org.tempuri.TempConvert",
+                WsdlParserUtils.getServiceClassPath(root,
+                        CommunicationSense.IMPORT));
+
+        wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V1_WSDL);
+        root = wsdl.getDocumentElement();
+        assertEquals(
+                "com.xwebservices.ws.xwebemailvalidation.XWebEmailValidation",
+                WsdlParserUtils.getServiceClassPath(root,
+                        CommunicationSense.IMPORT));
+
+        wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
+        root = wsdl.getDocumentElement();
+        assertEquals(
+                "v2.emailvalidation.xwebemailvalidation.wsuxwebservicesucom.EmailValidation",
+                WsdlParserUtils.getServiceClassPath(root,
+                        CommunicationSense.IMPORT));
+
+        File file = new File(SRC_TEST_RESOURCES_PATH,
+                TEMP_CONVERT_MODIFIED_LOCAL_WSDL);
+        wsdl = XmlUtils.getDocumentBuilder().parse(file);
+        root = wsdl.getDocumentElement();
+        assertEquals(
+                "org.te3mupuuri.www.kk.idu1ur.TEMP_002fC_0023ONe_0040R_002bT$GE_003dR_002aG_0027E_00282_00293_002c4_002f2_0025Rmm12Mm",
+                WsdlParserUtils.getServiceClassPath(root,
+                        CommunicationSense.IMPORT));
     }
-    
+
     /**
-     * Checks method
-     * {@link WsdlParserUtils#getPortTypeClassPath()}
+     * Checks method {@link WsdlParserUtils#getPortTypeClassPath()}
      * 
      * @throws Exception
      */
     @Test
     public void testGetPortTypeClassPath() throws Exception {
-	
-	Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
-	Element root = wsdl.getDocumentElement();
-	assertEquals("org.tempuri.TempConvertSoap", WsdlParserUtils.getPortTypeClassPath(root, CommunicationSense.IMPORT));
-	
-	wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V1_WSDL);
-	root = wsdl.getDocumentElement();
-	assertEquals("com.xwebservices.ws.xwebemailvalidation.XWebEmailValidationSoap", WsdlParserUtils.getPortTypeClassPath(root, CommunicationSense.IMPORT));
-	
-	wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
-	root = wsdl.getDocumentElement();
-	assertEquals("v2.emailvalidation.xwebemailvalidation.wsuxwebservicesucom.XWebEmailValidationInterface", WsdlParserUtils.getPortTypeClassPath(root, CommunicationSense.IMPORT));
-	
-	wsdl = XmlUtils.getDocumentBuilder().parse(KK_WEB_SERVICE_ENG_WSDL);
-	root = wsdl.getDocumentElement();
-	assertEquals("com.konakart.ws.KKWSEngIf", WsdlParserUtils.getPortTypeClassPath(root, CommunicationSense.IMPORT));
+
+        Document wsdl = XmlUtils.getDocumentBuilder().parse(TEMP_CONVERT_WSDL);
+        Element root = wsdl.getDocumentElement();
+        assertEquals("org.tempuri.TempConvertSoap",
+                WsdlParserUtils.getPortTypeClassPath(root,
+                        CommunicationSense.IMPORT));
+
+        wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V1_WSDL);
+        root = wsdl.getDocumentElement();
+        assertEquals(
+                "com.xwebservices.ws.xwebemailvalidation.XWebEmailValidationSoap",
+                WsdlParserUtils.getPortTypeClassPath(root,
+                        CommunicationSense.IMPORT));
+
+        wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
+        root = wsdl.getDocumentElement();
+        assertEquals(
+                "v2.emailvalidation.xwebemailvalidation.wsuxwebservicesucom.XWebEmailValidationInterface",
+                WsdlParserUtils.getPortTypeClassPath(root,
+                        CommunicationSense.IMPORT));
+
+        wsdl = XmlUtils.getDocumentBuilder().parse(KK_WEB_SERVICE_ENG_WSDL);
+        root = wsdl.getDocumentElement();
+        assertEquals("com.konakart.ws.KKWSEngIf",
+                WsdlParserUtils.getPortTypeClassPath(root,
+                        CommunicationSense.IMPORT));
     }
-    
+
 }

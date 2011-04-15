@@ -35,15 +35,15 @@ import java.lang.annotation.*;
 public @interface GvNIXXmlElement {
 
     String name() default "";
-    
+
     String xmlTypeName() default "";
 
     String namespace();
 
     String[] elementList();
-    
+
     boolean exported();
-    
+
     boolean enumElement() default false;
 
 }

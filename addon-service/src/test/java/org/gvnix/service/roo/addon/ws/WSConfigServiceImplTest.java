@@ -39,215 +39,219 @@ import org.w3c.dom.Element;
 /**
  * Addon Web Service configuration Test class.
  * 
- * @author Ricardo García Fernández at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
+ *         Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
 public class WSConfigServiceImplTest {
 
-  static final String WEB_XML = "webmvc-config.xml";
+    static final String WEB_XML = "webmvc-config.xml";
 
-  // Project web config file path
-  static final String WEB_XML_PATH = "WEB-INF/spring/webmvc-config.xml";
-
-  // Class under test
-  private WSConfigServiceImpl wSConfigServiceImpl;
-
-  // Mock objects to emulate Roo OSGi Services
-  private FileManager fileManager;
-
-  private MetadataService metadataService;
-
-  private ProjectOperations projectOperations;
-
-  private PathResolver pathResolver;
-
-  // Mock to emulate file management.
-  private ProjectMetadata projectMetadata;
-
-  private static Logger logger = Logger.getLogger(WSConfigServiceImplTest.class
-      .getName());
-
-  /**
-   * Setup operations instance and Mock objects
-   * 
-   * @throws java.lang.Exception
-   */
-  @Before
-  public void setUp() throws Exception {
+    // Project web config file path
+    static final String WEB_XML_PATH = "WEB-INF/spring/webmvc-config.xml";
 
     // Class under test
-    wSConfigServiceImpl = new WSConfigServiceImpl();
+    private WSConfigServiceImpl wSConfigServiceImpl;
 
-    // Setup Mock service objects
-    fileManager = createMock(FileManager.class);
-    metadataService = createMock(MetadataService.class);
-//    projectOperations = createMock(ProjectOperations.class);
-//    pathResolver = createMock(PathResolver.class);
+    // Mock objects to emulate Roo OSGi Services
+    private FileManager fileManager;
 
-    // Mock Objects
-    projectMetadata = createMock(ProjectMetadata.class);
+    private MetadataService metadataService;
 
-    // Inject mock objects in instance. This emulate OSGi environment
-    ReflectionTestUtils.setField(wSConfigServiceImpl, "fileManager",
-        fileManager);
-    ReflectionTestUtils.setField(wSConfigServiceImpl, "metadataService",
-        metadataService);
-//    ReflectionTestUtils.setField(wSConfigServiceImpl, "projectOperations",
-//        projectOperations);
-//    ReflectionTestUtils.setField(projectOperations, "pathResolver",
-//        pathResolver);
+    private ProjectOperations projectOperations;
 
-  }
+    private PathResolver pathResolver;
 
-  /**
-   * Checks method {@link WSConfigServiceImpl#isCxfDependenciesInstalled()}
-   * 
-   * @throws Exception
-   */
-  @Test
-  public void testAreCxfDependenciesInstalled() throws Exception {
+    // Mock to emulate file management.
+    private ProjectMetadata projectMetadata;
 
-    boolean areCxfDependenciesInstalledResult;
+    private static Logger logger = Logger
+            .getLogger(WSConfigServiceImplTest.class.getName());
 
-    /*
-     * Test 1 - Todas las dependencias de CXF han sido definidas en el pom.xml.
+    /**
+     * Setup operations instance and Mock objects
+     * 
+     * @throws java.lang.Exception
      */
-    expect(metadataService.get(ProjectMetadata.getProjectIdentifier()))
-        .andReturn(projectMetadata);
+    @Before
+    public void setUp() throws Exception {
 
-    Dependency dependency;
+        // Class under test
+        wSConfigServiceImpl = new WSConfigServiceImpl();
 
-    List<Element> dependencyList = wSConfigServiceImpl
-        .getRequiredDependencies(CommunicationSense.EXPORT);
+        // Setup Mock service objects
+        fileManager = createMock(FileManager.class);
+        metadataService = createMock(MetadataService.class);
+        // projectOperations = createMock(ProjectOperations.class);
+        // pathResolver = createMock(PathResolver.class);
 
-    for (Element element : dependencyList) {
+        // Mock Objects
+        projectMetadata = createMock(ProjectMetadata.class);
 
-      dependency = new Dependency(element);
-      expect(projectMetadata.isDependencyRegistered(dependency))
-          .andReturn(true);
+        // Inject mock objects in instance. This emulate OSGi environment
+        ReflectionTestUtils.setField(wSConfigServiceImpl, "fileManager",
+                fileManager);
+        ReflectionTestUtils.setField(wSConfigServiceImpl, "metadataService",
+                metadataService);
+        // ReflectionTestUtils.setField(wSConfigServiceImpl,
+        // "projectOperations",
+        // projectOperations);
+        // ReflectionTestUtils.setField(projectOperations, "pathResolver",
+        // pathResolver);
+
     }
 
-    replay(metadataService, projectMetadata);
-
-    areCxfDependenciesInstalledResult = wSConfigServiceImpl
-        .isDependenciesInstalled(CommunicationSense.EXPORT);
-
-    assertTrue("There is one or more dependencies not set.",
-        areCxfDependenciesInstalledResult);
-
-    logger.log(Level.INFO, "Test 1 \nAll Cxf Dependencies defined in pom.xml");
-
-    reset(metadataService, projectMetadata);
-
-    /*
-     * Test 2 - Falta al menos una dependencia por definir en el pom.xml del
-     * proyecto.
+    /**
+     * Checks method {@link WSConfigServiceImpl#isCxfDependenciesInstalled()}
+     * 
+     * @throws Exception
      */
-    String dependencyNotDefined = "jaxb-api";
+    @Test
+    public void testAreCxfDependenciesInstalled() throws Exception {
 
-    expect(metadataService.get(ProjectMetadata.getProjectIdentifier()))
-        .andReturn(projectMetadata);
+        boolean areCxfDependenciesInstalledResult;
 
-    for (Element element : dependencyList) {
+        /*
+         * Test 1 - Todas las dependencias de CXF han sido definidas en el
+         * pom.xml.
+         */
+        expect(metadataService.get(ProjectMetadata.getProjectIdentifier()))
+                .andReturn(projectMetadata);
 
-      dependency = new Dependency(element);
-      if (dependency.getArtifactId().compareTo(dependencyNotDefined) == 0) {
-        expect(projectMetadata.isDependencyRegistered(dependency)).andReturn(
-            false);
-      }
-      expect(projectMetadata.isDependencyRegistered(dependency))
-          .andReturn(true);
+        Dependency dependency;
+
+        List<Element> dependencyList = wSConfigServiceImpl
+                .getRequiredDependencies(CommunicationSense.EXPORT);
+
+        for (Element element : dependencyList) {
+
+            dependency = new Dependency(element);
+            expect(projectMetadata.isDependencyRegistered(dependency))
+                    .andReturn(true);
+        }
+
+        replay(metadataService, projectMetadata);
+
+        areCxfDependenciesInstalledResult = wSConfigServiceImpl
+                .isDependenciesInstalled(CommunicationSense.EXPORT);
+
+        assertTrue("There is one or more dependencies not set.",
+                areCxfDependenciesInstalledResult);
+
+        logger.log(Level.INFO,
+                "Test 1 \nAll Cxf Dependencies defined in pom.xml");
+
+        reset(metadataService, projectMetadata);
+
+        /*
+         * Test 2 - Falta al menos una dependencia por definir en el pom.xml del
+         * proyecto.
+         */
+        String dependencyNotDefined = "jaxb-api";
+
+        expect(metadataService.get(ProjectMetadata.getProjectIdentifier()))
+                .andReturn(projectMetadata);
+
+        for (Element element : dependencyList) {
+
+            dependency = new Dependency(element);
+            if (dependency.getArtifactId().compareTo(dependencyNotDefined) == 0) {
+                expect(projectMetadata.isDependencyRegistered(dependency))
+                        .andReturn(false);
+            }
+            expect(projectMetadata.isDependencyRegistered(dependency))
+                    .andReturn(true);
+        }
+
+        replay(metadataService, projectMetadata);
+
+        areCxfDependenciesInstalledResult = wSConfigServiceImpl
+                .isDependenciesInstalled(CommunicationSense.EXPORT);
+
+        assertFalse("There are all dependencies set.",
+                areCxfDependenciesInstalledResult);
+
+        logger.log(Level.INFO, "Test 2 \njaxb-api dependency is not set.");
+
+        reset(metadataService, projectMetadata);
+
     }
 
-    replay(metadataService, projectMetadata);
-
-    areCxfDependenciesInstalledResult = wSConfigServiceImpl
-        .isDependenciesInstalled(CommunicationSense.EXPORT);
-
-    assertFalse("There are all dependencies set.",
-        areCxfDependenciesInstalledResult);
-
-    logger.log(Level.INFO, "Test 2 \njaxb-api dependency is not set.");
-
-    reset(metadataService, projectMetadata);
-
-  }
-
-  /**
-   * Checks method {@link WSConfigServiceImpl#isCxfConfigurated()}
-   * 
-   * @throws Exception
-   */
-  @Test
-  public void testIsCxfConfigurated() throws Exception {
-
-    String projectName;
-    String cxfprojectFile;
-    String cxfPath;
-    boolean cxfConfigFileExpected;
-
-    /*
-     * Test 1 - Exists Cxf config file using project name. projectName =
-     * test-service-layer.
+    /**
+     * Checks method {@link WSConfigServiceImpl#isCxfConfigurated()}
+     * 
+     * @throws Exception
      */
-    projectName = "test-service-layer";
+    @Test
+    public void testIsCxfConfigurated() throws Exception {
 
-    cxfprojectFile = "WEB-INF/cxf-".concat(projectName).concat(".xml");
+        String projectName;
+        String cxfprojectFile;
+        String cxfPath;
+        boolean cxfConfigFileExpected;
 
-    cxfPath = cxfprojectFile;
+        /*
+         * Test 1 - Exists Cxf config file using project name. projectName =
+         * test-service-layer.
+         */
+        projectName = "test-service-layer";
 
-    cxfConfigFileExpected = true;
+        cxfprojectFile = "WEB-INF/cxf-".concat(projectName).concat(".xml");
 
-    expect(metadataService.get(ProjectMetadata.getProjectIdentifier()))
-        .andReturn(projectMetadata);
+        cxfPath = cxfprojectFile;
 
-    expect(projectMetadata.getProjectName()).andReturn(projectName);
+        cxfConfigFileExpected = true;
 
-//    expect(
-//        projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP,
-//            cxfprojectFile)).andReturn(cxfPath);
+        expect(metadataService.get(ProjectMetadata.getProjectIdentifier()))
+                .andReturn(projectMetadata);
 
-    expect(fileManager.exists(cxfPath)).andReturn(cxfConfigFileExpected);
+        expect(projectMetadata.getProjectName()).andReturn(projectName);
 
-    replay(metadataService, projectMetadata, fileManager);
+        // expect(
+        // projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP,
+        // cxfprojectFile)).andReturn(cxfPath);
 
-    assertTrue("The Cxf config file doesn't exists.", cxfConfigFileExpected);
+        expect(fileManager.exists(cxfPath)).andReturn(cxfConfigFileExpected);
 
-    logger.log(Level.INFO,
-        "Test 1 \nThe Cxf config file using project name exists.");
+        replay(metadataService, projectMetadata, fileManager);
 
-    reset(metadataService, projectMetadata, fileManager);
+        assertTrue("The Cxf config file doesn't exists.", cxfConfigFileExpected);
 
-  }
+        logger.log(Level.INFO,
+                "Test 1 \nThe Cxf config file using project name exists.");
 
-  /**
-   * Checks method
-   * {@link WSConfigServiceImpl#convertPackageToTargetNamespace(String)}
-   * 
-   * @throws Exception
-   */
-  @Test
-  public void testConvertPackageToTargetNamespace() throws Exception {
+        reset(metadataService, projectMetadata, fileManager);
 
-    String packageName = "org.gvnix.service.roo.addon";
-    String targetNamespaceExpected = "http://addon.roo.service.gvnix.org/";
+    }
 
-    String targetNamespaceResult;
-    /*
-     * Test 1 - Check's method functionality.
+    /**
+     * Checks method
+     * {@link WSConfigServiceImpl#convertPackageToTargetNamespace(String)}
+     * 
+     * @throws Exception
      */
-    targetNamespaceResult = wSConfigServiceImpl
-        .convertPackageToTargetNamespace(packageName);
+    @Test
+    public void testConvertPackageToTargetNamespace() throws Exception {
 
-    Assert.isTrue(
-        targetNamespaceResult != null && targetNamespaceResult.length() != 0,
-        "The method doesn't work properly.");
+        String packageName = "org.gvnix.service.roo.addon";
+        String targetNamespaceExpected = "http://addon.roo.service.gvnix.org/";
 
-    assertTrue("The namespace is not well generated",
-        targetNamespaceResult.contains(targetNamespaceExpected));
+        String targetNamespaceResult;
+        /*
+         * Test 1 - Check's method functionality.
+         */
+        targetNamespaceResult = wSConfigServiceImpl
+                .convertPackageToTargetNamespace(packageName);
 
-  }
+        Assert.isTrue(
+                targetNamespaceResult != null
+                        && targetNamespaceResult.length() != 0,
+                "The method doesn't work properly.");
+
+        assertTrue("The namespace is not well generated",
+                targetNamespaceResult.contains(targetNamespaceExpected));
+
+    }
 
 }

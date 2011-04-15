@@ -35,8 +35,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface GvNIXWebMethod {
 
-    public enum GvNIXWebMethodParameterStyle
-    {
+    public enum GvNIXWebMethodParameterStyle {
         BARE, WRAPPED
     }
 
@@ -45,7 +44,7 @@ public @interface GvNIXWebMethod {
     Class<?> webResultType();
 
     String webResultPartName() default "parameters";
-    
+
     boolean webResultHeader() default false;
 
     String action() default "";

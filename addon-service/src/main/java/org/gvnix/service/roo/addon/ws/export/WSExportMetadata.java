@@ -40,7 +40,10 @@ import org.springframework.roo.support.util.Assert;
  * gvNix Web Service Java Contract generation.
  * </p>
  * 
- * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
+ *         Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 public class WSExportMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
@@ -50,8 +53,8 @@ public class WSExportMetadata extends
     private static final String WEB_SERVICE_TYPE = MetadataIdentificationUtils
             .create(WEB_SERVICE_TYPE_STRING);
 
-    private static Logger logger = Logger
-            .getLogger(WSExportMetadata.class.getName());
+    private static Logger logger = Logger.getLogger(WSExportMetadata.class
+            .getName());
 
     public WSExportMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -78,9 +81,8 @@ public class WSExportMetadata extends
 
             // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
             AnnotationMetadata webServiceAnnotationMetadata = getWebServiceAnnotation(annotationMetadata);
-            
-            builder
-                    .addTypeAnnotation(webServiceAnnotationMetadata);
+
+            builder.addTypeAnnotation(webServiceAnnotationMetadata);
 
             AnnotationMetadata soapBindingAnnotationMetadata = getSoapBindingAnnotation(annotationMetadata);
 
@@ -159,14 +161,15 @@ public class WSExportMetadata extends
             annotationAttributeValueList.add(serviceNameAttributeValue);
 
             StringAttributeValue portNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("portName"), nameAttributeValue
-                            .getValue());
+                    new JavaSymbolName("portName"),
+                    nameAttributeValue.getValue());
 
             annotationAttributeValueList.add(portNameAttributeValue);
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//            return new DefaultAnnotationMetadata(javaType,
-//                    annotationAttributeValueList);
+            // DiSiD: Use AnnotationMetadataBuilder().build instead of
+            // DefaultAnnotationMetadata
+            // return new DefaultAnnotationMetadata(javaType,
+            // annotationAttributeValueList);
             return new AnnotationMetadataBuilder(javaType,
                     annotationAttributeValueList).build();
         }
@@ -185,7 +188,8 @@ public class WSExportMetadata extends
      * @return the annotation is already exists or will be created, or null if
      *         it will not be created (required)
      */
-    public AnnotationMetadata getSoapBindingAnnotation(AnnotationMetadata annotationMetadata) {
+    public AnnotationMetadata getSoapBindingAnnotation(
+            AnnotationMetadata annotationMetadata) {
         JavaType javaType = new JavaType("javax.jws.soap.SOAPBinding");
 
         if (isAnnotationIntroduced("javax.jws.soap.SOAPBinding")) {
@@ -228,9 +232,10 @@ public class WSExportMetadata extends
 
             annotationAttributeValueList.add(enumparameterStyleAttributeValue);
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//            return new DefaultAnnotationMetadata(javaType,
-//                    annotationAttributeValueList);
+            // DiSiD: Use AnnotationMetadataBuilder().build instead of
+            // DefaultAnnotationMetadata
+            // return new DefaultAnnotationMetadata(javaType,
+            // annotationAttributeValueList);
             return new AnnotationMetadataBuilder(javaType,
                     annotationAttributeValueList).build();
         }
@@ -299,10 +304,11 @@ public class WSExportMetadata extends
                 new JavaSymbolName("exclude"), false);
         annotationAttributeValueList.add(excludeAttribuetValue);
 
-        // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//        AnnotationMetadata webMethod = new DefaultAnnotationMetadata(
-//                new JavaType("javax.jws.WebMethod"),
-//                annotationAttributeValueList);
+        // DiSiD: Use AnnotationMetadataBuilder().build instead of
+        // DefaultAnnotationMetadata
+        // AnnotationMetadata webMethod = new DefaultAnnotationMetadata(
+        // new JavaType("javax.jws.WebMethod"),
+        // annotationAttributeValueList);
         AnnotationMetadata webMethod = new AnnotationMetadataBuilder(
                 new JavaType("javax.jws.WebMethod"),
                 annotationAttributeValueList).build();
@@ -338,10 +344,12 @@ public class WSExportMetadata extends
                                     "requestWrapperClassName"))).getValue());
             annotationAttributeValueList.add(classNameAttributeValue);
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//            AnnotationMetadata requestWrapper = new DefaultAnnotationMetadata(
-//                    new JavaType("javax.xml.ws.RequestWrapper"),
-//                    annotationAttributeValueList);
+            // DiSiD: Use AnnotationMetadataBuilder().build instead of
+            // DefaultAnnotationMetadata
+            // AnnotationMetadata requestWrapper = new
+            // DefaultAnnotationMetadata(
+            // new JavaType("javax.xml.ws.RequestWrapper"),
+            // annotationAttributeValueList);
             AnnotationMetadata requestWrapper = new AnnotationMetadataBuilder(
                     new JavaType("javax.xml.ws.RequestWrapper"),
                     annotationAttributeValueList).build();
@@ -363,15 +371,17 @@ public class WSExportMetadata extends
         if ((resutlNameAttributeValue != null && !resutlNameAttributeValue
                 .getValue().contains("void"))
                 && (resultTypeAttributeValue != null && !resultTypeAttributeValue
-                        .getValue().getFullyQualifiedTypeName().contains(
+                        .getValue()
+                        .getFullyQualifiedTypeName()
+                        .contains(
                                 JavaType.VOID_PRIMITIVE
                                         .getFullyQualifiedTypeName()))) {
 
             annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
             StringAttributeValue localNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("name"), resutlNameAttributeValue
-                            .getValue());
+                    new JavaSymbolName("name"),
+                    resutlNameAttributeValue.getValue());
             annotationAttributeValueList.add(localNameAttributeValue);
 
             StringAttributeValue gvNIxWebResultTargetNamespace = (StringAttributeValue) methodAnnotation
@@ -393,8 +403,8 @@ public class WSExportMetadata extends
                         new JavaSymbolName("header"), false);
             } else {
                 headerAttributeValue = new BooleanAttributeValue(
-                        new JavaSymbolName("header"), headerAttributeValue
-                                .getValue());
+                        new JavaSymbolName("header"),
+                        headerAttributeValue.getValue());
             }
             annotationAttributeValueList.add(headerAttributeValue);
 
@@ -407,15 +417,16 @@ public class WSExportMetadata extends
                         new JavaSymbolName("partName"), "parameters");
             } else {
                 partNameAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("partName"), partNameAttributeValue
-                                .getValue());
+                        new JavaSymbolName("partName"),
+                        partNameAttributeValue.getValue());
             }
             annotationAttributeValueList.add(partNameAttributeValue);
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//            AnnotationMetadata webResult = new DefaultAnnotationMetadata(
-//                    new JavaType("javax.jws.WebResult"),
-//                    annotationAttributeValueList);
+            // DiSiD: Use AnnotationMetadataBuilder().build instead of
+            // DefaultAnnotationMetadata
+            // AnnotationMetadata webResult = new DefaultAnnotationMetadata(
+            // new JavaType("javax.jws.WebResult"),
+            // annotationAttributeValueList);
             AnnotationMetadata webResult = new AnnotationMetadataBuilder(
                     new JavaType("javax.jws.WebResult"),
                     annotationAttributeValueList).build();
@@ -448,10 +459,12 @@ public class WSExportMetadata extends
                                     "responseWrapperClassName"))).getValue());
             annotationAttributeValueList.add(classNameAttributeValue);
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//            AnnotationMetadata responseWrapper = new DefaultAnnotationMetadata(
-//                    new JavaType("javax.xml.ws.ResponseWrapper"),
-//                    annotationAttributeValueList);
+            // DiSiD: Use AnnotationMetadataBuilder().build instead of
+            // DefaultAnnotationMetadata
+            // AnnotationMetadata responseWrapper = new
+            // DefaultAnnotationMetadata(
+            // new JavaType("javax.xml.ws.ResponseWrapper"),
+            // annotationAttributeValueList);
             AnnotationMetadata responseWrapper = new AnnotationMetadataBuilder(
                     new JavaType("javax.xml.ws.ResponseWrapper"),
                     annotationAttributeValueList).build();
@@ -462,14 +475,15 @@ public class WSExportMetadata extends
 
         } else {
             // @Oneway - not require a response from the service.
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//            AnnotationMetadata oneway = new DefaultAnnotationMetadata(
-//                    new JavaType("javax.jws.Oneway"),
-//                    new ArrayList<AnnotationAttributeValue<?>>());
+            // DiSiD: Use AnnotationMetadataBuilder().build instead of
+            // DefaultAnnotationMetadata
+            // AnnotationMetadata oneway = new DefaultAnnotationMetadata(
+            // new JavaType("javax.jws.Oneway"),
+            // new ArrayList<AnnotationAttributeValue<?>>());
             AnnotationMetadata oneway = new AnnotationMetadataBuilder(
                     new JavaType("javax.jws.Oneway"),
                     new ArrayList<AnnotationAttributeValue<?>>()).build();
-            
+
             // Add to AspectJ.
             builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
                     methodMetadata, oneway));
@@ -486,8 +500,8 @@ public class WSExportMetadata extends
      * @param methodAnnotation
      *            Annotations to generate ITD declaration.
      */
-    public void updateMethodWithGvNIXAnnotationFromWsdl(MethodMetadata methodMetadata,
-            AnnotationMetadata methodAnnotation) {
+    public void updateMethodWithGvNIXAnnotationFromWsdl(
+            MethodMetadata methodMetadata, AnnotationMetadata methodAnnotation) {
 
         List<AnnotationAttributeValue<?>> annotationAttributeValueList;
 
@@ -522,10 +536,11 @@ public class WSExportMetadata extends
                 new JavaSymbolName("exclude"), false);
         annotationAttributeValueList.add(excludeAttribuetValue);
 
-        // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//        AnnotationMetadata webMethod = new DefaultAnnotationMetadata(
-//                new JavaType("javax.jws.WebMethod"),
-//                annotationAttributeValueList);
+        // DiSiD: Use AnnotationMetadataBuilder().build instead of
+        // DefaultAnnotationMetadata
+        // AnnotationMetadata webMethod = new DefaultAnnotationMetadata(
+        // new JavaType("javax.jws.WebMethod"),
+        // annotationAttributeValueList);
         AnnotationMetadata webMethod = new AnnotationMetadataBuilder(
                 new JavaType("javax.jws.WebMethod"),
                 annotationAttributeValueList).build();
@@ -579,19 +594,20 @@ public class WSExportMetadata extends
             }
 
             if (!annotationAttributeValueList.isEmpty()) {
-        	
-        	  // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//                AnnotationMetadata requestWrapper = new DefaultAnnotationMetadata(
-//                        new JavaType("javax.xml.ws.RequestWrapper"),
-//                        annotationAttributeValueList);
+
+                // DiSiD: Use AnnotationMetadataBuilder().build instead of
+                // DefaultAnnotationMetadata
+                // AnnotationMetadata requestWrapper = new
+                // DefaultAnnotationMetadata(
+                // new JavaType("javax.xml.ws.RequestWrapper"),
+                // annotationAttributeValueList);
                 AnnotationMetadata requestWrapper = new AnnotationMetadataBuilder(
                         new JavaType("javax.xml.ws.RequestWrapper"),
                         annotationAttributeValueList).build();
 
                 // Add to AspectJ.
-                builder
-                        .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
-                                methodMetadata, requestWrapper));
+                builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                        methodMetadata, requestWrapper));
             }
 
         }
@@ -607,15 +623,17 @@ public class WSExportMetadata extends
         if ((resutlNameAttributeValue != null && !resutlNameAttributeValue
                 .getValue().contains("void"))
                 && (resultTypeAttributeValue != null && !resultTypeAttributeValue
-                        .getValue().getFullyQualifiedTypeName().contains(
+                        .getValue()
+                        .getFullyQualifiedTypeName()
+                        .contains(
                                 JavaType.VOID_PRIMITIVE
                                         .getFullyQualifiedTypeName()))) {
 
             annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
             StringAttributeValue localNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("name"), resutlNameAttributeValue
-                            .getValue());
+                    new JavaSymbolName("name"),
+                    resutlNameAttributeValue.getValue());
             annotationAttributeValueList.add(localNameAttributeValue);
 
             tmpAnnotationAttributeValue = methodAnnotation
@@ -641,8 +659,8 @@ public class WSExportMetadata extends
                         new JavaSymbolName("header"), false);
             } else {
                 headerAttributeValue = new BooleanAttributeValue(
-                        new JavaSymbolName("header"), headerAttributeValue
-                                .getValue());
+                        new JavaSymbolName("header"),
+                        headerAttributeValue.getValue());
             }
             annotationAttributeValueList.add(headerAttributeValue);
 
@@ -655,15 +673,16 @@ public class WSExportMetadata extends
                         new JavaSymbolName("partName"), "parameters");
             } else {
                 partNameAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("partName"), partNameAttributeValue
-                                .getValue());
+                        new JavaSymbolName("partName"),
+                        partNameAttributeValue.getValue());
             }
             annotationAttributeValueList.add(partNameAttributeValue);
 
-//            // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//            AnnotationMetadata webResult = new DefaultAnnotationMetadata(
-//                    new JavaType("javax.jws.WebResult"),
-//                    annotationAttributeValueList);
+            // // DiSiD: Use AnnotationMetadataBuilder().build instead of
+            // DefaultAnnotationMetadata
+            // AnnotationMetadata webResult = new DefaultAnnotationMetadata(
+            // new JavaType("javax.jws.WebResult"),
+            // annotationAttributeValueList);
             AnnotationMetadata webResult = new AnnotationMetadataBuilder(
                     new JavaType("javax.jws.WebResult"),
                     annotationAttributeValueList).build();
@@ -715,31 +734,33 @@ public class WSExportMetadata extends
 
             if (!annotationAttributeValueList.isEmpty()) {
 
-        	// DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//                AnnotationMetadata responseWrapper = new DefaultAnnotationMetadata(
-//                        new JavaType("javax.xml.ws.ResponseWrapper"),
-//                        annotationAttributeValueList);
+                // DiSiD: Use AnnotationMetadataBuilder().build instead of
+                // DefaultAnnotationMetadata
+                // AnnotationMetadata responseWrapper = new
+                // DefaultAnnotationMetadata(
+                // new JavaType("javax.xml.ws.ResponseWrapper"),
+                // annotationAttributeValueList);
                 AnnotationMetadata responseWrapper = new AnnotationMetadataBuilder(
                         new JavaType("javax.xml.ws.ResponseWrapper"),
                         annotationAttributeValueList).build();
 
                 // Add to AspectJ.
-                builder
-                        .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
-                                methodMetadata, responseWrapper));
+                builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                        methodMetadata, responseWrapper));
             }
 
         } else {
-            
+
             // @Oneway - not require a response from the service.
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//            AnnotationMetadata oneway = new DefaultAnnotationMetadata(
-//                    new JavaType("javax.jws.Oneway"),
-//                    new ArrayList<AnnotationAttributeValue<?>>());
+            // DiSiD: Use AnnotationMetadataBuilder().build instead of
+            // DefaultAnnotationMetadata
+            // AnnotationMetadata oneway = new DefaultAnnotationMetadata(
+            // new JavaType("javax.jws.Oneway"),
+            // new ArrayList<AnnotationAttributeValue<?>>());
             AnnotationMetadata oneway = new AnnotationMetadataBuilder(
                     new JavaType("javax.jws.Oneway"),
                     new ArrayList<AnnotationAttributeValue<?>>()).build();
-            
+
             // Add to AspectJ.
             builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
                     methodMetadata, oneway));
@@ -754,15 +775,17 @@ public class WSExportMetadata extends
      * @param methodMetadataListToExclude
      *            methods to exclude from Web Service.
      */
-    public void updateMethodWithoutGvNIXAnnotation(List<MethodMetadata> methodMetadataListToExclude) {
+    public void updateMethodWithoutGvNIXAnnotation(
+            List<MethodMetadata> methodMetadataListToExclude) {
 
         List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
         attributes.add(new BooleanAttributeValue(new JavaSymbolName("exclude"),
                 true));
-        
-        // DiSiD: Use AnnotationMetadataBuilder().build instead of DefaultAnnotationMetadata
-//        AnnotationMetadata methodAnnotation = new DefaultAnnotationMetadata(
-//                new JavaType("javax.jws.WebMethod"), attributes);
+
+        // DiSiD: Use AnnotationMetadataBuilder().build instead of
+        // DefaultAnnotationMetadata
+        // AnnotationMetadata methodAnnotation = new DefaultAnnotationMetadata(
+        // new JavaType("javax.jws.WebMethod"), attributes);
         AnnotationMetadata methodAnnotation = new AnnotationMetadataBuilder(
                 new JavaType("javax.jws.WebMethod"), attributes).build();
 
@@ -773,8 +796,7 @@ public class WSExportMetadata extends
                             GvNIXWebMethod.class.getName()));
 
             if (gvNIXWebMethodMethodAnnotation == null) {
-                builder
-                .addMethodAnnotation(new DeclaredMethodAnnotationDetails(
+                builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
                         md, methodAnnotation));
             }
         }

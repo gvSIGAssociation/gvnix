@@ -27,52 +27,54 @@ import org.gvnix.service.roo.addon.ws.export.WSExportWsdlOperationsImpl;
 /**
  * Addon for Handle Service Layer
  * 
- * @author Ricardo García at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Ricardo García at <a href="http://www.disid.com">DiSiD Technologies
+ *         S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria
+ *         d'Infraestructures i Transport</a>
  */
 @Component
 @Service
-public class WSExportWsdlOperationsImpl implements
-        WSExportWsdlOperations {
+public class WSExportWsdlOperationsImpl implements WSExportWsdlOperations {
 
-    @Reference private WSExportWsdlConfigService wSExportWsdlConfigService;
+    @Reference
+    private WSExportWsdlConfigService wSExportWsdlConfigService;
 
-  private static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
+    private static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
 
-  private static Logger logger = Logger
-      .getLogger(WSExportWsdlOperationsImpl.class.getName());
+    private static Logger logger = Logger
+            .getLogger(WSExportWsdlOperationsImpl.class.getName());
 
-  public boolean isProjectAvailable() {
+    public boolean isProjectAvailable() {
 
-    return wSExportWsdlConfigService.isProjectAvailable();
-  }
+        return wSExportWsdlConfigService.isProjectAvailable();
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public void exportWSDL2Java(String url) {
+    /**
+     * {@inheritDoc}
+     */
+    public void exportWSDL2Java(String url) {
 
-    // Check WSDL, configure plugin and generate sources.
-    wSExportWsdlConfigService.exportWSDLWebService(url,
-        CommunicationSense.EXPORT_WSDL);
+        // Check WSDL, configure plugin and generate sources.
+        wSExportWsdlConfigService.exportWSDLWebService(url,
+                CommunicationSense.EXPORT_WSDL);
 
-    // Check generated classes.
-    wSExportWsdlConfigService
-        .monitoringGeneratedSourcesDirectory(GENERATED_CXF_SOURCES_DIR);
+        // Check generated classes.
+        wSExportWsdlConfigService
+                .monitoringGeneratedSourcesDirectory(GENERATED_CXF_SOURCES_DIR);
 
-    // Convert java classes with gvNIX annotations.
-    updateAnnotationsToGvNIX();
+        // Convert java classes with gvNIX annotations.
+        updateAnnotationsToGvNIX();
 
-  }
+    }
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * Check the files listed in Arrays in this class.
-   * </p>
-   */
-  public void updateAnnotationsToGvNIX() {
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Check the files listed in Arrays in this class.
+     * </p>
+     */
+    public void updateAnnotationsToGvNIX() {
 
-    wSExportWsdlConfigService.generateGvNIXWebServiceFiles();
-  }
+        wSExportWsdlConfigService.generateGvNIXWebServiceFiles();
+    }
 
 }

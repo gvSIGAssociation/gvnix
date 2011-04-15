@@ -34,12 +34,11 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 public @interface GvNIXWebService {
 
-    public enum GvNIXWebServiceParameterStyle
-    {
+    public enum GvNIXWebServiceParameterStyle {
         BARE, WRAPPED
     }
 
-    /** 
+    /**
      * Web Service portType
      * 
      * @return
@@ -53,14 +52,14 @@ public @interface GvNIXWebService {
      */
     String targetNamespace();
 
-    /** 
+    /**
      * Web Service Name.
      * 
      * @return
      */
     String serviceName();
 
-    /** 
+    /**
      * Address to publish the service.
      * 
      * @return
@@ -76,17 +75,18 @@ public @interface GvNIXWebService {
      * @return
      */
     String fullyQualifiedTypeName();
-    
+
     /**
      * true if Web Services has been created from wsdl using the Add-on.
      * <p>
-     * If is false, operation input/output parameters and Exceptions involved have to be checked.
+     * If is false, operation input/output parameters and Exceptions involved
+     * have to be checked.
      * </p>
      * 
      * @return
      */
     boolean exported();
-    
+
     /**
      * SOAPBinding parameter style for Web Service.
      * 

@@ -46,16 +46,19 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 
 /**
- * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
+ *         Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 @Component(immediate = true)
 @Service
 public class WSExportWsdlListener implements FileEventListener {
 
-  static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
+    static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
 
-  protected static Logger logger = Logger.getLogger(WSExportWsdlListener.class
-      .getName());
+    protected static Logger logger = Logger
+            .getLogger(WSExportWsdlListener.class.getName());
 
     static final String webService = "javax.jws.WebService";
     static final String webServiceInterface = "WebService";
@@ -67,241 +70,247 @@ public class WSExportWsdlListener implements FileEventListener {
     static final String webFault = "WebFault";
     static final String PACKAGE_INFO_FILE = "package-info.java";
 
-  /**
-   * Use ProjectOperations to install new dependencies, plugins, properties, etc
-   * into the project configuration
-   */
-  @Reference private ProjectOperations projectOperations;
+    /**
+     * Use ProjectOperations to install new dependencies, plugins, properties,
+     * etc into the project configuration
+     */
+    @Reference
+    private ProjectOperations projectOperations;
 
-  @Reference private WSExportWsdlConfigService wSExportWsdlConfigService;
+    @Reference
+    private WSExportWsdlConfigService wSExportWsdlConfigService;
 
-  private String generatedSourcesDirectory;
+    private String generatedSourcesDirectory;
 
-  protected void activate(ComponentContext context) {
-    // Reset generated file lists.
-    wSExportWsdlConfigService.resetGeneratedFilesList();
-  }
-
-  /** {@inheritDoc} */
-  public void onFileEvent(FileEvent fileEvent) {
-
-    File file = fileEvent.getFileDetails().getFile();
-
-    // nothing to do when project hasn't been created
-    if(!projectOperations.isProjectAvailable()) {
-      return;
+    protected void activate(ComponentContext context) {
+        // Reset generated file lists.
+        wSExportWsdlConfigService.resetGeneratedFilesList();
     }
 
-    if (file.getAbsolutePath().contains(getGeneratedSourcesDirectory())
-        && !file.isDirectory()) {
+    /** {@inheritDoc} */
+    public void onFileEvent(FileEvent fileEvent) {
 
-      if ((fileEvent.getOperation().compareTo(FileOperation.MONITORING_START) == 0)
-          || (fileEvent.getOperation().compareTo(FileOperation.CREATED) == 0)
-          || (fileEvent.getOperation().compareTo(FileOperation.UPDATED) == 0)) {
+        File file = fileEvent.getFileDetails().getFile();
 
-        if (file.getName().contentEquals(PACKAGE_INFO_FILE)) {
-          wSExportWsdlConfigService.setSchemaPackageInfoFile(file);
-          return;
+        // nothing to do when project hasn't been created
+        if (!projectOperations.isProjectAvailable()) {
+            return;
         }
 
-        // Parse Java file.
-        CompilationUnit unit;
-        try {
-          unit = JavaParser.parse(file);
+        if (file.getAbsolutePath().contains(getGeneratedSourcesDirectory())
+                && !file.isDirectory()) {
 
-          // Get the first class or interface Java type
-          List<TypeDeclaration> types = unit.getTypes();
-          if (types != null) {
-            TypeDeclaration type = types.get(0);
-            if ((type instanceof ClassOrInterfaceDeclaration)
-                || (type instanceof EnumDeclaration)) {
+            if ((fileEvent.getOperation().compareTo(
+                    FileOperation.MONITORING_START) == 0)
+                    || (fileEvent.getOperation().compareTo(
+                            FileOperation.CREATED) == 0)
+                    || (fileEvent.getOperation().compareTo(
+                            FileOperation.UPDATED) == 0)) {
 
-              logger.fine(fileEvent.getFileDetails().getFile()
-                  .getAbsolutePath());
-
-              // Get all annotations.
-              List<AnnotationExpr> annotations = type.getAnnotations();
-
-              // Check annotation types.
-              for (AnnotationExpr annotationExpr : annotations) {
-
-                if (analyzeAnnotations(file, annotationExpr, type)) {
-                  break;
+                if (file.getName().contentEquals(PACKAGE_INFO_FILE)) {
+                    wSExportWsdlConfigService.setSchemaPackageInfoFile(file);
+                    return;
                 }
 
-              }
+                // Parse Java file.
+                CompilationUnit unit;
+                try {
+                    unit = JavaParser.parse(file);
+
+                    // Get the first class or interface Java type
+                    List<TypeDeclaration> types = unit.getTypes();
+                    if (types != null) {
+                        TypeDeclaration type = types.get(0);
+                        if ((type instanceof ClassOrInterfaceDeclaration)
+                                || (type instanceof EnumDeclaration)) {
+
+                            logger.fine(fileEvent.getFileDetails().getFile()
+                                    .getAbsolutePath());
+
+                            // Get all annotations.
+                            List<AnnotationExpr> annotations = type
+                                    .getAnnotations();
+
+                            // Check annotation types.
+                            for (AnnotationExpr annotationExpr : annotations) {
+
+                                if (analyzeAnnotations(file, annotationExpr,
+                                        type)) {
+                                    break;
+                                }
+
+                            }
+                        }
+                    }
+
+                } catch (ParseException e) {
+                    throw new IllegalStateException(
+                            "Generated web service java file has errors:\n"
+                                    + e.getMessage());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new IllegalStateException(
+                            "Generated web service java file has errors:\n"
+                                    + e.getMessage());
+
+                }
+
             }
-          }
-
         }
-        catch (ParseException e) {
-          throw new IllegalStateException(
-              "Generated web service java file has errors:\n" + e.getMessage());
-
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-          throw new IllegalStateException(
-              "Generated web service java file has errors:\n" + e.getMessage());
-
-        }
-
-      }
     }
-  }
 
-  /**
-   * Check annotations from java generated classes to set file in priority
-   * lists.
-   * 
-   * @param annotationExpr to check.
-   * @param file file to Add to priority list.
-   * @param type to check if Web Service class is an interface.
-   * @return true if has found selected annotation.
-   */
-  public boolean analyzeAnnotations(File file, AnnotationExpr annotationExpr,
-                                    TypeDeclaration type) {
+    /**
+     * Check annotations from java generated classes to set file in priority
+     * lists.
+     * 
+     * @param annotationExpr
+     *            to check.
+     * @param file
+     *            file to Add to priority list.
+     * @param type
+     *            to check if Web Service class is an interface.
+     * @return true if has found selected annotation.
+     */
+    public boolean analyzeAnnotations(File file, AnnotationExpr annotationExpr,
+            TypeDeclaration type) {
 
-    ClassOrInterfaceDeclaration classOrInterfaceDeclaration;
+        ClassOrInterfaceDeclaration classOrInterfaceDeclaration;
 
-    if (annotationExpr instanceof NormalAnnotationExpr) {
+        if (annotationExpr instanceof NormalAnnotationExpr) {
 
-      NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
+            NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
 
-      if (normalAnnotationExpr.getName().getName().contains(xmlRootElement)
-          || normalAnnotationExpr.getName().getName().contains(xmlAccessorType)) {
+            if (normalAnnotationExpr.getName().getName()
+                    .contains(xmlRootElement)
+                    || normalAnnotationExpr.getName().getName()
+                            .contains(xmlAccessorType)) {
 
-        wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-            GvNIXAnnotationType.XML_ELEMENT);
-        return true;
-      }
-      else if (normalAnnotationExpr.getName().getName().contains(webFault)) {
+                wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                        GvNIXAnnotationType.XML_ELEMENT);
+                return true;
+            } else if (normalAnnotationExpr.getName().getName()
+                    .contains(webFault)) {
 
-        wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-            GvNIXAnnotationType.WEB_FAULT);
-        return true;
-      }
-      else if (normalAnnotationExpr.getName().toString()
-          .contentEquals(webService)
-          || normalAnnotationExpr.getName().toString()
-              .contentEquals(webServiceInterface)) {
+                wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                        GvNIXAnnotationType.WEB_FAULT);
+                return true;
+            } else if (normalAnnotationExpr.getName().toString()
+                    .contentEquals(webService)
+                    || normalAnnotationExpr.getName().toString()
+                            .contentEquals(webServiceInterface)) {
 
-        classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
+                classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
 
-        if (!classOrInterfaceDeclaration.isInterface()) {
+                if (!classOrInterfaceDeclaration.isInterface()) {
 
-          wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-              GvNIXAnnotationType.WEB_SERVICE);
+                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                            GvNIXAnnotationType.WEB_SERVICE);
+                } else {
+                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                            GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
+                }
+
+                return true;
+            }
+
+        } else if (annotationExpr instanceof MarkerAnnotationExpr) {
+
+            MarkerAnnotationExpr markerAnnotationExpr = (MarkerAnnotationExpr) annotationExpr;
+
+            if (markerAnnotationExpr.getName().getName()
+                    .contains(xmlRootElement)
+                    || markerAnnotationExpr.getName().getName()
+                            .contains(xmlAccessorType)) {
+
+                wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                        GvNIXAnnotationType.XML_ELEMENT);
+                return true;
+            } else if (markerAnnotationExpr.getName().getName()
+                    .contains(webFault)) {
+
+                wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                        GvNIXAnnotationType.WEB_FAULT);
+                return true;
+            } else if (markerAnnotationExpr.getName().toString()
+                    .contains(webService)
+                    || markerAnnotationExpr.getName().toString()
+                            .contentEquals(webServiceInterface)) {
+
+                classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
+
+                if (!classOrInterfaceDeclaration.isInterface()) {
+
+                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                            GvNIXAnnotationType.WEB_SERVICE);
+                } else {
+                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                            GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
+                }
+
+                return true;
+            } else if (markerAnnotationExpr.getName().toString()
+                    .contentEquals(xmlEnum)) {
+
+                wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                        GvNIXAnnotationType.XML_ELEMENT);
+                return true;
+            }
+
+        } else if (annotationExpr instanceof SingleMemberAnnotationExpr) {
+
+            SingleMemberAnnotationExpr singleMemberAnnotationExpr = (SingleMemberAnnotationExpr) annotationExpr;
+
+            if (singleMemberAnnotationExpr.getName().getName()
+                    .contains(xmlRootElement)
+                    || singleMemberAnnotationExpr.getName().getName()
+                            .contains(xmlAccessorType)) {
+
+                wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                        GvNIXAnnotationType.XML_ELEMENT);
+                return true;
+            } else if (singleMemberAnnotationExpr.getName().getName()
+                    .contains(webFault)) {
+
+                wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                        GvNIXAnnotationType.WEB_FAULT);
+                return true;
+            } else if (singleMemberAnnotationExpr.getName().getName()
+                    .contains(webService)
+                    || singleMemberAnnotationExpr.getName().getName()
+                            .contains(webServiceInterface)) {
+
+                classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
+
+                if (!classOrInterfaceDeclaration.isInterface()) {
+
+                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                            GvNIXAnnotationType.WEB_SERVICE);
+                } else {
+                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                            GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
+                }
+
+                return true;
+            }
         }
-        else {
-          wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-              GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
-        }
-
-        return true;
-      }
-
+        return false;
     }
-    else if (annotationExpr instanceof MarkerAnnotationExpr) {
 
-      MarkerAnnotationExpr markerAnnotationExpr = (MarkerAnnotationExpr) annotationExpr;
-
-      if (markerAnnotationExpr.getName().getName().contains(xmlRootElement)
-          || markerAnnotationExpr.getName().getName().contains(xmlAccessorType)) {
-
-        wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-            GvNIXAnnotationType.XML_ELEMENT);
-        return true;
-      }
-      else if (markerAnnotationExpr.getName().getName().contains(webFault)) {
-
-        wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-            GvNIXAnnotationType.WEB_FAULT);
-        return true;
-      }
-      else if (markerAnnotationExpr.getName().toString().contains(webService)
-          || markerAnnotationExpr.getName().toString()
-              .contentEquals(webServiceInterface)) {
-
-        classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
-
-        if (!classOrInterfaceDeclaration.isInterface()) {
-
-          wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-              GvNIXAnnotationType.WEB_SERVICE);
+    /**
+     * Utility to get {@link #generatedSourcesDirectory}.
+     * <p>
+     * Use this method to ensure it is initialized.
+     * 
+     * @return
+     */
+    private String getGeneratedSourcesDirectory() {
+        if (generatedSourcesDirectory != null) {
+            return generatedSourcesDirectory;
         }
-        else {
-          wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-              GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
-        }
+        generatedSourcesDirectory = projectOperations.getPathResolver()
+                .getIdentifier(Path.ROOT, GENERATED_CXF_SOURCES_DIR);
 
-        return true;
-      }
-      else if (markerAnnotationExpr.getName().toString().contentEquals(xmlEnum)) {
-
-        wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-            GvNIXAnnotationType.XML_ELEMENT);
-        return true;
-      }
-
+        return generatedSourcesDirectory;
     }
-    else if (annotationExpr instanceof SingleMemberAnnotationExpr) {
-
-      SingleMemberAnnotationExpr singleMemberAnnotationExpr = (SingleMemberAnnotationExpr) annotationExpr;
-
-      if (singleMemberAnnotationExpr.getName().getName()
-          .contains(xmlRootElement)
-          || singleMemberAnnotationExpr.getName().getName()
-              .contains(xmlAccessorType)) {
-
-        wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-            GvNIXAnnotationType.XML_ELEMENT);
-        return true;
-      }
-      else if (singleMemberAnnotationExpr.getName().getName()
-          .contains(webFault)) {
-
-        wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-            GvNIXAnnotationType.WEB_FAULT);
-        return true;
-      }
-      else if (singleMemberAnnotationExpr.getName().getName()
-          .contains(webService)
-          || singleMemberAnnotationExpr.getName().getName()
-              .contains(webServiceInterface)) {
-
-        classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
-
-        if (!classOrInterfaceDeclaration.isInterface()) {
-
-          wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-              GvNIXAnnotationType.WEB_SERVICE);
-        }
-        else {
-          wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-              GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
-        }
-
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Utility to get {@link #generatedSourcesDirectory}.
-   * <p>
-   * Use this method to ensure it is initialized.
-   * 
-   * @return 
-   */
-  private String getGeneratedSourcesDirectory() {
-    if(generatedSourcesDirectory != null) {
-      return generatedSourcesDirectory;
-    }
-    generatedSourcesDirectory = projectOperations.getPathResolver()
-    .getIdentifier(Path.ROOT, GENERATED_CXF_SOURCES_DIR);
-
-    return generatedSourcesDirectory;
-  }
 }

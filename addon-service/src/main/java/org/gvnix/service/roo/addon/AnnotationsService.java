@@ -15,25 +15,28 @@ import org.springframework.roo.model.JavaType;
  */
 public interface AnnotationsService {
 
-  /**
-   * Add GvNIX annotations dependency to the current project.
-   */
-  public void addGvNIXAnnotationsDependency();
+    /**
+     * Add GvNIX annotations dependency to the current project.
+     */
+    public void addGvNIXAnnotationsDependency();
 
-  /**
-   * Add an annotation to a JavaType with some attributes.
-   * <p>
-   * If annotation already assined on class, message will be raised.
-   * </p>
-   * 
-   * @param serviceClass Java type to add de annotation
-   * @param annotation Annotation class full name, null if not
-   * @param annotationAttributeValues Attribute list for the annotation
-   * @param forceUpdate overrides annotation value if is true.
-   */
-  public void addJavaTypeAnnotation(JavaType serviceClass,
-                                    String annotation,
-                                    List<AnnotationAttributeValue<?>> annotationAttributeValues,
-                                    boolean forceUpdate);
+    /**
+     * Add an annotation to a JavaType with some attributes.
+     * <p>
+     * If annotation already assined on class, message will be raised.
+     * </p>
+     * 
+     * @param serviceClass
+     *            Java type to add de annotation
+     * @param annotation
+     *            Annotation class full name, null if not
+     * @param annotationAttributeValues
+     *            Attribute list for the annotation
+     * @param forceUpdate
+     *            overrides annotation value if is true.
+     */
+    public void addJavaTypeAnnotation(JavaType serviceClass, String annotation,
+            List<AnnotationAttributeValue<?>> annotationAttributeValues,
+            boolean forceUpdate);
 
 }

@@ -36,138 +36,144 @@ import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
 
 /**
- * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
+ *         Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
 public class WSExportExceptionMetadata extends
-    AbstractItdTypeDetailsProvidingMetadataItem {
+        AbstractItdTypeDetailsProvidingMetadataItem {
 
-  private static Logger logger = Logger
-      .getLogger(WSExportExceptionMetadata.class.getName());
+    private static Logger logger = Logger
+            .getLogger(WSExportExceptionMetadata.class.getName());
 
-  private static final String EXCEPTION_WEB_FAULT_TYPE_STRING = WSExportExceptionMetadata.class
-      .getName();
+    private static final String EXCEPTION_WEB_FAULT_TYPE_STRING = WSExportExceptionMetadata.class
+            .getName();
 
-  private static final String EXCEPTION_WEB_FAULT_TYPE = MetadataIdentificationUtils
-      .create(EXCEPTION_WEB_FAULT_TYPE_STRING);
+    private static final String EXCEPTION_WEB_FAULT_TYPE = MetadataIdentificationUtils
+            .create(EXCEPTION_WEB_FAULT_TYPE_STRING);
 
-  public WSExportExceptionMetadata(String identifier, JavaType aspectName,
-      PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-    super(identifier, aspectName, governorPhysicalTypeMetadata);
+    public WSExportExceptionMetadata(String identifier, JavaType aspectName,
+            PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+        super(identifier, aspectName, governorPhysicalTypeMetadata);
 
-    Assert.isTrue(isValid(identifier), "Metadata identification string '"
-        + identifier + "' does not appear to be a valid");
+        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+                + identifier + "' does not appear to be a valid");
 
-    if (!isValid()) {
-      return;
+        if (!isValid()) {
+            return;
+        }
+
+        // Create the metadata.
+        AnnotationMetadata annotationMetadata = MemberFindingUtils
+                .getTypeAnnotation(governorTypeDetails, new JavaType(
+                        GvNIXWebFault.class.getName()));
+
+        // Add @javax.jws.WebFault annotation to ITD.
+        AnnotationMetadata webFaultAnnotationMetadata = getTypeAnnotation(annotationMetadata);
+        if (webFaultAnnotationMetadata != null) {
+            builder.addTypeAnnotation(webFaultAnnotationMetadata);
+        }
+
+        // Create a representation of the desired output ITD
+        itdTypeDetails = builder.build();
     }
 
-    // Create the metadata.
-    AnnotationMetadata annotationMetadata = MemberFindingUtils
-        .getTypeAnnotation(governorTypeDetails, new JavaType(
-            GvNIXWebFault.class.getName()));
+    /**
+     * Create @WebFault annotation with @GvNIXWebFault attribute values.
+     * 
+     * @param annotationMetadata
+     *            to retrieve attributes.
+     * @return WebFault annotation to define.
+     */
+    public AnnotationMetadata getTypeAnnotation(
+            AnnotationMetadata annotationMetadata) {
 
-    // Add @javax.jws.WebFault annotation to ITD.
-    AnnotationMetadata webFaultAnnotationMetadata = getTypeAnnotation(annotationMetadata);
-    if (webFaultAnnotationMetadata != null) {
-      builder.addTypeAnnotation(webFaultAnnotationMetadata);
+        JavaType javaType = new JavaType("javax.xml.ws.WebFault");
+
+        if (isAnnotationIntroduced("javax.xml.ws.WebFault")) {
+
+            List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+            StringAttributeValue nameAttributeValue = (StringAttributeValue) annotationMetadata
+                    .getAttribute(new JavaSymbolName("name"));
+
+            annotationAttributeValueList.add(nameAttributeValue);
+
+            StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) annotationMetadata
+                    .getAttribute(new JavaSymbolName("targetNamespace"));
+
+            annotationAttributeValueList.add(targetNamespaceAttributeValue);
+
+            StringAttributeValue faultBeanAttributeValue = (StringAttributeValue) annotationMetadata
+                    .getAttribute(new JavaSymbolName("faultBean"));
+
+            annotationAttributeValueList.add(faultBeanAttributeValue);
+
+            // DiSiD: Use AnnotationMetadataBuilder().build instead of
+            // DefaultAnnotationMetadata
+            // return new DefaultAnnotationMetadata(javaType,
+            // annotationAttributeValueList);
+            return new AnnotationMetadataBuilder(javaType,
+                    annotationAttributeValueList).build();
+        }
+
+        return MemberFindingUtils.getDeclaredTypeAnnotation(
+                governorTypeDetails, javaType);
+
     }
 
-    // Create a representation of the desired output ITD
-    itdTypeDetails = builder.build();
-  }
+    /**
+     * Indicates whether the annotation will be introduced via this ITD.
+     * 
+     * @param annotation
+     *            to be check if exists.
+     * @return true if it will be introduced, false otherwise
+     */
+    public boolean isAnnotationIntroduced(String annotation) {
+        JavaType javaType = new JavaType(annotation);
+        AnnotationMetadata result = MemberFindingUtils
+                .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
 
-  /**
-   * Create @WebFault annotation with @GvNIXWebFault attribute values.
-   * 
-   * @param annotationMetadata to retrieve attributes.
-   * @return WebFault annotation to define.
-   */
-  public AnnotationMetadata getTypeAnnotation(AnnotationMetadata annotationMetadata) {
-
-    JavaType javaType = new JavaType("javax.xml.ws.WebFault");
-
-    if (isAnnotationIntroduced("javax.xml.ws.WebFault")) {
-
-      List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-      StringAttributeValue nameAttributeValue = (StringAttributeValue) annotationMetadata
-          .getAttribute(new JavaSymbolName("name"));
-
-      annotationAttributeValueList.add(nameAttributeValue);
-
-      StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) annotationMetadata
-          .getAttribute(new JavaSymbolName("targetNamespace"));
-
-      annotationAttributeValueList.add(targetNamespaceAttributeValue);
-
-      StringAttributeValue faultBeanAttributeValue = (StringAttributeValue) annotationMetadata
-          .getAttribute(new JavaSymbolName("faultBean"));
-
-      annotationAttributeValueList.add(faultBeanAttributeValue);
-
-      // DiSiD: Use AnnotationMetadataBuilder().build instead of
-      // DefaultAnnotationMetadata
-      // return new DefaultAnnotationMetadata(javaType,
-      // annotationAttributeValueList);
-      return new AnnotationMetadataBuilder(javaType,
-          annotationAttributeValueList).build();
+        return result == null;
     }
 
-    return MemberFindingUtils.getDeclaredTypeAnnotation(governorTypeDetails,
-        javaType);
-
-  }
-
-  /**
-   * Indicates whether the annotation will be introduced via this ITD.
-   * 
-   * @param annotation to be check if exists.
-   * @return true if it will be introduced, false otherwise
-   */
-  public boolean isAnnotationIntroduced(String annotation) {
-    JavaType javaType = new JavaType(annotation);
-    AnnotationMetadata result = MemberFindingUtils.getDeclaredTypeAnnotation(
-        governorTypeDetails, javaType);
-
-    return result == null;
-  }
-
-  /**
-   * Checks correct namespace URI format. Suffix 'http://'.
-   * 
-   * @param namespace string to check as correct namespace.
-   * @return true if has correct URI format.
-   */
-  private boolean checkNamespaceFormat(String namespace) {
-    if (StringUtils.hasText(namespace)) {
-      return StringUtils.startsWithIgnoreCase(namespace, "http://");
+    /**
+     * Checks correct namespace URI format. Suffix 'http://'.
+     * 
+     * @param namespace
+     *            string to check as correct namespace.
+     * @return true if has correct URI format.
+     */
+    private boolean checkNamespaceFormat(String namespace) {
+        if (StringUtils.hasText(namespace)) {
+            return StringUtils.startsWithIgnoreCase(namespace, "http://");
+        }
+        return false;
     }
-    return false;
-  }
 
-  public static String getMetadataIdentiferType() {
-    return EXCEPTION_WEB_FAULT_TYPE;
-  }
+    public static String getMetadataIdentiferType() {
+        return EXCEPTION_WEB_FAULT_TYPE;
+    }
 
-  public static boolean isValid(String metadataIdentificationString) {
-    return PhysicalTypeIdentifierNamingUtils.isValid(
-        EXCEPTION_WEB_FAULT_TYPE_STRING, metadataIdentificationString);
-  }
+    public static boolean isValid(String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.isValid(
+                EXCEPTION_WEB_FAULT_TYPE_STRING, metadataIdentificationString);
+    }
 
-  public static final JavaType getJavaType(String metadataIdentificationString) {
-    return PhysicalTypeIdentifierNamingUtils.getJavaType(
-        EXCEPTION_WEB_FAULT_TYPE_STRING, metadataIdentificationString);
-  }
+    public static final JavaType getJavaType(String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.getJavaType(
+                EXCEPTION_WEB_FAULT_TYPE_STRING, metadataIdentificationString);
+    }
 
-  public static final Path getPath(String metadataIdentificationString) {
-    return PhysicalTypeIdentifierNamingUtils.getPath(
-        EXCEPTION_WEB_FAULT_TYPE_STRING, metadataIdentificationString);
-  }
+    public static final Path getPath(String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.getPath(
+                EXCEPTION_WEB_FAULT_TYPE_STRING, metadataIdentificationString);
+    }
 
-  public static final String createIdentifier(JavaType javaType, Path path) {
-    return PhysicalTypeIdentifierNamingUtils.createIdentifier(
-        EXCEPTION_WEB_FAULT_TYPE_STRING, javaType, path);
-  }
+    public static final String createIdentifier(JavaType javaType, Path path) {
+        return PhysicalTypeIdentifierNamingUtils.createIdentifier(
+                EXCEPTION_WEB_FAULT_TYPE_STRING, javaType, path);
+    }
 
 }

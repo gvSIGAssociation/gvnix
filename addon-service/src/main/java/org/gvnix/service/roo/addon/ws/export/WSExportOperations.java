@@ -27,7 +27,9 @@ import org.springframework.roo.model.JavaType;
 /**
  * Addon for Handle Service Layer
  * 
- * @author Ricardo García at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Ricardo García at <a href="http://www.disid.com">DiSiD Technologies
+ *         S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria
+ *         d'Infraestructures i Transport</a>
  */
 public interface WSExportOperations {
 
@@ -44,9 +46,9 @@ public interface WSExportOperations {
     };
 
     /**
-     * Is service layer web service export command available on Roo console ? 
+     * Is service layer web service export command available on Roo console ?
      * 
-     * @return Service layer web service export command available on Roo console 
+     * @return Service layer web service export command available on Roo console
      */
     boolean isProjectAvailable();
 
@@ -65,7 +67,7 @@ public interface WSExportOperations {
      *            Address to access the service.
      */
     public void exportService(JavaType className, String serviceName,
-	    String portTypeName, String targetNamespace, String addressName);
+            String portTypeName, String targetNamespace, String addressName);
 
     /**
      * Exports an operation to a Web Service Operation.
@@ -91,10 +93,10 @@ public interface WSExportOperations {
      * 
      */
     public void exportOperation(JavaType serviceClass,
-	    JavaSymbolName methodName, String operationName, String resutlName,
-	    String resultNamespace, String responseWrapperName,
-	    String responseWrapperNamespace, String requestWrapperName,
-	    String requestWrapperNamespace);
+            JavaSymbolName methodName, String operationName, String resutlName,
+            String resultNamespace, String responseWrapperName,
+            String responseWrapperNamespace, String requestWrapperName,
+            String requestWrapperNamespace);
 
     /**
      * Creates the list of annotations with the values defined.
@@ -146,7 +148,7 @@ public interface WSExportOperations {
      * @return true if method exists and annotation is not defined.
      */
     public boolean isMethodAvailableToExport(JavaType serviceClass,
-	    JavaSymbolName methodName, String annotationName);
+            JavaSymbolName methodName, String annotationName);
 
     /**
      * Creates the list of annotations for each method input parameter with

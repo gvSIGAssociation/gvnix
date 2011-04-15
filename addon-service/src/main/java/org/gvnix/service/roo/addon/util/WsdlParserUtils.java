@@ -55,13 +55,13 @@ public class WsdlParserUtils {
     /** Compatible SOAP 1.1 and SOAP 1.2 namespaces **/
     public static final String SOAP_11_NAMESPACE = "http://schemas.xmlsoap.org/wsdl/soap/";
     public static final String SOAP_11_NAMESPACE_WITHOUT_SLASH = SOAP_11_NAMESPACE
-	    .substring(0, SOAP_11_NAMESPACE.length() - 1);
+            .substring(0, SOAP_11_NAMESPACE.length() - 1);
     public static final String SOAP_12_NAMESPACE = "http://schemas.xmlsoap.org/wsdl/soap12/";
     public static final String SOAP_12_NAMESPACE_WITHOUT_SLASH = SOAP_12_NAMESPACE
-	    .substring(0, SOAP_12_NAMESPACE.length() - 1);
+            .substring(0, SOAP_12_NAMESPACE.length() - 1);
 
     public static final String XML_NAMESPACE_PREFIX = "xmlns:";
-    
+
     /** Character separators in different strings **/
     public static final String NAMESPACE_SEPARATOR = ":";
     public static final String FILE_SEPARATOR = File.separator;
@@ -69,43 +69,41 @@ public class WsdlParserUtils {
     public static final String PACKAGE_SEPARATOR = ".";
 
     /** Tokens in a namespace that are treated as package name part separators. */
-    public static final char[] pkgSeparators = {'.', ':'};
+    public static final char[] pkgSeparators = { '.', ':' };
 
     /** Field javaPkgSeparator */
     public static final char javaPkgSeparator = pkgSeparators[0];
-    
+
     /**
-     * These are java keywords as specified at the following URL (sorted alphabetically).
-     * http://java.sun.com/docs/books/jls/second_edition/html/lexical.doc.html#229308
-     * Note that false, true, and null are not strictly keywords; they are literal values,
-     * but for the purposes of this array, they can be treated as literals.
-     *    ****** PLEASE KEEP THIS LIST SORTED IN ASCENDING ORDER ******
+     * These are java keywords as specified at the following URL (sorted
+     * alphabetically).
+     * http://java.sun.com/docs/books/jls/second_edition/html/lexical
+     * .doc.html#229308 Note that false, true, and null are not strictly
+     * keywords; they are literal values, but for the purposes of this array,
+     * they can be treated as literals. ****** PLEASE KEEP THIS LIST SORTED IN
+     * ASCENDING ORDER ******
      */
-    public static final String keywords[] =
-    {
-        "abstract",  "assert",       "boolean",    "break",      "byte",      "case",
-        "catch",     "char",         "class",      "const",     "continue",
-        "default",   "do",           "double",     "else",      "extends",
-        "false",     "final",        "finally",    "float",     "for",
-        "goto",      "if",           "implements", "import",    "instanceof",
-        "int",       "interface",    "long",       "native",    "new",
-        "null",      "package",      "private",    "protected", "public",
-        "return",    "short",        "static",     "strictfp",  "super",
-        "switch",    "synchronized", "this",       "throw",     "throws",
-        "transient", "true",         "try",        "void",      "volatile",
-        "while"
-    };
+    public static final String keywords[] = { "abstract", "assert", "boolean",
+            "break", "byte", "case", "catch", "char", "class", "const",
+            "continue", "default", "do", "double", "else", "extends", "false",
+            "final", "finally", "float", "for", "goto", "if", "implements",
+            "import", "instanceof", "int", "interface", "long", "native",
+            "new", "null", "package", "private", "protected", "public",
+            "return", "short", "static", "strictfp", "super", "switch",
+            "synchronized", "this", "throw", "throws", "transient", "true",
+            "try", "void", "volatile", "while" };
 
     /** Collator for comparing the strings */
-    public static final Collator englishCollator = Collator.getInstance(Locale.ENGLISH);
+    public static final Collator englishCollator = Collator
+            .getInstance(Locale.ENGLISH);
 
     /** Use this character as suffix */
     public static final char keywordPrefix = '_';
 
     /** Path to client generated sources (axis and cxf) **/
     public static final String TARGET_GENERATED_SOURCES_PATH = "."
-	    + FILE_SEPARATOR + "target" + FILE_SEPARATOR + "generated-sources"
-	    + FILE_SEPARATOR + "client";
+            + FILE_SEPARATOR + "target" + FILE_SEPARATOR + "generated-sources"
+            + FILE_SEPARATOR + "client";
 
     /** WSDL element names used **/
     public static final String DEFINITIONS_ELEMENT = "definitions";
@@ -124,16 +122,16 @@ public class WsdlParserUtils {
 
     /** WSDL xpaths used **/
     public static final String BINDINGS_XPATH = XPATH_SEPARATOR
-	    + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + BINDING_ELEMENT;
+            + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + BINDING_ELEMENT;
     public static final String PORT_TYPES_XPATH = XPATH_SEPARATOR
-	    + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + PORT_TYPE_ELEMENT;
+            + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + PORT_TYPE_ELEMENT;
     public static final String ADDRESSES_XPATH = XPATH_SEPARATOR
-	    + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + SERVICE_ELEMENT
-	    + XPATH_SEPARATOR + PORT_ELEMENT + XPATH_SEPARATOR
-	    + ADDRESS_ELEMENT;
+            + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + SERVICE_ELEMENT
+            + XPATH_SEPARATOR + PORT_ELEMENT + XPATH_SEPARATOR
+            + ADDRESS_ELEMENT;
     public static final String CHILD_BINDINGS_XPATH = XPATH_SEPARATOR
-	    + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + BINDING_ELEMENT
-	    + XPATH_SEPARATOR + BINDING_ELEMENT;
+            + DEFINITIONS_ELEMENT + XPATH_SEPARATOR + BINDING_ELEMENT
+            + XPATH_SEPARATOR + BINDING_ELEMENT;
 
     /**
      * Constructs a valid java package path from target namespace of root wsdl.
@@ -149,16 +147,17 @@ public class WsdlParserUtils {
      */
     public static String getTargetNamespaceRelatedPackage(Element root) {
 
-	Assert.notNull(root, "Wsdl root element required");
+        Assert.notNull(root, "Wsdl root element required");
 
-	// Get the namespace attribute from root wsdl
-	String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
-	Assert.hasText(namespace, "Namespace has no text");
+        // Get the namespace attribute from root wsdl
+        String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
+        Assert.hasText(namespace, "Namespace has no text");
 
-	String pkg = getTargetNamespaceRelatedPackage(namespace, root).toLowerCase();
-	pkg = pkg.replace('_', 'u');
+        String pkg = getTargetNamespaceRelatedPackage(namespace, root)
+                .toLowerCase();
+        pkg = pkg.replace('_', 'u');
 
-	return pkg.concat(".");
+        return pkg.concat(".");
     }
 
     /**
@@ -175,10 +174,11 @@ public class WsdlParserUtils {
      *            Root element of the wsdl
      * @return Equivalent java package or empty
      */
-    private static String getTargetNamespaceRelatedPackage(String namespace, Element root) {
+    private static String getTargetNamespaceRelatedPackage(String namespace,
+            Element root) {
 
-	return normalizePackageName(makePackageName(namespace),
-		javaPkgSeparator);
+        return normalizePackageName(makePackageName(namespace),
+                javaPkgSeparator);
     }
 
     /**
@@ -190,11 +190,11 @@ public class WsdlParserUtils {
      */
     private static String normalizePackageName(String pkg, char separator) {
 
-	for (int i = 0; i < pkgSeparators.length; i++) {
-	    pkg = pkg.replace(pkgSeparators[i], separator);
-	}
+        for (int i = 0; i < pkgSeparators.length; i++) {
+            pkg = pkg.replace(pkgSeparators[i], separator);
+        }
 
-	return pkg;
+        return pkg;
     }
 
     /**
@@ -205,67 +205,67 @@ public class WsdlParserUtils {
      */
     public static String makePackageName(String namespace) {
 
-	String hostname = null;
-	String path = "";
+        String hostname = null;
+        String path = "";
 
-	// get the target namespace of the document
-	try {
+        // get the target namespace of the document
+        try {
 
-	    URL u = new URL(namespace);
-	    hostname = u.getHost();
-	    path = u.getPath();
+            URL u = new URL(namespace);
+            hostname = u.getHost();
+            path = u.getPath();
 
-	} catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
 
-	    if (namespace.indexOf(":") > -1) {
+            if (namespace.indexOf(":") > -1) {
 
-		hostname = namespace.substring(namespace.indexOf(":") + 1);
-		if (hostname.indexOf("/") > -1) {
+                hostname = namespace.substring(namespace.indexOf(":") + 1);
+                if (hostname.indexOf("/") > -1) {
 
-		    hostname = hostname.substring(0, hostname.indexOf("/"));
-		}
-	    } else {
+                    hostname = hostname.substring(0, hostname.indexOf("/"));
+                }
+            } else {
 
-		hostname = namespace;
-	    }
-	}
+                hostname = namespace;
+            }
+        }
 
-	// if we didn't file a hostname, bail
-	if (hostname == null) {
-	    return null;
-	}
+        // if we didn't file a hostname, bail
+        if (hostname == null) {
+            return null;
+        }
 
-	// convert illegal java identifier
-	hostname = hostname.replace('-', '_');
-	path = path.replace('-', '_');
+        // convert illegal java identifier
+        hostname = hostname.replace('-', '_');
+        path = path.replace('-', '_');
 
-	// chomp off last forward slash in path, if necessary
-	if ((path.length() > 0) && (path.charAt(path.length() - 1) == '/')) {
-	    path = path.substring(0, path.length() - 1);
-	}
+        // chomp off last forward slash in path, if necessary
+        if ((path.length() > 0) && (path.charAt(path.length() - 1) == '/')) {
+            path = path.substring(0, path.length() - 1);
+        }
 
-	// tokenize the hostname and reverse it
-	StringTokenizer st = new StringTokenizer(hostname, ".:");
-	String[] words = new String[st.countTokens()];
+        // tokenize the hostname and reverse it
+        StringTokenizer st = new StringTokenizer(hostname, ".:");
+        String[] words = new String[st.countTokens()];
 
-	for (int i = 0; i < words.length; ++i) {
-	    words[i] = st.nextToken();
-	}
+        for (int i = 0; i < words.length; ++i) {
+            words[i] = st.nextToken();
+        }
 
-	StringBuffer sb = new StringBuffer(namespace.length());
+        StringBuffer sb = new StringBuffer(namespace.length());
 
-	for (int i = words.length - 1; i >= 0; --i) {
-	    addWordToPackageBuffer(sb, words[i], (i == words.length - 1));
-	}
+        for (int i = words.length - 1; i >= 0; --i) {
+            addWordToPackageBuffer(sb, words[i], (i == words.length - 1));
+        }
 
-	// tokenize the path
-	StringTokenizer st2 = new StringTokenizer(path, "/");
+        // tokenize the path
+        StringTokenizer st2 = new StringTokenizer(path, "/");
 
-	while (st2.hasMoreTokens()) {
-	    addWordToPackageBuffer(sb, st2.nextToken(), false);
-	}
+        while (st2.hasMoreTokens()) {
+            addWordToPackageBuffer(sb, st2.nextToken(), false);
+        }
 
-	return sb.toString();
+        return sb.toString();
     }
 
     /**
@@ -284,36 +284,36 @@ public class WsdlParserUtils {
      *            a flag indicating whether this is the first word
      */
     private static void addWordToPackageBuffer(StringBuffer sb, String word,
-	    boolean firstWord) {
+            boolean firstWord) {
 
-	if (isJavaKeyword(word)) {
-	    word = makeNonJavaKeyword(word);
-	}
+        if (isJavaKeyword(word)) {
+            word = makeNonJavaKeyword(word);
+        }
 
-	// separate with dot after the first word
-	if (!firstWord) {
-	    sb.append('.');
-	}
+        // separate with dot after the first word
+        if (!firstWord) {
+            sb.append('.');
+        }
 
-	// prefix digits with underscores
-	if (Character.isDigit(word.charAt(0))) {
-	    sb.append('_');
-	}
+        // prefix digits with underscores
+        if (Character.isDigit(word.charAt(0))) {
+            sb.append('_');
+        }
 
-	// replace periods with underscores
-	if (word.indexOf('.') != -1) {
-	    char[] buf = word.toCharArray();
+        // replace periods with underscores
+        if (word.indexOf('.') != -1) {
+            char[] buf = word.toCharArray();
 
-	    for (int i = 0; i < word.length(); i++) {
-		if (buf[i] == '.') {
-		    buf[i] = '_';
-		}
-	    }
+            for (int i = 0; i < word.length(); i++) {
+                if (buf[i] == '.') {
+                    buf[i] = '_';
+                }
+            }
 
-	    word = new String(buf);
-	}
+            word = new String(buf);
+        }
 
-	sb.append(word);
+        sb.append(word);
     }
 
     /**
@@ -322,7 +322,7 @@ public class WsdlParserUtils {
      * @return boolean true/false
      */
     public static boolean isJavaKeyword(String keyword) {
-	return (Arrays.binarySearch(keywords, keyword, englishCollator) >= 0);
+        return (Arrays.binarySearch(keywords, keyword, englishCollator) >= 0);
     }
 
     /**
@@ -333,7 +333,7 @@ public class WsdlParserUtils {
      * </p>
      */
     public static String makeNonJavaKeyword(String keyword) {
-	return keywordPrefix + keyword;
+        return keywordPrefix + keyword;
     }
 
     /**
@@ -349,45 +349,45 @@ public class WsdlParserUtils {
      */
     public static Element findFirstCompatibleAddress(Element root) {
 
-	Assert.notNull(root, "Wsdl root element required");
+        Assert.notNull(root, "Wsdl root element required");
 
-	// Find all address elements
-	List<Element> addresses = XmlUtils.findElements(ADDRESSES_XPATH, root);
+        // Find all address elements
+        List<Element> addresses = XmlUtils.findElements(ADDRESSES_XPATH, root);
 
-	// Separate on a list the addresses prefix
-	List<String> prefixes = new ArrayList<String>();
-	for (int i = 0; i < addresses.size(); i++) {
+        // Separate on a list the addresses prefix
+        List<String> prefixes = new ArrayList<String>();
+        for (int i = 0; i < addresses.size(); i++) {
 
-	    String nodeName = addresses.get(i).getNodeName();
-	    prefixes.add(i, getNamespace(nodeName));
-	}
+            String nodeName = addresses.get(i).getNodeName();
+            prefixes.add(i, getNamespace(nodeName));
+        }
 
-	// Separate on a list the addresses namespace
-	List<String> namespaces = new ArrayList<String>();
-	for (int i = 0; i < prefixes.size(); i++) {
+        // Separate on a list the addresses namespace
+        List<String> namespaces = new ArrayList<String>();
+        for (int i = 0; i < prefixes.size(); i++) {
 
-	    namespaces.add(i, getNamespaceURI(root, prefixes.get(i)));
-	}
+            namespaces.add(i, getNamespaceURI(root, prefixes.get(i)));
+        }
 
-	// Any namepace is a SOAP namespace with or whitout final slash ?
-	int index;
-	if ((index = namespaces.indexOf(SOAP_12_NAMESPACE)) != -1
-		|| (index = namespaces.indexOf(SOAP_12_NAMESPACE_WITHOUT_SLASH)) != -1) {
+        // Any namepace is a SOAP namespace with or whitout final slash ?
+        int index;
+        if ((index = namespaces.indexOf(SOAP_12_NAMESPACE)) != -1
+                || (index = namespaces.indexOf(SOAP_12_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
-	    // First preference: SOAP 1.2 protocol
+            // First preference: SOAP 1.2 protocol
 
-	} else if ((index = namespaces.indexOf(SOAP_11_NAMESPACE)) != -1
-		|| (index = namespaces.indexOf(SOAP_11_NAMESPACE_WITHOUT_SLASH)) != -1) {
+        } else if ((index = namespaces.indexOf(SOAP_11_NAMESPACE)) != -1
+                || (index = namespaces.indexOf(SOAP_11_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
-	    // Second preference: SOAP 1.1 protocol
+            // Second preference: SOAP 1.1 protocol
 
-	} else {
+        } else {
 
-	    // Other protocols not supported
-	    return null;
-	}
+            // Other protocols not supported
+            return null;
+        }
 
-	return addresses.get(index);
+        return addresses.get(index);
     }
 
     /**
@@ -402,30 +402,30 @@ public class WsdlParserUtils {
      * @return Element found or null if not
      */
     private static Element getReferencedElement(Element root,
-	    List<Element> elements, String reference) {
+            List<Element> elements, String reference) {
 
-	Assert.notNull(root, "Wsdl root element required");
-	Assert.notNull(elements, "Elements list required");
-	Assert.notNull(reference, "Reference required");
+        Assert.notNull(root, "Wsdl root element required");
+        Assert.notNull(elements, "Elements list required");
+        Assert.notNull(reference, "Reference required");
 
-	String prefix = getNamespace(reference);
-	String sufix = getLocalName(reference);
-	String namespace = getNamespaceURI(root, prefix);
+        String prefix = getNamespace(reference);
+        String sufix = getLocalName(reference);
+        String namespace = getNamespaceURI(root, prefix);
 
-	Element element = null;
-	for (Element elementIter : elements) {
+        Element element = null;
+        for (Element elementIter : elements) {
 
-	    String referenceIter = elementIter.getAttribute(NAME_ATTRIBUTE);
-	    String prefixIter = getNamespace(referenceIter);
-	    String sufixIter = getLocalName(referenceIter);
-	    String namespaceIter = getNamespaceURI(root, prefixIter);
-	    if (sufixIter.equals(sufix) && namespaceIter.equals(namespace)) {
+            String referenceIter = elementIter.getAttribute(NAME_ATTRIBUTE);
+            String prefixIter = getNamespace(referenceIter);
+            String sufixIter = getLocalName(referenceIter);
+            String namespaceIter = getNamespaceURI(root, prefixIter);
+            if (sufixIter.equals(sufix) && namespaceIter.equals(namespace)) {
 
-		element = elementIter;
-	    }
-	}
+                element = elementIter;
+            }
+        }
 
-	return element;
+        return element;
     }
 
     /**
@@ -437,24 +437,25 @@ public class WsdlParserUtils {
      *            Communication sense type
      * @return Path to the class
      */
-    public static String getServiceClassPath(Element root, CommunicationSense sense) {
+    public static String getServiceClassPath(Element root,
+            CommunicationSense sense) {
 
-	Assert.notNull(root, "Wsdl root element required");
+        Assert.notNull(root, "Wsdl root element required");
 
-	// Build the classpath related to the namespace
-	String path = getTargetNamespaceRelatedPackage(root);
+        // Build the classpath related to the namespace
+        String path = getTargetNamespaceRelatedPackage(root);
 
-	// Find a compatible service name
-	String name = findFirstCompatibleServiceClassName(root, sense);
+        // Find a compatible service name
+        String name = findFirstCompatibleServiceClassName(root, sense);
 
-	if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
-	    
-	    // Rpc generated service source ends with this string
-	    name = name.concat("Locator");
-	}
-	
-	// Class path is the concat of path and name
-	return path + capitalizeFirstChar(name);
+        if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
+
+            // Rpc generated service source ends with this string
+            name = name.concat("Locator");
+        }
+
+        // Class path is the concat of path and name
+        return path + capitalizeFirstChar(name);
     }
 
     /**
@@ -466,25 +467,27 @@ public class WsdlParserUtils {
      *            Communication sense type
      * @return Path to the class
      */
-    public static String getPortTypeClassPath(Element root, CommunicationSense sense) {
+    public static String getPortTypeClassPath(Element root,
+            CommunicationSense sense) {
 
-	Assert.notNull(root, "Wsdl root element required");
+        Assert.notNull(root, "Wsdl root element required");
 
-	// Build the classpath related to the namespace
-	String path = getTargetNamespaceRelatedPackage(root);
+        // Build the classpath related to the namespace
+        String path = getTargetNamespaceRelatedPackage(root);
 
-	// Find a compatible port type name
-	String name = findFirstCompatiblePortTypeClassName(root, sense);
-	
-	if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense) && name.endsWith("Port")) {
-	 
-	    name = name.concat("_PortType");
-	}
+        // Find a compatible port type name
+        String name = findFirstCompatiblePortTypeClassName(root, sense);
 
-	// Class path is the concat of path and name
-	return path + capitalizeFirstChar(name);
+        if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)
+                && name.endsWith("Port")) {
+
+            name = name.concat("_PortType");
+        }
+
+        // Class path is the concat of path and name
+        return path + capitalizeFirstChar(name);
     }
-    
+
     /**
      * Get the port type Java file
      * 
@@ -494,9 +497,11 @@ public class WsdlParserUtils {
      *            Communication sense type
      * @return Java file
      */
-    public static File getPortTypeJavaFile(Element root, CommunicationSense sense) {
+    public static File getPortTypeJavaFile(Element root,
+            CommunicationSense sense) {
 
-	return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(root, sense)));
+        return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(
+                root, sense)));
     }
 
     /**
@@ -507,23 +512,25 @@ public class WsdlParserUtils {
      * @return Path to the java file
      */
     private static String convertTypePathToJavaPath(String classPath) {
-	
-	Assert.hasText(classPath, "Text in class path required");
 
-	return classPath.replace(PACKAGE_SEPARATOR, FILE_SEPARATOR).concat(".java");
+        Assert.hasText(classPath, "Text in class path required");
+
+        return classPath.replace(PACKAGE_SEPARATOR, FILE_SEPARATOR).concat(
+                ".java");
     }
-    
+
     /**
      * Get the file on path in generated sources folder.
      * 
-     * @param path Searched path
+     * @param path
+     *            Searched path
      * @return File to path
      */
     private static File getGeneratedJavaFile(String path) {
-	
-	Assert.hasText(path, "Text in path required");
 
-	return new File(TARGET_GENERATED_SOURCES_PATH, path);
+        Assert.hasText(path, "Text in path required");
+
+        return new File(TARGET_GENERATED_SOURCES_PATH, path);
     }
 
     /**
@@ -539,13 +546,14 @@ public class WsdlParserUtils {
      *            Communication sense type
      * @return First compatible service class name
      */
-    private static String findFirstCompatibleServiceClassName(Element root, CommunicationSense sense) {
+    private static String findFirstCompatibleServiceClassName(Element root,
+            CommunicationSense sense) {
 
-	String name = findFirstCompatibleServiceElementName(root);
+        String name = findFirstCompatibleServiceElementName(root);
 
-	return convertNameToJavaFormat(name, sense);
+        return convertNameToJavaFormat(name, sense);
     }
-    
+
     /**
      * Find the first compatible service related element name of the root.
      * 
@@ -560,17 +568,17 @@ public class WsdlParserUtils {
      * @return First compatible service class name
      */
     private static String findFirstCompatibleServiceElementName(Element root) {
-	
-	Assert.notNull(root, "Wsdl root element required");
 
-	Element port = findFirstCompatiblePort(root);
+        Assert.notNull(root, "Wsdl root element required");
 
-	// Get the path to the service class defined by the wsdl
-	Element service = ((Element) port.getParentNode());
-	String name = service.getAttribute(NAME_ATTRIBUTE);
-	Assert.hasText(name, "No name attribute in service element");
-	
-	return name;
+        Element port = findFirstCompatiblePort(root);
+
+        // Get the path to the service class defined by the wsdl
+        Element service = ((Element) port.getParentNode());
+        String name = service.getAttribute(NAME_ATTRIBUTE);
+        Assert.hasText(name, "No name attribute in service element");
+
+        return name;
     }
 
     /**
@@ -586,23 +594,24 @@ public class WsdlParserUtils {
      */
     public static Element findFirstCompatiblePort(Element root) {
 
-	Assert.notNull(root, "Wsdl root element required");
+        Assert.notNull(root, "Wsdl root element required");
 
-	// Find a compatible address element
-	Element address = findFirstCompatibleAddress(root);
-	Assert.notNull(address, "No compatible SOAP 1.1 or 1.2 protocol");
+        // Find a compatible address element
+        Element address = findFirstCompatibleAddress(root);
+        Assert.notNull(address, "No compatible SOAP 1.1 or 1.2 protocol");
 
-	// Get the port element defined by the wsdl
-	Element port = ((Element) address.getParentNode());
+        // Get the port element defined by the wsdl
+        Element port = ((Element) address.getParentNode());
 
-	return port;
+        return port;
     }
 
     /**
      * Check port if Supported port element of the root.
      * 
      * <p>
-     * Should exists only one compatible port using SOAP protocol version 1.1 or 1.2.
+     * Should exists only one compatible port using SOAP protocol version 1.1 or
+     * 1.2.
      * </p>
      * 
      * @param root
@@ -627,7 +636,8 @@ public class WsdlParserUtils {
      * Check compatible address element of the root.
      * 
      * <p>
-     * Should exists only one compatible address using SOAP protocol version 1.1 or 1.2.
+     * Should exists only one compatible address using SOAP protocol version 1.1
+     * or 1.2.
      * </p>
      * 
      * @param root
@@ -674,7 +684,9 @@ public class WsdlParserUtils {
                         .indexOf(SOAP_11_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
             if (isSoap12Compatible) {
-                Assert.state(false, "There are defined SOAP 1.1 and 1.2 protocols.\nMust be only one protocol defined.");
+                Assert.state(
+                        false,
+                        "There are defined SOAP 1.1 and 1.2 protocols.\nMust be only one protocol defined.");
             }
 
             isSoap11Compatible = true;
@@ -709,12 +721,14 @@ public class WsdlParserUtils {
      *            Communication sense type
      * @return First compatible port element class name
      */
-    public static String findFirstCompatiblePortClassName(Element root, CommunicationSense sense) {
+    public static String findFirstCompatiblePortClassName(Element root,
+            CommunicationSense sense) {
 
-	Assert.notNull(root, "Wsdl root element required");
+        Assert.notNull(root, "Wsdl root element required");
 
-	// Get the the port element name
-	return convertNameToJavaFormat(findFirstCompatiblePort(root).getAttribute(NAME_ATTRIBUTE), sense);
+        // Get the the port element name
+        return convertNameToJavaFormat(findFirstCompatiblePort(root)
+                .getAttribute(NAME_ATTRIBUTE), sense);
     }
 
     /**
@@ -730,23 +744,24 @@ public class WsdlParserUtils {
      *            Communication sense type
      * @return First compatible port type class name
      */
-    private static String findFirstCompatiblePortTypeClassName(Element root, CommunicationSense sense) {
+    private static String findFirstCompatiblePortTypeClassName(Element root,
+            CommunicationSense sense) {
 
-	Assert.notNull(root, "Wsdl root element required");
+        Assert.notNull(root, "Wsdl root element required");
 
-	Element binding = findFirstCompatibleBinding(root);
+        Element binding = findFirstCompatibleBinding(root);
 
-	// Find all port types elements
-	List<Element> portTypes = XmlUtils.findElements(PORT_TYPES_XPATH, root);
-	Assert.notEmpty(portTypes, "No valid port type format");
-	String portTypeRef = binding.getAttribute(TYPE_ATTRIBUTE);
-	Assert.hasText(portTypeRef, "No type attribute in binding element");
-	Element portType = getReferencedElement(root, portTypes, portTypeRef);
-	Assert.notNull(portType, "No valid port type reference");
-	String portTypeName = portType.getAttribute(NAME_ATTRIBUTE);
-	Assert.hasText(portTypeName, "No name attribute in port type element");
+        // Find all port types elements
+        List<Element> portTypes = XmlUtils.findElements(PORT_TYPES_XPATH, root);
+        Assert.notEmpty(portTypes, "No valid port type format");
+        String portTypeRef = binding.getAttribute(TYPE_ATTRIBUTE);
+        Assert.hasText(portTypeRef, "No type attribute in binding element");
+        Element portType = getReferencedElement(root, portTypes, portTypeRef);
+        Assert.notNull(portType, "No valid port type reference");
+        String portTypeName = portType.getAttribute(NAME_ATTRIBUTE);
+        Assert.hasText(portTypeName, "No name attribute in port type element");
 
-	return convertNameToJavaFormat(portTypeName, sense);
+        return convertNameToJavaFormat(portTypeName, sense);
     }
 
     /**
@@ -762,19 +777,19 @@ public class WsdlParserUtils {
      */
     private static Element findFirstCompatibleBinding(Element root) {
 
-	Assert.notNull(root, "Wsdl root element required");
+        Assert.notNull(root, "Wsdl root element required");
 
-	// Find all binding elements
-	List<Element> bindings = XmlUtils.findElements(BINDINGS_XPATH, root);
-	Assert.notEmpty(bindings, "No valid binding format");
+        // Find all binding elements
+        List<Element> bindings = XmlUtils.findElements(BINDINGS_XPATH, root);
+        Assert.notEmpty(bindings, "No valid binding format");
 
-	Element port = findFirstCompatiblePort(root);
-	String bindingRef = port.getAttribute(BINDING_ATTRIBUTE);
-	Assert.hasText(bindingRef, "No binding attribute in port element");
-	Element binding = getReferencedElement(root, bindings, bindingRef);
-	Assert.notNull(binding, "No valid binding reference");
+        Element port = findFirstCompatiblePort(root);
+        String bindingRef = port.getAttribute(BINDING_ATTRIBUTE);
+        Assert.hasText(bindingRef, "No binding attribute in port element");
+        Element binding = getReferencedElement(root, bindings, bindingRef);
+        Assert.notNull(binding, "No valid binding reference");
 
-	return binding;
+        return binding;
     }
 
     /**
@@ -794,22 +809,22 @@ public class WsdlParserUtils {
      */
     private static String getNamespaceURI(Element root, String namespace) {
 
-	Assert.notNull(root, "Wsdl root element required");
+        Assert.notNull(root, "Wsdl root element required");
 
-	String namespaceURI = null;
+        String namespaceURI = null;
 
-	if (namespace != null && namespace.length() > 0) {
+        if (namespace != null && namespace.length() > 0) {
 
-	    // Get the namespace related to the prefix
-	    namespaceURI = root.getAttribute(XML_NAMESPACE_PREFIX + namespace);
-	}
+            // Get the namespace related to the prefix
+            namespaceURI = root.getAttribute(XML_NAMESPACE_PREFIX + namespace);
+        }
 
-	if (namespaceURI == null) {
+        if (namespaceURI == null) {
 
-	    namespaceURI = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
-	}
+            namespaceURI = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
+        }
 
-	return namespaceURI;
+        return namespaceURI;
     }
 
     /**
@@ -826,19 +841,19 @@ public class WsdlParserUtils {
      */
     protected static String getNamespace(String elementName) {
 
-	Assert.notNull(elementName, "Element name required");
+        Assert.notNull(elementName, "Element name required");
 
-	String prefix = "";
+        String prefix = "";
 
-	// Get the index of the namespace separator char
-	int index = elementName.indexOf(NAMESPACE_SEPARATOR);
-	if (index != -1) {
+        // Get the index of the namespace separator char
+        int index = elementName.indexOf(NAMESPACE_SEPARATOR);
+        if (index != -1) {
 
-	    // Get the prefix
-	    prefix = elementName.substring(0, index);
-	}
+            // Get the prefix
+            prefix = elementName.substring(0, index);
+        }
 
-	return prefix;
+        return prefix;
     }
 
     /**
@@ -855,10 +870,10 @@ public class WsdlParserUtils {
      */
     protected static String getLocalName(String elementName) {
 
-	Assert.notNull(elementName, "Element name required");
+        Assert.notNull(elementName, "Element name required");
 
-	return elementName.replaceFirst(getNamespace(elementName)
-		+ NAMESPACE_SEPARATOR, "");
+        return elementName.replaceFirst(getNamespace(elementName)
+                + NAMESPACE_SEPARATOR, "");
     }
 
     /**
@@ -875,14 +890,14 @@ public class WsdlParserUtils {
      * @return Valid java name
      */
     private static String convertNameToJavaFormat(String name,
-	    CommunicationSense sense) {
+            CommunicationSense sense) {
 
-	if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)) {
+        if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)) {
 
-	    return convertRpcNameToJavaFormat(name);
-	}
+            return convertRpcNameToJavaFormat(name);
+        }
 
-	return convertDocumentNameToJavaFormat(name);
+        return convertDocumentNameToJavaFormat(name);
     }
 
     /**
@@ -891,7 +906,7 @@ public class WsdlParserUtils {
      * <p>
      * Valid chars are letters, numbers and $. '-', '_', ':' and '.' chars are
      * replaced with none. Other chars are replaced by unicode value with format
-     * "_002f". New words in name always will be start by uppercase. 
+     * "_002f". New words in name always will be start by uppercase.
      * </p>
      * 
      * @param name
@@ -900,64 +915,64 @@ public class WsdlParserUtils {
      */
     private static String convertDocumentNameToJavaFormat(String name) {
 
-	Assert.notNull(name, "Name required");
+        Assert.notNull(name, "Name required");
 
-	StringBuffer ostr = new StringBuffer();
+        StringBuffer ostr = new StringBuffer();
 
-	// First character, uppercase
-	boolean upper = true;
-	for (int i = 0; i < name.length(); i++) {
+        // First character, uppercase
+        boolean upper = true;
+        for (int i = 0; i < name.length(); i++) {
 
-	    char ch = name.charAt(i);
+            char ch = name.charAt(i);
 
-	    // Letter, number or $
-	    if ((ch >= 'a') && (ch <= 'z') || (ch >= 'A') && (ch <= 'Z')
-		    || (ch >= '0') && (ch <= '9') || ch == '$') {
+            // Letter, number or $
+            if ((ch >= 'a') && (ch <= 'z') || (ch >= 'A') && (ch <= 'Z')
+                    || (ch >= '0') && (ch <= '9') || ch == '$') {
 
-		if (upper) {
+                if (upper) {
 
-		    ostr.append(Character.toUpperCase(ch));
+                    ostr.append(Character.toUpperCase(ch));
 
-		} else {
+                } else {
 
-		    ostr.append(ch);
-		}
+                    ostr.append(ch);
+                }
 
-		if ((ch >= '0') && (ch <= '9') || ch == '$') {
+                if ((ch >= '0') && (ch <= '9') || ch == '$') {
 
-		    // Next character to number or $ will be uppercase
-		    upper = true;
+                    // Next character to number or $ will be uppercase
+                    upper = true;
 
-		} else {
+                } else {
 
-		    upper = false;
-		}
-	    } else {
+                    upper = false;
+                }
+            } else {
 
-		// Next characters will be replace by none, others to Unicode
-		if (ch != '-' && ch != '_' && ch != ':' && ch != '.') {
+                // Next characters will be replace by none, others to Unicode
+                if (ch != '-' && ch != '_' && ch != ':' && ch != '.') {
 
-		    // Unicode prefix
-		    ostr.append("_");
+                    // Unicode prefix
+                    ostr.append("_");
 
-		    // Unicode value
-		    String hex = Integer.toHexString(name.charAt(i) & 0xFFFF);
-		    for (int j = 0; j < 4 - hex.length(); j++) {
+                    // Unicode value
+                    String hex = Integer.toHexString(name.charAt(i) & 0xFFFF);
+                    for (int j = 0; j < 4 - hex.length(); j++) {
 
-			// Prepend zeros because unicode requires 4 digits
-			ostr.append("0");
-		    }
+                        // Prepend zeros because unicode requires 4 digits
+                        ostr.append("0");
+                    }
 
-		    // Standard unicode format
-		    ostr.append(hex.toLowerCase());
-		}
+                    // Standard unicode format
+                    ostr.append(hex.toLowerCase());
+                }
 
-		// Next character will be uppercase
-		upper = true;
-	    }
-	}
+                // Next character will be uppercase
+                upper = true;
+            }
+        }
 
-	return (new String(ostr));
+        return (new String(ostr));
     }
 
     /**
@@ -969,13 +984,13 @@ public class WsdlParserUtils {
      */
     private static String convertRpcNameToJavaFormat(String name) {
 
-	String java = new String(name);
+        String java = new String(name);
 
-	if (!isJavaId(java)) {
-	    java = xmlNameToJavaClass(name);
-	}
+        if (!isJavaId(java)) {
+            java = xmlNameToJavaClass(name);
+        }
 
-	return java;
+        return java;
     }
 
     /**
@@ -987,15 +1002,15 @@ public class WsdlParserUtils {
      **/
     public static boolean isJavaId(String id) {
 
-	if (id == null || id.equals("") || isJavaKeyword(id))
-	    return false;
-	if (!Character.isJavaIdentifierStart(id.charAt(0)))
-	    return false;
-	for (int i = 1; i < id.length(); i++)
-	    if (!Character.isJavaIdentifierPart(id.charAt(i)))
-		return false;
+        if (id == null || id.equals("") || isJavaKeyword(id))
+            return false;
+        if (!Character.isJavaIdentifierStart(id.charAt(0)))
+            return false;
+        for (int i = 1; i < id.length(); i++)
+            if (!Character.isJavaIdentifierPart(id.charAt(i)))
+                return false;
 
-	return true;
+        return true;
     }
 
     /**
@@ -1006,7 +1021,7 @@ public class WsdlParserUtils {
      */
     public static String xmlNameToJavaClass(String name) {
 
-	return capitalizeFirstChar(xmlNameToJava(name));
+        return capitalizeFirstChar(xmlNameToJava(name));
     }
 
     /**
@@ -1017,19 +1032,19 @@ public class WsdlParserUtils {
      */
     public static String capitalizeFirstChar(String name) {
 
-	if ((name == null) || name.equals("")) {
-	    return name;
-	}
+        if ((name == null) || name.equals("")) {
+            return name;
+        }
 
-	char start = name.charAt(0);
+        char start = name.charAt(0);
 
-	if (Character.isLowerCase(start)) {
-	    start = Character.toUpperCase(start);
+        if (Character.isLowerCase(start)) {
+            start = Character.toUpperCase(start);
 
-	    return start + name.substring(1);
-	}
+            return start + name.substring(1);
+        }
 
-	return name;
+        return name;
     }
 
     /**
@@ -1041,171 +1056,175 @@ public class WsdlParserUtils {
      * @return the java name per JSR 101 specification
      */
     public static String xmlNameToJava(String name) {
-	
-	// protect ourselves from garbage
-	if (name == null || name.equals(""))
-	    return name;
 
-	char[] nameArray = name.toCharArray();
-	int nameLen = name.length();
-	StringBuffer result = new StringBuffer(nameLen);
-	boolean wordStart = false;
+        // protect ourselves from garbage
+        if (name == null || name.equals(""))
+            return name;
 
-	// The mapping indicates to convert first character.
-	int i = 0;
-	while (i < nameLen
-		&& (isPunctuation(nameArray[i]) || !Character
-			.isJavaIdentifierStart(nameArray[i]))) {
-	    i++;
-	}
-	if (i < nameLen) {
-	    // Decapitalization code used to be here, but we use the
-	    // Introspector function now after we filter out all bad chars.
+        char[] nameArray = name.toCharArray();
+        int nameLen = name.length();
+        StringBuffer result = new StringBuffer(nameLen);
+        boolean wordStart = false;
 
-	    result.append(nameArray[i]);
-	    // wordStart = !Character.isLetter(nameArray[i]);
-	    wordStart = !Character.isLetter(nameArray[i])
-		    && nameArray[i] != "_".charAt(0);
-	} else {
-	    // The identifier cannot be mapped strictly according to
-	    // JSR 101
-	    if (Character.isJavaIdentifierPart(nameArray[0])) {
-		result.append("_" + nameArray[0]);
-	    } else {
-		// The XML identifier does not contain any characters
-		// we can map to Java. Using the length of the string
-		// will make it somewhat unique.
-		result.append("_" + nameArray.length);
-	    }
-	}
+        // The mapping indicates to convert first character.
+        int i = 0;
+        while (i < nameLen
+                && (isPunctuation(nameArray[i]) || !Character
+                        .isJavaIdentifierStart(nameArray[i]))) {
+            i++;
+        }
+        if (i < nameLen) {
+            // Decapitalization code used to be here, but we use the
+            // Introspector function now after we filter out all bad chars.
 
-	// The mapping indicates to skip over
-	// all characters that are not letters or
-	// digits. The first letter/digit
-	// following a skipped character is
-	// upper-cased.
-	for (++i; i < nameLen; ++i) {
-	    char c = nameArray[i];
+            result.append(nameArray[i]);
+            // wordStart = !Character.isLetter(nameArray[i]);
+            wordStart = !Character.isLetter(nameArray[i])
+                    && nameArray[i] != "_".charAt(0);
+        } else {
+            // The identifier cannot be mapped strictly according to
+            // JSR 101
+            if (Character.isJavaIdentifierPart(nameArray[0])) {
+                result.append("_" + nameArray[0]);
+            } else {
+                // The XML identifier does not contain any characters
+                // we can map to Java. Using the length of the string
+                // will make it somewhat unique.
+                result.append("_" + nameArray.length);
+            }
+        }
 
-	    // if this is a bad char, skip it and remember to capitalize next
-	    // good character we encounter
-	    if (isPunctuation(c) || !Character.isJavaIdentifierPart(c)) {
-		wordStart = true;
-		continue;
-	    }
-	    if (wordStart && Character.isLowerCase(c)) {
-		result.append(Character.toUpperCase(c));
-	    } else {
-		result.append(c);
-	    }
-	    // If c is not a character, but is a legal Java
-	    // identifier character, capitalize the next character.
-	    // For example: "22hi" becomes "22Hi"
-	    // wordStart = !Character.isLetter(c);
-	    wordStart = !Character.isLetter(c) && c != "_".charAt(0);
-	}
+        // The mapping indicates to skip over
+        // all characters that are not letters or
+        // digits. The first letter/digit
+        // following a skipped character is
+        // upper-cased.
+        for (++i; i < nameLen; ++i) {
+            char c = nameArray[i];
 
-	// covert back to a String
-	String newName = result.toString();
+            // if this is a bad char, skip it and remember to capitalize next
+            // good character we encounter
+            if (isPunctuation(c) || !Character.isJavaIdentifierPart(c)) {
+                wordStart = true;
+                continue;
+            }
+            if (wordStart && Character.isLowerCase(c)) {
+                result.append(Character.toUpperCase(c));
+            } else {
+                result.append(c);
+            }
+            // If c is not a character, but is a legal Java
+            // identifier character, capitalize the next character.
+            // For example: "22hi" becomes "22Hi"
+            // wordStart = !Character.isLetter(c);
+            wordStart = !Character.isLetter(c) && c != "_".charAt(0);
+        }
 
-	// Follow JavaBean rules, but we need to check if the first
-	// letter is uppercase first
-	if (Character.isUpperCase(newName.charAt(0)))
-	    newName = Introspector.decapitalize(newName);
+        // covert back to a String
+        String newName = result.toString();
 
-	// check for Java keywords
-	if (isJavaKeyword(newName))
-	    newName = makeNonJavaKeyword(newName);
+        // Follow JavaBean rules, but we need to check if the first
+        // letter is uppercase first
+        if (Character.isUpperCase(newName.charAt(0)))
+            newName = Introspector.decapitalize(newName);
 
-	return newName;
+        // check for Java keywords
+        if (isJavaKeyword(newName))
+            newName = makeNonJavaKeyword(newName);
+
+        return newName;
     }
 
     /**
      * Is this an XML punctuation character?
      */
     private static boolean isPunctuation(char c) {
-	
-	return '-' == c || '.' == c || ':' == c || '\u00B7' == c
-		|| '\u0387' == c || '\u06DD' == c || '\u06DE' == c;
+
+        return '-' == c || '.' == c || ':' == c || '\u00B7' == c
+                || '\u0387' == c || '\u06DD' == c || '\u06DE' == c;
     }
 
     /**
-     * Is wsdl document root element rpc encoded ?  
+     * Is wsdl document root element rpc encoded ?
      * 
-     * @param root Wsdl document root element
+     * @param root
+     *            Wsdl document root element
      * @return is rpc endoded
      */
     public static boolean isRpcEncoded(Element root) {
 
-	Assert.notNull(root, "Wsdl root element required");
-	
-	// Find binding element
-	Element binding = findFirstCompatibleBinding(root);
+        Assert.notNull(root, "Wsdl root element required");
 
-	// Find all child bindings
-	List<Element> childs = XmlUtils.findElements(CHILD_BINDINGS_XPATH, root);
-	Assert.notEmpty(childs, "No valid child bindings format");
-	
-	// Get child binding related to binding element
-	for (Element child : childs) {
-	    
-	    // Get child parent binding element name
-	    Element parentBinding = ((Element)child.getParentNode());
-	    String name = parentBinding.getAttribute(NAME_ATTRIBUTE);
-	    Assert.hasText(name, "No name attribute in child binding element");
-	    
-	    // If parent binding has the same name as binding
-	    if (name.equals(binding.getAttribute(NAME_ATTRIBUTE))) {
-		
-		// Check RPC style
-		String style = child.getAttribute(STYLE_ATTRIBUTE);
-		Assert.hasText(name, "No style attribute in child binding element");
-		if ("rpc".equalsIgnoreCase(style)) {
-		    
-		    return true;
-		}
-	    }
-	    
-	    /*
-	     * TODO To be completed like next condition for each operation:
-	     * 
-	     *  (bindingStyle = RPC | operationStyle == RPC) & (inputUse = ENCODED | outputUse = ENCODED)
-	     * 
-	     * If any operation match previous condition, then is rpc encoded
-	     */
-	}
-	
-	return false;
+        // Find binding element
+        Element binding = findFirstCompatibleBinding(root);
+
+        // Find all child bindings
+        List<Element> childs = XmlUtils
+                .findElements(CHILD_BINDINGS_XPATH, root);
+        Assert.notEmpty(childs, "No valid child bindings format");
+
+        // Get child binding related to binding element
+        for (Element child : childs) {
+
+            // Get child parent binding element name
+            Element parentBinding = ((Element) child.getParentNode());
+            String name = parentBinding.getAttribute(NAME_ATTRIBUTE);
+            Assert.hasText(name, "No name attribute in child binding element");
+
+            // If parent binding has the same name as binding
+            if (name.equals(binding.getAttribute(NAME_ATTRIBUTE))) {
+
+                // Check RPC style
+                String style = child.getAttribute(STYLE_ATTRIBUTE);
+                Assert.hasText(name,
+                        "No style attribute in child binding element");
+                if ("rpc".equalsIgnoreCase(style)) {
+
+                    return true;
+                }
+            }
+
+            /*
+             * TODO To be completed like next condition for each operation:
+             * 
+             * (bindingStyle = RPC | operationStyle == RPC) & (inputUse =
+             * ENCODED | outputUse = ENCODED)
+             * 
+             * If any operation match previous condition, then is rpc encoded
+             */
+        }
+
+        return false;
     }
 
     /**
      * Check connection and WSDL format from the given url.
      * 
-     * @param url URL to check
+     * @param url
+     *            URL to check
      * @return Wsdl document root element
-     * @exception IllegalStateException wsdl no connection or invalid
+     * @exception IllegalStateException
+     *                wsdl no connection or invalid
      */
     public static Element validateWsdlUrl(String url) {
-      
-      try {
-  	
-        // Parse the wsdl location to a DOM document
-        Document wsdl = XmlUtils.getDocumentBuilder().parse(url);
-        Element root = wsdl.getDocumentElement();
-        Assert.notNull(root, "No valid document format");
-        
-        return root;
-        
-      } catch (SAXException e) {
-      
-          throw new IllegalStateException(
-      	    "The format of the wsdl has errors");
-      
-      } catch (IOException e) {
-      
-          throw new IllegalStateException(
-      	    "There is no access to the wsdl");
-      }
+
+        try {
+
+            // Parse the wsdl location to a DOM document
+            Document wsdl = XmlUtils.getDocumentBuilder().parse(url);
+            Element root = wsdl.getDocumentElement();
+            Assert.notNull(root, "No valid document format");
+
+            return root;
+
+        } catch (SAXException e) {
+
+            throw new IllegalStateException("The format of the wsdl has errors");
+
+        } catch (IOException e) {
+
+            throw new IllegalStateException("There is no access to the wsdl");
+        }
     }
 
 }

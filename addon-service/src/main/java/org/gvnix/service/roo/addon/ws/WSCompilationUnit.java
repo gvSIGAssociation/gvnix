@@ -29,7 +29,10 @@ import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 
 /**
- * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
+ *         Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 public class WSCompilationUnit implements CompilationUnitServices {
 
@@ -37,10 +40,10 @@ public class WSCompilationUnit implements CompilationUnitServices {
     private JavaType enclosingTypeName;
     private List<ImportDeclaration> imports;
     private List<TypeDeclaration> innerTypes;
-    
+
     // DiSiD: Added property and initialited on constructor
     private PhysicalTypeCategory physicalTypeCategory;
-    
+
     /**
      * 
      * @param compilationUnitPackage
@@ -50,7 +53,8 @@ public class WSCompilationUnit implements CompilationUnitServices {
      */
     public WSCompilationUnit(JavaPackage compilationUnitPackage,
             JavaType enclosingTypeName, List<ImportDeclaration> imports,
-            List<TypeDeclaration> innerTypes, PhysicalTypeCategory physicalTypeCategory) {
+            List<TypeDeclaration> innerTypes,
+            PhysicalTypeCategory physicalTypeCategory) {
         super();
         this.compilationUnitPackage = compilationUnitPackage;
         this.enclosingTypeName = enclosingTypeName;
@@ -59,44 +63,64 @@ public class WSCompilationUnit implements CompilationUnitServices {
         this.physicalTypeCategory = physicalTypeCategory;
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.javaparser.CompilationUnitServices#flush()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.roo.classpath.javaparser.CompilationUnitServices#
+     * flush()
      */
     public void flush() {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.javaparser.CompilationUnitServices#getCompilationUnitPackage()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.roo.classpath.javaparser.CompilationUnitServices#
+     * getCompilationUnitPackage()
      */
     public JavaPackage getCompilationUnitPackage() {
         return compilationUnitPackage;
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.javaparser.CompilationUnitServices#getEnclosingTypeName()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.roo.classpath.javaparser.CompilationUnitServices#
+     * getEnclosingTypeName()
      */
     public JavaType getEnclosingTypeName() {
         return enclosingTypeName;
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.javaparser.CompilationUnitServices#getImports()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.roo.classpath.javaparser.CompilationUnitServices#
+     * getImports()
      */
     public List<ImportDeclaration> getImports() {
         return imports;
     }
 
-    /* (non-Javadoc)
-     * @see org.springframework.roo.classpath.javaparser.CompilationUnitServices#getInnerTypes()
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.roo.classpath.javaparser.CompilationUnitServices#
+     * getInnerTypes()
      */
     public List<TypeDeclaration> getInnerTypes() {
         return innerTypes;
     }
 
     public PhysicalTypeCategory getPhysicalTypeCategory() {
-      // DiSiD: Unimplemented and required by CompilationUnitServices 
-      return physicalTypeCategory;
+        // DiSiD: Unimplemented and required by CompilationUnitServices
+        return physicalTypeCategory;
     }
 
 }

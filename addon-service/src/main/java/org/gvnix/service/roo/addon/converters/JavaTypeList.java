@@ -24,26 +24,26 @@ import java.util.List;
 import org.springframework.roo.model.JavaType;
 
 /**
- * @author Ricardo García Fernández at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
+ *         Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  */
 public class JavaTypeList {
 
-  private List<JavaType> javaTypes;
+    private List<JavaType> javaTypes;
 
-  public JavaTypeList() {
-    super();
-    javaTypes = new ArrayList<JavaType>();
-  }
+    public JavaTypeList() {
+        super();
+        javaTypes = new ArrayList<JavaType>();
+    }
 
-  public List<JavaType> getJavaTypes() {
-    return javaTypes;
-  }
+    public List<JavaType> getJavaTypes() {
+        return javaTypes;
+    }
 
-  public void setJavaTypes(List<JavaType> javaTypes) {
-    this.javaTypes = javaTypes;
-  }
+    public void setJavaTypes(List<JavaType> javaTypes) {
+        this.javaTypes = javaTypes;
+    }
 
 }

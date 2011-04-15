@@ -26,41 +26,46 @@ import org.springframework.roo.model.JavaType;
 /**
  * Addon for Handle Service Layer
  * 
- * @author Ricardo García at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ * @author Ricardo García at <a href="http://www.disid.com">DiSiD Technologies
+ *         S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria
+ *         d'Infraestructures i Transport</a>
  */
 public interface ServiceOperations {
 
-  /**
-   * Is service layer command available on Roo console ?
-   * 
-   * @return Service layer command available on Roo console
-   */
-  boolean isProjectAvailable();
+    /**
+     * Is service layer command available on Roo console ?
+     * 
+     * @return Service layer command available on Roo console
+     */
+    boolean isProjectAvailable();
 
-  /**
-   * Create a Service class.
-   * 
-   * @param serviceClass class to be created.
-   */
-  public void createServiceClass(JavaType serviceClass);
+    /**
+     * Create a Service class.
+     * 
+     * @param serviceClass
+     *            class to be created.
+     */
+    public void createServiceClass(JavaType serviceClass);
 
-  /**
-   * Adds an operation to a class.
-   * 
-   * @param operationName Operation Name to be created.
-   * @param returnType Operation java return Type.
-   * @param className Class to insert the operation.
-   * @param paramTypeList List of JavaType for each input parameter.
-   * @param paramNameList List of names for each input parameter.
-   * @param exceptionList List of exceptions that throws the operation.
-   */
-  public void addServiceOperation(JavaSymbolName operationName,
-                                  JavaType returnType, JavaType className,
-                                  List<JavaType> paramTypeList,
-                                  List<String> paramNameList,
-                                  List<JavaType> exceptionList);
+    /**
+     * Adds an operation to a class.
+     * 
+     * @param operationName
+     *            Operation Name to be created.
+     * @param returnType
+     *            Operation java return Type.
+     * @param className
+     *            Class to insert the operation.
+     * @param paramTypeList
+     *            List of JavaType for each input parameter.
+     * @param paramNameList
+     *            List of names for each input parameter.
+     * @param exceptionList
+     *            List of exceptions that throws the operation.
+     */
+    public void addServiceOperation(JavaSymbolName operationName,
+            JavaType returnType, JavaType className,
+            List<JavaType> paramTypeList, List<String> paramNameList,
+            List<JavaType> exceptionList);
 
 }

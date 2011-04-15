@@ -59,321 +59,344 @@ import org.springframework.roo.support.util.StringUtils;
  * affects to Service Contract WSDL.
  * </p>
  * 
- * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
+ *         Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 @Component(immediate = true)
 @Service
 public class WSExportXmlElementMetadataProvider extends
-    AbstractItdMetadataProvider {
+        AbstractItdMetadataProvider {
 
-  @Reference private WSConfigService wSConfigService;
-  @Reference private WSExportValidationService wSExportValidationService;
-  @Reference private AnnotationsService annotationsService;
+    @Reference
+    private WSConfigService wSConfigService;
+    @Reference
+    private WSExportValidationService wSExportValidationService;
+    @Reference
+    private AnnotationsService annotationsService;
 
-  private EntityMetadata entityMetadata;
+    private EntityMetadata entityMetadata;
 
-  private List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
+    private List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
 
-  private List<FieldMetadata> fieldMetadataTransientList = new ArrayList<FieldMetadata>();
+    private List<FieldMetadata> fieldMetadataTransientList = new ArrayList<FieldMetadata>();
 
-  private static Logger logger = Logger
-      .getLogger(WSExportXmlElementMetadataProvider.class.getName());
+    private static Logger logger = Logger
+            .getLogger(WSExportXmlElementMetadataProvider.class.getName());
 
-  protected void activate(ComponentContext context) {
-    // Ensure we're notified of all metadata related to physical Java types,
-    // in particular their initial creation
-    metadataDependencyRegistry.registerDependency(
-        PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-    addMetadataTrigger(new JavaType(GvNIXXmlElement.class.getName()));
-  }
-
-  /*
-   * (non-Javadoc)
-   * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
-   * createLocalIdentifier(org.springframework.roo.model.JavaType,
-   * org.springframework.roo.project.Path)
-   */
-  protected String createLocalIdentifier(JavaType javaType, Path path) {
-    return WSExportXmlElementMetadata.createIdentifier(javaType, path);
-  }
-
-  /*
-   * (non-Javadoc)
-   * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
-   * getGovernorPhysicalTypeIdentifier(java.lang.String)
-   */
-  protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
-    JavaType javaType = WSExportXmlElementMetadata
-        .getJavaType(metadataIdentificationString);
-    Path path = WSExportXmlElementMetadata
-        .getPath(metadataIdentificationString);
-    String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(
-        javaType, path);
-    return physicalTypeIdentifier;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getMetadata
-   * (java.lang.String, org.springframework.roo.model.JavaType,
-   * org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
-   */
-  protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString,
-                                                            JavaType aspectName,
-                                                            PhysicalTypeMetadata governorPhysicalTypeMetadata,
-                                                            String itdFilename) {
-
-    WSExportXmlElementMetadata wSExportXmlElementMetadata = null;
-
-    if (wSConfigService.isProjectWebAvailable()) {
-
-      // Install configuration to export services if it's not installed.
-      wSConfigService.install(CommunicationSense.EXPORT);
-      // Installs jax2ws plugin in project.
-      wSConfigService.installJaxwsBuildPlugin();
-      // Add GvNixAnnotations to the project.
-      annotationsService.addGvNIXAnnotationsDependency();
-
-      // We know governor type details are non-null and can be safely cast
-
-      // Work out the MIDs of the other metadata we depend on
-      JavaType javaType = WSExportXmlElementMetadata
-          .getJavaType(metadataIdentificationString);
-      Path path = WSExportXmlElementMetadata
-          .getPath(metadataIdentificationString);
-      String entityMetadataKey = EntityMetadata
-          .createIdentifier(javaType, path);
-
-      // Check if Web Service definition is correct.
-      // DiSiD: Use getMemberHoldingTypeDetails instead of
-      // getPhysicalTypeDetails
-      // PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
-      // .getPhysicalTypeDetails();
-      PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
-          .getMemberHoldingTypeDetails();
-
-      ClassOrInterfaceTypeDetails governorTypeDetails;
-      if (physicalTypeDetails == null
-          || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
-        // There is a problem
-        return null;
-      }
-      else {
-        // We have reliable physical type details
-        governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
-      }
-
-      // Reset entityMetadata.
-      entityMetadata = null;
-      // We need to lookup the metadata we depend on
-      MetadataItem item = metadataService.get(entityMetadataKey);
-      if (item != null) {
-        entityMetadata = (EntityMetadata) item;
-      }
-
-      // We need to be informed if our dependent metadata changes
-      metadataDependencyRegistry.registerDependency(entityMetadataKey,
-          metadataIdentificationString);
-
-      // Redefine field lists.
-      fieldMetadataElementList = new ArrayList<FieldMetadata>();
-      fieldMetadataTransientList = new ArrayList<FieldMetadata>();
-
-      AnnotationMetadata gvNixXmlElementAnnotationMetadata = MemberFindingUtils
-          .getTypeAnnotation(governorTypeDetails, new JavaType(
-              GvNIXXmlElement.class.getName()));
-
-      // Field @XmlElement and @XmlTransient annotations lists.
-      setTransientAndElementFields(governorTypeDetails,
-          gvNixXmlElementAnnotationMetadata);
-
-      // Create metaData with field list values.
-      wSExportXmlElementMetadata = new WSExportXmlElementMetadata(
-          metadataIdentificationString, aspectName,
-          governorPhysicalTypeMetadata, entityMetadata,
-          fieldMetadataElementList, fieldMetadataTransientList);
-
+    protected void activate(ComponentContext context) {
+        // Ensure we're notified of all metadata related to physical Java types,
+        // in particular their initial creation
+        metadataDependencyRegistry.registerDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        addMetadataTrigger(new JavaType(GvNIXXmlElement.class.getName()));
     }
 
-    return wSExportXmlElementMetadata;
-  }
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
+     * createLocalIdentifier(org.springframework.roo.model.JavaType,
+     * org.springframework.roo.project.Path)
+     */
+    protected String createLocalIdentifier(JavaType javaType, Path path) {
+        return WSExportXmlElementMetadata.createIdentifier(javaType, path);
+    }
 
-  /**
-   * Check correct format for annotation attribute values and define which
-   * fields will be exported in XSD schema.
-   * <p>
-   * Fields defined in 'elementList' annotation attribute will be exported.
-   * </p>
-   * 
-   * @param governorTypeDetails class to get fields to check.
-   * @param gvNixXmlElementAnnotationMetadata to check element values.
-   * @return {@link List} of annotated {@link FieldMetadata}.
-   */
-  private void setTransientAndElementFields(ClassOrInterfaceTypeDetails governorTypeDetails,
-                                            AnnotationMetadata gvNixXmlElementAnnotationMetadata) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
+     * getGovernorPhysicalTypeIdentifier(java.lang.String)
+     */
+    protected String getGovernorPhysicalTypeIdentifier(
+            String metadataIdentificationString) {
+        JavaType javaType = WSExportXmlElementMetadata
+                .getJavaType(metadataIdentificationString);
+        Path path = WSExportXmlElementMetadata
+                .getPath(metadataIdentificationString);
+        String physicalTypeIdentifier = PhysicalTypeIdentifier
+                .createIdentifier(javaType, path);
+        return physicalTypeIdentifier;
+    }
 
-    if (governorTypeDetails.getPhysicalTypeCategory().equals(
-        PhysicalTypeCategory.CLASS)) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.roo.classpath.itd.AbstractItdMetadataProvider#getMetadata
+     * (java.lang.String, org.springframework.roo.model.JavaType,
+     * org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
+     */
+    protected ItdTypeDetailsProvidingMetadataItem getMetadata(
+            String metadataIdentificationString, JavaType aspectName,
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            String itdFilename) {
 
-      AnnotationAttributeValue<?> tmpAttribute;
+        WSExportXmlElementMetadata wSExportXmlElementMetadata = null;
 
-      StringAttributeValue nameStringAtrributeValue = null;
-      StringAttributeValue xmlTypeNameStringAtrributeValue = null;
+        if (wSConfigService.isProjectWebAvailable()) {
 
-      BooleanAttributeValue exportedAttributeValue;
+            // Install configuration to export services if it's not installed.
+            wSConfigService.install(CommunicationSense.EXPORT);
+            // Installs jax2ws plugin in project.
+            wSConfigService.installJaxwsBuildPlugin();
+            // Add GvNixAnnotations to the project.
+            annotationsService.addGvNIXAnnotationsDependency();
 
-      tmpAttribute = gvNixXmlElementAnnotationMetadata
-          .getAttribute(new JavaSymbolName("exported"));
+            // We know governor type details are non-null and can be safely cast
 
-      Assert.isTrue(tmpAttribute != null,
-          "Attribute 'exported' in annotation @GvNIXXmlElement defined in class '"
-              + governorTypeDetails.getName().getFullyQualifiedTypeName()
-              + "' has to be defined to export in XSD schema in WSDL.");
+            // Work out the MIDs of the other metadata we depend on
+            JavaType javaType = WSExportXmlElementMetadata
+                    .getJavaType(metadataIdentificationString);
+            Path path = WSExportXmlElementMetadata
+                    .getPath(metadataIdentificationString);
+            String entityMetadataKey = EntityMetadata.createIdentifier(
+                    javaType, path);
 
-      exportedAttributeValue = (BooleanAttributeValue) tmpAttribute;
+            // Check if Web Service definition is correct.
+            // DiSiD: Use getMemberHoldingTypeDetails instead of
+            // getPhysicalTypeDetails
+            // PhysicalTypeDetails physicalTypeDetails =
+            // governorPhysicalTypeMetadata
+            // .getPhysicalTypeDetails();
+            PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
+                    .getMemberHoldingTypeDetails();
 
-      tmpAttribute = gvNixXmlElementAnnotationMetadata
-          .getAttribute(new JavaSymbolName("name"));
-
-      if (tmpAttribute != null) {
-        nameStringAtrributeValue = (StringAttributeValue) tmpAttribute;
-      }
-
-      tmpAttribute = gvNixXmlElementAnnotationMetadata
-          .getAttribute(new JavaSymbolName("xmlTypeName"));
-      if (tmpAttribute != null) {
-        xmlTypeNameStringAtrributeValue = (StringAttributeValue) tmpAttribute;
-      }
-
-      if (!exportedAttributeValue.getValue()) {
-        Assert
-            .isTrue(
-                (nameStringAtrributeValue != null && StringUtils
-                    .hasText(nameStringAtrributeValue.getValue()))
-                    || (xmlTypeNameStringAtrributeValue != null && StringUtils
-                        .hasText(xmlTypeNameStringAtrributeValue.getValue())),
-                "Attribute 'name' or 'xmlTypeName' in annotation @GvNIXXmlElement defined in class '"
-                    + governorTypeDetails.getName().getFullyQualifiedTypeName()
-                    + "' has to be defined to export in XSD schema in WSDL.");
-      }
-
-      // resultNamespace
-      StringAttributeValue namespaceStringAttributeValue;
-
-      tmpAttribute = (StringAttributeValue) gvNixXmlElementAnnotationMetadata
-          .getAttribute(new JavaSymbolName("namespace"));
-
-      Assert.isTrue(
-          tmpAttribute != null
-              && StringUtils.hasText(((StringAttributeValue) tmpAttribute)
-                  .getValue()),
-          "Attribute 'namespace' in annotation @GvNIXXmlElement defined in class '"
-              + governorTypeDetails.getName().getFullyQualifiedTypeName()
-              + "' has to be defined to export in XSD schema in WSDL.");
-
-      namespaceStringAttributeValue = (StringAttributeValue) tmpAttribute;
-
-      Assert
-          .isTrue(
-              wSExportValidationService
-                  .checkNamespaceFormat(namespaceStringAttributeValue
-                      .getValue()),
-              "Attribute 'namespace' in annotation @GvNIXXmlElement defined in class '"
-                  + governorTypeDetails.getName().getFullyQualifiedTypeName()
-                  + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
-
-      // Retrieve Array attribute element
-      ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue = (ArrayAttributeValue) gvNixXmlElementAnnotationMetadata
-          .getAttribute(new JavaSymbolName("elementList"));
-
-      Assert
-          .isTrue(
-              elementListArrayAttributeValue != null,
-              "Attribute 'elementList' in '@GvNIXXmlElement' annotation must be defined.\nArray with field names of '"
-                  + governorTypeDetails.getName().getFullyQualifiedTypeName()
-                  + "' to be used in Web Service operation.\nIf you don't want to publish any fields set the attribute value: 'elementList = {\"\"}'");
-
-      List<StringAttributeValue> elementListStringValue = elementListArrayAttributeValue
-          .getValue();
-
-      List<FieldMetadata> declaredFieldList = new ArrayList<FieldMetadata>();
-
-      // Fields from Entity MetaData.
-      if (entityMetadata != null && entityMetadata.isValid()) {
-        declaredFieldList.add(entityMetadata.getIdentifierField());
-        declaredFieldList.add(entityMetadata.getVersionField());
-      }
-      // Check duplicated fields.
-      for (FieldMetadata fieldMetadata : governorTypeDetails
-          .getDeclaredFields()) {
-
-        if (!declaredFieldList.contains(fieldMetadata)) {
-          declaredFieldList.add(fieldMetadata);
-        }
-      }
-
-      boolean containsValue;
-      // Check fields from collection.
-      for (FieldMetadata fieldMetadata : declaredFieldList) {
-
-        containsValue = false;
-
-        for (StringAttributeValue value : elementListStringValue) {
-
-          containsValue = value.getValue().contains(
-              fieldMetadata.getFieldName().getSymbolName());
-
-          if (containsValue) {
-
-            if (!exportedAttributeValue.getValue()) {
-
-              Assert
-                  .isTrue(
-                      wSExportValidationService.isJavaTypeAllowed(
-                          fieldMetadata.getFieldType(),
-                          MethodParameterType.XMLENTITY,
-                          governorTypeDetails.getName()),
-                      "The '"
-                          + MethodParameterType.XMLENTITY
-                          + "' type '"
-                          + fieldMetadata.getFieldType()
-                              .getFullyQualifiedTypeName()
-                          + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed Object defined in: '"
-                          + governorTypeDetails.getName()
-                              .getFullyQualifiedTypeName() + "'.");
+            ClassOrInterfaceTypeDetails governorTypeDetails;
+            if (physicalTypeDetails == null
+                    || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+                // There is a problem
+                return null;
+            } else {
+                // We have reliable physical type details
+                governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
             }
 
-            fieldMetadataElementList.add(fieldMetadata);
-            break;
+            // Reset entityMetadata.
+            entityMetadata = null;
+            // We need to lookup the metadata we depend on
+            MetadataItem item = metadataService.get(entityMetadataKey);
+            if (item != null) {
+                entityMetadata = (EntityMetadata) item;
+            }
 
-          }
+            // We need to be informed if our dependent metadata changes
+            metadataDependencyRegistry.registerDependency(entityMetadataKey,
+                    metadataIdentificationString);
+
+            // Redefine field lists.
+            fieldMetadataElementList = new ArrayList<FieldMetadata>();
+            fieldMetadataTransientList = new ArrayList<FieldMetadata>();
+
+            AnnotationMetadata gvNixXmlElementAnnotationMetadata = MemberFindingUtils
+                    .getTypeAnnotation(governorTypeDetails, new JavaType(
+                            GvNIXXmlElement.class.getName()));
+
+            // Field @XmlElement and @XmlTransient annotations lists.
+            setTransientAndElementFields(governorTypeDetails,
+                    gvNixXmlElementAnnotationMetadata);
+
+            // Create metaData with field list values.
+            wSExportXmlElementMetadata = new WSExportXmlElementMetadata(
+                    metadataIdentificationString, aspectName,
+                    governorPhysicalTypeMetadata, entityMetadata,
+                    fieldMetadataElementList, fieldMetadataTransientList);
+
         }
 
-        if (!containsValue) {
-          fieldMetadataTransientList.add(fieldMetadata);
+        return wSExportXmlElementMetadata;
+    }
+
+    /**
+     * Check correct format for annotation attribute values and define which
+     * fields will be exported in XSD schema.
+     * <p>
+     * Fields defined in 'elementList' annotation attribute will be exported.
+     * </p>
+     * 
+     * @param governorTypeDetails
+     *            class to get fields to check.
+     * @param gvNixXmlElementAnnotationMetadata
+     *            to check element values.
+     * @return {@link List} of annotated {@link FieldMetadata}.
+     */
+    private void setTransientAndElementFields(
+            ClassOrInterfaceTypeDetails governorTypeDetails,
+            AnnotationMetadata gvNixXmlElementAnnotationMetadata) {
+
+        if (governorTypeDetails.getPhysicalTypeCategory().equals(
+                PhysicalTypeCategory.CLASS)) {
+
+            AnnotationAttributeValue<?> tmpAttribute;
+
+            StringAttributeValue nameStringAtrributeValue = null;
+            StringAttributeValue xmlTypeNameStringAtrributeValue = null;
+
+            BooleanAttributeValue exportedAttributeValue;
+
+            tmpAttribute = gvNixXmlElementAnnotationMetadata
+                    .getAttribute(new JavaSymbolName("exported"));
+
+            Assert.isTrue(
+                    tmpAttribute != null,
+                    "Attribute 'exported' in annotation @GvNIXXmlElement defined in class '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' has to be defined to export in XSD schema in WSDL.");
+
+            exportedAttributeValue = (BooleanAttributeValue) tmpAttribute;
+
+            tmpAttribute = gvNixXmlElementAnnotationMetadata
+                    .getAttribute(new JavaSymbolName("name"));
+
+            if (tmpAttribute != null) {
+                nameStringAtrributeValue = (StringAttributeValue) tmpAttribute;
+            }
+
+            tmpAttribute = gvNixXmlElementAnnotationMetadata
+                    .getAttribute(new JavaSymbolName("xmlTypeName"));
+            if (tmpAttribute != null) {
+                xmlTypeNameStringAtrributeValue = (StringAttributeValue) tmpAttribute;
+            }
+
+            if (!exportedAttributeValue.getValue()) {
+                Assert.isTrue(
+                        (nameStringAtrributeValue != null && StringUtils
+                                .hasText(nameStringAtrributeValue.getValue()))
+                                || (xmlTypeNameStringAtrributeValue != null && StringUtils
+                                        .hasText(xmlTypeNameStringAtrributeValue
+                                                .getValue())),
+                        "Attribute 'name' or 'xmlTypeName' in annotation @GvNIXXmlElement defined in class '"
+                                + governorTypeDetails.getName()
+                                        .getFullyQualifiedTypeName()
+                                + "' has to be defined to export in XSD schema in WSDL.");
+            }
+
+            // resultNamespace
+            StringAttributeValue namespaceStringAttributeValue;
+
+            tmpAttribute = (StringAttributeValue) gvNixXmlElementAnnotationMetadata
+                    .getAttribute(new JavaSymbolName("namespace"));
+
+            Assert.isTrue(
+                    tmpAttribute != null
+                            && StringUtils
+                                    .hasText(((StringAttributeValue) tmpAttribute)
+                                            .getValue()),
+                    "Attribute 'namespace' in annotation @GvNIXXmlElement defined in class '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' has to be defined to export in XSD schema in WSDL.");
+
+            namespaceStringAttributeValue = (StringAttributeValue) tmpAttribute;
+
+            Assert.isTrue(
+                    wSExportValidationService
+                            .checkNamespaceFormat(namespaceStringAttributeValue
+                                    .getValue()),
+                    "Attribute 'namespace' in annotation @GvNIXXmlElement defined in class '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+
+            // Retrieve Array attribute element
+            ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue = (ArrayAttributeValue) gvNixXmlElementAnnotationMetadata
+                    .getAttribute(new JavaSymbolName("elementList"));
+
+            Assert.isTrue(
+                    elementListArrayAttributeValue != null,
+                    "Attribute 'elementList' in '@GvNIXXmlElement' annotation must be defined.\nArray with field names of '"
+                            + governorTypeDetails.getName()
+                                    .getFullyQualifiedTypeName()
+                            + "' to be used in Web Service operation.\nIf you don't want to publish any fields set the attribute value: 'elementList = {\"\"}'");
+
+            List<StringAttributeValue> elementListStringValue = elementListArrayAttributeValue
+                    .getValue();
+
+            List<FieldMetadata> declaredFieldList = new ArrayList<FieldMetadata>();
+
+            // Fields from Entity MetaData.
+            if (entityMetadata != null && entityMetadata.isValid()) {
+                declaredFieldList.add(entityMetadata.getIdentifierField());
+                declaredFieldList.add(entityMetadata.getVersionField());
+            }
+            // Check duplicated fields.
+            for (FieldMetadata fieldMetadata : governorTypeDetails
+                    .getDeclaredFields()) {
+
+                if (!declaredFieldList.contains(fieldMetadata)) {
+                    declaredFieldList.add(fieldMetadata);
+                }
+            }
+
+            boolean containsValue;
+            // Check fields from collection.
+            for (FieldMetadata fieldMetadata : declaredFieldList) {
+
+                containsValue = false;
+
+                for (StringAttributeValue value : elementListStringValue) {
+
+                    containsValue = value.getValue().contains(
+                            fieldMetadata.getFieldName().getSymbolName());
+
+                    if (containsValue) {
+
+                        if (!exportedAttributeValue.getValue()) {
+
+                            Assert.isTrue(
+                                    wSExportValidationService.isJavaTypeAllowed(
+                                            fieldMetadata.getFieldType(),
+                                            MethodParameterType.XMLENTITY,
+                                            governorTypeDetails.getName()),
+                                    "The '"
+                                            + MethodParameterType.XMLENTITY
+                                            + "' type '"
+                                            + fieldMetadata
+                                                    .getFieldType()
+                                                    .getFullyQualifiedTypeName()
+                                            + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed Object defined in: '"
+                                            + governorTypeDetails
+                                                    .getName()
+                                                    .getFullyQualifiedTypeName()
+                                            + "'.");
+                        }
+
+                        fieldMetadataElementList.add(fieldMetadata);
+                        break;
+
+                    }
+                }
+
+                if (!containsValue) {
+                    fieldMetadataTransientList.add(fieldMetadata);
+                }
+            }
+
         }
-      }
 
     }
 
-  }
+    /*
+     * (non-Javadoc)
+     * 
+     * @seeorg.springframework.roo.classpath.itd.ItdMetadataProvider#
+     * getItdUniquenessFilenameSuffix()
+     */
+    public String getItdUniquenessFilenameSuffix() {
+        return "GvNix_XmlElement";
+    }
 
-  /*
-   * (non-Javadoc)
-   * @seeorg.springframework.roo.classpath.itd.ItdMetadataProvider#
-   * getItdUniquenessFilenameSuffix()
-   */
-  public String getItdUniquenessFilenameSuffix() {
-    return "GvNix_XmlElement";
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
-   */
-  public String getProvidesType() {
-    return WSExportXmlElementMetadata.getMetadataIdentiferType();
-  }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
+     */
+    public String getProvidesType() {
+        return WSExportXmlElementMetadata.getMetadataIdentiferType();
+    }
 
 }

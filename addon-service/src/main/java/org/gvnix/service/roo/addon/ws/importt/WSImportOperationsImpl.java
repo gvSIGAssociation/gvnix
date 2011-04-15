@@ -51,83 +51,90 @@ import org.w3c.dom.Element;
 @Service
 public class WSImportOperationsImpl implements WSImportOperations {
 
-    private static Logger logger = Logger
-	    .getLogger(WSImportOperations.class.getName());
+    private static Logger logger = Logger.getLogger(WSImportOperations.class
+            .getName());
 
-    @Reference private FileManager fileManager;
-    @Reference private ProjectOperations projectOperations;
-    @Reference private JavaParserService javaParserService;
-    @Reference private AnnotationsService annotationsService;
-    @Reference private WSConfigService wSConfigService;
-    @Reference private TypeLocationService typeLocationService;
-    
-//    @Reference
-//    private ClasspathOperations classpathOperations;
-    
-    
-  /*
-   * (non-Javadoc)
-   * @see org.gvnix.service.roo.addon.ws.importt.WSImportOperations
-   * isProjectAvailable()
-   */
-  public boolean isProjectAvailable() {
-    return wSConfigService.isProjectAvailable();
-  }
+    @Reference
+    private FileManager fileManager;
+    @Reference
+    private ProjectOperations projectOperations;
+    @Reference
+    private JavaParserService javaParserService;
+    @Reference
+    private AnnotationsService annotationsService;
+    @Reference
+    private WSConfigService wSConfigService;
+    @Reference
+    private TypeLocationService typeLocationService;
 
-  /**
-   * {@inheritDoc}
-   * <p>
-   * If the class to add annotation doesn't exist it will be created
-   * automatically in 'src/main/java' directory inside the package defined.
-   * </p>
-   */
-  public void addImportAnnotation(JavaType serviceClass, String wsdlLocation) {
+    // @Reference
+    // private ClasspathOperations classpathOperations;
 
-    // Check URL connection and WSDL format
-    WsdlParserUtils.validateWsdlUrl(wsdlLocation);
-      
-    // Service class path
-    String fileLocation = projectOperations.getPathResolver().getIdentifier(
-        Path.SRC_MAIN_JAVA,
-        serviceClass.getFullyQualifiedTypeName().replace('.', '/')
-            .concat(".java"));
-
-    // If class not exists, create it
-    if (!fileManager.exists(fileLocation)) {
-
-      // Create service class with Service Annotation.
-      javaParserService.createServiceClass(serviceClass);
-      logger.log(
-          Level.FINE,
-          "New service class created: "
-              + serviceClass.getFullyQualifiedTypeName());
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.gvnix.service.roo.addon.ws.importt.WSImportOperations
+     * isProjectAvailable()
+     */
+    public boolean isProjectAvailable() {
+        return wSConfigService.isProjectAvailable();
     }
 
-    // Check if import annotation is already defined
-    // DiSiD: Use typeLocationService instead of classpathOperations
-    // if (javaParserService.isAnnotationIntroduced(GvNIXWebServiceProxy.class
-    // .getName(), classpathOperations
-    // .getClassOrInterface(serviceClass))) {
-    if (javaParserService.isAnnotationIntroduced(
-        GvNIXWebServiceProxy.class.getName(),
-        typeLocationService.getClassOrInterface(serviceClass))) {
+    /**
+     * {@inheritDoc}
+     * <p>
+     * If the class to add annotation doesn't exist it will be created
+     * automatically in 'src/main/java' directory inside the package defined.
+     * </p>
+     */
+    public void addImportAnnotation(JavaType serviceClass, String wsdlLocation) {
 
-      logger
-          .log(Level.WARNING, "Provided class is already importing a service");
+        // Check URL connection and WSDL format
+        WsdlParserUtils.validateWsdlUrl(wsdlLocation);
+
+        // Service class path
+        String fileLocation = projectOperations.getPathResolver()
+                .getIdentifier(
+                        Path.SRC_MAIN_JAVA,
+                        serviceClass.getFullyQualifiedTypeName()
+                                .replace('.', '/').concat(".java"));
+
+        // If class not exists, create it
+        if (!fileManager.exists(fileLocation)) {
+
+            // Create service class with Service Annotation.
+            javaParserService.createServiceClass(serviceClass);
+            logger.log(
+                    Level.FINE,
+                    "New service class created: "
+                            + serviceClass.getFullyQualifiedTypeName());
+        }
+
+        // Check if import annotation is already defined
+        // DiSiD: Use typeLocationService instead of classpathOperations
+        // if
+        // (javaParserService.isAnnotationIntroduced(GvNIXWebServiceProxy.class
+        // .getName(), classpathOperations
+        // .getClassOrInterface(serviceClass))) {
+        if (javaParserService.isAnnotationIntroduced(
+                GvNIXWebServiceProxy.class.getName(),
+                typeLocationService.getClassOrInterface(serviceClass))) {
+
+            logger.log(Level.WARNING,
+                    "Provided class is already importing a service");
+        } else {
+
+            // Add the import definition annotation and attributes to the class
+            List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
+            annotationAttributeValues.add(new StringAttributeValue(
+                    new JavaSymbolName("wsdlLocation"), wsdlLocation));
+            annotationsService.addJavaTypeAnnotation(serviceClass,
+                    GvNIXWebServiceProxy.class.getName(),
+                    annotationAttributeValues, false);
+
+            // Add GvNixAnnotations to the project.
+            annotationsService.addGvNIXAnnotationsDependency();
+        }
     }
-    else {
-
-      // Add the import definition annotation and attributes to the class
-      List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
-      annotationAttributeValues.add(new StringAttributeValue(
-          new JavaSymbolName("wsdlLocation"), wsdlLocation));
-      annotationsService.addJavaTypeAnnotation(serviceClass,
-          GvNIXWebServiceProxy.class.getName(), annotationAttributeValues,
-          false);
-
-      // Add GvNixAnnotations to the project.
-      annotationsService.addGvNIXAnnotationsDependency();
-    }
-  }
 
 }

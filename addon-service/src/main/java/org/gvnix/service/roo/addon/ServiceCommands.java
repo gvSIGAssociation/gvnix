@@ -38,10 +38,9 @@ import org.springframework.roo.support.logging.HandlerUtils;
 /**
  * Addon for Handle Service Layer
  * 
- * @author Ricardo García at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
+ * @author Ricardo García at <a href="http://www.disid.com">DiSiD Technologies
+ *         S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria
+ *         d'Infraestructures i Transport</a>
  */
 @Component
 @Service
@@ -50,12 +49,16 @@ public class ServiceCommands implements CommandMarker {
     private static final Logger logger = HandlerUtils
             .getLogger(SimpleParser.class);
 
-    @Reference private ServiceOperations serviceOperations;
-    @Reference private WSExportOperations wSExportOperations;
-    @Reference private WSImportOperations wSImportOperations;
-    @Reference private WSExportWsdlOperations wSExportWsdlOperations;
+    @Reference
+    private ServiceOperations serviceOperations;
+    @Reference
+    private WSExportOperations wSExportOperations;
+    @Reference
+    private WSImportOperations wSImportOperations;
+    @Reference
+    private WSExportWsdlOperations wSExportWsdlOperations;
 
-    @CliAvailabilityIndicator( { "service class", "service operation" })
+    @CliAvailabilityIndicator({ "service class", "service operation" })
     public boolean isCreateServiceClassAvailable() {
 
         return serviceOperations.isProjectAvailable();
@@ -101,10 +104,9 @@ public class ServiceCommands implements CommandMarker {
             paramNameArray = StringUtils
                     .commaDelimitedListToStringArray(paramNames);
 
-            Assert
-                    .isTrue(
-                            paramTypesList.getJavaTypes().size() == paramNameArray.length,
-                            "The method parameter types must have the same number of parameter names to create the method.");
+            Assert.isTrue(
+                    paramTypesList.getJavaTypes().size() == paramNameArray.length,
+                    "The method parameter types must have the same number of parameter names to create the method.");
 
             for (int i = 0; i <= paramNameArray.length - 1; i++) {
 
@@ -144,19 +146,18 @@ public class ServiceCommands implements CommandMarker {
 
         wSExportOperations.exportService(serviceClass, serviceName,
                 portTypeName, targetNamespace, addressName);
-        logger
-                .warning("** IMPORTANT: Use 'service export operation' command (without the quotes) to publish service operations **"
-                        .concat(System.getProperty("line.separator")));
+        logger.warning("** IMPORTANT: Use 'service export operation' command (without the quotes) to publish service operations **"
+                .concat(System.getProperty("line.separator")));
 
     }
 
-    @CliAvailabilityIndicator( "service export operation" )
+    @CliAvailabilityIndicator("service export operation")
     public boolean isServiceExportOperationAvailable() {
 
         return wSExportOperations.isProjectAvailable();
     }
 
-    @CliAvailabilityIndicator( "service list operation")
+    @CliAvailabilityIndicator("service list operation")
     public boolean isServiceListOperationAvailable() {
 
         return wSExportOperations.isProjectAvailable();
@@ -204,30 +205,27 @@ public class ServiceCommands implements CommandMarker {
             @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.service.test.gvnix.org/'. It must have URI format.") String requestWrapperNamespace) {
 
         if (StringUtils.hasText(resultNamespace)) {
-            Assert
-                    .isTrue(StringUtils.startsWithIgnoreCase(resultNamespace,
-                            "http://"),
-                            "Name space for WebResult is not correctly defined. It must have URI format.");
+            Assert.isTrue(StringUtils.startsWithIgnoreCase(resultNamespace,
+                    "http://"),
+                    "Name space for WebResult is not correctly defined. It must have URI format.");
         }
 
         if (StringUtils.hasText(requestWrapperNamespace)) {
-            Assert
-                    .isTrue(
-                            StringUtils.startsWithIgnoreCase(
-                                    requestWrapperNamespace, "http://"),
-                            "Name space for RequestWrapper is not correctly defined. It must have URI format.");
+            Assert.isTrue(
+                    StringUtils.startsWithIgnoreCase(requestWrapperNamespace,
+                            "http://"),
+                    "Name space for RequestWrapper is not correctly defined. It must have URI format.");
         }
 
         if (StringUtils.hasText(responseWrapperNamespace)) {
-            Assert
-                    .isTrue(
-                            StringUtils.startsWithIgnoreCase(
-                                    responseWrapperNamespace, "http://"),
-                            "Name space for ResponsetWrapper is not correctly defined. It must have URI format.");
+            Assert.isTrue(
+                    StringUtils.startsWithIgnoreCase(responseWrapperNamespace,
+                            "http://"),
+                    "Name space for ResponsetWrapper is not correctly defined. It must have URI format.");
         }
 
-        wSExportOperations.exportOperation(serviceClass,
-                methodName, operationName, resultName, resultNamespace,
+        wSExportOperations.exportOperation(serviceClass, methodName,
+                operationName, resultName, resultNamespace,
                 responseWrapperName, responseWrapperNamespace,
                 requestWrapperName, requestWrapperNamespace);
     }

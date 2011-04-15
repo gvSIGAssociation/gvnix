@@ -36,7 +36,7 @@ public @interface GvNIXWebServiceProxy {
 
     // The WSDL location is required
     String wsdlLocation();
-    
+
     // TODO Si el servicio tiene varios port types, ¿ a cual accedemos ?
 
 }
