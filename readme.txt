@@ -61,32 +61,30 @@ Run gvNIX dev
 
     bash:~/gvnix/trunk/code/roo$ mvn clean install
     
-   Roo is only necessary to compile the first time.
-   Only recompile if Roo source code change.
+   Roo is only necessary to be installed the first time.
+   Only reinstall it if Roo source code change.
 
 #. Build gvNIX::
 
     bash:~/gvnix/trunk/code$ mvn clean install
+    
+   From now, you will need to reinstall only each modified module instead of reinstall all gvNIX again::
+   
+    bash:~/gvnix/trunk/code/module$ mvn clean install
 
-#. Get started with gvNIX
+#. Add gvNIX ``bin`` directory to PATH::
 
-   * Add gvNIX ``bin`` directory to PATH::
+    bash:~/gvnix/trunk/code$ PATH=$PWD/bin:$PATH
+    
+   It is recommended that you add this information to your .bashrc script.
 
-      bash:~/gvnix/trunk/code$ PATH=$PWD/bin:$PATH
+#. Execute gvNIX shell in your java project::
+
+    bash:~/project$ gvnix-dev
       
-     It is recommended that you add this information to you .bashrc script.
-
-   * Change to your Java project directory::
-
-      bash:~/gvnix/trunk/code$ cd ~/project-directory
-
-   * Execute gvNIX shell::
-
-      bash:~/project-directory$ gvnix-dev
-      
-     Or execute gvNIX shell on debug mode::
+   Or execute gvNIX shell on debug mode in your java project::
      
-      bash:~/project-directory$ gvnix-dev-debug
+    bash:~/project$ gvnix-dev-debug
 
 .. admonition:: Important
 
@@ -284,3 +282,10 @@ TODO
 
 * Currently, clients are required to create a MutableFile instance to read an XML file to convert to a DOM Document.
   FileManager and XmlUtils will be enhanced to do the work itself reducing the need for so much code in callers.
+
+* Replace hard coded gvNIX version with var:
+
+   roo/shell/src/main/java/org/springframework/roo/shell/AbstractShell.java
+
+* Validate bin/ scripts.
+  ¿ Replace GVNIX_HOME and ROO_HOME vars with GVNIX_DEV and ROO_DEV ?
