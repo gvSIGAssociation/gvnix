@@ -746,6 +746,8 @@ Execute next command on a empty folder to validate add-on:
 
   bash:~/project$ gvnix-dev script --file src/test/resources/gvnix-test.roo
 
+Check roo exited with code 0, else error.
+
 TODO
 ====
 
@@ -766,3 +768,9 @@ TODO
  * Sería una buena idea generar una clase de Test para el cliente en el proyecto para así asegurarnos de que funciona siguiendo la metodología de ROO para generar clases de Test con respecto a la BBDD.
 
 * Al final del comando de export sería interesante mostrar un mensaje en la consola de Roo indicando la ruta HTTP en la que ha quedado publicado el servicio.
+
+* Al final del comando de import o en la doc de referencia, sería interesante añadir alguna información sobre el uso de @Autowired.
+
+* Error http://projects.disid.com/issues/4991
+
+* Error http://projects.disid.com/issues/5009
