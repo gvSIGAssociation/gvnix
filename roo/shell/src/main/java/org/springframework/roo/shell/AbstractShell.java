@@ -363,8 +363,8 @@ public abstract class AbstractShell extends AbstractShellStatusPublisher impleme
     	sb.append("    ____  ____  ____  ").append(System.getProperty("line.separator")); 
 		sb.append("   / __ \\/ __ \\/ __ \\ ").append(System.getProperty("line.separator"));
 		sb.append("  / /_/ / / / / / / / ").append(System.getProperty("line.separator"));
-		sb.append(" / _, _/ /_/ / /_/ /  ").append(System.getProperty("line.separator"));
-		sb.append("/_/ |_|\\____/\\____/   ").append(" ").append(versionInfo()).append(System.getProperty("line.separator"));
+		sb.append(" / _, _/ /_/ / /_/ /  ").append(" ").append(versionInfo()).append(System.getProperty("line.separator"));
+		sb.append("/_/ |_|\\____/\\____/   ").append("gvNIX distribution 0.7.0-SNAPSHOT").append(System.getProperty("line.separator"));
 		sb.append(System.getProperty("line.separator"));
 		
 		return sb.toString();
