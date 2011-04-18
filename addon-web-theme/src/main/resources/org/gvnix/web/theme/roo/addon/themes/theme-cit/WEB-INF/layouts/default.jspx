@@ -81,7 +81,7 @@
 
         <c:if test="${pageContext['request'].userPrincipal != null}">
           <span>
-            <spring:url var="logout" value="/resources/j_spring_security_logout" />
+            <spring:url var="logout" value="/static/j_spring_security_logout" />
             <a href="${logout}" title="${go_home_msg}">
               <img src="${close_button}" align="center" class="close" 
                 alt="${go_home_msg}"/>
