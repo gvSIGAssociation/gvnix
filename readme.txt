@@ -48,11 +48,14 @@ Git
 ---
 
 Be aware that Roo source code is commited on gvNIX project at ``roo`` folder.
-However, Roo source code can be managed with Git commands like:
+However, Roo source code can be updated to a new tag with next commands:
 
-* Update:        git pull 
-* List tags:     git tag -l
-* Change to tag: git checkout {version}
+* Update git info:				git pull
+* List available tags:			git tag -l
+* Store our Roo modifications:	git stash
+* Change to new tag:			git checkout {version}
+* Apply our Roo modifications:	git stash pop
+* Save in SVN:					svn commit
 
 Run gvNIX dev
 =============
