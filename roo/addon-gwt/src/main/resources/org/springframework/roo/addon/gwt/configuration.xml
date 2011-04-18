@@ -83,7 +83,11 @@
 			</plugin>
 		</plugins>
 		<gae-dependencies>
-
+			<dependency>
+				<groupId>com.google.appengine</groupId>
+				<artifactId>appengine-api-1.0-sdk</artifactId>
+				<version>1.4.0</version>
+			</dependency>
 		</gae-dependencies>
 		<!-- Note redundant gwt-maven-plugin config above -->
 		<gae-plugins>

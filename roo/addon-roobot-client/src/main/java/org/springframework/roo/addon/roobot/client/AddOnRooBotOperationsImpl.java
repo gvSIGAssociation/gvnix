@@ -67,6 +67,34 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	private final Class<AddOnRooBotOperationsImpl> mutex = AddOnRooBotOperationsImpl.class;
 	private Preferences prefs;
+	private List<String> noUpgradeBsnList = Arrays.asList(
+			"org.springframework.uaa.client", 
+			"org.springframework.roo.url.stream.jdk", 
+			"org.springframework.roo.url.stream",
+			"org.springframework.roo.file.monitor",
+			"org.springframework.roo.file.monitor.polling",
+			"org.springframework.roo.file.monitor.polling.roo",
+			"org.springframework.roo.bootstrap",
+			"org.springframework.roo.classpath",
+			"org.springframework.roo.classpath.javaparser",
+			"org.springframework.roo.deployment.support",
+			"org.springframework.roo.felix",
+			"org.springframework.roo.file.undo",
+			"org.springframework.roo.metadata",
+			"org.springframework.roo.model",
+			"org.springframework.roo.osgi.bundle",
+			"org.springframework.roo.osgi.roo.bundle",
+			"org.springframework.roo.process.manager",
+			"org.springframework.roo.project",
+			"org.springframework.roo.root",
+			"org.springframework.roo.shell",
+			"org.springframework.roo.shell.jline",
+			"org.springframework.roo.shell.jline.osgi",
+			"org.springframework.roo.shell.osgi",
+			"org.springframework.roo.startlevel",
+			"org.springframework.roo.support",
+			"org.springframework.roo.support.osgi",
+			"org.springframework.roo.uaa");
 	
 	public static final String ADDON_UPGRADE_STABILITY_LEVEL = "ADDON_UPGRADE_STABILITY_LEVEL";
 	
@@ -126,14 +154,14 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 			sb.append(" [available versions: ");
 			for (BundleVersion version: BundleVersion.orderByVersion(new ArrayList<BundleVersion>(bundle.getVersions()))) {
 				sb.append(version.getVersion()).append(", ");
-			};
+			}
 			sb.delete(sb.length() - 2, sb.length()).append("]");
 		}
 		logInfo("Name", bundleVersion.getPresentationName());
 		logInfo("BSN", bundle.getSymbolicName());
 		logInfo("Version", sb.toString());
 		logInfo("Roo Version", bundleVersion.getRooVersion());
-		logInfo("Ranking", new Float(bundle.getRanking()).toString());
+		logInfo("Ranking", Float.toString(bundle.getRanking()));
 		logInfo("JAR Size", bundleVersion.getSize() + " bytes");
 		logInfo("PGP Signature", bundleVersion.getPgpKey() + " signed by " + bundleVersion.getPgpDescriptions());
 		logInfo("OBR URL", bundleVersion.getObrUrl());
@@ -181,14 +209,16 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 	}
 	
 	private void installAddon(BundleVersion bundleVersion, String bsn) {
-		if (installOrUpgradeAddOn(bundleVersion, bsn, true).equals(InstallOrUpgradeStatus.SUCCESS)) {
+		InstallOrUpgradeStatus status = installOrUpgradeAddOn(bundleVersion, bsn, true);
+		if (status.equals(InstallOrUpgradeStatus.SUCCESS)) {
 			log.info("Successfully installed add-on: " + bundleVersion.getPresentationName() + " [version: " + bundleVersion.getVersion() + "]");
 			log.warning("[Hint] Please consider rating this add-on with the following command:");
 			log.warning("[Hint] addon feedback bundle --bundleSymbolicName " + bsn.substring(0, bsn.indexOf(";") != -1 ? bsn.indexOf(";") : bsn.length()) + " --rating ... --comment \"...\"");
+		} else if (status.equals(InstallOrUpgradeStatus.SHELL_RESTART_NEEDED)){
+			log.warning("You have upgraded a Roo core addon. To complete this installation please restart the Roo shell.");
 		} else {
 			log.warning("Unable to install add-on: " + bundleVersion.getPresentationName() + " [version: " + bundleVersion.getVersion() + "]");
 		}
-		
 	}
 
 	private InstallOrUpgradeStatus installOrUpgradeAddOn(BundleVersion bundleVersion, String bsn, boolean install) {
@@ -206,6 +236,9 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 		}
 		if (!shell.executeCommand("osgi obr start --bundleSymbolicName " + bsn)) {
 			success = false;
+		}
+		if (shell == null) { // workaround for ROO-2190
+			return InstallOrUpgradeStatus.SHELL_RESTART_NEEDED;
 		}
 		if (!shell.executeCommand("osgi obr url remove --url " + bundleVersion.getObrUrl())) {
 			success = false;
@@ -238,7 +271,7 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 		}
 	}
 	
-	public Integer searchAddOns(boolean showFeedback, String searchTerms, boolean refresh, int linesPerResult, int maxResults, boolean trustedOnly, boolean compatibleOnly, String requiresCommand) {
+	public Integer searchAddOns(boolean showFeedback, String searchTerms, boolean refresh, int linesPerResult, int maxResults, boolean trustedOnly, boolean compatibleOnly, boolean communityOnly, String requiresCommand) {
 		synchronized (mutex) {
 			if (maxResults > 99) {
 				maxResults = 99;
@@ -274,7 +307,7 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 					}
 				}
 				List<Bundle> bundles = Bundle.orderBySearchRelevance(new ArrayList<Bundle>(bundleCache.values()));
-				LinkedList<Bundle> filteredSearchResults = filterList(bundles, trustedOnly, compatibleOnly, requiresCommand, onlyRelevantBundles);
+				LinkedList<Bundle> filteredSearchResults = filterList(bundles, trustedOnly, compatibleOnly, communityOnly, requiresCommand, onlyRelevantBundles);
 				if (showFeedback) {
 					printResultList(filteredSearchResults, maxResults, linesPerResult);
 				}
@@ -290,7 +323,7 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 		}
 	}
 
-	public void listAddOns(boolean refresh, int linesPerResult, int maxResults, boolean trustedOnly, boolean compatibleOnly, String requiresCommand) {
+	public void listAddOns(boolean refresh, int linesPerResult, int maxResults, boolean trustedOnly, boolean compatibleOnly, boolean communityOnly, String requiresCommand) {
 		synchronized (mutex) {
 			if (bundleCache.size() == 0) {
 				// We should refresh regardless in this case
@@ -301,7 +334,7 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 			}
 			if (bundleCache.size() != 0) {
 				List<Bundle> bundles = Bundle.orderByRanking(new ArrayList<Bundle>(bundleCache.values()));
-				LinkedList<Bundle> filteredList = filterList(bundles, trustedOnly, compatibleOnly, requiresCommand, false);
+				LinkedList<Bundle> filteredList = filterList(bundles, trustedOnly, compatibleOnly, communityOnly, requiresCommand, false);
 				printResultList(filteredList, maxResults, linesPerResult);
 			} else {
 				log.info("No add-ons known. Are you online? Try the 'download status' command");
@@ -311,7 +344,7 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 	
 	public void upgradesAvailable(AddOnStabilityLevel addonStabilityLevel) {
 		synchronized (mutex) {
-			addonStabilityLevel = addonStabilityLevel == null ? AddOnStabilityLevel.ANY : addonStabilityLevel;
+			addonStabilityLevel = checkAddOnStabilityLevel(addonStabilityLevel);
 			Map<String, Bundle> bundles = getUpgradableBundles(addonStabilityLevel);
 			if (bundles.size() > 0) {
 				log.info("The following add-ons / components are available for upgrade for level: " + addonStabilityLevel.name());
@@ -428,7 +461,7 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 		}
 	}
 	
-	private LinkedList<Bundle> filterList(List<Bundle> bundles, boolean trustedOnly, boolean compatibleOnly, String requiresCommand, boolean onlyRelevantBundles) {
+	private LinkedList<Bundle> filterList(List<Bundle> bundles, boolean trustedOnly, boolean compatibleOnly, boolean communityOnly, String requiresCommand, boolean onlyRelevantBundles) {
 		LinkedList<Bundle> filteredList = new LinkedList<Bundle>();
 		List<PGPPublicKeyRing> keys = null;
 		if (trustedOnly) {
@@ -442,6 +475,9 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 			if (trustedOnly && !isTrustedKey(keys, latest.getPgpKey())) {
 				continue bundle_loop;
 			} 
+			if (communityOnly && latest.getObrUrl().equals("http://spring-roo-repository.springsource.org/repository.xml")) {
+				continue bundle_loop;
+			}
 			if (compatibleOnly && !isCompatible(latest.getRooVersion())) {
 				continue bundle_loop;
 			}
@@ -570,12 +606,15 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 				bundleCache.clear();
 				for (Element bundleElement : XmlUtils.findElements("/roobot/bundles/bundle", roobotXml.getDocumentElement())) {
 					String bsn = bundleElement.getAttribute("bsn");
+					if (noUpgradeBsnList.contains(bsn)) {
+						// List only add-ons which are not core (see ROO-2190)
+						continue; 
+					}
 					List<Comment> comments = new LinkedList<Comment>();
 					for (Element commentElement: XmlUtils.findElements("comments/comment", bundleElement)) {
 						comments.add(new Comment(Rating.fromInt(new Integer(commentElement.getAttribute("rating"))), commentElement.getAttribute("comment"), dateFormat.parse(commentElement.getAttribute("date"))));
 					}
-					Bundle bundle = new Bundle(bundleElement.getAttribute("bsn"), new Float(bundleElement.getAttribute("uaa-ranking")).floatValue(), comments);
-						
+					Bundle bundle = new Bundle(bundleElement.getAttribute("bsn"), new Float(bundleElement.getAttribute("uaa-ranking")), comments);
 					for (Element versionElement: XmlUtils.findElements("versions/version", bundleElement)) {
 						if (bsn != null && bsn.length() > 0 && versionElement != null) {
 							String signedBy = "";
@@ -613,7 +652,6 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 									rooVersion = split[0] + "." + split[1];
 								}
 							}
-							
 							BundleVersion version = new BundleVersion(versionElement.getAttribute("url"), versionElement.getAttribute("obr-url"), versionBuilder.toString(), versionElement.getAttribute("name"), new Long(versionElement.getAttribute("size")).longValue(), versionElement.getAttribute("description"), pgpKey, signedBy, rooVersion, commands);
 							// For security reasons we ONLY accept httppgp:// add-on versions
 							if (!version.getUri().startsWith("httppgp://")) {
@@ -767,7 +805,7 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 					String exisingBundleVersion = ebv.toString().trim();
 					if (isCompatible(b.getLatestVersion().getRooVersion()) 
 							&& rooBotBundleVersion.compareToIgnoreCase(exisingBundleVersion) > 0 
-							&& asl.getLevel() >= AddOnStabilityLevel.getAddOnStabilityLevel(exisingBundleVersion)) {
+							&& asl.getLevel() > AddOnStabilityLevel.getAddOnStabilityLevel(exisingBundleVersion)) {
 						bundles.put(b.getSymbolicName() + ";" + exisingBundleVersion, b);
 					}
 				}
@@ -796,6 +834,6 @@ public class AddOnRooBotOperationsImpl implements AddOnRooBotOperations {
 	}
 	
 	private enum InstallOrUpgradeStatus {
-		SUCCESS, FAILED, INVALID_OBR_URL, PGP_VERIFICATION_NEEDED
+		SUCCESS, FAILED, INVALID_OBR_URL, PGP_VERIFICATION_NEEDED, SHELL_RESTART_NEEDED;
 	}
 }

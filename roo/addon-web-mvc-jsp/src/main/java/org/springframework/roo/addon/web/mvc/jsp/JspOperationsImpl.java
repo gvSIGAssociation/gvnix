@@ -83,9 +83,17 @@ public class JspOperationsImpl implements JspOperations {
 	protected void activate(ComponentContext context) {
 		this.context = context;
 	}
+	
+	public boolean isControllerAvailable() {
+		return fileManager.exists(projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml"));
+	}
 
-	public boolean isProjectAvailable() {
+	private boolean isProjectAvailable() {
 		return projectOperations.isProjectAvailable();
+	}
+	
+	public boolean isSetupAvailable() {
+		return isProjectAvailable() && !isControllerAvailable();
 	}
 
 	public boolean isInstallLanguageCommandAvailable() {
@@ -94,6 +102,11 @@ public class JspOperationsImpl implements JspOperations {
 
 	public void installCommonViewArtefacts() {
 		Assert.isTrue(isProjectAvailable(), "Project metadata required");
+		
+		if (!isControllerAvailable()) {
+			webMvcOperations.installAllWebMvcArtifacts();
+		}
+		
 		PathResolver pathResolver = projectOperations.getPathResolver();
 
 		// Install tiles config
@@ -132,7 +145,7 @@ public class JspOperationsImpl implements JspOperations {
 				fileManager.createFile(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/i18n/application.properties"));
 				propFileOperations.addPropertyIfNotExists(Path.SRC_MAIN_WEBAPP, "/WEB-INF/i18n/application.properties", "application_name", projectName.substring(0, 1).toUpperCase() + projectName.substring(1), true);
 			} catch (Exception e) {
-				new IllegalStateException("Encountered an error during copying of resources for MVC JSP addon.", e);
+				throw new IllegalStateException("Encountered an error during copying of resources for MVC JSP addon.", e);
 			}
 		}
 	}
@@ -156,9 +169,8 @@ public class JspOperationsImpl implements JspOperations {
 			try {
 				document = XmlUtils.getDocumentBuilder().parse(TemplateUtils.getTemplate(getClass(), "index-template.jspx"));
 				XmlUtils.findRequiredElement("/div/message", document.getDocumentElement()).setAttribute("code", "label" + path.replace("/", "_") + "_" + lcViewName);
-				XmlUtils.findRequiredElement("/div/page", document.getDocumentElement()).setAttribute("id", path.replace("/", "_") + "_" + lcViewName);
 			} catch (Exception e) {
-				new IllegalStateException("Encountered an error during copying of resources for controller class.", e);
+				throw new IllegalStateException("Encountered an error during copying of resources for controller class.", e);
 			}
 		}
 		XmlUtils.writeXml(fileManager.createFile(projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views" + path + "/" + lcViewName + ".jspx")).getOutputStream(), document);
@@ -178,7 +190,6 @@ public class JspOperationsImpl implements JspOperations {
 		PathResolver pathResolver = projectOperations.getPathResolver();
 		
 		if (!fileManager.exists(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/layouts/default.jspx"))) {
-			webMvcOperations.installAllWebMvcArtifacts();
 			installCommonViewArtefacts();
 		}
 		String lcViewName = viewName.getSymbolName().toLowerCase();
@@ -418,7 +429,7 @@ public class JspOperationsImpl implements JspOperations {
 				try {
 					FileCopyUtils.copy(url.openStream(), fileManager.createFile(targetDirectory + fileName).getOutputStream());
 				} catch (IOException e) {
-					new IllegalStateException("Encountered an error during copying of resources for MVC JSP addon.", e);
+					throw new IllegalStateException("Encountered an error during copying of resources for MVC JSP addon.", e);
 				}
 			}
 		}
@@ -434,13 +445,6 @@ public class JspOperationsImpl implements JspOperations {
 
 		String targetDirectory = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "");
 		
-//country locale parts currently not supported due to default lowercasing of all files in Roo shell
-		
-//		String country = "";
-//		if (i18n.getLocale().getCountry() != null && i18n.getLocale().getCountry().length() > 0) {
-//			country = "_" + i18n.getLocale().getCountry().toUpperCase();
-//		}
-		
 		// Install message bundle
 		String messageBundle = targetDirectory + "/WEB-INF/i18n/messages_" + i18n.getLocale().getLanguage() /*+ country*/ + ".properties";
 		// Special case for english locale (default)
@@ -451,7 +455,7 @@ public class JspOperationsImpl implements JspOperations {
 			try {
 				FileCopyUtils.copy(i18n.getMessageBundle(), fileManager.createFile(messageBundle).getOutputStream());
 			} catch (IOException e) {
-				new IllegalStateException("Encountered an error during copying of message bundle MVC JSP addon.", e);
+				throw new IllegalStateException("Encountered an error during copying of message bundle MVC JSP addon.", e);
 			}
 		}
 
@@ -461,7 +465,7 @@ public class JspOperationsImpl implements JspOperations {
 			try {
 				FileCopyUtils.copy(i18n.getFlagGraphic(), fileManager.createFile(flagGraphic).getOutputStream());
 			} catch (IOException e) {
-				new IllegalStateException("Encountered an error during copying of flag graphic for MVC JSP addon.", e);
+				throw new IllegalStateException("Encountered an error during copying of flag graphic for MVC JSP addon.", e);
 			}
 		}
 
@@ -481,10 +485,8 @@ public class JspOperationsImpl implements JspOperations {
 			throw new IllegalStateException(e);
 		}
 
-//		if (null == XmlUtils.findFirstElement("//span[@id='language']/language[@locale='" + i18n.getLocale().toString() + "']", footer.getDocumentElement())) {
 		if (null == XmlUtils.findFirstElement("//span[@id='language']/language[@locale='" + i18n.getLocale().getLanguage() + "']", footer.getDocumentElement())) {
 			Element span = XmlUtils.findRequiredElement("//span[@id='language']", footer.getDocumentElement());
-//			span.appendChild(new XmlElementBuilder("util:language", footer).addAttribute("locale", i18n.getLocale().toString()).addAttribute("label", i18n.getLanguage()).build());
 			span.appendChild(new XmlElementBuilder("util:language", footer).addAttribute("locale", i18n.getLocale().getLanguage()).addAttribute("label", i18n.getLanguage()).build());
 			XmlUtils.writeXml(footerFile.getOutputStream(), footer);
 		}

@@ -11,7 +11,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperationsImpl;
@@ -203,7 +203,7 @@ public final class SolrJspMetadataListener implements MetadataProvider, Metadata
 			try {
 				original = XmlUtils.getDocumentBuilder().parse(fileManager.getInputStream(jspFilename));
 			} catch (Exception e) {
-				new IllegalStateException("Could not parse file: " + jspFilename);
+				throw new IllegalStateException("Could not parse file: " + jspFilename);
 			} 
 			Assert.notNull(original, "Unable to parse " + jspFilename);
 			if (XmlRoundTripUtils.compareDocuments(original, proposed)) {

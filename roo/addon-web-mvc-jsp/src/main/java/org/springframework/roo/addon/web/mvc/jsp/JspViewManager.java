@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 
@@ -15,6 +14,7 @@ import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDe
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
@@ -95,6 +95,14 @@ public class JspViewManager {
 		for (FieldMetadata field : fields) {
 			if (++fieldCounter < 7) {
 				Element columnElement = new XmlElementBuilder("table:column", document).addAttribute("id", XmlUtils.convertId("c:" + formbackingType.getFullyQualifiedTypeName() + "." + field.getFieldName().getSymbolName())).addAttribute("property", uncapitalize(field.getFieldName().getSymbolName())).build();
+				String fieldName = uncapitalize(field.getFieldName().getSymbolName());
+				if (field.getFieldType().equals(new JavaType(Date.class.getName()))) {
+					columnElement.setAttribute("date", "true");
+					columnElement.setAttribute("dateTimePattern", "${" + entityName + "_" + fieldName.toLowerCase() + "_date_format}");
+				} else if (field.getFieldType().equals(new JavaType(Calendar.class.getName()))) {
+					columnElement.setAttribute("calendar", "true");
+					columnElement.setAttribute("dateTimePattern", "${" + entityName + "_" + fieldName.toLowerCase() + "_date_format}");
+				}
 				columnElement.setAttribute("z", XmlRoundTripUtils.calculateUniqueKeyFor(columnElement));
 				fieldTable.appendChild(columnElement);
 			}
@@ -156,33 +164,39 @@ public class JspViewManager {
 	public Document getCreateDocument() {
 		DocumentBuilder builder = XmlUtils.getDocumentBuilder();
 		Document document = builder.newDocument();
-
+		
 		// Add document namespaces
 		Element div = (Element) document.appendChild(new XmlElementBuilder("div", document).addAttribute("xmlns:form", "urn:jsptagdir:/WEB-INF/tags/form").addAttribute("xmlns:field", "urn:jsptagdir:/WEB-INF/tags/form/fields").addAttribute("xmlns:jsp", "http://java.sun.com/JSP/Page").addAttribute("xmlns:c", "http://java.sun.com/jsp/jstl/core").addAttribute("xmlns:spring", "http://www.springframework.org/tags").addAttribute("version", "2.0").addChild(new XmlElementBuilder("jsp:directive.page", document).addAttribute("contentType", "text/html;charset=UTF-8").build()).addChild(new XmlElementBuilder("jsp:output", document).addAttribute("omit-xml-declaration", "yes").build()).build());
-
+		
 		// Add form create element
 		Element formCreate = new XmlElementBuilder("form:create", document).addAttribute("id", XmlUtils.convertId("fc:" + formbackingType.getFullyQualifiedTypeName())).addAttribute("modelAttribute", entityName).addAttribute("path", controllerPath).addAttribute("render", "${empty dependencies}").build();
-
+		
 		if (!controllerPath.toLowerCase().equals(formbackingType.getSimpleTypeName().toLowerCase())) {
 			formCreate.setAttribute("path", controllerPath);
 		}
-
-		List<FieldMetadata> formFields = new ArrayList<FieldMetadata>(fields);
+		
+		List<FieldMetadata> formFields = new ArrayList<FieldMetadata>();
 		
 		// Handle Roo identifiers
-		for (FieldMetadata field : formbackingTypePersistenceMetadata.getRooIdentifierFields()) {
-			FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
-			formFields.add(fieldBuilder.build());
+		if (formbackingTypePersistenceMetadata.getRooIdentifierFields().size() > 0) {
+			formCreate.setAttribute("compositePkField", formbackingTypePersistenceMetadata.getIdentifierField().getFieldName().getSymbolName());
+			for (FieldMetadata field : formbackingTypePersistenceMetadata.getRooIdentifierFields()) {
+				FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
+				fieldBuilder.setFieldName(new JavaSymbolName(formbackingTypePersistenceMetadata.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
+				formFields.add(fieldBuilder.build());
+			}
 		}
+		formFields.addAll(fields);
+		
 		createFieldsForCreateAndUpdate(formFields, document, formCreate, true);
 		formCreate.setAttribute("z", XmlRoundTripUtils.calculateUniqueKeyFor(formCreate));
-
+		
 		Element dependency = new XmlElementBuilder("form:dependency", document).addAttribute("id", XmlUtils.convertId("d:" + formbackingType.getFullyQualifiedTypeName())).addAttribute("render", "${not empty dependencies}").addAttribute("dependencies", "${dependencies}").build();
 		dependency.setAttribute("z", XmlRoundTripUtils.calculateUniqueKeyFor(dependency));
-
+		
 		div.appendChild(formCreate);
 		div.appendChild(dependency);
-
+		
 		return document;
 	}
 
@@ -246,36 +260,30 @@ public class JspViewManager {
 				JavaTypeMetadataDetails collectionTypeMetadataHolder = relatedDomainTypes.get(getJavaTypeForField(field));
 				JavaTypePersistenceMetadataDetails typePersistenceMetadataHolder = collectionTypeMetadataHolder.getPersistenceDetails();
 				if (collectionTypeMetadataHolder != null && typePersistenceMetadataHolder != null) {
-					fieldElement = new XmlElementBuilder("field:select", document).addAttribute("items", "${" + collectionTypeMetadataHolder.getPlural().toLowerCase() + "}").addAttribute("itemValue", typePersistenceMetadataHolder.getIdentifierField().getFieldName().getSymbolName()).addAttribute("path", "/" + getPathForType(getJavaTypeForField(field))).build();
-					if (null != MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.persistence.ManyToMany"))) {
+					fieldElement = new XmlElementBuilder("field:select", document).addAttribute("required", "true").addAttribute("items", "${" + collectionTypeMetadataHolder.getPlural().toLowerCase() + "}").addAttribute("itemValue", typePersistenceMetadataHolder.getIdentifierField().getFieldName().getSymbolName()).addAttribute("path", "/" + getPathForType(getJavaTypeForField(field))).build();
+					if (field.getCustomData().keySet().contains(PersistenceCustomDataKeys.MANY_TO_MANY_FIELD)) {
 						fieldElement.setAttribute("multiple", "true");
 					}
 				}
-			} else if (typeMetadataHolder != null && typeMetadataHolder.isEnumType() && null != MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.persistence.Enumerated"))) {
-				fieldElement = new XmlElementBuilder("field:select", document).addAttribute("items", "${" + typeMetadataHolder.getPlural().toLowerCase() + "}").addAttribute("path", "/" + getPathForType(type)).build();
+			} else if (typeMetadataHolder != null && typeMetadataHolder.isEnumType() && field.getCustomData().keySet().contains(PersistenceCustomDataKeys.ENUMERATED_FIELD)) {
+				fieldElement = new XmlElementBuilder("field:select", document).addAttribute("required", "true").addAttribute("items", "${" + typeMetadataHolder.getPlural().toLowerCase() + "}").addAttribute("path", "/" + getPathForType(type)).build();
 			} else if (type.getFullyQualifiedTypeName().equals(Boolean.class.getName()) || type.getFullyQualifiedTypeName().equals(boolean.class.getName())) {
 				fieldElement = document.createElement("field:checkbox");
 			} else if (typeMetadataHolder != null && typeMetadataHolder.isApplicationType()) {
 				JavaTypePersistenceMetadataDetails typePersistenceMetadataHolder = typeMetadataHolder.getPersistenceDetails();
 				if (typePersistenceMetadataHolder != null) {
-					fieldElement = new XmlElementBuilder("field:select", document).addAttribute("items", "${" + typeMetadataHolder.getPlural().toLowerCase() + "}").addAttribute("itemValue", typePersistenceMetadataHolder.getIdentifierField().getFieldName().getSymbolName()).addAttribute("path", "/" + getPathForType(type)).build();
+					fieldElement = new XmlElementBuilder("field:select", document).addAttribute("required", "true").addAttribute("items", "${" + typeMetadataHolder.getPlural().toLowerCase() + "}").addAttribute("itemValue", typePersistenceMetadataHolder.getIdentifierField().getFieldName().getSymbolName()).addAttribute("path", "/" + getPathForType(type)).build();
 				}
 			} else if (type.getFullyQualifiedTypeName().equals(Date.class.getName()) || type.getFullyQualifiedTypeName().equals(Calendar.class.getName())) {
-				fieldElement = new XmlElementBuilder("field:datetime", document).addAttribute("dateTimePattern", "${" + entityName + "_" + paramName.getSymbolName().toLowerCase() + "_date_format}").build();
+				fieldElement = new XmlElementBuilder("field:datetime", document).addAttribute("required", "true").addAttribute("dateTimePattern", "${" + entityName + "_" + paramName.getSymbolName().toLowerCase() + "_date_format}").build();
 			} else {
-				fieldElement = document.createElement("field:input");
+				fieldElement = new XmlElementBuilder("field:input", document).addAttribute("required", "true").build();
 			}
-			
-			if (fieldElement == null) {
-				fieldElement = document.createElement("field:input");
-			}
-
 			addCommonAttributes(field, fieldElement);
 			fieldElement.setAttribute("disableFormBinding", "true");
 			fieldElement.setAttribute("field", paramName.getSymbolName());
 			fieldElement.setAttribute("id", XmlUtils.convertId("f:" + formbackingType.getFullyQualifiedTypeName() + "." + paramName));
 			fieldElement.setAttribute("z", XmlRoundTripUtils.calculateUniqueKeyFor(fieldElement));
-
 			formFind.appendChild(fieldElement);
 		}
 		return document;
@@ -285,7 +293,6 @@ public class JspViewManager {
 		for (FieldMetadata field : formFields) {
 			String fieldName = field.getFieldName().getSymbolName();
 			JavaType fieldType = field.getFieldType();
-			List<AnnotationMetadata> annotations = field.getAnnotations();
 			AnnotationMetadata annotationMetadata;
 
 			// Ignoring java.util.Map field types (see ROO-194)
@@ -293,15 +300,11 @@ public class JspViewManager {
 				continue;
 			}
 			// Fields contained in the embedded Id type have been added separately to the field list
-			if (null != MemberFindingUtils.getAnnotationOfType(annotations, new JavaType("javax.persistence.EmbeddedId"))) {
+			if (field.getCustomData().keySet().contains(PersistenceCustomDataKeys.EMBEDDED_ID_FIELD)) {
 				continue;
 			}
-			if (fieldType.getFullyQualifiedTypeName().equals(Set.class.getName())) {
-				if (fieldType.getParameters().size() != 1) {
-					throw new IllegalArgumentException("A set is defined without specification of its type (via generics) - unable to create view for it");
-				}
-				fieldType = getJavaTypeForField(field);
-			}
+			
+			fieldType = getJavaTypeForField(field);
 			
 			JavaTypeMetadataDetails typeMetadataHolder = relatedDomainTypes.get(fieldType);
 			JavaTypePersistenceMetadataDetails typePersistenceMetadataHolder = null;
@@ -316,49 +319,43 @@ public class JspViewManager {
 				// Handle enum fields
 			} else if (typeMetadataHolder != null && typeMetadataHolder.isEnumType()) {
 				fieldElement = new XmlElementBuilder("field:select", document).addAttribute("items", "${" + typeMetadataHolder.getPlural().toLowerCase() + "}").addAttribute("path", getPathForType(fieldType)).build();
-			} else {
-				for (AnnotationMetadata annotation : annotations) {
-					if (annotation.getAnnotationType().getFullyQualifiedTypeName().equals("javax.persistence.OneToMany")) {
-						// OneToMany relationships are managed from the 'many' side of the relationship, therefore we provide a link to the relevant form
-						// the link URL is determined as a best effort attempt following Roo REST conventions, this link might be wrong if custom paths are used
-						// if custom paths are used the developer can adjust the path attribute in the field:reference tag accordingly
-						if (typePersistenceMetadataHolder != null) {
-							fieldElement = new XmlElementBuilder("field:simple", document).addAttribute("messageCode", "entity_reference_not_managed").addAttribute("messageCodeAttribute", new JavaSymbolName(fieldType.getSimpleTypeName()).getReadableSymbolName()).build();
-						}
-					}
-					if (annotation.getAnnotationType().getFullyQualifiedTypeName().equals("javax.persistence.ManyToOne") || annotation.getAnnotationType().getFullyQualifiedTypeName().equals("javax.persistence.ManyToMany") || annotation.getAnnotationType().getFullyQualifiedTypeName().equals("javax.persistence.OneToOne")) {
-						JavaType referenceType = getJavaTypeForField(field);
-						JavaTypeMetadataDetails referenceTypeMetadata = relatedDomainTypes.get(referenceType);
-						if (referenceType != null/** fix for ROO-1888 --> **/ && referenceTypeMetadata != null && referenceTypeMetadata.isApplicationType() && typePersistenceMetadataHolder != null) {
-							fieldElement = new XmlElementBuilder("field:select", document).addAttribute("items", "${" + referenceTypeMetadata.getPlural().toLowerCase() + "}").addAttribute("itemValue", typePersistenceMetadataHolder.getIdentifierField().getFieldName().getSymbolName()).addAttribute("path", "/" + getPathForType(getJavaTypeForField(field))).build();
+			} else if (field.getCustomData().keySet().contains(PersistenceCustomDataKeys.ONE_TO_MANY_FIELD)) {
+				// OneToMany relationships are managed from the 'many' side of the relationship, therefore we provide a link to the relevant form
+				// the link URL is determined as a best effort attempt following Roo REST conventions, this link might be wrong if custom paths are used
+				// if custom paths are used the developer can adjust the path attribute in the field:reference tag accordingly
+				if (typePersistenceMetadataHolder != null) {
+					fieldElement = new XmlElementBuilder("field:simple", document).addAttribute("messageCode", "entity_reference_not_managed").addAttribute("messageCodeAttribute", new JavaSymbolName(fieldType.getSimpleTypeName()).getReadableSymbolName()).build();
+				} else {
+					continue;
+				}
+			} else if (field.getCustomData().keySet().contains(PersistenceCustomDataKeys.MANY_TO_ONE_FIELD) || field.getCustomData().keySet().contains(PersistenceCustomDataKeys.MANY_TO_MANY_FIELD) || field.getCustomData().keySet().contains(PersistenceCustomDataKeys.ONE_TO_ONE_FIELD)) {
+				JavaType referenceType = getJavaTypeForField(field);
+				JavaTypeMetadataDetails referenceTypeMetadata = relatedDomainTypes.get(referenceType);
+				if (referenceType != null/** fix for ROO-1888 --> **/ && referenceTypeMetadata != null && referenceTypeMetadata.isApplicationType() && typePersistenceMetadataHolder != null) {
+					fieldElement = new XmlElementBuilder("field:select", document).addAttribute("items", "${" + referenceTypeMetadata.getPlural().toLowerCase() + "}").addAttribute("itemValue", typePersistenceMetadataHolder.getIdentifierField().getFieldName().getSymbolName()).addAttribute("path", "/" + getPathForType(getJavaTypeForField(field))).build();
 
-							if (annotation.getAnnotationType().getFullyQualifiedTypeName().equals("javax.persistence.ManyToMany")) {
-								fieldElement.setAttribute("multiple", "true");
-							}
-						}
-					}
-					// Only include the date picker for styles supported by Dojo
-					// (SMALL & MEDIUM)
-					if (fieldType.getFullyQualifiedTypeName().equals(Date.class.getName()) || fieldType.getFullyQualifiedTypeName().equals(Calendar.class.getName())) {
-						fieldElement = new XmlElementBuilder("field:datetime", document).addAttribute("dateTimePattern", "${" + entityName + "_" + fieldName.toLowerCase() + "_date_format}").build();
-
-						if (null != MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Future"))) {
-							fieldElement.setAttribute("future", "true");
-						} else if (null != MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Past"))) {
-							fieldElement.setAttribute("past", "true");
-						}
-					}
-					if (annotation.getAnnotationType().getFullyQualifiedTypeName().equals("javax.persistence.Lob")) {
-						fieldElement = new XmlElementBuilder("field:textarea", document).build();
+					if (field.getCustomData().keySet().contains(PersistenceCustomDataKeys.MANY_TO_MANY_FIELD)) {
+						fieldElement.setAttribute("multiple", "true");
 					}
 				}
-				if (null != (annotationMetadata = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Size")))) {
-					AnnotationAttributeValue<?> max = annotationMetadata.getAttribute(new JavaSymbolName("max"));
-					if (max != null) {
-						int maxValue = (Integer) max.getValue();
-						if (fieldElement == null && maxValue > 30) {
-							fieldElement = new XmlElementBuilder("field:textarea", document).build();
-						}
+			} else if (fieldType.getFullyQualifiedTypeName().equals(Date.class.getName()) || fieldType.getFullyQualifiedTypeName().equals(Calendar.class.getName())) {
+				// Only include the date picker for styles supported by Dojo (SMALL & MEDIUM)
+				fieldElement = new XmlElementBuilder("field:datetime", document).addAttribute("dateTimePattern", "${" + entityName + "_" + fieldName.toLowerCase() + "_date_format}").build();
+
+				if (null != MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Future"))) {
+					fieldElement.setAttribute("future", "true");
+				} else if (null != MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Past"))) {
+					fieldElement.setAttribute("past", "true");
+				}
+			} else if (field.getCustomData().keySet().contains(PersistenceCustomDataKeys.LOB_FIELD)) {
+				fieldElement = new XmlElementBuilder("field:textarea", document).build();
+			} 
+			if (null != (annotationMetadata = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Size")))) {
+				AnnotationAttributeValue<?> max = annotationMetadata.getAttribute(new JavaSymbolName("max"));
+				if (max != null) {
+					int maxValue = (Integer) max.getValue();
+					if (fieldElement == null && maxValue > 30) {
+						fieldElement = new XmlElementBuilder("field:textarea", document).build();
 					}
 				}
 			}
@@ -366,7 +363,6 @@ public class JspViewManager {
 			if (fieldElement == null) {
 				fieldElement = document.createElement("field:input");
 			}
-
 			addCommonAttributes(field, fieldElement);
 			fieldElement.setAttribute("field", fieldName);
 			fieldElement.setAttribute("id", XmlUtils.convertId("c:" + formbackingType.getFullyQualifiedTypeName() + "." + field.getFieldName().getSymbolName()));
@@ -384,7 +380,7 @@ public class JspViewManager {
 			}
 			List<JavaType> parameters = field.getFieldType().getParameters();
 			if (parameters.size() == 0) {
-				throw new IllegalStateException("Could not determine the parameter type for the " + field.getFieldName().getSymbolName() + " field in " + formbackingType.getSimpleTypeName());
+				throw new IllegalStateException("Unable to determine the parameter type for the " + field.getFieldName().getSymbolName() + " field in " + formbackingType.getSimpleTypeName());
 			}
 			return parameters.get(0);
 		} else {
@@ -452,6 +448,17 @@ public class JspViewManager {
 			if (tagName.endsWith("textarea") || tagName.endsWith("input") || tagName.endsWith("datetime") || tagName.endsWith("textarea") || tagName.endsWith("select") || tagName.endsWith("reference")) {
 				fieldElement.setAttribute("required", "true");
 			}
+		}
+		if (field.getCustomData().keySet().contains(PersistenceCustomDataKeys.COLUMN_FIELD)) {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> values = (Map<String, Object>) field.getCustomData().get(PersistenceCustomDataKeys.COLUMN_FIELD);
+			if (values.keySet().contains("nullable") && ((Boolean) values.get("nullable")) == false) {
+				fieldElement.setAttribute("required", "true"); 
+			}
+		}
+		// Disable form binding for nested fields (mainly PKs)
+		if (field.getFieldName().getSymbolName().contains(".")) {
+			fieldElement.setAttribute("disableFormBinding", "true");
 		}
 	}
 

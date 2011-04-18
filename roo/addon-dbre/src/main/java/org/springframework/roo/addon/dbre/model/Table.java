@@ -13,7 +13,7 @@ import org.springframework.roo.support.util.Assert;
  * @since 1.1
  */
 public class Table implements Serializable {
-	private static final long serialVersionUID = 8765395915966846012L;
+	private static final long serialVersionUID = 5929578655573544100L;
 	private String catalog;
 	private Schema schema;
 	private String name;
@@ -23,6 +23,7 @@ public class Table implements Serializable {
 	private Set<ForeignKey> importedKeys = new LinkedHashSet<ForeignKey>();
 	private Set<ForeignKey> exportedKeys = new LinkedHashSet<ForeignKey>();
 	private Set<Index> indices = new LinkedHashSet<Index>();
+	private boolean includeNonPortableAttributes;
 
 	Table() {
 	}
@@ -174,6 +175,14 @@ public class Table implements Serializable {
 		return indices.add(index);
 	}
 	
+	public boolean isIncludeNonPortableAttributes() {
+		return includeNonPortableAttributes;
+	}
+
+	public void setIncludeNonPortableAttributes(boolean includeNonPortableAttributes) {
+		this.includeNonPortableAttributes = includeNonPortableAttributes;
+	}
+
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -211,6 +220,6 @@ public class Table implements Serializable {
 	}
 
 	public String toString() {
-		return String.format("Table [name=%s, catalog=%s, schema=%s, description=%s, columns=%s, importedKeys=%s, exportedKeys=%s, indices=%s]", name, catalog, (schema != null ? schema.getName() : ""), description, columns, importedKeys, exportedKeys, indices);
+		return String.format("Table [name=%s, catalog=%s, schema=%s, description=%s, columns=%s, importedKeys=%s, exportedKeys=%s, indices=%s, includeNonPortableAttributes=%s]", name, catalog, (schema != null ? schema.getName() : ""), description, columns, importedKeys, exportedKeys, indices, includeNonPortableAttributes);
 	}
 }

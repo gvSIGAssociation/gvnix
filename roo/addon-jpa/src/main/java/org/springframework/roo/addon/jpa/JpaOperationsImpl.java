@@ -49,6 +49,10 @@ import org.w3c.dom.Element;
 @Component
 @Service
 public class JpaOperationsImpl implements JpaOperations {
+	private static final String DATABASE_URL = "database.url";
+	private static final String DATABASE_DRIVER = "database.driverClassName";
+	private static final String DATABASE_USERNAME = "database.username";
+	private static final String DATABASE_PASSWORD = "database.password";
 	private static final String PERSISTENCE_UNIT = "persistence-unit";
 	private static final String GAE_PERSISTENCE_UNIT_NAME = "transactions-optional";
 	private static final String PERSISTENCE_UNIT_NAME = "persistenceUnit";
@@ -72,9 +76,8 @@ public class JpaOperationsImpl implements JpaOperations {
 	public SortedSet<String> getDatabaseProperties() {
 		if (fileManager.exists(getDatabasePropertiesPath())) {
 			return propFileOperations.getPropertyKeys(Path.SPRING_CONFIG_ROOT, "database.properties", true);
-		} else {
-			return getPropertiesFromDataNucleusConfiguration();
 		}
+		return getPropertiesFromDataNucleusConfiguration();
 	}
 
 	private String getPersistencePath() {
@@ -232,15 +235,15 @@ public class JpaOperationsImpl implements JpaOperations {
 		root.appendChild(entityManagerFactory);
 		XmlUtils.removeTextNodes(root);
 
-		XmlUtils.writeXml(contextMutableFile.getOutputStream(), appCtx);
+		fileManager.createOrUpdateXmlFileIfRequired(contextPath, appCtx, true);
 	}
 
 	private void updatePersistenceXml(OrmProvider ormProvider, JdbcDatabase jdbcDatabase, String hostName, String databaseName, String userName, String password, String persistenceUnit) {
 		String persistencePath = getPersistencePath();
-		MutableFile persistenceMutableFile = null;
 
 		Document persistence;
 		try {
+			MutableFile persistenceMutableFile = null;
 			if (fileManager.exists(persistencePath)) {
 				persistenceMutableFile = fileManager.updateFile(persistencePath);
 				persistence = XmlUtils.getDocumentBuilder().parse(persistenceMutableFile.getInputStream());
@@ -323,7 +326,7 @@ public class JpaOperationsImpl implements JpaOperations {
 				properties.appendChild(createPropertyElement("hibernate.dialect", dialects.getProperty(ormProvider.name() + "." + jdbcDatabase.name()), persistence));
 				properties.appendChild(persistence.createComment(" value=\"create\" to build a new database on each run; value=\"update\" to modify an existing database; value=\"create-drop\" means the same as \"create\" but also drops tables when Hibernate closes; value=\"validate\" makes no changes to the database ")); // ROO-627
 				String hbm2dll = "create";
-				if (jdbcDatabase == JdbcDatabase.DB2400) {
+				if (jdbcDatabase == JdbcDatabase.DB2_400) {
 					hbm2dll = "validate";
 				}
 				properties.appendChild(createPropertyElement("hibernate.hbm2ddl.auto", hbm2dll, persistence));
@@ -387,7 +390,8 @@ public class JpaOperationsImpl implements JpaOperations {
 		}
 
 		persistenceUnitElement.appendChild(properties);
-		XmlUtils.writeXml(persistenceMutableFile.getOutputStream(), persistence);
+		
+		fileManager.createOrUpdateXmlFileIfRequired(persistencePath, persistence, true);
 	}
 
 	private String getConnectionString(JdbcDatabase jdbcDatabase, String hostName, String databaseName) {
@@ -420,36 +424,36 @@ public class JpaOperationsImpl implements JpaOperations {
 				fileManager.delete(loggingPropertiesPath);
 			}
 			return;
-		} else {
-			MutableFile appengineMutableFile = null;
-			Document appengine;
-			try {
-				if (appenginePathExists) {
-					appengineMutableFile = fileManager.updateFile(appenginePath);
-					appengine = XmlUtils.getDocumentBuilder().parse(appengineMutableFile.getInputStream());
-				} else {
-					appengineMutableFile = fileManager.createFile(appenginePath);
-					InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "appengine-web-template.xml");
-					Assert.notNull(templateInputStream, "Could not acquire appengine-web.xml template");
-					appengine = XmlUtils.getDocumentBuilder().parse(templateInputStream);
-				}
-			} catch (Exception e) {
-				throw new IllegalStateException(e);
+		}
+		
+		MutableFile appengineMutableFile = null;
+		Document appengine;
+		try {
+			if (appenginePathExists) {
+				appengineMutableFile = fileManager.updateFile(appenginePath);
+				appengine = XmlUtils.getDocumentBuilder().parse(appengineMutableFile.getInputStream());
+			} else {
+				appengineMutableFile = fileManager.createFile(appenginePath);
+				InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "appengine-web-template.xml");
+				Assert.notNull(templateInputStream, "Could not acquire appengine-web.xml template");
+				appengine = XmlUtils.getDocumentBuilder().parse(templateInputStream);
 			}
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
 
-			Element rootElement = appengine.getDocumentElement();
-			Element applicationElement = XmlUtils.findFirstElement("/appengine-web-app/application", rootElement);
-			applicationElement.setTextContent(StringUtils.hasText(applicationId) ? applicationId : getProjectName());
+		Element rootElement = appengine.getDocumentElement();
+		Element applicationElement = XmlUtils.findFirstElement("/appengine-web-app/application", rootElement);
+		applicationElement.setTextContent(StringUtils.hasText(applicationId) ? applicationId : getProjectName());
 
-			XmlUtils.writeXml(appengineMutableFile.getOutputStream(), appengine);
+		fileManager.createOrUpdateXmlFileIfRequired(appenginePath, appengine, true);
 
-			if (!loggingPropertiesPathExists) {
-				try {
-					InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "logging.properties");
-					FileCopyUtils.copy(templateInputStream, fileManager.createFile(loggingPropertiesPath).getOutputStream());
-				} catch (IOException e) {
-					throw new IllegalStateException(e);
-				}
+		if (!loggingPropertiesPathExists) {
+			try {
+				InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "logging.properties");
+				FileCopyUtils.copy(templateInputStream, fileManager.createFile(loggingPropertiesPath).getOutputStream());
+			} catch (IOException e) {
+				throw new IllegalStateException(e);
 			}
 		}
 	}
@@ -482,23 +486,38 @@ public class JpaOperationsImpl implements JpaOperations {
 			throw new IllegalStateException(e);
 		}
 
-		props.put("database.driverClassName", jdbcDatabase.getDriverClassName());
-
 		String connectionString = getConnectionString(jdbcDatabase, hostName, databaseName);
-		props.put("database.url", connectionString);
-
 		if (jdbcDatabase.getKey().equals("HYPERSONIC") || jdbcDatabase == JdbcDatabase.H2_IN_MEMORY || jdbcDatabase == JdbcDatabase.SYBASE) {
 			userName = StringUtils.hasText(userName) ? userName : "sa";
 		}
-		props.put("database.username", StringUtils.trimToEmpty(userName));
-		props.put("database.password", StringUtils.trimToEmpty(password));
 
+		boolean hasChanged = !props.get(DATABASE_DRIVER).equals(jdbcDatabase.getDriverClassName());
+		hasChanged |= !props.get(DATABASE_URL).equals(connectionString);
+		hasChanged |= !props.get(DATABASE_USERNAME).equals(StringUtils.trimToEmpty(userName));
+		hasChanged |= !props.get(DATABASE_PASSWORD).equals(StringUtils.trimToEmpty(password));
+		if (!hasChanged) {
+			// No changes from existing database configuration so exit now
+			return;
+		}
+		
+		// Write changes to database.properties file
+		props.put(DATABASE_URL, connectionString);
+		props.put(DATABASE_DRIVER, jdbcDatabase.getDriverClassName());
+		props.put(DATABASE_USERNAME, StringUtils.trimToEmpty(userName));
+		props.put(DATABASE_PASSWORD, StringUtils.trimToEmpty(password));
+
+		OutputStream outputStream = null;
 		try {
-			OutputStream outputStream = databaseMutableFile.getOutputStream();
+			outputStream = databaseMutableFile.getOutputStream();
 			props.store(outputStream, "Updated at " + new Date());
-			outputStream.close();
-		} catch (IOException ioe) {
-			throw new IllegalStateException(ioe);
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		} finally {
+			if (outputStream != null) {
+				try {
+					outputStream.close();
+				} catch (IOException ignored) {}
+			}
 		}
 	}
 
@@ -533,12 +552,18 @@ public class JpaOperationsImpl implements JpaOperations {
 		props.put("sfdc.userName", StringUtils.trimToEmpty(userName));
 		props.put("sfdc.password", StringUtils.trimToEmpty(password));
 
+		OutputStream outputStream = null;
 		try {
-			OutputStream outputStream = configMutableFile.getOutputStream();
+			outputStream = configMutableFile.getOutputStream();
 			props.store(outputStream, "Updated at " + new Date());
-			outputStream.close();
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
+		} finally {
+			if (outputStream != null) {
+				try {
+					outputStream.close();
+				} catch (IOException ignored) {}
+			}
 		}
 	}
 
@@ -765,73 +790,85 @@ public class JpaOperationsImpl implements JpaOperations {
 
 		Element root = (Element) pom.getFirstChild();
 		
+		// Removed unwanted database dependencies
 		List<JdbcDatabase> databases = new ArrayList<JdbcDatabase>();
 		for (JdbcDatabase database : JdbcDatabase.values()) {
 			if (!database.getKey().equals(jdbcDatabase.getKey()) && !database.getDriverClassName().equals(jdbcDatabase.getDriverClassName())) {
 				databases.add(database);
 			}
 		}
-		removeArtifacts(getDbXPath(databases), root, configuration);
+		boolean hasChanged = removeArtifacts(getDbXPath(databases), root, configuration);
 
+		// Removed unwanted ORM providers
 		List<OrmProvider> ormProviders = new ArrayList<OrmProvider>();
 		for (OrmProvider provider : OrmProvider.values()) {
 			if (provider != ormProvider) {
 				ormProviders.add(provider);
 			}
 		}
-		removeArtifacts(getProviderXPath(ormProviders), root, configuration);
 		
-		mutableFile.setDescriptionOfChange("Removed redundant artifacts");
-		
-		XmlUtils.writeXml(mutableFile.getOutputStream(), pom);
+		hasChanged |= removeArtifacts(getProviderXPath(ormProviders), root, configuration);
+
+		if (hasChanged) {
+			// Something has changed so write changes to pom.xml
+			mutableFile.setDescriptionOfChange("Removed redundant artifacts");
+			XmlUtils.writeXml(mutableFile.getOutputStream(), pom);
+		}
 
 		if (jdbcDatabase != JdbcDatabase.GOOGLE_APP_ENGINE) {
 			updateEclipsePlugin(false, pom, mutableFile);
 		}
 	}
 		
-	private void removeArtifacts(String xPathExpression, Element root, Element configuration) {
+	private boolean removeArtifacts(String xPathExpression, Element root, Element configuration) {
+		boolean hasChanged = false;
+		
 		// Remove unwanted dependencies
 		Element dependenciesElement = XmlUtils.findFirstElement("/project/dependencies", root);
 		for (Element candidate : XmlUtils.findElements("/project/dependencies/dependency", root)) {
-			unwanted: for (Element dependencyElement : XmlUtils.findElements(xPathExpression + "/dependencies/dependency", configuration)) {
+			for (Element dependencyElement : XmlUtils.findElements(xPathExpression + "/dependencies/dependency", configuration)) {
 				if (new Dependency(dependencyElement).equals(new Dependency(candidate))) {
 					// Found it
 					dependenciesElement.removeChild(candidate);
-					break unwanted;
+					XmlUtils.removeTextNodes(dependenciesElement);
+					hasChanged = true;
 				}
 			}
 		}
-		XmlUtils.removeTextNodes(dependenciesElement);
 
 		// Remove unwanted filters
 		Element filtersElement = XmlUtils.findFirstElement("/project/build/filters", root);
-		for (Element candidate : XmlUtils.findElements("/project/build/filters/filter", root)) {
-			unwanted: for (Element filterElement : XmlUtils.findElements(xPathExpression + "/filters/filter", configuration)) {
-				if (new Filter(filterElement).equals(new Filter(candidate))) {
-					// Found it
-					filtersElement.removeChild(candidate);
-					break unwanted;
+		if (filtersElement != null) {
+			for (Element candidate : XmlUtils.findElements("/project/build/filters/filter", root)) {
+				for (Element filterElement : XmlUtils.findElements(xPathExpression + "/filters/filter", configuration)) {
+					if (new Filter(filterElement).equals(new Filter(candidate))) {
+						// Found it
+						filtersElement.removeChild(candidate);
+						XmlUtils.removeTextNodes(filtersElement);
+						hasChanged = true;
+					}
 				}
 			}
-		}
-		XmlUtils.removeTextNodes(filtersElement);
-		if (filtersElement != null && !filtersElement.hasChildNodes()) {
-			filtersElement.getParentNode().removeChild(filtersElement);
-		}
 
+			if (!filtersElement.hasChildNodes()) {
+				filtersElement.getParentNode().removeChild(filtersElement);
+			}
+		}
+		
 		// Remove unwanted plugins
 		Element pluginsElement = XmlUtils.findFirstElement("/project/build/plugins", root);
 		for (Element candidate : XmlUtils.findElements("/project/build/plugins/plugin", root)) {
-			unwanted: for (Element pluginElement : XmlUtils.findElements(xPathExpression + "/plugins/plugin", configuration)) {
+			for (Element pluginElement : XmlUtils.findElements(xPathExpression + "/plugins/plugin", configuration)) {
 				if (new Plugin(pluginElement).equals(new Plugin(candidate))) {
 					// Found it
 					pluginsElement.removeChild(candidate);
-					break unwanted;
+					XmlUtils.removeTextNodes(pluginsElement);
+					hasChanged = true;
 				}
 			}
 		}
-		XmlUtils.removeTextNodes(pluginsElement);
+		
+		return hasChanged;
 	}
 
 	private String getDbXPath(JdbcDatabase jdbcDatabase) {

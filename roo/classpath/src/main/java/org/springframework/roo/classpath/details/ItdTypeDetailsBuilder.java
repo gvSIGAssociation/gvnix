@@ -8,7 +8,6 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
-import org.springframework.roo.model.CustomDataImpl;
 import org.springframework.roo.model.ImportRegistrationResolver;
 import org.springframework.roo.model.ImportRegistrationResolverImpl;
 import org.springframework.roo.model.JavaType;
@@ -41,6 +40,14 @@ public final class ItdTypeDetailsBuilder extends AbstractMemberHoldingTypeDetail
 	private List<DeclaredFieldAnnotationDetails> fieldAnnotations = new ArrayList<DeclaredFieldAnnotationDetails>();
 	private List<DeclaredMethodAnnotationDetails> methodAnnotations = new ArrayList<DeclaredMethodAnnotationDetails>();
 
+	public ItdTypeDetailsBuilder(ItdTypeDetails existing) {
+		super(existing.getDeclaredByMetadataId(), existing);
+		this.governor = existing.getGovernor();
+		this.aspect = existing.getAspect();
+		this.privilegedAspect = existing.isPrivilegedAspect();
+		this.importRegistrationResolver = new ImportRegistrationResolverImpl(aspect.getPackage());
+	}
+	
 	public ItdTypeDetailsBuilder(String declaredByMetadataId, ClassOrInterfaceTypeDetails governor, JavaType aspect, boolean privilegedAspect) {
 		super(declaredByMetadataId);
 		Assert.notNull(governor, "Name (to receive the introductions) required");
@@ -52,7 +59,7 @@ public final class ItdTypeDetailsBuilder extends AbstractMemberHoldingTypeDetail
 	}
 
 	public ItdTypeDetails build() {
-		return new DefaultItdTypeDetails(CustomDataImpl.NONE, getDeclaredByMetadataId(), getModifier(), governor, aspect, privilegedAspect, importRegistrationResolver.getRegisteredImports(), buildConstructors(), buildFields(), buildMethods(), getExtendsTypes(), getImplementsTypes(), buildAnnotations(), fieldAnnotations, methodAnnotations, innerTypes);
+		return new DefaultItdTypeDetails(getCustomData().build(), getDeclaredByMetadataId(), getModifier(), governor, aspect, privilegedAspect, importRegistrationResolver.getRegisteredImports(), buildConstructors(), buildFields(), buildMethods(), getExtendsTypes(), getImplementsTypes(), buildAnnotations(), fieldAnnotations, methodAnnotations, innerTypes);
 	}
 
 	public ImportRegistrationResolver getImportRegistrationResolver() {

@@ -6,12 +6,16 @@ import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.configurable.ConfigurableMetadataProvider;
 import org.springframework.roo.addon.dod.DataOnDemandMetadata;
-import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectMetadata;
@@ -58,35 +62,38 @@ public final class IntegrationTestMetadataProvider extends AbstractItdMetadataPr
 		JavaType dodJavaType = new JavaType(annotationValues.getEntity().getFullyQualifiedTypeName() + "DataOnDemand");
 		String dataOnDemandMetadataKey = DataOnDemandMetadata.createIdentifier(dodJavaType, Path.SRC_TEST_JAVA);
 		DataOnDemandMetadata dataOnDemandMetadata = (DataOnDemandMetadata) metadataService.get(dataOnDemandMetadataKey);
-		if (dataOnDemandMetadata == null || !dataOnDemandMetadata.isValid()) {
-			return null;
-		}
-	
-		// Lookup the entity's metadata
-		JavaType javaType = annotationValues.getEntity();
-		Path path = Path.SRC_MAIN_JAVA;
-		String entityMetadataKey = EntityMetadata.createIdentifier(javaType, path);
-		EntityMetadata entityMetadata = (EntityMetadata) metadataService.get(entityMetadataKey);
-		if (entityMetadata == null || !entityMetadata.isValid()) {
-			return null;
-		}
-		
-		MethodMetadata identifierAccessorMethod = entityMetadata.getIdentifierAccessor();
-		MethodMetadata versionAccessorMethod = entityMetadata.getVersionAccessor();
-		MethodMetadata countMethod = entityMetadata.getCountMethod();
-		MethodMetadata findMethod = entityMetadata.getFindMethod();
-		MethodMetadata findAllMethod = entityMetadata.getFindAllMethod();
-		MethodMetadata findEntriesMethods = entityMetadata.getFindEntriesMethod();
-		MethodMetadata flushMethod = entityMetadata.getFlushMethod();
-		MethodMetadata mergeMethod = entityMetadata.getMergeMethod();
-		MethodMetadata persistMethod = entityMetadata.getPersistMethod();
-		MethodMetadata removeMethod = entityMetadata.getRemoveMethod();
 
 		// We need to be informed if our dependent metadata changes
 		metadataDependencyRegistry.registerDependency(dataOnDemandMetadataKey, metadataIdentificationString);
-		metadataDependencyRegistry.registerDependency(entityMetadataKey, metadataIdentificationString);
+
+		if (dataOnDemandMetadata == null || !dataOnDemandMetadata.isValid()) {
+			return null;
+		}
+		
+		// Lookup the entity's metadata
+		MemberDetails memberDetails = getMemberDetails(annotationValues.getEntity());
+		
+		MethodMetadata identifierAccessorMethod = MemberFindingUtils.getMostConcreteMethodWithTag(memberDetails, PersistenceCustomDataKeys.IDENTIFIER_ACCESSOR_METHOD);
+		MethodMetadata versionAccessorMethod = MemberFindingUtils.getMostConcreteMethodWithTag(memberDetails, PersistenceCustomDataKeys.VERSION_ACCESSOR_METHOD);
+		MethodMetadata countMethod = MemberFindingUtils.getMostConcreteMethodWithTag(memberDetails, PersistenceCustomDataKeys.COUNT_ALL_METHOD);
+		MethodMetadata findMethod = MemberFindingUtils.getMostConcreteMethodWithTag(memberDetails, PersistenceCustomDataKeys.FIND_METHOD);
+		MethodMetadata findAllMethod = MemberFindingUtils.getMostConcreteMethodWithTag(memberDetails, PersistenceCustomDataKeys.FIND_ALL_METHOD);
+		MethodMetadata findEntriesMethod = MemberFindingUtils.getMostConcreteMethodWithTag(memberDetails, PersistenceCustomDataKeys.FIND_ENTRIES_METHOD);
+		MethodMetadata flushMethod = MemberFindingUtils.getMostConcreteMethodWithTag(memberDetails, PersistenceCustomDataKeys.FLUSH_METHOD);
+		MethodMetadata mergeMethod = MemberFindingUtils.getMostConcreteMethodWithTag(memberDetails, PersistenceCustomDataKeys.MERGE_METHOD);
+		MethodMetadata persistMethod = MemberFindingUtils.getMostConcreteMethodWithTag(memberDetails, PersistenceCustomDataKeys.PERSIST_METHOD);
+		MethodMetadata removeMethod = MemberFindingUtils.getMostConcreteMethodWithTag(memberDetails, PersistenceCustomDataKeys.REMOVE_METHOD);
+		
+		boolean hasEmbeddedIdentifier = dataOnDemandMetadata.hasEmbeddedIdentifier();
+
+		for (MemberHoldingTypeDetails memberHoldingTypeDetails : memberDetails.getDetails()) {
+			if (memberHoldingTypeDetails instanceof ClassOrInterfaceTypeDetails) {
+				metadataDependencyRegistry.registerDependency(memberHoldingTypeDetails.getDeclaredByMetadataId(), metadataIdentificationString);
+				break;
+			}
+		}
 				
-		return new IntegrationTestMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, projectMetadata, annotationValues, dataOnDemandMetadata, identifierAccessorMethod, versionAccessorMethod, countMethod, findMethod, findAllMethod, findEntriesMethods, flushMethod, mergeMethod, persistMethod, removeMethod);
+		return new IntegrationTestMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, projectMetadata, annotationValues, dataOnDemandMetadata, identifierAccessorMethod, versionAccessorMethod, countMethod, findMethod, findAllMethod, findEntriesMethod, flushMethod, mergeMethod, persistMethod, removeMethod, hasEmbeddedIdentifier);
 	}
 	
 	public String getItdUniquenessFilenameSuffix() {

@@ -68,7 +68,7 @@ quick_zip_gpg_tests() {
 
     # Test the hash worked OK
     # (for script testing purposes only:) sed -i 's/0/1/g' $ASSEMBLY_SHA
-    sha1sum --check --status $ASSEMBLY_SHA
+    sha1sum --status --check $ASSEMBLY_SHA
     if [[ ! "$?" = "0" ]]; then
         l_error "sha1sum verification of $ASSEMBLY_SHA failed" >&2; exit 1;
     fi
@@ -292,6 +292,12 @@ if [[ "$COMMAND" = "assembly" ]]; then
     rm $WORK_DIR/bundle/*jgit*.jar
     rm $WORK_DIR/bundle/*git*.jar
     rm $WORK_DIR/bundle/*op4j*.jar
+    rm $WORK_DIR/bundle/*aopalliance-*.jar
+    rm $WORK_DIR/bundle/jackson-*.jar
+    rm $WORK_DIR/bundle/jcl-over-slf4j-*.jar
+    rm $WORK_DIR/bundle/servlet-api-*.jar
+    rm $WORK_DIR/bundle/slf4j-*.jar
+    rm $WORK_DIR/bundle/spring-*.jar
     mv $WORK_DIR/bundle/org.springframework.roo.bootstrap-*.jar $WORK_DIR/bin
     mv $WORK_DIR/bundle/org.apache.felix.framework-*.jar $WORK_DIR/bin
     cp $ROO_HOME/bootstrap/src/main/bin/* $WORK_DIR/bin
@@ -300,8 +306,8 @@ if [[ "$COMMAND" = "assembly" ]]; then
     cp $ROO_HOME/bootstrap/readme.txt $WORK_DIR/
     cp `find $ROO_HOME -iname legal-\*.txt` $WORK_DIR/legal
     cp `find $ROO_HOME -iname \*.roo | grep -v "/target/"` $WORK_DIR/samples
-    cp -r $ROO_HOME/deployment-support/target/site/reference/pdf $WORK_DIR/docs/pdf
-    cp -r $ROO_HOME/deployment-support/target/site/reference/html $WORK_DIR/docs/html
+    cp -r $ROO_HOME/deployment-support/target/site/reference/pdf/ $WORK_DIR/docs/pdf
+    cp -r $ROO_HOME/deployment-support/target/site/reference/html/ $WORK_DIR/docs/html
 
     # Prepare to write the ZIP
     log "Cleaning $DIST_DIR" 
@@ -417,12 +423,26 @@ if [[ "$COMMAND" = "deploy" ]]; then
     log "AWS pkg.f.name.: $ZIP_FILENAME"
     log "AWS proj.name..: $PROJECT_NAME"
     log "AWS Path.......: $AWS_PATH"
-    s3_execute put --acl-public \
+
+    type -P s3cmd &>/dev/null || { l_error "s3cmd not found. Aborting." >&2; exit 1; }
+    S3CMD_OPTS=''
+    if [ "$DRY_RUN" = "1" ]; then
+        S3CMD_OPTS="$S3CMD_OPTS --dry-run"
+    fi
+    if [ "$VERBOSE" = "1" ]; then
+        S3CMD_OPTS="$S3CMD_OPTS -v"
+    fi
+    s3cmd $S3CMD_OPTS put --acl-public \
         "--add-header=x-amz-meta-bundle.version:$VERSION" \
         "--add-header=x-amz-meta-release.type:$TYPE" \
         "--add-header=x-amz-meta-package.file.name:$ZIP_FILENAME" \
         "--add-header=x-amz-meta-project.name:$PROJECT_NAME" \
         $ASSEMBLY_ZIP $AWS_PATH
+    EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "s3cmd failed (exit code $EXITED)." >&2; exit 1;
+    fi
+
     s3_execute put --acl-public $ASSEMBLY_SHA $AWS_PATH
     s3_execute put --acl-public $ASSEMBLY_ASC $AWS_PATH
 

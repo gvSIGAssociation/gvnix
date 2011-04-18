@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,10 +17,13 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.springframework.roo.addon.dbre.model.Column;
 import org.springframework.roo.addon.dbre.model.Database;
+import org.springframework.roo.addon.dbre.model.DbreModelService;
 import org.springframework.roo.addon.dbre.model.Table;
 import org.springframework.roo.addon.entity.Identifier;
+import org.springframework.roo.addon.entity.IdentifierService;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.entity.RooIdentifier;
+import org.springframework.roo.addon.test.IntegrationTestOperations;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -32,6 +36,9 @@ import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDeta
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.file.monitor.event.FileEvent;
+import org.springframework.roo.file.monitor.event.FileEventListener;
+import org.springframework.roo.file.monitor.event.FileOperation;
 import org.springframework.roo.metadata.AbstractHashCodeTrackingMetadataNotifier;
 import org.springframework.roo.metadata.MetadataItem;
 import org.springframework.roo.model.JavaPackage;
@@ -40,19 +47,20 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.shell.Shell;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
 
 /**
- * Responds to discovery of database structural information from {@link DbreModelService} and creates and manages entities based on this.
- * 
+ * Implementation of {@link DbreDatabaseListener}.
+ *
  * @author Alan Stewart
  * @since 1.1
  */
 @Component(immediate = true)
 @Service
-public class DbreDatabaseListenerImpl extends AbstractHashCodeTrackingMetadataNotifier implements DbreDatabaseListener {
+public class DbreDatabaseListenerImpl extends AbstractHashCodeTrackingMetadataNotifier implements IdentifierService, FileEventListener {
 	private static final JavaType ROO_ENTITY = new JavaType(RooEntity.class.getName());
 	private static final JavaType ROO_IDENTIFIER = new JavaType(RooIdentifier.class.getName());
 	private static final String IDENTIFIER_TYPE = "identifierType";
@@ -61,31 +69,45 @@ public class DbreDatabaseListenerImpl extends AbstractHashCodeTrackingMetadataNo
 	private static final String PRIMARY_KEY_SUFFIX = "PK";
 	@Reference private DbreModelService dbreModelService;
 	@Reference private FileManager fileManager;
+	@Reference private ProjectOperations projectOperations;
+	@Reference private IntegrationTestOperations integrationTestOperations;
 	@Reference private TypeLocationService typeLocationService;
 	@Reference private TypeManagementService typeManagementService;
 	@Reference private Shell shell;
-	
 	private Map<JavaType, List<Identifier>> identifierResults = null;
 
-	// This method will be called when the database becomes available for the first time and the rest of Roo has started up OK
-	public void notifyDatabaseRefreshed(Database newDatabase) {
-		processDatabase(newDatabase);
+	public void onFileEvent(FileEvent fileEvent) {
+		if (fileEvent.getFileDetails().getCanonicalPath().equals(dbreModelService.getDbreXmlPath())) {
+			if (fileEvent.getOperation() == FileOperation.UPDATED || fileEvent.getOperation() == FileOperation.CREATED) {
+				deserializeDatabase();
+			}
+		}
 	}
 
-	private void processDatabase(Database database) {
-		if (database == null) {
-			return;
+	public List<Identifier> getIdentifiers(JavaType pkType) {
+		if (identifierResults == null) {
+			// Need to populate the identifier results before returning from this method
+			deserializeDatabase();
 		}
-		if (database.hasTables()) {
+		if (identifierResults == null) {
+			// It's still null, so maybe the DBRE XML file isn't available at this time or similar
+			return null;
+		}
+		return identifierResults.get(pkType);
+	}
+	
+	private void deserializeDatabase() {
+		Database database = dbreModelService.getDatabase();
+		if (database != null) {
 			identifierResults = new HashMap<JavaType, List<Identifier>>();
 			reverseEngineer(database);
 		}
 	}
 
 	private void reverseEngineer(Database database) {
-		// Lookup the relevant destination package if not explicitly given
 		Set<ClassOrInterfaceTypeDetails> managedEntities = typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(new JavaType(RooDbManaged.class.getName()));
 		
+		// Lookup the relevant destination package if not explicitly given
 		JavaPackage destinationPackage = database.getDestinationPackage();
 		if (destinationPackage == null) {
 			if (!managedEntities.isEmpty()) {
@@ -96,9 +118,12 @@ public class DbreDatabaseListenerImpl extends AbstractHashCodeTrackingMetadataNo
 
 		// Fall back to project's top level package
 		if (destinationPackage == null) {
-			ProjectMetadata projectMetadata = (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
+			ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
 			destinationPackage = projectMetadata.getTopLevelPackage();
 		}
+		
+		// Set the destination package in the database
+		database.setDestinationPackage(destinationPackage);
 
 		// Get tables from database
 		Set<Table> tables = new LinkedHashSet<Table>(database.getTables());
@@ -118,21 +143,35 @@ public class DbreDatabaseListenerImpl extends AbstractHashCodeTrackingMetadataNo
 		for (Table table : tables) {
 			// Don't create types from join tables in many-to-many associations
 			if (!table.isJoinTable()) {
+				table.setIncludeNonPortableAttributes(database.isIncludeNonPortableAttributes());
 				newEntities.add(createNewManagedEntityFromTable(table, destinationPackage));
 			}
 		}
-
+		
+		// Create integration tests if required
+		if (database.isTestAutomatically()) {
+			for (ClassOrInterfaceTypeDetails entity : newEntities) {
+				integrationTestOperations.newIntegrationTest(entity.getName());
+			}
+		}
+		
 		// Notify
-		managedEntities.addAll(newEntities);
-		for (ClassOrInterfaceTypeDetails managedEntity : managedEntities) {
-			MetadataItem metadataItem = metadataService.get(managedEntity.getDeclaredByMetadataId(), true);
+		List<ClassOrInterfaceTypeDetails> allEntities = new LinkedList<ClassOrInterfaceTypeDetails>();
+		allEntities.addAll(newEntities);
+		allEntities.addAll(managedEntities);
+		notify(allEntities);
+	}
+
+	private void notify(List<ClassOrInterfaceTypeDetails> entities) {
+		for (ClassOrInterfaceTypeDetails managedIdentifierType : getManagedIdentifiers()) {
+			MetadataItem metadataItem = metadataService.get(managedIdentifierType.getDeclaredByMetadataId(), true);
 			if (metadataItem != null) {
 				notifyIfRequired(metadataItem);
 			}
 		}
 
-		for (ClassOrInterfaceTypeDetails managedIdentifierType : getManagedIdentifiers()) {
-			MetadataItem metadataItem = metadataService.get(managedIdentifierType.getDeclaredByMetadataId(), true);
+		for (ClassOrInterfaceTypeDetails entity : entities) {
+			MetadataItem metadataItem = metadataService.get(entity.getDeclaredByMetadataId(), true);
 			if (metadataItem != null) {
 				notifyIfRequired(metadataItem);
 			}
@@ -166,11 +205,13 @@ public class DbreDatabaseListenerImpl extends AbstractHashCodeTrackingMetadataNo
 		String tableName = (String) tableAttribute.getValue();
 		Assert.hasText(tableName, errMsg);
 		Table table = database.getTable(tableName);
-		if (table == null) {
-			// Table has been dropped so delete managed type, and its identifier if applicable
+		if (table == null || !managedEntity.getName().getPackage().equals(database.getDestinationPackage())) {
+			// Table has been dropped or we have deliberately changed the package so delete managed type, and its identifier if applicable
 			deleteManagedType(managedEntity);
 			return null;
 		}
+
+		table.setIncludeNonPortableAttributes(database.isIncludeNonPortableAttributes());
 
 		// Get new @RooEntity attributes
 		Set<JavaSymbolName> attributesToDeleteIfPresent = new LinkedHashSet<JavaSymbolName>();
@@ -194,6 +235,7 @@ public class DbreDatabaseListenerImpl extends AbstractHashCodeTrackingMetadataNo
 		// Update the annotation on disk
 		MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) managedEntity;
 		mutableTypeDetails.updateTypeAnnotation(rooEntityBuilder.build(), attributesToDeleteIfPresent);
+		
 		return table;
 	}
 
@@ -270,7 +312,7 @@ public class DbreDatabaseListenerImpl extends AbstractHashCodeTrackingMetadataNo
 			attributesToDeleteIfPresent.add(new JavaSymbolName(IDENTIFIER_TYPE));
 
 			// We don't need a PK class, so we just tell the EntityMetadataProvider via IdentifierService the column name, field type and field name to use
-			List<Identifier> identifiers = getIdentifiersFromPrimaryKeys(table.getName(), table.getPrimaryKeys());
+			List<Identifier> identifiers = getIdentifiersFromPrimaryKeys(table);
 			identifierResults.put(javaType, identifiers);
 		} else if (pkCount == 0 || pkCount > 1) {
 			// Table has either no primary keys or more than one primary key so create a composite key
@@ -284,21 +326,9 @@ public class DbreDatabaseListenerImpl extends AbstractHashCodeTrackingMetadataNo
 
 			// We need a PK class, so we tell the IdentifierMetadataProvider via IdentifierService the various column names, field types and field names to use
 			// For tables with no primary keys, create a composite key using all the table's columns
-			List<Identifier> identifiers = pkCount == 0 ? getIdentifiersFromColumns(table.getName(), table.getColumns()) : getIdentifiersFromPrimaryKeys(table.getName(), table.getPrimaryKeys());
+			List<Identifier> identifiers = pkCount == 0 ? getIdentifiersFromColumns(table) : getIdentifiersFromPrimaryKeys(table);
 			identifierResults.put(identifierType, identifiers);
 		}
-	}
-
-	public List<Identifier> getIdentifiers(JavaType pkType) {
-		if (identifierResults == null) {
-			// Need to populate the identifier results before returning from this method
-			processDatabase(dbreModelService.getDatabase(null));
-		}
-		if (identifierResults == null) {
-			// It's still null, so maybe the DBRE XML file isn't available at this time or similar
-			return null;
-		}
-		return identifierResults.get(pkType);
 	}
 
 	private void createIdentifierClass(JavaType identifierType) {
@@ -318,24 +348,30 @@ public class DbreDatabaseListenerImpl extends AbstractHashCodeTrackingMetadataNo
 		shell.flash(Level.FINE, "", DbreDatabaseListenerImpl.class.getName());
 	}
 
-	private List<Identifier> getIdentifiersFromPrimaryKeys(String tableName, Set<Column> primaryKeys) {
-		return getIdentifiersFromColumns(tableName, primaryKeys);
+	private List<Identifier> getIdentifiersFromPrimaryKeys(Table table) {
+		return getIdentifiers(table, true);
 	}
 
-	private List<Identifier> getIdentifiersFromColumns(String tableName, Set<Column> columns) {
+	private List<Identifier> getIdentifiersFromColumns(Table table) {
+		return getIdentifiers(table, false);
+	}
+
+	private List<Identifier> getIdentifiers(Table table, boolean usePrimaryKeys) {
 		List<Identifier> result = new ArrayList<Identifier>();
 
 		// Add fields to the identifier class
+		Set<Column> columns = usePrimaryKeys ? table.getPrimaryKeys() : table.getColumns();
 		for (Column column : columns) {
 			String columnName = column.getName();
 			JavaSymbolName fieldName;
 			try {
 				fieldName = new JavaSymbolName(DbreTypeUtils.suggestFieldName(columnName));
 			} catch (RuntimeException e) {
-				throw new IllegalArgumentException("Failed to create field name for column '" + columnName + "' in table '" + tableName + "': " + e.getMessage());
+				throw new IllegalArgumentException("Failed to create field name for column '" + columnName + "' in table '" + table.getName() + "': " + e.getMessage());
 			}
 			JavaType fieldType = column.getJavaType();
-			result.add(new Identifier(fieldName, fieldType, columnName));
+			String columnDefinition = table.isIncludeNonPortableAttributes() ? column.getTypeName() : "";
+			result.add(new Identifier(fieldName, fieldType, columnName, column.getColumnSize(), column.getScale(), columnDefinition));
 		}
 
 		return result;

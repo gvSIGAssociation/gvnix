@@ -18,21 +18,26 @@ import org.springframework.roo.support.util.Assert;
  * @since 1.1
  */
 public class Database implements Serializable {
-	private static final long serialVersionUID = -5373400310368191289L;
+	private static final long serialVersionUID = -6699287170489794958L;
 
 	/** The name of the database model. Defaults to the catalog name if the schema name is not available. */
 	private String name;
 
-	/** The JavaPackage where entities are created */
-	private JavaPackage destinationPackage;
-
 	/** All tables. */
 	private Set<Table> tables;
 
-	Database(String name, Set<Table> tables, JavaPackage destinationPackage) {
+	/** The JavaPackage where entities are created */
+	private JavaPackage destinationPackage;
+	
+	/** Whether to create integration tests */
+	private boolean testAutomatically;
+	
+	/** Whether or not to included non-portable JPA attribues in the @Column annotation */
+	private boolean includeNonPortableAttributes;
+	
+	Database(String name, Set<Table> tables) {
 		Assert.hasText(name, "Database name required");
 		Assert.notNull(tables, "Tables required");
-		this.destinationPackage = destinationPackage;
 		this.name = name;
 		this.tables = tables;
 		initialize();
@@ -40,10 +45,6 @@ public class Database implements Serializable {
 
 	public String getName() {
 		return name;
-	}
-
-	public JavaPackage getDestinationPackage() {
-		return destinationPackage;
 	}
 
 	public Schema getSchema() {
@@ -65,6 +66,30 @@ public class Database implements Serializable {
 			}
 		}
 		return null;
+	}
+
+	public JavaPackage getDestinationPackage() {
+		return destinationPackage;
+	}
+
+	public void setDestinationPackage(JavaPackage destinationPackage) {
+		this.destinationPackage = destinationPackage;
+	}
+
+	public boolean isTestAutomatically() {
+		return testAutomatically;
+	}
+
+	public void setTestAutomatically(boolean testAutomatically) {
+		this.testAutomatically = testAutomatically;
+	}
+
+	public boolean isIncludeNonPortableAttributes() {
+		return includeNonPortableAttributes;
+	}
+
+	public void setIncludeNonPortableAttributes(boolean includeNonPortableAttributes) {
+		this.includeNonPortableAttributes = includeNonPortableAttributes;
 	}
 
 	/**
@@ -134,12 +159,12 @@ public class Database implements Serializable {
 					Reference reference = foreignKey.getReferences().iterator().next();
 					reference.setInsertableOrUpdatable(false);
 					break fk;
-				} else {
-					for (Reference reference : foreignKey.getReferences()) {
-						reference.setInsertableOrUpdatable(false);
-					}
-					break fk;
 				}
+				
+				for (Reference reference : foreignKey.getReferences()) {
+					reference.setInsertableOrUpdatable(false);
+				}
+				break fk;
 			}
 		}
 	}

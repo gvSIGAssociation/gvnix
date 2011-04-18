@@ -98,28 +98,6 @@ or sign a replacement key (the public key servers offer no way to
 revoke a key unless you can sign the recovation request).
 
 ======================================================================
-OSGI WRAPPING JARS
-======================================================================
-
-Some Roo modules require JARs that are not already in OSGi form. That
-is, they don't have an OSGi-aware manifest. Roo has a special project
-called "wrapper" that can convert normal JARs into OSGi JARs.
-
-You'll need to run the wrapper before trying to do anything with Roo.
-If you don't do this, you'll see errors which state Maven cannot find
-"org.springframework.roo.wrapping.some_module".
-
-To create the wrapped JARs, from the root Roo checkout location type:
-
-  cd $ROO_HOME/wrapping
-  mvn clean install
-  cd ..
-
-You need not do this too often. If you get an error about a missing
-wrapper JAR (org.springframework.roo.wrapping.some_module), simply
-repeat the above commands and you should be fine.
-
-======================================================================
 DEVELOPING WITHIN ECLIPSE
 ======================================================================
 
@@ -298,7 +276,8 @@ RELEASE PROCEDURE:
    * Assembly ZIP unzips and is of a sensible size
    * Assembly ZIP contains both PDF and HTML documentation
    * Assembly ZIP runs correctly when installed on major platforms
-   * Run the "reference guide" command, copy the resulting XML file
+   * Create Jira Task ticket "Release Spring Roo x.y.z.aaaaaa"
+   * Run the "reference guide" command in the Roo shell, copy the resulting XML file
      into $ROO_HOME/deployment-support/src/site/docbook/reference,
      git commit and then git push (so the appendix is updated)
 
@@ -325,7 +304,7 @@ RELEASE PROCEDURE:
    very helpful for our users:
 
    cd $ROO_HOME/deployment-support
-   ./roo-deploy -c assembly -Tv (-T means Maven tests with empty repo)
+   ./roo-deploy.sh -c assembly -Tv (-T means Maven tests with empty repo)
 
 7. Repeat the verification tests on the assembly ZIP (see above). See
    note below if coordinating a release with the STS team.
@@ -341,7 +320,7 @@ RELEASE PROCEDURE:
    cd $ROO_HOME
    mvn deploy
    cd $ROO_HOME/deployment-support
-   ./roo-deploy -c deploy (use -dv for a dry-run and verbose logging)
+   ./roo-deploy.sh -c deploy (use -dv for a dry-run and verbose logging)
 
 10. Increment the version number to the next BUILD-SNAPSHOT number:
 

@@ -14,6 +14,7 @@ public class RequestEvent extends GwtEvent<RequestEvent.Handler> {
 	 * Implemented by handlers of this type of event.
 	 */
 	public interface Handler extends EventHandler {
+		
 		/**
 		 * Called when a {@link RequestEvent} is fired.
 		 *
@@ -38,8 +39,7 @@ public class RequestEvent extends GwtEvent<RequestEvent.Handler> {
 	 * @param handler  a {@link RequestEvent.Handler}
 	 * @return a {@link HandlerRegistration} instance
 	 */
-	public static HandlerRegistration register(EventBus eventBus,
-	                                           RequestEvent.Handler handler) {
+	public static HandlerRegistration register(EventBus eventBus, RequestEvent.Handler handler) {
 		return eventBus.addHandler(TYPE, handler);
 	}
 

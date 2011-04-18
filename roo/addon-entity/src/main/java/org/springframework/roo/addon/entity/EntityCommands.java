@@ -6,11 +6,12 @@ import java.util.List;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.springframework.roo.addon.test.IntegrationTestOperations;
+import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.operations.InheritanceType;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.model.ReservedWords;
-import org.springframework.roo.project.Path;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
@@ -27,8 +28,9 @@ import org.springframework.roo.support.util.Assert;
 @Service
 public class EntityCommands implements CommandMarker {
 	@Reference private EntityOperations entityOperations;
+	@Reference private IntegrationTestOperations integrationTestOperations;
 	
-	@CliAvailabilityIndicator( { "entity", "embeddable", "test integration", "dod" })
+	@CliAvailabilityIndicator( { "entity", "embeddable" })
 	public boolean isPersistentClassAvailable() {
 		return entityOperations.isPersistentClassAvailable();
 	}
@@ -51,7 +53,8 @@ public class EntityCommands implements CommandMarker {
 		@CliOption(key = "mappedSuperclass", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false", help = "Apply @MappedSuperclass for this entity") boolean mappedSuperclass, 
 		@CliOption(key = "serializable", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Whether the generated class should implement java.io.Serializable") boolean serializable, 
 		@CliOption(key = "persistenceUnit", mandatory = false, help = "The persistence unit name to be used in the persistence.xml file") String persistenceUnit,
-		@CliOption(key = "permitReservedWords", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates whether reserved words are ignored by Roo") boolean permitReservedWords) {
+		@CliOption(key = "permitReservedWords", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates whether reserved words are ignored by Roo") boolean permitReservedWords,
+		@CliOption(key = "entityName", mandatory = false, help = "The name used to refer to the entity in queries") String entityName) {
 
 		Assert.isTrue(!identifierType.isPrimitive(), "Identifier type cannot be a primitive");
 
@@ -65,7 +68,7 @@ public class EntityCommands implements CommandMarker {
 
 		// Reject attempts to name the entity "Test", due to possible clashes with data on demand (see ROO-50)
 		// We will allow this to happen, though if the user insists on it via --permitReservedWords (see ROO-666)
-		if (!isEntityReasonablyNamed(name)) {
+		if (!BeanInfoUtils.isEntityReasonablyNamed(name)) {
 			if (permitReservedWords && testAutomatically) {
 				throw new IllegalArgumentException("Entity name cannot contain 'Test' or 'TestCase' as you are requesting tests; remove --testAutomatically or rename the proposed entity");
 			}
@@ -113,6 +116,9 @@ public class EntityCommands implements CommandMarker {
 		if (inheritanceType != null) {
 			rooEntityBuilder.addStringAttribute("inheritanceType", inheritanceType.name());
 		}
+		if (entityName != null) {
+			rooEntityBuilder.addStringAttribute("entityName", entityName);
+		}
 		annotations.add(rooEntityBuilder);
 
 		if (serializable) {
@@ -128,7 +134,7 @@ public class EntityCommands implements CommandMarker {
 		}
 
 		if (testAutomatically) {
-			entityOperations.newIntegrationTest(name);
+			integrationTestOperations.newIntegrationTest(name);
 		}
 	}
 
@@ -143,42 +149,5 @@ public class EntityCommands implements CommandMarker {
 		}
 
 		entityOperations.newEmbeddableClass(name, serializable);
-	}
-
-	@CliCommand(value = "test integration", help = "Creates a new integration test for the specified entity")
-	public void newIntegrationTest(
-		@CliOption(key = "entity", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The name of the entity to create an integration test for") JavaType entity, 
-		@CliOption(key = "permitReservedWords", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates whether reserved words are ignored by Roo") boolean permitReservedWords) {
-
-		if (!permitReservedWords) {
-			ReservedWords.verifyReservedWordsNotPresent(entity);
-		}
-
-		Assert.isTrue(isEntityReasonablyNamed(entity), "Cannot create an integration test for an entity named 'Test' or 'TestCase' under any circumstances");
-		
-		entityOperations.newIntegrationTest(entity);
-	}
-
-	@CliCommand(value = "dod", help = "Creates a new data on demand for the specified entity")
-	public void newDod(
-		@CliOption(key = "entity", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The entity which this data on demand class will create and modify as required") JavaType entity, 
-		@CliOption(key = "class", mandatory = false, help = "The class which will be created to hold this data on demand provider (defaults to the entity name + 'DataOnDemand')") JavaType clazz, 
-		@CliOption(key = "permitReservedWords", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Indicates whether reserved words are ignored by Roo") boolean permitReservedWords) {
-
-		if (!permitReservedWords) {
-			ReservedWords.verifyReservedWordsNotPresent(entity);
-		}
-
-		Assert.isTrue(isEntityReasonablyNamed(entity), "Cannot create data on demand for an entity named 'Test' or 'TestCase' under any circumstances");
-
-		if (clazz == null) {
-			clazz = new JavaType(entity.getFullyQualifiedTypeName() + "DataOnDemand");
-		}
-
-		entityOperations.newDod(entity, clazz, Path.SRC_TEST_JAVA);
-	}
-
-	private boolean isEntityReasonablyNamed(JavaType entity) {
-		return !entity.getSimpleTypeName().startsWith("Test") && !entity.getSimpleTypeName().endsWith("TestCase") && !entity.getSimpleTypeName().endsWith("Test");
 	}
 }

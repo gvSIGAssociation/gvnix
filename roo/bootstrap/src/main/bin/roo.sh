@@ -62,12 +62,12 @@ if [ "$cygwin" = "true" ]; then
 fi
 
 # make sure to disable the flash message feature for the default OSX terminal, we recommend to use a ANSI compliant terminal such as iTerm if flash message support is desired
-FLASH_DISABLED=false;
+APPLE_TERMINAL=false;
 if [ "$TERM_PROGRAM" = "Apple_Terminal" ]; then
-	FLASH_DISABLED=true
+	APPLE_TERMINAL=true
 fi
 
 # Hop, hop, hop...
-java -Dflash.message.disabled=$FLASH_DISABLED $ROO_OPTS -Droo.args="$*" -DdevelopmentMode=false -Dorg.osgi.framework.storage="$ROO_OSGI_FRAMEWORK_STORAGE" -Dfelix.auto.deploy.dir="$ROO_AUTO_DEPLOY_DIRECTORY" -Dfelix.config.properties="file:$ROO_CONFIG_FILE_PROPERTIES" -cp "$ROO_CP" org.springframework.roo.bootstrap.Main
+java -Dis.apple.terminal=$APPLE_TERMINAL $ROO_OPTS -Droo.args="$*" -DdevelopmentMode=false -Dorg.osgi.framework.storage="$ROO_OSGI_FRAMEWORK_STORAGE" -Dfelix.auto.deploy.dir="$ROO_AUTO_DEPLOY_DIRECTORY" -Dfelix.config.properties="file:$ROO_CONFIG_FILE_PROPERTIES" -cp "$ROO_CP" org.springframework.roo.bootstrap.Main
 EXITED=$?
 # echo Roo exited with code $EXITED

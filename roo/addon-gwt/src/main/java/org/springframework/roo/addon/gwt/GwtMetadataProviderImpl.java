@@ -1,5 +1,16 @@
 package org.springframework.roo.addon.gwt;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -7,14 +18,11 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.DefaultPhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
-import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
+import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.metadata.MetadataItem;
@@ -24,15 +32,9 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
-
-import java.io.File;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * Monitors Java types and if necessary creates/updates/deletes the GWT files maintained for each mirror-compatible object.
@@ -57,18 +59,26 @@ import java.util.Set;
 @Component(immediate = true)
 @Service
 public class GwtMetadataProviderImpl implements GwtMetadataProvider {
-	@Reference private GwtFileManager gwtFileManager;
-	@Reference private MetadataDependencyRegistry metadataDependencyRegistry;
 	@Reference private FileManager fileManager;
-	@Reference private MetadataService metadataService;
-	@Reference private GwtTypeNamingStrategy gwtTypeNamingStrategy;
-	@Reference private MemberDetailsScanner memberDetailsScanner;
-	@Reference private GwtTemplatingService gwtTemplateService;
+	@Reference private GwtFileManager gwtFileManager;
+	@Reference private GwtTemplateService gwtTemplateService;
 	@Reference private GwtTypeService gwtTypeService;
+	@Reference private MetadataService metadataService;
+	@Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+	@Reference private ProjectOperations projectOperations;
+	private Map<String, Set<String>> dependsOn = new HashMap<String, Set<String>>();
+
+	protected void activate(ComponentContext context) {
+		metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
+	}
+
+	protected void deactivate(ComponentContext context) {
+		metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
+	}
 
 	public MetadataItem get(String metadataIdentificationString) {
 		// Abort early if we can't continue
-		ProjectMetadata projectMetadata = getProjectMetadata();
+		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
 		if (projectMetadata == null) {
 			return null;
 		}
@@ -85,87 +95,105 @@ public class GwtMetadataProviderImpl implements GwtMetadataProvider {
 			return null;
 		}
 
-		// Abort if this is for a .java file under any of the GWT-related directories
-		for (GwtPath path : GwtPath.values()) {
-			if (governorTypeName.getPackage().getFullyQualifiedPackageName().equals(path.packageName(projectMetadata))) {
-				return null;
-			}
+		// We are only interested in source that is not in the client package
+		if (governorTypeName.getPackage().getFullyQualifiedPackageName().startsWith(GwtPath.CLIENT.packageName(projectMetadata))) {
+			return null;
 		}
 
+		String physicalTypeId = PhysicalTypeIdentifier.createIdentifier(governorTypeName, governorTypePath);
 		// Obtain the governor's information
-		PhysicalTypeMetadata governorPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(governorTypeName, governorTypePath));
+		PhysicalTypeMetadata governorPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(physicalTypeId);
 		if (governorPhysicalTypeMetadata == null || !governorPhysicalTypeMetadata.isValid() || !(governorPhysicalTypeMetadata.getMemberHoldingTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
 			return null;
 		}
 
 		ClassOrInterfaceTypeDetails governorTypeDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata.getMemberHoldingTypeDetails();
-
-		if (Modifier.isAbstract(governorTypeDetails.getModifier())) {
-			return null;
-		}
-
 		EntityMetadata entityMetadata = (EntityMetadata) metadataService.get(EntityMetadata.createIdentifier(governorTypeName, governorTypePath));
 
-		//We are only interested in a certain types, we must verify that the MID passed in corresponds with such a type.
+		// We are only interested in a certain types, we must verify that the MID passed in corresponds with such a type.
 		if (!GwtUtils.isMappable(governorTypeDetails, entityMetadata)) {
 			return null;
 		}
 
-		List<MemberHoldingTypeDetails> memberHoldingTypeDetails = memberDetailsScanner.getMemberDetails(GwtMetadataProviderImpl.class.getName(), governorTypeDetails).getDetails();
-		Map<GwtType, JavaType> mirrorTypeMap = GwtUtils.getMirrorTypeMap(projectMetadata, governorTypeName);
-		Map<JavaType, JavaType> gwtClientTypeMap = gwtTypeService.getClientTypeMap(governorTypeDetails);
-
-		// Next let's obtain a handle to the "proxy" we'd want to produce/modify/delete as applicable for this governor
-		JavaType keyTypeName = gwtTypeNamingStrategy.convertGovernorTypeNameIntoKeyTypeName(GwtType.PROXY, projectMetadata, governorTypeName);
-		Path keyTypePath = Path.SRC_MAIN_JAVA;
-
-		metadataDependencyRegistry.registerDependency(entityMetadata.getId(), metadataIdentificationString);
-
-		// Lookup any existing proxy type and verify it is mapped to this governor MID (ie detect name collisions and abort if necessary)
-		// We do this before deleting, to verify we don't get into a delete-create-delete type case if there are name collisions
-		PhysicalTypeMetadata keyPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(keyTypeName, keyTypePath));
-
-		metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.createIdentifier(keyTypeName, keyTypePath), metadataIdentificationString);
-
-		if (keyPhysicalTypeMetadata != null && keyPhysicalTypeMetadata.isValid() && keyPhysicalTypeMetadata.getMemberHoldingTypeDetails() instanceof ClassOrInterfaceTypeDetails) {
-			// The key presently exists, so do a sanity check
-			ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) keyPhysicalTypeMetadata.getMemberHoldingTypeDetails();
-			AnnotationMetadata rooGwtAnnotation = MemberFindingUtils.getAnnotationOfType(cid.getAnnotations(), new JavaType(RooGwtMirroredFrom.class.getName()));
-			Assert.notNull(rooGwtAnnotation, "@" + RooGwtMirroredFrom.class.getSimpleName() + " removed from " + keyTypeName.getFullyQualifiedTypeName() + " unexpectedly");
-			AnnotationAttributeValue<?> value = rooGwtAnnotation.getAttribute(new JavaSymbolName("value"));
-			Assert.isInstanceOf(StringAttributeValue.class, value, "Expected string-based content in @" + RooGwtMirroredFrom.class.getSimpleName() + " on " + keyTypeName.getFullyQualifiedTypeName());
-			JavaType actualValue = new JavaType(value.getValue().toString());
-
-			// Now we've read the original type, let's verify it's the same as what we're expecting
-			Assert.isTrue(actualValue.equals(governorTypeName), "Every mappable type in the project must have a unique simple type name (" + governorTypeName + " and " + actualValue + " both cannot map to single key " + keyTypeName + ")");
-		}
-
-		// Excellent, so we have uniqueness taken care of by now; let's get the some metadata so we can discover what fields are available (NB: this will return null for enums)
-		// Handle the "governor is deleted/unavailable/not-suitable-for-mirroring" use case
-
-		Map<JavaSymbolName, GwtProxyProperty> clientSideTypeMap = gwtTypeService.getClientSideTypeMap(governorTypeDetails);
-
-		GwtMetadata gwtMetadata = new GwtMetadata(metadataIdentificationString, mirrorTypeMap, governorTypeDetails, keyTypePath, entityMetadata, clientSideTypeMap, gwtClientTypeMap);
-		if (keyPhysicalTypeMetadata == null) {
-			DefaultPhysicalTypeMetadata defaultPhysicalTypeMetadata = new DefaultPhysicalTypeMetadata(PhysicalTypeIdentifier.createIdentifier(keyTypeName, keyTypePath), keyTypePath.toString(), gwtMetadata.buildProxy());
-			Set<JavaSymbolName> proxyFields = new HashSet<JavaSymbolName>();
-			for (JavaSymbolName symbolName : clientSideTypeMap.keySet()) {
-				if (clientSideTypeMap.get(symbolName).getValueType().equals(mirrorTypeMap.get(GwtType.PROXY))) {
-					proxyFields.add(symbolName);
+		List<MethodMetadata> proxyMethods = gwtTypeService.getProxyMethods(governorTypeDetails);
+		List<MethodMetadata> convertedProxyMethods = new LinkedList<MethodMetadata>();
+		boolean dependsOnSomething = false;
+		List<String> sourcePaths = gwtTypeService.getSourcePaths();
+		for (MethodMetadata method : proxyMethods) {
+			JavaType returnType = method.getReturnType().isCommonCollectionType() && method.getReturnType().getParameters().size() != 0 ? method.getReturnType().getParameters().get(0) : method.getReturnType();
+			if (gwtTypeService.isDomainObject(returnType) && !method.getReturnType().equals(governorTypeName)) {
+				JavaType proxyType = GwtUtils.convertGovernorTypeNameIntoKeyTypeName(GwtType.PROXY, projectMetadata, returnType);
+				PhysicalTypeMetadata ptmd = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(proxyType, Path.SRC_MAIN_JAVA));
+				if (ptmd == null) {
+					Set<String> set = new HashSet<String>();
+					if (dependsOn.containsKey(createLocalIdentifier(returnType, Path.SRC_MAIN_JAVA))) {
+						set = dependsOn.get(createLocalIdentifier(returnType, Path.SRC_MAIN_JAVA));
+					}
+					set.add(metadataIdentificationString);
+					dependsOn.put(createLocalIdentifier(returnType, Path.SRC_MAIN_JAVA), set);
+					dependsOnSomething = true;
+					break;
 				}
 			}
-			for (JavaSymbolName symbolName : proxyFields) {
-				GwtProxyProperty proxyProperty = clientSideTypeMap.get(symbolName);
-				GwtProxyProperty newProxyProperty = new GwtProxyProperty(getProjectMetadata(), proxyProperty.getPropertyType(), defaultPhysicalTypeMetadata, proxyProperty.getName(), proxyProperty.getGetter());
-				clientSideTypeMap.put(symbolName, newProxyProperty);
+			JavaType gwtType = gwtTypeService.getGwtSideLeafType(method.getReturnType(), projectOperations.getProjectMetadata(), governorTypeDetails.getName(), false);
+			MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(method);
+			methodBuilder.setReturnType(gwtType);
+			MethodMetadata convertedMethod = methodBuilder.build();
+			if (gwtTypeService.isMethodReturnTypesInSourcePath(convertedMethod, governorTypeDetails, sourcePaths)) {
+				convertedProxyMethods.add(methodBuilder.build());
 			}
+		}
+
+		List<MethodMetadata> requestMethods = gwtTypeService.getRequestMethods(governorTypeDetails);
+
+		GwtMetadata gwtMetadata = new GwtMetadata(metadataIdentificationString, governorTypeDetails, projectMetadata, convertedProxyMethods, requestMethods, entityMetadata);
+		gwtFileManager.write(gwtMetadata.buildProxy(), true);
+		gwtFileManager.write(gwtMetadata.buildRequest(), true);
+
+		if (dependsOnSomething) {
+			return null;
+		}
+
+		if (dependsOn.containsKey(metadataIdentificationString)) {
+			Set<String> toRemove = new HashSet<String>();
+			Set<String> toAlert = dependsOn.get(metadataIdentificationString);
+			for (String toGet : toAlert) {
+				metadataService.get(toGet);
+				toRemove.add(toGet);
+			}
+			toAlert.removeAll(toRemove);
+		}
+
+		buildType(GwtType.APP_ENTITY_TYPES_PROCESSOR);
+		buildType(GwtType.APP_REQUEST_FACTORY);
+		buildType(GwtType.LIST_PLACE_RENDERER);
+		buildType(GwtType.MASTER_ACTIVITIES);
+		buildType(GwtType.LIST_PLACE_RENDERER);
+		buildType(GwtType.DETAILS_ACTIVITIES);
+		buildType(GwtType.MOBILE_ACTIVITIES);
+
+		Map<JavaSymbolName, GwtProxyProperty> clientSideTypeMap = new LinkedHashMap<JavaSymbolName, GwtProxyProperty>();
+
+		for (MethodMetadata proxyMethod : convertedProxyMethods) {
+			JavaSymbolName propertyName = new JavaSymbolName(StringUtils.uncapitalize(BeanInfoUtils.getPropertyNameForJavaBeanMethod(proxyMethod).getSymbolName()));
+			JavaType propertyType = proxyMethod.getReturnType();
+			PhysicalTypeMetadata ptmd = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(propertyType, Path.SRC_MAIN_JAVA));
+
+			if (propertyType.isCommonCollectionType()) {
+				ptmd = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(propertyType.getParameters().get(0), Path.SRC_MAIN_JAVA));
+			}
+
+			GwtProxyProperty gwtProxyProperty = new GwtProxyProperty(projectOperations.getProjectMetadata(), propertyType, ptmd, propertyName.getSymbolName(), proxyMethod.getMethodName().getSymbolName());
+			clientSideTypeMap.put(propertyName, gwtProxyProperty);
 		}
 
 		GwtTemplateDataHolder templateDataHolder = gwtTemplateService.getMirrorTemplateTypeDetails(governorTypeDetails, clientSideTypeMap);
 		Map<GwtType, List<ClassOrInterfaceTypeDetails>> typesToBeWritten = new HashMap<GwtType, List<ClassOrInterfaceTypeDetails>>();
 		Map<String, String> xmlToBeWritten = new HashMap<String, String>();
+		Map<GwtType, JavaType> mirrorTypeMap = GwtUtils.getMirrorTypeMap(projectMetadata, governorTypeName);
+
 		for (GwtType gwtType : mirrorTypeMap.keySet()) {
-			if (!gwtType.isMirrorType()) {
+			if (!gwtType.isMirrorType() || gwtType.equals(GwtType.PROXY) || gwtType.equals(GwtType.REQUEST)) {
 				continue;
 			}
 			gwtType.dynamicallyResolveFieldsToWatch(clientSideTypeMap);
@@ -173,7 +201,7 @@ public class GwtMetadataProviderImpl implements GwtMetadataProvider {
 
 			List<MemberHoldingTypeDetails> extendsTypes = gwtTypeService.getExtendsTypes(templateDataHolder.getTemplateTypeDetailsMap().get(gwtType));
 
-			typesToBeWritten.put(gwtType, gwtMetadata.buildType(gwtType, templateDataHolder.getTemplateTypeDetailsMap().get(gwtType), extendsTypes));
+			typesToBeWritten.put(gwtType, gwtTypeService.buildType(gwtType, templateDataHolder.getTemplateTypeDetailsMap().get(gwtType), extendsTypes));
 
 			if (gwtType.isCreateUiXml()) {
 				String destFile = gwtType.getPath().canonicalFileSystemPath(projectMetadata) + File.separatorChar + mirrorTypeMap.get(gwtType).getSimpleTypeName() + ".ui.xml";
@@ -189,15 +217,12 @@ public class GwtMetadataProviderImpl implements GwtMetadataProvider {
 		for (GwtType type : typesToBeWritten.keySet()) {
 			gwtFileManager.write(typesToBeWritten.get(type), type.isOverwriteConcrete());
 		}
-
 		for (ClassOrInterfaceTypeDetails type : templateDataHolder.getTypeList()) {
 			gwtFileManager.write(type, false);
 		}
-
 		for (String destFile : xmlToBeWritten.keySet()) {
 			gwtFileManager.write(destFile, xmlToBeWritten.get(destFile));
 		}
-
 		for (String destFile : templateDataHolder.getXmlMap().keySet()) {
 			gwtFileManager.write(destFile, templateDataHolder.getXmlMap().get(destFile));
 		}
@@ -205,9 +230,27 @@ public class GwtMetadataProviderImpl implements GwtMetadataProvider {
 		return gwtMetadata;
 	}
 
-	public void notify(String upstreamDependency, String downstreamDependency) {
+	private void buildType(GwtType type) {
+		if (GwtType.LIST_PLACE_RENDERER.equals(type)) {
+			ProjectMetadata projectMetadata = (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
+			HashMap<JavaSymbolName, List<JavaType>> watchedMethods = new HashMap<JavaSymbolName, List<JavaType>>();
+			watchedMethods.put(new JavaSymbolName("render"), Collections.singletonList(new JavaType(projectMetadata.getTopLevelPackage().getFullyQualifiedPackageName() + ".client.scaffold.place.ProxyListPlace")));
+			type.setWatchedMethods(watchedMethods);
+		} else {
+			type.resolveMethodsToWatch(type);
+		}
 
-		ProjectMetadata projectMetadata = getProjectMetadata();
+		type.resolveWatchedFieldNames(type);
+		List<ClassOrInterfaceTypeDetails> templateTypeDetails = gwtTemplateService.getStaticTemplateTypeDetails(type);
+		List<ClassOrInterfaceTypeDetails> typesToBeWritten = new ArrayList<ClassOrInterfaceTypeDetails>();
+		for (ClassOrInterfaceTypeDetails templateTypeDetail : templateTypeDetails) {
+			typesToBeWritten.addAll(gwtTypeService.buildType(type, templateTypeDetail, gwtTypeService.getExtendsTypes(templateTypeDetail)));
+		}
+		gwtFileManager.write(typesToBeWritten, type.isOverwriteConcrete());
+	}
+
+	public void notify(String upstreamDependency, String downstreamDependency) {
+		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
 		if (projectMetadata == null) {
 			return;
 		}
@@ -234,18 +277,6 @@ public class GwtMetadataProviderImpl implements GwtMetadataProvider {
 		if (get(downstreamDependency) != null) {
 			metadataDependencyRegistry.notifyDownstream(downstreamDependency);
 		}
-	}
-
-	private ProjectMetadata getProjectMetadata() {
-		return (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
-	}
-
-	protected void activate(ComponentContext context) {
-		metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-	}
-
-	protected void deactivate(ComponentContext context) {
-		metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
 	}
 
 	protected String createLocalIdentifier(JavaType javaType, Path path) {

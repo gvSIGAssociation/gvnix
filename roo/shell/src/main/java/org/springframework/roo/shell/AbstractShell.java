@@ -59,8 +59,10 @@ public abstract class AbstractShell extends AbstractShellStatusPublisher impleme
 		if (inputStream == null) {
 			// Try to find the resource via the classloader
 			Set<URL> urls = findUrls(resource.getName());
+			
 			// Handle search system failure
 			Assert.notNull(urls, "Unable to process classpath bundles to locate the script");
+			
 			// Handle the file simply not being present, but the search being OK
 			Assert.notEmpty(urls, "Resource '" + resource + "' not found on disk or in classpath");
 			Assert.isTrue(urls.size() == 1, "More than one '" + resource + "' was found in the classpath; unable to continue");
@@ -70,31 +72,45 @@ public abstract class AbstractShell extends AbstractShellStatusPublisher impleme
 				throw new IllegalStateException(e);
 			}
 		}
-		
-	    try {
-	    	BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
-	        String line;
-	        int i = 0;
-	        while ((line = in.readLine()) != null) {
-	        	i++;
-	        	if (lineNumbers) {
-		        	logger.fine("Line " + i + ": " + line);
-	        	} else {
-		        	logger.fine(line);
-	        	}
-	        	if (!"".equals(line.trim())) {
-		        	boolean success = executeScriptLine(line);
-		        	if (!success) {
-		        		// Abort script processing, given something went wrong
-		        		throw new IllegalStateException("Script execution aborted");
-		        	}
-	        	}
-	        }
-	        in.close();
-	    } catch (IOException e) {
-	    	throw new IllegalStateException(e);
-	    }
-	    logger.fine("Script required " + ((new Date().getTime() - started)/1000) + " second(s) to execute");
+
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(inputStream));
+			String line;
+			int i = 0;
+			while ((line = in.readLine()) != null) {
+				i++;
+				if (lineNumbers) {
+					logger.fine("Line " + i + ": " + line);
+				} else {
+					logger.fine(line);
+				}
+				if (!"".equals(line.trim())) {
+					boolean success = executeScriptLine(line);
+					if (success && ((line.trim().startsWith("q") || line.trim().startsWith("ex")))) {
+						break;
+					} else if (!success) {
+						// Abort script processing, given something went wrong
+						throw new IllegalStateException("Script execution aborted");
+					}
+				}
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException ignored) {}
+			}
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException ignored) {}
+			}
+			
+			logger.fine("Script required " + ((new Date().getTime() - started) / 1000) + " second(s) to execute");
+		}
 	}
 	
 	/**
@@ -129,7 +145,7 @@ public abstract class AbstractShell extends AbstractShellStatusPublisher impleme
     	ParseResult parseResult = null;
 		try {
 			// We support simple block comments; ie a single pair per line
-			if (!inBlockComment && line.contains("/*")) {
+			if (!inBlockComment && line.contains("/*") && line.contains("*/")) {
 				blockCommentBegin();
 				String lhs = line.substring(0, line.lastIndexOf("/*"));
 				if (line.contains("*/")) {
@@ -151,7 +167,7 @@ public abstract class AbstractShell extends AbstractShellStatusPublisher impleme
 			if (!inBlockComment && (line.trim().startsWith("//") || line.trim().startsWith("#"))) { // # support in ROO-1116
 				line = "";
 			}
-			// convert any TAB characters to whitespace (ROO-527)
+			// Convert any TAB characters to whitespace (ROO-527)
 			line = line.replace('\t', ' ');
 			if ("".equals(line.trim())) {
 				setShellStatus(Status.EXECUTION_SUCCESS);
@@ -160,24 +176,25 @@ public abstract class AbstractShell extends AbstractShellStatusPublisher impleme
 			parseResult = getParser().parse(line);
 			if (parseResult == null) {
 				return false;
-			} else {
-				setShellStatus(Status.EXECUTING);
-				Object result = executionStrategy.execute(parseResult);
-				setShellStatus(Status.EXECUTION_RESULT_PROCESSING);
-				if (result != null) {
-					if (result instanceof ExitShellRequest) {
-						exitShellRequest = (ExitShellRequest) result;
-						// Give ProcessManager a chance to close down its threads before the overall OSGi framework is terminated (ROO-1938)
-						executionStrategy.terminate();
-					} else if (result instanceof Iterable<?>) {
-						for (Object o : (Iterable<?>) result) {
-							logger.info(o.toString());
-						}
-					} else {
-						logger.info(result.toString());
+			}
+			
+			setShellStatus(Status.EXECUTING);
+			Object result = executionStrategy.execute(parseResult);
+			setShellStatus(Status.EXECUTION_RESULT_PROCESSING);
+			if (result != null) {
+				if (result instanceof ExitShellRequest) {
+					exitShellRequest = (ExitShellRequest) result;
+					// Give ProcessManager a chance to close down its threads before the overall OSGi framework is terminated (ROO-1938)
+					executionStrategy.terminate();
+				} else if (result instanceof Iterable<?>) {
+					for (Object o : (Iterable<?>) result) {
+						logger.info(o.toString());
 					}
+				} else {
+					logger.info(result.toString());
 				}
 			}
+			
 			logCommandIfRequired(line, true);
 			setShellStatus(Status.EXECUTION_SUCCESS, line, parseResult);
 			return true;

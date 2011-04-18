@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -44,6 +45,7 @@ import org.w3c.dom.Element;
  */
 public class SimpleParser implements Parser {
 	private static final Logger logger = HandlerUtils.getLogger(SimpleParser.class);
+	private static final Comparator<String> comparator = new NaturalOrderComparator<String>();
 	private final Object mutex = this;
 	private Set<Converter> converters = new HashSet<Converter>();
 	private Set<CommandMarker> commands = new HashSet<CommandMarker>();
@@ -159,9 +161,8 @@ public class SimpleParser implements Parser {
 					if (requiredType.isPrimitive()) {
 						logger.warning("Nulls cannot be presented to primitive type " + requiredType.getSimpleName() + " for option '" + StringUtils.arrayToCommaDelimitedString(cliOption.key()) + "'");
 						return null;
-					} else {
-						arguments.add(null);
 					}
+					arguments.add(null);
 					continue;
 				}
 
@@ -179,14 +180,15 @@ public class SimpleParser implements Parser {
 						}
 					}
 					if (c == null) {
+						System.out.println("requiredType: " + requiredType);
 						// Fall back to a normal SimpleTypeConverter and attempt conversion
 						throw new IllegalStateException("TODO: Add basic type conversion");
 						// SimpleTypeConverter simpleTypeConverter = new SimpleTypeConverter();
 						// result = simpleTypeConverter.convertIfNecessary(value, requiredType, mp);
-					} else {
-						// Use the converter
-						result = c.convertFromText(value, requiredType, cliOption.optionContext());
 					}
+					
+					// Use the converter
+					result = c.convertFromText(value, requiredType, cliOption.optionContext());
 					arguments.add(result);
 				} catch (RuntimeException e) {
 					logger.warning("Failed to convert '" + value + "' to type " + requiredType.getSimpleName() + " for option '" + StringUtils.arrayToCommaDelimitedString(cliOption.key()) + "'");
@@ -334,7 +336,6 @@ public class SimpleParser implements Parser {
 							// This is the first match, so ensure the intended match really represents the start of a command and not a later word within it
 							if (lastCommandWordUsed == 0 && candidate > 0) {
 								// This is not a valid match
-								bufferToReturn = null;
 								break next_buffer_loop;
 							}
 						}
@@ -399,7 +400,7 @@ public class SimpleParser implements Parser {
 
 			// Start by locating a method that matches
 			Set<MethodTarget> targets = locateTargets(translated, false, true);
-			SortedSet<String> results = new TreeSet<String>();
+			SortedSet<String> results = new TreeSet<String>(comparator);
 
 			// logger.info("RESULTS: '" + translated + "' " + StringUtils.collectionToCommaDelimitedString(targets));
 
@@ -730,9 +731,8 @@ public class SimpleParser implements Parser {
 								// Values presented from the last space onwards
 								if (translated.endsWith(" ")) {
 									return translated.lastIndexOf(" ") + 1;
-								} else {
-									return translated.trim().lastIndexOf(" ");
 								}
+								return translated.trim().lastIndexOf(" ");
 							}
 							return 0;
 						}
@@ -757,7 +757,7 @@ public class SimpleParser implements Parser {
 			}
 
 			// Compute the sections we'll be outputting, and get them into a nice order
-			SortedMap<String, Object> sections = new TreeMap<String, Object>();
+			SortedMap<String, Object> sections = new TreeMap<String, Object>(comparator);
 			next_target: for (Object target : commands) {
 				Method[] methods = target.getClass().getMethods();
 				for (Method m : methods) {
@@ -787,7 +787,7 @@ public class SimpleParser implements Parser {
 
 			for (String section : sections.keySet()) {
 				Object target = sections.get(section);
-				SortedMap<String, Element> individualCommands = new TreeMap<String, Element>();
+				SortedMap<String, Element> individualCommands = new TreeMap<String, Element>(comparator);
 
 				Method[] methods = target.getClass().getMethods();
 				for (Method m : methods) {
@@ -974,7 +974,7 @@ public class SimpleParser implements Parser {
 				// Only a single argument, so default to the normal help operation
 			}
 
-			SortedSet<String> result = new TreeSet<String>();
+			SortedSet<String> result = new TreeSet<String>(comparator);
 			for (MethodTarget mt : matchingTargets) {
 				CliCommand cmd = mt.method.getAnnotation(CliCommand.class);
 				if (cmd != null) {
@@ -999,7 +999,7 @@ public class SimpleParser implements Parser {
 
 	public Set<String> getEveryCommand() {
 		synchronized (mutex) {
-			SortedSet<String> result = new TreeSet<String>();
+			SortedSet<String> result = new TreeSet<String>(comparator);
 			for (Object o : commands) {
 				Method[] methods = o.getClass().getMethods();
 				for (Method m : methods) {

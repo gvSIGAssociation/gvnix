@@ -4,12 +4,13 @@
 	<parent>
 		<groupId>org.springframework.roo</groupId>
 		<artifactId>org.springframework.roo.osgi.roo.bundle</artifactId>
-		<version>1.1.2.RELEASE</version>
+		<version>1.1.3.RELEASE</version>
 		<relativePath>../osgi-roo-bundle</relativePath>
 	</parent>
 	<artifactId>org.springframework.roo.addon.email</artifactId>
 	<packaging>bundle</packaging>
 	<name>Spring Roo - Addon - Email</name>
+	<description>Support for integration and configuration of Spring's email support in the target project.</description>
 	<dependencies>
         <!-- OSGi -->
          <dependency>
