@@ -57,6 +57,8 @@ However, Roo source code can be updated to a new tag with next commands:
 * Apply our Roo modifications:	git stash pop
 * Save in SVN:					svn commit
 
+Save in SVN can be done after each git command or only last command. 
+
 Run gvNIX dev
 =============
 
@@ -292,3 +294,7 @@ TODO
 
 * Validate bin/ scripts.
   ¿ Replace GVNIX_HOME and ROO_HOME vars with GVNIX_DEV and ROO_DEV ?
+
+* Hibernate: PostLoad method invoked before collection initialised
+
+  https://issues.jboss.org/browse/JBAS-5474
