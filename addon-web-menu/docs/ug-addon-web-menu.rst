@@ -28,10 +28,58 @@ Introduction
 
 This Roo add-on lets you to manage the application structure from Roo shell.
 
-Roo Shell commands
-====================
+Menu management in Pet clinic 
+-------------------------------
 
-Command list to implement in this add-on:
+Create a new directory for the project::
+
+  Bash shell:
+
+    mkdir clinic
+    cd clinic
+
+Start gvNIX::
+
+  clinic$ gvnix.sh
+      ____  ____  ____  
+     / __ \/ __ \/ __ \ 
+    / /_/ / / / / / / / 
+   / _, _/ /_/ / /_/ /   1.1.2.RELEASE [rev fbc33bb]
+  /_/ |_|\____/\____/   gvNIX distribution 0.6.0
+  
+  
+  Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
+  roo>
+
+Create the project::
+
+  roo> script clinic.roo
+
+Setup menu management: install dependencies, create menu model and load initial menu data structure from *menu.jspx*::
+
+  roo> menu setup
+
+Create a new menu category to contain all finders::
+
+  roo> // Create a category to contain application finders
+  roo> menu entry add --label Finders
+  roo> // Change default ID to Category_ID
+  roo> menu entry update --id i_page_finders --nid c_finders
+  roo> // Move to root level
+  roo> menu entry move --id c_finders --before c_seleniumtests
+  roo> // Move finders to new finders category
+  roo> menu entry move --id fi_pet_nameandweight --into c_finders
+  roo> menu entry move --id fi_pet_sendremindersandweightlessthan --into c_finders
+  roo> menu entry move --id fi_pet_owner --into c_finders
+  roo> menu entry move --id fi_pet_typeandnamelike --into c_finders
+  roo> menu entry move --id fi_visit_descriptionandvisitdate --into c_finders
+  roo> menu entry move --id fi_visit_descriptionlike --into c_finders
+  roo> menu entry move --id fi_visit_visitdatebetween --into c_finders
+
+Run `mvn tomcat:run` in the root of your project and the new application structure should be available under the URL _http://localhost:8080/petclinic/_
+
+Available commands
+====================
 
 ``menu setup``
 --------------------------
@@ -224,32 +272,4 @@ Shows all information about a page. Example for Locale 'es'::
       Roles        : 
       Hidden       : false
 
-Use cases
-=============
-
-Installation use case
----------------------
-
-Developer wants to manage the site structure in his Roo application. Do it as follows:
-
-#. Install this add-on if it isn't already installed::
-
-    roo> osgi start --url 
-    TODO: Include in roobot.xml
-
-#. Execute command ``menu setup``.
-
-List menu structure
---------------------
-
-Developer wants show current menu structure:
-
-#. Execute command ``menu tree``
-
-Change a menu item
---------------------
-
-Developer wants to change the element ``Main`` to ``My_Main`` to customize the label:
-
-#. Execute command ``menu entry update --id ENTRY_ID --label My_Main``
 
