@@ -18,34 +18,46 @@
  */
 package org.gvnix.service.roo.addon.ws;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.*;
-
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
+import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
-//import org.springframework.roo.addon.maven.MavenOperations;
-
-// DiSiD: Roo 1.1.0.M3 remove the URL rewriter dependency
-// TODO: It is required configure the services URL in some other location ?
-//import org.springframework.roo.addon.web.mvc.controller.UrlRewriteOperations;
-
-import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.process.manager.ProcessManager;
-import org.springframework.roo.project.*;
+import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.Plugin;
+import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Property;
-import org.springframework.roo.support.util.*;
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
+import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.FileCopyUtils;
+import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.util.XmlUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * Utilities to manage the CXF web services library.
@@ -68,6 +80,9 @@ public class WSConfigServiceImpl implements WSConfigService {
     private FileManager fileManager;
     @Reference
     private ProjectOperations projectOperations;
+
+    @Reference
+    private SecurityService securityService;
 
     // DiSiD: Roo 1.1.0.M3 remove the URL rewriter dependency
     // TODO: It is required configure the services URL in some other location ?
@@ -1506,7 +1521,18 @@ public class WSConfigServiceImpl implements WSConfigService {
         // Add the package name to generate sources
 
         // Check URL connection and WSDL format to obtain the targetNamespace
-        Element rootElement = WsdlParserUtils.validateWsdlUrl(wsdlLocation);
+        // Element rootElement = WsdlParserUtils.validateWsdlUrl(wsdlLocation);
+        Element rootElement = null;
+        try {
+            // read the WSDL with the support of the Security System
+            // passphrase is null because we only work with default password
+            // 'changeit'
+            rootElement = securityService.parseWsdlFromUrl(
+                    wsdlLocation, null).getDocumentElement();
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "Error parsing WSDL from ".concat(wsdlLocation), e);
+        }
 
         // Configure the packagename to generate client sources
         Element packagenames = pom.createElement("packagenames");
@@ -1617,7 +1643,18 @@ public class WSConfigServiceImpl implements WSConfigService {
         // Add the package name to generate sources
 
         // Check URL connection and WSDL format to obtain the targetNamespace
-        Element rootElement = WsdlParserUtils.validateWsdlUrl(wsdlLocation);
+        // Element rootElement = WsdlParserUtils.validateWsdlUrl(wsdlLocation);
+        Element rootElement = null;
+        try {
+            // read the WSDL with the support of the Security System
+            // passphrase is null because we only work with default password
+            // 'changeit'
+            rootElement = securityService.parseWsdlFromUrl(
+                    wsdlLocation, null).getDocumentElement();
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "Error parsing WSDL from ".concat(wsdlLocation), e);
+        }
 
         // Configure the packagename to generate client sources
         Element packageSpace = pom.createElement("packageSpace");
@@ -1663,7 +1700,8 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // DiSiD: Use pathResolver instead of mavenOperations
         // File root = new File(mavenOperations.getProjectRoot());
-        File root = new File(projectOperations.getPathResolver().getRoot(
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        File root = new File(pathResolver.getRoot(
                 Path.ROOT));
 
         Assert.isTrue(root.isDirectory() && root.exists(),
@@ -1710,7 +1748,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     private class LoggingInputStream extends Thread {
 
-        private BufferedReader inputStream;
+        private final BufferedReader inputStream;
 
         public LoggingInputStream(InputStream inputStream) {
             this.inputStream = new BufferedReader(new InputStreamReader(

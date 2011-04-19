@@ -17,9 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * 
+ *
  */
 package org.gvnix.service.roo.addon.security;
+
+import org.w3c.dom.Document;
 
 /**
  * <p>
@@ -39,5 +41,18 @@ public interface SecurityService {
      * Adds dependencies and initializes WSSJ4 library in project
      */
     void setupWSSJ4();
+
+    /**
+     * Parse a WSDL form given urlStr and if it's needed it manage trustcacerts
+     * in order to allow connection against secure servers with non confiable
+     * certificates
+     * 
+     * @param urlStr
+     * @param keyStorePassphrase
+     * @return
+     * @throws Exception
+     */
+    Document parseWsdlFromUrl(String urlStr, String keyStorePassphrase)
+            throws Exception;
 
 }

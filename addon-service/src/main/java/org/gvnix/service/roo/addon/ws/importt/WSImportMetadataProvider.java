@@ -21,12 +21,14 @@ package org.gvnix.service.roo.addon.ws.importt;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.*;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceProxy;
+import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
-import org.gvnix.service.roo.addon.ws.importt.WSImportMetadataProvider;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -40,11 +42,7 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 /**
  * <p>
@@ -63,6 +61,9 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
     @Reference
     private WSConfigService wSConfigService;
+
+    @Reference
+    private SecurityService securityService;
 
     private static Logger logger = Logger
             .getLogger(WSImportMetadataProvider.class.getName());
@@ -84,6 +85,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
      * createLocalIdentifier(org.springframework.roo.model.JavaType,
      * org.springframework.roo.project.Path)
      */
+    @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
 
         return WSImportMetadata.createIdentifier(javaType, path);
@@ -95,6 +97,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
      * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
      * getGovernorPhysicalTypeIdentifier(java.lang.String)
      */
+    @Override
     protected String getGovernorPhysicalTypeIdentifier(
             String metadataIdentificationString) {
 
@@ -115,6 +118,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
      * (java.lang.String, org.springframework.roo.model.JavaType,
      * org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
      */
+    @Override
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
             String metadataIdentificationString, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -159,7 +163,18 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
             try {
 
                 // Check URL connection and WSDL format
-                Element root = WsdlParserUtils.validateWsdlUrl(url.getValue());
+                Element root = null;
+                try {
+                    // read the WSDL with the support of the Security System
+                    // passphrase is null because we only work with default
+                    // password 'changeit'
+                    root = securityService.parseWsdlFromUrl(
+                            url.getValue(), null).getDocumentElement();
+                } catch (Exception e) {
+                    throw new IllegalStateException(
+                            "Error parsing WSDL from ".concat(url.getValue()),
+                            e);
+                }
 
                 boolean generate;
                 if (WsdlParserUtils.isRpcEncoded(root)) {
@@ -185,7 +200,8 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
                 // Create metadata
                 metadata = new WSImportMetadata(metadataIdentificationString,
-                        aspectName, governorPhysicalTypeMetadata);
+                        aspectName, governorPhysicalTypeMetadata,
+                        securityService);
 
             } catch (IOException e) {
 

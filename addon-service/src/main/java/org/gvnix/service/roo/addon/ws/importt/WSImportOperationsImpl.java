@@ -31,7 +31,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
 import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceProxy;
-import org.gvnix.service.roo.addon.util.WsdlParserUtils;
+import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -42,6 +42,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
+import org.w3c.dom.Document;
 
 /**
  * Addon for Handle Web Service Proxy Layer
@@ -71,6 +72,9 @@ public class WSImportOperationsImpl implements WSImportOperations {
     @Reference
     private TypeLocationService typeLocationService;
 
+    @Reference
+    private SecurityService securityService;
+
     // @Reference
     // private ClasspathOperations classpathOperations;
 
@@ -94,7 +98,16 @@ public class WSImportOperationsImpl implements WSImportOperations {
     public void addImportAnnotation(JavaType serviceClass, String wsdlLocation) {
 
         // Check URL connection and WSDL format
-        WsdlParserUtils.validateWsdlUrl(wsdlLocation);
+        try {
+            // read the WSDL with the support of the Security System
+            // passphrase is null because we only work with default password
+            // 'changeit'
+            Document wsdl = securityService
+                    .parseWsdlFromUrl(wsdlLocation, null);
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "Error parsing WSDL from ".concat(wsdlLocation), e);
+        }
 
         // Service class path
         String fileLocation = projectOperations.getPathResolver()

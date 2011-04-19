@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
@@ -481,7 +482,7 @@ public class WsdlParserUtils {
         // RPC Encoded web services adds sufix to port type when equals to port
         if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)
                 && portType.equals(port)) {
-
+          
             portType = portType.concat("_PortType");
         }
 
@@ -685,10 +686,9 @@ public class WsdlParserUtils {
                         .indexOf(SOAP_11_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
             if (isSoap12Compatible) {
-                Assert
-                        .state(
-                                false,
-                                "There are defined SOAP 1.1 and 1.2 protocols.\nMust be only one protocol defined.");
+                Assert.state(
+                        false,
+                        "There are defined SOAP 1.1 and 1.2 protocols.\nMust be only one protocol defined.");
             }
 
             isSoap11Compatible = true;
@@ -1200,13 +1200,16 @@ public class WsdlParserUtils {
     }
 
     /**
-     * Check connection and WSDL format from the given url.
+     * Check connection and WSDL format from the given url.<br/>
+     * If you need SSL support acceding to WSLD you should use
+     * {@link SecurityService#parseWsdlFromUrl(String, String)}
      * 
      * @param url
      *            URL to check
      * @return Wsdl document root element
      * @exception IllegalStateException
      *                wsdl no connection or invalid
+     * 
      */
     public static Element validateWsdlUrl(String url) {
 

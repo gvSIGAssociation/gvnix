@@ -36,23 +36,26 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceProxy;
+import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
-import org.gvnix.service.roo.addon.ws.importt.WSImportMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.*;
-import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.MethodMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.model.*;
+import org.springframework.roo.model.DataType;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -80,14 +83,19 @@ public class WSImportMetadata extends
     private static final String WEB_SERVICE_TYPE = MetadataIdentificationUtils
             .create(WEB_SERVICE_TYPE_STRING);
 
+    private SecurityService securityService;
+
     // From annotation
     @AutoPopulate
     private String wsdlLocation;
 
     public WSImportMetadata(String identifier, JavaType aspectName,
-            PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+            PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            SecurityService secuirityService) {
 
         super(identifier, aspectName, governorPhysicalTypeMetadata);
+
+        this.securityService = secuirityService;
 
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be valid");
@@ -110,7 +118,17 @@ public class WSImportMetadata extends
             try {
 
                 // Check URL connection and WSDL format
-                Element root = WsdlParserUtils.validateWsdlUrl(wsdlLocation);
+                Element root = null;
+                try {
+                    // read the WSDL with the support of the Security System
+                    // passphrase is null because we only work with default
+                    // password 'changeit'
+                    root = securityService.parseWsdlFromUrl(
+                            wsdlLocation, null).getDocumentElement();
+                } catch (Exception e) {
+                    throw new IllegalStateException(
+                            "Error parsing WSDL from ".concat(wsdlLocation), e);
+                }
 
                 // Create Aspect methods related to this wsdl location
                 if (WsdlParserUtils.isRpcEncoded(root)) {
