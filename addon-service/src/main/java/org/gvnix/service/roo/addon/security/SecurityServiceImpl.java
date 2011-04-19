@@ -62,7 +62,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Implementation of {@link SecurityService}
- * 
+ *
  * @author Jose Manuel Vivó Arnal ( jmvivo at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -89,7 +89,7 @@ public class SecurityServiceImpl implements SecurityService {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * <p>
      * This performs this operations:
      * </p>
@@ -97,7 +97,7 @@ public class SecurityServiceImpl implements SecurityService {
      * <li>Install Apache WSSJ4 depenency in pom</li>
      * <li>Creates axis <code>client-config.wsdd</code> file</li>
      * </ul>
-     * 
+     *
      **/
     public void setupWSSJ4() {
         addDependencies();
@@ -164,12 +164,12 @@ public class SecurityServiceImpl implements SecurityService {
      * the error.</li>
      * </ol>
      * With that operation we can try again to get the WSDL.<br/>
-     * 
+     *
      * Also it exports the chain certificates to <code>.cer</code> files in
      * <code>SRC_MAIN_RESOURCES</code>, so the developer can distribute them for
      * its installation in other environments or just in case we reach the
      * problem with the JVM <code>cacerts</code> file permissions.
-     * 
+     *
      * @see GvNix509TrustManager#saveCertFile(String, X509Certificate,
      *      FileManager, PathResolver)
      * @see <a href=
@@ -249,7 +249,7 @@ public class SecurityServiceImpl implements SecurityService {
                     /*
                      * TODO: code to replace directly JVM cacerts by our custom
                      * keystore
-                     * 
+                     *
                      * if (GvNix509TrustManager.replaceJVMCacerts(keystore,
                      * jvmCacerts, fileManager)) {
                      * logger.info("JVM cacert has been replaced " +
@@ -278,10 +278,23 @@ public class SecurityServiceImpl implements SecurityService {
         }
     }
 
+    /** {@inheritDoc} */
+    public Document loadWsdlUrl(String url) {
+        try {
+            // read the WSDL with the support of the Security System
+            // passphrase is null because we only work with default password
+            // 'changeit'
+            return parseWsdlFromUrl(url, null);
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "Error parsing WSDL from ".concat(url), e);
+        }
+    }
+
     /**
      * Copy, if exists, the cacerts keystore of the JVM in a new keystore file
      * gvnix-cacerts
-     * 
+     *
      * @return
      */
     private File createCacertsBasedOnJvmCacerts() {

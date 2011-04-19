@@ -2115,18 +2115,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     public Document checkWSDLFile(String url) {
 
         // Check URL connection and WSDL format
-        // Element root = WsdlParserUtils.validateWsdlUrl(url);
-        Element root = null;
-        try {
-            // read the WSDL with the support of the Security System
-            // passphrase is null because we only work with default password
-            // 'changeit'
-            root = securityService.parseWsdlFromUrl(url, null)
-                    .getDocumentElement();
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "Error parsing WSDL from ".concat(url), e);
-        }
+        Element root = securityService.loadWsdlUrl(url).getDocumentElement();
 
         Assert.isTrue(!WsdlParserUtils.isRpcEncoded(root), "This Wsdl '" + url
                 + "' is RPC Encoded and is not supported by the Add-on.");

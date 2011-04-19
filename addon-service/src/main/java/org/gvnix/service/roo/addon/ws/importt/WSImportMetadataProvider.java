@@ -163,18 +163,8 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
             try {
 
                 // Check URL connection and WSDL format
-                Element root = null;
-                try {
-                    // read the WSDL with the support of the Security System
-                    // passphrase is null because we only work with default
-                    // password 'changeit'
-                    root = securityService.parseWsdlFromUrl(
-                            url.getValue(), null).getDocumentElement();
-                } catch (Exception e) {
-                    throw new IllegalStateException(
-                            "Error parsing WSDL from ".concat(url.getValue()),
-                            e);
-                }
+                Element root = securityService.loadWsdlUrl(url.getValue())
+                        .getDocumentElement();
 
                 boolean generate;
                 if (WsdlParserUtils.isRpcEncoded(root)) {

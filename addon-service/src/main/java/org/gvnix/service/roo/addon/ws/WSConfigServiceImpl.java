@@ -1521,18 +1521,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         // Add the package name to generate sources
 
         // Check URL connection and WSDL format to obtain the targetNamespace
-        // Element rootElement = WsdlParserUtils.validateWsdlUrl(wsdlLocation);
-        Element rootElement = null;
-        try {
-            // read the WSDL with the support of the Security System
-            // passphrase is null because we only work with default password
-            // 'changeit'
-            rootElement = securityService.parseWsdlFromUrl(
-                    wsdlLocation, null).getDocumentElement();
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "Error parsing WSDL from ".concat(wsdlLocation), e);
-        }
+        Element rootElement = securityService.loadWsdlUrl(wsdlLocation)
+                .getDocumentElement();
 
         // Configure the packagename to generate client sources
         Element packagenames = pom.createElement("packagenames");
@@ -1643,18 +1633,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         // Add the package name to generate sources
 
         // Check URL connection and WSDL format to obtain the targetNamespace
-        // Element rootElement = WsdlParserUtils.validateWsdlUrl(wsdlLocation);
-        Element rootElement = null;
-        try {
-            // read the WSDL with the support of the Security System
-            // passphrase is null because we only work with default password
-            // 'changeit'
-            rootElement = securityService.parseWsdlFromUrl(
-                    wsdlLocation, null).getDocumentElement();
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "Error parsing WSDL from ".concat(wsdlLocation), e);
-        }
+        Element rootElement = securityService.loadWsdlUrl(wsdlLocation)
+                .getDocumentElement();
 
         // Configure the packagename to generate client sources
         Element packageSpace = pom.createElement("packageSpace");

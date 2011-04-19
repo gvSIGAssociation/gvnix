@@ -118,17 +118,8 @@ public class WSImportMetadata extends
             try {
 
                 // Check URL connection and WSDL format
-                Element root = null;
-                try {
-                    // read the WSDL with the support of the Security System
-                    // passphrase is null because we only work with default
-                    // password 'changeit'
-                    root = securityService.parseWsdlFromUrl(
-                            wsdlLocation, null).getDocumentElement();
-                } catch (Exception e) {
-                    throw new IllegalStateException(
-                            "Error parsing WSDL from ".concat(wsdlLocation), e);
-                }
+                Element root = securityService.loadWsdlUrl(wsdlLocation)
+                        .getDocumentElement();
 
                 // Create Aspect methods related to this wsdl location
                 if (WsdlParserUtils.isRpcEncoded(root)) {

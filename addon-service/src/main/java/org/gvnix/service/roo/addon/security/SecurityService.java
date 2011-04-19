@@ -55,4 +55,12 @@ public interface SecurityService {
     Document parseWsdlFromUrl(String urlStr, String keyStorePassphrase)
             throws Exception;
 
+    /**
+     * Wrapper method of {@link #parseWsdlFromUrl(String, String)}
+     * 
+     * @param url
+     * @return
+     */
+    Document loadWsdlUrl(String url);
+
 }

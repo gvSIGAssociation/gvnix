@@ -482,7 +482,7 @@ public class WsdlParserUtils {
         // RPC Encoded web services adds sufix to port type when equals to port
         if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)
                 && portType.equals(port)) {
-          
+
             portType = portType.concat("_PortType");
         }
 
@@ -1202,7 +1202,7 @@ public class WsdlParserUtils {
     /**
      * Check connection and WSDL format from the given url.<br/>
      * If you need SSL support acceding to WSLD you should use
-     * {@link SecurityService#parseWsdlFromUrl(String, String)}
+     * {@link SecurityService#loadWsdlUrl(String)}
      * 
      * @param url
      *            URL to check

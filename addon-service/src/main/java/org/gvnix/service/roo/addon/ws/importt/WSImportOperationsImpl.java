@@ -42,7 +42,6 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
-import org.w3c.dom.Document;
 
 /**
  * Addon for Handle Web Service Proxy Layer
@@ -98,16 +97,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
     public void addImportAnnotation(JavaType serviceClass, String wsdlLocation) {
 
         // Check URL connection and WSDL format
-        try {
-            // read the WSDL with the support of the Security System
-            // passphrase is null because we only work with default password
-            // 'changeit'
-            Document wsdl = securityService
-                    .parseWsdlFromUrl(wsdlLocation, null);
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "Error parsing WSDL from ".concat(wsdlLocation), e);
-        }
+        securityService.loadWsdlUrl(wsdlLocation);
 
         // Service class path
         String fileLocation = projectOperations.getPathResolver()
