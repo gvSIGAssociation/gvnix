@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
@@ -475,17 +474,19 @@ public class WsdlParserUtils {
         // Build the classpath related to the namespace
         String path = getTargetNamespaceRelatedPackage(root);
 
-        // Find a compatible port type name
-        String name = findFirstCompatiblePortTypeClassName(root, sense);
+        // Find a compatible port and port type name
+        String portType = findFirstCompatiblePortTypeClassName(root, sense);
+        String port = findFirstCompatiblePortClassName(root, sense);
 
+        // RPC Encoded web services adds sufix to port type when equals to port
         if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)
-                && name.endsWith("Port")) {
+                && portType.equals(port)) {
 
-            name = name.concat("_PortType");
+            portType = portType.concat("_PortType");
         }
 
         // Class path is the concat of path and name
-        return path + capitalizeFirstChar(name);
+        return path + capitalizeFirstChar(portType);
     }
 
     /**
@@ -684,9 +685,10 @@ public class WsdlParserUtils {
                         .indexOf(SOAP_11_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
             if (isSoap12Compatible) {
-                Assert.state(
-                        false,
-                        "There are defined SOAP 1.1 and 1.2 protocols.\nMust be only one protocol defined.");
+                Assert
+                        .state(
+                                false,
+                                "There are defined SOAP 1.1 and 1.2 protocols.\nMust be only one protocol defined.");
             }
 
             isSoap11Compatible = true;
