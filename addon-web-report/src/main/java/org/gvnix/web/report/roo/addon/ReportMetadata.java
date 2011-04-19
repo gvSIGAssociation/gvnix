@@ -36,9 +36,9 @@ import java.util.regex.Pattern;
 
 import org.gvnix.web.report.roo.addon.util.ReportValidTypes;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
-import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataUtils;
+import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -111,6 +111,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
     private PropFileOperations propFileOperations;
     private MetadataService metadataService;
     private MemberDetailsScanner memberDetailsScanner;
+    private WebMetadataService webMetadataService;
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
     public ReportMetadata(String identifier, JavaType aspectName,
@@ -119,7 +120,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
             MetadataService metadataService,
             MemberDetailsScanner memberDetailsScanner,
             MetadataDependencyRegistry metadataDependencyRegistry,
-            WebScaffoldMetadata webScaffoldMetadata, FileManager fileManager,
+            WebScaffoldMetadata webScaffoldMetadata,
+            WebMetadataService webMetadataService, FileManager fileManager,
             ProjectOperations projectOperations,
             PropFileOperations propFileOperations,
             List<StringAttributeValue> definedReports) {
@@ -130,6 +132,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         this.projectOperations = projectOperations;
         this.propFileOperations = propFileOperations;
         this.metadataService = metadataService;
+        this.webMetadataService = webMetadataService;
         this.memberDetailsScanner = memberDetailsScanner;
         this.metadataDependencyRegistry = metadataDependencyRegistry;
 
@@ -560,11 +563,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
         // Get member details of fromBackingObject type
         MemberDetails memberDetails = getMemberDetails(fromBackingObject);
-        List<FieldMetadata> elegibleFields = WebMetadataUtils
-                .getScaffoldElegibleFieldMetadata(fromBackingObject,
-                        memberDetails, metadataService,
-                        governorPhysicalTypeMetadata.getId(),
-                        metadataDependencyRegistry);
+        List<FieldMetadata> elegibleFields = webMetadataService.getScaffoldEligibleFieldMetadata(fromBackingObject,
+                        memberDetails, governorPhysicalTypeMetadata.getId());
         /*
          * We only use 3 fields in the sample report. By now we only use field
          * types accepted by JasperReports XMLSchema

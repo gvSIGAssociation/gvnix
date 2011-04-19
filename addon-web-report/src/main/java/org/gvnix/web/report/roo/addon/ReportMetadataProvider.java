@@ -10,8 +10,9 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadataProvider;
+import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
@@ -59,6 +60,9 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
 
     @Reference
     PropFileOperations propFileOperations;
+
+    @Reference
+    WebMetadataService webMetadataService;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -175,7 +179,8 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
                 governorPhysicalTypeMetadata,
                 MemberFindingUtils.getMethods(controllerMemberDetails),
                 metadataService, memberDetailsScanner,
-                metadataDependencyRegistry, webScaffoldMetadata, fileManager,
+                metadataDependencyRegistry, webScaffoldMetadata,
+                webMetadataService, fileManager,
                 projectOperations, propFileOperations, definedReports);
     }
 
