@@ -18,6 +18,10 @@
  */
 package org.gvnix.service.roo.addon.ws.importt;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +35,9 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
 import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceProxy;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceSecurity;
 import org.gvnix.service.roo.addon.security.SecurityService;
+import org.gvnix.service.roo.addon.security.WSServiceSecurityMetadata;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -40,8 +46,11 @@ import org.springframework.roo.classpath.details.annotations.StringAttributeValu
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.FileCopyUtils;
 
 /**
  * Addon for Handle Web Service Proxy Layer
@@ -157,5 +166,158 @@ public class WSImportOperationsImpl implements WSImportOperations {
             classNames.add(cid.getName().getFullyQualifiedTypeName());
         }
         return classNames;
+    }
+
+    /** {@inheritDoc} **/
+    public void addSignatureAnnotation(JavaType importedServiceClass,
+            File certificate, String password, String alias) {
+
+        // get class
+        ClassOrInterfaceTypeDetails importedServiceDetails = typeLocationService
+                .getClassOrInterface(importedServiceClass);
+
+        // checks if class is really a imported service
+        boolean hasImportAnnotation = javaParserService.isAnnotationIntroduced(
+                GvNIXWebServiceProxy.class.getName(), importedServiceDetails);
+        Assert.isTrue(hasImportAnnotation, importedServiceDetails.toString()
+                .concat(" is not a imported service"));
+
+        // Check if certificate file exist
+        Assert.isTrue(certificate.exists(), certificate.getAbsolutePath()
+                .concat(" not found"));
+        Assert.isTrue(certificate.isFile(), certificate.getAbsolutePath()
+                .concat(" is not a file"));
+
+        // Check certificate extension
+        if (!certificate.getName().endsWith(".p12")) {
+            // if it's not .p12 show a warning
+            logger.warning("Currently this action only supports pkcs12. "
+                    .concat(certificate.getAbsolutePath()).concat(
+                            " has no '.p12' extension"));
+        }
+
+        // Copy certificate file into resources
+        File targetCertificated = copyCertificateFileIntoResources(
+                importedServiceClass, certificate);
+
+        // Add annotation to class
+        List<AnnotationAttributeValue<?>> annotationAttributeValues = new ArrayList<AnnotationAttributeValue<?>>();
+        annotationAttributeValues
+                .add(new StringAttributeValue(
+                        new JavaSymbolName("certificate"), targetCertificated
+                                .getName()));
+        annotationAttributeValues.add(new StringAttributeValue(
+                new JavaSymbolName("password"), password));
+        annotationAttributeValues.add(new StringAttributeValue(
+                new JavaSymbolName("alias"), alias));
+        annotationsService.addJavaTypeAnnotation(importedServiceClass,
+                GvNIXWebServiceSecurity.class.getName(),
+                annotationAttributeValues, false);
+
+        // Add GvNixAnnotations to the project.
+        annotationsService.addGvNIXAnnotationsDependency();
+
+    }
+
+    /**
+     * <p>
+     * Copy a certificate file into project resources
+     * </p>
+     * 
+     * <p>
+     * If a file with the same name already exists, file will be copied using a
+     * new name adding an suffix to original base name (see
+     * {@link #computeCertificateTargetName(File, JavaType)}).
+     * </p>
+     * 
+     * @param importedServiceClass
+     * @param certificate
+     * @return final file generated
+     */
+    private File copyCertificateFileIntoResources(
+            JavaType importedServiceClass, File certificate) {
+        // Prepare target file name
+        File targetCertificated = computeCertificateTargetName(certificate,
+                importedServiceClass);
+
+        // Create target folder (if not exists)
+        if (!targetCertificated.getParentFile().exists()) {
+            fileManager.createDirectory(targetCertificated.getParentFile()
+                    .getAbsolutePath());
+        }
+
+        // Copy certificate file to project resource folder
+        MutableFile targetCertificatedMutableFile = fileManager
+                .createFile(targetCertificated.getAbsolutePath());
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = new FileInputStream(certificate);
+            os = targetCertificatedMutableFile.getOutputStream();
+
+            FileCopyUtils.copy(is, os);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (Exception e) {
+                    // Noting to do
+                }
+            }
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (Exception e) {
+                    // Noting to do
+                }
+            }
+        }
+        return targetCertificated;
+    }
+
+    /**
+     * <p>
+     * Generates file names for certificate file to copy into project resource
+     * folder until it find a unused one.
+     * </p>
+     * 
+     * <p>
+     * The first try is <code>{target-folder}/{certificate_fileName}</code>
+     * </p>
+     * <p>
+     * Pattern:
+     * <code>{target-folder}/{certificate_name}_{counter}.{certificate_extension}</code>
+     * </p>
+     * 
+     * @param certificate
+     * @param importedServiceClass
+     * @return
+     */
+    private File computeCertificateTargetName(File certificate,
+            JavaType importedServiceClass) {
+
+        String certificateName = certificate.getName();
+        String extension = certificateName.substring(
+                certificateName.lastIndexOf('.'), certificateName.length());
+        certificateName = certificateName.substring(0,
+                certificateName.lastIndexOf('.'));
+        String targetPath = WSServiceSecurityMetadata.getCertificatePath(
+                importedServiceClass, certificate.getName());
+        targetPath = projectOperations.getPathResolver().getIdentifier(
+                Path.SRC_MAIN_RESOURCES, targetPath);
+
+        int index = 1;
+        String baseNamePath = targetPath.replace(certificate.getName(), "");
+
+        while (fileManager.exists(targetPath)) {
+            targetPath = baseNamePath.concat(certificateName)
+                    .concat("_" + index).concat(extension);
+            targetPath = projectOperations.getPathResolver().getIdentifier(
+                    Path.SRC_MAIN_RESOURCES, targetPath);
+            index++;
+        }
+        return new File(targetPath);
     }
 }

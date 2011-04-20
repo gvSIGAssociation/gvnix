@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.roo.addon;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -280,7 +281,24 @@ public class ServiceCommands implements CommandMarker {
                 || wSExportOperations.isProjectAvailable();
     }
 
-    @CliCommand(value = "service ws list", help = "Shows a list of import and exports services")
+    public boolean isServiceSecurityWs() {
+        return wSImportOperations.isProjectAvailable();
+    }
+
+    @CliCommand(value = "service security ws", help = "Adds Signature to a imported Web Service request")
+    public void serviceSecurityWs(
+            @CliOption(key = "class", mandatory = true, help = "Name of the imported service class") JavaType importedServiceClass,
+            @CliOption(key = "certificate", mandatory = true, help = "pkcs12 file to use for sing the request") File certificate,
+            @CliOption(key = "password", mandatory = true, help = "pkcs12 file password to use for sing the request") String password,
+            @CliOption(key = "alias", mandatory = true, help = "alias of pkcs12 file to use for sing the request") String alias) {
+        // TODO use converters to auto-complete imported service class parameter
+        // (converter can use WSImportOperation.getServiceList() for
+        // auto-complete)
+        wSImportOperations.addSignatureAnnotation(importedServiceClass,
+                certificate, password, alias);
+    }
+
+    @CliCommand(value = "service ws list", help = "Shows a class list which imports and/or exposes services")
     public String serviceWsList() {
 
         // Gets imported services
@@ -294,7 +312,22 @@ public class ServiceCommands implements CommandMarker {
     }
 
     /**
+     * <p>
      * Format web service list
+     * </p>
+     * 
+     * <p>
+     * Pattern:<br/>
+     * 
+     * <pre>
+     * Services             exposed   import
+     * ------------------- --------- ---------
+     * {className}             X         X
+     * {className2}                      X
+     * {className3}            X
+     * </pre>
+     * 
+     * </p>
      * 
      * @param importedServices
      * @param exposedServices

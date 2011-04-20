@@ -21,7 +21,11 @@
  */
 package org.gvnix.service.roo.addon.security;
 
+import java.io.IOException;
+import java.util.Map;
+
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  * <p>
@@ -54,6 +58,17 @@ public interface SecurityService {
      */
     Document parseWsdlFromUrl(String urlStr, String keyStorePassphrase)
             throws Exception;
+
+    /**
+     * Adds or update a client service definition to client-config.wsdd file
+     * 
+     * @param serviceName
+     * @param properties
+     * @throws SAXException
+     * @throws IOException
+     */
+    void addOrUpdateAxisClientService(String serviceName,
+            Map<String, String> properties) throws SAXException, IOException;
 
     /**
      * Wrapper method of {@link #parseWsdlFromUrl(String, String)}

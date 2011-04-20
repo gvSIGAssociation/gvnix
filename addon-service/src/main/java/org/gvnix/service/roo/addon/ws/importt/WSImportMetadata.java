@@ -150,6 +150,13 @@ public class WSImportMetadata extends
     }
 
     /**
+     * @return WSDL location
+     */
+    public String getWsdlLocation() {
+        return wsdlLocation;
+    }
+
+    /**
      * Create methods on Aspect file related to this wsdl location.
      * 
      * @param root

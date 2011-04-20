@@ -16,20 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- *
- */
 package org.gvnix.service.roo.addon.security;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -41,12 +43,14 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import javax.xml.transform.Transformer;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.metadata.MetadataService;
+import org.gvnix.service.roo.addon.AnnotationsService;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
@@ -62,7 +66,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Implementation of {@link SecurityService}
- *
+ * 
  * @author Jose Manuel Vivó Arnal ( jmvivo at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -78,18 +82,19 @@ public class SecurityServiceImpl implements SecurityService {
     private static Logger logger = Logger.getLogger(SecurityServiceImpl.class
             .getName());
 
-    private static final String DEPENDENCIES_FILE = "dependencies-wss4j.xml";
+    private static final String DEPENDENCIES_FILE = "dependencies-wssl4.xml";
+    private static final String AXIS_CLIENT_CONFIG_TEMPLATE_FILE = "client-config-axis-template.xml";
 
-    @Reference
-    private MetadataService metadataService;
     @Reference
     private FileManager fileManager;
     @Reference
     private ProjectOperations projectOperations;
+    @Reference
+    private AnnotationsService annotationsService;
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * <p>
      * This performs this operations:
      * </p>
@@ -97,7 +102,7 @@ public class SecurityServiceImpl implements SecurityService {
      * <li>Install Apache WSSJ4 depenency in pom</li>
      * <li>Creates axis <code>client-config.wsdd</code> file</li>
      * </ul>
-     *
+     * 
      **/
     public void setupWSSJ4() {
         addDependencies();
@@ -105,12 +110,41 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     /**
+     * @return Returns the path to axis client wsdd config file
+     */
+    private String getAxisClientConfigPath() {
+        return projectOperations.getPathResolver().getIdentifier(
+                Path.SRC_MAIN_RESOURCES, "client-config.wsdd");
+    }
+
+    /**
      * Creates <code>client-config.wssd</code> file in application resources
      * folder
      */
     private void createAxisClientConfigFile() {
-        // TODO Auto-generated method stub
+        String axisClientConfigPath = getAxisClientConfigPath();
 
+        if (fileManager.exists(axisClientConfigPath)) {
+            return;
+        }
+
+        // Gets the template
+        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+                AXIS_CLIENT_CONFIG_TEMPLATE_FILE);
+
+        // Create target file
+        MutableFile cxfXmlMutableFile = fileManager
+                .createFile(axisClientConfigPath);
+
+        try {
+            FileCopyUtils.copy(templateInputStream,
+                    cxfXmlMutableFile.getOutputStream());
+        } catch (Exception e) {
+
+            throw new IllegalStateException(e);
+        }
+
+        fileManager.scan();
     }
 
     /**
@@ -118,8 +152,7 @@ public class SecurityServiceImpl implements SecurityService {
      */
     protected void addDependencies() {
 
-        // TODO Unify distinct dependencies files in only one
-
+        annotationsService.addGvNIXAnnotationsDependency();
         InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
                 DEPENDENCIES_FILE);
         Assert.notNull(templateInputStream,
@@ -164,12 +197,12 @@ public class SecurityServiceImpl implements SecurityService {
      * the error.</li>
      * </ol>
      * With that operation we can try again to get the WSDL.<br/>
-     *
+     * 
      * Also it exports the chain certificates to <code>.cer</code> files in
      * <code>SRC_MAIN_RESOURCES</code>, so the developer can distribute them for
      * its installation in other environments or just in case we reach the
      * problem with the JVM <code>cacerts</code> file permissions.
-     *
+     * 
      * @see GvNix509TrustManager#saveCertFile(String, X509Certificate,
      *      FileManager, PathResolver)
      * @see <a href=
@@ -177,8 +210,8 @@ public class SecurityServiceImpl implements SecurityService {
      *      >Java SE keytool</a>.
      *      </p>
      */
-    public Document parseWsdlFromUrl(String urlStr,
-            String keyStorePassphrase) throws Exception {
+    public Document parseWsdlFromUrl(String urlStr, String keyStorePassphrase)
+            throws Exception {
 
         try {
             // Parse the wsdl location to a DOM document
@@ -249,7 +282,7 @@ public class SecurityServiceImpl implements SecurityService {
                     /*
                      * TODO: code to replace directly JVM cacerts by our custom
                      * keystore
-                     *
+                     * 
                      * if (GvNix509TrustManager.replaceJVMCacerts(keystore,
                      * jvmCacerts, fileManager)) {
                      * logger.info("JVM cacert has been replaced " +
@@ -294,7 +327,7 @@ public class SecurityServiceImpl implements SecurityService {
     /**
      * Copy, if exists, the cacerts keystore of the JVM in a new keystore file
      * gvnix-cacerts
-     *
+     * 
      * @return
      */
     private File createCacertsBasedOnJvmCacerts() {
@@ -330,4 +363,102 @@ public class SecurityServiceImpl implements SecurityService {
                 .concat("cacerts"));
     }
 
+    /** {@inheritDoc} */
+    public void addOrUpdateAxisClientService(String serviceName,
+            Map<String, String> parameters) throws SAXException, IOException {
+        createAxisClientConfigFile();
+        String axisClientPath = getAxisClientConfigPath();
+        Document document = XmlUtils.getDocumentBuilder().parse(
+                new File(axisClientPath));
+
+        Element deployment = (Element) document.getFirstChild();
+
+        Element serviceElementDescriptor = getAxisClientService(document,
+                serviceName, parameters);
+
+        List<Element> previousServices = XmlUtils.findElements(
+                "/deployment/service[@name='".concat(serviceName).concat("']"),
+                deployment);
+
+        if (previousServices.isEmpty()) {
+            deployment.appendChild(serviceElementDescriptor);
+        } else {
+            deployment.replaceChild(serviceElementDescriptor,
+                    previousServices.get(0));
+        }
+
+        OutputStream outputStream = new ByteArrayOutputStream();
+
+        Transformer transformer = XmlUtils.createIndentingTransformer();
+
+        XmlUtils.writeXml(transformer, outputStream, document);
+
+        fileManager.createOrUpdateTextFileIfRequired(axisClientPath,
+                outputStream.toString(), false);
+
+    }
+
+    /**
+     * <p>
+     * Create a xml element for a axis security service cliente configuration
+     * </p>
+     * 
+     * <p>
+     * Result element will be like this:
+     * </p>
+     * 
+     * <pre>
+     * &lt;service name="{serviceName}"&gt;
+     *      &lt;requestFlow&gt;
+     *          &lt;handler type="java:org.apache.ws.axis.security.WSDoAllSender"&gt;
+     *             &lt;!-- For every entry in parameters --&gt;
+     *             &lt;parameter name="{paramKey}" value="{paramValue}"/&gt;
+     *             &lt;!-- End for every entry --&gt;
+     *          &lt;/handler&gt;
+     *      &lt;/requestFlow&gt;
+     * &lt;/service&gt;
+     * </pre>
+     * 
+     * @param doc
+     *            client-config.wsdd document
+     * @param serviceName
+     * @param parameters
+     * @return
+     */
+    private Element getAxisClientService(Document doc, String serviceName,
+            Map<String, String> parameters) {
+
+        // <service name="Service_Name">
+        Element service = doc.createElement("service");
+        // FIXME set service name
+        service.setAttribute("name", serviceName);
+
+        // <requestFlow>
+        Element requestFlow = doc.createElement("requestFlow");
+
+        // <handler type="java:org.apache.ws.axis.security.WSDoAllSender">
+        Element handler = doc.createElement("handler");
+        handler.setAttribute("type",
+                "java:org.apache.ws.axis.security.WSDoAllSender");
+
+        Element parameter;
+
+        Set<Entry<String, String>> entrySet = parameters.entrySet();
+        for (Entry<String, String> entry : entrySet) {
+            // <parameter name="{paramKey}" value="{paramValue}"/>
+            parameter = doc.createElement("parameter");
+            parameter.setAttribute("name", entry.getKey());
+            parameter.setAttribute("value", entry.getValue());
+            handler.appendChild(parameter);
+        }
+
+        // </handler>
+        requestFlow.appendChild(handler);
+
+        // </requestFlow>
+        service.appendChild(requestFlow);
+
+        // </service>
+        return service;
+    }
 }

@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.roo.addon.ws.importt;
 
+import java.io.File;
 import java.util.List;
 
 import org.springframework.roo.model.JavaType;
@@ -54,5 +55,31 @@ public interface WSImportOperations {
      * 
      * @return
      */
-    List<String> getServiceList();
+    public List<String> getServiceList();
+
+    /**
+     * <p>
+     * Adds the gvNIX annotation for add signature to request to a import
+     * service.
+     * </p>
+     * 
+     * <p>
+     * <b>Note:</b> <code>certificate</code> certificate file will be copied
+     * into resources project folder.<br/>
+     * If file already exist, a new name (adding a numeric suffix to base name)
+     * will be generated and used.
+     * </p>
+     * 
+     * @param importedServiceClassName
+     *            class with the imported service to apply signature
+     * @param certificate
+     *            <code>.p12</code> file to use to sign requests
+     * @param password
+     *            for <code>.p12</code> file
+     * @param alias
+     *            of the certificate from certificate file to use for sing
+     *            request
+     */
+    public void addSignatureAnnotation(JavaType importedServiceClassName,
+            File certificate, String password, String alias);
 }
