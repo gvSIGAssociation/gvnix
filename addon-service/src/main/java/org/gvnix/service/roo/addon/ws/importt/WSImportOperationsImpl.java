@@ -176,11 +176,23 @@ public class WSImportOperationsImpl implements WSImportOperations {
         ClassOrInterfaceTypeDetails importedServiceDetails = typeLocationService
                 .getClassOrInterface(importedServiceClass);
 
+        // checks if already has security annotation
+        boolean alreadyAnnotated = javaParserService
+                .isAnnotationIntroduced(
+                        GvNIXWebServiceSecurity.class.getName(),
+                        importedServiceDetails);
+        Assert.isTrue(
+                !alreadyAnnotated,
+                importedServiceDetails.getName().toString()
+                        .concat(" already has ")
+                        .concat(GvNIXWebServiceSecurity.class.getSimpleName())
+                        .concat(" annotation."));
+
         // checks if class is really a imported service
         boolean hasImportAnnotation = javaParserService.isAnnotationIntroduced(
                 GvNIXWebServiceProxy.class.getName(), importedServiceDetails);
-        Assert.isTrue(hasImportAnnotation, importedServiceDetails.toString()
-                .concat(" is not a imported service"));
+        Assert.isTrue(hasImportAnnotation, importedServiceDetails.getName()
+                .toString().concat(" is not a imported service"));
 
         // Check if certificate file exist
         Assert.isTrue(certificate.exists(), certificate.getAbsolutePath()
