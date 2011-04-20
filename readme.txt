@@ -298,3 +298,10 @@ TODO
 * Hibernate: PostLoad method invoked before collection initialised
 
   https://issues.jboss.org/browse/JBAS-5474
+
+* Make uniform generated "aj" file names (examples):
+
+  + OCCChecksumMetadataProvider.java:  "gvNIX_occChecksum" 
+  + WSServiceSecurityMetadataProvider.java:  "GvNIX_WebSecurity" 
+  + WSExportExceptionMetadataProvider.java:  "GvNIX_WebFault"  
+  + WSExportMetadataProvider.java: "GvNix_WebService"
