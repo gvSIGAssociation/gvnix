@@ -305,11 +305,12 @@ public class WSImportOperationsImpl implements WSImportOperations {
                 certificateName.lastIndexOf('.'));
         String targetPath = WSServiceSecurityMetadata.getCertificatePath(
                 importedServiceClass, certificate.getName());
+        String baseNamePath = targetPath.replace(certificate.getName(), "");
+
         targetPath = projectOperations.getPathResolver().getIdentifier(
                 Path.SRC_MAIN_RESOURCES, targetPath);
 
         int index = 1;
-        String baseNamePath = targetPath.replace(certificate.getName(), "");
 
         while (fileManager.exists(targetPath)) {
             targetPath = baseNamePath.concat(certificateName)
