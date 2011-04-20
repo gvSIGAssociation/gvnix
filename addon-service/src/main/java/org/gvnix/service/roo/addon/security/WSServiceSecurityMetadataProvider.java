@@ -19,8 +19,11 @@
 package org.gvnix.service.roo.addon.security;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -189,31 +192,97 @@ public final class WSServiceSecurityMetadataProvider extends
      */
     private void createSecurityPropertiesFile(JavaType aspectName,
             WSServiceSecurityMetadata metadata) throws IOException {
+
+        // Resolve absolute path
         String propertiesPath = projectOperations.getPathResolver()
                 .getIdentifier(Path.SRC_MAIN_RESOURCES,
                         metadata.getPropertiesPath());
+
+        OutputStream os;
+
+        // Gets properties form
+        Properties properties = metadata.getSecurityProperties();
+
+        // Checks if file exists
         MutableFile mutableFile;
         if (fileManager.exists(propertiesPath)) {
+            // Load current file content
+            Properties storedProperties = new Properties();
             mutableFile = fileManager.updateFile(propertiesPath);
+            InputStream is = null;
+            try {
+                is = mutableFile.getInputStream();
+                storedProperties.load(is);
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+            // Compare content
+            if (propertiesEquals(properties, storedProperties)) {
+                // File Content is up to date --> exit
+                return;
+            }
         } else {
             // Unable to find the file, so let's create it
             mutableFile = fileManager.createFile(propertiesPath);
         }
-        Properties properties = metadata.getSecurityProperties();
 
-        OutputStream os = mutableFile.getOutputStream();
+        // Store properties in file
+        os = null;
         try {
-            properties.store(
-                    os,
-                    "Service '".concat(metadata.getServiceName())
-                            .concat("' security properities. Class ")
-                            .concat(aspectName.getFullyQualifiedTypeName()));
+            os = mutableFile.getOutputStream();
+            storeProperties(aspectName, metadata, os, properties);
         } finally {
-            try {
+            if (os != null) {
                 os.close();
-            } catch (IOException ignored) {
             }
         }
+    }
+
+    /**
+     * Compares the values of two Property instances
+     * 
+     * @param one
+     * @param other
+     * @return
+     */
+    private boolean propertiesEquals(Properties one, Properties other) {
+        if (one.size() != other.size()) {
+            return false;
+        }
+        Set<Entry<Object, Object>> entrySet = one.entrySet();
+        Object otherValue;
+        for (Entry<Object, Object> entry : entrySet) {
+            otherValue = other.get(entry.getKey());
+            if (otherValue == null) {
+                if (entry.getValue() != null) {
+                    return false;
+                }
+            } else if (!otherValue.equals(entry.getValue())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Store properties into a output stream
+     * 
+     * @param aspectName
+     * @param metadata
+     * @param os
+     * @param properties
+     * @throws IOException
+     */
+    private void storeProperties(JavaType aspectName,
+            WSServiceSecurityMetadata metadata, OutputStream os,
+            Properties properties) throws IOException {
+        properties.store(
+                os,
+                "Service '".concat(metadata.getServiceName())
+                        .concat("' security properities. Class ")
+                        .concat(aspectName.getFullyQualifiedTypeName()));
     }
 
     /**
