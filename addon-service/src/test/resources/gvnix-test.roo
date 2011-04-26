@@ -87,8 +87,6 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy17 --wsdl http://www.unifiedsoftware.co.uk/freeibanvalidate.wsdl
 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy18 --wsdl http://greg.froh.ca/fun/random_bushism/soap/?wsdl
-
 // [CORRECT] First create a service class and then import a web service in them. Wsdl already exists.
 service class --class ~.services.ClaseProxy32
 service import ws --class ~.services.ClaseProxy32 --wsdl http://ws.soatrader.com/easycfm.com/1.0/Captcha?WSDL
