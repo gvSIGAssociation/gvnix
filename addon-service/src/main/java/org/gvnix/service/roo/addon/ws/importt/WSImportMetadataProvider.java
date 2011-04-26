@@ -72,9 +72,8 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
         // Ensure we're notified of all metadata related to physical Java types,
         // in particular their initial creation
-        metadataDependencyRegistry.registerDependency(
-                PhysicalTypeIdentifier.getMetadataIdentiferType(),
-                getProvidesType());
+        metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
+                .getMetadataIdentiferType(), getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXWebServiceProxy.class.getName()));
     }
 
@@ -181,7 +180,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
                             CommunicationSense.IMPORT);
                 }
 
-                // Generate source code client clases if necessary
+                // Generate source code client classes if necessary
                 if (generate) {
 
                     wSConfigService.mvn(WSConfigService.GENERATE_SOURCES,

@@ -138,7 +138,7 @@ public interface WSConfigService {
      *            contract wsdl url to import
      * @param type
      *            Communication sense type
-     * @return wsdl location added, or false if already exists
+     * @return Generate sources required ?
      */
     public boolean importService(JavaType className, String wsdlLocation,
             CommunicationSense type);
