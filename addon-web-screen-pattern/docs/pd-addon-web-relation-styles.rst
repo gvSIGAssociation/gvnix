@@ -35,7 +35,7 @@ This add-on have to install and manage the application visualization for entitie
 # Tagx files to show the related entities in forms show and update.
 
 # Create MetadataProvider and Metadata for generate:
-- AspectJ file and method to retrieve paginated results for related entities. 
+- AspectJ file and method to retrieve paginated results for related entities.
 - Regenerate the AspectJ class when perform any change in the one_to_many relations of the entity.
 # Create a MetadataListener to monitoring changes after the execution @RooWebScaffold:
 - Regenerate jspx files (show and update) if there any changes in the entity adding o removing a 1-n relationship.
@@ -74,7 +74,7 @@ Metadata for create AspecJ method using entity's properties (1-n relations).
 # The metadata creates the search method for paginated related entities.
 
   * Crete AspecJ method for retrieve related entities that are annotated as 1-n relationship.
-  
+
 # Use DefaultClassOrInterfaceDetail to retrieve the annotation information for the declared relationships.
 
 Create MetadataProvider that listens RooEntity's changes
@@ -107,12 +107,12 @@ Access to show and update jspx files::
 
     * <relations:tab> using tabs visualization: ``tabs``.
     * This tag contains each relationship definided inside using tagx from the Add-on ``<relation:tabview>``.
-      
+
       * For each property of the related entity have to create a column tag to show the element properties inside table columns.
   * Exists
 
     * This tag contains each relationship definided inside using tagx from the Add-on ``<relation:tabview>``.
-      
+
       * For each property of the related entity have to create a column tag to show the element properties inside table columns.
 
 Roo Shell commands
@@ -150,7 +150,7 @@ Future enhancements
 
 * Support database reverse engineering OneToMany relations generated on .aj file.
 
-* Support primary key with name different of "id" (no getId and setId). 
+* Support primary key with name different of "id" (no getId and setId).
 
 New commands
 --------------
@@ -168,3 +168,8 @@ TODO
 * Forzar altura de la capa contenedora de tabs para que no quede oculta la tabla por debajo.
   El tamaño no puede ser fijo, pq la tabla puede crecer más aún del tamaño máximo fijado.
   r148
+
+* Respecto al punto anterior: en Sentencias r17 se ha corregido el problema de manera demasiado
+  add-hoc. Al height de las capas se le suman 137px que es lo que ocupan las 5 nuevas filas.
+  Revisar lo que se comenta en http://anaturb.net/dojo/my/dojoTabContainer.htm por si puede
+  servir como mejor solución.
