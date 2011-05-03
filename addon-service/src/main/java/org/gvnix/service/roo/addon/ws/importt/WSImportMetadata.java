@@ -83,7 +83,7 @@ public class WSImportMetadata extends
     private static final String WEB_SERVICE_TYPE = MetadataIdentificationUtils
             .create(WEB_SERVICE_TYPE_STRING);
 
-    private SecurityService securityService;
+    private final SecurityService securityService;
 
     // From annotation
     @AutoPopulate
@@ -253,7 +253,7 @@ public class WSImportMetadata extends
         if (throwsList != null) {
             for (NameExpr nameExpr : throwsList) {
 
-                throwsTypes.add(new JavaType(nameExpr.toString()));
+                throwsTypes.add(getJavaTypeByName(root, nameExpr.toString()));
             }
         }
 
@@ -272,16 +272,9 @@ public class WSImportMetadata extends
                 portTypePath, portName, method, parameters, returnType);
 
         // Create the method metadata with previous information
-        // DiSiD: Use MethodMetadataBuilder.build() instead of
-        // DefaultMethodMetadata
-        // MethodMetadata result = new DefaultMethodMetadata(getId(), method
-        // .getModifiers(), new JavaSymbolName(method.getName()),
-        // returnType, javaTypes, javaNames,
-        // new ArrayList<AnnotationMetadata>(), throwsTypes, body
-        // .getOutput());
         MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
-                getId(), method.getModifiers(), new JavaSymbolName(
-                        method.getName()), returnType, javaTypes, javaNames,
+                getId(), method.getModifiers(), new JavaSymbolName(method
+                        .getName()), returnType, javaTypes, javaNames,
                 new InvocableMemberBodyBuilder().appendFormalLine(body
                         .getOutput()));
         for (JavaType javaType : throwsTypes) {
@@ -360,6 +353,7 @@ public class WSImportMetadata extends
     private JavaType getJavaTypeByName(Element root, String name) {
 
         JavaType type;
+        int index;
 
         if (getJavaClassPrimitiveByName(name) != null) {
 
@@ -374,7 +368,7 @@ public class WSImportMetadata extends
 
         } else if (name.trim().endsWith("[]")) {
 
-            // If an array, analyze array dimensions quantity
+            // If array, analyze dimensions quantity
             int i = 0;
             while (name.trim().endsWith("[]")) {
 
@@ -394,14 +388,31 @@ public class WSImportMetadata extends
                         null);
             }
         }
-        // Object types with or without package
+        // Object types without package
         else if (name.indexOf('.') == -1) {
 
             // If not package separator, add generated client package
-            type = new JavaType(
-                    WsdlParserUtils.getTargetNamespaceRelatedPackage(root)
-                            + name);
-        } else {
+            type = new JavaType(WsdlParserUtils
+                    .getTargetNamespaceRelatedPackage(root)
+                    + name);
+        }
+        // Collection types
+        else if ((index = name.indexOf('<')) != -1) {
+
+            // Collection type name an inner type params
+            String typeName = name.substring(0, index);
+            String typeParam = name.substring(index + 1, name.indexOf('>'));
+            logger.log(Level.FINE, "Collection: class=" + typeName + ", type="
+                    + typeParam);
+
+            // Include param into List, required by JavaType
+            List<JavaType> array = new ArrayList<JavaType>();
+            array.add(new JavaType(typeParam));
+
+            type = new JavaType(typeName, 0, DataType.TYPE, null, array);
+        }
+        // Object types with package
+        else {
 
             type = new JavaType(name);
         }
