@@ -9,9 +9,9 @@
 :Date:      $Date: 2010-05-20 09:25:20 +0200 (jue 20 de may de 2010) $
 
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
-Unported License. To view a copy of this license, visit 
-http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to 
-Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 
+Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 94105, USA.
 
 .. contents::
@@ -48,7 +48,7 @@ active theme - Theme that has been included inside the project structure overwri
 
 .. admonition:: Note
 
-     active theme doesn't delete the old theme files, only override ones that have the same name. 
+     active theme doesn't delete the old theme files, only override ones that have the same name.
 
 Theme folder structure
 -----------------------
@@ -98,7 +98,7 @@ Content specification::
 theme.xml
 ----------
 
-This file contents theme's description with this structure:: 
+This file contents theme's description with this structure::
 
     <theme>
       <description>
@@ -127,10 +127,10 @@ Execute the list command.
 
 You will get an output similar to::
 
-  gvNIX           Installed       Active        Name        Description               
-    X                X                          CIT         CIT theme for Roo projects  
-    X                X              X           gvNIX       gvNIX base theme            
-    X                                           blue        Blue color theme            
+  gvNIX           Installed       Active        Name        Description
+    X                X                          CIT         CIT theme for Roo projects
+    X                X              X           gvNIX       gvNIX base theme
+    X                                           blue        Blue color theme
 
 
 Activation
@@ -158,8 +158,8 @@ Installs selected theme into project.
 
 Copy the selected theme into the folder ``themes`` in root directory of the project using the Roo components to create files.
 If theme exists in themes project folder: override it.
-  
- 
+
+
 List
 -----
 
@@ -181,7 +181,7 @@ Adds an ``<id>`` label to selected theme ``theme.xml`` file with the theme folde
 
 .. admonition:: Note
 
-     Activation a theme will copy the selected theme files into webapp application directory. This action **will not** delete files from another installed theme. 
+     Activation a theme will copy the selected theme files into webapp application directory. This action **will not** delete files from another installed theme.
 
 Commands
 =========
@@ -196,7 +196,7 @@ Installs selected theme into project.
 Parameters:
 
   * ``--name`` (mandatory): Theme's name available in gvNIX.
-    
+
 theme manager list
 -------------------
 
@@ -225,3 +225,9 @@ Application versions
 
 * gvNIX-0.3 version: The Add-on install the theme defined in the gvNIX repository folder.
 * Future versions: The command to create a theme with edited files from a project to export in other Roo projects.
+
+
+TODO
+=====
+
+* Review work done in Sentencias issue #5030 (r16) in order to port it to the add-on.
