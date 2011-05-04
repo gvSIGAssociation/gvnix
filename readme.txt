@@ -218,19 +218,6 @@ TODO
 
   https://jira.springsource.org/browse/ROO-2297
   
-* Composite primary key support in MVC scaffolding:
-  
-   https://jira.springsource.org/browse/ROO-1999
-
-  Support for embedded in Web scaffolding:
-
-   http://projects.disid.com/issues/3920  
-   https://jira.springsource.org/browse/ROO-345
-  
-  Data-on-demand and integration tests to support composite primary keys
-  
-   https://jira.springsource.org/browse/ROO-2070
-
 * Declare annotation to a method param.
   Declare annotation - augmentation/overriding and precedence.
   
@@ -305,3 +292,8 @@ TODO
   + WSServiceSecurityMetadataProvider.java:  "GvNIX_WebSecurity" 
   + WSExportExceptionMetadataProvider.java:  "GvNIX_WebFault"  
   + WSExportMetadataProvider.java: "GvNix_WebService"
+
+* Some add-ons has duplicated resources section at pom.xml to correct replacing.
+  However, mvn eclipse:eclipse not works.
+
+* Los proyectos gvNIX por defecto configuran DBCP, probar que funciona aunque se reinicie la BBDD
