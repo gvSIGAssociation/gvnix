@@ -24,9 +24,9 @@
 
     <programlistingco>
       <areaspec>
-        <area coords="1" id="ex.annot.class"></area>
+        <area coords="1" xml:id="ex.annot.class"></area>
 
-        <area coords="7" id="ex.annot.attri"></area>
+        <area coords="7" xml:id="ex.annot.attri"></area>
       </areaspec>
 
       <programlisting>@Entity
@@ -385,11 +385,11 @@ public class Entity1 {
 
           <programlistingco>
             <areaspec>
-              <area coords="10" id="ex.regexp"></area>
+              <area coords="10" xml:id="ex.regexp"></area>
 
-              <area coords="16" id="ex.set"></area>
+              <area coords="16" xml:id="ex.set"></area>
 
-              <area coords="21" id="ex.entity"></area>
+              <area coords="21" xml:id="ex.entity"></area>
             </areaspec>
 
             <programlisting>@Entity
@@ -717,17 +717,17 @@ public class Entity1 {
 
         <programlistingco>
           <areaspec>
-            <area coords="8" id="ex.annot.field"></area>
+            <area coords="8" xml:id="ex.annot.field"></area>
 
-            <area coords="11" id="ex.annot.trans"></area>
+            <area coords="11" xml:id="ex.annot.trans"></area>
 
-            <area coords="13" id="ex.annot.preci"></area>
+            <area coords="13" xml:id="ex.annot.preci"></area>
 
-            <area coords="16" id="ex.annot.many"></area>
+            <area coords="16" xml:id="ex.annot.many"></area>
 
-            <area coords="17" id="ex.annot.join"></area>
+            <area coords="17" xml:id="ex.annot.join"></area>
 
-            <area coords="20" id="ex.annot.one"></area>
+            <area coords="20" xml:id="ex.annot.one"></area>
           </areaspec>
 
           <programlisting>@Entity
@@ -811,9 +811,8 @@ public class Entity1 {
 
       <orderedlist>
         <listitem>
-          <para>Configurar la anotación <classname><link
-          linkend="guia-desarrollo_gestion-entidades_definicion_crear-a-mano_anotacion-rooentity"><link
-          xlink:href="http://static.springsource.org/spring-roo/org.springframework.roo.annotations/apidocs/org/springframework/roo/addon/entity/RooEntity.html">@RooEntity</link></link></classname>
+          <para>Configurar la anotación <link
+          xlink:href="http://static.springsource.org/spring-roo/org.springframework.roo.annotations/apidocs/org/springframework/roo/addon/entity/RooEntity.html">@RooEntity</link>
           para ajustar el nombre del campo, tipo y nombre de columna en la
           tabla.</para>
 

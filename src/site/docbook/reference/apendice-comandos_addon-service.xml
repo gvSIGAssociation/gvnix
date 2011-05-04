@@ -9,7 +9,7 @@
   <title xml:lang="es">Comandos del Add-on Service</title>
 
   <para xml:lang="es">Para una descripción general ver <link
-  linkend="addon-web-report">Add-on Service</link>.</para>
+  linkend="addon-service">Add-on Service</link>.</para>
 
   <table>
     <title xml:lang="es">Comandos de Add-on Service</title>
@@ -83,6 +83,23 @@
           ws</link></entry>
 
           <entry>Importa un servicio web a una clase Java.</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-service_ws_list">service ws
+          list</link></entry>
+
+          <entry>Lista los servicios web de la aplicación.</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-service_security_ws">service
+          security ws</link></entry>
+
+          <entry>Añade la configuración necesaria para firmar una petición a
+          un servicio de Axis (cliente).</entry>
         </row>
       </tbody>
     </tgroup>
@@ -407,6 +424,76 @@
 
           <para>Nombre de la clase donde queremos importar el cliente del
           servicio web. Si no existe la creará.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-service_ws_list">
+    <title>service ws list</title>
+
+    <para>Lista los servicios web que están registrados en la aplicación,
+    tanto los expuestos como los importados. El resultado se formatea de la
+    siguiente forma:</para>
+
+    <programlisting>roo&gt; service ws list
+service     exposed     import
+---------   --------    ------
+Service1       X
+Service2                  X   
+Service3                  X   </programlisting>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-service_security_ws">
+    <title>service security ws</title>
+
+    <para>Añade la configuración necesaria para firmar una petición de un
+    cliente de servicio web creado con la libería Axis.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>--class</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][Ruta canónica de la clase a que contiene
+          el servicio importado. Admite ~. para denotar el paquete raiz del
+          proyecto]</emphasis></para>
+
+          <para>Nombre de la clase que contiene el servicio importado. Debe
+          ser un servicio que use la librería Axis.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--certificate</term>
+
+        <listitem>
+          <para><emphasis>[Requerido][Ruta al fichero pkcs12 que contiene el
+          certificado a usar para firmar la petición]</emphasis></para>
+
+          <para>Nombre del fichero que contiene el certificado que hay que
+          usar para firmar la petición. El fichero será copiado a un
+          directorio de recursos del proyecto.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--password</term>
+
+        <listitem>
+          <para><emphasis>[Requerido]</emphasis></para>
+
+          <para>Contraseña del certificado de firma.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--alias</term>
+
+        <listitem>
+          <para><emphasis>[Requerido]</emphasis></para>
+
+          <para>Alias a usar para la firma.</para>
         </listitem>
       </varlistentry>
     </variablelist>

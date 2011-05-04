@@ -13,7 +13,7 @@
   informes con JasperReports y generar informes de ejemplo como punto de
   partida para elaborar informes sobre una entidad.</para>
 
-  <section xml:id="addon-theme-manager_descripcion">
+  <section xml:id="addon-web-report_descripcion">
     <title xml:lang="es">Descripción</title>
 
     <para xml:lang="es">Este add-on permite añadir soporte JasperReports y
@@ -32,9 +32,11 @@
     xlink:href="http://jasperforge.org/projects/ireport">iReport</link>.</para>
 
     <figure>
+      <title>Editor de informes IReport</title>
+
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/ireport.png" />
+          <imagedata fileref="images/ireport.png"></imagedata>
         </imageobject>
       </mediaobject>
     </figure>
@@ -90,9 +92,11 @@
       Fonts</emphasis> accedemos a esta pantalla:</para>
 
       <figure>
+        <title>Herramienta de gestión de fuentes de IReport</title>
+
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/iReportFonts.png" />
+            <imagedata fileref="images/iReportFonts.png"></imagedata>
           </imageobject>
         </mediaobject>
       </figure>

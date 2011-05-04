@@ -2,7 +2,6 @@
 <chapter version="5.0" xml:id="guia-desarrollo-eclipse" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
@@ -10,7 +9,7 @@
   <title xml:lang="es">Desarrollo con Eclipse</title>
 
   <section xml:id="guia-desarrollo_eclipse-instalar">
-    <title xml:id="es">Prerrequisitos</title>
+    <title xml:lang="es">Prerrequisitos</title>
 
     <para><emphasis><emphasis>Necesitas lo
     siguiente:</emphasis></emphasis></para>
@@ -158,10 +157,10 @@
     </note>
   </section>
 
-  <section xml:id="guia-desarrollo_eclipse-usasrº">
-    <title xml:id="es">Utilizar Eclipse como IDE</title>
+  <section xml:id="guia-desarrollo_eclipse-usasr">
+    <title>Utilizar Eclipse como IDE</title>
 
-    <section xml:id="guia-desarrollo_eclipse-usasrº">
+    <section xml:id="guia-desarrollo_eclipse-usar">
       <title xml:id="es">Crear proyecto gvNIX/Roo en Eclipse IDE</title>
 
       <para xml:lang="es">Podemos crear un proyecto gvNIX desde Eclipse a
@@ -173,7 +172,7 @@
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_new_roo_project.png" />
+            <imagedata fileref="images/eclipse_new_roo_project.png"></imagedata>
           </imageobject>
         </mediaobject>
       </figure>
@@ -211,41 +210,39 @@ Created ...</programlisting>
 
       <para><emphasis role="bold">controller</emphasis> crea controladores de
       la capa web que gestionaran la interacción del usuario con la
-      aplicación. Lo veremos en <link linkend="???">Crear la capa web con el
-      intérprete de comandos</link>.</para>
+      aplicación. Lo veremos en <link
+      linkend="guia-desarrollo_web_definir-controller">Crear la capa web con
+      el intérprete de comandos</link>.</para>
 
       <programlisting>~.web roo&gt; <emphasis role="bold">selenium test --controller ~.web.TimerController</emphasis>
 Created ...</programlisting>
 
-      <para>
-        <para>Si queremos incluir en el proyecto test de integración tenemos a
-        nuestra disposición el comando <emphasis role="bold">selenium
-        test</emphasis> que generará los scripts necesarios para probar la
-        interfaz web de la aplicación. Mediante <emphasis role="bold">mvn
-        selenium:selenese</emphasis>, estando el servidor de la aplicación
-        corriendo, se ejecutará el conjunto de tests sobre una nueva instancia
-        del navegador FireFox.</para>
+      <para>Si queremos incluir en el proyecto test de integración tenemos a
+      nuestra disposición el comando <emphasis role="bold">selenium
+      test</emphasis> que generará los scripts necesarios para probar la
+      interfaz web de la aplicación. Mediante <emphasis role="bold">mvn
+      selenium:selenese</emphasis>, estando el servidor de la aplicación
+      corriendo, se ejecutará el conjunto de tests sobre una nueva instancia
+      del navegador FireFox.</para>
 
-        <programlisting>~.web roo&gt; <emphasis role="bold">theme install --id cit</emphasis>
+      <programlisting>~.web roo&gt; <emphasis role="bold">theme install --id cit</emphasis>
 ~.web roo&gt; <emphasis role="bold">theme set --id cit</emphasis></programlisting>
 
-        <para>Mediante el comando <emphasis role="bold">theme</emphasis>, del
-        <emphasis>Add-on Theme Manager</emphasis> propio de gvNIX, podemos
-        configurar el tema visual que presentará la aplicación.</para>
-      </para>
+      <para>Mediante el comando <emphasis role="bold">theme</emphasis>, del
+      <emphasis>Add-on Theme Manager</emphasis> propio de gvNIX, podemos
+      configurar el tema visual que presentará la aplicación.</para>
     </section>
 
     <section>
-      <title xml:id="es">Importar proyecto gvNIX a Eclipse IDE</title>
-    </section>
+      <title>Importar proyecto gvNIX a Eclipse IDE</title>
 
-    <para>Como gvNIX/Roo permite crear proyectos desde la linea de comandos,
-    podemos vernos en la situación de que queramos importar un proyecto
-    existente al IDE. Si estamos ejecutando gvNIX en la línea de comandos,
-    bastaría con ejecutar el comando <command>perform eclipse</command> para
-    crear una estructura de proyecto Eclipse:</para>
+      <para>Como gvNIX/Roo permite crear proyectos desde la linea de comandos,
+      podemos vernos en la situación de que queramos importar un proyecto
+      existente al IDE. Si estamos ejecutando gvNIX en la línea de comandos,
+      bastaría con ejecutar el comando <command>perform eclipse</command> para
+      crear una estructura de proyecto Eclipse:</para>
 
-    <programlisting>~.domain.PizzaOrder roo&gt; <command>perform eclipse</command>
+      <programlisting>~.domain.PizzaOrder roo&gt; <command>perform eclipse</command>
 <computeroutput>[Thread-6] Warning: JAVA_HOME environment variable is not set.
 [Thread-6] [INFO] Scanning for projects...
 [Thread-6] [INFO] ------------------------------------------------------------------------
@@ -266,25 +263,26 @@ Created ...</programlisting>
 [Thread-6] [INFO] ------------------------------------------------------------------------</computeroutput>
 ~.domain.PizzaOrder roo&gt;</programlisting>
 
-    <para xml:lang="es">Este comando termina ejecutando un <command>mvn
-    eclipse:eclipse</command> para el proyecto, por lo que es indiferente el
-    uso de ambos métodos.</para>
+      <para xml:lang="es">Este comando termina ejecutando un <command>mvn
+      eclipse:eclipse</command> para el proyecto, por lo que es indiferente el
+      uso de ambos métodos.</para>
 
-    <para xml:lang="es">Ahora se ha de importar al entorno de trabajo mediante
-    <command>File -&gt; Import -&gt; Existing Projects into
-    workSpace</command>. Si aparece el mensaje <emphasis>Turn Weaving Service
-    on?</emphasis>, marca la casilla <emphasis>Don't ask again until next
-    upgrade</emphasis> y clic en <emphasis>Yes</emphasis> (tendrás que
-    reiniciar Eclipse).</para>
+      <para xml:lang="es">Ahora se ha de importar al entorno de trabajo
+      mediante <command>File -&gt; Import -&gt; Existing Projects into
+      workSpace</command>. Si aparece el mensaje <emphasis>Turn Weaving
+      Service on?</emphasis>, marca la casilla <emphasis>Don't ask again until
+      next upgrade</emphasis> y clic en <emphasis>Yes</emphasis> (tendrás que
+      reiniciar Eclipse).</para>
 
-    <para xml:lang="es">También es posible borrar la configuración de eclipse
-    ejecutando el comando <command>mvn eclipse:clean</command>. Para regenerar
-    la configuración de eclipse en un solo comando usar <command>mvn
-    eclipse:clean eclipse:eclipse</command>.</para>
+      <para xml:lang="es">También es posible borrar la configuración de
+      eclipse ejecutando el comando <command>mvn eclipse:clean</command>. Para
+      regenerar la configuración de eclipse en un solo comando usar
+      <command>mvn eclipse:clean eclipse:eclipse</command>.</para>
+    </section>
   </section>
 
   <section xml:id="guia-desarrollo_eclipse-pruebas-unitarias">
-    <title xml:id="es">Desarollo de pruebas unitarias</title>
+    <title xml:lang="es">Desarollo de pruebas unitarias</title>
 
     <para><emphasis>TBC</emphasis></para>
   </section>

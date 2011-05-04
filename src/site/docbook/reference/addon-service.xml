@@ -11,7 +11,7 @@
   <para xml:lang="es">Add-on que permite generar servidores y clientes de
   servicios web (WS) de forma automática.</para>
 
-  <section xml:id="addon-persistence_occchecksum">
+  <section xml:id="addon-service_funcionality">
     <title>Funcionalidad del Add-on.</title>
 
     <para>Permite crear servicios web desde cero o importarlos basándose en
