@@ -88,6 +88,104 @@ public class MyWebService {
       linkend="apendice-comandos_addon-service_import_ws">service import
       ws</link>. Facilitando la ruta a un WSDL, gvNIX generará la clase que
       contendrá los métdos del cliente.</para>
+
+      <para>Para usar este cliente simplemente hay que crear un campo en la
+      clase donde queramos hacer uso de él y añadirle la anotación
+      <emphasis>@Autowired</emphasis>.</para>
+
+      <programlisting>public class MyClassUsingWebService {
+  ...
+  @Autowired
+  private ClassOfWebServiceClient classOfWebServiceClient;
+  ...
+  public void methodUsingWebService() {
+    ...
+    classOfWebServiceClient.wsOperation(..);
+    ...
+  }
+}</programlisting>
+
+      <para>La ruta al WSDL puede ser tanto un archivo local (file://) como
+      una URL a un por HTTP o HTTPS.</para>
+
+      <para>Cuando el WSDL es un archivo local o un recurso que se encuentre
+      en un servidor no seguro (acceso HTTP), gvNIX accede al WSLD y tras
+      procesarlo realiza las tareas necesarias para generar un servicio local
+      que hará las veces de cliente del WS remoto.</para>
+
+      <para>En el caso de que el WSDL lo sirva un servidor seguro al que se
+      accede por HTTPS pueden darse dos posibles escenarios:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>El certificado del servidor ha sido creado por una <emphasis
+          role="bold">Autoridad de certificación (CA) confiable por la
+          JVM</emphasis>.</para>
+
+          <para>En este caso, el procesado del WSDL funciona de la misma
+          manera que en el caso de acceso por HTTP, transparente para el
+          usuario.</para>
+        </listitem>
+
+        <listitem>
+          <para>El certificado de servidor ha sido creado por un <emphasis
+          role="bold">CA no confiable</emphasis> (caso de certificados
+          autofirmados).</para>
+
+          <para>Aquí, es responsabilidad del usuario el aceptar las
+          credenciales del servidor para poder acceder al WSDL. Recordando
+          como trabajan los navegadores web, cuando intentamos acceder a un
+          recurso seguro, si el certificado del servidor no ha sido creado por
+          un CA que se encuentre entre la lista de CAs conocida (Verisign,
+          Thwate, Equfax, ...), el navegador nos muestra un mensaje de
+          advertencia y nos pregunta si queremos confiar en la identidad del
+          servidor. Nosotros podemos, o no, aceptar el certificado.</para>
+
+          <para>Para simplificar el proceso de importación de WS, gvNIX
+          intenta hacer esta tarea de "confiar" en el certificado de manera
+          transparente para el usuario.</para>
+
+          <para>Para ello, gvNIX manipula el almacen de certificados de la JVM
+          siempre que sea posible. Esto es:</para>
+
+          <orderedlist>
+            <listitem>
+              <para>Existe el archivo de <emphasis>keystore
+              $JAVA_HOME/jre/lib/security/cacerts</emphasis> y es modificable
+              por el usuario del sistema que está ejecutando gvNIX.</para>
+            </listitem>
+
+            <listitem>
+              <para>La contraseña del <emphasis>keystore</emphasis> es
+              changeit (la contraseña por defecto del keystore).</para>
+            </listitem>
+          </orderedlist>
+
+          <para>Si gvNIX puede modificar el keystore, importará los
+          certificados implicados en la autenticación del servidor y entonces
+          podrá acceder al WSDL requerido para generar el cliente del WS.
+          </para>
+
+          <para>Al mismo tiempo, se crea en
+          <emphasis>src/main/resources</emphasis> una copia del almacen de
+          certificados en el archivo gvnix-cacerts y una copia local de los
+          certificados importados con el nombre
+          <emphasis>&lt;servidor&gt;-&lt;indice_certificado&gt;.cer</emphasis>.
+          De esta forma, los certificados pueden ser distribuidos con el resto
+          de archivos del proyecto para que puedan ser instalados en otros
+          entornos.</para>
+
+          <para>Si gvNIX no puede modificar el keystore de la JVM, porque no
+          se cumplen las 2 condiciones enumeradas anteriormente, creará de
+          todas formas la copia de los certificados necesarios para que sea el
+          usuario quien instale los mismos en el almacen de certificados de su
+          JVM. Para ello se puede hacer uso de la herramienta <link
+          xlink:href="http://download.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html">keytool</link>
+          (distribuida también con el JDK). La operación de importar los
+          certificados equivale a la aceptación que hacemos con el
+          navegador.</para>
+        </listitem>
+      </orderedlist>
     </section>
   </section>
 </chapter>
