@@ -13,9 +13,9 @@
    :backlinks: none
 
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
-Unported License. To view a copy of this license, visit 
-http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to 
-Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 
+Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 94105, USA.
 
 Introducción - Descripción funcional.
@@ -38,14 +38,14 @@ See td-contract-first-from-java.rst
 Requirements
 =============
 
-TBC: 
+TBC:
 
 Requirements are in priority order:
 
 * Web service servers creation without write wsdl and xsd.
   Use contract first model, but generate contract (wsdl + xsd) from Java with a DSL language as Java Annotations and/or AspectJ.
-  
-  A change in the source code should not affect the generated service contract (wsdl + xsd). 
+
+  A change in the source code should not affect the generated service contract (wsdl + xsd).
   If a code change makes inconsistent the relationship with the service annotations, would be required to generate a compilation or startup error.
 
 * Using SOAP binding document / literal versus RPC / encoded servers generated, because RPC is obsolete by WS-I Basic Profile.
@@ -54,7 +54,7 @@ Requirements are in priority order:
 
 * Not use interfaces related to the implementation on service layer and entitity layer web service servers generation.
 
-* Web service framework installation will be automatic when client or server generation is required. 
+* Web service framework installation will be automatic when client or server generation is required.
 
 * Allow the generation of local services, without web service support (Spring @Service).
 
@@ -121,7 +121,7 @@ Annotation ``behavior`` to avoid Web Service Contract::
 * Change method name.
 
   * Controled by operationName attribute. Doesn't change the contract.
-  
+
 * Change input types.
 
   * Change type: Managed by attribute type in **@GvNIXWebParam**. If there is a change ``only`` in java code, will throw an exception, you have to change it in annotation if you want ot change the WS-Contract.
@@ -130,7 +130,7 @@ Annotation ``behavior`` to avoid Web Service Contract::
 
   * Managed with ``webResultType`` attribute in **@GvNIXWebParam**. Has to be the same type as defined in java code.
 
-These behaviors are managed by the MetadataProvider that catches changes in a class annotated with **@GvNIXWebService**. 
+These behaviors are managed by the MetadataProvider that catches changes in a class annotated with **@GvNIXWebService**.
 
 .. admonition:: Nota:
 
@@ -164,7 +164,7 @@ Define *@GvNIXWebService* annotation in class to export as Web Service.
 Mandatory ``attributes`` to export a class as Web Service:
 
   * ``name``: Name for Web Service Port Type definition in WSDL.
-  * ``targetNamespace``: Namespace for Web Service in WSDL. i.e.: ``targetNamespace= "http://services.project.layer.service.test.gvnix.org/"``. 
+  * ``targetNamespace``: Namespace for Web Service in WSDL. i.e.: ``targetNamespace= "http://services.project.layer.service.test.gvnix.org/"``.
   * ``serviceName``: Service name to publish the service in WSDL.
   * ``address``: Address to access to the service in application.
   * ``fullyQualifiedTypeName``: Java fully qualified type name to control if changes the package or class name to avoid updating service contract. i.e.: ``fullyQualifiedTypeName= =org.gvnix.test.service.layer.project.services.Clase"``.
@@ -243,9 +243,9 @@ You can define *@GvNIXXmlElementField* annotation for each *@GvNIXXmlElement*. I
 
   * ``namespace``: Namespace for XML Schema element. i.e.: ``namespace= "http://services.project.layer.service.test.gvnix.org/"``.
 
-  * ``nillable``: Customize the element declaration to be nillable. Schema element declaration with occurance range of 0..1. 
-    
-  * ``required``: Customize the element declaration to be required. Schema element declaration must exists. 
+  * ``nillable``: Customize the element declaration to be nillable. Schema element declaration with occurance range of 0..1.
+
+  * ``required``: Customize the element declaration to be required. Schema element declaration must exists.
 
   * ``type``:  The Java class being referenced.
 
@@ -294,7 +294,7 @@ service operation:
 
 * Create a method with input name in the selected class. The method is composed by:
 
-    * Return type: The default return type is ``void`` if there is no return type defined. 
+    * Return type: The default return type is ``void`` if there is no return type defined.
     * Input parameters: T aren't mandatory to be defined in an operation.
 
         * Created the class **JavaTypeList** to retrieve the parameter types and manage with the converter *JavaTypeListConverter**.
@@ -344,7 +344,7 @@ service define ws:
         </plugin>
 
 * Add web service definition to CXF config file. Create the file if doesn't exists.
-* Create AspectJ file. Associated metadata to service class within CXF annotations: 
+* Create AspectJ file. Associated metadata to service class within CXF annotations:
 
     * Define @WebService and @SOAPBinding to the published class setting the *@GvNIXWebService* annotation attributes into corresponding CXF annotation properties or default ones.
     * Annotate with *@WebMethod(exclude = true)* all class methods that aren't defined with *@GvNixWebMethod*.
@@ -356,18 +356,50 @@ Command to publish a method as web service operation.
 
 service operation:
 
-* Modify method in Class where is defined with **@GvNIXWebMethod** annotation with its mandatory parameters or ¿ defined in inter-operability web service standards by default ?. 
+* Modify method in Class where is defined with **@GvNIXWebMethod** annotation with its mandatory parameters or ¿ defined in inter-operability web service standards by default ?.
 
   * Create or Modify associated AspectJ file with the new published method. Rebuild with defined values in gVNIX annotations. Associated Metadata generates AspectJ file.
   * Checks if GvNIX annotation is well formed before generate Metadata, if is incorrect shows a message and deletes metadata.
-* Add @GvNIXWebFault annotation to method _Exceptions_ if are defined in the project. If Exception are imported create a declaration in an AspectJ file. Associated Metadata generates AspectJ file. 
+* Add @GvNIXWebFault annotation to method _Exceptions_ if are defined in the project. If Exception are imported create a declaration in an AspectJ file. Associated Metadata generates AspectJ file.
 
   * Checks if GvNIX annotation is well formed before generate Metadata, if is incorrect shows a message and deletes metadata.
 * Checks **Allowed Parameters** involved in operation.
 
   * If there is a not allowed parameters (input/output) doesn't publish the operation. See: supported data types.
-  * Adds **GvNIXXmlElement** annotation to object parameters, if not exists already 
-  
+  * Adds **GvNIXXmlElement** annotation to object parameters, if not exists already
+
+Import a web service from a WSDL
+----------------------------------
+
+service import ws:
+
+* Create the class defined by the command parameter ``--class`` and annotate it with **@GvNIXWebServiceProxy(wsdlLocation = "<url_of_the_wsld>")**.
+
+If the WSDL is under a secure server and the access is through HTTPS we are facing two possible scenarios:
+
+1. Server with reliable certificate authority:
+
+  In this case the WSDL will be accessible and the add-on will perform all the operations needed in order to create the
+  local service.
+
+2. Server with non reliable certificate authority:
+
+  There we need to import the certificates in authentication chain to our keystore, and retry to access the WSDL. In this
+  case the add-on will do this operations for us.
+
+  The add-on, in this version, try to use the cacerts keystore under $JAVA_HOME/jre/lib/security/cacerts (this path is
+  for Sun JVM) with default ``changeit`` password.
+
+  When the handsake process fails due to the reability on the server certificate, the add-on creates a copy of the cacerts
+  keystore under ``src/main/resources/gvnix-cacerts`` and automatically import the certificates in certificate chain to it.
+  Also a local copy of the certificates is created under ``src/main/resources/<host>-<cert-index>.cer`` so you can
+  distribute them in order to install it to other environments (see keytool command manual). Finally the same certificates
+  are installed to the JVM cacerts keystore in ordert to enable the WSDL access. Maybe in a future version this last
+  operation will be enabled by a command parameter.
+
+  Now the add-on retries to access the secured WSDL and now it gets the file and performs all the operations needed in
+  order to create the local service.
+
 Supported data types
 --------------------------
 
@@ -406,7 +438,7 @@ Entities defined in the project.
 Where a method uses an Entity in operation, the Add-on adds **@GvNIXXmlElement** annotation to the entity to generate a metadata that builds a correct xml format to be sent in web service operation as input/output parameter.
 * The fields are checked if they accomplish with web service interoperability.
 
-  * Fields with a database relationship annotation are defined as **@XmlTransient** elements which are not sent in the operation as part of the Entity. 
+  * Fields with a database relationship annotation are defined as **@XmlTransient** elements which are not sent in the operation as part of the Entity.
   * The other ones are defined as **@XmlElement** with ``name`` attribute.
 
 Commands
@@ -419,9 +451,9 @@ service class
 
 Create new Service Class.
 
-Parameters: 
-  
-  * ``--class`` (mandatory) New Service Class name 
+Parameters:
+
+  * ``--class`` (mandatory) New Service Class name
 
 service operation
 ------------------
@@ -450,7 +482,7 @@ Parameters:
   * ``--addressName`` Address to publish the Web Service in server. Default class name value.
   * ``--targetNamespace`` Namespace name for the service.
 
-service list operation 
+service list operation
 ----------------------------
 
 List all method from Web Service class that are not exported as Web Service Operation.
@@ -459,7 +491,7 @@ Parameters:
 
   * ``--class`` (mandatory) Class to search methods that are not exported.
 
-service export operation ws 
+service export operation ws
 ----------------------------
 
 Publish a service method as a Web Service operation.
@@ -471,7 +503,7 @@ Parameters:
   * ``--operationName`` Name of the method to be showed as a Web Service operation.
   * ``--resultName`` Method result name.
   * ``--resultNamespace`` Namespace of the result type.
-  * ``--responseWrapperName`` Name to define the Response Wrapper Object. 
+  * ``--responseWrapperName`` Name to define the Response Wrapper Object.
   * ``--responseWrapperNamespace``: Namespace of the Response Wrapper Object.
   * ``--requestWrapperName``: Name to define the Request Wrapper Object.
   * ``--requestWrapperNamespace``: Namespace of the Request Wrapper Object.
@@ -569,7 +601,7 @@ Tipos de servicios:
    3. Document/encoded (Nobody follows this style. It is not WS-I compliant)
    4. Document/literal
    5. Document/literal wrapped
-   
+
 Algoritmo que indica cuando es RPC/Encoded, lo pongo como info y lo pasaremos a la doc.
 
 Analizando el elemento binding, será RPC/Encoded si para alguna de las operaciones de dicho binding se cumple la siguiente condición:
