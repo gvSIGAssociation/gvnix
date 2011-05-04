@@ -9,9 +9,9 @@
 :Date:      $Date$
 
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
-Unported License. To view a copy of this license, visit 
-http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to 
-Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 
+Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 94105, USA.
 
 .. contents::
@@ -46,7 +46,7 @@ Commands
 
 * service define ws --class clase --name nombreServicio:
 
-* service export operation --class clase --method nombreMetodoEntidad --name nombreAPublicar: 
+* service export operation --class clase --method nombreMetodoEntidad --name nombreAPublicar:
 
 * service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
 
@@ -68,3 +68,17 @@ http://projects.disid.com/issues/3879
 
 And then, run ``mvn clean install`` in roo sources directory to use this update.
 
+
+About import WS based on WSDL
+==============================
+
+If the WSDL is under a secure server and the access is through HTTPS and the host uses a certificate non reliable by the JVM
+the add-on will handle the unreachable source error importing, automatically, the certificates in certificate chain to JVM
+cacerts keystore. That is, ``$JAVA_HOME/jre/lib/security/cacerts`` in SUN JDK distribution. Also it creates a local copy of
+the needed certificates under ``src/main/resources`` folder of the project, with ``.cer`` extension, so you can distribute
+them for its installation in other environments.
+
+Notice that this will be possible only if ``cacerts`` file is writable by the
+system user running the add-on and the password of the keystore is ``changeit`` (the default keystore password). If these
+two conditions are not met, the add-on only will create the local copy of the certs in certificate chain and you are the
+responsible of its instalation in your cacerts keystore (see keytool manual for keystore manipulation).
