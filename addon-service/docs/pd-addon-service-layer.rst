@@ -767,10 +767,4 @@ TODO
  * Investigar la posibilidad de que una clase no sea definida como un servicio-componente OSGi y sin embargo pueda utilizar otros servicios-componentes OSGi. Se quiere utilizar para la clase ServiceLayerWsConfigService.
  * Sería una buena idea generar una clase de Test para el cliente en el proyecto para así asegurarnos de que funciona siguiendo la metodología de ROO para generar clases de Test con respecto a la BBDD.
 
-* Al final del comando de export sería interesante mostrar un mensaje en la consola de Roo indicando la ruta HTTP en la que ha quedado publicado el servicio.
-
-* Al final del comando de import o en la doc de referencia, sería interesante añadir alguna información sobre el uso de @Autowired.
-
-* Error http://projects.disid.com/issues/4991
-
-* Error http://projects.disid.com/issues/5009
+* Quizás sería interesante definir un nombre (o identificador o descripción) único para cada servicio, por lo menos para los importados. Esta información sería muy útil para conocer el servicio que tiene asociado dicha clase, ya que actualmente solo podemos conocer la URL del WSDL que a veces es muy poco representativa de lo que proporciona el servicio.
