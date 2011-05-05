@@ -927,3 +927,5 @@ TODO
 * Si se ejecuta en la clase Visi de petclinic un 'service export' de un método añadido se produce un problema parece que devido a que la clase Owner hereda de AbstractPerson y eso no se ha tendido en cuenta.
   Otra cosa importante es que se pierden algunos import (por ejemplo, java.util.List que utiliza el método creado) al regenerar el Visi.java para añadirle la anotación @GvNIXWebMethod dejando el fichero con errores de compilación.
   
+* Los parámetros "wsdl" de los comandos, para cuando son "file" podría se interesante que autocompletase. Para ello podríamos cambiar el tipo de String a URL y registrar un Converter que, identificando el protocolo "file" delegase en el Converter para el autocompletado.
+  
