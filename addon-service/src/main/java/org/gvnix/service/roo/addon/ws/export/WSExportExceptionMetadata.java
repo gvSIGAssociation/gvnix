@@ -20,7 +20,6 @@ package org.gvnix.service.roo.addon.ws.export;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
@@ -36,7 +35,6 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 
 /**
  * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
@@ -46,9 +44,6 @@ import org.springframework.roo.support.util.StringUtils;
  */
 public class WSExportExceptionMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
-
-    private static Logger logger = Logger
-            .getLogger(WSExportExceptionMetadata.class.getName());
 
     private static final String EXCEPTION_WEB_FAULT_TYPE_STRING = WSExportExceptionMetadata.class
             .getName();
@@ -75,7 +70,7 @@ public class WSExportExceptionMetadata extends
         // Add @javax.jws.WebFault annotation to ITD.
         AnnotationMetadata webFaultAnnotationMetadata = getTypeAnnotation(annotationMetadata);
         if (webFaultAnnotationMetadata != null) {
-            builder.addTypeAnnotation(webFaultAnnotationMetadata);
+            builder.addAnnotation(webFaultAnnotationMetadata);
         }
 
         // Create a representation of the desired output ITD
@@ -135,20 +130,6 @@ public class WSExportExceptionMetadata extends
                 .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
 
         return result == null;
-    }
-
-    /**
-     * Checks correct namespace URI format. Suffix 'http://'.
-     * 
-     * @param namespace
-     *            string to check as correct namespace.
-     * @return true if has correct URI format.
-     */
-    private boolean checkNamespaceFormat(String namespace) {
-        if (StringUtils.hasText(namespace)) {
-            return StringUtils.startsWithIgnoreCase(namespace, "http://");
-        }
-        return false;
     }
 
     public static String getMetadataIdentiferType() {

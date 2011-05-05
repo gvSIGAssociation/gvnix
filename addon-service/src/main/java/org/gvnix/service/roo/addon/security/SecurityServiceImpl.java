@@ -30,9 +30,8 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Logger;
+import java.util.Map.Entry;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -79,8 +78,6 @@ import org.xml.sax.SAXException;
 @Component
 @Service
 public class SecurityServiceImpl implements SecurityService {
-    private static Logger logger = Logger.getLogger(SecurityServiceImpl.class
-            .getName());
 
     private static final String DEPENDENCIES_FILE = "dependencies-wssl4.xml";
     private static final String AXIS_CLIENT_CONFIG_TEMPLATE_FILE = "client-config-axis-template.xml";
@@ -137,8 +134,8 @@ public class SecurityServiceImpl implements SecurityService {
                 .createFile(axisClientConfigPath);
 
         try {
-            FileCopyUtils.copy(templateInputStream,
-                    cxfXmlMutableFile.getOutputStream());
+            FileCopyUtils.copy(templateInputStream, cxfXmlMutableFile
+                    .getOutputStream());
         } catch (Exception e) {
 
             throw new IllegalStateException(e);
@@ -155,8 +152,8 @@ public class SecurityServiceImpl implements SecurityService {
         annotationsService.addGvNIXAnnotationsDependency();
         InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
                 DEPENDENCIES_FILE);
-        Assert.notNull(templateInputStream,
-                "Can't adquire dependencies file ".concat(DEPENDENCIES_FILE));
+        Assert.notNull(templateInputStream, "Can't adquire dependencies file "
+                .concat(DEPENDENCIES_FILE));
 
         Document dependencyDoc;
         try {
@@ -229,7 +226,8 @@ public class SecurityServiceImpl implements SecurityService {
 
             // passphrase of the keystore
             char[] passphrase = (StringUtils.hasText(keyStorePassphrase) ? keyStorePassphrase
-                    .toCharArray() : "changeit".toCharArray());
+                    .toCharArray()
+                    : "changeit".toCharArray());
 
             File keystore = createCacertsBasedOnJvmCacerts();
             Assert.isTrue(keystore.isFile(), "JVM cacerts file does not exist");
@@ -319,8 +317,8 @@ public class SecurityServiceImpl implements SecurityService {
             // 'changeit'
             return parseWsdlFromUrl(url, null);
         } catch (Exception e) {
-            throw new IllegalStateException(
-                    "Error parsing WSDL from ".concat(url), e);
+            throw new IllegalStateException("Error parsing WSDL from "
+                    .concat(url), e);
         }
     }
 
@@ -344,9 +342,8 @@ public class SecurityServiceImpl implements SecurityService {
                                     .getOutputStream());
                     fileManager.commit();
                 } catch (IOException e) {
-                    throw new IllegalStateException(
-                            "Error creatin a copy of ".concat(jvmCacerts
-                                    .getAbsolutePath()));
+                    throw new IllegalStateException("Error creatin a copy of "
+                            .concat(jvmCacerts.getAbsolutePath()));
                 }
             }
         }
@@ -358,9 +355,9 @@ public class SecurityServiceImpl implements SecurityService {
         String SEP = File.separator;
         // TODO: intentar cargar el keystore usando el JVM API
         // System.getProperty("javax.net.ssl.trustStore")
-        return new File(System.getProperty("java.home").concat(SEP)
-                .concat("lib").concat(SEP).concat("security").concat(SEP)
-                .concat("cacerts"));
+        return new File(System.getProperty("java.home").concat(SEP).concat(
+                "lib").concat(SEP).concat("security").concat(SEP).concat(
+                "cacerts"));
     }
 
     /** {@inheritDoc} */
@@ -383,8 +380,8 @@ public class SecurityServiceImpl implements SecurityService {
         if (previousServices.isEmpty()) {
             deployment.appendChild(serviceElementDescriptor);
         } else {
-            deployment.replaceChild(serviceElementDescriptor,
-                    previousServices.get(0));
+            deployment.replaceChild(serviceElementDescriptor, previousServices
+                    .get(0));
         }
 
         OutputStream outputStream = new ByteArrayOutputStream();

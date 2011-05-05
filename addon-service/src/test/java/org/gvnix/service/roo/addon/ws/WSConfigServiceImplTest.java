@@ -18,20 +18,24 @@
  */
 package org.gvnix.service.roo.addon.ws;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.gvnix.service.roo.addon.ws.WSConfigServiceImpl;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.*;
+import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.w3c.dom.Element;
@@ -58,10 +62,6 @@ public class WSConfigServiceImplTest {
     private FileManager fileManager;
 
     private MetadataService metadataService;
-
-    private ProjectOperations projectOperations;
-
-    private PathResolver pathResolver;
 
     // Mock to emulate file management.
     private ProjectMetadata projectMetadata;
@@ -244,13 +244,12 @@ public class WSConfigServiceImplTest {
         targetNamespaceResult = wSConfigServiceImpl
                 .convertPackageToTargetNamespace(packageName);
 
-        Assert.isTrue(
-                targetNamespaceResult != null
-                        && targetNamespaceResult.length() != 0,
+        Assert.isTrue(targetNamespaceResult != null
+                && targetNamespaceResult.length() != 0,
                 "The method doesn't work properly.");
 
-        assertTrue("The namespace is not well generated",
-                targetNamespaceResult.contains(targetNamespaceExpected));
+        assertTrue("The namespace is not well generated", targetNamespaceResult
+                .contains(targetNamespaceExpected));
 
     }
 

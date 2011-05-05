@@ -174,42 +174,6 @@ public class WSExportOperationsImpl implements WSExportOperations {
     }
 
     /**
-     * Creates @GvNIXWebService annotation with default attributes.
-     * 
-     * @param serviceClass
-     * @return @GvNIXWebService default annotation.
-     */
-    private AnnotationMetadata getDefaultGvNIXWebServiceAnnotation(
-            JavaType serviceClass) {
-
-        // Checks serviceName parameter to publish the web service.
-        String serviceName = serviceClass.getSimpleTypeName();
-
-        // Namespace for the web service.
-        String targetNamespace = wSConfigService
-                .convertPackageToTargetNamespace(serviceClass.getPackage()
-                        .toString());
-
-        // Check address name not blank and set service name if not defined.
-        String addressName = serviceClass.getSimpleTypeName();
-
-        String portTypeName = serviceName.concat("PortType");
-
-        // Define @GvNIXWebService annotation and attributes.
-        // Check port type attribute name format and add attributes to a list.
-        List<AnnotationAttributeValue<?>> gvNixWebServiceAnnotationAttributes = exportServiceAnnotationAttributes(
-                serviceClass, serviceName, portTypeName, targetNamespace,
-                addressName);
-
-        // Create @GvNIXWebService with attributes.
-        AnnotationMetadata defaultAnnotationMetadata = new AnnotationMetadataBuilder(
-                new JavaType(GvNIXWebService.class.getName()),
-                gvNixWebServiceAnnotationAttributes).build();
-
-        return defaultAnnotationMetadata;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public List<AnnotationAttributeValue<?>> exportServiceAnnotationAttributes(
@@ -535,7 +499,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
                 + serviceClass.getFullyQualifiedTypeName() + "'.");
 
         // Go and get the service layer ws metadata to export selected method.
-        JavaType javaType = PhysicalTypeIdentifier.getJavaType(id);
+        PhysicalTypeIdentifier.getJavaType(id);
         Path path = PhysicalTypeIdentifier.getPath(id);
         String entityMid = WSExportMetadata
                 .createIdentifier(serviceClass, path);

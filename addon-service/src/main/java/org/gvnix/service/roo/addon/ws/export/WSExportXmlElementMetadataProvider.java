@@ -20,7 +20,6 @@ package org.gvnix.service.roo.addon.ws.export;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -82,9 +81,6 @@ public class WSExportXmlElementMetadataProvider extends
     private List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
 
     private List<FieldMetadata> fieldMetadataTransientList = new ArrayList<FieldMetadata>();
-
-    private static Logger logger = Logger
-            .getLogger(WSExportXmlElementMetadataProvider.class.getName());
 
     protected void activate(ComponentContext context) {
         // Ensure we're notified of all metadata related to physical Java types,

@@ -18,11 +18,10 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
-import java.util.logging.Logger;
-
-import org.apache.felix.scr.annotations.*;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
-import org.gvnix.service.roo.addon.ws.export.WSExportWsdlOperationsImpl;
 
 /**
  * Addon for Handle Service Layer
@@ -39,9 +38,6 @@ public class WSExportWsdlOperationsImpl implements WSExportWsdlOperations {
     private WSExportWsdlConfigService wSExportWsdlConfigService;
 
     private static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
-
-    private static Logger logger = Logger
-            .getLogger(WSExportWsdlOperationsImpl.class.getName());
 
     public boolean isProjectAvailable() {
 

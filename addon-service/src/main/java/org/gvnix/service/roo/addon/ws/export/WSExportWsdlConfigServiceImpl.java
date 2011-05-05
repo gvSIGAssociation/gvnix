@@ -627,11 +627,9 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                         FieldMetadata fieldMetadata;
                         FieldDeclaration fieldDeclaration;
-                        MethodMetadata methodMetadata;
                         MethodMetadata tmpMethodMetadata;
                         MethodDeclaration methodDeclaration;
                         ConstructorMetadata constructorMetadata;
-                        ConstructorMetadata tmpConstructorMetadata;
                         ConstructorDeclaration constructorDeclaration;
 
                         // Extended classes.
@@ -676,7 +674,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                                 constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
 
-                                tmpConstructorMetadata = new JavaParserConstructorMetadata(
+                                new JavaParserConstructorMetadata(
                                         declaredByMetadataId,
                                         constructorDeclaration,
                                         compilationUnitServices,

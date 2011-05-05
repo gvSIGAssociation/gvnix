@@ -832,7 +832,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         if (StringUtils.hasText(namespace)) {
 
             try {
-                URI uri = new URI(namespace);
+                new URI(namespace);
 
             } catch (URISyntaxException e) {
                 return false;

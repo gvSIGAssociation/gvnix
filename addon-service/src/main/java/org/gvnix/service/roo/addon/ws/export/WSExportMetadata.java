@@ -20,7 +20,6 @@ package org.gvnix.service.roo.addon.ws.export;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.gvnix.service.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
@@ -62,9 +61,6 @@ public class WSExportMetadata extends
     private static final String WEB_SERVICE_TYPE = MetadataIdentificationUtils
             .create(WEB_SERVICE_TYPE_STRING);
 
-    private static Logger logger = Logger.getLogger(WSExportMetadata.class
-            .getName());
-
     public WSExportMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             List<MethodMetadata> methodMetadataList) {
@@ -91,11 +87,11 @@ public class WSExportMetadata extends
             // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
             AnnotationMetadata webServiceAnnotationMetadata = getWebServiceAnnotation(annotationMetadata);
 
-            builder.addTypeAnnotation(webServiceAnnotationMetadata);
+            builder.addAnnotation(webServiceAnnotationMetadata);
 
             AnnotationMetadata soapBindingAnnotationMetadata = getSoapBindingAnnotation(annotationMetadata);
 
-            builder.addTypeAnnotation(soapBindingAnnotationMetadata);
+            builder.addAnnotation(soapBindingAnnotationMetadata);
 
             // Methods to exclude from web service.
             List<MethodMetadata> methodMetadataListToExclude = new ArrayList<MethodMetadata>();

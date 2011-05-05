@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElementField;
@@ -37,7 +36,6 @@ import org.springframework.roo.classpath.details.annotations.AnnotationAttribute
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
-import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
 import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
@@ -73,9 +71,6 @@ public class WSExportXmlElementMetadata extends
     private static final String XML_ELEMENT_TYPE = MetadataIdentificationUtils
             .create(XML_ELEMENT_STRING);
 
-    private static Logger logger = Logger
-            .getLogger(WSExportXmlElementMetadata.class.getName());
-
     public WSExportXmlElementMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             List<FieldMetadata> fieldMetadataElementList,
@@ -101,7 +96,7 @@ public class WSExportXmlElementMetadata extends
                     gvNIXXmlElementAnnotationMetadata, fieldMetadataElementList);
 
             for (AnnotationMetadata annotationMetadata : annotationTypeList) {
-                builder.addTypeAnnotation(annotationMetadata);
+                builder.addAnnotation(annotationMetadata);
             }
 
             // If is Java Enum type
@@ -250,8 +245,8 @@ public class WSExportXmlElementMetadata extends
         AnnotationAttributeValue<?> tmpAttribute;
 
         // Boolean exported attribute.
-        BooleanAttributeValue exportedBooleanAttributeValue = (BooleanAttributeValue) gvNIXXmlElementAnnotationMetadata
-                .getAttribute(new JavaSymbolName("exported"));
+        gvNIXXmlElementAnnotationMetadata.getAttribute(new JavaSymbolName(
+                "exported"));
 
         // Annotation list.
         List<AnnotationMetadata> annotationTypeList = new ArrayList<AnnotationMetadata>();

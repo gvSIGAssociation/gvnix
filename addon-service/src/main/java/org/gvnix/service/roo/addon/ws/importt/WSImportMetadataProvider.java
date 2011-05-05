@@ -19,7 +19,6 @@
 package org.gvnix.service.roo.addon.ws.importt;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -64,9 +63,6 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
     @Reference
     private SecurityService securityService;
-
-    private static Logger logger = Logger
-            .getLogger(WSImportMetadataProvider.class.getName());
 
     protected void activate(ComponentContext context) {
 
