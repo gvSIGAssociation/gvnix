@@ -102,6 +102,45 @@ web binding setup // Comando de gvNIX</programlisting>
       similar a la planteada por Spring Security. Ejemplo:</para>
 
       <programlisting>es.gv.cit.pizzashop.security.authentication.wscit</programlisting>
+
+      <para>Del mismo modo que se debe seguir un convenio para el código Java
+      generado, debemos también tenerolo para los distintos <emphasis
+      role="bold">artefactos que se generan</emphasis>.</para>
+
+      <para>El motivo para adoptar este convenio es principalmente la
+      mantenibilidad del proyecto generado. No sabemos quién mantendrá el
+      proyecto en un futuro y posiblemente no conozca gvNIX, o es más, podría
+      ser que se hubiese dejado de usar gvNIX en ese proyecto. Lo que si
+      podemos saber es que el desarrollador encargado del mantenimiento
+      conocerá los estándares de las distintas tecnologías usadas y sabrá que
+      cuando se usa Spring, sus ficheros de configuración suelen estar en
+      <emphasis>src/main/resources/spring</emphasis> (que al empaquetarlo
+      acaban en <emphasis>/WEB-INF/classes/META-INF/spring</emphasis>).</para>
+
+      <para>La principal regla a seguir es seguir los estándars de facto de la
+      librería que del artefacto generado. Un ejemplo muy claro de esto lo
+      tenemos con las distintas JSP que generamos cuando usamos Spring MVC
+      para la capa web del proyecto. Como aquí se usa Tiles como librería del
+      motor de plantillas, las JSP se generan en el directorio
+      <emphasis>/WEB-INF/views</emphasis> puesto que es el estándar seguido en
+      todos los proyectos que usan Tiles.</para>
+
+      <para>Algunos ejemplos más para intentar ilustrar este convenio:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Artefactos estáticos relacionados con la capa web: dentro de
+          <emphasis>src/main/webapp/</emphasis>
+          (<emphasis>src/main/webapp/images, src/main/webapp/styles,
+          src/main/webapp/scripts</emphasis>).</para>
+        </listitem>
+
+        <listitem>
+          <para>Artefactos de las vistas en la capa web: dentro de
+          <emphasis>WEB-INF</emphasis> (<emphasis>WEB-INF/layouts,
+          WEB-INF/views, WEB-INF/reports</emphasis>).</para>
+        </listitem>
+      </itemizedlist>
     </section>
   </section>
 
@@ -128,7 +167,7 @@ web binding setup // Comando de gvNIX</programlisting>
 
     <para xml:lang="es">Dentro del fichero pom.xml habría que añadir la
     etiqueta <literal>description</literal> dentro de
-    <literal>project</literal> con una breve descripción del add-on. </para>
+    <literal>project</literal> con una breve descripción del add-on.</para>
 
     <para xml:lang="es">Ejemplo:</para>
 
