@@ -163,8 +163,8 @@ public class MyWebService {
 
           <para>Si gvNIX puede modificar el keystore, importará los
           certificados implicados en la autenticación del servidor y entonces
-          podrá acceder al WSDL requerido para generar el cliente del WS.
-          </para>
+          podrá acceder al WSDL requerido para generar el cliente del
+          WS.</para>
 
           <para>Al mismo tiempo, se crea en
           <emphasis>src/main/resources</emphasis> una copia del almacen de
@@ -186,6 +186,62 @@ public class MyWebService {
           navegador.</para>
         </listitem>
       </orderedlist>
+
+      <section>
+        <title>Añadir firmado de petición a un cliente</title>
+
+        <para>El add-on incorpora una implementación que permite añadir una
+        firma digital a la peticiones realizadas a un servicio web
+        importado.</para>
+
+        <para>Actualmente esta opción sólo está disponible para los servicio
+        web que utilicen la librería Axis. En futuras versiones se añadirá
+        servicio para CXF y otra operaciones relacionadas con
+        seguridad.</para>
+
+        <para>Para ello necesitamos disponer de:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>Servicio web importado en la aplicación.</para>
+          </listitem>
+
+          <listitem>
+            <para>Fichero <emphasis>pkc12</emphasis> con el certificado a usar
+            para firmar la petición.</para>
+          </listitem>
+
+          <listitem>
+            <para>Contraseña del certificado.</para>
+          </listitem>
+
+          <listitem>
+            <para>Alias a usar con el certificado</para>
+          </listitem>
+        </orderedlist>
+
+        <para>Disponiendo de esto elementos, usaremos el comando <link
+        xlink:href="apendice-comandos_addon-service_security_ws">service
+        security ws</link> para añadir la operación.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Lista de servicios web en la aplicación</title>
+
+      <para>El comando <link
+      xlink:href="apendice-comandos_addon-service_ws_list">service ws
+      list</link> permite obtener un listado de los servicios expuestos o
+      importados en la aplicación.</para>
+
+      <para>El resultado es una salida como esta:</para>
+
+      <programlisting>roo&gt; service ws list
+service     exposed     import
+---------   --------    ------
+Service1       X
+Service2                  X   
+Service3                  X   </programlisting>
     </section>
   </section>
 </chapter>
