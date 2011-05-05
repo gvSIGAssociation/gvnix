@@ -18,10 +18,13 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
+import java.util.List;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.springframework.roo.model.JavaType;
 
 /**
  * Addon for Handle Service Layer
@@ -47,7 +50,7 @@ public class WSExportWsdlOperationsImpl implements WSExportWsdlOperations {
     /**
      * {@inheritDoc}
      */
-    public void exportWSDL2Java(String url) {
+    public List<JavaType> exportWSDL2Java(String url) {
 
         // Check WSDL, configure plugin and generate sources.
         wSExportWsdlConfigService.exportWSDLWebService(url,
@@ -58,7 +61,7 @@ public class WSExportWsdlOperationsImpl implements WSExportWsdlOperations {
                 .monitoringGeneratedSourcesDirectory(GENERATED_CXF_SOURCES_DIR);
 
         // Convert java classes with gvNIX annotations.
-        updateAnnotationsToGvNIX();
+        return updateAnnotationsToGvNIX();
 
     }
 
@@ -67,10 +70,12 @@ public class WSExportWsdlOperationsImpl implements WSExportWsdlOperations {
      * <p>
      * Check the files listed in Arrays in this class.
      * </p>
+     * 
+     * @return implementation classes
      */
-    public void updateAnnotationsToGvNIX() {
+    public List<JavaType> updateAnnotationsToGvNIX() {
 
-        wSExportWsdlConfigService.generateGvNIXWebServiceFiles();
+        return wSExportWsdlConfigService.generateGvNIXWebServiceFiles();
     }
 
 }

@@ -19,7 +19,7 @@
 package org.gvnix.service.roo.addon.ws.export;
 
 import japa.parser.ParseException;
-import japa.parser.ast.*;
+import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.body.TypeDeclaration;
 
@@ -27,7 +27,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.gvnix.service.roo.addon.annotations.*;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebMethod;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
+import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MethodMetadata;
@@ -103,8 +106,10 @@ public interface WSExportWsdlConfigService {
     /**
      * Creates java files in 'src/main/java' from with gvNIX Web Service
      * Annotations.
+     * 
+     * @return implementation classes
      */
-    public void generateGvNIXWebServiceFiles();
+    public List<JavaType> generateGvNIXWebServiceFiles();
 
     /**
      * Generates java files with '@GvNIXXmlElement' values.
@@ -132,8 +137,10 @@ public interface WSExportWsdlConfigService {
 
     /**
      * Generates java files with '@GvNIXWebService' values.
+     * 
+     * @return implementation class list
      */
-    public void generateGvNIXWebServiceClasses();
+    public List<JavaType> generateGvNIXWebServiceClasses();
 
     /**
      * Retrieve Web Service implemented interface from interface list.

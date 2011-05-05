@@ -18,6 +18,10 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
+import java.util.List;
+
+import org.springframework.roo.model.JavaType;
+
 /**
  * Addon for Handle Service Layer
  * 
@@ -40,11 +44,14 @@ public interface WSExportWsdlOperations {
      * 
      * @param url
      *            from WSDL file to export.
+     * @return implementation classes
      */
-    public void exportWSDL2Java(String url);
+    public List<JavaType> exportWSDL2Java(String url);
 
     /**
      * Create new files with '@GvNIX' annotations in SRC_MAIN_JAVA.
+     * 
+     * @return implementation classes
      */
-    public void updateAnnotationsToGvNIX();
+    public List<JavaType> updateAnnotationsToGvNIX();
 }

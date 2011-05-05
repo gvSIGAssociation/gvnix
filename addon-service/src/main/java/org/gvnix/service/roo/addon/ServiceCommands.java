@@ -21,6 +21,7 @@ package org.gvnix.service.roo.addon;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -75,10 +76,11 @@ public class ServiceCommands implements CommandMarker {
     }
 
     @CliCommand(value = "service class", help = "Creates a new Service class in SRC_MAIN_JAVA.")
-    public void createServiceClass(
+    public String createServiceClass(
             @CliOption(key = "class", mandatory = true, help = "Name of the service class to create") JavaType serviceClass) {
 
         serviceOperations.createServiceClass(serviceClass);
+        return "New class can be used adding a property of this type with @Autowired annotation in the class that use it.";
     }
 
     @CliCommand(value = "service operation", help = "Adds a new method to existing Service")
@@ -147,7 +149,7 @@ public class ServiceCommands implements CommandMarker {
     }
 
     @CliCommand(value = "service define ws", help = "Defines a service endpoint interface (SEI) that will be mapped to a PortType in service contract. If target class doesn't exist the add-on will create it.")
-    public void serviceExport(
+    public String serviceExport(
             @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass,
             @CliOption(key = "serviceName", mandatory = false, help = "Name to publish the Web Service.") String serviceName,
             @CliOption(key = "portTypeName", mandatory = false, help = "Name to define the portType.") String portTypeName,
@@ -156,9 +158,12 @@ public class ServiceCommands implements CommandMarker {
 
         wSExportOperations.exportService(serviceClass, serviceName,
                 portTypeName, targetNamespace, addressName);
-        logger.warning("** IMPORTANT: Use 'service export operation' command (without the quotes) to publish service operations **"
-                .concat(System.getProperty("line.separator")));
-
+        StringBuilder sb = new StringBuilder();
+        sb.append("* New service has been defined without operations, use 'service export operation' command to add it.");
+        sb.append("\n");
+        sb.append("* New service can be shown adding '/services/' suffix to your base application URL.");
+        sb.append("\n");
+        return sb.toString();
     }
 
     @CliAvailabilityIndicator("service export operation")
@@ -255,11 +260,18 @@ public class ServiceCommands implements CommandMarker {
     }
 
     @CliCommand(value = "service import ws", help = "Imports a Web Service to Service class. If the class doesn't exists the Addon will create it.")
-    public void serviceImport(
+    public String serviceImport(
             @CliOption(key = "class", mandatory = true, help = "Name of the service class to import or create") JavaType serviceClass,
             @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
 
         wSImportOperations.addImportAnnotation(serviceClass, url);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("* New service can be used adding a property of this type with @Autowired annotation in the class that use it.");
+        sb.append("\n");
+        sb.append("* If new service has security requirements, use 'service security ws' command.");
+        sb.append("\n");
+        return sb.toString();
     }
 
     @CliAvailabilityIndicator("service export ws")
@@ -269,10 +281,32 @@ public class ServiceCommands implements CommandMarker {
     }
 
     @CliCommand(value = "service export ws", help = "Exports a Web Service from WSDL to java code with gvNIX annotations to generate this Web Service in project with dummy methods.")
-    public void serviceExportWsdl(
+    public String serviceExportWsdl(
             @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
 
-        wSExportWsdlOperations.exportWSDL2Java(url);
+        List<JavaType> serviceClasses = wSExportWsdlOperations
+                .exportWSDL2Java(url);
+        StringBuilder sb = new StringBuilder();
+        if (serviceClasses == null || serviceClasses.size() == 0) {
+            return null;
+        } else if (serviceClasses.size() == 1) {
+
+            sb.append(MessageFormat
+                    .format("* New service has been created at {0}, edit it to add you business logic.",
+                            new Object[] { serviceClasses.get(0)
+                                    .getFullyQualifiedTypeName() }));
+        } else {
+            sb.append("* New service classes has been created, edit them to add you business logic:");
+            for (JavaType serviceClass : serviceClasses) {
+                sb.append("    - ".concat(serviceClass
+                        .getFullyQualifiedTypeName()));
+            }
+
+        }
+        sb.append("\n");
+        sb.append("* New service can be shown adding '/services/' suffix to your base application URL.");
+        sb.append("\n");
+        return sb.toString();
     }
 
     @CliAvailabilityIndicator("service ws list")
