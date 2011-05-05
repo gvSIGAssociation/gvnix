@@ -148,12 +148,6 @@ public class WSExportXmlElementMetadata extends
         List<AnnotationAttributeValue<?>> attributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
         // Creates the annotation.
-        // DiSiD: Use AnnotationMetadataBuilder().build instead of
-        // DefaultAnnotationMetadata
-        // AnnotationMetadata xmlTransientAnnotation = new
-        // DefaultAnnotationMetadata(
-        // new JavaType("javax.xml.bind.annotation.XmlTransient"),
-        // attributeValueList);
         AnnotationMetadata xmlTransientAnnotation = new AnnotationMetadataBuilder(
                 new JavaType("javax.xml.bind.annotation.XmlTransient"),
                 attributeValueList).build();
@@ -224,11 +218,6 @@ public class WSExportXmlElementMetadata extends
             }
 
             // Creates the annotation.
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of
-            // DefaultAnnotationMetadata
-            // xmlTransientAnnotation = new DefaultAnnotationMetadata(
-            // new JavaType("javax.xml.bind.annotation.XmlElement"),
-            // attributeValueList);
             xmlTransientAnnotation = new AnnotationMetadataBuilder(
                     new JavaType("javax.xml.bind.annotation.XmlElement"),
                     attributeValueList).build();
@@ -286,11 +275,6 @@ public class WSExportXmlElementMetadata extends
             xmlRootElementAnnotationAttributeValueList
                     .add(namespaceAttributeValue);
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of
-            // DefaultAnnotationMetadata
-            // AnnotationMetadata xmlRootElementAnnotation = new
-            // DefaultAnnotationMetadata(
-            // xmlRootElement, xmlRootElementAnnotationAttributeValueList);
             AnnotationMetadata xmlRootElementAnnotation = new AnnotationMetadataBuilder(
                     xmlRootElement, xmlRootElementAnnotationAttributeValueList)
                     .build();
@@ -338,11 +322,6 @@ public class WSExportXmlElementMetadata extends
                 .getAttribute(new JavaSymbolName("namespace"));
         xmlTypeAnnotationAttributeValueList.add(xmlTypeNamespaceAttributeValue);
 
-        // DiSiD: Use AnnotationMetadataBuilder().build instead of
-        // DefaultAnnotationMetadata
-        // AnnotationMetadata xmlTypeRootElementAnnotation = new
-        // DefaultAnnotationMetadata(
-        // xmlType, xmlTypeAnnotationAttributeValueList);
         AnnotationMetadata xmlTypeRootElementAnnotation = new AnnotationMetadataBuilder(
                 xmlType, xmlTypeAnnotationAttributeValueList).build();
 
@@ -366,12 +345,6 @@ public class WSExportXmlElementMetadata extends
 
         if (!enumerationClass) {
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of
-            // DefaultAnnotationMetadata
-            // AnnotationMetadata xmlAccessorTypeAnnotation = new
-            // DefaultAnnotationMetadata(
-            // xmlAccessorType,
-            // xmlAccessorTypeAnnotationAttributeValueList);
             AnnotationMetadata xmlAccessorTypeAnnotation = new AnnotationMetadataBuilder(
                     xmlAccessorType,
                     xmlAccessorTypeAnnotationAttributeValueList).build();
@@ -386,11 +359,6 @@ public class WSExportXmlElementMetadata extends
 
             JavaType xmlEnum = new JavaType("javax.xml.bind.annotation.XmlEnum");
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of
-            // DefaultAnnotationMetadata
-            // AnnotationMetadata xmlEnumAnnotation = new
-            // DefaultAnnotationMetadata(
-            // xmlEnum, xmlEnumAnnotationAttributeValueList);
             AnnotationMetadata xmlEnumAnnotation = new AnnotationMetadataBuilder(
                     xmlEnum, xmlEnumAnnotationAttributeValueList).build();
 

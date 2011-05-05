@@ -18,31 +18,59 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.*;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
 import org.gvnix.service.roo.addon.JavaParserService;
-import org.gvnix.service.roo.addon.annotations.*;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
+import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.gvnix.service.roo.addon.ws.export.WSExportOperations.MethodParameterType;
-import org.gvnix.service.roo.addon.ws.export.WSExportValidationServiceImpl;
 import org.springframework.roo.addon.entity.EntityMetadata;
-import org.springframework.roo.classpath.*;
-import org.springframework.roo.classpath.details.*;
-import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.PhysicalTypeDetails;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.*;
-import org.springframework.roo.support.util.*;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.FileCopyUtils;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
@@ -120,9 +148,9 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         MethodMetadata methodToCheck = javaParserService
                 .getMethodByNameInClass(serviceClass, methodName);
 
-        Assert.isTrue(methodToCheck != null,
-                "The method: '" + methodName + " doesn't exists in the class '"
-                        + serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert.isTrue(methodToCheck != null, "The method: '" + methodName
+                + " doesn't exists in the class '"
+                + serviceClass.getFullyQualifiedTypeName() + "'.");
 
         List<JavaType> throwsTypes = methodToCheck.getThrowsTypes();
 
@@ -134,15 +162,16 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
             extendsThrowable = checkExceptionExtension(throwType);
 
-            Assert.isTrue(
-                    extendsThrowable,
-                    "The '"
-                            + throwType.getFullyQualifiedTypeName()
-                            + "' class doesn't extend from 'java.lang.Throwable' in method '"
-                            + methodName
-                            + "' from class '"
-                            + serviceClass.getFullyQualifiedTypeName()
-                            + "'.\nIt can't be used as Exception in method to be thrown.");
+            Assert
+                    .isTrue(
+                            extendsThrowable,
+                            "The '"
+                                    + throwType.getFullyQualifiedTypeName()
+                                    + "' class doesn't extend from 'java.lang.Throwable' in method '"
+                                    + methodName
+                                    + "' from class '"
+                                    + serviceClass.getFullyQualifiedTypeName()
+                                    + "'.\nIt can't be used as Exception in method to be thrown.");
 
             fileLocation = projectOperations.getPathResolver().getIdentifier(
                     Path.SRC_MAIN_JAVA,
@@ -238,9 +267,6 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
         if (!fileManager.exists(fileLocation)) {
             // Create file.
-            // DiSiD: Write immediately
-            // fileManager
-            // .createOrUpdateTextFileIfRequired(fileLocation, template);
             fileManager.createOrUpdateTextFileIfRequired(fileLocation,
                     template, true);
         }
@@ -249,8 +275,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         String webFaultDeclaration = "declare @type: ${exception_class_name}: @WebFault(name = \"${name}\", targetNamespace = \"${targetNamespace}\", faultBean = \"${faultBean}\");";
 
         Map<String, String> exceptionDeclaration = new HashMap<String, String>();
-        exceptionDeclaration.put("exception_class_name",
-                exceptionClass.getFullyQualifiedTypeName());
+        exceptionDeclaration.put("exception_class_name", exceptionClass
+                .getFullyQualifiedTypeName());
 
         for (AnnotationAttributeValue<?> annotationAttributeValue : annotationAttributeValues) {
             exceptionDeclaration
@@ -277,19 +303,16 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
             int eOFindex = fileContents.lastIndexOf("}");
 
-            updatedFilecontents = fileContents.substring(0, eOFindex)
-                    .concat("    ").concat(webFaultDeclaration).concat("\n\n}");
+            updatedFilecontents = fileContents.substring(0, eOFindex).concat(
+                    "    ").concat(webFaultDeclaration).concat("\n\n}");
 
-            // DiSiD: Write immediately
-            // fileManager.createOrUpdateTextFileIfRequired(fileLocation,
-            // updatedFilecontents);
             fileManager.createOrUpdateTextFileIfRequired(fileLocation,
                     updatedFilecontents, true);
 
         } else {
-            logger.log(Level.FINE,
-                    "Exception '" + exceptionClass.getFullyQualifiedTypeName()
-                            + "' has already been exported as @WebFault.");
+            logger.log(Level.FINE, "Exception '"
+                    + exceptionClass.getFullyQualifiedTypeName()
+                    + "' has already been exported as @WebFault.");
         }
 
     }
@@ -327,17 +350,14 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
         fileLocation = projectOperations.getPathResolver().getIdentifier(
                 Path.SRC_MAIN_JAVA,
-                throwType.getFullyQualifiedTypeName().replace('.', '/')
-                        .concat(".java"));
+                throwType.getFullyQualifiedTypeName().replace('.', '/').concat(
+                        ".java"));
 
         // Exception defined in the project or imported.
         if (fileManager.exists(fileLocation)) {
 
             // Load class or interface details.
             // If class not found an exception will be raised.
-            // DiSiD: Use typeLocationService instead of classpathOperations
-            // ClassOrInterfaceTypeDetails typeDetails = classpathOperations
-            // .getClassOrInterface(throwType);
             ClassOrInterfaceTypeDetails typeDetails = typeLocationService
                     .getClassOrInterface(throwType);
 
@@ -446,10 +466,10 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
             }
 
         } catch (ClassNotFoundException e) {
-            logger.log(Level.WARNING,
-                    "The class: '" + javaType.getFullyQualifiedTypeName()
-                            + "' doesn't exist while checking if extends '"
-                            + implmentedJavaType + "'.");
+            logger.log(Level.WARNING, "The class: '"
+                    + javaType.getFullyQualifiedTypeName()
+                    + "' doesn't exist while checking if extends '"
+                    + implmentedJavaType + "'.");
             return false;
         }
 
@@ -472,23 +492,25 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         MethodMetadata methodToCheck = javaParserService
                 .getMethodByNameInClass(serviceClass, methodName);
 
-        Assert.isTrue(methodToCheck != null,
-                "The method: '" + methodName + " doesn't exists in the class '"
-                        + serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert.isTrue(methodToCheck != null, "The method: '" + methodName
+                + " doesn't exists in the class '"
+                + serviceClass.getFullyQualifiedTypeName() + "'.");
 
         // Check Return type
         JavaType returnType = methodToCheck.getReturnType();
 
-        Assert.isTrue(
-                isJavaTypeAllowed(returnType, MethodParameterType.RETURN,
-                        serviceClass),
-                "The '"
-                        + MethodParameterType.RETURN
-                        + "' type '"
-                        + returnType.getFullyQualifiedTypeName()
-                        + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
-                        + "\nDefined in: '"
-                        + serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert
+                .isTrue(
+                        isJavaTypeAllowed(returnType,
+                                MethodParameterType.RETURN, serviceClass),
+                        "The '"
+                                + MethodParameterType.RETURN
+                                + "' type '"
+                                + returnType.getFullyQualifiedTypeName()
+                                + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
+                                + "\nDefined in: '"
+                                + serviceClass.getFullyQualifiedTypeName()
+                                + "'.");
 
         // Check Input Parameters
         List<AnnotatedJavaType> inputParametersList = methodToCheck
@@ -496,17 +518,19 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
         for (AnnotatedJavaType annotatedJavaType : inputParametersList) {
 
-            Assert.isTrue(
-                    isJavaTypeAllowed(annotatedJavaType.getJavaType(),
-                            MethodParameterType.PARAMETER, serviceClass),
-                    "The '"
-                            + MethodParameterType.PARAMETER
-                            + "' type '"
-                            + annotatedJavaType.getJavaType()
-                                    .getFullyQualifiedTypeName()
-                            + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
-                            + "\nDefined in: '"
-                            + serviceClass.getFullyQualifiedTypeName() + "'.");
+            Assert
+                    .isTrue(
+                            isJavaTypeAllowed(annotatedJavaType.getJavaType(),
+                                    MethodParameterType.PARAMETER, serviceClass),
+                            "The '"
+                                    + MethodParameterType.PARAMETER
+                                    + "' type '"
+                                    + annotatedJavaType.getJavaType()
+                                            .getFullyQualifiedTypeName()
+                                    + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
+                                    + "\nDefined in: '"
+                                    + serviceClass.getFullyQualifiedTypeName()
+                                    + "'.");
 
         }
     }
@@ -532,9 +556,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         String fileLocation = projectOperations.getPathResolver()
                 .getIdentifier(
                         Path.SRC_MAIN_JAVA,
-                        javaType.getFullyQualifiedTypeName()
-                                .replace('.', File.separatorChar)
-                                .concat(".java"));
+                        javaType.getFullyQualifiedTypeName().replace('.',
+                                File.separatorChar).concat(".java"));
 
         // It's an imported collection or map ?
         // FIX: Only permits to check classes imported into project that are
@@ -547,15 +570,17 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
             // Check if javaType is an available collection.
             if (isNotAllowedCollectionType(javaType)) {
-                logger.log(
-                        Level.WARNING,
-                        "The '"
-                                + methodParameterType
-                                + "' type '"
-                                + javaType.getFullyQualifiedTypeName()
-                                + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection defined in: '"
-                                + serviceClass.getFullyQualifiedTypeName()
-                                + "'.");
+                logger
+                        .log(
+                                Level.WARNING,
+                                "The '"
+                                        + methodParameterType
+                                        + "' type '"
+                                        + javaType.getFullyQualifiedTypeName()
+                                        + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection defined in: '"
+                                        + serviceClass
+                                                .getFullyQualifiedTypeName()
+                                        + "'.");
 
                 return false;
             }
@@ -615,9 +640,6 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                     .get(targetId);
             Assert.notNull(ptm, "Java source class doesn't exists.");
 
-            // DiSiD: Use getMemberHoldingTypeDetails instead of
-            // getPhysicalTypeDetails
-            // PhysicalTypeDetails ptd = ptm.getPhysicalTypeDetails();
             PhysicalTypeDetails ptd = ptm.getMemberHoldingTypeDetails();
 
             Assert.notNull(ptd,
@@ -632,15 +654,15 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
             List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
             StringAttributeValue nameStringAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("name"),
-                    StringUtils.uncapitalize(javaType.getSimpleTypeName()));
+                    new JavaSymbolName("name"), StringUtils
+                            .uncapitalize(javaType.getSimpleTypeName()));
 
             annotationAttributeValueList.add(nameStringAttributeValue);
 
             StringAttributeValue namespaceStringAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("namespace"),
-                    wSConfigService.convertPackageToTargetNamespace(javaType
-                            .getPackage().toString()));
+                    new JavaSymbolName("namespace"), wSConfigService
+                            .convertPackageToTargetNamespace(javaType
+                                    .getPackage().toString()));
 
             annotationAttributeValueList.add(namespaceStringAttributeValue);
 
@@ -653,8 +675,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                     && !elementListArrayAttributeValue.getValue().isEmpty()) {
 
                 xmlTypeNameStringAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("xmlTypeName"),
-                        javaType.getSimpleTypeName());
+                        new JavaSymbolName("xmlTypeName"), javaType
+                                .getSimpleTypeName());
                 annotationAttributeValueList
                         .add(xmlTypeNameStringAttributeValue);
 
@@ -674,9 +696,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
             annotationAttributeValueList.add(exportedBooleanAttributeValue);
 
-            annotationsService.addJavaTypeAnnotation(
-                    mutableTypeDetails.getName(),
-                    GvNIXXmlElement.class.getName(),
+            annotationsService.addJavaTypeAnnotation(mutableTypeDetails
+                    .getName(), GvNIXXmlElement.class.getName(),
                     annotationAttributeValueList, false);
 
             return true;
@@ -686,15 +707,16 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         // TODO: Create an Aj file to declare objects that doesn't belong to
         // project. In Roo next version fix it with Classpath loaders.
 
-        logger.log(
-                Level.INFO,
-                "The "
-                        + methodParameterType
-                        + " parameter type: '"
-                        + javaType.getFullyQualifiedTypeName()
-                        + "' in method '' from class '"
-                        + serviceClass.getFullyQualifiedTypeName()
-                        + "' does not belong to project class definitions and its not mapped to be used in web service operation.");
+        logger
+                .log(
+                        Level.INFO,
+                        "The "
+                                + methodParameterType
+                                + " parameter type: '"
+                                + javaType.getFullyQualifiedTypeName()
+                                + "' in method '' from class '"
+                                + serviceClass.getFullyQualifiedTypeName()
+                                + "' does not belong to project class definitions and its not mapped to be used in web service operation.");
 
         return true;
     }
@@ -711,8 +733,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
         List<FieldMetadata> tmpFieldMetadataElementList = new ArrayList<FieldMetadata>();
 
-        String identifier = EntityMetadata.createIdentifier(
-                governorTypeDetails.getName(), Path.SRC_MAIN_JAVA);
+        String identifier = EntityMetadata.createIdentifier(governorTypeDetails
+                .getName(), Path.SRC_MAIN_JAVA);
 
         // Obtain the entity metadata type and itd mutable details.
         EntityMetadata entityMetadata = (EntityMetadata) metadataService
@@ -765,8 +787,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         for (FieldMetadata fieldMetadata : tmpFieldMetadataElementList) {
 
             isAllowed = isJavaTypeAllowed(fieldMetadata.getFieldType(),
-                    MethodParameterType.XMLENTITY,
-                    governorTypeDetails.getName());
+                    MethodParameterType.XMLENTITY, governorTypeDetails
+                            .getName());
 
             // Add field that implements disallowed collection
             // interface.
@@ -847,10 +869,11 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
             if (notAllowed) {
 
-                logger.warning("The method parameter '"
-                        + javaType.getFullyQualifiedTypeName()
-                        + "' type '"
-                        + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is or Extends a disallowed collection.");
+                logger
+                        .warning("The method parameter '"
+                                + javaType.getFullyQualifiedTypeName()
+                                + "' type '"
+                                + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is or Extends a disallowed collection.");
                 return notAllowed;
             }
         }
@@ -861,10 +884,11 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                     notAllowedInterfaceCollection);
 
             if (notAllowed) {
-                logger.warning("The method parameter '"
-                        + javaType.getFullyQualifiedTypeName()
-                        + "' type '"
-                        + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is or Implements a disallowed collection.");
+                logger
+                        .warning("The method parameter '"
+                                + javaType.getFullyQualifiedTypeName()
+                                + "' type '"
+                                + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is or Implements a disallowed collection.");
                 return notAllowed;
             }
         }
@@ -878,10 +902,6 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     public String getWebServiceDefaultNamespace(JavaType serviceClass) {
 
         // Retrieve Web Service target Namespace value.
-        // ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails =
-        // classpathOperations
-        // .getClassOrInterface(serviceClass);
-        // DiSiD: Use typeLocationService instead of classpathOperations
         ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = typeLocationService
                 .getClassOrInterface(serviceClass);
 
@@ -894,8 +914,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                 .getTypeAnnotation(classOrInterfaceTypeDetails, new JavaType(
                         GvNIXWebService.class.getName()));
 
-        Assert.isTrue(
-                gvNixWebServiceAnnotaionMetadata != null,
+        Assert.isTrue(gvNixWebServiceAnnotaionMetadata != null,
                 "Launch command 'service define ws --class "
                         + serviceClass.getFullyQualifiedTypeName()
                         + "' to export class to Web Service.");
@@ -903,22 +922,25 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         StringAttributeValue webServiceTargetNamespaceAttributeValue = (StringAttributeValue) gvNixWebServiceAnnotaionMetadata
                 .getAttribute(new JavaSymbolName("targetNamespace"));
 
-        Assert.isTrue(
-                webServiceTargetNamespaceAttributeValue != null
-                        && StringUtils
-                                .hasText(webServiceTargetNamespaceAttributeValue
-                                        .getValue()),
-                "You must define 'targetNamespace' annotation attribute in @GvNIXWebService in class: '"
-                        + serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert
+                .isTrue(
+                        webServiceTargetNamespaceAttributeValue != null
+                                && StringUtils
+                                        .hasText(webServiceTargetNamespaceAttributeValue
+                                                .getValue()),
+                        "You must define 'targetNamespace' annotation attribute in @GvNIXWebService in class: '"
+                                + serviceClass.getFullyQualifiedTypeName()
+                                + "'.");
 
         String webServiceTargetNamespace = webServiceTargetNamespaceAttributeValue
                 .getValue();
 
-        Assert.isTrue(
-                checkNamespaceFormat(webServiceTargetNamespace),
-                "Attribute 'targetNamespace' in @GvNIXWebService for Web Service class '"
-                        + serviceClass.getFullyQualifiedTypeName()
-                        + "'has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+        Assert
+                .isTrue(
+                        checkNamespaceFormat(webServiceTargetNamespace),
+                        "Attribute 'targetNamespace' in @GvNIXWebService for Web Service class '"
+                                + serviceClass.getFullyQualifiedTypeName()
+                                + "'has to start with 'http://'.\ni.e.: http://name.of.namespace/");
         return webServiceTargetNamespace;
     }
 
@@ -927,14 +949,11 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      */
     public boolean checkIsNotRooEntity(JavaType serviceClass) {
 
-        // DiSiD: Use typeLocationService instead of classpathOperations
-        // ClassOrInterfaceTypeDetails typeDetails = classpathOperations
-        // .getClassOrInterface(serviceClass);
         ClassOrInterfaceTypeDetails typeDetails = typeLocationService
                 .getClassOrInterface(serviceClass);
 
-        String identifier = EntityMetadata.createIdentifier(
-                typeDetails.getName(), Path.SRC_MAIN_JAVA);
+        String identifier = EntityMetadata.createIdentifier(typeDetails
+                .getName(), Path.SRC_MAIN_JAVA);
 
         EntityMetadata entityMetadata = (EntityMetadata) metadataService
                 .get(identifier);

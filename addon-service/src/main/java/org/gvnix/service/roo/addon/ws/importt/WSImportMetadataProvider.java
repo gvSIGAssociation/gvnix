@@ -129,11 +129,6 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
         if (wSConfigService.isProjectAvailable()) {
 
             // Check if Web Service definition is correct.
-            // DiSiD: Use getMemberHoldingTypeDetails instead of
-            // getPhysicalTypeDetails
-            // PhysicalTypeDetails physicalTypeDetails =
-            // governorPhysicalTypeMetadata
-            // .getPhysicalTypeDetails();
             PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
                     .getMemberHoldingTypeDetails();
 

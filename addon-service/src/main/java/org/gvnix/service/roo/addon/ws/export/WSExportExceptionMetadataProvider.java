@@ -21,14 +21,17 @@ package org.gvnix.service.roo.addon.ws.export;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.felix.scr.annotations.*;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
-import org.gvnix.service.roo.addon.ws.export.WSExportExceptionMetadataProvider;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.classpath.*;
+import org.springframework.roo.classpath.PhysicalTypeDetails;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
@@ -65,9 +68,8 @@ public class WSExportExceptionMetadataProvider extends
     protected void activate(ComponentContext context) {
         // Ensure we're notified of all metadata related to physical Java types,
         // in particular their initial creation
-        metadataDependencyRegistry.registerDependency(
-                PhysicalTypeIdentifier.getMetadataIdentiferType(),
-                getProvidesType());
+        metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
+                .getMetadataIdentiferType(), getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXWebFault.class.getName()));
     }
 
@@ -78,6 +80,7 @@ public class WSExportExceptionMetadataProvider extends
      * createLocalIdentifier(org.springframework.roo.model.JavaType,
      * org.springframework.roo.project.Path)
      */
+    @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
         return WSExportExceptionMetadata.createIdentifier(javaType, path);
     }
@@ -88,6 +91,7 @@ public class WSExportExceptionMetadataProvider extends
      * @seeorg.springframework.roo.classpath.itd.AbstractItdMetadataProvider#
      * getGovernorPhysicalTypeIdentifier(java.lang.String)
      */
+    @Override
     protected String getGovernorPhysicalTypeIdentifier(
             String metadataIdentificationString) {
         JavaType javaType = WSExportExceptionMetadata
@@ -107,6 +111,7 @@ public class WSExportExceptionMetadataProvider extends
      * (java.lang.String, org.springframework.roo.model.JavaType,
      * org.springframework.roo.classpath.PhysicalTypeMetadata, java.lang.String)
      */
+    @Override
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
             String metadataIdentificationString, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -124,11 +129,6 @@ public class WSExportExceptionMetadataProvider extends
             annotationsService.addGvNIXAnnotationsDependency();
 
             // Check if Web Service definition is correct.
-            // DiSiD: Use getMemberHoldingTypeDetails instead of
-            // getPhysicalTypeDetails
-            // PhysicalTypeDetails physicalTypeDetails =
-            // governorPhysicalTypeMetadata
-            // .getPhysicalTypeDetails();
             PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
                     .getMemberHoldingTypeDetails();
 
@@ -155,28 +155,21 @@ public class WSExportExceptionMetadataProvider extends
                         metadataIdentificationString, aspectName,
                         governorPhysicalTypeMetadata);
 
-                // DiSiD: Use getAnnotations instead of getTypeAnnotations and
-                // getMemberHoldingTypeDetails instead of getItdTypeDetails
-                // if
-                // (exceptionMetadata.getItdTypeDetails().getTypeAnnotations()
                 if (exceptionMetadata.getMemberHoldingTypeDetails()
                         .getAnnotations()
 
                         .isEmpty()) {
-                    logger.log(
-                            Level.WARNING,
-                            "The annotation @GvNIXWebFault is not declared correctly for '"
+                    logger
+                            .log(
+                                    Level.WARNING,
+                                    "The annotation @GvNIXWebFault is not declared correctly for '"
 
-                                    // DiSiD: Use getMemberHoldingTypeDetails
-                                    // instead of getPhysicalTypeDetails
-                                    // + governorPhysicalTypeMetadata
-                                    // .getPhysicalTypeDetails()
-                                    + governorPhysicalTypeMetadata
-                                            .getMemberHoldingTypeDetails()
+                                            + governorPhysicalTypeMetadata
+                                                    .getMemberHoldingTypeDetails()
 
-                                            .getName()
-                                            .getFullyQualifiedTypeName()
-                                    + "'.\nThis will not export the Exception to be used in Web Service.\n@WebParam annotation will be deleted untill the annotation is defined correctly.");
+                                                    .getName()
+                                                    .getFullyQualifiedTypeName()
+                                            + "'.\nThis will not export the Exception to be used in Web Service.\n@WebParam annotation will be deleted untill the annotation is defined correctly.");
                 }
             }
         }
@@ -221,11 +214,12 @@ public class WSExportExceptionMetadataProvider extends
                         .checkNamespaceFormat(namespaceAttributeValue
                                 .getValue());
 
-        Assert.isTrue(
-                correctNamespace,
-                "@GvNIXWebFault annotation attribute value 'targetNamespace' in '"
-                        + governorTypeDetails.getName()
-                        + "' must be well formed.\ni.e.: http://my.example.com/");
+        Assert
+                .isTrue(
+                        correctNamespace,
+                        "@GvNIXWebFault annotation attribute value 'targetNamespace' in '"
+                                + governorTypeDetails.getName()
+                                + "' must be well formed.\ni.e.: http://my.example.com/");
 
         // Check faultBean.
         StringAttributeValue faultBeanAttributeValue = (StringAttributeValue) annotationMetadata
@@ -236,13 +230,14 @@ public class WSExportExceptionMetadataProvider extends
                 && governorTypeDetails.getName().getFullyQualifiedTypeName()
                         .contentEquals(faultBeanAttributeValue.getValue());
 
-        Assert.isTrue(
-                correctFaultBean,
-                "@GvNIXWebFault annotation attribute value 'faultBean' in '"
-                        + governorTypeDetails.getName()
-                        + "' must have the same value that class complete name.\ni.e.: '"
-                        + governorTypeDetails.getName()
-                                .getFullyQualifiedTypeName() + "'");
+        Assert
+                .isTrue(
+                        correctFaultBean,
+                        "@GvNIXWebFault annotation attribute value 'faultBean' in '"
+                                + governorTypeDetails.getName()
+                                + "' must have the same value that class complete name.\ni.e.: '"
+                                + governorTypeDetails.getName()
+                                        .getFullyQualifiedTypeName() + "'");
         return true;
     }
 

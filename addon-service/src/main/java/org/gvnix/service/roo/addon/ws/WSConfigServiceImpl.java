@@ -80,19 +80,10 @@ public class WSConfigServiceImpl implements WSConfigService {
     private FileManager fileManager;
     @Reference
     private ProjectOperations projectOperations;
-
     @Reference
     private SecurityService securityService;
-
-    // DiSiD: Roo 1.1.0.M3 remove the URL rewriter dependency
-    // TODO: It is required configure the services URL in some other location ?
-    // @Reference
-    // private UrlRewriteOperations urlRewriteOperations;
-
     @Reference
     private AnnotationsService annotationsService;
-    // @Reference
-    // private MavenOperations mavenOperations;
     @Reference
     private ProcessManager processManager;
 
@@ -135,13 +126,6 @@ public class WSConfigServiceImpl implements WSConfigService {
             // - Add CXFServlet and map it to /services/*
             // - Add cxf-PROJECT_NAME.xml to Spring Context Loader
             installCxfWebConfigurationFile();
-
-            // Setup URL rewrite to avoid to filter requests to WebServices
-            // DiSiD: Roo 1.1.0.M3 remove the URL rewriter dependency
-            // TODO: It is required configure the services URL in some other
-            // location
-            // ?
-            // installCxfUrlRewriteConfigurationFile();
         }
     }
 
@@ -157,7 +141,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      */
     public boolean isLibraryInstalled(CommunicationSense type) {
 
-        // TODO Check Web and Url Rewrite configuration files on IMPORT ?
+        // TODO Check Web configuration file on IMPORT ?
 
         boolean cxfInstalled = isDependenciesInstalled(type);
 
@@ -355,11 +339,6 @@ public class WSConfigServiceImpl implements WSConfigService {
             List<Element> cxfDependencies = getRequiredDependencies(type);
             for (Element dependency : cxfDependencies) {
 
-                // DiSiD: Unkown error when dependencyUpdate used, use
-                // addDependency
-                // instead
-                // projectOperations.dependencyUpdate(new
-                // Dependency(dependency));
                 projectOperations.addDependency(new Dependency(dependency));
             }
         }
@@ -493,73 +472,6 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);
     }
-
-    // DiSiD: Roo 1.1.0.M3 remove the URL rewriter dependency
-    // TODO: It is required configure the services URL in some other location ?
-    // /**
-    // * Update url rewrite rules.
-    // *
-    // */
-    // private void installCxfUrlRewriteConfigurationFile() {
-    //
-    // // Open file and append rules before the first element
-    // String xmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-    // "WEB-INF/urlrewrite.xml");
-    // Assert.isTrue(fileManager.exists(xmlPath), "urlrewrite.xml not found");
-    //
-    // Document urlRewriteDoc = urlRewriteOperations.getUrlRewriteDocument();
-    //
-    // Element root = urlRewriteDoc.getDocumentElement();
-    //
-    // Element existingRule =
-    // XmlUtils.findFirstElement("/urlrewrite/rule[from='/services/**']", root);
-    //
-    // if (existingRule != null) {
-    // // Web Service filter exists.
-    // return;
-    // }
-    //
-    // Element rule = urlRewriteDoc.createElement("rule");
-    // rule.setAttribute("enabled", "true");
-    // Element from = urlRewriteDoc.createElement("from");
-    // from.setTextContent("/services/**");
-    // rule.appendChild(from);
-    // Element to = urlRewriteDoc.createElement("to");
-    // to.setAttribute("last", "true");
-    // to.setTextContent("/services/$1");
-    // rule.appendChild(to);
-    //
-    // // Create rule in dest doc
-    // root.insertBefore(rule, root.getFirstChild());
-    //
-    // urlRewriteOperations.writeUrlRewriteDocument(urlRewriteDoc);
-    // }
-
-    /**
-     * Get addon rewrite rules.
-     * 
-     * @return List of addon rewrite rules
-     */
-    // DiSiD: Not used
-    // private List<Element> getCxfUrlRewriteRequiredRules() {
-    //
-    // InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
-    // "urlrewrite-rules.xml");
-    // Assert.notNull(templateInputStream,
-    // "Could not adquire urlrewrite-rules.xml file");
-    //
-    // Document dependencyDoc;
-    // try {
-    // dependencyDoc = XmlUtils.getDocumentBuilder().parse(
-    // templateInputStream);
-    // } catch (Exception e) {
-    // throw new IllegalStateException(e);
-    // }
-    //
-    // Element root = (Element) dependencyDoc.getFirstChild();
-    //
-    // return XmlUtils.findElements("/urlrewrite-rules/cxf/rule", root);
-    // }
 
     /**
      * {@inheritDoc}
@@ -1693,8 +1605,6 @@ public class WSConfigServiceImpl implements WSConfigService {
      */
     public void mvn(String parameters, String message) throws IOException {
 
-        // DiSiD: Use pathResolver instead of mavenOperations
-        // File root = new File(mavenOperations.getProjectRoot());
         PathResolver pathResolver = projectOperations.getPathResolver();
         File root = new File(pathResolver.getRoot(Path.ROOT));
 

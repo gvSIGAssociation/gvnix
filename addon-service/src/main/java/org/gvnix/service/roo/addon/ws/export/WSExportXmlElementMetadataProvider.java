@@ -162,11 +162,6 @@ public class WSExportXmlElementMetadataProvider extends
                     javaType, path);
 
             // Check if Web Service definition is correct.
-            // DiSiD: Use getMemberHoldingTypeDetails instead of
-            // getPhysicalTypeDetails
-            // PhysicalTypeDetails physicalTypeDetails =
-            // governorPhysicalTypeMetadata
-            // .getPhysicalTypeDetails();
             PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
                     .getMemberHoldingTypeDetails();
 

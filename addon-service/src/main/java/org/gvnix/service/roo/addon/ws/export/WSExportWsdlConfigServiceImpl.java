@@ -344,7 +344,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                         .getAbsolutePath();
 
                 absoluteFilePath = StringUtils
-                        .delete(absoluteFilePath,
+                        .delete(
+                                absoluteFilePath,
                                 projectOperations
                                         .getPathResolver()
                                         .getIdentifier(
@@ -354,9 +355,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                 String destinyPath = projectOperations.getPathResolver()
                         .getIdentifier(Path.SRC_MAIN_JAVA, absoluteFilePath);
 
-                // DiSiD: Write immediately
-                // fileManager.createOrUpdateTextFileIfRequired(destinyPath,
-                // pacakageFileToString);
                 fileManager.createOrUpdateTextFileIfRequired(destinyPath,
                         pacakageFileToString, true);
 
@@ -414,10 +412,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         // CompilationUnitServices to create the class.
         compilationUnitServices = new WSCompilationUnit(new JavaPackage(
                 packageName), javaType, importDeclarationList,
-                new ArrayList<TypeDeclaration>(),
-
-                // DiSiD: Add type category class
-                PhysicalTypeCategory.CLASS);
+                new ArrayList<TypeDeclaration>(), PhysicalTypeCategory.CLASS);
 
         List<ClassOrInterfaceDeclaration> innerClassDeclarationList = new ArrayList<ClassOrInterfaceDeclaration>();
 
@@ -521,12 +516,11 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                         }
                     }
 
-                    fieldDeclaration = new FieldDeclaration(
-                            tmpFieldDeclaration.getJavaDoc(),
-                            tmpFieldDeclaration.getModifiers(),
+                    fieldDeclaration = new FieldDeclaration(tmpFieldDeclaration
+                            .getJavaDoc(), tmpFieldDeclaration.getModifiers(),
                             tmpFieldDeclaration.getAnnotations(),
-                            tmpFieldDeclaration.getType(),
-                            tmpFieldDeclaration.getVariables());
+                            tmpFieldDeclaration.getType(), tmpFieldDeclaration
+                                    .getVariables());
 
                     for (VariableDeclarator var : fieldDeclaration
                             .getVariables()) {
@@ -564,13 +558,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         // class.
         if (!isEnumDeclaration) {
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of
-            // DefaultAnnotationMetadata
-            // AnnotationMetadata rooEntityAnnotationMetadata = new
-            // DefaultAnnotationMetadata(
-            // new JavaType(
-            // "org.springframework.roo.addon.javabean.RooJavaBean"),
-            // new ArrayList<AnnotationAttributeValue<?>>());
             AnnotationMetadata rooEntityAnnotationMetadata = new AnnotationMetadataBuilder(
                     new JavaType(
                             "org.springframework.roo.addon.javabean.RooJavaBean"),
@@ -664,8 +651,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                                         .getName().toString()), javaType,
                                 compilationUnit.getImports(),
                                 new ArrayList<TypeDeclaration>(),
-
-                                // DiSiD: Add type category class
                                 PhysicalTypeCategory.CLASS);
 
                         for (BodyDeclaration bodyDeclaration : classOrInterfaceDeclaration
@@ -697,28 +682,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                                         compilationUnitServices,
                                         new HashSet<JavaSymbolName>());
 
-                                // DiSiD Use ConstructorMetadataBuilder instead
-                                // of
-                                // DefaultConstructorMetadata
-                                // constructorMetadata = new
-                                // DefaultConstructorMetadata(
-                                // declaredByMetadataId,
-                                // tmpConstructorMetadata.getModifier(),
-                                // tmpConstructorMetadata
-                                // .getParameterTypes(),
-                                // tmpConstructorMetadata
-                                // .getParameterNames(),
-                                // tmpConstructorMetadata.getAnnotations(),
-                                // tmpConstructorMetadata
-                                // .getBody()
-                                // .substring(
-                                // tmpConstructorMetadata
-                                // .getBody()
-                                // .indexOf("{") + 1,
-                                // tmpConstructorMetadata
-                                // .getBody()
-                                // .lastIndexOf(
-                                // "}")));
                                 ConstructorMetadataBuilder constructorMetadataBuilder = new ConstructorMetadataBuilder(
                                         declaredByMetadataId);
                                 constructorMetadata = constructorMetadataBuilder
@@ -737,29 +700,12 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                                         compilationUnitServices,
                                         new HashSet<JavaSymbolName>());
 
-                                // DiSiD: Use MethodMetadataBuilder.build()
-                                // instead of
-                                // DefaultMethodMetadata
-                                // methodMetadata = new DefaultMethodMetadata(
-                                // declaredByMetadataId, tmpMethodMetadata
-                                // .getModifier(),
-                                // tmpMethodMetadata.getMethodName(),
-                                // tmpMethodMetadata.getReturnType(),
-                                // tmpMethodMetadata.getParameterTypes(),
-                                // tmpMethodMetadata.getParameterNames(),
-                                // tmpMethodMetadata.getAnnotations(),
-                                // tmpMethodMetadata.getThrowsTypes(),
-                                // tmpMethodMetadata.getBody().substring(
-                                // tmpMethodMetadata.getBody()
-                                // .indexOf("{") + 1,
-                                // tmpMethodMetadata.getBody()
-                                // .lastIndexOf("}")));
                                 InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
                                 bodyBuilder.appendFormalLine(tmpMethodMetadata
                                         .getBody());
                                 MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
-                                        declaredByMetadataId,
-                                        tmpMethodMetadata.getModifier(),
+                                        declaredByMetadataId, tmpMethodMetadata
+                                                .getModifier(),
                                         tmpMethodMetadata.getMethodName(),
                                         tmpMethodMetadata.getReturnType(),
                                         tmpMethodMetadata.getParameterTypes(),
@@ -889,8 +835,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                                         .getName().toString()), javaType,
                                 compilationUnit.getImports(),
                                 new ArrayList<TypeDeclaration>(),
-
-                                // DiSiD: Add type category class
                                 PhysicalTypeCategory.CLASS);
 
                         // GvNIXWebFault Annotation.Get all annotations.
@@ -966,28 +910,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                                                     compilationUnitServices,
                                                     new HashSet<JavaSymbolName>());
 
-                                            // DiSiD: Use
-                                            // MethodMetadataBuilder.build()
-                                            // instead of
-                                            // DefaultMethodMetadata
-                                            // interfaceTmpMethodMetadata = new
-                                            // DefaultMethodMetadata(
-                                            // declaredByMetadataId,
-                                            // interfaceTmpMethodMetadata
-                                            // .getModifier(),
-                                            // interfaceTmpMethodMetadata
-                                            // .getMethodName(),
-                                            // interfaceTmpMethodMetadata
-                                            // .getReturnType(),
-                                            // interfaceTmpMethodMetadata
-                                            // .getParameterTypes(),
-                                            // interfaceTmpMethodMetadata
-                                            // .getParameterNames(),
-                                            // interfaceTmpMethodMetadata
-                                            // .getAnnotations(),
-                                            // interfaceTmpMethodMetadata
-                                            // .getThrowsTypes(),
-                                            // tmpMethodMetadata.getBody());
                                             MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
                                                     declaredByMetadataId,
                                                     interfaceTmpMethodMetadata
@@ -1148,8 +1070,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                 NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
 
-                if (normalAnnotationExpr.getName().getName()
-                        .contains(WSExportWsdlListener.xmlRootElement)) {
+                if (normalAnnotationExpr.getName().getName().contains(
+                        WSExportWsdlListener.xmlRootElement)) {
 
                     // Retrieve values.
                     for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
@@ -1167,8 +1089,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                     }
 
-                } else if (normalAnnotationExpr.getName().getName()
-                        .contains(WSExportWsdlListener.xmlType)) {
+                } else if (normalAnnotationExpr.getName().getName().contains(
+                        WSExportWsdlListener.xmlType)) {
 
                     for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
 
@@ -1234,8 +1156,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                 SingleMemberAnnotationExpr singleMemberAnnotationExpr = (SingleMemberAnnotationExpr) annotationExpr;
 
-                if (singleMemberAnnotationExpr.getName().getName()
-                        .contains(WSExportWsdlListener.xmlAccessorType)) {
+                if (singleMemberAnnotationExpr.getName().getName().contains(
+                        WSExportWsdlListener.xmlAccessorType)) {
 
                 }
             } /*
@@ -1288,10 +1210,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                         NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) packageAnnotationExpr;
 
-                        if (normalAnnotationExpr
-                                .getName()
-                                .toString()
-                                .contains("javax.xml.bind.annotation.XmlSchema")) {
+                        if (normalAnnotationExpr.getName().toString().contains(
+                                "javax.xml.bind.annotation.XmlSchema")) {
 
                             List<MemberValuePair> pairs = normalAnnotationExpr
                                     .getPairs();
@@ -1357,11 +1277,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         annotationAttributeValues.add(enumElementBooleanAttributeValue);
 
         // Create annotation.
-        // DiSiD: Use AnnotationMetadataBuilder().build instead of
-        // DefaultAnnotationMetadata
-        // gvNIXXmlElementAnnotationMetadata = new DefaultAnnotationMetadata(
-        // new JavaType(GvNIXXmlElement.class.getName()),
-        // annotationAttributeValues);
         gvNIXXmlElementAnnotationMetadata = new AnnotationMetadataBuilder(
                 new JavaType(GvNIXXmlElement.class.getName()),
                 annotationAttributeValues).build();
@@ -1389,11 +1304,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         AnnotationMetadata gvNIXXmlElementFieldAnnotation;
         if (xmlElementAnnotation == null) {
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of
-            // DefaultAnnotationMetadata
-            // gvNIXXmlElementFieldAnnotation = new DefaultAnnotationMetadata(
-            // new JavaType(GvNIXXmlElementField.class.getName()),
-            // new ArrayList<AnnotationAttributeValue<?>>());
             gvNIXXmlElementFieldAnnotation = new AnnotationMetadataBuilder(
                     new JavaType(GvNIXXmlElementField.class.getName()),
                     new ArrayList<AnnotationAttributeValue<?>>()).build();
@@ -1412,11 +1322,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                 gvNIXXmlElementFieldAttributes.add(tmpAnnotationAttributeValue);
             }
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of
-            // DefaultAnnotationMetadata
-            // gvNIXXmlElementFieldAnnotation = new DefaultAnnotationMetadata(
-            // new JavaType(GvNIXXmlElementField.class.getName()),
-            // gvNIXXmlElementFieldAttributes);
             gvNIXXmlElementFieldAnnotation = new AnnotationMetadataBuilder(
                     new JavaType(GvNIXXmlElementField.class.getName()),
                     gvNIXXmlElementFieldAttributes).build();
@@ -1425,17 +1330,11 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         updatedAnnotationMetadataList.add(gvNIXXmlElementFieldAnnotation);
 
         // Create new Field with GvNIXAnnotation.
-        // DiSiD: Use FieldMetadataBuilder instead of DefaultFieldMetadata
-        // convertedFieldMetadata = new DefaultFieldMetadata(fieldMetadata
-        // .getDeclaredByMetadataId(), fieldMetadata.getModifier(),
-        // fieldMetadata.getFieldName(), fieldMetadata.getFieldType(),
-        // fieldMetadata.getFieldInitializer(),
-        // updatedAnnotationMetadataList);
         FieldMetadataBuilder fieldMetadataBuilder = new FieldMetadataBuilder(
-                fieldMetadata.getDeclaredByMetadataId(),
-                fieldMetadata.getModifier(), fieldMetadata.getFieldName(),
-                fieldMetadata.getFieldType(),
-                fieldMetadata.getFieldInitializer());
+                fieldMetadata.getDeclaredByMetadataId(), fieldMetadata
+                        .getModifier(), fieldMetadata.getFieldName(),
+                fieldMetadata.getFieldType(), fieldMetadata
+                        .getFieldInitializer());
         for (AnnotationMetadata annotationMetadata : updatedAnnotationMetadataList) {
             fieldMetadataBuilder.addAnnotation(annotationMetadata);
         }
@@ -1505,11 +1404,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                 new JavaSymbolName("faultBean"), faultBeanWebFault));
 
         // Create GvNIXWebFault annotation.
-        // DiSiD: Use AnnotationMetadataBuilder().build instead of
-        // DefaultAnnotationMetadata
-        // gvNIXWebFaultAnnotationMetadata = new DefaultAnnotationMetadata(
-        // new JavaType(GvNIXWebFault.class.getName()),
-        // gvNIXWebFaultAnnotationAttributes);
         gvNIXWebFaultAnnotationMetadata = new AnnotationMetadataBuilder(
                 new JavaType(GvNIXWebFault.class.getName()),
                 gvNIXWebFaultAnnotationAttributes).build();
@@ -1568,8 +1462,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
                 StringAttributeValue addressStringAttributeValue;
 
-                if (normalAnnotationExpr.getName().getName()
-                        .contains(WSExportWsdlListener.webServiceInterface)) {
+                if (normalAnnotationExpr.getName().getName().contains(
+                        WSExportWsdlListener.webServiceInterface)) {
 
                     // Retrieve values.
                     for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
@@ -1587,8 +1481,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                             break;
                         }
                     }
-                } else if (normalAnnotationExpr.getName().getName()
-                        .contains(WSExportWsdlListener.soapBinding)) {
+                } else if (normalAnnotationExpr.getName().getName().contains(
+                        WSExportWsdlListener.soapBinding)) {
 
                     for (MemberValuePair pair : normalAnnotationExpr.getPairs()) {
 
@@ -1682,8 +1576,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
         // fullyQualifiedTypeName
         StringAttributeValue fullyQualifiedStringAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("fullyQualifiedTypeName"),
-                javaType.getFullyQualifiedTypeName());
+                new JavaSymbolName("fullyQualifiedTypeName"), javaType
+                        .getFullyQualifiedTypeName());
         gvNIXWebServiceAnnotationAttributes
                 .add(fullyQualifiedStringAttributeValue);
 
@@ -1693,11 +1587,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         gvNIXWebServiceAnnotationAttributes.add(exportedAttributeValue);
 
         // Create GvNIXWebService annotation.
-        // DiSiD: Use AnnotationMetadataBuilder().build instead of
-        // DefaultAnnotationMetadata
-        // gvNIXWebServiceAnnotationMetadata = new DefaultAnnotationMetadata(
-        // new JavaType(GvNIXWebService.class.getName()),
-        // gvNIXWebServiceAnnotationAttributes);
         gvNIXWebServiceAnnotationMetadata = new AnnotationMetadataBuilder(
                 new JavaType(GvNIXWebService.class.getName()),
                 gvNIXWebServiceAnnotationAttributes).build();
@@ -1722,11 +1611,12 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         AnnotationMetadata gvNIXWEbMethodAnnotationMetadata = getGvNIXWebMethodAnnotation(
                 methodMetadata, defaultNamespace);
 
-        Assert.isTrue(
-                gvNIXWEbMethodAnnotationMetadata != null,
-                "Generated Web Service method: '"
-                        + methodMetadata.getMethodName()
-                        + "' is not correctly generated with Web Service annotation values.\nRelaunch the command.");
+        Assert
+                .isTrue(
+                        gvNIXWEbMethodAnnotationMetadata != null,
+                        "Generated Web Service method: '"
+                                + methodMetadata.getMethodName()
+                                + "' is not correctly generated with Web Service annotation values.\nRelaunch the command.");
 
         gvNIXWebMethodAnnotationMetadataList
                 .add(gvNIXWEbMethodAnnotationMetadata);
@@ -1735,29 +1625,19 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         List<AnnotatedJavaType> annotatedGvNIXWebParameterList = getGvNIXWebParamsAnnotations(
                 methodMetadata, defaultNamespace);
 
-        Assert.isTrue(
-                gvNIXWEbMethodAnnotationMetadata != null,
-                "Generated Web Service method: '"
-                        + methodMetadata.getMethodName()
-                        + "' is not correctly generated with Web Service annotation values for its parameters.\nRelaunch the command.");
+        Assert
+                .isTrue(
+                        gvNIXWEbMethodAnnotationMetadata != null,
+                        "Generated Web Service method: '"
+                                + methodMetadata.getMethodName()
+                                + "' is not correctly generated with Web Service annotation values for its parameters.\nRelaunch the command.");
 
         // Rebuild method with retrieved parameters.
-        // DiSiD: Use MethodMetadataBuilder.build() instead of
-        // DefaultMethodMetadata
-        // gvNIXMethodMetadata = new DefaultMethodMetadata(methodMetadata
-        // .getDeclaredByMetadataId(), methodMetadata.getModifier(),
-        // methodMetadata.getMethodName(), methodMetadata.getReturnType(),
-        // annotatedGvNIXWebParameterList, methodMetadata
-        // .getParameterNames(),
-        // gvNIXWebMethodAnnotationMetadataList, methodMetadata
-        // .getThrowsTypes(), methodMetadata.getBody().substring(
-        // methodMetadata.getBody().indexOf("{") + 1,
-        // methodMetadata.getBody().lastIndexOf("}")));
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         bodyBuilder.appendFormalLine(methodMetadata.getBody());
         MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
-                methodMetadata.getDeclaredByMetadataId(),
-                methodMetadata.getModifier(), methodMetadata.getMethodName(),
+                methodMetadata.getDeclaredByMetadataId(), methodMetadata
+                        .getModifier(), methodMetadata.getMethodName(),
                 methodMetadata.getReturnType(), annotatedGvNIXWebParameterList,
                 methodMetadata.getParameterNames(), bodyBuilder);
         for (AnnotationMetadata annotationMetadata : gvNIXWebMethodAnnotationMetadataList) {
@@ -1819,8 +1699,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         StringAttributeValue actionAttributeValue;
         if (tmpAttributeValue != null) {
             actionAttributeValue = new StringAttributeValue(new JavaSymbolName(
-                    "action"),
-                    ((StringAttributeValue) tmpAttributeValue).getValue());
+                    "action"), ((StringAttributeValue) tmpAttributeValue)
+                    .getValue());
         } else {
             actionAttributeValue = new StringAttributeValue(new JavaSymbolName(
                     "action"), "");
@@ -1850,8 +1730,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
         } else {
             resultTypeAttributeValue = new ClassAttributeValue(
-                    new JavaSymbolName("webResultType"),
-                    methodMetadata.getReturnType());
+                    new JavaSymbolName("webResultType"), methodMetadata
+                            .getReturnType());
 
             AnnotationAttributeValue<?> nameAttributeValue = webResultAnnotation
                     .getAttribute(new JavaSymbolName("name"));
@@ -2016,11 +1896,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
             }
         }
 
-        // DiSiD: Use AnnotationMetadataBuilder().build instead of
-        // DefaultAnnotationMetadata
-        // gvNIXWEbMethodAnnotationMetadata = new DefaultAnnotationMetadata(
-        // new JavaType(GvNIXWebMethod.class.getName()),
-        // gvNIXWEbMethodAnnotationAttributeValues);
         gvNIXWEbMethodAnnotationMetadata = new AnnotationMetadataBuilder(
                 new JavaType(GvNIXWebMethod.class.getName()),
                 gvNIXWEbMethodAnnotationAttributeValues).build();
@@ -2078,12 +1953,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
             gvNIXWebParamAttributeValueList.add(typeClassAttributeValue);
 
             // @GvNIXWebParam
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of
-            // DefaultAnnotationMetadata
-            // AnnotationMetadata gvNixWebParamAnnotationMetadata = new
-            // DefaultAnnotationMetadata(
-            // new JavaType(GvNIXWebParam.class.getName()),
-            // gvNIXWebParamAttributeValueList);
             AnnotationMetadata gvNixWebParamAnnotationMetadata = new AnnotationMetadataBuilder(
                     new JavaType(GvNIXWebParam.class.getName()),
                     gvNIXWebParamAttributeValueList).build();
@@ -2094,8 +1963,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
             parameterAnnotationList.add(webParamAnnotationMetadata);
 
             // Add annotation list to parameter.
-            parameterWithAnnotations = new AnnotatedJavaType(
-                    parameterType.getJavaType(), parameterAnnotationList);
+            parameterWithAnnotations = new AnnotatedJavaType(parameterType
+                    .getJavaType(), parameterAnnotationList);
 
             annotatedGvNIXWebParameterList.add(parameterWithAnnotations);
         }
@@ -2159,8 +2028,9 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                         root);
 
         // If plugin element not exists, message error
-        Assert.notNull(codegenWsPlugin,
-                "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+        Assert
+                .notNull(codegenWsPlugin,
+                        "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Checks if already exists the execution.
         Element oldGenerateSourcesCxfServer = XmlUtils.findFirstElement(

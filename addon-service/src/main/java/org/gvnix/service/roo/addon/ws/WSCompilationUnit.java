@@ -36,13 +36,13 @@ import org.springframework.roo.model.JavaType;
  */
 public class WSCompilationUnit implements CompilationUnitServices {
 
-    private JavaPackage compilationUnitPackage;
-    private JavaType enclosingTypeName;
-    private List<ImportDeclaration> imports;
-    private List<TypeDeclaration> innerTypes;
+    private final JavaPackage compilationUnitPackage;
+    private final JavaType enclosingTypeName;
+    private final List<ImportDeclaration> imports;
+    private final List<TypeDeclaration> innerTypes;
 
-    // DiSiD: Added property and initialited on constructor
-    private PhysicalTypeCategory physicalTypeCategory;
+    // Added property and initialited on constructor
+    private final PhysicalTypeCategory physicalTypeCategory;
 
     /**
      * 
@@ -119,7 +119,6 @@ public class WSCompilationUnit implements CompilationUnitServices {
     }
 
     public PhysicalTypeCategory getPhysicalTypeCategory() {
-        // DiSiD: Unimplemented and required by CompilationUnitServices
         return physicalTypeCategory;
     }
 

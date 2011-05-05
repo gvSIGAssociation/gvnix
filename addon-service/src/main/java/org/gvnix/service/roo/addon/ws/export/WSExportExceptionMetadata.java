@@ -23,14 +23,17 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
-import org.gvnix.service.roo.addon.ws.export.WSExportExceptionMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.model.*;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
@@ -110,10 +113,6 @@ public class WSExportExceptionMetadata extends
 
             annotationAttributeValueList.add(faultBeanAttributeValue);
 
-            // DiSiD: Use AnnotationMetadataBuilder().build instead of
-            // DefaultAnnotationMetadata
-            // return new DefaultAnnotationMetadata(javaType,
-            // annotationAttributeValueList);
             return new AnnotationMetadataBuilder(javaType,
                     annotationAttributeValueList).build();
         }

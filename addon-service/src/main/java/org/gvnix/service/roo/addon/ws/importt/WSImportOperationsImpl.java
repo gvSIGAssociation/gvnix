@@ -115,29 +115,22 @@ public class WSImportOperationsImpl implements WSImportOperations {
         String fileLocation = projectOperations.getPathResolver()
                 .getIdentifier(
                         Path.SRC_MAIN_JAVA,
-                        serviceClass.getFullyQualifiedTypeName()
-                                .replace('.', '/').concat(".java"));
+                        serviceClass.getFullyQualifiedTypeName().replace('.',
+                                '/').concat(".java"));
 
         // If class not exists, create it
         if (!fileManager.exists(fileLocation)) {
 
             // Create service class with Service Annotation.
             javaParserService.createServiceClass(serviceClass);
-            logger.log(
-                    Level.FINE,
-                    "New service class created: "
-                            + serviceClass.getFullyQualifiedTypeName());
+            logger.log(Level.FINE, "New service class created: "
+                    + serviceClass.getFullyQualifiedTypeName());
         }
 
         // Check if import annotation is already defined
-        // DiSiD: Use typeLocationService instead of classpathOperations
-        // if
-        // (javaParserService.isAnnotationIntroduced(GvNIXWebServiceProxy.class
-        // .getName(), classpathOperations
-        // .getClassOrInterface(serviceClass))) {
-        if (javaParserService.isAnnotationIntroduced(
-                GvNIXWebServiceProxy.class.getName(),
-                typeLocationService.getClassOrInterface(serviceClass))) {
+        if (javaParserService.isAnnotationIntroduced(GvNIXWebServiceProxy.class
+                .getName(), typeLocationService
+                .getClassOrInterface(serviceClass))) {
 
             logger.log(Level.WARNING,
                     "Provided class is already importing a service");
@@ -184,12 +177,10 @@ public class WSImportOperationsImpl implements WSImportOperations {
                 .isAnnotationIntroduced(
                         GvNIXWebServiceSecurity.class.getName(),
                         importedServiceDetails);
-        Assert.isTrue(
-                !alreadyAnnotated,
-                importedServiceDetails.getName().toString()
-                        .concat(" already has ")
-                        .concat(GvNIXWebServiceSecurity.class.getSimpleName())
-                        .concat(" annotation."));
+        Assert.isTrue(!alreadyAnnotated, importedServiceDetails.getName()
+                .toString().concat(" already has ").concat(
+                        GvNIXWebServiceSecurity.class.getSimpleName()).concat(
+                        " annotation."));
 
         // checks if class is really a imported service and if it's a
         // RPC-Encoded
@@ -316,10 +307,10 @@ public class WSImportOperationsImpl implements WSImportOperations {
             JavaType importedServiceClass) {
 
         String certificateName = certificate.getName();
-        String extension = certificateName.substring(
-                certificateName.lastIndexOf('.'), certificateName.length());
-        certificateName = certificateName.substring(0,
-                certificateName.lastIndexOf('.'));
+        String extension = certificateName.substring(certificateName
+                .lastIndexOf('.'), certificateName.length());
+        certificateName = certificateName.substring(0, certificateName
+                .lastIndexOf('.'));
         String targetPath = WSServiceSecurityMetadata.getCertificatePath(
                 importedServiceClass, certificate.getName());
         String baseNamePath = targetPath.replace(certificate.getName(), "");
@@ -330,8 +321,8 @@ public class WSImportOperationsImpl implements WSImportOperations {
         int index = 1;
 
         while (fileManager.exists(targetPath)) {
-            targetPath = baseNamePath.concat(certificateName)
-                    .concat("_" + index).concat(extension);
+            targetPath = baseNamePath.concat(certificateName).concat(
+                    "_" + index).concat(extension);
             targetPath = projectOperations.getPathResolver().getIdentifier(
                     Path.SRC_MAIN_RESOURCES, targetPath);
             index++;
