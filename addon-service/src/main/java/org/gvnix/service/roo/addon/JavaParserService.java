@@ -24,7 +24,10 @@ import java.util.List;
 
 import org.gvnix.service.roo.addon.ws.export.WSExportWsdlConfigService.GvNIXAnnotationType;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
-import org.springframework.roo.classpath.details.*;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ConstructorMetadata;
+import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
@@ -210,4 +213,14 @@ public interface JavaParserService {
             List<JavaType> declaredClassList,
             PhysicalTypeCategory physicalTypeCategory,
             List<JavaSymbolName> enumConstantsList);
+
+    /**
+     * Returns annotation metada from a class
+     * 
+     * @param annotation
+     * @param governorTypeDetails
+     * @return
+     */
+    public AnnotationMetadata getAnnotation(String annotation,
+            ClassOrInterfaceTypeDetails governorTypeDetails);
 }

@@ -316,6 +316,9 @@ public final class WSServiceSecurityMetadataProvider extends
 
         Assert.notNull(wsdl, "Can't get WSDl from ".concat(wsdlLocation));
 
+        Assert.isTrue(WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
+                "Only RPC-Encoded services is supported");
+
         // Gets first port
         Element port = WsdlParserUtils.findFirstCompatiblePort(wsdl
                 .getDocumentElement());

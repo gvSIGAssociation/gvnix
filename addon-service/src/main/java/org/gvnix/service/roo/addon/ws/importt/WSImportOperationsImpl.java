@@ -38,10 +38,12 @@ import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceProxy;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceSecurity;
 import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.security.WSServiceSecurityMetadata;
+import org.gvnix.service.roo.addon.util.WsdlParserUtils;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -51,6 +53,7 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
+import org.w3c.dom.Document;
 
 /**
  * Addon for Handle Web Service Proxy Layer
@@ -188,11 +191,13 @@ public class WSImportOperationsImpl implements WSImportOperations {
                         .concat(GvNIXWebServiceSecurity.class.getSimpleName())
                         .concat(" annotation."));
 
-        // checks if class is really a imported service
-        boolean hasImportAnnotation = javaParserService.isAnnotationIntroduced(
-                GvNIXWebServiceProxy.class.getName(), importedServiceDetails);
-        Assert.isTrue(hasImportAnnotation, importedServiceDetails.getName()
-                .toString().concat(" is not a imported service"));
+        // checks if class is really a imported service and if it's a
+        // RPC-Encoded
+        Document wsdl = getWSDLFromClass(importedServiceClass);
+        Assert.notNull(wsdl, importedServiceDetails.getName().toString()
+                .concat(" is not a imported service"));
+        Assert.isTrue(WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
+                "Only RPC-Encoded services is supported");
 
         // Check if certificate file exist
         Assert.isTrue(certificate.exists(), certificate.getAbsolutePath()
@@ -332,5 +337,29 @@ public class WSImportOperationsImpl implements WSImportOperations {
             index++;
         }
         return new File(targetPath);
+    }
+
+    /**
+     * Returns the wsdl document for a proxy class
+     * 
+     * @param serviceClass
+     * @return wsdl or null if it's not a proxy class
+     */
+    public Document getWSDLFromClass(JavaType serviceClass) {
+        // get class
+        ClassOrInterfaceTypeDetails importedServiceDetails = typeLocationService
+                .getClassOrInterface(serviceClass);
+
+        AnnotationMetadata annotation = javaParserService.getAnnotation(
+                GvNIXWebServiceProxy.class.getName(), importedServiceDetails);
+
+        if (annotation == null) {
+            return null;
+        }
+
+        Document wsdl = securityService.loadWsdlUrl((String) annotation
+                .getAttribute(new JavaSymbolName("wsdlLocation")).getValue());
+
+        return wsdl;
     }
 }

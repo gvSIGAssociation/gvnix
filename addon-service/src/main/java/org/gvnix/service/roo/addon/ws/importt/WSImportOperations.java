@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.List;
 
 import org.springframework.roo.model.JavaType;
+import org.w3c.dom.Document;
 
 /**
  * Addon for Handle Web Service Proxy Layer
@@ -82,4 +83,12 @@ public interface WSImportOperations {
      */
     public void addSignatureAnnotation(JavaType importedServiceClassName,
             File certificate, String password, String alias);
+
+    /**
+     * Returns the wsdl document for a proxy class
+     * 
+     * @param serviceClass
+     * @return wsdl or null if it's not a proxy class
+     */
+    public Document getWSDLFromClass(JavaType serviceClass);
 }

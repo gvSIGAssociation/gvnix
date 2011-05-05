@@ -774,6 +774,18 @@ public class JavaParserServiceImpl implements JavaParserService {
         return isDefined;
     }
 
+    public AnnotationMetadata getAnnotation(String annotation,
+            ClassOrInterfaceTypeDetails governorTypeDetails) {
+        JavaType javaType = new JavaType(annotation);
+        for (AnnotationMetadata annotationMetadata : governorTypeDetails
+                .getAnnotations()) {
+            if (annotationMetadata.getAnnotationType().equals(javaType)) {
+                return annotationMetadata;
+            }
+        }
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      * <p>
