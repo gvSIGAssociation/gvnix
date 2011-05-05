@@ -921,3 +921,9 @@ TODO
   * Add support for others actions
   * Use converters for service class to allow autocomplete
   * Support more Certificate types.
+
+* Replace "exported" with "exposed".
+
+* Si se ejecuta en la clase Visi de petclinic un 'service export' de un método añadido se produce un problema parece que devido a que la clase Owner hereda de AbstractPerson y eso no se ha tendido en cuenta.
+  Otra cosa importante es que se pierden algunos import (por ejemplo, java.util.List que utiliza el método creado) al regenerar el Visi.java para añadirle la anotación @GvNIXWebMethod dejando el fichero con errores de compilación.
+  
