@@ -2,14 +2,13 @@ package org.gvnix.service.roo.addon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.service.roo.addon.AnnotationsService;
-import org.gvnix.service.roo.addon.JavaParserService;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
@@ -19,6 +18,7 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadataB
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.util.Assert;
@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 
 /**
  * Utilities to manage annotations.
- * 
+ *
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -45,6 +45,9 @@ public class AnnotationsServiceImpl implements AnnotationsService {
     private MetadataService metadataService;
     @Reference
     private TypeLocationService typeLocationService;
+
+    private static final String PROJECT_METADATA_IDENTIFIER = ProjectMetadata
+            .getProjectIdentifier();
 
     private static Logger logger = Logger.getLogger(AnnotationsService.class
             .getName());
@@ -69,8 +72,23 @@ public class AnnotationsServiceImpl implements AnnotationsService {
 
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", conf);
-        for (Element depen : depens) {
 
+        Dependency dependency = null;
+        for (Element depen : depens) {
+            ProjectMetadata md = (ProjectMetadata) metadataService
+                    .get(PROJECT_METADATA_IDENTIFIER);
+            if (md == null) {
+                return;
+            }
+            dependency = new Dependency(depen);
+            Set<Dependency> results = md
+                    .getDependenciesExcludingVersion(dependency);
+            for (Dependency existingDependency : results) {
+                if (!existingDependency.getVersionId().equals(
+                        dependency.getVersionId())) {
+                    projectOperations.removeDependency(existingDependency);
+                }
+            }
             projectOperations.addDependency(new Dependency(depen));
         }
     }
