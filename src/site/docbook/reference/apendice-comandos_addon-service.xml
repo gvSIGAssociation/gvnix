@@ -433,15 +433,15 @@
     <title>service ws list</title>
 
     <para>Lista los servicios web que están registrados en la aplicación,
-    tanto los expuestos como los importados. El resultado se formatea de la
+    tanto los exportados como los importados. El resultado se formatea de la
     siguiente forma:</para>
 
     <programlisting>roo&gt; service ws list
-service     exposed     import
----------   --------    ------
+service     exported     imported
+---------   ---------   ----------
 Service1       X
-Service2                  X   
-Service3                  X   </programlisting>
+Service2                    X 
+Service3                    X </programlisting>
   </section>
 
   <section xml:id="apendice-comandos_addon-service_security_ws">

@@ -52,7 +52,7 @@ Commands
 
 * service entity --class nombreClase:
 
-* service ws list : List all project services (exposed/imported) in console.
+* service ws list : List all project services (exported/imported) in console.
 
 * service security ws --class importedServiceClass --certificate path_to_certificate_file --password password --alias alias
 

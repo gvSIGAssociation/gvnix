@@ -530,7 +530,7 @@ Parameters:
 
 service ws list
 -------------------
-Shows a class list with imports and/or exposes services
+Shows a class list with imports and/or exported services.
 
 service security ws
 ---------------------

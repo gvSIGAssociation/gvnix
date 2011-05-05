@@ -298,17 +298,17 @@ public class ServiceCommands implements CommandMarker {
                 certificate, password, alias);
     }
 
-    @CliCommand(value = "service ws list", help = "Shows a class list which imports and/or exposes services")
+    @CliCommand(value = "service ws list", help = "Shows a class list with imported and/or exported services")
     public String serviceWsList() {
 
         // Gets imported services
         List<String> imported = wSImportOperations.getServiceList();
 
-        // Gets exposed services
-        List<String> exposed = wSExportOperations.getServiceList();
+        // Gets exported services
+        List<String> exported = wSExportOperations.getServiceList();
 
         // Format result
-        return formatWsList(imported, exposed);
+        return formatWsList(imported, exported);
     }
 
     /**
@@ -320,23 +320,23 @@ public class ServiceCommands implements CommandMarker {
      * Pattern:<br/>
      * 
      * <pre>
-     * Services             exposed   import
-     * ------------------- --------- ---------
-     * {className}             X         X
-     * {className2}                      X
+     * Services             exported   imported
+     * ------------------- --------- -----------
+     * {className}             X          X
+     * {className2}                       X
      * {className3}            X
      * </pre>
      * 
      * </p>
      * 
      * @param importedServices
-     * @param exposedServices
+     * @param exportedServices
      * @return
      */
     private String formatWsList(List<String> importedServices,
-            List<String> exposedServices) {
+            List<String> exportedServices) {
         if ((importedServices == null || importedServices.isEmpty())
-                && (exposedServices == null || exposedServices.isEmpty())) {
+                && (exportedServices == null || exportedServices.isEmpty())) {
             return "No Web Services services found in application";
         }
 
@@ -353,8 +353,8 @@ public class ServiceCommands implements CommandMarker {
                 }
             }
         }
-        if (exposedServices != null) {
-            for (String service : exposedServices) {
+        if (exportedServices != null) {
+            for (String service : exportedServices) {
                 services.add(service);
                 if (service.length() > maxLength) {
                     maxLength = service.length();
@@ -369,38 +369,38 @@ public class ServiceCommands implements CommandMarker {
         // Add header
         printer.print(fitStringTo("Services", maxLength, ' '));
         printer.print("   ");
-        printer.print("exposed");
+        printer.print("exported");
         printer.print("   ");
-        printer.println("import");
+        printer.println("imported");
 
         // Add header separator
         printer.print(fitStringTo("", maxLength + 1, '-'));
         printer.print(' ');
-        printer.print(fitStringTo("", "exposed".length() + 2, '-'));
+        printer.print(fitStringTo("", "exported".length() + 2, '-'));
         printer.print(' ');
-        printer.print(fitStringTo("", "import".length() + 2, '-'));
+        printer.print(fitStringTo("", "imported".length() + 2, '-'));
         printer.println();
 
         for (String service : services) {
             printer.print(fitStringTo(service, maxLength, ' '));
             printer.print("   ");
 
-            if (exposedServices.contains(service)) {
+            if (exportedServices.contains(service)) {
                 printer.print(fitStringTo("", 3, ' '));
                 printer.print('X');
-                printer.print(fitStringTo("", 3, ' '));
+                printer.print(fitStringTo("", 4, ' '));
             } else {
-                printer.print(fitStringTo("", 7, ' '));
+                printer.print(fitStringTo("", 8, ' '));
             }
 
             printer.print("   ");
 
             if (importedServices.contains(service)) {
-                printer.print(fitStringTo("", 2, ' '));
-                printer.print('X');
                 printer.print(fitStringTo("", 3, ' '));
+                printer.print('X');
+                printer.print(fitStringTo("", 4, ' '));
             } else {
-                printer.print(fitStringTo("", 6, ' '));
+                printer.print(fitStringTo("", 8, ' '));
             }
             printer.println();
         }

@@ -231,17 +231,17 @@ public class MyWebService {
 
       <para>El comando <link
       xlink:href="apendice-comandos_addon-service_ws_list">service ws
-      list</link> permite obtener un listado de los servicios expuestos o
+      list</link> permite obtener un listado de los servicios exportados o
       importados en la aplicación.</para>
 
       <para>El resultado es una salida como esta:</para>
 
       <programlisting>roo&gt; service ws list
-service     exposed     import
----------   --------    ------
+service     exported     imported
+---------   ---------   ----------
 Service1       X
-Service2                  X   
-Service3                  X   </programlisting>
+Service2                    X   
+Service3                    X   </programlisting>
     </section>
   </section>
 </chapter>
