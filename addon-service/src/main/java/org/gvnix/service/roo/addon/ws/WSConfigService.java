@@ -64,8 +64,9 @@ public interface WSConfigService {
      * 
      * @param type
      *            Communication type
+     * @return
      */
-    public void install(CommunicationSense type);
+    public boolean install(CommunicationSense type);
 
     /**
      * Publish a class as Web Service.
@@ -125,8 +126,10 @@ public interface WSConfigService {
      *            WSDL file.
      * @param type
      *            Communication sense type
+     * @return
      */
-    public void addExportLocation(String wsdlLocation, Document wsdlDocument,
+    public boolean addExportLocation(String wsdlLocation,
+            Document wsdlDocument,
             CommunicationSense type);
 
     /**
@@ -194,5 +197,5 @@ public interface WSConfigService {
      * @param type
      *            of {@link CommunicationSense}
      */
-    public void addProjectProperties(CommunicationSense type);
+    public boolean addProjectProperties(CommunicationSense type);
 }

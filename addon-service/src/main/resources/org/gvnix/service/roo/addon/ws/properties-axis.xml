@@ -2,7 +2,6 @@
 <configuration>
   <gvnix>
     <properties>
-      <gvnix.version>${gvnix.version}</gvnix.version>
       <axis.version>1.4</axis.version>
     </properties>
   </gvnix>

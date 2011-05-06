@@ -2,7 +2,6 @@
 <configuration>
   <gvnix>
     <properties>
-      <gvnix.version>${gvnix.version}</gvnix.version>
       <cxf.version>2.2.12</cxf.version>
     </properties>
   </gvnix>

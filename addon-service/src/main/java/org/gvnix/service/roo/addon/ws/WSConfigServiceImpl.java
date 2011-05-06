@@ -33,6 +33,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
 import org.gvnix.service.roo.addon.security.SecurityService;
+import org.gvnix.service.roo.addon.util.DependenciesVersionManager;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
@@ -49,7 +50,6 @@ import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.project.Property;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
 import org.springframework.roo.support.util.StringUtils;
@@ -105,10 +105,10 @@ public class WSConfigServiceImpl implements WSConfigService {
      * @param type
      *            Communication type
      */
-    public void install(CommunicationSense type) {
+    public boolean install(CommunicationSense type) {
 
         // Check if properties are set in pom.xml
-        addProjectProperties(type);
+        boolean propertiesUpdated = addProjectProperties(type);
 
         // Check if it's already installed.
         if (!isLibraryInstalled(type)) {
@@ -127,6 +127,8 @@ public class WSConfigServiceImpl implements WSConfigService {
             // - Add cxf-PROJECT_NAME.xml to Spring Context Loader
             installCxfWebConfigurationFile();
         }
+
+        return propertiesUpdated;
     }
 
     /**
@@ -210,8 +212,8 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         try {
 
-            FileCopyUtils.copy(templateInputStream, cxfXmlMutableFile
-                    .getOutputStream());
+            FileCopyUtils.copy(templateInputStream,
+                    cxfXmlMutableFile.getOutputStream());
         } catch (Exception e) {
 
             throw new IllegalStateException(e);
@@ -333,7 +335,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         boolean isInstalled = isDependenciesInstalled(type);
 
         // Add project properties values.
-        addProjectProperties(type);
+        // addProjectProperties(type);
 
         if (!isInstalled) {
             List<Element> cxfDependencies = getRequiredDependencies(type);
@@ -347,7 +349,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * {@inheritDoc}
      */
-    public void addProjectProperties(CommunicationSense type) {
+    public boolean addProjectProperties(CommunicationSense type) {
 
         // Add project properties, as versions
         List<Element> projectProperties = new ArrayList<Element>();
@@ -388,9 +390,8 @@ public class WSConfigServiceImpl implements WSConfigService {
             break;
         }
 
-        for (Element property : projectProperties) {
-            projectOperations.addProperty(new Property(property));
-        }
+        return DependenciesVersionManager.managePropertyVersion(
+                metadataService, projectOperations, projectProperties);
     }
 
     /**
@@ -518,8 +519,9 @@ public class WSConfigServiceImpl implements WSConfigService {
         StringAttributeValue serviceName = (StringAttributeValue) annotationMetadata
                 .getAttribute(new JavaSymbolName("serviceName"));
 
-        Assert.isTrue(serviceName != null
-                && StringUtils.hasText(serviceName.getValue()),
+        Assert.isTrue(
+                serviceName != null
+                        && StringUtils.hasText(serviceName.getValue()),
                 "Annotation attribute 'serviceName' in "
                         + className.getFullyQualifiedTypeName()
                         + "' must be defined.");
@@ -527,8 +529,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         StringAttributeValue address = (StringAttributeValue) annotationMetadata
                 .getAttribute(new JavaSymbolName("address"));
 
-        Assert.isTrue(address != null
-                && StringUtils.hasText(address.getValue()),
+        Assert.isTrue(
+                address != null && StringUtils.hasText(address.getValue()),
                 "Annotation attribute 'address' in "
                         + className.getFullyQualifiedTypeName()
                         + "' must be defined.");
@@ -536,8 +538,10 @@ public class WSConfigServiceImpl implements WSConfigService {
         StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) annotationMetadata
                 .getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
 
-        Assert.isTrue(fullyQualifiedTypeName != null
-                && StringUtils.hasText(fullyQualifiedTypeName.getValue()),
+        Assert.isTrue(
+                fullyQualifiedTypeName != null
+                        && StringUtils.hasText(fullyQualifiedTypeName
+                                .getValue()),
                 "Annotation attribute 'fullyQualifiedTypeName' in "
                         + className.getFullyQualifiedTypeName()
                         + "' must be defined.");
@@ -613,12 +617,11 @@ public class WSConfigServiceImpl implements WSConfigService {
 
                         classService.getParentNode().replaceChild(
                                 updateClassService, classService);
-                        logger
-                                .log(
-                                        Level.INFO,
-                                        "The service '"
-                                                + serviceName.getValue()
-                                                + "' has updated 'id' attribute in cxf config file.");
+                        logger.log(
+                                Level.INFO,
+                                "The service '"
+                                        + serviceName.getValue()
+                                        + "' has updated 'id' attribute in cxf config file.");
                     }
 
                 } else {
@@ -634,8 +637,8 @@ public class WSConfigServiceImpl implements WSConfigService {
                         Element updateClassService = classService;
                         String idValue = classService.getAttribute("id");
 
-                        updateClassService.setAttribute("class", className
-                                .getFullyQualifiedTypeName());
+                        updateClassService.setAttribute("class",
+                                className.getFullyQualifiedTypeName());
 
                         if (!StringUtils.hasText(idValue)
                                 || !idValue.contentEquals(serviceName
@@ -643,22 +646,20 @@ public class WSConfigServiceImpl implements WSConfigService {
                             updateClassService.setAttribute("id", serviceName
                                     .getValue().concat("Impl"));
 
-                            logger
-                                    .log(
-                                            Level.INFO,
-                                            "The service '"
-                                                    + serviceName.getValue()
-                                                    + "' has updated 'id' attribute in cxf config file.");
+                            logger.log(
+                                    Level.INFO,
+                                    "The service '"
+                                            + serviceName.getValue()
+                                            + "' has updated 'id' attribute in cxf config file.");
                         }
 
                         classService.getParentNode().replaceChild(
                                 updateClassService, classService);
-                        logger
-                                .log(
-                                        Level.INFO,
-                                        "The service '"
-                                                + serviceName.getValue()
-                                                + "' has updated 'class' attribute in cxf config file.");
+                        logger.log(
+                                Level.INFO,
+                                "The service '"
+                                        + serviceName.getValue()
+                                        + "' has updated 'class' attribute in cxf config file.");
                     }
 
                 }
@@ -682,12 +683,11 @@ public class WSConfigServiceImpl implements WSConfigService {
 
                         classService.getParentNode().replaceChild(
                                 updateClassService, classService);
-                        logger
-                                .log(
-                                        Level.INFO,
-                                        "The service '"
-                                                + serviceName.getValue()
-                                                + "' has updated 'id' attribute in cxf config file.");
+                        logger.log(
+                                Level.INFO,
+                                "The service '"
+                                        + serviceName.getValue()
+                                        + "' has updated 'id' attribute in cxf config file.");
                     }
                 }
             }
@@ -705,16 +705,15 @@ public class WSConfigServiceImpl implements WSConfigService {
                 if (!StringUtils.hasText(classNameAttribute)
                         || !classNameAttribute.contentEquals(className
                                 .getFullyQualifiedTypeName())) {
-                    updateIdService.setAttribute("class", className
-                            .getFullyQualifiedTypeName());
+                    updateIdService.setAttribute("class",
+                            className.getFullyQualifiedTypeName());
                     idService.getParentNode().replaceChild(updateIdService,
                             idService);
-                    logger
-                            .log(
-                                    Level.INFO,
-                                    "The service '"
-                                            + serviceName.getValue()
-                                            + "' has updated 'class' attribute in cxf config file.");
+                    logger.log(
+                            Level.INFO,
+                            "The service '"
+                                    + serviceName.getValue()
+                                    + "' has updated 'class' attribute in cxf config file.");
                 }
 
             }
@@ -725,8 +724,8 @@ public class WSConfigServiceImpl implements WSConfigService {
 
                 bean = cxfXml.createElement("bean");
                 bean.setAttribute("id", serviceName.getValue().concat("Impl"));
-                bean.setAttribute("class", className
-                        .getFullyQualifiedTypeName());
+                bean.setAttribute("class",
+                        className.getFullyQualifiedTypeName());
 
                 root.appendChild(bean);
             }
@@ -764,19 +763,18 @@ public class WSConfigServiceImpl implements WSConfigService {
                 if (!StringUtils.hasText(idAttribute)
                         || !idAttribute.contentEquals(serviceName.getValue())) {
 
-                    updateAddressEndpoint.setAttribute("id", serviceName
-                            .getValue());
+                    updateAddressEndpoint.setAttribute("id",
+                            serviceName.getValue());
                     updateAddressEndpoint.setAttribute("implementor", "#"
                             .concat(serviceName.getValue()).concat("Impl"));
 
                     addressEndpoint.getParentNode().replaceChild(
                             updateAddressEndpoint, addressEndpoint);
-                    logger
-                            .log(
-                                    Level.INFO,
-                                    "The endpoint bean '"
-                                            + serviceName.getValue()
-                                            + "' has updated 'id' attribute in cxf config file.");
+                    logger.log(
+                            Level.INFO,
+                            "The endpoint bean '"
+                                    + serviceName.getValue()
+                                    + "' has updated 'id' attribute in cxf config file.");
 
                 }
 
@@ -800,17 +798,16 @@ public class WSConfigServiceImpl implements WSConfigService {
                         || !addressAttribute.contentEquals("/".concat(address
                                 .getValue()))) {
 
-                    updateIdEndpoint.setAttribute("address", "/".concat(address
-                            .getValue()));
+                    updateIdEndpoint.setAttribute("address",
+                            "/".concat(address.getValue()));
 
                     idEndpoint.getParentNode().replaceChild(updateIdEndpoint,
                             idEndpoint);
-                    logger
-                            .log(
-                                    Level.INFO,
-                                    "The endpoint bean '"
-                                            + serviceName.getValue()
-                                            + "' has updated 'address' attribute in cxf config file.");
+                    logger.log(
+                            Level.INFO,
+                            "The endpoint bean '"
+                                    + serviceName.getValue()
+                                    + "' has updated 'address' attribute in cxf config file.");
 
                 }
 
@@ -822,10 +819,9 @@ public class WSConfigServiceImpl implements WSConfigService {
 
                 endpoint = cxfXml.createElement("jaxws:endpoint");
                 endpoint.setAttribute("id", serviceName.getValue());
-                endpoint.setAttribute("implementor", "#".concat(
-                        serviceName.getValue()).concat("Impl"));
-                endpoint
-                        .setAttribute("address", "/".concat(address.getValue()));
+                endpoint.setAttribute("implementor",
+                        "#".concat(serviceName.getValue()).concat("Impl"));
+                endpoint.setAttribute("address", "/".concat(address.getValue()));
                 root.appendChild(endpoint);
             }
 
@@ -908,9 +904,8 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         if (jaxWsPlugin == null) {
 
-            logger
-                    .log(Level.INFO,
-                            "Jax-Ws plugin is not defined in the pom.xml. Installing in project.");
+            logger.log(Level.INFO,
+                    "Jax-Ws plugin is not defined in the pom.xml. Installing in project.");
             // Installs jax2ws plugin.
             installJaxwsBuildPlugin();
         }
@@ -945,8 +940,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
                 Node updateServiceExecution;
                 updateServiceExecution = (serviceExecution.getFirstChild() != null) ? serviceExecution
-                        .getFirstChild().getNextSibling()
-                        : null;
+                        .getFirstChild().getNextSibling() : null;
 
                 while (updateServiceExecution != null) {
 
@@ -954,17 +948,15 @@ public class WSConfigServiceImpl implements WSConfigService {
                             "className")) {
                         updateServiceExecution.setTextContent(serviceClass
                                 .getFullyQualifiedTypeName());
-                        XmlUtils
-                                .writeXml(pomMutableFile.getOutputStream(), pom);
-                        logger
-                                .log(
-                                        Level.INFO,
-                                        "Wsdl generation with CXF plugin for '"
-                                                + serviceName
-                                                + " service, updated className attribute for '"
-                                                + serviceClass
-                                                        .getFullyQualifiedTypeName()
-                                                + "'.");
+                        XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+                        logger.log(
+                                Level.INFO,
+                                "Wsdl generation with CXF plugin for '"
+                                        + serviceName
+                                        + " service, updated className attribute for '"
+                                        + serviceClass
+                                                .getFullyQualifiedTypeName()
+                                        + "'.");
                         return;
                     }
 
@@ -1059,8 +1051,9 @@ public class WSConfigServiceImpl implements WSConfigService {
      */
     public void installJaxwsBuildPlugin() {
         Element pluginElement = XmlUtils.findFirstElement(
-                "/jaxws-plugin/plugin", XmlUtils.getConfiguration(this
-                        .getClass(), "dependencies-export-jaxws-plugin.xml"));
+                "/jaxws-plugin/plugin",
+                XmlUtils.getConfiguration(this.getClass(),
+                        "dependencies-export-jaxws-plugin.xml"));
 
         projectOperations.buildPluginUpdate(new Plugin(pluginElement));
 
@@ -1079,7 +1072,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         boolean added;
 
         // Project properties to pom.xml
-        addProjectProperties(type);
+        // addProjectProperties(type);
 
         if (CommunicationSense.IMPORT_RPC_ENCODED.equals(type)) {
 
@@ -1099,11 +1092,11 @@ public class WSConfigServiceImpl implements WSConfigService {
      * plugin configuration not exists, it will be created.
      * </p>
      */
-    public void addExportLocation(String wsdlLocation, Document wsdlDocument,
-            CommunicationSense type) {
+    public boolean addExportLocation(String wsdlLocation,
+            Document wsdlDocument, CommunicationSense type) {
 
         // Project properties to pom.xml
-        addProjectProperties(type);
+        boolean propertiesUpdated = addProjectProperties(type);
 
         switch (type) {
 
@@ -1117,6 +1110,8 @@ public class WSConfigServiceImpl implements WSConfigService {
             addExportWSDLLocationDocument(wsdlLocation, wsdlDocument);
             break;
         }
+
+        return propertiesUpdated;
     }
 
     /**
@@ -1166,9 +1161,8 @@ public class WSConfigServiceImpl implements WSConfigService {
                         root);
 
         // If plugin element not exists, message error
-        Assert
-                .notNull(codegenWsPlugin,
-                        "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+        Assert.notNull(codegenWsPlugin,
+                "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Checks if already exists the execution.
         Element oldGenerateSourcesCxfServer = XmlUtils.findFirstElement(
@@ -1243,8 +1237,8 @@ public class WSConfigServiceImpl implements WSConfigService {
                 .getTargetNamespaceRelatedPackage(rootElement);
 
         packageName = packageName.toLowerCase();
-        packagename.setTextContent(packageName.substring(0, packageName
-                .length() - 1));
+        packagename.setTextContent(packageName.substring(0,
+                packageName.length() - 1));
         packagenames.appendChild(packagename);
         wsdlOption.appendChild(packagenames);
 
@@ -1316,8 +1310,9 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Get plugin template
         Element pluginTemplate = XmlUtils.findFirstElement(
-                "/codegen-plugin/plugin", XmlUtils.getConfiguration(this
-                        .getClass(), "dependencies-import-codegen-plugin.xml"));
+                "/codegen-plugin/plugin", XmlUtils.getConfiguration(
+                        this.getClass(),
+                        "dependencies-import-codegen-plugin.xml"));
 
         // Add plugin
         projectOperations.buildPluginUpdate(new Plugin(pluginTemplate));
@@ -1346,9 +1341,8 @@ public class WSConfigServiceImpl implements WSConfigService {
                         root);
 
         // If plugin element not exists, message error
-        Assert
-                .notNull(plugin,
-                        "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+        Assert.notNull(plugin,
+                "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
         // The wsdl location already exists ?
         Element execution = XmlUtils.findFirstElement(
@@ -1450,8 +1444,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         Element packagename = pom.createElement("packagename");
         String packageName = WsdlParserUtils
                 .getTargetNamespaceRelatedPackage(rootElement);
-        packagename.setTextContent(packageName.substring(0, packageName
-                .length() - 1));
+        packagename.setTextContent(packageName.substring(0,
+                packageName.length() - 1));
         packagenames.appendChild(packagename);
         wsdlOption.appendChild(packagenames);
 
@@ -1507,9 +1501,8 @@ public class WSConfigServiceImpl implements WSConfigService {
                         root);
 
         // If plugin element not exists, message error
-        Assert
-                .notNull(axistoolsPlugin,
-                        "Axistools plugin is not defined in the pom.xml, relaunch again this command.");
+        Assert.notNull(axistoolsPlugin,
+                "Axistools plugin is not defined in the pom.xml, relaunch again this command.");
 
         // The wsdl location already exists ?
         Element wsdlLocationElement = XmlUtils.findFirstElement(
@@ -1562,8 +1555,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         Element packageSpace = pom.createElement("packageSpace");
         String packageName = WsdlParserUtils
                 .getTargetNamespaceRelatedPackage(rootElement);
-        packageSpace.setTextContent(packageName.substring(0, packageName
-                .length() - 1));
+        packageSpace.setTextContent(packageName.substring(0,
+                packageName.length() - 1));
         configuration.appendChild(packageSpace);
 
         // Create new url element and append it to the XML tree
@@ -1584,7 +1577,7 @@ public class WSConfigServiceImpl implements WSConfigService {
             CommunicationSense type) {
 
         // Install import WS configuration requirements, if not installed
-        install(type);
+        boolean propertiesUpdated = install(type);
 
         // Add wsdl location to pom.xml
         boolean added = addImportLocation(wsdlLocation, type);
@@ -1597,7 +1590,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                 WsdlParserUtils.TARGET_GENERATED_SOURCES_PATH).exists();
 
         // Regenerating sources required ?
-        return added || !sourcesExists;
+        return added || !sourcesExists || propertiesUpdated;
     }
 
     /**
@@ -1625,10 +1618,10 @@ public class WSConfigServiceImpl implements WSConfigService {
         if (processManager.isDevelopmentMode()) {
 
             // Ensure separate threads are used for logging, as per ROO-652
-            LoggingInputStream input = new LoggingInputStream(p
-                    .getInputStream());
-            LoggingInputStream errors = new LoggingInputStream(p
-                    .getErrorStream());
+            LoggingInputStream input = new LoggingInputStream(
+                    p.getInputStream());
+            LoggingInputStream errors = new LoggingInputStream(
+                    p.getErrorStream());
 
             input.start();
             errors.start();
@@ -1678,8 +1671,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         ioe.getMessage().contains("CreateProcess error=2")) // for
                 // Windows
                 {
-                    logger
-                            .severe("Could not locate Maven executable; please ensure mvn command is in your path");
+                    logger.severe("Could not locate Maven executable; please ensure mvn command is in your path");
                 }
             } finally {
                 if (inputStream != null) {

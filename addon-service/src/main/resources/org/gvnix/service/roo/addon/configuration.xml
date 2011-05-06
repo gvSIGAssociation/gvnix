@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration>
-	<gvnix>
+  <gvnix>
         <dependencies>
             <dependency>
                 <groupId>org.gvnix</groupId>
@@ -17,5 +17,5 @@
                 <url>https://gvnix.googlecode.com/svn/repo</url>
             </repository>
         </repositories>
-	</gvnix>
+  </gvnix>
 </configuration>
