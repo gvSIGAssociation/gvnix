@@ -5,8 +5,8 @@
 :Project:   gvNIX. Spring Roo based RAD tool
 :Copyright: Conselleria d'Infraestructures i Transport - Generalitat Valenciana
 :Author:    DiSiD Technologies, S.L.
-:Revision:  $Rev: 747 $
-:Date:      $Date: 2011-04-10 20:37:10 +0200 (dom 10 de abr de 2011) $
+:Revision:  $Rev$
+:Date:      $Date$
 
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
 Unported License. To view a copy of this license, visit
