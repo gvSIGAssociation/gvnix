@@ -47,42 +47,8 @@ public interface ReportOperations {
     boolean isProjectAvailable();
 
     /**
-     * Indicate if is a Spring MVC project
-     *
-     * @return
-     */
-    boolean isSpringMvcProject();
-
-    /**
-     * Indicate the project has a web layer based on Spring MVC Tiles.
-     *
-     * @return true if the user installed an Spring MVC Tiles web layer, otherwise
-     *         returns false.
-     */
-    boolean isSpringMvcTilesProject();
-
-    /**
-     * Indicate if JasperReports views are already installed
-     *
-     * @return
-     */
-    boolean isJasperViewsProject();
-
-    /**
      * Annotate the provided Java type with {@link GvNIXReports}
      */
     void annotateType(JavaType type, String reportName, String format);
 
-    /**
-     * Setup all add-on artifacts:
-     * <ul>
-     * <li>Maven repositories</>
-     * <li>Maven properties</>
-     * <li>Maven dependencies: JasperReports, the add-on itself</li>
-     * <li>JaperReports views resolver in webmvc-config.xml</>
-     * <li>copy the jasper-views.xml config file</>
-     * </ul>
-     *
-     */
-    void setup();
 }

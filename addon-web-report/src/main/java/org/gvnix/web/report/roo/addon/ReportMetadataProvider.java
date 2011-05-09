@@ -64,6 +64,9 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
     @Reference
     WebMetadataService webMetadataService;
 
+    @Reference
+    ReportConfigService reportConfigService;
+
     /**
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
@@ -103,15 +106,18 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
     /**
      * Return an instance of the Metadata offered by this add-on
      */
+    @Override
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
             String metadataIdentificationString, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
-        // We know governor type details are non-null and can be safely cast
+        // Setup JasperReports support
+        reportConfigService.setup();
 
         JavaType javaType = ReportMetadata
                 .getJavaType(metadataIdentificationString);
 
+        // We know governor type details are non-null and can be safely cast
         ClassOrInterfaceTypeDetails controllerClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
         Assert.notNull(
@@ -229,6 +235,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
         return "GvNIXReport";
     }
 
+    @Override
     protected String getGovernorPhysicalTypeIdentifier(
             String metadataIdentificationString) {
         JavaType javaType = ReportMetadata
@@ -237,6 +244,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
+    @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
         return ReportMetadata.createIdentifier(javaType, path);
     }

@@ -58,6 +58,9 @@ public class ReportCommands implements CommandMarker { // All command types must
     @Reference
     private ReportOperations operations;
 
+    @Reference
+    private ReportConfigService reportConfigService;
+
     /**
      * This method is optional. It allows automatic command hiding in situations
      * when the command should not be visible. For example the 'entity' command
@@ -69,12 +72,12 @@ public class ReportCommands implements CommandMarker { // All command types must
      * visibility requirements.
      *
      * <p>
-     *          Setup available if:
-     *          <ul>
-     *     <li>Project is created</li>
-     *     <li>Spring MVC set. Pure Spring MVC web tier or GWT web tier</li>
-     *     <li>Setup not already done</li>
-     *   </ul>
+     * Setup available if:
+     * <ul>
+     * <li>Project is created</li>
+     * <li>Spring MVC set. Pure Spring MVC web tier or GWT web tier</li>
+     * <li>Setup not already done</li>
+     * </ul>
      * </p>
      *
      * @return true (default) if the command should be visible at this stage,
@@ -83,14 +86,14 @@ public class ReportCommands implements CommandMarker { // All command types must
     @CliAvailabilityIndicator({ "web report setup" })
     public boolean isSetupAvailable() {
         return operations.isProjectAvailable()
-                && operations.isSpringMvcProject()
-                && !operations.isJasperViewsProject();
+                && reportConfigService.isSpringMvcProject()
+                && !reportConfigService.isJasperViewsProject();
     }
 
     @CliAvailabilityIndicator({ "web report add" })
     public boolean isAddAvailable() {
         return operations.isProjectAvailable()
-                && operations.isSpringMvcTilesProject();
+                && reportConfigService.isSpringMvcTilesProject();
     }
 
 
@@ -107,8 +110,8 @@ public class ReportCommands implements CommandMarker { // All command types must
             @CliOption(key = "reportName", mandatory = true, help = "The name of the new report.") String reportName,
             @CliOption(key = "format", mandatory = false, unspecifiedDefaultValue = "pdf", specifiedDefaultValue = "pdf", help = "The format for the new report. Available PDF, Excel (xls), HTML, CSV") String format) {
 
-        if (!operations.isJasperViewsProject()) {
-            operations.setup();
+        if (!reportConfigService.isJasperViewsProject()) {
+            reportConfigService.setup();
         }
 
         operations.annotateType(controller, reportName, format);
@@ -121,6 +124,6 @@ public class ReportCommands implements CommandMarker { // All command types must
      */
     @CliCommand(value = "web report setup", help = "Setup JasperReport support in the project. Adds maven dependencies to pom.xlm. Adds JasperReportViewResolver in webmvc-config.xml. Installs jasper-views.xml as config file for JasperReportViewResolver. Installs jasperreports_extension.properties and the FreeSans font family TTF fonts in the webapp classpath.")
     public void setup() {
-        operations.setup();
+        reportConfigService.setup();
     }
 }
