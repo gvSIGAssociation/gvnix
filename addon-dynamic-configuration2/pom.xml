@@ -35,10 +35,10 @@
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
 
-  <artifactId>org.gvnix.dynamic.configuration.roo.addon</artifactId>
+  <artifactId>org.gvnix.dynamic.configuration2.roo.addon</artifactId>
   <packaging>bundle</packaging>
 
-  <name>gvNIX - Addon - Dynamic Configuration </name>
+  <name>gvNIX - Spring Roo - Addon - Dynamic Configuration</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
@@ -202,7 +202,7 @@
   <properties>
     <gvnix.version>${parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
-    <repo.folder>org/gvnix/service/roo/addon</repo.folder>
+    <repo.folder>org/gvnix/dynamicconfiguration/roo/addon</repo.folder>
   </properties>
 
 </project>
