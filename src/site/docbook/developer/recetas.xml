@@ -440,6 +440,364 @@
   }
 </programlisting>
     </section>
+
+    <section>
+      <title>Actualización de versiones de dependencias</title>
+
+      <para>Hemos visto como añadir propiedades y dependencias al archivo
+      <emphasis>pom.xml</emphasis> del proyecto. Por lo general, es
+      interesante que si una nueva versión de gvNIX hace uso de versiones más
+      nuevas de librerías de terceros, se actualice las partes necesarias del
+      <emphasis>pom.xml</emphasis> del proyecto para favorecernos de las
+      mejoras que puedan aportar. Spring Roo ya lo hace eactualizando la
+      proiedad <emphasis>&lt;roo.version/&gt;</emphasis> cada vez que liberan
+      una nueva versión del framework.</para>
+
+      <note>
+        <para>Es posible que, en función de donde queramos usar el código
+        siguiente, necesitemos modificarlo para que se adapte a las
+        necesidades particulares del addón donde lo usamos.</para>
+      </note>
+
+      <para>Para poder contemplar esta funcionalidad necesitmos el siguiente
+      código:</para>
+
+      <programlisting>public enum Qualifiers {
+
+    RELEASE("RELEASE"), EMPTY(""), SNAPSHOT("SNAPSHOT");
+
+    private String qualifier;
+
+    private Qualifiers(String qualifier) {
+        this.qualifier = qualifier;
+    }
+
+    public boolean isRelease() {
+        return this.equals(RELEASE) || this.equals(EMPTY);
+    }
+
+    public boolean isSnapshot() {
+        return this.equals(SNAPSHOT);
+    }
+
+    /**
+     * Says if the qualifier is newer than passed qualifier
+     * &lt;ul&gt;
+     * &lt;li&gt;RELEASE equals to EMPTY&lt;/li&gt;
+     * &lt;li&gt;RELEASE newer than SNAPSHOT&lt;/li&gt;
+     * &lt;/ul&gt;
+     * 
+     * @param q
+     * @return &lt;ul&gt;
+     *         &lt;li&gt;0 if this equals to q&lt;/li&gt;
+     *         &lt;li&gt;1 if this newer than q&lt;/li&gt;
+     *         &lt;li&gt;-1 otherwise&lt;/li&gt;
+     *         &lt;/ul&gt;
+     */
+    public int newerThan(Qualifiers q) {
+        if (this.equals(q)) {
+            return 0;
+        }
+        if (this.isRelease() &amp;&amp; q.isSnapshot()) {
+            return 1;
+        }
+        return -1;
+    }
+}</programlisting>
+
+      <para>El enumerado <emphasis>Qualifiers</emphasis> sirve para poder
+      decidir de entre dos versiones iguales cual es más nueva basado en su
+      cualificador (ej.: 0.7.0 &gt; 0.7.0-SNAPSHOT. La ausencia de
+      cualificador indica que es una versión RELEASE).</para>
+
+      <programlisting xml:id="recetas-actualizacion_versiones-VersionInfo">public class VersionInfo {
+    private Integer major = 0;
+    private Integer minor = 0;
+    private Integer patch = 0;
+    private Qualifiers qualifier = Qualifiers.EMPTY;
+
+    public int compareTo(VersionInfo v) {
+        if (v == null) {
+            throw new NullPointerException();
+        }
+        int result = major.compareTo(v.major);
+        if (result != 0) {
+            return result;
+        }
+        result = minor.compareTo(v.minor);
+        if (result != 0) {
+            return result;
+        }
+        result = patch.compareTo(v.patch);
+        if (result != 0) {
+            return result;
+        }
+        result = qualifier.newerThan(v.qualifier);
+        if (result != 0) {
+            return result;
+        }
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return major + "." + minor + "." + patch + "." + qualifier;
+    }
+
+    /**
+     * Extracts the version information from the string. Never throws an
+     * exception. &lt;br/&gt;
+     *
+     * @param version
+     *            to extract from (can be null or empty)
+     * @return the version information or null if it was not in a normal form
+     */
+    public static VersionInfo extractVersionInfoFromString(String version) {
+        if (version == null || version.length() == 0) {
+            return null;
+        }
+
+        String[] ver = version.split("\\.");
+        try {
+            // versions as x.y.z
+            if (ver.length == 3) {
+                VersionInfo result = new VersionInfo();
+                result.major = new Integer(ver[0]);
+                result.minor = new Integer(ver[1]);
+                // gvNIX versions can be x.y.z (for final versions or release
+                // versions) and x.y.z-q (for snapshots versions)
+                String[] patchVerQualifier = ver[2].split("-");
+                result.patch = new Integer(patchVerQualifier[0]);
+                if (patchVerQualifier.length == 2) {
+                    String qualifier = patchVerQualifier[1];
+                    if (qualifier.equalsIgnoreCase(Qualifiers.RELEASE
+                            .toString())) {
+                        result.qualifier = Qualifiers.RELEASE;
+                    } else if (qualifier.equalsIgnoreCase(Qualifiers.SNAPSHOT
+                            .toString())) {
+                        result.qualifier = Qualifiers.SNAPSHOT;
+                    }
+                }
+                return result;
+            }
+            // versions as x.y
+            if (ver.length == 2) {
+                VersionInfo result = new VersionInfo();
+                result.major = new Integer(ver[0]);
+                result.minor = new Integer(ver[1]);
+                return result;
+            }
+        } catch (RuntimeException e) {
+            return null;
+        }
+        return null;
+    }
+}</programlisting>
+
+      <para>VersionInfo es la clase que permite decidir que versión es mayor
+      de entre dos. Realmente permite crear un objeto basándonos en una caden
+      que informa de un número de versión (según las recomendaciones Maven),
+      esto es, <emphasis>X.Y.Z-QUALIFIER (donde X=Versión mayor, Y=Version
+      menor, Z=Versión del patch y
+      QUALIFIER=[RELEASE|SNAPSHOT|...].</emphasis> La implementación del
+      método <emphasis role="bold">comparteTo(...)</emphasis> permite esta
+      operación.</para>
+
+      <para>Finalmente una clase de utilidad que nos permite manipular el
+      pom.xml del proyecto para usando las clases anteriores:</para>
+
+      <programlisting>public class DependenciesVersionManager {
+    private static final String PROJECT_METADATA_IDENTIFIER = ProjectMetadata
+            .getProjectIdentifier();
+
+    /**
+     * Given a list of DOM elements representing Maven dependencies determines
+     * if may add or not them to project's pom.xml
+     * 
+     * @param metadataService
+     * @param projectOperations
+     * @param dependenciesElements
+     * @return true if a dependency has been added or updated, false otherwise
+     */
+    <emphasis role="bold">public static boolean manageDependencyVersion</emphasis>(
+            MetadataService metadataService,
+            ProjectOperations projectOperations,
+            List&lt;Element&gt; dependenciesElements) {
+        // Get project metadata in order to check existing properties
+        ProjectMetadata md = (ProjectMetadata) metadataService
+                .get(PROJECT_METADATA_IDENTIFIER);
+        if (md == null) {
+            return false;
+        }
+
+        boolean updateDependency = true;
+        Set&lt;Dependency&gt; results;
+        Dependency dependency = null;
+        for (Element depen : dependenciesElements) {
+            dependency = new Dependency(depen);
+            // Get existing dependencies for check them against new dependencies
+            results = md.getDependenciesExcludingVersion(dependency);
+
+            VersionInfo existingDepVersionInfo = null;
+            VersionInfo newDepVersionInfo = VersionInfo
+                    .extractVersionInfoFromString(dependency.getVersionId());
+
+            for (Dependency existingDependency : results) {
+                existingDepVersionInfo = VersionInfo
+                        .extractVersionInfoFromString(existingDependency
+                                .getVersionId());
+                if (existingDepVersionInfo != null) {
+                    // Remove existing dependency in pom.xml just if it's older
+                    // than the new one
+                    if (existingDepVersionInfo.compareTo(newDepVersionInfo) &lt; 0) {
+                        projectOperations.removeDependency(existingDependency);
+                        updateDependency = true;
+                    } else {
+                        updateDependency = false;
+                    }
+                }
+            }
+        }
+        // Add the new dependency just if needed
+        if (updateDependency) {
+            projectOperations.addDependency(dependency);
+        }
+        return updateDependency;
+    }
+
+    /**
+     * Given a list of DOM elements representing Maven properties determines if
+     * may add or not them to project's pom.xml
+     * 
+     * @param metadataService
+     * @param projectOperations
+     * @param projectProperties
+     * @return true if a property has been added or updated, false otherwise
+     */
+    <emphasis role="bold">public static boolean managePropertyVersion</emphasis>(
+            MetadataService metadataService,
+            ProjectOperations projectOperations, List&lt;Element&gt; projectProperties) {
+
+        boolean propertiesUpdated = false;
+
+        // Get project metadata in order to check existing properties
+        ProjectMetadata md = (ProjectMetadata) metadataService
+                .get(PROJECT_METADATA_IDENTIFIER);
+        if (md == null) {
+            return propertiesUpdated;
+        }
+
+        Set&lt;Property&gt; results = null;
+        Property property = null;
+        VersionInfo existingPropVersionInfo = null;
+        VersionInfo newPropVersionInfo = null;
+        for (Element elemProperty : projectProperties) {
+            propertiesUpdated = true;
+            // Create a new property instance for the property in add-on config
+            property = new Property(elemProperty);
+            newPropVersionInfo = VersionInfo
+                    .extractVersionInfoFromString(property.getValue());
+            // Get existing properties for check them against new properties
+            results = md.getPropertiesExcludingValue(property);
+            for (Property existingProperty : results) {
+                existingPropVersionInfo = VersionInfo
+                        .extractVersionInfoFromString(existingProperty
+                                .getValue());
+                if (existingPropVersionInfo != null) {
+                    // Remove existing property in pom.xml just if it's older
+                    // than the new one
+                    if (existingPropVersionInfo.compareTo(newPropVersionInfo) &lt; 0) {
+                        // We don't need to remove the property since it's
+                        // defined and addProperty will replace it, so, just
+                        // mark is as updatable
+                        // projectOperations.removeProperty(property);
+                        propertiesUpdated = true;
+                    } else {
+                        propertiesUpdated = false;
+                    }
+                }
+            }
+            // Add the new property just if needed
+            if (propertiesUpdated) {
+                projectOperations.addProperty(new Property(elemProperty));
+            }
+        }
+        return propertiesUpdated;
+    }
+
+}</programlisting>
+
+      <para>Los métodos <emphasis
+      role="bold">manageDependencyVersion</emphasis> y <emphasis
+      role="bold">managePropertyVersion</emphasis> se ocupan de buscar entre
+      las dependencias (y propiedades) ya configuradas del proyecto en el
+      pom.xml una dependencia o una propiedad determinada y sirviendose del
+      objeto <link
+      linkend="recetas-actualizacion_versiones-VersionInfo">VersionInfo</link>
+      decidir que hacer con la nueva dependencia / propiedad que se desea
+      saber si hay que añadir al descriptor del proyecto.</para>
+
+      <para>La búsqueda de dependencias / propiedades definidas en el proyecto
+      se hace mediante los métodos:</para>
+
+      <programlisting>ProjectMetadata#getDependenciesExcludingVersion(dependency)
+y
+ProjectMetadata#getPropertiesExcludingValue(property)</programlisting>
+
+      <para>Estos métodos ofrecen la búsqueda de dependencias y propiedades en
+      el descriptor del proyecto sin hacer caso al número de versión (o valor
+      en el caso de las propiedades). En caso de que exista la dependencia o
+      propiedad buscada debemos decidir si la actualizamos o la dejamos tal
+      cual está definida. Para ello nos valemos de VersionInfo. En caso de
+      querer actualizar una versión de una dependencia, primero debemos
+      eliminar la descripción de la misma en el pom.xml
+      (<emphasis>ProjectOperations#removeDependency(dependency)</emphasis>) y
+      luego añadir la nueva
+      (<emphasis>ProjectOperations#addDependency(dependency)</emphasis>). En
+      el caso de las propiedades no es necesario eliminar la definición
+      existente ya que el método
+      <emphasis>ProjectOperations#addProperty(property)</emphasis> modificará
+      el valor de la propiedad por el nuevo.</para>
+
+      <important>
+        <para><emphasis role="bold">En gvNIX se ha tomado la decisión de que
+        han de prevalecer las versiones mayores de las dependencias
+        definidas</emphasis>. Esto quiere decir que si una versión de gvNIX
+        actualiza la versión de una dependencía a una versión mayor (incluida
+        la versión de la propia dependencía con un add-on en el caso del uso
+        de anotaciones definidas por la librería del add-on), aunque
+        posteriormente el proyecto se gestione con una versión de gvNIX
+        anterior (abrimos una versión previa de gvNIX en el directorio del
+        proyecto con el que se está trabajando) la versión que prevalecerá
+        será la más nueva. Ejemplo:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>Creamos un proyecto con gvNIX 0.7.0.</para>
+          </listitem>
+
+          <listitem>
+            <para>Este proyecto hace uso del add-on Service en su versión
+            0.7.0.</para>
+          </listitem>
+
+          <listitem>
+            <para>Actualizamos gvNIX a 0.8.0 y abrimos el mismo proyecto con
+            esta nueva versión de gvNIX. Entonces la dependencia con el add-on
+            Service se actualizará a 0.8.0 (casi seguramente).</para>
+          </listitem>
+
+          <listitem>
+            <para>Volvemos a abrir gvNIX 0.7.0 sobre el proyecto. La
+            dependencia con el add-on Service debe permanecer con la versión
+            más nueva que es 0.8.0.</para>
+          </listitem>
+        </orderedlist>
+
+        <para>La misma decisión es aplicable a librerías de terceros
+        (JasperReports, CXF, Axis, ...)</para>
+      </important>
+    </section>
   </section>
 
   <section>
@@ -450,7 +808,7 @@
 
     <programlistingco>
       <areaspec>
-        <area coords="???" xml:id="???"></area>
+        <area coords="???" xml:id="recetas-metadatos_proyecto"></area>
       </areaspec>
 
       <programlisting>public class PageOperationsImpl implements PageOperations {
