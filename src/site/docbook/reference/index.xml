@@ -167,6 +167,8 @@
     <xi:include href="addon-service.xml" />
 
     <xi:include href="addon-web-i18n.xml" />
+
+    <xi:include href="addon-dynamic-config.xml" />
   </part>
 
   <part xml:id="desarrollo-addons">

@@ -597,4 +597,6 @@ javax.persistence.OptimisticLockException</programlisting>
   <xi:include href="apendice-comandos_addon-service.xml" />
 
   <xi:include href="apendice-comandos_addon-i18n.xml" />
+
+  <xi:include href="apendice-comandos_addon-dynamic_config.xml" />
 </chapter>

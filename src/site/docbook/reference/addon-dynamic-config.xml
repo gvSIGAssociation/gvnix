@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-dynamic_config"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:svg="http://www.w3.org/2000/svg"
+         xmlns:m="http://www.w3.org/1998/Math/MathML"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:db="http://docbook.org/ns/docbook">
+  <title>Add-on Dynamic Configuration</title>
+
+  <section>
+    <title>Descripción</title>
+
+    <para>El add-on pretende simplificar la tarea de configuración por
+    perfiles del proyecto. Cuando usamos Maven como gestor del ciclo de
+    desarrollo del proyecto nos encontramos con la posibilidad de usar <link
+    xlink:href="http://maven.apache.org/guides/introduction/introduction-to-profiles.html">perfiles</link>
+    para cada momento del ciclo de desarrollo o para los ditintos entornos de
+    ejecución que tendrá la aplicación (development, preproduction, tests,
+    production, ...).</para>
+
+    <programlisting>   &lt;profiles&gt;
+     &lt;profile&gt;
+       &lt;id&gt;environment-name&lt;/id&gt;
+       &lt;activation&gt;...&lt;/activation&gt;
+       &lt;build&gt;...&lt;/build&gt;
+       &lt;modules&gt;...&lt;/modules&gt;
+       &lt;repositories&gt;...&lt;/repositories&gt;
+       &lt;pluginRepositories&gt;...&lt;/pluginRepositories&gt;
+       &lt;dependencies&gt;...&lt;/dependencies&gt;
+       &lt;reporting&gt;...&lt;/reporting&gt;
+       &lt;dependencyManagement&gt;...&lt;/dependencyManagement&gt;
+       &lt;distributionManagement&gt;...&lt;/distributionManagement&gt;
+       &lt;properties&gt;
+         &lt;property.name&gt;property-value&lt;/name&gt;
+         ...
+       &lt;/properties&gt;
+     &lt;/profile&gt;
+   &lt;/profiles&gt;</programlisting>
+
+    <para>Esta funcionalidad nos permite configurar de manera distinta el
+    comportamiento de la aplicación según donde vaya a ser ejecutado. Por
+    ejemplo, la conexión a la BBDD de la aplicación será a una URL distinta
+    según estemos trabajando en desarrollo (en la máquina del programador) o
+    si la aplicación va a ser desplegada en el entorno de producción. </para>
+
+    <para>Para esto en la sección <emphasis>&lt;properties/&gt;</emphasis> de
+    cada sección profile podemos declarar tantas propiedades como queramos de
+    forma que al generar el paquete del distribución del proyecto, se
+    reemplacen el valor de estas propiedades en los ficheros adecuados. Esto
+    implica que en distintos archivos de configuración, como puede ser
+    <emphasis>database.properties</emphasis>, empiecen a aparecer variables
+    definidas (<emphasis>${db.url}, ${db.user}</emphasis>, ...). Esta
+    circunstancia, a la larga, puede complicar la comprensión de la
+    configuración del proyecto o dificultar su gestión.</para>
+  </section>
+
+  <section>
+    <title>Funcionalidad</title>
+
+    <para>Vista la problemática descrita en el punto anterior, el add-on
+    dynamic configuration simplifica esta gestión creando una estructura de
+    configuraciones que cuando activamos una de ellas, modifica
+    automáticamente los archivos de configuración implicados con los valores
+    definitivos según la configuración que hemos activado, de forma que
+    evitamos la aparición de variables <emphasis>${property.name}</emphasis>,
+    podemos modificar las configuraciones de manera más rápida que haciendolo
+    a mano y además es independiente del sistema de gestión del ciclo de vida
+    del proyecto (hemos comentado el caso de Maven, pero el add-on es
+    perfectamente aplicable a proyectos que usen Ant).</para>
+
+    <important>
+      <para>Hay que decir que esta funcionalidad está disponible sólo en el
+      entorno de ejecución de gvNIX, en el proyecto generado no podemos
+      modificar nada para que el perfil deseado esté activo. Esto es así
+      porque como hemos comentado, el add-on modifica automáticamente los
+      archivos de configuración implicados.</para>
+    </important>
+
+    <para>A medida que vamos ejecutando comandos del add-on veremos que se
+    crea/modifica el archivo
+    <emphasis>src/main/resources/dynamic-configuration.xml</emphasis></para>
+
+    <para>Podemos crear una nueva configuración con el comando <link
+    linkend="apendice-comandos_addon-dynamic_config-config_save">configuration
+    save</link> que tiene un parámetro obligatorio (<emphasis>name</emphasis>)
+    que define el nombre que se le da a la nueva configuración. Si queremos
+    ver las distintas configuraciones que hemos creado usaremos <link
+    linkend="apendice-comandos_addon-dynamic_config-config_list">configuration
+    list</link>. Para borrar cualquiera de las configuraciones existentes
+    tenemos disponible el comando <link
+    linkend="apendice-comandos_addon-dynamic_config-config_delete">configuration
+    delete</link>.</para>
+
+    <para>A partir de este momento podemos añadir nuevas propiedades para su
+    gestíon mediante el add-on ejecutando el comando <link
+    linkend="apendice-comandos_addon-dynamic_config-config_prop_add">configuration
+    property add</link>. A las propiedades les asignaremos valor, o lo
+    modificaremos, con <link
+    linkend="apendice-comandos_addon-dynamic_config-config_prop_update">configuration
+    property update</link>. Podemos listar las propiedades que estamos
+    gestionando con el comando <link
+    linkend="apendice-comandos_addon-dynamic_config-config_prop_list">configuration
+    property list</link>. La visualización de los valores que toma cada
+    propiedad en las distintas configuraciones está disponible con <link
+    linkend="apendice-comandos_addon-dynamic_config-config_prop_values">configuration
+    property values</link>. Si queremos dejar de gestionar una propiedad en
+    todas las configuraciones creadas usaremos <link
+    linkend="apendice-comandos_addon-dynamic_config-config_prop_delete">configuration
+    property delete</link>.</para>
+
+    <para>Para hacer persistentes los valores de las propiedades gestionadas
+    en una configuración determinada en los archivos del proyecto debemos
+    activar la configuración con <link
+    linkend="apendice-comandos_addon-dynamic_config-config_activate">configuration
+    activate</link>. Por contra <link
+    linkend="apendice-comandos_addon-dynamic_config-config_unactivate">configuration
+    unactivate</link> desvincula los ficheros del proyecto de la
+    configuración.</para>
+
+    <para>Veamoslo en ejecución:</para>
+
+    <programlisting>roo&gt; <emphasis role="bold">configuration save --name development</emphasis>
+Created SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Configuration saved
+(use 'configuration property list' to see properties defined in the configuration or 'configuration activate' \
+  to update project files with configuration properties)
+roo&gt; <emphasis role="bold">configuration save --name preproduction</emphasis>
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Configuration saved
+(use 'configuration property list' to see properties defined in the configuration or 'configuration activate' \
+  to update project files with configuration properties)
+roo&gt; <emphasis role="bold">configuration property add --name database.password</emphasis>
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Property added
+(use 'configuration property update' to set property values or 'configuration save' to create a new configuration)
+roo&gt; <emphasis role="bold">configuration property add --name database.username</emphasis>
+....
+roo&gt; <emphasis role="bold">configuration property add --name database.url</emphasis>
+....
+roo&gt; <emphasis role="bold">configuration property update --configuration development --property database.password  --value 1234</emphasis>
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Property updated
+(use 'configuration activate' to update project files with configuration properties if not active yet or \
+  'configuration property values' to show property values)
+roo&gt; <emphasis role="bold">configuration property update --configuration development --property database.username --value user1</emphasis>
+....
+roo&gt; <emphasis role="bold">configuration property update --configuration development --property database.url \
+  --value jdbc\:postgresql\://localhost\:5432/my_db</emphasis>
+....
+roo&gt; <emphasis role="bold">configuration property update --configuration preproduction --property database.password  --value pre1234</emphasis>
+....
+roo&gt; <emphasis role="bold">configuration list</emphasis>
+                    development
+----------------------------------------
+                    preproduction
+----------------------------------------
+roo&gt; <emphasis role="bold">configuration property list</emphasis> 
+ * Database Conection Properties
+   - database.password
+   - database.username
+   - database.url
+roo&gt; <emphasis role="bold">configuration property values --name database.password</emphasis>
+                    development
+----------------------------------------
+ * Database Conection Properties
+   - database.password = 1234
+                    preproduction
+----------------------------------------
+ * Database Conection Properties
+   - database.password = pre1234
+roo&gt; <emphasis role="bold">configuration activate --name development</emphasis>   
+Updated SRC_MAIN_RESOURCES/META-INF/spring/database.properties
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Configuration activated on project files
+ * Database Conection Properties
+   - database.password = 1234
+   - database.username = user1
+   - database.url = jdbc\:postgresql\://localhost\:5432/my_db
+(now 'configuration property update' will modify project files too, use 'configuration unactivate' to disable)
+roo&gt; <emphasis role="bold">configuration list</emphasis>
+                    preproduction
+----------------------------------------
+      (Active)      development
+----------------------------------------
+roo&gt; <emphasis role="bold">configuration unactivate --name development</emphasis> 
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Configuration unactivated
+(now 'configuration property update' will not modify project files, only configurations)
+</programlisting>
+
+    <para>En ocasiones podemos encontrarnos con el siguiente mensaje al
+    realizar alguna acción de activación o desactivación de una configuración
+    dada:</para>
+
+    <programlisting>roo&gt; configuration unactivate --name development 
+<emphasis role="bold">Configuration not unactivated.
+Active configuration has unsaved modifications, then you can:
+ * Undo project files modifications
+ * Update active configuration properties with 'configuration property update'
+ * Save active configuration with 'configuration save'
+ * Delete active configuration with 'configuration delete'</emphasis></programlisting>
+
+    <para>esto se debe a una incongruencia entre los valores de las
+    propiedades que tenemos en la configuración (en el ejemplo configuración
+    <emphasis>development</emphasis>) y los valores de las mismas propiedades
+    en el archivo del proyecto. Esto puede ocurrir porque hemos modificado el
+    archivo del proyecto, el archivo que tiene definida la propiedad en
+    cuestión sin usar los comandos del add-on (o simplemente porque otro
+    componente de gvNIX ha modificado el mismo archivo). Para solucionar este
+    error, nos indica que opciones tenemos:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Deshacer los cambios en los archivos del proyecto.</para>
+      </listitem>
+
+      <listitem>
+        <para>Actualizar la propiedad que está causando el problema usando el
+        comando pertinente.</para>
+      </listitem>
+
+      <listitem>
+        <para>Guardar la configuaración activa, lo cual haría que perdieramos
+        los últimos cambios en nuestra configuración ya que lo que hace esta
+        acción es coger los valores del archivo del poryecto y usarlos como
+        valores de nuestra configuración.</para>
+      </listitem>
+
+      <listitem>
+        <para>Descartar la configuración activa y perder todos los cambios
+        realizados.</para>
+      </listitem>
+    </orderedlist>
+  </section>
+</chapter>
