@@ -55,7 +55,14 @@ public interface WSExportOperations {
     boolean isProjectAvailable();
 
     /**
+     * <p>
      * Exports a class to Web Service.
+     * </p>
+     * 
+     * <p>
+     * If the class to export as web service doesn't exist it will be created
+     * automatically in 'src/main/java' directory inside the package defined.
+     * </p>
      * 
      * @param className
      *            class to export.
@@ -72,7 +79,13 @@ public interface WSExportOperations {
             String portTypeName, String targetNamespace, String addressName);
 
     /**
-     * Exports an operation to a Web Service Operation.
+     * <p>
+     * Exports a class method as a Web Service Operation.
+     * </p>
+     * <p>
+     * <code>serviceClass</code> will be annotated as a Web Service if it's
+     * needed
+     * </p>
      * 
      * @param serviceClass
      *            Class to export a method.
@@ -137,20 +150,18 @@ public interface WSExportOperations {
             String requestWrapperNamespace, String webServiceTargetNamespace);
 
     /**
-     * Check if the method methodName exists in serviceClass and is not
-     * annotated before with annotationName.
+     * Check if the method methodName exists in serviceClass and can be
+     * exported.
      * 
      * @param serviceClass
      *            to check if method exists
      * @param methodName
      *            method to check if exists and is annotation defined.
-     * @param annotationName
-     *            to search in method.
      * 
      * @return true if method exists and annotation is not defined.
      */
     public boolean isMethodAvailableToExport(JavaType serviceClass,
-            JavaSymbolName methodName, String annotationName);
+            JavaSymbolName methodName);
 
     /**
      * Creates the list of annotations for each method input parameter with
@@ -190,7 +201,15 @@ public interface WSExportOperations {
             String targetNamespace, String addressName);
 
     /**
+     * <p>
      * List methods available to export as web service operations.
+     * </p>
+     * <p>
+     * <code>serviceClass</code> must be annotated with @GvNIXWebService.
+     * </p>
+     * <p>
+     * Retrieves method names which aren't annotated with @GvNIXWebMethod.
+     * </p>
      * 
      * @param serviceClass
      *            class to search available methods to export as web service

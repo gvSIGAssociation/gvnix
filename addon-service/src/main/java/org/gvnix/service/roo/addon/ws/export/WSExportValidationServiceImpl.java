@@ -127,26 +127,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Add web services annotations to each founded exception.
-     * </p>
-     * <p>
-     * Two types of exceptions and two ways to define annotations:
-     * </p>
-     * <ul>
-     * <li>Exceptions defined in the project.
-     * <p>
-     * Add @GvNIXWebFault annotation to Exception.
-     * </p>
-     * </li>
-     * <li>Exceptions imported into the project.
-     * <p>
-     * Add web service fault annotation using AspectJ template.
-     * </p>
-     * </li>
-     * </ul>
      */
-    public boolean checkMethodExceptions(JavaType serviceClass,
+    public boolean prepareMethodExceptions(JavaType serviceClass,
             JavaSymbolName methodName, String webServiceTargetNamespace) {
 
         MethodMetadata methodToCheck = javaParserService
@@ -489,7 +471,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      * Marshalled according Ws-I standards.
      * </p>
      */
-    public void checkAuthorizedJavaTypesInOperation(JavaType serviceClass,
+    public void prepareAuthorizedJavaTypesInOperation(JavaType serviceClass,
             JavaSymbolName methodName) {
 
         MethodMetadata methodToCheck = javaParserService
@@ -715,13 +697,13 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
         logger.log(
                 Level.INFO,
-                "The "
-                        + methodParameterType
-                        + " parameter type: '"
-                        + javaType.getFullyQualifiedTypeName()
-                        + "' in method '' from class '"
-                        + serviceClass.getFullyQualifiedTypeName()
-                        + "' does not belong to project class definitions and its not mapped to be used in web service operation.");
+                "The ".concat(methodParameterType.toString())
+                        .concat(" parameter type: '")
+                        .concat(javaType.getFullyQualifiedTypeName())
+                        .concat("' in method '' from class '")
+                        .concat(serviceClass.getFullyQualifiedTypeName())
+                        .concat("' does not belong to project class definitions ")
+                        .concat("and its not mapped to be used in web service operation."));
 
         return true;
     }
@@ -849,19 +831,6 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * {@inheritDoc}
-     * <p>
-     * The list of not allowed collections is defined as static in this class.
-     * </p>
-     * <p>
-     * Not allow sorted collections.
-     * </p>
-     * <ul>
-     * <li>Set</li>
-     * <li>Map</li>
-     * <li>TreeMap</li>
-     * <li>Vector</li>
-     * <li>HashSet</li>
-     * </ul>
      */
     public boolean isNotAllowedCollectionType(JavaType javaType) {
 

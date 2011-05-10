@@ -45,6 +45,8 @@ import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
 
 /**
+ * Metadata provider for {@link WSExportExceptionMetadata}
+ * 
  * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
  *         Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -68,8 +70,9 @@ public class WSExportExceptionMetadataProvider extends
     protected void activate(ComponentContext context) {
         // Ensure we're notified of all metadata related to physical Java types,
         // in particular their initial creation
-        metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
-                .getMetadataIdentiferType(), getProvidesType());
+        metadataDependencyRegistry.registerDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXWebFault.class.getName()));
     }
 
@@ -119,59 +122,61 @@ public class WSExportExceptionMetadataProvider extends
 
         WSExportExceptionMetadata exceptionMetadata = null;
 
-        if (wSConfigService.isProjectWebAvailable()) {
+        if (!wSConfigService.isProjectWebAvailable()) {
+            return null;
+        }
 
-            // Install configuration to export services if it's not installed.
-            wSConfigService.install(CommunicationSense.EXPORT);
-            // Installs jax2ws plugin in project.
-            wSConfigService.installJaxwsBuildPlugin();
-            // Add GvNixAnnotations to the project.
-            annotationsService.addGvNIXAnnotationsDependency();
+        // Install configuration to export services if it's not installed.
+        wSConfigService.install(CommunicationSense.EXPORT);
+        // Installs jax2ws plugin in project.
+        wSConfigService.installJava2wsPlugin();
+        // Add GvNixAnnotations to the project.
+        annotationsService.addGvNIXAnnotationsDependency();
 
-            // Check if Web Service definition is correct.
-            PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
-                    .getMemberHoldingTypeDetails();
+        // Check if Web Service definition is correct.
+        PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
+                .getMemberHoldingTypeDetails();
 
-            ClassOrInterfaceTypeDetails governorTypeDetails;
-            if (physicalTypeDetails == null
-                    || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
-                // There is a problem
-                return null;
-            } else {
-                // We have reliable physical type details
-                governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
-            }
+        ClassOrInterfaceTypeDetails governorTypeDetails;
+        if (physicalTypeDetails == null
+                || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+            // There is a problem
+            return null;
+        } else {
+            // We have reliable physical type details
+            governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
+        }
 
-            AnnotationMetadata annotationMetadata = MemberFindingUtils
-                    .getTypeAnnotation(governorTypeDetails, new JavaType(
-                            GvNIXWebFault.class.getName()));
+        // Gets fault annotation
+        AnnotationMetadata annotationMetadata = MemberFindingUtils
+                .getTypeAnnotation(governorTypeDetails, new JavaType(
+                        GvNIXWebFault.class.getName()));
 
-            boolean correctGvNIXWebFaultAnnotation = checkGvNixWebFaultAnnotationAttributes(
-                    governorTypeDetails, annotationMetadata);
+        // Checks attributes
+        boolean correctGvNIXWebFaultAnnotation = checkGvNixWebFaultAnnotationAttributes(
+                governorTypeDetails, annotationMetadata);
 
-            if (correctGvNIXWebFaultAnnotation) {
+        if (!correctGvNIXWebFaultAnnotation) {
+            return null;
+        }
 
-                exceptionMetadata = new WSExportExceptionMetadata(
-                        metadataIdentificationString, aspectName,
-                        governorPhysicalTypeMetadata);
+        // Generate metadata
+        exceptionMetadata = new WSExportExceptionMetadata(
+                metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata);
 
-                if (exceptionMetadata.getMemberHoldingTypeDetails()
-                        .getAnnotations()
-
-                        .isEmpty()) {
-                    logger
-                            .log(
-                                    Level.WARNING,
-                                    "The annotation @GvNIXWebFault is not declared correctly for '"
-
-                                            + governorPhysicalTypeMetadata
-                                                    .getMemberHoldingTypeDetails()
-
-                                                    .getName()
-                                                    .getFullyQualifiedTypeName()
-                                            + "'.\nThis will not export the Exception to be used in Web Service.\n@WebParam annotation will be deleted untill the annotation is defined correctly.");
-                }
-            }
+        if (exceptionMetadata.getMemberHoldingTypeDetails().getAnnotations()
+                .isEmpty()) {
+            logger.log(
+                    Level.WARNING,
+                    "The annotation @GvNIXWebFault is not declared correctly for '"
+                            .concat(governorPhysicalTypeMetadata
+                                    .getMemberHoldingTypeDetails().getName()
+                                    .getFullyQualifiedTypeName())
+                            .concat("'.\nThis will not export the Exception ")
+                            .concat("to be used in Web Service.\n@WebParam ")
+                            .concat("annotation will be deleted until the ")
+                            .concat("annotation is defined correctly."));
         }
 
         return exceptionMetadata;
@@ -214,12 +219,11 @@ public class WSExportExceptionMetadataProvider extends
                         .checkNamespaceFormat(namespaceAttributeValue
                                 .getValue());
 
-        Assert
-                .isTrue(
-                        correctNamespace,
-                        "@GvNIXWebFault annotation attribute value 'targetNamespace' in '"
-                                + governorTypeDetails.getName()
-                                + "' must be well formed.\ni.e.: http://my.example.com/");
+        Assert.isTrue(
+                correctNamespace,
+                "@GvNIXWebFault annotation attribute value 'targetNamespace' in '"
+                        + governorTypeDetails.getName()
+                        + "' must be well formed.\ni.e.: http://my.example.com/");
 
         // Check faultBean.
         StringAttributeValue faultBeanAttributeValue = (StringAttributeValue) annotationMetadata
@@ -230,14 +234,13 @@ public class WSExportExceptionMetadataProvider extends
                 && governorTypeDetails.getName().getFullyQualifiedTypeName()
                         .contentEquals(faultBeanAttributeValue.getValue());
 
-        Assert
-                .isTrue(
-                        correctFaultBean,
-                        "@GvNIXWebFault annotation attribute value 'faultBean' in '"
-                                + governorTypeDetails.getName()
-                                + "' must have the same value that class complete name.\ni.e.: '"
-                                + governorTypeDetails.getName()
-                                        .getFullyQualifiedTypeName() + "'");
+        Assert.isTrue(
+                correctFaultBean,
+                "@GvNIXWebFault annotation attribute value 'faultBean' in '"
+                        + governorTypeDetails.getName()
+                        + "' must have the same value that class complete name.\ni.e.: '"
+                        + governorTypeDetails.getName()
+                                .getFullyQualifiedTypeName() + "'");
         return true;
     }
 

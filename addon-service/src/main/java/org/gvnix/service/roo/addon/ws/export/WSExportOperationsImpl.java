@@ -98,43 +98,30 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * {@inheritDoc}
      */
     public boolean isProjectAvailable() {
-
         if (getPathResolver() == null) {
-
             return false;
         }
 
+        // Checks if it's a web project
         String webXmlPath = projectOperations.getPathResolver().getIdentifier(
                 Path.SRC_MAIN_WEBAPP, "/WEB-INF/web.xml");
-        if (!fileManager.exists(webXmlPath)) {
-
-            return false;
-        }
-
-        return true;
+        return fileManager.exists(webXmlPath);
     }
 
     /**
      * @return the path resolver or null if there is no user project
      */
     private PathResolver getPathResolver() {
-
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
                 .get(ProjectMetadata.getProjectIdentifier());
         if (projectMetadata == null) {
-
             return null;
         }
-
         return projectMetadata.getPathResolver();
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * If the class to export as web service doesn't exist it will be created
-     * automatically in 'src/main/java' directory inside the package defined.
-     * </p>
      */
     public void exportService(JavaType serviceClass, String serviceName,
             String portTypeName, String targetNamespace, String addressName) {
@@ -143,21 +130,24 @@ public class WSExportOperationsImpl implements WSExportOperations {
         // not available.
         wSConfigService.install(CommunicationSense.EXPORT);
 
+        // Localizes java file
         String fileLocation = projectOperations.getPathResolver()
                 .getIdentifier(
                         Path.SRC_MAIN_JAVA,
-                        serviceClass.getFullyQualifiedTypeName().replace('.',
-                                '/').concat(".java"));
+                        serviceClass.getFullyQualifiedTypeName()
+                                .replace('.', '/').concat(".java"));
 
         if (!fileManager.exists(fileLocation)) {
-            logger.log(Level.INFO, "Crea la nueva clase de servicio: "
-                    + serviceClass.getSimpleTypeName()
-                    + " para publicarla como servicio web.");
+            logger.log(
+                    Level.INFO,
+                    "Creating a new class '".concat(
+                            serviceClass.getSimpleTypeName()).concat(
+                            " to export web service."));
             // Create service class with Service Annotation.
             javaParserService.createServiceClass(serviceClass);
-
         }
 
+        // Prepares attributes for @gvNIXWebService annotation
         List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = exportServiceAnnotationAttributes(
                 serviceClass, serviceName, portTypeName, targetNamespace,
                 addressName);
@@ -167,9 +157,9 @@ public class WSExportOperationsImpl implements WSExportOperations {
                 false);
 
         // Installs jax2ws plugin in project.
-        wSConfigService.installJaxwsBuildPlugin();
+        wSConfigService.installJava2wsPlugin();
 
-        // Add GvNixAnnotations to the project.
+        // Add GvNixAnnotations dependency to the project.
         annotationsService.addGvNIXAnnotationsDependency();
     }
 
@@ -184,11 +174,9 @@ public class WSExportOperationsImpl implements WSExportOperations {
                 : serviceClass.getSimpleTypeName();
 
         // Checks correct namespace format.
-        Assert
-                .isTrue(
-                        wSExportValidationService
-                                .checkNamespaceFormat(targetNamespace),
-                        "The namespace for Target Namespace has to be defined using URI fromat.\ni.e.: http://name.of.namespace/");
+        Assert.isTrue(
+                wSExportValidationService.checkNamespaceFormat(targetNamespace),
+                "The namespace for Target Namespace has to be defined using URI fromat.\ni.e.: http://name.of.namespace/");
 
         // Namespace for the web service.
         targetNamespace = StringUtils.hasText(targetNamespace) ? targetNamespace
@@ -233,8 +221,8 @@ public class WSExportOperationsImpl implements WSExportOperations {
         Assert.notNull(serviceClass, "Java type required");
         Assert.notNull(methodName, "Operation name required");
 
-        // Check if serviceClass is a Web Service. If doesn't exist shows an
-        // error.
+        // Check if serviceClass is a Web Service. If doesn't exist exports as
+        // service
         if (!isWebServiceClass(serviceClass)) {
             // Export as a service.
             exportService(serviceClass, null, null, null, null);
@@ -244,21 +232,22 @@ public class WSExportOperationsImpl implements WSExportOperations {
                 .getWebServiceDefaultNamespace(serviceClass);
 
         // Check if method exists in the class.
-        Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName,
-                GvNIXWebMethod.class.getName()), "The method: '" + methodName
-                + " doesn't exists in the class '"
-                + serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName),
+                "The method: '" + methodName + " doesn't exists in the class '"
+                        + serviceClass.getFullyQualifiedTypeName() + "'.");
 
         // Check authorized JavaTypes in operation.
-        wSExportValidationService.checkAuthorizedJavaTypesInOperation(
+        // Also, adds @GvNIXXmlElement annotation to any related project type
+        // which needs it.
+        wSExportValidationService.prepareAuthorizedJavaTypesInOperation(
                 serviceClass, methodName);
 
         // Check if method has return type.
         JavaType returnType = returnJavaType(serviceClass, methodName);
 
-        Assert.isTrue(returnType != null, "The method: '" + methodName
-                + " doesn't exists in the class '"
-                + serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert.isTrue(returnType != null,
+                "The method: '" + methodName + " doesn't exists in the class '"
+                        + serviceClass.getFullyQualifiedTypeName() + "'.");
 
         boolean isReturnTypeVoid = returnType.equals(JavaType.VOID_OBJECT)
                 || returnType.equals(JavaType.VOID_PRIMITIVE);
@@ -270,30 +259,28 @@ public class WSExportOperationsImpl implements WSExportOperations {
             resultName = "return";
         }
 
-        // Check if method throws an Exception and update.
-        wSExportValidationService.checkMethodExceptions(serviceClass,
+        // Check if method throws an Exception and update it with annotations
+        // if it's needed.
+        wSExportValidationService.prepareMethodExceptions(serviceClass,
                 methodName, webServiceTargetNamespace);
 
         // Checks correct namespace format.
         if (!isReturnTypeVoid) {
 
-            Assert
-                    .isTrue(
-                            wSExportValidationService
-                                    .checkNamespaceFormat(resultNamespace),
-                            "The namespace for result has to start with 'http://'.\ni.e.: http://name.of.namespace/");
-            Assert
-                    .isTrue(
-                            wSExportValidationService
-                                    .checkNamespaceFormat(responseWrapperNamespace),
-                            "The namespace for Response Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+            Assert.isTrue(
+                    wSExportValidationService
+                            .checkNamespaceFormat(resultNamespace),
+                    "The namespace for result has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+            Assert.isTrue(
+                    wSExportValidationService
+                            .checkNamespaceFormat(responseWrapperNamespace),
+                    "The namespace for Response Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
         }
 
-        Assert
-                .isTrue(
-                        wSExportValidationService
-                                .checkNamespaceFormat(requestWrapperNamespace),
-                        "The namespace for Request Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
+        Assert.isTrue(
+                wSExportValidationService
+                        .checkNamespaceFormat(requestWrapperNamespace),
+                "The namespace for Request Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
 
         // Create annotations to selected Method
         List<AnnotationMetadata> annotationMetadataUpdateList = getAnnotationsToExportOperation(
@@ -374,20 +361,21 @@ public class WSExportOperationsImpl implements WSExportOperations {
         List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
         List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
-        // javax.jws.WebMethod
+        // @WebMethod.operationName
         operationName = StringUtils.hasText(operationName) ? operationName
                 : methodName.getSymbolName();
-
         StringAttributeValue operationNameAttributeValue = new StringAttributeValue(
                 new JavaSymbolName("operationName"), operationName);
         annotationAttributeValueList.add(operationNameAttributeValue);
 
+        // Gets target method
         MethodMetadata methodMetadata = javaParserService
                 .getMethodByNameInClass(serviceClass, methodName);
 
         // Check input parameters.
         if (!methodMetadata.getParameterTypes().isEmpty()
                 && !methodMetadata.getParameterNames().isEmpty()) {
+            // no input parameters. Prepare request wrapper
 
             // javax.xml.ws.RequestWrapper
             requestWrapperName = StringUtils.hasText(requestWrapperName) ? requestWrapperName
@@ -401,72 +389,86 @@ public class WSExportOperationsImpl implements WSExportOperations {
                     .hasText(requestWrapperNamespace) ? requestWrapperNamespace
                     : webServiceTargetNamespace;
 
+            // RequestWrapper namespace
             StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("requestWrapperNamespace"),
                     requestWrapperNamespace);
             annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-            String className = serviceClass.getPackage()
-                    .getFullyQualifiedPackageName().concat(".").concat(
-                            StringUtils.capitalize(requestWrapperName).concat(
-                                    "RequestWrapper"));
+            // Wrapper class
+            String className = serviceClass
+                    .getPackage()
+                    .getFullyQualifiedPackageName()
+                    .concat(".")
+                    .concat(StringUtils.capitalize(requestWrapperName).concat(
+                            "RequestWrapper"));
             StringAttributeValue classNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("requestWrapperClassName"), className);
             annotationAttributeValueList.add(classNameAttributeValue);
 
         }
 
-        // Check result value
+        // Check return value
         if ((resultName != null && returnType != null)
                 && !(returnType.equals(JavaType.VOID_PRIMITIVE) || (returnType
                         .equals(JavaType.VOID_PRIMITIVE)))) {
 
+            // Not void method
+
+            // resultName
             StringAttributeValue resultNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("resultName"), resultName);
             annotationAttributeValueList.add(resultNameAttributeValue);
 
+            // resultNamespace
             resultNamespace = StringUtils.hasText(resultNamespace) ? resultNamespace
                     : webServiceTargetNamespace;
-
             StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("resultNamespace"), resultNamespace);
             annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
+            // result type
             ClassAttributeValue resultTypeAttributeValue = new ClassAttributeValue(
                     new JavaSymbolName("webResultType"), returnType);
             annotationAttributeValueList.add(resultTypeAttributeValue);
 
             // javax.xml.ws.ResponseWrapper
+
+            // response wrapper name
             responseWrapperName = StringUtils.hasText(responseWrapperName) ? responseWrapperName
                     : operationName.concat("Response");
-
             StringAttributeValue responseWrapperNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("responseWrapperName"),
                     responseWrapperName);
             annotationAttributeValueList.add(responseWrapperNameAttributeValue);
 
+            // response wrapper namespace
             responseWrapperNamespace = StringUtils
                     .hasText(responseWrapperNamespace) ? responseWrapperNamespace
                     : webServiceTargetNamespace;
-
             targetNamespaceAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("responseWrapperNamespace"),
                     responseWrapperNamespace);
             annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
+            // Class for response wrapper
             String className = serviceClass.getPackage()
-                    .getFullyQualifiedPackageName().concat(".").concat(
-                            StringUtils.capitalize(responseWrapperName));
+                    .getFullyQualifiedPackageName().concat(".")
+                    .concat(StringUtils.capitalize(responseWrapperName));
             StringAttributeValue classNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("responseWrapperClassName"), className);
             annotationAttributeValueList.add(classNameAttributeValue);
 
         } else {
 
+            // is a void method
+
+            // result name
             StringAttributeValue localNameAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("resultName"), "void");
             annotationAttributeValueList.add(localNameAttributeValue);
 
+            // result type
             ClassAttributeValue resultTypeAttributeValue = new ClassAttributeValue(
                     new JavaSymbolName("webResultType"),
                     JavaType.VOID_PRIMITIVE);
@@ -493,12 +495,15 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * @return true if the {@link JavaType} contains {@link WSExportMetadata}.
      */
     private boolean isWebServiceClass(JavaType serviceClass) {
+        // Gets PhysicalTypeIdentifier for serviceClass
         String id = physicalTypeMetadataProvider.findIdentifier(serviceClass);
 
-        Assert.notNull(id, "Cannot locate source for '"
-                + serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert.notNull(
+                id,
+                "Cannot locate source for '"
+                        + serviceClass.getFullyQualifiedTypeName() + "'.");
 
-        // Go and get the service layer ws metadata to export selected method.
+        // Prepares WSExportMetadata identifier.
         PhysicalTypeIdentifier.getJavaType(id);
         Path path = PhysicalTypeIdentifier.getPath(id);
         String entityMid = WSExportMetadata
@@ -509,6 +514,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
                 .get(entityMid);
 
         if (wSExportMetadata == null) {
+            // it isn't an exported service
             return false;
         } else {
             return true;
@@ -517,14 +523,13 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Check if method exists in the class.
-     * </p>
      */
     public boolean isMethodAvailableToExport(JavaType serviceClass,
-            JavaSymbolName methodName, String annotationName) {
+            JavaSymbolName methodName) {
 
-        boolean exists = true;
+        boolean isAnnotated = true;
+
+        // Gets method information
         MethodMetadata methodMetadata = javaParserService
                 .getMethodByNameInClass(serviceClass, methodName);
 
@@ -532,18 +537,11 @@ public class WSExportOperationsImpl implements WSExportOperations {
             return false;
         }
 
-        exists = javaParserService.isAnnotationIntroducedInMethod(
+        // Checks if it already has @GvNIXWebMethod
+        isAnnotated = javaParserService.isAnnotationIntroducedInMethod(
                 GvNIXWebMethod.class.getName(), methodMetadata);
-        Assert
-                .isTrue(
-                        exists == false,
-                        "The method '"
-                                + methodName
-                                + "' has been annotated with @"
-                                + annotationName
-                                + " before, you could update annotation parameters inside its class.");
 
-        return true;
+        return !isAnnotated;
     }
 
     /**
@@ -553,14 +551,18 @@ public class WSExportOperationsImpl implements WSExportOperations {
             JavaType serviceClass, JavaSymbolName methodName,
             String webServiceTargetNamespace) {
 
+        // List to store annotations for parameters
         List<AnnotatedJavaType> annotatedWebParameterList = new ArrayList<AnnotatedJavaType>();
 
+        // Method information
         MethodMetadata methodMetadata = javaParserService
                 .getMethodByNameInClass(serviceClass, methodName);
 
+        // Method parameter types
         List<AnnotatedJavaType> parameterTypesList = methodMetadata
                 .getParameterTypes();
 
+        // Method parameter names
         List<JavaSymbolName> parameterNamesList = methodMetadata
                 .getParameterNames();
 
@@ -571,76 +573,84 @@ public class WSExportOperationsImpl implements WSExportOperations {
         AnnotatedJavaType parameterWithAnnotations;
         List<AnnotationMetadata> parameterAnnotationList;
 
-        // @WebParam default values.
+        // prepares @WebParam default values.
         StringAttributeValue partNameAttributeValue = new StringAttributeValue(
                 new JavaSymbolName("partName"), "parameters");
-
         EnumAttributeValue modeAttributeValue = new EnumAttributeValue(
                 new JavaSymbolName("mode"), new EnumDetails(new JavaType(
                         "javax.jws.WebParam.Mode"), new JavaSymbolName("IN")));
-
         BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
                 new JavaSymbolName("header"), false);
 
+        // for each parameters
         for (AnnotatedJavaType parameterType : parameterTypesList) {
 
+            // annotation of this parameter
             parameterAnnotationList = new ArrayList<AnnotationMetadata>();
 
-            // @GvNIXWebParam
+            // values for @GvNIXWebParam annotation
             List<AnnotationAttributeValue<?>> gvNIXWebParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
+            // Get current parameter name
             int index = parameterTypesList.indexOf(parameterType);
-
             JavaSymbolName parameterName = parameterNamesList.get(index);
 
+            // @GvNIXWebParam.name
             StringAttributeValue nameWebParamAttributeValue = new StringAttributeValue(
                     new JavaSymbolName("name"), parameterName.getSymbolName());
-
             gvNIXWebParamAttributeValueList.add(nameWebParamAttributeValue);
 
+            // @GvNIXWebParam.type
             ClassAttributeValue typeClassAttributeValue = new ClassAttributeValue(
                     new JavaSymbolName("type"), parameterType.getJavaType());
-
             gvNIXWebParamAttributeValueList.add(typeClassAttributeValue);
 
+            // Build @GvNIXWebParam annotation
             AnnotationMetadata gvNixWebParamAnnotationMetadata = new AnnotationMetadataBuilder(
                     new JavaType(GvNIXWebParam.class.getName()),
                     gvNIXWebParamAttributeValueList).build();
 
+            // Add @GvNIXWebParam to annotation list
             parameterAnnotationList.add(gvNixWebParamAnnotationMetadata);
 
-            // @WebParam
+            // values for @WebParam annotation
             List<AnnotationAttributeValue<?>> webParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
+            // @WebParam.name
             webParamAttributeValueList.add(nameWebParamAttributeValue);
 
+            // if not a primitive or standard type
             if (!parameterType.getJavaType().isPrimitive()
                     && !parameterType.getJavaType().isCommonCollectionType()
                     && !parameterType.getJavaType().getFullyQualifiedTypeName()
                             .startsWith("java.lang")) {
 
+                // @WebParam.targetnamespace
                 StringAttributeValue targetNamespace = new StringAttributeValue(
                         new JavaSymbolName("targetNamespace"),
                         webServiceTargetNamespace);
-
                 webParamAttributeValueList.add(targetNamespace);
             }
 
+            // @WebParam.partName <-- parameters (default)
             webParamAttributeValueList.add(partNameAttributeValue);
 
+            // @WebParam.mode <-- IN (default)
             webParamAttributeValueList.add(modeAttributeValue);
 
+            // @WebParam.header <-- false (default)
             webParamAttributeValueList.add(headerAttributeValue);
 
+            // Build annotation @WebParam
             AnnotationMetadata webParamAnnotationMetadata = new AnnotationMetadataBuilder(
                     new JavaType("javax.jws.WebParam"),
                     webParamAttributeValueList).build();
-
+            // Add @GvNIXWebParam to annotation list
             parameterAnnotationList.add(webParamAnnotationMetadata);
 
             // Add annotation list to parameter.
-            parameterWithAnnotations = new AnnotatedJavaType(parameterType
-                    .getJavaType(), parameterAnnotationList);
+            parameterWithAnnotations = new AnnotatedJavaType(
+                    parameterType.getJavaType(), parameterAnnotationList);
 
             annotatedWebParameterList.add(parameterWithAnnotations);
 
@@ -651,12 +661,6 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
     /**
      * {@inheritDoc}
-     * <p>
-     *'serviceClass' must be annotated with @GvNIXWebService.
-     * </p>
-     * <p>
-     * Retrieves method names which aren't annotated with @GvNIXWebMethod.
-     * </p>
      */
     public String getAvailableServiceOperationsToExport(JavaType serviceClass) {
 
@@ -677,16 +681,19 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
         String id = physicalTypeMetadataProvider.findIdentifier(serviceClass);
 
-        Assert.notNull(id, "Cannot locate source for '"
-                + serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert.notNull(
+                id,
+                "Cannot locate source for '"
+                        + serviceClass.getFullyQualifiedTypeName() + "'.");
 
+        // Get service class details
         ClassOrInterfaceTypeDetails tmpServiceDetails = typeLocationService
                 .getClassOrInterface(serviceClass);
 
         // Checks if it's mutable
         Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-                tmpServiceDetails, "Can't modify "
-                        + tmpServiceDetails.getName());
+                tmpServiceDetails,
+                "Can't modify " + tmpServiceDetails.getName());
 
         MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
 
@@ -705,12 +712,15 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
         boolean isAnnotationIntroduced;
 
+        // for every method
         for (MethodMetadata methodMetadata : methodList) {
 
+            // already has @GvNIXWebMethod
             isAnnotationIntroduced = javaParserService
-                    .isAnnotationIntroducedInMethod(GvNIXWebMethod.class
-                            .getName(), methodMetadata);
+                    .isAnnotationIntroducedInMethod(
+                            GvNIXWebMethod.class.getName(), methodMetadata);
 
+            // if ! has @GvNIXWebMethod
             if (!isAnnotationIntroduced) {
                 if (!StringUtils.hasText(methodListStringBuilder.toString())) {
                     methodListStringBuilder
@@ -718,6 +728,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
                                     + serviceClass.getFullyQualifiedTypeName()
                                     + "':\n");
                 }
+                // add method name to list
                 methodListStringBuilder
                         .append("\t* "
                                 + methodMetadata.getMethodName()
@@ -740,10 +751,13 @@ public class WSExportOperationsImpl implements WSExportOperations {
     /** {@inheritDoc} **/
     public List<String> getServiceList() {
         List<String> classNames = new ArrayList<String>();
+
+        // Gets all classes annotated with @GvNIxWebService
         Set<ClassOrInterfaceTypeDetails> cids = typeLocationService
                 .findClassesOrInterfaceDetailsWithAnnotation(new JavaType(
                         GvNIXWebService.class.getName()));
         for (ClassOrInterfaceTypeDetails cid : cids) {
+            // Exclude abstract classes
             if (Modifier.isAbstract(cid.getModifier())) {
                 continue;
             }

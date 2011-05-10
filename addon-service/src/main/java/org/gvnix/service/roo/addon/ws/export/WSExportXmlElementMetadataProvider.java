@@ -142,7 +142,7 @@ public class WSExportXmlElementMetadataProvider extends
             // Install configuration to export services if it's not installed.
             wSConfigService.install(CommunicationSense.EXPORT);
             // Installs jax2ws plugin in project.
-            wSConfigService.installJaxwsBuildPlugin();
+            wSConfigService.installJava2wsPlugin();
             // Add GvNixAnnotations to the project.
             annotationsService.addGvNIXAnnotationsDependency();
 

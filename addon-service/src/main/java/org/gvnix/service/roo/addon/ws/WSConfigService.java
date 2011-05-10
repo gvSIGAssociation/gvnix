@@ -70,14 +70,22 @@ public interface WSConfigService {
 
     /**
      * Publish a class as Web Service.
+     * <p>
+     * Define a Web Service class in cxf configuration file to be published.
+     * <p>
+     * <p>
+     * Update cxf file if its necessary to avoid changes in WSDL contract
+     * checking type annotation values from service class.
+     * </p>
      * 
      * @param className
      *            to be published as Web Service.
      * @param annotationMetadata
      *            with all necessary values to define a Web Service.
-     * @return true if className has changed to update annotation.
+     * @return true if class annotation must be updated (Class name or package
+     *         has been changed).
      */
-    public boolean exportClass(JavaType className,
+    public boolean publishClassAsWebService(JavaType className,
             AnnotationMetadata annotationMetadata);
 
     /**
@@ -90,8 +98,13 @@ public interface WSConfigService {
     public String convertPackageToTargetNamespace(String packageName);
 
     /**
-     * Configure Web Service class to generate wsdl contract in jax2ws plugin in
-     * pom.xml.
+     * <p>
+     * Adds wsdl generation configuration in pom.xml using java2ws maven plugin
+     * for a Web Service class
+     * </p>
+     * <p>
+     * Installs java2ws plugin if it's needed
+     * </p>
      * 
      * @param serviceClass
      *            Service to generate Wsdl.
@@ -102,11 +115,15 @@ public interface WSConfigService {
      * @param fullyQualifiedTypeName
      *            class name location defined in annotation.
      */
-    public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName,
+    public void addToJava2wsPlugin(JavaType serviceClass, String serviceName,
             String addressName, String fullyQualifiedTypeName);
 
     /**
      * Add a wsdl location to import.
+     * <p>
+     * Adds a wsdl location to the plugin configuration. If code generation
+     * plugin configuration not exists, it will be created.
+     * </p>
      * 
      * @param wsdlLocation
      *            WSDL file location
@@ -118,7 +135,14 @@ public interface WSConfigService {
             CommunicationSense type);
 
     /**
+     * <p>
      * Add a wsdl location to export.
+     * </p>
+     * 
+     * <p>
+     * Adds a wsdl location to the plugin configuration. If code generation
+     * plugin configuration not exists, it will be created.
+     * </p>
      * 
      * @param wsdlLocation
      *            WSDL file location.
@@ -161,9 +185,9 @@ public interface WSConfigService {
     public void mvn(String parameters, String message) throws IOException;
 
     /**
-     * Create Jax-WS plugin configuration in pom.xml.
+     * Installs Java2ws plugin in pom.xml.
      */
-    public void installJaxwsBuildPlugin();
+    public void installJava2wsPlugin();
 
     /**
      * Checks if library is properly configured in a project.
@@ -173,7 +197,7 @@ public interface WSConfigService {
      * 
      * @param type
      *            Communication type
-     * @return true or false if it's configurated
+     * @return true or false if it's configured
      */
     public boolean isLibraryInstalled(CommunicationSense type);
 

@@ -20,13 +20,20 @@ package org.gvnix.service.roo.addon.ws.export;
 
 import java.util.List;
 
+import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
+import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
+import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.ws.export.WSExportOperations.MethodParameterType;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.annotations.*;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
 /**
+ * Utility component to Export Web services
+ * 
  * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
  *         Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -36,7 +43,8 @@ public interface WSExportValidationService {
 
     /**
      * Checks if JavaTypes input/output parameters involved in operation are
-     * permitted to be published in web service.
+     * permitted to be published in web service and adds {@link GvNIXXmlElement}
+     * annotation to any related project type which needs it.
      * 
      * @param serviceClass
      *            to check if the method is correct to be published.
@@ -44,11 +52,26 @@ public interface WSExportValidationService {
      *            method to check if input/output parameters ara permitted to be
      *            publish in web service.
      */
-    public void checkAuthorizedJavaTypesInOperation(JavaType serviceClass,
+    public void prepareAuthorizedJavaTypesInOperation(JavaType serviceClass,
             JavaSymbolName methodName);
 
     /**
+     * <p>
      * Check if JavaType is defined in common collection type Set or extends it.
+     * </p>
+     * <p>
+     * The list of not allowed collections is defined as static in this class.
+     * </p>
+     * <p>
+     * Not allow sorted collections.
+     * </p>
+     * <ul>
+     * <li>Set</li>
+     * <li>Map</li>
+     * <li>TreeMap</li>
+     * <li>Vector</li>
+     * <li>HashSet</li>
+     * </ul>
      * 
      * @param javaType
      *            to check.
@@ -71,7 +94,27 @@ public interface WSExportValidationService {
             MethodParameterType methodParameterType, JavaType serviceClass);
 
     /**
+     * <p>
      * Check method exceptions to publish in service operation.
+     * </p>
+     * <p>
+     * Add web services annotations to each founded exception.
+     * </p>
+     * <p>
+     * There are two exceptions types and two ways to define annotations:
+     * </p>
+     * <ul>
+     * <li>Exceptions defined in the project.
+     * <p>
+     * Add {@link GvNIXWebFault} annotation to Exception.
+     * </p>
+     * </li>
+     * <li>Exceptions imported into the project.
+     * <p>
+     * Add web service fault annotation using AspectJ template.
+     * </p>
+     * </li>
+     * </ul>
      * 
      * @param serviceClass
      *            where the method is defined.
@@ -82,11 +125,12 @@ public interface WSExportValidationService {
      * @return true if the exceptions are published correctly or false if the
      *         exceptions don't exists or are incorrect.
      */
-    public boolean checkMethodExceptions(JavaType serviceClass,
+    public boolean prepareMethodExceptions(JavaType serviceClass,
             JavaSymbolName methodName, String webServiceTargetNamespace);
 
     /**
-     * Adds a declaration of @WebFault to exceptionClass in AspectJ file.
+     * Adds a declaration of <code>@WebFault</code> to exceptionClass in AspectJ
+     * file.
      * 
      * @param exceptionClass
      *            to export as web service exception.
@@ -106,13 +150,14 @@ public interface WSExportValidationService {
     public boolean checkNamespaceFormat(String namespace);
 
     /**
-     * Check if serviceClass has defined @GvNIXWebService annotation with valid
-     * 'targetNamespace' attribute and returns it if is correct.
+     * Check if serviceClass has defined {@link GvNIXWebService} annotation with
+     * valid 'targetNamespace' attribute and returns it if is correct.
      * 
      * @param serviceClass
      *            Web Service class to check correct target Namespace and return
      *            as result.
-     * @return targetNamespace attribute from annotation @GvNIXWebService.
+     * @return targetNamespace attribute from annotation {@link GvNIXWebService}
+     *         .
      */
     public String getWebServiceDefaultNamespace(JavaType serviceClass);
 
@@ -128,6 +173,8 @@ public interface WSExportValidationService {
      * <li>Unsupported Collections.</li>
      * <li>Project Objects.</li>
      * </ul>
+     * 
+     * TODO Utility class. Remove from interface?
      * 
      * @param governorTypeDetails
      *            class to get fields to check.

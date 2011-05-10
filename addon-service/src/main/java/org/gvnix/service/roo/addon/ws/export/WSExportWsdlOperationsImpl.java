@@ -52,24 +52,35 @@ public class WSExportWsdlOperationsImpl implements WSExportWsdlOperations {
      */
     public List<JavaType> exportWSDL2Java(String url) {
 
-        // Check WSDL, configure plugin and generate sources.
+        // Generate java files for WSDL using maven wsdl2java plugin.
+        // Generated are paced in GENERATED_CXF_SOURCES_DIR.
         wSExportWsdlConfigService.exportWSDLWebService(url,
                 CommunicationSense.EXPORT_WSDL);
 
-        // Check generated classes.
+        // Add GENERATED_CXF_SOURCES_DIR roo file monitor for get notification
+        // of all files create by maven plugin
         wSExportWsdlConfigService
                 .monitoringGeneratedSourcesDirectory(GENERATED_CXF_SOURCES_DIR);
 
-        // Convert java classes with gvNIX annotations.
+        // WSExporWsdlListerner register all created files into
+        // GENERATED_CXF_SOURCES_DIR,
+        // Identify file type and call to wSExportWsdlConfigService for every
+        // single file.
+
+        // After maven wsdl2java plugin finished (its is supposed to finish
+        // before this command [!!!]) this command copy generated files into
+        // src folder and annotated with GvNIX classes.
         return updateAnnotationsToGvNIX();
 
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Check the files listed in Arrays in this class.
-     * </p>
+     * 
+     * TODO this method must changed to private or removed
+     * 
+     * This method calls
+     * {@link WSExportWsdlConfigService#generateGvNIXWebServiceFiles()}
      * 
      * @return implementation classes
      */

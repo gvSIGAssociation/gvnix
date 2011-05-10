@@ -23,7 +23,8 @@ import java.util.List;
 import org.springframework.roo.model.JavaType;
 
 /**
- * Addon for Handle Service Layer
+ * Operation for export a web service base on a WSDL declaration (Contract
+ * First).
  * 
  * @author Ricardo García at <a href="http://www.disid.com">DiSiD Technologies
  *         S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria
@@ -50,6 +51,10 @@ public interface WSExportWsdlOperations {
 
     /**
      * Create new files with '@GvNIX' annotations in SRC_MAIN_JAVA.
+     * 
+     * TODO: To be removed. This method is used internally by service and
+     * depends on a sequence of calls, so its STRONGLY RECOMENDED remove it from
+     * interface and maintain it in implementation
      * 
      * @return implementation classes
      */

@@ -476,18 +476,8 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Define a Web Service class in cxf configuration file to be published.
-     * <p>
-     * <p>
-     * Update cxf file if its necessary to avoid changes in WSDL contract
-     * checking type annotation values from service class.
-     * </p>
-     * <p>
-     * Update annotation class if Class name or package changes.
-     * </p>
      */
-    public boolean exportClass(JavaType className,
+    public boolean publishClassAsWebService(JavaType className,
             AnnotationMetadata annotationMetadata) {
 
         Assert.isTrue(annotationMetadata != null, "Annotation '"
@@ -869,22 +859,14 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Adds the plugin configuration from a file.
-     * </p>
-     * <p>
-     * Defines an execution for the serviceClass with the serviceName to
-     * generate in maven compile goal.
-     * </p>
      */
-    public void jaxwsBuildPlugin(JavaType serviceClass, String serviceName,
+    public void addToJava2wsPlugin(JavaType serviceClass, String serviceName,
             String addressName, String fullyQualifiedTypeName) {
 
-        // Update plugin with execution configuration.
+        // Get pom
         String pomPath = getPomFilePath();
         Assert.isTrue(pomPath != null,
                 "Cxf configuration file not found, export again the service.");
-
         MutableFile pomMutableFile = null;
         Document pom;
         try {
@@ -894,46 +876,50 @@ public class WSConfigServiceImpl implements WSConfigService {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
-
         Element root = pom.getDocumentElement();
 
+        // Gets java2ws plugin element
         Element jaxWsPlugin = XmlUtils
                 .findFirstElement(
                         "/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-java2ws-plugin']",
                         root);
 
+        // Install it if it's missing
         if (jaxWsPlugin == null) {
 
             logger.log(Level.INFO,
                     "Jax-Ws plugin is not defined in the pom.xml. Installing in project.");
             // Installs jax2ws plugin.
-            installJaxwsBuildPlugin();
+            installJava2wsPlugin();
         }
 
-        boolean classNameChanged = false;
+        // Checks if already exists the execution.
+        Element serviceExecution = XmlUtils.findFirstElement(
+                "/project/build/plugins/plugin/executions/execution/configuration[className='"
+                        .concat(serviceClass.getFullyQualifiedTypeName())
+                        .concat("']"), root);
 
+        if (serviceExecution != null) {
+            logger.log(
+                    Level.FINE,
+                    "A previous Wsdl generation with CXF plugin for '".concat(
+                            serviceName).concat("' service has been found."));
+            return;
+        }
+
+        // Checks if name of java class has been changed comparing current
+        // service class and name declared in annotation
+        boolean classNameChanged = false;
         if (!serviceClass.getFullyQualifiedTypeName().contentEquals(
                 fullyQualifiedTypeName)) {
             classNameChanged = true;
         }
 
-        // Checks if already exists the execution.
-        Element serviceExecution = XmlUtils
-                .findFirstElement(
-                        "/project/build/plugins/plugin/executions/execution/configuration[className='"
-                                + serviceClass.getFullyQualifiedTypeName()
-                                + "']", root);
-
-        if (serviceExecution != null) {
-            logger.log(Level.FINE, "Wsdl generation with CXF plugin for '"
-                    + serviceName + " service, has been configured before.");
-            return;
-        }
-
+        // if class has been changed (package or name) update execution
         if (classNameChanged) {
             serviceExecution = XmlUtils.findFirstElement(
                     "/project/build/plugins/plugin/executions/execution/configuration[className='"
-                            + fullyQualifiedTypeName + "']", root);
+                            .concat(fullyQualifiedTypeName).concat("']"), root);
 
             // Update with serviceClass.getFullyQualifiedTypeName().
             if (serviceExecution != null && serviceExecution.hasChildNodes()) {
@@ -942,12 +928,16 @@ public class WSConfigServiceImpl implements WSConfigService {
                 updateServiceExecution = (serviceExecution.getFirstChild() != null) ? serviceExecution
                         .getFirstChild().getNextSibling() : null;
 
+                // Find node which contains old class name
                 while (updateServiceExecution != null) {
 
                     if (updateServiceExecution.getNodeName().contentEquals(
                             "className")) {
+                        // Update node content with new value
                         updateServiceExecution.setTextContent(serviceClass
                                 .getFullyQualifiedTypeName());
+
+                        // write pom
                         XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
                         logger.log(
                                 Level.INFO,
@@ -957,6 +947,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                                         + serviceClass
                                                 .getFullyQualifiedTypeName()
                                         + "'.");
+                        // That's all
                         return;
                     }
 
@@ -965,54 +956,20 @@ public class WSConfigServiceImpl implements WSConfigService {
                             .getNextSibling();
 
                 }
-
             }
         }
 
-        // Execution
-        serviceExecution = pom.createElement("execution");
-
+        // Prepare Execution configuration
         String executionID = "${project.basedir}/src/test/resources/generated/wsdl/"
                 .concat(addressName).concat(".wsdl");
-
-        Element id = pom.createElement("id");
-        id.setTextContent(executionID);
-
-        serviceExecution.appendChild(id);
-        Element phase = pom.createElement("phase");
-        phase.setTextContent("test");
-
-        serviceExecution.appendChild(phase);
-
-        // Configuration
-        Element configuration = pom.createElement("configuration");
-        Element className = pom.createElement("className");
-        className.setTextContent(serviceClass.getFullyQualifiedTypeName());
-        Element outputFile = pom.createElement("outputFile");
-        outputFile
-                .setTextContent("${project.basedir}/src/test/resources/generated/wsdl/"
-                        .concat(addressName).concat(".wsdl"));
-        Element genWsdl = pom.createElement("genWsdl");
-        genWsdl.setTextContent("true");
-        Element verbose = pom.createElement("verbose");
-        verbose.setTextContent("true");
-
-        configuration.appendChild(className);
-        configuration.appendChild(outputFile);
-        configuration.appendChild(genWsdl);
-        configuration.appendChild(verbose);
-
-        serviceExecution.appendChild(configuration);
-
-        // Goals
-        Element goals = pom.createElement("goals");
-        Element goal = pom.createElement("goal");
-        goal.setTextContent("java2ws");
-        goals.appendChild(goal);
-
-        serviceExecution.appendChild(goals);
+        serviceExecution = createJava2wsExecutionElement(pom, serviceClass,
+                addressName, executionID);
 
         // Checks if already exists the execution.
+
+        // XXX ??? this is hard difficult because previously it's already
+        // checked
+        // using class name
         Element oldExecution = XmlUtils.findFirstElement(
                 "/project/build/plugins/plugin/executions/execution[id='"
                         + executionID + "']", root);
@@ -1047,9 +1004,77 @@ public class WSConfigServiceImpl implements WSConfigService {
     }
 
     /**
+     * Generates Element for service wsdl generation execution
+     * 
+     * @param pom
+     *            Pom document
+     * @param serviceClass
+     *            to generate
+     * @param addressName
+     *            of the service
+     * @param executionID
+     *            execution identifier
+     * @return
+     */
+    private Element createJava2wsExecutionElement(Document pom,
+            JavaType serviceClass, String addressName, String executionID) {
+
+        Element serviceExecution = pom.createElement("execution");
+
+        // execution.id
+        Element id = pom.createElement("id");
+        id.setTextContent(executionID);
+
+        // execution.phase
+        serviceExecution.appendChild(id);
+        Element phase = pom.createElement("phase");
+        phase.setTextContent("test");
+        serviceExecution.appendChild(phase);
+
+        // Execution.Configuration
+        Element configuration = pom.createElement("configuration");
+
+        // Execution.configuration.className
+        Element className = pom.createElement("className");
+        className.setTextContent(serviceClass.getFullyQualifiedTypeName());
+
+        // Excecution.configuration.outputFile
+        Element outputFile = pom.createElement("outputFile");
+        outputFile
+                .setTextContent("${project.basedir}/src/test/resources/generated/wsdl/"
+                        .concat(addressName).concat(".wsdl"));
+
+        // execution.configuration.genWsdl
+        Element genWsdl = pom.createElement("genWsdl");
+        genWsdl.setTextContent("true");
+
+        // execution.configuration.verbose
+        Element verbose = pom.createElement("verbose");
+        verbose.setTextContent("true");
+
+        // execution.configuration
+        configuration.appendChild(className);
+        configuration.appendChild(outputFile);
+        configuration.appendChild(genWsdl);
+        configuration.appendChild(verbose);
+
+        // execution
+        serviceExecution.appendChild(configuration);
+
+        // Goals
+        Element goals = pom.createElement("goals");
+        Element goal = pom.createElement("goal");
+        goal.setTextContent("java2ws");
+        goals.appendChild(goal);
+
+        serviceExecution.appendChild(goals);
+        return serviceExecution;
+    }
+
+    /**
      * {@inheritDoc}
      */
-    public void installJaxwsBuildPlugin() {
+    public void installJava2wsPlugin() {
         Element pluginElement = XmlUtils.findFirstElement(
                 "/jaxws-plugin/plugin",
                 XmlUtils.getConfiguration(this.getClass(),
@@ -1060,37 +1085,38 @@ public class WSConfigServiceImpl implements WSConfigService {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * Adds a wsdl location to the plugin configuration. If code generation
-     * plugin configuration not exists, it will be created.
-     * </p>
+     * Install wsdl2java maven plugin in pom.xml
      */
-    public boolean addImportLocation(String wsdlLocation,
-            CommunicationSense type) {
+    public void installWsdl2javaPlugin() {
+        // Get plugin template
+        Element plugin = XmlUtils.findFirstElement(
+                "/cxf-codegen/cxf-codegen-plugin/plugin", XmlUtils
+                        .getConfiguration(this.getClass(),
+                                "dependencies-export-wsdl2java-plugin.xml"));
 
-        boolean added;
-
-        // Project properties to pom.xml
-        // addProjectProperties(type);
-
-        if (CommunicationSense.IMPORT_RPC_ENCODED.equals(type)) {
-
-            added = addImportLocationRpc(wsdlLocation);
-        } else {
-
-            added = addImportLocationDocument(wsdlLocation);
-        }
-
-        return added;
+        // Add plugin
+        projectOperations.buildPluginUpdate(new Plugin(plugin));
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Adds a wsdl location to the plugin configuration. If code generation
-     * plugin configuration not exists, it will be created.
-     * </p>
+     */
+    public boolean addImportLocation(String wsdlLocation,
+            CommunicationSense type) {
+
+        // Adds Project properties to pom.xml
+        // addProjectProperties(type);
+
+        // Identifies the type of library to use
+        if (CommunicationSense.IMPORT_RPC_ENCODED.equals(type)) {
+            return addImportLocationRpc(wsdlLocation);
+        } else {
+            return addImportLocationDocument(wsdlLocation);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public boolean addExportLocation(String wsdlLocation,
             Document wsdlDocument, CommunicationSense type) {
@@ -1128,14 +1154,8 @@ public class WSConfigServiceImpl implements WSConfigService {
     private void addExportWSDLLocationDocument(String wsdlLocation,
             Document wsdlDocument) {
 
-        // Get plugin template
-        Element plugin = XmlUtils.findFirstElement(
-                "/cxf-codegen/cxf-codegen-plugin/plugin", XmlUtils
-                        .getConfiguration(this.getClass(),
-                                "dependencies-export-wsdl2java-plugin.xml"));
-
-        // Add plugin
-        projectOperations.buildPluginUpdate(new Plugin(plugin));
+        // install Plugin
+        installWsdl2javaPlugin();
 
         // Get pom.xml
         String pomPath = getPomFilePath();
@@ -1151,7 +1171,6 @@ public class WSConfigServiceImpl implements WSConfigService {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
-
         Element root = pom.getDocumentElement();
 
         // Get plugin element
@@ -1160,7 +1179,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         "/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']",
                         root);
 
-        // If plugin element not exists, message error
+        // If plugin element not exists, error message
         Assert.notNull(codegenWsPlugin,
                 "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
@@ -1169,68 +1188,127 @@ public class WSConfigServiceImpl implements WSConfigService {
                 "/project/build/plugins/plugin/executions/execution[id='"
                         + CXF_WSDL2JAVA_EXECUTION_ID + "']", root);
 
-        // Access executions > execution.
+        // Generate execution configuration element.
+        Element newGenerateSourcesCxfServer = createWsdl2JavaExecutionElement(
+                pom, wsdlDocument, wsdlLocation);
+
+        // Checks if exists executions.
+        Element oldExecutions = XmlUtils.findFirstElementByName("executions",
+                codegenWsPlugin);
+
+        Element newExecutions;
+
+        // To Update execution definitions It must be replaced in pom.xml to
+        // maintain the format.
+        if (oldGenerateSourcesCxfServer != null) {
+            oldGenerateSourcesCxfServer.getParentNode().replaceChild(
+                    newGenerateSourcesCxfServer, oldGenerateSourcesCxfServer);
+        } else {
+
+            if (oldExecutions == null) {
+                newExecutions = pom.createElement("executions");
+                newExecutions.appendChild(newGenerateSourcesCxfServer);
+
+                codegenWsPlugin.appendChild(newExecutions);
+            } else {
+                newExecutions = oldExecutions;
+                newExecutions.appendChild(newGenerateSourcesCxfServer);
+                oldExecutions.getParentNode().replaceChild(newExecutions,
+                        oldExecutions);
+            }
+        }
+
+        // Write new XML to disk
+        XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+
+    }
+
+    /**
+     * Creates execution xml pom element for wsdl2java generation
+     * 
+     * @param pom
+     * @param wsdlDocument
+     *            to generate sources
+     * @param wsdlLocation
+     *            current wsdl location
+     * @return
+     */
+    private Element createWsdl2JavaExecutionElement(Document pom,
+            Document wsdlDocument, String wsdlLocation) {
         Element newGenerateSourcesCxfServer = pom.createElement("execution");
 
         // Create name for id.
+        // execution.id
         Element id = pom.createElement("id");
         id.setTextContent(CXF_WSDL2JAVA_EXECUTION_ID);
         newGenerateSourcesCxfServer.appendChild(id);
 
+        // execution.phase
         Element phase = pom.createElement("phase");
         phase.setTextContent("generate-sources");
         newGenerateSourcesCxfServer.appendChild(phase);
 
+        // execution.goals.goal
         Element goals = pom.createElement("goals");
         Element goal = pom.createElement("goal");
         goal.setTextContent("wsdl2java");
         goals.appendChild(goal);
         newGenerateSourcesCxfServer.appendChild(goals);
 
+        // execution.configuration
         Element configuration = pom.createElement("configuration");
         newGenerateSourcesCxfServer.appendChild(configuration);
 
+        // execution.configuration.sourceRoo
         Element sourceRoot = pom.createElement("sourceRoot");
         sourceRoot
                 .setTextContent("${basedir}/target/generated-sources/cxf/server");
         configuration.appendChild(sourceRoot);
 
+        // execution.configuration.defaultOption
         Element defaultOptions = pom.createElement("defaultOptions");
+        configuration.appendChild(defaultOptions);
 
         // Soap Headers.
+        // execution.configuration.defaultOption.extendedSoapHeaders <-- true
         Element extendedSoapHeaders = pom.createElement("extendedSoapHeaders");
         extendedSoapHeaders.setTextContent("true");
         defaultOptions.appendChild(extendedSoapHeaders);
 
         // AutoNameResolution to solve naming conflicts.
+        // execution.configuration.defaultOption.autoNameResolution <-- true
         Element autoNameResolution = pom.createElement("autoNameResolution");
         autoNameResolution.setTextContent("true");
         defaultOptions.appendChild(autoNameResolution);
 
-        configuration.appendChild(defaultOptions);
-
+        // execution.configuration.wsdlOptions
         Element wsdlOptions = pom.createElement("wsdlOptions");
         configuration.appendChild(wsdlOptions);
 
+        // execution.configuration.wsdlOptions.wsdlOption
         Element wsdlOption = pom.createElement("wsdlOption");
+        wsdlOptions.appendChild(wsdlOption);
 
         // Check URI correct format
         wsdlLocation = removeFilePrefix(wsdlLocation);
 
+        // execution.configuration.wsdlOptions.wsdlOption.wsdl
         Element wsdl = pom.createElement("wsdl");
+        wsdlOption.appendChild(wsdl);
         wsdl.setTextContent(wsdlLocation);
 
+        // execution.configuration.wsdlOptions.wsdlOption.extraargs.extraarg <--
+        // "-impl"
         Element extraArgs = pom.createElement("extraargs");
         Element extraArg = pom.createElement("extraarg");
         extraArg.setTextContent("-impl");
         extraArgs.appendChild(extraArg);
-
-        wsdlOption.appendChild(wsdl);
         wsdlOption.appendChild(extraArgs);
 
         Element rootElement = wsdlDocument.getDocumentElement();
 
         // Configure the packagename to generate client sources
+        // execution.configuration.wsdlOptions.wsdlOption.packagenames.packagename
         Element packagenames = pom.createElement("packagenames");
         Element packagename = pom.createElement("packagename");
         String packageName = WsdlParserUtils
@@ -1242,40 +1320,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         packagenames.appendChild(packagename);
         wsdlOption.appendChild(packagenames);
 
-        wsdlOptions.appendChild(wsdlOption);
-
-        // Checks if exists executions.
-        Element oldExecutions = XmlUtils.findFirstElementByName("executions",
-                codegenWsPlugin);
-
-        Element newExecutions;
-
-        // To Update execution definitions It must be replaced in pom.xml to
-        // maintain the format.
-        if (oldGenerateSourcesCxfServer != null) {
-
-            oldGenerateSourcesCxfServer.getParentNode().replaceChild(
-                    newGenerateSourcesCxfServer, oldGenerateSourcesCxfServer);
-        } else {
-
-            if (oldExecutions == null) {
-                newExecutions = pom.createElement("executions");
-                newExecutions.appendChild(newGenerateSourcesCxfServer);
-
-                codegenWsPlugin.appendChild(newExecutions);
-
-            } else {
-
-                newExecutions = oldExecutions;
-                newExecutions.appendChild(newGenerateSourcesCxfServer);
-                oldExecutions.getParentNode().replaceChild(newExecutions,
-                        oldExecutions);
-            }
-        }
-
-        // Write new XML to disk
-        XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
-
+        return newGenerateSourcesCxfServer;
     }
 
     /**
