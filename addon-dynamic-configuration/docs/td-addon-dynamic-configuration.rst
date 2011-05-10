@@ -13,9 +13,9 @@
    :backlinks: none
 
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
-Unported License. To view a copy of this license, visit 
-http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to 
-Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 
+Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 94105, USA.
 
 Introduction
@@ -28,7 +28,7 @@ Requirements
 
 * Independent of the build system (like Maven, Ant, ...)
 * Friendly and easy to use
-* Faster than write profiles directly in some build system (Maven, Ant, ...) 
+* Faster than write profiles directly in some build system (Maven, Ant, ...)
 * Avoid variables ``${property.name}`` along project files.
   More readable aproximation is to store the value of variable on currently active profile
 * Current active profile selection
@@ -43,12 +43,12 @@ Proposals
  * Define a OSGi component that can be implemented by other addons to manage their own files with different profile values.
  * Out of the box, has already implemented some OSGi components to profile some files of a project, like database.properties.
  * When a profile property is changed, related OSGi component will be alerted to change the value in corresponding files.
- * The profiles information is stored on a independent and own file on project resources.  
+ * The profiles information is stored on a independent and own file on project resources.
 
 Maven profile addon
 -------------------
 
-This option is interesting because Maven is the build tool used by default on generated projects.  
+This option is interesting because Maven is the build tool used by default on generated projects.
 
 * Use maven profiles section at pom.xml::
 
@@ -67,9 +67,9 @@ This option is interesting because Maven is the build tool used by default on ge
        <properties>...</properties>
      </profile>
    </profiles>
- 
+
   This is a non extensive example, it could not have all available profile configurations.
-  
+
   Multiple environments could be defined, one on each profile section.
 
   More info at `Maven pom.xml profiles`_
@@ -79,9 +79,9 @@ This option is interesting because Maven is the build tool used by default on ge
    <properties>
      <property.name>property-value</name>
      ...
-   </properties> 
+   </properties>
 
-* Target locations to search in property variables to be replaces are defined at pom.xml resources section::  
+* Target locations to search in property variables to be replaces are defined at pom.xml resources section::
 
    <resources>
    <resource>
@@ -93,21 +93,21 @@ This option is interesting because Maven is the build tool used by default on ge
     </resource>
    </resources>
 
-  A resource with true filtering value means a location to search and replace property variables with the selected profile value.   
+  A resource with true filtering value means a location to search and replace property variables with the selected profile value.
 
 * Property variables format::
 
    ${property.name}
 
   The ``property.name`` variable will be replaced with the ``property-value`` if the file location is included in resources.
-  
+
 TODO
 ````
 
 * Which directories to add on resources to do the filtering of the properties defined in the profile ?
 * A resources section can be defined on a profile section ?
 * Use activation to set the active profile ?
-* If active profile setted, ¿ what hapens if other profile is selected from maven command (-p pre) ? 
+* If active profile setted, ¿ what hapens if other profile is selected from maven command (-p pre) ?
 
 References
 ``````````
@@ -141,37 +141,37 @@ Example:
   This class has the @org.apache.felix.scr.annotations.Component and @org.apache.felix.scr.annotations.Service annotations.
 
   * Class annotation ``@org.apache.felix.scr.annotations.Reference(name="commands", strategy=ReferenceStrategy.LOOKUP, policy=ReferencePolicy.DYNAMIC, referenceInterface=CommandMarker.class, cardinality=ReferenceCardinality.OPTIONAL_MULTIPLE)``
-  
+
     Defines references to other services made available to the component.
     Take notice that attribute ``referenceInterface=CommandMarker.class`` is the Java interface implemented by each command class.
 
   * Property ``org.osgi.service.component.ComponentContext context``
-  
+
     This property is used by the component instance to interact with its execution context including locating services by reference name.
-    
+
   * Method ``Object[] objs = context.locateServices("commands");``
-  
+
     Returns the service objects for the specified reference name.
- 
+
   * Utility::
-  
-	@SuppressWarnings("unchecked")
-	private <T> Set<T> getSet(String name) {
-		Set<T> result = new HashSet<T>();
-		Object[] objs = context.locateServices(name);
-		if (objs != null) {
-			for (Object o : objs) {
-				result.add((T) o);
-			}
-		}
-		if ("commands".equals(name)) {
-			result.add((T) this);
-		}
-		return result;
-	}
+
+  @SuppressWarnings("unchecked")
+  private <T> Set<T> getSet(String name) {
+    Set<T> result = new HashSet<T>();
+    Object[] objs = context.locateServices(name);
+    if (objs != null) {
+      for (Object o : objs) {
+        result.add((T) o);
+      }
+    }
+    if ("commands".equals(name)) {
+      result.add((T) this);
+    }
+    return result;
+  }
 
   * For each Object on Set, get all methods with ``java.lang.reflect.Method[] methods = getClass().getMethods();``
-  
+
   * To invoke some ``java.lang.reflect.Method``, use reflection with ``invoke`` method
 
 Conclusion
@@ -205,13 +205,13 @@ Example::
   class DatabaseDynamicConfiguration implements DefaultDynamicConfiguration {
 
     DynPropertyList read() {
-    
+
       // Reads database.properties values and generates an object with given format
     }
-    
+
     void write(DynPropertyList dynProps) {
-    
-      // Update database.properties with values stored on the object in given format 
+
+      // Update database.properties with values stored on the object in given format
     }
   }
 
@@ -239,21 +239,45 @@ TODO
 * Future versions commands proposal
 
  * configuration file
- 
+
   * list: List all files managed by profile addon
-  * add: File to add to profile addon, no included by default 
+  * add: File to add to profile addon, no included by default
   * delete: Remove a file from profile addon
   * properties or info: Property values of a file
 
 * urlrewrite.xml not used from Roo 1.1.0.M3
 
+* Would be a good improvement to show the real name of the properties, if it's possible, instead of the XPATH of
+them. i.e:
+
+  ``/persistence/persistence-unit/properties/property[1][@name] => hibernate.dialect``
+
+* In the same way as commented before, don't show the XPATH of the values of the property we want to manage. i.e:
+
+  ``/persistence/persistence-unit/properties/property[1][@value] => is the value attribute of hibernate.dialect``
+
+* IMO when the error message is shown:
+
+  ::
+
+    Configuration not unactivated.
+    Active configuration has unsaved modifications, then you can:
+     * Undo project files modifications
+     * Update active configuration properties with 'configuration property update'
+     * Save active configuration with 'configuration save'
+     * Delete active configuration with 'configuration delete'
+
+  we should to try improve the message with a better information, if it's possible, to show which changes are
+  pending to save.
+
+
 References
 ==========
 
-* `Maven introduction to profiles`_ 
+* `Maven introduction to profiles`_
 
 .. _Maven introduction to profiles: http://maven.apache.org/guides/introduction/introduction-to-profiles.html
 
-* `Maven pom.xml profiles`_ 
+* `Maven pom.xml profiles`_
 
 .. _Maven pom.xml profiles: http://maven.apache.org/pom.html#Profiles
