@@ -31,16 +31,16 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.DefaultAnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
-import org.springframework.roo.classpath.operations.ClasspathOperations;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -65,234 +65,246 @@ import org.springframework.roo.support.util.Assert;
  */
 @Component(componentAbstract = true)
 public abstract class AnnotationClassDynamicConfiguration extends
-    AbstractItdMetadataProvider {
+        AbstractItdMetadataProvider {
 
-  private List<PhysicalTypeMetadata> types = new ArrayList<PhysicalTypeMetadata>();
+    private final List<PhysicalTypeMetadata> types = new ArrayList<PhysicalTypeMetadata>();
 
-  @Reference
-  private ClasspathOperations classpathOperations;
+    @Reference
+    private TypeLocationService typeLocationService;
 
-  private static final Logger logger = HandlerUtils
-      .getLogger(AnnotationClassDynamicConfiguration.class);
+    private static final Logger logger = HandlerUtils
+            .getLogger(AnnotationClassDynamicConfiguration.class);
 
-  /**
-   * Get the java type related to the annotation to include as dynamic configuration.
-   * 
-   * @return Annotation java type
-   */
-  protected abstract JavaType getAnnotationJavaType();
-  
-  /**
-   * Get the fully qualified type name of managed annotation. 
-   * 
-   * @return Fully qualified type name
-   */
-  protected String getAnnotationTypeName() {
-    
-    return getAnnotationJavaType().getFullyQualifiedTypeName();
-  }
+    /**
+     * Get the java type related to the annotation to include as dynamic
+     * configuration.
+     * 
+     * @return Annotation java type
+     */
+    protected abstract JavaType getAnnotationJavaType();
 
-  /**
-   * Add trigger for classes with some annotation.
-   * 
-   * @param context OSGi context
-   */
-  protected void activate(ComponentContext context) {
+    /**
+     * Get the fully qualified type name of managed annotation.
+     * 
+     * @return Fully qualified type name
+     */
+    protected String getAnnotationTypeName() {
 
-    metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
-        .getMetadataIdentiferType(), getProvidesType());
-    addMetadataTrigger(getAnnotationJavaType());
-  }
+        return getAnnotationJavaType().getFullyQualifiedTypeName();
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  @SuppressWarnings("unchecked")
-  public DynPropertyList read() {
+    /**
+     * Add trigger for classes with some annotation.
+     * 
+     * @param context
+     *            OSGi context
+     */
+    protected void activate(ComponentContext context) {
 
-    // List to include the dynamic property list from types
-    DynPropertyList dynProps = new DynPropertyList();
-    for (PhysicalTypeMetadata type : types) {
+        metadataDependencyRegistry.registerDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        addMetadataTrigger(getAnnotationJavaType());
+    }
 
-      // Get the annotation attributes from type
-      AnnotationMetadata annot = MemberFindingUtils.getTypeAnnotation(
-          ((ClassOrInterfaceTypeDetails) type.getPhysicalTypeDetails()),
-          getAnnotationJavaType());
-      List<JavaSymbolName> attrs = annot.getAttributeNames();
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    public DynPropertyList read() {
 
-      // Iterate all attributes to create their dynamic configuration
-      for (JavaSymbolName attr : attrs) {
+        // List to include the dynamic property list from types
+        DynPropertyList dynProps = new DynPropertyList();
+        for (PhysicalTypeMetadata type : types) {
 
-        // Dynamic property with attribute name and value
-        AnnotationAttributeValue value = annot
-            .getAttribute(new JavaSymbolName(attr.getSymbolName()));
-        
-        // Only annotation string attributes are considered
-        if (value instanceof StringAttributeValue) {
+            // Get the annotation attributes from type
+            AnnotationMetadata annot = MemberFindingUtils.getTypeAnnotation(
+                    (type.getMemberHoldingTypeDetails()),
+                    getAnnotationJavaType());
+            List<JavaSymbolName> attrs = annot.getAttributeNames();
 
-          dynProps.add(new DynProperty(type.getPhysicalTypeDetails().getName()
-              + "/" + annot.getAnnotationType() + "/" + attr.getSymbolName(),
-              (String)value.getValue()));
+            // Iterate all attributes to create their dynamic configuration
+            for (JavaSymbolName attr : attrs) {
+
+                // Dynamic property with attribute name and value
+                AnnotationAttributeValue value = annot
+                        .getAttribute(new JavaSymbolName(attr.getSymbolName()));
+
+                // Only annotation string attributes are considered
+                if (value instanceof StringAttributeValue) {
+
+                    dynProps.add(new DynProperty(type
+                            .getMemberHoldingTypeDetails().getName()
+                            + "/"
+                            + annot.getAnnotationType()
+                            + "/"
+                            + attr.getSymbolName(), (String) value.getValue()));
+                }
+            }
         }
-      }
+
+        return dynProps;
     }
 
-    return dynProps;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    public void write(DynPropertyList dynProps) {
 
-  /**
-   * {@inheritDoc}
-   */
-  @SuppressWarnings("unchecked")
-  public void write(DynPropertyList dynProps) {
+        // Iterate all dynamic properties to update java annotation attributes
+        for (DynProperty dynProp : dynProps) {
 
-    // Iterate all dynamic properties to update java annotation attributes
-    for (DynProperty dynProp : dynProps) {
+            // Dynamic property reference key
+            String key = dynProp.getKey();
 
-      // Dynamic property reference key
-      String key = dynProp.getKey();
+            // Obtain the java class from key
+            int javaEnd = key.indexOf("/");
+            String javaName = key.substring(0, javaEnd);
 
-      // Obtain the java class from key
-      int javaEnd = key.indexOf("/");
-      String javaName = key.substring(0, javaEnd);
-      
-      MutableClassOrInterfaceTypeDetails mutableClass = null;
-      List<AnnotationMetadata> annots = new ArrayList<AnnotationMetadata>();
-      try {
-        
-        JavaType javaType = new JavaType(javaName);
-        ClassOrInterfaceTypeDetails javaClass = classpathOperations
-            .getClassOrInterface(javaType);
+            MutableClassOrInterfaceTypeDetails mutableClass = null;
+            List<AnnotationMetadata> annots = new ArrayList<AnnotationMetadata>();
+            try {
 
-        // Check and get mutable instance
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-            javaClass, "Can't modify " + javaClass.getName());
-        mutableClass = (MutableClassOrInterfaceTypeDetails) javaClass;
-        annots = (List<AnnotationMetadata>)mutableClass.getTypeAnnotations();
-      }
-      catch (Exception e) {
+                JavaType javaType = new JavaType(javaName);
+                ClassOrInterfaceTypeDetails javaClass = typeLocationService
+                        .getClassOrInterface(javaType);
 
-        logger.log(Level.WARNING, "Class " + javaName
-            + " to update annotation attribute value not exists");
-        continue;
-      }
+                // Check and get mutable instance
+                Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+                        javaClass, "Can't modify " + javaClass.getName());
+                mutableClass = (MutableClassOrInterfaceTypeDetails) javaClass;
+                annots = mutableClass.getAnnotations();
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Class " + javaName
+                        + " to update annotation attribute value not exists");
+                continue;
+            }
 
-      // Get annotation and attribute name
-      int annotEnd = key.indexOf("/", javaEnd + 1);
-      String annotName = key.substring(javaEnd + 1, annotEnd);
-      String attrName = key.substring(annotEnd + 1, key.length());
-      
-      // Iterate all java class annotations
-      AnnotationMetadata annotation = null;
-      boolean exists = false;
-      for (AnnotationMetadata annot : annots) {
+            // Get annotation and attribute name
+            int annotEnd = key.indexOf("/", javaEnd + 1);
+            String annotName = key.substring(javaEnd + 1, annotEnd);
+            String attrName = key.substring(annotEnd + 1, key.length());
 
-        // If any java class annotation type equals to this class type
-        if (annot.getAnnotationType().equals(getAnnotationJavaType())) {
-          
-          if (annot.getAttribute(new JavaSymbolName(attrName)) == null) {
-          
-            // Referenced attribute not exists on annotation 
-            logger.log(Level.WARNING, "On class " + javaName
-                + " not exists the annotation attribute to update");
-          }
-          else {
-            
-            // Take the annotation with the attribute
-            annotation = annot;
-          }
-          
-          exists = true;
-          break;
+            // Iterate all java class annotations
+            AnnotationMetadata annotation = null;
+            boolean exists = false;
+            for (AnnotationMetadata annot : annots) {
+
+                // If any java class annotation type equals to this class type
+                if (annot.getAnnotationType().equals(getAnnotationJavaType())) {
+
+                    if (annot.getAttribute(new JavaSymbolName(attrName)) == null) {
+
+                        // Referenced attribute not exists on annotation
+                        logger.log(
+                                Level.WARNING,
+                                "On class "
+                                        + javaName
+                                        + " not exists the annotation attribute to update");
+                    } else {
+
+                        // Take the annotation with the attribute
+                        annotation = annot;
+                    }
+
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (!exists) {
+
+                // Referenced annotation not exists
+                logger.log(
+                        Level.WARNING,
+                        "On class "
+                                + javaName
+                                + " not exists the annotation to update the attribute value");
+            }
+
+            if (annotation != null) {
+
+                // Drop current annotation
+                mutableClass.removeTypeAnnotation(annotation
+                        .getAnnotationType());
+
+                // Add the same annotation with new attribute value
+                List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+                attrs.add(new StringAttributeValue(
+                        new JavaSymbolName(attrName), dynProp.getValue()));
+                AnnotationMetadataBuilder newAnnotBuilder = new AnnotationMetadataBuilder(
+                        new JavaType(annotName), attrs);
+                mutableClass.addTypeAnnotation(newAnnotBuilder.build());
+            }
         }
-      }
-      
-      if (!exists) {
-        
-        // Referenced annotation not exists
-        logger.log(Level.WARNING, "On class " + javaName
-            + " not exists the annotation to update the attribute value");
-      }
-      
-      if (annotation != null) {
-        
-        // Drop current annotation
-        mutableClass.removeTypeAnnotation(annotation.getAnnotationType());
-
-        // Add the same annotation with new attribute value
-        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
-        attrs.add(new StringAttributeValue(new JavaSymbolName(attrName),
-            dynProp.getValue()));
-        AnnotationMetadata newAnnot = new DefaultAnnotationMetadata(
-            new JavaType(annotName), attrs);
-        mutableClass.addTypeAnnotation(newAnnot);
-      }
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  protected ItdTypeDetailsProvidingMetadataItem getMetadata(
-                                                            String metadataId,
-                                                            JavaType type,
-                                                            PhysicalTypeMetadata metadata,
-                                                            String file) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ItdTypeDetailsProvidingMetadataItem getMetadata(
+            String metadataId, JavaType type, PhysicalTypeMetadata metadata,
+            String file) {
 
-    addTypeMetadata(metadata);
-    return null;
-  }
-
-  /**
-   * Registers classes with some annotation.
-   * 
-   * @param Metadata type to register
-   */
-  private void addTypeMetadata(PhysicalTypeMetadata type) {
-    
-    if (!this.types.contains(type)) {
-      this.types.add(type);
+        addTypeMetadata(metadata);
+        return null;
     }
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  protected String createLocalIdentifier(JavaType type, Path path) {
 
-    return PhysicalTypeIdentifierNamingUtils.createIdentifier(
-        getAnnotationTypeName(), type, path);
-  }
+    /**
+     * Registers classes with some annotation.
+     * 
+     * @param Metadata
+     *            type to register
+     */
+    private void addTypeMetadata(PhysicalTypeMetadata type) {
 
-  /**
-   * {@inheritDoc}
-   */
-  protected String getGovernorPhysicalTypeIdentifier(String metadataId) {
+        if (!this.types.contains(type)) {
+            this.types.add(type);
+        }
+    }
 
-    JavaType type = PhysicalTypeIdentifierNamingUtils.getJavaType(
-        getAnnotationTypeName(), metadataId);
-    Path path = PhysicalTypeIdentifierNamingUtils.getPath(
-        getAnnotationTypeName(), metadataId);
-    String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(
-        type, path);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String createLocalIdentifier(JavaType type, Path path) {
 
-    return physicalTypeIdentifier;
-  }
+        return PhysicalTypeIdentifierNamingUtils.createIdentifier(
+                getAnnotationTypeName(), type, path);
+    }
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getItdUniquenessFilenameSuffix() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getGovernorPhysicalTypeIdentifier(String metadataId) {
 
-    return getAnnotationTypeName();
-  }
+        JavaType type = PhysicalTypeIdentifierNamingUtils.getJavaType(
+                getAnnotationTypeName(), metadataId);
+        Path path = PhysicalTypeIdentifierNamingUtils.getPath(
+                getAnnotationTypeName(), metadataId);
+        String physicalTypeIdentifier = PhysicalTypeIdentifier
+                .createIdentifier(type, path);
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getProvidesType() {
+        return physicalTypeIdentifier;
+    }
 
-    return MetadataIdentificationUtils.create(getAnnotationTypeName());
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public String getItdUniquenessFilenameSuffix() {
+
+        return getAnnotationTypeName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getProvidesType() {
+
+        return MetadataIdentificationUtils.create(getAnnotationTypeName());
+    }
 
 }
