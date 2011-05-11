@@ -53,12 +53,12 @@
     <module>addon-web-theme</module>
     <module>addon-service</module>
     <module>addon-occ</module>
-    <module>addon-cit-security</module> 
+    <module>addon-cit-security</module>
+    <module>addon-dynamic-configuration</module>
     <!-- 
       <module>addon-web-exception-handler</module> 
       <module>addon-web-relation-styles</module> 
       <module>addon-web-mvc-binding</module> 
-      <module>addon-dynamic-configuration</module> 
       <module>annotations</module> 
     -->
   </modules>
