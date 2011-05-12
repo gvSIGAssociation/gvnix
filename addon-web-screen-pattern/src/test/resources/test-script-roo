@@ -23,4 +23,4 @@ field set --fieldName coches --type org.gvnix.test.relation.list.table.domain.Ca
 
 controller all --package org.gvnix.test.relation.list.table.web
 
-relationships setup table
+web screen

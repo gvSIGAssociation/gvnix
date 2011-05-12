@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.relation.styles.roo.addon;
+package org.gvnix.web.screen.roo.addon;
 
 /**
  * Interface of operations this add-on offers. Typically used by a command type 
