@@ -36,8 +36,9 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
@@ -48,7 +49,8 @@ import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.scanner.MemberDetails;
-import org.springframework.roo.classpath.scanner.MemberDetailsImpl;
+import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
+import org.springframework.roo.classpath.scanner.MemberDetailsScannerImpl;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
@@ -76,68 +78,90 @@ import org.w3c.dom.Node;
  * Listens for {@link WebScaffoldMetadata} and produces JSPs when requested by
  * that metadata.
  * 
- * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
- * @author Enrique Ruiz (eruiz at disid dot com) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
+ *         Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * @author Enrique Ruiz (eruiz at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 @Component(immediate = true)
 @Service
 public class ScreenMetadataListener implements // MetadataProvider,
-	MetadataNotificationListener {
+        MetadataNotificationListener {
 
-    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference
+    private MetadataDependencyRegistry metadataDependencyRegistry;
 
-    @Reference private MetadataService metadataService;
+    @Reference
+    private MetadataService metadataService;
 
-    @Reference private FileManager fileManager;
+    @Reference
+    private FileManager fileManager;
 
-    @Reference private PathResolver pathResolver;
+    @Reference
+    private PathResolver pathResolver;
 
-    @Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    @Reference
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
-    @Reference private ProcessManagerStatusProvider processManagerStatus;
+    @Reference
+    private ProcessManagerStatusProvider processManagerStatus;
 
-    @Reference private ScreenOperations operations;
+    @Reference
+    private ScreenOperations operations;
 
     private StatusListener statusListener;
 
     private WebScaffoldMetadata webScaffoldMetadata;
 
+    private EntityMetadata entityMetadata;
+
     private ComponentContext context;
 
-    private Set<String> upstreamDependencyList = new HashSet<String>();
+    private final Set<String> upstreamDependencyList = new HashSet<String>();
 
     private static Logger logger = Logger
-	    .getLogger(ScreenMetadataListener.class.getName());
+            .getLogger(ScreenMetadataListener.class.getName());
 
     protected void activate(ComponentContext context) {
-	this.context = context;
-	metadataDependencyRegistry.addNotificationListener(this);
-	statusListener = new StatusListener(this);
-	processManagerStatus.addProcessManagerStatusListener(statusListener);
+        this.context = context;
+        metadataDependencyRegistry.addNotificationListener(this);
+        statusListener = new StatusListener(this);
+        processManagerStatus.addProcessManagerStatusListener(statusListener);
     }
 
     /** {@inheritDoc} */
     public void notify(String upstreamDependency, String downstreamDependency) {
 
-	if (!operations.isProjectAvailable()
-		|| !operations.isSpringMvcProject()
-		|| !operations.isActivated()) {
-	    return;
-	}
+        if (!operations.isProjectAvailable()
+                || !operations.isSpringMvcProject()
+                || !operations.isActivated()) {
+            return;
+        }
 
-	// DiSiD: Refactor to see upstreanMetadata and metadata, replace JspMetadata with PhysicalTypeIdentifier and check Controller sufix exists
-	String upstreamMetadata = MetadataIdentificationUtils.getMetadataClass(upstreamDependency);
-	String metadata = MetadataIdentificationUtils.getMetadataClass(PhysicalTypeIdentifier.getMetadataIdentiferType());
-	if (upstreamMetadata.equals(metadata) && upstreamDependency.endsWith("Controller")) {
-//	if (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
-//		.equals(
-//			MetadataIdentificationUtils
-//				.getMetadataClass(JspMetadata
-//					.getMetadataIdentiferType()))) {
+        // DiSiD: Refactor to see upstreanMetadata and metadata, replace
+        // JspMetadata with PhysicalTypeIdentifier and check Controller sufix
+        // exists
+        String upstreamMetadata = MetadataIdentificationUtils
+                .getMetadataClass(upstreamDependency);
+        String metadata = MetadataIdentificationUtils
+                .getMetadataClass(PhysicalTypeIdentifier
+                        .getMetadataIdentiferType());
+        if (upstreamMetadata.equals(metadata)
+                && upstreamDependency.endsWith("Controller")) {
+            // if
+            // (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
+            // .equals(
+            // MetadataIdentificationUtils
+            // .getMetadataClass(JspMetadata
+            // .getMetadataIdentiferType()))) {
 
-	    // Add upstreamDependency to a Stack.
-	    upstreamDependencyList.add(upstreamDependency);
-	}
+            // Add upstreamDependency to a Stack.
+            upstreamDependencyList.add(upstreamDependency);
+        }
 
     }
 
@@ -146,55 +170,55 @@ public class ScreenMetadataListener implements // MetadataProvider,
      */
     private boolean writeToDiskIfNecessary(String jspFilename, Document proposed) {
 
-	String controllerPath = webScaffoldMetadata.getAnnotationValues()
-		.getPath();
+        String controllerPath = webScaffoldMetadata.getAnnotationValues()
+                .getPath();
 
-	if (controllerPath.startsWith("/")) {
-	    controllerPath = controllerPath.substring(1);
-	}
+        if (controllerPath.startsWith("/")) {
+            controllerPath = controllerPath.substring(1);
+        }
 
-	String jspxPath = pathResolver
-		.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/views/"
-			+ controllerPath + "/" + jspFilename + ".jspx");
+        String jspxPath = pathResolver
+                .getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/views/"
+                        + controllerPath + "/" + jspFilename + ".jspx");
 
-	Assert.isTrue(fileManager.exists(jspxPath), jspFilename
-		+ ".jspx not found");
+        Assert.isTrue(fileManager.exists(jspxPath), jspFilename
+                + ".jspx not found");
 
-	ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-	XmlUtils.writeXml(XmlUtils.createIndentingTransformer(),
-		byteArrayOutputStream, proposed);
-	String proposedString = byteArrayOutputStream.toString();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        XmlUtils.writeXml(XmlUtils.createIndentingTransformer(),
+                byteArrayOutputStream, proposed);
+        String proposedString = byteArrayOutputStream.toString();
 
-	MutableFile mutableFile = null;
-	if (fileManager.exists(jspxPath)) {
-	    String originalString = null;
+        MutableFile mutableFile = null;
+        if (fileManager.exists(jspxPath)) {
+            String originalString = null;
 
-	    try {
-		originalString = FileCopyUtils.copyToString(new FileReader(
-			jspxPath));
-	    } catch (Exception e) {
-		throw new IllegalStateException("Could not get the file:\t'"
-			+ jspxPath + "'", e.getCause());
-	    }
+            try {
+                originalString = FileCopyUtils.copyToString(new FileReader(
+                        jspxPath));
+            } catch (Exception e) {
+                throw new IllegalStateException("Could not get the file:\t'"
+                        + jspxPath + "'", e.getCause());
+            }
 
-	    if (!proposedString.equals(originalString)) {
-		mutableFile = fileManager.updateFile(jspxPath);
-	    }
+            if (!proposedString.equals(originalString)) {
+                mutableFile = fileManager.updateFile(jspxPath);
+            }
 
-	    try {
-		if (mutableFile != null) {
+            try {
+                if (mutableFile != null) {
 
-		    FileCopyUtils.copy(proposedString, new OutputStreamWriter(
-			    mutableFile.getOutputStream()));
-		    fileManager.scan();
-		}
-	    } catch (IOException ioe) {
-		throw new IllegalStateException("Could not output '"
-			+ mutableFile.getCanonicalPath() + "'", ioe);
-	    }
-	}
+                    FileCopyUtils.copy(proposedString, new OutputStreamWriter(
+                            mutableFile.getOutputStream()));
+                    fileManager.scan();
+                }
+            } catch (IOException ioe) {
+                throw new IllegalStateException("Could not output '"
+                        + mutableFile.getCanonicalPath() + "'", ioe);
+            }
+        }
 
-	return true;
+        return true;
     }
 
     /**
@@ -211,65 +235,85 @@ public class ScreenMetadataListener implements // MetadataProvider,
      *         ArrayList.
      */
     private List<FieldMetadata> getAnnotatedFields(String upstreamDependency,
-	    String annotationPath) {
+            String annotationPath) {
 
-	// DiSiD: Use PhysicalTypeIdentifier instead of JspMetadata
-	JavaType javaType = PhysicalTypeIdentifier.getJavaType(upstreamDependency);
-	Path webPath = PhysicalTypeIdentifier.getPath(upstreamDependency);
-//	JavaType javaType = JspMetadata.getJavaType(upstreamDependency);
-//	Path webPath = JspMetadata.getPath(upstreamDependency);
-	
-	String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
-		javaType, webPath);
-	WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
-		.get(webScaffoldMetadataKey);
+        // DiSiD: Use PhysicalTypeIdentifier instead of JspMetadata
+        JavaType javaType = PhysicalTypeIdentifier
+                .getJavaType(upstreamDependency);
+        Path webPath = PhysicalTypeIdentifier.getPath(upstreamDependency);
+        // JavaType javaType = JspMetadata.getJavaType(upstreamDependency);
+        // Path webPath = JspMetadata.getPath(upstreamDependency);
 
-	this.webScaffoldMetadata = webScaffoldMetadata;
+        String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
+                javaType, webPath);
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+                .get(webScaffoldMetadataKey);
 
-	// DiSiD: Get BeanInfoMetadata from form backing object annotation because getIdentifierForBeanInfoMetadata method removed
-	WebScaffoldAnnotationValues annotationValues = webScaffoldMetadata.getAnnotationValues();
-	JavaType backingObject = annotationValues.getFormBackingObject();
-	String beanInfoMetadataKey = BeanInfoMetadata.createIdentifier(backingObject, webPath);
-	BeanInfoMetadata beanInfoMetadata = (BeanInfoMetadata) metadataService
-	.get(beanInfoMetadataKey);
-	// BeanInfoMetadata
-//	String beanInfoMetadataKey = webScaffoldMetadata
-//		.getIdentifierForBeanInfoMetadata();
-//	BeanInfoMetadata beanInfoMetadata = (BeanInfoMetadata) metadataService
-//		.get(beanInfoMetadataKey);
+        this.webScaffoldMetadata = webScaffoldMetadata;
 
-	this.beanInfoMetadata = beanInfoMetadata;
+        // DiSiD: Get BeanInfoMetadata from form backing object annotation
+        // because getIdentifierForBeanInfoMetadata method removed
+        WebScaffoldAnnotationValues annotationValues = webScaffoldMetadata
+                .getAnnotationValues();
+        JavaType backingObject = annotationValues.getFormBackingObject();
 
-	// DiSiD: Not set entityMetadata because getIdentifierForEntityMetadata method removed and never used now
-	// Retrieve Controller Entity
-//	String entityMetadataInfo = webScaffoldMetadata
-//		.getIdentifierForEntityMetadata();
-//	JavaType entityJavaType = EntityMetadata
-//		.getJavaType(entityMetadataInfo);
-//	Path path = EntityMetadata.getPath(entityMetadataInfo);
-//	String entityMetadataKey = EntityMetadata.createIdentifier(
-//		entityJavaType, path);
-//	EntityMetadata entityMetadata = (EntityMetadata) metadataService
-//		.get(entityMetadataKey);
-//	this.entityMetadata = entityMetadata;
-	// We need to abort if we couldn't find dependent metadata
-//	if (beanInfoMetadata == null || !beanInfoMetadata.isValid()
-//		|| entityMetadata == null || !entityMetadata.isValid()) {
-//	    // Can't get hold of the entity we are needing to build JSPs for
-//	    return null;
-//	}
-	
-	// DiSiD: Roo uses now getMemberHoldingTypeDetails instead of getItdTypeDetails to get type details and obtained from beanInfoMetadata instead from entityMetadata
-//	DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
-//		.getItdTypeDetails();
-	DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) beanInfoMetadata.getMemberHoldingTypeDetails();
+        entityMetadata = (EntityMetadata) metadataService.get(EntityMetadata
+                .createIdentifier(backingObject, webPath));
 
-	// Retrieve the fields that are defined as OneToMany relationship.
-	List<FieldMetadata> fieldMetadataList = MemberFindingUtils
-		.getFieldsWithAnnotation(defaultItdTypeDetails.getGovernor(),
-			new JavaType(annotationPath));
+        // TODO: orovira comentadas siguientes dos lineas
+        // String beanInfoMetadataKey = BeanInfoMetadata.createIdentifier(
+        // backingObject, webPath);
+        // BeanInfoMetadata beanInfoMetadata = (BeanInfoMetadata)
+        // metadataService
+        // .get(beanInfoMetadataKey);
+        // BeanInfoMetadata
+        // String beanInfoMetadataKey = webScaffoldMetadata
+        // .getIdentifierForBeanInfoMetadata();
+        // BeanInfoMetadata beanInfoMetadata = (BeanInfoMetadata)
+        // metadataService
+        // .get(beanInfoMetadataKey);
 
-	return fieldMetadataList;
+        // TODO: orovira comentada siguientes linea
+        // this.beanInfoMetadata = beanInfoMetadata;
+
+        // DiSiD: Not set entityMetadata because getIdentifierForEntityMetadata
+        // method removed and never used now
+        // Retrieve Controller Entity
+        // String entityMetadataInfo = webScaffoldMetadata
+        // .getIdentifierForEntityMetadata();
+        // JavaType entityJavaType = EntityMetadata
+        // .getJavaType(entityMetadataInfo);
+        // Path path = EntityMetadata.getPath(entityMetadataInfo);
+        // String entityMetadataKey = EntityMetadata.createIdentifier(
+        // entityJavaType, path);
+        // EntityMetadata entityMetadata = (EntityMetadata) metadataService
+        // .get(entityMetadataKey);
+        // this.entityMetadata = entityMetadata;
+        // We need to abort if we couldn't find dependent metadata
+        // if (beanInfoMetadata == null || !beanInfoMetadata.isValid()
+        // || entityMetadata == null || !entityMetadata.isValid()) {
+        // // Can't get hold of the entity we are needing to build JSPs for
+        // return null;
+        // }
+
+        // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of
+        // getItdTypeDetails to get type details and obtained from
+        // beanInfoMetadata instead from entityMetadata
+        // DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails)
+        // entityMetadata
+        // .getItdTypeDetails();
+        DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
+                .getMemberHoldingTypeDetails();
+        // TODO: orovira comentada siguiente linea
+        // (DefaultItdTypeDetails)
+        // beanInfoMetadata.getMemberHoldingTypeDetails();
+
+        // Retrieve the fields that are defined as OneToMany relationship.
+        List<FieldMetadata> fieldMetadataList = MemberFindingUtils
+                .getFieldsWithAnnotation(defaultItdTypeDetails.getGovernor(),
+                        new JavaType(annotationPath));
+
+        return fieldMetadataList;
     }
 
     /**
@@ -287,277 +331,316 @@ public class ScreenMetadataListener implements // MetadataProvider,
      * @return Updated Document with the new fields.
      */
     private Document updateView(String viewName,
-	    List<FieldMetadata> oneToManyFieldMetadatas,
-	    String selectedDecorator) {
+            List<FieldMetadata> oneToManyFieldMetadatas,
+            String selectedDecorator) {
 
-	// DiSiD: Roo uses now getMemberHoldingTypeDetails instead of getItdTypeDetails to get type details and obtained from beanInfoMetadata instead from entityMetadata
-//	DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
-//		.getItdTypeDetails();
-	DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) beanInfoMetadata.getMemberHoldingTypeDetails();
-	
-	String entityName = defaultItdTypeDetails.getGovernor().getName()
-		.getSimpleTypeName();
+        // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of
+        // getItdTypeDetails to get type details and obtained from
+        // beanInfoMetadata instead from entityMetadata
+        // DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails)
+        // entityMetadata
+        // .getItdTypeDetails();
+        DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
+                .getMemberHoldingTypeDetails();
+        // (DefaultItdTypeDetails)
+        // beanInfoMetadata.getMemberHoldingTypeDetails();
 
-	String controllerPath = webScaffoldMetadata.getAnnotationValues()
-		.getPath();
+        String entityName = defaultItdTypeDetails.getGovernor().getName()
+                .getSimpleTypeName();
 
-	if (controllerPath.startsWith("/")) {
-	    controllerPath = controllerPath.substring(1);
-	}
+        String controllerPath = webScaffoldMetadata.getAnnotationValues()
+                .getPath();
 
-	String jspxPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-		"WEB-INF/views/" + controllerPath + "/" + viewName + ".jspx");
+        if (controllerPath.startsWith("/")) {
+            controllerPath = controllerPath.substring(1);
+        }
 
-	Assert.isTrue(fileManager.exists(jspxPath), viewName
-		+ ".jspx not found");
+        String jspxPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "WEB-INF/views/" + controllerPath + "/" + viewName + ".jspx");
 
-	Document jspxView;
+        Assert.isTrue(fileManager.exists(jspxPath), viewName
+                + ".jspx not found");
 
-	try {
-	    jspxView = XmlUtils.getDocumentBuilder().parse(
-		    fileManager.getInputStream(jspxPath));
-	} catch (Exception e) {
-	    throw new IllegalStateException(e);
-	}
-	Element documentRoot = jspxView.getDocumentElement();
+        Document jspxView;
 
-	// Loop for each OneToMany field.
+        try {
+            jspxView = XmlUtils.getDocumentBuilder().parse(
+                    fileManager.getInputStream(jspxPath));
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        Element documentRoot = jspxView.getDocumentElement();
 
-	Element defaultField = null;
+        // Loop for each OneToMany field.
 
-	// Views to create.
-	Element oldGroupViews = null;
-	Element groupViews = null;
-	Element views = null;
+        Element defaultField = null;
 
-	Element divView = XmlUtils.findFirstElement("/div", documentRoot);
-	Assert.isTrue(divView != null, "There is no div tagx defined in "
-		+ viewName + ".jspx.");
+        // Views to create.
+        Element oldGroupViews = null;
+        Element groupViews = null;
+        Element views = null;
 
-	// Add the new view if doesn't exists
-	oldGroupViews = XmlUtils.findFirstElement("/div/" + selectedDecorator
-		+ "[@id='relations']", documentRoot);
+        Element divView = XmlUtils.findFirstElement("/div", documentRoot);
+        Assert.isTrue(divView != null, "There is no div tagx defined in "
+                + viewName + ".jspx.");
 
-	// There aren't relationships to update or remove.
-	if (oneToManyFieldMetadatas.isEmpty() && oldGroupViews == null) {
-	    return null;
-	} else
-	// It doesn't have relationships. Remove old relation views and
-	// attributes.
-	if (oneToManyFieldMetadatas.isEmpty() && oldGroupViews != null) {
+        // Add the new view if doesn't exists
+        oldGroupViews = XmlUtils.findFirstElement("/div/" + selectedDecorator
+                + "[@id='relations']", documentRoot);
 
-	    divView.removeAttribute("xmlns:relations");
-	    divView.removeAttribute("xmlns:relation");
-	    divView.removeAttribute("xmlns:table");
+        // There aren't relationships to update or remove.
+        if (oneToManyFieldMetadatas.isEmpty() && oldGroupViews == null) {
+            return null;
+        } else
+        // It doesn't have relationships. Remove old relation views and
+        // attributes.
+        if (oneToManyFieldMetadatas.isEmpty() && oldGroupViews != null) {
 
-	    oldGroupViews.getParentNode().removeChild(oldGroupViews);
+            divView.removeAttribute("xmlns:relations");
+            divView.removeAttribute("xmlns:relation");
+            divView.removeAttribute("xmlns:table");
 
-	    return jspxView;
-	}
+            oldGroupViews.getParentNode().removeChild(oldGroupViews);
 
-	// Create element for group views.
-	// relations="urn:jsptagdir:/WEB-INF/tags/relations"
-	if (oldGroupViews == null) {
+            return jspxView;
+        }
 
-	    // Add tagx attributes to div bean.
-	    divView.setAttribute("xmlns:relations",
-		    "urn:jsptagdir:/WEB-INF/tags/relations");
-	    divView.setAttribute("xmlns:relation",
-		    "urn:jsptagdir:/WEB-INF/tags/relations/decorators");
-	    divView.setAttribute("xmlns:table",
-		    "urn:jsptagdir:/WEB-INF/tags/form/fields");
+        // Create element for group views.
+        // relations="urn:jsptagdir:/WEB-INF/tags/relations"
+        if (oldGroupViews == null) {
 
-	}
+            // Add tagx attributes to div bean.
+            divView.setAttribute("xmlns:relations",
+                    "urn:jsptagdir:/WEB-INF/tags/relations");
+            divView.setAttribute("xmlns:relation",
+                    "urn:jsptagdir:/WEB-INF/tags/relations/decorators");
+            divView.setAttribute("xmlns:table",
+                    "urn:jsptagdir:/WEB-INF/tags/form/fields");
 
-	// Create group views.
-	groupViews = new XmlElementBuilder("relations:" + selectedDecorator,
-		jspxView).addAttribute("id", "relations").build();
+        }
 
-	WebScaffoldMetadata relatedWebScaffoldMetadata;
+        // Create group views.
+        groupViews = new XmlElementBuilder("relations:" + selectedDecorator,
+                jspxView).addAttribute("id", "relations").build();
 
-	// Show initialized table properties.
-	String create = "false";
-	String delete = "false";
-	String update = "false";
+        WebScaffoldMetadata relatedWebScaffoldMetadata;
 
-	String z = "user-managed";
+        // Show initialized table properties.
+        String create = "false";
+        String delete = "false";
+        String update = "false";
 
-	// Add the relationship views.
-	for (FieldMetadata fieldMetadata : oneToManyFieldMetadatas) {
+        String z = "user-managed";
 
-	    if (viewName.compareTo("show") == 0) {
+        // Add the relationship views.
+        for (FieldMetadata fieldMetadata : oneToManyFieldMetadatas) {
 
-		defaultField = XmlUtils.findFirstElement(
-			"/div/show/display[@field='"
-				+ fieldMetadata.getFieldName() + "']",
-			documentRoot);
-		delete = "false";
-	    } else if (viewName.compareTo("update") == 0) {
-		defaultField = XmlUtils.findFirstElement(
-			"/div/update/simple[@field='"
-				+ fieldMetadata.getFieldName() + "']",
-			documentRoot);
-		delete = "true";
-	    }
+            if (viewName.compareTo("show") == 0) {
 
-	    if ((defaultField != null)
-		    && ((defaultField.getAttribute("render").compareTo("") == 0) || (defaultField
-			    .getAttribute("render").compareTo("true") == 0))) {
-		// Don't show the default view of relationship.
-		defaultField.setAttribute("render", "false");
-		defaultField.setAttribute("z", z);
-	    }
+                defaultField = XmlUtils.findFirstElement(
+                        "/div/show/display[@field='"
+                                + fieldMetadata.getFieldName() + "']",
+                        documentRoot);
+                delete = "false";
+            } else if (viewName.compareTo("update") == 0) {
+                defaultField = XmlUtils.findFirstElement(
+                        "/div/update/simple[@field='"
+                                + fieldMetadata.getFieldName() + "']",
+                        documentRoot);
+                delete = "true";
+            }
 
-	    // Retrieve Related Entities Metadata
-	    JavaType relationshipJavaType = fieldMetadata.getFieldType();
-	    // ignoring java.util.Map field types (see ROO-194)
-	    if (relationshipJavaType.getFullyQualifiedTypeName().equals(
-		    Set.class.getName())) {
+            if ((defaultField != null)
+                    && ((defaultField.getAttribute("render").compareTo("") == 0) || (defaultField
+                            .getAttribute("render").compareTo("true") == 0))) {
+                // Don't show the default view of relationship.
+                defaultField.setAttribute("render", "false");
+                defaultField.setAttribute("z", z);
+            }
 
-		Assert
-			.isTrue(
-				relationshipJavaType.getParameters().size() == 1,
-				"A set is defined without specification of its type (via generics) - unable to create view for it");
-	    }
+            // Retrieve Related Entities Metadata
+            JavaType relationshipJavaType = fieldMetadata.getFieldType();
+            // ignoring java.util.Map field types (see ROO-194)
+            if (relationshipJavaType.getFullyQualifiedTypeName().equals(
+                    Set.class.getName())) {
 
-	    relationshipJavaType = relationshipJavaType.getParameters().get(0);
-	    
-	    // TODO No WebScaffoldMetadata can be obtained error; then no create, delete, update and path 
-	    relatedWebScaffoldMetadata = getRelatedEntityWebScaffoldMetadata(relationshipJavaType);
+                Assert.isTrue(
+                        relationshipJavaType.getParameters().size() == 1,
+                        "A set is defined without specification of its type (via generics) - unable to create view for it");
+            }
 
-	    // Check if exists the path.
-	    String path;
+            relationshipJavaType = relationshipJavaType.getParameters().get(0);
 
-	    // If doesn't exist related controller to entity relation.
-	    // Don't enable table action properties.
-	    if (relatedWebScaffoldMetadata == null) {
-		create = "false";
-		delete = "false";
-		update = "false";
-		path = "/";
-	    } else {
-		create = "true";
-		update = "true";
-		path = "/".concat(relatedWebScaffoldMetadata
-			.getAnnotationValues().getPath());
-	    }
+            // TODO No WebScaffoldMetadata can be obtained error; then no
+            // create, delete, update and path
+            relatedWebScaffoldMetadata = getRelatedEntityWebScaffoldMetadata(relationshipJavaType);
 
-	    String propertyName = fieldMetadata.getFieldName().getSymbolName();
+            // Check if exists the path.
+            String path;
 
-	    views = new XmlElementBuilder("relation:".concat(selectedDecorator)
-		    .concat("view"), jspxView).addAttribute(
-		    "data",
-		    "${".concat(StringUtils.uncapitalize(entityName)).concat(
-			    "}")).addAttribute(
-		    "id",
-		    
-		    // DiSiD: Roo now uses '_' separator instead of '.' on i18n tags
-		    // TODO Unify i18n tags generation method
-		    "s_".concat(
-			    beanInfoMetadata.getJavaBean()
-				    .getFullyQualifiedTypeName()).concat(".")
-			    .concat(propertyName).replace('.', '_')).addAttribute("field",
-//		    "s:".concat(
-//			    beanInfoMetadata.getJavaBean()
-//				    .getFullyQualifiedTypeName()).concat(".")
-//			    .concat(propertyName)).addAttribute("field",
-				    
-		    fieldMetadata.getFieldName().getSymbolName()).addAttribute(
-		    "fieldId",
-		    
-		    // DiSiD: Roo now uses '_' separator instead of '.' on i18n tags
-		    "l_".concat(
-			    beanInfoMetadata.getJavaBean()
-			    .getFullyQualifiedTypeName()).concat(".")
-			    .concat(propertyName).replace('.', '_')).addAttribute("messageCode",
-			    "entity_reference_not_managed").addAttribute(
-//		    "l:".concat(
-//			    beanInfoMetadata.getJavaBean()
-//				    .getFullyQualifiedTypeName()).concat(".")
-//			    .concat(propertyName)).addAttribute("messageCode",			    
-//		    "entity.reference.not.managed").addAttribute(
-				    
-		    "messageCodeAttribute", entityName).addAttribute("path",
-		    path).addAttribute("delete", delete).addAttribute("create",
-		    create).addAttribute("update", update).addAttribute(
-		    "dataResult", propertyName.concat("list")).addAttribute(
-		    "relatedEntitySet",
-		    "${".concat(StringUtils.uncapitalize(entityName)).concat(
-			    ".").concat(propertyName).concat("}")).build();
+            // If doesn't exist related controller to entity relation.
+            // Don't enable table action properties.
+            if (relatedWebScaffoldMetadata == null) {
+                create = "false";
+                delete = "false";
+                update = "false";
+                path = "/";
+            } else {
+                create = "true";
+                update = "true";
+                path = "/".concat(relatedWebScaffoldMetadata
+                        .getAnnotationValues().getPath());
+            }
 
-	    // Create column fields and group the elements created.
+            String entityFullyQualifiedTypeName = defaultItdTypeDetails
+                    .getGovernor().getName().getFullyQualifiedTypeName();
 
-	    String idEntityMetadata = physicalTypeMetadataProvider
-		    .findIdentifier(relationshipJavaType);
+            String propertyName = fieldMetadata.getFieldName().getSymbolName();
 
-	    // DiSiD: Roo uses now metadataService instead of scan all to get metadata
-//	    Set<MetadataItem> metadata = itdMetadataScanner
-//		    .getMetadata(idEntityMetadata);
-//
-//	    BeanInfoMetadata relatedBeanInfoMetadata = null;
-//
-//	    for (MetadataItem item : metadata) {
-//		if (item instanceof BeanInfoMetadata) {
-//		    relatedBeanInfoMetadata = (BeanInfoMetadata) item;
-//		    break;
-//		}
-//	    }
-	    
-	    // DiSiD: Use BeanInfoMetadata instead of JavaParserClassMetadata to avoid cast error 
-	    JavaParserClassMetadata relatedBeanInfoMetadata = (JavaParserClassMetadata)metadataService.get(idEntityMetadata);
-//	    BeanInfoMetadata relatedBeanInfoMetadata = (BeanInfoMetadata)metadataService.get(idEntityMetadata);
+            views = new XmlElementBuilder("relation:".concat(selectedDecorator)
+                    .concat("view"), jspxView)
+                    .addAttribute(
+                            "data",
+                            "${".concat(StringUtils.uncapitalize(entityName))
+                                    .concat("}"))
+                    .addAttribute("id",
 
-	    Assert.notNull(relatedBeanInfoMetadata,
-		    "There is no metadata related for this identifier:\t"
-			    + idEntityMetadata);
+                    // DiSiD: Roo now uses '_' separator instead of '.' on i18n
+                    // tags
+                    // TODO Unify i18n tags generation method
+                            "s_".concat(
+                            /*
+                             * beanInfoMetadata.getJavaBean()
+                             * .getFullyQualifiedTypeName()
+                             */
+                            entityFullyQualifiedTypeName).concat(".")
+                                    .concat(propertyName).replace('.', '_'))
+                    .addAttribute("field",
+                    // "s:".concat(
+                    // beanInfoMetadata.getJavaBean()
+                    // .getFullyQualifiedTypeName()).concat(".")
+                    // .concat(propertyName)).addAttribute("field",
 
-	    List<FieldMetadata> fieldMetadataList = getElegibleFields(relatedBeanInfoMetadata);
-	    Element columnField;
+                            fieldMetadata.getFieldName().getSymbolName())
+                    .addAttribute("fieldId",
 
-	    // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of getItdTypeDetails to get type details
-//	    String relatedEntityClassName = relatedBeanInfoMetadata
-//		    .getItdTypeDetails().getName().getFullyQualifiedTypeName();
-	    String relatedEntityClassName = relatedBeanInfoMetadata.getMemberHoldingTypeDetails().getName().getFullyQualifiedTypeName();
-	    
-	    String property;
+                    // DiSiD: Roo now uses '_' separator instead of '.'
+                    // on i18n tags
+                            "l_".concat(
+                            /*
+                             * beanInfoMetadata.getJavaBean()
+                             * .getFullyQualifiedTypeName()
+                             */
+                            entityFullyQualifiedTypeName).concat(".")
+                                    .concat(propertyName).replace('.', '_'))
+                    .addAttribute("messageCode", "entity_reference_not_managed")
+                    .addAttribute(
+                    // "l:".concat(
+                    // beanInfoMetadata.getJavaBean()
+                    // .getFullyQualifiedTypeName()).concat(".")
+                    // .concat(propertyName)).addAttribute("messageCode",
+                    // "entity.reference.not.managed").addAttribute(
 
-	    for (FieldMetadata relatedEntityfieldMetadata : fieldMetadataList) {
+                            "messageCodeAttribute", entityName)
+                    .addAttribute("path", path)
+                    .addAttribute("delete", delete)
+                    .addAttribute("create", create)
+                    .addAttribute("update", update)
+                    .addAttribute("dataResult", propertyName.concat("list"))
+                    .addAttribute(
+                            "relatedEntitySet",
+                            "${".concat(StringUtils.uncapitalize(entityName))
+                                    .concat(".").concat(propertyName)
+                                    .concat("}")).build();
 
-		property = relatedEntityfieldMetadata.getFieldName()
-			.getSymbolName();
-		columnField = new XmlElementBuilder("table:column", jspxView)
-			.addAttribute(
-				"id",
-				
-				// TODO DiSiD: Roo now uses '_' separator instead of '.' on i18n tags
-				"s_".concat(relatedEntityClassName.concat(".")
-					.concat(property).replace('.', '_'))).addAttribute(
-				"property", property).addAttribute("z", z)
-//				"s:".concat(relatedEntityClassName.concat(".")
-//					.concat(property))).addAttribute(
-//				"property", property).addAttribute("z", z)
-				
-			.build();
+            // Create column fields and group the elements created.
 
-		views.appendChild(columnField);
-	    }
+            String idEntityMetadata = physicalTypeMetadataProvider
+                    .findIdentifier(relationshipJavaType);
 
-	    groupViews.appendChild(views);
-	}
+            // DiSiD: Roo uses now metadataService instead of scan all to get
+            // metadata
+            // Set<MetadataItem> metadata = itdMetadataScanner
+            // .getMetadata(idEntityMetadata);
+            //
+            // BeanInfoMetadata relatedBeanInfoMetadata = null;
+            //
+            // for (MetadataItem item : metadata) {
+            // if (item instanceof BeanInfoMetadata) {
+            // relatedBeanInfoMetadata = (BeanInfoMetadata) item;
+            // break;
+            // }
+            // }
 
-	if (oldGroupViews == null) {
-	    jspxView.getLastChild().appendChild(groupViews);
-	    
-	    // DiSiD: Overwrite relation table position to avoid invisibility 
-	    // TODO Move inline style to a addon new CSS file
-	    Node style = documentRoot.getOwnerDocument().createElement("style");
-	    style.setTextContent("body .dijitAlignClient {position: relative;}");
-	    jspxView.getLastChild().appendChild(style);
-	    
-	} else {
-	oldGroupViews.getParentNode().replaceChild(groupViews, oldGroupViews);
-	}
-	return jspxView;
+            // DiSiD: Use BeanInfoMetadata instead of JavaParserClassMetadata to
+            // avoid cast error
+            EntityMetadata relatedEntityMetadata = (EntityMetadata) metadataService
+                    .get(idEntityMetadata);
+            // JavaParserClassMetadata relatedBeanInfoMetadata =
+            // (JavaParserClassMetadata) metadataService
+            // .get(idEntityMetadata);
+
+            // BeanInfoMetadata relatedBeanInfoMetadata =
+            // (BeanInfoMetadata)metadataService.get(idEntityMetadata);
+
+            Assert.notNull(/* relatedBeanInfoMetadata */relatedEntityMetadata,
+                    "There is no metadata related for this identifier:\t"
+                            + idEntityMetadata);
+
+            List<FieldMetadata> fieldMetadataList = getElegibleFields(
+            /* relatedBeanInfoMetadata */relatedEntityMetadata,
+                    relationshipJavaType);
+            Element columnField;
+
+            // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of
+            // getItdTypeDetails to get type details
+            // String relatedEntityClassName = relatedBeanInfoMetadata
+            // .getItdTypeDetails().getName().getFullyQualifiedTypeName();
+            String relatedEntityClassName = /* relatedBeanInfoMetadata */relatedEntityMetadata
+                    .getMemberHoldingTypeDetails().getName()
+                    .getFullyQualifiedTypeName();
+
+            String property;
+
+            for (FieldMetadata relatedEntityfieldMetadata : fieldMetadataList) {
+
+                property = relatedEntityfieldMetadata.getFieldName()
+                        .getSymbolName();
+                columnField = new XmlElementBuilder("table:column", jspxView)
+                        .addAttribute("id",
+
+                        // TODO DiSiD: Roo now uses '_' separator
+                        // instead of '.' on i18n tags
+                                "s_".concat(relatedEntityClassName.concat(".")
+                                        .concat(property).replace('.', '_')))
+                        .addAttribute("property", property)
+                        .addAttribute("z", z)
+                        // "s:".concat(relatedEntityClassName.concat(".")
+                        // .concat(property))).addAttribute(
+                        // "property", property).addAttribute("z", z)
+
+                        .build();
+
+                views.appendChild(columnField);
+            }
+
+            groupViews.appendChild(views);
+        }
+
+        if (oldGroupViews == null) {
+            jspxView.getLastChild().appendChild(groupViews);
+
+            // DiSiD: Overwrite relation table position to avoid invisibility
+            // TODO Move inline style to a addon new CSS file
+            Node style = documentRoot.getOwnerDocument().createElement("style");
+            style.setTextContent("body .dijitAlignClient {position: relative;}");
+            jspxView.getLastChild().appendChild(style);
+
+        } else {
+            oldGroupViews.getParentNode().replaceChild(groupViews,
+                    oldGroupViews);
+        }
+        return jspxView;
     }
 
     /**
@@ -570,191 +653,243 @@ public class ScreenMetadataListener implements // MetadataProvider,
      * @return
      */
     private WebScaffoldMetadata getRelatedEntityWebScaffoldMetadata(
-	    JavaType relationshipJavaType) {
+            JavaType relationshipJavaType) {
 
-	WebScaffoldMetadata relationshipMetadata = null;
+        WebScaffoldMetadata relationshipMetadata = null;
 
-	FileDetails srcRoot = new FileDetails(new File(pathResolver
-		.getRoot(Path.SRC_MAIN_JAVA)), null);
-	String antPath = pathResolver.getRoot(Path.SRC_MAIN_JAVA)
-		+ File.separatorChar + "**" + File.separatorChar + "*.java";
-	SortedSet<FileDetails> entries = fileManager
-		.findMatchingAntPath(antPath);
+        FileDetails srcRoot = new FileDetails(new File(
+                pathResolver.getRoot(Path.SRC_MAIN_JAVA)), null);
+        String antPath = pathResolver.getRoot(Path.SRC_MAIN_JAVA)
+                + File.separatorChar + "**" + File.separatorChar + "*.java";
+        SortedSet<FileDetails> entries = fileManager
+                .findMatchingAntPath(antPath);
 
-	for (FileDetails file : entries) {
-	    String fullPath = srcRoot.getRelativeSegment(file
-		    .getCanonicalPath());
-	    fullPath = fullPath.substring(1, fullPath.lastIndexOf(".java"))
-		    .replace(File.separatorChar, '.'); // ditch the first /
-	    // and .java
-	    JavaType javaType = new JavaType(fullPath);
-	    String id = physicalTypeMetadataProvider.findIdentifier(javaType);
-	    if (id != null) {
-		PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
-			.get(id);
-		if (ptm == null
-			
-			// DiSiD: Roo uses now getMemberHoldingTypeDetails instead of getPhysicalTypeDetails to get typeDetails
-//			|| ptm.getPhysicalTypeDetails() == null
-//			|| !(ptm.getPhysicalTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
-			|| ptm.getMemberHoldingTypeDetails() == null
-			|| !(ptm.getMemberHoldingTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
-		    
-		    continue;
-		}
+        for (FileDetails file : entries) {
+            String fullPath = srcRoot.getRelativeSegment(file
+                    .getCanonicalPath());
+            fullPath = fullPath.substring(1, fullPath.lastIndexOf(".java"))
+                    .replace(File.separatorChar, '.'); // ditch the first /
+            // and .java
+            JavaType javaType = new JavaType(fullPath);
+            String id = physicalTypeMetadataProvider.findIdentifier(javaType);
+            if (id != null) {
+                PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+                        .get(id);
+                if (ptm == null
 
-		// DiSiD: Roo uses now getMemberHoldingTypeDetails instead of getPhysicalTypeDetails to get typeDetails
-//		ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) ptm
-//			.getPhysicalTypeDetails();
-		ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) ptm.getMemberHoldingTypeDetails();	
-		
-		if (Modifier.isAbstract(cid.getModifier())) {
-		    continue;
-		}
+                        // DiSiD: Roo uses now getMemberHoldingTypeDetails
+                        // instead of getPhysicalTypeDetails to get typeDetails
+                        // || ptm.getPhysicalTypeDetails() == null
+                        // || !(ptm.getPhysicalTypeDetails() instanceof
+                        // ClassOrInterfaceTypeDetails)) {
+                        || ptm.getMemberHoldingTypeDetails() == null
+                        || !(ptm.getMemberHoldingTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
 
-		// Roo uses now metadataService instead of scan all to get metadata and use JavaParserClassMetadata to avoid cast error
-//		Set<MetadataItem> metadata = itdMetadataScanner.getMetadata(id);
-		JavaParserClassMetadata em = (JavaParserClassMetadata)metadataService.get(id);
+                    continue;
+                }
 
-//		for (MetadataItem item : metadata) {
-//		    if (item instanceof EntityMetadata) {
-//			EntityMetadata em = (EntityMetadata) item;
-		
-			// DiSiD: Roo uses now getMemberHoldingTypeDetails instead of getItdTypeDetails to get type details
-//			if (relationshipJavaType.compareTo(em
-//				.getItdTypeDetails().getName()) == 0) {
-        		if (relationshipJavaType.compareTo(em
-        			.getMemberHoldingTypeDetails().getName()) == 0) {
-        		    
-			    Set<String> downstream = metadataDependencyRegistry
-				    .getDownstream(em.getId());
-			    // check to see if this entity metadata has a web
-			    // scaffold metadata listening to it
-			    for (String ds : downstream) {
-				if (WebScaffoldMetadata.isValid(ds)) {
-				    // there is already a controller for this
-				    // entity
-				    String entityMetadataKey = WebScaffoldMetadata
-					    .createIdentifier(
-						    WebScaffoldMetadata
-							    .getJavaType(ds),
-						    WebScaffoldMetadata
-							    .getPath(ds));
-				    relationshipMetadata = (WebScaffoldMetadata) metadataService
-					    .get(entityMetadataKey);
-				    return relationshipMetadata;
-				}
-			    }
-			}
-//		    }
-//		}
-	    }
-	}
-	return relationshipMetadata;
+                // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of
+                // getPhysicalTypeDetails to get typeDetails
+                // ClassOrInterfaceTypeDetails cid =
+                // (ClassOrInterfaceTypeDetails) ptm
+                // .getPhysicalTypeDetails();
+                ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) ptm
+                        .getMemberHoldingTypeDetails();
+
+                if (Modifier.isAbstract(cid.getModifier())) {
+                    continue;
+                }
+
+                // Roo uses now metadataService instead of scan all to get
+                // metadata and use JavaParserClassMetadata to avoid cast error
+                // Set<MetadataItem> metadata =
+                // itdMetadataScanner.getMetadata(id);
+                EntityMetadata em = (EntityMetadata) metadataService.get(id);
+                // JavaParserClassMetadata em = (JavaParserClassMetadata)
+                // metadataService
+                // .get(id);
+
+                // for (MetadataItem item : metadata) {
+                // if (item instanceof EntityMetadata) {
+                // EntityMetadata em = (EntityMetadata) item;
+
+                // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of
+                // getItdTypeDetails to get type details
+                // if (relationshipJavaType.compareTo(em
+                // .getItdTypeDetails().getName()) == 0) {
+                if (relationshipJavaType.compareTo(em
+                        .getMemberHoldingTypeDetails().getName()) == 0) {
+
+                    Set<String> downstream = metadataDependencyRegistry
+                            .getDownstream(em.getId());
+                    // check to see if this entity metadata has a web
+                    // scaffold metadata listening to it
+                    for (String ds : downstream) {
+                        if (WebScaffoldMetadata.isValid(ds)) {
+                            // there is already a controller for this
+                            // entity
+                            String entityMetadataKey = WebScaffoldMetadata
+                                    .createIdentifier(
+                                            WebScaffoldMetadata.getJavaType(ds),
+                                            WebScaffoldMetadata.getPath(ds));
+                            relationshipMetadata = (WebScaffoldMetadata) metadataService
+                                    .get(entityMetadataKey);
+                            return relationshipMetadata;
+                        }
+                    }
+                }
+                // }
+                // }
+            }
+        }
+        return relationshipMetadata;
     }
 
     /**
      * Retrieve BeanInfoMetadata fields.
      * 
+     * @param beanInfoMetadata
+     *            metadata of the type we want retrieve the fields
+     * @param type
+     *            JavaType form we want get its fields
      * @return {@link FieldMetadata} list.
      */
     private List<FieldMetadata> getElegibleFields(
-	    
-	    // DiSiD: Method parameter requires to change from BeanInfoMetadata to JavaParserClassMetadata
-	    JavaParserClassMetadata beanInfoMetadata) {
-//	    BeanInfoMetadata beanInfoMetadata) {
-	    
-	    
-	List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
-	
-	// DiSiD: Get declared fields instead of public accessors and from JavaParserClassMetadata instead from BeanInfoMetadata
-	// TODO No aspect properties are considered, as generated by database reverse engineering
-	for (FieldMetadata method : beanInfoMetadata.getMemberHoldingTypeDetails().getDeclaredFields()) {
-//	for (MethodMetadata method : beanInfoMetadata.getPublicAccessors(false)) {
-	    
-	    // DiSiD: Get property name from method field name instead of use BeanInfoMetadata
-//	    JavaSymbolName propertyName = BeanInfoMetadata
-//		    .getPropertyNameForJavaBeanMethod(method);
-	    JavaSymbolName propertyName = method.getFieldName();
 
-	    // DiSiD: Get field for property name from JavaParserClassMetadata instead from BeanInfoMetadata
-	    List<MemberHoldingTypeDetails> details = new ArrayList<MemberHoldingTypeDetails>(); 
-	    details.add(beanInfoMetadata.getMemberHoldingTypeDetails());
-	    MemberDetails memberDetails = new MemberDetailsImpl(details);
-	    FieldMetadata field = BeanInfoUtils.getFieldForPropertyName(memberDetails, propertyName);
-//	    FieldMetadata field = beanInfoMetadata
-//		    .getFieldForPropertyName(propertyName);
+    // DiSiD: Method parameter requires to change from BeanInfoMetadata to
+    // JavaParserClassMetadata
+    // JavaParserClassMetadata beanInfoMetadata) {
+    // BeanInfoMetadata beanInfoMetadata) {
+            EntityMetadata beanInfoMetadata, JavaType type) {
 
-	    if (field != null && hasMutator(field, beanInfoMetadata)) {
+        List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
 
-		// Never include id field (it shouldn't normally have a mutator
-		// anyway, but the user might have added one)
-		if (MemberFindingUtils
-			.getAnnotationOfType(field.getAnnotations(),
-				new JavaType("javax.persistence.Id")) != null) {
-		    continue;
-		}
-		// Never include version field (it shouldn't normally have a
-		// mutator anyway, but the user might have added one)
-		if (MemberFindingUtils.getAnnotationOfType(field
-			.getAnnotations(), new JavaType(
-			"javax.persistence.Version")) != null) {
-		    continue;
-		}
-		fields.add(field);
-	    }
-	}
-	return fields;
+        // DiSiD: Get declared fields instead of public accessors and from
+        // JavaParserClassMetadata instead from BeanInfoMetadata
+        // TODO No aspect properties are considered, as generated by database
+        // reverse engineering
+        for (FieldMetadata method : beanInfoMetadata
+                .getMemberHoldingTypeDetails().getDeclaredFields()) {
+            // for (MethodMetadata method :
+            // beanInfoMetadata.getPublicAccessors(false)) {
+
+            // DiSiD: Get property name from method field name instead of use
+            // BeanInfoMetadata
+            // JavaSymbolName propertyName = BeanInfoMetadata
+            // .getPropertyNameForJavaBeanMethod(method);
+            JavaSymbolName propertyName = method.getFieldName();
+
+            // DiSiD: Get field for property name from JavaParserClassMetadata
+            // instead from BeanInfoMetadata
+            List<MemberHoldingTypeDetails> details = new ArrayList<MemberHoldingTypeDetails>();
+            details.add(beanInfoMetadata.getMemberHoldingTypeDetails());
+            // MemberDetails memberDetails = new MemberDetailsImpl(details);
+            MemberDetails memberDetails = getMemeberDetails(type);
+            FieldMetadata field = BeanInfoUtils.getFieldForPropertyName(
+                    memberDetails, propertyName);
+            // FieldMetadata field = beanInfoMetadata
+            // .getFieldForPropertyName(propertyName);
+
+            if (field != null && hasMutator(field, beanInfoMetadata, type)) {
+
+                // Never include id field (it shouldn't normally have a mutator
+                // anyway, but the user might have added one)
+                if (MemberFindingUtils
+                        .getAnnotationOfType(field.getAnnotations(),
+                                new JavaType("javax.persistence.Id")) != null) {
+                    continue;
+                }
+                // Never include version field (it shouldn't normally have a
+                // mutator anyway, but the user might have added one)
+                if (MemberFindingUtils.getAnnotationOfType(field
+                        .getAnnotations(), new JavaType(
+                        "javax.persistence.Version")) != null) {
+                    continue;
+                }
+                fields.add(field);
+            }
+        }
+        return fields;
     }
 
+    /**
+     * 
+     * @param fieldMetadata
+     * @param beanInfoMetadata
+     * @param type
+     * @return
+     */
     private boolean hasMutator(FieldMetadata fieldMetadata,
-	    
-	    // DiSiD: Method parameter requires to change from BeanInfoMetadata to JavaParserClassMetadata
-	    JavaParserClassMetadata beanInfoMetadata) {
-//	    BeanInfoMetadata beanInfoMetadata) {
-	
-	// DiSiD: Get declared fields instead of public mutators and from JavaParserClassMetadata instead from BeanInfoMetadata
-	// TODO No aspect properties are considered, as generated by database reverse engineering
-	for (FieldMetadata mutator : beanInfoMetadata.getMemberHoldingTypeDetails().getDeclaredFields()) {
-//	for (MethodMetadata mutator : beanInfoMetadata.getPublicMutators()) {
-	
-	    // DiSiD: Get field for property name from JavaParserClassMetadata
-	    JavaSymbolName propertyName = mutator.getFieldName();
-	    List<MemberHoldingTypeDetails> details = new ArrayList<MemberHoldingTypeDetails>(); 
-	    details.add(beanInfoMetadata.getMemberHoldingTypeDetails());
-	    MemberDetails memberDetails = new MemberDetailsImpl(details);
-	    FieldMetadata field = BeanInfoUtils.getFieldForPropertyName(memberDetails, propertyName);
-	    
-	    // DiSiD: Compare fields directly instead of use BeanInfoMetadata
-	    if (fieldMetadata.equals(field))
-//	    if (fieldMetadata.equals(beanInfoMetadata
-//		    .getFieldForPropertyName(BeanInfoMetadata	    
-//			    .getPropertyNameForJavaBeanMethod(mutator))))
-		
-		return true;
-	}
-	return false;
+    // DiSiD: Method parameter requires to change from BeanInfoMetadata to
+    // JavaParserClassMetadata
+    // JavaParserClassMetadata beanInfoMetadata) {
+    // BeanInfoMetadata beanInfoMetadata) {
+            EntityMetadata beanInfoMetadata, JavaType type) {
+
+        // DiSiD: Get declared fields instead of public mutators and from
+        // JavaParserClassMetadata instead from BeanInfoMetadata
+        // TODO No aspect properties are considered, as generated by database
+        // reverse engineering
+        for (FieldMetadata mutator : beanInfoMetadata
+                .getMemberHoldingTypeDetails().getDeclaredFields()) {
+            // for (MethodMetadata mutator :
+            // beanInfoMetadata.getPublicMutators()) {
+
+            // DiSiD: Get field for property name from JavaParserClassMetadata
+            JavaSymbolName propertyName = mutator.getFieldName();
+            List<MemberHoldingTypeDetails> details = new ArrayList<MemberHoldingTypeDetails>();
+            details.add(beanInfoMetadata.getMemberHoldingTypeDetails());
+            // MemberDetails memberDetails = new MemberDetailsImpl(details);
+            MemberDetails memberDetails = getMemeberDetails(type);
+            FieldMetadata field = BeanInfoUtils.getFieldForPropertyName(
+                    memberDetails, propertyName);
+
+            // DiSiD: Compare fields directly instead of use BeanInfoMetadata
+            if (fieldMetadata.equals(field))
+                // if (fieldMetadata.equals(beanInfoMetadata
+                // .getFieldForPropertyName(BeanInfoMetadata
+                // .getPropertyNameForJavaBeanMethod(mutator))))
+
+                return true;
+        }
+        return false;
+    }
+
+    private MemberDetails getMemeberDetails(JavaType type) {
+        MemberDetailsScanner memberDetailsScanner = new MemberDetailsScannerImpl();
+        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+                .get(PhysicalTypeIdentifier.createIdentifier(type,
+                        Path.SRC_MAIN_JAVA));
+
+        Assert.notNull(
+                physicalTypeMetadata,
+                "Unable to obtain physical type metdata for type "
+                        + type.getFullyQualifiedTypeName());
+
+        return memberDetailsScanner.getMemberDetails(getClass().getName(),
+                (ClassOrInterfaceTypeDetails) physicalTypeMetadata
+                        .getMemberHoldingTypeDetails());
+
     }
 
     class StatusListener implements ProcessManagerStatusListener {
 
-	ScreenMetadataListener screenMetadataListener;
+        ScreenMetadataListener screenMetadataListener;
 
-	public StatusListener(
-		ScreenMetadataListener screenMetadataListener) {
-	    super();
-	    this.screenMetadataListener = screenMetadataListener;
-	}
+        public StatusListener(ScreenMetadataListener screenMetadataListener) {
+            super();
+            this.screenMetadataListener = screenMetadataListener;
+        }
 
-	public void onProcessManagerStatusChange(
-		ProcessManagerStatus oldStatus, ProcessManagerStatus newStatus) {
-	    if (newStatus == ProcessManagerStatus.AVAILABLE) {
+        public void onProcessManagerStatusChange(
+                ProcessManagerStatus oldStatus, ProcessManagerStatus newStatus) {
+            if (newStatus == ProcessManagerStatus.AVAILABLE) {
 
-		// logger.warning("Operations delayed.");
-		screenMetadataListener.performDelayed();
-	    }
+                // logger.warning("Operations delayed.");
+                screenMetadataListener.performDelayed();
+            }
 
-	}
+        }
 
     }
 
@@ -764,38 +899,38 @@ public class ScreenMetadataListener implements // MetadataProvider,
      */
     public void performDelayed() {
 
-	// Work out the MIDs of the other metadata we depend on
-	String annotationPath = "javax.persistence.OneToMany";
+        // Work out the MIDs of the other metadata we depend on
+        String annotationPath = "javax.persistence.OneToMany";
 
-	Iterator<String> iter = upstreamDependencyList.iterator();
-	if (!iter.hasNext()) {
-	    return;
-	}
+        Iterator<String> iter = upstreamDependencyList.iterator();
+        if (!iter.hasNext()) {
+            return;
+        }
 
-	String upstreamDependency;
+        String upstreamDependency;
 
-	while (iter.hasNext()) {
-	    upstreamDependency = iter.next();
+        while (iter.hasNext()) {
+            upstreamDependency = iter.next();
 
-	    List<FieldMetadata> oneToManyFieldMetadatas = getAnnotatedFields(
-		    upstreamDependency, annotationPath);
+            List<FieldMetadata> oneToManyFieldMetadatas = getAnnotatedFields(
+                    upstreamDependency, annotationPath);
 
-	    // Retrieve the associated jspx (show an update).
+            // Retrieve the associated jspx (show an update).
 
-	    Document showDocument = updateView("show", oneToManyFieldMetadatas,
-		    "tab");
-	    if (showDocument != null) {
-		writeToDiskIfNecessary("show", showDocument);
-	    }
+            Document showDocument = updateView("show", oneToManyFieldMetadatas,
+                    "tab");
+            if (showDocument != null) {
+                writeToDiskIfNecessary("show", showDocument);
+            }
 
-	    Document updateDocument = updateView("update",
-		    oneToManyFieldMetadatas, "tab");
-	    if (updateDocument != null) {
-		writeToDiskIfNecessary("update", updateDocument);
-	    }
+            Document updateDocument = updateView("update",
+                    oneToManyFieldMetadatas, "tab");
+            if (updateDocument != null) {
+                writeToDiskIfNecessary("update", updateDocument);
+            }
 
-	    iter.remove();
-	}
+            iter.remove();
+        }
 
     }
 }
