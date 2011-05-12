@@ -67,17 +67,6 @@
   </pluginRepositories>
   -->
   <dependencies>
-    <!-- OSGi -->
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>4.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <version>4.1.0</version>
-    </dependency>
     <!-- Apache Felix -->
     <dependency>
       <groupId>org.apache.felix</groupId>

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.relation.styles.roo.addon;
+package org.gvnix.web.screen.roo.addon;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -152,13 +152,6 @@ public class ScreenMetadataListener implements // MetadataProvider,
                         .getMetadataIdentiferType());
         if (upstreamMetadata.equals(metadata)
                 && upstreamDependency.endsWith("Controller")) {
-            // if
-            // (MetadataIdentificationUtils.getMetadataClass(upstreamDependency)
-            // .equals(
-            // MetadataIdentificationUtils
-            // .getMetadataClass(JspMetadata
-            // .getMetadataIdentiferType()))) {
-
             // Add upstreamDependency to a Stack.
             upstreamDependencyList.add(upstreamDependency);
         }
@@ -241,8 +234,6 @@ public class ScreenMetadataListener implements // MetadataProvider,
         JavaType javaType = PhysicalTypeIdentifier
                 .getJavaType(upstreamDependency);
         Path webPath = PhysicalTypeIdentifier.getPath(upstreamDependency);
-        // JavaType javaType = JspMetadata.getJavaType(upstreamDependency);
-        // Path webPath = JspMetadata.getPath(upstreamDependency);
 
         String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
                 javaType, webPath);
@@ -251,62 +242,16 @@ public class ScreenMetadataListener implements // MetadataProvider,
 
         this.webScaffoldMetadata = webScaffoldMetadata;
 
-        // DiSiD: Get BeanInfoMetadata from form backing object annotation
-        // because getIdentifierForBeanInfoMetadata method removed
+        // DiSiD: set entityMetatada based on backingObject
         WebScaffoldAnnotationValues annotationValues = webScaffoldMetadata
                 .getAnnotationValues();
         JavaType backingObject = annotationValues.getFormBackingObject();
-
         entityMetadata = (EntityMetadata) metadataService.get(EntityMetadata
                 .createIdentifier(backingObject, webPath));
 
-        // TODO: orovira comentadas siguientes dos lineas
-        // String beanInfoMetadataKey = BeanInfoMetadata.createIdentifier(
-        // backingObject, webPath);
-        // BeanInfoMetadata beanInfoMetadata = (BeanInfoMetadata)
-        // metadataService
-        // .get(beanInfoMetadataKey);
-        // BeanInfoMetadata
-        // String beanInfoMetadataKey = webScaffoldMetadata
-        // .getIdentifierForBeanInfoMetadata();
-        // BeanInfoMetadata beanInfoMetadata = (BeanInfoMetadata)
-        // metadataService
-        // .get(beanInfoMetadataKey);
-
-        // TODO: orovira comentada siguientes linea
-        // this.beanInfoMetadata = beanInfoMetadata;
-
-        // DiSiD: Not set entityMetadata because getIdentifierForEntityMetadata
-        // method removed and never used now
-        // Retrieve Controller Entity
-        // String entityMetadataInfo = webScaffoldMetadata
-        // .getIdentifierForEntityMetadata();
-        // JavaType entityJavaType = EntityMetadata
-        // .getJavaType(entityMetadataInfo);
-        // Path path = EntityMetadata.getPath(entityMetadataInfo);
-        // String entityMetadataKey = EntityMetadata.createIdentifier(
-        // entityJavaType, path);
-        // EntityMetadata entityMetadata = (EntityMetadata) metadataService
-        // .get(entityMetadataKey);
-        // this.entityMetadata = entityMetadata;
-        // We need to abort if we couldn't find dependent metadata
-        // if (beanInfoMetadata == null || !beanInfoMetadata.isValid()
-        // || entityMetadata == null || !entityMetadata.isValid()) {
-        // // Can't get hold of the entity we are needing to build JSPs for
-        // return null;
-        // }
-
-        // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of
-        // getItdTypeDetails to get type details and obtained from
-        // beanInfoMetadata instead from entityMetadata
-        // DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails)
-        // entityMetadata
-        // .getItdTypeDetails();
+        // DiSiD: we need details about entity ITD
         DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
                 .getMemberHoldingTypeDetails();
-        // TODO: orovira comentada siguiente linea
-        // (DefaultItdTypeDetails)
-        // beanInfoMetadata.getMemberHoldingTypeDetails();
 
         // Retrieve the fields that are defined as OneToMany relationship.
         List<FieldMetadata> fieldMetadataList = MemberFindingUtils
@@ -334,17 +279,10 @@ public class ScreenMetadataListener implements // MetadataProvider,
             List<FieldMetadata> oneToManyFieldMetadatas,
             String selectedDecorator) {
 
-        // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of
-        // getItdTypeDetails to get type details and obtained from
-        // beanInfoMetadata instead from entityMetadata
-        // DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails)
-        // entityMetadata
-        // .getItdTypeDetails();
+        // DiSiD: We need some info from main entity (the one with oneToMany
+        // relations)
         DefaultItdTypeDetails defaultItdTypeDetails = (DefaultItdTypeDetails) entityMetadata
                 .getMemberHoldingTypeDetails();
-        // (DefaultItdTypeDetails)
-        // beanInfoMetadata.getMemberHoldingTypeDetails();
-
         String entityName = defaultItdTypeDetails.getGovernor().getName()
                 .getSimpleTypeName();
 
@@ -371,10 +309,7 @@ public class ScreenMetadataListener implements // MetadataProvider,
         }
         Element documentRoot = jspxView.getDocumentElement();
 
-        // Loop for each OneToMany field.
-
         Element defaultField = null;
-
         // Views to create.
         Element oldGroupViews = null;
         Element groupViews = null;
@@ -504,44 +439,21 @@ public class ScreenMetadataListener implements // MetadataProvider,
                             "${".concat(StringUtils.uncapitalize(entityName))
                                     .concat("}"))
                     .addAttribute("id",
-
                     // DiSiD: Roo now uses '_' separator instead of '.' on i18n
                     // tags
                     // TODO Unify i18n tags generation method
-                            "s_".concat(
-                            /*
-                             * beanInfoMetadata.getJavaBean()
-                             * .getFullyQualifiedTypeName()
-                             */
-                            entityFullyQualifiedTypeName).concat(".")
-                                    .concat(propertyName).replace('.', '_'))
+                            "s_".concat(entityFullyQualifiedTypeName)
+                                    .concat(".").concat(propertyName)
+                                    .replace('.', '_'))
                     .addAttribute("field",
-                    // "s:".concat(
-                    // beanInfoMetadata.getJavaBean()
-                    // .getFullyQualifiedTypeName()).concat(".")
-                    // .concat(propertyName)).addAttribute("field",
-
                             fieldMetadata.getFieldName().getSymbolName())
-                    .addAttribute("fieldId",
-
-                    // DiSiD: Roo now uses '_' separator instead of '.'
-                    // on i18n tags
-                            "l_".concat(
-                            /*
-                             * beanInfoMetadata.getJavaBean()
-                             * .getFullyQualifiedTypeName()
-                             */
-                            entityFullyQualifiedTypeName).concat(".")
-                                    .concat(propertyName).replace('.', '_'))
-                    .addAttribute("messageCode", "entity_reference_not_managed")
                     .addAttribute(
-                    // "l:".concat(
-                    // beanInfoMetadata.getJavaBean()
-                    // .getFullyQualifiedTypeName()).concat(".")
-                    // .concat(propertyName)).addAttribute("messageCode",
-                    // "entity.reference.not.managed").addAttribute(
-
-                            "messageCodeAttribute", entityName)
+                            "fieldId",
+                            "l_".concat(entityFullyQualifiedTypeName)
+                                    .concat(".").concat(propertyName)
+                                    .replace('.', '_'))
+                    .addAttribute("messageCode", "entity_reference_not_managed")
+                    .addAttribute("messageCodeAttribute", entityName)
                     .addAttribute("path", path)
                     .addAttribute("delete", delete)
                     .addAttribute("create", create)
@@ -554,49 +466,21 @@ public class ScreenMetadataListener implements // MetadataProvider,
                                     .concat("}")).build();
 
             // Create column fields and group the elements created.
-
             String idEntityMetadata = physicalTypeMetadataProvider
                     .findIdentifier(relationshipJavaType);
-
-            // DiSiD: Roo uses now metadataService instead of scan all to get
-            // metadata
-            // Set<MetadataItem> metadata = itdMetadataScanner
-            // .getMetadata(idEntityMetadata);
-            //
-            // BeanInfoMetadata relatedBeanInfoMetadata = null;
-            //
-            // for (MetadataItem item : metadata) {
-            // if (item instanceof BeanInfoMetadata) {
-            // relatedBeanInfoMetadata = (BeanInfoMetadata) item;
-            // break;
-            // }
-            // }
-
-            // DiSiD: Use BeanInfoMetadata instead of JavaParserClassMetadata to
-            // avoid cast error
-            EntityMetadata relatedEntityMetadata = (EntityMetadata) metadataService
+            // DiSiD: Retrieve the PhysicalTypeMetadata of the related entity
+            PhysicalTypeMetadata relatedEntityMetadata = (PhysicalTypeMetadata) metadataService
                     .get(idEntityMetadata);
-            // JavaParserClassMetadata relatedBeanInfoMetadata =
-            // (JavaParserClassMetadata) metadataService
-            // .get(idEntityMetadata);
-
-            // BeanInfoMetadata relatedBeanInfoMetadata =
-            // (BeanInfoMetadata)metadataService.get(idEntityMetadata);
 
             Assert.notNull(/* relatedBeanInfoMetadata */relatedEntityMetadata,
                     "There is no metadata related for this identifier:\t"
                             + idEntityMetadata);
 
             List<FieldMetadata> fieldMetadataList = getElegibleFields(
-            /* relatedBeanInfoMetadata */relatedEntityMetadata,
-                    relationshipJavaType);
+                    relatedEntityMetadata, relationshipJavaType);
             Element columnField;
 
-            // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of
-            // getItdTypeDetails to get type details
-            // String relatedEntityClassName = relatedBeanInfoMetadata
-            // .getItdTypeDetails().getName().getFullyQualifiedTypeName();
-            String relatedEntityClassName = /* relatedBeanInfoMetadata */relatedEntityMetadata
+            String relatedEntityClassName = relatedEntityMetadata
                     .getMemberHoldingTypeDetails().getName()
                     .getFullyQualifiedTypeName();
 
@@ -608,18 +492,12 @@ public class ScreenMetadataListener implements // MetadataProvider,
                         .getSymbolName();
                 columnField = new XmlElementBuilder("table:column", jspxView)
                         .addAttribute("id",
-
                         // TODO DiSiD: Roo now uses '_' separator
                         // instead of '.' on i18n tags
                                 "s_".concat(relatedEntityClassName.concat(".")
                                         .concat(property).replace('.', '_')))
                         .addAttribute("property", property)
-                        .addAttribute("z", z)
-                        // "s:".concat(relatedEntityClassName.concat(".")
-                        // .concat(property))).addAttribute(
-                        // "property", property).addAttribute("z", z)
-
-                        .build();
+                        .addAttribute("z", z).build();
 
                 views.appendChild(columnField);
             }
@@ -644,9 +522,12 @@ public class ScreenMetadataListener implements // MetadataProvider,
     }
 
     /**
-     * Retrieve the associated WebScaffoldMetada from a JavaType.
+     * Retrieve the associated WebScaffoldMetada from a JavaType. <br/>
      * 
-     * TODO No WebScaffoldMetadata can be obtained error
+     * TODO No WebScaffoldMetadata can be obtained error<br/>
+     * 
+     * TODO Mirar de implementar esto usando WebScaffoldMetadataProvider.<br/>
+     * En ReportMetadataProvider se hace usando este provider.
      * 
      * @param relationshipJavaType
      *            Relationship JavaType
@@ -675,24 +556,16 @@ public class ScreenMetadataListener implements // MetadataProvider,
             if (id != null) {
                 PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
                         .get(id);
+                // DiSiD: nothing to do if we have a non valid
+                // physicalTypeMetadata
                 if (ptm == null
-
-                        // DiSiD: Roo uses now getMemberHoldingTypeDetails
-                        // instead of getPhysicalTypeDetails to get typeDetails
-                        // || ptm.getPhysicalTypeDetails() == null
-                        // || !(ptm.getPhysicalTypeDetails() instanceof
-                        // ClassOrInterfaceTypeDetails)) {
                         || ptm.getMemberHoldingTypeDetails() == null
                         || !(ptm.getMemberHoldingTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
 
                     continue;
                 }
 
-                // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of
-                // getPhysicalTypeDetails to get typeDetails
-                // ClassOrInterfaceTypeDetails cid =
-                // (ClassOrInterfaceTypeDetails) ptm
-                // .getPhysicalTypeDetails();
+                // DiSiD: Get a reference of the physical java class
                 ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) ptm
                         .getMemberHoldingTypeDetails();
 
@@ -700,28 +573,11 @@ public class ScreenMetadataListener implements // MetadataProvider,
                     continue;
                 }
 
-                // Roo uses now metadataService instead of scan all to get
-                // metadata and use JavaParserClassMetadata to avoid cast error
-                // Set<MetadataItem> metadata =
-                // itdMetadataScanner.getMetadata(id);
-                EntityMetadata em = (EntityMetadata) metadataService.get(id);
-                // JavaParserClassMetadata em = (JavaParserClassMetadata)
-                // metadataService
-                // .get(id);
-
-                // for (MetadataItem item : metadata) {
-                // if (item instanceof EntityMetadata) {
-                // EntityMetadata em = (EntityMetadata) item;
-
-                // DiSiD: Roo uses now getMemberHoldingTypeDetails instead of
-                // getItdTypeDetails to get type details
-                // if (relationshipJavaType.compareTo(em
-                // .getItdTypeDetails().getName()) == 0) {
-                if (relationshipJavaType.compareTo(em
+                if (relationshipJavaType.compareTo(ptm
                         .getMemberHoldingTypeDetails().getName()) == 0) {
 
                     Set<String> downstream = metadataDependencyRegistry
-                            .getDownstream(em.getId());
+                            .getDownstream(ptm.getId());
                     // check to see if this entity metadata has a web
                     // scaffold metadata listening to it
                     for (String ds : downstream) {
@@ -738,15 +594,23 @@ public class ScreenMetadataListener implements // MetadataProvider,
                         }
                     }
                 }
-                // }
-                // }
             }
         }
         return relationshipMetadata;
     }
 
     /**
-     * Retrieve BeanInfoMetadata fields.
+     * Retrieve BeanInfoMetadata fields. <br/>
+     * 
+     * TODO: quizas se pueda hacer usando:
+     * 
+     * <pre>
+     * List<\FieldMetadata\> elegibleFields = webMetadataService.getScaffoldEligibleFieldMetadata(fromBackingObject,
+     *                         memberDetails, governorPhysicalTypeMetadata.getId());
+     * </pre>
+     * 
+     * Mirar si sirve de ejemplo:
+     * ReportMetadata.installJasperReportTemplate(String, JavaType)
      * 
      * @param beanInfoMetadata
      *            metadata of the type we want retrieve the fields
@@ -755,12 +619,7 @@ public class ScreenMetadataListener implements // MetadataProvider,
      * @return {@link FieldMetadata} list.
      */
     private List<FieldMetadata> getElegibleFields(
-
-    // DiSiD: Method parameter requires to change from BeanInfoMetadata to
-    // JavaParserClassMetadata
-    // JavaParserClassMetadata beanInfoMetadata) {
-    // BeanInfoMetadata beanInfoMetadata) {
-            EntityMetadata beanInfoMetadata, JavaType type) {
+            PhysicalTypeMetadata beanInfoMetadata, JavaType type) {
 
         List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
 
@@ -770,25 +629,15 @@ public class ScreenMetadataListener implements // MetadataProvider,
         // reverse engineering
         for (FieldMetadata method : beanInfoMetadata
                 .getMemberHoldingTypeDetails().getDeclaredFields()) {
-            // for (MethodMetadata method :
-            // beanInfoMetadata.getPublicAccessors(false)) {
 
-            // DiSiD: Get property name from method field name instead of use
-            // BeanInfoMetadata
-            // JavaSymbolName propertyName = BeanInfoMetadata
-            // .getPropertyNameForJavaBeanMethod(method);
             JavaSymbolName propertyName = method.getFieldName();
 
-            // DiSiD: Get field for property name from JavaParserClassMetadata
-            // instead from BeanInfoMetadata
             List<MemberHoldingTypeDetails> details = new ArrayList<MemberHoldingTypeDetails>();
             details.add(beanInfoMetadata.getMemberHoldingTypeDetails());
-            // MemberDetails memberDetails = new MemberDetailsImpl(details);
+
             MemberDetails memberDetails = getMemeberDetails(type);
             FieldMetadata field = BeanInfoUtils.getFieldForPropertyName(
                     memberDetails, propertyName);
-            // FieldMetadata field = beanInfoMetadata
-            // .getFieldForPropertyName(propertyName);
 
             if (field != null && hasMutator(field, beanInfoMetadata, type)) {
 
@@ -813,6 +662,8 @@ public class ScreenMetadataListener implements // MetadataProvider,
     }
 
     /**
+     * TODO: Si se cambia la forma de obtener los elegible fields este método
+     * sobra
      * 
      * @param fieldMetadata
      * @param beanInfoMetadata
@@ -820,11 +671,7 @@ public class ScreenMetadataListener implements // MetadataProvider,
      * @return
      */
     private boolean hasMutator(FieldMetadata fieldMetadata,
-    // DiSiD: Method parameter requires to change from BeanInfoMetadata to
-    // JavaParserClassMetadata
-    // JavaParserClassMetadata beanInfoMetadata) {
-    // BeanInfoMetadata beanInfoMetadata) {
-            EntityMetadata beanInfoMetadata, JavaType type) {
+            PhysicalTypeMetadata beanInfoMetadata, JavaType type) {
 
         // DiSiD: Get declared fields instead of public mutators and from
         // JavaParserClassMetadata instead from BeanInfoMetadata
@@ -832,29 +679,28 @@ public class ScreenMetadataListener implements // MetadataProvider,
         // reverse engineering
         for (FieldMetadata mutator : beanInfoMetadata
                 .getMemberHoldingTypeDetails().getDeclaredFields()) {
-            // for (MethodMetadata mutator :
-            // beanInfoMetadata.getPublicMutators()) {
 
-            // DiSiD: Get field for property name from JavaParserClassMetadata
             JavaSymbolName propertyName = mutator.getFieldName();
             List<MemberHoldingTypeDetails> details = new ArrayList<MemberHoldingTypeDetails>();
             details.add(beanInfoMetadata.getMemberHoldingTypeDetails());
-            // MemberDetails memberDetails = new MemberDetailsImpl(details);
+
             MemberDetails memberDetails = getMemeberDetails(type);
             FieldMetadata field = BeanInfoUtils.getFieldForPropertyName(
                     memberDetails, propertyName);
 
             // DiSiD: Compare fields directly instead of use BeanInfoMetadata
             if (fieldMetadata.equals(field))
-                // if (fieldMetadata.equals(beanInfoMetadata
-                // .getFieldForPropertyName(BeanInfoMetadata
-                // .getPropertyNameForJavaBeanMethod(mutator))))
-
                 return true;
         }
         return false;
     }
 
+    /**
+     * Return the member details of the given Type
+     * 
+     * @param type
+     * @return
+     */
     private MemberDetails getMemeberDetails(JavaType type) {
         MemberDetailsScanner memberDetailsScanner = new MemberDetailsScannerImpl();
         PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
@@ -884,7 +730,6 @@ public class ScreenMetadataListener implements // MetadataProvider,
         public void onProcessManagerStatusChange(
                 ProcessManagerStatus oldStatus, ProcessManagerStatus newStatus) {
             if (newStatus == ProcessManagerStatus.AVAILABLE) {
-
                 // logger.warning("Operations delayed.");
                 screenMetadataListener.performDelayed();
             }
