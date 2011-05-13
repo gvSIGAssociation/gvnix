@@ -57,7 +57,11 @@ However, Roo source code can be updated to a new tag with next commands:
 * Apply our Roo modifications:	git stash pop
 * Save in SVN:					svn commit
 
-Save in SVN can be done after each git command or only last command. 
+Save in SVN can be done after each git command or only last command.
+
+Other userful Git commands:
+
+* Change to master branch:		git checkout master 
 
 Run gvNIX dev
 =============
@@ -238,6 +242,10 @@ TODO
 	aunque el propio hibernate ya lo tienen más que usado.
 	
 	http://ehcache.org/documentation/hibernate.html
+	
+	Foro Roo:
+	
+	http://forum.springsource.org/showthread.php?109011-Caching-Entities-In-Roo
 
 * Criteria API:
 	
