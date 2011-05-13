@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <licenses>
+    <license>
+      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <distribution>repo</distribution>
+      <comments>
+      <![CDATA[
+      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+      i Transport - Generalitat Valenciana
+      Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program. If not, see <http://www.gnu.org/licenses />.
+      ]]>
+      </comments>
+    </license>
+  </licenses>
+  <parent>
+    <groupId>org.gvnix</groupId>
+    <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
+    <version>0.7.0-SNAPSHOT</version>
+    <relativePath>../osgi-roo-bundle</relativePath>
+  </parent>
+  <artifactId>org.gvnix.web.mvc.binding.roo.addon</artifactId>
+  <packaging>bundle</packaging>
+  <name>gvNIX - Addon - Web MVC Bindings</name>
+  <organization>
+    <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
+  </organization>
+  <description>gvNIX Property Editor Bindings Add-on</description>
+  <url>http://www.gvnix.org</url>
+
+  <!-- DiSiD: Add gvnix version from parent pom and google code project name and repo folder values -->
+  <properties>
+    <gvnix.version>${parent.version}</gvnix.version>
+    <google.code.project.name>gvnix</google.code.project.name>
+    <repo.folder>org/gvnix/web/screen/roo/addon</repo.folder>
+  </properties>
+
+
+  <dependencies>
+    <!-- Apache Felix -->
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.scr.annotations</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+    <!-- Spring Roo modules -->
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.metadata</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.process.manager</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.project</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.support</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.shell</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.bootstrap</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.roo</groupId>
+      <artifactId>org.springframework.roo.classpath</artifactId>
+    </dependency>
+  </dependencies>
+</project>
