@@ -56,8 +56,8 @@
     <module>addon-cit-security</module>
     <module>addon-dynamic-configuration</module>
     <module>addon-web-screen-pattern</module>
+    <module>addon-web-exception-handler</module> 
     <!-- 
-      <module>addon-web-exception-handler</module> 
       <module>addon-web-mvc-binding</module> 
       <module>annotations</module> 
     -->

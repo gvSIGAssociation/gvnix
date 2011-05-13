@@ -305,3 +305,5 @@ TODO
   However, mvn eclipse:eclipse not works.
 
 * Los proyectos gvNIX por defecto configuran DBCP, probar que funciona aunque se reinicie la BBDD
+
+* Revisar los pom.xml de los add-ons (ver que tengan la dependencias correctas y hereden las del pom padre

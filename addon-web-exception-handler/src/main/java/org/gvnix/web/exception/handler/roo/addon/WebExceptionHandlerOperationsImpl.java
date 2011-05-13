@@ -23,8 +23,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.springframework.roo.addon.mvc.jsp.TilesOperations;
-import org.springframework.roo.addon.mvc.jsp.TilesOperationsImpl;
+import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
+import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperationsImpl;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.metadata.MetadataService;
