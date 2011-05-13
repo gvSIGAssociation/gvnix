@@ -1,5 +1,6 @@
 package org.gvnix.web.mvc.binding.roo.addon;
 
+import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MethodMetadata;
@@ -58,9 +60,8 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
     private PathResolver pathResolver;
     @Reference
     private ProjectOperations projectOperations;
-
-    // @Reference
-    // private ClasspathOperations classpathOperations;
+    @Reference
+    private TypeManagementService typeManagementService;
 
     private JavaType currentInitializer = null;
 
@@ -278,11 +279,10 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
     private void generateJavaFile(JavaType initializerClass,
             boolean stringEmptyAsNull) {
 
-        String ressourceIdentifier = PhysicalTypeIdentifier.createIdentifier(
-                initializerClass, Path.SRC_MAIN_JAVA);
-        // classpathOperations
-        // .getPhysicalLocationCanonicalPath(initializerClass,
-        // Path.SRC_MAIN_JAVA);
+        String ressourceIdentifier = pathResolver.getIdentifier(
+                Path.SRC_MAIN_JAVA,
+                initializerClass.getFullyQualifiedTypeName()
+                        .replaceAll("\\.", File.separator).concat(".java"));
 
         String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
                 initializerClass, pathResolver.getPath(ressourceIdentifier));
@@ -291,14 +291,10 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
             PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
                     .get(declaredByMetadataId);
             if (ptm != null
-                    // && ptm.getPhysicalTypeDetails() != null
-                    // || !(ptm.getPhysicalTypeDetails() instanceof
-                    // ClassOrInterfaceTypeDetails)) {
                     && ptm.getMemberHoldingTypeDetails() != null
                     || !(ptm.getMemberHoldingTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
                 ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) ptm
                         .getMemberHoldingTypeDetails();
-                // .getPhysicalTypeDetails();
 
                 if (cid.getImplementsTypes()
                         .contains(
@@ -333,32 +329,18 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
                 "org.springframework.web.bind.support.WebBindingInitializer"));
         itdBuilder.setImplementsTypes(implementsTypes);
 
-        List<MethodMetadata> declaredMethods = new ArrayList<MethodMetadata>(1);
         MethodMetadata declaredMethod = null;
         if (stringEmptyAsNull) {
             declaredMethod = getInitBinderMethodWithNotEmptyStrings(declaredByMetadataId);
-            // declaredMethods
-            // .add(getInitBinderMethodWithNotEmptyStrings(declaredByMetadataId));
         } else {
             declaredMethod = getInitBinderMethod(declaredByMetadataId, null);
-            // declaredMethods
-            // .add(getInitBinderMethod(declaredByMetadataId, null));
         }
 
         if (declaredMethod != null) {
             itdBuilder.addMethod(declaredMethod);
         }
 
-        itdBuilder.build();
-
-        // ClassOrInterfaceTypeDetails details = new
-        // DefaultClassOrInterfaceTypeDetails(
-        // declaredByMetadataId, initializerClass, Modifier.PUBLIC,
-        // PhysicalTypeCategory.CLASS, null, null, declaredMethods, null,
-        // null, implementsTypes, null, null);
-
-        // classpathOperations.generateClassFile(details);
-
+        typeManagementService.generateClassFile(itdBuilder.build());
     }
 
     /**
@@ -517,14 +499,6 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
                 1);
         annotations.add(annotation);
-        // List<AnnotationMetadata> annotations = new
-        // ArrayList<AnnotationMetadata>(1);
-        // annotations.add(new AnnotationMetadataBuilder(new JavaType(
-        // Override.class.getName()),
-        // new ArrayList<AnnotationAttributeValue<?>>()).build());
-        // annotations.add(new DefaultAnnotationMetadata(new JavaType(
-        // Override.class.getName()),
-        // new ArrayList<AnnotationAttributeValue<?>>()));
 
         MethodMetadataBuilder mmb = new MethodMetadataBuilder(
                 declaredByMetadataId, Modifier.PUBLIC, new JavaSymbolName(
@@ -534,12 +508,6 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
         mmb.setAnnotations(annotations);
 
         return mmb.build();
-        // return new DefaultMethodMetadata(declaredByMetadataId,
-        // Modifier.PUBLIC,
-        // new JavaSymbolName("initBinder"), JavaType.VOID_PRIMITIVE,
-        // AnnotatedJavaType.convertFromJavaTypes(params), paramNames,
-        // annotations, null, body);
-
     }
 
     /**

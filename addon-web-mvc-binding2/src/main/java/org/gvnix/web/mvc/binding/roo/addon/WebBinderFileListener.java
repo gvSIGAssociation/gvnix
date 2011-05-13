@@ -1,14 +1,16 @@
 package org.gvnix.web.mvc.binding.roo.addon;
 
+import java.io.File;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.file.monitor.event.FileEvent;
 import org.springframework.roo.file.monitor.event.FileEventListener;
 import org.springframework.roo.file.monitor.event.FileOperation;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
 
 /**
@@ -28,9 +30,6 @@ public class WebBinderFileListener implements FileEventListener {
     @Reference
     private ProjectOperations projectOperations;
 
-    // @Reference
-    // private ClasspathOperations classpathOperations;
-
     public void onFileEvent(FileEvent fileEvent) {
 
         // Checks if is mvc config file
@@ -42,16 +41,15 @@ public class WebBinderFileListener implements FileEventListener {
         }
 
         if (webBinderOperations.getCurrentInitializer() != null) {
+            PathResolver pathResolver = projectOperations.getPathResolver();
             // Check if is java file of initialize
-            String physicalTypeIdentifier = PhysicalTypeIdentifier
-                    .createIdentifier(
-                            webBinderOperations.getCurrentInitializer(),
-                            Path.SRC_MAIN_JAVA);
-            Path path = PhysicalTypeIdentifier.getPath(physicalTypeIdentifier);
-            // String path = classpathOperations
-            // .getPhysicalLocationCanonicalPath(physicalTypeIdentifier);
+            String physicalTypeIdentifier = pathResolver.getIdentifier(
+                    Path.SRC_MAIN_JAVA,
+                    webBinderOperations.getCurrentInitializer()
+                            .getFullyQualifiedTypeName()
+                            .replaceAll("\\.", File.separator));
             if (fileEvent.getFileDetails().getFile().getAbsolutePath()
-                    .equals(path.getName())) {
+                    .equals(physicalTypeIdentifier)) {
                 // It's the initilaizer file
                 if (fileEvent.getOperation() == FileOperation.DELETED) {
                     // if it has been deleted this clear the configuration
@@ -60,7 +58,7 @@ public class WebBinderFileListener implements FileEventListener {
 
             } else if (fileEvent.getOperation() == FileOperation.RENAMED
                     && fileEvent.getPreviousName().getAbsolutePath()
-                            .equals(path)) {
+                            .equals(physicalTypeIdentifier)) {
                 // The initilaizer file has been renamed, update the mvc config
                 JavaType newType = null; // FIXME
                 webBinderOperations.renameInitializer(newType);
