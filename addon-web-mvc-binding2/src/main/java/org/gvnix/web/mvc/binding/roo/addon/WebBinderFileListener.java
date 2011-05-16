@@ -40,14 +40,15 @@ public class WebBinderFileListener implements FileEventListener {
             }
         }
 
-        if (webBinderOperations.getCurrentInitializer() != null) {
+        JavaType currentInitializer = webBinderOperations
+                .getCurrentInitializer();
+        if (currentInitializer != null) {
             PathResolver pathResolver = projectOperations.getPathResolver();
             // Check if is java file of initialize
             String physicalTypeIdentifier = pathResolver.getIdentifier(
                     Path.SRC_MAIN_JAVA,
-                    webBinderOperations.getCurrentInitializer()
-                            .getFullyQualifiedTypeName()
-                            .replaceAll("\\.", File.separator));
+                    currentInitializer.getFullyQualifiedTypeName()
+                            .replaceAll("\\.", File.separator).concat(".java"));
             if (fileEvent.getFileDetails().getFile().getAbsolutePath()
                     .equals(physicalTypeIdentifier)) {
                 // It's the initilaizer file
@@ -56,7 +57,12 @@ public class WebBinderFileListener implements FileEventListener {
                     webBinderOperations.drop();
                 }
 
-            } else if (fileEvent.getOperation() == FileOperation.RENAMED
+            }
+            /*
+             * TODO: Try to fix RENAMED event since now when rename file is
+             * performed (mv file newfile) performs CREATED and DELETED events
+             */
+            else if (fileEvent.getOperation() == FileOperation.RENAMED
                     && fileEvent.getPreviousName().getAbsolutePath()
                             .equals(physicalTypeIdentifier)) {
                 // The initilaizer file has been renamed, update the mvc config

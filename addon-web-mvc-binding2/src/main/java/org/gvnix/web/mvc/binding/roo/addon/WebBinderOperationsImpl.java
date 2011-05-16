@@ -236,7 +236,7 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
                             annotationMethodHandlerElement);
             Assert.isTrue(webBindingInitializerProperties.size() == 1,
                     "More than 1 element in 'webBindingInitializer' property");
-            webBindingInitializerBean = XmlUtils.findFirstElement("//bean",
+            webBindingInitializerBean = XmlUtils.findFirstElementByName("bean",
                     webBindingInitializerProperties.get(0));
         }
 
