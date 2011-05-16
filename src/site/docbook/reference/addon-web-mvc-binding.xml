@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="addon-web-mvc-binding"
+<chapter version="5.0" xml:id="addon-web-mvc-binding" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook" 
-         xml:lang="es">
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title>Add-on Web MVC Binding</title>
 
   <section xml:id="addon-web-mvc-binding_descripcion">
     <title xml:lang="es">Descripción</title>
 
     <para xml:lang="es">Este add-on prepara la configuración de los editores
-    por defecto de propiedades para Spring MVC en un una clase. </para>
+    por defecto de propiedades para Spring MVC en un una clase.</para>
 
     <para xml:lang="es">Para ver más información sobre los editores de
     propiedades ver la <link
