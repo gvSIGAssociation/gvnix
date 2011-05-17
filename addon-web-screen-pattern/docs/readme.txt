@@ -55,7 +55,7 @@ Run the application in Bash Shell and see the actual style::
 
 Back to the gvNIX/Roo Shell and type::
 
-  relationships setup table
+  web screen 
 
 After copying tagx files, generate AspectJ files and new jspx views, run again the application with the maven commmand::
 
