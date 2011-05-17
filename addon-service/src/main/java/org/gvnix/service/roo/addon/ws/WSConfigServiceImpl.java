@@ -1080,7 +1080,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                 XmlUtils.getConfiguration(this.getClass(),
                         "dependencies-export-jaxws-plugin.xml"));
 
-        projectOperations.buildPluginUpdate(new Plugin(pluginElement));
+        projectOperations.updateBuildPlugin(new Plugin(pluginElement));
         fileManager.commit();
 
     }
@@ -1096,7 +1096,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                                 "dependencies-export-wsdl2java-plugin.xml"));
 
         // Add plugin
-        projectOperations.buildPluginUpdate(new Plugin(plugin));
+        projectOperations.updateBuildPlugin(new Plugin(plugin));
         fileManager.commit();
     }
 
@@ -1362,7 +1362,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         "dependencies-import-codegen-plugin.xml"));
 
         // Add plugin
-        projectOperations.buildPluginUpdate(new Plugin(pluginTemplate));
+        projectOperations.updateBuildPlugin(new Plugin(pluginTemplate));
         fileManager.commit();
 
         // Get pom.xml
@@ -1523,7 +1523,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         "dependencies-import-axistools-plugin.xml"));
 
         // Add plugin
-        projectOperations.buildPluginUpdate(new Plugin(plugin));
+        projectOperations.updateBuildPlugin(new Plugin(plugin));
         fileManager.commit();
 
         // Get pom.xml
