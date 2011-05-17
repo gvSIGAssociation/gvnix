@@ -1,0 +1,19 @@
+theme list
+theme install --id cit
+theme set --id cit
+web mvc install language --code ca
+occ checksum all
+menu setup
+menu tree
+web report setup
+//controller class --class ~.web.MyController
+//web report add --controller ~.web.MyController --reportName Report --format pdf
+menu entry add --label my_test
+service class --class ~.services.Clase
+service operation --name checkString --service ~.services.Clase
+service define ws --class ~.services.Clase
+service operation --name returnString --service ~.services.Clase --return java.lang.String --exceptions java.lang.Exception
+service export operation --class ~.services.Clase --method returnString --resultName resultado
+service import ws --class ~.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
+service import ws --class ~.services.ClaseProxy11 --wsdl http://www.aswinanand.com/sendsms.php?wsdl
+service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
