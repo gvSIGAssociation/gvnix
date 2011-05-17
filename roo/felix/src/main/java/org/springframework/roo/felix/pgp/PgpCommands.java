@@ -28,7 +28,6 @@ import org.springframework.roo.shell.CommandMarker;
 @Service
 @Component
 public class PgpCommands implements CommandMarker {
-
 	@Reference PgpService pgpService;
 
 	@CliCommand(value="pgp status", help="Displays the status of the PGP environment")
@@ -72,10 +71,9 @@ public class PgpCommands implements CommandMarker {
 		if (pgpService.isAutomaticTrust()) {
 			pgpService.setAutomaticTrust(false);
 			return "Automatic PGP key trusting disabled (this is the safest option)";
-		} else {
-			pgpService.setAutomaticTrust(true);
-			return "Automatic PGP key trusting enabled (this is potentially unsafe); disable by typing 'pgp automatic trust' again";
 		}
+		pgpService.setAutomaticTrust(true);
+		return "Automatic PGP key trusting enabled (this is potentially unsafe); disable by typing 'pgp automatic trust' again";
 	}
 	
 	@CliCommand(value="pgp untrust", help="Revokes your trust for a particular key ID")
@@ -111,7 +109,7 @@ public class PgpCommands implements CommandMarker {
 		for (PGPPublicKeyRing keyRing : keyRings) {
 			Iterator<PGPPublicKey> it = keyRing.getPublicKeys();
 			while (it.hasNext()) {
-			    PGPPublicKey pgpKey = (PGPPublicKey)it.next();
+			    PGPPublicKey pgpKey = it.next();
 		        if (new PgpKeyId(pgpKey.getKeyID()).equals(keyId)) {
 		        	// We know about this key, so return a one-liner
 		        	StringBuilder sb = new StringBuilder();
@@ -140,7 +138,7 @@ public class PgpCommands implements CommandMarker {
 		Iterator<PGPPublicKey> it = keyRing.getPublicKeys();
 		boolean first = true;
 		while (it.hasNext()) {
-		    PGPPublicKey pgpKey = (PGPPublicKey)it.next();
+		    PGPPublicKey pgpKey = it.next();
 		    if (first) {
 		        appendLine(sb, ">>>> KEY ID: " + new PgpKeyId(pgpKey) + " <<<<");
 			    appendLine(sb, "     More Info: " + pgpService.getKeyServerUrlToRetrieveKeyInformation(new PgpKeyId(pgpKey)));

@@ -17,11 +17,15 @@ import java.util.Set;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.addon.entity.EntityMetadata;
+import org.springframework.roo.addon.plural.PluralMetadata;
 import org.springframework.roo.classpath.MutablePhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.scanner.MemberDetails;
+import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
@@ -29,6 +33,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
 
@@ -44,16 +49,15 @@ import org.springframework.roo.support.util.StringUtils;
 @Component
 @Service
 public class GwtTemplateServiceImpl implements GwtTemplateService {
-	@Reference private MutablePhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 	@Reference private FileManager fileManager;
+	@Reference private MemberDetailsScanner memberDetailsScanner;
 	@Reference private MetadataService metadataService;
+	@Reference private MutablePhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+	@Reference private ProjectOperations projectOperations;
 
 	public GwtTemplateDataHolder getMirrorTemplateTypeDetails(ClassOrInterfaceTypeDetails governorTypeDetails, Map<JavaSymbolName, GwtProxyProperty> clientSideTypeMap) {
-		JavaType governorTypeName = governorTypeDetails.getName();
-		Path governorTypePath = PhysicalTypeIdentifier.getPath(governorTypeDetails.getDeclaredByMetadataId());
-		EntityMetadata entityMetadata = (EntityMetadata) metadataService.get(EntityMetadata.createIdentifier(governorTypeName, governorTypePath));
-		ProjectMetadata projectMetadata = getProjectMetadata();
-		Map<GwtType, JavaType> mirrorTypeMap = GwtUtils.getMirrorTypeMap(projectMetadata, governorTypeName);
+		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
+		Map<GwtType, JavaType> mirrorTypeMap = GwtUtils.getMirrorTypeMap(projectMetadata, governorTypeDetails.getName());
 
 		Map<GwtType, ClassOrInterfaceTypeDetails> templateTypeDetailsMap = new HashMap<GwtType, ClassOrInterfaceTypeDetails>();
 		Map<GwtType, String> xmlTemplates = new HashMap<GwtType, String>();
@@ -61,13 +65,13 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
 			if (gwtType.getTemplate() == null) {
 				continue;
 			}
-			TemplateDataDictionary dataDictionary = buildMirrorDataDictionary(gwtType, governorTypeDetails, mirrorTypeMap, clientSideTypeMap, entityMetadata);
+			TemplateDataDictionary dataDictionary = buildMirrorDataDictionary(gwtType, governorTypeDetails, mirrorTypeMap, clientSideTypeMap);
 			gwtType.dynamicallyResolveFieldsToWatch(clientSideTypeMap);
 			gwtType.dynamicallyResolveMethodsToWatch(mirrorTypeMap.get(GwtType.PROXY), clientSideTypeMap, projectMetadata);
 			templateTypeDetailsMap.put(gwtType, getTemplateDetails(dataDictionary, gwtType.getTemplate(), mirrorTypeMap.get(gwtType)));
 
 			if (gwtType.isCreateUiXml()) {
-				dataDictionary = buildMirrorDataDictionary(gwtType, governorTypeDetails, mirrorTypeMap, clientSideTypeMap, entityMetadata);
+				dataDictionary = buildMirrorDataDictionary(gwtType, governorTypeDetails, mirrorTypeMap, clientSideTypeMap);
 				String contents = getTemplateContents(gwtType.getTemplate() + "UiXml", dataDictionary);
 				xmlTemplates.put(gwtType, contents);
 			}
@@ -141,7 +145,7 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
 	}
 
 	private TemplateDataDictionary buildDictionary(GwtType type) {
-		ProjectMetadata projectMetadata = getProjectMetadata();
+		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
 		TemplateDataDictionary dataDictionary = null;
 		GwtType locate = GwtType.PROXY;
 		String antPath = locate.getPath().canonicalFileSystemPath(projectMetadata) + File.separatorChar + "**" + locate.getSuffix() + ".java";
@@ -229,9 +233,9 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
 	}
 
 	private TemplateDataDictionary buildStandardDataDictionary(GwtType type) {
-		ProjectMetadata projectMetadata = getProjectMetadata();
+		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
 
-		JavaType javaType = GwtUtils.getDestinationJavaType(type, projectMetadata);
+		JavaType javaType = new JavaType(getFullyQualifiedTypeName(type, projectMetadata));
 		TemplateDataDictionary dataDictionary = TemplateDictionary.create();
 		for (GwtType reference : type.getReferences()) {
 			addReference(dataDictionary, reference);
@@ -248,12 +252,8 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
 		addImport(dataDictionary, gwtType.getPath().packageName(projectMetadata) + "." + simpleName + gwtType.getSuffix());
 	}
 
-	private ProjectMetadata getProjectMetadata() {
-		return (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
-	}
-
-	private TemplateDataDictionary buildMirrorDataDictionary(GwtType type, ClassOrInterfaceTypeDetails governorTypeDetails, Map<GwtType, JavaType> mirrorTypeMap, Map<JavaSymbolName, GwtProxyProperty> clientSideTypeMap, EntityMetadata entityMetadata) {
-		ProjectMetadata projectMetadata = getProjectMetadata();
+	private TemplateDataDictionary buildMirrorDataDictionary(GwtType type, ClassOrInterfaceTypeDetails governorTypeDetails, Map<GwtType, JavaType> mirrorTypeMap, Map<JavaSymbolName, GwtProxyProperty> clientSideTypeMap) {
+		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
 		JavaType proxyType = mirrorTypeMap.get(GwtType.PROXY);
 		JavaType javaType = mirrorTypeMap.get(type);
 
@@ -265,139 +265,148 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
 
 		addImport(dataDictionary, proxyType.getFullyQualifiedTypeName());
 
+		String pluralMetadataKey = PluralMetadata.createIdentifier(governorTypeDetails.getName(), Path.SRC_MAIN_JAVA);
+		PluralMetadata pluralMetadata = (PluralMetadata) metadataService.get(pluralMetadataKey);
+		String plural = pluralMetadata.getPlural();
+		
+		String simpleTypeName = governorTypeDetails.getName().getSimpleTypeName();
+
 		dataDictionary.setVariable("className", javaType.getSimpleTypeName());
 		dataDictionary.setVariable("packageName", javaType.getPackage().getFullyQualifiedPackageName());
 		dataDictionary.setVariable("placePackage", GwtPath.SCAFFOLD_PLACE.packageName(projectMetadata));
 		dataDictionary.setVariable("scaffoldUiPackage", GwtPath.SCAFFOLD_UI.packageName(projectMetadata));
 		dataDictionary.setVariable("sharedScaffoldPackage", GwtPath.SHARED_SCAFFOLD.packageName(projectMetadata));
 		dataDictionary.setVariable("uiPackage", GwtPath.MANAGED_UI.packageName(projectMetadata));
-		dataDictionary.setVariable("name", governorTypeDetails.getName().getSimpleTypeName());
-		dataDictionary.setVariable("pluralName", entityMetadata.getPlural());
-		dataDictionary.setVariable("nameUncapitalized", StringUtils.uncapitalize(governorTypeDetails.getName().getSimpleTypeName()));
+		dataDictionary.setVariable("name", simpleTypeName);
+		dataDictionary.setVariable("pluralName", plural);
+		dataDictionary.setVariable("nameUncapitalized", StringUtils.uncapitalize(simpleTypeName));
 		dataDictionary.setVariable("proxy", proxyType.getSimpleTypeName());
-		dataDictionary.setVariable("pluralName", entityMetadata.getPlural());
+		dataDictionary.setVariable("pluralName", plural);
 		dataDictionary.setVariable("proxyRenderer", GwtProxyProperty.getProxyRendererType(projectMetadata, proxyType));
 		String proxyFields = null;
-		GwtProxyProperty primaryProp = null;
-		GwtProxyProperty secondaryProp = null;
-		GwtProxyProperty dateProp = null;
+		GwtProxyProperty primaryProperty = null;
+		GwtProxyProperty secondaryProperty = null;
+		GwtProxyProperty dateProperty = null;
 		Set<String> importSet = new HashSet<String>();
-		for (GwtProxyProperty property : clientSideTypeMap.values()) {
+		
+		MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), governorTypeDetails);
+		 
+		for (GwtProxyProperty gwtProxyProperty : clientSideTypeMap.values()) {
 			// Determine if this is the primary property.
-			if (primaryProp == null) {
+			if (primaryProperty == null) {
 				// Choose the first available field.
-				primaryProp = property;
-			} else if (property.isString() && !primaryProp.isString()) {
+				primaryProperty = gwtProxyProperty;
+			} else if (gwtProxyProperty.isString() && !primaryProperty.isString()) {
 				// Favor String properties over other types.
-				secondaryProp = primaryProp;
-				primaryProp = property;
-			} else if (secondaryProp == null) {
+				secondaryProperty = primaryProperty;
+				primaryProperty = gwtProxyProperty;
+			} else if (secondaryProperty == null) {
 				// Choose the next available property.
-				secondaryProp = property;
-			} else if (property.isString() && !secondaryProp.isString()) {
+				secondaryProperty = gwtProxyProperty;
+			} else if (gwtProxyProperty.isString() && !secondaryProperty.isString()) {
 				// Favor String properties over other types.
-				secondaryProp = property;
+				secondaryProperty = gwtProxyProperty;
 			}
 
 			// Determine if this is the first date property.
-			if (dateProp == null && property.isDate()) {
-				dateProp = property;
+			if (dateProperty == null && gwtProxyProperty.isDate()) {
+				dateProperty = gwtProxyProperty;
 			}
 
-			if (property.isProxy() || property.isCollectionOfProxy()) {
+			if (gwtProxyProperty.isProxy() || gwtProxyProperty.isCollectionOfProxy()) {
 				if (proxyFields != null) {
 					proxyFields += ", ";
 				} else {
 					proxyFields = "";
 				}
-				proxyFields += "\"" + property.getName() + "\"";
+				proxyFields += "\"" + gwtProxyProperty.getName() + "\"";
 			}
 
-			dataDictionary.addSection("fields").setVariable("field", property.getName());
-			if (!isReadOnly(property.getName(), governorTypeDetails, entityMetadata))
-				dataDictionary.addSection("editViewProps").setVariable("prop", property.forEditView());
+			dataDictionary.addSection("fields").setVariable("field", gwtProxyProperty.getName());
+			if (!isReadOnly(gwtProxyProperty.getName(), governorTypeDetails, memberDetails)) {
+				dataDictionary.addSection("editViewProps").setVariable("prop", gwtProxyProperty.forEditView());
+			}
 
 			TemplateDataDictionary propertiesSection = dataDictionary.addSection("properties");
-			propertiesSection.setVariable("prop", property.getName());
-			propertiesSection.setVariable("propId", proxyType.getSimpleTypeName() + "_" + property.getName());
-			propertiesSection.setVariable("propGetter", property.getGetter());
-			propertiesSection.setVariable("propType", property.getType());
-			propertiesSection.setVariable("propFormatter", property.getFormatter());
-			propertiesSection.setVariable("propRenderer", property.getRenderer());
-			propertiesSection.setVariable("propReadable", property.getReadableName());
+			propertiesSection.setVariable("prop", gwtProxyProperty.getName());
+			propertiesSection.setVariable("propId", proxyType.getSimpleTypeName() + "_" + gwtProxyProperty.getName());
+			propertiesSection.setVariable("propGetter", gwtProxyProperty.getGetter());
+			propertiesSection.setVariable("propType", gwtProxyProperty.getType());
+			propertiesSection.setVariable("propFormatter", gwtProxyProperty.getFormatter());
+			propertiesSection.setVariable("propRenderer", gwtProxyProperty.getRenderer());
+			propertiesSection.setVariable("propReadable", gwtProxyProperty.getReadableName());
 
-			if (!isReadOnly(property.getName(), governorTypeDetails, entityMetadata)) {
+			if (!isReadOnly(gwtProxyProperty.getName(), governorTypeDetails, memberDetails)) {
 				TemplateDataDictionary editableSection = dataDictionary.addSection("editableProperties");
-				editableSection.setVariable("prop", property.getName());
-				editableSection.setVariable("propId", proxyType.getSimpleTypeName() + "_" + property.getName());
-				editableSection.setVariable("propGetter", property.getGetter());
-				editableSection.setVariable("propType", property.getType());
-				editableSection.setVariable("propFormatter", property.getFormatter());
-				editableSection.setVariable("propRenderer", property.getRenderer());
-				editableSection.setVariable("propBinder", property.getBinder());
-				editableSection.setVariable("propReadable", property.getReadableName());
+				editableSection.setVariable("prop", gwtProxyProperty.getName());
+				editableSection.setVariable("propId", proxyType.getSimpleTypeName() + "_" + gwtProxyProperty.getName());
+				editableSection.setVariable("propGetter", gwtProxyProperty.getGetter());
+				editableSection.setVariable("propType", gwtProxyProperty.getType());
+				editableSection.setVariable("propFormatter", gwtProxyProperty.getFormatter());
+				editableSection.setVariable("propRenderer", gwtProxyProperty.getRenderer());
+				editableSection.setVariable("propBinder", gwtProxyProperty.getBinder());
+				editableSection.setVariable("propReadable", gwtProxyProperty.getReadableName());
 			}
 
 			dataDictionary.setVariable("proxyRendererType", GwtType.EDIT_RENDERER.getPath().packageName(projectMetadata) + "." + proxyType.getSimpleTypeName() + "Renderer");
 
-			if (property.isProxy() || property.isEnum() || property.isCollectionOfProxy()) {
-				TemplateDataDictionary section = dataDictionary.addSection(property.isEnum() ? "setEnumValuePickers" : "setProxyValuePickers");
-				section.setVariable("setValuePicker", property.getSetValuePickerMethod());
-				section.setVariable("setValuePickerName", property.getSetValuePickerMethodName());
-				section.setVariable("valueType", property.getValueType().getSimpleTypeName());
-				section.setVariable("rendererType", property.getProxyRendererType());
-				if (property.isProxy() || property.isCollectionOfProxy()) {
-					String propTypeName = StringUtils.uncapitalize(property.isCollectionOfProxy() ? property.getPropertyType().getParameters().get(0).getSimpleTypeName() : property.getPropertyType().getSimpleTypeName());
+			if (gwtProxyProperty.isProxy() || gwtProxyProperty.isEnum() || gwtProxyProperty.isCollectionOfProxy()) {
+				TemplateDataDictionary section = dataDictionary.addSection(gwtProxyProperty.isEnum() ? "setEnumValuePickers" : "setProxyValuePickers");
+				section.setVariable("setValuePicker", gwtProxyProperty.getSetValuePickerMethod());
+				section.setVariable("setValuePickerName", gwtProxyProperty.getSetValuePickerMethodName());
+				section.setVariable("valueType", gwtProxyProperty.getValueType().getSimpleTypeName());
+				section.setVariable("rendererType", gwtProxyProperty.getProxyRendererType());
+				if (gwtProxyProperty.isProxy() || gwtProxyProperty.isCollectionOfProxy()) {
+					String propTypeName = StringUtils.uncapitalize(gwtProxyProperty.isCollectionOfProxy() ? gwtProxyProperty.getPropertyType().getParameters().get(0).getSimpleTypeName() : gwtProxyProperty.getPropertyType().getSimpleTypeName());
 					propTypeName = propTypeName.substring(0, propTypeName.indexOf("Proxy"));
 					section.setVariable("requestInterface", propTypeName + "Request");
 					section.setVariable("findMethod", "find" + StringUtils.capitalize(propTypeName) + "Entries(0, 50)");
 				}
-				maybeAddImport(dataDictionary, importSet, property.getPropertyType());
-				maybeAddImport(dataDictionary, importSet, property.getValueType());
-				if (property.isCollectionOfProxy()) {
-					maybeAddImport(dataDictionary, importSet, property.getPropertyType().getParameters().get(0));
-					maybeAddImport(dataDictionary, importSet, property.getSetEditorType());
+				maybeAddImport(dataDictionary, importSet, gwtProxyProperty.getPropertyType());
+				maybeAddImport(dataDictionary, importSet, gwtProxyProperty.getValueType());
+				if (gwtProxyProperty.isCollectionOfProxy()) {
+					maybeAddImport(dataDictionary, importSet, gwtProxyProperty.getPropertyType().getParameters().get(0));
+					maybeAddImport(dataDictionary, importSet, gwtProxyProperty.getSetEditorType());
 				}
 			}
-
 		}
 
 		dataDictionary.setVariable("proxyFields", proxyFields);
 
 		// Add a section for the mobile properties.
-		if (primaryProp != null) {
-			dataDictionary.setVariable("primaryProp", primaryProp.getName());
-			dataDictionary.setVariable("primaryPropGetter", primaryProp.getGetter());
-			dataDictionary.setVariable("primaryPropBuilder", primaryProp.forMobileListView("primaryRenderer"));
+		if (primaryProperty != null) {
+			dataDictionary.setVariable("primaryProp", primaryProperty.getName());
+			dataDictionary.setVariable("primaryPropGetter", primaryProperty.getGetter());
+			dataDictionary.setVariable("primaryPropBuilder", primaryProperty.forMobileListView("primaryRenderer"));
 			TemplateDataDictionary section = dataDictionary.addSection("mobileProperties");
-			section.setVariable("prop", primaryProp.getName());
-			section.setVariable("propGetter", primaryProp.getGetter());
-			section.setVariable("propType", primaryProp.getType());
-			section.setVariable("propRenderer", primaryProp.getRenderer());
+			section.setVariable("prop", primaryProperty.getName());
+			section.setVariable("propGetter", primaryProperty.getGetter());
+			section.setVariable("propType", primaryProperty.getType());
+			section.setVariable("propRenderer", primaryProperty.getRenderer());
 			section.setVariable("propRendererName", "primaryRenderer");
 		} else {
 			dataDictionary.setVariable("primaryProp", "id");
 			dataDictionary.setVariable("primaryPropGetter", "getId");
 			dataDictionary.setVariable("primaryPropBuilder", "");
 		}
-		if (secondaryProp != null) {
-			dataDictionary.setVariable("secondaryPropBuilder", secondaryProp.forMobileListView("secondaryRenderer"));
+		if (secondaryProperty != null) {
+			dataDictionary.setVariable("secondaryPropBuilder", secondaryProperty.forMobileListView("secondaryRenderer"));
 			TemplateDataDictionary section = dataDictionary.addSection("mobileProperties");
-			section.setVariable("prop", secondaryProp.getName());
-			section.setVariable("propGetter", secondaryProp.getGetter());
-			section.setVariable("propType", secondaryProp.getType());
-			section.setVariable("propRenderer", secondaryProp.getRenderer());
+			section.setVariable("prop", secondaryProperty.getName());
+			section.setVariable("propGetter", secondaryProperty.getGetter());
+			section.setVariable("propType", secondaryProperty.getType());
+			section.setVariable("propRenderer", secondaryProperty.getRenderer());
 			section.setVariable("propRendererName", "secondaryRenderer");
 		} else {
 			dataDictionary.setVariable("secondaryPropBuilder", "");
 		}
-		if (dateProp != null) {
-			dataDictionary.setVariable("datePropBuilder", dateProp.forMobileListView("dateRenderer"));
+		if (dateProperty != null) {
+			dataDictionary.setVariable("datePropBuilder", dateProperty.forMobileListView("dateRenderer"));
 			TemplateDataDictionary section = dataDictionary.addSection("mobileProperties");
-			section.setVariable("prop", dateProp.getName());
-			section.setVariable("propGetter", dateProp.getGetter());
-			section.setVariable("propType", dateProp.getType());
-			section.setVariable("propRenderer", dateProp.getRenderer());
+			section.setVariable("prop", dateProperty.getName());
+			section.setVariable("propGetter", dateProperty.getGetter());
+			section.setVariable("propType", dateProperty.getType());
+			section.setVariable("propRenderer", dateProperty.getRenderer());
 			section.setVariable("propRendererName", "dateRenderer");
 		} else {
 			dataDictionary.setVariable("datePropBuilder", "");
@@ -411,7 +420,7 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
 	}
 
 	private JavaType getDestinationJavaType(GwtType destType) {
-		return new JavaType(GwtUtils.getFullyQualifiedTypeName(destType, getProjectMetadata()));
+		return new JavaType(getFullyQualifiedTypeName(destType, projectOperations.getProjectMetadata()));
 	}
 
 	private void addReference(TemplateDataDictionary dataDictionary, GwtType type) {
@@ -419,13 +428,17 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
 		dataDictionary.setVariable(type.getName(), getDestinationJavaType(type).getSimpleTypeName());
 	}
 
-	private boolean isReadOnly(String name, ClassOrInterfaceTypeDetails governorTypeDetails, EntityMetadata entityMetadata) {
-		FieldMetadata versionField = entityMetadata.getVersionField();
-		FieldMetadata idField = entityMetadata.getIdentifierField();
-		Assert.notNull(versionField, "Version unavailable for " + governorTypeDetails.getName() + " - required for GWT support");
-		Assert.notNull(idField, "Id unavailable for " + governorTypeDetails.getName() + " - required for GWT support");
-		JavaSymbolName versionPropertyName = versionField.getFieldName();
+	private boolean isReadOnly(String name, ClassOrInterfaceTypeDetails governorTypeDetails, MemberDetails memberDetails) {
+		List<FieldMetadata> idFields = MemberFindingUtils.getFieldsWithTag(memberDetails, PersistenceCustomDataKeys.IDENTIFIER_FIELD);
+		Assert.isTrue(!idFields.isEmpty(), "Id unavailable for '" + governorTypeDetails.getName().getFullyQualifiedTypeName() + "' - required for GWT support");
+		FieldMetadata idField = idFields.get(0);
 		JavaSymbolName idPropertyName = idField.getFieldName();
+		
+		List<FieldMetadata> versionFields = MemberFindingUtils.getFieldsWithTag(memberDetails, PersistenceCustomDataKeys.VERSION_FIELD);
+		Assert.isTrue(!versionFields.isEmpty(), "Version unavailable for '" + governorTypeDetails.getName().getFullyQualifiedTypeName() + "' - required for GWT support");
+		FieldMetadata versionField = versionFields.get(0);
+		JavaSymbolName versionPropertyName = versionField.getFieldName();
+		
 		return name.equals(idPropertyName.getSymbolName()) || name.equals(versionPropertyName.getSymbolName());
 	}
 
@@ -457,5 +470,9 @@ public class GwtTemplateServiceImpl implements GwtTemplateService {
 		}
 
 		return javaType;
+	}
+	
+	private String getFullyQualifiedTypeName(GwtType gwtType, ProjectMetadata projectMetadata) {
+		return gwtType.getPath().packageName(projectMetadata) + "." + gwtType.getTemplate();
 	}
 }

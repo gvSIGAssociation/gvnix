@@ -9,6 +9,7 @@ import org.springframework.roo.project.Repository;
  * @author Stefan Schmidt
  * @since 1.1
  */
+@Deprecated
 public interface RepositoryListener {
 
 	void repositoryAdded(Repository repositiory);

@@ -9,6 +9,7 @@ import org.springframework.roo.project.Resource;
  * @author Alan Stewart
  * @since 1.1
  */
+@Deprecated
 public interface ResourceListener {
 
 	void resourceAdded(Resource resource);

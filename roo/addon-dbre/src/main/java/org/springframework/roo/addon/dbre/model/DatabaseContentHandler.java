@@ -14,7 +14,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * {@link ContentHandler} implementation for converting the .roo-dbre xml file into a {@link Database} object.
+ * {@link ContentHandler} implementation for converting the DBRE xml file into a {@link Database} object.
  * 
  * @author Alan Stewart
  * @since 1.1
@@ -109,6 +109,7 @@ public final class DatabaseContentHandler extends DefaultHandler {
 	private Table getTable(Attributes attributes) {
 		Table table = new Table();
 		table.setName(attributes.getValue(DatabaseXmlUtils.NAME));
+		table.setSchema(new Schema(name));
 		if (StringUtils.hasText(attributes.getValue(DatabaseXmlUtils.DESCRIPTION))) {
 			table.setDescription(DatabaseXmlUtils.DESCRIPTION);
 		}

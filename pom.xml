@@ -58,9 +58,6 @@
     <module>addon-web-screen-pattern</module>
     <module>addon-web-mvc-binding</module> 
     <module>addon-web-exception-handler</module> 
-    <!-- 
-      <module>annotations</module> 
-    -->
   </modules>
 
   <!-- Note when doing releases: tagBase is set in release plugin configuration 
@@ -993,7 +990,7 @@
   </reporting>
   <properties>
     <spring.version>3.0.5.RELEASE</spring.version>
-    <roo.version>1.1.3.RELEASE</roo.version>
+    <roo.version>1.1.4.RELEASE</roo.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- DiSiD: Add google code project name -->
     <google.code.project.name>gvnix</google.code.project.name>

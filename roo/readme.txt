@@ -30,7 +30,7 @@ need to add a $ROO_HOME variable. It is simply used in these docs.
 Next double-check you meet the installation requirements:
 
  * A proper installation of Java 6 or above
- * Maven 3.0.1+ properly installed and working with your Java 5+
+ * Maven 3.0.1+ properly installed and working with your Java 6+
  * Internet access so that Maven can download required dependencies
 
 Next you need to setup an environment variable called MAVEN_OPTS.
@@ -95,7 +95,7 @@ However, if you're doing a lot of builds you might prefer automation.
 One final note if you're new to GPG: don't lose your private key!
 Backup the secring.gpg file, as you'll need it to ever revoke your key
 or sign a replacement key (the public key servers offer no way to
-revoke a key unless you can sign the recovation request).
+revoke a key unless you can sign the revocation request).
 
 ======================================================================
 DEVELOPING WITHIN ECLIPSE
@@ -203,7 +203,7 @@ changes with:
 
   git status
 
-You can use "gwt add -A" if you just want to add everything you see.
+You can use "git add -A" if you just want to add everything you see.
 
 Next you need to make a commit. Do this via:
 
@@ -248,7 +248,7 @@ PREREQUISITES:
    * Git push privileges (if you can commit, you have this)
    * VPN access for SSH into static.springsource.org
    * SSH keypair for auto login into static.springsource.org
-   * s3cmd setup (so "s3cmd ls" lists spring-roo-repository.s2.org)
+   * s3cmd setup (so "s3cmd ls" lists spring-roo-repository.springsource.org)
    * ~/.m2/settings.xml for spring-roo-repository-release and
      spring-roo-repository-snapshot IDs with S3 username/password
    * @SpringRoo twitter account credentials
@@ -271,7 +271,7 @@ RELEASE PROCEDURE:
    mvn clean site
    ./roo-deploy.sh -c assembly -tv (use -t for extra tests)
 
-2. Verify the assembly ZIP looks good:
+2. Verify the assembly ZIP ($ROO_HOME/target/roo-deploy/dist/*.zip) looks good:
 
    * Assembly ZIP unzips and is of a sensible size
    * Assembly ZIP contains both PDF and HTML documentation

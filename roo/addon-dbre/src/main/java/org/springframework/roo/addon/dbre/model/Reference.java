@@ -2,6 +2,9 @@ package org.springframework.roo.addon.dbre.model;
 
 import java.io.Serializable;
 
+import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.StringUtils;
+
 /**
  * Represents a reference between a column in the local table and a column in another table.
  * 
@@ -29,6 +32,8 @@ public class Reference implements Serializable {
 	 * Creates a new reference between the two given columns.
 	 */
 	Reference(String localColumnName, String foreignColumnName) {
+		Assert.isTrue(StringUtils.hasText(localColumnName), "Foreign key reference local column name required");
+		Assert.isTrue(StringUtils.hasText(foreignColumnName), "Foreign key reference foreign column name required");
 		this.localColumnName = localColumnName;
 		this.foreignColumnName = foreignColumnName; 
 	}
@@ -113,6 +118,6 @@ public class Reference implements Serializable {
 	}
 
 	public String toString() {
-		return String.format("Reference [localColumnName=%s, foreignColumnName=%s]", localColumnName, foreignColumnName);
+		return String.format("Reference [localColumnName=%s, foreignColumnName=%s, insertableOrUpdatable=%s]", localColumnName, foreignColumnName, insertableOrUpdatable);
 	}
 }

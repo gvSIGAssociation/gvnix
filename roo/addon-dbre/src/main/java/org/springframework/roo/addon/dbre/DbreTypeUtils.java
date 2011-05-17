@@ -81,7 +81,7 @@ public abstract class DbreTypeUtils {
 
 		if (!StringUtils.hasText(tableName)) {
 			// The search continues...
-			annotation = MemberFindingUtils.getTypeAnnotation(classOrInterfaceTypeDetails, new JavaType(RooEntity.class.getName()));
+			annotation = MemberFindingUtils.getTypeAnnotation(classOrInterfaceTypeDetails, new JavaType("org.springframework.roo.addon.entity.RooEntity"));
 			if (annotation != null) {
 				AnnotationAttributeValue<?> tableAttribute = annotation.getAttribute(new JavaSymbolName("table"));
 				if (tableAttribute != null) {

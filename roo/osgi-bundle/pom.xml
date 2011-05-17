@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.roo</groupId>
 		<artifactId>org.springframework.roo.root</artifactId>
-		<version>1.1.3.RELEASE</version>
+		<version>1.1.4.RELEASE</version>
 		<relativePath>..</relativePath>
 	</parent>
     <artifactId>org.springframework.roo.osgi.bundle</artifactId>
@@ -90,6 +90,7 @@
 				<version>1.6</version>
 				<executions>
 					<execution>
+						<!-- copies the JARs we have built locally (eg bootstrap JAR) that noone else depends on into the target/all -->
 						<id>copy-jars-for-roo-dev-or-assembly</id>
 						<phase>package</phase>
 						<configuration>

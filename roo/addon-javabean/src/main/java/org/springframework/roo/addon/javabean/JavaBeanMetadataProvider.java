@@ -1,5 +1,10 @@
 package org.springframework.roo.addon.javabean;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -16,14 +21,13 @@ import org.springframework.roo.classpath.details.annotations.AnnotationAttribute
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * Provides {@link JavaBeanMetadata}.
@@ -36,15 +40,41 @@ import java.util.Map;
 public final class JavaBeanMetadataProvider extends AbstractItdMetadataProvider {
 	@Reference private ProjectOperations projectOperations;
 	@Reference private TypeLocationService typeLocationService;
+	private Set<String> producedMids = new LinkedHashSet<String>();
+	private Boolean wasGaeEnabled = null;
 
 	protected void activate(ComponentContext context) {
+		metadataDependencyRegistry.addNotificationListener(this);
 		metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
 		addMetadataTrigger(new JavaType(RooJavaBean.class.getName()));
 	}
 
 	protected void deactivate(ComponentContext context) {
+		metadataDependencyRegistry.removeNotificationListener(this);
 		metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
 		removeMetadataTrigger(new JavaType(RooJavaBean.class.getName()));
+	}
+
+	@Override
+	protected void notifyForGenericListener(String upstreamDependency) {
+		if (!StringUtils.hasText(upstreamDependency) || !MetadataIdentificationUtils.isValid(upstreamDependency)) {
+			return;
+		}
+		if (!upstreamDependency.equals(ProjectMetadata.getProjectIdentifier())) {
+			return;
+		}
+		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
+		if (projectMetadata == null || !projectMetadata.isValid()) {
+			return;
+		}
+		boolean isGaeEnabled = projectMetadata.isGaeEnabled();
+		boolean hasGaeStateChanged = wasGaeEnabled == null || isGaeEnabled != wasGaeEnabled;
+		if (projectMetadata.isGwtEnabled() && hasGaeStateChanged) {
+			wasGaeEnabled = isGaeEnabled;
+			for (String producedMid : producedMids) {
+				metadataService.get(producedMid, true);
+			}
+		}
 	}
 
 	protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
@@ -62,13 +92,25 @@ public final class JavaBeanMetadataProvider extends AbstractItdMetadataProvider 
 				declaredFields.put(field, isGaeInterested(field));
 			}
 		}
+
+		producedMids.add(metadataIdentificationString);
 		return new JavaBeanMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, declaredFields);
 	}
 
 	private FieldMetadata isGaeInterested(FieldMetadata field) {
+		// We are not interested if the field is annotated with @javax.persistence.Transient
+		for (AnnotationMetadata annotationMetadata : field.getAnnotations()) {
+			if (annotationMetadata.getAnnotationType().getFullyQualifiedTypeName().equals("javax.persistence.Transient")) {
+				return null;
+			}
+		}
 		JavaType fieldType = field.getFieldType();
+		// If the field is a common collection type we need to get the element type
 		if (fieldType.isCommonCollectionType()) {
-			fieldType = field.getFieldType().getParameters().get(0);
+			if (fieldType.getParameters().isEmpty()) {
+				return null;
+			}
+			fieldType = fieldType.getParameters().get(0);
 		}
 
 		try {
@@ -104,21 +146,22 @@ public final class JavaBeanMetadataProvider extends AbstractItdMetadataProvider 
 
 	private FieldMetadata getIdentifierField(ClassOrInterfaceTypeDetails governorTypeDetails) {
 		for (AnnotationMetadata annotation : governorTypeDetails.getAnnotations()) {
-			if (annotation.getAnnotationType().getFullyQualifiedTypeName().equals("org.springframework.roo.addon.entity.RooEntity")) {
-				AnnotationAttributeValue<?> value = annotation.getAttribute(new JavaSymbolName("identifierField"));
-				if (value != null) {
-					FieldMetadata possibleIdentifierField = MemberFindingUtils.getField(governorTypeDetails, new JavaSymbolName(String.valueOf(value.getValue())));
-					for (AnnotationMetadata fieldAnnotation : possibleIdentifierField.getAnnotations()) {
-						if (fieldAnnotation.getAnnotationType().getFullyQualifiedTypeName().equals("javax.persistence.Id")) {
-							return possibleIdentifierField;
-						}
+			if (!annotation.getAnnotationType().getFullyQualifiedTypeName().equals("org.springframework.roo.addon.entity.RooEntity")) {
+				continue;
+			}
+			AnnotationAttributeValue<?> value = annotation.getAttribute(new JavaSymbolName("identifierField"));
+			if (value != null) {
+				FieldMetadata possibleIdentifierField = MemberFindingUtils.getField(governorTypeDetails, new JavaSymbolName(String.valueOf(value.getValue())));
+				for (AnnotationMetadata fieldAnnotation : possibleIdentifierField.getAnnotations()) {
+					if (fieldAnnotation.getAnnotationType().getFullyQualifiedTypeName().equals("javax.persistence.Id")) {
+						return possibleIdentifierField;
 					}
-				} else {
-					for (MemberHoldingTypeDetails member : memberDetailsScanner.getMemberDetails(JavaBeanMetadataProvider.class.getName(), governorTypeDetails).getDetails()) {
-						for (FieldMetadata field : member.getDeclaredFields()) {
-							if (field.getFieldName().getSymbolName().equals("id")) {
-								return field;
-							}
+				}
+			} else {
+				for (MemberHoldingTypeDetails member : getMemberDetails(governorTypeDetails.getName()).getDetails()) {
+					for (FieldMetadata field : member.getDeclaredFields()) {
+						if (field.getFieldName().getSymbolName().equals("id")) {
+							return field;
 						}
 					}
 				}

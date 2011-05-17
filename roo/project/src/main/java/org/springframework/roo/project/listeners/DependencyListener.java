@@ -10,6 +10,7 @@ import org.springframework.roo.project.Dependency;
  * @since 1.0
  *
  */
+@Deprecated
 public interface DependencyListener {
 
 	void dependencyAdded(Dependency d);

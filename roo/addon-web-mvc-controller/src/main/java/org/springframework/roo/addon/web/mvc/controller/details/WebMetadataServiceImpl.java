@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -258,7 +257,7 @@ public class WebMetadataServiceImpl implements WebMetadataService {
 		Assert.notNull(metadataService, "Metadata service required");
 		Assert.notNull(memberDetails, "Member details required");
 		
-		Map<JavaSymbolName, DateTimeFormatDetails> dates = new HashMap<JavaSymbolName, DateTimeFormatDetails>();
+		Map<JavaSymbolName, DateTimeFormatDetails> dates = new LinkedHashMap<JavaSymbolName, DateTimeFormatDetails>();
 		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = getJavaTypePersistenceMetadataDetails(javaType, memberDetails, metadataIdentificationString);
 		for (MethodMetadata method : MemberFindingUtils.getMethods(memberDetails)) {
 			// Only interested in accessors
@@ -299,7 +298,7 @@ public class WebMetadataServiceImpl implements WebMetadataService {
 						}
 					}
 				} else {
-					logger.warning("It is recommended to use @DateTimeFormat(style=\"S-\") on " + fieldMetadata.getFieldName() + " to use automatic date conversion in Spring MVC");
+					logger.warning("It is recommended to use @DateTimeFormat(style=\"S-\") on " + fieldMetadata.getFieldType().getFullyQualifiedTypeName() + "." + fieldMetadata.getFieldName() + " to use automatic date conversion in Spring MVC");
 				}
 			}
 		}
@@ -394,7 +393,7 @@ public class WebMetadataServiceImpl implements WebMetadataService {
 	
 	public MemberDetails getMemberDetails(JavaType javaType) {
 		PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(javaType, Path.SRC_MAIN_JAVA));
-		Assert.notNull(physicalTypeMetadata, "Unable to obtain physical type metdata for type " + javaType.getFullyQualifiedTypeName());
+		Assert.notNull(physicalTypeMetadata, "Unable to obtain physical type metadata for type " + javaType.getFullyQualifiedTypeName());
 		ClassOrInterfaceTypeDetails classOrInterfaceDetails = (ClassOrInterfaceTypeDetails) physicalTypeMetadata.getMemberHoldingTypeDetails();
 		return memberDetailsScanner.getMemberDetails(WebMetadataServiceImpl.class.getName(), classOrInterfaceDetails);
 	}

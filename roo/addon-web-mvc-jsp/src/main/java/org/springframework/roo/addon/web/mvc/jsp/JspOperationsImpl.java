@@ -1,7 +1,9 @@
 package org.springframework.roo.addon.web.mvc.jsp;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.backup.BackupOperations;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.WebMvcOperations;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
@@ -38,7 +41,6 @@ import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
@@ -77,6 +79,7 @@ public class JspOperationsImpl implements JspOperations {
 	@Reference private PropFileOperations propFileOperations;
 	@Reference private I18nSupport i18nSupport;
 	@Reference private UaaRegistrationService uaaRegistrationService;
+	@Reference private BackupOperations backupOperations;
 
 	private ComponentContext context;
 
@@ -113,27 +116,27 @@ public class JspOperationsImpl implements JspOperations {
 		updateConfiguration();
 
 		// Install styles
-		copyDirectoryContents("images/*.*", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/images"));
+		copyDirectoryContents("images/*.*", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/images"), false);
 
 		// Install styles
-		copyDirectoryContents("styles/*.css", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/styles"));
-		copyDirectoryContents("styles/*.properties", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/classes"));
+		copyDirectoryContents("styles/*.css", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/styles"), false);
+		copyDirectoryContents("styles/*.properties", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/classes"), false);
 
 		// Install layout
-		copyDirectoryContents("tiles/default.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/layouts/"));
-		copyDirectoryContents("tiles/layouts.xml", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/layouts/"));
-		copyDirectoryContents("tiles/header.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"));
-		copyDirectoryContents("tiles/footer.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"));
-		copyDirectoryContents("tiles/views.xml", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"));
+		copyDirectoryContents("tiles/default.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/layouts/"), false);
+		copyDirectoryContents("tiles/layouts.xml", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/layouts/"), false);
+		copyDirectoryContents("tiles/header.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"), false);
+		copyDirectoryContents("tiles/footer.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"), false);
+		copyDirectoryContents("tiles/views.xml", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"), false);
 
 		// Install common view files
-		copyDirectoryContents("*.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"));
+		copyDirectoryContents("*.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"), false);
 
 		// Install tags
-		copyDirectoryContents("tags/form/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/form"));
-		copyDirectoryContents("tags/form/fields/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/form/fields"));
-		copyDirectoryContents("tags/menu/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/menu"));
-		copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"));
+		copyDirectoryContents("tags/form/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/form"), false);
+		copyDirectoryContents("tags/form/fields/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/form/fields"), false);
+		copyDirectoryContents("tags/menu/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/menu"), false);
+		copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"), false);
 
 		// Install default language 'en'
 		installI18n(i18nSupport.getLanguage(Locale.ENGLISH));
@@ -173,7 +176,10 @@ public class JspOperationsImpl implements JspOperations {
 				throw new IllegalStateException("Encountered an error during copying of resources for controller class.", e);
 			}
 		}
-		XmlUtils.writeXml(fileManager.createFile(projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views" + path + "/" + lcViewName + ".jspx")).getOutputStream(), document);
+
+		String viewFile = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views" + path + "/" + lcViewName + ".jspx");
+		fileManager.createOrUpdateTextFileIfRequired(viewFile, XmlUtils.nodeToString(document), false);
+
 		installView(new JavaSymbolName(viewName), path, title, category, registerStaticController);
 	}
 
@@ -198,27 +204,32 @@ public class JspOperationsImpl implements JspOperations {
 		tilesOperations.addViewDefinition(folderName, folderName + "/" + lcViewName, TilesOperationsImpl.DEFAULT_TEMPLATE, "/WEB-INF/views" + folderName + "/" + lcViewName + ".jspx");
 
 		String mvcConfig = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/spring/webmvc-config.xml");
-
 		if (registerStaticController && fileManager.exists(mvcConfig)) {
-			MutableFile mvcConfigFile = fileManager.updateFile(mvcConfig);
-			Document doc;
-			try {
-				doc = XmlUtils.getDocumentBuilder().parse(mvcConfigFile.getInputStream());
-			} catch (Exception e) {
-				throw new IllegalStateException("Could not parse " + mvcConfig, e);
-			}
+			Document document = XmlUtils.readXml(fileManager.getInputStream(mvcConfig));
 
-			if (null == XmlUtils.findFirstElement("/beans/view-controller[@path='" + folderName + "/" + lcViewName + "']", doc.getDocumentElement())) {
-				Element sibling = XmlUtils.findFirstElement("/beans/view-controller", doc.getDocumentElement());
-				Element view = new XmlElementBuilder("mvc:view-controller", doc).addAttribute("path", folderName + "/" + lcViewName).build();
+			if (null == XmlUtils.findFirstElement("/beans/view-controller[@path='" + folderName + "/" + lcViewName + "']", document.getDocumentElement())) {
+				Element sibling = XmlUtils.findFirstElement("/beans/view-controller", document.getDocumentElement());
+				Element view = new XmlElementBuilder("mvc:view-controller", document).addAttribute("path", folderName + "/" + lcViewName).build();
 				if (sibling != null) {
 					sibling.getParentNode().insertBefore(view, sibling);
 				} else {
-					doc.getDocumentElement().appendChild(view);
+					document.getDocumentElement().appendChild(view);
 				}
-				XmlUtils.writeXml(mvcConfigFile.getOutputStream(), doc);
+				fileManager.createOrUpdateTextFileIfRequired(mvcConfig, XmlUtils.nodeToString(document), false);
 			}
 		}
+	}
+	
+	public void updateTags(boolean backup) {
+		if (backup) {
+			backupOperations.backup();
+		}
+		PathResolver pathResolver = projectOperations.getPathResolver();
+		// Update tags
+		copyDirectoryContents("tags/form/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/form"), true);
+		copyDirectoryContents("tags/form/fields/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/form/fields"), true);
+		copyDirectoryContents("tags/menu/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/menu"), true);
+		copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"), true);
 	}
 
 	/**
@@ -364,25 +375,18 @@ public class JspOperationsImpl implements JspOperations {
 
 		// Add config to MVC app context
 		String mvcConfig = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml");
-		MutableFile mutableMvcConfigFile = fileManager.updateFile(mvcConfig);
-		Document mvcConfigDocument;
-		try {
-			mvcConfigDocument = XmlUtils.getDocumentBuilder().parse(mutableMvcConfigFile.getInputStream());
-		} catch (Exception ex) {
-			throw new IllegalStateException("Could not open Spring MVC config file '" + mvcConfig + "'", ex);
-		}
-
+		Document mvcConfigDocument = XmlUtils.readXml(fileManager.getInputStream(mvcConfig));
 		Element beans = mvcConfigDocument.getDocumentElement();
 
-		if (null != XmlUtils.findFirstElement("/beans/bean[@id='tilesViewResolver']", beans) || null != XmlUtils.findFirstElement("/beans/bean[@id='tilesConfigurer']", beans)) {
+		if (null != XmlUtils.findFirstElement("/beans/bean[@id = 'tilesViewResolver']", beans) || null != XmlUtils.findFirstElement("/beans/bean[@id = 'tilesConfigurer']", beans)) {
 			return; // Tiles is already configured, nothing to do
 		}
 
-		InputStream configTemplateInputStream = TemplateUtils.getTemplate(getClass(), "tiles/tiles-mvc-config-template.xml");
-		Assert.notNull(configTemplateInputStream, "Could not acquire dependencies.xml file");
 		Document configDoc;
 		try {
-			configDoc = XmlUtils.getDocumentBuilder().parse(configTemplateInputStream);
+			InputStream configTemplateInputStream = TemplateUtils.getTemplate(getClass(), "tiles/tiles-mvc-config-template.xml");
+			Assert.notNull(configTemplateInputStream, "Could not acquire dependencies.xml file");
+			configDoc = XmlUtils.readXml(configTemplateInputStream);
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
@@ -395,11 +399,7 @@ public class JspOperationsImpl implements JspOperations {
 			beans.appendChild(importedBean);
 		}
 
-		XmlUtils.writeXml(mutableMvcConfigFile.getOutputStream(), mvcConfigDocument);
-		try {
-			configTemplateInputStream.close();
-		} catch (IOException ignore) {
-		}
+		fileManager.createOrUpdateTextFileIfRequired(mvcConfig, XmlUtils.nodeToString(mvcConfigDocument), false);
 	}
 
 	/**
@@ -408,7 +408,7 @@ public class JspOperationsImpl implements JspOperations {
 	 * @param sourceAntPath the source path
 	 * @param targetDirectory the target directory
 	 */
-	private void copyDirectoryContents(String sourceAntPath, String targetDirectory) {
+	private void copyDirectoryContents(String sourceAntPath, String targetDirectory, boolean replace) {
 		Assert.hasText(sourceAntPath, "Source path required");
 		Assert.hasText(targetDirectory, "Target directory required");
 
@@ -425,11 +425,36 @@ public class JspOperationsImpl implements JspOperations {
 		Assert.notNull(urls, "Could not search bundles for resources for Ant Path '" + path + "'");
 		for (URL url : urls) {
 			String fileName = url.getPath().substring(url.getPath().lastIndexOf("/") + 1);
-			if (!fileManager.exists(targetDirectory + fileName)) {
+			if (replace) {
+				BufferedReader in = null;
+				StringBuilder sb = new StringBuilder();
 				try {
-					FileCopyUtils.copy(url.openStream(), fileManager.createFile(targetDirectory + fileName).getOutputStream());
-				} catch (IOException e) {
-					throw new IllegalStateException("Encountered an error during copying of resources for MVC JSP addon.", e);
+					in = new BufferedReader(new InputStreamReader(url.openConnection().getInputStream()));
+					while (true) {
+						int ch = in.read();
+						if (ch < 0) {
+							break;
+						}
+						sb.append((char) ch);
+					}
+				} catch (Exception e) {
+					throw new IllegalStateException(e);
+				} finally {
+					if (in != null) {
+						try {
+							in.close();
+						} catch (IOException ignored) {
+						}
+					}
+				}
+				fileManager.createOrUpdateTextFileIfRequired(targetDirectory + fileName, sb.toString(), false);
+			} else {
+				if (!fileManager.exists(targetDirectory + fileName)) {
+					try {
+						FileCopyUtils.copy(url.openStream(), fileManager.createFile(targetDirectory + fileName).getOutputStream());
+					} catch (IOException e) {
+						throw new IllegalStateException("Encountered an error during copying of resources for MVC JSP addon.", e);
+					}
 				}
 			}
 		}
@@ -471,24 +496,12 @@ public class JspOperationsImpl implements JspOperations {
 
 		// Setup language definition in languages.jspx
 		String footerFileLocation = targetDirectory + "/WEB-INF/views/footer.jspx";
-		MutableFile footerFile = null;
-
-		Document footer = null;
-		try {
-			if (fileManager.exists(footerFileLocation)) {
-				footerFile = fileManager.updateFile(footerFileLocation);
-				footer = XmlUtils.getDocumentBuilder().parse(footerFile.getInputStream());
-			} else {
-				throw new IllegalStateException("Could not aquire the footer.jspx file");
-			}
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
+		Document footer = XmlUtils.readXml(fileManager.getInputStream(footerFileLocation));
 
 		if (null == XmlUtils.findFirstElement("//span[@id='language']/language[@locale='" + i18n.getLocale().getLanguage() + "']", footer.getDocumentElement())) {
 			Element span = XmlUtils.findRequiredElement("//span[@id='language']", footer.getDocumentElement());
 			span.appendChild(new XmlElementBuilder("util:language", footer).addAttribute("locale", i18n.getLocale().getLanguage()).addAttribute("label", i18n.getLanguage()).build());
-			XmlUtils.writeXml(footerFile.getOutputStream(), footer);
+			fileManager.createOrUpdateTextFileIfRequired(footerFileLocation, XmlUtils.nodeToString(footer), false);
 		}
 		
 		// Record use of add-on (most languages are implemented via public add-ons)

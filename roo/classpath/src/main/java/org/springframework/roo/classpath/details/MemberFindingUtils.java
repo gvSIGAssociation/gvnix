@@ -54,7 +54,8 @@ public abstract class MemberFindingUtils {
 		}
 		for (MethodMetadata method : memberHoldingTypeDetails.getDeclaredMethods()) {
 			if (method.getMethodName().equals(methodName)) {
-				if (parameters.equals(AnnotatedJavaType.convertFromAnnotatedJavaTypes(method.getParameterTypes()))) {
+				List<JavaType> paramTypes = AnnotatedJavaType.convertFromAnnotatedJavaTypes(method.getParameterTypes());
+				if (paramTypes.equals(parameters)) {
 					return method;
 				}
 			}
@@ -379,7 +380,7 @@ public abstract class MemberFindingUtils {
 	 */
 	public static MethodMetadata getMostConcreteMethodWithTag(MemberDetails memberDetails, Object tagKey) {
 		List<MethodMetadata> taggedMethods = getMethodsWithTag(memberDetails, tagKey);
-		if (taggedMethods.size() == 0) {
+		if (taggedMethods.isEmpty()) {
 			return null;
 		} 
 		return taggedMethods.get(0);
@@ -438,7 +439,7 @@ public abstract class MemberFindingUtils {
 		Assert.notNull(memberDetails, "MemberDetails required");
 		Assert.notNull(tag, "Custom data tag required");
 		List<MemberHoldingTypeDetails> memberHoldingTypeDetailsList = getMemberHoldingTypeDetailsWithTag(memberDetails, tag);
-		if (memberHoldingTypeDetailsList.size() == 0) {
+		if (memberHoldingTypeDetailsList.isEmpty()) {
 			return null;
 		}
 		return memberHoldingTypeDetailsList.get(memberHoldingTypeDetailsList.size() - 1);

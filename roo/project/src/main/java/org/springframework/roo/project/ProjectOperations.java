@@ -4,6 +4,7 @@ package org.springframework.roo.project;
 import java.util.List;
 
 import org.springframework.roo.project.listeners.DependencyListener;
+import org.springframework.roo.project.listeners.FilterListener;
 import org.springframework.roo.project.listeners.PluginListener;
 import org.springframework.roo.project.listeners.PropertyListener;
 import org.springframework.roo.project.listeners.RepositoryListener;
@@ -36,12 +37,13 @@ public interface ProjectOperations {
 	 * @return the {@link PathResolver}, or null if the project is unavailable
 	 */
 	PathResolver getPathResolver();
-
+	
 	/**
 	 * Register a listener to track changes in build dependencies.
 	 * 
 	 * @param listener the DependencyListener to register.
 	 */
+	@Deprecated
 	void addDependencyListener(DependencyListener listener);
 
 	/**
@@ -49,6 +51,7 @@ public interface ProjectOperations {
 	 *
 	 * @param listener the DependencyListener to remove.
 	 */
+	@Deprecated
 	void removeDependencyListener(DependencyListener listener);
 
 	/**
@@ -56,6 +59,7 @@ public interface ProjectOperations {
 	 *
 	 * @param listener the RepositoryListener to register.
 	 */
+	@Deprecated
 	void addRepositoryListener(RepositoryListener listener);
 
 	/**
@@ -63,6 +67,7 @@ public interface ProjectOperations {
 	 *
 	 * @param listener the RepositoryListener to remove.
 	 */
+	@Deprecated
 	void removeRepositoryListener(RepositoryListener listener);
 	
 	/**
@@ -70,6 +75,7 @@ public interface ProjectOperations {
 	 *
 	 * @param listener the RepositoryListener to register.
 	 */
+	@Deprecated
 	void addPluginRepositoryListener(RepositoryListener listener);
 
 	/**
@@ -77,6 +83,7 @@ public interface ProjectOperations {
 	 *
 	 * @param listener the RepositoryListener to remove.
 	 */
+	@Deprecated
 	void removePluginRepositoryListener(RepositoryListener listener);
 
 	/**
@@ -84,6 +91,7 @@ public interface ProjectOperations {
 	 *
 	 * @param listener the PluginListener to register.
 	 */
+	@Deprecated
 	void addPluginListener(PluginListener listener);
 
 	/**
@@ -91,11 +99,13 @@ public interface ProjectOperations {
 	 *
 	 * @param listener the PluginListener to remove.
 	 */
+	@Deprecated
 	void removePluginListener(PluginListener listener);
 	
 	/**
 	 * Register a listener to track changes in pom properties
 	 */
+	@Deprecated
 	void addPropertyListener(PropertyListener listener);
 
 	/**
@@ -103,8 +113,25 @@ public interface ProjectOperations {
 	 *
 	 * @param listener the PropertyListener to remove.
 	 */
+	@Deprecated
 	void removePropertyListener(PropertyListener listener);
+	
+	/**
+	 * Register a listener to track changes in pom filters
 
+	 * @param listener the FilterListener to register.
+	 */
+	@Deprecated
+	void addFilterListener(FilterListener listener);
+	
+	/**
+	 * Remove a filter listener from change tracking
+	 *
+	 * @param listener the FilterListener to remove.
+	 */
+	@Deprecated
+	void removeFilterListener(FilterListener listener);
+	
 	/**
 	 * Updates the project type.
 	 * 
@@ -148,7 +175,18 @@ public interface ProjectOperations {
 	void addDependency(String groupId, String artifactId, String version);
 
 	/**
-	 * Allows removal of a JAR dependency to the POM. 
+	 * Allows removal of JAR dependencies from the POM. 
+	 * 
+	 * <p>
+	 * Provides a convenient way for third parties to instruct end users how to use the CLI to add support
+	 * for their projects without requiring the user to manually edit a pom.xml or write an add-on.
+	 * 
+	 * @param dependencies a list of dependencies to remove (required)
+	 */
+	void removeDependencies(List<Dependency> dependencies);
+
+	/**
+	 * Allows removal of a JAR dependency from the POM. 
 	 * 
 	 * <p>
 	 * Provides a convenient way for third parties to instruct end users how to use the CLI to remove an unwanted
@@ -238,6 +276,17 @@ public interface ProjectOperations {
 	void removePluginRepository(Repository repository);
 
 	/**
+	 * Allows addition of a build plugins to the POM. 
+	 * 
+	 * <p>
+	 * Provides a convenient way for third parties to instruct end users how to use the CLI to add 
+	 * a new build capability to their projects without requiring the user to manually edit a pom.xml or write an add-on.
+	 * 
+	 * @param plugins a list build plugins to add (required)
+	 */
+	void addBuildPlugins(List<Plugin> plugins);
+
+	/**
 	 * Allows addition of a build plugin to the POM. 
 	 * 
 	 * <p>
@@ -249,7 +298,18 @@ public interface ProjectOperations {
 	void addBuildPlugin(Plugin plugin);
 
 	/**
-	 * Allows remove of an existing build plugin from the POM. 
+	 * Allows removal of an existing build plugins from the POM. 
+	 * 
+	 * <p>
+	 * Provides a convenient way for third parties to instruct end users how to use the CLI to remove an unwanted
+	 * build plugins from their projects without requiring the user to manually edit a pom.xml or write an add-on.
+	 * 
+	 * @param plugins a list build plugins to remove (required)
+	 */
+	void removeBuildPlugins(List<Plugin> plugins);
+	
+	/**
+	 * Allows removall of an existing build plugin from the POM. 
 	 * 
 	 * <p>
 	 * Provides a convenient way for third parties to instruct end users how to use the CLI to remove an unwanted
@@ -266,8 +326,21 @@ public interface ProjectOperations {
 	 * 
 	 * @param plugin the build plugin to update (required)
 	 */
-	void buildPluginUpdate(Plugin plugin);
+	void updateBuildPlugin(Plugin plugin);
 	
+	/**
+	 * Verifies if the specified  build plugin is present. If it is present, silently returns. If it is not
+	 * present, removes any build plugin which matches {@link ProjectMetadata#getBuildPluginsExcludingVersion(Plugin)}.
+	 * Always adds the presented plugin.
+	 * 
+	 * <p>
+	 * This method is deprecated - use {@link #updateBuildPlugin(Plugin)} instead.
+	 * 
+	 * @param plugin the build plugin to update (required)
+	 */
+	@Deprecated
+	void buildPluginUpdate(Plugin plugin);
+
 	/**
 	 * Allows addition of a property to the POM. 
 	 * 

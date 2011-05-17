@@ -62,7 +62,7 @@ public class TypeLocationServiceImpl implements TypeLocationService, MetadataNot
 	}
 
 	public void notify(String upstreamDependency, String downstreamDependency) {
-		if (upstreamDependency.startsWith("MID:org.springframework.roo.classpath.PhysicalTypeIdentifier#")) {
+		if (upstreamDependency != null && PhysicalTypeIdentifier.isValid(upstreamDependency)) {
 			// Change to Java, so drop the cache
 			cache.clear();
 			tagBasedCache.clear();
@@ -94,13 +94,29 @@ public class TypeLocationServiceImpl implements TypeLocationService, MetadataNot
 		return (ClassOrInterfaceTypeDetails) physicalTypeDetails;
 	}
 
+	public ClassOrInterfaceTypeDetails findClassOrInterface(JavaType requiredClassOrInterface) {
+		String metadataIdentificationString = physicalTypeMetadataProvider.findIdentifier(requiredClassOrInterface);
+		if (metadataIdentificationString == null) {
+			return null;
+		}
+		PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(metadataIdentificationString);
+		if (physicalTypeMetadata == null) {
+			return null;
+		}
+		PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata.getMemberHoldingTypeDetails();
+		if (physicalTypeDetails == null || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+			return null;
+		}
+		return (ClassOrInterfaceTypeDetails) physicalTypeDetails;
+	}
+
 	public void processTypesWithTag(Object tag, LocatedTypeCallback callback) {
-		List<String> locatedPhysicalTypeMids = cache.get(tag);
+		List<String> locatedPhysicalTypeMids = tagBasedCache.get(tag);
 		
 		if (locatedPhysicalTypeMids == null) {
 			locatedPhysicalTypeMids = new ArrayList<String>();
 			
-			for (ClassOrInterfaceTypeDetails cid : getProjectJavaTypes()) {
+			for (ClassOrInterfaceTypeDetails cid : getProjectJavaTypes(Path.SRC_MAIN_JAVA)) {
 				MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(TypeLocationServiceImpl.class.getName(), cid);
 				if (MemberFindingUtils.getMemberHoldingTypeDetailsWithTag(memberDetails, tag).size() > 0) {
 					locatedPhysicalTypeMids.add(cid.getDeclaredByMetadataId());
@@ -125,7 +141,7 @@ public class TypeLocationServiceImpl implements TypeLocationService, MetadataNot
 		if (locatedPhysicalTypeMids == null) {
 			locatedPhysicalTypeMids = new ArrayList<String>();
 			
-			for (ClassOrInterfaceTypeDetails cid : getProjectJavaTypes()) {
+			for (ClassOrInterfaceTypeDetails cid : getProjectJavaTypes(Path.SRC_MAIN_JAVA)) {
 				annotation: for (JavaType annotation : annotationsToDetect) {
 					if (MemberFindingUtils.getTypeAnnotation(cid, annotation) != null) {
 						locatedPhysicalTypeMids.add(cid.getDeclaredByMetadataId());
@@ -188,12 +204,12 @@ public class TypeLocationServiceImpl implements TypeLocationService, MetadataNot
 		return null;
 	}
 	
-	private List<ClassOrInterfaceTypeDetails> getProjectJavaTypes() {
+	public List<ClassOrInterfaceTypeDetails> getProjectJavaTypes(Path path) {
 		PathResolver pathResolver = projectOperations.getPathResolver();
-		FileDetails srcRoot = new FileDetails(new File(pathResolver.getRoot(Path.SRC_MAIN_JAVA)), null);
+		FileDetails srcRoot = new FileDetails(new File(pathResolver.getRoot(path)), null);
 		List<ClassOrInterfaceTypeDetails> projectTypes = new ArrayList<ClassOrInterfaceTypeDetails>();
 		
-		for (FileDetails file : fileManager.findMatchingAntPath(pathResolver.getRoot(Path.SRC_MAIN_JAVA) + File.separatorChar + "**" + File.separatorChar + "*.java")) {
+		for (FileDetails file : fileManager.findMatchingAntPath(pathResolver.getRoot(path) + File.separatorChar + "**" + File.separatorChar + "*.java")) {
 			String fullPath = srcRoot.getRelativeSegment(file.getCanonicalPath());
 			fullPath = fullPath.substring(1, fullPath.lastIndexOf(".java")).replace(File.separatorChar, '.'); // Ditch the first / and .java
 			JavaType javaType;
@@ -205,8 +221,8 @@ public class TypeLocationServiceImpl implements TypeLocationService, MetadataNot
 			String id = physicalTypeMetadataProvider.findIdentifier(javaType);
 			if (id != null) {
 				// Now I've found it, let's work out the Path it is from
-				Path path = PhysicalTypeIdentifier.getPath(id);
-				String physicalTypeMid = PhysicalTypeIdentifier.createIdentifier(javaType, path);
+				Path locatedPath = PhysicalTypeIdentifier.getPath(id);
+				String physicalTypeMid = PhysicalTypeIdentifier.createIdentifier(javaType, locatedPath);
 				ClassOrInterfaceTypeDetails located = getClassOrInterfaceTypeDetails(physicalTypeMid);
 				if (located != null) {
 					projectTypes.add(located);

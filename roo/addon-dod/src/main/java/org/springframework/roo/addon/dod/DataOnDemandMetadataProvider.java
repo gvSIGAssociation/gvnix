@@ -1,7 +1,6 @@
 package org.springframework.roo.addon.dod;
 
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,8 +40,8 @@ import org.springframework.roo.project.Path;
 @Service
 public final class DataOnDemandMetadataProvider extends AbstractMemberDiscoveringItdMetadataProvider {
 	@Reference private ConfigurableMetadataProvider configurableMetadataProvider;
-	private Map<JavaType, String> entityToDodMidMap = new HashMap<JavaType, String>();
-	private Map<String, JavaType> dodMidToEntityMap = new HashMap<String, JavaType>();
+	private Map<JavaType, String> entityToDodMidMap = new LinkedHashMap<JavaType, String>();
+	private Map<String, JavaType> dodMidToEntityMap = new LinkedHashMap<String, JavaType>();
 	
 	protected void activate(ComponentContext context) {
 		metadataDependencyRegistry.addNotificationListener(this);
@@ -65,7 +64,7 @@ public final class DataOnDemandMetadataProvider extends AbstractMemberDiscoverin
 		JavaType governor = itdTypeDetails.getName();
 		String localMid = entityToDodMidMap.get(governor);
 		if (localMid == null) {
-			// No DOD is not interested in this JavaType, so let's move on
+			// No DOD is interested in this JavaType, so let's move on
 			return null;
 		}
 		

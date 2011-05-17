@@ -1,11 +1,8 @@
 package org.springframework.roo.addon.web.mvc.jsp;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +34,6 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
@@ -95,7 +91,7 @@ public final class JspMetadataListener implements MetadataProvider, MetadataNoti
 		Assert.notNull(formBackingTypeMetadataDetails, "Unable to obtain metadata for type " + formbackingType.getFullyQualifiedTypeName());
 
 		// Install web artifacts only if Spring MVC config is missing
-		// TODO: remove this call when 'controller' commands are gone
+		// TODO: Remove this call when 'controller' commands are gone
 		PathResolver pathResolver = projectOperations.getPathResolver();
 		if (!fileManager.exists(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/views"))) {
 			jspOperations.installCommonViewArtefacts();
@@ -112,7 +108,11 @@ public final class JspMetadataListener implements MetadataProvider, MetadataNoti
 		ProjectMetadata projectMetadata = (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
 		Assert.notNull(projectMetadata, "Project metadata required");
 		
-		List<FieldMetadata> elegibleFields = webMetadataService.getScaffoldEligibleFieldMetadata(formbackingType, memberDetails, metadataIdentificationString);
+		List<FieldMetadata> eligibleFields = webMetadataService.getScaffoldEligibleFieldMetadata(formbackingType, memberDetails, metadataIdentificationString);
+
+		if (eligibleFields.size() == 0) {
+			return null;
+		}
 
 		SortedMap<JavaType, JavaTypeMetadataDetails> relatedTypeMd = webMetadataService.getRelatedApplicationTypeMetadata(formbackingType, memberDetails, metadataIdentificationString);
 		
@@ -123,10 +123,9 @@ public final class JspMetadataListener implements MetadataProvider, MetadataNoti
 			return null;
 		}
 
-		JspViewManager viewManager = new JspViewManager(elegibleFields, webScaffoldMetadata.getAnnotationValues(), relatedTypeMd);
+		JspViewManager viewManager = new JspViewManager(eligibleFields, webScaffoldMetadata.getAnnotationValues(), relatedTypeMd);
 
 		String controllerPath = webScaffoldMetadata.getAnnotationValues().getPath();
-
 		if (controllerPath.startsWith("/")) {
 			controllerPath = controllerPath.substring(1);
 		}
@@ -151,14 +150,14 @@ public final class JspMetadataListener implements MetadataProvider, MetadataNoti
 
 		JavaSymbolName categoryName = new JavaSymbolName(formbackingType.getSimpleTypeName());
 
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new LinkedHashMap<String, String>();
 		properties.put("menu_category_" + categoryName.getSymbolName().toLowerCase() + "_label", categoryName.getReadableSymbolName());
 		
 		if (webScaffoldMetadata.getAnnotationValues().isCreate()) {
 			String listPath = destinationDirectory + "/create.jspx";
 			writeToDiskIfNecessary(listPath, viewManager.getCreateDocument());
 			JavaSymbolName menuItemId = new JavaSymbolName("new");
-			// add 'create new' menu item
+			// Add 'create new' menu item
 			menuOperations.addMenuItem(categoryName, menuItemId, "global_menu_new", "/" + controllerPath + "?form", MenuOperations.DEFAULT_MENU_ITEM_PREFIX);
 			properties.put("menu_item_" + categoryName.getSymbolName().toLowerCase() + "_" + menuItemId.getSymbolName().toLowerCase() + "_label", new JavaSymbolName(formbackingType.getSimpleTypeName()).getReadableSymbolName());
 			tilesOperations.addViewDefinition(controllerPath, controllerPath + "/" + "create", TilesOperations.DEFAULT_TEMPLATE, "/WEB-INF/views/" + controllerPath + "/create.jspx");
@@ -173,7 +172,7 @@ public final class JspMetadataListener implements MetadataProvider, MetadataNoti
 		} else {
 			tilesOperations.removeViewDefinition(controllerPath + "/" + "update", controllerPath);
 		}
-		// setup labels for i18n support
+		// Setup labels for i18n support
 		String resourceId = XmlUtils.convertId("label." + formbackingType.getFullyQualifiedTypeName().toLowerCase());
 		properties.put(resourceId, new JavaSymbolName(formbackingType.getSimpleTypeName()).getReadableSymbolName());
 
@@ -228,7 +227,7 @@ public final class JspMetadataListener implements MetadataProvider, MetadataNoti
 			for (FinderMetadataDetails finderDetails : finderMethodsDetails) {
 				String finderName = finderDetails.getFinderMethodMetadata().getMethodName().getSymbolName();
 				String listPath = destinationDirectory + "/" + finderName + ".jspx";
-				// finders only get scaffolded if the finder name is not too long (see ROO-1027)
+				// Finders only get scaffolded if the finder name is not too long (see ROO-1027)
 				if (listPath.length() > 244) {
 					continue;
 				}
@@ -247,52 +246,24 @@ public final class JspMetadataListener implements MetadataProvider, MetadataNoti
 		
 		propFileOperations.addProperties(Path.SRC_MAIN_WEBAPP, "/WEB-INF/i18n/application.properties", properties, true, false);
 
-		// clean up links to finders which are removed by now
+		// Clean up links to finders which are removed by now
 		menuOperations.cleanUpFinderMenuItems(categoryName, allowedMenuItems);
 
 		return new JspMetadata(metadataIdentificationString, webScaffoldMetadata);
 	}
 
 	/** return indicates if disk was changed (ie updated or created) */
-	private boolean writeToDiskIfNecessary(String jspFilename, Document proposed) {
+	private void writeToDiskIfNecessary(String jspFilename, Document proposed) {
 		Document original = null;
-
-		// If mutableFile becomes non-null, it means we need to use it to write out the contents of jspContent to the file
-		MutableFile mutableFile = null;
 		if (fileManager.exists(jspFilename)) {
-			try {
-				original = XmlUtils.getDocumentBuilder().parse(fileManager.getInputStream(jspFilename));
-			} catch (Exception e) {
-				throw new IllegalStateException("Could not parse file: " + jspFilename);
-			}
-			Assert.notNull(original, "Unable to parse " + jspFilename);
+			original = XmlUtils.readXml(fileManager.getInputStream(jspFilename));
 			if (XmlRoundTripUtils.compareDocuments(original, proposed)) {
-				mutableFile = fileManager.updateFile(jspFilename);
+				XmlUtils.removeTextNodes(original);
+				fileManager.createOrUpdateTextFileIfRequired(jspFilename, XmlUtils.nodeToString(original), false);
 			}
 		} else {
-			original = proposed;
-			mutableFile = fileManager.createFile(jspFilename);
-			Assert.notNull(mutableFile, "Could not create JSP file '" + jspFilename + "'");
+			fileManager.createOrUpdateTextFileIfRequired(jspFilename, XmlUtils.nodeToString(proposed), false);
 		}
-
-		if (mutableFile != null) {
-			try {
-				// Build a string representation of the JSP
-				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-				XmlUtils.writeXml(XmlUtils.createIndentingTransformer(), byteArrayOutputStream, original);
-				String jspContent = byteArrayOutputStream.toString();
-				byteArrayOutputStream.close();
-				// We need to write the file out (it's a new file, or the existing file has different contents)
-				FileCopyUtils.copy(jspContent, new OutputStreamWriter(mutableFile.getOutputStream()));
-				// Return and indicate we wrote out the file
-				return true;
-			} catch (IOException ioe) {
-				throw new IllegalStateException("Could not output '" + mutableFile.getCanonicalPath() + "'", ioe);
-			}
-		}
-
-		// A file existed, but it contained the same content, so we return false
-		return false;
 	}
 	
 	public void notify(String upstreamDependency, String downstreamDependency) {

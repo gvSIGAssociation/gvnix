@@ -1,10 +1,9 @@
 package org.springframework.roo.addon.web.mvc.controller.scaffold.mvc;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -17,7 +16,6 @@ import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDe
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.json.WebJsonMetadataProviderImpl;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeLocationService;
@@ -34,11 +32,10 @@ import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.Assert;
 
 /**
- * Provides {@link WebScaffoldMetadata}.
+ * Implementation of  {@link WebScaffoldMetadataProvider}.
  * 
  * @author Stefan Schmidt
  * @since 1.0
@@ -46,12 +43,11 @@ import org.springframework.roo.support.util.Assert;
 @Component(immediate = true) 
 @Service 
 public final class WebScaffoldMetadataProviderImpl extends AbstractMemberDiscoveringItdMetadataProvider implements WebScaffoldMetadataProvider {
-	private static final Logger logger = HandlerUtils.getLogger(WebJsonMetadataProviderImpl.class);
 	@Reference private TypeLocationService typeLocationService;
 	@Reference private ConversionServiceOperations conversionServiceOperations;
 	@Reference private WebMetadataService webMetadataService;
-	private Map<JavaType, String> entityToDodMidMap = new HashMap<JavaType, String>();
-	private Map<String, JavaType> dodMidToEntityMap = new HashMap<String, JavaType>();
+	private Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
+	private Map<String, JavaType> webScaffoldMidToEntityMap = new LinkedHashMap<String, JavaType>();
 
 	protected void activate(ComponentContext context) {
 		metadataDependencyRegistry.addNotificationListener(this);
@@ -59,12 +55,18 @@ public final class WebScaffoldMetadataProviderImpl extends AbstractMemberDiscove
 		addMetadataTrigger(new JavaType(RooWebScaffold.class.getName()));
 	}
 	
+	protected void deactivate(ComponentContext context) {
+		metadataDependencyRegistry.removeNotificationListener(this);
+		metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
+		removeMetadataTrigger(new JavaType(RooWebScaffold.class.getName()));
+	}
+	
 	protected String getLocalMidToRequest(ItdTypeDetails itdTypeDetails) {
-		// Determine the governor for this ITD, and whether any DOD metadata is even hoping to hear about changes to that JavaType and its ITDs
+		// Determine the governor for this ITD, and whether any metadata is even hoping to hear about changes to that JavaType and its ITDs
 		JavaType governor = itdTypeDetails.getName();
-		String localMid = entityToDodMidMap.get(governor);
+		String localMid = entityToWebScaffoldMidMap.get(governor);
 		if (localMid == null) {
-			// No DOD is not interested in this JavaType, so let's move on
+			// Not interested in this JavaType, so let's move on
 			return null;
 		}
 		
@@ -79,14 +81,14 @@ public final class WebScaffoldMetadataProviderImpl extends AbstractMemberDiscove
 			return null;
 		}
 		
-		// Remember that this entity JavaType matches up with this DOD's metadata identification string
+		// Remember that this entity JavaType matches up with this metadata identification string
 		// Start by clearing the previous association
-		JavaType oldEntity = dodMidToEntityMap.get(metadataIdentificationString);
+		JavaType oldEntity = webScaffoldMidToEntityMap.get(metadataIdentificationString);
 		if (oldEntity != null) {
-			entityToDodMidMap.remove(oldEntity);
+			entityToWebScaffoldMidMap.remove(oldEntity);
 		}
-		entityToDodMidMap.put(annotationValues.getFormBackingObject(), metadataIdentificationString);
-		dodMidToEntityMap.put(metadataIdentificationString, annotationValues.getFormBackingObject());
+		entityToWebScaffoldMidMap.put(annotationValues.getFormBackingObject(), metadataIdentificationString);
+		webScaffoldMidToEntityMap.put(metadataIdentificationString, annotationValues.getFormBackingObject());
 		
 		// Lookup the form backing object's metadata
 		JavaType formBackingType = annotationValues.getFormBackingObject();
@@ -94,24 +96,24 @@ public final class WebScaffoldMetadataProviderImpl extends AbstractMemberDiscove
 		installConversionService(governorPhysicalTypeMetadata.getMemberHoldingTypeDetails().getName());
 		
 		PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA));
-		Assert.notNull(formBackingObjectPhysicalTypeMetadata, "Unable to obtain physical type metdata for type " + formBackingType.getFullyQualifiedTypeName());
-		ClassOrInterfaceTypeDetails formbackingClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadata.getMemberHoldingTypeDetails();
-		MemberDetails formBackingObjectMemberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), formbackingClassOrInterfaceDetails);
+		Assert.notNull(formBackingObjectPhysicalTypeMetadata, "Unable to obtain physical type metadata for type " + formBackingType.getFullyQualifiedTypeName());
+		MemberDetails formBackingObjectMemberDetails = getMemberDetails(formBackingObjectPhysicalTypeMetadata);
 		
 		MemberHoldingTypeDetails memberHoldingTypeDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(formBackingObjectMemberDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
 		if (memberHoldingTypeDetails == null) {
-//			logger.warning("Aborting - the form backing object for Roo MVC scaffolded controllers need to be @RooEntity persistent types at this time");
 			return null;
 		}
 		
 		// We need to be informed if our dependent metadata changes
 		metadataDependencyRegistry.registerDependency(memberHoldingTypeDetails.getDeclaredByMetadataId(), metadataIdentificationString);
 		
-		// We do not need to monitor the parent, as any changes to the java type associated with the parent will trickle down to the governing java type
 		SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = webMetadataService.getRelatedApplicationTypeMetadata(formBackingType, formBackingObjectMemberDetails, metadataIdentificationString);
 		List<JavaTypeMetadataDetails> dependentApplicationTypeMetadata = webMetadataService.getDependentApplicationTypeMetadata(formBackingType, formBackingObjectMemberDetails, metadataIdentificationString);
 		Map<JavaSymbolName, DateTimeFormatDetails> datePatterns = webMetadataService.getDatePatterns(formBackingType, formBackingObjectMemberDetails, metadataIdentificationString);
-		return new WebScaffoldMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, annotationValues, formBackingObjectMemberDetails, relatedApplicationTypeMetadata, dependentApplicationTypeMetadata, datePatterns);
+
+		MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
+
+		return new WebScaffoldMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, annotationValues, memberDetails, relatedApplicationTypeMetadata, dependentApplicationTypeMetadata, datePatterns);
 	}
 	
 	void installConversionService(JavaType governor) {
@@ -125,9 +127,12 @@ public final class WebScaffoldMetadataProviderImpl extends AbstractMemberDiscove
 			AnnotationAttributeValue<?> attr = annotation.getAttribute(new JavaSymbolName("registerConverters"));
 			if (attr != null) {
 				if (Boolean.FALSE.equals(attr.getValue())) {
-					throw new IllegalStateException("Found registerConverters=false in scaffolded controller " + controller + ". " +
-							"Remove this property from all controllers and let Spring ROO install the new application-wide ApplicationConversionServiceFactoryBean. " +
-							"Then move your custom getXxxConverter() methods to it, delete the GenericConversionService field and the @PostContruct method.");
+					StringBuilder sb = new StringBuilder();
+					sb.append("Found registerConverters=false in scaffolded controller ");
+					sb.append(controller).append(". ");
+					sb.append("Remove this property from all controllers and let Spring ROO install the new application-wide ApplicationConversionServiceFactoryBean. ");
+					sb.append("Then move your custom getXxxConverter() methods to it, delete the GenericConversionService field and the @PostContruct method.");
+					throw new IllegalStateException(sb.toString());
 				}
 			}
 		}

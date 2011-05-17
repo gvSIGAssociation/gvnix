@@ -215,7 +215,7 @@
       ask to add a persistence provider will JPA be installed, and only when
       you add a field using JavaBean Validation annotations will that library
       be installed. The same holds true for Spring Security, Spring Web Flow
-      and the other technologies Roo supports. With Roo you really do smart
+      and the other technologies Roo supports. With Roo you really do start
       small and incrementally add technologies if and when you want to, which
       is consistent with Roo's philosophy of there being <link
       linkend="intro-why-use-it-no-engineering-tradeoffs">no engineering
@@ -230,7 +230,7 @@
       the late Jef Raskin's book, "<link
       xlink:href="http://en.wikipedia.org/wiki/The_Humane_Interface">The
       Humane Interface</link>". In the book Raskin argued we have a duty to
-      make things so easy to use that people naturally "habitate" to the
+      make things so easy to use that people naturally "habituate" to the
       interface, that text-based interfaces are often more appropriate than
       GUIs, and that your "locus of attention" is all that matters to you and
       a machine should never disrupt your locus of attention and randomly
@@ -433,8 +433,7 @@
       </listitem>
 
       <listitem>
-        <para>Apache Maven 2.0.9 or above installed and in the path (for use
-        with Roo-created projects; Roo itself does require Maven)</para>
+        <para>Apache Maven 2.0.9 or above installed and in the path</para>
       </listitem>
     </itemizedlist>
 
@@ -504,8 +503,8 @@ $ <emphasis role="bold">rmdir roo-test</emphasis></programlisting>
     Roo shell.</para>
 
     <para>At present the only configuration settings available is roo.bright.
-    This causes forground messages in the shell to be displayed with brighter
-    colors. This is potentially useful if your background color is light (eg
+    This causes foreground messages in the shell to be displayed with brighter
+    colors. This is potentially useful if your background color is light (e.g.
     white). You can set the variable using the following commands:</para>
 
     <para><programlisting>$ <emphasis role="bold">export ROO_OPTS="-Droo.bright=true"</emphasis>                   // Linux or Apple
@@ -524,7 +523,7 @@ $ <emphasis role="bold">set ROO_OPTS="-Droo.bright=true"</emphasis>             
 
     <para>The purpose of this application is just to try out Roo. We won't
     explain what's going on in these steps, but don't worry - we'll do that in
-    the next chaper, <link linkend="beginning">Beginning With Roo: The
+    the next chapter, <link linkend="beginning">Beginning With Roo: The
     Tutorial</link>. We will try to teach you about some usability features as
     we go along, though.</para>
 
@@ -644,7 +643,7 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
     of how Roo works. To help you learn Roo we ship several sample scripts
     that can be used to build new applications. These sample scripts can be
     found in your $ROO_HOME/samples directory. You can run any sample script
-    by using the follow command format:</para>
+    by using the following command format:</para>
 
     <programlisting>$ <emphasis role="bold">mkdir sample</emphasis>
 $ <emphasis role="bold">cd sample</emphasis>
@@ -708,7 +707,7 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
     <para>The next step is to complete the <link linkend="beginning">Beginning
     With Roo: The Tutorial</link> chapter. In the tutorial chapter you'll
     learn how to use Roo with your preferred IDE and how flexible and natural
-    is to develop with Roo. After that you should read the <link
+    it is to develop with Roo. After that you should read the <link
     linkend="architecture">application architecture</link> chapter to
     understand what Roo applications look like. From there you might wish to
     wrap up the recommended tour of Roo with a skim over the <link

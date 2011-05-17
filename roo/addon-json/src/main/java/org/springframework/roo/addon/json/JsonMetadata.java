@@ -32,7 +32,6 @@ public class JsonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 	private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
 	private JsonAnnotationValues annotationValues;
 	private String typeNamePlural;
-	private JavaType governorType;
 
 	public JsonMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String typeNamePlural, JsonAnnotationValues annotationValues) {
 		super(identifier, aspectName, governorPhysicalTypeMetadata);
@@ -45,7 +44,6 @@ public class JsonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 		}
 		this.annotationValues = annotationValues;
 		this.typeNamePlural = typeNamePlural;
-		this.governorType = governorTypeDetails.getName();
 
 		builder.addMethod(getToJsonMethod());
 		builder.addMethod(getFromJsonMethod());
@@ -81,7 +79,7 @@ public class JsonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 		String serializer = new JavaType("flexjson.JSONSerializer").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
 		String root = annotationValues.getRootName() != null && annotationValues.getRootName().length() > 0 ? ".rootName(\"" + annotationValues.getRootName() + "\")" : "";
-		bodyBuilder.appendFormalLine("return new " + serializer + "()" + root + ".exclude(\"*.class\").serialize(this);");
+		bodyBuilder.appendFormalLine("return new " + serializer + "()" + root + ".exclude(\"*.class\")" + (annotationValues.isDeepSerialize() ? ".deepSerialize(this)" : ".serialize(this)") + ";");
 
 		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, new JavaType("java.lang.String"), bodyBuilder);
 		methodBuilder.putCustomData(CustomDataJsonTags.TO_JSON_METHOD, null);
@@ -105,7 +103,7 @@ public class JsonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 		}
 
 		List<JavaType> typeParams = new ArrayList<JavaType>();
-		typeParams.add(governorType);
+		typeParams.add(destination);
 		List<AnnotatedJavaType> parameters = new ArrayList<AnnotatedJavaType>();
 		parameters.add(new AnnotatedJavaType(new JavaType(Collection.class.getName(), 0, DataType.TYPE, null, typeParams), null));
 
@@ -121,7 +119,7 @@ public class JsonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 		String serializer = new JavaType("flexjson.JSONSerializer").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
 		String root = annotationValues.getRootName() != null && annotationValues.getRootName().length() > 0 ? ".rootName(\"" + annotationValues.getRootName() + "\")" : "";
-		bodyBuilder.appendFormalLine("return new " + serializer + "()" + root + ".exclude(\"*.class\").serialize(collection);");
+		bodyBuilder.appendFormalLine("return new " + serializer + "()" + root + ".exclude(\"*.class\")" + (annotationValues.isDeepSerialize() ? ".deepSerialize(collection)" : ".serialize(collection)") + ";");
 
 		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC | Modifier.STATIC, methodName, new JavaType("java.lang.String"), parameters, paramNames, bodyBuilder);
 		methodBuilder.putCustomData(CustomDataJsonTags.TO_JSON_ARRAY_METHOD, null);
@@ -156,7 +154,7 @@ public class JsonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 
 		String list = new JavaType("java.util.List").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
 		String arrayList = new JavaType("java.util.ArrayList").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
-		String bean = governorType.getSimpleTypeName();
+		String bean = destination.getSimpleTypeName();
 
 		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 		String deserializer = new JavaType("flexjson.JSONDeserializer").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
@@ -166,7 +164,7 @@ public class JsonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 		paramNames.add(new JavaSymbolName("json"));
 
 		List<JavaType> params = new ArrayList<JavaType>();
-		params.add(governorType);
+		params.add(destination);
 		JavaType collection = new JavaType("java.util.Collection", 0, DataType.TYPE, null, params);
 
 		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC | Modifier.STATIC, methodName, collection, parameters, paramNames, bodyBuilder);
@@ -181,7 +179,7 @@ public class JsonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 		}
 
 		// Compute the relevant method name
-		return new JavaSymbolName(methodLabel.replace("<TypeName>", governorType.getSimpleTypeName()));
+		return new JavaSymbolName(methodLabel.replace("<TypeName>", destination.getSimpleTypeName()));
 	}
 
 	private MethodMetadata getFromJsonMethod() {
@@ -201,12 +199,12 @@ public class JsonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 
 		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 		String deserializer = new JavaType("flexjson.JSONDeserializer").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
-		bodyBuilder.appendFormalLine("return new " + deserializer + "<" + governorType.getSimpleTypeName() + ">().use(null, " + governorType.getSimpleTypeName() + ".class).deserialize(json);");
+		bodyBuilder.appendFormalLine("return new " + deserializer + "<" + destination.getSimpleTypeName() + ">().use(null, " + destination.getSimpleTypeName() + ".class).deserialize(json);");
 
 		List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
 		paramNames.add(new JavaSymbolName("json"));
 
-		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC | Modifier.STATIC, methodName, governorType, parameters, paramNames, bodyBuilder);
+		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC | Modifier.STATIC, methodName, destination, parameters, paramNames, bodyBuilder);
 		methodBuilder.putCustomData(CustomDataJsonTags.FROM_JSON_METHOD, null);
 		return methodBuilder.build();
 	}

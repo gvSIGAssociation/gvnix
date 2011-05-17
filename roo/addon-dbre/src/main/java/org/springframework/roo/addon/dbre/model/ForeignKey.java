@@ -9,7 +9,7 @@ import org.springframework.roo.support.util.Assert;
 /**
  * Represents a database foreign key.
  * <p>
- * A foreign key is modelled from the {@link java.sql.DatabaseMetaData#getImportedKeys(String, String, String)} or {@link java.sql.DatabaseMetaData#getExportedKeys(String, String, String)} methods.
+ * A foreign key is modeled from the {@link java.sql.DatabaseMetaData#getImportedKeys(String, String, String)} or {@link java.sql.DatabaseMetaData#getExportedKeys(String, String, String)} methods.
  * 
  * @author Alan Stewart
  * @since 1.1
@@ -120,7 +120,8 @@ public class ForeignKey implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((foreignTableName == null) ? 0 : foreignTableName.hashCode());
+		result = prime * result + (exported ? 1231 : 1237);
+		result = prime * result + ((foreignTable == null) ? 0 : foreignTable.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -134,10 +135,12 @@ public class ForeignKey implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ForeignKey other = (ForeignKey) obj;
-		if (foreignTableName == null) {
-			if (other.foreignTableName != null)
+		if (exported != other.exported)
+			return false;
+		if (foreignTable == null) {
+			if (other.foreignTable != null)
 				return false;
-		} else if (!foreignTableName.equals(other.foreignTableName))
+		} else if (!foreignTable.equals(other.foreignTable))
 			return false;
 		if (name == null) {
 			if (other.name != null)

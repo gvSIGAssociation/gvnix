@@ -3,7 +3,6 @@ package org.springframework.roo.addon.dbre;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Set;
@@ -13,11 +12,11 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.springframework.roo.addon.dbre.model.Database;
+import org.springframework.roo.addon.dbre.model.DatabaseXmlUtils;
 import org.springframework.roo.addon.dbre.model.DbreModelService;
 import org.springframework.roo.addon.dbre.model.Schema;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
@@ -73,43 +72,25 @@ public class DbreOperationsImpl implements DbreOperations {
 		} else if (!database.hasTables()) {
 			logger.warning("Schema '" + schema.getName() + "' does not exist or does not have any tables. Note that the schema names of some databases are case-sensitive");
 		} else {
-			OutputStream outputStream = null;
 			try {
-				outputStream = file != null ? new FileOutputStream(file) : new ByteArrayOutputStream();
-				dbreModelService.serializeDatabase(database, outputStream, displayOnly);
 				if (displayOnly) {
+					Document document = DatabaseXmlUtils.getDatabaseDocument(database);
+					OutputStream outputStream = file != null ? new FileOutputStream(file) : new ByteArrayOutputStream();
+					XmlUtils.writeXml(outputStream, document);
 					logger.info(file != null ? "Database metadata written to file " + file.getAbsolutePath() : outputStream.toString());
+				} else {
+					dbreModelService.writeDatabase(database);
 				}
 			} catch (Exception e) {
 				throw new IllegalStateException(e);
-			} finally {
-				if (outputStream != null) {
-					try {
-						outputStream.close();
-					} catch (IOException ignored) {
-					}
-				}
 			}
 		}
 	}
 	
 	private void updatePom() {
-		String pomPath = projectOperations.getPathResolver().getIdentifier(Path.ROOT, "pom.xml");
-		MutableFile mutableFile = null;
-
-		Document pom;
-		try {
-			if (fileManager.exists(pomPath)) {
-				mutableFile = fileManager.updateFile(pomPath);
-				pom = XmlUtils.getDocumentBuilder().parse(mutableFile.getInputStream());
-			} else {
-				throw new IllegalStateException("Could not acquire pom.xml in " + pomPath);
-			}
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-		
-		Element root = pom.getDocumentElement();
+		String pom = projectOperations.getPathResolver().getIdentifier(Path.ROOT, "pom.xml");
+		Document document = XmlUtils.readXml(fileManager.getInputStream(pom));
+		Element root = document.getDocumentElement();
 		
 		String warPluginXPath = "/project/build/plugins/plugin[artifactId = 'maven-war-plugin']";
 		Element warPluginElement = XmlUtils.findFirstElement(warPluginXPath, root);
@@ -125,25 +106,25 @@ public class DbreOperationsImpl implements DbreOperations {
 		
 		Element configurationElement = XmlUtils.findFirstElement("configuration", warPluginElement);
 		if (configurationElement == null) {
-			configurationElement = pom.createElement("configuration");
+			configurationElement = document.createElement("configuration");
 		}
 		Element webResourcesElement = XmlUtils.findFirstElement("configuration/webResources", warPluginElement);
 		if (webResourcesElement == null) {
-			webResourcesElement = pom.createElement("webResources");
+			webResourcesElement = document.createElement("webResources");
 		}
 		Element excludesElement = XmlUtils.findFirstElement("configuration/webResources/resource/excludes", warPluginElement);
 		if (excludesElement == null) {
-			excludesElement = pom.createElement("excludes");
+			excludesElement = document.createElement("excludes");
 		}
 
-		excludeElement = pom.createElement("exclude");
+		excludeElement = document.createElement("exclude");
 		excludeElement.setTextContent("dbre.xml");
 		excludesElement.appendChild(excludeElement);
 		
-		Element directoryElement = pom.createElement("directory");
+		Element directoryElement = document.createElement("directory");
 		directoryElement.setTextContent("src/main/resources");
 		
-		Element resourceElement = pom.createElement("resource");
+		Element resourceElement = document.createElement("resource");
 		resourceElement.appendChild(directoryElement);
 		resourceElement.appendChild(excludesElement);
 		webResourcesElement.appendChild(resourceElement);
@@ -152,23 +133,15 @@ public class DbreOperationsImpl implements DbreOperations {
 		
 		warPluginElement.appendChild(configurationElement);
 		
-		XmlUtils.writeXml(mutableFile.getOutputStream(), pom);
+		fileManager.createOrUpdateTextFileIfRequired(pom, XmlUtils.nodeToString(document), false);
 	}
 
 	private void updatePersistenceXml() {
 		String persistencePath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml");
-		MutableFile persistenceMutableFile = null;
-
-		Document persistence;
-		try {
-			persistenceMutableFile = fileManager.updateFile(persistencePath);
-			persistence = XmlUtils.getDocumentBuilder().parse(persistenceMutableFile.getInputStream());
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-
-		Element root = persistence.getDocumentElement();
-		Element providerElement = XmlUtils.findFirstElement("/persistence/persistence-unit/provider", root);
+		Document document = XmlUtils.readXml(fileManager.getInputStream(persistencePath));
+		Element root = document.getDocumentElement();
+		
+		Element providerElement = XmlUtils.findFirstElement("/persistence/persistence-unit[@transaction-type = 'RESOURCE_LOCAL']/provider", root);
 		Assert.notNull(providerElement, "/persistence/persistence-unit/provider is null");
 		String provider = providerElement.getTextContent();
 		Element propertyElement = null;
@@ -192,7 +165,7 @@ public class DbreOperationsImpl implements DbreOperations {
 		}
 
 		if (changed) {
-			XmlUtils.writeXml(persistenceMutableFile.getOutputStream(), persistence);
+			fileManager.createOrUpdateTextFileIfRequired(persistencePath, XmlUtils.nodeToString(document), false);
 		}
 	}
 

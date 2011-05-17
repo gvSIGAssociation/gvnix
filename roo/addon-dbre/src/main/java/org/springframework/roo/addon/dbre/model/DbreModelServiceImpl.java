@@ -1,11 +1,10 @@
 package org.springframework.roo.addon.dbre.model;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -73,35 +72,49 @@ public class DbreModelServiceImpl implements DbreModelService {
 		}
 	}
 
-	public Database getDatabaseFromCache() {
-		if (cachedIntrospections.containsKey(lastSchema)) {
+	public Database getDatabase(boolean evictCache) {
+		if (!evictCache && cachedIntrospections.containsKey(lastSchema)) {
 			return cachedIntrospections.get(lastSchema);
 		}
-		return null;
-	}
-
-	public Database getDatabase() {
+		if (evictCache && cachedIntrospections.containsKey(lastSchema)) {
+			cachedIntrospections.remove(lastSchema);
+		}
 		String dbreXmlPath = getDbreXmlPath();
 		if (!StringUtils.hasText(dbreXmlPath) || !fileManager.exists(dbreXmlPath)) {
 			return null;
 		}
- 
-		FileDetails fileDetails = fileManager.readFile(dbreXmlPath);
+
+		Database database = null;
+		InputStream inputStream = null;
 		try {
-			InputStream inputStream = new FileInputStream(fileDetails.getFile());
-			Database database = DatabaseXmlUtils.readDatabaseStructureFromInputStream(inputStream);
+			inputStream = fileManager.getInputStream(dbreXmlPath);
+			database = DatabaseXmlUtils.readDatabase(inputStream);
 			cacheDatabase(database);
 			return database;
 		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+			throw new IllegalStateException(e);
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException ignored) {}
+			}
 		}
+	}
+
+	public void writeDatabase(Database database) {
+		Document document = DatabaseXmlUtils.getDatabaseDocument(database);
+		fileManager.createOrUpdateTextFileIfRequired(getDbreXmlPath(), XmlUtils.nodeToString(document), true);
 	}
 	
 	public String getDbreXmlPath() {
 		return projectOperations.isProjectAvailable() ? projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_RESOURCES, "dbre.xml") : null;
 	}
 	
+	public String getNoSchemaString() {
+		return "no-schema-required";
+	}
+
 	public Database refreshDatabase(Schema schema, boolean view, Set<String> includeTables, Set<String> excludeTables) {
 		Assert.notNull(schema, "Schema required");
 
@@ -119,15 +132,6 @@ public class DbreModelServiceImpl implements DbreModelService {
 		}
 	}
 	
-	public void serializeDatabase(Database database, OutputStream outputStream, boolean displayOnly) {
-		Assert.notNull(database, "Database required");
-		Assert.notNull(outputStream, "Output stream required");
-		DatabaseXmlUtils.writeDatabaseStructureToOutputStream(database, outputStream);
-		if (!displayOnly) {
-			fileManager.createOrUpdateTextFileIfRequired(getDbreXmlPath(), outputStream.toString(), true);
-		}
-	}
-
 	private void cacheDatabase(Database database) {
 		if (database != null) {
 			lastSchema = database.getSchema();
@@ -135,7 +139,7 @@ public class DbreModelServiceImpl implements DbreModelService {
 		}
 	}
 	
-	private Connection getConnection(boolean displayAddOns) throws SQLException {
+	private Connection getConnection(boolean displayAddOns) {
 		if (fileManager.exists(projectOperations.getPathResolver().getIdentifier(Path.SPRING_CONFIG_ROOT, "database.properties"))) {
 			Map<String, String> connectionProperties = propFileOperations.getProperties(Path.SPRING_CONFIG_ROOT, "database.properties");
 			return connectionProvider.getConnection(connectionProperties, displayAddOns);

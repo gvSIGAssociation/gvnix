@@ -42,7 +42,7 @@ import org.w3c.dom.Element;
 @Component 
 @Service 
 public class SolrOperationsImpl implements SolrOperations {
-	private static final Dependency SOLRJ = new Dependency("org.apache.solr", "solr-solrj", "1.4.0");
+	private static final Dependency SOLRJ = new Dependency("org.apache.solr", "solr-solrj", "1.4.1");
 	@Reference private FileManager fileManager;
 	@Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 	@Reference private MetadataService metadataService;
@@ -50,7 +50,15 @@ public class SolrOperationsImpl implements SolrOperations {
 	@Reference private TypeLocationService typeLocationService;
 
 	public boolean isInstallSearchAvailable() {
-		return projectOperations.isProjectAvailable() && fileManager.exists(projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml"));
+		return projectOperations.isProjectAvailable() && !solrPropsInstalled() && fileManager.exists(projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_RESOURCES, "META-INF/persistence.xml"));
+	}
+	
+	public boolean isSearchAvailable() {
+		return solrPropsInstalled();
+	}
+	
+	private boolean solrPropsInstalled() {
+		return fileManager.exists(projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_RESOURCES, "META-INF/spring/solr.properties"));
 	}
 
 	public void setupConfig(String solrServerUrl) {
@@ -59,21 +67,8 @@ public class SolrOperationsImpl implements SolrOperations {
 		updateSolrProperties(solrServerUrl);
 
 		String contextPath = projectOperations.getPathResolver().getIdentifier(Path.SPRING_CONFIG_ROOT, "applicationContext.xml");
-		MutableFile contextMutableFile = null;
-
-		Document appCtx;
-		try {
-			if (fileManager.exists(contextPath)) {
-				contextMutableFile = fileManager.updateFile(contextPath);
-				appCtx = XmlUtils.getDocumentBuilder().parse(contextMutableFile.getInputStream());
-			} else {
-				throw new IllegalStateException("Could not find applicationContext.xml");
-			}
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-
-		Element root = (Element) appCtx.getFirstChild();
+		Document appCtx = XmlUtils.readXml(fileManager.getInputStream(contextPath));
+		Element root = appCtx.getDocumentElement();
 
 		if (XmlUtils.findFirstElementByName("task:annotation-driven", root) == null) {
 			if (root.getAttribute("xmlns:task").length() == 0) {
@@ -85,28 +80,23 @@ public class SolrOperationsImpl implements SolrOperations {
 		}
 
 		Element solrServer = XmlUtils.findFirstElement("/beans/bean[@id='solrServer']", root);
-
 		if (solrServer != null) {
 			return;
 		}
 
 		root.appendChild(new XmlElementBuilder("bean", appCtx).addAttribute("id", "solrServer").addAttribute("class", "org.apache.solr.client.solrj.impl.CommonsHttpSolrServer").addChild(new XmlElementBuilder("constructor-arg", appCtx).addAttribute("value", "${solr.serverUrl}").build()).build());
-
-		XmlUtils.writeXml(contextMutableFile.getOutputStream(), appCtx);
+		XmlUtils.removeTextNodes(root);
+		
+		fileManager.createOrUpdateTextFileIfRequired(contextPath, XmlUtils.nodeToString(appCtx), false);
 	}
 
 	private void updateSolrProperties(String solrServerUrl) {
 		String solrPath = projectOperations.getPathResolver().getIdentifier(Path.SPRING_CONFIG_ROOT, "solr.properties");
-		MutableFile solrMutableFile = null;
-
+		boolean solrExists = fileManager.exists(solrPath);
 		Properties props = new Properties();
-
 		try {
 			if (fileManager.exists(solrPath)) {
-				solrMutableFile = fileManager.updateFile(solrPath);
-				props.load(solrMutableFile.getInputStream());
-			} else {
-				solrMutableFile = fileManager.createFile(solrPath);
+				props.load(fileManager.getInputStream(solrPath));
 			}
 		} catch (IOException ioe) {
 			throw new IllegalStateException(ioe);
@@ -115,12 +105,19 @@ public class SolrOperationsImpl implements SolrOperations {
 		props.put("solr.serverUrl", solrServerUrl);
 		props.put("executor.poolSize", "10");
 
+		OutputStream outputStream = null;
 		try {
-			OutputStream outputStream = solrMutableFile.getOutputStream();
+			MutableFile mutableFile = solrExists ? fileManager.updateFile(solrPath) : fileManager.createFile(solrPath);
+			outputStream = mutableFile.getOutputStream();
 			props.store(outputStream, "Updated at " + new Date());
-			outputStream.close();
-		} catch (IOException ioe) {
-			throw new IllegalStateException(ioe);
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		} finally {
+			if (outputStream != null) {
+				try {
+					outputStream.close();
+				} catch (IOException ignored) {}
+			}
 		}
 	}
 

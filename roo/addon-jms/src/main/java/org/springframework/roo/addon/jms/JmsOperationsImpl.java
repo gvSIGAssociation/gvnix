@@ -1,6 +1,7 @@
 package org.springframework.roo.addon.jms;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +28,10 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
 import org.springframework.roo.support.util.StringUtils;
 import org.springframework.roo.support.util.TemplateUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
@@ -71,43 +70,42 @@ public class JmsOperationsImpl implements JmsOperations {
 	public void installJms(JmsProvider jmsProvider, String name, JmsDestinationType destinationType) {
 		Assert.isTrue(isInstallJmsAvailable(), "Project not available");
 		Assert.notNull(jmsProvider, "JMS provider required");
-		
-		String jmsContextPath = projectOperations.getPathResolver().getIdentifier(Path.SPRING_CONFIG_ROOT, "applicationContext-jms.xml");
-		MutableFile jmsContextMutableFile = null;
 
-		Document appCtx;
+		String jmsContextPath = projectOperations.getPathResolver().getIdentifier(Path.SPRING_CONFIG_ROOT, "applicationContext-jms.xml");
+		Document document;
 		try {
 			if (fileManager.exists(jmsContextPath)) {
-				jmsContextMutableFile = fileManager.updateFile(jmsContextPath);
-				appCtx = XmlUtils.getDocumentBuilder().parse(jmsContextMutableFile.getInputStream());
+				document = XmlUtils.readXml(fileManager.getInputStream(jmsContextPath));
 			} else {
-				FileCopyUtils.copy(TemplateUtils.getTemplate(getClass(), "applicationContext-jms-template.xml"), fileManager.createFile(projectOperations.getPathResolver().getIdentifier(Path.SPRING_CONFIG_ROOT, "applicationContext-jms.xml")).getOutputStream());
-				jmsContextMutableFile = fileManager.updateFile(jmsContextPath);
-				appCtx = XmlUtils.getDocumentBuilder().parse(jmsContextMutableFile.getInputStream());
+				InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "applicationContext-jms-template.xml");
+				Assert.notNull(templateInputStream, "Could not acquire applicationContext-jms.xml template");
+				document = XmlUtils.getDocumentBuilder().parse(templateInputStream);
 			}
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 
-		Element root = (Element) appCtx.getFirstChild();
+		Element root = document.getDocumentElement();
 
 		if (StringUtils.hasText(name)) {
-			Element destination = appCtx.createElement("amq:" + destinationType.name().toLowerCase());
+			Element destination = document.createElement("amq:" + destinationType.name().toLowerCase());
 			destination.setAttribute("physicalName", name);
 			destination.setAttribute("id", name);
 			root.appendChild(destination);
-			addDefaultDestination(appCtx, name);
+			addDefaultDestination(document, name);
 		}
 
 		Element listenerContainer = XmlUtils.findFirstElement("/beans/listener-container[@destination-type = '" + destinationType.name().toLowerCase() + "']", root);
 		if (listenerContainer == null) {
-			listenerContainer = appCtx.createElement("jms:listener-container");
+			listenerContainer = document.createElement("jms:listener-container");
 			listenerContainer.setAttribute("connection-factory", "jmsFactory");
 			listenerContainer.setAttribute("destination-type", destinationType.name().toLowerCase());
 			root.appendChild(listenerContainer);
 		}
 
-		XmlUtils.writeXml(jmsContextMutableFile.getOutputStream(), appCtx);
+		XmlUtils.removeTextNodes(root);
+		
+		fileManager.createOrUpdateTextFileIfRequired(jmsContextPath, XmlUtils.nodeToString(document), false);
 
 		updateConfiguration(jmsProvider);
 	}
@@ -144,20 +142,7 @@ public class JmsOperationsImpl implements JmsOperations {
 		
 		if (async) {
 			String contextPath = projectOperations.getPathResolver().getIdentifier(Path.SPRING_CONFIG_ROOT, "applicationContext.xml");
-			MutableFile contextMutableFile = null;
-
-			Document appCtx = null;
-			try {
-				if (fileManager.exists(contextPath)) {
-					contextMutableFile = fileManager.updateFile(contextPath);
-					appCtx = XmlUtils.getDocumentBuilder().parse(contextMutableFile.getInputStream());
-				} else {
-					throw new IllegalStateException("Could not aquire the Spring applicationContext.xml file");
-				}
-			} catch (Exception e) {
-				throw new IllegalStateException(e);
-			}
-
+			Document appCtx = XmlUtils.readXml(fileManager.getInputStream(contextPath));
 			Element root = appCtx.getDocumentElement();
 			
 			if (XmlUtils.findFirstElementByName("task:annotation-driven", root) == null) {
@@ -167,7 +152,9 @@ public class JmsOperationsImpl implements JmsOperations {
 				}
 				root.appendChild(new XmlElementBuilder("task:annotation-driven", appCtx).addAttribute("executor", "asyncExecutor").addAttribute("mode", "aspectj").build());
 				root.appendChild(new XmlElementBuilder("task:executor", appCtx).addAttribute("id", "asyncExecutor").addAttribute("pool-size", "${executor.poolSize}").build());
-				XmlUtils.writeXml(XmlUtils.createIndentingTransformer(), contextMutableFile.getOutputStream(), appCtx);
+				
+				fileManager.createOrUpdateTextFileIfRequired(contextPath, XmlUtils.nodeToString(appCtx), false);
+
 				propFileOperations.addPropertyIfNotExists(Path.SPRING_CONFIG_ROOT, "jms.properties", "executor.poolSize", "10", true);
 			}
 			methodBuilder.addAnnotation(new AnnotationMetadataBuilder(new JavaType("org.springframework.scheduling.annotation.Async")));
@@ -203,41 +190,27 @@ public class JmsOperationsImpl implements JmsOperations {
 
 		// Compute physical location
 		PhysicalTypeMetadata toCreate = new DefaultPhysicalTypeMetadata(declaredByMetadataId, physicalLocationCanonicalPath, typeDetailsBuilder.build());
-
 		physicalTypeMetadataProvider.createPhysicalType(toCreate);
 
 		String jmsContextPath = projectOperations.getPathResolver().getIdentifier(Path.SPRING_CONFIG_ROOT, "applicationContext-jms.xml");
-		MutableFile jmsContextMutableFile = null;
-
-		Document appCtx;
-		try {
-			if (fileManager.exists(jmsContextPath)) {
-				jmsContextMutableFile = fileManager.updateFile(jmsContextPath);
-				appCtx = XmlUtils.getDocumentBuilder().parse(jmsContextMutableFile.getInputStream());
-			} else {
-				throw new IllegalStateException("Could not find applicationContext-jms.xml");
-			}
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-
-		Element root = appCtx.getDocumentElement();
+		Document document = XmlUtils.readXml(fileManager.getInputStream(jmsContextPath));
+		Element root = document.getDocumentElement();
 		
 		Element listenerContainer = XmlUtils.findFirstElementByName("jms:listener-container", root);
 		if (listenerContainer != null && destinationType.name().toLowerCase().equals(listenerContainer.getAttribute("destination-type"))) {
-			listenerContainer = appCtx.createElement("jms:listener-container");
+			listenerContainer = document.createElement("jms:listener-container");
 			listenerContainer.setAttribute("connection-factory", "jmsFactory");
 			listenerContainer.setAttribute("destination-type", destinationType.name().toLowerCase());
 			root.appendChild(listenerContainer);
 		}
 
 		if (listenerContainer != null) {
-			Element jmsListener = appCtx.createElement("jms:listener");
+			Element jmsListener = document.createElement("jms:listener");
 			jmsListener.setAttribute("ref", StringUtils.uncapitalize(targetType.getSimpleTypeName()));
 			jmsListener.setAttribute("method", "onMessage");
 			jmsListener.setAttribute("destination", name);
 
-			Element bean = appCtx.createElement("bean");
+			Element bean = document.createElement("bean");
 			bean.setAttribute("class", targetType.getFullyQualifiedTypeName());
 			bean.setAttribute("id", StringUtils.uncapitalize(targetType.getSimpleTypeName()));
 			root.appendChild(bean);
@@ -245,7 +218,7 @@ public class JmsOperationsImpl implements JmsOperations {
 			listenerContainer.appendChild(jmsListener);
 		}
 
-		XmlUtils.writeXml(jmsContextMutableFile.getOutputStream(), appCtx);
+		fileManager.createOrUpdateTextFileIfRequired(jmsContextPath, XmlUtils.nodeToString(document), false);
 	}
 
 	private void updateConfiguration(JmsProvider jmsProvider) {
@@ -268,7 +241,7 @@ public class JmsOperationsImpl implements JmsOperations {
 
 	private void addDefaultDestination(Document appCtx, String name) {
 		// If we do already have a default destination configured then do nothing
-		Element root = (Element) appCtx.getFirstChild();
+		Element root = appCtx.getDocumentElement();
 		if (null != XmlUtils.findFirstElement("/beans/bean[@class = 'org.springframework.jms.core.JmsTemplate']/property[@name = 'defaultDestination']", root)) {
 			return;
 		}

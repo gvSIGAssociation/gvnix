@@ -1,12 +1,12 @@
 package org.springframework.roo.process.manager.internal;
 
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SortedSet;
 
@@ -30,8 +30,7 @@ import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.process.manager.ProcessManager;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Document;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * Default implementation of {@link FileManager}.
@@ -42,10 +41,16 @@ import org.w3c.dom.Document;
 @Component
 @Service
 public class DefaultFileManager implements FileManager, UndoListener {
-	@Reference private UndoManager undoManager;
+	@Reference private FilenameResolver filenameResolver;
 	@Reference private NotifiableFileMonitorService fileMonitorService;
 	@Reference private ProcessManager processManager;
-	@Reference private FilenameResolver filenameResolver;
+	@Reference private UndoManager undoManager;
+
+	/** key: file identifier, value: new textual content */
+	private Map<String, String> deferredFileWrites = new LinkedHashMap<String, String>();
+
+	/** key: file identifier, value: new description of change */
+	private Map<String, String> deferredDescriptionOfChanges = new LinkedHashMap<String, String>();
 
 	protected void activate(ComponentContext context) {
 		undoManager.addUndoListener(this);
@@ -55,15 +60,16 @@ public class DefaultFileManager implements FileManager, UndoListener {
 		undoManager.removeUndoListener(this);
 	}
 	
-	/** key: file identifier, value: new textual content */
-	private Map<String, String> deferredFileWrites = new HashMap<String, String>();
-
 	public boolean exists(String fileIdentifier) {
 		Assert.hasText(fileIdentifier, "File identifier required");
 		return new File(fileIdentifier).exists();
 	}
 
 	public InputStream getInputStream(String fileIdentifier) {
+		if (deferredFileWrites.containsKey(fileIdentifier)) {
+			return new ByteArrayInputStream(deferredFileWrites.get(fileIdentifier).getBytes());
+		}
+		
 		File file = new File(fileIdentifier);
 		Assert.isTrue(file.exists(), "File '" + fileIdentifier + "' does not exist");
 		Assert.isTrue(file.isFile(), "Path '" + fileIdentifier + "' is not a file");
@@ -139,28 +145,22 @@ public class DefaultFileManager implements FileManager, UndoListener {
 		return fileMonitorService.findMatchingAntPath(antPath);
 	}
 
-	public int scan() {
-		return fileMonitorService.scanNotified();
-	}
-
 	public void createOrUpdateTextFileIfRequired(String fileIdentifier, String newContents, boolean writeImmediately) {
-		if (writeImmediately) {
-			createOrUpdateTextFileIfRequired(fileIdentifier, newContents);
-		} else {
-			deferredFileWrites.put(fileIdentifier, newContents);
-		}
+		createOrUpdateTextFileIfRequired(fileIdentifier, newContents, "", writeImmediately);
 	}
 	
-	public void createOrUpdateXmlFileIfRequired(String fileIdentifier, Document document, boolean writeImmediately) {
-		Assert.notNull(document, "Document required");
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		XmlUtils.writeXml(baos, document);
-		String newContents = baos.toString();
-		try {
-			baos.close();
-		} catch (IOException ignored) {}
-		
-		createOrUpdateTextFileIfRequired(fileIdentifier, newContents, writeImmediately);
+	public void createOrUpdateTextFileIfRequired(String fileIdentifier, String newContents, String descriptionOfChange, boolean writeImmediately) {
+		if (writeImmediately) {
+			createOrUpdateTextFileIfRequired(fileIdentifier, newContents, descriptionOfChange);
+		} else {
+			deferredFileWrites.put(fileIdentifier, newContents);
+			
+			String deferredDescriptionOfChange = StringUtils.defaultIfEmpty(deferredDescriptionOfChanges.get(fileIdentifier), "");
+			if (StringUtils.hasText(deferredDescriptionOfChange) && !deferredDescriptionOfChange.trim().endsWith(";")) {
+				deferredDescriptionOfChange += "; ";
+			} 
+			deferredDescriptionOfChanges.put(fileIdentifier, deferredDescriptionOfChange + StringUtils.trimToEmpty(descriptionOfChange));
+		}
 	}
 
 	public void commit() {
@@ -172,22 +172,40 @@ public class DefaultFileManager implements FileManager, UndoListener {
 						delete(fileIdentifier);
 					}
 				} else {
-					createOrUpdateTextFileIfRequired(fileIdentifier, newContents);
+					createOrUpdateTextFileIfRequired(fileIdentifier, newContents, StringUtils.trimToEmpty(deferredDescriptionOfChanges.get(fileIdentifier)));
 				}
 			}
 		} finally {
-			deferredFileWrites.clear();
+			clear();
 		}
 	}
 	
-	private void createOrUpdateTextFileIfRequired(String fileIdentifier, String newContents) {
+	public void clear() {
+		deferredFileWrites.clear();
+		deferredDescriptionOfChanges.clear();
+	}
+
+	public int scan() {
+		return fileMonitorService.scanNotified();
+	}
+
+	public void onUndoEvent(UndoEvent event) {
+		if (event.isUndoing()) {
+			clear();
+		} else {
+			// It's a flush or a reset event
+			commit();
+		}
+	}
+
+	private void createOrUpdateTextFileIfRequired(String fileIdentifier, String newContents, String descriptionOfChange) {
 		MutableFile mutableFile = null;
 		if (exists(fileIdentifier)) {
 			// First verify if the file has even changed
-			File f = new File(fileIdentifier);
+			File file = new File(fileIdentifier);
 			String existing = null;
 			try {
-				existing = FileCopyUtils.copyToString(new FileReader(f));
+				existing = FileCopyUtils.copyToString(new FileReader(file));
 			} catch (IOException ignored) {}
 
 			if (!newContents.equals(existing)) {
@@ -200,24 +218,13 @@ public class DefaultFileManager implements FileManager, UndoListener {
 
 		if (mutableFile != null) {
 			try {
+				if (StringUtils.hasText(descriptionOfChange)) {
+					mutableFile.setDescriptionOfChange(descriptionOfChange);
+				}
 				FileCopyUtils.copy(newContents.getBytes(), mutableFile.getOutputStream());
 			} catch (IOException e) {
 				throw new IllegalStateException("Could not output '" + mutableFile.getCanonicalPath() + "'", e);
 			}
 		}
 	}
-
-	public void clear() {
-		deferredFileWrites.clear();
-	}
-
-	public void onUndoEvent(UndoEvent event) {
-		if (event.isUndoing()) {
-			clear();
-		} else {
-			// It's a flush or a reset event
-			commit();
-		}
-	}
-
 }

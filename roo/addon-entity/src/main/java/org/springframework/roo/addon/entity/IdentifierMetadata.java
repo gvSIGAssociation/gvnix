@@ -24,6 +24,7 @@ import org.springframework.roo.classpath.details.annotations.populator.AutoPopul
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
+import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
@@ -135,6 +136,7 @@ public class IdentifierMetadata extends AbstractItdTypeDetailsProvidingMetadataI
 			for (Identifier identifier : identifierServiceResult) {
 				List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
 				annotations.add(getColumnBuilder(identifier));
+				setDateAnnotations(identifier, annotations);
 				
 				FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(getId(), Modifier.PRIVATE, annotations, identifier.getFieldName(), identifier.getFieldType());
 				FieldMetadata idField = fieldBuilder.build();
@@ -199,10 +201,24 @@ public class IdentifierMetadata extends AbstractItdTypeDetailsProvidingMetadataI
 			columnBuilder.addIntegerAttribute("precision", identifier.getColumnSize());
 			columnBuilder.addIntegerAttribute("scale", identifier.getScale());
 		}
-		
+
 		return columnBuilder;
 	}
 	
+	private void setDateAnnotations(Identifier identifier, List<AnnotationMetadataBuilder> annotations) {
+		// Add JSR 220 @Temporal annotation to date fields
+		if (identifier.getFieldType().equals(new JavaType("java.util.Date"))) {
+			String temporalType = StringUtils.defaultIfEmpty(StringUtils.toUpperCase(identifier.getColumnDefinition()), "DATE");
+			AnnotationMetadataBuilder temporalBuilder = new AnnotationMetadataBuilder(new JavaType("javax.persistence.Temporal"));
+			temporalBuilder.addEnumAttribute("value", new EnumDetails(new JavaType("javax.persistence.TemporalType"), new JavaSymbolName(temporalType)));
+			annotations.add(temporalBuilder);
+
+			AnnotationMetadataBuilder dateTimeFormatBuilder = new AnnotationMetadataBuilder(new JavaType("org.springframework.format.annotation.DateTimeFormat"));
+			dateTimeFormatBuilder.addStringAttribute("style", "S-");
+			annotations.add(dateTimeFormatBuilder);
+		}
+	}
+
 	private boolean hasField(List<? extends FieldMetadata> declaredFields, FieldMetadata idField) {
 		for (FieldMetadata declaredField : declaredFields) {
 			if (declaredField.getFieldName().equals(idField.getFieldName())) {
@@ -229,7 +245,7 @@ public class IdentifierMetadata extends AbstractItdTypeDetailsProvidingMetadataI
 			String requiredAccessorName = getRequiredAccessorName(field);
 			MethodMetadata accessor = MemberFindingUtils.getMethod(governorTypeDetails, new JavaSymbolName(requiredAccessorName), new ArrayList<JavaType>());
 			if (accessor != null) {
-				Assert.isTrue(Modifier.isPublic(accessor.getModifier()), "User provided field but failed to provide a public '" + requiredAccessorName + "()' method in '" + governorTypeDetails.getName().getFullyQualifiedTypeName() + "'");
+				Assert.isTrue(Modifier.isPublic(accessor.getModifier()), "User provided field but failed to provide a public '" + requiredAccessorName + "()' method in '" + destination.getFullyQualifiedTypeName() + "'");
 			} else {
 				accessor = getAccessor(field);
 			}
@@ -272,7 +288,7 @@ public class IdentifierMetadata extends AbstractItdTypeDetailsProvidingMetadataI
 			paramTypes.add(field.getFieldType());
 			MethodMetadata mutator = MemberFindingUtils.getMethod(governorTypeDetails, new JavaSymbolName(requiredMutatorName), paramTypes);
 			if (mutator != null) {
-				Assert.isTrue(Modifier.isPublic(mutator.getModifier()), "User provided field but failed to provide a public '" + requiredMutatorName + "(" + field.getFieldName().getSymbolName() + ")' method in '" + governorTypeDetails.getName().getFullyQualifiedTypeName() + "'");
+				Assert.isTrue(Modifier.isPublic(mutator.getModifier()), "User provided field but failed to provide a public '" + requiredMutatorName + "(" + field.getFieldName().getSymbolName() + ")' method in '" + destination.getFullyQualifiedTypeName() + "'");
 			} else {
 				mutator = getMutator(field);
 			}
@@ -391,7 +407,7 @@ public class IdentifierMetadata extends AbstractItdTypeDetailsProvidingMetadataI
 			return null;
 		}
 
-		String typeName = governorTypeDetails.getName().getSimpleTypeName();
+		String typeName = destination.getSimpleTypeName();
 
 		// Create the method
 		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();

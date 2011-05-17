@@ -1,5 +1,6 @@
 package org.springframework.roo.project;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -10,6 +11,8 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.CollectionUtils;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * Represents a project.
@@ -76,7 +79,7 @@ public class ProjectMetadata extends AbstractMetadataItem {
 	}
 	
 	/**
-	 * Convenience method for determining whether all presented dependencies are registered. 
+	 * Convenience method for determining whether all of the presented dependencies are registered. 
 	 *
 	 * @param dependencies the dependencies to check (required)
 	 * @return whether all the dependencies are currently registered or not
@@ -84,6 +87,17 @@ public class ProjectMetadata extends AbstractMetadataItem {
 	public boolean isAllDependenciesRegistered(List<Dependency> dependencies) {
 		Assert.notNull(dependencies, "Dependencies to check is required");
 		return this.dependencies.containsAll(dependencies);
+	}
+
+	/**
+	 * Convenience method for determining whether any of the presented dependencies are registered. 
+	 *
+	 * @param dependencies the dependencies to check (required)
+	 * @return whether any of the dependencies are currently registered or not
+	 */
+	public boolean isAnyDependenciesRegistered(List<Dependency> dependencies) {
+		Assert.notNull(dependencies, "Dependencies to check is required");
+		return CollectionUtils.containsAny(this.dependencies, dependencies);
 	}
 
 	/**
@@ -144,15 +158,57 @@ public class ProjectMetadata extends AbstractMetadataItem {
 	}
 
 	/**
+	 * Convenience method for determining whether all of the presented plugins
+	 * are registered based on the groupId, artifactId, and version.
+	 *
+	 * @param plugins the plugins to check (required)
+	 * @return whether all the plugins are currently registered or not
+	 */
+	public boolean isAllPluginsRegistered(List<Plugin> plugins) {
+		Assert.notNull(plugins, "Plugins to check is required");
+		for (Plugin plugin : plugins) {
+			if (!isBuildPluginRegistered(plugin)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Convenience method for determining whether any of the presented plugins
+	 * are registered based on the groupId, artifactId, and version.
+	 *
+	 * @param plugins the plugins to check (required)
+	 * @return whether any of the plugins are currently registered or not
+	 */
+	public boolean isAnyPluginsRegistered(List<Plugin> plugins) {
+		Assert.notNull(plugins, "Plugins to check is required");
+		for (Plugin plugin : plugins) {
+			if (isBuildPluginRegistered(plugin)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Convenience method for determining whether a particular build plugin
-	 * is registered.
+	 * is registered based on the groupId, artifactId, and version.
 	 * 
 	 * @param plugin to check (required)
 	 * @return whether the build plugin is currently registered or not
 	 */
 	public boolean isBuildPluginRegistered(Plugin plugin) {
 		Assert.notNull(plugin, "Plugin to check is required");
-		return buildPlugins.contains(plugin);
+		for (Plugin existingPlugin : buildPlugins) {
+			boolean matchFound = existingPlugin.getGroupId().equals(plugin.getGroupId());
+			matchFound &= existingPlugin.getArtifactId().equals(plugin.getArtifactId());
+			matchFound &= existingPlugin.getVersion().equals(plugin.getVersion());
+			if (matchFound) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -204,6 +260,8 @@ public class ProjectMetadata extends AbstractMetadataItem {
 	}
 
 	/**
+	 * Returns an unmodifiable set of the project's dependencies.
+	 * 
 	 * @return an unmodifiable representation of the dependencies (never null, but may be empty)
 	 */
 	public Set<Dependency> getDependencies() {
@@ -230,8 +288,7 @@ public class ProjectMetadata extends AbstractMetadataItem {
 	}
 	
 	/**
-	 * @return an unmodifiable collection of the build plugins (never null, but
-	 * may be empty).
+	 * @return an unmodifiable collection of the build plugins (never null, but may be empty).
 	 */
 	public Set<Plugin> getBuildPlugins() {
 		return Collections.unmodifiableSet(buildPlugins);
@@ -306,17 +363,26 @@ public class ProjectMetadata extends AbstractMetadataItem {
 	}
 
 	/**
-	 * Determines whether the GWT Maven plugin exists in the pom.
+	 * Determines whether GWT is enabled in the project.
 	 * 
-	 * @return true if the gwt-maven-plugin is present in the pom.xml, otherwise false
+	 * @return true if the gwt-maven-plugin is present in the pom.xml or the ApplicationScaffold.gwt.xml file exists, otherwise false
 	 */
 	public boolean isGwtEnabled() {
+		boolean gwtEnabled = false;
 		for (Plugin buildPlugin : buildPlugins) {
 			if ("gwt-maven-plugin".equals(buildPlugin.getArtifactId())) {
-				return true;
+				gwtEnabled = true;
+				break;
 			}
 		}
-		return false;
+		
+		if (!gwtEnabled) {
+			String gwtXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA, StringUtils.replace(topLevelPackage.getFullyQualifiedPackageName(), ".", File.separator) + "/ApplicationScaffold.gwt.xml");
+			File file = new File(gwtXmlPath);
+			gwtEnabled = file.exists();
+		}
+		
+		return gwtEnabled;
 	}
 
 	

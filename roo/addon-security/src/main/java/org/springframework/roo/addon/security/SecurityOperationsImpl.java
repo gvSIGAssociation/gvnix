@@ -10,7 +10,6 @@ import org.apache.felix.scr.annotations.Service;
 import org.springframework.roo.addon.web.mvc.controller.WebMvcOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
@@ -83,42 +82,19 @@ public class SecurityOperationsImpl implements SecurityOperations {
 			tilesOperations.addViewDefinition("", "login", TilesOperations.PUBLIC_TEMPLATE, "/WEB-INF/views/login.jspx");
 		}
 
-		String webXml = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml");
-
-		try {
-			if (fileManager.exists(webXml)) {
-				MutableFile mutableWebXml = fileManager.updateFile(webXml);
-				Document webXmlDoc = XmlUtils.getDocumentBuilder().parse(mutableWebXml.getInputStream());
-				WebXmlUtils.addFilterAtPosition(WebXmlUtils.FilterPosition.BETWEEN, WebMvcOperations.HTTP_METHOD_FILTER_NAME, WebMvcOperations.OPEN_ENTITYMANAGER_IN_VIEW_FILTER_NAME, SecurityOperations.SECURITY_FILTER_NAME, "org.springframework.web.filter.DelegatingFilterProxy", "/*", webXmlDoc, null);
-				XmlUtils.writeXml(mutableWebXml.getOutputStream(), webXmlDoc);
-			} else {
-				throw new IllegalStateException("Could not acquire " + webXml);
-			}
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
+		String webXmlPath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml");
+		Document webXmlDocument = XmlUtils.readXml(fileManager.getInputStream(webXmlPath));
+		WebXmlUtils.addFilterAtPosition(WebXmlUtils.FilterPosition.BETWEEN, WebMvcOperations.HTTP_METHOD_FILTER_NAME, WebMvcOperations.OPEN_ENTITYMANAGER_IN_VIEW_FILTER_NAME, SecurityOperations.SECURITY_FILTER_NAME, "org.springframework.web.filter.DelegatingFilterProxy", "/*", webXmlDocument, null);
+		fileManager.createOrUpdateTextFileIfRequired(webXmlPath, XmlUtils.nodeToString(webXmlDocument), false);
 
 		// Include static view controller handler to webmvc-config.xml
-		String webMvc = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml");
-
-		MutableFile mutableConfigXml = null;
-		Document webConfigDoc;
-		try {
-			if (fileManager.exists(webMvc)) {
-				mutableConfigXml = fileManager.updateFile(webMvc);
-				webConfigDoc = XmlUtils.getDocumentBuilder().parse(mutableConfigXml.getInputStream());
-			} else {
-				throw new IllegalStateException("Could not acquire " + webMvc);
-			}
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-
-		Element viewController = XmlUtils.findFirstElementByName("mvc:view-controller", webConfigDoc.getDocumentElement());
-		Assert.notNull(viewController, "Could not find mvc:view-controller in " + webMvc);
-
-		viewController.getParentNode().insertBefore(new XmlElementBuilder("mvc:view-controller", webConfigDoc).addAttribute("path", "/login").build(), viewController);
-		XmlUtils.writeXml(mutableConfigXml.getOutputStream(), webConfigDoc);
+		String webConfigPath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml");
+		Document webConfigDocument = XmlUtils.readXml(fileManager.getInputStream(webConfigPath));
+		Element webConfig = webConfigDocument.getDocumentElement();
+		Element viewController = XmlUtils.findFirstElementByName("mvc:view-controller", webConfig);
+		Assert.notNull(viewController, "Could not find mvc:view-controller in " + webConfig);
+		viewController.getParentNode().insertBefore(new XmlElementBuilder("mvc:view-controller", webConfigDocument).addAttribute("path", "/login").build(), viewController);
+		fileManager.createOrUpdateTextFileIfRequired(webConfigPath, XmlUtils.nodeToString(webConfigDocument), false);
 	}
 
 	private void updatePomProperties(Element configuration) {

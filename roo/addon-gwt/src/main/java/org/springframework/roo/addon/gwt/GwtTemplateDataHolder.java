@@ -1,9 +1,9 @@
 package org.springframework.roo.addon.gwt;
 
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 
 /**
  * Holder for types and xml files created via {@link GwtTemplateService}.
@@ -11,9 +11,7 @@ import java.util.Map;
  * @author James Tyrrell
  * @since 1.1.2
  */
-
 public class GwtTemplateDataHolder {
-
 	private final Map<GwtType, ClassOrInterfaceTypeDetails> templateTypeDetailsMap;
 	private final Map<GwtType, String> xmlTemplates;
 	private final List<ClassOrInterfaceTypeDetails> typeList;

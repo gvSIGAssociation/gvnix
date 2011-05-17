@@ -1,7 +1,7 @@
 package org.springframework.roo.addon.web.mvc.controller.converter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -81,7 +81,6 @@ public final class ConversionServiceMetadataProvider extends AbstractItdMetadata
 	@Override
 	protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
 		applicationConversionServiceFactoryBeanMid = metadataIdentificationString;
-
 		// To get here we know the governor is the ApplicationConversionServiceFactoryBean so let's go ahead and create its ITD
 		Map<JavaType, List<MethodMetadata>> relevantDomainTypes = findDomainTypesRequiringAConverter(metadataIdentificationString);
 		if (relevantDomainTypes.isEmpty()) { 
@@ -97,7 +96,7 @@ public final class ConversionServiceMetadataProvider extends AbstractItdMetadata
 		Map<JavaType, Map<Object, JavaSymbolName>> types = new TreeMap<JavaType, Map<Object,JavaSymbolName>>();
 		for (JavaType controller : typeLocationService.findTypesWithAnnotation(rooWebScaffold)) {
 			PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(controller, Path.SRC_MAIN_JAVA));
-			Assert.notNull(physicalTypeMetadata, "Unable to obtain physical type metdata for type " + controller.getFullyQualifiedTypeName());
+			Assert.notNull(physicalTypeMetadata, "Unable to obtain physical type metadata for type " + controller.getFullyQualifiedTypeName());
 			WebScaffoldAnnotationValues webScaffoldAnnotationValues = new WebScaffoldAnnotationValues(physicalTypeMetadata);
 			JavaType backingType = webScaffoldAnnotationValues.getFormBackingObject();
 			MemberDetails memberDetails = getMemberDetails(backingType);
@@ -105,7 +104,7 @@ public final class ConversionServiceMetadataProvider extends AbstractItdMetadata
 			if (embeddedIdFields.size() > 1) {
 				throw new IllegalStateException("Found multiple embedded ID fields in " + backingType.getFullyQualifiedTypeName() + " type. Only one is allowed.");
 			} else if (embeddedIdFields.size() == 1) {
-				Map<Object, JavaSymbolName> jsonMethodNames = new HashMap<Object, JavaSymbolName>();
+				Map<Object, JavaSymbolName> jsonMethodNames = new LinkedHashMap<Object, JavaSymbolName>();
 				MemberDetails fieldMemberDetails = getMemberDetails(embeddedIdFields.get(0).getFieldType());
 				MethodMetadata fromJsonMethod = MemberFindingUtils.getMostConcreteMethodWithTag(fieldMemberDetails, CustomDataJsonTags.FROM_JSON_METHOD);
 				if (fromJsonMethod != null) {
@@ -123,10 +122,10 @@ public final class ConversionServiceMetadataProvider extends AbstractItdMetadata
 	
 	protected Map<JavaType, List<MethodMetadata>> findDomainTypesRequiringAConverter(String metadataIdentificationString) {
 		JavaType rooWebScaffold = new JavaType(RooWebScaffold.class.getName());
-		Map<JavaType, List<MethodMetadata>> relevantDomainTypes = new HashMap<JavaType, List<MethodMetadata>>();
+		Map<JavaType, List<MethodMetadata>> relevantDomainTypes = new LinkedHashMap<JavaType, List<MethodMetadata>>();
 		for (JavaType controller : typeLocationService.findTypesWithAnnotation(rooWebScaffold)) {
 			PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(controller, Path.SRC_MAIN_JAVA));
-			Assert.notNull(physicalTypeMetadata, "Unable to obtain physical type metdata for type " + controller.getFullyQualifiedTypeName());
+			Assert.notNull(physicalTypeMetadata, "Unable to obtain physical type metadata for type " + controller.getFullyQualifiedTypeName());
 			WebScaffoldAnnotationValues webScaffoldAnnotationValues = new WebScaffoldAnnotationValues(physicalTypeMetadata);
 			relevantDomainTypes.putAll(findRelevantTypes(webScaffoldAnnotationValues.getFormBackingObject(), metadataIdentificationString));
 		}
@@ -135,8 +134,8 @@ public final class ConversionServiceMetadataProvider extends AbstractItdMetadata
 	
 	private Map<JavaType, List<MethodMetadata>> findRelevantTypes(JavaType type, String metadataIdentificationString) {
 		MemberDetails memberDetails = getMemberDetails(type);
-		Map<JavaType, List<MethodMetadata>> types = new HashMap<JavaType, List<MethodMetadata>>();
-		List<MethodMetadata> locatedAccessors = new ArrayList<MethodMetadata>();
+		Map<JavaType, List<MethodMetadata>> types = new LinkedHashMap<JavaType, List<MethodMetadata>>();
+		List<MethodMetadata> locatedAccessors = new LinkedList<MethodMetadata>();
 		
 		metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.createIdentifier(type, Path.SRC_MAIN_JAVA), metadataIdentificationString);
 		int counter = 0;

@@ -1,16 +1,16 @@
 package org.springframework.roo.addon.dbre.model;
 
-import java.io.OutputStream;
 import java.util.Set;
 
 /**
- * Retrieves database metadata from an XML file or a JDBC connection.
+ * Retrieves database metadata from the dbre.xml file or a JDBC connection. 
+ * Also writes database metadata to the dbre.xml file.
  * 
  * @author Alan Stewart
  * @since 1.1
  */
 public interface DbreModelService {
-	
+
 	/**
 	 * Determines if the database uses schemas.
 	 * 
@@ -32,28 +32,33 @@ public interface DbreModelService {
 	Set<Schema> getSchemas(boolean displayAddOns);
 	
 	/**
-	 * Reads the database metadata information from DBRE XML if possible.
+	 * Reads the database metadata information from either a cache or from the dbre.xml file if possible.
 	 * 
-	 * <p>
-	 * NOTE: the XML file can only store one database.
-	 * 
+	 * @param evictCache forces eviction of the database from the cache before attempting retrieval
 	 * @return the database metadata if it could be parsed, otherwise null if unavailable for any reason
 	 */
-	Database getDatabase();
-
+	Database getDatabase(boolean evictCache);
+	
 	/**
-	 * Retrieves the database metadata from a cache if possible.
-	 *  
-	 * @return the database metadata, otherwise null if unavailable for any reason
-	 */
-	Database getDatabaseFromCache();
-
-	/**
-	 * Returns the identifier for the DBRE XML file.
+	 * Serializes the database to the dbre.xml file.
 	 * 
-	 * @return a String representing the path of the DBRE XML file
+	 * @param database the database to be written out to disk
+	 */
+	void writeDatabase(Database database);
+
+	/**
+	 * Returns the identifier for the dbre.xml file.
+	 * 
+	 * @return a String representing the path of the dbre.xml file
 	 */
 	String getDbreXmlPath();
+	
+	/**
+	 * Returns the schema string for databases which do not support schemas, such as MySQL.
+	 * 
+	 * @return the string, "no-schema-required"
+	 */
+	String getNoSchemaString();
 
 	/**
 	 * Retrieves the database metadata from a JDBC connection.
@@ -65,16 +70,4 @@ public interface DbreModelService {
 	 * @return the database metadata if available (null if cannot connect to the database or the schema is not found)
 	 */
 	Database refreshDatabase(Schema schema, boolean view, Set<String> includeTables, Set<String> excludeTables);
-	
-	/**
-	 * Writes the database metadata to an output stream.
-	 * 
-	 * <p>
-	 * It is the responsibility of the caller to close the output stream when finished.
-	 * 
-	 * @param database the database metadata (required)
-	 * @param outputStream the output stream to write to (required)
-	 * @param displayOnly whether the serialization operation is for instrospection purposes only or for the Roo-managed DBRE XML file
-	 */
-	void serializeDatabase(Database database, OutputStream outputStream, boolean displayOnly);
 }

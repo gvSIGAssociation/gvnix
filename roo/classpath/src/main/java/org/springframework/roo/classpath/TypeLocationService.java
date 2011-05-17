@@ -24,9 +24,17 @@ public interface TypeLocationService {
 	 * If these assumption are not met, an exception will be thrown.
 	 * 
 	 * @param requiredClassOrInterface that should be parsed (required)
-	 * @return the details (never returns null)
+	 * @return the ClassOrInterfaceTypeDetails (never returns null)
 	 */
 	ClassOrInterfaceTypeDetails getClassOrInterface(JavaType requiredClassOrInterface);
+	
+	/**
+	 * Attempts to find the requested {@link JavaType}, assuming it is a class or interface.
+	 * 
+	 * @param requiredClassOrInterface that should be parsed (required)
+	 * @return the ClassOrInterfaceTypeDetails if found, otherwise null if not found
+	 */
+	ClassOrInterfaceTypeDetails findClassOrInterface(JavaType requiredClassOrInterface);
 
 	/**
 	 * Processes types with the specified list of annotations and uses the supplied 
@@ -68,4 +76,11 @@ public interface TypeLocationService {
 	 * @return a set of ClassOrInterfaceTypeDetails that have the specified tag.
 	 */
 	Set<ClassOrInterfaceTypeDetails> findClassesOrInterfaceDetailsWithTag(Object tag);
+
+	/**
+	 * Returns a list of {@link ClassOrInterfaceTypeDetails} that are contained within the specified {@link Path}.
+	 *
+	 * @return a list of ClassOrInterfaceTypeDetails contained in path.
+	 */
+	List<ClassOrInterfaceTypeDetails> getProjectJavaTypes(Path path);
 }

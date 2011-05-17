@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -25,10 +27,17 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.w3c.dom.DOMConfiguration;
+import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSException;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 
 /**
  * Utilities related to DOM and XML usage.
@@ -47,6 +56,25 @@ public final class XmlUtils {
 	private XmlUtils() {
 	}
 
+	/**
+	 * Read an XML document from the supplied input stream and return a document.
+	 *  
+	 * @param inputStream the input stream to read from (required).  The stream is closed upon completion.
+	 * @return a document.
+	 */
+	public static final Document readXml(InputStream inputStream) {
+		Assert.notNull(inputStream, "InputStream required");
+		try {
+			return factory.newDocumentBuilder().parse(inputStream);
+		} catch (Exception e) {
+			throw new IllegalStateException("Could not open input stream", e);
+		} finally {
+			try {
+				inputStream.close();
+			} catch (IOException inored) {}
+		}
+	}
+	
 	/**
 	 * Write an XML document to the OutputStream provided. This will use the pre-configured Roo provided Transformer.
 	 * 
@@ -85,9 +113,115 @@ public final class XmlUtils {
 	}
 	
 	/**
-	 * Creates a {@link StreamResult} by wrapping the given outputEntry in an
+	 * Write an XML document to the OutputStream provided. This method will detect if the JDK supports the
+	 * DOM Level 3 "format-pretty-print" configuration and make use of it. If not found it will fall back to 
+	 * using formatting offered by TrAX. 
+	 * 
+	 * @param outputStream the output stream to write to. The stream is closed upon completion.
+	 * @param document the document to write.
+	 */
+	public static void writeFormattedXml(OutputStream outputStream, Document document) {
+		// Note that the "format-pretty-print" DOM configuration parameter can only be set in JDK 1.6+.
+		DOMImplementation domImplementation = document.getImplementation();
+		if (domImplementation.hasFeature("LS", "3.0") && domImplementation.hasFeature("Core", "2.0")) {
+			DOMImplementationLS domImplementationLS = null;
+			try {
+				domImplementationLS = (DOMImplementationLS) domImplementation.getFeature("LS", "3.0");
+			} catch (NoSuchMethodError nsme) {
+				// Fall back to default LS
+				DOMImplementationRegistry registry = null;
+				try {
+					registry = DOMImplementationRegistry.newInstance();
+				} catch (Exception e) {
+					// DOMImplementationRegistry not available. Falling back to TrAX.
+					writeXml(outputStream, document);
+					return;
+				}
+				if (registry != null) {
+					domImplementationLS = (DOMImplementationLS) registry.getDOMImplementation("LS");
+				} else {
+					// DOMImplementationRegistry not available. Falling back to TrAX.
+					writeXml(outputStream, document);
+				}
+			}
+			if (domImplementationLS != null) {
+				LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
+				DOMConfiguration domConfiguration = lsSerializer.getDomConfig();
+				if (domConfiguration.canSetParameter("format-pretty-print", Boolean.TRUE)) {
+					lsSerializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
+					LSOutput lsOutput = domImplementationLS.createLSOutput();
+					lsOutput.setEncoding("UTF-8");
+					lsOutput.setByteStream(outputStream);
+					try {
+					lsSerializer.write(document, lsOutput);
+					} catch (LSException lse) {
+						throw new IllegalStateException(lse);
+					} finally {
+						try {
+							outputStream.close();
+						} catch (IOException ignored) {
+							// Do nothing
+						}
+					}
+				} else {
+					// DOMConfiguration 'format-pretty-print' parameter not available. Falling back to TrAX.
+					writeXml(outputStream, document);
+				}
+			} else {
+				// DOMImplementationLS not available. Falling back to TrAX.
+				writeXml(outputStream, document);
+			}
+		} else {
+			// DOM 3.0 LS and/or DOM 2.0 Core not supported. Falling back to TrAX.
+			writeXml(outputStream, document);
+		}
+	}
+	
+	/**
+	 * Compares two DOM {@link Node nodes} by comparing the representations of the nodes as XML strings
+	 *
+	 * @param node1 the first node
+	 * @param node2 the second node
+	 * @return true if the XML representation node1 is the same as the XML representation of node2, otherwise false
+	 */
+	public static boolean compareNodes(Node node1, Node node2) {
+		Assert.notNull(node1, "First node required");
+		Assert.notNull(node2, "Second node required");
+		// The documents need to be cloned as normalization has side-effects
+		node1 = node1.cloneNode(true);
+		node2 = node2.cloneNode(true);
+		// The documents need to be normalized before comparison takes place to remove any formatting that interfere with comparison
+		if (node1 instanceof Document && node2 instanceof Document) {
+			((Document) node1).normalizeDocument();
+			((Document) node2).normalizeDocument();
+		} else {
+			node1.normalize();
+			node2.normalize();
+		}
+		return nodeToString(node1).equals(nodeToString(node2));
+	}
+
+	/**
+	 * Converts a {@link Node node} to an XML string
+	 *
+	 * @param node the first element
+	 * @return the XML String representation of the node, never null
+	 */
+	public static String nodeToString(Node node) {
+		try {
+			StringWriter writer = new StringWriter();
+			createIndentingTransformer().transform(new DOMSource(node), new StreamResult(writer));
+			return writer.toString();
+		} catch (TransformerException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	/**
+	 * Creates a {@link StreamResult} by wrapping the given outputStream in an
 	 * {@link OutputStreamWriter} that transforms Windows line endings (\r\n) 
 	 * into Unix line endings (\n) on Windows for consistency with Roo's templates.  
+	 * 
 	 * @param outputStream
 	 * @return StreamResult 
 	 * @throws UnsupportedEncodingException 
@@ -107,6 +241,7 @@ public final class XmlUtils {
 				public void write(int c) throws IOException {
 					if (c != '\r') super.write(c);
 				}
+				
 				public void write(String str, int off, int len) throws IOException {
 					String orig = str.substring(off, off + len);
 					String filtered = orig.replace("\r\n", "\n");
@@ -290,32 +425,32 @@ public final class XmlUtils {
 		// factory.setNamespaceAware(true);
 		try {
 			return factory.newDocumentBuilder();
-		} catch (ParserConfigurationException ex) {
-			throw new IllegalStateException(ex);
+		} catch (ParserConfigurationException e) {
+			throw new IllegalStateException(e);
 		}
 	}
 	
 	/**
-	 * Removes empty text nodes from the specified element
+	 * Removes empty text nodes from the specified node
 	 * 
-	 * @param element the element where empty text nodes will be removed
+	 * @param node the element where empty text nodes will be removed
 	 */
-	public static void removeTextNodes(Element element) {
-		if (element == null) {
+	public static void removeTextNodes(Node node) {
+		if (node == null) {
 			return;
 		}
 		
-		NodeList children = element.getChildNodes();
+		NodeList children = node.getChildNodes();
 		for (int i = children.getLength() - 1; i >= 0; i--) {
 			Node child = children.item(i);
 			switch (child.getNodeType()) {
 				case Node.ELEMENT_NODE:
-					removeTextNodes((Element) child);
+					removeTextNodes(child);
 					break;
 				case Node.CDATA_SECTION_NODE:
 				case Node.TEXT_NODE:
 					if (!StringUtils.hasText(child.getNodeValue())) {
-						element.removeChild(child);
+						node.removeChild(child);
 					}
 					break;
 			}

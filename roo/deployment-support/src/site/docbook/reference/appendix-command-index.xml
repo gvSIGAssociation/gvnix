@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <appendix xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="command-index">
     <title>Command Index</title>
-    <para>This appendix was automatically built from Roo 1.1.3.RELEASE [rev 68e9162].</para>
+    <para>This appendix was automatically built from Roo 1.1.4.RELEASE [rev d4d95d4].</para>
     <para>Commands are listed in alphabetic order, and are shown in monospaced font with any mandatory options you must specify when using the command. Most commands accept a large number of options, and all of the possible options for each command are presented in this appendix.</para>
     <section xml:id="command-index-add-on-commands">
         <title>Add On Commands</title>
@@ -2280,13 +2280,13 @@
         </section>
         <section xml:id="command-index-test-stub">
             <title>test stub</title>
-            <para>Creates a test stub for the specified entity</para>
+            <para>Creates a test stub for the specified class</para>
             <programlisting><![CDATA[test stub]]></programlisting>
             <variablelist>
                 <varlistentry>
-                    <term>--entity</term>
+                    <term>--class</term>
                     <listitem>
-                        <para>The name of the entity this mock test is targeting; default if option not present: '*'</para>
+                        <para>The name of the class this mock test is targeting; default if option not present: '*'</para>
                     </listitem>
                 </varlistentry>
                 <varlistentry>
@@ -2572,13 +2572,26 @@
                         <para>The root name which should be used to wrap the JSON document; no default value</para>
                     </listitem>
                 </varlistentry>
+                <varlistentry>
+                    <term>--deepSerialize</term>
+                    <listitem>
+                        <para>Indication if deep serialization should be enabled.; default if option present: 'true'; default if option not present: 'false'</para>
+                    </listitem>
+                </varlistentry>
             </variablelist>
         </section>
         <section xml:id="command-index-json-all">
             <title>json all</title>
             <para>Adds @RooJson annotation to all types annotated with @RooJavaBean</para>
             <programlisting><![CDATA[json all]]></programlisting>
-            <para>This command does not accept any options.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>--deepSerialize</term>
+                    <listitem>
+                        <para>Indication if deep serialization should be enabled; default if option present: 'true'; default if option not present: 'false'</para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </section>
     </section>
     <section xml:id="command-index-jsp-commands">
@@ -2678,6 +2691,19 @@
             <para>Setup a basic project structure for a Spring MVC / JSP application</para>
             <programlisting><![CDATA[web mvc setup]]></programlisting>
             <para>This command does not accept any options.</para>
+        </section>
+        <section xml:id="command-index-web-mvc-update-tags">
+            <title>web mvc update tags</title>
+            <para>Replace an existing application tagx library with the latest version (use --backup option to backup your application first)</para>
+            <programlisting><![CDATA[web mvc update tags]]></programlisting>
+            <variablelist>
+                <varlistentry>
+                    <term>--backup</term>
+                    <listitem>
+                        <para>Backup your application before replacing your existing tag library; default if option present: 'true'; default if option not present: 'false'</para>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </section>
         <section xml:id="command-index-web-mvc-view">
             <title>web mvc view</title>

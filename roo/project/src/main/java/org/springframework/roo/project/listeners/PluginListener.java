@@ -9,6 +9,7 @@ import org.springframework.roo.project.Plugin;
  * @author Alan Stewart
  * @since 1.1
  */
+@Deprecated
 public interface PluginListener {
 
 	void pluginAdded(Plugin plugin);

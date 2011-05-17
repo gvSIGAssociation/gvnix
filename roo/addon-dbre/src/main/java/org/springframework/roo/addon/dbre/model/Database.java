@@ -151,20 +151,12 @@ public class Database implements Serializable {
 		// Mark repeated columns with insertable = false and updatable = false
 		for (Map.Entry<Column, Set<ForeignKey>> entrySet : repeatedColumns.entrySet()) {
 			Set<ForeignKey> foreignKeys = entrySet.getValue();
-			if (foreignKeys.size() <= 1) {
-				continue;
-			}
-			fk: for (ForeignKey foreignKey : foreignKeys) {
-				if (foreignKey.getReferenceCount() == 1) {
-					Reference reference = foreignKey.getReferences().iterator().next();
-					reference.setInsertableOrUpdatable(false);
-					break fk;
+			for (ForeignKey foreignKey : foreignKeys) {
+				if (foreignKeys.size() > 1 || foreignKey.getForeignTableName().equals(table.getName())) {
+					for (Reference reference : foreignKey.getReferences()) {
+						reference.setInsertableOrUpdatable(false);
+					}
 				}
-				
-				for (Reference reference : foreignKey.getReferences()) {
-					reference.setInsertableOrUpdatable(false);
-				}
-				break fk;
 			}
 		}
 	}
@@ -237,5 +229,9 @@ public class Database implements Serializable {
 		if (equals) {
 			table.setJoinTable(true);
 		}
+	}
+
+	public String toString() {
+		return String.format("Database [name=%s, tables=%s, destinationPackage=%s, testAutomatically=%s, includeNonPortableAttributes=%s]", name, tables, destinationPackage, testAutomatically, includeNonPortableAttributes);
 	}
 }

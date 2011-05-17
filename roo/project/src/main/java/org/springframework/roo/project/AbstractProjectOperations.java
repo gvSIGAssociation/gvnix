@@ -50,146 +50,174 @@ public abstract class AbstractProjectOperations implements ProjectOperations {
 		return projectMetadata != null ? projectMetadata.getPathResolver() : null;
 	}
 
+	@Deprecated
 	public void addDependencyListener(DependencyListener listener) {
 		this.listeners.add(listener);
 	}
 	
+	@Deprecated
 	public void removeDependencyListener(DependencyListener listener) {
 		this.listeners.remove(listener);
 	}
 	
+	@Deprecated
 	private void sendDependencyAdditionNotifications(Dependency dependency) {
 		for (DependencyListener listener : listeners) {
 			listener.dependencyAdded(dependency);
 		}
 	}
 	
+	@Deprecated
 	private void sendDependencyRemovalNotifications(Dependency dependency) {
 		for (DependencyListener listener :listeners) {
 			listener.dependencyRemoved(dependency);
 		}
 	}
 	
+	@Deprecated
 	public void addRepositoryListener(RepositoryListener listener) {
 		this.repositoryListeners.add(listener);
 	}
 	
+	@Deprecated
 	public void removeRepositoryListener(RepositoryListener listener) {
 		this.repositoryListeners.remove(listener);
 	}
 	
+	@Deprecated
 	private void sendRepositoryAdditionNotifications(Repository repository) {
 		for (RepositoryListener listener : repositoryListeners) {
 			listener.repositoryAdded(repository);
 		}
 	}
 	
+	@Deprecated
 	private void sendRepositoryRemovalNotifications(Repository repository) {
 		for (RepositoryListener listener : repositoryListeners) {
 			listener.repositoryRemoved(repository);
 		}
 	}
 	
+	@Deprecated
 	public void addPluginRepositoryListener(RepositoryListener listener) {
 		this.pluginRepositoryListeners.add(listener);
 	}
 	
+	@Deprecated
 	public void removePluginRepositoryListener(RepositoryListener listener) {
 		this.pluginRepositoryListeners.remove(listener);
 	}
 	
+	@Deprecated
 	private void sendPluginRepositoryAdditionNotifications(Repository repository) {
 		for (RepositoryListener listener : pluginRepositoryListeners) {
 			listener.repositoryAdded(repository);
 		}
 	}
 	
+	@Deprecated
 	private void sendPluginRepositoryRemovalNotifications(Repository repository) {
 		for (RepositoryListener listener : pluginRepositoryListeners) {
 			listener.repositoryRemoved(repository);
 		}
 	}
 	
+	@Deprecated
 	public void addPluginListener(PluginListener listener) {
 		this.pluginListeners.add(listener);
 	}
 	
+	@Deprecated
 	public void removePluginListener(PluginListener listener) {
 		this.pluginListeners.remove(listener);
 	}
 	
+	@Deprecated
 	private void sendPluginAdditionNotifications(Plugin plugin) {
 		for (PluginListener listener : pluginListeners) {
 			listener.pluginAdded(plugin);
 		}
 	}
 	
+	@Deprecated
 	private void sendPluginRemovalNotifications(Plugin plugin) {
 		for (PluginListener listener : pluginListeners) {
 			listener.pluginRemoved(plugin);
 		}
 	}
 
+	@Deprecated
 	public void addPropertyListener(PropertyListener listener) {
 		this.propertyListeners.add(listener);
 	}
 	
+	@Deprecated
 	public void removePropertyListener(PropertyListener listener) {
 		this.propertyListeners.remove(listener);
 	}
 	
+	@Deprecated
 	private void sendPropertyAdditionNotifications(Property property) {
 		for (PropertyListener listener : propertyListeners) {
 			listener.propertyAdded(property);
 		}
 	}
 	
+	@Deprecated
 	private void sendPropertyRemovalNotifications(Property property) {
 		for (PropertyListener listener : propertyListeners) {
 			listener.propertyRemoved(property);
 		}
 	}
 
+	@Deprecated
 	public void addFilterListener(FilterListener listener) {
 		this.filterListeners.add(listener);
 	}
 	
+	@Deprecated
 	public void removeFilterListener(FilterListener listener) {
 		this.filterListeners.remove(listener);
 	}
 	
+	@Deprecated
 	private void sendFilterAdditionNotifications(Filter filter) {
 		for (FilterListener listener : filterListeners) {
 			listener.filterAdded(filter);
 		}
 	}
 	
+	@Deprecated
 	private void sendFilterRemovalNotifications(Filter filter) {
 		for (FilterListener listener : filterListeners) {
 			listener.filterRemoved(filter);
 		}
 	}
 
+	@Deprecated
 	public void addResourceListener(ResourceListener listener) {
 		this.resourceListeners.add(listener);
 	}
 	
+	@Deprecated
 	public void removeResourceListener(ResourceListener listener) {
 		this.resourceListeners.remove(listener);
 	}
 	
+	@Deprecated
 	private void sendResourceAdditionNotifications(Resource resource) {
 		for (ResourceListener listener : resourceListeners) {
 			listener.resourceAdded(resource);
 		}
 	}
 	
+	@Deprecated
 	private void sendResourceRemovalNotifications(Resource resource) {
 		for (ResourceListener listener : resourceListeners) {
 			listener.resourceRemoved(resource);
 		}
 	}
-
+	
 	public void updateProjectType(ProjectType projectType) {
 		Assert.notNull(projectType, "ProjectType required");
 		projectMetadataProvider.updateProjectType(projectType);
@@ -208,7 +236,7 @@ public abstract class AbstractProjectOperations implements ProjectOperations {
 		Assert.isTrue(isProjectAvailable(), "Dependency modification prohibited at this time");
 		Assert.notNull(dependency, "Dependency required");
 		projectMetadataProvider.addDependency(dependency);
-		sendDependencyAdditionNotifications(dependency);		
+		sendDependencyAdditionNotifications(dependency);
 	}
 	
 	public final void addDependency(String groupId, String artifactId, String version) {
@@ -221,6 +249,15 @@ public abstract class AbstractProjectOperations implements ProjectOperations {
 		sendDependencyAdditionNotifications(dependency);
 	}
 	
+	public final void removeDependencies(List<Dependency> dependencies) {
+		Assert.isTrue(isProjectAvailable(), "Dependency modification prohibited at this time");
+		Assert.notNull(dependencies, "Dependencies required");
+		projectMetadataProvider.removeDependencies(dependencies);
+		for (Dependency dependency : dependencies) {
+			sendDependencyRemovalNotifications(dependency);
+		}
+	}
+
 	public final void removeDependency(Dependency dependency) {
 		Assert.isTrue(isProjectAvailable(), "Dependency modification prohibited at this time");
 		Assert.notNull(dependency, "Dependency required");
@@ -284,6 +321,15 @@ public abstract class AbstractProjectOperations implements ProjectOperations {
 		sendPluginRepositoryRemovalNotifications(repository);
 	}
 
+	public final void addBuildPlugins(List<Plugin> plugins) {
+		Assert.isTrue(isProjectAvailable(), "Plugin modification prohibited at this time");
+		Assert.notNull(plugins, "BuildPlugins required");
+		projectMetadataProvider.addBuildPlugins(plugins);
+		for (Plugin plugin : plugins) {
+			sendPluginAdditionNotifications(plugin);
+		}
+	}
+	
 	public final void addBuildPlugin(Plugin plugin) {
 		Assert.isTrue(isProjectAvailable(), "Plugin modification prohibited at this time");
 		Assert.notNull(plugin, "Plugin required");
@@ -291,6 +337,15 @@ public abstract class AbstractProjectOperations implements ProjectOperations {
 		sendPluginAdditionNotifications(plugin);
 	}
 	
+	public final void removeBuildPlugins(List<Plugin> plugins) {
+		Assert.isTrue(isProjectAvailable(), "Plugin modification prohibited at this time");
+		Assert.notNull(plugins, "Plugins required");
+		projectMetadataProvider.removeBuildPlugins(plugins);
+		for (Plugin plugin : plugins) {
+			sendPluginRemovalNotifications(plugin);
+		}
+	}
+
 	public final void removeBuildPlugin(Plugin plugin) {
 		Assert.isTrue(isProjectAvailable(), "Plugin modification prohibited at this time");
 		Assert.notNull(plugin, "Plugin required");
@@ -298,21 +353,20 @@ public abstract class AbstractProjectOperations implements ProjectOperations {
 		sendPluginRemovalNotifications(plugin);
 	}
 	
-	public void buildPluginUpdate(Plugin plugin) {
-		Assert.isTrue(isProjectAvailable(), "Plugin modification prohibited at this time");
+	public void updateBuildPlugin(Plugin plugin) {
+		ProjectMetadata projectMetadata = getProjectMetadata();
+		Assert.notNull(projectMetadata, "Plugin modification prohibited at this time");
 		Assert.notNull(plugin, "Plugin required");
-		ProjectMetadata projectMetadata = (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
-		Assert.notNull(projectMetadata, "Project metadata unavailable");
-		
-		if (projectMetadata.isBuildPluginRegistered(plugin)) {
-			// Already exists, so just quit
-			return;
+		for (Plugin existingPlugin : projectMetadata.getBuildPlugins()) {
+			if (existingPlugin.equals(plugin)) {
+				// Already exists, so just quit
+				return;
+			}
 		}
 		
 		// Delete any existing plugin with a different version
 		for (Plugin existing : projectMetadata.getBuildPluginsExcludingVersion(plugin)) {
 			projectMetadataProvider.removeBuildPlugin(existing);
-			sendPluginRemovalNotifications(existing);
 		}
 		
 		// Add the plugin
@@ -320,6 +374,11 @@ public abstract class AbstractProjectOperations implements ProjectOperations {
 		sendPluginAdditionNotifications(plugin);
 	}
 	
+	@Deprecated
+	public void buildPluginUpdate(Plugin plugin) {
+		updateBuildPlugin(plugin);
+	}
+
 	public final void addProperty(Property property) {
 		Assert.isTrue(isProjectAvailable(), "Property modification prohibited at this time");
 		Assert.notNull(property, "Property required");		

@@ -9,6 +9,7 @@ import org.springframework.roo.project.Filter;
  * @author Alan Stewart
  * @since 1.1
  */
+@Deprecated
 public interface FilterListener {
 
 	void filterAdded(Filter filter);

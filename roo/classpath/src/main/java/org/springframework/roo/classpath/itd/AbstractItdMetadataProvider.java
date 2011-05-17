@@ -216,7 +216,6 @@ public abstract class AbstractItdMetadataProvider extends AbstractHashCodeTracki
 		
 		// Obtain the physical type
 		PhysicalTypeMetadata governorPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(governorPhysicalTypeIdentifier);
-		
 		if (governorPhysicalTypeMetadata == null || !governorPhysicalTypeMetadata.isValid()) {
 			// We can't get even basic information about the physical type, so abort (the ITD will be deleted by ItdFileDeletionService)
 			return null;
@@ -363,25 +362,27 @@ public abstract class AbstractItdMetadataProvider extends AbstractHashCodeTracki
 		String providesType = MetadataIdentificationUtils.getMetadataClass(memberHoldingTypeDetails.getDeclaredByMetadataId());
 		Path path = PhysicalTypeIdentifierNamingUtils.getPath(providesType, memberHoldingTypeDetails.getDeclaredByMetadataId());
 		
-		//  Produce the local MID we're going to use to make the request
+		// Produce the local MID we're going to use to make the request
 		return createLocalIdentifier(governorType, path);
 	}
 
 	protected MemberDetails getMemberDetails(JavaType type) {
 		// We need to lookup the metadata we depend on
 		PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(type, Path.SRC_MAIN_JAVA));
-		
+		return getMemberDetails(physicalTypeMetadata);
+	}
+
+	protected MemberDetails getMemberDetails(PhysicalTypeMetadata physicalTypeMetadata) {
 		// We need to abort if we couldn't find dependent metadata
 		if (physicalTypeMetadata == null || !physicalTypeMetadata.isValid()) {
 			return null;
-		} 
-		
+		}
+
 		ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeMetadata.getMemberHoldingTypeDetails();
 		if (classOrInterfaceTypeDetails == null) {
 			// Abort if the type's class details aren't available (parse error etc)
 			return null;
 		}
-		
 		return memberDetailsScanner.getMemberDetails(getClass().getName(), classOrInterfaceTypeDetails);
 	}
 }

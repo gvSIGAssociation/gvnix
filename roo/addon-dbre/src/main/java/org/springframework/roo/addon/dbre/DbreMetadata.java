@@ -34,7 +34,6 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadataB
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
 import org.springframework.roo.classpath.details.annotations.NestedAnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
-import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.operations.Cardinality;
@@ -80,6 +79,7 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 	private static final String MAPPED_BY = "mappedBy";
 	private static final String REFERENCED_COLUMN = "referencedColumnName";
 
+	private DbManagedAnnotationValues annotationValues;
 	private List<? extends FieldMetadata> entityFields;
 	private List<? extends MethodMetadata> entityMethods;
 	private FieldMetadata identifierField;
@@ -87,26 +87,22 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 	private FieldMetadata versionField;
 	private Set<ClassOrInterfaceTypeDetails> managedEntities;
 
-	public DbreMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, List<? extends FieldMetadata> entityFields, List<? extends MethodMetadata> entityMethods, FieldMetadata identifierField, EmbeddedIdentifierHolder embeddedIdentifierHolder, FieldMetadata versionField, Set<ClassOrInterfaceTypeDetails> managedEntities, Database database) {
+	public DbreMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, DbManagedAnnotationValues annotationValues, List<? extends FieldMetadata> entityFields, List<? extends MethodMetadata> entityMethods, FieldMetadata identifierField, EmbeddedIdentifierHolder embeddedIdentifierHolder, FieldMetadata versionField, Set<ClassOrInterfaceTypeDetails> managedEntities, Database database) {
 		super(identifier, aspectName, governorPhysicalTypeMetadata);
 		Assert.isTrue(isValid(identifier), "Metadata identification string '" + identifier + "' does not appear to be a valid");
+		Assert.notNull(annotationValues, "Annotation values required");
 		Assert.notNull(entityFields, "Entity fields required");
 		Assert.notNull(entityMethods, "Entity methods required");
 		Assert.notNull(managedEntities, "Managed entities required");
 		Assert.notNull(database, "Database required");
 
+		this.annotationValues = annotationValues;
 		this.entityFields = entityFields;
 		this.entityMethods = entityMethods;
 		this.identifierField = identifierField;
 		this.embeddedIdentifierHolder = embeddedIdentifierHolder;
 		this.versionField = versionField;
 		this.managedEntities = managedEntities;
-
-		// Process values from the annotation, if present
-		AnnotationMetadata annotation = MemberFindingUtils.getDeclaredTypeAnnotation(governorTypeDetails, new JavaType(RooDbManaged.class.getName()));
-		if (annotation != null) {
-			AutoPopulationUtils.populate(this, annotation);
-		}
 
 		Table table = database.getTable(DbreTypeUtils.getTableName(governorTypeDetails));
 		if (table == null) {
@@ -184,7 +180,7 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 			String fieldSuffix = keySequence != null && keySequence > 0 ? String.valueOf(keySequence) : "";
 			JavaSymbolName fieldName = new JavaSymbolName(DbreTypeUtils.suggestFieldName(foreignTableName) + fieldSuffix);
 			JavaType fieldType = DbreTypeUtils.findTypeForTableName(managedEntities, foreignTableName);
-			Assert.notNull(fieldType, getErrorMsg(foreignTableName, table.getName()));
+			Assert.notNull(fieldType, "Attempted to create one-to-one field '"+ fieldName + "' in '" + destination.getFullyQualifiedTypeName() + "'" + getErrorMsg(foreignTableName, table.getName()));
 
 			// Fields are stored in a field-keyed map first before adding them to the builder.
 			// This ensures the fields from foreign keys with multiple columns will only get created once.
@@ -205,12 +201,13 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 		}
 
 		for (ForeignKey exportedKey : table.getExportedKeys()) {
+			Assert.notNull(exportedKey.getForeignTable(), "Foreign key table for foreign key '" + exportedKey.getName() + "' in table '" + table.getName() + "' must not be null in determining a one-to-one relationship");
 			if (exportedKey.getForeignTable().isJoinTable()) {
 				continue;
 			}
 			String foreignTableName = exportedKey.getForeignTableName();
 			Table foreignTable = database.getTable(foreignTableName);
-			Assert.notNull(foreignTable, "Related table '" + foreignTableName + "' could not be found but was referenced by table '" + table.getName() + "'");
+			Assert.notNull(foreignTable, "Related table '" + foreignTableName + "' could not be found but has a foreign-key reference to table '" + table.getName() + "'");
 
 			if (!isOneToOne(foreignTable, foreignTable.getImportedKey(exportedKey.getName()))) {
 				continue;
@@ -220,7 +217,7 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 			JavaSymbolName fieldName = new JavaSymbolName(DbreTypeUtils.suggestFieldName(foreignTableName) + fieldSuffix);
 
 			JavaType fieldType = DbreTypeUtils.findTypeForTableName(managedEntities, foreignTableName);
-			Assert.notNull(fieldType, getErrorMsg(foreignTableName));
+			Assert.notNull(fieldType, "Attempted to create one-to-one mapped-by field '"+ fieldName + "' in '" + destination.getFullyQualifiedTypeName() + "'" + getErrorMsg(foreignTableName));
 
 			// Check for existence of same field - ROO-1691
 			while (true) {
@@ -238,10 +235,12 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 	}
 
 	private void addOneToManyFields(Database database, Table table) {
+		Assert.notNull(table, "Table required");
 		if (table.isJoinTable()) {
 			return;
 		}
 		for (ForeignKey exportedKey : table.getExportedKeys()) {
+			Assert.notNull(exportedKey.getForeignTable(), "Foreign key table for foreign key '" + exportedKey.getName() + "' in table '" + table.getName() + "' must not be null in determining a one-to-many relationship");
 			if (exportedKey.getForeignTable().isJoinTable()) {
 				continue;
 			}
@@ -296,7 +295,7 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 				fieldName = new JavaSymbolName(DbreTypeUtils.suggestFieldName(foreignTableName) + fieldSuffix);
 			}
 			JavaType fieldType = DbreTypeUtils.findTypeForTableName(managedEntities, foreignTableName);
-			Assert.notNull(fieldType, getErrorMsg(foreignTableName, table.getName()));
+			Assert.notNull(fieldType, "Attempted to create many-to-one field '"+ fieldName + "' in '" + destination.getFullyQualifiedTypeName() + "'" + getErrorMsg(foreignTableName, table.getName()));
 
 			// Fields are stored in a field-keyed map first before adding them to the builder.
 			// This ensures the fields from foreign keys with multiple columns will only get created once.
@@ -312,7 +311,8 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 	private FieldMetadata getManyToManyOwningSideField(JavaSymbolName fieldName, Table joinTable, Table inverseSideTable) {
 		List<JavaType> params = new ArrayList<JavaType>();
 		JavaType element = DbreTypeUtils.findTypeForTable(managedEntities, inverseSideTable);
-		Assert.notNull(element, getErrorMsg(inverseSideTable.getName()));
+		Assert.notNull(element, "Attempted to create many-to-many owning-side field '"+ fieldName + "' in '" + destination.getFullyQualifiedTypeName() + "' " + getErrorMsg(inverseSideTable.getName()));
+
 		params.add(element);
 		String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(element, Path.SRC_MAIN_JAVA);
 		SetField fieldDetails = new SetField(physicalTypeIdentifier, new JavaType("java.util.Set", 0, DataType.TYPE, null, params), fieldName, element, Cardinality.MANY_TO_MANY);
@@ -359,7 +359,8 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 	private FieldMetadata getManyToManyInverseSideField(JavaSymbolName fieldName, JavaSymbolName mappedByFieldName, Table owningSideTable) {
 		List<JavaType> params = new ArrayList<JavaType>();
 		JavaType element = DbreTypeUtils.findTypeForTable(managedEntities, owningSideTable);
-		Assert.notNull(element, getErrorMsg(owningSideTable.getName()));
+		Assert.notNull(element, "Attempted to create many-to-many inverse-side field '"+ fieldName + "' in '" + destination.getFullyQualifiedTypeName() + "'" + getErrorMsg(owningSideTable.getName()));
+
 		params.add(element);
 		String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(element, Path.SRC_MAIN_JAVA);
 		SetField fieldDetails = new SetField(physicalTypeIdentifier, new JavaType("java.util.Set", 0, DataType.TYPE, null, params), fieldName, element, Cardinality.MANY_TO_MANY);
@@ -378,6 +379,7 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 		List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
 		AnnotationMetadataBuilder oneToOneBuilder = new AnnotationMetadataBuilder(ONE_TO_ONE);
 		oneToOneBuilder.addStringAttribute(MAPPED_BY, mappedByFieldName.getSymbolName());
+		oneToOneBuilder.addEnumAttribute("cascade", new EnumDetails(new JavaType("javax.persistence.CascadeType"), new JavaSymbolName("ALL")));
 		annotations.add(oneToOneBuilder);
 
 		FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(getId(), Modifier.PRIVATE, annotations, fieldName, fieldType);
@@ -457,7 +459,8 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 		List<JavaType> params = new ArrayList<JavaType>();
 
 		JavaType element = DbreTypeUtils.findTypeForTableName(managedEntities, foreignTableName);
-		Assert.notNull(element, getErrorMsg(foreignTableName));
+		Assert.notNull(element, "Attempted to create one-to-many mapped-by field '"+ fieldName + "' in '" + destination.getFullyQualifiedTypeName() + "'" + getErrorMsg(foreignTableName));
+
 		params.add(element);
 		String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(element, Path.SRC_MAIN_JAVA);
 		SetField fieldDetails = new SetField(physicalTypeIdentifier, new JavaType("java.util.Set", 0, DataType.TYPE, null, params), fieldName, element, Cardinality.ONE_TO_MANY);
@@ -491,16 +494,12 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 
 		if (fieldType != null) {
 			if (isCompositeKeyColumn(reference.getLocalColumn()) || reference.getLocalColumn().isPrimaryKey() || !reference.isInsertableOrUpdatable()) {
-				addOtherJoinColumnAttributes(joinColumnBuilder);
+				joinColumnBuilder.addBooleanAttribute("insertable", false);
+				joinColumnBuilder.addBooleanAttribute("updatable", false);
 			}
 		}
 
 		return joinColumnBuilder;
-	}
-
-	private void addOtherJoinColumnAttributes(AnnotationMetadataBuilder joinColumnBuilder) {
-		joinColumnBuilder.addBooleanAttribute("insertable", false);
-		joinColumnBuilder.addBooleanAttribute("updatable", false);
 	}
 
 	private AnnotationMetadataBuilder getJoinColumnsAnnotation(Set<Reference> references, JavaType fieldType) {
@@ -518,6 +517,7 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 	private boolean isOneToOne(Table table, ForeignKey foreignKey) {
 		Assert.notNull(table, "Table must not be null in determining a one-to-one relationship");
 		Assert.notNull(foreignKey, "Foreign key must not be null in determining a one-to-one relationship");
+		Assert.notNull(foreignKey.getForeignTable(), "Foreign key table for foreign key '" + foreignKey.getName() + "' in table '" + table.getName() + "' must not be null in determining a one-to-one relationship");
 		boolean equals = table.getPrimaryKeyCount() == foreignKey.getReferenceCount();
 		Iterator<Column> primaryKeyIterator = table.getPrimaryKeys().iterator();
 		while (equals && primaryKeyIterator.hasNext()) {
@@ -548,7 +548,7 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 				fieldName = getUniqueFieldName(fieldName);
 			}
 
-			field = getField(fieldName, column, table.isIncludeNonPortableAttributes());
+			field = getField(fieldName, column, table.getName(), table.isIncludeNonPortableAttributes());
 
 			uniqueFields.put(fieldName, field);
 		}
@@ -605,8 +605,9 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 		return versionField != null && versionField.getFieldName().equals(fieldName);
 	}
 
-	private FieldMetadata getField(JavaSymbolName fieldName, Column column, boolean includeNonPortable) {
+	private FieldMetadata getField(JavaSymbolName fieldName, Column column, String tableName, boolean includeNonPortable) {
 		JavaType fieldType = column.getJavaType();
+		Assert.notNull(fieldType, "Field type for column '" + column.getName() + "' in table '"+ tableName +"' is null");
 
 		// Add annotations to field
 		List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
@@ -864,13 +865,17 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 	}
 
 	private String getErrorMsg(String tableName) {
-		return "Type for table '" + tableName + "' could not be found";
+		return " but type for table '" + tableName + "' could not be found or is not database managed (not annotated with @RooDbManaged)";
 	}
 
-	private String getErrorMsg(String tableName, String referenceTableName) {
-		return getErrorMsg(tableName) + " but was referenced by table '" + referenceTableName + "'";
+	private String getErrorMsg(String foreignTableName, String tableName) {
+		return getErrorMsg(foreignTableName) + " and table '" + tableName + "' has a foreign-key reference to table '" + foreignTableName + "'";
 	}
 
+	public boolean isAutomaticallyDelete() {
+		return annotationValues.isAutomaticallyDelete();
+	}
+	
 	public static final String getMetadataIdentiferType() {
 		return PROVIDES_TYPE;
 	}

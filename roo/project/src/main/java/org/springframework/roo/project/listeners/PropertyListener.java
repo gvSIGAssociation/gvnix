@@ -9,6 +9,7 @@ import org.springframework.roo.project.Property;
  * @author Alan Stewart
  * @since 1.1
  */
+@Deprecated
 public interface PropertyListener {
 
 	void propertyAdded(Property property);

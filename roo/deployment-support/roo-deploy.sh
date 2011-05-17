@@ -288,6 +288,7 @@ if [[ "$COMMAND" = "assembly" ]]; then
     mkdir -p $WORK_DIR/samples
     cp $ROO_HOME/annotations/target/*-$VERSION.jar $WORK_DIR/annotations
     cp $ROO_HOME/target/all/*.jar $WORK_DIR/bundle
+    rm $WORK_DIR/bundle/org.springframework.roo.annotations-$VERSION.jar
     rm $WORK_DIR/bundle/*jsch*.jar
     rm $WORK_DIR/bundle/*jgit*.jar
     rm $WORK_DIR/bundle/*git*.jar
@@ -298,6 +299,10 @@ if [[ "$COMMAND" = "assembly" ]]; then
     rm $WORK_DIR/bundle/servlet-api-*.jar
     rm $WORK_DIR/bundle/slf4j-*.jar
     rm $WORK_DIR/bundle/spring-*.jar
+    # These have to be removed as the Cloud Foundry add-on requires dependencies that are not bundled and thus must be installed via the shell.
+    rm $WORK_DIR/bundle/*cloud.foundry*.jar
+    rm $WORK_DIR/bundle/*cloud-foundry-api*.jar
+    rm $WORK_DIR/bundle/*AppCloudClient*.jar
     mv $WORK_DIR/bundle/org.springframework.roo.bootstrap-*.jar $WORK_DIR/bin
     mv $WORK_DIR/bundle/org.apache.felix.framework-*.jar $WORK_DIR/bin
     cp $ROO_HOME/bootstrap/src/main/bin/* $WORK_DIR/bin
@@ -306,8 +311,8 @@ if [[ "$COMMAND" = "assembly" ]]; then
     cp $ROO_HOME/bootstrap/readme.txt $WORK_DIR/
     cp `find $ROO_HOME -iname legal-\*.txt` $WORK_DIR/legal
     cp `find $ROO_HOME -iname \*.roo | grep -v "/target/"` $WORK_DIR/samples
-    cp -r $ROO_HOME/deployment-support/target/site/reference/pdf/ $WORK_DIR/docs/pdf
-    cp -r $ROO_HOME/deployment-support/target/site/reference/html/ $WORK_DIR/docs/html
+    cp -r $ROO_HOME/deployment-support/target/site/reference/pdf/ $WORK_DIR/docs
+    cp -r $ROO_HOME/deployment-support/target/site/reference/html/ $WORK_DIR/docs
 
     # Prepare to write the ZIP
     log "Cleaning $DIST_DIR" 
@@ -341,7 +346,7 @@ if [[ "$COMMAND" = "assembly" ]]; then
     EXITED=$?
     if [[ ! "$EXITED" = "1" ]]; then
         log "Found gpg.passphrase in ~/.m2/settings.xml..."
-        PASSPHRASE=`grep "<gpg.passphrase>" ~/.m2/settings.xml | sed 's/<gpg.passphrase>//' | sed 's/<\/gpg.passphrase>//' | sed 's/ //g'`
+        PASSPHRASE=`grep "<gpg.passphrase>" ~/.m2/settings.xml | sed 's/.*<gpg.passphrase>//' | sed 's/<\/gpg.passphrase>.*//'`
         echo "$PASSPHRASE" | gpg $GPG_OPTS --batch --passphrase-fd 0 -a --output $ASSEMBLY_ASC --detach-sign $ASSEMBLY_ZIP
     else
         log "gpg.passphrase NOT found in ~/.m2/settings.xml. Trying with gpg agent."
