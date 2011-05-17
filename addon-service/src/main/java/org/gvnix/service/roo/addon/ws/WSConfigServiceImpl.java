@@ -1081,6 +1081,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         "dependencies-export-jaxws-plugin.xml"));
 
         projectOperations.buildPluginUpdate(new Plugin(pluginElement));
+        fileManager.commit();
 
     }
 
@@ -1096,6 +1097,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Add plugin
         projectOperations.buildPluginUpdate(new Plugin(plugin));
+        fileManager.commit();
     }
 
     /**
@@ -1361,6 +1363,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Add plugin
         projectOperations.buildPluginUpdate(new Plugin(pluginTemplate));
+        fileManager.commit();
 
         // Get pom.xml
         String pomPath = getPomFilePath();
@@ -1521,6 +1524,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Add plugin
         projectOperations.buildPluginUpdate(new Plugin(plugin));
+        fileManager.commit();
 
         // Get pom.xml
         String pomPath = getPomFilePath();
