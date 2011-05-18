@@ -106,7 +106,13 @@ It is recommended that you create an Eclipse project for each add-on, in spite o
 Package gvNIX
 =============
 
-* Create the tag for the version we want to build using the following command::
+* Update and commit gvNIX version at Roo shell start:
+
+   roo/shell/src/main/java/org/springframework/roo/shell/AbstractShell.java
+
+* Update and commit the appropriate Roo version (tag or head) with git and set this Roo version reference into gvNIX parent pom.xml. 
+
+* Create the tag for the gvNIX version we want to build using the following command::
 
    bash:~/gvnix/trunk/code$ svn update
    bash:~/gvnix/trunk/code$ mvn release:prepare -Dtag={version}
