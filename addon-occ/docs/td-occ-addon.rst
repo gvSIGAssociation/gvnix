@@ -82,3 +82,8 @@ Notes
 Se crea la plantilla de AspectJ debido a que hay que declarar la precedencia en el ITD, por eso no se crean los métodos mediante código java.
 
 Investigar más adelante si ROO da la posibilidad de definir la precedencia mediante una lista.
+
+TODO
+-----
+
+* We've noticed a compilation error when perform ``mvn clean assembly:assebly`` and the project has unit test over entitie defined. See http://projects.disid.com/issues/5157 for further details.
