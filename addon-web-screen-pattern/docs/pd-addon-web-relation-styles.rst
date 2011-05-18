@@ -173,3 +173,7 @@ TODO
   add-hoc. Al height de las capas se le suman 137px que es lo que ocupan las 5 nuevas filas.
   Revisar lo que se comenta en http://anaturb.net/dojo/my/dojoTabContainer.htm por si puede
   servir como mejor solución.
+
+* Hay un problema con este add-on probocado por el método
+  org.gvnix.web.screen.roo.addon.ScreenMetadataListener.getAnnotatedFields(String, String). Falla
+  porque no está controllado el caso de que WebScaffoldMetada sea null.
