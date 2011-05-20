@@ -28,27 +28,31 @@ This document contents relative to this add-on.
 Definitions
 =================
 
+TBC
+
 Requirements
 =============
 
-This add-on have to install and manage the application visualization for entities using some screen patterns.
-So, it should to create/maintain both JSPx files and the code in Controllers. In this version it must work
-with Spring MVC artifacts.
+#. This add-on have to install and manage the application visualization for entities by applying screen patterns.
 
-* Create the needed metadata to handle the defined pattern. That is, for a given Entity how this must be
-  shown in CRUD operations, and how its related entities (@OneToMany annotated fields) must be shown in
-  the same context. Note that the same entity could be set with several patterns based on which context is
-  defining the pattern (Entit1 <related with> Entity2 and Entity3; Entity2 <related with> Entity3).
+   .. admonition:: What is an screen pattern?
 
-* JSPx, TAGx to work with an entity and its related entities. The layout must follow the defined pattern
-  (master register, mater tabular, detail register, detail tabular).
+    http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns
 
+   So, it should to create/maintain both JSPx files and the code in Controllers. Currently screen patterns will be applied to Spring MVC projects.
 
-Functionality
-===============
+#. A pattern layout must be defined by any developer, that is, he will be able to set patterns as master-register/detail-table, master-table/detail-register, master-table/detail-table/detail-register, etc.
 
-Add-on functionality.
+#. The same entity could be set with several patterns based on which context is defining the pattern (Entit1 <related with> Entity2 and Entity3; Entity2 <related with> Entity3).
 
+TBC: How form fields will be layout, how to change form field layouts, applied to relation choosen by developer, ....
+
+Tech design
+============
+
+#. Create the needed metadata to handle the defined pattern. That is, for a given Entity how this must be shown in CRUD operations, and how its related entities (@OneToMany annotated fields) must be shown in the same context. 
+
+#. JSPx, TAGx to work with an entity and its related entities. The layout must follow the defined pattern (master register, mater tabular, detail register, detail tabular).
 
 ITD
 ----
