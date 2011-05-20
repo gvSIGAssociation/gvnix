@@ -22,30 +22,28 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.roo.addon.propfiles.PropFileOperations;
-import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
-import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
-import org.springframework.roo.metadata.MetadataDependencyRegistry;
+import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.EnumDetails;
+import org.springframework.roo.model.ImportRegistrationResolver;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
 
@@ -68,113 +66,441 @@ public class PatternMetadata extends
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
+    // TODO: annotationValues is Candidate to be removed
+    private WebScaffoldAnnotationValues annotationValues;
+    private MemberDetails memberDetails;
+    private JavaType formBackingType;
+
     public PatternMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            List<MethodMetadata> controllerMethods,
-            MetadataService metadataService,
-            MemberDetailsScanner memberDetailsScanner,
-            MetadataDependencyRegistry metadataDependencyRegistry,
-            WebScaffoldMetadata webScaffoldMetadata,
-            WebMetadataService webMetadataService, FileManager fileManager,
-            ProjectOperations projectOperations,
-            PropFileOperations propFileOperations,
+            WebScaffoldAnnotationValues annotationValues,
+            MemberDetails memberDetails,
             List<StringAttributeValue> definedPatterns) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
+        Assert.notNull(annotationValues, "Annotation values required");
+        Assert.notNull(memberDetails, "Member details required");
+        if (!isValid()) {
+            return;
+        }
+        this.annotationValues = annotationValues;
+        this.formBackingType = annotationValues.getFormBackingObject();
+        this.memberDetails = memberDetails;
 
-        // Adding a new sample field definition
-        builder.addField(getSampleField());
-
-        // Adding a new sample method definition
-        builder.addMethod(getSampleMethod());
+        /*
+         * TODO: Add Methods only if there are a pattern "table"
+         */
+        builder.addMethod(getCreateListMethod());
+        builder.addMethod(getUpdateListMethod());
+        builder.addMethod(getDeleteListMethod());
+        builder.addMethod(getFilterListMethod());
+        builder.addMethod(getRefererRedirectMethod());
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
     }
 
-    /**
-     * Create metadata for a field definition.
-     * 
-     * @return a FieldMetadata object
-     */
-    private FieldMetadata getSampleField() {
-        // Note private fields are private to the ITD, not the target type, this
-        // is undesirable if a dependent method is pushed in to the target type
-        int modifier = 0;
-
-        // Using the FieldMetadataBuilder to create the field definition.
-        FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(getId(), // Metadata
-                                                                              // ID
-                                                                              // provided
-                                                                              // by
-                                                                              // supertype
-                modifier, // Using package protection rather than private
-                new ArrayList<AnnotationMetadataBuilder>(), // No annotations
-                                                            // for this field
-                new JavaSymbolName("sampleField"), // Field name
-                JavaType.STRING_OBJECT); // Field type
-
-        return fieldBuilder.build(); // Build and return a FieldMetadata
-                                     // instance
+    public enum RequestMethod {
+        DELETE, PUT, POST, GET;
     }
 
-    private MethodMetadata getSampleMethod() {
+    public enum PersistenceMethod {
+        REMOVE("remove"), PERSIST("persist"), MERGE("merge");
+
+        private String name;
+
+        private PersistenceMethod(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+    }
+
+    /**
+     * Generates the MethodMedata of createList() method for ITD
+     * 
+     * @return
+     */
+    private MethodMetadata getCreateListMethod() {
+        // Here we're sure that Entity.createList() method exists
+
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("sampleMethod");
+        JavaSymbolName methodName = new JavaSymbolName("createList");
+
+        // Define method annotations
+        List<AnnotationAttributeValue<?>> requestMappingAttributes = getRequestMappingAttributes(RequestMethod.POST);
+        // Define method parameter types
+        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypes();
 
         // Check if a method with the same signature already exists in the
         // target type
-        MethodMetadata method = methodExists(methodName,
-                new ArrayList<AnnotatedJavaType>());
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
             // If it already exists, just return the method and omit its
             // generation via the ITD
             return method;
         }
 
-        // Define method annotations (none in this case)
-        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        // Define method parameter names
+        List<JavaSymbolName> methodParamNames = getMethodParameterNames();
 
-        // Define method throws types (none in this case)
-        List<JavaType> throwsTypes = new ArrayList<JavaType>();
-
-        // Define method parameter types (none in this case)
-        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
-
-        // Define method parameter names (none in this case)
-        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-
-        // Create the method body
-        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine("System.out.println(\"Hello World\");");
-
-        // Use the MethodMetadataBuilder for easy creation of MethodMetadata
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(PersistenceMethod.PERSIST);
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.VOID_PRIMITIVE,
-                parameterTypes, parameterNames, bodyBuilder);
-        methodBuilder.setAnnotations(annotations);
-        methodBuilder.setThrowsTypes(throwsTypes);
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
 
-        return methodBuilder.build(); // Build and return a MethodMetadata
-                                      // instance
+        // Get Method RequestMapping annotation
+        AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestMapping"),
+                requestMappingAttributes);
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(requestMapping);
+        methodBuilder.setAnnotations(annotations);
+
+        return methodBuilder.build();
     }
 
+    /**
+     * Generates the MethodMedata of updateList() method for ITD
+     * 
+     * @return
+     */
+    private MethodMetadata getUpdateListMethod() {
+        // Here we're sure that Entity.updateList() method exists
+
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("updateList");
+
+        // Define method annotations
+        List<AnnotationAttributeValue<?>> requestMappingAttributes = getRequestMappingAttributes(RequestMethod.PUT);
+        // Define method parameter types
+        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypes();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method parameter names
+        List<JavaSymbolName> methodParamNames = getMethodParameterNames();
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(PersistenceMethod.MERGE);
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
+
+        // Get Method RequestMapping annotation
+        AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestMapping"),
+                requestMappingAttributes);
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(requestMapping);
+        methodBuilder.setAnnotations(annotations);
+
+        return methodBuilder.build();
+    }
+
+    /**
+     * Generates the MethodMedata of deleteList() method for ITD
+     * 
+     * @return
+     */
+    private MethodMetadata getDeleteListMethod() {
+        // Here we're sure that Entity.deleteList() method exists
+
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("deleteList");
+
+        // Define method annotations
+        List<AnnotationAttributeValue<?>> requestMappingAttributes = getRequestMappingAttributes(RequestMethod.DELETE);
+        // Define method parameter types
+        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypes();
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method parameter names
+        List<JavaSymbolName> methodParamNames = getMethodParameterNames();
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(PersistenceMethod.REMOVE);
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
+
+        // Get Method RequestMapping annotation
+        AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestMapping"),
+                requestMappingAttributes);
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(requestMapping);
+        methodBuilder.setAnnotations(annotations);
+
+        return methodBuilder.build();
+    }
+
+    /**
+     * Generates the MethodMedata of filterList(EntityList) method for ITD
+     * <p>
+     * The generated method removes from the passed list the objects not
+     * involved in the operation.
+     * </p>
+     * 
+     * @return
+     */
+    private MethodMetadata getFilterListMethod() {
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("filterList");
+
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        parameterTypes.add(new AnnotatedJavaType(new JavaType(formBackingType
+                .getFullyQualifiedTypeName().concat("List")), null));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        MethodMetadata method = methodExists(methodName, parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName("entities"));
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName()
+                .concat("List list = new ")
+                .concat(formBackingType.getSimpleTypeName()).concat("List();"));
+        bodyBuilder
+                .appendFormalLine("for ( Integer select : entities.getSelected() ) {");
+
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("if ( select != null ) {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("list.getList().add(entities.getList().get(select));");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine("return list;");
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                parameterTypes, parameterNames, bodyBuilder);
+
+        return methodBuilder.build();
+    }
+
+    /**
+     * Generates the MethodMedata of
+     * getRefererRedirectViewName(HttpServletRequest) method for ITD
+     * <p>
+     * The generated method redirects to the Referer URL
+     * </p>
+     * 
+     * @return
+     */
+    private MethodMetadata getRefererRedirectMethod() {
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName(
+                "getRefererRedirectViewName");
+
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        parameterTypes.add(new AnnotatedJavaType(new JavaType(
+                "javax.servlet.http.HttpServletRequest"), null));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        MethodMetadata method = methodExists(methodName, parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName("httpServletRequest"));
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        // ImportRegistrationResolver gives access to imports in the
+        // Java/AspectJ source
+        ImportRegistrationResolver irr = builder
+                .getImportRegistrationResolver();
+        // We need import org.springframework.util.StringUtils
+        irr.addImport(new JavaType("org.springframework.util.StringUtils"));
+
+        bodyBuilder
+                .appendFormalLine("String referer = httpServletRequest.getHeader(\"Referer\");");
+
+        bodyBuilder.appendFormalLine("if (!StringUtils.hasText(referer)) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return null;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("return \"redirect:\".concat(referer);");
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                parameterTypes, parameterNames, bodyBuilder);
+
+        return methodBuilder.build();
+    }
+
+    /**
+     * Returns the Attributes of the {@link RequestMapping} annotation for the
+     * methods
+     * 
+     * <p>
+     * Returns:<br>
+     * <code>value="/list", method = RequestMethod.DELETE</code> as attributes
+     * of RequestMapping annotation
+     * </p>
+     * 
+     * @param requestMethod
+     * @return
+     */
+    private List<AnnotationAttributeValue<?>> getRequestMappingAttributes(
+            RequestMethod requestMethod) {
+        // Define method annotations
+        // @RequestMapping(value="/list", method = RequestMethod.DELETE)
+        List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        requestMappingAttributes.add(new StringAttributeValue(
+                new JavaSymbolName("value"), "/list"));
+        requestMappingAttributes.add(new EnumAttributeValue(new JavaSymbolName(
+                "method"), new EnumDetails(new JavaType(
+                "org.springframework.web.bind.annotation.RequestMethod"),
+                new JavaSymbolName(requestMethod.name()))));
+
+        return requestMappingAttributes;
+    }
+
+    /**
+     * Returns the list of Parameter Types for the methods
+     * <p>
+     * Returns a list containing:<br/>
+     * <code>@Valid formBackingObjectList, BindingResult, HttpServletRequest</cod>
+     * </p>
+     * 
+     * @return
+     */
+    private List<AnnotatedJavaType> getMethodParameterTypes() {
+        /*
+         * Define method parameter types. (@Valid formBackingObjectList,
+         * BindingResult, HttpServletRequest)
+         */
+        List<AnnotationMetadata> methodAttributesAnnotations = new ArrayList<AnnotationMetadata>();
+        AnnotationMetadataBuilder methodAttributesAnnotation = new AnnotationMetadataBuilder(
+                new JavaType("javax.validation.Valid"));
+        methodAttributesAnnotations.add(methodAttributesAnnotation.build());
+
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        parameterTypes.add(new AnnotatedJavaType(new JavaType(formBackingType
+                .getFullyQualifiedTypeName().concat("List")),
+                methodAttributesAnnotations));
+        parameterTypes.add(new AnnotatedJavaType(new JavaType(
+                "org.springframework.validation.BindingResult"), null));
+        /*
+         * parameterTypes.add(new AnnotatedJavaType(new JavaType(
+         * "org.springframework.ui.Model"), null));
+         */
+        parameterTypes.add(new AnnotatedJavaType(new JavaType(
+                "javax.servlet.http.HttpServletRequest"), null));
+
+        return parameterTypes;
+    }
+
+    /**
+     * Returns the list of parameter names for the methods
+     * <p>
+     * Returns:<br/>
+     * <code>entities, bindingResult, httpServletRequest</code>
+     * </p>
+     * 
+     * @return
+     */
+    private List<JavaSymbolName> getMethodParameterNames() {
+        // Define method parameter names (entities, bindingResult,
+        // httpServletRequest)
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName("entities"));
+        parameterNames.add(new JavaSymbolName("bindingResult"));
+        // parameterNames.add(new JavaSymbolName("uiModel"));
+        parameterNames.add(new JavaSymbolName("httpServletRequest"));
+        return parameterNames;
+    }
+
+    /**
+     * Returns the method body of the methods given a {@link PersistenceMethod}
+     * <p>
+     * Example:<br/>
+     * <code>
+     * if ( !bindingResult.hasErrors() ) {<br/>
+     * &nbsp;&nbsp;Car.persist(filterList(entities));<br/>
+     * }<br/>
+     * return getRefererRedirectViewName(httpServletRequest);
+     * </code>
+     * 
+     * @param persistenceMethod
+     * @return
+     */
+    private InvocableMemberBodyBuilder getMethodBodyBuilder(
+            PersistenceMethod persistenceMethod) {
+        // Create the method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        // test if form has errors
+        bodyBuilder.appendFormalLine("if ( !bindingResult.hasErrors() ) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName()
+                .concat(".").concat(persistenceMethod.getName())
+                .concat("(filterList(entities));"));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder
+                .appendFormalLine("return getRefererRedirectViewName(httpServletRequest);");
+
+        return bodyBuilder;
+    }
+
+    /**
+     * Returns the method if exists or null otherwise. With this we assure that
+     * a method is defined once in the Class
+     * 
+     * @param methodName
+     * @param paramTypes
+     * @return
+     */
     private MethodMetadata methodExists(JavaSymbolName methodName,
             List<AnnotatedJavaType> paramTypes) {
-        // We have no access to method parameter information, so we scan by name
-        // alone and treat any match as authoritative
-        // We do not scan the superclass, as the caller is expected to know
-        // we'll only scan the current class
-        for (MethodMetadata method : governorTypeDetails.getDeclaredMethods()) {
-            if (method.getMethodName().equals(methodName)
-                    && method.getParameterTypes().equals(paramTypes)) {
-                // Found a method of the expected name; we won't check method
-                // parameters though
-                return method;
-            }
-        }
-        return null;
+        return MemberFindingUtils.getMethod(memberDetails, methodName,
+                AnnotatedJavaType.convertFromAnnotatedJavaTypes(paramTypes));
     }
 
     // Typically, no changes are required beyond this point

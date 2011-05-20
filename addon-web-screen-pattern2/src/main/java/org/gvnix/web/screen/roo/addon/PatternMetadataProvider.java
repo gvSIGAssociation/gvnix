@@ -19,7 +19,6 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -28,13 +27,17 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
+import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
@@ -67,8 +70,25 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
     private static final Logger logger = HandlerUtils
             .getLogger(PatternMetadataProvider.class);
 
+    /**
+     * {@link GvNIXPattern} JavaType
+     */
+    public static final JavaType PATTERN_ANNOTATION = new JavaType(
+            GvNIXPattern.class.getName());
+    /**
+     * Name of {@link GvNIXPattern} attribute value
+     */
+    public static final JavaSymbolName PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
+            "value");
+
+    /**
+     * {@link RooWebScaffold} JavaType
+     */
+    public static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(
+            RooWebScaffold.class.getName());
+
     @Reference
-    WebScaffoldMetadataProvider webScaffoldMetadataProvider;
+    private TypeLocationService typeLocationService;
 
     @Reference
     ProjectOperations projectOperations;
@@ -119,6 +139,20 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
             String metadataIdentificationString, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
+        /*
+         * TODO: Check that the project has defined the dependency with the
+         * add-on lib and define it if needed
+         */
+
+        // We need to parse the annotation, which we expect to be present
+        WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
+                governorPhysicalTypeMetadata);
+        if (!annotationValues.isAnnotationFound()
+                || annotationValues.getFormBackingObject() == null
+                || governorPhysicalTypeMetadata.getMemberHoldingTypeDetails() == null) {
+            return null;
+        }
+
         JavaType controllerType = PatternMetadata
                 .getJavaType(metadataIdentificationString);
 
@@ -127,90 +161,141 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
         Path path = PatternMetadata.getPath(metadataIdentificationString);
         String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
                 controllerType, path);
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) webScaffoldMetadataProvider
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
                 .get(webScaffoldMetadataKey);
         if (webScaffoldMetadata == null) {
-            logger.warning("The pattern can not be defined over a Controlloer without "
-                    + "@RooWebScaffold annotation and its 'fromBackingObject' attribute "
-                    + "set. Check "
-                    + controllerType.getFullyQualifiedTypeName());
+            /*
+             * logger.warning(
+             * "The pattern can not be defined over a Controlloer without " +
+             * "@RooWebScaffold annotation and its 'fromBackingObject' attribute "
+             * + "set. Check " + controllerType.getFullyQualifiedTypeName());
+             */
             return null;
         }
 
         // We know governor type details are non-null and can be safely cast
-        ClassOrInterfaceTypeDetails controllerClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
+        ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
         Assert.notNull(
-                controllerClassOrInterfaceDetails,
+                cid,
                 "Governor failed to provide class type details, in violation of superclass contract");
-        MemberDetails controllerMemberDetails = memberDetailsScanner
-                .getMemberDetails(getClass().getName(),
-                        controllerClassOrInterfaceDetails);
-
-        List<StringAttributeValue> definedPatterns = new ArrayList<StringAttributeValue>();
 
         AnnotationMetadata gvNixPatternAnnotation = MemberFindingUtils
-                .getAnnotationOfType(
-                        controllerClassOrInterfaceDetails.getAnnotations(),
-                        new JavaType(GvNIXPattern.class.getName()));
+                .getAnnotationOfType(cid.getAnnotations(), PATTERN_ANNOTATION);
+
+        // Check if there are pattern names used more than once in project
+        String patternDefinedTwice = findPatternDefinedMoreThanOnceInProject();
+        Assert.isNull(patternDefinedTwice,
+                "There is a pattern name used more than once in the project");
+
+        List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
 
         if (gvNixPatternAnnotation != null) {
-            AnnotationAttributeValue<?> val = gvNixPatternAnnotation
-                    .getAttribute(new JavaSymbolName("value"));
+            AnnotationAttributeValue<?> thisAnnotationValue = gvNixPatternAnnotation
+                    .getAttribute(PATTERN_ANNOTATION_ATTR_VALUE_NAME);
 
-            if (val != null) {
-                // Ensure we have an array of strings
-                if (!(val instanceof ArrayAttributeValue<?>)) {
-                    // logger.warning(getErrorMsg());
-                    return null;
-                }
+            if (thisAnnotationValue != null) {
+                // Check if the controller has defined the same pattern more
+                // than once
+                Assert.isTrue(
+                        arePatternsDefinedOnceInController(thisAnnotationValue),
+                        "Controller "
+                                .concat(cid.getName()
+                                        .getFullyQualifiedTypeName())
+                                .concat(" has the same pattern defined more than once"));
 
-                ArrayAttributeValue<?> arrayVal = (ArrayAttributeValue<?>) val;
-                HashMap<String, String> validPatterns = getValidPatterns(arrayVal);
+                ArrayAttributeValue<?> arrayVal = (ArrayAttributeValue<?>) thisAnnotationValue;
 
-                for (String pattern : validPatterns.keySet()) {
-                    StringAttributeValue newSV = new StringAttributeValue(
-                            new JavaSymbolName("ignored"), pattern.concat("=")
-                                    .concat(validPatterns.get(pattern)));
-                    definedPatterns.add(newSV);
+                if (arrayVal != null) {
+                    @SuppressWarnings("unchecked")
+                    List<StringAttributeValue> values = (List<StringAttributeValue>) arrayVal
+                            .getValue();
+                    for (StringAttributeValue value : values) {
+                        patternList.add(value);
+                    }
                 }
             }
         }
+
+        // Lookup the form backing object's metadata and check that
+        JavaType formBackingType = annotationValues.getFormBackingObject();
+
+        PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+                .get(PhysicalTypeIdentifier.createIdentifier(formBackingType,
+                        Path.SRC_MAIN_JAVA));
+        Assert.notNull(formBackingObjectPhysicalTypeMetadata,
+                "Unable to obtain physical type metadata for type "
+                        + formBackingType.getFullyQualifiedTypeName());
+        MemberDetails formBackingObjectMemberDetails = getMemberDetails(formBackingObjectPhysicalTypeMetadata);
+
+        MemberHoldingTypeDetails memberHoldingTypeDetails = MemberFindingUtils
+                .getMostConcreteMemberHoldingTypeDetailsWithTag(
+                        formBackingObjectMemberDetails,
+                        PersistenceCustomDataKeys.PERSISTENT_TYPE);
+        if (memberHoldingTypeDetails == null) {
+            return null;
+        }
+
+        MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
 
         // Pass dependencies required by the metadata in through its constructor
         return new PatternMetadata(metadataIdentificationString, aspectName,
-                governorPhysicalTypeMetadata,
-                MemberFindingUtils.getMethods(controllerMemberDetails),
-                metadataService, memberDetailsScanner,
-                metadataDependencyRegistry, webScaffoldMetadata,
-                webMetadataService, fileManager, projectOperations,
-                propFileOperations, definedPatterns);
+                governorPhysicalTypeMetadata, annotationValues, memberDetails,
+                patternList);
     }
 
-    private HashMap<String, String> getValidPatterns(
-            ArrayAttributeValue<?> arrayVal) {
-        HashMap<String, String> validPatterns = new HashMap<String, String>();
-        StringAttributeValue sv = null;
-        String[] pattern = {};
-        for (Object o : arrayVal.getValue()) {
-            if (!(o instanceof StringAttributeValue)) {
-                return null;
+    private boolean arePatternsDefinedOnceInController(
+            AnnotationAttributeValue<?> values) {
+        List<String> auxList = new ArrayList<String>();
+        for (String value : getPatternNames(values)) {
+            if (auxList.contains(value)) {
+                return false;
+            } else {
+                auxList.add(value);
             }
-            sv = (StringAttributeValue) o;
-            pattern = sv.getValue().split("=");
-            // TODO: Change the next test using validation over Enumeration
-            if (pattern[1].equalsIgnoreCase("table")) {
-                if (validPatterns.containsKey(pattern[0])) {
-                    throw new IllegalStateException(
-                            "Pattern "
-                                    .concat(pattern[0])
-                                    .concat(" already defined. You can't define twice the same pattern."));
-                } else {
-                    validPatterns.put(pattern[0], pattern[1]);
+        }
+        return true;
+
+    }
+
+    private String findPatternDefinedMoreThanOnceInProject() {
+        List<String> definedPatternsInProject = new ArrayList<String>();
+        AnnotationMetadata annotationMetadata = null;
+        for (ClassOrInterfaceTypeDetails cid : typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(PATTERN_ANNOTATION)) {
+            annotationMetadata = MemberFindingUtils.getAnnotationOfType(
+                    cid.getAnnotations(), PATTERN_ANNOTATION);
+            if (annotationMetadata != null) {
+                AnnotationAttributeValue<?> annotationValues = annotationMetadata
+                        .getAttribute(PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+                for (String patternName : getPatternNames(annotationValues)) {
+                    if (definedPatternsInProject.contains(patternName)) {
+                        return patternName;
+                    } else {
+                        definedPatternsInProject.add(patternName);
+                    }
                 }
             }
         }
-        return validPatterns;
+        return null;
+    }
+
+    private List<String> getPatternNames(AnnotationAttributeValue<?> values) {
+        List<String> patternNames = new ArrayList<String>();
+        if (values != null) {
+            @SuppressWarnings("unchecked")
+            List<StringAttributeValue> attrValues = (List<StringAttributeValue>) values
+                    .getValue();
+
+            if (attrValues != null) {
+                String[] pattern = {};
+                for (StringAttributeValue strAttrValue : attrValues) {
+                    pattern = strAttrValue.getValue().split("=");
+                    patternNames.add(pattern[0]);
+                }
+            }
+        }
+        return patternNames;
     }
 
     /**
