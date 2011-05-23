@@ -54,6 +54,32 @@ Tech design
 
 #. JSPx, TAGx to work with an entity and its related entities. The layout must follow the defined pattern (master register, mater tabular, detail register, detail tabular).
 
+Command
+---------
+
+::
+
+  web mvc pattern --class ~.web.PetController --type table --name MyPattern
+
+Options:
+
+* class: The path and name of the controller object to be used. *Required*. Extends: JavaType
+
+  Definir nuestro RooWebScaffoldJavaType que extiende JavaType y que adicionalmente comprobará que la anotación @RooWebScaffold se encuentra definida en el tipo principal de la clase Java.
+  Comprobar que la anotación @RooWebScaffold se encuentra definida en el tipo principal de la clase Java
+
+* type: The pattern type to include on the controller object. *Required*
+
+  Debe ser un tipo enumerado que permita elegir autocompletando de entre ciertos posibles valores.
+
+  En una primera versión, la única posibilidad de este tipo enumerado será el valor "table".
+
+* name: Unique name for the pattern. *Required*. Type: JavaSymbolName, it avoids non valid characters.
+
+El comando tendrá que incluir la anotación @GvNIXPattern en la clase indicada por la opción "class" del comando y con el siguiente value::
+
+  @GvNIXPattern({"MyPattern=table"})
+
 ITD
 ----
 
