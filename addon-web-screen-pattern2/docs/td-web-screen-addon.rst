@@ -39,8 +39,9 @@ Requirements
 
     http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns
 
-   So, it should to create/maintain both JSPx files and the code in Controllers. Currently screen patterns will be applied to Spring MVC projects.
-
+   So, it should to create/maintain JSPx/TAGx/JS/CSS/Images files, the code in Controllers and optionally the code in Entities.
+   Currently screen patterns will be applied to Spring MVC projects.
+   
 #. A pattern layout must be defined by any developer, that is, he will be able to set patterns as master-register/detail-table, master-table/detail-register, master-table/detail-table/detail-register, etc.
 
 #. The same entity could be set with several patterns based on which context is defining the pattern (Entit1 <related with> Entity2 and Entity3; Entity2 <related with> Entity3).
@@ -128,10 +129,12 @@ Metadata
 
     ``@GvNIXRelationsPattern`` triggers the update of annotations in related entities adding or
     modifying their own ``@GvNIXPattern``.
+    
+    TODO: Use case of distinct annotation on related entities instead of ``@GvNIXPattern``.
 
 * Metadata for Entity
 
-  **That only has sense in those cases where the pattern requires to work with list of entities,
+  **That only has sense in table pattern case where the pattern requires to work with list of entities,
   that is, batch operations.**
 
   The metadata in entities defines the methods accepting list of entities as parameter and performs
@@ -164,6 +167,14 @@ Use cases
 Installation
 -------------
 
+References
+==========
+
+* http://pragmatikroo.blogspot.com/2011/04/springt-roo-standard-screen-patterns.html
+
+* http://viralpatel.net/blogs/2011/01/spring-roo-implement-masterdetail-forms.html
+
+* http://viralpatel.net/blogs/download/spring/springroo-masterdetail.zip
 
 Future enhancements
 ====================

@@ -110,7 +110,11 @@ Package gvNIX
 
    roo/shell/src/main/java/org/springframework/roo/shell/AbstractShell.java
 
-* Update and commit the appropriate Roo version (tag or head) with git and set this Roo version reference into gvNIX parent pom.xml. 
+* Update and commit the appropriate Roo version (tag or head) with git and set this Roo version reference into gvNIX parent pom.xml.
+
+* Update and commit the appropriate Roo and gvNIX versions (GVNIX_VERSION and ROO_VERSION) at build.sh file.
+
+* Update and commit the appropriate gvNIX version in docbook documentacion at src/site/docbook
 
 * Create the tag for the gvNIX version we want to build using the following command::
 
@@ -149,6 +153,10 @@ Source code
 * Optional, package the source code release use the following command::
 
    bash:/tmp$ svn export http://webdav.cop.gva.es/svn/gvnix/tags/{version}
+   
+  Rename folder:
+  
+   bash:/tmp$ mv {version} gvNIX-{version}-src/
 
   ZIP created folder with name ``gvNIX-{version}-src.zip``::
   
@@ -307,7 +315,15 @@ TODO
   + WSServiceSecurityMetadataProvider.java:  "GvNIX_WebSecurity" 
   + WSExportExceptionMetadataProvider.java:  "GvNIX_WebFault"  
   + WSExportMetadataProvider.java: "GvNix_WebService"
-
+  + OCCChecksumMetadataProvider: gvNIX_occChecksum
+  + WSServiceSecurityMetadataProvider: GvNIX_WebSecurity
+  + WSExportMetadataProvider: GvNix_WebService
+  + WSExportXmlElementMetadataProvider: GvNix_XmlElement
+  + WSImportMetadataProvider: GvNix_WebServiceProxy
+  + ScreenMetadataProvider: gvNIX_related_entries
+  
+  Decidido utilizar formato GvNIX_${nombre de la anotación sin el prefijo GvNIX}
+  
 * Some add-ons has duplicated resources section at pom.xml to correct replacing.
   However, mvn eclipse:eclipse not works.
 
