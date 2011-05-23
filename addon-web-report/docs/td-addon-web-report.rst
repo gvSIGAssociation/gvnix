@@ -149,7 +149,7 @@ Just stores a reference to its ReportMetadata.
 ReportJspMetadataListener
 --------------------------
 
-Handles the changes in the ReportMetadata ITD, so when them happen, it triggers changes in the JSP. Actually, just the creation
+Handles the changes in the ReportMetadata ITD, so when they happen, it triggers changes in the JSP. Actually, just the creation
 of the JSP. In the future other changes as adapt the form to the fields finder form will be performed.
 
 So, its main purpose is to create the JSP with the form requesting the report.
@@ -158,3 +158,6 @@ TODO
 ====
 
 * https://jira.springsource.org/browse/ROO-228?focusedCommentId=64509&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_64509
+
+* Revisit ReportMetadataProvider in order to modify the method used to retrieve WebScaffoldMetadata via MetadataService instead of
+  WebScaffoldMetadataProvider.
