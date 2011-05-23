@@ -50,7 +50,7 @@ TBC: How form fields will be layout, how to change form field layouts, applied t
 Tech design
 ============
 
-#. Create the needed metadata to handle the defined pattern. That is, for a given Entity how this must be shown in CRUD operations, and how its related entities (@OneToMany annotated fields) must be shown in the same context. 
+#. Create the needed metadata to handle the defined pattern. That is, for a given Entity how this must be shown in CRUD operations, and how its related entities (@OneToMany annotated fields) must be shown in the same context.
 
 #. JSPx, TAGx to work with an entity and its related entities. The layout must follow the defined pattern (master register, mater tabular, detail register, detail tabular).
 
@@ -74,7 +74,7 @@ Options:
 
   En una primera versión, la única posibilidad de este tipo enumerado será el valor "table".
 
-* name: Unique name for the pattern. *Required*. Type: JavaSymbolName, it avoids non valid characters.
+* name: Unique name for the pattern in whole project. *Required*. Type: JavaSymbolName, it avoids non valid characters.
 
 El comando tendrá que incluir la anotación @GvNIXPattern en la clase indicada por la opción "class" del comando y con el siguiente value::
 
@@ -96,9 +96,9 @@ Metadata
     So, the metadata in controller holds information about how to render **formBackingObject** in
     each context.
 
-    The anotations defining these metadata will be:
+    The annotations defining these metadata will be:
 
-    * **@GvNIXPattern**: Defines patterns over formBackingObject entitiy.
+    * **@GvNIXPattern**: Defines patterns over formBackingObject entity.
       e.g: ``@GvNIXPattern({"pattern_id1=register", "pattern_id2=table"})``. (the format may change)
 
     * **@GvNIXRelationsPattern**: Defines patterns over the entities related with formBackingObject
@@ -106,9 +106,13 @@ Metadata
       e.g: ``@GvNIXRelationsPattern({"pattern_id1: field1=table, field2=table",
       "pattern_id2: field2=table"})`` (the format may change)
 
-    ``@GvNIXPattern`` annotation tiggers the generation of the AspectJ files with the methods in the
+    ``@GvNIXPattern`` annotation triggers the generation of the AspectJ files with the methods in the
     controller accepting request of operations over the entity. Also, they trigger the generation of
     the MVC artifacts (JSPx files) rendering views of the formBackingObject.
+
+    Both, ``@GvNIXPattern`` and ``@GvNIXRelationsPattern``, trigger the modification of the JAVA files
+    defining the related entities adding the annotation ``GvNIXEntityBatch`` (described below) when the
+    pattern selected is of type "table".
 
     The JSPx files will keept the structure of the MVC artifacts created by Roo::
 

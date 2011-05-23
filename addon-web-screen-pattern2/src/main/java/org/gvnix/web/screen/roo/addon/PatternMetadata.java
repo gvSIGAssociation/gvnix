@@ -23,12 +23,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
+import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
@@ -39,6 +42,7 @@ import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMeta
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.ImportRegistrationResolver;
 import org.springframework.roo.model.JavaSymbolName;
@@ -66,16 +70,23 @@ public class PatternMetadata extends
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
+    private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(
+            GvNIXEntityBatch.class.getName());
+
     // TODO: annotationValues is Candidate to be removed
     private WebScaffoldAnnotationValues annotationValues;
     private MemberDetails memberDetails;
     private JavaType formBackingType;
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    private MetadataService metadataService;
 
     public PatternMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             WebScaffoldAnnotationValues annotationValues,
             MemberDetails memberDetails,
-            List<StringAttributeValue> definedPatterns) {
+            List<StringAttributeValue> definedPatterns,
+            PhysicalTypeMetadataProvider physicalTypeMetadataProvider,
+            MetadataService metadataService) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
@@ -87,10 +98,14 @@ public class PatternMetadata extends
         this.annotationValues = annotationValues;
         this.formBackingType = annotationValues.getFormBackingObject();
         this.memberDetails = memberDetails;
+        this.physicalTypeMetadataProvider = physicalTypeMetadataProvider;
+        this.metadataService = metadataService;
 
         /*
-         * TODO: Add Methods only if there are a pattern "table"
+         * TODO: Add Methods only if there is a pattern "table" and take care of
+         * attributes "create, update, delete" in RooWebScaffold annotation
          */
+        annotateFormBackingObject();
         builder.addMethod(getCreateListMethod());
         builder.addMethod(getUpdateListMethod());
         builder.addMethod(getDeleteListMethod());
@@ -101,10 +116,18 @@ public class PatternMetadata extends
         itdTypeDetails = builder.build();
     }
 
+    /**
+     * Enumeration of HTTP Request method types
+     * 
+     */
     public enum RequestMethod {
         DELETE, PUT, POST, GET;
     }
 
+    /**
+     * Enumeration of some persistence method names
+     * 
+     */
     public enum PersistenceMethod {
         REMOVE("remove"), PERSIST("persist"), MERGE("merge");
 
@@ -117,6 +140,60 @@ public class PatternMetadata extends
         public String getName() {
             return this.name;
         }
+    }
+
+    /**
+     * Update the annotations in formBackingType entity adding
+     * {@link GvNIXBatchEntity}
+     */
+    private void annotateFormBackingObject() {
+        // Retrieve metadata for the Java source type the annotation is being
+        // added to
+        String formBackingTypeId = physicalTypeMetadataProvider
+                .findIdentifier(formBackingType);
+        if (formBackingTypeId == null) {
+            throw new IllegalArgumentException("Cannot locate source for '"
+                    + formBackingType.getFullyQualifiedTypeName() + "'");
+        }
+
+        // Obtain the physical type and itd mutable details
+        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+                .get(formBackingTypeId);
+        Assert.notNull(physicalTypeMetadata,
+                "Java source code unavailable for type ".concat(formBackingType
+                        .getFullyQualifiedTypeName()));
+
+        // Obtain physical type details for the target type
+        PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
+                .getMemberHoldingTypeDetails();
+        Assert.notNull(physicalTypeDetails,
+                "Java source code details unavailable for type "
+                        .concat(formBackingType.getFullyQualifiedTypeName()));
+
+        // Test if the type is an MutableClassOrInterfaceTypeDetails instance so
+        // the annotation can be added
+        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+                physicalTypeDetails, "Java source code is immutable for type "
+                        .concat(formBackingType.getFullyQualifiedTypeName()));
+        MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
+
+        // Test if the annotation already exists on the target type
+        AnnotationMetadata annotationMetadata = MemberFindingUtils
+                .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
+                        ENTITY_BATCH_ANNOTATION);
+
+        // Annotate formBackingType with GvNIXEntityBatch just if is not
+        // annotated already. We don't need to update attributes since it
+        if (annotationMetadata == null) {
+            // Prepare annotation builder
+            AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                    ENTITY_BATCH_ANNOTATION);
+            mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
+            // Remove metadata of formBackingType from cache avoiding to get a
+            // non fresh metadata instance
+            metadataService.evict(formBackingTypeId);
+        }
+
     }
 
     /**

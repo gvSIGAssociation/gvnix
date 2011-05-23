@@ -33,6 +33,7 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnno
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -99,6 +100,12 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
     @Reference
     WebMetadataService webMetadataService;
 
+    @Reference
+    private WebScreenConfigService configService;
+
+    @Reference
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+
     /**
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
@@ -139,10 +146,9 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
             String metadataIdentificationString, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
-        /*
-         * TODO: Check that the project has defined the dependency with the
-         * add-on lib and define it if needed
-         */
+
+        // Setup project for use annotation
+        configService.setup();
 
         // We need to parse the annotation, which we expect to be present
         WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
@@ -241,7 +247,7 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
         // Pass dependencies required by the metadata in through its constructor
         return new PatternMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, annotationValues, memberDetails,
-                patternList);
+                patternList, physicalTypeMetadataProvider, metadataService);
     }
 
     private boolean arePatternsDefinedOnceInController(
