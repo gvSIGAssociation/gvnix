@@ -68,7 +68,7 @@ public class EntityBatchMetadata extends
      * Target entity metadata. To get persitence methods (merge, persist,
      * remove)
      */
-    private EntityMetadata entityMetadata;
+    private final EntityMetadata entityMetadata;
 
     /**
      * Entity list inner class
@@ -137,6 +137,8 @@ public class EntityBatchMetadata extends
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
+        Assert.notNull(entityMetadata, "EntityMetadata is needed.");
+        this.entityMetadata = entityMetadata;
 
         builder.addInnerType(getListInnerClass());
         builder.addMethod(getMergeListMethod());
@@ -155,17 +157,17 @@ public class EntityBatchMetadata extends
     public ClassOrInterfaceTypeDetails getListInnerClass() {
         if (listInnerClass == null) {
             // Generate inner class name
-            JavaType listInnerClassJavaType = new JavaType(aspectName
-                    .getFullyQualifiedTypeName().concat("List"), 0,
-                    DataType.TYPE, null, null);
+            JavaType listInnerClassJavaType = new JavaType(destination
+                    .getSimpleTypeName().concat("List"), 0, DataType.TYPE,
+                    null, null);
 
             // Create class builder
             ClassOrInterfaceTypeDetailsBuilder classBuilder = new ClassOrInterfaceTypeDetailsBuilder(
-                    getId(), Modifier.STATIC, listInnerClassJavaType,
-                    PhysicalTypeCategory.CLASS);
+                    getId(), Modifier.STATIC | Modifier.PUBLIC,
+                    listInnerClassJavaType, PhysicalTypeCategory.CLASS);
 
             // Add fields
-            FieldMetadata listField = getListInner_field("list", aspectName)
+            FieldMetadata listField = getListInner_field("list", destination)
                     .build();
             FieldMetadata selectedField = getListInner_field("selected",
                     new JavaType("Integer")).build();
@@ -196,16 +198,19 @@ public class EntityBatchMetadata extends
      * @return
      */
     private MethodMetadataBuilder getListInner_getter(FieldMetadata field) {
+        // Gets filed name
+        String fieldName = field.getFieldName().getSymbolName();
 
         // Generate method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine("return list;");
+        bodyBuilder.appendFormalLine(MessageFormat.format("return {0};",
+                new Object[] { fieldName }));
 
         // Creates Method builder
         MethodMetadataBuilder builder = new MethodMetadataBuilder(getId(),
                 Modifier.PUBLIC, new JavaSymbolName("get".concat(StringUtils
-                        .capitalize(field.getFieldName().getSymbolName()))),
-                field.getFieldType(), bodyBuilder);
+                        .capitalize(fieldName))), field.getFieldType(),
+                bodyBuilder);
 
         return builder;
     }
@@ -259,8 +264,8 @@ public class EntityBatchMetadata extends
                 null, typeParams);
 
         FieldMetadataBuilder builder = new FieldMetadataBuilder(getId(),
-                Modifier.PRIVATE, new JavaSymbolName(name), fieldType,
-                MessageFormat.format("new ArrayList<{0}>()",
+                Modifier.PROTECTED, new JavaSymbolName(name), fieldType,
+                MessageFormat.format("new java.util.ArrayList<{0}>()",
                         new Object[] { listType.getSimpleTypeName() }));
 
         return builder;
@@ -358,8 +363,8 @@ public class EntityBatchMetadata extends
          * entity.${targetMethod}(); }
          */
         bodyBuilder.appendFormalLine(MessageFormat.format(
-                "for ({0} entity : entities.list) {",
-                new Object[] { aspectName.getArgName() }));
+                "for ({0} entity : entities.list) '{'",
+                new Object[] { destination.getSimpleTypeName() }));
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine(MessageFormat.format("entity.{0}();",
                 new Object[] { targetMethod.getMethodName().getSymbolName() }));

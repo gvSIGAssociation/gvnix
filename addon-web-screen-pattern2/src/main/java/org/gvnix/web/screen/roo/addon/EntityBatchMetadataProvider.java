@@ -63,6 +63,10 @@ public final class EntityBatchMetadataProvider extends
     @Reference
     PropFileOperations propFileOperations;
 
+    /* For project setup */
+    @Reference
+    WebScreenConfigService config;
+
     /**
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
@@ -124,6 +128,9 @@ public final class EntityBatchMetadataProvider extends
                     " only can be set to @RooEntity annotated classes."));
             return null;
         }
+
+        // Perform project setup (adds dependencies to project)
+        config.setup();
 
         // Pass dependencies required by the metadata in through its constructor
         return new EntityBatchMetadata(metadataIdentificationString,
