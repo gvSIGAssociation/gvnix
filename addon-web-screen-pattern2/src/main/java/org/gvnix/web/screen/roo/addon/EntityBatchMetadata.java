@@ -373,7 +373,7 @@ public class EntityBatchMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.VOID_PRIMITIVE,
+                getId(), Modifier.STATIC, methodName, JavaType.VOID_PRIMITIVE,
                 parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
