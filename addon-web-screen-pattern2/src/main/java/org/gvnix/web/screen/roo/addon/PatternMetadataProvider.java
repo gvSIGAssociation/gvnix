@@ -31,6 +31,7 @@ import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
@@ -65,7 +66,7 @@ import org.springframework.roo.support.util.Assert;
  *         Transport</a>
  * @since 0.8
  */
-@Component
+@Component(immediate = true)
 @Service
 public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
     private static final Logger logger = HandlerUtils
@@ -90,6 +91,9 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
 
     @Reference
     private TypeLocationService typeLocationService;
+
+    @Reference
+    WebScaffoldMetadataProvider webScaffoldMetadataProvider;
 
     @Reference
     ProjectOperations projectOperations;
@@ -179,6 +183,9 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
             return null;
         }
 
+        metadataDependencyRegistry.registerDependency(webScaffoldMetadataKey,
+                metadataIdentificationString);
+
         // We know governor type details are non-null and can be safely cast
         ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
@@ -246,8 +253,10 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
 
         // Pass dependencies required by the metadata in through its constructor
         return new PatternMetadata(metadataIdentificationString, aspectName,
-                governorPhysicalTypeMetadata, annotationValues, memberDetails,
-                patternList, physicalTypeMetadataProvider, metadataService);
+                governorPhysicalTypeMetadata, webScaffoldMetadata,
+                annotationValues, memberDetails, patternList,
+                memberDetailsScanner, physicalTypeMetadataProvider,
+                metadataService);
     }
 
     private boolean arePatternsDefinedOnceInController(

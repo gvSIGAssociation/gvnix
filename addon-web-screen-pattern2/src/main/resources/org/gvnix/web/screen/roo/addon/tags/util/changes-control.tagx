@@ -1,0 +1,55 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+  <!--
+    Disable A HREFs to force user to Accept or Cancel changes.
+    
+    If user tries to click any anchor in current page, a warning dialog box
+    will be shown to alert he or she must accept or cancel form data 
+    previous to go out.
+  -->
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="active" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Active changes control inmediately after page load (default 'true')" />
+
+  <!-- Set default values -->
+  <c:if test="${empty active}">
+    <c:set var="active" value="${true}" />
+  </c:if>
+
+  <util:message-box id="PendingChangesMsgBox" show="${false}" code="message_pending_changes_problemdescription" />
+
+  <script type="text/javascript"><![CDATA[
+  dojo.require("dijit.Dialog");
+  
+  function gvNixChangesControl() {
+    // all <A> elements
+    dojo.query("A").forEach( 
+
+      // selectTag the current item value
+      // idx the index in the list being iterated over
+      // arr a reference to the list itself
+      function(selectTag, idx, arr) {
+      
+        // connect to the domEvent "onclick" to node selectTag to call
+        // given function when click on selectTag
+        dojo.connect(selectTag, "onclick", function(event) {
+
+          // prevent an event's default behavior (e.g., a link from loading a new page)
+          event.preventDefault();
+
+          // note the message box was created by message-box tag, so we only
+          // have to render it
+          dijit.byId('PendingChangesMsgBox').show();
+        });
+      }
+    );
+    return true;
+  }
+
+  dojo.addOnLoad(function(){
+    if(${active}) {
+      gvNixChangesControl();
+    }
+  });
+  ]]></script>
+
+</jsp:root>

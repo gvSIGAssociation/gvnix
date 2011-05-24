@@ -1,0 +1,73 @@
+/*divs estructura para viewlist*/
+
+.panel-tabs {
+    float: right;
+    height: auto;
+    left: -7px;
+    position: relative;
+    width: 3%;
+    z-index: 100;
+}
+
+/*tundra-dijit*/
+
+.dijitTitlePaneTitle { 
+	width: 97%;
+}
+
+.dijitContentPane {
+    display: block;
+    overflow: visible;
+}
+.dijitTitlePaneContentOuter {
+    border: none;
+    padding:0;
+    margin:0;
+}
+.tundra .dijitTitlePaneContentOuter {
+    border: none;
+    padding:0;
+    margin:0;
+}
+
+.patternContentPane {
+    overflow: auto;
+}
+
+.patternContentPane table {}
+
+.patternContentPane table tr.footer {}
+
+.patternContentPane table tr.footer td {}
+
+.patternContentPane table tr.footer td div.submit {
+    padding: 1px;
+    text-align: right;
+    height: 21px;
+}
+
+.tundra .dijitTitlePaneContentInner {
+    padding: 0;
+}
+
+/* quicklinks */
+
+div.quicklinks {
+    text-align: right;
+    padding: 0;
+    margin:0;
+    width: 98%;
+}
+
+.quicklinks form {
+    display: inline;
+}
+
+.quicklinks ul {
+    margin: 0;
+    padding: 0;
+}
+
+.quicklinks ul li {
+    display: inline;
+}
