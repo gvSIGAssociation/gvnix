@@ -1,0 +1,265 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:pattern="urn:jsptagdir:/WEB-INF/tags/pattern" version="2.0">
+  <jsp:directive.tag import="java.util.ArrayList" />
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute name="modelAttribute" type="java.lang.String" required="true" rtexprvalue="true" description="The name of the model attribute for form binding" />
+  <jsp:directive.attribute name="path" type="java.lang.String" required="true" rtexprvalue="true" description="Specify the relative URL path (with leading /)" />
+  <jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this object, will default to a message bundle if not supplied" />
+  <jsp:directive.attribute name="idField" type="java.lang.String" required="false" rtexprvalue="true" description="Specify the field name of the id field (default 'id')" />
+  <jsp:directive.attribute name="versionField" type="java.lang.String" required="false" rtexprvalue="true" description="Specify the field name of the version field (default 'version'). If specified 'none' the version field will not be inlcuded (versionField='none')." />
+  <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
+  <jsp:directive.attribute name="openPane" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Control if the title pane is opened or closed by default (default: true)" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+  <c:if test="${empty render or render}">
+
+    <c:set var="path" value="${path}/list" />
+    <c:set var="modelAttributeData" value="${requestScope[modelAttribute]}"/>
+
+    <!-- Secure escaped identifier to be used on html and javascript places -->
+    <c:set var="secId">
+      <spring:escapeBody htmlEscape="true" javaScriptEscape="true">${id}</spring:escapeBody>
+    </c:set>
+
+      <!-- If no identifier field name specified, set 'id' by default -->
+      <c:if test="${empty idField}">
+        <c:set var="idField" value="id" />
+      </c:if>
+
+      <!-- If no version field name, 'version' is the default name -->
+      <c:if test="${empty versionField}">
+        <c:set var="versionField" value="version" />
+      </c:if>
+
+      <c:set var="typeName" value="${fn:split(id,'_')[fn:length(fn:split(id,'_')) - 1]}" scope="request" />
+
+      <!-- Show panel tab to access other defined page modes (search, edit, list, ...) -->
+      <spring:message arguments="${typeName}" code="entity_list_all" var="entity_relations"/>
+      <util:panel-tabs>
+        <util:panel-tab active="${true}" id="${id}" title="${entity_relations}" type="list"/>
+      </util:panel-tabs>
+
+      <c:if test="${empty label}">
+        <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label" htmlEscape="false" />
+      </c:if>
+      <spring:message arguments="${label}" code="entity_show" var="title_msg" />
+      <util:panel id="${secId}" title="${title_msg}" openPane="${openPane}">
+
+        <!-- Show quick links to make available actions over table rows (create, update, delete, ...) -->
+        <spring:message code="entity_delete" arguments="${typeName}" var="delete_entity" htmlEscape="false"/>
+        <spring:message code="entity_delete_confirm" var="delete_confirm_msg" htmlEscape="false"/>
+        <spring:message code="entity_create" arguments="${typeName}" var="create_label" />
+        <spring:message code="entity_update" arguments="${typeName}" var="update_label" />
+        <util:quicklinks id="${id}">
+          <util:quicklink id="${id}_create" label="${create_label}" type="CREATE" onclick="gvNixChangesControl(); gvnix_create('${secId}');" />
+          <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="gvNixChangesControl(); gvnix_edit('${secId}');" />
+          <util:quicklink id="${id}_delete" label="${delete_entity}" type="DELETE" onclick="gvnix_delete_confirm('${delete_confirm_msg}', '${secId}');" />
+        </util:quicklinks>
+
+        <!-- Global layer for this entity table -->
+        <div id="${secId}" class="patternContentPane">
+
+          <!-- Make available the control to avoid changes when gvNixChangesControl() is called -->
+          <util:changes-control active="false"/>
+
+          <c:set var="rowStylePrefix" value="gvNixTableRow ${secId}_row_" scope="request" />
+          <c:set var="colStylePrefix" value="gvNixTableData ${secId}_col_" scope="request" />
+
+          <!-- Starts data table -->
+          <table>
+
+            <!-- Table column header -->
+            <thead>
+              <tr class="${rowStylePrefix}0">
+
+                <c:set var="colCounter" value="${1}" scope="request" />
+
+                <th class="${colStylePrefix}gvnix_checkbox">
+                  <!-- The first column header is a checkbox to select all checkboxes -->
+                  <input type="checkbox" id="gvnix_select_all_${secId}" onclick="gvnix_select_all('${secId}');" />
+                </th>
+
+                <!-- Include column headers when item value is null and count the number of visible columns -->
+                <c:set var="item" value="${null}" scope="request" />
+                <jsp:doBody />
+
+              </tr>
+            </thead>
+
+            <!-- Action URL for update, delete and add forms -->
+            <spring:url value="${path}" var="formUrl" />
+
+            <!-- Form for update and delete (on delete, http method is changed to DELETE) -->
+            <form:form id="gvnix_form_${secId}" action="${fn:escapeXml(formUrl)}" method="PUT" modelAttribute="item">
+
+            <!-- Calculate pagination parameters -->
+            <c:set var="page" value="${id}Page" scope="request"/>
+            <c:set var="pageSize" value="${id}PageSize" scope="request"/>
+            <c:set var="beginItem" value="${empty param[page] or empty param[pageSize] ? 0 : param[page] * param[pageSize] - param[pageSize]}" scope="request"/>
+            <c:set var="endItem" value="${empty param[page] or empty param[pageSize] ? 9 : param[page] * param[pageSize] - 1}" scope="request"/>
+
+            <!-- Create a row for each item on data collection between pagination items -->
+            <c:forEach items="${modelAttributeData}" var="item" varStatus="pos" begin="${beginItem}" end="${endItem}">
+              <tr class="${rowStylePrefix}${pos.count}">
+
+                <!-- 0-index position for list and selected collections sended to controller -->
+                <c:set var="fieldPos" value="${pos.count - 1}" scope="request" />
+
+                <!-- Include id property and optional version property -->
+                <c:set var="fieldPrefix" value="_${secId}[${fieldPos}]_" scope="request" />
+                <c:set var="namePrefix" value="list[${fieldPos}]." scope="request" />
+                <input type="hidden" id="${fieldPrefix}${idField}_id" name="${namePrefix}${idField}" value="${item[idField]}" disabled="disabled" />
+                <c:if test="${versionField ne 'none'}">
+                  <input type="hidden" id="${fieldPrefix}${versionField}_id" name="${namePrefix}${versionField}" value="${item[fn:toLowerCase(versionField)]}" disabled="disabled" />
+                </c:if>
+
+                <!-- Add a checkbox field on each row with a knowned id -->
+                <td class="${colStylePrefix}gvnix_checkbox">
+                  <input type="checkbox" id="gvnix_checkbox_${secId}" name="selected[${fieldPos}]" value="${fieldPos}" />
+                </td>
+
+                <!-- Add an item row in some pos with a parent id -->
+                <c:set var="item" value="${item}" scope="request" />
+                <c:set var="pos" value="${pos}" scope="request" />
+                <c:set var="parentId" value="${id}" scope="request" />
+                <jsp:doBody />
+
+              </tr>
+
+            </c:forEach>
+
+            </form:form>
+
+            <!-- Form for add, not visible by default -->
+            <form:form id="gvnix_add_form_${secId}" action="${fn:escapeXml(formUrl)}/?form" method="POST">
+
+              <!-- Include at last table positions 5 empty rows to create new items -->
+              <c:forEach begin="0" end="4" varStatus="new">
+                <tr id="gvnix_add_row_${secId}" style="display: none;">
+
+                  <!-- Add a checkbox field on each row with a knowned id -->
+                  <td>
+                    <c:set var="fieldPos" value="${new.count - 1}" scope="request" />
+                    <input type="hidden" id="gvnix_checkbox_add_${secId}[${fieldPos}]" name="selected[${fieldPos}]" value="${fieldPos}" disabled="disabled"/>
+                  </td>
+
+                  <!-- Add an empty row in some pos with a parent id -->
+                  <c:set var="item" value="" scope="request" />
+                  <c:set var="pos" value="${new}" scope="request" />
+                  <c:set var="parentId" value="${id}" scope="request" />
+                  <jsp:doBody />
+
+                </tr>
+              </c:forEach>
+
+            </form:form>
+
+            <tr class="footer">
+              <td colspan="${colCounter}">
+
+                <!-- If maxPages not empty use Roo pagination, else gvnix pagination -->
+                <c:choose>
+                  <c:when test="${not empty maxPages}">
+                    <util:pagination maxPages="${maxPages}" page="${param.page}" size="${param.size}" />
+                  </c:when>
+                  <c:otherwise>
+                    <pattern:paginationadd field="${id}" relatedEntitySet="${modelAttributeData}" />
+                  </c:otherwise>
+                </c:choose>
+
+                <!-- Add all URL params, except 'exception' to avoid repetition -->
+                <spring:url value="" var="currentUrl" htmlEscape="false">
+                  <c:forEach var="p" items="${param}" >
+                    <c:if test="${p.key ne 'exception'}">
+                      <spring:param name="${p.key}" value="${p.value}" />
+                    </c:if>
+                  </c:forEach>
+                </spring:url>
+
+                <!-- Submit layer to confirm table actions -->
+                <div class="submit">
+
+                  <!-- Update layer: not visible by default and and activated by javascript gvnix_edit() function -->
+                  <div id="gvnix_control_update" style="display: none;">
+                    <span class="warning">
+                      <spring:url value="/resources/images/gvnix/pattern/enEdicion.gif" var="imgUrl" />
+                      <img alt="" src="${fn:escapeXml(imgUrl)}" title="" />
+                    </span>
+                    <spring:message code="button_save" var="save_button"/>
+                    <spring:message code="button_cancel" var="cancel_button"/>
+                    <input type="button" id="gvnix_control_update_cancel" value="${fn:escapeXml(cancel_button)}" onclick="location.href = '${currentUrl}';" class="button_cancel" />
+                    <input type="button" id="gvnix_control_update_save" value="${fn:escapeXml(save_button)}" onclick="gvnix_update('${secId}');" class="button_save" />
+                  </div>
+
+                  <!-- Add layer: not visible by default and and activated by javascript gvnix_create() function -->
+                  <div id="gvnix_control_add" style="display: none;">
+                    <span class="warning">
+                      <spring:url value="/resources/images/gvnix/pattern/enEdicion.gif" var="imgUrl" />
+                      <img alt="" src="${fn:escapeXml(imgUrl)}" title="" />
+                    </span>
+                    <spring:message code="button_save" var="save_button"/>
+                    <spring:message code="button_cancel" var="cancel_button"/>
+                    <input type="button" id="gvnix_control_add_cancel" value="${fn:escapeXml(cancel_button)}" onclick="location.href = '${currentUrl}';" class="button_cancel" />
+                    <input type="button" id="gvnix_control_add_save" value="${fn:escapeXml(save_button)}" onclick="gvnix_add('${secId}');" class="button_save" />
+                  </div>
+
+                </div>
+
+              </td>
+            </tr>
+
+          <!-- Ends data table -->
+          </table>
+
+        </div>
+
+      </util:panel>
+
+      <script type="text/javascript"><![CDATA[
+
+        /*
+         * Disable all not selected rows (not submitted) and submit add form.
+         */
+        function gvnix_add(element) {
+          var inputTexts = dojo.query('#gvnix_add_form_' + element + ' ~ tr > td > input[type="text"]');
+          if (inputTexts.length <= 0) {
+            inputTexts = dojo.query('#gvnix_add_form_' + element + ' ~ * > tr > td > input[type="text"]');
+          }
+
+          inputTexts.forEach(function(input) {
+            checkselected = false;
+            if (input.value != '') {
+              checkselected = true;
+            }
+            else {
+              input.disabled = true;
+            }
+            if (checkselected) {
+              indexPatt = /\[.*\]/;
+              itemIndex = input.id.match(indexPatt);
+              itemCheckbox = dojo.byId('gvnix_checkbox_add_' + element + itemIndex[0]);
+              itemCheckbox.disabled = false;
+            }
+          });
+
+          // Get add form and submit them
+          var forms = dojo.query('form[id^="gvnix_add_form_' + element + '"]');
+          forms[0].submit();
+        }
+
+        /*
+         * Submit update form.
+         */
+        function gvnix_update(element) {
+          // Get update form and submit them
+          var forms = dojo.query('form[id^="gvnix_form_' + element + '"]');
+          forms[0].submit();
+        }
+
+      ]]></script>
+
+
+  </c:if>
+
+</jsp:root>

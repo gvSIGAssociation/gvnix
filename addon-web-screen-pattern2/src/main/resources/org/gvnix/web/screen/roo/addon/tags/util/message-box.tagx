@@ -1,9 +1,9 @@
 <jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
   <!--
-    Modal Dialog Box simulates a regular GUI dialog box. 
-    
+    Modal Dialog Box simulates a regular GUI dialog box.
+
     Usage:
-    
+
     * Controller classes: Add error code request attribute
         uiModel.addAttribute("MESSAGE_ERROR", "_error_code_");
 
@@ -31,7 +31,7 @@
   </c:if>
 
   <!-- Default error message -->
-  <spring:message code="error_uncaughtexception_problemdescription" 
+  <spring:message code="error_uncaughtexception_problemdescription"
     var="default_message_error_desc" htmlEscape="false"/>
 
   <!-- Highest precedence: Search message code by message type as request attribute -->
@@ -66,7 +66,7 @@
     </c:when>
     <c:otherwise>
 
-      <!-- 
+      <!--
         Support to receive error codes in request parameters, useful to use
         with ReferrerHandlerExceptionResolver.
         Note explicit message has higher precedence, in that case error code
@@ -76,7 +76,7 @@
         <c:when test="${not empty param.exception}">
           <c:set var="MsgDlgClass" value="MessageErrorBox" />
           <spring:message code="message_error_title" var="title" htmlEscape="false"/>
-          <spring:message code="error_${fn:toLowerCase(param.exception)}_problemdescription" var="description" 
+          <spring:message code="error_${fn:toLowerCase(param.exception)}_problemdescription" var="description"
             text="${default_message_error_desc}" htmlEscape="false"/>
         </c:when>
 
@@ -84,7 +84,7 @@
         <c:when test="${not empty code}">
           <c:set var="MsgDlgClass" value="MessageAlertBox" />
           <spring:message code="message_alert_title" var="title" htmlEscape="false"/>
-          <spring:message code="${code}" var="description" 
+          <spring:message code="${code}" var="description"
             text="${default_message_error_desc}" htmlEscape="false"/>
         </c:when>
       </c:choose>
@@ -93,29 +93,31 @@
   </c:choose>
 
   <c:if test="${not empty MsgDlgClass}">
-    <spring:message code="button_proceed" var="button_label" 
+    <spring:message code="button_proceed" var="button_label"
       htmlEscape="false"/>
     <div dojoType="dijit.Dialog" id="${id}" style="display: none; position: absolute;">
       <div class="avisocorto">${title}</div>
       <div class="avisolargo">${description}</div>
       <div class="closeMessage">
-      <button class="boton" dojoType="dijit.form.Button" type="button" 
+      <button class="boton" dojoType="dijit.form.Button" type="button"
         onClick="dijit.byId('${id}').hide();">${button_label}</button>
       </div>
     </div>
 
+    <spring:message code="application_name" var="dialogTitle" htmlEscape="false"/>
+
     <script type="text/javascript"><![CDATA[
         dojo.require("dijit.Dialog");
-  
-        var dlgContent = dojo.byId('${id}');  
+
+        var dlgContent = dojo.byId('${id}');
         var messageDlg;
         dojo.addOnLoad(function() {
           // create the dialog:
           messageDlg = new dijit.Dialog(
            { class: "MessageBoxDialog ${MsgDlgClass}",
-             title: "SENTENCIAS", 
+             title: "${dialogTitle}",
              style: "width: 350px" }, dlgContent);
-  
+
           if(${show}) {
             messageDlg.show();
           }
