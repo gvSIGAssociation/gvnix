@@ -399,8 +399,9 @@ public class PatternJspMetadataListener implements MetadataProvider,
                     loadScriptsXml).addAttribute("rel", "stylesheet")
                     .addAttribute("type", "text/css")
                     .addAttribute("media", "screen")
-                    .addAttribute("href", "${pattern_css_url}")
-                    .setText("<!-- required for FF3 and Opera -->").build();
+                    .addAttribute("href", "${pattern_css_url}").build();
+            linkPatternCss.appendChild(loadScriptsXml
+                    .createCDATASection("<!-- required for FF3 and Opera -->"));
             Node linkTrundraCssNode = XmlUtils.findFirstElement(
                     "/root/link[@href='${tundra_url}']", lsRoot);
             if (linkTrundraCssNode != null) {
@@ -437,8 +438,9 @@ public class PatternJspMetadataListener implements MetadataProvider,
                     .addAttribute("var", "qljs_url").build();
             Element scriptQlJs = new XmlElementBuilder("script", loadScriptsXml)
                     .addAttribute("src", "${qljs_url}")
-                    .addAttribute("type", "text/javascript")
-                    .setText("<!-- required for FF3 and Opera -->").build();
+                    .addAttribute("type", "text/javascript").build();
+            scriptQlJs.appendChild(loadScriptsXml
+                    .createCDATASection("<!-- required for FF3 and Opera -->"));
             List<Element> scrtiptElements = XmlUtils.findElements(
                     "/root/script", lsRoot);
             // Element lastScript = null;
@@ -551,14 +553,15 @@ public class PatternJspMetadataListener implements MetadataProvider,
         if (!controllerPath.startsWith("/")) {
             controllerPath = "/".concat(controllerPath);
         }
-        JavaTypeMetadataDetails formbackingTypeMetadata = relatedDomainTypes
-                .get(formbackingType);
-        Assert.notNull(formbackingTypeMetadata,
-                "Form backing type metadata required");
-        JavaTypePersistenceMetadataDetails formbackingTypePersistenceMetadata = formbackingTypeMetadata
-                .getPersistenceDetails();
-        Assert.notNull(formbackingTypePersistenceMetadata,
-                "Persistence metadata required for form backing type");
+        // JavaTypeMetadataDetails formbackingTypeMetadata = relatedDomainTypes
+        // .get(formbackingType);
+        // Assert.notNull(formbackingTypeMetadata,
+        // "Form backing type metadata required");
+        // JavaTypePersistenceMetadataDetails formbackingTypePersistenceMetadata
+        // = formbackingTypeMetadata
+        // .getPersistenceDetails();
+        // Assert.notNull(formbackingTypePersistenceMetadata,
+        // "Persistence metadata required for form backing type");
 
         DocumentBuilder builder = XmlUtils.getDocumentBuilder();
         Document document = builder.newDocument();
@@ -571,6 +574,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
                 .addAttribute("xmlns:field",
                         "urn:jsptagdir:/WEB-INF/tags/pattern/form/field")
                 .addAttribute("xmlns:jsp", "http://java.sun.com/JSP/Page")
+                .addAttribute("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util")
                 .addAttribute("version", "2.0")
                 .addChild(
                         new XmlElementBuilder("jsp:directive.page", document)
@@ -581,13 +585,23 @@ public class PatternJspMetadataListener implements MetadataProvider,
                                 .addAttribute("omit-xml-declaration", "yes")
                                 .build()).build());
 
+        // Add message-box element
+        Element messageBox = new XmlElementBuilder("util:message-box", document)
+                .addAttribute(
+                        "id",
+                        formbackingTypeMetadata.getPlural().toLowerCase()
+                                .concat("_message_box")).build();
+
         // Add form update element
         Element formUpdate = new XmlElementBuilder("form:update", document)
                 .addAttribute(
                         "id",
                         XmlUtils.convertId("fu:"
                                 + formbackingType.getFullyQualifiedTypeName()))
-                .addAttribute("modelAttribute", entityName).build();
+                /* Modified previous value entityName */
+                .addAttribute("modelAttribute",
+                        formbackingTypeMetadata.getPlural().toLowerCase())
+                .build();
 
         if (!controllerPath.toLowerCase().equals(
                 formbackingType.getSimpleTypeName().toLowerCase())) {
@@ -611,6 +625,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
             formUpdate.setAttribute("versionField", methodName.substring(3));
         }
 
+        div.appendChild(messageBox);
         createFieldsForCreateAndUpdate(entityName, relatedDomainTypes,
                 eligibleFields, document, formUpdate, false);
         formUpdate.setAttribute("z",

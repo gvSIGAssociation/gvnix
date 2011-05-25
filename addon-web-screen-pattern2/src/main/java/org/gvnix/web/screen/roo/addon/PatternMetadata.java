@@ -21,8 +21,13 @@ package org.gvnix.web.screen.roo.addon;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
 
+import org.springframework.roo.addon.propfiles.PropFileOperations;
+import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
@@ -39,14 +44,18 @@ import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
 import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
+import org.springframework.roo.classpath.itd.ItdSourceFileComposer;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -82,27 +91,36 @@ public class PatternMetadata extends
     private MemberDetails memberDetails;
     private JavaType formBackingType;
     private List<String> definedPatterns;
+    SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata;
+    private JavaTypeMetadataDetails javaTypeMetadataHolder;
     private List<MethodMetadata> controllerMethods;
 
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     private MetadataService metadataService;
     private MemberDetailsScanner memberDetailsScanner;
+    private PropFileOperations propFileOperations;
 
-    public PatternMetadata(String identifier, JavaType aspectName,
+    public PatternMetadata(
+            String identifier,
+            JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             WebScaffoldMetadata webScaffoldMetadata,
             WebScaffoldAnnotationValues annotationValues,
             MemberDetails memberDetails,
             List<StringAttributeValue> definedPatterns,
+            SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
             MemberDetailsScanner memberDetailsScanner,
             PhysicalTypeMetadataProvider physicalTypeMetadataProvider,
-            MetadataService metadataService) {
+            MetadataService metadataService,
+            PropFileOperations propFileOperations) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
         Assert.notNull(webScaffoldMetadata, "WebScaffoldMetadata required");
         Assert.notNull(annotationValues, "Annotation values required");
         Assert.notNull(memberDetails, "Member details required");
+        Assert.notNull(relatedApplicationTypeMetadata,
+                "Related application type metadata required");
         if (!isValid()) {
             return;
         }
@@ -110,9 +128,17 @@ public class PatternMetadata extends
         this.annotationValues = annotationValues;
         this.formBackingType = annotationValues.getFormBackingObject();
         this.memberDetails = memberDetails;
+        this.relatedApplicationTypeMetadata = relatedApplicationTypeMetadata;
+        this.javaTypeMetadataHolder = relatedApplicationTypeMetadata
+                .get(formBackingType);
+        Assert.notNull(javaTypeMetadataHolder,
+                "Metadata holder required for form backing type: "
+                        + formBackingType);
+
         this.physicalTypeMetadataProvider = physicalTypeMetadataProvider;
         this.metadataService = metadataService;
         this.memberDetailsScanner = memberDetailsScanner;
+        this.propFileOperations = propFileOperations;
         this.controllerMethods = getControllerMethods(governorPhysicalTypeMetadata);
 
         /*
@@ -123,17 +149,26 @@ public class PatternMetadata extends
         for (StringAttributeValue definedPattern : definedPatterns) {
             definedPatternsList.add(definedPattern.getValue());
         }
-        if (isTabularDefined(definedPatternsList)) {
+        boolean istabdefined = isTabularDefined(definedPatternsList);
+        if (istabdefined/* isTabularDefined(definedPatternsList) */) {
             annotateFormBackingObject();
             builder.addMethod(getCreateListMethod());
             builder.addMethod(getUpdateListMethod());
             builder.addMethod(getDeleteListMethod());
             builder.addMethod(getFilterListMethod());
             builder.addMethod(getRefererRedirectMethod());
+            builder.addMethod(getTabularMethod());
         }
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
+        // System.out.println("*** " + this.hashCode() + " - " + this.getId());
+        // // + " imports: "
+        // // + builder.getImportRegistrationResolver()
+        // // .getRegisteredImports());
+        // System.out.println("*** " + this.hashCode() + " - " + istabdefined
+        // + " - " + definedPatternsList);
+        new ItdSourceFileComposer(itdTypeDetails);
         this.definedPatterns = Collections
                 .unmodifiableList(definedPatternsList);
     }
@@ -229,6 +264,131 @@ public class PatternMetadata extends
             mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
         }
 
+    }
+
+    /**
+     * Returns the method handling requests of a given gvnixpattern of type
+     * tabular
+     * 
+     * @return
+     */
+    private MethodMetadata getTabularMethod() {
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("tabular");
+
+        // Properties defined for the method
+        Map<String, String> properties = new HashMap<String, String>();
+
+        // Define method parameter types
+        // @RequestParam(value = "gvnixpattern", required = true) String
+        // pattern, HttpServletRequest req, Model uiModel)
+        List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
+        List<AnnotationAttributeValue<?>> requestParamAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        requestParamAttributes.add(new StringAttributeValue(new JavaSymbolName(
+                "value"), "gvnixpattern"));
+        requestParamAttributes.add(new BooleanAttributeValue(
+                new JavaSymbolName("required"), true));
+        List<AnnotationMetadata> methodAttributesAnnotations = new ArrayList<AnnotationMetadata>();
+        AnnotationMetadataBuilder methodAttributesAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestParam"),
+                requestParamAttributes);
+        methodAttributesAnnotations.add(methodAttributesAnnotation.build());
+
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(String.class
+                .getName()), methodAttributesAnnotations));
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "org.springframework.ui.Model"), null));
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "javax.servlet.http.HttpServletRequest"), null));
+
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method parameter names
+        // pattern, uiModel, request
+        List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
+        methodParamNames.add(new JavaSymbolName("pattern"));
+        methodParamNames.add(new JavaSymbolName("uiModel"));
+        methodParamNames.add(new JavaSymbolName("request"));
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        String entityNamePlural = javaTypeMetadataHolder.getPlural();
+        List<JavaType> typeParams = new ArrayList<JavaType>();
+        typeParams.add(formBackingType);
+        JavaType javaUtilList = new JavaType("java.util.List", 0,
+                DataType.TYPE, null, typeParams);
+        bodyBuilder.appendFormalLine(javaUtilList
+                .getFullyQualifiedTypeName()
+                // .getNameIncludingTypeParameters(false,
+                // builder.getImportRegistrationResolver())
+                .concat(" ")
+                .concat(entityNamePlural.toLowerCase())
+                .concat(" = ")
+                .concat(formBackingType.getFullyQualifiedTypeName())
+                // formBackingType.getNameIncludingTypeParameters(false,
+                // builder.getImportRegistrationResolver()))
+                .concat(".")
+                .concat(javaTypeMetadataHolder.getPersistenceDetails()
+                        .getFindAllMethod().getMethodName().getSymbolName()
+                        .concat("();")));
+
+        bodyBuilder.appendFormalLine("if (".concat(
+                entityNamePlural.toLowerCase()).concat(".isEmpty()) {"));
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
+                entityNamePlural.toLowerCase()).concat("\", null);"));
+        bodyBuilder
+                .appendFormalLine("uiModel.addAttribute(\"MESSAGE_INFO\",\"message_entitynotfound_problemdescription\");");
+        bodyBuilder.appendFormalLine("return \"".concat(
+                entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                .concat(entityNamePlural.toLowerCase()).concat("\", ")
+                .concat(entityNamePlural.toLowerCase()).concat(");"));
+        bodyBuilder.appendFormalLine("return \"".concat(
+                entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
+        properties.put("message_entitynotfound_problemdescription",
+                "There are not data of this entity");
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
+
+        // Get Method RequestMapping annotation
+        List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
+        paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
+                "gvnixpattern"));
+        requestMappingAttributes
+                .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
+                        new JavaSymbolName("params"), paramValues));
+        requestMappingAttributes.add(new EnumAttributeValue(new JavaSymbolName(
+                "method"), new EnumDetails(new JavaType(
+                "org.springframework.web.bind.annotation.RequestMethod"),
+                new JavaSymbolName(RequestMethod.GET.name()))));
+        AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestMapping"),
+                requestMappingAttributes);
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(requestMapping);
+        methodBuilder.setAnnotations(annotations);
+
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        propFileOperations
+                .addProperties(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/i18n/application.properties", properties,
+                        true, false);
+        return method;
     }
 
     /**

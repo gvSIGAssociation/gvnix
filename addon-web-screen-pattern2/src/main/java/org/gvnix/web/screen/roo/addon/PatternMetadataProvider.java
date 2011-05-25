@@ -20,6 +20,7 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
@@ -28,6 +29,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
+import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
@@ -245,7 +247,12 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
                 .getMostConcreteMemberHoldingTypeDetailsWithTag(
                         formBackingObjectMemberDetails,
                         PersistenceCustomDataKeys.PERSISTENT_TYPE);
-        if (memberHoldingTypeDetails == null) {
+        SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = webMetadataService
+                .getRelatedApplicationTypeMetadata(formBackingType,
+                        formBackingObjectMemberDetails,
+                        metadataIdentificationString);
+        if (memberHoldingTypeDetails == null
+                || relatedApplicationTypeMetadata == null) {
             return null;
         }
 
@@ -255,8 +262,9 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
         return new PatternMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, webScaffoldMetadata,
                 annotationValues, memberDetails, patternList,
-                memberDetailsScanner, physicalTypeMetadataProvider,
-                metadataService);
+                relatedApplicationTypeMetadata, memberDetailsScanner,
+                physicalTypeMetadataProvider, metadataService,
+                propFileOperations);
     }
 
     private boolean arePatternsDefinedOnceInController(
