@@ -147,7 +147,14 @@ Package gvNIX
 
 * Update (or create if not exists) the wiki page for each add-on from add-on user guide on html format.
 
-* Send to communication department the final release date to publish on social networks.  
+* Send to communication department the final release date and version changes summary to publish on social networks:
+
+  * Forum
+  * Google Code
+  * DiSiD blog
+  * gvNIX linkedin group
+  * gvNIX twit with Google Code link
+  * DiSiD twit with DiSiD blog link
 
 Source code
 -----------
