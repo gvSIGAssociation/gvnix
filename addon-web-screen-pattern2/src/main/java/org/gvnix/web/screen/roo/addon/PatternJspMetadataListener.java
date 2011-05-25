@@ -16,6 +16,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -256,16 +257,54 @@ public class PatternJspMetadataListener implements MetadataProvider,
          * TODO: next test may be replaced by a test over allow or not create
          * operation of the entity
          */
-        // JspViewManager viewManager = new JspViewManager(eligibleFields,
-        // webScaffoldMetadata.getAnnotationValues(), relatedTypeMd);
         if (true) {
             String patternPath = destinationDirectory.concat("/")
                     .concat(patternNameType[0]).concat(".jspx");
             writeToDiskIfNecessary(patternPath, getUpdateDocument());
+            // add view to views.xml
+            tilesOperations.addViewDefinition(controllerPath, controllerPath
+                    + "/" + patternNameType[0],
+                    TilesOperations.DEFAULT_TEMPLATE, "/WEB-INF/views/"
+                            + controllerPath + "/" + patternNameType[0]
+                            + ".jspx");
+            // add entry to menu.jspx
+            JavaSymbolName categoryName = new JavaSymbolName(
+                    formbackingType.getSimpleTypeName());
+            JavaSymbolName menuItemId = new JavaSymbolName(
+                    "list_tabular_".concat(patternNameType[0]));
+            menuOperations.addMenuItem(categoryName, menuItemId,
+                    "menu_list_tabular_" + patternNameType[0], "/"
+                            + controllerPath + "?gvnixpattern="
+                            + patternNameType[0],
+                    MenuOperations.DEFAULT_MENU_ITEM_PREFIX);
+            // add needed properties
+            Map<String, String> properties = new LinkedHashMap<String, String>();
+            properties.put(
+                    "menu_list_tabular_" + patternNameType[0],
+                    new JavaSymbolName(formbackingType.getSimpleTypeName())
+                            .getReadableSymbolName()
+                            + "list tabular "
+                            + patternNameType[0]);
+            properties.put(
+                    "menu_item_" + categoryName.getSymbolName().toLowerCase()
+                            + "_" + menuItemId.getSymbolName().toLowerCase()
+                            + "_label",
+                    new JavaSymbolName(formbackingType.getSimpleTypeName())
+                            .getReadableSymbolName()
+                            + "list tabular "
+                            + patternNameType[0]);
+            propFileOperations.addProperties(Path.SRC_MAIN_WEBAPP,
+                    "/WEB-INF/i18n/application.properties", properties, true,
+                    false);
         }
 
     }
 
+    /**
+     * Installs static resources (JS, images, CSS) and tagx in the destination
+     * project. Also, the i18n properties needed by tagx are set in
+     * application.properties
+     */
     private void installPatternArtifacts() {
         installStaticResource("images/pattern/enEdicion.gif");
         installStaticResource("images/pattern/plis_on.gif");
@@ -283,8 +322,20 @@ public class PatternJspMetadataListener implements MetadataProvider,
         // modify load-scripts.tagx
         modifyLoadScriptsTagx();
 
+        // TODO: add properties needed by artifacts
+        // Detected: message_alert_title, message_info_title,
+        // message_error_title
+
     }
 
+    /**
+     * Updates load-scripts.tagx adding in the right position some elements:
+     * <ul>
+     * <li><code>spring:url</code> elements for JS and CSS</li>
+     * <li><code>link</code> element for CSS</li>
+     * <li><code>script</code> element for JS</li>
+     * </ul>
+     */
     private void modifyLoadScriptsTagx() {
         PathResolver pathResolver = projectOperations.getPathResolver();
         String loadScriptsTagx = pathResolver.getIdentifier(
@@ -404,6 +455,12 @@ public class PatternJspMetadataListener implements MetadataProvider,
                 loadScriptsXml.getDocumentElement());
     }
 
+    /**
+     * Installs the resource given by parameter path into the same path inside
+     * <code>src/main/webapp/</code>
+     * 
+     * @param path
+     */
     private void installStaticResource(String path) {
         PathResolver pathResolver = projectOperations.getPathResolver();
         String imageFile = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
@@ -469,6 +526,15 @@ public class PatternJspMetadataListener implements MetadataProvider,
         }
     }
 
+    /**
+     * Returns de XML Document with the JSPx
+     * <p>
+     * <strong>This method is based in:</strong>
+     * {@link org.springframework.roo.addon.web.mvc.jsp. JspViewManager#getUpdateDocument()}
+     * </p>
+     * 
+     * @return
+     */
     private Document getUpdateDocument() {
 
         String controllerPath = webScaffoldAnnotationValues.getPath();
@@ -548,6 +614,11 @@ public class PatternJspMetadataListener implements MetadataProvider,
         return document;
     }
 
+    /**
+     * {@link org.springframework.roo.addon.web.mvc.jsp.JspViewManager#
+     * createFieldsForCreateAndUpdate(List<FieldMetadata>, Document, Element,
+     * boolean)}
+     */
     private void createFieldsForCreateAndUpdate(String entityName,
             Map<JavaType, JavaTypeMetadataDetails> relatedDomainTypes,
             List<FieldMetadata> formFields, Document document, Element root,
@@ -720,6 +791,9 @@ public class PatternJspMetadataListener implements MetadataProvider,
         }
     }
 
+    /**
+     * {@link org.springframework.roo.addon.web.mvc.jsp.JspViewManager#getJavaTypeForField(FieldMetadata)}
+     */
     private JavaType getJavaTypeForField(FieldMetadata field) {
         if (field.getFieldType().isCommonCollectionType()) {
             // Currently there is no scaffolding available for Maps (see
@@ -740,6 +814,9 @@ public class PatternJspMetadataListener implements MetadataProvider,
         return field.getFieldType();
     }
 
+    /**
+     * {@link org.springframework.roo.addon.web.mvc.jsp.JspViewManager#getPathForType(JavaType)}
+     */
     private String getPathForType(JavaType type) {
         JavaTypeMetadataDetails javaTypeMetadataHolder = relatedDomainTypes
                 .get(type);
@@ -750,6 +827,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
         return javaTypeMetadataHolder.getControllerPath();
     }
 
+    /** {@link org.springframework.roo.addon.web.mvc.jsp.JspViewManager#addCommonAttributes(FieldMetadata, Element)} */
     private void addCommonAttributes(FieldMetadata field, Element fieldElement) {
         AnnotationMetadata annotationMetadata;
         if (field.getFieldType().equals(new JavaType(Integer.class.getName()))
@@ -889,7 +967,10 @@ public class PatternJspMetadataListener implements MetadataProvider,
         }
     }
 
-    /** return indicates if disk was changed (ie updated or created) */
+    /**
+     * Decides if write to disk is needed (ie updated or created)<br/>
+     * Used for JSPx files
+     */
     private void writeToDiskIfNecessary(String jspFilename, Document proposed) {
         Document original = null;
         if (fileManager.exists(jspFilename)) {
@@ -906,6 +987,14 @@ public class PatternJspMetadataListener implements MetadataProvider,
         }
     }
 
+    /**
+     * Decides if write to disk is needed (ie updated or created)<br/>
+     * Used for TAGx files
+     * 
+     * @param filePath
+     * @param body
+     * @return
+     */
     private boolean writeToDiskIfNecessary(String filePath, Element body) {
         // Build a string representation of the JSP
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

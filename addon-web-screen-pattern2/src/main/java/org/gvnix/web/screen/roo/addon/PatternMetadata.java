@@ -48,7 +48,6 @@ import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.EnumDetails;
-import org.springframework.roo.model.ImportRegistrationResolver;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
@@ -123,16 +122,14 @@ public class PatternMetadata extends
         List<String> definedPatternsList = new ArrayList<String>();
         for (StringAttributeValue definedPattern : definedPatterns) {
             definedPatternsList.add(definedPattern.getValue());
-
-            if (definedPattern.getValue().split("=")[1]
-                    .equalsIgnoreCase("table")) {
-                annotateFormBackingObject();
-                addCreateListMethod();
-                addUpdateListMethod();
-                addDeleteListMethod();
-                addFilterListMethod();
-                addRefererRedirectMethod();
-            }
+        }
+        if (isTabularDefined(definedPatternsList)) {
+            annotateFormBackingObject();
+            builder.addMethod(getCreateListMethod());
+            builder.addMethod(getUpdateListMethod());
+            builder.addMethod(getDeleteListMethod());
+            builder.addMethod(getFilterListMethod());
+            builder.addMethod(getRefererRedirectMethod());
         }
 
         // Create a representation of the desired output ITD
@@ -165,6 +162,22 @@ public class PatternMetadata extends
         public String getName() {
             return this.name;
         }
+    }
+
+    /**
+     * If there is a pattern tabular defined in GvNIXPattern it returns true,
+     * false otherwise
+     * 
+     * @param definedPatternsList
+     * @return
+     */
+    private boolean isTabularDefined(List<String> definedPatternsList) {
+        for (String definedPattern : definedPatternsList) {
+            if (definedPattern.split("=")[1].equalsIgnoreCase("table")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -223,7 +236,7 @@ public class PatternMetadata extends
      * 
      * @return
      */
-    private MethodMetadata addCreateListMethod() {
+    private MethodMetadata getCreateListMethod() {
         // Here we're sure that Entity.createList() method exists
 
         // Specify the desired method name
@@ -261,10 +274,9 @@ public class PatternMetadata extends
         annotations.add(requestMapping);
         methodBuilder.setAnnotations(annotations);
 
-        MethodMetadata md = methodBuilder.build();
-        builder.addMethod(md);
-        controllerMethods.add(md);
-        return md;
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
     }
 
     /**
@@ -272,7 +284,7 @@ public class PatternMetadata extends
      * 
      * @return
      */
-    private MethodMetadata addUpdateListMethod() {
+    private MethodMetadata getUpdateListMethod() {
         // Here we're sure that Entity.updateList() method exists
 
         // Specify the desired method name
@@ -310,10 +322,9 @@ public class PatternMetadata extends
         annotations.add(requestMapping);
         methodBuilder.setAnnotations(annotations);
 
-        MethodMetadata md = methodBuilder.build();
-        builder.addMethod(md);
-        controllerMethods.add(md);
-        return md;
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
     }
 
     /**
@@ -321,7 +332,7 @@ public class PatternMetadata extends
      * 
      * @return
      */
-    private MethodMetadata addDeleteListMethod() {
+    private MethodMetadata getDeleteListMethod() {
         // Here we're sure that Entity.deleteList() method exists
 
         // Specify the desired method name
@@ -359,10 +370,9 @@ public class PatternMetadata extends
         annotations.add(requestMapping);
         methodBuilder.setAnnotations(annotations);
 
-        MethodMetadata md = methodBuilder.build();
-        builder.addMethod(md);
-        controllerMethods.add(md);
-        return md;
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
     }
 
     /**
@@ -374,7 +384,7 @@ public class PatternMetadata extends
      * 
      * @return
      */
-    private MethodMetadata addFilterListMethod() {
+    private MethodMetadata getFilterListMethod() {
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("filterList");
 
@@ -425,10 +435,9 @@ public class PatternMetadata extends
                                 .concat("List")), parameterTypes,
                 parameterNames, bodyBuilder);
 
-        MethodMetadata md = methodBuilder.build();
-        builder.addMethod(md);
-        controllerMethods.add(md);
-        return md;
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
     }
 
     /**
@@ -440,7 +449,7 @@ public class PatternMetadata extends
      * 
      * @return
      */
-    private MethodMetadata addRefererRedirectMethod() {
+    private MethodMetadata getRefererRedirectMethod() {
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName(
                 "getRefererRedirectViewName");
@@ -465,17 +474,12 @@ public class PatternMetadata extends
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        // ImportRegistrationResolver gives access to imports in the
-        // Java/AspectJ source
-        ImportRegistrationResolver irr = builder
-                .getImportRegistrationResolver();
-        // We need import org.springframework.util.StringUtils
-        irr.addImport(new JavaType("org.springframework.util.StringUtils"));
 
         bodyBuilder
                 .appendFormalLine("String referer = httpServletRequest.getHeader(\"Referer\");");
 
-        bodyBuilder.appendFormalLine("if (!StringUtils.hasText(referer)) {");
+        bodyBuilder
+                .appendFormalLine("if (!org.springframework.util.StringUtils.hasText(referer)) {");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("return null;");
         bodyBuilder.indentRemove();
@@ -483,14 +487,20 @@ public class PatternMetadata extends
 
         bodyBuilder.appendFormalLine("return \"redirect:\".concat(referer);");
 
+        // ImportRegistrationResolver gives access to imports in the
+        // Java/AspectJ source
+        // ImportRegistrationResolver irr = builder
+        // .getImportRegistrationResolver();
+        // We need import org.springframework.util.StringUtils
+        // irr.addImport(new JavaType("org.springframework.util.StringUtils"));
+
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
                 parameterTypes, parameterNames, bodyBuilder);
 
-        MethodMetadata md = methodBuilder.build();
-        builder.addMethod(md);
-        controllerMethods.add(md);
-        return md;
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
     }
 
     /**
