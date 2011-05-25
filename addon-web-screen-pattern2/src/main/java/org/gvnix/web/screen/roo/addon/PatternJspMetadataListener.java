@@ -318,6 +318,12 @@ public class PatternJspMetadataListener implements MetadataProvider,
         copyDirectoryContents("tags/pattern/*.tagx",
                 pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
                         "/WEB-INF/tags/pattern"));
+        copyDirectoryContents("tags/pattern/form/*.tagx",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/tags/pattern/form"));
+        copyDirectoryContents("tags/pattern/form/field/*.tagx",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/tags/pattern/form/field"));
 
         // modify load-scripts.tagx
         modifyLoadScriptsTagx();
@@ -561,9 +567,9 @@ public class PatternJspMetadataListener implements MetadataProvider,
         Element div = (Element) document.appendChild(new XmlElementBuilder(
                 "div", document)
                 .addAttribute("xmlns:form",
-                        "urn:jsptagdir:/WEB-INF/tags/pattern")
+                        "urn:jsptagdir:/WEB-INF/tags/pattern/form")
                 .addAttribute("xmlns:field",
-                        "urn:jsptagdir:/WEB-INF/tags/pattern")
+                        "urn:jsptagdir:/WEB-INF/tags/pattern/form/field")
                 .addAttribute("xmlns:jsp", "http://java.sun.com/JSP/Page")
                 .addAttribute("version", "2.0")
                 .addChild(
