@@ -38,32 +38,33 @@ import org.springframework.roo.project.PathResolver;
  */
 @Component(componentAbstract = true)
 public abstract class FileDynamicConfiguration {
-  
-  @Reference protected PathResolver pathResolver;
-  @Reference protected FileManager fileManager;
 
-  /**
-   * Get the dynamic configuration file path.
-   * 
-   * @return Dynamic configuration file path
-   */
-  public abstract String getFilePath();
+    @Reference
+    protected PathResolver pathResolver;
+    @Reference
+    protected FileManager fileManager;
 
-  /**
-   * Get the properties mutable file if exists.
-   * 
-   * @return Properties mutable file or null if not exists
-   */
-  protected MutableFile getFile() {
+    /**
+     * Get the dynamic configuration file path.
+     * 
+     * @return Dynamic configuration file path
+     */
+    public abstract String getFilePath();
 
-    String path = pathResolver.getIdentifier(Path.ROOT,
-        getFilePath());
-    if (!fileManager.exists(path)) {
+    /**
+     * Get the properties mutable file if exists.
+     * 
+     * @return Properties mutable file or null if not exists
+     */
+    protected MutableFile getFile() {
 
-      return null;
+        String path = pathResolver.getIdentifier(Path.ROOT, getFilePath());
+        if (!fileManager.exists(path)) {
+
+            return null;
+        }
+
+        return fileManager.updateFile(path);
     }
-
-    return fileManager.updateFile(path);
-  }
 
 }

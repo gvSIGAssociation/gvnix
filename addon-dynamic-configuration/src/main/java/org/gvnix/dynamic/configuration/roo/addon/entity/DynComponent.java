@@ -27,111 +27,111 @@ package org.gvnix.dynamic.configuration.roo.addon.entity;
  *         Transport</a>
  */
 public class DynComponent {
-  
-  private String id;
 
-  private String name;
-  
-  private DynPropertyList properties;
-  
-  
-  public DynComponent() {
-    super();
-  }
+    private String id;
 
-  public DynComponent(String id, String name, DynPropertyList properties) {
-    super();
-    this.id = id;
-    this.name = name;
-    this.properties = properties;
-  }
+    private String name;
 
-  public DynComponent(String name) {
-    super();
-    this.id = name;
-  }
+    private DynPropertyList properties;
 
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getName() {
-    
-    if (name != null && name.length() > 0) {
-    
-      return name;
-    }
-    
-    return id.substring(id.lastIndexOf(".") + 1, id.length());
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public DynPropertyList getProperties() {
-    return properties;
-  }
-
-  public void addProperty(DynProperty property) {
-    properties.add(property);
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * Name and property/value set, each on new line. 
-   */
-  @Override
-  public String toString() {
-
-    // Show the component name
-    StringBuffer buffer = new StringBuffer();
-    buffer.append(" * " + getName());
-
-    // Show properties
-    for (DynProperty prop : properties) {
-
-      // Show the property and value if exists with format
-      buffer.append("\n");
-      buffer.append("   - " + prop.getKey());
-      if (prop.getValue() != null && prop.getValue().length() > 0) {
-        buffer.append(" = " + prop.getValue());
-      }
+    public DynComponent() {
+        super();
     }
 
-    return buffer.toString();
-  }
-  
-  /**
-   * Two components are equal if their properties are equal.
-   * 
-   * @param obj Component to compare to
-   * @return Component equals
-   */
-  public boolean equals(DynComponent obj) {
+    public DynComponent(String id, String name, DynPropertyList properties) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.properties = properties;
+    }
 
-    for (DynProperty component : properties) {
-      
-      boolean exist = false;
-      for (DynProperty component2 : obj.getProperties()) {
-        if (component.equals(component2)) {
-          
-          exist = true;
-          break;
+    public DynComponent(String name) {
+        super();
+        this.id = name;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+
+        if (name != null && name.length() > 0) {
+
+            return name;
         }
-      }
-      
-      if (!exist) {
-        return false;
-      }
+
+        return id.substring(id.lastIndexOf(".") + 1, id.length());
     }
-    
-    return true;
-  }
-  
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public DynPropertyList getProperties() {
+        return properties;
+    }
+
+    public void addProperty(DynProperty property) {
+        properties.add(property);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Name and property/value set, each on new line.
+     */
+    @Override
+    public String toString() {
+
+        // Show the component name
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(" * " + getName());
+
+        // Show properties
+        for (DynProperty prop : properties) {
+
+            // Show the property and value if exists with format
+            buffer.append("\n");
+            buffer.append("   - " + prop.getKey());
+            if (prop.getValue() != null && prop.getValue().length() > 0) {
+                buffer.append(" = " + prop.getValue());
+            }
+        }
+
+        return buffer.toString();
+    }
+
+    /**
+     * Two components are equal if their properties are equal.
+     * 
+     * @param obj
+     *            Component to compare to
+     * @return Component equals
+     */
+    public boolean equals(DynComponent obj) {
+
+        for (DynProperty component : properties) {
+
+            boolean exist = false;
+            for (DynProperty component2 : obj.getProperties()) {
+                if (component.equals(component2)) {
+
+                    exist = true;
+                    break;
+                }
+            }
+
+            if (!exist) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

@@ -22,7 +22,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
 /**
- * Dynamic configuration manager of application context XML. 
+ * Dynamic configuration manager of application context XML.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -32,23 +32,23 @@ import org.apache.felix.scr.annotations.Service;
 @Component
 @Service
 public class ApplicationContextDynamicConfiguration extends
-    XmlDynamicConfiguration implements DefaultDynamicConfiguration {
+        XmlDynamicConfiguration implements DefaultDynamicConfiguration {
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getName() {
-    
-    return "Spring Application Context XML";
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getFilePath() {
+        return "Spring Application Context XML";
+    }
 
-    return "src/main/resources/META-INF/spring/applicationContext.xml";
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getFilePath() {
+
+        return "src/main/resources/META-INF/spring/applicationContext.xml";
+    }
 
 }

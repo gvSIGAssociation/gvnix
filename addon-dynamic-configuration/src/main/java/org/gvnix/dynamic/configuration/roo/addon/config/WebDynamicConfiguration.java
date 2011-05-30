@@ -22,7 +22,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
 /**
- * Dynamic configuration manager of Web XML. 
+ * Dynamic configuration manager of Web XML.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -32,23 +32,23 @@ import org.apache.felix.scr.annotations.Service;
 @Component
 @Service
 public class WebDynamicConfiguration extends XmlDynamicConfiguration implements
-    DefaultDynamicConfiguration {
+        DefaultDynamicConfiguration {
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getName() {
-    
-    return "Web Application Descriptor XML";
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getFilePath() {
+        return "Web Application Descriptor XML";
+    }
 
-    return "src/main/webapp/WEB-INF/web.xml";
-  }
-  
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getFilePath() {
+
+        return "src/main/webapp/WEB-INF/web.xml";
+    }
+
 }

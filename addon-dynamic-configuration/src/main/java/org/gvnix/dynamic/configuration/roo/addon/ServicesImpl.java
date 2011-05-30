@@ -54,174 +54,184 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 @Component
 @Service
-@Reference(name="components", strategy=ReferenceStrategy.LOOKUP, policy=ReferencePolicy.DYNAMIC, referenceInterface=DefaultDynamicConfiguration.class, cardinality=ReferenceCardinality.OPTIONAL_MULTIPLE)
+@Reference(name = "components", strategy = ReferenceStrategy.LOOKUP, policy = ReferencePolicy.DYNAMIC, referenceInterface = DefaultDynamicConfiguration.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class ServicesImpl implements Services {
-  
-  private static final Logger logger = HandlerUtils.getLogger(ServicesImpl.class);
 
-  private ComponentContext context;
-  
-  protected void activate(ComponentContext context) {
-    this.context = context;
-  }
-  
-  /**
-   * Get all the dynamic configuration components.
-   * 
-   * @return Dynamic configuration components
-   */
-  private Set<DefaultDynamicConfiguration> getComponents() {
-    
-    return getSet("components");
-  }
-  
-  /**
-   * Get named configuration components.
-   * 
-   * @param <T> Components type
-   * @param name Components name
-   * @return Components
-   */
-  @SuppressWarnings("unchecked")
-  private <T> Set<T> getSet(String name) {
-    
-    Set<T> result = new HashSet<T>();
-    Object[] objs = context.locateServices(name);
-    if (objs != null) {
-      for (Object o : objs) {
-        
-        result.add((T) o);
-      }
-    }
-    
-    return result;
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public DynConfiguration getCurrentConfiguration() {
+    private static final Logger logger = HandlerUtils
+            .getLogger(ServicesImpl.class);
 
-    // Variable to store active dynamic configuration
-    DynConfiguration dynConf = new DynConfiguration();
-    dynConf.setActive(Boolean.TRUE);
-    
-    // Iterate all dynamic configurations components registered
-    for (DefaultDynamicConfiguration o : getComponents()) {
-      try {
-        
-        // Invoke the read method of all components to get its properties
-        Class<? extends Object> c = o.getClass();
-        Method m = (Method) c.getMethod("read", new Class[0]);
-        DynPropertyList dynProps = (DynPropertyList) m.invoke(o, new Object[0]);
+    private ComponentContext context;
 
-        // Create a dynamic configuration object with component and properties
-        DynComponent dynComp = new DynComponent(c.getName(), o.getName(), dynProps);
-        dynConf.addComponent(dynComp);
-      }
-      catch (NoSuchMethodException nsme) {
-
-        logger.log(Level.SEVERE,
-            "No read method on dynamic configuration class", nsme);
-      }
-      catch (InvocationTargetException ite) {
-
-        logger.log(Level.SEVERE,
-            "Cannot invoke read method on dynamic configuration class", ite);
-      }
-      catch (IllegalAccessException iae) {
-
-        logger.log(Level.SEVERE,
-            "Cannot access read method on dynamic configuration class", iae);
-      }
+    protected void activate(ComponentContext context) {
+        this.context = context;
     }
 
-    return dynConf;
-  }
+    /**
+     * Get all the dynamic configuration components.
+     * 
+     * @return Dynamic configuration components
+     */
+    private Set<DefaultDynamicConfiguration> getComponents() {
 
-  /**
-   * {@inheritDoc}
-   */
-  public DynComponent getCurrentComponent(String name) {
-    
-    // TODO Two properties with same name can exist on different components
+        return getSet("components");
+    }
 
-    // Get current configuration from disk files
-    DynConfiguration dynConf = getCurrentConfiguration();
-    for (DynComponent dynComp : dynConf.getComponents()) {
+    /**
+     * Get named configuration components.
+     * 
+     * @param <T>
+     *            Components type
+     * @param name
+     *            Components name
+     * @return Components
+     */
+    @SuppressWarnings("unchecked")
+    private <T> Set<T> getSet(String name) {
 
-      // Search the property on the configuration components
-      for (DynProperty dynProp : dynComp.getProperties()) {
-        if (dynProp.getKey().equals(name)) {
-          
-          return dynComp;
+        Set<T> result = new HashSet<T>();
+        Object[] objs = context.locateServices(name);
+        if (objs != null) {
+            for (Object o : objs) {
+
+                result.add((T) o);
+            }
         }
-      }
+
+        return result;
     }
-    
-    return null;
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  public DynProperty getCurrentProperty(String name) {
+    /**
+     * {@inheritDoc}
+     */
+    public DynConfiguration getCurrentConfiguration() {
 
-    // Get current component from disk files
-    DynComponent dynComp = getCurrentComponent(name);
+        // Variable to store active dynamic configuration
+        DynConfiguration dynConf = new DynConfiguration();
+        dynConf.setActive(Boolean.TRUE);
 
-      // Search the property on the component
-      for (DynProperty dynProp : dynComp.getProperties()) {
-        if (dynProp.getKey().equals(name)) {
-          
-          return dynProp;
+        // Iterate all dynamic configurations components registered
+        for (DefaultDynamicConfiguration o : getComponents()) {
+            try {
+
+                // Invoke the read method of all components to get its
+                // properties
+                Class<? extends Object> c = o.getClass();
+                Method m = (Method) c.getMethod("read", new Class[0]);
+                DynPropertyList dynProps = (DynPropertyList) m.invoke(o,
+                        new Object[0]);
+
+                // Create a dynamic configuration object with component and
+                // properties
+                DynComponent dynComp = new DynComponent(c.getName(),
+                        o.getName(), dynProps);
+                dynConf.addComponent(dynComp);
+            } catch (NoSuchMethodException nsme) {
+
+                logger.log(Level.SEVERE,
+                        "No read method on dynamic configuration class", nsme);
+            } catch (InvocationTargetException ite) {
+
+                logger.log(
+                        Level.SEVERE,
+                        "Cannot invoke read method on dynamic configuration class",
+                        ite);
+            } catch (IllegalAccessException iae) {
+
+                logger.log(
+                        Level.SEVERE,
+                        "Cannot access read method on dynamic configuration class",
+                        iae);
+            }
         }
-      }
-    
-    return null;
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @SuppressWarnings("unchecked")
-  public void setCurrentConfiguration(DynConfiguration dynConf) {
 
-    // Iterate all dynamic configurations components registered
-    for (Object o : getComponents()) {
-      try {
-        
-        // Invoke the read method of all components to get its properties
-        Class<? extends Object> c = o.getClass();
+        return dynConf;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public DynComponent getCurrentComponent(String name) {
+
+        // TODO Two properties with same name can exist on different components
+
+        // Get current configuration from disk files
+        DynConfiguration dynConf = getCurrentConfiguration();
         for (DynComponent dynComp : dynConf.getComponents()) {
 
-          if (c.getName().equals(dynComp.getId())) {
+            // Search the property on the configuration components
+            for (DynProperty dynProp : dynComp.getProperties()) {
+                if (dynProp.getKey().equals(name)) {
 
-            Class[] t = new Class[1];
-            t[0] = DynPropertyList.class;
-            Method m = (Method) c.getMethod("write", t);
-            Object[] args = new Object[1];
-            args[0] = dynComp.getProperties();
-            m.invoke(o, args);
-          }
+                    return dynComp;
+                }
+            }
         }
-      }
-      catch (NoSuchMethodException nsme) {
 
-        logger.log(Level.SEVERE,
-            "No write method on dynamic configuration class", nsme);
-      }
-      catch (InvocationTargetException ite) {
-
-        logger.log(Level.SEVERE,
-            "Cannot invoke write method on dynamic configuration class", ite);
-      }
-      catch (IllegalAccessException iae) {
-
-        logger.log(Level.SEVERE,
-            "Cannot access write method on dynamic configuration class", iae);
-      }
+        return null;
     }
-  }
+
+    /**
+     * {@inheritDoc}
+     */
+    public DynProperty getCurrentProperty(String name) {
+
+        // Get current component from disk files
+        DynComponent dynComp = getCurrentComponent(name);
+
+        // Search the property on the component
+        for (DynProperty dynProp : dynComp.getProperties()) {
+            if (dynProp.getKey().equals(name)) {
+
+                return dynProp;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    public void setCurrentConfiguration(DynConfiguration dynConf) {
+
+        // Iterate all dynamic configurations components registered
+        for (Object o : getComponents()) {
+            try {
+
+                // Invoke the read method of all components to get its
+                // properties
+                Class<? extends Object> c = o.getClass();
+                for (DynComponent dynComp : dynConf.getComponents()) {
+
+                    if (c.getName().equals(dynComp.getId())) {
+
+                        Class[] t = new Class[1];
+                        t[0] = DynPropertyList.class;
+                        Method m = (Method) c.getMethod("write", t);
+                        Object[] args = new Object[1];
+                        args[0] = dynComp.getProperties();
+                        m.invoke(o, args);
+                    }
+                }
+            } catch (NoSuchMethodException nsme) {
+
+                logger.log(Level.SEVERE,
+                        "No write method on dynamic configuration class", nsme);
+            } catch (InvocationTargetException ite) {
+
+                logger.log(
+                        Level.SEVERE,
+                        "Cannot invoke write method on dynamic configuration class",
+                        ite);
+            } catch (IllegalAccessException iae) {
+
+                logger.log(
+                        Level.SEVERE,
+                        "Cannot access write method on dynamic configuration class",
+                        iae);
+            }
+        }
+    }
 
 }

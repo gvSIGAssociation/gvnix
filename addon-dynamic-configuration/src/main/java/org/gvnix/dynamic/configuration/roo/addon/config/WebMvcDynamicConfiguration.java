@@ -22,7 +22,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
 /**
- * Dynamic configuration manager of Web MVC Configuration XML. 
+ * Dynamic configuration manager of Web MVC Configuration XML.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -31,24 +31,24 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-public class WebMvcDynamicConfiguration extends XmlDynamicConfiguration implements
-    DefaultDynamicConfiguration {
+public class WebMvcDynamicConfiguration extends XmlDynamicConfiguration
+        implements DefaultDynamicConfiguration {
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getName() {
-    
-    return "Web MVC Configuration XML";
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getFilePath() {
+        return "Web MVC Configuration XML";
+    }
 
-    return "src/main/webapp/WEB-INF/spring/webmvc-config.xml";
-  }
-  
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getFilePath() {
+
+        return "src/main/webapp/WEB-INF/spring/webmvc-config.xml";
+    }
+
 }

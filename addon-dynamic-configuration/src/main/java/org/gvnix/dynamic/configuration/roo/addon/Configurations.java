@@ -35,129 +35,149 @@ import org.w3c.dom.Element;
  */
 public interface Configurations {
 
-  /**
-   * Add a dynamic configuration on the configuration file.
-   * 
-   * @param configs Dynamic configuration to store at configuration file
-   */
-  public void addConfiguration(DynConfiguration dynConf);
-  
-  /**
-   * Delete a configuration element from the configuration file.
-   * 
-   * @param conf Configuration element to delete 
-   */
-  public void deleteConfiguration(Element conf);
+    /**
+     * Add a dynamic configuration on the configuration file.
+     * 
+     * @param configs
+     *            Dynamic configuration to store at configuration file
+     */
+    public void addConfiguration(DynConfiguration dynConf);
 
-  /**
-   * Parse a configuration element to a dynamic configuration.
-   * <p>
-   * All configuration component properties will be processed if name is null.
-   * If name not null, only specified property name will be processed.
-   * </p>
-   * 
-   * @param conf Configuration element
-   * @param property Property name to parse or all if null
-   * @return Dynamic configuration
-   */
-  public DynConfiguration parseConfiguration(Element conf, String property);
+    /**
+     * Delete a configuration element from the configuration file.
+     * 
+     * @param conf
+     *            Configuration element to delete
+     */
+    public void deleteConfiguration(Element conf);
 
-  /**
-   * Parse a component element to a dynamic component.
-   * <p>
-   * All component properties will be processed if name is null. If name not
-   * null, only specified property name will be processed.
-   * </p>
-   * 
-   * @param comp Component element
-   * @param name Property name to parse or all if null
-   * @return Dynamic configuration
-   */
-  public DynComponent parseComponent(Element comp, String name);
-  
-  /**
-   * Parse a property element to a dynamic property.
-   * 
-   * @param prop Property element
-   * @return Dynamic property
-   */
-  public DynProperty parseProperty(Element prop);
-  
-  /**
-   * Save the document of an element on the configuration file.
-   * 
-   * @param conf Element of the document to save
-   */
-  public void saveConfiguration(Element elem);
-  
-  /**
-   * Find the first configuration element with given name. 
-   * 
-   * @param name Configuration element name
-   * @return Configuration element
-   */
-  public Element findConfiguration(String name);
-  
-  /**
-   * Get the base configuration from configuration.
-   * 
-   * @return Base configuration element
-   */
-  public Element getBaseConfiguration();
-  
-  /**
-   * Get all configuration elements. 
-   * 
-   * @return All configuration elements
-   */
-  public List<Element> getAllConfigurations();
+    /**
+     * Parse a configuration element to a dynamic configuration.
+     * <p>
+     * All configuration component properties will be processed if name is null.
+     * If name not null, only specified property name will be processed.
+     * </p>
+     * 
+     * @param conf
+     *            Configuration element
+     * @param property
+     *            Property name to parse or all if null
+     * @return Dynamic configuration
+     */
+    public DynConfiguration parseConfiguration(Element conf, String property);
 
-  /**
-   * Get all component elements or null if not exists.
-   * 
-   * @return All configuration elements or null.
-   */
-  public List<Element> getAllComponents();
+    /**
+     * Parse a component element to a dynamic component.
+     * <p>
+     * All component properties will be processed if name is null. If name not
+     * null, only specified property name will be processed.
+     * </p>
+     * 
+     * @param comp
+     *            Component element
+     * @param name
+     *            Property name to parse or all if null
+     * @return Dynamic configuration
+     */
+    public DynComponent parseComponent(Element comp, String name);
 
-  /**
-   * Get a property element from a configuration with some name.
-   * 
-   * @param configuration Configuration name
-   * @param property Property name
-   * @return Dynamic property
-   */
-  public Element getProperty(String configuration, String property);
-  
-  /**
-   * Get current dynamic configuration from configuration file.
-   * 
-   * @return Active dynamic configuration
-   */
-  public DynConfiguration getActiveConfiguration();
-  
-  /**
-   * Set the active configuration on the configuration file.
-   * 
-   * @param name Configuration name
-   */
-  public void setActiveConfiguration(String name);
+    /**
+     * Parse a property element to a dynamic property.
+     * 
+     * @param prop
+     *            Property element
+     * @return Dynamic property
+     */
+    public DynProperty parseProperty(Element prop);
 
-  /**
-   * Add a component property name and value on stored and base configurations.
-   * 
-   * @param name Property name
-   * @param value Property value
-   * @param compId Component id
-   * @param compName Component name
-   */
-  public void addProperties(String name, String value, String compId, String compName);
-  
-  /**
-   * Delete a component property name on stored and base configurations.
-   * 
-   * @param name Property name
-   * @param component Component id
-   */
-  public void deleteProperties(String name, String component);
+    /**
+     * Save the document of an element on the configuration file.
+     * 
+     * @param conf
+     *            Element of the document to save
+     */
+    public void saveConfiguration(Element elem);
+
+    /**
+     * Find the first configuration element with given name.
+     * 
+     * @param name
+     *            Configuration element name
+     * @return Configuration element
+     */
+    public Element findConfiguration(String name);
+
+    /**
+     * Get the base configuration from configuration.
+     * 
+     * @return Base configuration element
+     */
+    public Element getBaseConfiguration();
+
+    /**
+     * Get all configuration elements.
+     * 
+     * @return All configuration elements
+     */
+    public List<Element> getAllConfigurations();
+
+    /**
+     * Get all component elements or null if not exists.
+     * 
+     * @return All configuration elements or null.
+     */
+    public List<Element> getAllComponents();
+
+    /**
+     * Get a property element from a configuration with some name.
+     * 
+     * @param configuration
+     *            Configuration name
+     * @param property
+     *            Property name
+     * @return Dynamic property
+     */
+    public Element getProperty(String configuration, String property);
+
+    /**
+     * Get current dynamic configuration from configuration file.
+     * 
+     * @return Active dynamic configuration
+     */
+    public DynConfiguration getActiveConfiguration();
+
+    /**
+     * Set the active configuration on the configuration file.
+     * 
+     * @param name
+     *            Configuration name
+     */
+    public void setActiveConfiguration(String name);
+
+    /**
+     * Add a component property name and value on stored and base
+     * configurations.
+     * 
+     * @param name
+     *            Property name
+     * @param value
+     *            Property value
+     * @param compId
+     *            Component id
+     * @param compName
+     *            Component name
+     */
+    public void addProperties(String name, String value, String compId,
+            String compName);
+
+    /**
+     * Delete a component property name on stored and base configurations.
+     * 
+     * @param name
+     *            Property name
+     * @param component
+     *            Component id
+     */
+    public void deleteProperties(String name, String component);
 
 }

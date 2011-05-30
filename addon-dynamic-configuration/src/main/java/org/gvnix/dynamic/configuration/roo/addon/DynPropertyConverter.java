@@ -44,83 +44,87 @@ import org.springframework.roo.support.logging.HandlerUtils;
 @Component
 @Service
 public class DynPropertyConverter implements Converter {
-  
-  public static final String SOURCE_FILES = "source";
-  public static final String CONFIGURATION_FILE = "config";
 
-  private static final Logger logger = HandlerUtils.getLogger(DynPropertyConverter.class);
+    public static final String SOURCE_FILES = "source";
+    public static final String CONFIGURATION_FILE = "config";
 
-  @Reference private Services services;
-  @Reference private Operations operations;
-  @Reference private Configurations configurations;
-  
-  /**
-   * {@inheritDoc}
-   */
-  public Object convertFromText(String value, Class<?> requiredType,
-                                String optionContext) {
-    
-    // Create a dynamic property with key and without value
-    return new DynProperty(value, "");
-  }
+    private static final Logger logger = HandlerUtils
+            .getLogger(DynPropertyConverter.class);
 
-  /**
-   * {@inheritDoc}
-   */
-  public boolean getAllPossibleValues(List<String> completions,
-                                      Class<?> requiredType,
-                                      String existingData,
-                                      String optionContext, MethodTarget target) {
-    
-    // Option context mark property completions origin
-    if (CONFIGURATION_FILE.equals(optionContext)) {
-      
-      // Find all properties key from configuration file
-      DynConfiguration dynConf = configurations.parseConfiguration(configurations.getBaseConfiguration(), null);
-      return addPropertyCompletions(completions, dynConf);
+    @Reference
+    private Services services;
+    @Reference
+    private Operations operations;
+    @Reference
+    private Configurations configurations;
+
+    /**
+     * {@inheritDoc}
+     */
+    public Object convertFromText(String value, Class<?> requiredType,
+            String optionContext) {
+
+        // Create a dynamic property with key and without value
+        return new DynProperty(value, "");
     }
-    else if (SOURCE_FILES.equals(optionContext)) {
-      
-      // Find all properties key from files on disk
-      DynConfiguration dynConf = services.getCurrentConfiguration();
-      return addPropertyCompletions(completions, dynConf);
-    }
-    else {
-      
-      // No valid state
-      logger.log(Level.SEVERE, "Invalid property possible values context");
-      return false;
-    }
-  }
 
-  /**
-   * Add a dynamic configuration properties to completions list.
-   * 
-   * @param completions Completions list
-   * @param dynConf Dynamic configuration
-   * @return Completions list exists
-   */
-  private boolean addPropertyCompletions(List<String> completions,
-                                         DynConfiguration dynConf) {
-    boolean any = false;
-    for (DynComponent dynComp : dynConf.getComponents()) {
-      for (DynProperty dynProp : dynComp.getProperties()) {
+    /**
+     * {@inheritDoc}
+     */
+    public boolean getAllPossibleValues(List<String> completions,
+            Class<?> requiredType, String existingData, String optionContext,
+            MethodTarget target) {
 
-        completions.add(dynProp.getKey());
-        any = true;
-      }
+        // Option context mark property completions origin
+        if (CONFIGURATION_FILE.equals(optionContext)) {
+
+            // Find all properties key from configuration file
+            DynConfiguration dynConf = configurations.parseConfiguration(
+                    configurations.getBaseConfiguration(), null);
+            return addPropertyCompletions(completions, dynConf);
+        } else if (SOURCE_FILES.equals(optionContext)) {
+
+            // Find all properties key from files on disk
+            DynConfiguration dynConf = services.getCurrentConfiguration();
+            return addPropertyCompletions(completions, dynConf);
+        } else {
+
+            // No valid state
+            logger.log(Level.SEVERE, "Invalid property possible values context");
+            return false;
+        }
     }
-    
-    return any;
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  public boolean supports(Class<?> requiredType, String optionContext) {
-    
-    // This converter supports dynamic property
-    return DynProperty.class.isAssignableFrom(requiredType);
-  }
+    /**
+     * Add a dynamic configuration properties to completions list.
+     * 
+     * @param completions
+     *            Completions list
+     * @param dynConf
+     *            Dynamic configuration
+     * @return Completions list exists
+     */
+    private boolean addPropertyCompletions(List<String> completions,
+            DynConfiguration dynConf) {
+        boolean any = false;
+        for (DynComponent dynComp : dynConf.getComponents()) {
+            for (DynProperty dynProp : dynComp.getProperties()) {
+
+                completions.add(dynProp.getKey());
+                any = true;
+            }
+        }
+
+        return any;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean supports(Class<?> requiredType, String optionContext) {
+
+        // This converter supports dynamic property
+        return DynProperty.class.isAssignableFrom(requiredType);
+    }
 
 }

@@ -32,23 +32,23 @@ import org.apache.felix.scr.annotations.Service;
 @Component
 @Service
 public class DatabaseDynamicConfiguration extends
-    PropertiesDynamicConfiguration implements DefaultDynamicConfiguration {
+        PropertiesDynamicConfiguration implements DefaultDynamicConfiguration {
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getName() {
-    
-    return "Database Conection Properties";
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getFilePath() {
+        return "Database Conection Properties";
+    }
 
-    return "src/main/resources/META-INF/spring/database.properties";
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getFilePath() {
+
+        return "src/main/resources/META-INF/spring/database.properties";
+    }
 
 }

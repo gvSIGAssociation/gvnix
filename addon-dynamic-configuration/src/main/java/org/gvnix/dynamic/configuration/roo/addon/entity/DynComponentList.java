@@ -30,6 +30,6 @@ import java.util.ArrayList;
  */
 public class DynComponentList extends ArrayList<DynComponent> {
 
-  private static final long serialVersionUID = 5890548949957755428L;
+    private static final long serialVersionUID = 5890548949957755428L;
 
 }

@@ -31,19 +31,19 @@ import java.util.Iterator;
  */
 public class DynConfigurationList extends ArrayList<DynConfiguration> {
 
-  private static final long serialVersionUID = 7339101943396730003L;
+    private static final long serialVersionUID = 7339101943396730003L;
 
-  @Override
-  public String toString() {
-    
-    StringBuffer buffer = new StringBuffer();
-    
-    Iterator<DynConfiguration> iter = iterator();
-    while (iter.hasNext()) {
-      buffer.append(iter.next().toString());
+    @Override
+    public String toString() {
+
+        StringBuffer buffer = new StringBuffer();
+
+        Iterator<DynConfiguration> iter = iterator();
+        while (iter.hasNext()) {
+            buffer.append(iter.next().toString());
+        }
+
+        return buffer.toString();
     }
-    
-    return buffer.toString();
-  }
-  
+
 }

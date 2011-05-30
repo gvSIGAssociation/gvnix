@@ -39,51 +39,51 @@ import org.springframework.roo.shell.MethodTarget;
 @Component
 @Service
 public class DynConfigurationConverter implements Converter {
-  
-  @Reference private Operations operations;
 
-  /**
-   * {@inheritDoc}
-   */
-  public Object convertFromText(String value, Class<?> requiredType,
-                                String optionContext) {
-    
-    // Create a dynamic configuration with name only
-    return new DynConfiguration(value);
-  }
+    @Reference
+    private Operations operations;
 
-  /**
-   * {@inheritDoc}
-   */
-  public boolean getAllPossibleValues(List<String> completions,
-                                      Class<?> requiredType,
-                                      String existingData,
-                                      String optionContext, MethodTarget target) {
+    /**
+     * {@inheritDoc}
+     */
+    public Object convertFromText(String value, Class<?> requiredType,
+            String optionContext) {
 
-    // Find all stored configurations
-    DynConfigurationList dynConfs = operations.findConfigurations();
-    
-    // No stored configurations
-    if (dynConfs.isEmpty()) {
-      
-      return false;
+        // Create a dynamic configuration with name only
+        return new DynConfiguration(value);
     }
-    
-    // Add each configuration name to completions
-    for (DynConfiguration dynConf : dynConfs) {
-      completions.add(dynConf.getName()); 
-    }
-    
-    return true;
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  public boolean supports(Class<?> requiredType, String optionContext) {
-    
-    // This converter supports dynamic configuration
-    return DynConfiguration.class.isAssignableFrom(requiredType);
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public boolean getAllPossibleValues(List<String> completions,
+            Class<?> requiredType, String existingData, String optionContext,
+            MethodTarget target) {
+
+        // Find all stored configurations
+        DynConfigurationList dynConfs = operations.findConfigurations();
+
+        // No stored configurations
+        if (dynConfs.isEmpty()) {
+
+            return false;
+        }
+
+        // Add each configuration name to completions
+        for (DynConfiguration dynConf : dynConfs) {
+            completions.add(dynConf.getName());
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean supports(Class<?> requiredType, String optionContext) {
+
+        // This converter supports dynamic configuration
+        return DynConfiguration.class.isAssignableFrom(requiredType);
+    }
 
 }

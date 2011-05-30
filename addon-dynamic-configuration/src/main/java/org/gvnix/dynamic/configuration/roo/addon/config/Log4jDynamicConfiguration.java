@@ -22,7 +22,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
 /**
- * Dynamic configuration manager of log4j logging properties. 
+ * Dynamic configuration manager of log4j logging properties.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -32,23 +32,23 @@ import org.apache.felix.scr.annotations.Service;
 @Component
 @Service
 public class Log4jDynamicConfiguration extends PropertiesDynamicConfiguration
-    implements DefaultDynamicConfiguration {
+        implements DefaultDynamicConfiguration {
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getName() {
-    
-    return "Logging Service Properties";
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getFilePath() {
+        return "Logging Service Properties";
+    }
 
-    return "src/main/resources/log4j.properties";
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getFilePath() {
+
+        return "src/main/resources/log4j.properties";
+    }
 
 }

@@ -33,23 +33,25 @@ import org.springframework.roo.model.JavaType;
 @Component
 @Service
 public class WebServiceProxyDynamicConfiguration extends
-    AnnotationClassDynamicConfiguration implements DefaultDynamicConfiguration {
-  
-  /**
-   * {@inheritDoc}
-   */
-  public String getName() {
-    
-    return "gvNIX Web Service Proxy Annotations";
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected JavaType getAnnotationJavaType() {
-    
-    return new JavaType("org.gvnix.service.layer.roo.addon.annotations.GvNIXWebServiceProxy");
-  }
+        AnnotationClassDynamicConfiguration implements
+        DefaultDynamicConfiguration {
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
+
+        return "gvNIX Web Service Proxy Annotations";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected JavaType getAnnotationJavaType() {
+
+        return new JavaType(
+                "org.gvnix.service.layer.roo.addon.annotations.GvNIXWebServiceProxy");
+    }
 
 }

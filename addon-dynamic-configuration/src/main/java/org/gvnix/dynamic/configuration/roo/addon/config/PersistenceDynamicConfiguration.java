@@ -22,7 +22,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
 /**
- * Dynamic configuration manager of persistence XML. 
+ * Dynamic configuration manager of persistence XML.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -32,23 +32,23 @@ import org.apache.felix.scr.annotations.Service;
 @Component
 @Service
 public class PersistenceDynamicConfiguration extends XmlDynamicConfiguration
-    implements DefaultDynamicConfiguration {
+        implements DefaultDynamicConfiguration {
 
-  /**
-   * {@inheritDoc}
-   */
-  public String getName() {
-    
-    return "Persistence XML";
-  }
+    /**
+     * {@inheritDoc}
+     */
+    public String getName() {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getFilePath() {
+        return "Persistence XML";
+    }
 
-    return "src/main/resources/META-INF/persistence.xml";
-  }
-  
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getFilePath() {
+
+        return "src/main/resources/META-INF/persistence.xml";
+    }
+
 }

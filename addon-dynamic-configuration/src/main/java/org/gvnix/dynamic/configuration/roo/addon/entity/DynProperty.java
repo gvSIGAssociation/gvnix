@@ -28,58 +28,62 @@ package org.gvnix.dynamic.configuration.roo.addon.entity;
  */
 public class DynProperty {
 
-  private String key;
+    private String key;
 
-  private String value;
-  
-  
-  public DynProperty(String key, String value) {
-    super();
-    this.key = key;
-    this.value = value;
-  }
+    private String value;
 
-  public String getKey() {
-    return key;
-  }
-  
-  public void setKey(String key) {
-    this.key = key;
-  }
-  
-  public String getValue() {
-    return value;
-  }
-  
-  public void setValue(String value) {
-    this.value = value;
-  }
-
-  @Override
-  public String toString() {
-    return "DynProperty [key=" + key + ", value=" + value + "]";
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * Two properties are equal if their key and value are equals.
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    DynProperty other = (DynProperty) obj;
-    if (key == null) {
-      if (other.key != null) return false;
+    public DynProperty(String key, String value) {
+        super();
+        this.key = key;
+        this.value = value;
     }
-    else if (!key.equals(other.key)) return false;
-    if (value == null) {
-      if (other.value != null) return false;
+
+    public String getKey() {
+        return key;
     }
-    else if (!value.equals(other.value)) return false;
-    return true;
-  }
-  
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return "DynProperty [key=" + key + ", value=" + value + "]";
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Two properties are equal if their key and value are equals.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DynProperty other = (DynProperty) obj;
+        if (key == null) {
+            if (other.key != null)
+                return false;
+        } else if (!key.equals(other.key))
+            return false;
+        if (value == null) {
+            if (other.value != null)
+                return false;
+        } else if (!value.equals(other.value))
+            return false;
+        return true;
+    }
+
 }

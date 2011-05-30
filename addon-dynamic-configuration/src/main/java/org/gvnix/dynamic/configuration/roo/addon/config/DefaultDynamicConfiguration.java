@@ -18,8 +18,8 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 /**
  * Interface methods required by every manager of a dynamic configuration file.
  * <p>
- * The manager class is responsible of read and write the properties list of
- * the dynamic configuration file.
+ * The manager class is responsible of read and write the properties list of the
+ * dynamic configuration file.
  * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
@@ -29,25 +29,26 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
  */
 public interface DefaultDynamicConfiguration {
 
-  /**
-   * Reads a configuration file and generates a properties list.
-   *  
-   * @return File info getted from the original file.
-   */
-  DynPropertyList read();
+    /**
+     * Reads a configuration file and generates a properties list.
+     * 
+     * @return File info getted from the original file.
+     */
+    DynPropertyList read();
 
-  /**
-   * Update a configuration file with the values of the properties list.
-   * 
-   * @param file Info to be stored on the original file.
-   */
-  void write(DynPropertyList dynProperties);
-  
-  /**
-   * Get the dynamic configuration component name.
-   * 
-   * @return Dynamic configuration component name
-   */
-  String getName();
+    /**
+     * Update a configuration file with the values of the properties list.
+     * 
+     * @param file
+     *            Info to be stored on the original file.
+     */
+    void write(DynPropertyList dynProperties);
+
+    /**
+     * Get the dynamic configuration component name.
+     * 
+     * @return Dynamic configuration component name
+     */
+    String getName();
 
 }
