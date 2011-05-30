@@ -65,8 +65,8 @@
 
   <!-- CIT repository for tag and branch from mvn release:* commands and googlecode repository for upload from mvn deploy command -->
   <scm>
-    <connection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/trunk/code</connection>
-    <developerConnection>scm:svn:http://webdav.cop.gva.es/svn/gvnix/trunk/code</developerConnection>
+    <connection>scm:svn:http://scmcit.gva.es/svn/gvnix/trunk/code</connection>
+    <developerConnection>scm:svn:http://scmcit.gva.es/svn/gvnix/trunk/code</developerConnection>
     <url>http://code.google.com/p/gvnix/source/browse</url>
   </scm>
   <distributionManagement>
@@ -932,11 +932,11 @@
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <!-- this declaration is optional because we're using standart svn layout -->
           <tagBase>
-            http://webdav.cop.gva.es/svn/gvnix/tags
+            http://scmcit.gva.es/svn/gvnix/tags
           </tagBase>
           <!-- this declaration is optional because we're using standart svn layout -->
           <branchBase>
-            http://webdav.cop.gva.es/svn/gvnix/branches
+            http://scmcit.gva.es/svn/gvnix/branches
           </branchBase>
         </configuration>
       </plugin>

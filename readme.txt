@@ -161,7 +161,7 @@ Source code
 
 * Optional, package the source code release use the following command::
 
-   bash:/tmp$ svn export http://webdav.cop.gva.es/svn/gvnix/tags/{version}
+   bash:/tmp$ svn export http://scmcit.gva.es/svn/gvnix/tags/{version}
    
   Rename folder:
   
