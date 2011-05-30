@@ -25,16 +25,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.logging.Logger;
 
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
@@ -51,8 +52,6 @@ import org.springframework.roo.classpath.details.annotations.StringAttributeValu
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.itd.ItdSourceFileComposer;
-import org.springframework.roo.classpath.scanner.MemberDetails;
-import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.DataType;
@@ -60,6 +59,7 @@ import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
 
@@ -77,6 +77,10 @@ import org.springframework.roo.support.util.Assert;
  */
 public class PatternMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
+
+    private static final Logger logger = HandlerUtils
+            .getLogger(PatternMetadata.class);
+
     private static final String PROVIDES_TYPE_STRING = PatternMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
@@ -86,18 +90,14 @@ public class PatternMetadata extends
             GvNIXEntityBatch.class.getName());
 
     private WebScaffoldMetadata webScaffoldMetadata;
-    // TODO: annotationValues is Candidate to be removed
     private WebScaffoldAnnotationValues annotationValues;
-    private MemberDetails memberDetails;
     private JavaType formBackingType;
     private List<String> definedPatterns;
     SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata;
     private JavaTypeMetadataDetails javaTypeMetadataHolder;
     private List<MethodMetadata> controllerMethods;
 
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     private MetadataService metadataService;
-    private MemberDetailsScanner memberDetailsScanner;
     private PropFileOperations propFileOperations;
 
     public PatternMetadata(
@@ -106,11 +106,9 @@ public class PatternMetadata extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             WebScaffoldMetadata webScaffoldMetadata,
             WebScaffoldAnnotationValues annotationValues,
-            MemberDetails memberDetails,
             List<StringAttributeValue> definedPatterns,
+            List<MethodMetadata> controllerMethods,
             SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
-            MemberDetailsScanner memberDetailsScanner,
-            PhysicalTypeMetadataProvider physicalTypeMetadataProvider,
             MetadataService metadataService,
             PropFileOperations propFileOperations) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
@@ -118,7 +116,6 @@ public class PatternMetadata extends
                 + identifier + "' does not appear to be a valid");
         Assert.notNull(webScaffoldMetadata, "WebScaffoldMetadata required");
         Assert.notNull(annotationValues, "Annotation values required");
-        Assert.notNull(memberDetails, "Member details required");
         Assert.notNull(relatedApplicationTypeMetadata,
                 "Related application type metadata required");
         if (!isValid()) {
@@ -127,7 +124,7 @@ public class PatternMetadata extends
         this.webScaffoldMetadata = webScaffoldMetadata;
         this.annotationValues = annotationValues;
         this.formBackingType = annotationValues.getFormBackingObject();
-        this.memberDetails = memberDetails;
+        this.controllerMethods = controllerMethods;
         this.relatedApplicationTypeMetadata = relatedApplicationTypeMetadata;
         this.javaTypeMetadataHolder = relatedApplicationTypeMetadata
                 .get(formBackingType);
@@ -135,11 +132,8 @@ public class PatternMetadata extends
                 "Metadata holder required for form backing type: "
                         + formBackingType);
 
-        this.physicalTypeMetadataProvider = physicalTypeMetadataProvider;
         this.metadataService = metadataService;
-        this.memberDetailsScanner = memberDetailsScanner;
         this.propFileOperations = propFileOperations;
-        this.controllerMethods = getControllerMethods(governorPhysicalTypeMetadata);
 
         /*
          * TODO: Take care of attributes "create, update, delete" in
@@ -149,28 +143,27 @@ public class PatternMetadata extends
         for (StringAttributeValue definedPattern : definedPatterns) {
             definedPatternsList.add(definedPattern.getValue());
         }
-        boolean istabdefined = isTabularDefined(definedPatternsList);
-        if (istabdefined/* isTabularDefined(definedPatternsList) */) {
-            annotateFormBackingObject();
+
+        this.definedPatterns = Collections
+                .unmodifiableList(definedPatternsList);
+
+        if (isTabularDefined(definedPatternsList)) {
+            // annotateFormBackingObject();
             builder.addMethod(getCreateListMethod());
             builder.addMethod(getUpdateListMethod());
             builder.addMethod(getDeleteListMethod());
             builder.addMethod(getFilterListMethod());
             builder.addMethod(getRefererRedirectMethod());
+            builder.addField(getDefinedPatternField());
+            builder.addMethod(getIsPatternDefinedMethod());
             builder.addMethod(getTabularMethod());
+            // logger.warning(formBackingType.getSimpleTypeName().concat(
+            // " must be annotated with @GvNIXEntityBatch"));
         }
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
-        // System.out.println("*** " + this.hashCode() + " - " + this.getId());
-        // // + " imports: "
-        // // + builder.getImportRegistrationResolver()
-        // // .getRegisteredImports());
-        // System.out.println("*** " + this.hashCode() + " - " + istabdefined
-        // + " - " + definedPatternsList);
         new ItdSourceFileComposer(itdTypeDetails);
-        this.definedPatterns = Collections
-                .unmodifiableList(definedPatternsList);
     }
 
     /**
@@ -217,13 +210,41 @@ public class PatternMetadata extends
 
     /**
      * Update the annotations in formBackingType entity adding
-     * {@link GvNIXBatchEntity}
+     * {@link GvNIXBatchEntity}.
+     * <p>
+     * The method is <code>unused</code> until we find a way to invoke it
+     * without get any issues
      */
+    @SuppressWarnings("unused")
     private void annotateFormBackingObject() {
+
+        // Test if the annotation already exists on the target type
+        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getMutableTypeDetailsFormbakingObject();
+        AnnotationMetadata annotationMetadata = MemberFindingUtils
+                .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
+                        ENTITY_BATCH_ANNOTATION);
+
+        // Annotate formBackingType with GvNIXEntityBatch just if is not
+        // annotated already. We don't need to update attributes
+        if (annotationMetadata == null) {
+            // Prepare annotation builder
+            AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                    ENTITY_BATCH_ANNOTATION);
+            mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
+        }
+    }
+
+    /**
+     * Return the MutableClassOrInterfaceTypeDetails instance of the
+     * formbackingType
+     * 
+     * @return
+     */
+    private MutableClassOrInterfaceTypeDetails getMutableTypeDetailsFormbakingObject() {
         // Retrieve metadata for the Java source type the annotation is being
         // added to
-        String formBackingTypeId = physicalTypeMetadataProvider
-                .findIdentifier(formBackingType);
+        String formBackingTypeId = PhysicalTypeIdentifier.createIdentifier(
+                formBackingType, Path.SRC_MAIN_JAVA);
         if (formBackingTypeId == null) {
             throw new IllegalArgumentException("Cannot locate source for '"
                     + formBackingType.getFullyQualifiedTypeName() + "'");
@@ -249,21 +270,26 @@ public class PatternMetadata extends
                 physicalTypeDetails, "Java source code is immutable for type "
                         .concat(formBackingType.getFullyQualifiedTypeName()));
         MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
+        return mutableTypeDetails;
+    }
 
-        // Test if the annotation already exists on the target type
-        AnnotationMetadata annotationMetadata = MemberFindingUtils
-                .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
-                        ENTITY_BATCH_ANNOTATION);
+    private FieldMetadataBuilder getDefinedPatternField() {
 
-        // Annotate formBackingType with GvNIXEntityBatch just if is not
-        // annotated already. We don't need to update attributes since it
-        if (annotationMetadata == null) {
-            // Prepare annotation builder
-            AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
-                    ENTITY_BATCH_ANNOTATION);
-            mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
+        String definedPatternIds = "";
+        for (String definedPattern : definedPatterns) {
+            if (definedPatternIds.length() > 0) {
+                definedPatternIds = definedPatternIds.concat(", ");
+            }
+            definedPatternIds = definedPatternIds.concat("\"")
+                    .concat(definedPattern.split("=")[0]).concat("\"");
         }
 
+        JavaType stringArray = new JavaType(
+                JavaType.STRING_OBJECT.getFullyQualifiedTypeName(), 1,
+                DataType.TYPE, null, null);
+        return new FieldMetadataBuilder(getId(), Modifier.PRIVATE
+                | Modifier.STATIC, new JavaSymbolName("definedPatterns"),
+                stringArray, "{ ".concat(definedPatternIds).concat(" }"));
     }
 
     /**
@@ -319,20 +345,26 @@ public class PatternMetadata extends
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         String entityNamePlural = javaTypeMetadataHolder.getPlural();
+
+        bodyBuilder.appendFormalLine("if ( !isPatternDefined(pattern) ) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return \"redirect:/".concat(
+                entityNamePlural.toLowerCase()).concat("\";"));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
         List<JavaType> typeParams = new ArrayList<JavaType>();
         typeParams.add(formBackingType);
         JavaType javaUtilList = new JavaType("java.util.List", 0,
                 DataType.TYPE, null, typeParams);
         bodyBuilder.appendFormalLine(javaUtilList
-                .getFullyQualifiedTypeName()
-                // .getNameIncludingTypeParameters(false,
-                // builder.getImportRegistrationResolver())
+                .getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver())
                 .concat(" ")
                 .concat(entityNamePlural.toLowerCase())
                 .concat(" = ")
-                .concat(formBackingType.getFullyQualifiedTypeName())
-                // formBackingType.getNameIncludingTypeParameters(false,
-                // builder.getImportRegistrationResolver()))
+                .concat(formBackingType.getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver()))
                 .concat(".")
                 .concat(javaTypeMetadataHolder.getPersistenceDetails()
                         .getFindAllMethod().getMethodName().getSymbolName()
@@ -388,6 +420,57 @@ public class PatternMetadata extends
                 .addProperties(Path.SRC_MAIN_WEBAPP,
                         "/WEB-INF/i18n/application.properties", properties,
                         true, false);
+        return method;
+    }
+
+    private MethodMetadata getIsPatternDefinedMethod() {
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("isPatternDefined");
+
+        // Define method parameter types
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        parameterTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT, null));
+
+        // Check if a method with the same signature already exists in the
+        // target type
+        MethodMetadata method = methodExists(methodName, parameterTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method parameter names
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
+        parameterNames.add(new JavaSymbolName("pattern"));
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        // List<String> definedPatternsList = Arrays.asList(definedPatterns);
+        List<JavaType> typeParams = new ArrayList<JavaType>();
+        typeParams.add(JavaType.STRING_OBJECT);
+        JavaType javaUtilList = new JavaType("java.util.List", 0,
+                DataType.TYPE, null, typeParams);
+        JavaType javaUtilArrays = new JavaType("java.util.Arrays", 0,
+                DataType.TYPE, null, null);
+        bodyBuilder.appendFormalLine(javaUtilList
+                .getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver())
+                .concat(" definedPatternsList = ")
+                .concat(javaUtilArrays.getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver()).concat(
+                        ".asList(definedPatterns);")));
+        bodyBuilder
+                .appendFormalLine("return definedPatternsList.contains(pattern);");
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName,
+                JavaType.BOOLEAN_PRIMITIVE, parameterTypes, parameterNames,
+                bodyBuilder);
+
+        method = methodBuilder.build();
+        controllerMethods.add(method);
         return method;
     }
 
@@ -638,21 +721,18 @@ public class PatternMetadata extends
         bodyBuilder
                 .appendFormalLine("String referer = httpServletRequest.getHeader(\"Referer\");");
 
-        bodyBuilder
-                .appendFormalLine("if (!org.springframework.util.StringUtils.hasText(referer)) {");
+        JavaType stringUtils = new JavaType(
+                "org.springframework.util.StringUtils");
+        bodyBuilder.appendFormalLine("if (!".concat(
+                stringUtils.getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver())).concat(
+                ".hasText(referer)) {"));
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("return null;");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
         bodyBuilder.appendFormalLine("return \"redirect:\".concat(referer);");
-
-        // ImportRegistrationResolver gives access to imports in the
-        // Java/AspectJ source
-        // ImportRegistrationResolver irr = builder
-        // .getImportRegistrationResolver();
-        // We need import org.springframework.util.StringUtils
-        // irr.addImport(new JavaType("org.springframework.util.StringUtils"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
@@ -769,7 +849,8 @@ public class PatternMetadata extends
         bodyBuilder.appendFormalLine("if ( !bindingResult.hasErrors() ) {");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine(formBackingType
-                .getFullyQualifiedTypeName().concat(".")
+                .getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver()).concat(".")
                 .concat(persistenceMethod.getName())
                 .concat("(filterList(entities));"));
         bodyBuilder.indentRemove();
@@ -803,29 +884,12 @@ public class PatternMetadata extends
         return null;
     }
 
-    /**
-     * Populate the list of existing methods in Controller
-     * 
-     * @param physicalTypeMetadata
-     * @return
-     */
-    private List<MethodMetadata> getControllerMethods(
-            PhysicalTypeMetadata physicalTypeMetadata) {
-        ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeMetadata
-                .getMemberHoldingTypeDetails();
-        if (classOrInterfaceTypeDetails == null) {
-            // Abort if the type's class details aren't available (parse error
-            // etc)
-            return null;
-        }
-        return MemberFindingUtils.getMethods(memberDetailsScanner
-                .getMemberDetails(getClass().getName(),
-                        classOrInterfaceTypeDetails));
-
-    }
-
     public WebScaffoldMetadata getWebScaffoldMetadata() {
         return this.webScaffoldMetadata;
+    }
+
+    public SortedMap<JavaType, JavaTypeMetadataDetails> getRelatedApplicationTypeMetadata() {
+        return this.relatedApplicationTypeMetadata;
     }
 
     public List<String> getDefinedPatterns() {

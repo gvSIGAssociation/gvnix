@@ -75,6 +75,12 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
             RooWebScaffold.class.getName());
 
     /**
+     * {@link GvNIXEntityBatch} JavaType
+     */
+    public static final JavaType ENTITYBATCH_ANNOTATION = new JavaType(
+            GvNIXEntityBatch.class.getName());
+
+    /**
      * MetadataService offers access to Roo's metadata model, use it to retrieve
      * any available metadata by its MID
      */
@@ -207,6 +213,74 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
             mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
         }
 
+        annotateFormBackingObject(mutableTypeDetails);
+
+    }
+
+    private void annotateFormBackingObject(
+            MutableClassOrInterfaceTypeDetails mutableTypeDetails) {
+        AnnotationMetadata rooWebScaffoldAnnotationMetadata = MemberFindingUtils
+                .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
+                        ROOWEBSCAFFOLD_ANNOTATION);
+
+        AnnotationAttributeValue<?> formbakingObjectAttValue = rooWebScaffoldAnnotationMetadata
+                .getAttribute(new JavaSymbolName("formBackingObject"));
+
+        JavaType formBakingObjectType = (JavaType) formbakingObjectAttValue
+                .getValue();
+        Assert.notNull(formBakingObjectType,
+                "formBakingObject attribute of RooWebScaffold in "
+                        + mutableTypeDetails.getName().getSimpleTypeName()
+                        + " must be set");
+
+        // Retrieve metadata for the Java source type the annotation is being
+        // added to
+        String formBackingTypeId = physicalTypeMetadataProvider
+                .findIdentifier(formBakingObjectType);
+        if (formBackingTypeId == null) {
+            throw new IllegalArgumentException("Cannot locate source for '"
+                    + formBakingObjectType.getFullyQualifiedTypeName() + "'");
+        }
+
+        // Obtain the physical type and itd mutable details
+        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+                .get(formBackingTypeId, true);
+        Assert.notNull(physicalTypeMetadata,
+                "Java source code unavailable for type "
+                        .concat(formBakingObjectType
+                                .getFullyQualifiedTypeName()));
+
+        // Obtain physical type details for the target type
+        PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
+                .getMemberHoldingTypeDetails();
+        Assert.notNull(physicalTypeDetails,
+                "Java source code details unavailable for type "
+                        .concat(formBakingObjectType
+                                .getFullyQualifiedTypeName()));
+
+        // Test if the type is an MutableClassOrInterfaceTypeDetails instance so
+        // the annotation can be added
+        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+                physicalTypeDetails, "Java source code is immutable for type "
+                        .concat(formBakingObjectType
+                                .getFullyQualifiedTypeName()));
+
+        // Test if the annotation already exists on the target type
+        MutableClassOrInterfaceTypeDetails formBakingObjectMutableTypeDetails = (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
+        AnnotationMetadata annotationMetadata = MemberFindingUtils
+                .getAnnotationOfType(
+                        formBakingObjectMutableTypeDetails.getAnnotations(),
+                        ENTITYBATCH_ANNOTATION);
+
+        // Annotate formBackingType with GvNIXEntityBatch just if is not
+        // annotated already. We don't need to update attributes
+        if (annotationMetadata == null) {
+            // Prepare annotation builder
+            AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                    ENTITYBATCH_ANNOTATION);
+            formBakingObjectMutableTypeDetails
+                    .addTypeAnnotation(annotationBuilder.build());
+        }
     }
 
     /**

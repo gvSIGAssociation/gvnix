@@ -34,19 +34,22 @@ import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataServi
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadataProvider;
+import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ItdTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
+import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
-import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
+import org.springframework.roo.classpath.itd.AbstractMemberDiscoveringItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaSymbolName;
@@ -62,6 +65,7 @@ import org.springframework.roo.support.util.Assert;
  * services needed by the metadata type. Register metadata triggers and
  * dependencies here. Also define the unique add-on ITD identifier.
  * 
+ * 
  * @author Oscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -70,7 +74,8 @@ import org.springframework.roo.support.util.Assert;
  */
 @Component(immediate = true)
 @Service
-public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
+public final class PatternMetadataProvider extends
+        AbstractMemberDiscoveringItdMetadataProvider {
     private static final Logger logger = HandlerUtils
             .getLogger(PatternMetadataProvider.class);
 
@@ -90,6 +95,12 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
      */
     public static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(
             RooWebScaffold.class.getName());
+
+    /**
+     * {@link GvNIXEntityBatch} JavaType
+     */
+    public static final JavaType ENTITYBATCH_ANNOTATION = new JavaType(
+            GvNIXEntityBatch.class.getName());
 
     @Reference
     private TypeLocationService typeLocationService;
@@ -122,6 +133,9 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
      *            container (ie find out if certain bundles are active)
      */
     protected void activate(ComponentContext context) {
+        // next line adding a notification listener over this class allow method
+        // getLocalMidToRequest(ItdTypeDetails) to be invoked
+        metadataDependencyRegistry.addNotificationListener(this);
         metadataDependencyRegistry.registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
@@ -138,10 +152,71 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
      *            container (ie find out if certain bundles are active)
      */
     protected void deactivate(ComponentContext context) {
+        metadataDependencyRegistry.removeNotificationListener(this);
         metadataDependencyRegistry.deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
         removeMetadataTrigger(new JavaType(GvNIXPattern.class.getName()));
+    }
+
+    /**
+     * TODO: try to implement again this method optimizing the way we're
+     * deciding if we're interested or not in the JavaType.<br/>
+     * Other examples in
+     * FinderMetadataProviderImpl#getLocalMidToRequest(ItdTypeDetails)
+     */
+    @Override
+    protected String getLocalMidToRequest(ItdTypeDetails itdTypeDetails) {
+        // Determine the governor for this ITD, and whether any metadata is even
+        // hoping to hear about changes to that JavaType and its ITDs
+        JavaType governor = itdTypeDetails.getName();
+        if (hasGvNIXEntityBatch(governor)) {
+            // Not interested in this JavaType, so let's move on
+            // return null;
+            return getLocalMid(itdTypeDetails);
+        }
+
+        // Because localMid is not null, we know that it is a
+        // return localMid;
+        return null;
+    }
+
+    private boolean hasGvNIXEntityBatch(JavaType entity) {
+        String formBackingTypeId = physicalTypeMetadataProvider
+                .findIdentifier(entity);
+        if (formBackingTypeId == null) {
+            throw new IllegalArgumentException("Cannot locate source for '"
+                    + entity.getFullyQualifiedTypeName() + "'");
+        }
+
+        // Obtain the physical type and itd mutable details
+        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+                .get(formBackingTypeId, true);
+        Assert.notNull(physicalTypeMetadata,
+                "Java source code unavailable for type ".concat(entity
+                        .getFullyQualifiedTypeName()));
+
+        // Obtain physical type details for the target type
+        PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
+                .getMemberHoldingTypeDetails();
+        Assert.notNull(physicalTypeDetails,
+                "Java source code details unavailable for type ".concat(entity
+                        .getFullyQualifiedTypeName()));
+
+        // Test if the type is an MutableClassOrInterfaceTypeDetails instance so
+        // the annotation can be added
+        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+                physicalTypeDetails, "Java source code is immutable for type "
+                        .concat(entity.getFullyQualifiedTypeName()));
+
+        // Test if the annotation already exists on the target type
+        MutableClassOrInterfaceTypeDetails formBakingObjectMutableTypeDetails = (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
+        AnnotationMetadata annotationMetadata = MemberFindingUtils
+                .getAnnotationOfType(
+                        formBakingObjectMutableTypeDetails.getAnnotations(),
+                        ENTITYBATCH_ANNOTATION);
+
+        return (annotationMetadata != null);
     }
 
     /**
@@ -153,9 +228,6 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
 
-        // Setup project for use annotation
-        configService.setup();
-
         // We need to parse the annotation, which we expect to be present
         WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
                 governorPhysicalTypeMetadata);
@@ -164,6 +236,9 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
                 || governorPhysicalTypeMetadata.getMemberHoldingTypeDetails() == null) {
             return null;
         }
+
+        // Setup project for use annotation
+        configService.setup();
 
         JavaType controllerType = PatternMetadata
                 .getJavaType(metadataIdentificationString);
@@ -185,8 +260,8 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
             return null;
         }
 
-        metadataDependencyRegistry.registerDependency(webScaffoldMetadataKey,
-                metadataIdentificationString);
+        // metadataDependencyRegistry.registerDependency(webScaffoldMetadataKey,
+        // metadataIdentificationString);
 
         // We know governor type details are non-null and can be safely cast
         ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
@@ -261,9 +336,9 @@ public final class PatternMetadataProvider extends AbstractItdMetadataProvider {
         // Pass dependencies required by the metadata in through its constructor
         return new PatternMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, webScaffoldMetadata,
-                annotationValues, memberDetails, patternList,
-                relatedApplicationTypeMetadata, memberDetailsScanner,
-                physicalTypeMetadataProvider, metadataService,
+                annotationValues, patternList,
+                MemberFindingUtils.getMethods(memberDetails),
+                relatedApplicationTypeMetadata, metadataService,
                 propFileOperations);
     }
 

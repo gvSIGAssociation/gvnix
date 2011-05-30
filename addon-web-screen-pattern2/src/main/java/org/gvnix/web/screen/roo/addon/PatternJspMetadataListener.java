@@ -148,9 +148,8 @@ public class PatternJspMetadataListener implements MetadataProvider,
             return null;
         }
 
-        relatedDomainTypes = webMetadataService
-                .getRelatedApplicationTypeMetadata(formbackingType,
-                        memberDetails, metadataIdentificationString);
+        relatedDomainTypes = patternMetadata
+                .getRelatedApplicationTypeMetadata();
         Assert.notNull(relatedDomainTypes, "Related domain types required");
 
         formbackingTypeMetadata = relatedDomainTypes.get(formbackingType);
@@ -201,7 +200,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
             }
         }
 
-        // We should now have an instance-specific "downstream dependency" that
+        // We should now have an instance-specific "downstream dependency"that
         // can be processed by this class
         Assert.isTrue(
                 MetadataIdentificationUtils.getMetadataClass(
@@ -213,11 +212,6 @@ public class PatternJspMetadataListener implements MetadataProvider,
                         + "' to this provider (which uses '"
                         + getProvidesType() + "'");
 
-        /*
-         * metadataService.evict(downstreamDependency); if
-         * (get(downstreamDependency) != null) {
-         * metadataDependencyRegistry.notifyDownstream(downstreamDependency); }
-         */
         metadataService.get(downstreamDependency, true);
 
     }
@@ -257,7 +251,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
          * TODO: next test may be replaced by a test over allow or not create
          * operation of the entity
          */
-        if (true) {
+        if (patternNameType[1].equalsIgnoreCase("table")) {
             String patternPath = destinationDirectory.concat("/")
                     .concat(patternNameType[0]).concat(".jspx");
             writeToDiskIfNecessary(patternPath, getUpdateDocument());
@@ -283,7 +277,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
                     "menu_list_tabular_" + patternNameType[0],
                     new JavaSymbolName(formbackingType.getSimpleTypeName())
                             .getReadableSymbolName()
-                            + "list tabular "
+                            + " list tabular "
                             + patternNameType[0]);
             properties.put(
                     "menu_item_" + categoryName.getSymbolName().toLowerCase()
@@ -291,7 +285,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
                             + "_label",
                     new JavaSymbolName(formbackingType.getSimpleTypeName())
                             .getReadableSymbolName()
-                            + "list tabular "
+                            + " list tabular "
                             + patternNameType[0]);
             propFileOperations.addProperties(Path.SRC_MAIN_WEBAPP,
                     "/WEB-INF/i18n/application.properties", properties, true,
