@@ -423,7 +423,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
                                             .getFullyQualifiedTypeName())
                                     .concat(".").concat(fieldName))).build();
             Element li = new XmlElementBuilder("li", document)
-                    .addAttribute("class", "size40")
+                    .addAttribute("class", "size120")
                     .addAttribute(
                             "id",
                             XmlUtils.convertId("li:"
@@ -506,6 +506,15 @@ public class PatternJspMetadataListener implements MetadataProvider,
         // TODO: add properties needed by artifacts
         // Detected: message_alert_title, message_info_title,
         // message_error_title
+        Map<String, String> properties = new LinkedHashMap<String, String>();
+        properties.put("message_alert_title", "Alert");
+        properties.put("message_info_title", "Information");
+        properties.put("message_error_title", "Error");
+
+        propFileOperations
+                .addProperties(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/i18n/application.properties", properties,
+                        true, false);
 
     }
 
