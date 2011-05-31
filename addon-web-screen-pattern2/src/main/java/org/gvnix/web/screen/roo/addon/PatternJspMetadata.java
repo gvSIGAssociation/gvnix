@@ -1,8 +1,20 @@
 /*
- * Copyright 2011 DiSiD Technologies S.L.L. All rights reserved.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
  *
- * Project  : DiSiD org.gvnix.web.screen.roo.addon2
- * SVN Id   : $Id$
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.screen.roo.addon;
 
@@ -14,6 +26,18 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
 
+/**
+ * Metadata built from {@link PatternMetadata}. The metadata identifier for a
+ * {@link PatternJspMetadata} is the fully qualifier name of the controller, and
+ * the source {@link Path} of the controller. This can be created using
+ * {@link #createIdentifier(JavaType, Path)}.
+ * 
+ * @author Óscar Rovira (orovira at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * @since 0.8
+ */
 public class PatternJspMetadata extends AbstractMetadataItem {
 
     private static final String PROVIDES_TYPE_STRING = PatternJspMetadata.class

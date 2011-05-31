@@ -213,7 +213,9 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
             mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
         }
 
-        annotateFormBackingObject(mutableTypeDetails);
+        if (pattern.equals(WebPattern.tabular)) {
+            annotateFormBackingObject(mutableTypeDetails);
+        }
 
     }
 

@@ -1,8 +1,20 @@
 /*
- * Copyright 2011 DiSiD Technologies S.L.L. All rights reserved.
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
  *
- * Project  : DiSiD org.gvnix.web.screen.roo.addon2
- * SVN Id   : $Id$
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.screen.roo.addon;
 
@@ -68,6 +80,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+/**
+ * This Listener produces MVC artifacts for a given pattern
+ * 
+ * @author Óscar Rovira (orovira at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * @since 0.8
+ */
 @Component(immediate = true)
 @Service
 public class PatternJspMetadataListener implements MetadataProvider,
@@ -251,47 +272,207 @@ public class PatternJspMetadataListener implements MetadataProvider,
          * TODO: next test may be replaced by a test over allow or not create
          * operation of the entity
          */
-        if (patternNameType[1].equalsIgnoreCase("table")) {
-            String patternPath = destinationDirectory.concat("/")
-                    .concat(patternNameType[0]).concat(".jspx");
-            writeToDiskIfNecessary(patternPath, getUpdateDocument());
-            // add view to views.xml
-            tilesOperations.addViewDefinition(controllerPath, controllerPath
-                    + "/" + patternNameType[0],
-                    TilesOperations.DEFAULT_TEMPLATE, "/WEB-INF/views/"
-                            + controllerPath + "/" + patternNameType[0]
-                            + ".jspx");
-            // add entry to menu.jspx
-            JavaSymbolName categoryName = new JavaSymbolName(
-                    formbackingType.getSimpleTypeName());
-            JavaSymbolName menuItemId = new JavaSymbolName(
-                    "list_tabular_".concat(patternNameType[0]));
-            menuOperations.addMenuItem(categoryName, menuItemId,
-                    "menu_list_tabular_" + patternNameType[0], "/"
-                            + controllerPath + "?gvnixpattern="
-                            + patternNameType[0],
-                    MenuOperations.DEFAULT_MENU_ITEM_PREFIX);
-            // add needed properties
-            Map<String, String> properties = new LinkedHashMap<String, String>();
-            properties.put(
-                    "menu_list_tabular_" + patternNameType[0],
-                    new JavaSymbolName(formbackingType.getSimpleTypeName())
-                            .getReadableSymbolName()
-                            + " list tabular "
-                            + patternNameType[0]);
-            properties.put(
-                    "menu_item_" + categoryName.getSymbolName().toLowerCase()
-                            + "_" + menuItemId.getSymbolName().toLowerCase()
-                            + "_label",
-                    new JavaSymbolName(formbackingType.getSimpleTypeName())
-                            .getReadableSymbolName()
-                            + " list tabular "
-                            + patternNameType[0]);
-            propFileOperations.addProperties(Path.SRC_MAIN_WEBAPP,
-                    "/WEB-INF/i18n/application.properties", properties, true,
-                    false);
+        if (patternNameType[1].equalsIgnoreCase(WebPattern.tabular.name())) {
+            installPatternTypeArtifact(WebPattern.tabular,
+                    destinationDirectory, controllerPath, patternNameType[0]);
+        } else if (patternNameType[1].equalsIgnoreCase(WebPattern.register
+                .name())) {
+            installPatternTypeArtifact(WebPattern.register,
+                    destinationDirectory, controllerPath, patternNameType[0]);
+        } else {
+            // Pattern type not supported. Nothing to do
         }
 
+    }
+
+    private void installPatternTypeArtifact(WebPattern patternType,
+            String destinationDirectory, String controllerPath,
+            String patternName) {
+        String patternTypeStr = patternType.name();
+        String patternPath = destinationDirectory.concat("/")
+                .concat(patternName).concat(".jspx");
+        Document jspDoc = patternType.equals(WebPattern.tabular) ? getUpdateDocument()
+                : getRegisterDocument();
+        writeToDiskIfNecessary(patternPath, jspDoc);
+        // add view to views.xml
+        tilesOperations.addViewDefinition(controllerPath, controllerPath + "/"
+                + patternName, TilesOperations.DEFAULT_TEMPLATE,
+                "/WEB-INF/views/" + controllerPath + "/" + patternName
+                        + ".jspx");
+        // add entry to menu.jspx
+        JavaSymbolName categoryName = new JavaSymbolName(
+                formbackingType.getSimpleTypeName());
+        JavaSymbolName menuItemId = new JavaSymbolName("list_"
+                .concat(patternTypeStr).concat("_").concat(patternName));
+        String queryString = patternType.equals(WebPattern.tabular) ? "?gvnixpattern="
+                .concat(patternName) : "?gvnixpattern=".concat(patternName)
+                .concat("&index=1");
+        menuOperations.addMenuItem(categoryName, menuItemId, "menu_list_"
+                .concat(patternTypeStr).concat("_").concat(patternName), "/"
+                + controllerPath + queryString,
+                MenuOperations.DEFAULT_MENU_ITEM_PREFIX);
+        // add needed properties
+        Map<String, String> properties = new LinkedHashMap<String, String>();
+        properties.put(
+                "menu_list_".concat(patternTypeStr).concat("_")
+                        .concat(patternName),
+                new JavaSymbolName(formbackingType.getSimpleTypeName())
+                        .getReadableSymbolName()
+                        + " list ".concat(patternTypeStr).concat(" ")
+                        + patternName);
+        properties.put(
+                "menu_item_" + categoryName.getSymbolName().toLowerCase() + "_"
+                        + menuItemId.getSymbolName().toLowerCase() + "_label",
+                new JavaSymbolName(formbackingType.getSimpleTypeName())
+                        .getReadableSymbolName()
+                        + " list ".concat(patternTypeStr).concat(" ")
+                        + patternName);
+        propFileOperations
+                .addProperties(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/i18n/application.properties", properties,
+                        true, false);
+    }
+
+    private Document getRegisterDocument() {
+        String controllerPath = webScaffoldAnnotationValues.getPath();
+        Assert.notNull(controllerPath,
+                "Path is not specified in the @RooWebScaffold annotation for '"
+                        + webScaffoldAnnotationValues.getGovernorTypeDetails()
+                                .getName() + "'");
+        if (!controllerPath.startsWith("/")) {
+            controllerPath = "/".concat(controllerPath);
+        }
+
+        DocumentBuilder builder = XmlUtils.getDocumentBuilder();
+        Document document = builder.newDocument();
+
+        // Add document namespaces
+        Element div = (Element) document.appendChild(new XmlElementBuilder(
+                "div", document)
+                .addAttribute("xmlns:field",
+                        "urn:jsptagdir:/WEB-INF/tags/form/fields")
+                .addAttribute("xmlns:page",
+                        "urn:jsptagdir:/WEB-INF/tags/pattern/form")
+                .addAttribute("xmlns:jsp", "http://java.sun.com/JSP/Page")
+                .addAttribute("version", "2.0")
+                .addChild(
+                        new XmlElementBuilder("jsp:directive.page", document)
+                                .addAttribute("contentType",
+                                        "text/html;charset=UTF-8").build())
+                .addChild(
+                        new XmlElementBuilder("jsp:output", document)
+                                .addAttribute("omit-xml-declaration", "yes")
+                                .build()).build());
+
+        Element pageShow = new XmlElementBuilder("page:show", document)
+                .addAttribute(
+                        "id",
+                        XmlUtils.convertId("ps:"
+                                + formbackingType.getFullyQualifiedTypeName()))
+                .addAttribute(
+                        "object",
+                        "${"
+                                + formbackingTypeMetadata.getPlural()
+                                        .toLowerCase() + "}")
+                .addAttribute("path", controllerPath).build();
+        if (!webScaffoldAnnotationValues.isCreate()) {
+            pageShow.setAttribute("create", "false");
+        }
+        if (!webScaffoldAnnotationValues.isUpdate()) {
+            pageShow.setAttribute("update", "false");
+        }
+        if (!webScaffoldAnnotationValues.isDelete()) {
+            pageShow.setAttribute("delete", "false");
+        }
+        pageShow.setAttribute("z",
+                XmlRoundTripUtils.calculateUniqueKeyFor(pageShow));
+
+        Element divContentPane = new XmlElementBuilder("div", document)
+                .addAttribute(
+                        "id",
+                        XmlUtils.convertId("div:"
+                                + formbackingType.getFullyQualifiedTypeName()
+                                + "_contetnPane"))
+                .addAttribute("class", "patternContentPane").build();
+
+        Element divForm = new XmlElementBuilder("div", document)
+                .addAttribute(
+                        "id",
+                        XmlUtils.convertId("div:"
+                                + formbackingType.getFullyQualifiedTypeName()
+                                + "_formNoedit"))
+                .addAttribute("class", "formularios boxNoedit").build();
+
+        divContentPane.appendChild(divForm);
+
+        // Add field:display elements for each field
+        for (FieldMetadata field : eligibleFields) {
+            // Ignoring java.util.Map field types (see ROO-194)
+            if (field.getFieldType().equals(new JavaType(Map.class.getName()))) {
+                continue;
+            }
+            String fieldName = uncapitalize(field.getFieldName()
+                    .getSymbolName());
+
+            Element ul = new XmlElementBuilder("ul", document)
+                    .addAttribute("class", "formInline")
+                    .addAttribute(
+                            "id",
+                            XmlUtils.convertId("ul:"
+                                    .concat(formbackingType
+                                            .getFullyQualifiedTypeName())
+                                    .concat(".").concat(fieldName))).build();
+            Element li = new XmlElementBuilder("li", document)
+                    .addAttribute("class", "size40")
+                    .addAttribute(
+                            "id",
+                            XmlUtils.convertId("li:"
+                                    .concat(formbackingType
+                                            .getFullyQualifiedTypeName())
+                                    .concat(".").concat(fieldName))).build();
+            ul.appendChild(li);
+
+            Element fieldDisplay = new XmlElementBuilder("field:display",
+                    document)
+                    .addAttribute(
+                            "id",
+                            XmlUtils.convertId("s:"
+                                    + formbackingType
+                                            .getFullyQualifiedTypeName() + "."
+                                    + field.getFieldName().getSymbolName()))
+                    .addAttribute(
+                            "object",
+                            "${"
+                                    + formbackingTypeMetadata.getPlural()
+                                            .toLowerCase() + "}")
+                    .addAttribute("field", fieldName).build();
+            if (field.getFieldType().equals(new JavaType(Date.class.getName()))) {
+                fieldDisplay.setAttribute("date", "true");
+                fieldDisplay.setAttribute("dateTimePattern", "${" + entityName
+                        + "_" + fieldName.toLowerCase() + "_date_format}");
+            } else if (field.getFieldType().equals(
+                    new JavaType(Calendar.class.getName()))) {
+                fieldDisplay.setAttribute("calendar", "true");
+                fieldDisplay.setAttribute("dateTimePattern", "${" + entityName
+                        + "_" + fieldName.toLowerCase() + "_date_format}");
+            } else if (field.getFieldType().isCommonCollectionType()
+                    && field.getCustomData().get(
+                            PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) != null) {
+                continue;
+            }
+            fieldDisplay.setAttribute("z",
+                    XmlRoundTripUtils.calculateUniqueKeyFor(fieldDisplay));
+
+            li.appendChild(fieldDisplay);
+            divForm.appendChild(ul);
+        }
+
+        pageShow.appendChild(divContentPane);
+
+        // div.appendChild(messageBox);
+        div.appendChild(pageShow);
+
+        return document;
     }
 
     /**
@@ -315,9 +496,9 @@ public class PatternJspMetadataListener implements MetadataProvider,
         copyDirectoryContents("tags/pattern/form/*.tagx",
                 pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
                         "/WEB-INF/tags/pattern/form"));
-        copyDirectoryContents("tags/pattern/form/field/*.tagx",
+        copyDirectoryContents("tags/pattern/form/fields/*.tagx",
                 pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-                        "/WEB-INF/tags/pattern/form/field"));
+                        "/WEB-INF/tags/pattern/form/fields"));
 
         // modify load-scripts.tagx
         modifyLoadScriptsTagx();
@@ -547,15 +728,6 @@ public class PatternJspMetadataListener implements MetadataProvider,
         if (!controllerPath.startsWith("/")) {
             controllerPath = "/".concat(controllerPath);
         }
-        // JavaTypeMetadataDetails formbackingTypeMetadata = relatedDomainTypes
-        // .get(formbackingType);
-        // Assert.notNull(formbackingTypeMetadata,
-        // "Form backing type metadata required");
-        // JavaTypePersistenceMetadataDetails formbackingTypePersistenceMetadata
-        // = formbackingTypeMetadata
-        // .getPersistenceDetails();
-        // Assert.notNull(formbackingTypePersistenceMetadata,
-        // "Persistence metadata required for form backing type");
 
         DocumentBuilder builder = XmlUtils.getDocumentBuilder();
         Document document = builder.newDocument();

@@ -26,10 +26,16 @@ package org.gvnix.web.screen.roo.addon;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  * 
+ * @author Óscar Rovira (orovira at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * 
  * @since 0.8
  */
 public enum WebPattern {
-    table
-    // table pattern
+    tabular, // tabular pattern
+    register
+    // register pattern
 
 }
