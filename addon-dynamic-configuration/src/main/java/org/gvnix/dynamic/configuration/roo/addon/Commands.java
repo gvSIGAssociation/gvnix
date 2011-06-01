@@ -36,7 +36,6 @@ import org.springframework.roo.shell.CommandMarker;
 /**
  * Dynamic configuration console commands.
  * <ul>
- * <li>TODO Add an editor to list dynamic configuration names on commands</li>
  * <li>TODO No empty modules information should will appear on console</li>
  * </ul>
  * 
@@ -370,6 +369,29 @@ public class Commands implements CommandMarker {
             logger.log(Level.WARNING,
                     "(use 'configuration property list' to see properties)");
         }
+    }
+
+    @CliAvailabilityIndicator("configuration export")
+    public boolean isExport() {
+
+        return operations.isProjectAvailable();
+    }
+
+    // TODO Add a parameter with the target build tool (mvn, ant, ...)
+    // TODO Add a parameter with the configuration to export ?
+    // XXX Currently, only mvn build tool available.
+    @CliCommand(value = "configuration export", help = "Write saved configurations into the build tool")
+    public void export() {
+
+        // Write all dynamic configurations into the build tool
+        // TODO Some return value ?
+        operations.export();
+
+        logger.log(Level.INFO, "Configuration exported");
+        // showDynComponents(dynConf);
+        // logger.log(
+        // Level.INFO,
+        // "(use 'configuration property list' to see properties defined in the configuration or 'configuration activate' to update project files with configuration properties)");
     }
 
     /**

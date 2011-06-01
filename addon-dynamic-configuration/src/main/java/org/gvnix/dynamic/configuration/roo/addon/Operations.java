@@ -168,4 +168,11 @@ public interface Operations {
      */
     public boolean deleteProperty(String name);
 
+    /**
+     * Write all stored dynamic configurations into the build tool.
+     * 
+     * @return Dynamic configuration stored
+     */
+    public void export();
+
 }
