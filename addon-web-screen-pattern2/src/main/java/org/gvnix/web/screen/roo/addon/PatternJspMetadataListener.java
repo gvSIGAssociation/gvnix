@@ -317,8 +317,9 @@ public class PatternJspMetadataListener implements MetadataProvider,
         JavaSymbolName menuItemId = new JavaSymbolName("list_"
                 .concat(patternTypeStr).concat("_").concat(patternName));
         String queryString = patternType.equals(WebPattern.tabular) ? "?gvnixpattern="
-                .concat(patternName) : "?gvnixpattern=".concat(patternName)
-                .concat("&index=1");
+                .concat(patternName) : "?gvnixform&gvnixpattern=".concat(
+                patternName).concat(
+                "&index=${empty param.index ? 1 : param.index}");
         menuOperations.addMenuItem(categoryName, menuItemId, "menu_list_"
                 .concat(patternTypeStr).concat("_").concat(patternName), "/"
                 + controllerPath + queryString,
@@ -413,7 +414,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
                         "id",
                         XmlUtils.convertId("div:"
                                 + formbackingType.getFullyQualifiedTypeName()
-                                + "_contetnPane"))
+                                + "_contentPane"))
                 .addAttribute("class", "patternContentPane").build();
 
         Element divForm = new XmlElementBuilder("div", document)
