@@ -148,6 +148,7 @@ public class PatternMetadata extends
                 .unmodifiableList(definedPatternsList);
 
         // add a field and common methods
+        builder.addField(getGvNIXPatternField());
         builder.addField(getDefinedPatternField());
         builder.addMethod(getIsPatternDefinedMethod());
 
@@ -164,7 +165,13 @@ public class PatternMetadata extends
         }
 
         if (isPatternTypeDefined(WebPattern.register, definedPatternsList)) {
+            addStaticFields();
             builder.addMethod(getRegisterMethod());
+            builder.addMethod(getUpdateMethod());
+            builder.addMethod(getCreateMethod());
+            builder.addMethod(getDeleteMethod());
+            builder.addMethod(getRefererQueryMethod());
+            builder.addMethod(getRefererQueryNoIndexMethod());
         }
 
         // Create a representation of the desired output ITD
@@ -172,9 +179,457 @@ public class PatternMetadata extends
         new ItdSourceFileComposer(itdTypeDetails);
     }
 
-    // public enum PatternType {
-    // table, register;
-    // }
+    private MethodMetadata getUpdateMethod() {
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("update");
+
+        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
+
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        List<JavaSymbolName> methodParamNames = getMethodParameterNamesCreateUpdate();
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        String entityNamePlural = javaTypeMetadataHolder.getPlural();
+
+        bodyBuilder.appendFormalLine("String viewName = update(".concat(
+                formBackingType.getSimpleTypeName().toLowerCase()).concat(
+                ", bindingResult, uiModel, request);"));
+
+        bodyBuilder.appendFormalLine("if ( bindingResult.hasErrors() ) {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return viewName + \"?\" + refererQuery(request);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder
+                .appendFormalLine("return \""
+                        .concat("redirect:/")
+                        .concat(entityNamePlural.toLowerCase())
+                        .concat("/\" + \"?\" + FORM_PARAM_NAME + \"&\" + refererQuery(request);"));
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
+
+        methodBuilder
+                .setAnnotations(getRequestMappingAnnotationCreateUpdate(RequestMethod.PUT));
+
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
+    }
+
+    private MethodMetadata getCreateMethod() {
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("create");
+
+        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
+
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        List<JavaSymbolName> methodParamNames = getMethodParameterNamesCreateUpdate();
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        String entityNamePlural = javaTypeMetadataHolder.getPlural();
+
+        bodyBuilder.appendFormalLine("String viewName = create(".concat(
+                formBackingType.getSimpleTypeName().toLowerCase()).concat(
+                ", bindingResult, uiModel, request);"));
+
+        bodyBuilder.appendFormalLine("if ( bindingResult.hasErrors() ) {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return viewName + \"?\" + refererQuery(request);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
+                .getNameIncludingTypeParameters()
+                .concat(" count = ")
+                .concat(formBackingType.getSimpleTypeName())
+                .concat(".")
+                .concat(javaTypeMetadataHolder.getPersistenceDetails()
+                        .getCountMethod().getMethodName().getSymbolName())
+                .concat("();"));
+        bodyBuilder
+                .appendFormalLine("return \""
+                        .concat("redirect:/")
+                        .concat(entityNamePlural.toLowerCase())
+                        .concat("/\" + \"?\" + FORM_PARAM_NAME + \"&\" + refererQuery(request, (count == 0 ? 1 : count));"));
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
+
+        methodBuilder
+                .setAnnotations(getRequestMappingAnnotationCreateUpdate(RequestMethod.POST));
+
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
+    }
+
+    private MethodMetadata getDeleteMethod() {
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("delete");
+
+        // Define method parameter types
+        List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
+
+        List<AnnotationAttributeValue<?>> reqParamAttrPathVar = new ArrayList<AnnotationAttributeValue<?>>();
+        reqParamAttrPathVar.add(new StringAttributeValue(new JavaSymbolName(
+                "value"), "id"));
+        List<AnnotationMetadata> methodAttrPathVarAnnotations = new ArrayList<AnnotationMetadata>();
+        AnnotationMetadataBuilder methodAttPathVarAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.PathVariable"),
+                reqParamAttrPathVar);
+        methodAttrPathVarAnnotations.add(methodAttPathVarAnnotation.build());
+        methodParamTypes.add(new AnnotatedJavaType(JavaType.LONG_OBJECT,
+                methodAttrPathVarAnnotations));
+
+        List<AnnotationAttributeValue<?>> reqParamAttrPattern = new ArrayList<AnnotationAttributeValue<?>>();
+        reqParamAttrPattern.add(new StringAttributeValue(new JavaSymbolName(
+                "value"), "PATTERN_PARAM_NAME"));
+        reqParamAttrPattern.add(new BooleanAttributeValue(new JavaSymbolName(
+                "required"), false));
+        List<AnnotationMetadata> methodAttrPatternAnnotations = new ArrayList<AnnotationMetadata>();
+        AnnotationMetadataBuilder methodAttrPatternAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestParam"),
+                reqParamAttrPattern);
+        methodAttrPatternAnnotations.add(methodAttrPatternAnnotation.build());
+        methodParamTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
+                methodAttrPatternAnnotations));
+
+        List<AnnotationAttributeValue<?>> reqParamAttrPage = new ArrayList<AnnotationAttributeValue<?>>();
+        reqParamAttrPage.add(new StringAttributeValue(new JavaSymbolName(
+                "value"), "PATTERN_PARAM_NAME"));
+        reqParamAttrPage.add(new BooleanAttributeValue(new JavaSymbolName(
+                "required"), false));
+        List<AnnotationMetadata> methodAttrPageAnnotations = new ArrayList<AnnotationMetadata>();
+        AnnotationMetadataBuilder methodAttrPageAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestParam"),
+                reqParamAttrPage);
+        methodAttrPageAnnotations.add(methodAttrPageAnnotation.build());
+        methodParamTypes.add(new AnnotatedJavaType(JavaType.INT_OBJECT,
+                methodAttrPageAnnotations));
+
+        List<AnnotationAttributeValue<?>> reqParamAttrSize = new ArrayList<AnnotationAttributeValue<?>>();
+        reqParamAttrSize.add(new StringAttributeValue(new JavaSymbolName(
+                "value"), "PATTERN_PARAM_NAME"));
+        reqParamAttrSize.add(new BooleanAttributeValue(new JavaSymbolName(
+                "required"), false));
+        List<AnnotationMetadata> methodAttrSizeAnnotations = new ArrayList<AnnotationMetadata>();
+        AnnotationMetadataBuilder methodAttrSizeAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestParam"),
+                reqParamAttrSize);
+        methodAttrSizeAnnotations.add(methodAttrSizeAnnotation.build());
+        methodParamTypes.add(new AnnotatedJavaType(JavaType.INT_OBJECT,
+                methodAttrSizeAnnotations));
+
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "org.springframework.ui.Model"), null));
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "javax.servlet.http.HttpServletRequest"), null));
+
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method parameter names
+        // id, pattern, page, size, uiModel, request
+        List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
+        methodParamNames.add(new JavaSymbolName("id"));
+        methodParamNames.add(new JavaSymbolName("pattern"));
+        methodParamNames.add(new JavaSymbolName("page"));
+        methodParamNames.add(new JavaSymbolName("size"));
+        methodParamNames.add(new JavaSymbolName("uiModel"));
+        methodParamNames.add(new JavaSymbolName("request"));
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        String entityNamePlural = javaTypeMetadataHolder.getPlural();
+
+        bodyBuilder.appendFormalLine("delete(id, page, size, uiModel);");
+        bodyBuilder
+                .appendFormalLine("return \""
+                        .concat("redirect:/")
+                        .concat(entityNamePlural.toLowerCase())
+                        .concat("/\" + \"?\" + FORM_PARAM_NAME + \"&\" + refererQuery(request, 1L);"));
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
+
+        // Get Method RequestMapping annotation
+        List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        requestMappingAttributes.add(new StringAttributeValue(
+                new JavaSymbolName("value"), "/{"
+                        + javaTypeMetadataHolder.getPersistenceDetails()
+                                .getIdentifierField().getFieldName()
+                                .getSymbolName() + "}"));
+        List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
+        paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
+                "PATTERN_PARAM_NAME"));
+        requestMappingAttributes
+                .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
+                        new JavaSymbolName("params"), paramValues));
+        requestMappingAttributes.add(new EnumAttributeValue(new JavaSymbolName(
+                "method"), new EnumDetails(new JavaType(
+                "org.springframework.web.bind.annotation.RequestMethod"),
+                new JavaSymbolName(RequestMethod.DELETE.name()))));
+        AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestMapping"),
+                requestMappingAttributes);
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(requestMapping);
+
+        methodBuilder.setAnnotations(annotations);
+
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
+    }
+
+    private MethodMetadata getRefererQueryMethod() {
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("refererQuery");
+
+        // Define method parameter types
+        List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
+
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "javax.servlet.http.HttpServletRequest"), null));
+        methodParamTypes.add(new AnnotatedJavaType(JavaType.LONG_OBJECT, null));
+
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method parameter names
+        // request
+        List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
+        methodParamNames.add(new JavaSymbolName("request"));
+        methodParamNames.add(new JavaSymbolName("i"));
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        bodyBuilder.appendFormalLine("String query = refererQuery(request);");
+        bodyBuilder
+                .appendFormalLine("int ini = query.indexOf(\"&\" + INDEX_PARAM_NAME + \"=\");");
+        bodyBuilder
+                .appendFormalLine("String index = \"&\" + INDEX_PARAM_NAME + \"=\" + i;");
+
+        bodyBuilder.appendFormalLine("if (ini == -1) {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("ini = query.indexOf(\"?\" + INDEX_PARAM_NAME + \"=\");");
+        bodyBuilder
+                .appendFormalLine("index = \"?\" + INDEX_PARAM_NAME + \"=\" + i;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("if (ini == -1) {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("ini = query.startsWith(INDEX_PARAM_NAME + \"=\") ? 0 : -1;");
+        bodyBuilder.appendFormalLine("index = INDEX_PARAM_NAME + \"=\" + i;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("if (ini == -1) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return \"\";");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder
+                .appendFormalLine("int end = query.indexOf(\"&\", ini + 1);");
+        bodyBuilder.appendFormalLine("end = end == -1 ? query.length() : end;");
+
+        bodyBuilder
+                .appendFormalLine("String prefix = query.substring(0, ini);");
+        bodyBuilder
+                .appendFormalLine("String sufix = query.substring(end, query.length());");
+
+        bodyBuilder
+                .appendFormalLine("return prefix.concat(index).concat(sufix);");
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), 0, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
+
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
+    }
+
+    private MethodMetadata getRefererQueryNoIndexMethod() {
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("refererQuery");
+
+        // Define method parameter types
+        List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
+
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "javax.servlet.http.HttpServletRequest"), null));
+
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
+        if (method != null) {
+            // If it already exists, just return the method and omit its
+            // generation via the ITD
+            return method;
+        }
+
+        // Define method parameter names
+        // request
+        List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
+        methodParamNames.add(new JavaSymbolName("request"));
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        bodyBuilder.appendFormalLine("String url = \"\";");
+        bodyBuilder
+                .appendFormalLine("String referer = request.getHeader(REFERER_PARAM_NAME);");
+
+        JavaType stringUtils = new JavaType(
+                "org.springframework.util.StringUtils");
+        bodyBuilder.appendFormalLine("if (".concat(
+                stringUtils.getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver())).concat(
+                ".hasText(referer)) {"));
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("try {");
+        bodyBuilder.indent();
+        JavaType netURL = new JavaType("java.net.URL");
+        bodyBuilder.appendFormalLine("url = new ".concat(
+                netURL.getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver())).concat(
+                "(referer).getQuery();"));
+        bodyBuilder
+                .appendFormalLine("if ( url.contains(PATTERN_PARAM_NAME) ) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return url;");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        JavaType netMalformedEx = new JavaType("java.net.MalformedURLException");
+        bodyBuilder.appendFormalLine("} catch ( ".concat(
+                netMalformedEx.getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver())).concat(
+                " e ) {"));
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine("return url;");
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), 0, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
+
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
+    }
+
+    private List<AnnotationMetadataBuilder> getRequestMappingAnnotationCreateUpdate(
+            RequestMethod requestMethod) {
+        // Get Method RequestMapping annotation
+        List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
+        paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
+                "PATTERN_PARAM_NAME"));
+        requestMappingAttributes
+                .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
+                        new JavaSymbolName("params"), paramValues));
+        requestMappingAttributes.add(new EnumAttributeValue(new JavaSymbolName(
+                "method"), new EnumDetails(new JavaType(
+                "org.springframework.web.bind.annotation.RequestMethod"),
+                new JavaSymbolName(requestMethod.name()))));
+        AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestMapping"),
+                requestMappingAttributes);
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+        annotations.add(requestMapping);
+        return annotations;
+    }
+
+    private List<AnnotatedJavaType> getMethodParameterTypesCreateUpdate() {
+        // Define method parameter types
+        // @RequestParam(value = "gvnixpattern", required = true) String
+        // pattern, @Valid Owner owner, BindingResult bindingResult,
+        // HttpServletRequest req, Model uiModel)
+        List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
+
+        List<AnnotationAttributeValue<?>> reqParamAttrPattern = new ArrayList<AnnotationAttributeValue<?>>();
+        reqParamAttrPattern.add(new StringAttributeValue(new JavaSymbolName(
+                "value"), "PATTERN_PARAM_NAME"));
+        reqParamAttrPattern.add(new BooleanAttributeValue(new JavaSymbolName(
+                "required"), false));
+        List<AnnotationMetadata> methodAttrPatternAnnotations = new ArrayList<AnnotationMetadata>();
+        AnnotationMetadataBuilder methodAttrPatternAnnotation = new AnnotationMetadataBuilder(
+                new JavaType(
+                        "org.springframework.web.bind.annotation.RequestParam"),
+                reqParamAttrPattern);
+        methodAttrPatternAnnotations.add(methodAttrPatternAnnotation.build());
+
+        List<AnnotationMetadata> methodAttrValidAnnotations = new ArrayList<AnnotationMetadata>();
+        AnnotationMetadataBuilder methodAttValidAnnotation = new AnnotationMetadataBuilder(
+                new JavaType("javax.validation.Valid"));
+        methodAttrValidAnnotations.add(methodAttValidAnnotation.build());
+
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(String.class
+                .getName()), methodAttrPatternAnnotations));
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(formBackingType
+                .getSimpleTypeName()), methodAttrValidAnnotations));
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "org.springframework.validation.BindingResult"), null));
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "org.springframework.ui.Model"), null));
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "javax.servlet.http.HttpServletRequest"), null));
+        return methodParamTypes;
+    }
+
+    private List<JavaSymbolName> getMethodParameterNamesCreateUpdate() {
+        // Define method parameter names
+        // pattern, entity, bindingResult, uiModel, request
+        List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
+        methodParamNames.add(new JavaSymbolName("pattern"));
+        methodParamNames.add(new JavaSymbolName(formBackingType
+                .getSimpleTypeName().toLowerCase()));
+        methodParamNames.add(new JavaSymbolName("bindingResult"));
+        methodParamNames.add(new JavaSymbolName("uiModel"));
+        methodParamNames.add(new JavaSymbolName("request"));
+        return methodParamNames;
+    }
 
     /**
      * Enumeration of HTTP Request method types
@@ -286,6 +741,13 @@ public class PatternMetadata extends
         return mutableTypeDetails;
     }
 
+    private FieldMetadataBuilder getGvNIXPatternField() {
+        return new FieldMetadataBuilder(getId(), Modifier.PRIVATE
+                | Modifier.STATIC | Modifier.FINAL, new JavaSymbolName(
+                "PATTERN_PARAM_NAME"), JavaType.STRING_OBJECT,
+                "\"gvnixpattern\"");
+    }
+
     private FieldMetadataBuilder getDefinedPatternField() {
 
         String definedPatternIds = "";
@@ -303,6 +765,24 @@ public class PatternMetadata extends
         return new FieldMetadataBuilder(getId(), Modifier.PRIVATE
                 | Modifier.STATIC, new JavaSymbolName("definedPatterns"),
                 stringArray, "{ ".concat(definedPatternIds).concat(" }"));
+    }
+
+    private void addStaticFields() {
+        FieldMetadataBuilder field = new FieldMetadataBuilder(getId(),
+                Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL,
+                new JavaSymbolName("INDEX_PARAM_NAME"), JavaType.STRING_OBJECT,
+                "\"index\"");
+        builder.addField(field);
+
+        field = new FieldMetadataBuilder(getId(), Modifier.PRIVATE
+                | Modifier.STATIC | Modifier.FINAL, new JavaSymbolName(
+                "FORM_PARAM_NAME"), JavaType.STRING_OBJECT, "\"gvnixform\"");
+        builder.addField(field);
+
+        field = new FieldMetadataBuilder(getId(), Modifier.PRIVATE
+                | Modifier.STATIC | Modifier.FINAL, new JavaSymbolName(
+                "REFERER_PARAM_NAME"), JavaType.STRING_OBJECT, "\"Referer\"");
+        builder.addField(field);
     }
 
     /**
