@@ -171,8 +171,8 @@ public interface Operations {
     /**
      * Write all stored dynamic configurations into the build tool.
      * 
-     * @return Dynamic configuration stored
+     * @return Exported dynamic configuration
      */
-    public void export();
+    public DynConfigurationList export();
 
 }

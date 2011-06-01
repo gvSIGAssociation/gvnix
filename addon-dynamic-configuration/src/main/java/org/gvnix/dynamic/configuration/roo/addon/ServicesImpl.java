@@ -116,7 +116,7 @@ public class ServicesImpl implements Services {
                 // Invoke the read method of all components to get its
                 // properties
                 Class<? extends Object> c = o.getClass();
-                Method m = (Method) c.getMethod("read", new Class[0]);
+                Method m = c.getMethod("read", new Class[0]);
                 DynPropertyList dynProps = (DynPropertyList) m.invoke(o,
                         new Object[0]);
 
@@ -145,6 +145,51 @@ public class ServicesImpl implements Services {
         }
 
         return dynConf;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getFilePath(DynComponent dynComp) {
+
+        String path = "";
+
+        // Find required dynamic configuration component
+        for (DefaultDynamicConfiguration o : getComponents()) {
+            if (o.getClass().getName().equals(dynComp.getId())) {
+
+                try {
+
+                    // Invoke the get file path method of component
+                    Class<? extends Object> c = o.getClass();
+                    Method m = c.getMethod("getFilePath", new Class[0]);
+                    path = (String) m.invoke(o, new Object[0]);
+
+                } catch (NoSuchMethodException nsme) {
+
+                    logger.log(
+                            Level.SEVERE,
+                            "No get file path method on dynamic configuration class",
+                            nsme);
+                } catch (InvocationTargetException ite) {
+
+                    logger.log(
+                            Level.SEVERE,
+                            "Cannot invoke get file path method on dynamic configuration class",
+                            ite);
+                } catch (IllegalAccessException iae) {
+
+                    logger.log(
+                            Level.SEVERE,
+                            "Cannot access get file path method on dynamic configuration class",
+                            iae);
+                }
+
+                break;
+            }
+        }
+
+        return path;
     }
 
     /**
@@ -192,7 +237,6 @@ public class ServicesImpl implements Services {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     public void setCurrentConfiguration(DynConfiguration dynConf) {
 
         // Iterate all dynamic configurations components registered
@@ -206,9 +250,10 @@ public class ServicesImpl implements Services {
 
                     if (c.getName().equals(dynComp.getId())) {
 
+                        @SuppressWarnings("rawtypes")
                         Class[] t = new Class[1];
                         t[0] = DynPropertyList.class;
-                        Method m = (Method) c.getMethod("write", t);
+                        Method m = c.getMethod("write", t);
                         Object[] args = new Object[1];
                         args[0] = dynComp.getProperties();
                         m.invoke(o, args);

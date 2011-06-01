@@ -65,4 +65,12 @@ public interface Services {
      */
     public void setCurrentConfiguration(DynConfiguration dynConf);
 
+    /**
+     * Get the file path related with a dynamic component.
+     * 
+     * @param dynComp
+     *            Dynamic component to file path
+     * @return File path
+     */
+    public String getFilePath(DynComponent dynComp);
 }

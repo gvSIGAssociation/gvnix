@@ -341,30 +341,21 @@ public class OperationsImpl implements Operations {
      * 
      * {@inheritDoc}
      */
-    public void export() {
+    public DynConfigurationList export() {
+
+        // Iterate stored dynamic configurations for export to pom
+        DynConfigurationList dynConfs = findConfigurations();
+        if (dynConfs.isEmpty()) {
+            return null;
+        }
+
+        // Pom root element
+        String pom = projectOperations.getPathResolver().getIdentifier(
+                Path.ROOT, "pom.xml");
+        Document doc = XmlUtils.readXml(fileManager.getInputStream(pom));
+        Element root = doc.getDocumentElement();
 
         // <project>
-        // ...
-        // <build>
-        // ...
-        // <resources>
-        // <resource>
-        // <directory>src/main/resources</directory>
-        // <includes>
-        // <include>log4j.properties</include>
-        // </includes>
-        // <filtering>true</filtering>
-        // </resource>
-        // <resource>
-        // <directory>src/main/resources</directory>
-        // <excludes>
-        // <exclude>log4j.properties</exclude>
-        // </excludes>
-        // <filtering>false</filtering>
-        // </resource>
-        // </resources>
-        // ...
-        // </build>
         // <profiles>
         // <profile>
         // <id>test</id>
@@ -373,14 +364,7 @@ public class OperationsImpl implements Operations {
         // </properties>
         // </profile>
         // </profiles>
-        // ...
         // </project>
-
-        // Pom root element
-        String pom = projectOperations.getPathResolver().getIdentifier(
-                Path.ROOT, "pom.xml");
-        Document doc = XmlUtils.readXml(fileManager.getInputStream(pom));
-        Element root = doc.getDocumentElement();
 
         // Profiles section: find or create if not exists
         Element profs = XmlUtils.findFirstElement("/project/profiles", root);
@@ -390,42 +374,130 @@ public class OperationsImpl implements Operations {
             root.appendChild(profs);
         }
 
-        // Iterate stored dynamic configurations for export to pom
-        DynConfigurationList dynConfs = findConfigurations();
         for (DynConfiguration dynConf : dynConfs) {
 
-            // Create a profile section for dynamic configuration
+            // Create a profile section for this dynamic configuration
             Element prof = doc.createElement("profile");
             profs.appendChild(prof);
 
-            // TODO Profile with this id can exist yet
+            // TODO Profile with this id can exist yet: avoid duplicated
             // Create an identifier for profile
             Element id = doc.createElement("id");
             id.setTextContent(dynConf.getName());
             prof.appendChild(id);
 
-            // Iterate components of dynamic configuration for export to pom
+            // If dynamic configuration is active: profile active by default
+            if (dynConf.isActive()) {
+
+                // <activation>
+                // <activeByDefault>true</activeByDefault>
+                // </activation>
+
+                // Create an activation section
+                Element activation = doc.createElement("activation");
+                prof.appendChild(activation);
+
+                Element active = doc.createElement("activeByDefault");
+                active.setTextContent("true");
+                activation.appendChild(active);
+
+            }
+
+            // Iterate components of dynamic configuration
             DynComponentList dynComps = dynConf.getComponents();
             for (DynComponent dynComp : dynComps) {
 
-                // Create a properties section for dynamic configuration
+                // <project>
+                // <build>
+                // <resources>
+                // <resource>
+                // <directory>src/main/resources</directory>
+                // <includes>
+                // <include>log4j.properties</include>
+                // </includes>
+                // <filtering>true</filtering>
+                // </resource>
+                // <resource>
+                // <directory>src/main/resources</directory>
+                // <excludes>
+                // <exclude>log4j.properties</exclude>
+                // </excludes>
+                // <filtering>false</filtering>
+                // </resource>
+                // </resources>
+                // </build>
+                // </project>
+
+                // Build section: find or create if not exists
+                Element build = XmlUtils.findFirstElement("/project/build",
+                        root);
+                if (build == null) {
+
+                    build = doc.createElement("build");
+                    root.appendChild(build);
+                }
+
+                // Resources section: find or create if not exists
+                Element resos = XmlUtils.findFirstElement("resources", build);
+                if (resos == null) {
+
+                    resos = doc.createElement("resources");
+                    build.appendChild(resos);
+                }
+
+                // Get dynamic component dir and file paths
+                String filePath = services.getFilePath(dynComp);
+                String dirName = filePath.substring(0,
+                        filePath.lastIndexOf('/'));
+                String fileName = filePath.substring(
+                        filePath.lastIndexOf('/') + 1, filePath.length());
+
+                // TODO Avoid duplicated resource
+
+                // Create a include resource section for this dynamic component
+                Element reso = doc.createElement("resource");
+                resos.appendChild(reso);
+                Element dir = doc.createElement("directory");
+                dir.setTextContent(dirName);
+                reso.appendChild(dir);
+                Element files = doc.createElement("includes");
+                reso.appendChild(files);
+                Element file = doc.createElement("include");
+                file.setTextContent(fileName);
+                files.appendChild(file);
+                Element filter = doc.createElement("filtering");
+                filter.setTextContent("true");
+                reso.appendChild(filter);
+
+                // Create a exclude resource section for this dynamic component
+                reso = doc.createElement("resource");
+                resos.appendChild(reso);
+                dir = doc.createElement("directory");
+                dir.setTextContent(dirName);
+                reso.appendChild(dir);
+                files = doc.createElement("excludes");
+                reso.appendChild(files);
+                file = doc.createElement("exclude");
+                file.setTextContent(fileName);
+                files.appendChild(file);
+                filter = doc.createElement("filtering");
+                filter.setTextContent("false");
+                reso.appendChild(filter);
+
+                // Create a properties section
                 Element props = doc.createElement("properties");
                 prof.appendChild(props);
 
-                // TODO Nothing to do with next values ?
-                // dynComp.getId();
-                // dynComp.getName();
-
-                // Iterate properties of dynamic configuration for export to pom
+                // Iterate properties of dynamic configuration
                 DynPropertyList dynProps = dynComp.getProperties();
                 for (DynProperty dynProp : dynProps) {
 
-                    // Create a property element for each dynamic property
+                    // Create a property element for this dynamic property
                     Element prop = doc.createElement(dynProp.getKey());
                     props.appendChild(prop);
 
-                    // Store dynamic property value in pom and replace dynamic
-                    // property value with a var
+                    // Store this dynamic property value in pom and replace
+                    // dynamic property value with a var
                     prop.setTextContent(dynProp.getValue());
                     dynProp.setValue("${" + dynProp.getKey() + "}");
                 }
@@ -436,32 +508,10 @@ public class OperationsImpl implements Operations {
             services.setCurrentConfiguration(dynConf);
         }
 
-        // TODO Finalize
-        // Element build = XmlUtils.findFirstElement("/project/build", root);
-        // if (build == null) {
-        //
-        // build = doc.createElement("build");
-        // root.appendChild(build);
-        // }
-        // Element resos = XmlUtils.findFirstElement("resources", build);
-        // if (resos == null) {
-        //
-        // resos = doc.createElement("resources");
-        // build.appendChild(resos);
-        // }
-        // Element reso = XmlUtils.findFirstElement(
-        // "resource/filtering[text()='true']", resos);
-        // if (reso == null) {
-        //
-        // reso = doc.createElement("resource");
-        // Element dir = doc.createElement("directory");
-        // dir.setTextContent("src/main/resources");
-        // reso.appendChild(dir);
-        // resos.appendChild(reso);
-        // }
-
         fileManager.createOrUpdateTextFileIfRequired(pom,
                 XmlUtils.nodeToString(doc), false);
+
+        return dynConfs;
     }
 
     /**

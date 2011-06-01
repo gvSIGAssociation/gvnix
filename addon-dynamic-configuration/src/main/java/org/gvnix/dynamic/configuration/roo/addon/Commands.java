@@ -173,7 +173,7 @@ public class Commands implements CommandMarker {
         DynConfigurationList dynConfs = operations.findConfigurations();
 
         // If null, dynamic configuration with this name not exists
-        if (dynConfs == null || dynConfs.size() == 0) {
+        if (dynConfs == null || dynConfs.isEmpty()) {
 
             logger.log(Level.WARNING, "There is no saved configurations");
             logger.log(
@@ -385,13 +385,30 @@ public class Commands implements CommandMarker {
 
         // Write all dynamic configurations into the build tool
         // TODO Some return value ?
-        operations.export();
+        DynConfigurationList dynConfs = operations.export();
 
-        logger.log(Level.INFO, "Configuration exported");
-        // showDynComponents(dynConf);
-        // logger.log(
-        // Level.INFO,
-        // "(use 'configuration property list' to see properties defined in the configuration or 'configuration activate' to update project files with configuration properties)");
+        // If null, dynamic configuration with this name not exists
+        if (dynConfs == null || dynConfs.isEmpty()) {
+
+            logger.log(Level.WARNING, "There is no saved configurations");
+            logger.log(
+                    Level.WARNING,
+                    "(use 'configuration save' to create a new configuration or 'configuration property list' to see properties defined)");
+            return;
+
+        } else {
+
+            logger.log(Level.INFO, "Configuration exported");
+            for (DynConfiguration dynConf : dynConfs) {
+
+                logger.log(Level.INFO, dynConf.toString());
+                showDynComponents(dynConf);
+
+            }
+            logger.log(Level.INFO,
+                    "(use '-P name' on maven commands to use the 'name' configuration)");
+        }
+
     }
 
     /**
