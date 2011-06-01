@@ -148,7 +148,7 @@ public class PatternMetadata extends
                 .unmodifiableList(definedPatternsList);
 
         // add a field and common methods
-        builder.addField(getGvNIXPatternField());
+        // builder.addField(getGvNIXPatternField());
         builder.addField(getDefinedPatternField());
         builder.addMethod(getIsPatternDefinedMethod());
 
@@ -165,7 +165,7 @@ public class PatternMetadata extends
         }
 
         if (isPatternTypeDefined(WebPattern.register, definedPatternsList)) {
-            addStaticFields();
+            // addStaticFields();
             builder.addMethod(getRegisterMethod());
             builder.addMethod(getUpdateMethod());
             builder.addMethod(getCreateMethod());
@@ -209,11 +209,9 @@ public class PatternMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        bodyBuilder
-                .appendFormalLine("return \""
-                        .concat("redirect:/")
-                        .concat(entityNamePlural.toLowerCase())
-                        .concat("/\" + \"?\" + FORM_PARAM_NAME + \"&\" + refererQuery(request);"));
+        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
+                .concat(entityNamePlural.toLowerCase())
+                .concat("?gvnixform&\" + refererQuery(request);"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
@@ -269,7 +267,7 @@ public class PatternMetadata extends
                 .appendFormalLine("return \""
                         .concat("redirect:/")
                         .concat(entityNamePlural.toLowerCase())
-                        .concat("/\" + \"?\" + FORM_PARAM_NAME + \"&\" + refererQuery(request, (count == 0 ? 1 : count));"));
+                        .concat("?gvnixform&\" + refererQuery(request, (count == 0 ? 1 : count));"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
@@ -304,7 +302,7 @@ public class PatternMetadata extends
 
         List<AnnotationAttributeValue<?>> reqParamAttrPattern = new ArrayList<AnnotationAttributeValue<?>>();
         reqParamAttrPattern.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "PATTERN_PARAM_NAME"));
+                "value"), "gvnixpattern"));
         reqParamAttrPattern.add(new BooleanAttributeValue(new JavaSymbolName(
                 "required"), false));
         List<AnnotationMetadata> methodAttrPatternAnnotations = new ArrayList<AnnotationMetadata>();
@@ -318,7 +316,7 @@ public class PatternMetadata extends
 
         List<AnnotationAttributeValue<?>> reqParamAttrPage = new ArrayList<AnnotationAttributeValue<?>>();
         reqParamAttrPage.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "PATTERN_PARAM_NAME"));
+                "value"), "gvnixpattern"));
         reqParamAttrPage.add(new BooleanAttributeValue(new JavaSymbolName(
                 "required"), false));
         List<AnnotationMetadata> methodAttrPageAnnotations = new ArrayList<AnnotationMetadata>();
@@ -332,7 +330,7 @@ public class PatternMetadata extends
 
         List<AnnotationAttributeValue<?>> reqParamAttrSize = new ArrayList<AnnotationAttributeValue<?>>();
         reqParamAttrSize.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "PATTERN_PARAM_NAME"));
+                "value"), "gvnixpattern"));
         reqParamAttrSize.add(new BooleanAttributeValue(new JavaSymbolName(
                 "required"), false));
         List<AnnotationMetadata> methodAttrSizeAnnotations = new ArrayList<AnnotationMetadata>();
@@ -371,11 +369,9 @@ public class PatternMetadata extends
         String entityNamePlural = javaTypeMetadataHolder.getPlural();
 
         bodyBuilder.appendFormalLine("delete(id, page, size, uiModel);");
-        bodyBuilder
-                .appendFormalLine("return \""
-                        .concat("redirect:/")
-                        .concat(entityNamePlural.toLowerCase())
-                        .concat("/\" + \"?\" + FORM_PARAM_NAME + \"&\" + refererQuery(request, 1L);"));
+        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
+                .concat(entityNamePlural.toLowerCase())
+                .concat("?gvnixform&\" + refererQuery(request, 1L);"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
@@ -390,7 +386,7 @@ public class PatternMetadata extends
                                 .getSymbolName() + "}"));
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
-                "PATTERN_PARAM_NAME"));
+                "gvnixpattern"));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
@@ -440,25 +436,21 @@ public class PatternMetadata extends
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
         bodyBuilder.appendFormalLine("String query = refererQuery(request);");
-        bodyBuilder
-                .appendFormalLine("int ini = query.indexOf(\"&\" + INDEX_PARAM_NAME + \"=\");");
-        bodyBuilder
-                .appendFormalLine("String index = \"&\" + INDEX_PARAM_NAME + \"=\" + i;");
+        bodyBuilder.appendFormalLine("int ini = query.indexOf(\"&index=\");");
+        bodyBuilder.appendFormalLine("String index = \"&index=\" + i;");
 
         bodyBuilder.appendFormalLine("if (ini == -1) {");
         bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("ini = query.indexOf(\"?\" + INDEX_PARAM_NAME + \"=\");");
-        bodyBuilder
-                .appendFormalLine("index = \"?\" + INDEX_PARAM_NAME + \"=\" + i;");
+        bodyBuilder.appendFormalLine("ini = query.indexOf(\"?index=\");");
+        bodyBuilder.appendFormalLine("index = \"?index=\" + i;");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
         bodyBuilder.appendFormalLine("if (ini == -1) {");
         bodyBuilder.indent();
         bodyBuilder
-                .appendFormalLine("ini = query.startsWith(INDEX_PARAM_NAME + \"=\") ? 0 : -1;");
-        bodyBuilder.appendFormalLine("index = INDEX_PARAM_NAME + \"=\" + i;");
+                .appendFormalLine("ini = query.startsWith(\"index=\") ? 0 : -1;");
+        bodyBuilder.appendFormalLine("index = \"index =\" + i;");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
@@ -516,7 +508,7 @@ public class PatternMetadata extends
 
         bodyBuilder.appendFormalLine("String url = \"\";");
         bodyBuilder
-                .appendFormalLine("String referer = request.getHeader(REFERER_PARAM_NAME);");
+                .appendFormalLine("String referer = request.getHeader(\"Referer\");");
 
         JavaType stringUtils = new JavaType(
                 "org.springframework.util.StringUtils");
@@ -532,8 +524,7 @@ public class PatternMetadata extends
                 netURL.getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver())).concat(
                 "(referer).getQuery();"));
-        bodyBuilder
-                .appendFormalLine("if ( url.contains(PATTERN_PARAM_NAME) ) {");
+        bodyBuilder.appendFormalLine("if ( url.contains(\"gvnixpattern\") ) {");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("return url;");
         bodyBuilder.indentRemove();
@@ -564,7 +555,7 @@ public class PatternMetadata extends
         List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
-                "PATTERN_PARAM_NAME"));
+                "gvnixpattern"));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
@@ -590,7 +581,7 @@ public class PatternMetadata extends
 
         List<AnnotationAttributeValue<?>> reqParamAttrPattern = new ArrayList<AnnotationAttributeValue<?>>();
         reqParamAttrPattern.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "PATTERN_PARAM_NAME"));
+                "value"), "gvnixpattern"));
         reqParamAttrPattern.add(new BooleanAttributeValue(new JavaSymbolName(
                 "required"), false));
         List<AnnotationMetadata> methodAttrPatternAnnotations = new ArrayList<AnnotationMetadata>();
@@ -741,6 +732,7 @@ public class PatternMetadata extends
         return mutableTypeDetails;
     }
 
+    @SuppressWarnings("unused")
     private FieldMetadataBuilder getGvNIXPatternField() {
         return new FieldMetadataBuilder(getId(), Modifier.PRIVATE
                 | Modifier.STATIC | Modifier.FINAL, new JavaSymbolName(
@@ -767,6 +759,7 @@ public class PatternMetadata extends
                 stringArray, "{ ".concat(definedPatternIds).concat(" }"));
     }
 
+    @SuppressWarnings("unused")
     private void addStaticFields() {
         FieldMetadataBuilder field = new FieldMetadataBuilder(getId(),
                 Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL,
@@ -1013,14 +1006,8 @@ public class PatternMetadata extends
                 .concat(" ")
                 .concat(formBackingType.getSimpleTypeName().toLowerCase()
                         .concat(" = null;")));
-        bodyBuilder.appendFormalLine("if (!".concat(
+        bodyBuilder.appendFormalLine("if (".concat(
                 entityNamePlural.toLowerCase()).concat(".isEmpty()) {"));
-        bodyBuilder.indent();
-        bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName()
-                .toLowerCase().concat(" = ")
-                .concat(entityNamePlural.toLowerCase()).concat(".get(0);"));
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("} else {");
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
                 entityNamePlural.toLowerCase()).concat("\", null);"));
@@ -1030,6 +1017,10 @@ public class PatternMetadata extends
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName()
+                .toLowerCase().concat(" = ")
+                .concat(entityNamePlural.toLowerCase()).concat(".get(0);"));
 
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
                 .concat(entityNamePlural.toLowerCase()).concat("\", ")
@@ -1067,7 +1058,7 @@ public class PatternMetadata extends
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
                 "gvnixpattern"));
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
-                "index"));
+                "gvnixform"));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
