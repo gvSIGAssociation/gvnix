@@ -171,6 +171,11 @@ public interface Operations {
     /**
      * Write all stored dynamic configurations into the build tool.
      * 
+     * <p>
+     * If no dynamic configuration active returns null. If no dynamic
+     * configurations returns empty List.
+     * </p>
+     * 
      * @return Exported dynamic configuration
      */
     public DynConfigurationList export();

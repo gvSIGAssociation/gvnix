@@ -388,12 +388,19 @@ public class Commands implements CommandMarker {
         DynConfigurationList dynConfs = operations.export();
 
         // If null, dynamic configuration with this name not exists
-        if (dynConfs == null || dynConfs.isEmpty()) {
+        if (dynConfs == null) {
 
             logger.log(Level.WARNING, "There is no saved configurations");
             logger.log(
                     Level.WARNING,
                     "(use 'configuration save' to create a new configuration or 'configuration property list' to see properties defined)");
+            return;
+
+        } else if (dynConfs.isEmpty()) {
+
+            logger.log(Level.WARNING, "There is no activated configuration");
+            logger.log(Level.WARNING,
+                    "(use 'configuration activate' to define the default configuration)");
             return;
 
         } else {

@@ -343,9 +343,16 @@ public class OperationsImpl implements Operations {
      */
     public DynConfigurationList export() {
 
-        // Iterate stored dynamic configurations for export to pom
+        // Find all stored dynamic configurations
         DynConfigurationList dynConfs = findConfigurations();
         if (dynConfs.isEmpty()) {
+
+            // If no dynamic configurations, return empty list
+            return dynConfs;
+        }
+
+        // If no active configuration, return null
+        if (configurations.getActiveConfiguration() == null) {
             return null;
         }
 
@@ -374,6 +381,7 @@ public class OperationsImpl implements Operations {
             root.appendChild(profs);
         }
 
+        // Iterate stored dynamic configurations for export to pom
         for (DynConfiguration dynConf : dynConfs) {
 
             // Create a profile section for this dynamic configuration
@@ -447,10 +455,19 @@ public class OperationsImpl implements Operations {
 
                 // Get dynamic component dir and file paths
                 String filePath = services.getFilePath(dynComp);
-                String dirName = filePath.substring(0,
-                        filePath.lastIndexOf('/'));
-                String fileName = filePath.substring(
-                        filePath.lastIndexOf('/') + 1, filePath.length());
+                int index = filePath.lastIndexOf('/');
+                String dirName;
+                String fileName;
+                if (index != -1) {
+
+                    dirName = filePath.substring(0, filePath.lastIndexOf('/'));
+                    fileName = filePath.substring(
+                            filePath.lastIndexOf('/') + 1, filePath.length());
+                } else {
+
+                    dirName = "";
+                    fileName = filePath;
+                }
 
                 // TODO Avoid duplicated resource
 
@@ -484,22 +501,40 @@ public class OperationsImpl implements Operations {
                 filter.setTextContent("false");
                 reso.appendChild(filter);
 
-                // Create a properties section
-                Element props = doc.createElement("properties");
-                prof.appendChild(props);
+                // Properties section: find or create if not exists
+                Element props = XmlUtils.findFirstElement("properties", prof);
+                if (props == null) {
+                    props = doc.createElement("properties");
+                    prof.appendChild(props);
+                }
 
                 // Iterate properties of dynamic configuration
                 DynPropertyList dynProps = dynComp.getProperties();
                 for (DynProperty dynProp : dynProps) {
 
+                    // TODO Replace with a standard way
+                    String key = dynProp.getKey().replace('/', '.')
+                            .replace('[', '.').replace(']', '.')
+                            .replace('@', '.').replace(':', '.')
+                            .replace('-', '.');
+                    while (key.startsWith(".")) {
+                        key = key.substring(1, key.length());
+                    }
+                    while (key.endsWith(".")) {
+                        key = key.substring(0, key.length() - 1);
+                    }
+                    while (key.contains("..")) {
+                        key = key.replace("..", ".");
+                    }
+
                     // Create a property element for this dynamic property
-                    Element prop = doc.createElement(dynProp.getKey());
+                    Element prop = doc.createElement(key);
                     props.appendChild(prop);
 
                     // Store this dynamic property value in pom and replace
                     // dynamic property value with a var
                     prop.setTextContent(dynProp.getValue());
-                    dynProp.setValue("${" + dynProp.getKey() + "}");
+                    dynProp.setValue("${" + key + "}");
                 }
             }
 

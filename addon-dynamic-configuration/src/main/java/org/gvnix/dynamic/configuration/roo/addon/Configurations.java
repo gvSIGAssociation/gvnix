@@ -142,7 +142,11 @@ public interface Configurations {
     /**
      * Get current dynamic configuration from configuration file.
      * 
-     * @return Active dynamic configuration
+     * <p>
+     * If no dynamic configuration active, null will be returned.
+     * </p>
+     * 
+     * @return Active dynamic configuration or null.
      */
     public DynConfiguration getActiveConfiguration();
 
