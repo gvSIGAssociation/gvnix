@@ -79,6 +79,7 @@ import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This Listener produces MVC artifacts for a given pattern
@@ -283,15 +284,26 @@ public class PatternJspMetadataListener implements MetadataProvider,
             // Pattern type not supported. Nothing to do
         }
 
+        modifyRooJsp(RooJspx.create);
+        modifyRooJsp(RooJspx.update);
+
     }
 
+    /**
+     * Creates a JSPx of the given WebPattern type
+     * 
+     * @param patternType
+     * @param destinationDirectory
+     * @param controllerPath
+     * @param patternName
+     */
     private void installPatternTypeArtifact(WebPattern patternType,
             String destinationDirectory, String controllerPath,
             String patternName) {
         String patternTypeStr = patternType.name();
         String patternPath = destinationDirectory.concat("/")
                 .concat(patternName).concat(".jspx");
-        Document jspDoc = patternType.equals(WebPattern.tabular) ? getUpdateDocument()
+        Document jspDoc = patternType.equals(WebPattern.tabular) ? getUpdateTabularDocument()
                 : getRegisterDocument();
         writeToDiskIfNecessary(patternPath, jspDoc);
         // add view to views.xml
@@ -333,6 +345,15 @@ public class PatternJspMetadataListener implements MetadataProvider,
                         true, false);
     }
 
+    /**
+     * Returns de XML Document with the JSPx
+     * <p>
+     * <strong>This method is based in:</strong>
+     * {@link org.springframework.roo.addon.web.mvc.jsp.JspViewManager#getShowDocument()}
+     * </p>
+     * 
+     * @return
+     */
     private Document getRegisterDocument() {
         String controllerPath = webScaffoldAnnotationValues.getPath();
         Assert.notNull(controllerPath,
@@ -473,6 +494,174 @@ public class PatternJspMetadataListener implements MetadataProvider,
         div.appendChild(pageShow);
 
         return document;
+    }
+
+    public enum RooJspx {
+        create, update;
+    }
+
+    /**
+     * Modifies create.jspx or update.jspx generate by Roo based on
+     * {@link RooJspx} param.
+     * <p>
+     * It wraps field element into ul/li elements and add a hidden param
+     * <code>gvnixpattern</code> and a button
+     * 
+     * @param rooJspx
+     */
+    private void modifyRooJsp(RooJspx rooJspx) {
+        String controllerPath = webScaffoldAnnotationValues.getPath();
+        Assert.notNull(controllerPath,
+                "Path is not specified in the @RooWebScaffold annotation for '"
+                        + webScaffoldAnnotationValues.getGovernorTypeDetails()
+                                .getName() + "'");
+        if (!controllerPath.startsWith("/")) {
+            controllerPath = "/".concat(controllerPath);
+        }
+
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        String docJspx = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "WEB-INF/views" + controllerPath + "/" + rooJspx.name()
+                        + ".jspx");
+
+        if (!fileManager.exists(docJspx)) {
+            // create.jspx doesn't exist, so nothing to do
+            return;
+        }
+
+        InputStream docJspxIs = fileManager.getInputStream(docJspx);
+
+        Document docJspXml;
+        try {
+            docJspXml = XmlUtils.getDocumentBuilder().parse(docJspxIs);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Could not open " + rooJspx.name()
+                    + ".jspx file", ex);
+        }
+
+        Element docRoot = docJspXml.getDocumentElement();
+        // Add new tag namesapces
+        Element divMain = XmlUtils.findFirstElement("/div", docRoot);
+        divMain.setAttribute("xmlns:spring",
+                "http://www.springframework.org/tags");
+        divMain.setAttribute("xmlns:pattern",
+                "urn:jsptagdir:/WEB-INF/tags/pattern");
+
+        String idPrefix = rooJspx.equals(RooJspx.create) ? "fc:" : "fu:";
+        String formType = rooJspx.equals(RooJspx.create) ? "create" : "update";
+
+        Element form = XmlUtils.findFirstElement(
+                "/div/"
+                        + formType
+                        + "[@id='"
+                        + XmlUtils.convertId(idPrefix
+                                + formbackingType.getFullyQualifiedTypeName())
+                        + "']", docRoot);
+
+        String divContPaneId = XmlUtils.convertId("div:"
+                + formbackingType.getFullyQualifiedTypeName() + "_contentPane");
+        Element divContentPane = XmlUtils.findFirstElement("/div/" + formType
+                + "/div[@id='" + divContPaneId + "']", docRoot);
+        if (null == divContentPane) {
+            divContentPane = new XmlElementBuilder("div", docJspXml)
+                    .addAttribute("id", divContPaneId)
+                    .addAttribute("class", "patternContentPane").build();
+        }
+
+        String divFormId = XmlUtils.convertId("div:"
+                + formbackingType.getFullyQualifiedTypeName() + "_formNoedit");
+        Element divForm = XmlUtils.findFirstElement("/div/" + formType
+                + "/div/div[@id='" + divFormId + "']", docRoot);
+        if (null == divForm) {
+            divForm = new XmlElementBuilder("div", docJspXml)
+                    .addAttribute("id", divFormId)
+                    .addAttribute("class", "formularios boxNoedit").build();
+            divContentPane.appendChild(divForm);
+        }
+
+        // Wrap fields into <ul><li/></ul>
+        NodeList fields = form.getChildNodes();
+        if (fields.getLength() > 0) {
+            Node thisField;
+            for (int i = 0; i < fields.getLength(); i++) {
+                thisField = fields.item(i);
+
+                if (thisField.getNodeName().startsWith("field:")
+                        && !thisField.getParentNode().getNodeName()
+                                .equalsIgnoreCase("li")) {
+                    if (null != thisField.getAttributes()
+                    /*
+                     * && null != thisField.getAttributes().getNamedItem(
+                     * "type") &&
+                     * !thisField.getAttributes().getNamedItem("type")
+                     * .getNodeValue().equalsIgnoreCase("hidden")
+                     */) {
+                        Node thisNodeCpy = thisField.cloneNode(true);
+                        String fieldAttValue = thisNodeCpy.getAttributes()
+                                .getNamedItem("field").getNodeValue();
+                        Element li = new XmlElementBuilder("li", docJspXml)
+                                .addAttribute("class", "size120")
+                                .addAttribute(
+                                        "id",
+                                        XmlUtils.convertId("li:"
+                                                .concat(formbackingType
+                                                        .getFullyQualifiedTypeName())
+                                                .concat(".")
+                                                .concat(fieldAttValue)))
+                                .addChild(thisNodeCpy).build();
+                        Element ul = new XmlElementBuilder("ul", docJspXml)
+                                .addAttribute("class", "formInline")
+                                .addAttribute(
+                                        "id",
+                                        XmlUtils.convertId("ul:"
+                                                .concat(formbackingType
+                                                        .getFullyQualifiedTypeName())
+                                                .concat(".")
+                                                .concat(fieldAttValue)))
+                                .addChild(li).build();
+                        divForm.appendChild(ul);
+                        form.removeChild(thisField);
+                        // form.replaceChild(ul, thisField);
+                    }
+                }
+            }
+        }
+
+        // Add a hidden field holding gvnixpattern parameter if exists
+        String hiddenFieldId = XmlUtils
+                .convertId("c:" + formbackingType.getFullyQualifiedTypeName()
+                        + "_gvnixpattern");
+        Element hiddenField = XmlUtils.findFirstElement("/div/" + formType
+                + "/div/div/hiddengvnipattern[@id='" + hiddenFieldId + "']",
+                docRoot);
+        if (null == hiddenField) {
+            hiddenField = new XmlElementBuilder("pattern:hiddengvnipattern",
+                    docJspXml).addAttribute("id", hiddenFieldId)
+                    .addAttribute("value", "${param.gvnixpattern}")
+                    .addAttribute("render", "${not empty param.gvnixpattern}")
+                    .build();
+            divForm.appendChild(hiddenField);
+        }
+
+        // Add a cancel button
+        String cancelId = XmlUtils.convertId(idPrefix
+                + formbackingType.getFullyQualifiedTypeName() + "_cancel");
+        Element cancelButton = XmlUtils.findFirstElement("/div/" + formType
+                + "/div/div/cancelbutton[@id='" + cancelId + "']", docRoot);
+        if (null == cancelButton) {
+            cancelButton = new XmlElementBuilder("pattern:cancelbutton",
+                    docJspXml).addAttribute("id", cancelId)
+                    .addAttribute("render", "${not empty param.gvnixpattern}")
+                    .build();
+            divForm.appendChild(cancelButton);
+        }
+
+        form.appendChild(divContentPane);
+
+        XmlUtils.removeTextNodes(docJspXml);
+        fileManager.createOrUpdateTextFileIfRequired(docJspx,
+                XmlUtils.nodeToString(docJspXml), true);
+        // writeToDiskIfNecessary(docJspx, docJspXml);
     }
 
     /**
@@ -645,6 +834,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
 
         writeToDiskIfNecessary(loadScriptsTagx,
                 loadScriptsXml.getDocumentElement());
+
     }
 
     /**
@@ -722,12 +912,12 @@ public class PatternJspMetadataListener implements MetadataProvider,
      * Returns de XML Document with the JSPx
      * <p>
      * <strong>This method is based in:</strong>
-     * {@link org.springframework.roo.addon.web.mvc.jsp. JspViewManager#getUpdateDocument()}
+     * {@link org.springframework.roo.addon.web.mvc.jsp.JspViewManager#getUpdateDocument()}
      * </p>
      * 
      * @return
      */
-    private Document getUpdateDocument() {
+    private Document getUpdateTabularDocument() {
 
         String controllerPath = webScaffoldAnnotationValues.getPath();
         Assert.notNull(controllerPath,
@@ -747,7 +937,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
                 .addAttribute("xmlns:form",
                         "urn:jsptagdir:/WEB-INF/tags/pattern/form")
                 .addAttribute("xmlns:field",
-                        "urn:jsptagdir:/WEB-INF/tags/pattern/form/field")
+                        "urn:jsptagdir:/WEB-INF/tags/pattern/form/fields")
                 .addAttribute("xmlns:jsp", "http://java.sun.com/JSP/Page")
                 .addAttribute("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util")
                 .addAttribute("version", "2.0")
@@ -1166,6 +1356,9 @@ public class PatternJspMetadataListener implements MetadataProvider,
     /**
      * Decides if write to disk is needed (ie updated or created)<br/>
      * Used for JSPx files
+     * 
+     * @param jspFilename
+     * @param proposed
      */
     private void writeToDiskIfNecessary(String jspFilename, Document proposed) {
         Document original = null;
