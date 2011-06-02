@@ -154,12 +154,12 @@ public class PatternMetadata extends
 
         if (isPatternTypeDefined(WebPattern.tabular, definedPatternsList)) {
             // annotateFormBackingObject();
+            builder.addMethod(getTabularMethod());
             builder.addMethod(getCreateListMethod());
             builder.addMethod(getUpdateListMethod());
             builder.addMethod(getDeleteListMethod());
             builder.addMethod(getFilterListMethod());
             builder.addMethod(getRefererRedirectMethod());
-            builder.addMethod(getTabularMethod());
             // logger.warning(formBackingType.getSimpleTypeName().concat(
             // " must be annotated with @GvNIXEntityBatch"));
         }
@@ -167,8 +167,8 @@ public class PatternMetadata extends
         if (isPatternTypeDefined(WebPattern.register, definedPatternsList)) {
             // addStaticFields();
             builder.addMethod(getRegisterMethod());
-            builder.addMethod(getUpdateMethod());
             builder.addMethod(getCreateMethod());
+            builder.addMethod(getUpdateMethod());
             builder.addMethod(getDeleteMethod());
             builder.addMethod(getRefererQueryMethod());
             builder.addMethod(getRefererQueryNoIndexMethod());
@@ -316,7 +316,7 @@ public class PatternMetadata extends
 
         List<AnnotationAttributeValue<?>> reqParamAttrPage = new ArrayList<AnnotationAttributeValue<?>>();
         reqParamAttrPage.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "gvnixpattern"));
+                "value"), "page"));
         reqParamAttrPage.add(new BooleanAttributeValue(new JavaSymbolName(
                 "required"), false));
         List<AnnotationMetadata> methodAttrPageAnnotations = new ArrayList<AnnotationMetadata>();
@@ -330,7 +330,7 @@ public class PatternMetadata extends
 
         List<AnnotationAttributeValue<?>> reqParamAttrSize = new ArrayList<AnnotationAttributeValue<?>>();
         reqParamAttrSize.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "gvnixpattern"));
+                "value"), "size"));
         reqParamAttrSize.add(new BooleanAttributeValue(new JavaSymbolName(
                 "required"), false));
         List<AnnotationMetadata> methodAttrSizeAnnotations = new ArrayList<AnnotationMetadata>();
@@ -450,7 +450,7 @@ public class PatternMetadata extends
         bodyBuilder.indent();
         bodyBuilder
                 .appendFormalLine("ini = query.startsWith(\"index=\") ? 0 : -1;");
-        bodyBuilder.appendFormalLine("index = \"index =\" + i;");
+        bodyBuilder.appendFormalLine("index = \"index=\" + i;");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
@@ -950,9 +950,9 @@ public class PatternMetadata extends
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(String.class
                 .getName()), methodAttrPatternAnnotations));
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(
-                "org.springframework.ui.Model"), null));
-        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
                 "javax.servlet.http.HttpServletRequest"), null));
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "org.springframework.ui.Model"), null));
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
@@ -966,8 +966,8 @@ public class PatternMetadata extends
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         methodParamNames.add(new JavaSymbolName("index"));
         methodParamNames.add(new JavaSymbolName("pattern"));
-        methodParamNames.add(new JavaSymbolName("uiModel"));
         methodParamNames.add(new JavaSymbolName("request"));
+        methodParamNames.add(new JavaSymbolName("uiModel"));
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -1001,11 +1001,6 @@ public class PatternMetadata extends
                                 .getSymbolName()
                                 .concat("(index == null ? 0 : (index.intValue() - 1), 1);")));
 
-        bodyBuilder.appendFormalLine(formBackingType
-                .getSimpleTypeName()
-                .concat(" ")
-                .concat(formBackingType.getSimpleTypeName().toLowerCase()
-                        .concat(" = null;")));
         bodyBuilder.appendFormalLine("if (".concat(
                 entityNamePlural.toLowerCase()).concat(".isEmpty()) {"));
         bodyBuilder.indent();
@@ -1019,8 +1014,10 @@ public class PatternMetadata extends
         bodyBuilder.appendFormalLine("}");
 
         bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName()
-                .toLowerCase().concat(" = ")
-                .concat(entityNamePlural.toLowerCase()).concat(".get(0);"));
+                .concat(" ")
+                .concat(formBackingType.getSimpleTypeName().toLowerCase())
+                .concat(" = ").concat(entityNamePlural.toLowerCase())
+                .concat(".get(0);"));
 
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
                 .concat(entityNamePlural.toLowerCase()).concat("\", ")

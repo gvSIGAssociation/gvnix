@@ -286,6 +286,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
 
         modifyRooJsp(RooJspx.create);
         modifyRooJsp(RooJspx.update);
+        modifyRooJsp(RooJspx.show);
 
     }
 
@@ -498,7 +499,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
     }
 
     public enum RooJspx {
-        create, update;
+        create, update, show;
     }
 
     /**
@@ -543,17 +544,18 @@ public class PatternJspMetadataListener implements MetadataProvider,
         Element docRoot = docJspXml.getDocumentElement();
         // Add new tag namesapces
         Element divMain = XmlUtils.findFirstElement("/div", docRoot);
-        divMain.setAttribute("xmlns:spring",
-                "http://www.springframework.org/tags");
-        divMain.setAttribute("xmlns:pattern",
-                "urn:jsptagdir:/WEB-INF/tags/pattern");
+        
+        if (rooJspx.equals(RooJspx.create) || rooJspx.equals(RooJspx.update)) {
+            divMain.setAttribute("xmlns:pattern",
+                    "urn:jsptagdir:/WEB-INF/tags/pattern");
+        }
 
-        String idPrefix = rooJspx.equals(RooJspx.create) ? "fc:" : "fu:";
-        String formType = rooJspx.equals(RooJspx.create) ? "create" : "update";
+        String idPrefix = rooJspx.equals(RooJspx.create) ? "fc:" : rooJspx
+                .equals(RooJspx.update) ? "fu:" : "ps:";
 
         Element form = XmlUtils.findFirstElement(
                 "/div/"
-                        + formType
+                        + rooJspx.name()
                         + "[@id='"
                         + XmlUtils.convertId(idPrefix
                                 + formbackingType.getFullyQualifiedTypeName())
@@ -561,8 +563,9 @@ public class PatternJspMetadataListener implements MetadataProvider,
 
         String divContPaneId = XmlUtils.convertId("div:"
                 + formbackingType.getFullyQualifiedTypeName() + "_contentPane");
-        Element divContentPane = XmlUtils.findFirstElement("/div/" + formType
-                + "/div[@id='" + divContPaneId + "']", docRoot);
+        Element divContentPane = XmlUtils.findFirstElement(
+                "/div/" + rooJspx.name() + "/div[@id='" + divContPaneId + "']",
+                docRoot);
         if (null == divContentPane) {
             divContentPane = new XmlElementBuilder("div", docJspXml)
                     .addAttribute("id", divContPaneId)
@@ -571,7 +574,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
 
         String divFormId = XmlUtils.convertId("div:"
                 + formbackingType.getFullyQualifiedTypeName() + "_formNoedit");
-        Element divForm = XmlUtils.findFirstElement("/div/" + formType
+        Element divForm = XmlUtils.findFirstElement("/div/" + rooJspx.name()
                 + "/div/div[@id='" + divFormId + "']", docRoot);
         if (null == divForm) {
             divForm = new XmlElementBuilder("div", docJspXml)
@@ -628,35 +631,39 @@ public class PatternJspMetadataListener implements MetadataProvider,
             }
         }
 
-        // Add a hidden field holding gvnixpattern parameter if exists
-        String hiddenFieldId = XmlUtils
-                .convertId("c:" + formbackingType.getFullyQualifiedTypeName()
-                        + "_gvnixpattern");
-        Element hiddenField = XmlUtils.findFirstElement("/div/" + formType
-                + "/div/div/hiddengvnipattern[@id='" + hiddenFieldId + "']",
-                docRoot);
-        if (null == hiddenField) {
-            hiddenField = new XmlElementBuilder("pattern:hiddengvnipattern",
-                    docJspXml).addAttribute("id", hiddenFieldId)
-                    .addAttribute("value", "${param.gvnixpattern}")
-                    .addAttribute("render", "${not empty param.gvnixpattern}")
-                    .build();
-            divForm.appendChild(hiddenField);
+        if (rooJspx.equals(RooJspx.create) || rooJspx.equals(RooJspx.update)) {
+            // Add a hidden field holding gvnixpattern parameter if exists
+            String hiddenFieldId = XmlUtils.convertId("c:"
+                    + formbackingType.getFullyQualifiedTypeName()
+                    + "_gvnixpattern");
+            Element hiddenField = XmlUtils.findFirstElement(
+                    "/div/" + rooJspx.name()
+                            + "/div/div/hiddengvnipattern[@id='"
+                            + hiddenFieldId + "']", docRoot);
+            if (null == hiddenField) {
+                hiddenField = new XmlElementBuilder(
+                        "pattern:hiddengvnipattern", docJspXml)
+                        .addAttribute("id", hiddenFieldId)
+                        .addAttribute("value", "${param.gvnixpattern}")
+                        .addAttribute("render",
+                                "${not empty param.gvnixpattern}").build();
+                divForm.appendChild(hiddenField);
+            }
+            // Add a cancel button
+            String cancelId = XmlUtils.convertId(idPrefix
+                    + formbackingType.getFullyQualifiedTypeName() + "_cancel");
+            Element cancelButton = XmlUtils.findFirstElement(
+                    "/div/" + rooJspx.name() + "/div/div/cancelbutton[@id='"
+                            + cancelId + "']", docRoot);
+            if (null == cancelButton) {
+                cancelButton = new XmlElementBuilder("pattern:cancelbutton",
+                        docJspXml)
+                        .addAttribute("id", cancelId)
+                        .addAttribute("render",
+                                "${not empty param.gvnixpattern}").build();
+                divForm.appendChild(cancelButton);
+            }
         }
-
-        // Add a cancel button
-        String cancelId = XmlUtils.convertId(idPrefix
-                + formbackingType.getFullyQualifiedTypeName() + "_cancel");
-        Element cancelButton = XmlUtils.findFirstElement("/div/" + formType
-                + "/div/div/cancelbutton[@id='" + cancelId + "']", docRoot);
-        if (null == cancelButton) {
-            cancelButton = new XmlElementBuilder("pattern:cancelbutton",
-                    docJspXml).addAttribute("id", cancelId)
-                    .addAttribute("render", "${not empty param.gvnixpattern}")
-                    .build();
-            divForm.appendChild(cancelButton);
-        }
-
         form.appendChild(divContentPane);
 
         XmlUtils.removeTextNodes(docJspXml);
@@ -693,7 +700,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
         // modify load-scripts.tagx
         modifyLoadScriptsTagx();
 
-        // TODO: add properties needed by artifacts
+        // XXX: add properties needed by artifacts
         // Detected: message_alert_title, message_info_title,
         // message_error_title
         Map<String, String> properties = new LinkedHashMap<String, String>();
