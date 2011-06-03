@@ -54,7 +54,7 @@ public class WebScreenCommands implements CommandMarker {
      * 
      * @return true if commands are available
      */
-    @CliAvailabilityIndicator({ "web mvc screen" })
+    @CliAvailabilityIndicator({ "web mvc pattern" })
     public boolean isWebScreenAvaliable() {
         return operations.isCommandAvailable();
     }
