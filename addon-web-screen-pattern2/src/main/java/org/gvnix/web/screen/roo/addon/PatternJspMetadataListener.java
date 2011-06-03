@@ -544,7 +544,7 @@ public class PatternJspMetadataListener implements MetadataProvider,
         Element docRoot = docJspXml.getDocumentElement();
         // Add new tag namesapces
         Element divMain = XmlUtils.findFirstElement("/div", docRoot);
-        
+
         if (rooJspx.equals(RooJspx.create) || rooJspx.equals(RooJspx.update)) {
             divMain.setAttribute("xmlns:pattern",
                     "urn:jsptagdir:/WEB-INF/tags/pattern");
@@ -701,18 +701,19 @@ public class PatternJspMetadataListener implements MetadataProvider,
         modifyLoadScriptsTagx();
 
         // XXX: add properties needed by artifacts
-        // Detected: message_alert_title, message_info_title,
-        // message_error_title
         Map<String, String> properties = new LinkedHashMap<String, String>();
         properties.put("message_alert_title", "Alert");
         properties.put("message_info_title", "Information");
         properties.put("message_error_title", "Error");
+        properties.put("message_suggest_title", "Suggestion");
+        properties
+                .put("message_pending_changes_problemdescription",
+                        "There are changes pending to save. SAVE or CANCEL before proceed.");
 
         propFileOperations
                 .addProperties(Path.SRC_MAIN_WEBAPP,
                         "/WEB-INF/i18n/application.properties", properties,
                         true, false);
-
     }
 
     /**
