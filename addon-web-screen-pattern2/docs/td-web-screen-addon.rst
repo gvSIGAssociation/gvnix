@@ -60,7 +60,7 @@ Command
 
 ::
 
-  web mvc pattern --class ~.web.PetController --pattern table --name MyPattern
+  web mvc pattern --class ~.web.PetController --type table --name MyPattern
 
 Options:
 
@@ -69,7 +69,7 @@ Options:
   Definir nuestro RooWebScaffoldJavaType que extiende JavaType y que adicionalmente comprobará que la anotación @RooWebScaffold se encuentra definida en el tipo principal de la clase Java.
   Comprobar que la anotación @RooWebScaffold se encuentra definida en el tipo principal de la clase Java
 
-* pattern: The pattern type to include on the controller object. *Required*
+* type: The pattern type to include on the controller object. *Required*
 
   Debe ser un tipo enumerado que permita elegir autocompletando de entre ciertos posibles valores.
 
