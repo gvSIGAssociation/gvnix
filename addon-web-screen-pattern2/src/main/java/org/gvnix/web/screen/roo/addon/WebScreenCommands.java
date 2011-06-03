@@ -69,7 +69,7 @@ public class WebScreenCommands implements CommandMarker {
      * @param pattern
      *            The pattern to apply
      */
-    @CliCommand(value = "web mvc screen", help = "Add a screen patter to a controller")
+    @CliCommand(value = "web mvc pattern", help = "Add a screen pattern to a controller")
     public void webScreenAdd(
             @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
             @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name,
