@@ -81,6 +81,38 @@ El comando tendrá que incluir la anotación @GvNIXPattern en la clase indicada 
 
   @GvNIXPattern({"MyPattern=table"})
 
+::
+
+  web mvc relation pattern --class ~.web.PetController --name MyPattern --field field1 --type table 
+
+Options:
+
+* class: The path and name of the controller object to be used. *Required*. Extends: JavaType
+
+  La clase debe estar ya anotada con @GvNIXPattern. 
+
+* name: name for the pattern in whole project to set relation pattern to. *Required*. Type: JavaSymbolName, it avoids non valid characters.
+
+  Debe estar un nombre definido en la anotación @GvNIXPattern
+
+* field: One-to-many property name to apply pattern to. *Required*
+
+  Ver la posibilidad de autocompletar.
+
+* type: The pattern type to apply pattern to. *Required*
+
+  Debe ser un tipo enumerado que permita elegir autocompletando de entre ciertos posibles valores.
+
+  En una primera versión, la única posibilidad de este tipo enumerado será el valor "table".
+
+El comando tendrá que incluir la anotación @GvNIXRelationsPattern en la clase indicada por la opción "class" del comando y con el siguiente value::
+
+  @GvNIXRelationsPattern({"MyPattern: field1=table"})``
+
+Si la anotación ya tubuiese un elemento para el patron añadido, el campo se añadira separado por comas::
+
+  @GvNIXRelationsPattern({"MyPattern: otherField=register, field1=table", "OtherPattern: otherField=talbe"})``
+
 ITD
 ----
 
