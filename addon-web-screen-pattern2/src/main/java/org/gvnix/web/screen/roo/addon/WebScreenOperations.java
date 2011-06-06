@@ -62,4 +62,31 @@ public interface WebScreenOperations {
      */
     void addPattern(JavaType controllerClass, JavaSymbolName name,
             WebPattern pattern);
+
+    /**
+     * <p>
+     * Adds a pattern to a web MVC controller field.
+     * </p>
+     * 
+     * <p>
+     * Adds to target controller @GvNIXRelationPattern annotation if it's
+     * needed.
+     * </p>
+     * 
+     * <p>
+     * Adds a new string pattern description to @GvNIXRelationPattern.
+     * </p>
+     * 
+     * @param controllerClass
+     *            The controller to apply the pattern to
+     * @param name
+     *            Identification to use for this pattern
+     * @param field
+     *            One-to-many field to apply the pattern to. It must exists in
+     *            controler's entity
+     * @param pattern
+     *            The pattern to apply
+     */
+    void addRelationPattern(JavaType controllerClass, JavaSymbolName name,
+            JavaSymbolName field, WebPattern type);
 }
