@@ -26,11 +26,15 @@ import java.util.regex.Pattern;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
+import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
@@ -41,6 +45,7 @@ import org.springframework.roo.classpath.details.annotations.StringAttributeValu
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -82,6 +87,18 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
             GvNIXRelationsPattern.class.getName());
 
     /**
+     * {@link GvNIXPattern} JavaType
+     */
+    public static final JavaType RELATED_PATTERN_ANNOTATION = new JavaType(
+            GvNIXRelatedPattern.class.getName());
+
+    /**
+     * Name of {@link GvNIXRelatedPattern} attribute value
+     */
+    public static final JavaSymbolName RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
+            "value");
+
+    /**
      * Name of {@link RooWebScaffold} attribute formBackingObject
      */
     public static final JavaSymbolName ROOWEBSCAFFOLD_ANNOTATION_ATTR_VALUE_FORMBACKINGOBJECT = new JavaSymbolName(
@@ -99,12 +116,18 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
     public static final JavaType ENTITYBATCH_ANNOTATION = new JavaType(
             GvNIXEntityBatch.class.getName());
 
+    public static final JavaType ONETOMANY_ANNOTATION = new JavaType(
+            "javax.persistence.OneToMany");
+
     /**
      * MetadataService offers access to Roo's metadata model, use it to retrieve
      * any available metadata by its MID
      */
     @Reference
     private MetadataService metadataService;
+
+    @Reference
+    private TypeLocationService typeLocationService;
 
     /**
      * Use the PhysicalTypeMetadataProvider to access information about a
@@ -134,7 +157,7 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
 
         // Get mutableTypeDetails from controllerClass. Also checks javaType is
         // a controller
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
+        MutableClassOrInterfaceTypeDetails controllerDetails = getControllerMutableTypeDetails(controllerClass);
 
         // TODO Refactor to check only this pattern in others controllers
         String patternDefinedTwice = patternService
@@ -149,7 +172,7 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
 
         // Test if the annotation already exists on the target type
         AnnotationMetadata annotationMetadata = MemberFindingUtils
-                .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
+                .getAnnotationOfType(controllerDetails.getAnnotations(),
                         PATTERN_ANNOTATION);
 
         // List of pattern to use
@@ -199,15 +222,17 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
 
         // Add or update annotation to target type
         if (isAlreadyAnnotated) {
-            mutableTypeDetails.updateTypeAnnotation(annotationBuilder.build(),
+            controllerDetails.updateTypeAnnotation(annotationBuilder.build(),
                     new HashSet<JavaSymbolName>());
         } else {
-            mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
+            controllerDetails.addTypeAnnotation(annotationBuilder.build());
         }
 
         if (pattern.equals(WebPattern.tabular)) {
-            annotateFormBackingObject(mutableTypeDetails);
+            annotateFormBackingObject(controllerDetails);
         }
+
+        // anotateFormBackingObjectRelationsControllers(controllerDetails);
 
     }
 
@@ -263,60 +288,354 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
                         mutableTypeDetails.getAnnotations(),
                         ROOWEBSCAFFOLD_ANNOTATION),
                 controllerClass.getSimpleTypeName().concat(
-                        " doesn't has @RooWebScaffold annotation"));
+                        " has not @RooWebScaffold annotation"));
         return mutableTypeDetails;
     }
 
-    private void annotateFormBackingObject(
-            MutableClassOrInterfaceTypeDetails mutableTypeDetails) {
-        AnnotationMetadata rooWebScaffoldAnnotationMetadata = MemberFindingUtils
-                .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
-                        ROOWEBSCAFFOLD_ANNOTATION);
+    /**
+     * For a given controller, this method inspect the OneToMany fields in its
+     * formBackingObjet and, based on GvNIXRelationsPattern annotationValues,
+     * annotates the controllers exposing these entities with the needed
+     * GvNIXPattern annotation
+     * 
+     * @param controllerDetails
+     * @param annotationValues
+     */
+    private void annotateFormBackingObjectRelationsControllers(
+            MutableClassOrInterfaceTypeDetails controllerDetails,
+            AnnotationAttributeValue<?> annotationValues) {
 
-        AnnotationAttributeValue<?> formbakingObjectAttValue = rooWebScaffoldAnnotationMetadata
-                .getAttribute(new JavaSymbolName("formBackingObject"));
-
-        JavaType formBakingObjectType = (JavaType) formbakingObjectAttValue
-                .getValue();
-        Assert.notNull(formBakingObjectType,
-                "formBakingObject attribute of RooWebScaffold in "
-                        + mutableTypeDetails.getName().getSimpleTypeName()
-                        + " must be set");
+        JavaType formBakingObjectType = getFormBakingObject(controllerDetails);
 
         // Retrieve metadata for the Java source type the annotation is being
         // added to
-        String formBackingTypeId = physicalTypeMetadataProvider
-                .findIdentifier(formBakingObjectType);
-        if (formBackingTypeId == null) {
-            throw new IllegalArgumentException("Cannot locate source for '"
+        String formBackingTypeId = EntityMetadata.createIdentifier(
+                formBakingObjectType, Path.SRC_MAIN_JAVA);
+        EntityMetadata formBackingTypeMetadata = (EntityMetadata) metadataService
+                .get(formBackingTypeId, true);
+        if (formBackingTypeMetadata == null) {
+            throw new IllegalArgumentException("Cannot locate Metadata for '"
                     + formBakingObjectType.getFullyQualifiedTypeName() + "'");
         }
 
+        List<FieldMetadata> fieldAnotations = patternService
+                .getOneToManyFieldsFromEntityJavaType(formBakingObjectType);
+        for (FieldMetadata field : fieldAnotations) {
+            if (field.getFieldType().isCommonCollectionType()) {
+                annotateEntityController(
+                        field.getFieldType().getParameters().get(0),
+                        getGvNIXRelatedPatternForEntityAndValues(
+                                field.getFieldName(), annotationValues));
+            }
+        }
+
+    }
+
+    /**
+     * For given parameters, entity and relationsPatternValues in the following
+     * annotation value format:
+     * <p>
+     * <code>@GvNIXRelationsPattern({"pattern_id1: field1=table, field2=table", "pattern_id2: field2=table"})</code>
+     * <p>
+     * the method parse the value and creates an instance of
+     * {@link GvNIXRelatedPattern} with the value of its part in the
+     * GvNIXRelationsPattern value. That is, in the given example, for (field1,
+     * {"pattern_id1: field1=table, field2=table",
+     * "pattern_id2: field2=table"}), it returns:<br/>
+     * GvNIXRelatedPattern({"pattern_id1=table"})
+     * 
+     * @param entity
+     * @param relationsPatternValues
+     * @return
+     */
+    private AnnotationMetadata getGvNIXRelatedPatternForEntityAndValues(
+            JavaSymbolName fieldName,
+            AnnotationAttributeValue<?> relationsPatternValues) {
+        List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
+        if (relationsPatternValues != null) {
+
+            @SuppressWarnings("unchecked")
+            List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues
+                    .getValue();
+            List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
+
+            // Parse annotationValues finding the field interesting part
+            if (relationsPatternList != null) {
+                String[] patternDef = {};
+                String[] fieldDefinitions = {};
+                String[] fieldPatternType = {};
+                for (StringAttributeValue strAttrValue : relationsPatternList) {
+                    patternDef = strAttrValue.getValue().split(":");
+                    fieldDefinitions = patternDef[1].trim().split(",");
+                    for (String fieldDef : fieldDefinitions) {
+                        fieldPatternType = fieldDef.trim().split("=");
+
+                        if (fieldName.getSymbolName().equalsIgnoreCase(
+                                fieldPatternType[0].trim())) {
+                            patternList
+                                    .add(new StringAttributeValue(
+                                            new JavaSymbolName("ignored"),
+                                            patternDef[0]
+                                                    .trim()
+                                                    .concat("=")
+                                                    .concat(fieldPatternType[1]
+                                                            .trim())));
+                        }
+                    }
+                }
+                attributes
+                        .add(new ArrayAttributeValue<StringAttributeValue>(
+                                RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME,
+                                patternList));
+            }
+        }
+        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                RELATED_PATTERN_ANNOTATION);
+        annotationBuilder.setAttributes(attributes);
+
+        return annotationBuilder.build();
+    }
+
+    /**
+     * Given a Entity this method look for the WebScaffold exposing it and adds
+     * {@link GvNIXPattern} in parameter annotation
+     * 
+     * @param entity
+     * @param annotation
+     */
+    private void annotateEntityController(JavaType entity,
+            AnnotationMetadata annotation) {
+        // MutableClassOrInterfaceTypeDetails mcitd =
+        // getPhysicalTypeDetails(entity);
+        AnnotationMetadata annotationMetadata = null;
+        for (ClassOrInterfaceTypeDetails cid : typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(ROOWEBSCAFFOLD_ANNOTATION)) {
+            annotationMetadata = MemberFindingUtils.getAnnotationOfType(
+                    cid.getAnnotations(), ROOWEBSCAFFOLD_ANNOTATION);
+            if (annotationMetadata != null) {
+                AnnotationAttributeValue<?> annotationValues = annotationMetadata
+                        .getAttribute(new JavaSymbolName("formBackingObject"));
+                if (annotationValues != null) {
+                    if (annotationValues.getName().compareTo(
+                            new JavaSymbolName("formBackingObject")) == 0
+                            && ((JavaType) annotationValues.getValue())
+                                    .getFullyQualifiedTypeName()
+                                    .equalsIgnoreCase(
+                                            entity.getFullyQualifiedTypeName())) {
+                        addOrUpdateGvNIXRelatedPatternToController(
+                                cid.getName(), annotation);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Annotates with GvNIXPattern (or updates the annotation value) the given
+     * controller
+     * 
+     * @param controllerClass
+     * @param annotation
+     *            Instace of GvNIXPattern annotation metadata
+     */
+    private void addOrUpdateGvNIXRelatedPatternToController(
+            JavaType controllerClass, AnnotationMetadata annotation) {
+
+        // Retrieve metadata for the Java source type the annotation is being
+        // added to
+        String controllerId = physicalTypeMetadataProvider
+                .findIdentifier(controllerClass);
+        if (controllerId == null) {
+            throw new IllegalArgumentException("Cannot locate source for '"
+                    + controllerClass.getFullyQualifiedTypeName() + "'");
+        }
+
+        final String controllerFriendlyName = PhysicalTypeIdentifier
+                .getFriendlyName(controllerId);
         // Obtain the physical type and itd mutable details
         PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
-                .get(formBackingTypeId, true);
+                .get(controllerId);
         Assert.notNull(physicalTypeMetadata,
                 "Java source code unavailable for type "
-                        .concat(formBakingObjectType
-                                .getFullyQualifiedTypeName()));
+                        .concat(controllerFriendlyName));
 
         // Obtain physical type details for the target type
         PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
                 .getMemberHoldingTypeDetails();
         Assert.notNull(physicalTypeDetails,
                 "Java source code details unavailable for type "
-                        .concat(formBakingObjectType
-                                .getFullyQualifiedTypeName()));
+                        .concat(controllerFriendlyName));
 
         // Test if the type is an MutableClassOrInterfaceTypeDetails instance so
         // the annotation can be added
         Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
                 physicalTypeDetails, "Java source code is immutable for type "
-                        .concat(formBakingObjectType
-                                .getFullyQualifiedTypeName()));
+                        .concat(controllerFriendlyName));
+        MutableClassOrInterfaceTypeDetails controllerDetails = (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
+
+        // Test if has the @RooWebScaffold
+        Assert.notNull(
+                MemberFindingUtils.getAnnotationOfType(
+                        controllerDetails.getAnnotations(),
+                        ROOWEBSCAFFOLD_ANNOTATION),
+                controllerClass.getSimpleTypeName().concat(
+                        " has not @RooWebScaffold annotation"));
+
+        // All checks passed OK.
+        // We don't need to do Setup because it must be done by addPattern call
 
         // Test if the annotation already exists on the target type
-        MutableClassOrInterfaceTypeDetails formBakingObjectMutableTypeDetails = (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
+        AnnotationMetadata annotationMetadata = MemberFindingUtils
+                .getAnnotationOfType(controllerDetails.getAnnotations(),
+                        RELATED_PATTERN_ANNOTATION);
+
+        // List of pattern to use
+        List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
+
+        boolean isAlreadyAnnotated = false;
+        if (annotationMetadata != null) {
+            // @GvNIXPattern alredy exists
+
+            // Loads previously registered pattern into patterList
+            // Also checks if name is used previously
+            AnnotationAttributeValue<?> previousAnnotationValues = annotationMetadata
+                    .getAttribute(RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+
+            if (previousAnnotationValues != null) {
+
+                @SuppressWarnings("unchecked")
+                List<StringAttributeValue> previousValues = (List<StringAttributeValue>) previousAnnotationValues
+                        .getValue();
+                patternList.addAll(previousValues);
+
+                // if (previousValues != null && !previousValues.isEmpty()) {
+                //
+                // for (StringAttributeValue value : previousValues) {
+                // // Check if name is already used
+                // //Assert.isTrue(!equalsPatternName(value, name),
+                // // "Pattern name already used in class");
+                //
+                // patternList.add(value);
+                // }
+                // }
+            }
+            isAlreadyAnnotated = true;
+        }
+
+        // We're sure that annotation has set a value since we created this
+        // instance
+        @SuppressWarnings("unchecked")
+        List<StringAttributeValue> newValues = (List<StringAttributeValue>) annotation
+                .getAttribute(RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME)
+                .getValue();
+        patternList.addAll(newValues);
+
+        AnnotationAttributeValue<?> gvNIXRelatedPatternValue = new ArrayAttributeValue<StringAttributeValue>(
+                RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList);
+        // Check if the controller has defined the same pattern more
+        // than once
+        // TODO: next check must be over if pattern id is already defined in
+        // project
+        // Assert.isTrue(
+        // arePatternsDefinedOnceInController(gvNIXRelatedPatternValue),
+        // "Controller ".concat(
+        // controllerClass.getFullyQualifiedTypeName()).concat(
+        // " has the same pattern defined more than once"));
+
+        // Prepare annotation builder
+        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                RELATED_PATTERN_ANNOTATION);
+        annotationBuilder.addAttribute(gvNIXRelatedPatternValue);
+
+        // Add or update annotation to target type
+        if (isAlreadyAnnotated) {
+            controllerDetails.updateTypeAnnotation(annotationBuilder.build(),
+                    new HashSet<JavaSymbolName>());
+        } else {
+            controllerDetails.addTypeAnnotation(annotationBuilder.build());
+        }
+
+    }
+
+    @SuppressWarnings("unused")
+    private boolean arePatternsDefinedOnceInController(
+            AnnotationAttributeValue<?> values) {
+        List<String> auxList = new ArrayList<String>();
+        for (String value : getPatternNames(values)) {
+            if (auxList.contains(value)) {
+                return false;
+            } else {
+                auxList.add(value);
+            }
+        }
+        return true;
+
+    }
+
+    private List<String> getPatternNames(AnnotationAttributeValue<?> values) {
+        List<String> patternNames = new ArrayList<String>();
+        if (values != null) {
+            @SuppressWarnings("unchecked")
+            List<StringAttributeValue> attrValues = (List<StringAttributeValue>) values
+                    .getValue();
+
+            if (attrValues != null) {
+                String[] pattern = {};
+                for (StringAttributeValue strAttrValue : attrValues) {
+                    pattern = strAttrValue.getValue().split("=");
+                    patternNames.add(pattern[0]);
+                }
+            }
+        }
+        return patternNames;
+    }
+
+    /**
+     * Returns an instace of MutableClassOrInterfaceTypeDetails of the type
+     * given
+     * 
+     * @param type
+     * @return
+     */
+    private MutableClassOrInterfaceTypeDetails getPhysicalTypeDetails(
+            JavaType type) {
+        // Retrieve metadata for the Java source type the annotation is being
+        // added to
+        String entityId = physicalTypeMetadataProvider.findIdentifier(type);
+        if (entityId == null) {
+            throw new IllegalArgumentException("Cannot locate source for '"
+                    + type.getFullyQualifiedTypeName() + "'");
+        }
+
+        // Obtain the physical type and itd mutable details
+        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+                .get(entityId, true);
+        Assert.notNull(physicalTypeMetadata,
+                "Java source code unavailable for type ".concat(type
+                        .getFullyQualifiedTypeName()));
+
+        // Obtain physical type details for the target type
+        PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
+                .getMemberHoldingTypeDetails();
+        Assert.notNull(physicalTypeDetails,
+                "Java source code details unavailable for type ".concat(type
+                        .getFullyQualifiedTypeName()));
+        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+                physicalTypeDetails, "Java source code is immutable for type "
+                        .concat(type.getFullyQualifiedTypeName()));
+        return (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
+    }
+
+    /**
+     * Annotates with GvNIXEntityBatch the JavaType defined by formBackingObject
+     * in controller web scaffold
+     * 
+     * @param controllerDetails
+     */
+    private void annotateFormBackingObject(
+            MutableClassOrInterfaceTypeDetails controllerDetails) {
+        // Test if the annotation already exists on the target type
+        MutableClassOrInterfaceTypeDetails formBakingObjectMutableTypeDetails = getFormBackingObjectPhysicalTypeDetails(controllerDetails);
         AnnotationMetadata annotationMetadata = MemberFindingUtils
                 .getAnnotationOfType(
                         formBakingObjectMutableTypeDetails.getAnnotations(),
@@ -331,6 +650,33 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
             formBakingObjectMutableTypeDetails
                     .addTypeAnnotation(annotationBuilder.build());
         }
+    }
+
+    private MutableClassOrInterfaceTypeDetails getFormBackingObjectPhysicalTypeDetails(
+            MutableClassOrInterfaceTypeDetails controllerDetails) {
+
+        JavaType formBakingObjectType = getFormBakingObject(controllerDetails);
+
+        return getPhysicalTypeDetails(formBakingObjectType);
+    }
+
+    private JavaType getFormBakingObject(
+            MutableClassOrInterfaceTypeDetails controllerDetails) {
+        AnnotationMetadata rooWebScaffoldAnnotationMetadata = MemberFindingUtils
+                .getAnnotationOfType(controllerDetails.getAnnotations(),
+                        ROOWEBSCAFFOLD_ANNOTATION);
+
+        AnnotationAttributeValue<?> formbakingObjectAttValue = rooWebScaffoldAnnotationMetadata
+                .getAttribute(new JavaSymbolName("formBackingObject"));
+
+        JavaType formBakingObjectType = (JavaType) formbakingObjectAttValue
+                .getValue();
+        Assert.notNull(formBakingObjectType,
+                "formBakingObject attribute of RooWebScaffold in "
+                        + controllerDetails.getName().getSimpleTypeName()
+                        + " must be set");
+
+        return formBakingObjectType;
     }
 
     /**
@@ -424,7 +770,7 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
                 patternService.getOneToManyFieldFromEntityJavaType(
                         formBackingObject, field.getSymbolName()),
                 "Field '".concat(field.getSymbolName())
-                        .concat("' not found or is not a OneToMany in '")
+                        .concat("' not found or is not OneToMany in '")
                         .concat(formBackingObject.getFullyQualifiedTypeName())
                         .concat("' entity."));
 
@@ -526,10 +872,9 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
         // Prepare annotation builder
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 RELATION_PATTERN_ANNOTATION);
-        annotationBuilder
-                .addAttribute(new ArrayAttributeValue<StringAttributeValue>(
-                        RELATION_PATTERN_ANNOTATION_ATTR_VALUE_NAME,
-                        patternList));
+        AnnotationAttributeValue<?> annotationValues = new ArrayAttributeValue<StringAttributeValue>(
+                RELATION_PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList);
+        annotationBuilder.addAttribute(annotationValues);
 
         // Add or update annotation to target type
         if (isAlreadyAnnotated) {
@@ -540,9 +885,11 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
         }
 
         // TODO Synchronize it with oscar's change
-        if (type.equals(WebPattern.tabular)) {
-            annotateFormBackingObject(mutableTypeDetails);
-        }
+        // if (type.equals(WebPattern.tabular)) {
+        annotateFormBackingObjectRelationsControllers(mutableTypeDetails,
+                annotationValues);
+        // annotateFormBackingObject(mutableTypeDetails);
+        // }
     }
 
     private boolean existsFieldPatternDeclaration(String definition,
@@ -555,7 +902,7 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
             sb.append(ch);
             sb.append(']');
         }
-        sb.append("[ ][=]");
+        sb.append("[ ]*[=]");
         Pattern pattern = Pattern.compile(sb.toString());
         return pattern.matcher(definition).find();
     }
