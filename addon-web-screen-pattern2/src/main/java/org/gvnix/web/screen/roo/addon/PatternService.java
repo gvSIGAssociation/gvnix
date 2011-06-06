@@ -18,6 +18,8 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import java.util.List;
+
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.model.JavaType;
@@ -54,6 +56,16 @@ public interface PatternService {
      */
     public FieldMetadata getOneToManyFieldFromEntityJavaType(
             JavaType entityJavaType, String fieldName);
+
+    /**
+     * Returns the list of fields metadata of those fields annotated with
+     * OneToMany
+     * 
+     * @param formBakingObjectType
+     * @return
+     */
+    public List<FieldMetadata> getOneToManyFieldsFromEntityJavaType(
+            JavaType formBakingObjectType);
 
     /**
      * Returns an instance of MutableClassOrInterfaceTypeDetails of the type

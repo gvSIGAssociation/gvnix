@@ -18,6 +18,7 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.felix.scr.annotations.Component;
@@ -65,6 +66,19 @@ public class PatternServicesImpl implements PatternService {
     /** {@inheritDoc} */
     public FieldMetadata getOneToManyFieldFromEntityJavaType(
             JavaType formBakingObjectType, String fieldName) {
+        List<FieldMetadata> oneToManyFields = getOneToManyFieldsFromEntityJavaType(formBakingObjectType);
+        for (FieldMetadata field : oneToManyFields) {
+            if (field.getFieldName().getSymbolName().equals(fieldName)) {
+                return field;
+            }
+        }
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public List<FieldMetadata> getOneToManyFieldsFromEntityJavaType(
+            JavaType formBakingObjectType) {
+        List<FieldMetadata> oneToManyFields = new ArrayList<FieldMetadata>();
         MutableClassOrInterfaceTypeDetails formBackingTypeMetadata = getPhysicalTypeDetails(formBakingObjectType);
 
         Assert.notNull(formBackingTypeMetadata, "Cannot locate Metadata for '"
@@ -75,15 +89,14 @@ public class PatternServicesImpl implements PatternService {
                 .getDeclaredFields();
 
         for (FieldMetadata field : fields) {
-            for (AnnotationMetadata fieldAnnotation : field.getAnnotations())
+            for (AnnotationMetadata fieldAnnotation : field.getAnnotations()) {
                 if (fieldAnnotation.getAnnotationType().equals(
                         ONETOMANY_ANNOTATION)) {
-                    if (field.getFieldName().getSymbolName().equals(fieldName)) {
-                        return field;
-                    }
+                    oneToManyFields.add(field);
                 }
+            }
         }
-        return null;
+        return oneToManyFields;
     }
 
     /** {@inheritDoc} */
