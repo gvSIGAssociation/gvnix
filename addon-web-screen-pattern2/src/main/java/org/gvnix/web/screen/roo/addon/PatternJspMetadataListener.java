@@ -481,6 +481,9 @@ public class PatternJspMetadataListener implements MetadataProvider,
             } else if (field.getFieldType().isCommonCollectionType()
                     && field.getCustomData().get(
                             PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) != null) {
+                // TODO: I think that here is the place to add the JSP elements
+                // for related entities. In this case, we must to check with
+                // GvNIXRelationsPattern if the field should be or not shown
                 continue;
             }
             fieldDisplay.setAttribute("z",
