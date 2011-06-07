@@ -19,6 +19,8 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -35,6 +37,7 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -50,6 +53,12 @@ import org.w3c.dom.Element;
 @Component
 @Service
 public class OperationsImpl implements Operations {
+
+    private static final Logger logger = HandlerUtils
+            .getLogger(OperationsImpl.class);
+
+    private static final String[] SOURCE_PATHS = { "src/main/resources",
+            "src/main/webapp" };
 
     @Reference
     private MetadataService metadataService;
@@ -338,7 +347,6 @@ public class OperationsImpl implements Operations {
     }
 
     /**
-     * 
      * {@inheritDoc}
      */
     public DynConfigurationList export() {
@@ -454,52 +462,95 @@ public class OperationsImpl implements Operations {
                 }
 
                 // Get dynamic component dir and file paths
+
                 String filePath = services.getFilePath(dynComp);
-                int index = filePath.lastIndexOf('/');
-                String dirName;
-                String fileName;
-                if (index != -1) {
 
-                    dirName = filePath.substring(0, filePath.lastIndexOf('/'));
-                    fileName = filePath.substring(
-                            filePath.lastIndexOf('/') + 1, filePath.length());
-                } else {
+                String dirName = "";
+                for (int i = 0; i < SOURCE_PATHS.length; i++) {
+                    if (filePath.startsWith(SOURCE_PATHS[i])) {
+                        dirName = SOURCE_PATHS[i];
+                        break;
+                    }
+                }
+                String fileName = filePath.substring(dirName.length() + 1);
+                if (dirName.isEmpty() || fileName.isEmpty()) {
 
-                    dirName = "";
-                    fileName = filePath;
+                    logger.log(Level.SEVERE, "Invalid file path for component "
+                            + dynComp.getName());
+                    break;
                 }
 
-                // TODO Avoid duplicated resource
+                // Resource section with filter: find or create if not exists
+                Element reso = XmlUtils.findFirstElement("resource/directory"
+                        + "[text()='" + dirName
+                        + "']/../filtering[text()='true']/..", resos);
+                Element dir;
+                if (reso == null) {
 
-                // Create a include resource section for this dynamic component
-                Element reso = doc.createElement("resource");
-                resos.appendChild(reso);
-                Element dir = doc.createElement("directory");
-                dir.setTextContent(dirName);
-                reso.appendChild(dir);
-                Element files = doc.createElement("includes");
-                reso.appendChild(files);
+                    // Create an include resource section and dir
+                    reso = doc.createElement("resource");
+                    resos.appendChild(reso);
+                    dir = doc.createElement("directory");
+                    dir.setTextContent(dirName);
+                    reso.appendChild(dir);
+                }
+
+                // Includes section: find or create if not exists
+                Element files = XmlUtils.findFirstElement("includes", reso);
+                if (files == null) {
+
+                    files = doc.createElement("includes");
+                    reso.appendChild(files);
+                }
+
+                // Include this component file name
                 Element file = doc.createElement("include");
                 file.setTextContent(fileName);
                 files.appendChild(file);
-                Element filter = doc.createElement("filtering");
-                filter.setTextContent("true");
-                reso.appendChild(filter);
 
-                // Create a exclude resource section for this dynamic component
-                reso = doc.createElement("resource");
-                resos.appendChild(reso);
-                dir = doc.createElement("directory");
-                dir.setTextContent(dirName);
-                reso.appendChild(dir);
-                files = doc.createElement("excludes");
-                reso.appendChild(files);
+                // Filter section: find or create if not exists
+                Element filter = XmlUtils.findFirstElement("filtering", reso);
+                if (filter == null) {
+
+                    filter = doc.createElement("filtering");
+                    filter.setTextContent("true");
+                    reso.appendChild(filter);
+                }
+
+                // Resource section without filter: find or create if not exists
+                reso = XmlUtils.findFirstElement("resource/directory"
+                        + "[text()='" + dirName
+                        + "']/../filtering[text()='false']/..", resos);
+                if (reso == null) {
+
+                    // Create an exclude resource section and dir
+                    reso = doc.createElement("resource");
+                    resos.appendChild(reso);
+                    dir = doc.createElement("directory");
+                    dir.setTextContent(dirName);
+                    reso.appendChild(dir);
+                }
+
+                // Includes section: find or create if not exists
+                files = XmlUtils.findFirstElement("excludes", reso);
+                if (files == null) {
+
+                    files = doc.createElement("excludes");
+                    reso.appendChild(files);
+                }
+
                 file = doc.createElement("exclude");
                 file.setTextContent(fileName);
                 files.appendChild(file);
-                filter = doc.createElement("filtering");
-                filter.setTextContent("false");
-                reso.appendChild(filter);
+
+                // Filter section: find or create if not exists
+                filter = XmlUtils.findFirstElement("filtering", reso);
+                if (filter == null) {
+
+                    filter = doc.createElement("filtering");
+                    filter.setTextContent("false");
+                    reso.appendChild(filter);
+                }
 
                 // Properties section: find or create if not exists
                 Element props = XmlUtils.findFirstElement("properties", prof);
