@@ -52,18 +52,17 @@ import org.springframework.roo.support.util.Assert;
  *         Transport</a>
  * @since 0.8
  */
-public class PatternMetadata extends AbstractPatternMetadata
-/* AbstractItdTypeDetailsProvidingMetadataItem */{
+public class RelatedPatternMetadata extends AbstractPatternMetadata {
 
     private static final Logger logger = HandlerUtils
-            .getLogger(PatternMetadata.class);
+            .getLogger(RelatedPatternMetadata.class);
 
-    private static final String PROVIDES_TYPE_STRING = PatternMetadata.class
+    private static final String PROVIDES_TYPE_STRING = RelatedPatternMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    public PatternMetadata(
+    public RelatedPatternMetadata(
             String identifier,
             JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,

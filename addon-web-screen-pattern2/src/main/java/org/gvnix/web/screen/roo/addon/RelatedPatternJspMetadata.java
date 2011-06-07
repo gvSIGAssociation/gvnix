@@ -18,33 +18,19 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
-import java.util.List;
-import java.util.SortedMap;
-import java.util.logging.Logger;
-
-import org.springframework.roo.addon.propfiles.PropFileOperations;
-import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
-import org.springframework.roo.classpath.details.MethodMetadata;
-import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
-import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.metadata.AbstractMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.logging.HandlerUtils;
+import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
 
 /**
- * This type produces metadata for a new ITD. It uses an
- * {@link ItdTypeDetailsBuilder} provided by
- * {@link AbstractItdTypeDetailsProvidingMetadataItem} to register a field in
- * the ITD and a new method.
+ * Metadata built from {@link RelatedPatternMetadata}. The metadata identifier
+ * for a {@link RelatedPatternJspMetadata} is the fully qualifier name of the
+ * controller, and the source {@link Path} of the controller. This can be
+ * created using {@link #createIdentifier(JavaType, Path)}.
  * 
  * @author Óscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -52,39 +38,33 @@ import org.springframework.roo.support.util.Assert;
  *         Transport</a>
  * @since 0.8
  */
-public class PatternMetadata extends AbstractPatternMetadata
-/* AbstractItdTypeDetailsProvidingMetadataItem */{
+public class RelatedPatternJspMetadata extends AbstractMetadataItem {
 
-    private static final Logger logger = HandlerUtils
-            .getLogger(PatternMetadata.class);
-
-    private static final String PROVIDES_TYPE_STRING = PatternMetadata.class
+    private static final String PROVIDES_TYPE_STRING = RelatedPatternJspMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    public PatternMetadata(
-            String identifier,
-            JavaType aspectName,
-            PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            WebScaffoldMetadata webScaffoldMetadata,
-            WebScaffoldAnnotationValues annotationValues,
-            List<StringAttributeValue> definedPatterns,
-            List<MethodMetadata> controllerMethods,
-            List<FieldMetadata> controllerFields,
-            SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
-            MetadataService metadataService,
-            PropFileOperations propFileOperations) {
-        super(identifier, aspectName, governorPhysicalTypeMetadata,
-                webScaffoldMetadata, annotationValues, definedPatterns,
-                controllerMethods, controllerFields,
-                relatedApplicationTypeMetadata, metadataService,
-                propFileOperations);
+    private final RelatedPatternMetadata relatedPatternMetadata;
+
+    public RelatedPatternJspMetadata(String identifier,
+            RelatedPatternMetadata patternMetadata) {
+        super(identifier);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
+        Assert.notNull(patternMetadata, "Report metadata required");
+
+        this.relatedPatternMetadata = patternMetadata;
     }
 
-    // Typically, no changes are required beyond this point
+    @Override
+    public String toString() {
+        ToStringCreator tsc = new ToStringCreator(this);
+        tsc.append("identifier", getId());
+        tsc.append("valid", valid);
+        tsc.append("pattern metadata id", relatedPatternMetadata.getId());
+        return tsc.toString();
+    }
 
     public static final String getMetadataIdentiferType() {
         return PROVIDES_TYPE;
@@ -109,4 +89,5 @@ public class PatternMetadata extends AbstractPatternMetadata
         return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING,
                 metadataIdentificationString);
     }
+
 }

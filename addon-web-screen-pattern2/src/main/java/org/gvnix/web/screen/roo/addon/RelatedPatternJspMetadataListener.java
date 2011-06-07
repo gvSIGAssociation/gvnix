@@ -39,7 +39,7 @@ import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
 
 /**
- * This Listener produces MVC artifacts for a given PatternJspMetadata
+ * This Listener produces MVC artifacts for a given RelatedPatternJspMetadata
  * 
  * @author Óscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -49,7 +49,7 @@ import org.springframework.roo.support.util.Assert;
  */
 @Component(immediate = true)
 @Service
-public class PatternJspMetadataListener extends
+public class RelatedPatternJspMetadataListener extends
         AbstractPatternJspMetadataListener {
 
     @Reference
@@ -71,7 +71,8 @@ public class PatternJspMetadataListener extends
 
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
-                PatternMetadata.getMetadataIdentiferType(), getProvidesType());
+                RelatedPatternMetadata.getMetadataIdentiferType(),
+                getProvidesType());
         this.context = context;
         _fileManager = fileManager;
         _tilesOperations = tilesOperations;
@@ -81,19 +82,20 @@ public class PatternJspMetadataListener extends
     }
 
     public MetadataItem get(String metadataIdentificationString) {
-        JavaType javaType = PatternJspMetadata
+        JavaType javaType = RelatedPatternJspMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = PatternJspMetadata.getPath(metadataIdentificationString);
-        String patternMetadataKey = PatternMetadata.createIdentifier(javaType,
-                path);
-        PatternMetadata patternMetadata = (PatternMetadata) metadataService
+        Path path = RelatedPatternJspMetadata
+                .getPath(metadataIdentificationString);
+        String patternMetadataKey = RelatedPatternMetadata.createIdentifier(
+                javaType, path);
+        RelatedPatternMetadata relatedPatternMetadata = (RelatedPatternMetadata) metadataService
                 .get(patternMetadataKey);
 
-        if (patternMetadata == null || !patternMetadata.isValid()) {
+        if (relatedPatternMetadata == null || !relatedPatternMetadata.isValid()) {
             return null;
         }
 
-        webScaffoldMetadata = patternMetadata.getWebScaffoldMetadata();
+        webScaffoldMetadata = relatedPatternMetadata.getWebScaffoldMetadata();
         Assert.notNull(webScaffoldMetadata, "Web scaffold metadata required");
 
         webScaffoldAnnotationValues = webScaffoldMetadata.getAnnotationValues();
@@ -122,7 +124,7 @@ public class PatternJspMetadataListener extends
             return null;
         }
 
-        relatedDomainTypes = patternMetadata
+        relatedDomainTypes = relatedPatternMetadata
                 .getRelatedApplicationTypeMetadata();
         Assert.notNull(relatedDomainTypes, "Related domain types required");
 
@@ -136,12 +138,13 @@ public class PatternJspMetadataListener extends
             return null;
         }
 
-        for (String definedPattern : patternMetadata.getDefinedPatterns()) {
+        for (String definedPattern : relatedPatternMetadata
+                .getDefinedPatterns()) {
             installMvcArtifacts(definedPattern);
         }
 
-        return new PatternJspMetadata(metadataIdentificationString,
-                patternMetadata);
+        return new RelatedPatternJspMetadata(metadataIdentificationString,
+                relatedPatternMetadata);
     }
 
     public void notify(String upstreamDependency, String downstreamDependency) {
@@ -151,7 +154,7 @@ public class PatternJspMetadataListener extends
                     MetadataIdentificationUtils.getMetadataClass(
                             upstreamDependency).equals(
                             MetadataIdentificationUtils
-                                    .getMetadataClass(PatternMetadata
+                                    .getMetadataClass(RelatedPatternMetadata
                                             .getMetadataIdentiferType())),
                     "Expected class-level notifications only for gvNIX Report metadata (not '"
                             + upstreamDependency + "')");
@@ -159,9 +162,10 @@ public class PatternJspMetadataListener extends
             // A physical Java type has changed, and determine what the
             // corresponding local metadata identification string would have
             // been
-            JavaType javaType = PatternMetadata.getJavaType(upstreamDependency);
-            Path path = PatternMetadata.getPath(upstreamDependency);
-            downstreamDependency = PatternJspMetadata.createIdentifier(
+            JavaType javaType = RelatedPatternMetadata
+                    .getJavaType(upstreamDependency);
+            Path path = RelatedPatternMetadata.getPath(upstreamDependency);
+            downstreamDependency = RelatedPatternJspMetadata.createIdentifier(
                     javaType, path);
 
             // We only need to proceed if the downstream dependency relationship
@@ -192,11 +196,11 @@ public class PatternJspMetadataListener extends
 
     @Override
     public boolean isRelatedPattern() {
-        return false;
+        return true;
     }
 
     public String getProvidesType() {
-        return PatternJspMetadata.getMetadataIdentiferType();
+        return RelatedPatternJspMetadata.getMetadataIdentiferType();
     }
 
 }
