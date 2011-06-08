@@ -57,8 +57,12 @@ public class OperationsImpl implements Operations {
     private static final Logger logger = HandlerUtils
             .getLogger(OperationsImpl.class);
 
-    private static final String[] SOURCE_PATHS = { "src/main/resources",
-            "src/main/webapp" };
+    private static final String RESOURCES_PATH = "src/main/resources";
+    // private static final String WEBAPP_PATH = "src/main/webapp";
+    private static final String[] SOURCE_PATHS = { RESOURCES_PATH /*
+                                                                   * ,
+                                                                   * WEBAPP_PATH
+                                                                   */};
 
     @Reference
     private MetadataService metadataService;
@@ -423,44 +427,6 @@ public class OperationsImpl implements Operations {
             DynComponentList dynComps = dynConf.getComponents();
             for (DynComponent dynComp : dynComps) {
 
-                // <project>
-                // <build>
-                // <resources>
-                // <resource>
-                // <directory>src/main/resources</directory>
-                // <includes>
-                // <include>log4j.properties</include>
-                // </includes>
-                // <filtering>true</filtering>
-                // </resource>
-                // <resource>
-                // <directory>src/main/resources</directory>
-                // <excludes>
-                // <exclude>log4j.properties</exclude>
-                // </excludes>
-                // <filtering>false</filtering>
-                // </resource>
-                // </resources>
-                // </build>
-                // </project>
-
-                // Build section: find or create if not exists
-                Element build = XmlUtils.findFirstElement("/project/build",
-                        root);
-                if (build == null) {
-
-                    build = doc.createElement("build");
-                    root.appendChild(build);
-                }
-
-                // Resources section: find or create if not exists
-                Element resos = XmlUtils.findFirstElement("resources", build);
-                if (resos == null) {
-
-                    resos = doc.createElement("resources");
-                    build.appendChild(resos);
-                }
-
                 // Get dynamic component dir and file paths
 
                 String filePath = services.getFilePath(dynComp);
@@ -480,6 +446,61 @@ public class OperationsImpl implements Operations {
                     break;
                 }
 
+                // <resource>
+                // <directory>src/main/resources</directory>
+                // <includes>
+                // <include>log4j.properties</include>
+                // </includes>
+                // <filtering>true</filtering>
+                // </resource>
+                // <resource>
+                // <directory>src/main/resources</directory>
+                // <excludes>
+                // <exclude>log4j.properties</exclude>
+                // </excludes>
+                // <filtering>false</filtering>
+                // </resource>
+
+                // Build section: find or create if not exists
+                Element build = XmlUtils.findFirstElement("/project/build",
+                        root);
+                if (build == null) {
+
+                    build = doc.createElement("build");
+                    root.appendChild(build);
+                }
+
+                Element resos;
+                // if (dirName.equals(WEBAPP_PATH)) {
+                //
+                // Element plugin = XmlUtils
+                // .findFirstElement(
+                // "plugins/plugin/artifactId[text()='maven-war-plugin']/..",
+                // build);
+                // Element conf = XmlUtils.findFirstElement("configuration",
+                // plugin);
+                // if (conf == null) {
+                //
+                // conf = doc.createElement("configuration");
+                // plugin.appendChild(conf);
+                // }
+                // resos = XmlUtils.findFirstElement("webResources", conf);
+                // if (resos == null) {
+                //
+                // resos = doc.createElement("webResources");
+                // conf.appendChild(resos);
+                // }
+                // } else {
+
+                // Resources section: find or create if not exists
+                resos = XmlUtils.findFirstElement("resources", build);
+                if (resos == null) {
+
+                    resos = doc.createElement("resources");
+                    build.appendChild(resos);
+                }
+                // }
+
                 // Resource section with filter: find or create if not exists
                 Element reso = XmlUtils.findFirstElement("resource/directory"
                         + "[text()='" + dirName
@@ -495,18 +516,18 @@ public class OperationsImpl implements Operations {
                     reso.appendChild(dir);
                 }
 
-                // Includes section: find or create if not exists
-                Element files = XmlUtils.findFirstElement("includes", reso);
-                if (files == null) {
-
-                    files = doc.createElement("includes");
-                    reso.appendChild(files);
-                }
-
-                // Include this component file name
-                Element file = doc.createElement("include");
-                file.setTextContent(fileName);
-                files.appendChild(file);
+                // // Includes section: find or create if not exists
+                // Element files = XmlUtils.findFirstElement("includes", reso);
+                // if (files == null) {
+                //
+                // files = doc.createElement("includes");
+                // reso.appendChild(files);
+                // }
+                //
+                // // Include this component file name
+                // Element file = doc.createElement("include");
+                // file.setTextContent(fileName);
+                // files.appendChild(file);
 
                 // Filter section: find or create if not exists
                 Element filter = XmlUtils.findFirstElement("filtering", reso);
@@ -517,40 +538,41 @@ public class OperationsImpl implements Operations {
                     reso.appendChild(filter);
                 }
 
-                // Resource section without filter: find or create if not exists
-                reso = XmlUtils.findFirstElement("resource/directory"
-                        + "[text()='" + dirName
-                        + "']/../filtering[text()='false']/..", resos);
-                if (reso == null) {
-
-                    // Create an exclude resource section and dir
-                    reso = doc.createElement("resource");
-                    resos.appendChild(reso);
-                    dir = doc.createElement("directory");
-                    dir.setTextContent(dirName);
-                    reso.appendChild(dir);
-                }
-
-                // Includes section: find or create if not exists
-                files = XmlUtils.findFirstElement("excludes", reso);
-                if (files == null) {
-
-                    files = doc.createElement("excludes");
-                    reso.appendChild(files);
-                }
-
-                file = doc.createElement("exclude");
-                file.setTextContent(fileName);
-                files.appendChild(file);
-
-                // Filter section: find or create if not exists
-                filter = XmlUtils.findFirstElement("filtering", reso);
-                if (filter == null) {
-
-                    filter = doc.createElement("filtering");
-                    filter.setTextContent("false");
-                    reso.appendChild(filter);
-                }
+                // // Resource section without filter: find or create if not
+                // exists
+                // reso = XmlUtils.findFirstElement("resource/directory"
+                // + "[text()='" + dirName
+                // + "']/../filtering[text()='false']/..", resos);
+                // if (reso == null) {
+                //
+                // // Create an exclude resource section and dir
+                // reso = doc.createElement("resource");
+                // resos.appendChild(reso);
+                // dir = doc.createElement("directory");
+                // dir.setTextContent(dirName);
+                // reso.appendChild(dir);
+                // }
+                //
+                // // Includes section: find or create if not exists
+                // files = XmlUtils.findFirstElement("excludes", reso);
+                // if (files == null) {
+                //
+                // files = doc.createElement("excludes");
+                // reso.appendChild(files);
+                // }
+                //
+                // file = doc.createElement("exclude");
+                // file.setTextContent(fileName);
+                // files.appendChild(file);
+                //
+                // // Filter section: find or create if not exists
+                // filter = XmlUtils.findFirstElement("filtering", reso);
+                // if (filter == null) {
+                //
+                // filter = doc.createElement("filtering");
+                // filter.setTextContent("false");
+                // reso.appendChild(filter);
+                // }
 
                 // Properties section: find or create if not exists
                 Element props = XmlUtils.findFirstElement("properties", prof);
