@@ -18,6 +18,7 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import java.beans.Introspector;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,6 +62,7 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.StringUtils;
 
 /**
  * This type produces metadata for a new ITD. It uses an
@@ -1003,6 +1005,7 @@ public abstract class AbstractPatternMetadata extends
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         String entityNamePlural = javaTypeMetadataHolder.getPlural();
+        String entityName = uncapitalize(formBackingType.getSimpleTypeName());
 
         bodyBuilder.appendFormalLine("if ( !isPatternDefined(pattern) ) {");
         bodyBuilder.indent();
@@ -1036,7 +1039,7 @@ public abstract class AbstractPatternMetadata extends
                 entityNamePlural.toLowerCase()).concat(".isEmpty()) {"));
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
-                entityNamePlural.toLowerCase()).concat("\", null);"));
+                entityName.toLowerCase()).concat("\", null);"));
         bodyBuilder
                 .appendFormalLine("uiModel.addAttribute(\"MESSAGE_INFO\",\"message_entitynotfound_problemdescription\");");
         bodyBuilder.appendFormalLine("return \"".concat(
@@ -1045,18 +1048,14 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("}");
 
         bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName()
-                .concat(" ")
-                .concat(formBackingType.getSimpleTypeName().toLowerCase())
-                .concat(" = ").concat(entityNamePlural.toLowerCase())
-                .concat(".get(0);"));
+                .concat(" ").concat(entityName.toLowerCase()).concat(" = ")
+                .concat(entityNamePlural.toLowerCase()).concat(".get(0);"));
 
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-                .concat(entityNamePlural.toLowerCase()).concat("\", ")
-                .concat(formBackingType.getSimpleTypeName().toLowerCase())
-                .concat(");"));
+                .concat(entityName.toLowerCase()).concat("\", ")
+                .concat(entityName.toLowerCase()).concat(");"));
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat("itemId")
-                .concat("\", ")
-                .concat(formBackingType.getSimpleTypeName().toLowerCase())
+                .concat("\", ").concat(entityName.toLowerCase())
                 .concat(".getId()").concat(");"));
 
         bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
@@ -1570,6 +1569,12 @@ public abstract class AbstractPatternMetadata extends
             }
         }
         return null;
+    }
+
+    protected String uncapitalize(String term) {
+        // [ROO-1790] this is needed to adhere to the JavaBean naming
+        // conventions (see JavaBean spec section 8.8)
+        return Introspector.decapitalize(StringUtils.capitalize(term));
     }
 
     public WebScaffoldMetadata getWebScaffoldMetadata() {

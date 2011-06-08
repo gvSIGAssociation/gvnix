@@ -26,12 +26,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
@@ -46,10 +49,13 @@ import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.metadata.MetadataNotificationListener;
 import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.model.JavaSymbolName;
@@ -107,10 +113,6 @@ public abstract class AbstractPatternJspMetadataListener implements
      * @param pattern
      */
     protected void installMvcArtifacts(String pattern) {
-        /*
-         * TODO: Check if Screen Patterns artifacts exist in project and copy
-         * them if they are not
-         */
         installPatternArtifacts();
 
         String[] patternNameType = pattern.split("=");
@@ -173,9 +175,11 @@ public abstract class AbstractPatternJspMetadataListener implements
         String patternTypeStr = patternType.name();
         String patternPath = destinationDirectory.concat("/")
                 .concat(patternName).concat(".jspx");
+        // Get the document for the pattern type
         Document jspDoc = patternType.equals(WebPattern.tabular) ? getUpdateTabularDocument()
-                : getRegisterDocument();
+                : getRegisterDocument(patternName);
         writeToDiskIfNecessary(patternPath, jspDoc);
+
         // add view to views.xml
         _tilesOperations.addViewDefinition(controllerPath, controllerPath + "/"
                 + patternName, TilesOperations.DEFAULT_TEMPLATE,
@@ -229,7 +233,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      * 
      * @return
      */
-    private Document getRegisterDocument() {
+    private Document getRegisterDocument(String patternName) {
         String controllerPath = webScaffoldAnnotationValues.getPath();
         Assert.notNull(controllerPath,
                 "Path is not specified in the @RooWebScaffold annotation for '"
@@ -249,6 +253,8 @@ public abstract class AbstractPatternJspMetadataListener implements
                         "urn:jsptagdir:/WEB-INF/tags/form/fields")
                 .addAttribute("xmlns:page",
                         "urn:jsptagdir:/WEB-INF/tags/pattern/form")
+                .addAttribute("xmlns:pattern",
+                        "urn:jsptagdir:/WEB-INF/tags/pattern")
                 .addAttribute("xmlns:jsp", "http://java.sun.com/JSP/Page")
                 .addAttribute("version", "2.0")
                 .addChild(
@@ -265,11 +271,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                         "id",
                         XmlUtils.convertId("ps:"
                                 + formbackingType.getFullyQualifiedTypeName()))
-                .addAttribute(
-                        "object",
-                        "${"
-                                + formbackingTypeMetadata.getPlural()
-                                        .toLowerCase() + "}")
+                .addAttribute("object", "${" + entityName.toLowerCase() + "}")
                 .addAttribute("path", controllerPath).build();
         if (!webScaffoldAnnotationValues.isCreate()) {
             pageShow.setAttribute("create", "false");
@@ -301,6 +303,8 @@ public abstract class AbstractPatternJspMetadataListener implements
 
         divContentPane.appendChild(divForm);
 
+        List<FieldMetadata> fieldsOfRelations = new ArrayList<FieldMetadata>();
+        boolean isRelatationShip = false;
         // Add field:display elements for each field
         for (FieldMetadata field : eligibleFields) {
             // Ignoring java.util.Map field types (see ROO-194)
@@ -336,11 +340,8 @@ public abstract class AbstractPatternJspMetadataListener implements
                                     + formbackingType
                                             .getFullyQualifiedTypeName() + "."
                                     + field.getFieldName().getSymbolName()))
-                    .addAttribute(
-                            "object",
-                            "${"
-                                    + formbackingTypeMetadata.getPlural()
-                                            .toLowerCase() + "}")
+                    .addAttribute("object",
+                            "${" + entityName.toLowerCase() + "}")
                     .addAttribute("field", fieldName).build();
             if (field.getFieldType().equals(new JavaType(Date.class.getName()))) {
                 fieldDisplay.setAttribute("date", "true");
@@ -354,24 +355,131 @@ public abstract class AbstractPatternJspMetadataListener implements
             } else if (field.getFieldType().isCommonCollectionType()
                     && field.getCustomData().get(
                             PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) != null) {
-                // TODO: I think that here is the place to add the JSP elements
-                // for related entities. In this case, we must to check with
-                // GvNIXRelationsPattern if the field should be or not shown
-                continue;
+                if (isRelationVisible(patternName, field.getFieldName()
+                        .getSymbolName())) {
+                    fieldsOfRelations.add(field);
+                    isRelatationShip = true;
+                }
+                // continue;
             }
-            fieldDisplay.setAttribute("z",
-                    XmlRoundTripUtils.calculateUniqueKeyFor(fieldDisplay));
 
-            li.appendChild(fieldDisplay);
-            divForm.appendChild(ul);
+            if (!isRelatationShip) {
+                fieldDisplay.setAttribute("z",
+                        XmlRoundTripUtils.calculateUniqueKeyFor(fieldDisplay));
+
+                li.appendChild(fieldDisplay);
+                divForm.appendChild(ul);
+                isRelatationShip = false;
+            }
         }
 
         pageShow.appendChild(divContentPane);
 
-        // div.appendChild(messageBox);
         div.appendChild(pageShow);
 
+        if (!fieldsOfRelations.isEmpty()) {
+            Element patternRelations = new XmlElementBuilder(
+                    "pattern:relations", document)
+                    .addAttribute(
+                            "id",
+                            XmlUtils.convertId("pr:"
+                                    + formbackingType
+                                            .getFullyQualifiedTypeName() + "."
+                                    + patternName))
+                    // .addAttribute(
+                    // "object",
+                    // "${"
+                    // + formbackingTypeMetadata.getPlural()
+                    // .toLowerCase() + "}")
+                    .addAttribute(
+                            "render",
+                            "${!empty ".concat(
+                                    formbackingTypeMetadata.getPlural()
+                                            .toLowerCase()).concat("}"))
+                    .build();
+            patternRelations.setAttribute("z",
+                    XmlRoundTripUtils.calculateUniqueKeyFor(patternRelations));
+            for (FieldMetadata fieldMetadata : fieldsOfRelations) {
+                String fieldName = uncapitalize(fieldMetadata.getFieldName()
+                        .getSymbolName());
+                Element patternRelation = new XmlElementBuilder(
+                        "pattern:relation", document)
+                        .addAttribute(
+                                "id",
+                                XmlUtils.convertId("pr:"
+                                        + formbackingType
+                                                .getFullyQualifiedTypeName()
+                                        + "." + fieldName))
+                        .addAttribute("object",
+                                "${" + entityName.toLowerCase() + "}")
+                        .addAttribute("field", fieldName)
+                        .addAttribute("patternName", patternName)
+                        .addAttribute(
+                                "referenceName",
+                                formbackingTypeMetadata.getPersistenceDetails()
+                                        .getIdentifierField().getFieldName()
+                                        .getSymbolName())
+                        .addAttribute(
+                                "render",
+                                "${!empty ".concat(
+                                        formbackingTypeMetadata.getPlural()
+                                                .toLowerCase()).concat("}"))
+                        .build();
+                patternRelation.setAttribute("z", XmlRoundTripUtils
+                        .calculateUniqueKeyFor(patternRelations));
+                patternRelations.appendChild(patternRelation);
+            }
+            div.appendChild(patternRelations);
+        }
+
+        // div.appendChild(messageBox);
+
         return document;
+    }
+
+    /**
+     * A relation is visible in a view if it's defined in
+     * {@link GvNIXRelationsPattern}
+     * 
+     * @param patternName
+     * @param symbolName
+     * @return
+     */
+    private boolean isRelationVisible(String patternName, String symbolName) {
+        ClassOrInterfaceTypeDetails cid = webScaffoldAnnotationValues
+                .getGovernorTypeDetails();
+
+        AnnotationMetadata gvNixRelatedPatternAnnotation = MemberFindingUtils
+                .getAnnotationOfType(cid.getAnnotations(), new JavaType(
+                        GvNIXRelationsPattern.class.getName()));
+        if (gvNixRelatedPatternAnnotation != null) {
+            AnnotationAttributeValue<?> thisAnnotationValue = gvNixRelatedPatternAnnotation
+                    .getAttribute(new JavaSymbolName("value"));
+
+            if (thisAnnotationValue != null) {
+
+                ArrayAttributeValue<?> arrayVal = (ArrayAttributeValue<?>) thisAnnotationValue;
+
+                if (arrayVal != null) {
+                    @SuppressWarnings("unchecked")
+                    List<StringAttributeValue> values = (List<StringAttributeValue>) arrayVal
+                            .getValue();
+                    String regexPattern = "(".concat(patternName).concat(")")
+                            .concat(".*").concat("(").concat(symbolName)
+                            .concat("=\\s*\\w*)");
+                    Pattern pattern = Pattern.compile(regexPattern);
+                    Matcher matcher = null;
+                    for (StringAttributeValue value : values) {
+                        matcher = pattern.matcher(value.getValue());
+                        if (matcher.find() && matcher.groupCount() == 2) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+
     }
 
     public enum RooJspx {
