@@ -4,6 +4,5 @@ configuration save --name test
 configuration property add --name log4j.rootLogger 
 configuration property add --name database.url 
 configuration property add --name /persistence/persistence-unit/properties/property[1][@value] 
-configuration property add --name /beans/context:property-placeholder[@location]  
 configuration activate --name test
 configuration export
