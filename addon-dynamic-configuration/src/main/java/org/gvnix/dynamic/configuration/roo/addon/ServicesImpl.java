@@ -71,7 +71,7 @@ public class ServicesImpl implements Services {
      * 
      * @return Dynamic configuration components
      */
-    private Set<DefaultDynamicConfiguration> getComponents() {
+    private Set<Object> getComponents() {
 
         return getSet("components");
     }
@@ -110,20 +110,22 @@ public class ServicesImpl implements Services {
         dynConf.setActive(Boolean.TRUE);
 
         // Iterate all dynamic configurations components registered
-        for (DefaultDynamicConfiguration o : getComponents()) {
+        for (Object o : getComponents()) {
             try {
 
-                // Invoke the read method of all components to get its
-                // properties
+                // Invoke the read method of all components to get properties
                 Class<? extends Object> c = o.getClass();
                 Method m = c.getMethod("read", new Class[0]);
                 DynPropertyList dynProps = (DynPropertyList) m.invoke(o,
                         new Object[0]);
 
-                // Create a dynamic configuration object with component and
-                // properties
-                DynComponent dynComp = new DynComponent(c.getName(),
-                        o.getName(), dynProps);
+                // Get dynamic configuration name
+                m = c.getMethod("getName", new Class[0]);
+                String name = (String) m.invoke(o, new Object[0]);
+
+                // Create a dynamic configuration with component and properties
+                DynComponent dynComp = new DynComponent(c.getName(), name,
+                        dynProps);
                 dynConf.addComponent(dynComp);
             } catch (NoSuchMethodException nsme) {
 
@@ -155,7 +157,7 @@ public class ServicesImpl implements Services {
         String path = "";
 
         // Find required dynamic configuration component
-        for (DefaultDynamicConfiguration o : getComponents()) {
+        for (Object o : getComponents()) {
             if (o.getClass().getName().equals(dynComp.getId())) {
 
                 try {

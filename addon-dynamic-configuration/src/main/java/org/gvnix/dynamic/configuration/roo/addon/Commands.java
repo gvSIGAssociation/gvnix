@@ -277,7 +277,7 @@ public class Commands implements CommandMarker {
             logger.log(Level.WARNING, "Property has no values");
             logger.log(
                     Level.WARNING,
-                    "(use 'configuration property add' to make available a configuration property or 'configuration property update' to set property values)");
+                    "(use 'configuration property add' to make available a configuration property or 'configuration property update' to set property new values)");
             return;
         }
 
@@ -339,13 +339,13 @@ public class Commands implements CommandMarker {
             logger.log(Level.INFO, "Property added");
             logger.log(
                     Level.INFO,
-                    "(use 'configuration property update' to set property values or 'configuration save' to create a new configuration)");
+                    "(use 'configuration property update' to set property new values or 'configuration save' to create a new configuration)");
         } else {
 
             logger.log(Level.WARNING, "Property already exists");
             logger.log(
                     Level.WARNING,
-                    "(use 'configuration property update' to set property values or 'configuration property delete' do remove it)");
+                    "(use 'configuration property update' to set property new values or 'configuration property delete' do remove it)");
         }
     }
 
