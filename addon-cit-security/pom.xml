@@ -146,6 +146,13 @@
       <version>${roo.version}</version>
       <type>bundle</type>
     </dependency>
+    <!-- gvNIX Roo add-ons -->
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.dynamic.configuration.roo.addon</artifactId>
+      <version>${gvnix.version}</version>
+      <type>bundle</type>
+    </dependency>
   </dependencies>
   <!--
   <scm>
