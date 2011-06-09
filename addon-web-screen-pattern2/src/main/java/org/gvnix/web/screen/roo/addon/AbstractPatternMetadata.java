@@ -25,11 +25,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.logging.Logger;
 
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
+import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
@@ -89,8 +91,9 @@ public abstract class AbstractPatternMetadata extends
     private WebScaffoldAnnotationValues annotationValues;
     private JavaType formBackingType;
     private List<String> definedPatterns;
-    SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata;
+    private SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata;
     private JavaTypeMetadataDetails javaTypeMetadataHolder;
+    private SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate;
     private List<MethodMetadata> controllerMethods;
     private List<FieldMetadata> controllerFields;
 
@@ -107,6 +110,7 @@ public abstract class AbstractPatternMetadata extends
             List<MethodMetadata> controllerMethods,
             List<FieldMetadata> controllerFields,
             SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
+            SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
             MetadataService metadataService,
             PropFileOperations propFileOperations) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
@@ -128,6 +132,10 @@ public abstract class AbstractPatternMetadata extends
         Assert.notNull(javaTypeMetadataHolder,
                 "Metadata holder required for form backing type: "
                         + formBackingType);
+        if (annotationValues.isPopulateMethods()) {
+            filterAleadyPopulatedTypes(typesForPopulate);
+        }
+        this.typesForPopulate = typesForPopulate;
 
         this.metadataService = metadataService;
         this.propFileOperations = propFileOperations;
@@ -145,7 +153,7 @@ public abstract class AbstractPatternMetadata extends
                 .unmodifiableList(definedPatternsList);
 
         builder.addField(getDefinedPatternField());
-        builder.addMethod(getIsPatternDefinedMethod());
+        // builder.addMethod(getIsPatternDefinedMethod());
 
         if (isPatternTypeDefined(WebPattern.tabular, this.definedPatterns)) {
             // annotateFormBackingObject();
@@ -155,8 +163,6 @@ public abstract class AbstractPatternMetadata extends
             builder.addMethod(getDeleteListMethod());
             builder.addMethod(getFilterListMethod());
             builder.addMethod(getRefererRedirectMethod());
-            // logger.warning(formBackingType.getSimpleTypeName().concat(
-            // " must be annotated with @GvNIXEntityBatch"));
         }
 
         if (isPatternTypeDefined(WebPattern.register, this.definedPatterns)) {
@@ -493,8 +499,7 @@ public abstract class AbstractPatternMetadata extends
             return method;
         }
 
-        // Define method parameter names
-        // request
+        // Define method parameter names request
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         methodParamNames.add(new JavaSymbolName("request"));
 
@@ -865,12 +870,16 @@ public abstract class AbstractPatternMetadata extends
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         String entityNamePlural = javaTypeMetadataHolder.getPlural();
 
-        bodyBuilder.appendFormalLine("if ( !isPatternDefined(pattern) ) {");
-        bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("return \"redirect:/".concat(
-                entityNamePlural.toLowerCase()).concat("\";"));
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
+        // XXX: Following code generates the part of this method validating
+        // defined patterns against a request. By now, we don't want to validate
+        // them
+
+        // bodyBuilder.appendFormalLine("if ( !isPatternDefined(pattern) ) {");
+        // bodyBuilder.indent();
+        // bodyBuilder.appendFormalLine("return \"redirect:/".concat(
+        // entityNamePlural.toLowerCase()).concat("\";"));
+        // bodyBuilder.indentRemove();
+        // bodyBuilder.appendFormalLine("}");
 
         List<JavaType> typeParams = new ArrayList<JavaType>();
         typeParams.add(formBackingType);
@@ -900,6 +909,37 @@ public abstract class AbstractPatternMetadata extends
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
+
+        // May we need to populate some Model Attributes with the data of
+        // related entities
+        for (JavaType type : typesForPopulate.keySet()) {
+            JavaTypeMetadataDetails javaTypeMd = typesForPopulate.get(type);
+            JavaTypePersistenceMetadataDetails javaTypePersistenceMd = javaTypeMd
+                    .getPersistenceDetails();
+            if (javaTypePersistenceMd != null
+                    && javaTypePersistenceMd.getFindAllMethod() != null) {
+                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                        .concat(javaTypeMd.getPlural().toLowerCase())
+                        .concat("\", ")
+                        .concat(type.getNameIncludingTypeParameters(false,
+                                builder.getImportRegistrationResolver()))
+                        .concat(".")
+                        .concat(javaTypePersistenceMd.getFindAllMethod()
+                                .getMethodName().getSymbolName())
+                        .concat("());"));
+            } else if (javaTypeMd.isEnumType()) {
+                JavaType arrays = new JavaType("java.util.Arrays");
+                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                        .concat(javaTypeMd.getPlural().toLowerCase())
+                        .concat("\", ")
+                        .concat(arrays.getNameIncludingTypeParameters(false,
+                                builder.getImportRegistrationResolver()))
+                        .concat(".asList(")
+                        .concat(type.getNameIncludingTypeParameters(false,
+                                builder.getImportRegistrationResolver()))
+                        .concat(".class.getEnumConstants()));"));
+            }
+        }
 
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
                 .concat(entityNamePlural.toLowerCase()).concat("\", ")
@@ -1007,12 +1047,16 @@ public abstract class AbstractPatternMetadata extends
         String entityNamePlural = javaTypeMetadataHolder.getPlural();
         String entityName = uncapitalize(formBackingType.getSimpleTypeName());
 
-        bodyBuilder.appendFormalLine("if ( !isPatternDefined(pattern) ) {");
-        bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("return \"redirect:/".concat(
-                entityNamePlural.toLowerCase()).concat("\";"));
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
+        // XXX: Following code generates the part of this method validating
+        // defined patterns against a request. By now, we don't want to validate
+        // them
+
+        // bodyBuilder.appendFormalLine("if ( !isPatternDefined(pattern) ) {");
+        // bodyBuilder.indent();
+        // bodyBuilder.appendFormalLine("return \"redirect:/".concat(
+        // entityNamePlural.toLowerCase()).concat("\";"));
+        // bodyBuilder.indentRemove();
+        // bodyBuilder.appendFormalLine("}");
 
         List<JavaType> typeParams = new ArrayList<JavaType>();
         typeParams.add(formBackingType);
@@ -1042,6 +1086,7 @@ public abstract class AbstractPatternMetadata extends
                 entityName.toLowerCase()).concat("\", null);"));
         bodyBuilder
                 .appendFormalLine("uiModel.addAttribute(\"MESSAGE_INFO\",\"message_entitynotfound_problemdescription\");");
+
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
         bodyBuilder.indentRemove();
@@ -1068,6 +1113,37 @@ public abstract class AbstractPatternMetadata extends
                 .concat("();"));
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"maxEntities"
                 .concat("\", count == 0 ? 1 : count);"));
+
+        // May we need to populate some Model Attributes with the data of
+        // related entities
+        for (JavaType type : typesForPopulate.keySet()) {
+            JavaTypeMetadataDetails javaTypeMd = typesForPopulate.get(type);
+            JavaTypePersistenceMetadataDetails javaTypePersistenceMd = javaTypeMd
+                    .getPersistenceDetails();
+            if (javaTypePersistenceMd != null
+                    && javaTypePersistenceMd.getFindAllMethod() != null) {
+                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                        .concat(javaTypeMd.getPlural().toLowerCase())
+                        .concat("\", ")
+                        .concat(type.getNameIncludingTypeParameters(false,
+                                builder.getImportRegistrationResolver()))
+                        .concat(".")
+                        .concat(javaTypePersistenceMd.getFindAllMethod()
+                                .getMethodName().getSymbolName())
+                        .concat("());"));
+            } else if (javaTypeMd.isEnumType()) {
+                JavaType arrays = new JavaType("java.util.Arrays");
+                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                        .concat(javaTypeMd.getPlural().toLowerCase())
+                        .concat("\", ")
+                        .concat(arrays.getNameIncludingTypeParameters(false,
+                                builder.getImportRegistrationResolver()))
+                        .concat(".asList(")
+                        .concat(type.getNameIncludingTypeParameters(false,
+                                builder.getImportRegistrationResolver()))
+                        .concat(".class.getEnumConstants()));"));
+            }
+        }
 
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
@@ -1546,6 +1622,35 @@ public abstract class AbstractPatternMetadata extends
                 .appendFormalLine("return getRefererRedirectViewName(httpServletRequest);");
 
         return bodyBuilder;
+    }
+
+    /**
+     * Remove from <code>typesForPopulate</code> those types that are being
+     * returned in any other populate method (these methods have ModelAttribute
+     * method annotation)
+     * 
+     * @param typesForPopulate
+     */
+    private void filterAleadyPopulatedTypes(
+            SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate) {
+
+        Set<JavaType> keyTypesForPopulate = typesForPopulate.keySet();
+        if (keyTypesForPopulate.isEmpty()) {
+            return;
+        }
+
+        for (MethodMetadata method : controllerMethods) {
+            JavaType returnType = method.getReturnType();
+            if (returnType.isCommonCollectionType()) {
+                for (JavaType genericType : returnType.getParameters()) {
+                    if (typesForPopulate.keySet().contains(genericType)) {
+                        typesForPopulate.remove(genericType);
+                    }
+                }
+            } else if (typesForPopulate.keySet().contains(returnType)) {
+                typesForPopulate.remove(returnType);
+            }
+        }
     }
 
     /**

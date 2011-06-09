@@ -72,13 +72,14 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
             List<MethodMetadata> controllerMethods,
             List<FieldMetadata> controllerFields,
             SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
+            SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
             MetadataService metadataService,
             PropFileOperations propFileOperations) {
         super(identifier, aspectName, governorPhysicalTypeMetadata,
                 webScaffoldMetadata, annotationValues, definedPatterns,
                 controllerMethods, controllerFields,
-                relatedApplicationTypeMetadata, metadataService,
-                propFileOperations);
+                relatedApplicationTypeMetadata, typesForPopulate,
+                metadataService, propFileOperations);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
     }

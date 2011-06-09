@@ -304,7 +304,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         divContentPane.appendChild(divForm);
 
         List<FieldMetadata> fieldsOfRelations = new ArrayList<FieldMetadata>();
-        boolean isRelatationShip = false;
+        boolean isRelatationship = false;
         // Add field:display elements for each field
         for (FieldMetadata field : eligibleFields) {
             // Ignoring java.util.Map field types (see ROO-194)
@@ -358,18 +358,18 @@ public abstract class AbstractPatternJspMetadataListener implements
                 if (isRelationVisible(patternName, field.getFieldName()
                         .getSymbolName())) {
                     fieldsOfRelations.add(field);
-                    isRelatationShip = true;
+                    isRelatationship = true;
                 }
                 // continue;
             }
 
-            if (!isRelatationShip) {
+            if (!isRelatationship) {
                 fieldDisplay.setAttribute("z",
                         XmlRoundTripUtils.calculateUniqueKeyFor(fieldDisplay));
 
                 li.appendChild(fieldDisplay);
                 divForm.appendChild(ul);
-                isRelatationShip = false;
+                isRelatationship = false;
             }
         }
 
@@ -386,17 +386,10 @@ public abstract class AbstractPatternJspMetadataListener implements
                                     + formbackingType
                                             .getFullyQualifiedTypeName() + "."
                                     + patternName))
-                    // .addAttribute(
-                    // "object",
-                    // "${"
-                    // + formbackingTypeMetadata.getPlural()
-                    // .toLowerCase() + "}")
                     .addAttribute(
                             "render",
-                            "${!empty ".concat(
-                                    formbackingTypeMetadata.getPlural()
-                                            .toLowerCase()).concat("}"))
-                    .build();
+                            "${!empty ".concat(entityName.toLowerCase())
+                                    .concat("}")).build();
             patternRelations.setAttribute("z",
                     XmlRoundTripUtils.calculateUniqueKeyFor(patternRelations));
             for (FieldMetadata fieldMetadata : fieldsOfRelations) {
@@ -414,19 +407,18 @@ public abstract class AbstractPatternJspMetadataListener implements
                                 "${" + entityName.toLowerCase() + "}")
                         .addAttribute("field", fieldName)
                         .addAttribute("patternName", patternName)
+                        .addAttribute("referenceName", entityName.toLowerCase())
                         .addAttribute(
-                                "referenceName",
+                                "referenceField",
                                 formbackingTypeMetadata.getPersistenceDetails()
                                         .getIdentifierField().getFieldName()
                                         .getSymbolName())
                         .addAttribute(
                                 "render",
-                                "${!empty ".concat(
-                                        formbackingTypeMetadata.getPlural()
-                                                .toLowerCase()).concat("}"))
-                        .build();
+                                "${!empty ".concat(entityName.toLowerCase())
+                                        .concat("}")).build();
                 patternRelation.setAttribute("z", XmlRoundTripUtils
-                        .calculateUniqueKeyFor(patternRelations));
+                        .calculateUniqueKeyFor(patternRelation));
                 patternRelations.appendChild(patternRelation);
             }
             div.appendChild(patternRelations);
@@ -658,11 +650,16 @@ public abstract class AbstractPatternJspMetadataListener implements
 
     /**
      * Installs static resources (JS, images, CSS) and tagx in the destination
-     * project. Also, the i18n properties needed by tagx are set in
-     * application.properties
+     * project. Also, sets in application.properties the i18n properties needed
+     * by tagx
      */
     private void installPatternArtifacts() {
         installStaticResource("images/pattern/enEdicion.gif");
+        installStaticResource("images/pattern/pedi_off.gif");
+        installStaticResource("images/pattern/pedi_on.gif");
+        installStaticResource("images/pattern/pfil_off.gif");
+        installStaticResource("images/pattern/pfil_on.gif");
+        installStaticResource("images/pattern/plis_off.gif");
         installStaticResource("images/pattern/plis_on.gif");
         installStaticResource("scripts/quicklinks.js");
         installStaticResource("styles/pattern.css");

@@ -328,7 +328,10 @@ public final class RelatedPatternMetadataProvider extends
                 annotationValues, patternList,
                 MemberFindingUtils.getMethods(memberDetails),
                 MemberFindingUtils.getFields(memberDetails),
-                relatedApplicationTypeMetadata, metadataService,
+                relatedApplicationTypeMetadata, getTypesForPopulate(
+                        metadataIdentificationString,
+                        governorPhysicalTypeMetadata, formBackingType,
+                        webMetadataService), metadataService,
                 propFileOperations);
     }
 

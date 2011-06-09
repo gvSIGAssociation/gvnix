@@ -19,19 +19,36 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
+import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
+import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractMemberDiscoveringItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.scanner.MemberDetails;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.logging.HandlerUtils;
+import org.springframework.roo.support.util.Assert;
 
 /**
  * Provides {@link PatternMetadata}. This type is called by Roo to retrieve the
@@ -62,6 +79,17 @@ public abstract class AbstractPatternMetadataProvider extends
      */
     protected static final JavaType ENTITYBATCH_ANNOTATION = new JavaType(
             GvNIXEntityBatch.class.getName());
+
+    /**
+     * {@link GvNIXPattern} JavaType
+     */
+    protected static final JavaType RELATIONS_PATTERN_ANNOTATION = new JavaType(
+            GvNIXRelationsPattern.class.getName());
+    /**
+     * Name of {@link GvNIXPattern} attribute value
+     */
+    protected static final JavaSymbolName RELATIONS_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
+            "value");
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -124,6 +152,126 @@ public abstract class AbstractPatternMetadataProvider extends
             }
         }
         return patternNames;
+    }
+
+    /**
+     * Read the values of GvNIXRelationsPattern and for the fields defined as
+     * visible relationships retrieve its JavaTypeMetadataDetails
+     * 
+     * @param metadataIdentificationString
+     * @param controllerPhysicalTypeMetadata
+     * @param formBackingType
+     * @param webMetadataService
+     * @return
+     */
+    protected SortedMap<JavaType, JavaTypeMetadataDetails> getTypesForPopulate(
+            String metadataIdentificationString,
+            PhysicalTypeMetadata controllerPhysicalTypeMetadata,
+            JavaType formBackingType, WebMetadataService webMetadataService) {
+        WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
+                controllerPhysicalTypeMetadata);
+        if (!annotationValues.isAnnotationFound()
+                || annotationValues.getFormBackingObject() == null
+                || controllerPhysicalTypeMetadata.getMemberHoldingTypeDetails() == null) {
+            return null;
+        }
+
+        ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) controllerPhysicalTypeMetadata
+                .getMemberHoldingTypeDetails();
+        Assert.notNull(
+                cid,
+                "Governor failed to provide class type details, in violation of superclass contract");
+
+        // Retrieve the fields defined as visible relationships in
+        // GvNIXRelationsPattern
+        AnnotationMetadata gvNixRelationsPatternAnnotation = MemberFindingUtils
+                .getAnnotationOfType(cid.getAnnotations(),
+                        RELATIONS_PATTERN_ANNOTATION);
+        Set<String> fields = new HashSet<String>();
+        if (gvNixRelationsPatternAnnotation != null) {
+            AnnotationAttributeValue<?> relationsPatternValues = gvNixRelationsPatternAnnotation
+                    .getAttribute(RELATIONS_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+
+            if (relationsPatternValues != null) {
+                @SuppressWarnings("unchecked")
+                List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues
+                        .getValue();
+
+                String[] patternDef = {};
+                String[] fieldDefinitions = {};
+                String[] fieldPatternType = {};
+                for (StringAttributeValue strAttrValue : relationsPatternList) {
+                    patternDef = strAttrValue.getValue().split(":");
+                    fieldDefinitions = patternDef[1].trim().split(",");
+                    for (String fieldDef : fieldDefinitions) {
+                        fieldPatternType = fieldDef.trim().split("=");
+                        fields.add(fieldPatternType[0]);
+                    }
+                }
+            }
+        }
+
+        MemberDetails formBackingTypeMemberDetails = webMetadataService
+                .getMemberDetails(formBackingType);
+        List<FieldMetadata> eligibleFields = webMetadataService
+                .getScaffoldEligibleFieldMetadata(formBackingType,
+                        formBackingTypeMemberDetails,
+                        metadataIdentificationString);
+
+        // We're interested only in those types defined in GvNIXRelationsPattern
+        // values
+        SortedMap<JavaType, JavaTypeMetadataDetails> interestingFieldsTypeMetadata = new TreeMap<JavaType, JavaTypeMetadataDetails>();
+        JavaType interestingFieldType = null;
+        for (FieldMetadata fieldMetadata : eligibleFields) {
+            if (fields.contains(fieldMetadata.getFieldName().getSymbolName())) {
+                interestingFieldType = fieldMetadata.getFieldType();
+                if (interestingFieldType.isCommonCollectionType()
+                        && !interestingFieldType.getParameters().isEmpty()) {
+                    interestingFieldType = interestingFieldType.getParameters()
+                            .get(0);
+                }
+                interestingFieldsTypeMetadata.putAll(getRelatedAppTypeMetadata(
+                        interestingFieldType, metadataIdentificationString,
+                        webMetadataService));
+            }
+        }
+        return interestingFieldsTypeMetadata;
+    }
+
+    /**
+     * For the given <code>type</code> the method returns a Map with its Related
+     * App. Types Metadata
+     * 
+     * @param type
+     * @param metadataIdentificationString
+     * @param webMetadataService
+     * @return
+     */
+    private SortedMap<JavaType, JavaTypeMetadataDetails> getRelatedAppTypeMetadata(
+            JavaType type, String metadataIdentificationString,
+            WebMetadataService webMetadataService) {
+        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+                .get(PhysicalTypeIdentifier.createIdentifier(type,
+                        Path.SRC_MAIN_JAVA));
+        Assert.notNull(
+                physicalTypeMetadata,
+                "Unable to obtain physical type metadata for type "
+                        + type.getFullyQualifiedTypeName());
+
+        MemberDetails typeMd = getMemberDetails(physicalTypeMetadata);
+
+        MemberHoldingTypeDetails memberHoldingTypeDetails = MemberFindingUtils
+                .getMostConcreteMemberHoldingTypeDetailsWithTag(typeMd,
+                        PersistenceCustomDataKeys.PERSISTENT_TYPE);
+        SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = webMetadataService
+                .getRelatedApplicationTypeMetadata(type, typeMd,
+                        metadataIdentificationString);
+        if (memberHoldingTypeDetails == null
+                || relatedApplicationTypeMetadata == null) {
+            return null;
+        }
+
+        return relatedApplicationTypeMetadata;
     }
 
     /**

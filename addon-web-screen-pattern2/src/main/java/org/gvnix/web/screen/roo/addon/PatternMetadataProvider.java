@@ -324,7 +324,10 @@ public final class PatternMetadataProvider extends
                 annotationValues, patternList,
                 MemberFindingUtils.getMethods(memberDetails),
                 MemberFindingUtils.getFields(memberDetails),
-                relatedApplicationTypeMetadata, metadataService,
+                relatedApplicationTypeMetadata, getTypesForPopulate(
+                        metadataIdentificationString,
+                        governorPhysicalTypeMetadata, formBackingType,
+                        webMetadataService), metadataService,
                 propFileOperations);
     }
 
