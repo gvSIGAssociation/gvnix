@@ -5,6 +5,7 @@
   <jsp:directive.attribute name="object" type="java.lang.Object" required="true" rtexprvalue="true" description="The form backing object" />
   <jsp:directive.attribute name="field" type="java.lang.String" required="true" rtexprvalue="true" description="Field as related entity" />
   <jsp:directive.attribute name="patternName" type="java.lang.String" required="true" rtexprvalue="true" description="Pattern Name used to show this relation" />
+  <jsp:directive.attribute name="referenceField" type="java.lang.String" required="true" rtexprvalue="true" description="Field of object as reference for relationship" />
   <jsp:directive.attribute name="referenceName" type="java.lang.String" required="true" rtexprvalue="true" description="Field of object as reference for relationship" />
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
@@ -15,7 +16,7 @@
     <div id="${id}_content" class="tab_content_${field}" title="${tab_label}">
       <c:set scope="request" value="${object[fn:escapeXml(field)]}" var="data"/>
       <c:set scope="request" value="${referenceName}" var="referenceName"/>
-      <c:set scope="request" value="${object[fn:escapeXml(referenceName)]}" var="referenceValue"/>
+      <c:set scope="request" value="${object[fn:escapeXml(referenceField)]}" var="referenceValue"/>
       <jsp:include page="../${field}/${patternName}.jspx"/>
     </div>
 
