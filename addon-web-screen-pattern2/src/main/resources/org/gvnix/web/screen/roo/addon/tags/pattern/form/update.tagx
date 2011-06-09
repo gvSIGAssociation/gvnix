@@ -183,7 +183,7 @@
                   <!-- Update layer: not visible by default and and activated by javascript gvnix_edit() function -->
                   <div id="gvnix_control_update" style="display: none;">
                     <span class="warning">
-                      <spring:url value="/resources/images/gvnix/pattern/enEdicion.gif" var="imgUrl" />
+                      <spring:url value="/resources/images/pattern/enEdicion.gif" var="imgUrl" />
                       <img alt="" src="${fn:escapeXml(imgUrl)}" title="" />
                     </span>
                     <spring:message code="button_save" var="save_button"/>
@@ -195,7 +195,7 @@
                   <!-- Add layer: not visible by default and and activated by javascript gvnix_create() function -->
                   <div id="gvnix_control_add" style="display: none;">
                     <span class="warning">
-                      <spring:url value="/resources/images/gvnix/pattern/enEdicion.gif" var="imgUrl" />
+                      <spring:url value="/resources/images/pattern/enEdicion.gif" var="imgUrl" />
                       <img alt="" src="${fn:escapeXml(imgUrl)}" title="" />
                     </span>
                     <spring:message code="button_save" var="save_button"/>
