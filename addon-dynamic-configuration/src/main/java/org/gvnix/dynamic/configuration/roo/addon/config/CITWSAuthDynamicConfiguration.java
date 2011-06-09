@@ -22,7 +22,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
 /**
- * Dynamic configuration manager of jdbc database properties.
+ * Dynamic configuration manager of CIT authentication web service properties.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -31,7 +31,7 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-public class DatabaseDynamicConfiguration extends
+public class CITWSAuthDynamicConfiguration extends
         PropertiesDynamicConfiguration implements DefaultDynamicConfiguration {
 
     /**
@@ -39,7 +39,7 @@ public class DatabaseDynamicConfiguration extends
      */
     public String getName() {
 
-        return "Database Connection Properties";
+        return "CIT Autentication Web Service Connection Properties";
     }
 
     /**
@@ -48,7 +48,7 @@ public class DatabaseDynamicConfiguration extends
     @Override
     public String getFilePath() {
 
-        return "src/main/resources/META-INF/spring/database.properties";
+        return "src/main/resources/META-INF/spring/CITWSAuth.properties";
     }
 
 }
