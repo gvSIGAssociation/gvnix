@@ -32,7 +32,7 @@
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.root</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>wrapping</artifactId>
@@ -47,6 +47,7 @@
 
   <modules>
     <module>oracle</module>
+    <module>aspectj</module>
   </modules>
 
   <repositories>
@@ -94,7 +95,7 @@
           -->
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Export-Package>*;version=${project.version}</Export-Package>
+            <Export-Package>*;version=${pkgVersion}</Export-Package>
             <Bundle-Vendor>${pkgVendor} (wrapped into an OSGi bundle by the gvNIX project build system)</Bundle-Vendor>
             <Bundle-DocURL>${pkgDocUrl}</Bundle-DocURL>
             <Bundle-License>${pkgLicense}</Bundle-License>
