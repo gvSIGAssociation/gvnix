@@ -955,8 +955,10 @@ public abstract class AbstractPatternJspMetadataListener implements
                         XmlUtils.convertId("fu:"
                                 + formbackingType.getFullyQualifiedTypeName()))
                 /* Modified previous value entityName */
-                .addAttribute("modelAttribute",
-                        entityName.toLowerCase().concat("Tab")).build();
+                .addAttribute(
+                        "modelAttribute",
+                        formbackingTypeMetadata.getPlural().toLowerCase()
+                                .concat("Tab")).build();
 
         if (!controllerPath.toLowerCase().equals(
                 formbackingType.getSimpleTypeName().toLowerCase())) {
