@@ -231,9 +231,6 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
         if (pattern.equals(WebPattern.tabular)) {
             annotateFormBackingObject(controllerDetails);
         }
-
-        // anotateFormBackingObjectRelationsControllers(controllerDetails);
-
     }
 
     /**
@@ -244,6 +241,8 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
      * Also checks if <code>controllerClass</code> is really a controller
      * (annotated with @RooWebScaffold using {@link Assert})
      * </p>
+     * 
+     * TODO: refactor this code to use getPhysicalTypeDetails(JavaType type)
      * 
      * @param controllerClass
      * @return
@@ -398,7 +397,7 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
 
     /**
      * Given a Entity this method look for the WebScaffold exposing it and adds
-     * {@link GvNIXPattern} in parameter annotation
+     * {@link GvNIXRelatedPattern} in parameter annotation
      * 
      * @param entity
      * @param annotation
@@ -431,8 +430,8 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
     }
 
     /**
-     * Annotates with GvNIXPattern (or updates the annotation value) the given
-     * controller
+     * Annotates with GvNIXRelatedPattern (or updates the annotation value) the
+     * given controller
      * 
      * @param controllerClass
      * @param annotation
@@ -507,17 +506,6 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
                 List<StringAttributeValue> previousValues = (List<StringAttributeValue>) previousAnnotationValues
                         .getValue();
                 patternList.addAll(previousValues);
-
-                // if (previousValues != null && !previousValues.isEmpty()) {
-                //
-                // for (StringAttributeValue value : previousValues) {
-                // // Check if name is already used
-                // //Assert.isTrue(!equalsPatternName(value, name),
-                // // "Pattern name already used in class");
-                //
-                // patternList.add(value);
-                // }
-                // }
             }
             isAlreadyAnnotated = true;
         }
@@ -555,6 +543,32 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
             controllerDetails.addTypeAnnotation(annotationBuilder.build());
         }
 
+        List<String> definedPatternsList = new ArrayList<String>();
+        for (StringAttributeValue definedPattern : patternList) {
+            definedPatternsList.add(definedPattern.getValue());
+        }
+        if (isPatternTypeDefined(WebPattern.tabular, definedPatternsList)) {
+            annotateFormBackingObject(controllerDetails);
+        }
+    }
+
+    /**
+     * If there is a pattern of givne WebPattern defined in GvNIXPattern it
+     * returns true, false otherwise
+     * 
+     * @param patternType
+     * @param definedPatternsList
+     * @return
+     */
+    private boolean isPatternTypeDefined(WebPattern patternType,
+            List<String> definedPatternsList) {
+        for (String definedPattern : definedPatternsList) {
+            if (definedPattern.split("=")[1].equalsIgnoreCase(patternType
+                    .name())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @SuppressWarnings("unused")
@@ -634,30 +648,24 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
      */
     private void annotateFormBackingObject(
             MutableClassOrInterfaceTypeDetails controllerDetails) {
-        // Test if the annotation already exists on the target type
-        MutableClassOrInterfaceTypeDetails formBakingObjectMutableTypeDetails = getFormBackingObjectPhysicalTypeDetails(controllerDetails);
+        JavaType formBackingObject = getFormBakingObject(controllerDetails);
+        annotateTypeWithGvNIXEntityBatch(formBackingObject);
+    }
+
+    private void annotateTypeWithGvNIXEntityBatch(JavaType type) {
+        MutableClassOrInterfaceTypeDetails typeMutableDetails = getPhysicalTypeDetails(type);
         AnnotationMetadata annotationMetadata = MemberFindingUtils
-                .getAnnotationOfType(
-                        formBakingObjectMutableTypeDetails.getAnnotations(),
+                .getAnnotationOfType(typeMutableDetails.getAnnotations(),
                         ENTITYBATCH_ANNOTATION);
 
-        // Annotate formBackingType with GvNIXEntityBatch just if is not
+        // Annotate type with GvNIXEntityBatch just if is not
         // annotated already. We don't need to update attributes
         if (annotationMetadata == null) {
             // Prepare annotation builder
             AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                     ENTITYBATCH_ANNOTATION);
-            formBakingObjectMutableTypeDetails
-                    .addTypeAnnotation(annotationBuilder.build());
+            typeMutableDetails.addTypeAnnotation(annotationBuilder.build());
         }
-    }
-
-    private MutableClassOrInterfaceTypeDetails getFormBackingObjectPhysicalTypeDetails(
-            MutableClassOrInterfaceTypeDetails controllerDetails) {
-
-        JavaType formBakingObjectType = getFormBakingObject(controllerDetails);
-
-        return getPhysicalTypeDetails(formBakingObjectType);
     }
 
     private JavaType getFormBakingObject(

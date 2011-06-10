@@ -15,7 +15,6 @@
   <c:if test="${empty render or render}">
 
     <c:set var="path" value="${path}/list" />
-    <c:set var="modelAttributeData" value="${requestScope[modelAttribute]}"/>
 
     <!-- Secure escaped identifier to be used on html and javascript places -->
     <c:set var="secId">
@@ -36,6 +35,7 @@
 
       <!-- Show panel tab to access other defined page modes (search, edit, list, ...) -->
       <spring:message arguments="${typeName}" code="entity_list_all" var="entity_relations"/>
+      <spring:url value="${path}" var="listUrl" />
       <util:panel-tabs>
         <util:panel-tab active="${true}" id="${id}" title="${entity_relations}" type="list"/>
       </util:panel-tabs>
@@ -100,7 +100,7 @@
             <c:set var="endItem" value="${empty param[page] or empty param[pageSize] ? 9 : param[page] * param[pageSize] - 1}" scope="request"/>
 
             <!-- Create a row for each item on data collection between pagination items -->
-            <c:forEach items="${modelAttributeData}" var="item" varStatus="pos" begin="${beginItem}" end="${endItem}">
+            <c:forEach items="${data}" var="item" varStatus="pos" begin="${beginItem}" end="${endItem}">
               <tr class="${rowStylePrefix}${pos.count}">
 
                 <!-- 0-index position for list and selected collections sended to controller -->
@@ -164,7 +164,7 @@
                     <util:pagination maxPages="${maxPages}" page="${param.page}" size="${param.size}" />
                   </c:when>
                   <c:otherwise>
-                    <pattern:paginationadd field="${id}" relatedEntitySet="${modelAttributeData}" />
+                    <pattern:paginationadd field="${id}" relatedEntitySet="${data}" />
                   </c:otherwise>
                 </c:choose>
 

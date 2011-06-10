@@ -902,7 +902,7 @@ public abstract class AbstractPatternMetadata extends
                 entityNamePlural.toLowerCase()).concat(".isEmpty()) {"));
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
-                entityNamePlural.toLowerCase()).concat("\", null);"));
+                entityNamePlural.toLowerCase()).concat("Tab\", null);"));
         bodyBuilder
                 .appendFormalLine("uiModel.addAttribute(\"MESSAGE_INFO\",\"message_entitynotfound_problemdescription\");");
         bodyBuilder.appendFormalLine("return \"".concat(
@@ -942,7 +942,7 @@ public abstract class AbstractPatternMetadata extends
         }
 
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-                .concat(entityNamePlural.toLowerCase()).concat("\", ")
+                .concat(entityNamePlural.toLowerCase()).concat("Tab\", ")
                 .concat(entityNamePlural.toLowerCase()).concat(");"));
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));

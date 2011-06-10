@@ -956,8 +956,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                                 + formbackingType.getFullyQualifiedTypeName()))
                 /* Modified previous value entityName */
                 .addAttribute("modelAttribute",
-                        formbackingTypeMetadata.getPlural().toLowerCase())
-                .build();
+                        entityName.toLowerCase().concat("Tab")).build();
 
         if (!controllerPath.toLowerCase().equals(
                 formbackingType.getSimpleTypeName().toLowerCase())) {
