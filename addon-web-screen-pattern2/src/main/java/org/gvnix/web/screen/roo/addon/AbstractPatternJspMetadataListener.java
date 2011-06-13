@@ -614,11 +614,11 @@ public abstract class AbstractPatternJspMetadataListener implements
                     + "_gvnixpattern");
             Element hiddenField = XmlUtils.findFirstElement(
                     "/div/" + rooJspx.name()
-                            + "/div/div/hiddengvnipattern[@id='"
+                            + "/div/div/hiddengvnixpattern[@id='"
                             + hiddenFieldId + "']", docRoot);
             if (null == hiddenField) {
                 hiddenField = new XmlElementBuilder(
-                        "pattern:hiddengvnipattern", docJspXml)
+                        "pattern:hiddengvnixpattern", docJspXml)
                         .addAttribute("id", hiddenFieldId)
                         .addAttribute("value", "${param.gvnixpattern}")
                         .addAttribute("render",
