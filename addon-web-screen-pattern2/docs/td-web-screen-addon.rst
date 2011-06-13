@@ -41,12 +41,12 @@ Requirements
 
    So, it should to create/maintain JSPx/TAGx/JS/CSS/Images files, the code in Controllers and optionally the code in Entities.
    Currently screen patterns will be applied to Spring MVC projects.
-   
+
 #. A pattern layout must be defined by any developer, that is, he will be able to set patterns as master-register/detail-table, master-table/detail-register, master-table/detail-table/detail-register, etc.
 
 #. The same entity could be set with several patterns based on which context is defining the pattern (Entit1 <related with> Entity2 and Entity3; Entity2 <related with> Entity3).
 
-TBC: How form fields will be layout, how to change form field layouts, applied to relation choosen by developer, ....
+TBC: How form fields will be layout, how to change form field layouts, applied to relation chosen by developer, ....
 
 Tech design
 ============
@@ -66,52 +66,58 @@ Options:
 
 * class: The path and name of the controller object to be used. *Required*. Extends: JavaType
 
-  Definir nuestro RooWebScaffoldJavaType que extiende JavaType y que adicionalmente comprobará que la anotación @RooWebScaffold se encuentra definida en el tipo principal de la clase Java.
-  Comprobar que la anotación @RooWebScaffold se encuentra definida en el tipo principal de la clase Java
+  This option must be the name or path of a JavaType annotated with RooWebScaffold in order to allow Metadata generation.
 
 * type: The pattern type to include on the controller object. *Required*
 
-  Debe ser un tipo enumerado que permita elegir autocompletando de entre ciertos posibles valores.
-
-  En una primera versión, la única posibilidad de este tipo enumerado será el valor "table".
+  Enum type in WebPattern will define the available pattern types. Nowadays: tabular and register.
 
 * name: Unique name for the pattern in whole project. *Required*. Type: JavaSymbolName, it avoids non valid characters.
 
-El comando tendrá que incluir la anotación @GvNIXPattern en la clase indicada por la opción "class" del comando y con el siguiente value::
+The command has to add the GvNIXPattern annotation in the class requested by the option "class" and with the following value::
 
-  @GvNIXPattern({"MyPattern=table"})
+  @GvNIXPattern({"MyPattern=tabular"})
+
+In the same operation, if requested type is "tabular", the Entity exposed by the given class has to be annotated with
+GvNIXEntityBatch also.
 
 ::
 
-  web mvc relation pattern --class ~.web.PetController --name MyPattern --field field1 --type table 
+  web mvc relation pattern --class ~.web.PetController --name MyPattern --field field1 --type table
 
 Options:
 
 * class: The path and name of the controller object to be used. *Required*. Extends: JavaType
 
-  La clase debe estar ya anotada con @GvNIXPattern. 
+  Desired class must be annotated with GvNIXPattern before apply the new annotation.
 
 * name: name for the pattern in whole project to set relation pattern to. *Required*. Type: JavaSymbolName, it avoids non valid characters.
 
-  Debe estar un nombre definido en la anotación @GvNIXPattern
+  The name of the pattern must be already defined as value of GvNIXPattern.
 
 * field: One-to-many property name to apply pattern to. *Required*
 
-  Ver la posibilidad de autocompletar.
+  The name of the field we want to show as relationship of the master entity (the formBackingObject of controller). By now,
+  this field must be annotated with OneToMany.
 
 * type: The pattern type to apply pattern to. *Required*
 
-  Debe ser un tipo enumerado que permita elegir autocompletando de entre ciertos posibles valores.
+  Enum type in WebPattern will define the available pattern types. Nowadays: tabular and register.
 
-  En una primera versión, la única posibilidad de este tipo enumerado será el valor "table".
-
-El comando tendrá que incluir la anotación @GvNIXRelationsPattern en la clase indicada por la opción "class" del comando y con el siguiente value::
+The command has to add the GvNIXRelationsPattern in the class requested by the option "class" and with the following value::
 
   @GvNIXRelationsPattern({"MyPattern: field1=table"})``
 
-Si la anotación ya tubuiese un elemento para el patron añadido, el campo se añadira separado por comas::
+If there is any previous GvNIXRelationsPattern defined, the field specified in the command will be added as comma separated value::
 
-  @GvNIXRelationsPattern({"MyPattern: otherField=register, field1=table", "OtherPattern: otherField=talbe"})``
+  @GvNIXRelationsPattern({"MyPattern: otherField=register, field1=tabular", "OtherPattern: otherField=tabular"})``
+
+Since the command applies a pattern definition over a new Entity (denoted by the field in the exposed Entity), the command has to
+annotate this new Entity with GvNIXRelatedPattern. This annotation takes the same value defined in GvNIXRelationsPattern for the
+given field and the given pattern identifier.
+
+As we described before for GvNIXPattern, if requested type is "tabular", the entity exposed by the field has to be annotated
+with GvNIXEntityBatch also.
 
 ITD
 ----
@@ -132,20 +138,21 @@ Metadata
     The annotations defining these metadata will be:
 
     * **@GvNIXPattern**: Defines patterns over formBackingObject entity.
-      e.g: ``@GvNIXPattern({"pattern_id1=register", "pattern_id2=table"})``. (the format may change)
+      e.g: ``@GvNIXPattern({"pattern_id1=register", "pattern_id2=tabular"})``. (the format may change)
 
     * **@GvNIXRelationsPattern**: Defines patterns over the entities related with formBackingObject
       entity.
-      e.g: ``@GvNIXRelationsPattern({"pattern_id1: field1=table, field2=table",
-      "pattern_id2: field2=table"})`` (the format may change)
+      e.g: ``@GvNIXRelationsPattern({"pattern_id1: field1=table, field2=tabular",
+      "pattern_id2: field2=tabular"})`` (the format may change)
 
     ``@GvNIXPattern`` annotation triggers the generation of the AspectJ files with the methods in the
     controller accepting request of operations over the entity. Also, they trigger the generation of
     the MVC artifacts (JSPx files) rendering views of the formBackingObject.
 
     Both, ``@GvNIXPattern`` and ``@GvNIXRelationsPattern``, trigger the modification of the JAVA files
-    defining the related entities adding the annotation ``GvNIXEntityBatch`` (described below) when the
-    pattern selected is of type "table".
+    defining the related entities adding the annotation ``GvNIXRelatedPattern`` in the case of
+    ``GvNIXRelationsPattern`` and ``GvNIXEntityBatch`` (described below) when the pattern selected is
+    of type "tabular".
 
     The JSPx files will keept the structure of the MVC artifacts created by Roo::
 
@@ -160,8 +167,8 @@ Metadata
      |   `-- ...
 
     ``@GvNIXRelationsPattern`` triggers the update of annotations in related entities adding or
-    modifying their own ``@GvNIXPattern``.
-    
+    modifying their own ``@GvNIXRelatedPattern``.
+
     TODO: Use case of distinct annotation on related entities instead of ``@GvNIXPattern``.
 
 * Metadata for Entity
@@ -177,7 +184,7 @@ Metadata
 Metadata Listeners
 ...................
 
-The add-on will have the needed metadata listeners registered to GvNIXPattern's changes, so it will
+The add-on will have the needed metadata listeners registered to GvNIXPattern and GvNIXRelatedPattern changes, so it will
 know when a pattern definition has been modified or removed and act handling the changes.
 
 
@@ -186,6 +193,9 @@ JSPx files
 
 The add-on will create it's own JSPx files for each defined pattern using the set of TAGx files
 available in the framework.
+
+For "tabular" type, created JSPx will be based on Roo's show.jspx but using gvNIX version of show.tagx. In the other hand,
+"register" JSPx are based on update.jspx, using gvNIX version of update.tagx.
 
 
 Roo Shell commands
@@ -215,8 +225,6 @@ Future enhancements
 TODO
 ====
 
-* El import de la clase BeanInfoUtils debe referenciar al add-on de classpath.
-
 * Forzar altura de la capa contenedora de tabs para que no quede oculta la tabla por debajo.
   El tamaño no puede ser fijo, pq la tabla puede crecer más aún del tamaño máximo fijado.
   r148
@@ -225,8 +233,4 @@ TODO
   add-hoc. Al height de las capas se le suman 137px que es lo que ocupan las 5 nuevas filas.
   Revisar lo que se comenta en http://anaturb.net/dojo/my/dojoTabContainer.htm por si puede
   servir como mejor solución.
-
-* Hay un problema con este add-on probocado por el método
-  org.gvnix.web.screen.roo.addon.ScreenMetadataListener.getAnnotatedFields(String, String). Falla
-  porque no está controllado el caso de que WebScaffoldMetada sea null.
 
