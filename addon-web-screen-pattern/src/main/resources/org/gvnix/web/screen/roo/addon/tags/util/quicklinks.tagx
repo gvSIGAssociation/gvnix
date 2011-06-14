@@ -1,0 +1,14 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+  <!--
+    Quick actions container for forms: create, edit, reset, ...
+  -->
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="false" rtexprvalue="true" description="HTML node ID" />
+
+  <div id="${id}_relations_quicklinks" class="quicklinks">
+    <ul>
+      <jsp:doBody />
+    </ul>
+  </div>
+</jsp:root>
