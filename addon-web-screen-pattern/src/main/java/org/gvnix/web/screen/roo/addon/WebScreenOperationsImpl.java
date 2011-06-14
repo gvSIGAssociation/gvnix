@@ -19,8 +19,10 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.felix.scr.annotations.Component;
@@ -209,8 +211,8 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
                 .concat(pattern.toString());
 
         // Adds new pattern
-        patternList.add(new StringAttributeValue(new JavaSymbolName("ignored"),
-                patternParameter));
+        patternList.add(new StringAttributeValue(new JavaSymbolName(
+                "__ARRAY_ELEMENT__"), patternParameter));
 
         // Prepare annotation builder
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
@@ -399,10 +401,10 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
         if (previousValueIndex >= 0) {
             // Restore previous value position if any
             patternList.add(previousValueIndex, new StringAttributeValue(
-                    new JavaSymbolName("ignored"), finalValue));
+                    new JavaSymbolName("__ARRAY_ELEMENT__"), finalValue));
         } else {
             patternList.add(new StringAttributeValue(new JavaSymbolName(
-                    "ignored"), finalValue));
+                    "__ARRAY_ELEMENT__"), finalValue));
         }
 
         // Prepare annotation builder
@@ -431,11 +433,11 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
      * GvNIXPattern annotation
      * 
      * @param controllerDetails
-     * @param annotationValues
+     * @param relationsPatternValues
      */
     private void annotateFormBackingObjectRelationsControllers(
             MutableClassOrInterfaceTypeDetails controllerDetails,
-            AnnotationAttributeValue<?> annotationValues) {
+            AnnotationAttributeValue<?> relationsPatternValues) {
 
         JavaType formBakingObjectType = getFormBakingObject(controllerDetails);
 
@@ -452,12 +454,19 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
 
         List<FieldMetadata> fieldAnotations = patternService
                 .getOneToManyFieldsFromEntityJavaType(formBakingObjectType);
-        for (FieldMetadata field : fieldAnotations) {
-            if (field.getFieldType().isCommonCollectionType()) {
-                annotateEntityController(
-                        field.getFieldType().getParameters().get(0),
-                        getGvNIXRelatedPatternForEntityAndValues(
-                                field.getFieldName(), annotationValues));
+        Map<String, String> fieldsPatternIdAndType = getFieldsPatternIdAndType(relationsPatternValues);
+        if (!fieldsPatternIdAndType.keySet().isEmpty()) {
+            for (FieldMetadata field : fieldAnotations) {
+                if (fieldsPatternIdAndType.keySet().contains(
+                        field.getFieldName().getSymbolName())
+                        && field.getFieldType().isCommonCollectionType()) {
+                    AnnotationMetadata relatedPattern = getGvNIXRelatedPattern(fieldsPatternIdAndType
+                            .get(field.getFieldName().getSymbolName()));
+                    if (relatedPattern != null) {
+                        annotateEntityController(field.getFieldType()
+                                .getParameters().get(0), relatedPattern);
+                    }
+                }
             }
         }
 
@@ -529,7 +538,7 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
 
         boolean isAlreadyAnnotated = false;
         if (annotationMetadata != null) {
-            // @GvNIXPattern alredy exists
+            // @GvNIXRelatedPattern alredy exists
 
             // Loads previously registered pattern into patterList
             // Also checks if name is used previously
@@ -552,7 +561,13 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
         List<StringAttributeValue> newValues = (List<StringAttributeValue>) annotation
                 .getAttribute(RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME)
                 .getValue();
-        patternList.addAll(newValues);
+        // Check if the same annotation value is already defined avoiding define
+        // it twice
+        for (StringAttributeValue stringAttributeValue : newValues) {
+            if (!patternList.contains(stringAttributeValue)) {
+                patternList.add(stringAttributeValue);
+            }
+        }
 
         AnnotationAttributeValue<?> gvNIXRelatedPatternValue = new ArrayAttributeValue<StringAttributeValue>(
                 RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList);
@@ -609,68 +624,68 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
     }
 
     /**
-     * For given parameters, entity and relationsPatternValues in the following
-     * annotation value format:
-     * <p>
-     * <code>@GvNIXRelationsPattern({"pattern_id1: field1=table, field2=table", "pattern_id2: field2=table"})</code>
-     * <p>
-     * the method parse the value and creates an instance of
-     * {@link GvNIXRelatedPattern} with the value of its part in the
-     * GvNIXRelationsPattern value. That is, in the given example, for (field1,
-     * {"pattern_id1: field1=table, field2=table",
-     * "pattern_id2: field2=table"}), it returns:<br/>
+     * For given attrValue, returns an instance of GvNIXRelatedPattern
+     * annotation <br/>
      * GvNIXRelatedPattern({"pattern_id1=table"})
      * 
-     * @param entity
-     * @param relationsPatternValues
+     * @param attrValue
      * @return
      */
-    private AnnotationMetadata getGvNIXRelatedPatternForEntityAndValues(
-            JavaSymbolName fieldName,
-            AnnotationAttributeValue<?> relationsPatternValues) {
+    private AnnotationMetadata getGvNIXRelatedPattern(String attrValue) {
         List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
-        if (relationsPatternValues != null) {
 
-            @SuppressWarnings("unchecked")
-            List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues
-                    .getValue();
-            List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
+        List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>(
+                1);
 
-            // Parse annotationValues finding the field interesting part
-            if (relationsPatternList != null) {
-                String[] patternDef = {};
-                String[] fieldDefinitions = {};
-                String[] fieldPatternType = {};
-                for (StringAttributeValue strAttrValue : relationsPatternList) {
-                    patternDef = strAttrValue.getValue().split(":");
-                    fieldDefinitions = patternDef[1].trim().split(",");
-                    for (String fieldDef : fieldDefinitions) {
-                        fieldPatternType = fieldDef.trim().split("=");
+        patternList.add(new StringAttributeValue(new JavaSymbolName(
+                "__ARRAY_ELEMENT__"), attrValue));
 
-                        if (fieldName.getSymbolName().equalsIgnoreCase(
-                                fieldPatternType[0].trim())) {
-                            patternList
-                                    .add(new StringAttributeValue(
-                                            new JavaSymbolName("ignored"),
-                                            patternDef[0]
-                                                    .trim()
-                                                    .concat("=")
-                                                    .concat(fieldPatternType[1]
-                                                            .trim())));
-                        }
-                    }
-                }
-                attributes
-                        .add(new ArrayAttributeValue<StringAttributeValue>(
-                                RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME,
-                                patternList));
-            }
-        }
+        attributes.add(new ArrayAttributeValue<StringAttributeValue>(
+                RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList));
+
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 RELATED_PATTERN_ANNOTATION);
         annotationBuilder.setAttributes(attributes);
 
         return annotationBuilder.build();
+    }
+
+    /**
+     * Given the param relationsPatternValues it returns a Map where keys are
+     * the fieldName part and values are patternId=patternType. That is, for:<br/>
+     * 
+     * relationsPatternValues = {"patternId: field1=tabular, field2=register"}
+     * it returns <br/>
+     * {field1 => "patternId=tabular", field2 => "patternId=register"}
+     * 
+     * @param relationsPatternValues
+     * @return
+     */
+    private Map<String, String> getFieldsPatternIdAndType(
+            AnnotationAttributeValue<?> relationsPatternValues) {
+        Map<String, String> fieldsPatternIdAndType = new HashMap<String, String>();
+        @SuppressWarnings("unchecked")
+        List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues
+                .getValue();
+
+        // Parse annotationValues finding the field interesting part
+        if (relationsPatternList != null) {
+            String[] patternDef = {};
+            String[] fieldDefinitions = {};
+            String[] fieldPatternType = {};
+            for (StringAttributeValue strAttrValue : relationsPatternList) {
+                patternDef = strAttrValue.getValue().split(":");
+                fieldDefinitions = patternDef[1].trim().split(",");
+                for (String fieldDef : fieldDefinitions) {
+                    fieldPatternType = fieldDef.trim().split("=");
+                    fieldsPatternIdAndType.put(
+                            fieldPatternType[0].trim(),
+                            patternDef[0].trim().concat("=")
+                                    .concat(fieldPatternType[1].trim()));
+                }
+            }
+        }
+        return fieldsPatternIdAndType;
     }
 
     /**
