@@ -9,9 +9,9 @@
 :Date:      $Date$
 
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
-Unported License. To view a copy of this license, visit 
-http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to 
-Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 
+Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 94105, USA.
 
 .. contents::
@@ -23,7 +23,12 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introduction
 ===============
 
-Add-on update jspx views from entities that have OneToMany mapped relationship to show them inside paginated tables grouped by tabs.
+Add-on updates jspx views from entities that have OneToMany mapped relationship to show them inside paginated tables grouped by
+tabs (pattern tabular) or in paginated views of single records (pattern register)
+
+  .. admonition:: What is an screen pattern?
+
+    http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns
 
 Project contents
 =================
@@ -53,20 +58,9 @@ Run the application in Bash Shell and see the actual style::
 
   mvn tomcat:run
 
-Back to the gvNIX/Roo Shell and type::
-
-  web screen 
-
-After copying tagx files, generate AspectJ files and new jspx views, run again the application with the maven commmand::
-
-  mvn tomcat:run
 
 Uninstall the Add-on
 =====================
-
-To remove the Add-on functionalities from your project you have to delete **gvnixcallfunction.tagx** file located in::
-
- - src/main/webapp/WEB-INF/tags/util/gvnixcallfunction.tagx
 
 Remove all related entities called with the tagx in jspx show and update.
 

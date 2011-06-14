@@ -1,26 +1,28 @@
 project --topLevelPackage org.gvnix.test.relation.list.table --projectName displayRelationsTable
 
-persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
+persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
 entity --class ~.domain.Person
 field string --fieldName name --notNull
-field number --fieldName edad --type java.lang.Integer 
-field date --fieldName fecha --type java.util.Calendar 
+field number --fieldName age --type java.lang.Integer
+field date --fieldName birthDate --type java.util.Calendar
 
 entity --class org.gvnix.test.relation.list.table.domain.Horse
 field string --fieldName name --notNull
 field reference --fieldName person --type org.gvnix.test.relation.list.table.domain.Person
 
 focus --class ~.domain.Person
-field set --fieldName horses --type org.gvnix.test.relation.list.table.domain.Horse --cardinality ONE_TO_MANY --mappedBy person 
+field set --fieldName horses --type org.gvnix.test.relation.list.table.domain.Horse --cardinality ONE_TO_MANY --mappedBy person
 
 entity --class org.gvnix.test.relation.list.table.domain.Car
 field string --fieldName name --notNull
 field reference --fieldName person --type org.gvnix.test.relation.list.table.domain.Person
 
 focus --class ~.domain.Person
-field set --fieldName coches --type org.gvnix.test.relation.list.table.domain.Car --cardinality ONE_TO_MANY --mappedBy person 
+field set --fieldName cars --type org.gvnix.test.relation.list.table.domain.Car --cardinality ONE_TO_MANY --mappedBy person
 
 controller all --package org.gvnix.test.relation.list.table.web
 
-web screen
+web mvc pattern --class ~.web.PersonController --name personregtab --type register
+//web mvc relation pattern --class ~.web.PersonController --name personregtab --field horses --type tabular
+//web mvc relation pattern --class ~.web.PersonController --name personregtab --field cars --type tabular
