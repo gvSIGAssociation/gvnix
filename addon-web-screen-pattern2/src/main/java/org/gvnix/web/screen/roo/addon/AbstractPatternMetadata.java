@@ -674,7 +674,6 @@ public abstract class AbstractPatternMetadata extends
      * The method is <code>unused</code> until we find a way to invoke it
      * without get any issues
      */
-    @SuppressWarnings("unused")
     protected void annotateFormBackingObject() {
 
         // Test if the annotation already exists on the target type
@@ -732,7 +731,6 @@ public abstract class AbstractPatternMetadata extends
         return mutableTypeDetails;
     }
 
-    @SuppressWarnings("unused")
     protected FieldMetadataBuilder getGvNIXPatternField() {
         return new FieldMetadataBuilder(getId(), Modifier.PRIVATE
                 | Modifier.STATIC | Modifier.FINAL, new JavaSymbolName(
@@ -797,7 +795,6 @@ public abstract class AbstractPatternMetadata extends
         return null;
     }
 
-    @SuppressWarnings("unused")
     protected void addStaticFields() {
         FieldMetadataBuilder field = new FieldMetadataBuilder(getId(),
                 Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL,
@@ -849,8 +846,8 @@ public abstract class AbstractPatternMetadata extends
                 .getName()), methodAttributesAnnotations));
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(
                 "org.springframework.ui.Model"), null));
-        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
-                "javax.servlet.http.HttpServletRequest"), null));
+        // methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+        // "javax.servlet.http.HttpServletRequest"), null));
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
@@ -864,7 +861,7 @@ public abstract class AbstractPatternMetadata extends
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         methodParamNames.add(new JavaSymbolName("pattern"));
         methodParamNames.add(new JavaSymbolName("uiModel"));
-        methodParamNames.add(new JavaSymbolName("request"));
+        // methodParamNames.add(new JavaSymbolName("request"));
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -958,6 +955,8 @@ public abstract class AbstractPatternMetadata extends
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
                 "gvnixpattern"));
+        paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
+                "!form"));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
