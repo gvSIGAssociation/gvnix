@@ -732,12 +732,16 @@ public abstract class AbstractPatternJspMetadataListener implements
 
         // spring:url elements
         Element testElement = XmlUtils.findFirstElement(
-                "/root/url[@var='qljs_url']", lsRoot);
+                "/root/url[@var='pattern_css_url']", lsRoot);
         if (testElement == null) {
             Element urlPatternCss = new XmlElementBuilder("spring:url",
                     loadScriptsXml)
                     .addAttribute("value", "/resources/styles/pattern.css")
                     .addAttribute("var", "pattern_css_url").build();
+            Element urlQlJs = new XmlElementBuilder("spring:url",
+                    loadScriptsXml)
+                    .addAttribute("value", "/resources/scripts/quicklinks.js")
+                    .addAttribute("var", "qljs_url").build();
             List<Element> springUrlElements = XmlUtils.findElements(
                     "/root/url", lsRoot);
             // Element lastSpringUrl = null;
@@ -748,10 +752,12 @@ public abstract class AbstractPatternJspMetadataListener implements
                     nextSibiling = lastSpringUrl.getNextSibling()
                             .getNextSibling();
                     lsRoot.insertBefore(urlPatternCss, nextSibiling);
+                    lsRoot.insertBefore(urlQlJs, nextSibiling);
                 }
             } else {
                 // Add at the end of the document
                 lsRoot.appendChild(urlPatternCss);
+                lsRoot.appendChild(urlQlJs);
             }
         }
 
@@ -765,7 +771,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                     .addAttribute("media", "screen")
                     .addAttribute("href", "${pattern_css_url}").build();
             linkPatternCss.appendChild(loadScriptsXml
-                    .createCDATASection("<!-- required for FF3 and Opera -->"));
+                    .createComment(" required for FF3 and Opera "));
             Node linkTrundraCssNode = XmlUtils.findFirstElement(
                     "/root/link[@href='${tundra_url}']", lsRoot);
             if (linkTrundraCssNode != null) {
@@ -796,15 +802,11 @@ public abstract class AbstractPatternJspMetadataListener implements
         testElement = XmlUtils.findFirstElement(
                 "/root/script[@src='${qljs_url}']", lsRoot);
         if (testElement == null) {
-            Element urlQlJs = new XmlElementBuilder("spring:url",
-                    loadScriptsXml)
-                    .addAttribute("value", "/resources/scripts/quicklinks.js")
-                    .addAttribute("var", "qljs_url").build();
             Element scriptQlJs = new XmlElementBuilder("script", loadScriptsXml)
                     .addAttribute("src", "${qljs_url}")
                     .addAttribute("type", "text/javascript").build();
             scriptQlJs.appendChild(loadScriptsXml
-                    .createCDATASection("<!-- required for FF3 and Opera -->"));
+                    .createComment(" required for FF3 and Opera "));
             List<Element> scrtiptElements = XmlUtils.findElements(
                     "/root/script", lsRoot);
             // Element lastScript = null;
@@ -813,12 +815,10 @@ public abstract class AbstractPatternJspMetadataListener implements
                         .get(scrtiptElements.size() - 1);
                 if (lastScript != null) {
                     nextSibiling = lastScript.getNextSibling().getNextSibling();
-                    lsRoot.insertBefore(urlQlJs, nextSibiling);
                     lsRoot.insertBefore(scriptQlJs, nextSibiling);
                 }
             } else {
                 // Add at the end of document
-                lsRoot.appendChild(urlQlJs);
                 lsRoot.appendChild(scriptQlJs);
             }
         }
