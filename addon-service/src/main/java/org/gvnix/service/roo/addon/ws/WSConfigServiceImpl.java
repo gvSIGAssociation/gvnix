@@ -1352,6 +1352,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * 
      * @param wsdlLocation
      *            WSDL file location
+     * @return Location added to pom ?
      */
     private boolean addImportLocationDocument(String wsdlLocation) {
 
@@ -1392,41 +1393,52 @@ public class WSConfigServiceImpl implements WSConfigService {
         Assert.notNull(plugin,
                 "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
-        // The wsdl location already exists ?
+        // Check URL connection and WSDL format
+        Element rootElement = securityService.loadWsdlUrl(wsdlLocation)
+                .getDocumentElement();
+
+        // The wsdl location already exists on old plugin format ?
+        Element wsdlOptionElement = XmlUtils.findFirstElement(
+                "executions/execution/configuration/wsdlOptions/wsdlOption[wsdl='"
+                        + removeFilePrefix(wsdlLocation) + "']", plugin);
+
+        // The wsdl location already exists on new plugin format ?
+        String serviceId = WsdlParserUtils
+                .findFirstCompatibleServiceElementName(rootElement);
         Element execution = XmlUtils.findFirstElement(
-                "executions/execution[phase='generate-sources']", plugin);
+                "executions/execution[phase='generate-sources' and id='"
+                        + serviceId + "']", plugin);
 
-        // If required execution already exists
-        if (execution != null) {
+        // If location already added on plugin, do nothing
+        if (execution != null || wsdlOptionElement != null) {
 
-            // The wsdl location already exists ?
-            Element wsdlOptionElement = XmlUtils.findFirstElement(
-                    "configuration/wsdlOptions/wsdlOption[wsdl='"
-                            + removeFilePrefix(wsdlLocation) + "']", execution);
+            return false;
 
-            // If location already added on plugin, do nothing
-            if (wsdlOptionElement != null) {
-
-                return false;
-            }
-        } else {
-
-            Element executions = XmlUtils.findFirstElementByName("executions",
-                    plugin);
-            execution = pom.createElement("execution");
-            Element id = pom.createElement("id");
-            id.setTextContent("generate-sources");
-            Element phase = pom.createElement("phase");
-            phase.setTextContent("generate-sources");
-            execution.appendChild(id);
-            execution.appendChild(phase);
-            Element goals = pom.createElement("goals");
-            Element goal = pom.createElement("goal");
-            goal.setTextContent("wsdl2java");
-            goals.appendChild(goal);
-            execution.appendChild(goals);
-            executions.appendChild(execution);
         }
+
+        // Create global executions section if not exists already
+        Element executions = XmlUtils.findFirstElementByName("executions",
+                plugin);
+        if (executions == null) {
+            executions = pom.createElement("executions");
+            plugin.appendChild(executions);
+
+        }
+
+        // Create an execution section for this service
+        execution = pom.createElement("execution");
+        Element id = pom.createElement("id");
+        id.setTextContent(serviceId);
+        Element phase = pom.createElement("phase");
+        phase.setTextContent("generate-sources");
+        execution.appendChild(id);
+        execution.appendChild(phase);
+        Element goals = pom.createElement("goals");
+        Element goal = pom.createElement("goal");
+        goal.setTextContent("wsdl2java");
+        goals.appendChild(goal);
+        execution.appendChild(goals);
+        executions.appendChild(execution);
 
         // Access execution > configuration > sourceRoot, wsdlOptions and
         // defaultOptions.
@@ -1481,22 +1493,18 @@ public class WSConfigServiceImpl implements WSConfigService {
         wsdl.setTextContent(removeFilePrefix(wsdlLocation));
         wsdlOption.appendChild(wsdl);
 
-        // Add the package name to generate sources
-
-        // Check URL connection and WSDL format to obtain the targetNamespace
-        Element rootElement = securityService.loadWsdlUrl(wsdlLocation)
-                .getDocumentElement();
-
         // Configure the packagename to generate client sources
         Element packagenames = pom.createElement("packagenames");
         Element packagename = pom.createElement("packagename");
+
+        // Add the package name to generate sources
         String packageName = WsdlParserUtils
                 .getTargetNamespaceRelatedPackage(rootElement);
         packagename.setTextContent(packageName.substring(0,
                 packageName.length() - 1));
+
         packagenames.appendChild(packagename);
         wsdlOption.appendChild(packagenames);
-
         wsdlOptions.appendChild(wsdlOption);
 
         // Write new XML to disk
@@ -1514,6 +1522,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * 
      * @param wsdlLocation
      *            WSDL file location
+     * @return Location added to pom ?
      */
     private boolean addImportLocationRpc(String wsdlLocation) {
 
@@ -1553,13 +1562,24 @@ public class WSConfigServiceImpl implements WSConfigService {
         Assert.notNull(axistoolsPlugin,
                 "Axistools plugin is not defined in the pom.xml, relaunch again this command.");
 
-        // The wsdl location already exists ?
-        Element wsdlLocationElement = XmlUtils.findFirstElement(
+        // Check URL connection and WSDL format
+        Element rootElement = securityService.loadWsdlUrl(wsdlLocation)
+                .getDocumentElement();
+
+        // The wsdl location already exists on old plugin format ?
+        Element wsdlLocationUrl = XmlUtils.findFirstElement(
                 "executions/execution/configuration/urls[url='" + wsdlLocation
                         + "']", axistoolsPlugin);
 
+        // The wsdl location already exists on new plugin format ?
+        String serviceId = WsdlParserUtils
+                .findFirstCompatibleServiceElementName(rootElement);
+        Element wsdlLocationElement = XmlUtils
+                .findFirstElement("executions/execution[id='" + serviceId
+                        + "']", axistoolsPlugin);
+
         // If location already added on plugin, do nothing
-        if (wsdlLocationElement != null) {
+        if (wsdlLocationElement != null && wsdlLocationUrl != null) {
 
             return false;
         }
@@ -1576,7 +1596,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         Element execution = pom.createElement("execution");
         Element id = pom.createElement("id");
-        id.setTextContent(wsdlLocation);
+        id.setTextContent(serviceId);
         Element phase = pom.createElement("phase");
         phase.setTextContent("generate-sources");
         execution.appendChild(id);
@@ -1593,12 +1613,6 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         Element urls = pom.createElement("urls");
         configuration.appendChild(urls);
-
-        // Add the package name to generate sources
-
-        // Check URL connection and WSDL format to obtain the targetNamespace
-        Element rootElement = securityService.loadWsdlUrl(wsdlLocation)
-                .getDocumentElement();
 
         // Configure the packagename to generate client sources
         Element packageSpace = pom.createElement("packageSpace");

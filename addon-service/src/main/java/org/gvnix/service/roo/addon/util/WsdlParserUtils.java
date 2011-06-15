@@ -134,6 +134,22 @@ public class WsdlParserUtils {
             + XPATH_SEPARATOR + BINDING_ELEMENT;
 
     /**
+     * Get the namespace attribute from root wsdl
+     * 
+     * @param root
+     *            Root element of the wsdl
+     * @return Wsdl namespace
+     */
+    public static String getTargetNamespace(Element root) {
+
+        // Get the namespace attribute from root wsdl
+        String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
+        Assert.hasText(namespace, "Namespace has no text");
+
+        return namespace;
+    }
+
+    /**
      * Constructs a valid java package path from target namespace of root wsdl.
      * 
      * <p>
@@ -150,8 +166,7 @@ public class WsdlParserUtils {
         Assert.notNull(root, "Wsdl root element required");
 
         // Get the namespace attribute from root wsdl
-        String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
-        Assert.hasText(namespace, "Namespace has no text");
+        String namespace = getTargetNamespace(root);
 
         String pkg = getTargetNamespaceRelatedPackage(namespace, root)
                 .toLowerCase();
@@ -569,7 +584,7 @@ public class WsdlParserUtils {
      *            Communication sense type
      * @return First compatible service class name
      */
-    private static String findFirstCompatibleServiceElementName(Element root) {
+    public static String findFirstCompatibleServiceElementName(Element root) {
 
         Assert.notNull(root, "Wsdl root element required");
 
@@ -823,7 +838,7 @@ public class WsdlParserUtils {
 
         if (namespaceURI == null) {
 
-            namespaceURI = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
+            namespaceURI = getTargetNamespace(root);
         }
 
         return namespaceURI;

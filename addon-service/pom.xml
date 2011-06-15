@@ -150,6 +150,14 @@
       <artifactId>org.springframework.roo.addon.web.mvc.controller</artifactId>
     </dependency>
     
+    <!-- gvNIX Roo add-ons -->
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.dynamic.configuration.roo.addon</artifactId>
+      <version>${gvnix.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    
     <!-- DiSiD: Unit Test dependencies -->
     <dependency>
       <groupId>org.easymock</groupId>

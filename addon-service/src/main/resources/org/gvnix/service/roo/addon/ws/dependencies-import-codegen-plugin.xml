@@ -4,22 +4,5 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-codegen-plugin</artifactId>
     <version>${cxf.version}</version>
-    <executions>
-        <execution>
-            <id>generate-sources</id>
-			<phase>generate-sources</phase>
-            <configuration>
-            	<sourceRoot>${basedir}/target/generated-sources/client</sourceRoot>
-				<defaultOptions>
-					<extendedSoapHeaders>true</extendedSoapHeaders>
-				</defaultOptions>
-                <wsdlOptions>
-                </wsdlOptions>
-            </configuration>
-            <goals>
-                <goal>wsdl2java</goal>
-            </goals>
-        </execution>
-    </executions>
   </plugin>
 </codegen-plugin>

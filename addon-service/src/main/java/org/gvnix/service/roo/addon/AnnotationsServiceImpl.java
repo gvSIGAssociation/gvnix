@@ -17,7 +17,6 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.util.Assert;
@@ -44,9 +43,6 @@ public class AnnotationsServiceImpl implements AnnotationsService {
     private MetadataService metadataService;
     @Reference
     private TypeLocationService typeLocationService;
-
-    private static final String PROJECT_METADATA_IDENTIFIER = ProjectMetadata
-            .getProjectIdentifier();
 
     private static Logger logger = Logger.getLogger(AnnotationsService.class
             .getName());
