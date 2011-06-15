@@ -52,12 +52,14 @@ import org.xml.sax.SAXException;
 @Component(componentAbstract = true)
 public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
 
-    private static final String REF_ATTRIBUTE_NAME = "ref";
-    private static final String XPATH_ELEMENT_SEPARATOR = "/";
-    private static final String XPATH_NAMESPACE_SUFIX = ":";
-    private static final String XPATH_ATTRIBUTE_PREFIX = "@";
-    private static final String XPATH_ARRAY_SUFIX = "]";
-    private static final String XPATH_ARRAY_PREFIX = "[";
+    protected static final String REF_ATTRIBUTE_NAME = "ref";
+    protected static final String XPATH_ELEMENT_SEPARATOR = "/";
+    protected static final String XPATH_NAMESPACE_SUFIX = ":";
+    protected static final String XPATH_ATTRIBUTE_PREFIX = "@";
+    protected static final String XPATH_ARRAY_SUFIX = "]";
+    protected static final String XPATH_ARRAY_PREFIX = "[";
+    protected static final String XPATH_EQUALS_SYMBOL = "=";
+    protected static final String XPATH_STRING_DELIMITER = "'";
 
     private static final Logger logger = HandlerUtils
             .getLogger(XmlDynamicConfiguration.class);
@@ -103,6 +105,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
 
             // Update the XML file
             XmlUtils.writeXml(file.getOutputStream(), doc);
+
         } else if (!dynProps.isEmpty()) {
 
             logger.log(Level.WARNING, "File " + getFilePath()
@@ -117,7 +120,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
      *            Mutable file
      * @return File document
      */
-    private Document getXmlDocument(MutableFile file) {
+    protected Document getXmlDocument(MutableFile file) {
 
         Document doc = null;
         try {
@@ -150,7 +153,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
      *            XML node list to convert
      * @return Dynamic property list
      */
-    private DynPropertyList getProperties(String baseName, NodeList nodes) {
+    protected DynPropertyList getProperties(String baseName, NodeList nodes) {
 
         DynPropertyList dynProps = new DynPropertyList();
 
@@ -168,8 +171,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
                 // Add dynamic properties related to node attributes
                 dynProps.addAll(getPropertyAttributes(node, xpath));
 
-                // Add dynamic properties related to their childs nodes and
-                // attributes
+                // Add dynamic properties related to childs nodes and attrs
                 dynProps.addAll(getProperties(xpath, node.getChildNodes()));
 
                 // Add dynamic property related to this node
@@ -195,7 +197,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
      *            Node to check
      * @return Has valid format
      */
-    private boolean isValidNode(Node node) {
+    protected boolean isValidNode(Node node) {
 
         short type = node.getNodeType();
         if (type == Node.ELEMENT_NODE || type == Node.TEXT_NODE
@@ -216,7 +218,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
      *            Xpath expression of this node
      * @return Dynamic property list
      */
-    private DynPropertyList getPropertyAttributes(Node node, String xpath) {
+    protected DynPropertyList getPropertyAttributes(Node node, String xpath) {
 
         DynPropertyList dynProps = new DynPropertyList();
 
@@ -255,7 +257,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
      *            Index of current node
      * @return Xpath expression
      */
-    private String getPropertyXpath(String baseName, NodeList nodes, int i) {
+    protected String getPropertyXpath(String baseName, NodeList nodes, int i) {
 
         // Get current node name
         String name = nodes.item(i).getNodeName();
@@ -269,8 +271,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
             Node node = nodes.item(j);
             if (name.equals(node.getNodeName()) && isValidNode(node)) {
 
-                // Calculate this node index related to brother nodes with same
-                // name
+                // Calculate node index related to brother nodes with same name
                 if (j > i) {
 
                     index = temp;
@@ -281,8 +282,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
             }
         }
 
-        // If temp greater than 1, this node is part of an array on index
-        // position
+        // If temp greater than 1, node is part of an array on index position
         if (temp > 1) {
             index = temp;
         }
@@ -306,14 +306,13 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
      *            Xpath expressión with optional namespaces
      * @return Xpath expresion without namespaces, if exists
      */
-    private String removeNamespaces(String xpath) {
+    protected String removeNamespaces(String xpath) {
 
         // Find all namespace separators sufix
         int end;
         while ((end = xpath.indexOf(XPATH_NAMESPACE_SUFIX)) != -1) {
 
-            // Namespace starts on element separator if attribute prefix not
-            // before
+            // Namespace starts on element separator if attr prefix not before
             String substr = xpath.substring(0, end + 1);
             int ini = substr.lastIndexOf(XPATH_ELEMENT_SEPARATOR);
             int ini2 = substr.lastIndexOf(XPATH_ATTRIBUTE_PREFIX);
@@ -339,7 +338,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
      * @param dynProps
      *            Dynamic property list
      */
-    private void setProperties(Element root, DynPropertyList dynProps) {
+    protected void setProperties(Element root, DynPropertyList dynProps) {
 
         // Iterate all dynamic properties to update
         for (DynProperty dynProp : dynProps) {
@@ -347,8 +346,7 @@ public abstract class XmlDynamicConfiguration extends FileDynamicConfiguration {
             // Remove possible namespaces
             String xpath = removeNamespaces(dynProp.getKey());
 
-            // If attribute prefix present, there is an attribute else an
-            // element
+            // If attr prefix present, there is an attribute else an element
             int index;
             if ((index = xpath.indexOf(XPATH_ARRAY_PREFIX
                     + XPATH_ATTRIBUTE_PREFIX)) != -1) {

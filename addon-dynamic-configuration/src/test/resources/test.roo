@@ -3,6 +3,6 @@ script --file clinic.roo
 configuration save --name test
 configuration property add --name log4j.rootLogger 
 configuration property add --name database.url 
-configuration property add --name /persistence/persistence-unit/properties/property[1][@value] 
+configuration property add --name hibernate.hbm2ddl.auto
 configuration activate --name test
 configuration export

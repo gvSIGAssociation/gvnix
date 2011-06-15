@@ -270,6 +270,8 @@ them. i.e:
   we should to try improve the message with a better information, if it's possible, to show which changes are
   pending to save.
 
+* What happens if Roo changes some configuration file like persistence.xml or database.properties when this files are already managed by dynamic configuration ?
+
 
 References
 ==========
