@@ -1,4 +1,0 @@
-// Spring Roo 1.1.4.RELEASE [rev f787ce7] log opened at 2011-05-19 13:51:46
-addon create advanced --topLevelPackage org.gvnix.web.screen.roo.addon --projectName "gvNIX - Spring Roo - Addon - Web MVC Screen Patterns" --description "MVC screen patterns management for Spring MVC based web layer. An screen pattern is ... TBC http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns"
-exit
-// Spring Roo 1.1.4.RELEASE [rev f787ce7] log closed at 2011-05-19 13:52:26
