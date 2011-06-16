@@ -1579,7 +1579,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         + "']", axistoolsPlugin);
 
         // If location already added on plugin, do nothing
-        if (wsdlLocationElement != null && wsdlLocationUrl != null) {
+        if (wsdlLocationElement != null || wsdlLocationUrl != null) {
 
             return false;
         }

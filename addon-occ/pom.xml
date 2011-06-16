@@ -49,7 +49,7 @@
   -->
   
   <!-- DiSiD: Add organization name, license and url -->
-  <name>gvNIX - Spring Roo - Addon - Optimistic Concurreny Control</name>
+  <name>gvNIX - Spring Roo - Addon - Optimistic Concurrency Control</name>
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>

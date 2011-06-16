@@ -19,8 +19,6 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -37,7 +35,6 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -54,15 +51,7 @@ import org.w3c.dom.Element;
 @Service
 public class OperationsImpl implements Operations {
 
-    private static final Logger logger = HandlerUtils
-            .getLogger(OperationsImpl.class);
-
     private static final String RESOURCES_PATH = "src/main/resources";
-    // private static final String WEBAPP_PATH = "src/main/webapp";
-    private static final String[] SOURCE_PATHS = { RESOURCES_PATH /*
-                                                                   * ,
-                                                                   * WEBAPP_PATH
-                                                                   */};
 
     @Reference
     private MetadataService metadataService;
@@ -427,25 +416,6 @@ public class OperationsImpl implements Operations {
             DynComponentList dynComps = dynConf.getComponents();
             for (DynComponent dynComp : dynComps) {
 
-                // Get dynamic component dir and file paths
-
-                String filePath = services.getFilePath(dynComp);
-
-                String dirName = "";
-                for (int i = 0; i < SOURCE_PATHS.length; i++) {
-                    if (filePath.startsWith(SOURCE_PATHS[i])) {
-                        dirName = SOURCE_PATHS[i];
-                        break;
-                    }
-                }
-                String fileName = filePath.substring(dirName.length() + 1);
-                if (dirName.isEmpty() || fileName.isEmpty()) {
-
-                    logger.log(Level.SEVERE, "Invalid file path for component "
-                            + dynComp.getName());
-                    break;
-                }
-
                 // <resource>
                 // <directory>src/main/resources</directory>
                 // <includes>
@@ -471,26 +441,6 @@ public class OperationsImpl implements Operations {
                 }
 
                 Element resos;
-                // if (dirName.equals(WEBAPP_PATH)) {
-                //
-                // Element plugin = XmlUtils
-                // .findFirstElement(
-                // "plugins/plugin/artifactId[text()='maven-war-plugin']/..",
-                // build);
-                // Element conf = XmlUtils.findFirstElement("configuration",
-                // plugin);
-                // if (conf == null) {
-                //
-                // conf = doc.createElement("configuration");
-                // plugin.appendChild(conf);
-                // }
-                // resos = XmlUtils.findFirstElement("webResources", conf);
-                // if (resos == null) {
-                //
-                // resos = doc.createElement("webResources");
-                // conf.appendChild(resos);
-                // }
-                // } else {
 
                 // Resources section: find or create if not exists
                 resos = XmlUtils.findFirstElement("resources", build);
@@ -499,11 +449,10 @@ public class OperationsImpl implements Operations {
                     resos = doc.createElement("resources");
                     build.appendChild(resos);
                 }
-                // }
 
                 // Resource section with filter: find or create if not exists
                 Element reso = XmlUtils.findFirstElement("resource/directory"
-                        + "[text()='" + dirName
+                        + "[text()='" + RESOURCES_PATH
                         + "']/../filtering[text()='true']/..", resos);
                 Element dir;
                 if (reso == null) {
@@ -512,22 +461,9 @@ public class OperationsImpl implements Operations {
                     reso = doc.createElement("resource");
                     resos.appendChild(reso);
                     dir = doc.createElement("directory");
-                    dir.setTextContent(dirName);
+                    dir.setTextContent(RESOURCES_PATH);
                     reso.appendChild(dir);
                 }
-
-                // // Includes section: find or create if not exists
-                // Element files = XmlUtils.findFirstElement("includes", reso);
-                // if (files == null) {
-                //
-                // files = doc.createElement("includes");
-                // reso.appendChild(files);
-                // }
-                //
-                // // Include this component file name
-                // Element file = doc.createElement("include");
-                // file.setTextContent(fileName);
-                // files.appendChild(file);
 
                 // Filter section: find or create if not exists
                 Element filter = XmlUtils.findFirstElement("filtering", reso);
@@ -537,42 +473,6 @@ public class OperationsImpl implements Operations {
                     filter.setTextContent("true");
                     reso.appendChild(filter);
                 }
-
-                // // Resource section without filter: find or create if not
-                // exists
-                // reso = XmlUtils.findFirstElement("resource/directory"
-                // + "[text()='" + dirName
-                // + "']/../filtering[text()='false']/..", resos);
-                // if (reso == null) {
-                //
-                // // Create an exclude resource section and dir
-                // reso = doc.createElement("resource");
-                // resos.appendChild(reso);
-                // dir = doc.createElement("directory");
-                // dir.setTextContent(dirName);
-                // reso.appendChild(dir);
-                // }
-                //
-                // // Includes section: find or create if not exists
-                // files = XmlUtils.findFirstElement("excludes", reso);
-                // if (files == null) {
-                //
-                // files = doc.createElement("excludes");
-                // reso.appendChild(files);
-                // }
-                //
-                // file = doc.createElement("exclude");
-                // file.setTextContent(fileName);
-                // files.appendChild(file);
-                //
-                // // Filter section: find or create if not exists
-                // filter = XmlUtils.findFirstElement("filtering", reso);
-                // if (filter == null) {
-                //
-                // filter = doc.createElement("filtering");
-                // filter.setTextContent("false");
-                // reso.appendChild(filter);
-                // }
 
                 // Properties section: find or create if not exists
                 Element props = XmlUtils.findFirstElement("properties", prof);
@@ -589,7 +489,7 @@ public class OperationsImpl implements Operations {
                     String key = dynProp.getKey().replace('/', '.')
                             .replace('[', '.').replace(']', '.')
                             .replace('@', '.').replace(':', '.')
-                            .replace('-', '.');
+                            .replace('-', '.').replace('%', '.');
                     while (key.startsWith(".")) {
                         key = key.substring(1, key.length());
                     }
@@ -611,13 +511,13 @@ public class OperationsImpl implements Operations {
                 }
             }
 
-            // Store dynamic configuration to replace dynamic property values
-            // with created vars name
+            // Update POM configuration before store vars to avoid overwrite
+            fileManager.createOrUpdateTextFileIfRequired(pom,
+                    XmlUtils.nodeToString(doc), true);
+
+            // Store created vars name
             services.setCurrentConfiguration(dynConf);
         }
-
-        fileManager.createOrUpdateTextFileIfRequired(pom,
-                XmlUtils.nodeToString(doc), false);
 
         return dynConfs;
     }

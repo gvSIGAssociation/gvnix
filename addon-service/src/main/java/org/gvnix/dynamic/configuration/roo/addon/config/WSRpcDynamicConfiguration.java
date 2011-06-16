@@ -22,7 +22,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 
 /**
- * Dynamic configuration manager of document type web services.
+ * Dynamic configuration manager of RPC type web services.
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -31,7 +31,7 @@ import org.apache.felix.scr.annotations.Service;
  */
 @Component
 @Service
-public class WSDocumentDynamicConfiguration extends
+public class WSRpcDynamicConfiguration extends
         XpathElementsDynamicConfiguration implements
         DefaultDynamicConfiguration {
 
@@ -40,7 +40,7 @@ public class WSDocumentDynamicConfiguration extends
      */
     public String getName() {
 
-        return "Document Type Web Services WSDL";
+        return "RPC Type Web Services WSDL";
     }
 
     /**
@@ -59,8 +59,8 @@ public class WSDocumentDynamicConfiguration extends
     public String getXpath() {
 
         return "/project/build/plugins/plugin"
-                + "[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']/"
-                + "executions/execution[phase='generate-sources']";
+                + "[groupId='org.codehaus.mojo' and artifactId='axistools-maven-plugin']/"
+                + "executions/execution";
     }
 
     /**
@@ -78,7 +78,7 @@ public class WSDocumentDynamicConfiguration extends
     @Override
     public String getValue() {
 
-        return "configuration/wsdlOptions/wsdlOption/wsdl";
+        return "configuration/urls/url";
     }
 
 }

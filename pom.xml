@@ -47,6 +47,7 @@
     <!-- TODO: Modules order is important for googlecode repository upload (validate it) -->
     <module>osgi-bundle</module>
     <module>osgi-roo-bundle</module>
+    <module>addon-dynamic-configuration</module>
     <module>addon-web-i18n</module>
     <module>addon-web-menu</module>
     <module>addon-web-report</module>
@@ -54,7 +55,6 @@
     <module>addon-service</module>
     <module>addon-occ</module>
     <module>addon-cit-security</module>
-    <module>addon-dynamic-configuration</module>
     <module>addon-web-screen-pattern</module>
     <module>addon-web-mvc-binding</module> 
     <module>addon-web-exception-handler</module> 
