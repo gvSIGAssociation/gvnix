@@ -24,19 +24,14 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
-import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponentList;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
-import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -51,8 +46,6 @@ import org.w3c.dom.Element;
 @Service
 public class OperationsImpl implements Operations {
 
-    private static final String RESOURCES_PATH = "src/main/resources";
-
     @Reference
     private MetadataService metadataService;
     @Reference
@@ -63,6 +56,8 @@ public class OperationsImpl implements Operations {
     ProjectOperations projectOperations;
     @Reference
     FileManager fileManager;
+    @Reference
+    PomManager pomManager;
 
     public boolean isProjectAvailable() {
         return getPathResolver() != null;
@@ -357,163 +352,9 @@ public class OperationsImpl implements Operations {
             return null;
         }
 
-        // Pom root element
-        String pom = projectOperations.getPathResolver().getIdentifier(
-                Path.ROOT, "pom.xml");
-        Document doc = XmlUtils.readXml(fileManager.getInputStream(pom));
-        Element root = doc.getDocumentElement();
-
-        // <project>
-        // <profiles>
-        // <profile>
-        // <id>test</id>
-        // <properties>
-        // <log4j.rootLogger>INFO, stdout</log4j.rootLogger>
-        // </properties>
-        // </profile>
-        // </profiles>
-        // </project>
-
-        // Profiles section: find or create if not exists
-        Element profs = XmlUtils.findFirstElement("/project/profiles", root);
-        if (profs == null) {
-
-            profs = doc.createElement("profiles");
-            root.appendChild(profs);
-        }
-
-        // Iterate stored dynamic configurations for export to pom
+        // Iterate exported dynamic configurations for write to pom
+        dynConfs = pomManager.export(dynConfs);
         for (DynConfiguration dynConf : dynConfs) {
-
-            // Create a profile section for this dynamic configuration
-            Element prof = doc.createElement("profile");
-            profs.appendChild(prof);
-
-            // TODO Profile with this id can exist yet: avoid duplicated
-            // Create an identifier for profile
-            Element id = doc.createElement("id");
-            id.setTextContent(dynConf.getName());
-            prof.appendChild(id);
-
-            // If dynamic configuration is active: profile active by default
-            if (dynConf.isActive()) {
-
-                // <activation>
-                // <activeByDefault>true</activeByDefault>
-                // </activation>
-
-                // Create an activation section
-                Element activation = doc.createElement("activation");
-                prof.appendChild(activation);
-
-                Element active = doc.createElement("activeByDefault");
-                active.setTextContent("true");
-                activation.appendChild(active);
-
-            }
-
-            // Iterate components of dynamic configuration
-            DynComponentList dynComps = dynConf.getComponents();
-            for (DynComponent dynComp : dynComps) {
-
-                // <resource>
-                // <directory>src/main/resources</directory>
-                // <includes>
-                // <include>log4j.properties</include>
-                // </includes>
-                // <filtering>true</filtering>
-                // </resource>
-                // <resource>
-                // <directory>src/main/resources</directory>
-                // <excludes>
-                // <exclude>log4j.properties</exclude>
-                // </excludes>
-                // <filtering>false</filtering>
-                // </resource>
-
-                // Build section: find or create if not exists
-                Element build = XmlUtils.findFirstElement("/project/build",
-                        root);
-                if (build == null) {
-
-                    build = doc.createElement("build");
-                    root.appendChild(build);
-                }
-
-                Element resos;
-
-                // Resources section: find or create if not exists
-                resos = XmlUtils.findFirstElement("resources", build);
-                if (resos == null) {
-
-                    resos = doc.createElement("resources");
-                    build.appendChild(resos);
-                }
-
-                // Resource section with filter: find or create if not exists
-                Element reso = XmlUtils.findFirstElement("resource/directory"
-                        + "[text()='" + RESOURCES_PATH
-                        + "']/../filtering[text()='true']/..", resos);
-                Element dir;
-                if (reso == null) {
-
-                    // Create an include resource section and dir
-                    reso = doc.createElement("resource");
-                    resos.appendChild(reso);
-                    dir = doc.createElement("directory");
-                    dir.setTextContent(RESOURCES_PATH);
-                    reso.appendChild(dir);
-                }
-
-                // Filter section: find or create if not exists
-                Element filter = XmlUtils.findFirstElement("filtering", reso);
-                if (filter == null) {
-
-                    filter = doc.createElement("filtering");
-                    filter.setTextContent("true");
-                    reso.appendChild(filter);
-                }
-
-                // Properties section: find or create if not exists
-                Element props = XmlUtils.findFirstElement("properties", prof);
-                if (props == null) {
-                    props = doc.createElement("properties");
-                    prof.appendChild(props);
-                }
-
-                // Iterate properties of dynamic configuration
-                DynPropertyList dynProps = dynComp.getProperties();
-                for (DynProperty dynProp : dynProps) {
-
-                    // TODO Replace with a standard way
-                    String key = dynProp.getKey().replace('/', '.')
-                            .replace('[', '.').replace(']', '.')
-                            .replace('@', '.').replace(':', '.')
-                            .replace('-', '.').replace('%', '.');
-                    while (key.startsWith(".")) {
-                        key = key.substring(1, key.length());
-                    }
-                    while (key.endsWith(".")) {
-                        key = key.substring(0, key.length() - 1);
-                    }
-                    while (key.contains("..")) {
-                        key = key.replace("..", ".");
-                    }
-
-                    // Create a property element for this dynamic property
-                    Element prop = doc.createElement(key);
-                    props.appendChild(prop);
-
-                    // Store this dynamic property value in pom and replace
-                    // dynamic property value with a var
-                    prop.setTextContent(dynProp.getValue());
-                    dynProp.setValue("${" + key + "}");
-                }
-            }
-
-            // Update POM configuration before store vars to avoid overwrite
-            fileManager.createOrUpdateTextFileIfRequired(pom,
-                    XmlUtils.nodeToString(doc), true);
 
             // Store created vars name
             services.setCurrentConfiguration(dynConf);
