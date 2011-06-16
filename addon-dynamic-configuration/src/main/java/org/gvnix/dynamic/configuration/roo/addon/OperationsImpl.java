@@ -301,16 +301,21 @@ public class OperationsImpl implements Operations {
     /**
      * {@inheritDoc}
      */
-    public boolean addProperty(String name) {
+    public Boolean addProperty(String name) {
 
         // If any component contain this property, add it
         if (getBaseProperty(name).getComponents().size() <= 0) {
 
+            // if dynamic component or property null, return null
+            DynComponent dynComp = services.getCurrentComponent(name);
+            DynProperty dynProp = services.getCurrentProperty(name);
+            if (dynComp == null || dynProp == null) {
+                return null;
+            }
+
             // Add the property in all configurations and base configuration
-            configurations.addProperties(name, services
-                    .getCurrentProperty(name).getValue(), services
-                    .getCurrentComponent(name).getId(), services
-                    .getCurrentComponent(name).getName());
+            configurations.addProperties(name, dynProp.getValue(),
+                    dynComp.getId(), dynComp.getName());
             return true;
         }
 

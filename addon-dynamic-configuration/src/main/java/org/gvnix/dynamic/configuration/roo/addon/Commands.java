@@ -334,7 +334,13 @@ public class Commands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Name of the property to add", optionContext = DynPropertyConverter.SOURCE_FILES) DynProperty name) {
 
         // Add the property and show a message
-        if (operations.addProperty(name.getKey())) {
+        Boolean added = operations.addProperty(name.getKey());
+        if (added == null) {
+
+            logger.log(Level.WARNING, "Property not exists");
+            logger.log(Level.WARNING,
+                    "(use 'configuration property list' to see properties defined)");
+        } else if (added == true) {
 
             logger.log(Level.INFO, "Property added");
             logger.log(

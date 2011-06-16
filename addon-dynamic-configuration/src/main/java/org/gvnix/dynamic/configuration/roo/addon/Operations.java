@@ -155,9 +155,9 @@ public interface Operations {
      * 
      * @param name
      *            Property name
-     * @return false if already exists
+     * @return false if already exists or null if not exists
      */
-    public boolean addProperty(String name);
+    public Boolean addProperty(String name);
 
     /**
      * Delete a property with some name on all configurations.

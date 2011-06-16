@@ -226,10 +226,12 @@ public class ServicesImpl implements Services {
         DynComponent dynComp = getCurrentComponent(name);
 
         // Search the property on the component
-        for (DynProperty dynProp : dynComp.getProperties()) {
-            if (dynProp.getKey().equals(name)) {
+        if (dynComp != null) {
+            for (DynProperty dynProp : dynComp.getProperties()) {
+                if (dynProp.getKey().equals(name)) {
 
-                return dynProp;
+                    return dynProp;
+                }
             }
         }
 
