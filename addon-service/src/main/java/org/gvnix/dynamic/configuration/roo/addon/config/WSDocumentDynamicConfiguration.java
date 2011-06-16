@@ -81,4 +81,12 @@ public class WSDocumentDynamicConfiguration extends
         return "configuration/wsdlOptions/wsdlOption/wsdl";
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPrefix() {
+
+        return "wsdl.";
+    }
 }

@@ -36,7 +36,8 @@ import org.w3c.dom.Element;
  * Abstract dynamic configuration component of XML files for managing elements
  * attributes with Xpath expressions.
  * <p>
- * Extends this class to manage new XML file values with Xpath expressions.
+ * Extends this class to manage new XML file values with Xpath attributes
+ * expressions.
  * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
@@ -46,7 +47,7 @@ import org.w3c.dom.Element;
  */
 @Component(componentAbstract = true)
 public abstract class XpathAttributesDynamicConfiguration extends
-        XmlDynamicConfiguration {
+        XpathDynamicConfiguration {
 
     private static final Logger logger = HandlerUtils
             .getLogger(XpathAttributesDynamicConfiguration.class);
@@ -83,7 +84,7 @@ public abstract class XpathAttributesDynamicConfiguration extends
                             + " to get not exists on file");
                     continue;
                 }
-                dynProps.add(new DynProperty(key, value));
+                dynProps.add(new DynProperty(setKeyValue(key), value));
             }
         }
 
@@ -110,8 +111,8 @@ public abstract class XpathAttributesDynamicConfiguration extends
                 String xpath = getXpath() + XPATH_ARRAY_PREFIX
                         + XPATH_ATTRIBUTE_PREFIX + getKey()
                         + XPATH_EQUALS_SYMBOL + XPATH_STRING_DELIMITER
-                        + dynProp.getKey() + XPATH_STRING_DELIMITER
-                        + XPATH_ARRAY_SUFIX;
+                        + getKeyValue(dynProp.getKey())
+                        + XPATH_STRING_DELIMITER + XPATH_ARRAY_SUFIX;
                 Element elem = XmlUtils.findFirstElement(xpath,
                         doc.getDocumentElement());
                 if (elem == null) {
@@ -142,26 +143,5 @@ public abstract class XpathAttributesDynamicConfiguration extends
                     + " not exists and there are dynamic properties to set it");
         }
     }
-
-    /**
-     * Xpath expression for access elements to manage attributes.
-     * 
-     * @return Xpath expression
-     */
-    public abstract String getXpath();
-
-    /**
-     * Attribute name used as property key.
-     * 
-     * @return Attribute key
-     */
-    public abstract String getKey();
-
-    /**
-     * Attribute name used as property value.
-     * 
-     * @return Attribute value
-     */
-    public abstract String getValue();
 
 }

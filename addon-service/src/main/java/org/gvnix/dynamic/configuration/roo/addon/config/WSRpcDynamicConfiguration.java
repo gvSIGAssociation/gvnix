@@ -81,4 +81,12 @@ public class WSRpcDynamicConfiguration extends
         return "configuration/urls/url";
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPrefix() {
+
+        return "wsdl.";
+    }
 }

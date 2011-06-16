@@ -35,7 +35,8 @@ import org.w3c.dom.Element;
  * Abstract dynamic configuration component of XML files for managing elements
  * content with Xpath expressions.
  * <p>
- * Extends this class to manage new XML file values with Xpath expressions.
+ * Extends this class to manage new XML file values with Xpath element
+ * expressions.
  * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
@@ -45,7 +46,7 @@ import org.w3c.dom.Element;
  */
 @Component(componentAbstract = true)
 public abstract class XpathElementsDynamicConfiguration extends
-        XmlDynamicConfiguration {
+        XpathDynamicConfiguration {
 
     private static final Logger logger = HandlerUtils
             .getLogger(XpathElementsDynamicConfiguration.class);
@@ -81,8 +82,8 @@ public abstract class XpathElementsDynamicConfiguration extends
                             + " to get not exists on file");
                     continue;
                 }
-                dynProps.add(new DynProperty(key.getTextContent(), value
-                        .getTextContent()));
+                dynProps.add(new DynProperty(setKeyValue(key.getTextContent()),
+                        value.getTextContent()));
             }
         }
 
@@ -101,7 +102,6 @@ public abstract class XpathElementsDynamicConfiguration extends
 
             // Obtain the root element of the XML file
             Document doc = getXmlDocument(file);
-            Element root = doc.getDocumentElement();
 
             // Update the root element property values with dynamic properties
             for (DynProperty dynProp : dynProps) {
@@ -109,9 +109,10 @@ public abstract class XpathElementsDynamicConfiguration extends
                 // Obtain the element related to this dynamic property
                 String xpath = getXpath() + XPATH_ARRAY_PREFIX + getKey()
                         + XPATH_EQUALS_SYMBOL + XPATH_STRING_DELIMITER
-                        + dynProp.getKey() + XPATH_STRING_DELIMITER
-                        + XPATH_ARRAY_SUFIX;
-                Element elem = XmlUtils.findFirstElement(xpath, root);
+                        + getKeyValue(dynProp.getKey())
+                        + XPATH_STRING_DELIMITER + XPATH_ARRAY_SUFIX;
+                Element elem = XmlUtils.findFirstElement(xpath,
+                        doc.getDocumentElement());
                 if (elem == null) {
 
                     logger.log(Level.WARNING, "Element " + xpath
@@ -140,26 +141,5 @@ public abstract class XpathElementsDynamicConfiguration extends
                     + " not exists and there are dynamic properties to set it");
         }
     }
-
-    /**
-     * Xpath expression for access elements to manage.
-     * 
-     * @return Xpath expression
-     */
-    public abstract String getXpath();
-
-    /**
-     * Element name used as property key.
-     * 
-     * @return Element key
-     */
-    public abstract String getKey();
-
-    /**
-     * Element name used as property value.
-     * 
-     * @return Element value
-     */
-    public abstract String getValue();
 
 }

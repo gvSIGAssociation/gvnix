@@ -79,4 +79,12 @@ public class PersistenceDynamicConfiguration extends
         return "value";
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPrefix() {
+
+        return null;
+    }
 }
