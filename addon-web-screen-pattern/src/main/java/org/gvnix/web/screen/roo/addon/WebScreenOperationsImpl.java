@@ -144,7 +144,7 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
     private WebScreenConfigService configService;
 
     /** {@inheritDoc} */
-    public boolean isCommandAvailable() {
+    public boolean isPatternCommandAvailable() {
         return configService.isSpringMvcProject();
     }
 
@@ -232,6 +232,11 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
         if (pattern.equals(WebPattern.tabular)) {
             annotateTypeWithGvNIXEntityBatch(getFormBakingObject(controllerDetails));
         }
+    }
+
+    /** {@inheritDoc} */
+    public boolean isRelationPatternCommandAvailable() {
+        return configService.arePattrenArtifactsInstalled();
     }
 
     /** {@inheritDoc} */

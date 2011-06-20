@@ -53,4 +53,11 @@ public interface WebScreenConfigService {
      * @return
      */
     boolean isSpringMvcProject();
+
+    /**
+     * Indicates if Pattern artifacts (tags) are installed in project
+     * 
+     * @return
+     */
+    boolean arePattrenArtifactsInstalled();
 }

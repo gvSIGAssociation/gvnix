@@ -50,13 +50,13 @@ public class WebScreenCommands implements CommandMarker {
     private WebScreenOperations operations;
 
     /**
-     * Informs if <code>web mvc screen *</code> command are available
+     * Informs if <code>web mvc pattern *</code> command are available
      * 
      * @return true if commands are available
      */
     @CliAvailabilityIndicator({ "web mvc pattern" })
-    public boolean isWebScreenAvaliable() {
-        return operations.isCommandAvailable();
+    public boolean isWebPatternAvaliable() {
+        return operations.isPatternCommandAvailable();
     }
 
     /**
@@ -75,6 +75,16 @@ public class WebScreenCommands implements CommandMarker {
             @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name,
             @CliOption(key = "type", mandatory = true, help = "The pattern to apply") WebPattern type) {
         operations.addPattern(controllerClass, name, type);
+    }
+
+    /**
+     * Informs if <code>web mvc relation pattern</code> command are available
+     * 
+     * @return true if commands are available
+     */
+    @CliAvailabilityIndicator({ "web mvc relation pattern" })
+    public boolean isWebRelationPatternAvaliable() {
+        return operations.isRelationPatternCommandAvailable();
     }
 
     /**

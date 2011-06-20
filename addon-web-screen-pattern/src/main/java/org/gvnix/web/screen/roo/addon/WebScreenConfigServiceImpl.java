@@ -63,6 +63,9 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
     /** webmvc-config.xml path */
     private String springMvcConfigFile;
 
+    /** src/main/webapp/WEB-INF/tags/pattern */
+    private String patternTagsFolder;
+
     /** {@inheritDoc} */
     public void setup() {
         Assert.isTrue(isSpringMvcProject(),
@@ -100,6 +103,20 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
                             "WEB-INF/spring/webmvc-config.xml");
         }
         return springMvcConfigFile;
+    }
+
+    /** {@inheritDoc} */
+    public boolean arePattrenArtifactsInstalled() {
+        return fileManager.exists(getPatternTagsFolder());
+    }
+
+    public String getPatternTagsFolder() {
+        if (patternTagsFolder == null) {
+            patternTagsFolder = projectOperations
+                    .getPathResolver()
+                    .getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/pattern");
+        }
+        return patternTagsFolder;
     }
 
     protected void activate(ComponentContext context) {

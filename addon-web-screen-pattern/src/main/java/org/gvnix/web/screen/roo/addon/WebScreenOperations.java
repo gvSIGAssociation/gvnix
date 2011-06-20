@@ -38,7 +38,7 @@ public interface WebScreenOperations {
      * 
      * @return true if it should be available, otherwise false
      */
-    boolean isCommandAvailable();
+    boolean isPatternCommandAvailable();
 
     /**
      * <p>
@@ -62,6 +62,13 @@ public interface WebScreenOperations {
      */
     void addPattern(JavaType controllerClass, JavaSymbolName name,
             WebPattern pattern);
+
+    /**
+     * Indicate commands should be available
+     * 
+     * @return true if it should be available, otherwise false
+     */
+    boolean isRelationPatternCommandAvailable();
 
     /**
      * <p>
