@@ -925,4 +925,10 @@ TODO
 * Replace "exported" with "exposed".
 
 * Los parámetros "wsdl" de los comandos, para cuando son "file" podría se interesante que autocompletase. Para ello podríamos cambiar el tipo de String a URL y registrar un Converter que, identificando el protocolo "file" delegase en el Converter para el autocompletado.
-  
+
+References
+==========
+
+* Securing Java web services
+
+  http://www.ivoa.net/internal/IVOA/IvoaGridAndWebServices/Java-security-howto.html

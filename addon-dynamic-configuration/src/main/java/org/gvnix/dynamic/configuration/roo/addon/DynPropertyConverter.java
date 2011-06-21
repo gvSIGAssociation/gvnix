@@ -27,7 +27,6 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
-import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.springframework.roo.shell.Converter;
 import org.springframework.roo.shell.MethodTarget;
@@ -53,8 +52,6 @@ public class DynPropertyConverter implements Converter {
 
     @Reference
     private Services services;
-    @Reference
-    private Operations operations;
     @Reference
     private Configurations configurations;
 

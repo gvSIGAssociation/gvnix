@@ -110,7 +110,6 @@ public abstract class AnnotationClassDynamicConfiguration extends
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     public DynPropertyList read() {
 
         // List to include the dynamic property list from types
@@ -127,7 +126,7 @@ public abstract class AnnotationClassDynamicConfiguration extends
             for (JavaSymbolName attr : attrs) {
 
                 // Dynamic property with attribute name and value
-                AnnotationAttributeValue value = annot
+                AnnotationAttributeValue<?> value = annot
                         .getAttribute(new JavaSymbolName(attr.getSymbolName()));
 
                 // Only annotation string attributes are considered
@@ -149,7 +148,6 @@ public abstract class AnnotationClassDynamicConfiguration extends
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     public void write(DynPropertyList dynProps) {
 
         // Iterate all dynamic properties to update java annotation attributes
