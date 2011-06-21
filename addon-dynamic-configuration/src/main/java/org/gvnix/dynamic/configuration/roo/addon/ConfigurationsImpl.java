@@ -240,16 +240,6 @@ public class ConfigurationsImpl implements Configurations {
     /**
      * {@inheritDoc}
      */
-    public List<Element> getAllComponents() {
-
-        return XmlUtils.findElements("/" + DYNAMIC_CONFIGURATION_ELEMENT_NAME
-                + "/" + CONFIGURATION_ELEMENT_NAME, getConfigurationDocument()
-                .getDocumentElement());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public Element getProperty(String configuration, String property) {
 
         // TODO Several properties with same name can exist at different
@@ -317,53 +307,7 @@ public class ConfigurationsImpl implements Configurations {
         }
 
         // Add property in base configuration
-        addProperty(name, "", compId, compName, getBaseConfiguration());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void deleteProperties(String name, String component) {
-
-        // Delete property in all stored configurations
-        List<Element> confs = getAllConfigurations();
-        for (Element conf : confs) {
-
-            deleteProperty(name, component, conf);
-        }
-
-        // Delete property in base configuration
-        deleteProperty(name, component, getBaseConfiguration());
-    }
-
-    /**
-     * Delete a component property name on a configurations.
-     * 
-     * @param name
-     *            Property name
-     * @param component
-     *            Component id
-     * @param conf
-     *            Configuration element
-     */
-    private void deleteProperty(String name, String component, Element conf) {
-
-        // Find component and property to delete
-        Element comp = getComponent(component, conf);
-        Element prop = XmlUtils.findFirstElement(PROPERTY_ELEMENT_NAME + "/"
-                + KEY_ELEMENT_NAME + "[text()='" + name + "']/..", comp);
-        if (prop != null) {
-
-            // Remove child property and component if no more properties
-            comp.removeChild(prop);
-            if (XmlUtils.findFirstElement(PROPERTY_ELEMENT_NAME, comp) == null) {
-
-                conf.removeChild(comp);
-            }
-
-            // Save configuration
-            saveConfiguration(conf);
-        }
+        addProperty(name, value, compId, compName, getBaseConfiguration());
     }
 
     /**

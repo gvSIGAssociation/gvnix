@@ -76,19 +76,10 @@ public class OperationsImpl implements Operations {
             configurations.deleteConfiguration(conf);
         }
 
-        // Store a configuration with base properties
+        // Create a configuration with base properties and values
         DynConfiguration dynConfig = configurations.parseConfiguration(
                 configurations.getBaseConfiguration(), null);
         dynConfig.setName(name);
-
-        for (DynComponent dynComp : dynConfig.getComponents()) {
-            for (DynProperty dynProp : dynComp.getProperties()) {
-
-                dynProp.setValue(services.getCurrentProperty(dynProp.getKey())
-                        .getValue());
-            }
-        }
-
         configurations.addConfiguration(dynConfig);
 
         return dynConfig;
@@ -107,60 +98,10 @@ public class OperationsImpl implements Operations {
 
             dynConfig = configurations.parseConfiguration(conf, null);
 
-            // Get current dynamic configuration from configuration file
-            DynConfiguration dynConfigActive = configurations
-                    .getActiveConfiguration();
-
-            // If no dynamic configuration or is the current, activate it
-            if (dynConfigActive == null
-                    || dynConfigActive.equals(services
-                            .getCurrentConfiguration())) {
-
-                // Set current configuration, update active and mark it as
-                // active
-                services.setCurrentConfiguration(dynConfig);
-                configurations.setActiveConfiguration(name);
-                dynConfig.setActive(true);
-            } else {
-
-                // This configuration can not be activated
-                dynConfig.setActive(false);
-            }
-        }
-
-        return dynConfig;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public DynConfiguration setUnactiveConfiguration(String name) {
-
-        DynConfiguration dynConfig = null;
-
-        // Find the dom configuration with requested name
-        Element conf = configurations.findConfiguration(name);
-        if (conf != null) {
-
-            dynConfig = configurations.parseConfiguration(conf, null);
-
-            // Get current dynamic configuration from configuration file
-            DynConfiguration dynConfigActive = configurations
-                    .getActiveConfiguration();
-
-            // If no dynamic configuration or is the current, activate it
-            if (dynConfigActive == null
-                    || dynConfigActive.equals(services
-                            .getCurrentConfiguration())) {
-
-                // Update active and mark it as inactive
-                configurations.setActiveConfiguration("");
-                dynConfig.setActive(false);
-            } else {
-
-                // This configuration can not be unactivated
-                dynConfig.setActive(true);
-            }
+            // Set current configuration, update active and mark as active
+            services.setCurrentConfiguration(dynConfig);
+            configurations.setActiveConfiguration(name);
+            dynConfig.setActive(true);
         }
 
         return dynConfig;
@@ -181,24 +122,6 @@ public class OperationsImpl implements Operations {
         }
 
         return dynConfs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean deleteConfiguration(String name) {
-
-        // Find the dom configuration with requested name
-        Element conf = configurations.findConfiguration(name);
-        if (conf != null) {
-
-            // If configuration already exists, delete it
-            configurations.deleteConfiguration(conf);
-
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -235,31 +158,6 @@ public class OperationsImpl implements Operations {
     /**
      * {@inheritDoc}
      */
-    public DynConfigurationList getProperties(String name) {
-
-        DynConfigurationList dynConfs = new DynConfigurationList();
-
-        // Find the dom configuration with requested name
-        List<Element> confs = configurations.getAllComponents();
-        if (confs != null) {
-
-            for (Element conf : confs) {
-
-                // Add only configurations with some component
-                DynConfiguration dynConf = configurations.parseConfiguration(
-                        conf, name);
-                if (dynConf.getComponents().size() > 0) {
-                    dynConfs.add(dynConf);
-                }
-            }
-        }
-
-        return dynConfs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public DynConfiguration getBaseProperty(String name) {
 
         // Find the dom configuration with requested name
@@ -284,17 +182,6 @@ public class OperationsImpl implements Operations {
         prop.getChildNodes().item(3).setTextContent(value);
         configurations.saveConfiguration(prop);
 
-        // Update property value on file if configuration is active
-        if (configurations.getActiveConfiguration() != null
-                && configuration.equals(configurations.getActiveConfiguration()
-                        .getName())) {
-
-            DynConfiguration dynConf = getBaseProperty(property);
-            dynConf.getComponents().get(0).getProperties().get(0)
-                    .setValue(value);
-            services.setCurrentConfiguration(dynConf);
-        }
-
         return configurations.parseProperty(prop);
     }
 
@@ -306,7 +193,7 @@ public class OperationsImpl implements Operations {
         // If any component contain this property, add it
         if (getBaseProperty(name).getComponents().size() <= 0) {
 
-            // if dynamic component or property null, return null
+            // If dynamic component or property null, return null
             DynComponent dynComp = services.getCurrentComponent(name);
             DynProperty dynProp = services.getCurrentProperty(name);
             if (dynComp == null || dynProp == null) {
@@ -325,23 +212,6 @@ public class OperationsImpl implements Operations {
     /**
      * {@inheritDoc}
      */
-    public boolean deleteProperty(String name) {
-
-        // If some components contains this property, delete it
-        if (getBaseProperty(name).getComponents().size() > 0) {
-
-            // Remove property from all configurations and base configuration
-            configurations.deleteProperties(name,
-                    services.getCurrentComponent(name).getId());
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public DynConfigurationList export() {
 
         // Find all stored dynamic configurations
@@ -350,11 +220,6 @@ public class OperationsImpl implements Operations {
 
             // If no dynamic configurations, return empty list
             return dynConfs;
-        }
-
-        // If no active configuration, return null
-        if (configurations.getActiveConfiguration() == null) {
-            return null;
         }
 
         // Iterate exported dynamic configurations for write to pom

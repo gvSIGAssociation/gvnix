@@ -59,34 +59,11 @@ public interface Operations {
     public DynConfiguration setActiveConfiguration(String name);
 
     /**
-     * Unlink files with the properties of the dynamic configuration.
-     * <ul>
-     * <li>If dynamic configuration with name not exists, null will be returned.
-     * </li>
-     * <li>If active property is false, there are pending local changes</li>
-     * </ul>
-     * 
-     * @param name
-     *            Dynamic configuration name to activate
-     * @return Dynamic configuration activated
-     */
-    public DynConfiguration setUnactiveConfiguration(String name);
-
-    /**
      * Get all stored dynamic configurations.
      * 
      * @return List of stored dynamic configurations or empty if not.
      */
     public DynConfigurationList findConfigurations();
-
-    /**
-     * Remove a previously stored configuration.
-     * 
-     * @param name
-     *            Name of the dynamic configuration
-     * @return Dynamic configuration to remove
-     */
-    public boolean deleteConfiguration(String name);
 
     /**
      * Get stored dynamic configuration with a name.
@@ -106,15 +83,6 @@ public interface Operations {
      * @return Base dynamic configuration.
      */
     public DynConfiguration getBaseConfiguration();
-
-    /**
-     * Get the properties stored along configurations with a name or empty.
-     * 
-     * @param name
-     *            Property name
-     * @return Related properties along distinct configurations or empty
-     */
-    public DynConfigurationList getProperties(String name);
 
     /**
      * Get the base dynamic configuration if contains a property name, else
@@ -158,15 +126,6 @@ public interface Operations {
      * @return false if already exists or null if not exists
      */
     public Boolean addProperty(String name);
-
-    /**
-     * Delete a property with some name on all configurations.
-     * 
-     * @param name
-     *            Property name
-     * @return false if not exists
-     */
-    public boolean deleteProperty(String name);
 
     /**
      * Write all stored dynamic configurations into the build tool.

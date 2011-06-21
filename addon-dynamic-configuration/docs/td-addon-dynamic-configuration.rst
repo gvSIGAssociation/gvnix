@@ -228,11 +228,8 @@ There are some OSGi abstract components that can be extended to easy components 
 TODO
 ====
 
-* Add an abstract OSGi component to easy component creation to manage Java properties.
-* Add command to export dynamic configurations to maven or ant system, Its will allow manage dynamic configurations without Roo console.
-  A very interesting improvement could be allow the generation of Ant and Maven Profiles on their configuration files (build.xml ant pom.xml respectively) and replace on profile files values with variables.
-  Thus on generated project the profile can be selected too.
-* Add component to manage dynamic configuration on java properties
+* Add an OSGi component to easy component creation to manage Java properties.
+* In export command add a parameter with the target build tool (mvn, ant, ...) because currently, only mvn build tool available.
 * Some files profile configuration can be standar to every projects, like log4j.properties.
   There is a standard file configuration to production environments.
   For example, log4j.properties on production environmente removes the code line of loggin messages by performance.
@@ -244,31 +241,6 @@ TODO
   * add: File to add to profile addon, no included by default
   * delete: Remove a file from profile addon
   * properties or info: Property values of a file
-
-* urlrewrite.xml not used from Roo 1.1.0.M3
-
-* Would be a good improvement to show the real name of the properties, if it's possible, instead of the XPATH of
-them. i.e:
-
-  ``/persistence/persistence-unit/properties/property[1][@name] => hibernate.dialect``
-
-* In the same way as commented before, don't show the XPATH of the values of the property we want to manage. i.e:
-
-  ``/persistence/persistence-unit/properties/property[1][@value] => is the value attribute of hibernate.dialect``
-
-* IMO when the error message is shown:
-
-  ::
-
-    Configuration not unactivated.
-    Active configuration has unsaved modifications, then you can:
-     * Undo project files modifications
-     * Update active configuration properties with 'configuration property update'
-     * Save active configuration with 'configuration save'
-     * Delete active configuration with 'configuration delete'
-
-  we should to try improve the message with a better information, if it's possible, to show which changes are
-  pending to save.
 
 * What happens if Roo changes some configuration file like persistence.xml or database.properties when this files are already managed by dynamic configuration ?
 

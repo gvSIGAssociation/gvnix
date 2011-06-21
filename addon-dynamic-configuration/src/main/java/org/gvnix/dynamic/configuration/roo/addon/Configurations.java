@@ -122,13 +122,6 @@ public interface Configurations {
     public List<Element> getAllConfigurations();
 
     /**
-     * Get all component elements or null if not exists.
-     * 
-     * @return All configuration elements or null.
-     */
-    public List<Element> getAllComponents();
-
-    /**
      * Get a property element from a configuration with some name.
      * 
      * @param configuration
@@ -173,15 +166,5 @@ public interface Configurations {
      */
     public void addProperties(String name, String value, String compId,
             String compName);
-
-    /**
-     * Delete a component property name on stored and base configurations.
-     * 
-     * @param name
-     *            Property name
-     * @param component
-     *            Component id
-     */
-    public void deleteProperties(String name, String component);
 
 }

@@ -1,8 +1,13 @@
 script --file clinic.roo
 
-configuration save --name test
+configuration create --name test
 configuration property add --name log4j.rootLogger 
 configuration property add --name database.url 
 configuration property add --name hibernate.hbm2ddl.auto
-configuration activate --name test
 configuration export
+configuration list
+configuration create --name pro
+configuration property value --configuration pro --property database.url --value jdbc:hsqldb:mem:petclinicpro
+configuration property add --name database.password 
+configuration export
+configuration list
