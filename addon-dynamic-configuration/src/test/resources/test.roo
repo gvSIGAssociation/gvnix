@@ -1,13 +1,31 @@
+
+# Create pet clinic example application
 script --file clinic.roo
 
-configuration create --name test
-configuration property add --name log4j.rootLogger 
-configuration property add --name database.url 
+# Create a development configuration
+configuration create --name dev
+
+# Make some properties available for all configurations 
+configuration property add --name database.url
 configuration property add --name hibernate.hbm2ddl.auto
-configuration export
+configuration property add --name log4j.rootLogger
+
+# Set property values distinct than default for development configuration
+configuration property value --configuration dev --property database.url --value jdbc:hsqldb:mem:mydevdb
+
+# Check configurations
 configuration list
+
+# Write configurations to project
+configuration export
+
+# Create a production configuration
 configuration create --name pro
-configuration property value --configuration pro --property database.url --value jdbc:hsqldb:mem:petclinicpro
-configuration property add --name database.password 
+
+# Set property values distinct than default for production configuration 
+configuration property value --configuration pro --property database.url --value jdbc:hsqldb:file:myprodb
+configuration property value --configuration pro --property hibernate.hbm2ddl.auto --value update
+configuration property value --configuration pro --property log4j.rootLogger --value "ERROR, stdout"
+
+# Write configurations to project
 configuration export
-configuration list

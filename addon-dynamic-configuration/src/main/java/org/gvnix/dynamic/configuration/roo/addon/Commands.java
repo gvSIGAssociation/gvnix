@@ -59,84 +59,34 @@ public class Commands implements CommandMarker {
         return operations.isProjectAvailable();
     }
 
-    @CliCommand(value = "configuration create", help = "Save a new configuration with a name")
+    @CliCommand(value = "configuration create", help = "Define a new configuration with a name")
     public void create(
-            @CliOption(key = "name", mandatory = true, help = "Name of the configuration to be saved") String name) {
+            @CliOption(key = "name", mandatory = true, help = "Name for defined configuration") String name) {
 
+        // Simple quotes not allowed: error with XML Xpath queries
+        name = name.startsWith("'") ? name.substring(1) : name;
+        name = name.endsWith("'") ? name.substring(0, name.length() - 1) : name;
+
+        // There is no previous dynamic configurations created ?
         DynConfigurationList dynConfs = operations.findConfigurations();
         boolean isFirstDynConf = dynConfs.isEmpty();
 
         // Store the active dynamic configuration
         DynConfiguration dynConf = operations.saveActiveConfiguration(name);
-        logger.log(Level.INFO, "configuration created");
+        logger.log(Level.INFO,
+                "Configuration created with currently available properties");
+
+        // If first dynamic configuration, set as default
         if (isFirstDynConf) {
             operations.setActiveConfiguration(name);
             logger.log(Level.INFO, "First created configuration set as default");
         }
+
+        // Show in console the added configuration
         showDynComponents(dynConf);
         logger.log(
                 Level.INFO,
-                "(use 'configuration list' to see properties defined in the configuration or 'configuration export' to generate the configuration at project)");
-    }
-
-    @CliAvailabilityIndicator("configuration list")
-    public boolean isList() {
-
-        return operations.isProjectAvailable()
-                && !operations.findConfigurations().isEmpty();
-    }
-
-    @CliCommand(value = "configuration list", help = "List all previously created configurations")
-    public void list() {
-
-        // If name specified get this configuration, else base configuration
-        DynConfigurationList dynConfs = operations.findConfigurations();
-
-        // If empty, no dynamic configuration exists
-        if (dynConfs.isEmpty()) {
-
-            logger.log(Level.WARNING, "There is not created configurations");
-            logger.log(Level.WARNING,
-                    "(use 'configuration create' to save a new configuration)");
-            return;
-        }
-
-        // Show in console the configurations list
-        showDynConfigurations(dynConfs);
-        logger.log(
-                Level.INFO,
-                "(use 'configuration property add' to include a configuration property or 'configuration property value' to set new values to property)");
-    }
-
-    @CliAvailabilityIndicator("configuration property value")
-    public boolean isPropertyValue() {
-
-        return operations.isProjectAvailable()
-                && !operations.findConfigurations().isEmpty();
-    }
-
-    @CliCommand(value = "configuration property value", help = "Set a value in a configuration property")
-    public void propertyValue(
-            @CliOption(key = "configuration", mandatory = true, help = "Name of the configuration to update") DynConfiguration configuration,
-            @CliOption(key = "property", mandatory = true, help = "Name of the property to update", optionContext = DynPropertyConverter.CONFIGURATION_FILE) DynProperty property,
-            @CliOption(key = "value", mandatory = true, help = "Value to set") String value) {
-
-        // Update the configuration
-        DynProperty dynProperty = operations.updateProperty(
-                configuration.getName(), property.getKey(), value);
-
-        // If null, property with this name not exists
-        if (dynProperty == null) {
-
-            logger.log(Level.WARNING, "Property not exists on configuration");
-            logger.log(
-                    Level.WARNING,
-                    "(use 'configuration property add' to include a configuration property or 'configuration create' to save a new configuration)");
-            return;
-        }
-
-        logger.log(Level.INFO, "Property value updated");
-        logger.log(Level.INFO, "(use 'configuration list' to show properties)");
+                "(use 'configuration property add' to make a property available for all configurations");
     }
 
     @CliAvailabilityIndicator("configuration property add")
@@ -146,29 +96,82 @@ public class Commands implements CommandMarker {
                 && !operations.findConfigurations().isEmpty();
     }
 
-    @CliCommand(value = "configuration property add", help = "Include a property in the configurations")
+    @CliCommand(value = "configuration property add", help = "Make a property available for all configurations")
     public void propertyAdd(
-            @CliOption(key = "name", mandatory = true, help = "Name of the property to add", optionContext = DynPropertyConverter.SOURCE_FILES) DynProperty name) {
+            @CliOption(key = "name", mandatory = true, help = "Name of property to add", optionContext = DynPropertyConverter.SOURCE_FILES) DynProperty name) {
 
         // Add the property and show a message
         Boolean added = operations.addProperty(name.getKey());
         if (added == null) {
 
             logger.log(Level.WARNING, "Property not exists");
-            logger.log(Level.WARNING,
-                    "(use 'configuration list' to see properties defined)");
+
         } else if (added == true) {
 
-            logger.log(Level.INFO, "Property added");
-            logger.log(
-                    Level.INFO,
-                    "(use 'configuration property value' to set new values to property or 'configuration create' to save a new configuration)");
+            logger.log(Level.INFO, "Property available for all configurations");
+            logger.log(Level.INFO,
+                    "(use 'configuration property value' to set property new values)");
+
         } else {
 
-            logger.log(Level.WARNING, "Property already exists");
             logger.log(Level.WARNING,
-                    "(use 'configuration property value' to set new values to property)");
+                    "Property already available for configurations");
+            logger.log(
+                    Level.WARNING,
+                    "(use 'configuration property value' to set property new values by configuration)");
         }
+    }
+
+    @CliAvailabilityIndicator("configuration property value")
+    public boolean isPropertyValue() {
+
+        return operations.isProjectAvailable()
+                && !operations.findConfigurations().isEmpty();
+    }
+
+    @CliCommand(value = "configuration property value", help = "Set new values into a configuration property")
+    public void propertyValue(
+            @CliOption(key = "configuration", mandatory = true, help = "Name of configuration to update") DynConfiguration configuration,
+            @CliOption(key = "property", mandatory = true, help = "Name of property to update", optionContext = DynPropertyConverter.CONFIGURATION_FILE) DynProperty property,
+            @CliOption(key = "value", mandatory = true, help = "New value to set") String value) {
+
+        // Update the configuration
+        DynProperty dynProperty = operations.updateProperty(
+                configuration.getName(), property.getKey(), value);
+
+        // If null, property with this name not exists
+        if (dynProperty == null) {
+
+            logger.log(Level.WARNING,
+                    "Property not available for configurations");
+            logger.log(
+                    Level.WARNING,
+                    "(use 'configuration property add' to make a property available for configurations)");
+            return;
+        }
+
+        logger.log(Level.INFO, "Property value seted");
+        logger.log(Level.INFO,
+                "(use 'configuration list' to show configurations and their properties)");
+    }
+
+    @CliAvailabilityIndicator("configuration list")
+    public boolean isList() {
+
+        return operations.isProjectAvailable()
+                && !operations.findConfigurations().isEmpty();
+    }
+
+    @CliCommand(value = "configuration list", help = "List all created configurations and their properties")
+    public void list() {
+
+        // If name specified get this configuration, else base configuration
+        DynConfigurationList dynConfs = operations.findConfigurations();
+
+        // Show in console the configurations list
+        showDynConfigurations(dynConfs);
+        logger.log(Level.INFO,
+                "(use 'configuration export' to write configurations into the project)");
     }
 
     @CliAvailabilityIndicator("configuration export")
@@ -178,27 +181,17 @@ public class Commands implements CommandMarker {
                 && !operations.findConfigurations().isEmpty();
     }
 
-    @CliCommand(value = "configuration export", help = "Write created configurations into the build tool")
+    @CliCommand(value = "configuration export", help = "Write current configurations into project")
     public void export() {
 
         // Write all dynamic configurations into the build tool
-        DynConfigurationList dynConfs = operations.export();
+        operations.export();
 
-        if (dynConfs.isEmpty()) {
-
-            logger.log(Level.WARNING, "There is no created configurations");
-            logger.log(
-                    Level.WARNING,
-                    "(use 'configuration create' to create a new configuration or 'configuration list' to see properties defined)");
-            return;
-
-        } else {
-
-            logger.log(Level.INFO, "Configuration exported");
-            logger.log(Level.INFO,
-                    "(use '-P name' on maven commands to use the 'name' configuration)");
-        }
-
+        logger.log(Level.INFO, "Configurations exported into project");
+        logger.log(Level.INFO,
+                "(use '-P name' on maven commands to use a configuration)");
+        logger.log(Level.INFO,
+                "(use 'configuration create' to define a new configuration)");
     }
 
     /**
