@@ -23,9 +23,6 @@ import org.apache.felix.scr.annotations.Component;
 /**
  * Abstract dynamic configuration component of XML files for managing elements
  * with Xpath expressions.
- * <p>
- * Extends this class to manage new XML file values with Xpath expressions.
- * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a

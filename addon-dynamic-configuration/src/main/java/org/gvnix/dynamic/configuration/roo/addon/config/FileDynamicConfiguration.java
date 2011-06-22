@@ -27,9 +27,6 @@ import org.springframework.roo.project.PathResolver;
 
 /**
  * Abstract dynamic configuration component of any file.
- * <p>
- * Extends this class to manage a new file.
- * </p>
  * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a

@@ -21,7 +21,7 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introduction
 ============
 
-Dynamic configuration is a profiles management system as Maven or Ant build to manage diferent variable values by environment.
+Dynamic configuration is a profiles management system as Maven or Ant build to manage diferent configuration values by environment.
 
 Requirements
 ============
@@ -29,8 +29,6 @@ Requirements
 * Independent of the build system (like Maven, Ant, ...)
 * Friendly and easy to use
 * Faster than write profiles directly in some build system (Maven, Ant, ...)
-* Avoid variables ``${property.name}`` along project files.
-  More readable aproximation is to store the value of variable on currently active profile
 * Current active profile selection
 
 Proposals
@@ -40,10 +38,9 @@ Proposals
 #. Ant profile addon: Modify files managed by other addons replacing some values with variables. Manage the Ant build.xml profiles section with the values related to variables.
 #. OSGi profile addon:
 
- * Define a OSGi component that can be implemented by other addons to manage their own files with different profile values.
- * Out of the box, has already implemented some OSGi components to profile some files of a project, like database.properties.
- * When a profile property is changed, related OSGi component will be alerted to change the value in corresponding files.
- * The profiles information is stored on a independent and own file on project resources.
+ * Define a OSGi component that can be implemented by other addons to manage their own files with different configuration values.
+ * Out of the box, has already implemented some OSGi components to configure some files of a project, like database.properties.
+ * The configuration information is stored on a independent and own file on project resources.
 
 Maven profile addon
 -------------------
@@ -85,11 +82,8 @@ This option is interesting because Maven is the build tool used by default on ge
 
    <resources>
    <resource>
-     <directory>xxx</directory>
-     <excludes>
-       <exclude>xxx</exclude>
-     </excludes>
-     <filtering>xxx</filtering>
+     <directory>src/main/resources</directory>
+     <filtering>true</filtering>
     </resource>
    </resources>
 
@@ -100,14 +94,6 @@ This option is interesting because Maven is the build tool used by default on ge
    ${property.name}
 
   The ``property.name`` variable will be replaced with the ``property-value`` if the file location is included in resources.
-
-TODO
-````
-
-* Which directories to add on resources to do the filtering of the properties defined in the profile ?
-* A resources section can be defined on a profile section ?
-* Use activation to set the active profile ?
-* If active profile setted, ¿ what hapens if other profile is selected from maven command (-p pre) ?
 
 References
 ``````````
@@ -123,9 +109,9 @@ This option is not much interesting because Ant is not the build tool used by de
 OSGi profile addon
 ------------------
 
-Profile selection is only available on the gvNIX environment, on generated project is not possible to change selected profile.
+Configuration definition is available on the gvNIX environment, and addon can export configuration to maven profiles. 
 
-Profile information (variables and values by environment) can be stored on same file or on separated files (one by environment).
+Profile information (variables and values by environment) is stored on same file.
 
 OSGi arquitecture
 `````````````````
@@ -183,52 +169,74 @@ Therefore, OSGi profile addon is a better aproach.
 Metadata
 ========
 
-It will be placed on src/main/resources folder or subfolder and its structure will be:
+It will be placed on src/main/resources/dynamic-configuration.xml and its structure will be::
 
-* OSGi component 1
-
-  * property1 = value1
-  * property2 = value2
-  * ...
-
-* OSGi component 2
-
-  * property1 = value1
-  * property2 = value2
-  * ...
+	<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<dynamic-configuration>
+		<active>dev</active>
+		<base>
+	        <component id="org.gvnix.dynamic.configuration.roo.addon.config.DatabaseDynamicConfiguration" name="Database Connection Properties">
+	            <property>
+	                <key>database.url</key>
+	                <value>jdbc:hsqldb:mem:petclinic</value>
+	            </property>
+	        </component>
+	    </base>
+	<configuration name="dev">
+	        <component id="org.gvnix.dynamic.configuration.roo.addon.config.DatabaseDynamicConfiguration" name="Database Connection Properties">
+	            <property>
+	                <key>database.url</key>
+	                <value>jdbc:hsqldb:mem:mydevdb</value>
+	            </property>
+	        </component>
+	    </configuration>
+	<configuration name="pro">
+	        <component id="org.gvnix.dynamic.configuration.roo.addon.config.DatabaseDynamicConfiguration" name="Database Connection Properties">
+	            <property>
+	                <key>database.url</key>
+	                <value>jdbc:hsqldb:file:myprodb</value>
+	            </property>
+	        </component>
+	    </configuration>
+	</dynamic-configuration>
 
 OSGi component
 ==============
 
 Example::
 
-  class DatabaseDynamicConfiguration implements DefaultDynamicConfiguration {
+  @Component
+  @Service
+  class MyDynamicConfiguration implements DefaultDynamicConfiguration {
 
     DynPropertyList read() {
 
-      // Reads database.properties values and generates an object with given format
+      // Reads file values and generates an object with given format
     }
 
     void write(DynPropertyList dynProps) {
 
-      // Update database.properties with values stored on the object in given format
+      // Update file with values stored on the object in given format
     }
   }
+
+This OSGi components can be implemented into other addons and will be obtained by OSGi framework by this addon to manage configuration properties defined by them.
+By example, gvNIX addon-cit-security and addon-service defines own dynamic configuration OSGi components for their configuration files.
 
 Abstract components
 -------------------
 
 There are some OSGi abstract components that can be extended to easy components creation:
 
-* AnnotationClassDynamicConfiguration: Provides management of some annotation attributes
 * PropertiesDynamicConfiguration: Provides management of some properties file
+* PropertiesListDynamicConfiguration: Provides management of a properties file list matching prefix and/or sufix files name
 * XmlDynamicConfiguration: Provides management of some XML file
-* FileDynamicConfiguration: Provides access to some file
+* XpathAttributesDynamicConfiguration: Provides management of some XML attributes defined by a Xpath expression
+* XpathElementsDynamicConfiguration: Provides management of some XML elements defined by a Xpath expression
 
 TODO
 ====
 
-* Add an OSGi component to easy component creation to manage Java properties.
 * In export command add a parameter with the target build tool (mvn, ant, ...) because currently, only mvn build tool available.
 * Some files profile configuration can be standar to every projects, like log4j.properties.
   There is a standard file configuration to production environments.
@@ -237,13 +245,9 @@ TODO
 
  * configuration file
 
-  * list: List all files managed by profile addon
-  * add: File to add to profile addon, no included by default
-  * delete: Remove a file from profile addon
-  * properties or info: Property values of a file
+  * add: File to add to configuration management
 
 * What happens if Roo changes some configuration file like persistence.xml or database.properties when this files are already managed by dynamic configuration ?
-
 
 References
 ==========

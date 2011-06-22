@@ -894,6 +894,11 @@ Execute next command on a empty folder to validate add-on:
 
 Check roo exited with code 0, else error.
 
+Dynamic configuration
+=====================
+
+See technical design documentation at addon-dynamic-configuration.
+
 TODO
 ====
 

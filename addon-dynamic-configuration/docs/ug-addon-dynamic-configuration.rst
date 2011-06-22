@@ -21,7 +21,7 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introduction
 ============
 
-Dynamic configuration allows you to manage diferent values by environment along different project files.
+Dynamic configuration allows you to manage diferent configuration values by environment along different project files.
 
 Files available in configurations
 =================================
@@ -31,86 +31,27 @@ Files available in configurations
   * src/main/resources/META-INF/spring/database.properties
   * src/main/resources/log4j.properties
 
-* Java
-
-  * Java annotation attributes of ``GvNIXWebServiceProxy`` annotation on ``Service Layer`` addon
-
 * Xml
  
-  * pom.xml
   * src/main/resources/META-INF/persistence.xml
-  * src/main/resources/META-INF/spring/applicationContext.xml
-  * src/main/webapp/WEB-INF/urlrewrite.xml
-  * src/main/webapp/WEB-INF/web.xml
-  * src/main/webapp/WEB-INF/spring/webmvc-config.xml
 
 Addon commands
 ==============
 
-* configuration save: Create a new configuration with a name
+* configuration create - Define a new configuration with a name
 
-  * name (Mandatory): Name of the configuration to be created
+ * name: Name for defined configuration
 
-  New configuration will store some project file properties.
-  When saved, this configuration is not set as ``Active``.
+* configuration property add - Make a property available for all configurations
 
-* configuration activate: Update project files with the configuration property values
+ * name: Name of property to add
 
-  * name (Mandatory): Name of the configuration to be activated
-  
-  Update project file properties with the properties saved in configuration.
-  When a configuration is active, configuration property updates will modify project files too.  
-  If some project file is modified while a configuration is active, new activation will not be allowed until:
-  
-  * Undo project files modifications
-  * Update previous active configuration properties
-  * Save previous active configuration
-  * Delete previous active configuration
+* configuration property value - Set new values into a configuration property
 
-* configuration unactivate: Unlink the project files from the active configuration
+ * configuration: Name of configuration to update
+ * property: Name of configuration to update
+ * value: New value to set
 
-  * name (Mandatory):  Name of the configuration to be unactivated
-  
-  When a configuration is unactive, configuration property updates will not modify project files.  
-  If some project file is modified while a configuration is active, unactivation will not be allowed until:
-  
-  * Undo project files modifications
-  * Update active configuration properties
-  * Save active configuration
-  * Delete active configuration
+* configuration list - List all created configurations and their properties
 
-* configuration list: List all previously saved configurations
-
-  Active configuration is marked with the ``Active`` text previously to the configuration name.
-
-* configuration delete: Remove a previously saved configuration
-
-  * name (Mandatory): Name of the configuration to be removed
-
-* configuration property list: Show the properties stored in a configuration
-
-  * name (Optional): Name of the configuration to list properties
-
-  If ``name`` command option not specified, list of added configuration properties will be showed without values.
-
-* configuration property values: Show distinct property values along configurations
-
-  * name (Mandatory): Property name
-  
-* configuration property update: Set a value in a configuration property
-
-  * configuration (Mandatory): Name of the configuration to update
-  * property (Mandatory): Name of the property to update
-  * value (Mandatory): Value to set
-  
-  If configuration is active, property will be update on project file too.  
-
-* configuration property add: Make available a property in the configurations
-
-  * name (Mandatory): Name of the property to add
-
-  Property will be added in all configurations with current project file value.
-
-* configuration property delete: Remove a property from all configurations
-
-  * name (Mandatory): Name of the property to delete
+* configuration export - Write current configurations into project

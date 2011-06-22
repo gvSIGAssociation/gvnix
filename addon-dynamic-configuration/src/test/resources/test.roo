@@ -27,5 +27,12 @@ configuration property value --configuration pro --property database.url --value
 configuration property value --configuration pro --property hibernate.hbm2ddl.auto --value update
 configuration property value --configuration pro --property log4j.rootLogger --value "ERROR, stdout"
 
+# Check configurations
+configuration list
+
 # Write configurations to project
 configuration export
+
+# Then you can run the application with distinct profiles:
+#  mvn clean tomcat:run -P dev
+#  mvn clean tomcat:run -P pro

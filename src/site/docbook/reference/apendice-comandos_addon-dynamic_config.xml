@@ -13,7 +13,7 @@
   linkend="addon-dynamic_config">Add-on Dynamic Configuration</link>.</para>
 
   <table>
-    <title xml:lang="es">Comandos de Add-on Dynamic Configuration</title>
+    <title xml:lang="es">Comandos del Add-on Dynamic Configuration</title>
 
     <tgroup cols="2">
       <thead>
@@ -30,69 +30,9 @@
         <row>
           <entry><link
           linkend="apendice-comandos_addon-dynamic_config-config_save">configuration
-          save</link></entry>
+          create</link></entry>
 
-          <entry>Crea una nueva configuración con el nombre dado</entry>
-        </row>
-
-        <row>
-          <entry><link
-          linkend="apendice-comandos_addon-dynamic_config-config_activate">configuration
-          activate</link></entry>
-
-          <entry>Actualiza los archivos del proyecto con los valores de las
-          propiedades en la configuración</entry>
-        </row>
-
-        <row>
-          <entry><link
-          linkend="apendice-comandos_addon-dynamic_config-config_unactivate">configuration
-          unactivate</link></entry>
-
-          <entry>Desvincula los archiovos del proyecto de la configuración
-          activa</entry>
-        </row>
-
-        <row>
-          <entry><link
-          linkend="apendice-comandos_addon-dynamic_config-config_list">configuration
-          list</link></entry>
-
-          <entry>Lista todas las configuraciones creadas</entry>
-        </row>
-
-        <row>
-          <entry><link
-          linkend="apendice-comandos_addon-dynamic_config-config_delete">configuration
-          delete</link></entry>
-
-          <entry>Elimina una configuración guardad</entry>
-        </row>
-
-        <row>
-          <entry><link
-          linkend="apendice-comandos_addon-dynamic_config-config_prop_list">configuration
-          property list</link></entry>
-
-          <entry>Lista las propiedades almacenadas en una
-          configuración</entry>
-        </row>
-
-        <row>
-          <entry><link
-          linkend="apendice-comandos_addon-dynamic_config-config_prop_values">configuration
-          property values</link></entry>
-
-          <entry>Muestra los distintos valores de las propiedades definidas en
-          cada configuración</entry>
-        </row>
-
-        <row>
-          <entry><link
-          linkend="apendice-comandos_addon-dynamic_config-config_prop_update">configuration
-          property update</link></entry>
-
-          <entry>Establece el valor de una propiedad de configuración</entry>
+          <entry>Define una nueva configuración con un nombre dado</entry>
         </row>
 
         <row>
@@ -100,25 +40,43 @@
           linkend="apendice-comandos_addon-dynamic_config-config_prop_add">configuration
           property add</link></entry>
 
-          <entry>Hace que una propiedad esté disponible en la
-          configuración</entry>
+          <entry>Hace que una propiedad esté disponible para su gestión en todas las
+          configuraciones</entry>
+        </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-dynamic_config-config_prop_update">configuration
+          property value</link></entry>
+
+          <entry>Establece el valor de una propiedad en una configuración</entry>
         </row>
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-dynamic_config-config_prop_delete">configuration
-          property delete</link></entry>
+          linkend="apendice-comandos_addon-dynamic_config-config_list">configuration
+          list</link></entry>
 
-          <entry>Elimina una propiedad de todas las configuraciones</entry>
+          <entry>Lista todas las configuraciones creadas juntos con sus propiedades
+          y valores</entry>
         </row>
+        
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-dynamic_config-config_export">configuration
+          export</link></entry>
+
+          <entry>Escribe todas todas las configuraciones en el proyecto. Actualmente se
+          escriben en el formato de perfiles de Maven.</entry>
+        </row>
+        
       </tbody>
     </tgroup>
   </table>
 
   <section xml:id="apendice-comandos_addon-dynamic_config-config_save">
-    <title>configuration save</title>
+    <title>configuration create</title>
 
-    <para>Crea una nueva configuración dinámica.</para>
+    <para>Define una nueva configuración con un nombre dado.</para>
 
     <para>Los parámetros son:</para>
 
@@ -134,99 +92,28 @@
     </variablelist>
   </section>
 
-  <section xml:id="apendice-comandos_addon-dynamic_config-config_activate">
-    <title>configuration activate</title>
+  <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_add">
+    <title>configuration property add</title>
 
-    <para>Activa una configuración dada actualizando los archivos del proyecto
-    que definen las propiedades gestionadas en la configuración. A partir de
-    ese momento, cuando se usa configuration property update también se
-    reflejan los cambios en los ficheros del proyecto.</para>
+    <para>Hace que una propiedad esté disponible para su gestión en todas las
+          configuraciones.</para>
 
     <variablelist>
       <varlistentry>
         <term>--name</term>
 
         <listitem>
-          <para><emphasis>[Requerido] Nombre de la configuración a activar /
-          aplicar</emphasis>.</para>
+          <para><emphasis>[Requerido] Nombre de la propiedad que se quiere
+          gestionar.</emphasis></para>
         </listitem>
       </varlistentry>
     </variablelist>
   </section>
-
-  <section xml:id="apendice-comandos_addon-dynamic_config-config_unactivate">
-    <title>configuration unactivate</title>
-
-    <para>Desactiva la configuración especificada y a partir de ese momento
-    los cambios realizados por configuration property update no se verán
-    reflejados en los archivos del proyecto.</para>
-
-    <variablelist>
-      <varlistentry>
-        <term>--name</term>
-
-        <listitem>
-          <para><emphasis>[Requerido] Nombre de la configuración a
-          desactivar.</emphasis></para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-  </section>
-
-  <section xml:id="apendice-comandos_addon-dynamic_config-config_list">
-    <title>configuration list</title>
-
-    <para>Lista las configuraciones definidas.</para>
-  </section>
-
-  <section>
-    <title
-    xml:id="apendice-comandos_addon-dynamic_config-config_delete">configuration
-    delete</title>
-
-    <para>Elimina una configuración dada.</para>
-
-    <variablelist>
-      <varlistentry>
-        <term>--name</term>
-
-        <listitem>
-          <para><emphasis>[Requerido] Nombre de la configuración a
-          eliminar.</emphasis></para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-  </section>
-
-  <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_list">
-    <title>configuration property list</title>
-
-    <para>Lista las propiedades gestionadas.</para>
-  </section>
-
-  <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_values">
-    <title>configuration property values</title>
-
-    <para>Muestra los distintos valores que toma una propiedad dada en cada
-    una de las configuraciones existentes.</para>
-
-    <variablelist>
-      <varlistentry>
-        <term>--name</term>
-
-        <listitem>
-          <para><emphasis>[Requerido] Nombre de la propiedad cuyo valor se
-          desea mostrar.</emphasis></para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-  </section>
-
+  
   <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_update">
-    <title>configuration property update</title>
+    <title>configuration property value</title>
 
-    <para>Establece el valor de una propiedad en una configuración
-    dada.</para>
+    <para>Establece el valor de una propiedad en una configuración.</para>
 
     <variablelist>
       <varlistentry>
@@ -258,38 +145,18 @@
     </variablelist>
   </section>
 
-  <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_add">
-    <title>configuration property add</title>
+  <section xml:id="apendice-comandos_addon-dynamic_config-config_list">
+    <title>configuration list</title>
 
-    <para>Añade una propiedad para que pueda ser gestionada por el
-    add-on.</para>
-
-    <variablelist>
-      <varlistentry>
-        <term>--name</term>
-
-        <listitem>
-          <para><emphasis>[Requerido] Nombre de la propiedad que se quiere
-          gestionar.</emphasis></para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
+    <para>Lista todas las configuraciones creadas juntos con sus propiedades
+          y valores.</para>
   </section>
+  
+  <section xml:id="apendice-comandos_addon-dynamic_config-config_export">
+    <title>configuration export</title>
 
-  <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_delete">
-    <title>configuration property delete</title>
-
-    <para>Elimina una propiedad de la gestión dinámica.</para>
-
-    <variablelist>
-      <varlistentry>
-        <term>--name</term>
-
-        <listitem>
-          <para><emphasis>[Requerido] Nombre de la propiedad a
-          eliminar.</emphasis></para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
+    <para>Escribe las configuraciones definidas actualmente en el proyecto
+    utilizando para ello el sistema de perfiles de Maven.</para>
   </section>
+  
 </section>

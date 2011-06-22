@@ -108,6 +108,11 @@ Examples::
 
     cit security setup --url [URL] --appName [APP_NAME] --login [LOGIN] --password [PASSWORD]
 
+Dynamic configuration
+=====================
+
+See technical design documentation at addon-dynamic-configuration.
+
 TODO
 ====
 

@@ -17,3 +17,6 @@ service export operation --class ~.services.Clase --method returnString --result
 service import ws --class ~.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
 service import ws --class ~.services.ClaseProxy11 --wsdl http://www.aswinanand.com/sendsms.php?wsdl
 service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+configuration create --name test
+configuration property add --name wsdl.XWebEmailValidation
+configuration export
