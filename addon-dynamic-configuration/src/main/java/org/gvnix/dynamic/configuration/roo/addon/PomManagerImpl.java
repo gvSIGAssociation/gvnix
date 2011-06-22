@@ -191,29 +191,26 @@ public class PomManagerImpl implements PomManager {
             build.appendChild(resos);
         }
 
-        // Resource section with filter: find or create if not exists
+        // Find resource section with directory and filter
         Element reso = XmlUtils.findFirstElement("resource/directory"
                 + "[text()='" + RESOURCES_PATH
                 + "']/../filtering[text()='true']/..", resos);
-        Element dir;
-        if (reso == null) {
 
-            // Create an include resource section and dir
-            reso = doc.createElement("resource");
-            resos.appendChild(reso);
-            dir = doc.createElement("directory");
-            dir.setTextContent(RESOURCES_PATH);
-            reso.appendChild(dir);
+        // Remove resource if already exists
+        if (reso != null) {
+
+            resos.removeChild(reso);
         }
 
-        // Filter section: find or create if not exists
-        Element filter = XmlUtils.findFirstElement("filtering", reso);
-        if (filter == null) {
-
-            filter = doc.createElement("filtering");
-            filter.setTextContent("true");
-            reso.appendChild(filter);
-        }
+        // Create resource section with directory and filter
+        reso = doc.createElement("resource");
+        resos.appendChild(reso);
+        Element dir = doc.createElement("directory");
+        dir.setTextContent(RESOURCES_PATH);
+        reso.appendChild(dir);
+        Element filter = doc.createElement("filtering");
+        filter.setTextContent("true");
+        reso.appendChild(filter);
 
         // <properties>
         // </properties>
