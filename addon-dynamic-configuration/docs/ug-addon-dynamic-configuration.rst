@@ -21,7 +21,7 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introduction
 ============
 
-Dynamic configuration allows you to manage diferent configuration values by environment along different project files.
+Dynamic configuration gives you the ability to change project global settings depending on the environment where it is being built.
 
 Files available in configurations
 =================================

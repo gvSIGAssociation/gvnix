@@ -21,7 +21,7 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introduction
 ============
 
-Dynamic configuration is a profiles management system as Maven or Ant build to manage diferent configuration values by environment.
+Dynamic configuration gives you the ability to change project global settings depending on the environment where it is being built.
 
 Requirements
 ============
