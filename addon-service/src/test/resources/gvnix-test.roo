@@ -1,5 +1,7 @@
 // metadata trace --level 2
 
+// Repositorio de WS para pruebas: http://soatest.parasoft.com/services/
+
 project --topLevelPackage org.gvnix.test.service.layer.project --projectName service-layer-test
 
 persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
