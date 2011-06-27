@@ -18,8 +18,6 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
-import java.util.logging.Logger;
-
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -34,7 +32,6 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -53,9 +50,6 @@ public final class EntityBatchMetadataProvider extends
 
     private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(
             GvNIXEntityBatch.class.getName());
-
-    private static final Logger logger = HandlerUtils
-            .getLogger(EntityBatchMetadataProvider.class);
 
     @Reference
     ProjectOperations projectOperations;
@@ -124,8 +118,7 @@ public final class EntityBatchMetadataProvider extends
         EntityMetadata entityMetadata = (EntityMetadata) metadataService
                 .get(entityMetadataKey);
         if (entityMetadata == null) {
-            logger.warning(getItdUniquenessFilenameSuffix().concat(
-                    " only can be set to @RooEntity annotated classes."));
+            // Metadata not available yet, do nothing on this invoke
             return null;
         }
 

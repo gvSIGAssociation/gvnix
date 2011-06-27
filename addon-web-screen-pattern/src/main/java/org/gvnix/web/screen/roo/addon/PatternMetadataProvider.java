@@ -21,7 +21,6 @@ package org.gvnix.web.screen.roo.addon;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -54,7 +53,6 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -74,8 +72,6 @@ import org.springframework.roo.support.util.Assert;
 @Service
 public final class PatternMetadataProvider extends
         AbstractPatternMetadataProvider {
-    private static final Logger logger = HandlerUtils
-            .getLogger(PatternMetadataProvider.class);
 
     /**
      * {@link GvNIXPattern} JavaType

@@ -21,7 +21,6 @@ package org.gvnix.web.screen.roo.addon;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -37,7 +36,6 @@ import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
-import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
@@ -54,7 +52,6 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -74,8 +71,6 @@ import org.springframework.roo.support.util.Assert;
 @Service
 public final class RelatedPatternMetadataProvider extends
         AbstractPatternMetadataProvider {
-    private static final Logger logger = HandlerUtils
-            .getLogger(RelatedPatternMetadataProvider.class);
 
     /**
      * {@link GvNIXRelatedPattern} JavaType
@@ -87,9 +82,6 @@ public final class RelatedPatternMetadataProvider extends
      */
     public static final JavaSymbolName RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
             "value");
-
-    @Reference
-    private TypeLocationService typeLocationService;
 
     @Reference
     WebScaffoldMetadataProvider webScaffoldMetadataProvider;
@@ -350,27 +342,28 @@ public final class RelatedPatternMetadataProvider extends
     //
     // }
 
-    private String findPatternDefinedMoreThanOnceInProject() {
-        List<String> definedPatternsInProject = new ArrayList<String>();
-        AnnotationMetadata annotationMetadata = null;
-        for (ClassOrInterfaceTypeDetails cid : typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(RELATED_PATTERN_ANNOTATION)) {
-            annotationMetadata = MemberFindingUtils.getAnnotationOfType(
-                    cid.getAnnotations(), RELATED_PATTERN_ANNOTATION);
-            if (annotationMetadata != null) {
-                AnnotationAttributeValue<?> annotationValues = annotationMetadata
-                        .getAttribute(RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-                for (String patternName : getPatternNames(annotationValues)) {
-                    if (definedPatternsInProject.contains(patternName)) {
-                        return patternName;
-                    } else {
-                        definedPatternsInProject.add(patternName);
-                    }
-                }
-            }
-        }
-        return null;
-    }
+    // private String findPatternDefinedMoreThanOnceInProject() {
+    // List<String> definedPatternsInProject = new ArrayList<String>();
+    // AnnotationMetadata annotationMetadata = null;
+    // for (ClassOrInterfaceTypeDetails cid : typeLocationService
+    // .findClassesOrInterfaceDetailsWithAnnotation(RELATED_PATTERN_ANNOTATION))
+    // {
+    // annotationMetadata = MemberFindingUtils.getAnnotationOfType(
+    // cid.getAnnotations(), RELATED_PATTERN_ANNOTATION);
+    // if (annotationMetadata != null) {
+    // AnnotationAttributeValue<?> annotationValues = annotationMetadata
+    // .getAttribute(RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+    // for (String patternName : getPatternNames(annotationValues)) {
+    // if (definedPatternsInProject.contains(patternName)) {
+    // return patternName;
+    // } else {
+    // definedPatternsInProject.add(patternName);
+    // }
+    // }
+    // }
+    // }
+    // return null;
+    // }
 
     /**
      * {@inheritDoc}, here the resulting file name will be

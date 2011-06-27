@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.logging.Logger;
 
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
@@ -61,7 +60,6 @@ import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
@@ -81,14 +79,10 @@ import org.springframework.roo.support.util.StringUtils;
 public abstract class AbstractPatternMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
-    private static final Logger logger = HandlerUtils
-            .getLogger(AbstractPatternMetadata.class);
-
     private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(
             GvNIXEntityBatch.class.getName());
 
     private WebScaffoldMetadata webScaffoldMetadata;
-    private WebScaffoldAnnotationValues annotationValues;
     private JavaType formBackingType;
     private List<String> definedPatterns;
     private SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata;
@@ -122,7 +116,6 @@ public abstract class AbstractPatternMetadata extends
             return;
         }
         this.webScaffoldMetadata = webScaffoldMetadata;
-        this.annotationValues = annotationValues;
         this.formBackingType = annotationValues.getFormBackingObject();
         this.controllerMethods = controllerMethods;
         this.controllerFields = controllerFields;
@@ -944,7 +937,7 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
         properties.put("message_entitynotfound_problemdescription",
-                "There are not data of this entity");
+                "There are not data for this entity");
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
@@ -1148,7 +1141,7 @@ public abstract class AbstractPatternMetadata extends
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
 
         properties.put("message_entitynotfound_problemdescription",
-                "There are not data of this entity");
+                "There are not data for this entity");
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,

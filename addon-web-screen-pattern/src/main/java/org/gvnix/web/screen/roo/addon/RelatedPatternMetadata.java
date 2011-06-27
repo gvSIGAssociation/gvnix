@@ -20,7 +20,6 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.List;
 import java.util.SortedMap;
-import java.util.logging.Logger;
 
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
@@ -37,7 +36,6 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -53,9 +51,6 @@ import org.springframework.roo.support.util.Assert;
  * @since 0.8
  */
 public class RelatedPatternMetadata extends AbstractPatternMetadata {
-
-    private static final Logger logger = HandlerUtils
-            .getLogger(RelatedPatternMetadata.class);
 
     private static final String PROVIDES_TYPE_STRING = RelatedPatternMetadata.class
             .getName();

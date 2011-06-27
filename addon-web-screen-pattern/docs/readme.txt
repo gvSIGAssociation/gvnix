@@ -23,26 +23,26 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Introduction
 ===============
 
-Add-on updates jspx views from entities that have OneToMany mapped relationship to show them inside paginated tables grouped by
-tabs (pattern tabular) or in paginated views of single records (pattern register)
+Add-on allow jspx views creation for entities showed with different patterns:
+
+  * tabular: Paginated and modifiable table of records
+  * register: Paginated views of single records
+
+
+Also, allow jspx views creation for OneToMany mapped relationship to show them with tabular pattern or register pattern.
 
   .. admonition:: What is an screen pattern?
 
     http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns
-
-Project contents
-=================
-
-This folder contains add-on sources and documents folder ``docs`` with documentation of this project.
 
 Features
 ===========
 
 This add-ons have this features:
 
-#. Installs new tagx in the project.
-#. Generates AspectJ files to get related entities paginated to be show in the jspx table inside a tab.
-#. Update the jspx views using featured tagx from the Add-on.
+#. Installs new TAGXs, images, CSS and scripts in the project.
+#. Create jspx views using featured tagx from the Add-on.
+#. Create AspectJ files related to entities new applied patterns.
 
 Installation Proof
 ===================
@@ -58,11 +58,10 @@ Run the application in Bash Shell and see the actual style::
 
   mvn tomcat:run
 
-
 Uninstall the Add-on
 =====================
 
-Remove all related entities called with the tagx in jspx show and update.
+Remove new patterns jspx views, menu entries and annotations.
 
 Limitations
 ===========

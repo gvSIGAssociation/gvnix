@@ -218,9 +218,16 @@ References
 
 * http://viralpatel.net/blogs/download/spring/springroo-masterdetail.zip
 
-Future enhancements
-====================
+Proof of concept
+================
 
+* Tabular pattern:
+
+ http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-screen-pattern-table
+ 
+* Register pattern:
+
+ http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-screen-pattern-register
 
 TODO
 ====

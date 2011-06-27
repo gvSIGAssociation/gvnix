@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
@@ -47,7 +46,6 @@ import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -65,8 +63,6 @@ import org.springframework.roo.support.util.Assert;
  */
 public abstract class AbstractPatternMetadataProvider extends
         AbstractMemberDiscoveringItdMetadataProvider {
-    private static final Logger logger = HandlerUtils
-            .getLogger(AbstractPatternMetadataProvider.class);
 
     /**
      * {@link RooWebScaffold} JavaType
