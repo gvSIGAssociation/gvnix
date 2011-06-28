@@ -46,7 +46,7 @@
   </organization>
   <description>Uncaught Exception Handler Management for Spring MVC based web layer.</description>
   <url>http://www.gvnix.org</url>
-  
+
   <properties>
     <gvnix.version>${parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
@@ -99,6 +99,14 @@
       <artifactId>org.springframework.roo.addon.propfiles</artifactId>
     </dependency>
 
+    <!-- gvNIX add-ons -->
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.web.i18n.roo.addon</artifactId>
+      <version>${gvnix.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
     <!-- DiSiD: Unit Test dependencies -->
     <dependency>
       <groupId>org.easymock</groupId>
@@ -123,7 +131,7 @@
       <artifactId>commons-logging</artifactId>
       <version>1.1.1</version>
       <scope>test</scope>
-    </dependency>    
+    </dependency>
   </dependencies>
 
   <distributionManagement>

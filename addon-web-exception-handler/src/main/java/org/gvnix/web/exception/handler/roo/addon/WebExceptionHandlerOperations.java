@@ -21,7 +21,10 @@ package org.gvnix.web.exception.handler.roo.addon;
 /**
  * Interface for {@link WebExceptionHandlerOperationsImpl}.
  * 
- * @author Ricardo García ( rgarcia at disid dot com ) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
+ * @author Ricardo García ( rgarcia at disid dot com ) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  * 
  */
 public interface WebExceptionHandlerOperations {
@@ -45,8 +48,8 @@ public interface WebExceptionHandlerOperations {
      *            Language to set the message.
      */
     public void addNewHandledException(String exceptionName,
-	    String exceptionTitle, String exceptionDescription,
-	    String exceptionLanguage);
+            String exceptionTitle, String exceptionDescription,
+            String exceptionLanguage);
 
     /**
      * Removes the selected Exception if exists.
@@ -69,8 +72,8 @@ public interface WebExceptionHandlerOperations {
      *            Language to set the message.
      */
     public void languageExceptionHandled(String exceptionName,
-	    String exceptionTitle, String exceptionDescription,
-	    String exceptionLanguage);
+            String exceptionTitle, String exceptionDescription,
+            String exceptionLanguage);
 
     /**
      * Set up gvNIX initial Exceptions to the project.
@@ -93,6 +96,14 @@ public interface WebExceptionHandlerOperations {
      * @return {@link Boolean} true if there are exceptions in the mapping.
      */
     public boolean isExceptionMappingAvailable();
+
+    /**
+     * Check if there are exceptions mapped in the
+     * MessageMappingExceptionHanlder bean.
+     * 
+     * @return {@link Boolean} true if there are exceptions in the mapping.
+     */
+    public boolean isMessageMappingAvailable();
 
     public boolean isProjectAvailable();
 

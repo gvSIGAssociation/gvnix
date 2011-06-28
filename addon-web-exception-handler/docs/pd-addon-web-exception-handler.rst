@@ -9,9 +9,9 @@
 :Date:      $Date$
 
 This work is licensed under the Creative Commons Attribution-Share Alike 3.0
-Unported License. To view a copy of this license, visit 
-http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to 
-Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 
+Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 94105, USA.
 
 Requirements
@@ -20,7 +20,7 @@ Requirements
 Add-on to handle Exceptions and show a friendly message to the user through a .jspx view.
 
 * Add a new Exception to be handled by the application.
-* Show the Exceptions handled by the application. 
+* Show the Exceptions handled by the application.
 * Remove a Exception handled by the application.
 * Adds a new translation of the exception message to the application.
 
@@ -28,7 +28,7 @@ Use Case
 =========
 
 This Add-on is developed to show a friendly Exception message to the user when is caught an Exception in the application using a .jspx view
- 
+
 Analysis
 =========
 
@@ -54,7 +54,7 @@ exception handler set language - Updates the messages of the Exception in the se
 
   * Checks if the Exception exists.
 
-    * Updates the tag of the messages**.properties file. 
+    * Updates the tag of the messages**.properties file.
 
 Commands
 =========
@@ -76,13 +76,15 @@ exception handler set language - Updates the messages of the Exception in the se
   Parameters: --excepcion Name of the exception e.g. java.lang.Exception,  --title Title of the exception, --description Description of the exception to show in the view and --language The language of the messages [es, en... etc].
 
 exception handler setup gvnix - Creates a Set of defined exceptions for gvNix
-  
+
 Proof of Concept
 =================
 
 TODO: The location of the project will be updated when the shell is built
 
-Project that contains the proof: exceptionsFASE1.
+Project that contains the proof: 
+http://scmcit.gva.es/svn/gvnix-proof/trunk/exception-error-handler
+
 
 Notes
 =======
@@ -97,3 +99,12 @@ Try to update views.xml file using ``TilesOperations`` service::
     tilesOperations.addViewDefinition("", "exception", TilesOperations.DEFAULT_TEMPLATE, jspxPath);
 
 Instead of using the Transformer provided by XmlUtils.
+
+
+TODO
+=====
+
+Since gvNIX must support Spanish, Valencian_Catalan languages in WebExceptionHandlerOperationsImpl.installMvcArtifacts()
+we are creating the message bundle files for these languages (messages_es.properties and messages_ca.properties). We've
+created two method that should be outsorced to a shared component so, other gvNIX add-ons creating its own i18n properties
+could use these methods.
