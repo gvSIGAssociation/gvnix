@@ -27,10 +27,9 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
+import org.gvnix.osgi.support.OperationUtils;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.w3c.dom.Element;
 
@@ -60,7 +59,8 @@ public class OperationsImpl implements Operations {
     PomManager pomManager;
 
     public boolean isProjectAvailable() {
-        return getPathResolver() != null;
+
+        return OperationUtils.isProjectAvailable(metadataService);
     }
 
     /**
@@ -231,21 +231,6 @@ public class OperationsImpl implements Operations {
         }
 
         return dynConfs;
-    }
-
-    /**
-     * @return the path resolver or null if there is no user project
-     */
-    private PathResolver getPathResolver() {
-
-        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
-        if (projectMetadata == null) {
-
-            return null;
-        }
-
-        return projectMetadata.getPathResolver();
     }
 
 }

@@ -22,15 +22,16 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.felix.scr.annotations.*;
-import org.gvnix.service.roo.addon.JavaParserService;
-import org.gvnix.service.roo.addon.ServiceOperations;
-import org.springframework.roo.classpath.details.annotations.*;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
+import org.gvnix.osgi.support.OperationUtils;
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.*;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -57,22 +58,7 @@ public class ServiceOperationsImpl implements ServiceOperations {
      */
     public boolean isProjectAvailable() {
 
-        return getPathResolver() != null;
-    }
-
-    /**
-     * @return the path resolver or null if there is no user project
-     */
-    private PathResolver getPathResolver() {
-
-        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
-        if (projectMetadata == null) {
-
-            return null;
-        }
-
-        return projectMetadata.getPathResolver();
+        return OperationUtils.isProjectAvailable(metadataService);
     }
 
     /**
