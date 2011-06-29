@@ -143,6 +143,8 @@ Package gvNIX
   Check if all add-ons are published correctly at http://gvnix.googlecode.com/svn/repo/repository.xml for RooBoot.
   This will create the ZIP file ``target/gvnix-dist/gvNIX-{version}.zip``.
 
+* Test uncompress ZIP file, start it a execute some script and check in STS.
+
 * Send to publish on gvPONTIS the gvNIX binary zip, the gvNIX source zip, the html single page reference guide and version changes summary.
 
 * Update (or create if not exists) the wiki page for each add-on from add-on user guide on html format.
