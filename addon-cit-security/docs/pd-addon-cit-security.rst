@@ -117,4 +117,5 @@ TODO
 ====
 
 * Review the packages of the WS client and Authentication artifacts
+* Change the login i18n description to avoid "admin" username and "admin" password. 
 
