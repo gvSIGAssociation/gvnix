@@ -105,6 +105,11 @@ public interface WebExceptionHandlerOperations {
      */
     public boolean isMessageMappingAvailable();
 
+    /**
+     * Check if project is available and if its a Spring MVC project
+     * 
+     * @return
+     */
     public boolean isProjectAvailable();
 
 }

@@ -31,10 +31,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.transform.Transformer;
@@ -42,6 +40,8 @@ import javax.xml.transform.Transformer;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.MessageBundleUtils;
+import org.gvnix.support.OperationUtils;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
@@ -60,7 +60,6 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.osgi.UrlFindingUtils;
 import org.springframework.roo.support.util.Assert;
@@ -910,17 +909,24 @@ public class WebExceptionHandlerOperationsImpl implements
         Set<I18n> supportedLanguages = i18nSupport.getSupportedLanguages();
         for (I18n i18n : supportedLanguages) {
             if (i18n.getLocale().equals(new Locale("ca"))) {
-                installI18nMessages(new ValencianCatalanLanguage());
-                addPropertiesToMessageBundle("ca");
+                MessageBundleUtils.installI18nMessages(
+                        new ValencianCatalanLanguage(), projectOperations,
+                        fileManager);
+                MessageBundleUtils.addPropertiesToMessageBundle("ca",
+                        getClass(), propFileOperations, projectOperations,
+                        fileManager);
                 break;
             }
         }
         // Add properties to Spanish messageBundle
-        installI18nMessages(new SpanishLanguage());
-        addPropertiesToMessageBundle("es");
+        MessageBundleUtils.installI18nMessages(new SpanishLanguage(),
+                projectOperations, fileManager);
+        MessageBundleUtils.addPropertiesToMessageBundle("es", getClass(),
+                propFileOperations, projectOperations, fileManager);
 
         // Add properties to default messageBundle
-        addPropertiesToMessageBundle("en");
+        MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
+                propFileOperations, projectOperations, fileManager);
     }
 
     /**
@@ -965,95 +971,6 @@ public class WebExceptionHandlerOperationsImpl implements
 
         writeToDiskIfNecessary(defaultJspx, defaultJspxXml.getDocumentElement());
 
-    }
-
-    /**
-     * Adds properties to the messages_<language>.properties message bundle
-     * file. Properties are loaded from a file in the add-on<br/>
-     * Note that for English ("en") the message bundle file is
-     * messages.properties
-     * 
-     * TODO: Maybe this method should be outsorced too as
-     * installI18nMessages(I18n)
-     * 
-     * @param language
-     * @param properties
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void addPropertiesToMessageBundle(String language) {
-        Properties properties = new Properties();
-        String propertiesFilePath = "/".concat(
-                getClass().getPackage().getName()).replace('.', '/');
-        try {
-            if (language == "en") {
-                propertiesFilePath = propertiesFilePath
-                        .concat("/messages.properties");
-                properties.load(getClass().getResourceAsStream(
-                        propertiesFilePath));
-                propFileOperations.addProperties(Path.SRC_MAIN_WEBAPP,
-                        "/WEB-INF/i18n/messages.properties",
-                        new HashMap<String, String>((Map) properties), true,
-                        false);
-            } else {
-                String messageBundle = projectOperations.getPathResolver()
-                        .getIdentifier(
-                                Path.SRC_MAIN_WEBAPP,
-                                "/WEB-INF/i18n/messages_" + language
-                                        + ".properties");
-                if (fileManager.exists(messageBundle)) {
-                    propertiesFilePath = propertiesFilePath.concat("/messages_"
-                            + language + ".properties");
-                    properties.load(getClass().getResourceAsStream(
-                            propertiesFilePath));
-
-                    propFileOperations.addProperties(Path.SRC_MAIN_WEBAPP,
-                            "/WEB-INF/i18n/messages_" + language
-                                    + ".properties",
-                            new HashMap<String, String>((Map) properties),
-                            true, false);
-                }
-            }
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Message properties for language \""
-                    .concat(language).concat("\" can't be loaded"));
-        }
-    }
-
-    /**
-     * TODO: This should be outsorced to a shared component
-     * 
-     * @param i18n
-     */
-    private void installI18nMessages(I18n i18n) {
-        Assert.notNull(i18n, "Language choice required");
-
-        if (i18n.getLocale() == null) {
-            logger.warning("could not parse language choice");
-            return;
-        }
-
-        String targetDirectory = projectOperations.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_WEBAPP, "");
-
-        // Install message bundle
-        String messageBundle = targetDirectory + "/WEB-INF/i18n/messages_"
-                + i18n.getLocale().getLanguage() + ".properties";
-        // Special case for english locale (default)
-        if (i18n.getLocale().equals(Locale.ENGLISH)) {
-            messageBundle = targetDirectory
-                    + "/WEB-INF/i18n/messages.properties";
-        }
-        if (!fileManager.exists(messageBundle)) {
-            try {
-                FileCopyUtils.copy(i18n.getMessageBundle(), fileManager
-                        .createFile(messageBundle).getOutputStream());
-            } catch (IOException e) {
-                throw new IllegalStateException(
-                        "Encountered an error during copying of message bundle MVC JSP addon.",
-                        e);
-            }
-        }
-        return;
     }
 
     /**
@@ -1332,31 +1249,29 @@ public class WebExceptionHandlerOperationsImpl implements
         return isExceptionAvailable;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * #isProjectAvailable()
+     */
     public boolean isProjectAvailable() {
 
-        if (getPathResolver() == null) {
-            return false;
-        }
+        // if (!OperationUtils.isProjectAvailable(metadataService)) {
+        // return false;
+        // }
 
-        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-                "WEB-INF/spring/webmvc-config.xml");
-
-        if (!fileManager.exists(webXmlPath)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @return the path resolver or null if there is no user project.
-     */
-    private PathResolver getPathResolver() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
-        if (projectMetadata == null) {
-            return null;
-        }
-        return projectMetadata.getPathResolver();
+        // String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+        // "WEB-INF/spring/webmvc-config.xml");
+        //
+        // if (!fileManager.exists(webXmlPath)) {
+        // return false;
+        // }
+        // return true;
+        return OperationUtils.isProjectAvailable(metadataService)
+                && OperationUtils.isSpringMvcProject(metadataService,
+                        fileManager);
     }
 
     /**
