@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.osgi.support;
+package org.gvnix.support;
 
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 
@@ -32,33 +34,55 @@ import org.springframework.roo.project.ProjectMetadata;
  */
 public class OperationUtils {
 
-  /**
-   * Check if there is a project available.
-   * 
-   * @param metadataService Metadata Service component
-   * @return Is project available ?
-   */
-  public static boolean isProjectAvailable(MetadataService metadataService) {
+    /**
+     * Check if there is a project available.
+     * 
+     * @param metadataService
+     *            Metadata Service component
+     * @return Is project available ?
+     */
+    public static boolean isProjectAvailable(MetadataService metadataService) {
+        return getPathResolver(metadataService) != null;
+    }
 
-      return getPathResolver(metadataService) != null;
-  }
-  
-  /**
-   * Get the path resolver or null if there is no project available.
-   * 
-   * @param metadataService Metadata Service component
-   * @return Path resolver or null
-   */
-  public static PathResolver getPathResolver(MetadataService metadataService) {
+    /**
+     * Get the path resolver or null if there is no project available.
+     * 
+     * @param metadataService
+     *            Metadata Service component
+     * @return Path resolver or null
+     */
+    public static PathResolver getPathResolver(MetadataService metadataService) {
 
-    ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-              .get(ProjectMetadata.getProjectIdentifier());
-      if (projectMetadata == null) {
+        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
+                .get(ProjectMetadata.getProjectIdentifier());
+        if (projectMetadata == null) {
 
-          return null;
-      }
+            return null;
+        }
 
-      return projectMetadata.getPathResolver();
-  }
-  
+        return projectMetadata.getPathResolver();
+    }
+
+    /**
+     * Check if current project is a Spring MVC one
+     * 
+     * @param metadataService
+     *            Metadata Service component
+     * @param fileManager
+     *            FileManager component
+     * @return
+     */
+    public static boolean isSpringMvcProject(MetadataService metadataService,
+            FileManager fileManager) {
+        PathResolver pathResolver = getPathResolver(metadataService);
+        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "WEB-INF/spring/webmvc-config.xml");
+
+        if (!fileManager.exists(webXmlPath)) {
+            return false;
+        }
+        return true;
+    }
+
 }

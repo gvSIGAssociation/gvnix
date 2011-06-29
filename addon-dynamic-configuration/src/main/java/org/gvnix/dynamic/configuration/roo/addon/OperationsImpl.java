@@ -27,7 +27,7 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
-import org.gvnix.osgi.support.OperationUtils;
+import org.gvnix.support.OperationUtils;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.ProjectOperations;
@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 
 /**
  * Dynamic configuration operations.
- * 
+ *
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i

@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.osgi.support.OperationUtils;
+import org.gvnix.support.OperationUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
