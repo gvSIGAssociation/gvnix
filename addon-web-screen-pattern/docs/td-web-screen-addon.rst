@@ -241,3 +241,4 @@ TODO
   Revisar lo que se comenta en http://anaturb.net/dojo/my/dojoTabContainer.htm por si puede
   servir como mejor solución.
 
+* Rename 'screen' with 'pattern'.
