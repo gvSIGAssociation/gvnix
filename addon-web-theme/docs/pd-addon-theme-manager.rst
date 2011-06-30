@@ -34,7 +34,7 @@ Manage application themes:
   * Manage active theme.
   * List installed, available and active themes.
 
-Future requirements:
+Future enhancements:
 
   * Save a new theme using the edited files of a project (css, images, jspx, tagx, xml).
 
@@ -110,6 +110,8 @@ TODO: If ``WEB-INF/views/views.xml`` file exists in the project the Add-on shoul
 Use Case
 =========
 
+TODO Validate this is valid already. 
+
 Set the environment variable ROO_THEMES = "gvNIX_HOME/themes" to retrieve the default theme location.
 Start Roo shell and create a web project.
 
@@ -142,6 +144,8 @@ Execute the activation command.
 
 Project Organization
 ======================
+
+TODO Validate this is valid already. 
 
 To assign more versatility to the Add-on there is not included any theme. The themes are stored in a different directory inside the gvNIX distribution: ``themes``. Each theme has a folder structure named itself.
 The directory must be defined to be packaged with the gvNIX distribution and controlled by the Add-on to get the sources of the themes to install.

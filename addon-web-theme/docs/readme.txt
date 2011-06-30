@@ -23,6 +23,8 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California,
 Requirements
 =============
 
+TODO Validate next subsections are valid already. 
+
 Development mode
 -----------------
 
@@ -43,49 +45,40 @@ Copy the folder ``gvNIX/themes`` to ``roo/trunk``.
 Installation Proof
 ===================
 
-Install the Add-on.
---------------------
+Installation
+------------
 
-Install the Add-on in gvNIX/Roo shell with the required commands for 1.1.0-M1 version.
+Install gvNIX or the Add-on in Roo shell.
 
 Create a web application
 -------------------------
 
 Create a web application with gvNix/Roo Shell script::
 
-    project --topLevelPackage org.gvnix.test.menu --java 5
+    project --topLevelPackage org.gvnix.test.menu
     persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
     entity --class ~.domain.Person --testAutomatically 
     field string --fieldName name --notNull 
-    dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1
-    dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3
     controller all --package ~.web
 
 Run the application and see the actual style::
 
   mvn tomcat:run
 
-Stop tomcat and apply gvNix theme (Install and set gvNix commands) to the project::
+Stop tomcat and apply gvNix theme (theme install and set commands) to the project::
 
-  theme install --name theme-gvNIX
-  theme set --name theme-gvNIX
+  theme install --id gvnix
+  theme set --id gvnix
 
 Restart the application and see the changes::
 
   mvn tomcat:run
 
-Stop the application and apply theme-cit using the gvNix commands::
+Stop the application and apply CIT theme using the addon commands::
 
-  theme install --name theme-gvNIX
-  theme set --name theme-gvNIX
+  theme install --id cit
+  theme set --id cit
 
-Create another entity and its controllers using Roo commands to see the menu update::
-
-  entity --class ~.domain.Car --testAutomatically 
-  field string --fieldName name --notNull 
-
-Run the appliation:
+Run the application and see the actual style::
 
   mvn tomcat:run
-  
-And the cit menu show the new entries. Roo updated menu.jspx.
