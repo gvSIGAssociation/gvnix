@@ -64,6 +64,15 @@ public class ModalDialog {
     this.description = description;
   }
 
+  public ModalDialog(DialogType dialogType, String page, String title, String description,
+      HashMap<String, Object> params) {
+    this.dialogType = dialogType;
+    this.page = page;
+    this.title = title;
+    this.description = description;
+    this.params = params;
+  }
+
   public DialogType getDialogType() {
     return dialogType;
   }

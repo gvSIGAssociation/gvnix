@@ -34,6 +34,7 @@ import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.itd.ItdSourceFileComposer;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
+import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
@@ -94,6 +95,15 @@ public class ModalDialogMetadata extends
                 new ArrayList<AnnotationMetadata>()));
         paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
                 new ArrayList<AnnotationMetadata>()));
+        paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
+                new ArrayList<AnnotationMetadata>()));
+        List<JavaType> typeParams = new ArrayList<JavaType>();
+        typeParams.add(JavaType.STRING_OBJECT);
+        typeParams.add(new JavaType("java.lang.Object"));
+        JavaType hashMap = new JavaType("java.util.HashMap", 0, DataType.TYPE,
+                null, typeParams);
+        paramTypes.add(new AnnotatedJavaType(hashMap,
+                new ArrayList<AnnotationMetadata>()));
         paramTypes.add(new AnnotatedJavaType(new JavaType(
                 "javax.servlet.http.HttpServletRequest"),
                 new ArrayList<AnnotationMetadata>()));
@@ -105,8 +115,10 @@ public class ModalDialogMetadata extends
 
         List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
         paramNames.add(new JavaSymbolName("dialogType"));
+        paramNames.add(new JavaSymbolName("page"));
         paramNames.add(new JavaSymbolName("title"));
         paramNames.add(new JavaSymbolName("description"));
+        paramNames.add(new JavaSymbolName("params"));
         paramNames.add(new JavaSymbolName("httpServletRequest"));
 
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -120,7 +132,7 @@ public class ModalDialogMetadata extends
                 .appendFormalLine(modalDialog
                         .getNameIncludingTypeParameters(false,
                                 builder.getImportRegistrationResolver())
-                        .concat(" modalDialog = new ModalDialog(dialogType, title, description);"));
+                        .concat(" modalDialog = new ModalDialog(dialogType, page, title, description, params);"));
         bodyBuilder
                 .appendFormalLine("session.setAttribute(\"dialogMessage\", modalDialog);");
 
