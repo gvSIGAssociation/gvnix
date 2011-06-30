@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.logging.Logger;
 
 import javax.xml.transform.Transformer;
 
@@ -84,27 +83,20 @@ import org.w3c.dom.Element;
 public class WebExceptionHandlerOperationsImpl implements
         WebExceptionHandlerOperations {
 
-    @Reference
-    TypeLocationService typeLocationService;
-
-    @Reference
-    ProjectOperations projectOperations;
-
-    @Reference
-    private TilesOperations tilesOperations;
-
-    @Reference
-    private I18nSupport i18nSupport;
-
-    private static Logger logger = Logger
-            .getLogger(WebExceptionHandlerOperationsImpl.class.getName());
-
     private static final String ITD_TEMPLATE = "exception.jspx";
 
     private static final String ENGLISH_LANGUAGE_FILENAME = "/WEB-INF/i18n/messages.properties";
 
     private static final String LANGUAGE_FILENAMES = "WEB-INF/i18n/messages**.properties";
 
+    @Reference
+    TypeLocationService typeLocationService;
+    @Reference
+    ProjectOperations projectOperations;
+    @Reference
+    private TilesOperations tilesOperations;
+    @Reference
+    private I18nSupport i18nSupport;
     @Reference
     private FileManager fileManager;
     @Reference
@@ -148,7 +140,6 @@ public class WebExceptionHandlerOperationsImpl implements
 
         List<Element> simpleMappingExceptionResolverProps = null;
         simpleMappingExceptionResolverProps = XmlUtils.findElements(
-                // "/beans/bean[@class='org.springframework.web.servlet.handler.SimpleMappingExceptionResolver']"
                 "/beans/bean[@id='messageMappingExceptionResolverBean']"
                         + "/property[@name='exceptionMappings']/props/prop",
                 root);
@@ -304,7 +295,6 @@ public class WebExceptionHandlerOperationsImpl implements
 
         Element simpleMappingExceptionResolverProp = XmlUtils
                 .findFirstElement(
-                // "/beans/bean[@class='org.springframework.web.servlet.handler.SimpleMappingExceptionResolver']"
                         "/beans/bean[@id='messageMappingExceptionResolverBean']"
                                 + "/property[@name='exceptionMappings']/props/prop[@key='"
                                 + exceptionName + "']", root);
@@ -342,14 +332,12 @@ public class WebExceptionHandlerOperationsImpl implements
 
         Element simpleMappingExceptionResolverProps = XmlUtils
                 .findFirstElement(
-                        // "/beans/bean[@class='org.springframework.web.servlet.handler.SimpleMappingExceptionResolver']"
                         "/beans/bean[@id='messageMappingExceptionResolverBean']"
                                 + "/property[@name='exceptionMappings']/props",
                         root);
 
         Element simpleMappingExceptionResolverProp = XmlUtils
                 .findFirstElement(
-                // "/beans/bean[@class='org.springframework.web.servlet.handler.SimpleMappingExceptionResolver']"
                         "/beans/bean[@id='messageMappingExceptionResolverBean']"
                                 + "/property[@name='exceptionMappings']/props/prop[@key='"
                                 + exceptionName + "']", root);
@@ -481,7 +469,6 @@ public class WebExceptionHandlerOperationsImpl implements
 
         Element simpleMappingExceptionResolverProp = XmlUtils
                 .findFirstElement(
-                // "/beans/bean[@class='org.springframework.web.servlet.handler.SimpleMappingExceptionResolver']"
                         "/beans/bean[@id='messageMappingExceptionResolverBean']"
                                 + "/property[@name='exceptionMappings']/props/prop[@key='"
                                 + exceptionName + "']", root);
@@ -931,6 +918,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Adds the element util:message-box in the right place in default.jspx
+     * layout
      */
     private void addMessageBoxInLayout() {
         PathResolver pathResolver = projectOperations.getPathResolver();
@@ -1038,8 +1026,7 @@ public class WebExceptionHandlerOperationsImpl implements
     private String installWebServletHandlerClass(String className) {
         String classFullName = getClassFullQualifiedName(className);
 
-        String classPath = projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_JAVA,
+        String classPath = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
                 classFullName.replace(".", File.separator).concat(".java"));
 
         String classPackage = classFullName.replace(".".concat(className), "");
@@ -1257,18 +1244,6 @@ public class WebExceptionHandlerOperationsImpl implements
      * #isProjectAvailable()
      */
     public boolean isProjectAvailable() {
-
-        // if (!OperationUtils.isProjectAvailable(metadataService)) {
-        // return false;
-        // }
-
-        // String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-        // "WEB-INF/spring/webmvc-config.xml");
-        //
-        // if (!fileManager.exists(webXmlPath)) {
-        // return false;
-        // }
-        // return true;
         return OperationUtils.isProjectAvailable(metadataService)
                 && OperationUtils.isSpringMvcProject(metadataService,
                         fileManager);
