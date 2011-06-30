@@ -546,9 +546,9 @@ Parameters:
   * ``--certificate`` (mandatory) pkcs12 to use for signing request. This file will be copied to project resources forlder.
   * ``--password`` (mandatory) password for certificate file.
   * ``--alias`` (mandatory) alias to use for signing.
-  
+
 Certificate file will be copied to ``src/main/resources/${path_of_class_package}/${certificate_file_name}. I file already exist, the file will be copied with another name (base on a counter).
- 
+
 
 
 Commands Availability
@@ -771,7 +771,7 @@ The command performs this actions:
 
 * Add dependecy to WSS4J in pom (if it's needed)::
 
- 	<dependency>
+   <dependency>
       <groupId>org.apache.ws.security</groupId>
       <artifactId>wss4j</artifactId>
       <version>1.5.11</version>
@@ -779,27 +779,27 @@ The command performs this actions:
 
 
 * Creates ``src/main/resources/client-config.wsdd`` with the basical content::
-	
-	<?xml version="1.0" encoding="UTF-8"?>
-	<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
-	 <transport name="http" pivot="java:org.apache.axis.transport.http.HTTPSender"/>
-	 <!-- Service signature template
-	  <service name="ServiciosMap" >
-	   <requestFlow >
-	    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-	     <parameter name="action" value="Signature"/>
-	     <parameter name="user" value="aplicacion_profile"/>
-	     <parameter name="passwordCallbackClass" value="es.gva.pki.sleipnir2.accvumapugateway.services.serviciosmap.PasswordHandler"/>
-	     <parameter name="signaturePropFile" value="ServiciosMap_outsecurity_sign.properties"/>
-	     <parameter name="signatureKeyIdentifier" value="DirectReference" />
-	    </handler>
-	   </requestFlow >
-	  </service >
-	   -->
-	</deployment>
+
+  <?xml version="1.0" encoding="UTF-8"?>
+  <deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+   <transport name="http" pivot="java:org.apache.axis.transport.http.HTTPSender"/>
+   <!-- Service signature template
+    <service name="ServiciosMap" >
+     <requestFlow >
+      <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+       <parameter name="action" value="Signature"/>
+       <parameter name="user" value="aplicacion_profile"/>
+       <parameter name="passwordCallbackClass" value="es.gva.pki.sleipnir2.accvumapugateway.services.serviciosmap.PasswordHandler"/>
+       <parameter name="signaturePropFile" value="ServiciosMap_outsecurity_sign.properties"/>
+       <parameter name="signatureKeyIdentifier" value="DirectReference" />
+      </handler>
+     </requestFlow >
+    </service >
+     -->
+  </deployment>
 
 * Copies the certificate file into the same package path into project resorces folder.
-	
+
 * Adds ``GvNIXWebServiceSecurity`` anntation to target class
 
 
@@ -807,39 +807,39 @@ The metadata provider performs this actions:
 
 * Generates ``.aj`` file that adds to class the ``javax.security.auth.callback.CallbackHandler`` implementation (like this code)::
 
-	public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-	    WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
-	    pc.setPassword(${Password});
-	}
-  
+  public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+      WSPasswordCallback pc = (WSPasswordCallback) callbacks[0];
+      pc.setPassword(${Password});
+  }
+
 * Generates ``${target_class_name}-security.properties`` in the same target class package inside project resources folder::
 
-	org.apache.ws.security.crypto.provider=org.apache.ws.security.components.crypto.Merlin
-	org.apache.ws.security.crypto.merlin.keystore.type=pkcs12
-	org.apache.ws.security.crypto.merlin.keystore.password=${Password}
-	org.apache.ws.security.crypto.merlin.alias.password=${Password}
-	org.apache.ws.security.crypto.merlin.keystore.alias=${Alias}
-	org.apache.ws.security.crypto.merlin.file=${Certificate}
+  org.apache.ws.security.crypto.provider=org.apache.ws.security.components.crypto.Merlin
+  org.apache.ws.security.crypto.merlin.keystore.type=pkcs12
+  org.apache.ws.security.crypto.merlin.keystore.password=${Password}
+  org.apache.ws.security.crypto.merlin.alias.password=${Password}
+  org.apache.ws.security.crypto.merlin.keystore.alias=${Alias}
+  org.apache.ws.security.crypto.merlin.file=${Certificate}
 
 * Adds an entry in ``src/main/resources/client-config.wsdd``::
 
-	<service name="${Servicio}">
-	   <requestFlow >
-	    <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
-	     <parameter name="action" value="Signature"/>
-	     <parameter name="user" value="${Alias}"/>
-	     <parameter name="passwordCallbackClass" value="${Proxy}"/>
-	     <parameter name="signaturePropFile" value="${Propiedades}"/>
-	     <parameter name="signatureKeyIdentifier" value="DirectReference" />
-	    </handler>
-	   </requestFlow >
-	</service >
-	
-	
+  <service name="${Servicio}">
+     <requestFlow >
+      <handler type="java:org.apache.ws.axis.security.WSDoAllSender" >
+       <parameter name="action" value="Signature"/>
+       <parameter name="user" value="${Alias}"/>
+       <parameter name="passwordCallbackClass" value="${Proxy}"/>
+       <parameter name="signaturePropFile" value="${Propiedades}"/>
+       <parameter name="signatureKeyIdentifier" value="DirectReference" />
+      </handler>
+     </requestFlow >
+  </service >
+
+
   * ``${Servicio}`` must be get from ``name`` atribute of wsdl ``port`` tag.
   * ``${Proxy}`` will be the same target class.
 
- 
+
 
 gvNIX
 -----
@@ -894,6 +894,16 @@ Execute next command on a empty folder to validate add-on:
 
 Check roo exited with code 0, else error.
 
+Proof of Concept
+================
+
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/ws-proxy-client-gefact
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/ws-secure-client-accv-identidad
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/ws-server-untrusted
+* https://svn.disid.com/svn/disid/proof/gvnix/bing-search-app
+* https://svn.disid.com/svn/disid/proof/gvnix/web-service-server-app
+* https://svn.disid.com/svn/disid/proof/gvnix/cxf-web-service
+
 Dynamic configuration
 =====================
 
@@ -921,7 +931,7 @@ TODO
 * Quizás sería interesante definir un nombre (o identificador o descripción) único para cada servicio, por lo menos para los importados. Esta información sería muy útil para conocer el servicio que tiene asociado dicha clase, ya que actualmente solo podemos conocer la URL del WSDL que a veces es muy poco representativa de lo que proporciona el servicio.
 
 * Service ws security:
-  
+
   * Add support to CXF services
   * Add support for others actions
   * Use converters for service class to allow autocomplete

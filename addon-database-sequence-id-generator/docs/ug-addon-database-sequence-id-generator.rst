@@ -25,14 +25,14 @@ Requirements
 
 Have a project with database connection.
 
-Installation Proof
-===================
+Installation
+============
 
 
 Install the Add-on.
 --------------------
 
-Install the Add-on in gvNIX/Roo shell with the required commands for 1.1.0-M1 version.
+Install gvNIX or the Add-on in Roo shell.
 
 Create web application
 -----------------------
@@ -40,11 +40,9 @@ Create web application
 Create a web application with database connection (previous existing database) using gvNix/Roo Shell script::
 
   // Spring Roo 1.1.0.M1 log opened at 2010-05-10 11:08:03
-  project --topLevelPackage org.gvnix.test.generated.id.sequence --java 5 --projectName generatedIdSequence
+  project --topLevelPackage org.gvnix.test.generated.id.sequence--projectName generatedIdSequence
   persistence setup --provider HIBERNATE --database POSTGRES --databaseName generated-id-test
   persistence setup --provider HIBERNATE --database POSTGRES --databaseName generated-id-test --userName user --password user
-  dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1
-  dependency add --groupId com.sun.xml.bind --artifactId jaxb-impl --version 2.1.3
   entity --class ~.domain.Person --testAutomatically 
   field string --fieldName name --class org.gvnix.test.generated.id.sequence.domain.Person
   entity --class ~.domain.RoundTable
@@ -54,4 +52,3 @@ Create a web application with database connection (previous existing database) u
 Use the command to add a sequence id to Person Entity::
 
   sequence generation add --entity org.gvnix.test.generated.id.sequence.domain.Person
-

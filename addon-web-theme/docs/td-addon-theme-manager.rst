@@ -230,6 +230,13 @@ Application versions
 * gvNIX-0.3 version: The Add-on install the theme defined in the gvNIX repository folder.
 * Future versions: The command to create a theme with edited files from a project to export in other Roo projects.
 
+Proof of Concept
+================
+
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-theme-cit
+* https://svn.disid.com/svn/disid/proof/gvnix/theme-cit-app
+* https://svn.disid.com/svn/disid/proof/gvnix/theme-gvnix-app
+* https://svn.disid.com/svn/disid/proof/spring_roo/cit_style
 
 TODO
 =====

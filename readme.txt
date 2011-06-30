@@ -233,6 +233,49 @@ Write doc
 * Download and install XMLmind XML Editor Personal Edition ( http://www.xmlmind.com/xmleditor/download.shtml )
 * Use the previous editor to open ``src/site/docbook/developer/index.xml`` and contribute with your knowledge.
 
+Proof of concept
+================
+
+Roo example projects:
+
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic
+
+ESB:
+
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/servicemix-service
+
+GWT:
+
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/vaadin
+* https://svn.disid.com/svn/disid/proof/gvnix/vaadin-test-project
+
+Real world projects:
+
+* http://scmcit.gva.es/svn/acuses
+* http://scmcit.gva.es/svn/sentencias
+* http://scmcit.gva.es/svn/regproy
+
+Tests:
+
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/sentencias-upgrade-roo-1.1.2
+* https://svn.disid.com/svn/disid/proof/gvnix/gvnix-demo
+* https://svn.disid.com/svn/disid/proof/spring_roo/pizza-shop
+* https://svn.disid.com/svn/disid/proof/spring_roo/terceros-test
+
+Composite identifiers:
+
+* https://svn.disid.com/svn/disid/proof/spring_roo/reveng_and_compound_id
+* https://svn.disid.com/svn/disid/proof/spring_roo/compositeId
+
+TCON:
+
+* https://svn.disid.com/svn/disid/proof/spring_roo/springmvc-tcon
+
+Tomcat5:
+
+* https://svn.disid.com/svn/disid/proof/gvnix/tomcat5
+* https://svn.disid.com/svn/disid/proof/spring_roo/gvnix_tomcat5_test
+
 TODO
 ====
 

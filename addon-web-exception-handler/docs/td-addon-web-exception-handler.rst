@@ -78,13 +78,13 @@ exception handler set language - Updates the messages of the Exception in the se
 exception handler setup gvnix - Creates a Set of defined exceptions for gvNix
 
 Proof of Concept
-=================
+================
 
-TODO: The location of the project will be updated when the shell is built
-
-Project that contains the proof: 
-http://scmcit.gva.es/svn/gvnix-proof/trunk/exception-error-handler
-
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/exception-error-handler
+* https://svn.disid.com/svn/disid/proof/gvnix/exception-handler-app
+* https://svn.disid.com/svn/disid/proof/spring_roo/exceptions-FASE2
+* https://svn.disid.com/svn/disid/proof/spring_roo/exceptions-FASE1
+* https://svn.disid.com/svn/disid/proof/spring_roo/exceptions
 
 Notes
 =======
@@ -104,7 +104,16 @@ Instead of using the Transformer provided by XmlUtils.
 TODO
 =====
 
-Since gvNIX must support Spanish, Valencian_Catalan languages in WebExceptionHandlerOperationsImpl.installMvcArtifacts()
-we are creating the message bundle files for these languages (messages_es.properties and messages_ca.properties). We've
-created two method that should be outsorced to a shared component so, other gvNIX add-ons creating its own i18n properties
-could use these methods.
+* Since gvNIX must support Spanish, Valencian_Catalan languages in WebExceptionHandlerOperationsImpl.installMvcArtifacts()
+  we are creating the message bundle files for these languages (messages_es.properties and messages_ca.properties). We've
+  created two method that should be outsorced to a shared component so, other gvNIX add-ons creating its own i18n properties
+  could use these methods.
+
+* Adjust command names to new Roo layout:
+
+  - exception handler add --> web mvc exception handler add
+  - exception handler list --> web mvc exception handler list
+  - exception handler remove --> web mvc exception handler remove
+  - exception handler set --> web mvc exception handler set
+  - exception handler setup gvnix --> web mvc exception handler setup gvnix
+ 

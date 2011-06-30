@@ -88,9 +88,14 @@ Parameters:
 
   * ``--increment`` (optional): Increment between ids.
 
+Proof of Concept
+================
+
+* https://svn.disid.com/svn/disid/proof/gvnix/generated-id-seq
+* https://svn.disid.com/svn/disid/proof/spring_roo/gvnix-generated-id-sequence
+
 Application versions
 =====================
 
 * gvNIX-0.3 version: The Add-on creates a sequence id associated to Entity and for all Entities.
 * future versions: Add incremente and allocatedSize functionality to the Add-on, it doesn't work with the annotations.
-

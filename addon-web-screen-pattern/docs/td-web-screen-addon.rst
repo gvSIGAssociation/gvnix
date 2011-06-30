@@ -229,6 +229,12 @@ Proof of concept
 
  http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-screen-pattern-register
 
+* https://svn.disid.com/svn/disid/proof/gvnix/display-relation-table
+* https://svn.disid.com/svn/disid/proof/gvnix/relationship-table-app
+* https://svn.disid.com/svn/disid/proof/gvnix/display-tag
+* https://svn.disid.com/svn/disid/proof/spring_roo/gvnix-display-relation-table
+* https://svn.disid.com/svn/disid/proof/spring_roo/gvnix-display-tag
+
 TODO
 ====
 

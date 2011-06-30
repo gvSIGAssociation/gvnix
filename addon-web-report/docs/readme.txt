@@ -35,13 +35,13 @@ Project contents
 This folder contains add-on sources and documents folder ``docs`` with documentation of this project.
 
 
-Installation Proof
-===================
+Installation
+============
 
 Install the Add-on.
 --------------------
 
-Install the Add-on in gvNIX/Roo shell with the required commands for 1.1.2-RELEASE version.
+Install gvNIX or the Add-on in Roo shell.
 
 Create a web application
 -------------------------

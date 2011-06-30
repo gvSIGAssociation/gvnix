@@ -35,10 +35,6 @@ This are features contained:
   - Lists all the handled Exception of the application.
   - Adds a new translation in a determinate language for an Exception.
 
-Proof of Concept
-=================
-
-
 How to install
 ===============
 
@@ -55,18 +51,3 @@ How to install
 That's all.
 
 To remove the addon execute ``addon uninstall --pattern {name_of_addon_zip_file_without_path}`` in any Roo console
-
-
-TODO
-=====
-
-* Adjust command names to new Roo layout:
-
-  - exception handler add --> web mvc exception handler add
-  - exception handler list --> web mvc exception handler list
-  - exception handler remove --> web mvc exception handler remove
-  - exception handler set --> web mvc exception handler set
-  - exception handler setup gvnix --> web mvc exception handler setup gvnix
-   
-   
-   

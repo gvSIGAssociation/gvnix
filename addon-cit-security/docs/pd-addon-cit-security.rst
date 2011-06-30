@@ -113,6 +113,11 @@ Dynamic configuration
 
 See technical design documentation at addon-dynamic-configuration.
 
+Proof of Concept
+================
+
+* https://svn.disid.com/svn/disid/proof/spring_roo/cit_security_test
+
 TODO
 ====
 

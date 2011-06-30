@@ -46,6 +46,14 @@ This annotations modify the entity in two ways:
 #. Generates a AspetcJ file that contains this solution logical implementation.
    This file uses the name ``*_Roo_gvNIX_occChecksum.aj``
 
+Proof of Concept
+================
+
+* https://svn.disid.com/svn/disid/proof/gvnix/concurrency
+* https://svn.disid.com/svn/disid/proof/gvnix/occ-checksum-app
+* https://svn.disid.com/svn/disid/proof/spring_roo/gvnix_concurrency_test
+* 
+
 TODO List
 =========
 

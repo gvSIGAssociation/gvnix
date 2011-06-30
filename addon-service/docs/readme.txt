@@ -58,11 +58,6 @@ Commands
 
   Adds message signature to a imported Axis web service. Certificate file will be copy into project resource. 
 
-Proof of Concept
-=================
-
-TBC
-
 How to install
 ===============
 

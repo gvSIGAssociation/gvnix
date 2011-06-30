@@ -44,8 +44,8 @@ This add-ons have this features:
 #. Create jspx views using featured tagx from the Add-on.
 #. Create AspectJ files related to entities new applied patterns.
 
-Installation Proof
-===================
+Installation
+============
 
 Create a web application
 -------------------------

@@ -42,8 +42,8 @@ Make gvNIX installation
 
 Copy the folder ``gvNIX/themes`` to ``roo/trunk``.
 
-Installation Proof
-===================
+Installation
+============
 
 Installation
 ------------

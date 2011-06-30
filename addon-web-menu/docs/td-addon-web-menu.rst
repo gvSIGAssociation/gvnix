@@ -111,6 +111,14 @@ Visibility check based on Spring EL (expressions)
 
 Another interesting feature could be add support to use Spring Expression Language for items visibility.
 
+Proof of Concept
+================
+
+* https://svn.disid.com/svn/disid/proof/gvnix/page-menu-app
+* https://svn.disid.com/svn/disid/proof/gvnix/web-menu
+* https://svn.disid.com/svn/disid/proof/spring_roo/struts-menu-integration
+* https://svn.disid.com/svn/disid/proof/spring_roo/gvnix_web_menu
+
 TODO
 ====
 
