@@ -897,6 +897,7 @@ Check roo exited with code 0, else error.
 Proof of Concept
 ================
 
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-service
 * http://scmcit.gva.es/svn/gvnix-proof/trunk/ws-proxy-client-gefact
 * http://scmcit.gva.es/svn/gvnix-proof/trunk/ws-secure-client-accv-identidad
 * http://scmcit.gva.es/svn/gvnix-proof/trunk/ws-server-untrusted

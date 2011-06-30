@@ -49,10 +49,10 @@ This annotations modify the entity in two ways:
 Proof of Concept
 ================
 
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-occ
 * https://svn.disid.com/svn/disid/proof/gvnix/concurrency
 * https://svn.disid.com/svn/disid/proof/gvnix/occ-checksum-app
 * https://svn.disid.com/svn/disid/proof/spring_roo/gvnix_concurrency_test
-* 
 
 TODO List
 =========

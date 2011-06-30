@@ -80,6 +80,7 @@ exception handler setup gvnix - Creates a Set of defined exceptions for gvNix
 Proof of Concept
 ================
 
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-modal-dialogs
 * http://scmcit.gva.es/svn/gvnix-proof/trunk/exception-error-handler
 * https://svn.disid.com/svn/disid/proof/gvnix/exception-handler-app
 * https://svn.disid.com/svn/disid/proof/spring_roo/exceptions-FASE2

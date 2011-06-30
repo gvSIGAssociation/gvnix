@@ -223,10 +223,12 @@ Proof of concept
 
 * Tabular pattern:
 
+ http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-table
  http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-screen-pattern-table
  
 * Register pattern:
 
+ http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-register
  http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-screen-pattern-register
 
 * https://svn.disid.com/svn/disid/proof/gvnix/display-relation-table

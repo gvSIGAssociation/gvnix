@@ -116,6 +116,7 @@ See technical design documentation at addon-dynamic-configuration.
 Proof of Concept
 ================
 
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-cit-security
 * https://svn.disid.com/svn/disid/proof/spring_roo/cit_security_test
 
 TODO

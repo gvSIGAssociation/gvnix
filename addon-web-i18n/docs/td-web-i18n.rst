@@ -1,4 +1,9 @@
 
+Proof of Concept
+================
+
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-i18n
+
 TODO
 ====
 

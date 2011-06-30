@@ -51,6 +51,11 @@ drop
 
 Remove the bean registration from ``webmvc-config.xml``.
 
+Proof of concept
+================
+
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-binding
+
 TODO
 ====
 

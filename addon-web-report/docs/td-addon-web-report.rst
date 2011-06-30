@@ -157,6 +157,7 @@ So, its main purpose is to create the JSP with the form requesting the report.
 Proof of Concept
 ================
 
+* http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-report
 * http://scmcit.gva.es/svn/gvnix-proof/trunk/jasperreports-app
 * https://svn.disid.com/svn/disid/proof/gvnix/jasperreports-app
 
