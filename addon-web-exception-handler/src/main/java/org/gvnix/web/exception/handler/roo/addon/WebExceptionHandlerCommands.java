@@ -18,11 +18,11 @@
  */
 package org.gvnix.web.exception.handler.roo.addon;
 
-import java.util.logging.Logger;
-
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
@@ -39,9 +39,6 @@ import org.springframework.roo.shell.CommandMarker;
 @Component
 @Service
 public class WebExceptionHandlerCommands implements CommandMarker {
-
-    private static Logger logger = Logger
-            .getLogger(WebExceptionHandlerCommands.class.getName());
 
     @Reference
     private WebExceptionHandlerOperations exceptionOperations;
@@ -114,6 +111,18 @@ public class WebExceptionHandlerCommands implements CommandMarker {
     @CliCommand(value = "exception handler setup gvnix", help = "Defines gvNIX predefined Exceptions.")
     public void setUpGvNIXExceptions() {
         exceptionOperations.setUpGvNIXExceptions();
+    }
+
+    @CliAvailabilityIndicator("web mvc add modalDialog")
+    public boolean isAddGvNIXModalDialogAvailable() {
+        return exceptionOperations.isProjectAvailable();
+    }
+
+    @CliCommand(value = "web mvc add modalDialog", help = "Defines gvNIX customizable ModalDialog.")
+    public void aGvNIXModalDialogAvailable(
+            @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
+            @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name) {
+        exceptionOperations.addModalDialogAnnotation(controllerClass, name);
     }
 
 }

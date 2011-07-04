@@ -18,6 +18,9 @@
  */
 package org.gvnix.web.exception.handler.roo.addon;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +40,14 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.FileCopyUtils;
+import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.support.util.TemplateUtils;
 
 /**
  * This type produces metadata for a new ITD. It uses an
@@ -55,21 +64,36 @@ import org.springframework.roo.support.util.Assert;
 public class ModalDialogMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
-    private final MemberDetails memberDetails;
-
     private static final String PROVIDES_TYPE_STRING = ModalDialogMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
+    private final MemberDetails memberDetails;
+
+    private final FileManager fileManager;
+    private final PathResolver pathResolver;
+
     public ModalDialogMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            MemberDetails memberDetails) {
+            MemberDetails memberDetails, List<String> definedModalDialogs,
+            FileManager fileManager, PathResolver pathResolver) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
+        Assert.notNull(memberDetails, "MemberDetails must be not null");
 
         this.memberDetails = memberDetails;
+
+        this.fileManager = fileManager;
+        this.pathResolver = pathResolver;
+
+        for (String modalDialog : definedModalDialogs) {
+            // Instalar JSPx basado en modaldialog-template.jspx y crear
+            // método
+            installModalDialogSample(modalDialog);
+            builder.addMethod(getCustomModalDialogMethod(modalDialog));
+        }
 
         builder.addMethod(getModalDialogMethod());
 
@@ -79,6 +103,9 @@ public class ModalDialogMetadata extends
     }
 
     /**
+     * Returns MethodMetadata for:
+     * <p>
+     * <code>modalDialog(DialogType dialogType, String title, String description, HttpServletRequest httpServletRequest)</code>
      * 
      * @param aspectName
      * @return
@@ -87,58 +114,218 @@ public class ModalDialogMetadata extends
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("modalDialog");
 
-        JavaType dialogType = getJavaTypeForClassName("DialogType");
-        List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>();
-        paramTypes.add(new AnnotatedJavaType(dialogType,
-                new ArrayList<AnnotationMetadata>()));
-        paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
-                new ArrayList<AnnotationMetadata>()));
-        paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
-                new ArrayList<AnnotationMetadata>()));
-        paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
-                new ArrayList<AnnotationMetadata>()));
-        List<JavaType> typeParams = new ArrayList<JavaType>();
-        typeParams.add(JavaType.STRING_OBJECT);
-        typeParams.add(new JavaType("java.lang.Object"));
-        JavaType hashMap = new JavaType("java.util.HashMap", 0, DataType.TYPE,
-                null, typeParams);
-        paramTypes.add(new AnnotatedJavaType(hashMap,
-                new ArrayList<AnnotationMetadata>()));
-        paramTypes.add(new AnnotatedJavaType(new JavaType(
-                "javax.servlet.http.HttpServletRequest"),
-                new ArrayList<AnnotationMetadata>()));
+        // JavaType dialogType = getJavaTypeForClassName("DialogType");
+        // List<AnnotatedJavaType> paramTypes = new
+        // ArrayList<AnnotatedJavaType>();
+        // paramTypes.add(new AnnotatedJavaType(dialogType,
+        // new ArrayList<AnnotationMetadata>()));
+        // paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
+        // new ArrayList<AnnotationMetadata>()));
+        // paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
+        // new ArrayList<AnnotationMetadata>()));
+        // paramTypes.add(new AnnotatedJavaType(new JavaType(
+        // "javax.servlet.http.HttpServletRequest"),
+        // new ArrayList<AnnotationMetadata>()));
+
+        List<AnnotatedJavaType> paramTypes = getMethodParamTypes(false);
 
         MethodMetadata modalDialogMethod = methodExists(methodName, paramTypes);
         if (modalDialogMethod != null) {
             return modalDialogMethod;
         }
 
+        List<JavaSymbolName> paramNames = getMethodParamNames(false);
+        // List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
+        // paramNames.add(new JavaSymbolName("dialogType"));
+        // paramNames.add(new JavaSymbolName("title"));
+        // paramNames.add(new JavaSymbolName("description"));
+        // paramNames.add(new JavaSymbolName("httpServletRequest"));
+
+        InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(null);
+        // new InvocableMemberBodyBuilder();
+        // JavaType httpSession = new
+        // JavaType("javax.servlet.http.HttpSession");
+        // bodyBuilder.appendFormalLine(httpSession
+        // .getNameIncludingTypeParameters(false,
+        // builder.getImportRegistrationResolver()).concat(
+        // " session = httpServletRequest.getSession();"));
+        // JavaType modalDialog = getJavaTypeForClassName("ModalDialog");
+        // bodyBuilder
+        // .appendFormalLine(modalDialog
+        // .getNameIncludingTypeParameters(false,
+        // builder.getImportRegistrationResolver())
+        // .concat(" modalDialog = new ModalDialog(dialogType, title, description);"));
+        // bodyBuilder
+        // .appendFormalLine("session.setAttribute(\"dialogMessage\", modalDialog);");
+
+        return new MethodMetadataBuilder(getId(), 0, methodName,
+                JavaType.VOID_PRIMITIVE, paramTypes, paramNames, bodyBuilder)
+                .build();
+    }
+
+    /**
+     * Returns MethodMetadata for:
+     * <p>
+     * <code>nameOfModalDialog(DialogType dialogType, String title, String description, HashMap<String, Object> params, HttpServletRequest httpServletRequest)</code>
+     * 
+     * @param aspectName
+     * @return
+     */
+    private MethodMetadata getCustomModalDialogMethod(String modalDialog) {
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName(modalDialog);
+
+        // JavaType dialogType = getJavaTypeForClassName("DialogType");
+        // List<AnnotatedJavaType> paramTypes = new
+        // ArrayList<AnnotatedJavaType>();
+        // paramTypes.add(new AnnotatedJavaType(dialogType,
+        // new ArrayList<AnnotationMetadata>()));
+        // paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
+        // new ArrayList<AnnotationMetadata>()));
+        // paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
+        // new ArrayList<AnnotationMetadata>()));
+        // List<JavaType> typeParams = new ArrayList<JavaType>();
+        // typeParams.add(JavaType.STRING_OBJECT);
+        // typeParams.add(new JavaType("java.lang.Object"));
+        // JavaType hashMap = new JavaType("java.util.HashMap", 0,
+        // DataType.TYPE,
+        // null, typeParams);
+        // paramTypes.add(new AnnotatedJavaType(hashMap,
+        // new ArrayList<AnnotationMetadata>()));
+        // paramTypes.add(new AnnotatedJavaType(new JavaType(
+        // "javax.servlet.http.HttpServletRequest"),
+        // new ArrayList<AnnotationMetadata>()));
+
+        List<AnnotatedJavaType> paramTypes = getMethodParamTypes(true);
+
+        MethodMetadata modalDialogMethod = methodExists(methodName, paramTypes);
+        if (modalDialogMethod != null) {
+            return modalDialogMethod;
+        }
+
+        List<JavaSymbolName> paramNames = getMethodParamNames(true);
+        // new ArrayList<JavaSymbolName>();
+        // paramNames.add(new JavaSymbolName("dialogType"));
+        // paramNames.add(new JavaSymbolName("title"));
+        // paramNames.add(new JavaSymbolName("description"));
+        // paramNames.add(new JavaSymbolName("params"));
+        // paramNames.add(new JavaSymbolName("httpServletRequest"));
+
+        InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(modalDialog);
+        // new InvocableMemberBodyBuilder();
+        // JavaType httpSession = new
+        // JavaType("javax.servlet.http.HttpSession");
+        // bodyBuilder.appendFormalLine(httpSession
+        // .getNameIncludingTypeParameters(false,
+        // builder.getImportRegistrationResolver()).concat(
+        // " session = httpServletRequest.getSession();"));
+        // JavaType modalDialogJavaType =
+        // getJavaTypeForClassName("ModalDialog");
+        // bodyBuilder
+        // .appendFormalLine(modalDialogJavaType
+        // .getNameIncludingTypeParameters(false,
+        // builder.getImportRegistrationResolver())
+        // .concat(" modalDialog = new ModalDialog(dialogType, \"/WEB-INF/dialogs/"
+        // .concat(modalDialog)
+        // .concat(".jspx\", title, description, params);")));
+        // bodyBuilder
+        // .appendFormalLine("session.setAttribute(\"dialogMessage\", modalDialog);");
+
+        return new MethodMetadataBuilder(getId(), 0, methodName,
+                JavaType.VOID_PRIMITIVE, paramTypes, paramNames, bodyBuilder)
+                .build();
+    }
+
+    /**
+     * Returns the list of method parameter types.
+     * 
+     * @param addParamsParameter
+     *            if true will define
+     *            <code>HashMap&lt;String, Object&gt; params</code> parameter
+     * @return
+     */
+    private List<AnnotatedJavaType> getMethodParamTypes(
+            boolean addParamsParameter) {
+        List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>();
+
+        JavaType dialogType = getJavaTypeForClassName("DialogType");
+        paramTypes.add(new AnnotatedJavaType(dialogType,
+                new ArrayList<AnnotationMetadata>()));
+        paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
+                new ArrayList<AnnotationMetadata>()));
+        paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
+                new ArrayList<AnnotationMetadata>()));
+        if (addParamsParameter) {
+            List<JavaType> typeParams = new ArrayList<JavaType>();
+            typeParams.add(JavaType.STRING_OBJECT);
+            typeParams.add(new JavaType("java.lang.Object"));
+            JavaType hashMap = new JavaType("java.util.HashMap", 0,
+                    DataType.TYPE, null, typeParams);
+            paramTypes.add(new AnnotatedJavaType(hashMap,
+                    new ArrayList<AnnotationMetadata>()));
+        }
+        paramTypes.add(new AnnotatedJavaType(new JavaType(
+                "javax.servlet.http.HttpServletRequest"),
+                new ArrayList<AnnotationMetadata>()));
+        return paramTypes;
+    }
+
+    /**
+     * Returns the list of method parameter names.
+     * 
+     * @param addParamsParameter
+     *            if true will define <code>params</code> parameter
+     * @return
+     */
+    private List<JavaSymbolName> getMethodParamNames(boolean addParamsParameter) {
         List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
         paramNames.add(new JavaSymbolName("dialogType"));
-        paramNames.add(new JavaSymbolName("page"));
         paramNames.add(new JavaSymbolName("title"));
         paramNames.add(new JavaSymbolName("description"));
-        paramNames.add(new JavaSymbolName("params"));
+        if (addParamsParameter) {
+            paramNames.add(new JavaSymbolName("params"));
+        }
         paramNames.add(new JavaSymbolName("httpServletRequest"));
+        return paramNames;
+    }
 
+    /**
+     * Returns the InvocableMemeberBodyBuilder for ModalDialog create and set in
+     * Session methods
+     * 
+     * @param customModalDialogJspxName
+     *            if informed will use
+     *            <code>ModalDialog(DialogType dialogType, String page, String title, String description, HashMap&lt;String, Object&gt; params)</code>
+     *            constructor
+     * @return
+     */
+    private InvocableMemberBodyBuilder getMethodBodyBuilder(
+            String customModalDialogJspxName) {
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         JavaType httpSession = new JavaType("javax.servlet.http.HttpSession");
         bodyBuilder.appendFormalLine(httpSession
                 .getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver()).concat(
                         " session = httpServletRequest.getSession();"));
-        JavaType modalDialog = getJavaTypeForClassName("ModalDialog");
-        bodyBuilder
-                .appendFormalLine(modalDialog
-                        .getNameIncludingTypeParameters(false,
-                                builder.getImportRegistrationResolver())
-                        .concat(" modalDialog = new ModalDialog(dialogType, page, title, description, params);"));
+        JavaType modalDialogJavaType = getJavaTypeForClassName("ModalDialog");
+        if (StringUtils.hasText(customModalDialogJspxName)) {
+            bodyBuilder
+                    .appendFormalLine(modalDialogJavaType
+                            .getNameIncludingTypeParameters(false,
+                                    builder.getImportRegistrationResolver())
+                            .concat(" modalDialog = new ModalDialog(dialogType, \"/WEB-INF/dialogs/"
+                                    .concat(customModalDialogJspxName)
+                                    .concat(".jspx\", title, description, params);")));
+        } else {
+            bodyBuilder
+                    .appendFormalLine(modalDialogJavaType
+                            .getNameIncludingTypeParameters(false,
+                                    builder.getImportRegistrationResolver())
+                            .concat(" modalDialog = new ModalDialog(dialogType, title, description);"));
+        }
         bodyBuilder
                 .appendFormalLine("session.setAttribute(\"dialogMessage\", modalDialog);");
-
-        return new MethodMetadataBuilder(getId(), 0, methodName,
-                JavaType.VOID_PRIMITIVE, paramTypes, paramNames, bodyBuilder)
-                .build();
+        return bodyBuilder;
     }
 
     private MethodMetadata methodExists(JavaSymbolName methodName,
@@ -172,6 +359,47 @@ public class ModalDialogMetadata extends
                     className));
         }
         return new JavaType(typePackage.concat(className));
+    }
+
+    private void installModalDialogSample(String modalDialog) {
+        String destinationPath = pathResolver.getIdentifier(
+                Path.SRC_MAIN_WEBAPP, "WEB-INF/dialogs/".concat(modalDialog)
+                        .concat(".jspx"));
+        if (!fileManager.exists(destinationPath)) {
+            String template;
+            try {
+
+                InputStream templateInputStream = TemplateUtils.getTemplate(
+                        getClass(), "modaldialog-template.jspx");
+
+                InputStreamReader readerFile = new InputStreamReader(
+                        templateInputStream);
+
+                template = FileCopyUtils.copyToString(readerFile);
+            } catch (IOException ioe) {
+                throw new IllegalStateException(
+                        "Unable load ITD jspx template", ioe);
+            }
+            try {
+                if (template.length() > 0) {
+                    MutableFile mutableJspx = fileManager
+                            .createFile(destinationPath);
+                    if (mutableJspx != null) {
+                        FileCopyUtils.copy(template.getBytes(),
+                                mutableJspx.getOutputStream());
+                    }
+                }
+            } catch (IOException ioe) {
+                throw new IllegalStateException("Could not create ".concat(
+                        modalDialog).concat(".jspx file"), ioe);
+            }
+
+        }
+        // else {
+        // logger.warning(modalDialog
+        // .concat(".jspx already exists. We keep previous file"));
+        // }
+
     }
 
     public static final String getMetadataIdentiferType() {

@@ -40,9 +40,7 @@ public class ModalDialog {
 
   private HashMap<String, Object> params;
 
-  public ModalDialog(DialogType dialogType, String page,
-      Exception exception, String title, String description,
-      HashMap<String, Object> params) {
+  public ModalDialog(DialogType dialogType, String page, Exception exception, String title, String description, HashMap<String, Object> params) {
     this.dialogType = dialogType;
     this.page = page;
     this.exception = exception;
@@ -51,11 +49,19 @@ public class ModalDialog {
     this.params = params;
   }
 
-  public ModalDialog(String page, Exception exception) {
-    this.dialogType = DialogType.Error;
+  public ModalDialog(DialogType dialogType, String page, String title, String description, HashMap<String, Object> params) {
+    this.dialogType = dialogType;
     this.page = page;
-    this.exception = exception;
-    this.title = "message_error_title";
+    this.title = title;
+    this.description = description;
+    this.params = params;
+  }
+
+  public ModalDialog(DialogType dialogType, String title, String description, HashMap<String, Object> params) {
+    this.dialogType = dialogType;
+    this.title = title;
+    this.description = description;
+    this.params = params;
   }
 
   public ModalDialog(DialogType dialogType, String title, String description) {
@@ -64,13 +70,11 @@ public class ModalDialog {
     this.description = description;
   }
 
-  public ModalDialog(DialogType dialogType, String page, String title, String description,
-      HashMap<String, Object> params) {
-    this.dialogType = dialogType;
+  public ModalDialog(String page, Exception exception) {
+    this.dialogType = DialogType.Error;
     this.page = page;
-    this.title = title;
-    this.description = description;
-    this.params = params;
+    this.exception = exception;
+    this.title = "message_error_title";
   }
 
   public DialogType getDialogType() {

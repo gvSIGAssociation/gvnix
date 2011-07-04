@@ -1,0 +1,25 @@
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+  <jsp:directive.page contentType="text/html;charset=UTF-8" />
+  <jsp:output omit-xml-declaration="yes"/>
+  <!--
+      This is a sample JSPx of a possible modal dialog.
+
+      The tag <util:message-box/> sets in scope 'request' these attributes:
+        - titleCode: i18n key in messages bundles
+        - descriptionCode: i18n key in messages bundles
+        - dialogParams: HashMap<String, Object> so you have available all those attributes
+                        you could need to render your modal dialog. Access to them with ${dialogParams['foo']}
+        - dialogId: HTML id of the modal dialog
+   -->
+  <spring:message var="title" code="${titleCode}" htmlEscape="false"/>
+  <util:panel id="title" title="${title}">
+    <h2>${fn:escapeXml(title)}</h2>
+    <p>
+      <spring:message code="${descriptionCode}" />
+    </p>
+    <div class="closeMessage">
+      <button class="boton" dojoType="dijit.form.Button" type="button"
+        onClick="dijit.byId('${dialogId}').hide();">Close</button>
+    </div>
+  </util:panel>
+</div>

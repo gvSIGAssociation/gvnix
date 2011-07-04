@@ -111,7 +111,7 @@
     <spring:message code="${titleCode}" text="" var="title" htmlEscape="false" />
     <c:set scope="request" var="descriptionCode" value="${dialogMessage.description}" />
     <c:if test="${!empty descriptionCode}">
-      <spring:message code="${descriptionCode}" var="description" htmlEscape="false" />
+      <spring:message code="${descriptionCode}" text="" var="description" htmlEscape="false" />
     </c:if>
     <!-- Use dialogParams as extra data container to use in the included JSPx -->
     <c:set scope="request" var="dialogParams" value="${dialogMessage.params}" />

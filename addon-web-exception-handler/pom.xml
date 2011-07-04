@@ -23,12 +23,11 @@
       GNU General Public License for more details.
 
       You should have received a copy of the GNU General Public License
-      along with this program.  If not, see <http://www.gnu.org/licenses />.
+      along with this program. If not, see <http://www.gnu.org/licenses />.
       ]]>
       </comments>
     </license>
   </licenses>
-
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
@@ -38,9 +37,7 @@
 
   <artifactId>org.gvnix.web.exception.handler.roo.addon</artifactId>
   <packaging>bundle</packaging>
-
   <name>gvNIX - Spring Roo - Addon - Web MVC Uncaught Exception Handler</name>
-
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
@@ -54,7 +51,6 @@
   </properties>
 
   <dependencies>
-
     <!-- Spring Roo modules -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
@@ -88,7 +84,6 @@
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.classpath</artifactId>
     </dependency>
-
     <!-- Spring Roo add-ons -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
@@ -104,7 +99,7 @@
       <groupId>org.gvnix</groupId>
       <artifactId>org.gvnix.web.i18n.roo.addon</artifactId>
       <version>${gvnix.version}</version>
-      <scope>compile</scope>
+      <scope>provided</scope>
     </dependency>
 
     <!-- DiSiD: gvNIX modules required by this addon -->
@@ -143,13 +138,18 @@
     </dependency>
   </dependencies>
 
+  <!-- DiSiD: Add google code distribution management -->
   <distributionManagement>
     <repository>
       <id>Google Code</id>
       <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
     </repository>
   </distributionManagement>
+
+  <!-- DiSiD: Add build resources filtering -->
   <build>
+
+    <!-- DiSiD: Add webdav extension to google code  -->
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
@@ -190,5 +190,21 @@
       </plugin>
     </plugins>
 
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/roo/addon/configuration.xml</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/roo/addon/configuration.xml</include>
+        </includes>
+      </resource>
+    </resources>
   </build>
 </project>

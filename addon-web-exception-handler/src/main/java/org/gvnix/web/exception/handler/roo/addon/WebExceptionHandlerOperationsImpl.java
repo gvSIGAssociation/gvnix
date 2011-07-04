@@ -26,7 +26,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,20 +42,31 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MessageBundleUtils;
+import org.gvnix.support.MetadataUtils;
 import org.gvnix.support.OperationUtils;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
+import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperationsImpl;
+import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
@@ -89,6 +102,13 @@ public class WebExceptionHandlerOperationsImpl implements
 
     private static final String LANGUAGE_FILENAMES = "WEB-INF/i18n/messages**.properties";
 
+    private static final JavaSymbolName VALUE = new JavaSymbolName("value");
+    private static final JavaSymbolName ARRAY_ELEMENT = new JavaSymbolName(
+            "__ARRAY_ELEMENT__");
+
+    private static final JavaType MODAL_DIALOGS = new JavaType(
+            GvNIXModalDialogs.class.getName());
+
     @Reference
     TypeLocationService typeLocationService;
     @Reference
@@ -105,6 +125,8 @@ public class WebExceptionHandlerOperationsImpl implements
     private PathResolver pathResolver;
     @Reference
     private PropFileOperations propFileOperations;
+    @Reference
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
     private ComponentContext context;
 
@@ -885,7 +907,7 @@ public class WebExceptionHandlerOperationsImpl implements
      * 
      * Also adds needed i18n properties to right message_xx.properties files
      */
-    private void installMvcArtifacts() {
+    public void installMvcArtifacts() {
         // copy util to tags/util
         copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(
                 Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"));
@@ -943,7 +965,7 @@ public class WebExceptionHandlerOperationsImpl implements
         Element lsHtml = defaultJspxXml.getDocumentElement();
 
         Element messageBoxElement = XmlUtils.findFirstElementByName(
-                "message-box", lsHtml);
+                "util:message-box", lsHtml);
         if (messageBoxElement == null) {
             // Add utils tag lib as attribute in html element
             lsHtml.setAttribute("xmlns:util",
@@ -1017,13 +1039,14 @@ public class WebExceptionHandlerOperationsImpl implements
         return classPackage.concat(".MessageMappingExceptionResolver");
     }
 
-    /**
-     * Installs the Java class given by its className
+    /*
+     * (non-Javadoc)
      * 
-     * @param className
-     * @return
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * #installWebServletHandlerClass(java.lang.String)
      */
-    private String installWebServletHandlerClass(String className) {
+    public String installWebServletHandlerClass(String className) {
         String classFullName = getClassFullQualifiedName(className);
 
         String classPath = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
@@ -1247,6 +1270,89 @@ public class WebExceptionHandlerOperationsImpl implements
         return OperationUtils.isProjectAvailable(metadataService)
                 && OperationUtils.isSpringMvcProject(metadataService,
                         fileManager);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * #addModalDialogAnnotation(org.springframework.roo.model.JavaType,
+     * org.springframework.roo.model.JavaSymbolName)
+     */
+    public void addModalDialogAnnotation(JavaType controllerClass,
+            JavaSymbolName name) {
+        Assert.notNull(controllerClass, "controller is required");
+        Assert.notNull(name, "name is required");
+
+        // Get mutableTypeDetails from controllerClass. Also checks javaType is
+        // a controller
+        MutableClassOrInterfaceTypeDetails controllerDetails = MetadataUtils
+                .getPhysicalTypeDetails(controllerClass, metadataService,
+                        physicalTypeMetadataProvider);
+        // Test if has the @RooWebScaffold
+        Assert.notNull(
+                MemberFindingUtils.getAnnotationOfType(controllerDetails
+                        .getAnnotations(),
+                        new JavaType(RooWebScaffold.class.getName())),
+                controllerClass.getSimpleTypeName().concat(
+                        " has not @RooWebScaffold annotation"));
+
+        // Test if the annotation already exists on the target type
+        AnnotationMetadata annotationMetadata = MemberFindingUtils
+                .getAnnotationOfType(controllerDetails.getAnnotations(),
+                        MODAL_DIALOGS);
+
+        // List of pattern to use
+        List<StringAttributeValue> modalDialogsList = new ArrayList<StringAttributeValue>();
+
+        boolean isAlreadyAnnotated = false;
+        if (annotationMetadata != null) {
+            // @GvNIXModalDialog already exists
+
+            // Loads previously registered modal dialog into modalDialogsList
+            // Also checks if name is used previously
+            AnnotationAttributeValue<?> previousAnnotationValues = annotationMetadata
+                    .getAttribute(VALUE);
+
+            if (previousAnnotationValues != null) {
+
+                @SuppressWarnings("unchecked")
+                List<StringAttributeValue> previousValues = (List<StringAttributeValue>) previousAnnotationValues
+                        .getValue();
+
+                if (previousValues != null && !previousValues.isEmpty()) {
+                    for (StringAttributeValue value : previousValues) {
+                        if (!modalDialogsList.contains(value)) {
+                            modalDialogsList.add(value);
+                        }
+                    }
+                }
+            }
+            isAlreadyAnnotated = true;
+        }
+
+        StringAttributeValue newModalDialogValue = new StringAttributeValue(
+                ARRAY_ELEMENT, name.getSymbolName());
+        if (!modalDialogsList.contains(newModalDialogValue)) {
+            modalDialogsList.add(newModalDialogValue);
+        }
+
+        // Prepare annotation builder
+        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                MODAL_DIALOGS);
+
+        // Add attribute values
+        annotationBuilder
+                .addAttribute(new ArrayAttributeValue<StringAttributeValue>(
+                        VALUE, modalDialogsList));
+
+        if (isAlreadyAnnotated) {
+            controllerDetails.updateTypeAnnotation(annotationBuilder.build(),
+                    new HashSet<JavaSymbolName>());
+        } else {
+            controllerDetails.addTypeAnnotation(annotationBuilder.build());
+        }
     }
 
     /**
