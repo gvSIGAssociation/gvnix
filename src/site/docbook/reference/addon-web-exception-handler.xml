@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="addon-web-exception-handler"
+<chapter version="5.0" xml:id="addon-web-exception-handler" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook" 
-         xml:lang="es">
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Add-on Web Exception Handler</title>
 
   <para>Add-on para la gestión de excepciones no controladas.</para>
@@ -71,6 +70,18 @@
           ha sido actualizado previamente.</para>
         </listitem>
       </itemizedlist></para>
+
+    <para>Desde la versión 0.8.0 de gvNIX, las excepciones se muestran
+    mediante un dialogo modal. Para ello, se modifica la definición, en el
+    archivo webmvc-config.xml, del bean
+    <emphasis>SimpleMappingExceptionResolver</emphasis> cambiando la clase por
+    una propia que se instala en el proyecto (subpaquete
+    <emphasis>servlet.handler</emphasis>, clase
+    <emphasis>MessageMappingExceptionResolver.java</emphasis>). En el mismo
+    subpaquete se instala también <emphasis>ModalDialog.java</emphasis>, un
+    bean que contendrá la información necesaria para visualizar la excepción
+    en la ventana modal renderizada para el componente
+    <emphasis>dialog-box.tagx</emphasis>.</para>
   </section>
 
   <section xml:id="addon-web-exception-handler_funcionalidad">

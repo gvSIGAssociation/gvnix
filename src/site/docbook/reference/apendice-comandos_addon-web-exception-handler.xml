@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_addon-web-exception-handler"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+    <title xml:lang="es">Comandos del Add-on Web Exception Handler</title>
+
+    <para xml:lang="es">Para una descripción general ver <link
+    linkend="addon-web-exception-handler">Add-on Web Exception
+    Handler</link>.</para>
+
+    <table>
+      <title>Comandos de Add-on Web Exception Handler</title>
+
+      <tgroup cols="2">
+        <thead>
+          <colspec colwidth="150" />
+
+          <row>
+            <entry align="center">Comando</entry>
+
+            <entry align="center">Descripción</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-web-exception-handler_exception-handler-list">exception
+            handler list</link></entry>
+
+            <entry xml:lang="es">Muestra las excepciones gestionadas por la
+            aplicación.</entry>
+          </row>
+
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-web-exception-handler_exception-handler-add">exception
+            handler add</link></entry>
+
+            <entry xml:lang="es">Añade una excepción nueva a la aplicación o
+            actualiza la definición.</entry>
+          </row>
+
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-web-exception-handler_exception-handler-set-language">exception
+            handler set language</link></entry>
+
+            <entry xml:lang="es">Añade un mensaje a una excepción existente en
+            el idioma indicado.</entry>
+          </row>
+
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-web-exception-handler_exception-handler-remove">exception
+            handler remove</link></entry>
+
+            <entry xml:lang="es">Elimina una excepción de la
+            aplicación.</entry>
+          </row>
+
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix">exception
+            handler setup gvnix</link></entry>
+
+            <entry xml:lang="es">Instala las excepciones por defecto de gvNIX
+            en la aplicación.</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <section xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-list">
+      <title xml:lang="es">exception handler list</title>
+
+      <para xml:lang="es">Muestra la lista de excepciones definidas en el
+      archivo webmvc-config.xml por la consola:</para>
+
+      <programlisting>Handled Exceptions:
+.DataAccessException
+.NoSuchRequestHandlingMethodException
+.TypeMismatchException
+.MissingServletRequestParameterException
+java.sql.SQLException
+org.springframework.transaction.TransactionException
+java.lang.UnsupportedOperationException
+javax.persistence.OptimisticLockException</programlisting>
+    </section>
+
+    <section>
+      <title
+      xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-add">exception
+      handler add</title>
+
+      <para xml:lang="es">Añade una excepción nueva a la aplicación o
+      actualiza la definición.</para>
+
+      <para xml:lang="es">Los parámetros son:<variablelist>
+          <varlistentry>
+            <term>--excepcion</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido]
+              [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Nombre de la excepción a capturar. Se ha de
+              especificar el paquete java completo del que proviene. Ej:
+              "java.lang.Exception" para que así las definiciones sean
+              únicas.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--title</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido]
+              [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Título de la excepción que se ha de mostrar
+              por pantalla.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--description</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido]
+              [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Mensaje que se muestra al capturar la
+              excepción para que el usuario reciba la información del
+              error.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--language</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido]
+              [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Idioma en el que se define el mensaje para
+              añadirlo al archivo correspondiente <emphasis>[es, de, it, nl,
+              sv, en]</emphasis>.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+    </section>
+
+    <section>
+      <title
+      xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-set-language">exception
+      handler set language</title>
+
+      <para xml:lang="es">Añade un mensaje a una excepción existente en el
+      idioma indicado.</para>
+
+      <para xml:lang="es">Los parámetros son:<variablelist>
+          <varlistentry>
+            <term>--excepcion</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido]
+              [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Nombre de la excepción a la que se va a
+              asignar el mensaje. Los nombres son los que aparecen al listar
+              las excepciones con el comando <emphasis>exception handler
+              list</emphasis>.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--title</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido]
+              [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Título de la excepción que se ha de mostrar
+              por pantalla.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--description</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido]
+              [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Mensaje que se muestra al capturar la
+              excepción para que el usuario reciba la información del
+              error.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--language</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido]
+              [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Idioma en el que se define el mensaje para
+              añadirlo al archivo correspondiente <emphasis>[es, de, it, nl,
+              sv, en]</emphasis>.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+    </section>
+
+    <section>
+      <title
+      xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-remove">exception
+      handler remove</title>
+
+      <para xml:lang="es">Eimina la excepción seleccionada de la
+      aplicación:</para>
+
+      <para xml:lang="es">Los parámetros son:<variablelist>
+          <varlistentry>
+            <term>--excepcion</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido]
+              [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Nombre de la excepción que se quiere
+              eliminar de la aplicación. Los nombres son los que aparecen al
+              listar las excepciones con el comando <emphasis>exception
+              handler list</emphasis>.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+    </section>
+
+    <section>
+      <title
+      xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix">exception
+      handler setup gvnix</title>
+
+      <para xml:lang="es">Instala las excepciones por defecto de gvNIX en la
+      aplicación. Para mas información ver: <link
+      linkend="addon-web-exception-handler">Add-on Web Exception
+      Handler</link>.</para>
+    </section>
+  </section>
