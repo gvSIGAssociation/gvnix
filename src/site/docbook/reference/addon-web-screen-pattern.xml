@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-web-screen-patterns" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Add-on Web Screen Patterns</title>
+
+  <para xml:lang="es">Add-on para aplicar patrones de visualización sobre
+  entidades. </para>
+
+  <para xml:lang="es">¿Qué entendemos por patrón de visualización? <link
+  xlink:href="http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns">"12
+  patrones de pantalla estándar"</link></para>
+
+  <section xml:id="addon-web-relation-styles_descripcion">
+    <title xml:lang="es">Descripción</title>
+
+    <para xml:lang="es">Este Add-on permite aplicar patrones de visualización
+    sobre las entidades de un proyecto determinado. Los patrones actualmente
+    soportados son:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Maestro tabular</para>
+      </listitem>
+
+      <listitem>
+        <para>Maestro registro</para>
+      </listitem>
+
+      <listitem>
+        <para>Maestro registro - Detalle tabular</para>
+      </listitem>
+    </itemizedlist>
+
+    <para xml:lang="es">En el patrón Maestro registro - Detalle tabular se
+    tienen en cuenta las relaciones 1 a n, <emphasis>ONE_TO_MANY,</emphasis>
+    de una entidad para agruparlas mediante pestañas separadas mostrando la
+    información en una tabla con la información paginada.</para>
+  </section>
+
+  <section xml:id="addon-web-relation-styles_instalacion">
+    <title xml:lang="es">Funcionalidad</title>
+
+    <para xml:lang="es">El add-on proporciona una serie de anotaciones que
+    sirven para definir patrones de visualización sobre una entidad de la
+    aplicación. Por comodidad se han definido una serie de <link
+    linkend="apendice-comandos_web-relation-styles">comandos</link> para
+    facilitar la aplicación de estas anotaciones en las clases Java
+    necesarias.</para>
+
+    <para xml:lang="es">Básicamente definremos un patrón de visualización
+    sobre una entidad (patrón tabular o registro), entendiendo esta como
+    maestro en el patrón de visualización, y sobre las entidades relacionadas
+    con el maestro definiremos sus propios patrones de visualización, detalle
+    del patrón.</para>
+
+    <para xml:lang="es">Supongamos el siguiente escenario codificado en Java
+    como:</para>
+
+    <programlisting>@Entity
+public class Entidad1 {
+  @OneToMany
+  Set&lt;Entidad2&gt; campo2;
+  @OneToMany
+  Set&lt;Entidad3&gt; campo3;
+  ...
+}
+
+@Entity
+public class Entidad2 {
+  ...
+}</programlisting>
+
+    <para xml:lang="es">El código anterior declara una
+    <emphasis>Entidad1</emphasis> que tiene un <emphasis>campo2</emphasis> que
+    define a su vez una relación 1 a n con la <emphasis>Entidad2</emphasis>,
+    lo mismo con la relación definida en el <emphasis>campo3</emphasis>. La
+    <emphasis>Entidad1</emphasis> está expuesta mediante el
+    <emphasis>Controlador1</emphasis>, a su vez la
+    <emphasis>Entidad2</emphasis> lo está mediante
+    <emphasis>Controlador2</emphasis>.</para>
+
+    <programlisting>@RooWebScaffold(..., formBakingObject=Entidad1.class)
+@Controller
+public class Controlador1 {
+  ...
+}
+
+@RooWebScaffold(..., formBackingObject=Entidad2.class)
+@Controller
+public class Controlador2 {
+  ...
+}
+</programlisting>
+
+    <para xml:lang="es">Así pues, mediante el commando <emphasis>web mvc
+    pattern</emphasis> podemos definir el patrón de visualización maestro
+    sobre cualquiera de las dos entidades descritas. Al usar el comando,
+    además de añadir la anotación <emphasis>@GvNIXPattern</emphasis> al
+    controlador elegido, se instalarán / crearán / modificarán los componentes
+    Spring MVC necesarios (diferentes archivos tagx, jspx, imágenes, archivos
+    Javascript, ...) y se generará los AspectJ apropiados para hacer posible
+    la visualización elegida mediante el patrón.</para>
+
+    <para xml:lang="es">A su vez, el comando <emphasis>web mvc relation
+    pattern</emphasis> nos permite actuar sobre como se visualizará el detalle
+    de una entidad dada, esto es, como se visualizarán las entidades
+    relacionadas al visualizar la entidad maestro. Notar que el comando se
+    aplica sobre un campo, una relación, determinada de la entidad maestro (en
+    el ejemplo propuesto, se aplicaría el comando una vez sobre
+    <emphasis>campo2</emphasis> y opcionalmente otra vez sobre
+    <emphasis>campo3</emphasis>). Este comando también instala / crea /
+    modifica componentes Spring MVC, añade la anotación
+    <emphasis>@GvNIXRelationsPattern</emphasis> en el controlador de la
+    entidad maestro y añade la anotación
+    <emphasis>@GvNIXRelatedPattern</emphasis> sobre la entidad de la relación
+    seleccionada en el comando. Estas anotaciones harán que se genere, en caso
+    necesario, los AspectJ para hacer posible la visualización seleccionada
+    mediante el patrón.</para>
+  </section>
+
+  <section>
+    <title>Patrón Tabular y Registro</title>
+
+    <section>
+      <title>Tabular</title>
+
+      <para>El patrón tabular define una visualización de varios registros a
+      la vez con la posibildad de paginar entre todos los registros
+      existentes. </para>
+
+      <para>Este formato de visualización implica que si se realiza alguna
+      acción sobre los registros visualizados en pantalla, mediante la
+      activación de la edición de registros o la creación de unos nuevos, los
+      cambios o nuevos registros se guardaran dentro de una misma transacción,
+      con lo que el fallo de una de las modificaciones / creaciones, provocará
+      que todo el proceso falle y los registros visualizados permanecerán
+      inalterados.</para>
+    </section>
+
+    <section>
+      <title>Registro</title>
+
+      <para>Este patrón es la visualización de un único registro pero con la
+      posibilidad de avanzar, mediante paginación de uno en uno, entre todos
+      los registros existentes.</para>
+    </section>
+  </section>
+</chapter>

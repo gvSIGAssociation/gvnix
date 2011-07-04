@@ -156,6 +156,8 @@
 
     <xi:include href="addon-web-menu.xml" />
 
+    <xi:include href="addon-web-screen-pattern.xml" />
+
     <xi:include href="addon-occ.xml" />
 
     <xi:include href="addon-web-exception-handler.xml" />

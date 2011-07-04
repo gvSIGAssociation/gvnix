@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_web-relation-styles"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Comandos del Add-on Web Screen Patterns</title>
+
+  <para xml:lang="es">Para una descripción general ver <link
+  linkend="addon-web-screen-patterns">Add-on Web Screen
+  Patterns</link>.</para>
+
+  <table>
+    <title xml:lang="es">Comandos Add-on Web Screen Patterns</title>
+
+    <tgroup cols="2">
+      <thead>
+        <colspec colwidth="150" />
+
+        <row>
+          <entry align="center">Comando</entry>
+
+          <entry align="center">Descripción</entry>
+        </row>
+      </thead>
+
+      <tbody>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web_mvc_pattern"><emphasis>web mvc
+          pattern</emphasis></link></entry>
+
+          <entry>Define un patrón de visualización sobre una entidad
+          dada</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web_mvc_relation_pattern"><emphasis>web
+          mvc relation pattern</emphasis></link></entry>
+
+          <entry>Define un patrón de visualización sobre una entidad
+          relacionada con su entidad maestro.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
+
+  <section xml:id="apendice-comandos_addon-web_mvc_pattern">
+    <title xml:lang="es">web mvc pattern</title>
+
+    <para xml:lang="es">Define un patron de visualización sobre la entidad
+    expuesta por el Controlador seleccionado.</para>
+
+    <para xml:lang="es">Los parámetros son:<variablelist>
+        <varlistentry>
+          <term>--class</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [Ruta canónica a la clase del
+            Controlador] [autocompletado]</emphasis></para>
+
+            <para>Ruta canónica a la clase del Controlador de la entidad sobre
+            la que se quiere definir el patrón de visualización. Admite el uso
+            de ~ para indicar el <emphasis>top level package</emphasis> del
+            proyecto.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--name</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [cadena del nombre dado al
+            patrón]</emphasis></para>
+
+            <para>Nombre para identificar el patrón. No admite espacios.
+            <emphasis role="bold">El nombre elegido sólo se podrá usar una vez
+            en todo el proyecto para evitar colisiones con los patrones
+            definidos en otras entidades.</emphasis></para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--type</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [tipo de patrón a aplicar (tabular ó
+            register)] [autocompletado]</emphasis></para>
+
+            <para>Tipo de patrón a aplicar sobre la entidad.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
+
+  <section xml:id="apendice-comandos_addon-web_mvc_relation_pattern">
+    <title>web mvc relation pattern</title>
+
+    <para>Define un patrón de visualización sobre una entidad relacionada con
+    su entidad maestro.</para>
+
+    <para xml:lang="es">Los parámetros son:<variablelist>
+        <varlistentry>
+          <term>--class</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [Ruta canónica a la clase del
+            Controlador] [autocompletado]</emphasis></para>
+
+            <para>Ruta canónica a la clase del Controlador de la entidad sobre
+            la que se quiere definir el patrón de visualización de la
+            relación. Admite el uso de ~ para indicar el <emphasis>top level
+            package</emphasis> del proyecto. El controlador seleccionado
+            deberá tener apicada la anotación GvNIXPattern</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--name</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [cadena del nombre dado al
+            patrón]</emphasis></para>
+
+            <para>Nombre para identificar el patrón. No admite espacios.
+            <emphasis role="bold">En este caso el nombre dado debe conicidir
+            con el definido anteriormente mediante el comando <emphasis>web
+            mvc pattern</emphasis>.</emphasis></para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--field</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [cadena del nombre del campo sobre el
+            que se desea definir el patrón detalle]</emphasis></para>
+
+            <para>Nombre del campo de la entidad maestro. <emphasis
+            role="bold">El campo debe definir una relación 1 a n, por tanto
+            debe estar anotado con @OneToMany.</emphasis></para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--type</term>
+
+          <listitem>
+            <para><emphasis>[Requerido] [tipo de patrón a aplicar (tabular ó
+            register)] [autocompletado]</emphasis></para>
+
+            <para>Tipo de patrón a aplicar sobre la entidad
+            relacionada.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
+</section>

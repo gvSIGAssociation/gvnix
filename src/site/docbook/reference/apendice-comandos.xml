@@ -505,6 +505,8 @@ javax.persistence.OptimisticLockException</programlisting>
 
   <xi:include href="apendice-comandos_addon-web-menu.xml" />
 
+  <xi:include href="apendice-comandos_addon-web-screen-pattern.xml" />
+
   <section xml:id="apendice-comandos_cit-security">
     <title xml:lang="es">Comandos del Add-on CIT Security</title>
 
