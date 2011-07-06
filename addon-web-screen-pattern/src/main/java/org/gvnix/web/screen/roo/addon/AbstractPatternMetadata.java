@@ -279,20 +279,23 @@ public abstract class AbstractPatternMetadata extends
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("delete");
 
+        FieldMetadata formBackingObjectIdField = javaTypeMetadataHolder
+                .getPersistenceDetails().getIdentifierField();
         // Define method parameter types
         List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
 
         List<AnnotationAttributeValue<?>> reqParamAttrPathVar = new ArrayList<AnnotationAttributeValue<?>>();
         reqParamAttrPathVar.add(new StringAttributeValue(new JavaSymbolName(
-                "value"), "id"));
+                "value"), formBackingObjectIdField.getFieldName()
+                .getSymbolName()));
         List<AnnotationMetadata> methodAttrPathVarAnnotations = new ArrayList<AnnotationMetadata>();
         AnnotationMetadataBuilder methodAttPathVarAnnotation = new AnnotationMetadataBuilder(
                 new JavaType(
                         "org.springframework.web.bind.annotation.PathVariable"),
                 reqParamAttrPathVar);
         methodAttrPathVarAnnotations.add(methodAttPathVarAnnotation.build());
-        methodParamTypes.add(new AnnotatedJavaType(JavaType.LONG_OBJECT,
-                methodAttrPathVarAnnotations));
+        methodParamTypes.add(new AnnotatedJavaType(formBackingObjectIdField
+                .getFieldType(), methodAttrPathVarAnnotations));
 
         List<AnnotationAttributeValue<?>> reqParamAttrPattern = new ArrayList<AnnotationAttributeValue<?>>();
         reqParamAttrPattern.add(new StringAttributeValue(new JavaSymbolName(
@@ -351,7 +354,7 @@ public abstract class AbstractPatternMetadata extends
         // Define method parameter names
         // id, pattern, page, size, uiModel, request
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
-        methodParamNames.add(new JavaSymbolName("id"));
+        methodParamNames.add(formBackingObjectIdField.getFieldName());
         methodParamNames.add(new JavaSymbolName("pattern"));
         methodParamNames.add(new JavaSymbolName("page"));
         methodParamNames.add(new JavaSymbolName("size"));
@@ -362,7 +365,9 @@ public abstract class AbstractPatternMetadata extends
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         String entityNamePlural = javaTypeMetadataHolder.getPlural();
 
-        bodyBuilder.appendFormalLine("delete(id, page, size, uiModel);");
+        bodyBuilder.appendFormalLine("delete(".concat(
+                formBackingObjectIdField.getFieldName().getSymbolName())
+                .concat(", page, size, uiModel);"));
         bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
                 .concat(entityNamePlural.toLowerCase())
                 .concat("?gvnixform&\" + refererQuery(request, 1L);"));
@@ -375,8 +380,7 @@ public abstract class AbstractPatternMetadata extends
         List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
         requestMappingAttributes.add(new StringAttributeValue(
                 new JavaSymbolName("value"), "/{"
-                        + javaTypeMetadataHolder.getPersistenceDetails()
-                                .getIdentifierField().getFieldName()
+                        + formBackingObjectIdField.getFieldName()
                                 .getSymbolName() + "}"));
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
@@ -1091,9 +1095,14 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
                 .concat(entityName.toLowerCase()).concat("\", ")
                 .concat(entityName.toLowerCase()).concat(");"));
-        bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat("itemId")
-                .concat("\", ").concat(entityName.toLowerCase())
-                .concat(".getId()").concat(");"));
+        bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                .concat("itemId")
+                .concat("\", ")
+                .concat(entityName.toLowerCase())
+                .concat(".")
+                .concat(javaTypeMetadataHolder.getPersistenceDetails()
+                        .getIdentifierAccessorMethod().getMethodName()
+                        .getSymbolName()).concat("());"));
 
         bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
                 .getNameIncludingTypeParameters()
