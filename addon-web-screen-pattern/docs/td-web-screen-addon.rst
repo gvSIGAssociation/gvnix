@@ -250,3 +250,16 @@ TODO
   servir como mejor solución.
 
 * Rename 'screen' with 'pattern'.
+
+* Los patrones de las entidades relacionadas actualmente funcionan para @OneToMany y deberían 
+  funcionar también para los tipos @ManyToMany sin cambios y para ManyToOne con algún pequeño cambio.
+
+* Ampliar la ejecución del comando de "pattern relation" para que se pueda ejecutar recursivamente.
+
+* La generación del ITD debe considerar los atributos mergeMethod, persistMethod y removeMethod de la
+  anotación @Entity ya que si se especifica un nombre distinto de método deberá utilizarse dicho nombre
+  en la invocación que se hace desde este ITD.
+
+* Escribir en el Java de la entidad la anotación GvNIXEntityBatch desde el Metadata de GvNIXPattern y GvNIXRelatedPattern,
+  en lugar de hacerlo desde el command.
+  
