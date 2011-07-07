@@ -54,7 +54,7 @@ public class WebScreenCommands implements CommandMarker {
      * 
      * @return true if commands are available
      */
-    @CliAvailabilityIndicator({ "web mvc pattern" })
+    @CliAvailabilityIndicator({ "web mvc pattern master" })
     public boolean isWebPatternAvaliable() {
         return operations.isPatternCommandAvailable();
     }
@@ -69,7 +69,7 @@ public class WebScreenCommands implements CommandMarker {
      * @param type
      *            The pattern to apply
      */
-    @CliCommand(value = "web mvc pattern", help = "Add a screen pattern to a controller")
+    @CliCommand(value = "web mvc pattern master", help = "Add a screen pattern to a controller")
     public void webScreenAdd(
             @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
             @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name,
@@ -78,11 +78,11 @@ public class WebScreenCommands implements CommandMarker {
     }
 
     /**
-     * Informs if <code>web mvc relation pattern</code> command are available
+     * Informs if <code>web mvc pattern detail</code> command are available
      * 
      * @return true if commands are available
      */
-    @CliAvailabilityIndicator({ "web mvc pattern relation" })
+    @CliAvailabilityIndicator({ "web mvc pattern detail" })
     public boolean isWebRelationPatternAvaliable() {
         return operations.isRelationPatternCommandAvailable();
     }
@@ -99,7 +99,7 @@ public class WebScreenCommands implements CommandMarker {
      * @param type
      *            The pattern to apply
      */
-    @CliCommand(value = "web mvc pattern relation", help = "Add a screen pattern to a controller")
+    @CliCommand(value = "web mvc pattern detail", help = "Add a screen pattern to a controller")
     public void webRelationPattern(
             @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
             @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name,
