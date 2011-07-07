@@ -43,24 +43,24 @@ public class WebExceptionHandlerCommands implements CommandMarker {
     @Reference
     private WebExceptionHandlerOperations exceptionOperations;
 
-    @CliAvailabilityIndicator("exception handler list")
+    @CliAvailabilityIndicator("web mvc exception handler list")
     public boolean isListExceptionHandlerAvailable() {
         return exceptionOperations.isProjectAvailable()
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "exception handler list", help = "Obtains the list of the Exceptions that handles the application.")
+    @CliCommand(value = "web mvc exception handler list", help = "Obtains the list of the Exceptions that handles the application.")
     public String listExceptionHandler() {
         return exceptionOperations.getHandledExceptionList();
     }
 
-    @CliAvailabilityIndicator("exception handler add")
+    @CliAvailabilityIndicator("web mvc exception handler add")
     public boolean isAddNewHandledException() {
         return exceptionOperations.isProjectAvailable()
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "exception handler add", help = "Adds a handler for an Uncaught Exception and creates a view with a specific message.")
+    @CliCommand(value = "web mvc exception handler add", help = "Adds a handler for an Uncaught Exception and creates a view with a specific message.")
     public void addNewHandledException(
             @CliOption(key = "exception", mandatory = true, help = "The name of the Exception you want to handle with the whole package path. e.g. java.lang.Exception") String exceptionName,
             @CliOption(key = "title", mandatory = true, help = "The title of the Exception you want to handle.\nEnter the title between commas if it is composed of more than one word.") String exceptionTitle,
@@ -71,27 +71,27 @@ public class WebExceptionHandlerCommands implements CommandMarker {
                 exceptionTitle, exceptionDescription, exceptionLanguage);
     }
 
-    @CliAvailabilityIndicator("exception handler remove")
+    @CliAvailabilityIndicator("web mvc exception handler remove")
     public boolean isRemoveExceptionHandledAvailable() {
         return exceptionOperations.isProjectAvailable()
         // && exceptionOperations.isExceptionMappingAvailable();
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "exception handler remove", help = "Removes the Exception handler select and her view.")
+    @CliCommand(value = "web mvc exception handler remove", help = "Removes the Exception handler select and her view.")
     public void removeExceptionHandled(
             @CliOption(key = "exception", mandatory = true, help = "The Exception you want to remove.") String exceptionName) {
         exceptionOperations.removeExceptionHandled(exceptionName);
     }
 
-    @CliAvailabilityIndicator("exception handler set language")
+    @CliAvailabilityIndicator("web mvc exception handler set language")
     public boolean isSetLanguageExceptionHandledAvailable() {
         return exceptionOperations.isProjectAvailable()
         // && exceptionOperations.isExceptionMappingAvailable();
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "exception handler set language", help = "Set the title and description of the exception selected to the choosed language file.")
+    @CliCommand(value = "web mvc exception handler set language", help = "Set the title and description of the exception selected to the choosed language file.")
     public void languageExceptionHandled(
             @CliOption(key = "exception", mandatory = true, help = "The name of the Exception you want to set the message with the whole package path. e.g. java.lang.Exception") String exceptionName,
             @CliOption(key = "title", mandatory = true, help = "The title of the Exception you want to handle.\nEnter the title between commas if it is composed of more than one word.") String exceptionTitle,
@@ -102,13 +102,13 @@ public class WebExceptionHandlerCommands implements CommandMarker {
                 exceptionTitle, exceptionDescription, exceptionLanguage);
     }
 
-    @CliAvailabilityIndicator("exception handler setup gvnix")
+    @CliAvailabilityIndicator("web mvc exception handler setup gvnix")
     public boolean isSetUpGvNIXExceptionsAvailable() {
         return exceptionOperations.isProjectAvailable()
                 && exceptionOperations.isExceptionMappingAvailable();
     }
 
-    @CliCommand(value = "exception handler setup gvnix", help = "Defines gvNIX predefined Exceptions.")
+    @CliCommand(value = "web mvc exception handler setup gvnix", help = "Defines gvNIX predefined Exceptions.")
     public void setUpGvNIXExceptions() {
         exceptionOperations.setUpGvNIXExceptions();
     }
