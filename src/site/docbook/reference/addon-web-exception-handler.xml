@@ -20,6 +20,9 @@
 
     <para xml:lang="es">Después de la definición de la excepción se pueden
     añadir mensajes para cada idioma disponible en la aplicación.</para>
+
+    <para xml:lang="es">Desde la versión 0.8.0 de gvNIX, los mensajes de
+    excepciones se muestran dentro de un dialogo modal.</para>
   </section>
 
   <section xml:id="addon-web-exception-handler_excptiones-de-gvnix">
@@ -29,9 +32,9 @@
     gvNIX.</para>
 
     <para xml:lang="es">Inlcuye un comando <link
-    linkend="apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix">exception
-    handler setup gvnix</link> para instalar un conjunto de excepciones
-    definidas para gvnix en los idiomas español e inglés:</para>
+    linkend="apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix">web
+    mvc exception handler setup gvnix</link> para instalar un conjunto de
+    excepciones definidas para gvnix en los idiomas español e inglés:</para>
 
     <para xml:lang="es"><itemizedlist>
         <listitem>
@@ -80,7 +83,7 @@
     <emphasis>MessageMappingExceptionResolver.java</emphasis>). En el mismo
     subpaquete se instala también <emphasis>ModalDialog.java</emphasis>, un
     bean que contendrá la información necesaria para visualizar la excepción
-    en la ventana modal renderizada para el componente
+    en la ventana modal renderizada por el componente
     <emphasis>dialog-box.tagx</emphasis>.</para>
   </section>
 

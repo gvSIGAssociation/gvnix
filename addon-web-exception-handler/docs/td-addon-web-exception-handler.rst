@@ -56,6 +56,8 @@ exception handler set language - Updates the messages of the Exception in the se
 
     * Updates the tag of the messages**.properties file.
 
+Since version 0.8.0 Exceptions are shown in a Modal Dialog view. This Modal Dialog takes the jspx defined and includes it as part of the view.
+
 Commands
 =========
 
@@ -110,11 +112,6 @@ TODO
   created two method that should be outsorced to a shared component so, other gvNIX add-ons creating its own i18n properties
   could use these methods.
 
-* Adjust command names to new Roo layout:
-
-  - exception handler add --> web mvc exception handler add
-  - exception handler list --> web mvc exception handler list
-  - exception handler remove --> web mvc exception handler remove
-  - exception handler set --> web mvc exception handler set
-  - exception handler setup gvnix --> web mvc exception handler setup gvnix
- 
+* Added a new command "web mvc add modalDialog" that installs message-box.tagx, a new jspx as sample of content of a modal dialog
+  and generate an ITD with a helper method to show a new modal dialog in view.
+  TODO: Maybe this method will be moved to another add-on
