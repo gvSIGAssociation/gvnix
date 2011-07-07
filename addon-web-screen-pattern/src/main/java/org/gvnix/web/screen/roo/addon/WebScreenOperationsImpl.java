@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.apache.felix.scr.annotations.Component;
@@ -62,6 +63,8 @@ import org.springframework.roo.support.util.Assert;
 @Component
 @Service
 public class WebScreenOperationsImpl implements WebScreenOperations {
+    private static Logger logger = Logger
+            .getLogger(WebScreenOperationsImpl.class.getName());
 
     /**
      * Name of {@link GvNIXPattern} attribute value
@@ -283,21 +286,22 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
                         " annotation in controller ".concat(controllerClass
                                 .getFullyQualifiedTypeName())));
 
-        boolean foundPattern = false;
-        for (StringAttributeValue value : patternValues) {
-            // Check if name is already used
-            if (equalsPatternName(value, name)) {
-                foundPattern = true;
-                break;
-            }
-        }
+        // Check if pattern name is already used as value of @GvNIXPattern
         Assert.isTrue(
-                foundPattern,
+                patternExists(patternValues, name),
                 "Pattern name '".concat(name.getSymbolName())
                         .concat("' not found in values of ")
                         .concat(PATTERN_ANNOTATION.getSimpleTypeName())
                         .concat(" annotation in controller ")
                         .concat(controllerClass.getFullyQualifiedTypeName()));
+
+        // Check if Patter Pattern is of type register
+        if (!isMasterPatternRegister(patternValues, name)) {
+            logger.warning("Pattern name '"
+                    .concat(name.getSymbolName())
+                    .concat("' is of type tabular. Currently gvNIX doesn't support 'Master tabular / Detail' pattern"));
+            return;
+        }
 
         // Get @RooController annotation to get formbackingObject definition
         AnnotationMetadata controllerAnnotationMetadata = MemberFindingUtils
@@ -429,6 +433,44 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
 
         annotateFormBackingObjectRelationsControllers(mutableTypeDetails,
                 annotationValues);
+    }
+
+    /**
+     * Given a pattern name says if it exists defined as Master pattern in
+     * GvNIXPattern
+     * 
+     * @param patternValues
+     * @param name
+     * @return
+     */
+    private boolean patternExists(List<StringAttributeValue> patternValues,
+            JavaSymbolName name) {
+        for (StringAttributeValue value : patternValues) {
+            // Check if name is already used
+            if (equalsPatternName(value, name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if given pattern name is defined in GvNIXPattern as type
+     * register, false otherwise.
+     * 
+     * @param patternValues
+     * @param name
+     * @return
+     */
+    private boolean isMasterPatternRegister(
+            List<StringAttributeValue> patternValues, JavaSymbolName name) {
+        for (StringAttributeValue value : patternValues) {
+            String current = value.getValue().replace(" ", "");
+            if (current.startsWith(name.getSymbolName().concat("="))) {
+                return current.endsWith("=register");
+            }
+        }
+        return false;
     }
 
     /**
@@ -694,7 +736,7 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
     }
 
     /**
-     * If there is a pattern of givne WebPattern defined in GvNIXPattern it
+     * If there is a pattern of given WebPattern defined in GvNIXPattern it
      * returns true, false otherwise
      * 
      * @param patternType
