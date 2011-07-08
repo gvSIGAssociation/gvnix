@@ -60,7 +60,7 @@ Command
 
 ::
 
-  web mvc pattern --class ~.web.PetController --type table --name MyPattern
+  web mvc pattern master --class ~.web.PetController --type table --name MyPattern
 
 Options:
 
@@ -83,7 +83,7 @@ GvNIXEntityBatch also.
 
 ::
 
-  web mvc relation pattern --class ~.web.PetController --name MyPattern --field field1 --type table
+  web mvc pattern detail --class ~.web.PetController --name MyPattern --field field1 --type table
 
 Options:
 
@@ -225,7 +225,7 @@ Proof of concept
 
  http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-table
  http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-screen-pattern-table
- 
+
 * Register pattern:
 
  http://scmcit.gva.es/svn/gvnix-proof/trunk/petclinic-register

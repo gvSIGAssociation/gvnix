@@ -1,4 +1,4 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:spring="http://www.springframework.org/tags" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
   <!--
     Entity slider.
 
@@ -29,7 +29,9 @@
         <c:forEach var="p" items="${param}" >
           <!-- don't add index param again -->
           <c:if test="${p.key ne 'index'}">
-            <spring:param name="${p.key}" value="${p.value}" />
+            <c:if test="${not (fn:endsWith(p.key, 'Page') || fn:endsWith(p.key, 'PageSize') ) }">
+              <spring:param name="${p.key}" value="${p.value}" />
+            </c:if>
           </c:if>
         </c:forEach>
       </spring:url>
@@ -44,11 +46,13 @@
         <spring:param name="index" value="${index - 1}" />
 
         <!-- maintain request params to navigate over finder results -->
-        <c:forEach var="p" items="${param}" > 
+        <c:forEach var="p" items="${param}" >
 
           <!-- don't add index param again -->
           <c:if test="${p.key ne 'index'}">
-            <spring:param name="${p.key}" value="${p.value}" />
+            <c:if test="${not (fn:endsWith(p.key, 'Page') || fn:endsWith(p.key, 'PageSize') ) }">
+              <spring:param name="${p.key}" value="${p.value}" />
+            </c:if>
           </c:if>
         </c:forEach>
       </spring:url>
@@ -66,11 +70,13 @@
         <spring:param name="index" value="${index + 1}" />
 
         <!-- maintain request params to navigate over finder results -->
-        <c:forEach var="p" items="${param}" > 
+        <c:forEach var="p" items="${param}" >
 
           <!-- don't add index param again -->
           <c:if test="${p.key ne 'index'}">
-            <spring:param name="${p.key}" value="${p.value}" />
+            <c:if test="${not (fn:endsWith(p.key, 'Page') || fn:endsWith(p.key, 'PageSize') ) }">
+              <spring:param name="${p.key}" value="${p.value}" />
+            </c:if>
           </c:if>
         </c:forEach>
       </spring:url>
@@ -85,11 +91,13 @@
         <spring:param name="index" value="${maxEntities}" />
 
         <!-- maintain request params to navigate over finder results -->
-        <c:forEach var="p" items="${param}" > 
+        <c:forEach var="p" items="${param}" >
 
           <!-- don't add index param again -->
           <c:if test="${p.key ne 'index'}">
-            <spring:param name="${p.key}" value="${p.value}" />
+            <c:if test="${not (fn:endsWith(p.key, 'Page') || fn:endsWith(p.key, 'PageSize') ) }">
+              <spring:param name="${p.key}" value="${p.value}" />
+            </c:if>
           </c:if>
         </c:forEach>
       </spring:url>

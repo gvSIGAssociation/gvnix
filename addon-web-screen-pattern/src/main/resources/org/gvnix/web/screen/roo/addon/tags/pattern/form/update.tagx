@@ -58,7 +58,7 @@
       <spring:message code="entity_update" arguments="${typeName}" var="update_label" />
       <util:quicklinks id="${id}">
         <util:quicklink id="${id}_create" label="${create_label}" type="CREATE" onclick="gvNixChangesControl(); gvnix_create('${secId}');" />
-        <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="gvNixChangesControl(); gvnix_edit('${secId}');" />
+        <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="gvnix_edit_ward('${secId}');" />
         <util:quicklink id="${id}_delete" label="${delete_entity}" type="DELETE" onclick="gvnix_delete_confirm('${delete_confirm_msg}', '${secId}');" />
       </util:quicklinks>
 
@@ -260,6 +260,16 @@
         // Get update form and submit them
         var forms = dojo.query('form[id^="gvnix_form_' + element + '"]');
         forms[0].submit();
+      }
+
+      /*
+       * Enable update form if any row selected
+       */
+      function gvnix_edit_ward(element) {
+        if ( gvnix_any_selected(element) ) {
+            gvNixChangesControl();
+            gvnix_edit('${secId}');
+        }
       }
 
     ]]></script>

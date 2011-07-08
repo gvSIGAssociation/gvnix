@@ -26,10 +26,27 @@
  */
 function gvnix_delete_confirm(msg, element) {
 
-    var r = confirm(msg);
-    if (r == true) {
-        gvnix_delete(element);
-    }
+  if (gvnix_any_selected(element)) {
+      var r = confirm(msg);
+      if (r == true) {
+          gvnix_delete(element);
+      }
+  }
+}
+
+/*
+ * Check if there is any row selected
+ */
+function gvnix_any_selected(element) {
+    var forms = dojo.query('input[id^="gvnix_checkbox_' + element + '"]');
+    var any = false;
+    forms.forEach(function(node, index, arr) {
+      // If selected row
+      if (node.checked == true) {
+        any = true;
+      }
+    });
+    return any;
 }
 
 /*
@@ -150,7 +167,7 @@ function gvnix_create(element) {
         node2.style.display = "block";
     });
 
-	// Fix element height adding 137px to its previous height definition
+  // Fix element height adding 137px to its previous height definition
     var divToOverflow = dojo.query('#relations > div[class*="dijitTabPaneWrapper"]')[0];
     var divHeight = dojo.style(divToOverflow, 'height');
     dojo.style(divToOverflow, 'height', divHeight + 137 + "px");
