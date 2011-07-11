@@ -126,10 +126,18 @@ public interface WebExceptionHandlerOperations {
             JavaSymbolName name);
 
     /**
+     * Annotates given controllerClass with {@link GvNIXModalDialog} with empty
+     * attribute value
+     * 
+     * @param controllerClass
+     */
+    public void addDefaultModalDialogAnnotation(JavaType controllerClass);
+
+    /**
      * Installs the Java class given by its className.
      * <p>
-     * It expects only "MessageMappingExceptionResolver" or "ModalDialog" as
-     * possible parameter
+     * It expects only "MessageMappingExceptionResolver" or "Dialog" as possible
+     * parameter
      * 
      * @param className
      * @return
@@ -148,4 +156,30 @@ public interface WebExceptionHandlerOperations {
      * Also adds needed i18n properties to right message_xx.properties files
      */
     public void installMvcArtifacts();
+
+    /**
+     * Setup modal dialogs support for current project
+     * <ul>
+     * <li>Setup maven dependency</li>
+     * <li>Installs bean Dialog.java</li>
+     * <li>Installs MVC Artifacts</li>
+     * </ul>
+     */
+    public void setupModalDialogsSupport();
+
+    /**
+     * Add addon repository and dependency to get annotations.
+     * 
+     * @param configuration
+     *            Configuration element
+     */
+    public void setupMavenDependency();
+
+    /**
+     * Returns true if message-box shows messages as modal dialogs, false
+     * otherwise.
+     * 
+     * @return
+     */
+    public boolean isMessageBoxOfTypeModal();
 }

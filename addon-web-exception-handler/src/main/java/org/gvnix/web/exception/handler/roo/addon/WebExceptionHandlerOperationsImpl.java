@@ -70,9 +70,11 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.osgi.UrlFindingUtils;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
@@ -909,8 +911,9 @@ public class WebExceptionHandlerOperationsImpl implements
      */
     public void installMvcArtifacts() {
         // copy util to tags/util
-        copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"));
+        copyDirectoryContents("tags/dialog/modal/*.tagx",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/tags/dialog/modal"));
         addMessageBoxInLayout();
 
         // Check if Valencian_Catalan language is supported and add properties
@@ -947,6 +950,9 @@ public class WebExceptionHandlerOperationsImpl implements
         String defaultJspx = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
                 "WEB-INF/layouts/default.jspx");
 
+        // TODO: Check if it's necessary to add message-box in home-default.jspx
+        // layout (when exists)
+
         if (!fileManager.exists(defaultJspx)) {
             // layouts/default.jspx doesn't exist, so nothing to do
             return;
@@ -958,23 +964,24 @@ public class WebExceptionHandlerOperationsImpl implements
         try {
             defaultJspxXml = XmlUtils.getDocumentBuilder().parse(defulatJspxIs);
         } catch (Exception ex) {
-            throw new IllegalStateException(
-                    "Could not open load-scripts.tagx file", ex);
+            throw new IllegalStateException("Could not open default.jspx file",
+                    ex);
         }
 
         Element lsHtml = defaultJspxXml.getDocumentElement();
 
+        // Set dialog tag lib as attribute in html element
+        lsHtml.setAttribute("xmlns:dialog",
+                "urn:jsptagdir:/WEB-INF/tags/dialog/modal");
+
         Element messageBoxElement = XmlUtils.findFirstElementByName(
-                "util:message-box", lsHtml);
+                "dialog:message-box", lsHtml);
         if (messageBoxElement == null) {
-            // Add utils tag lib as attribute in html element
-            lsHtml.setAttribute("xmlns:util",
-                    "urn:jsptagdir:/WEB-INF/tags/util");
             Element divMain = XmlUtils.findFirstElement(
                     "/html/body/div/div[@id='main']", lsHtml);
             Element insertAttributeBodyElement = XmlUtils.findFirstElement(
                     "/html/body/div/div/insertAttribute[@name='body']", lsHtml);
-            Element messageBox = new XmlElementBuilder("util:message-box",
+            Element messageBox = new XmlElementBuilder("dialog:message-box",
                     defaultJspxXml).build();
             divMain.insertBefore(messageBox, insertAttributeBodyElement);
         }
@@ -1035,7 +1042,7 @@ public class WebExceptionHandlerOperationsImpl implements
      */
     private String installWebServletHandlerClasses() {
         String classPackage = installWebServletHandlerClass("MessageMappingExceptionResolver");
-        installWebServletHandlerClass("ModalDialog");
+        installWebServletHandlerClass("Dialog");
         return classPackage.concat(".MessageMappingExceptionResolver");
     }
 
@@ -1059,7 +1066,7 @@ public class WebExceptionHandlerOperationsImpl implements
             InputStream template = TemplateUtils.getTemplate(
                     getClass(),
                     "web/servlet/handler/".concat(className).concat(
-                            "-template.java"));
+                            ".java-template"));
 
             String javaTemplate;
             try {
@@ -1075,7 +1082,7 @@ public class WebExceptionHandlerOperationsImpl implements
                         mutableClass.getOutputStream());
             } catch (IOException ioe) {
                 throw new IllegalStateException("Unable load "
-                        .concat(className).concat("-template.java template"),
+                        .concat(className).concat(".java-template template"),
                         ioe);
             } finally {
                 try {
@@ -1277,6 +1284,60 @@ public class WebExceptionHandlerOperationsImpl implements
      * 
      * @see
      * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * #setupModalDialogsSupport()
+     */
+    public void setupModalDialogsSupport() {
+        setupMavenDependency();
+        installWebServletHandlerClass("Dialog");
+        installMvcArtifacts();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * #setupMavenDependency()
+     */
+    public void setupMavenDependency() {
+        Element configuration = XmlUtils.getConfiguration(getClass(),
+                "configuration.xml");
+
+        // Install the add-on Google code repository and dependency needed to
+        // get the annotations
+
+        List<Element> repos = XmlUtils.findElements(
+                "/configuration/gvnix/repositories/repository", configuration);
+        for (Element repo : repos) {
+            projectOperations.addRepository(new Repository(repo));
+        }
+
+        List<Element> depens = XmlUtils.findElements(
+                "/configuration/gvnix/dependencies/dependency", configuration);
+        for (Element depen : depens) {
+            projectOperations.addDependency(new Dependency(depen));
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * #addModalDialogAnnotation(org.springframework.roo.model.JavaType,
+     * org.springframework.roo.model.JavaSymbolName)
+     */
+    public void addDefaultModalDialogAnnotation(JavaType controllerClass) {
+        Assert.notNull(controllerClass, "controller is required");
+
+        annotateWithModalDialog(controllerClass, null);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #addModalDialogAnnotation(org.springframework.roo.model.JavaType,
      * org.springframework.roo.model.JavaSymbolName)
      */
@@ -1284,6 +1345,13 @@ public class WebExceptionHandlerOperationsImpl implements
             JavaSymbolName name) {
         Assert.notNull(controllerClass, "controller is required");
         Assert.notNull(name, "name is required");
+
+        annotateWithModalDialog(controllerClass, name);
+    }
+
+    private void annotateWithModalDialog(JavaType controllerClass,
+            JavaSymbolName name) {
+        Assert.notNull(controllerClass, "controller is required");
 
         // Get mutableTypeDetails from controllerClass. Also checks javaType is
         // a controller
@@ -1332,20 +1400,22 @@ public class WebExceptionHandlerOperationsImpl implements
             isAlreadyAnnotated = true;
         }
 
-        StringAttributeValue newModalDialogValue = new StringAttributeValue(
-                ARRAY_ELEMENT, name.getSymbolName());
-        if (!modalDialogsList.contains(newModalDialogValue)) {
-            modalDialogsList.add(newModalDialogValue);
-        }
-
         // Prepare annotation builder
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 MODAL_DIALOGS);
 
-        // Add attribute values
-        annotationBuilder
-                .addAttribute(new ArrayAttributeValue<StringAttributeValue>(
-                        VALUE, modalDialogsList));
+        if (name != null) {
+            StringAttributeValue newModalDialogValue = new StringAttributeValue(
+                    ARRAY_ELEMENT, name.getSymbolName());
+            if (!modalDialogsList.contains(newModalDialogValue)) {
+                modalDialogsList.add(newModalDialogValue);
+            }
+
+            // Add attribute values
+            annotationBuilder
+                    .addAttribute(new ArrayAttributeValue<StringAttributeValue>(
+                            VALUE, modalDialogsList));
+        }
 
         if (isAlreadyAnnotated) {
             controllerDetails.updateTypeAnnotation(annotationBuilder.build(),
@@ -1353,6 +1423,46 @@ public class WebExceptionHandlerOperationsImpl implements
         } else {
             controllerDetails.addTypeAnnotation(annotationBuilder.build());
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * #isMessageBoxOfTypeModal()
+     */
+    public boolean isMessageBoxOfTypeModal() {
+        String defaultJspx = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "WEB-INF/layouts/default.jspx");
+
+        // TODO: Check if it's necessary to add message-box in home-default.jspx
+        // layout (when exists)
+
+        if (!fileManager.exists(defaultJspx)) {
+            // layouts/default.jspx doesn't exist, so nothing to do
+            return false;
+        }
+
+        InputStream defulatJspxIs = fileManager.getInputStream(defaultJspx);
+
+        Document defaultJspxXml;
+        try {
+            defaultJspxXml = XmlUtils.getDocumentBuilder().parse(defulatJspxIs);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Could not open default.jspx file",
+                    ex);
+        }
+
+        Element lsHtml = defaultJspxXml.getDocumentElement();
+
+        // Check if dialog:message-box is of type modal
+        String dialogNS = lsHtml.getAttribute("xmlns:dialog");
+        if (dialogNS.equals("urn:jsptagdir:/WEB-INF/tags/dialog/modal")) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

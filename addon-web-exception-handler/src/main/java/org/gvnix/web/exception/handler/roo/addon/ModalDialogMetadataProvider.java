@@ -41,14 +41,9 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Element;
 
 /**
  * Provides {@link ModalDialogMetadata}. This type is called by Roo to retrieve
@@ -78,8 +73,6 @@ public final class ModalDialogMetadataProvider extends
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     @Reference
     private WebExceptionHandlerOperations webExceptionHandlerOperations;
-    @Reference
-    private ProjectOperations projectOperations;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -123,25 +116,18 @@ public final class ModalDialogMetadataProvider extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
 
-        JavaType controllerType = ModalDialogMetadata
-                .getJavaType(metadataIdentificationString);
-        List<String> definedModalDialogs = getDefinedModalDialogsIfAny(controllerType);
-
-        if (definedModalDialogs != null && !definedModalDialogs.isEmpty()) {
-            setupMavenDependency();
-            webExceptionHandlerOperations
-                    .installWebServletHandlerClass("ModalDialog");
-            webExceptionHandlerOperations.installMvcArtifacts();
-        }
-
-        // Check if GvNIXModalDialogs support is set in current project checking
-        // if ModalDialog.java exists
+        // Check if GvNIXModalDialogs support is set
         if (!isModalDialogSupported(aspectName)) {
             // Nothing to do if ModalDialogs aren't supported
             return null;
         }
 
         MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
+        JavaType controllerType = ModalDialogMetadata
+                .getJavaType(metadataIdentificationString);
+        webExceptionHandlerOperations
+                .addDefaultModalDialogAnnotation(controllerType);
+        List<String> definedModalDialogs = getDefinedModalDialogsIfAny(controllerType);
         return new ModalDialogMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, memberDetails,
                 definedModalDialogs, fileManager, pathResolver);
@@ -163,8 +149,6 @@ public final class ModalDialogMetadataProvider extends
                         new JavaType(RooWebScaffold.class.getName())),
                 aspectName.getSimpleTypeName().concat(
                         " has not @RooWebScaffold annotation"));
-        // MutableClassOrInterfaceTypeDetails controllerDetails =
-        // getControllerMutableTypeDetails(controllerClass);
 
         // Test if the annotation already exists on the target type
         AnnotationMetadata annotationMetadata = MemberFindingUtils
@@ -198,11 +182,8 @@ public final class ModalDialogMetadataProvider extends
     }
 
     /**
-     * GvNIXModalDialogs are supported if ModalDialog class is installed in
-     * project.
-     * 
-     * TODO: Maybe the condition could be improved checking if message-box.tagx
-     * exists too
+     * GvNIXModalDialogs are supported if Dialog class is installed in project
+     * and message-box.tagx is of type 'modal'.
      * 
      * @param aspectName
      * @return
@@ -214,35 +195,10 @@ public final class ModalDialogMetadataProvider extends
                 Path.SRC_MAIN_JAVA,
                 File.separator.concat(
                         aspectPackage.replace(".", File.separator)).concat(
-                        "/servlet/handler/ModalDialog.java"));
+                        "/servlet/handler/Dialog.java"));
 
-        return fileManager.exists(modalDialogTypePath);
-    }
-
-    /**
-     * Add addon repository and dependency to get annotations.
-     * 
-     * @param configuration
-     *            Configuration element
-     */
-    private void setupMavenDependency() {
-        Element configuration = XmlUtils.getConfiguration(getClass(),
-                "configuration.xml");
-
-        // Install the add-on Google code repository and dependency needed to
-        // get the annotations
-
-        List<Element> repos = XmlUtils.findElements(
-                "/configuration/gvnix/repositories/repository", configuration);
-        for (Element repo : repos) {
-            projectOperations.addRepository(new Repository(repo));
-        }
-
-        List<Element> depens = XmlUtils.findElements(
-                "/configuration/gvnix/dependencies/dependency", configuration);
-        for (Element depen : depens) {
-            projectOperations.addDependency(new Dependency(depen));
-        }
+        return fileManager.exists(modalDialogTypePath)
+                && webExceptionHandlerOperations.isMessageBoxOfTypeModal();
     }
 
     public String getItdUniquenessFilenameSuffix() {

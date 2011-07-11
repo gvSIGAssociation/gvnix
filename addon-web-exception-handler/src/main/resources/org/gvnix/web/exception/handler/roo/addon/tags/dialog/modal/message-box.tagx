@@ -75,9 +75,6 @@
       <c:choose>
         <c:when test="${not empty param.exception}">
           <c:set var="MsgDlgClass" value="MessageErrorBox" />
-          <!--
-            en el siguiente message 'text' se anyade para no definir el code en los properties i18n
-          -->
           <spring:message code="message_error_title" text="Message Error Title" var="title" htmlEscape="false" />
           <spring:message code="error_${fn:toLowerCase(param.exception)}_problemdescription" var="description"
             text="${default_message_error_desc}" htmlEscape="false"/>

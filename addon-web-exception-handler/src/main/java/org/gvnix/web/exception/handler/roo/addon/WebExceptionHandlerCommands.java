@@ -43,24 +43,24 @@ public class WebExceptionHandlerCommands implements CommandMarker {
     @Reference
     private WebExceptionHandlerOperations exceptionOperations;
 
-    @CliAvailabilityIndicator("web mvc exception handler list")
+    @CliAvailabilityIndicator("web mvc exception list")
     public boolean isListExceptionHandlerAvailable() {
         return exceptionOperations.isProjectAvailable()
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc exception handler list", help = "Obtains the list of the Exceptions that handles the application.")
+    @CliCommand(value = "web mvc exception list", help = "Obtains the list of the Exceptions that handles the application.")
     public String listExceptionHandler() {
         return exceptionOperations.getHandledExceptionList();
     }
 
-    @CliAvailabilityIndicator("web mvc exception handler add")
+    @CliAvailabilityIndicator("web mvc exception add")
     public boolean isAddNewHandledException() {
         return exceptionOperations.isProjectAvailable()
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc exception handler add", help = "Adds a handler for an Uncaught Exception and creates a view with a specific message.")
+    @CliCommand(value = "web mvc exception add", help = "Adds a handler for an Uncaught Exception and creates a view with a specific message.")
     public void addNewHandledException(
             @CliOption(key = "exception", mandatory = true, help = "The name of the Exception you want to handle with the whole package path. e.g. java.lang.Exception") String exceptionName,
             @CliOption(key = "title", mandatory = true, help = "The title of the Exception you want to handle.\nEnter the title between commas if it is composed of more than one word.") String exceptionTitle,
@@ -71,27 +71,27 @@ public class WebExceptionHandlerCommands implements CommandMarker {
                 exceptionTitle, exceptionDescription, exceptionLanguage);
     }
 
-    @CliAvailabilityIndicator("web mvc exception handler remove")
+    @CliAvailabilityIndicator("web mvc exception remove")
     public boolean isRemoveExceptionHandledAvailable() {
         return exceptionOperations.isProjectAvailable()
         // && exceptionOperations.isExceptionMappingAvailable();
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc exception handler remove", help = "Removes the Exception handler select and her view.")
+    @CliCommand(value = "web mvc exception remove", help = "Removes the Exception handler select and her view.")
     public void removeExceptionHandled(
             @CliOption(key = "exception", mandatory = true, help = "The Exception you want to remove.") String exceptionName) {
         exceptionOperations.removeExceptionHandled(exceptionName);
     }
 
-    @CliAvailabilityIndicator("web mvc exception handler set language")
+    @CliAvailabilityIndicator("web mvc exception set language")
     public boolean isSetLanguageExceptionHandledAvailable() {
         return exceptionOperations.isProjectAvailable()
         // && exceptionOperations.isExceptionMappingAvailable();
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc exception handler set language", help = "Set the title and description of the exception selected to the choosed language file.")
+    @CliCommand(value = "web mvc exception set language", help = "Set the title and description of the exception selected to the choosed language file.")
     public void languageExceptionHandled(
             @CliOption(key = "exception", mandatory = true, help = "The name of the Exception you want to set the message with the whole package path. e.g. java.lang.Exception") String exceptionName,
             @CliOption(key = "title", mandatory = true, help = "The title of the Exception you want to handle.\nEnter the title between commas if it is composed of more than one word.") String exceptionTitle,
@@ -102,24 +102,35 @@ public class WebExceptionHandlerCommands implements CommandMarker {
                 exceptionTitle, exceptionDescription, exceptionLanguage);
     }
 
-    @CliAvailabilityIndicator("web mvc exception handler setup gvnix")
+    @CliAvailabilityIndicator("web mvc exception setup")
     public boolean isSetUpGvNIXExceptionsAvailable() {
         return exceptionOperations.isProjectAvailable()
                 && exceptionOperations.isExceptionMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc exception handler setup gvnix", help = "Defines gvNIX predefined Exceptions.")
+    @CliCommand(value = "web mvc exception setup", help = "Defines gvNIX predefined Exceptions.")
     public void setUpGvNIXExceptions() {
         exceptionOperations.setUpGvNIXExceptions();
     }
 
-    @CliAvailabilityIndicator("web mvc add modalDialog")
-    public boolean isAddGvNIXModalDialogAvailable() {
+    @CliAvailabilityIndicator("web mvc dialog setup")
+    public boolean isSetupGvNIXModalDialogAvailable() {
         return exceptionOperations.isProjectAvailable();
     }
 
-    @CliCommand(value = "web mvc add modalDialog", help = "Defines gvNIX customizable ModalDialog.")
-    public void aGvNIXModalDialogAvailable(
+    @CliCommand(value = "web mvc dialog setup", help = "Setup support for Modal Dialogs in current project.")
+    public void setupGvNIXModalDialog() {
+        exceptionOperations.setupModalDialogsSupport();
+    }
+
+    @CliAvailabilityIndicator("web mvc dialog add")
+    public boolean isAddGvNIXModalDialogAvailable() {
+        return exceptionOperations.isProjectAvailable()
+                && exceptionOperations.isMessageBoxOfTypeModal();
+    }
+
+    @CliCommand(value = "web mvc dialog add", help = "Defines gvNIX customizable Dialog.")
+    public void addGvNIXModalDialog(
             @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
             @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name) {
         exceptionOperations.addModalDialogAnnotation(controllerClass, name);

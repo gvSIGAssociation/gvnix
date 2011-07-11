@@ -89,8 +89,6 @@ public class ModalDialogMetadata extends
         this.pathResolver = pathResolver;
 
         for (String modalDialog : definedModalDialogs) {
-            // Instalar JSPx basado en modaldialog-template.jspx y crear
-            // método
             installModalDialogSample(modalDialog);
             builder.addMethod(getCustomModalDialogMethod(modalDialog));
         }
@@ -114,19 +112,6 @@ public class ModalDialogMetadata extends
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("modalDialog");
 
-        // JavaType dialogType = getJavaTypeForClassName("DialogType");
-        // List<AnnotatedJavaType> paramTypes = new
-        // ArrayList<AnnotatedJavaType>();
-        // paramTypes.add(new AnnotatedJavaType(dialogType,
-        // new ArrayList<AnnotationMetadata>()));
-        // paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
-        // new ArrayList<AnnotationMetadata>()));
-        // paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
-        // new ArrayList<AnnotationMetadata>()));
-        // paramTypes.add(new AnnotatedJavaType(new JavaType(
-        // "javax.servlet.http.HttpServletRequest"),
-        // new ArrayList<AnnotationMetadata>()));
-
         List<AnnotatedJavaType> paramTypes = getMethodParamTypes(false);
 
         MethodMetadata modalDialogMethod = methodExists(methodName, paramTypes);
@@ -135,28 +120,8 @@ public class ModalDialogMetadata extends
         }
 
         List<JavaSymbolName> paramNames = getMethodParamNames(false);
-        // List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
-        // paramNames.add(new JavaSymbolName("dialogType"));
-        // paramNames.add(new JavaSymbolName("title"));
-        // paramNames.add(new JavaSymbolName("description"));
-        // paramNames.add(new JavaSymbolName("httpServletRequest"));
 
         InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(null);
-        // new InvocableMemberBodyBuilder();
-        // JavaType httpSession = new
-        // JavaType("javax.servlet.http.HttpSession");
-        // bodyBuilder.appendFormalLine(httpSession
-        // .getNameIncludingTypeParameters(false,
-        // builder.getImportRegistrationResolver()).concat(
-        // " session = httpServletRequest.getSession();"));
-        // JavaType modalDialog = getJavaTypeForClassName("ModalDialog");
-        // bodyBuilder
-        // .appendFormalLine(modalDialog
-        // .getNameIncludingTypeParameters(false,
-        // builder.getImportRegistrationResolver())
-        // .concat(" modalDialog = new ModalDialog(dialogType, title, description);"));
-        // bodyBuilder
-        // .appendFormalLine("session.setAttribute(\"dialogMessage\", modalDialog);");
 
         return new MethodMetadataBuilder(getId(), 0, methodName,
                 JavaType.VOID_PRIMITIVE, paramTypes, paramNames, bodyBuilder)
@@ -175,27 +140,6 @@ public class ModalDialogMetadata extends
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName(modalDialog);
 
-        // JavaType dialogType = getJavaTypeForClassName("DialogType");
-        // List<AnnotatedJavaType> paramTypes = new
-        // ArrayList<AnnotatedJavaType>();
-        // paramTypes.add(new AnnotatedJavaType(dialogType,
-        // new ArrayList<AnnotationMetadata>()));
-        // paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
-        // new ArrayList<AnnotationMetadata>()));
-        // paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
-        // new ArrayList<AnnotationMetadata>()));
-        // List<JavaType> typeParams = new ArrayList<JavaType>();
-        // typeParams.add(JavaType.STRING_OBJECT);
-        // typeParams.add(new JavaType("java.lang.Object"));
-        // JavaType hashMap = new JavaType("java.util.HashMap", 0,
-        // DataType.TYPE,
-        // null, typeParams);
-        // paramTypes.add(new AnnotatedJavaType(hashMap,
-        // new ArrayList<AnnotationMetadata>()));
-        // paramTypes.add(new AnnotatedJavaType(new JavaType(
-        // "javax.servlet.http.HttpServletRequest"),
-        // new ArrayList<AnnotationMetadata>()));
-
         List<AnnotatedJavaType> paramTypes = getMethodParamTypes(true);
 
         MethodMetadata modalDialogMethod = methodExists(methodName, paramTypes);
@@ -204,32 +148,8 @@ public class ModalDialogMetadata extends
         }
 
         List<JavaSymbolName> paramNames = getMethodParamNames(true);
-        // new ArrayList<JavaSymbolName>();
-        // paramNames.add(new JavaSymbolName("dialogType"));
-        // paramNames.add(new JavaSymbolName("title"));
-        // paramNames.add(new JavaSymbolName("description"));
-        // paramNames.add(new JavaSymbolName("params"));
-        // paramNames.add(new JavaSymbolName("httpServletRequest"));
 
         InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(modalDialog);
-        // new InvocableMemberBodyBuilder();
-        // JavaType httpSession = new
-        // JavaType("javax.servlet.http.HttpSession");
-        // bodyBuilder.appendFormalLine(httpSession
-        // .getNameIncludingTypeParameters(false,
-        // builder.getImportRegistrationResolver()).concat(
-        // " session = httpServletRequest.getSession();"));
-        // JavaType modalDialogJavaType =
-        // getJavaTypeForClassName("ModalDialog");
-        // bodyBuilder
-        // .appendFormalLine(modalDialogJavaType
-        // .getNameIncludingTypeParameters(false,
-        // builder.getImportRegistrationResolver())
-        // .concat(" modalDialog = new ModalDialog(dialogType, \"/WEB-INF/dialogs/"
-        // .concat(modalDialog)
-        // .concat(".jspx\", title, description, params);")));
-        // bodyBuilder
-        // .appendFormalLine("session.setAttribute(\"dialogMessage\", modalDialog);");
 
         return new MethodMetadataBuilder(getId(), 0, methodName,
                 JavaType.VOID_PRIMITIVE, paramTypes, paramNames, bodyBuilder)
@@ -290,12 +210,12 @@ public class ModalDialogMetadata extends
     }
 
     /**
-     * Returns the InvocableMemeberBodyBuilder for ModalDialog create and set in
+     * Returns the InvocableMemeberBodyBuilder for Dialog create and set in
      * Session methods
      * 
      * @param customModalDialogJspxName
      *            if informed will use
-     *            <code>ModalDialog(DialogType dialogType, String page, String title, String description, HashMap&lt;String, Object&gt; params)</code>
+     *            <code>Dialog(DialogType dialogType, String page, String title, String description, HashMap&lt;String, Object&gt; params)</code>
      *            constructor
      * @return
      */
@@ -307,13 +227,13 @@ public class ModalDialogMetadata extends
                 .getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver()).concat(
                         " session = httpServletRequest.getSession();"));
-        JavaType modalDialogJavaType = getJavaTypeForClassName("ModalDialog");
+        JavaType modalDialogJavaType = getJavaTypeForClassName("Dialog");
         if (StringUtils.hasText(customModalDialogJspxName)) {
             bodyBuilder
                     .appendFormalLine(modalDialogJavaType
                             .getNameIncludingTypeParameters(false,
                                     builder.getImportRegistrationResolver())
-                            .concat(" modalDialog = new ModalDialog(dialogType, \"/WEB-INF/dialogs/"
+                            .concat(" modalDialog = new Dialog(dialogType, \"/WEB-INF/dialogs/"
                                     .concat(customModalDialogJspxName)
                                     .concat(".jspx\", title, description, params);")));
         } else {
@@ -321,7 +241,7 @@ public class ModalDialogMetadata extends
                     .appendFormalLine(modalDialogJavaType
                             .getNameIncludingTypeParameters(false,
                                     builder.getImportRegistrationResolver())
-                            .concat(" modalDialog = new ModalDialog(dialogType, title, description);"));
+                            .concat(" modalDialog = new Dialog(dialogType, title, description);"));
         }
         bodyBuilder
                 .appendFormalLine("session.setAttribute(\"dialogMessage\", modalDialog);");
@@ -339,24 +259,22 @@ public class ModalDialogMetadata extends
      * package name from the aspect of this metadata, that is the aspect of a
      * Controller class.
      * <p>
-     * Since the add-on installs ModalDialog class in subpackage
+     * Since the add-on installs Dialog class in subpackage
      * <code>controller_package.servlet.handler</code>, it builds the package
      * name adding <code>.servlet.handler.[className]</code> to the aspect
      * package.
      * <p>
-     * DialogType is special because is an enum type defined in ModalDialog
-     * class
+     * DialogType is special because is an enum type defined in Dialog class
      * 
      * @param className
-     *            Right now it expects only "DialogType" or "ModalDialog"
+     *            Right now it expects only "DialogType" or "Dialog"
      * @return
      */
     private JavaType getJavaTypeForClassName(String className) {
         String typePackage = aspectName.getPackage()
                 .getFullyQualifiedPackageName().concat(".servlet.handler.");
         if (className.equals("DialogType")) {
-            return new JavaType(typePackage.concat("ModalDialog.").concat(
-                    className));
+            return new JavaType(typePackage.concat("Dialog.").concat(className));
         }
         return new JavaType(typePackage.concat(className));
     }
@@ -370,7 +288,7 @@ public class ModalDialogMetadata extends
             try {
 
                 InputStream templateInputStream = TemplateUtils.getTemplate(
-                        getClass(), "modaldialog-template.jspx");
+                        getClass(), "modaldialog.jspx-template");
 
                 InputStreamReader readerFile = new InputStreamReader(
                         templateInputStream);

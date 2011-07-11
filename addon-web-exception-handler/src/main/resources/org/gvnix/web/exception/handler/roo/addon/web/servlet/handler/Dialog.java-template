@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 
 /**
- * Bean holding data about the ModalDialog we want to render with the help
+ * Bean holding data about the Dialog we want to render with the help
  * of <code>message-box.tagx</code> TAGx.
  *
  * <ul>
@@ -22,7 +22,7 @@ import java.util.HashMap;
  * </ul>
  *
  */
-public class ModalDialog {
+public class Dialog {
 
   public enum DialogType {
     Error, Info, Alert, Suggest;
@@ -40,7 +40,7 @@ public class ModalDialog {
 
   private HashMap<String, Object> params;
 
-  public ModalDialog(DialogType dialogType, String page, Exception exception, String title, String description, HashMap<String, Object> params) {
+  public Dialog(DialogType dialogType, String page, Exception exception, String title, String description, HashMap<String, Object> params) {
     this.dialogType = dialogType;
     this.page = page;
     this.exception = exception;
@@ -49,7 +49,7 @@ public class ModalDialog {
     this.params = params;
   }
 
-  public ModalDialog(DialogType dialogType, String page, String title, String description, HashMap<String, Object> params) {
+  public Dialog(DialogType dialogType, String page, String title, String description, HashMap<String, Object> params) {
     this.dialogType = dialogType;
     this.page = page;
     this.title = title;
@@ -57,20 +57,20 @@ public class ModalDialog {
     this.params = params;
   }
 
-  public ModalDialog(DialogType dialogType, String title, String description, HashMap<String, Object> params) {
+  public Dialog(DialogType dialogType, String title, String description, HashMap<String, Object> params) {
     this.dialogType = dialogType;
     this.title = title;
     this.description = description;
     this.params = params;
   }
 
-  public ModalDialog(DialogType dialogType, String title, String description) {
+  public Dialog(DialogType dialogType, String title, String description) {
     this.dialogType = dialogType;
     this.title = title;
     this.description = description;
   }
 
-  public ModalDialog(String page, Exception exception) {
+  public Dialog(String page, Exception exception) {
     this.dialogType = DialogType.Error;
     this.page = page;
     this.exception = exception;
@@ -127,7 +127,7 @@ public class ModalDialog {
 
   @Override
   public String toString() {
-    return "ModalDialog [dialogType=".concat(dialogType.name())
+    return "Dialog [dialogType=".concat(dialogType.name())
         .concat(", page=").concat(page)
         .concat(", exception=").concat(exception.toString())
         .concat(", title=").concat(title)
