@@ -296,10 +296,21 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
                         .concat(controllerClass.getFullyQualifiedTypeName()));
 
         // Check if Patter Pattern is of type register
+        // If is not register, user is setting a Master tabular - Detail pattern
+        // and this is not supported yet
         if (!isMasterPatternRegister(patternValues, name)) {
             logger.warning("Pattern name '"
                     .concat(name.getSymbolName())
                     .concat("' is of type tabular. Currently gvNIX doesn't support 'Master tabular / Detail' pattern"));
+            return;
+        }
+        // Check if user is setting Master register - Detail register
+        // if so, this is not supported yet, so abort
+        if (isMasterPatternRegister(patternValues, name)
+                && type == WebPattern.register) {
+            logger.warning("Pattern name '"
+                    .concat(name.getSymbolName())
+                    .concat("' is of type register and you are setting detail as register. Currently gvNIX doesn't support 'Master register / Detail register' pattern"));
             return;
         }
 

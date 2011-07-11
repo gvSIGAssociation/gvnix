@@ -251,7 +251,7 @@ TODO
 
 * Rename 'screen' with 'pattern'.
 
-* Los patrones de las entidades relacionadas actualmente funcionan para @OneToMany y deberían 
+* Los patrones de las entidades relacionadas actualmente funcionan para @OneToMany y deberían
   funcionar también para los tipos @ManyToMany sin cambios y para ManyToOne con algún pequeño cambio.
 
 * Ampliar la ejecución del comando de "pattern relation" para que se pueda ejecutar recursivamente.
@@ -262,4 +262,7 @@ TODO
 
 * Escribir en el Java de la entidad la anotación GvNIXEntityBatch desde el Metadata de GvNIXPattern y GvNIXRelatedPattern,
   en lugar de hacerlo desde el command.
-  
+
+* Se desactiva el soporte de los patrones Maestro tabular - Detalle * y Maestro registro - Detalle registro. En
+  WebScreenOperationsImpl.addRelationPattern(JavaType, JavaSymbolName, JavaSymbolName, WebPattern) se comprueba si
+  se están definiendo estos patrones y se aborta la ejecución en caso afirmativo.
