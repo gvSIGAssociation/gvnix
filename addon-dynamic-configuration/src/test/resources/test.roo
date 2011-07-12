@@ -9,6 +9,7 @@ configuration create --name dev
 configuration property add --name database.url
 configuration property add --name hibernate.hbm2ddl.auto
 configuration property add --name log4j.rootLogger
+configuration property add --name database.password
 
 # Set property values distinct than default for development configuration
 configuration property value --configuration dev --property database.url --value jdbc:hsqldb:mem:mydevdb
@@ -27,6 +28,9 @@ configuration property value --configuration pro --property database.url --value
 configuration property value --configuration pro --property hibernate.hbm2ddl.auto --value update
 configuration property value --configuration pro --property log4j.rootLogger --value "ERROR, stdout"
 
+# Undefined database password value for production configuration (value will be set from command line) 
+configuration property undefined --configuration pro --property database.password
+
 # Check configurations
 configuration list
 
@@ -35,4 +39,4 @@ configuration export
 
 # Then you can run the application with distinct profiles:
 #  mvn clean tomcat:run -P dev
-#  mvn clean tomcat:run -P pro
+#  mvn clean tomcat:run -P pro -D database.password=

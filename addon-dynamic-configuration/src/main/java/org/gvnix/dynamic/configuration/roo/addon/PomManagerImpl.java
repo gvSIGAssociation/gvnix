@@ -227,6 +227,8 @@ public class PomManagerImpl implements PomManager {
 
     /**
      * Write a property into POM profile.
+     *
+     * <p>No write property if null value.</p>
      * 
      * @param doc
      *            Pom document
@@ -250,16 +252,20 @@ public class PomManagerImpl implements PomManager {
             key = key.replace("..", ".");
         }
 
-        // <log4j.rootLogger>INFO, stdout</log4j.rootLogger>
+        // Create property if not empty (no write property if null value)
+        if (dynProp.getValue() != null) {
 
-        // Create a property element for this dynamic property
-        Element prop = doc.createElement(key);
-        props.appendChild(prop);
+            // <log4j.rootLogger>INFO, stdout</log4j.rootLogger>
 
-        // Store this dynamic property value in pom and replace
-        // dynamic property value with a var
-        prop.setTextContent(dynProp.getValue());
+            // Create a property element for this dynamic property
+            Element prop = doc.createElement(key);
+            props.appendChild(prop);
+
+            // Store this dynamic property value in pom and replace
+            // dynamic property value with a var
+            prop.setTextContent(dynProp.getValue());
+        }
+
         dynProp.setValue("${" + key + "}");
     }
-
 }

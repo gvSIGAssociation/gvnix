@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 
 /**
  * Dynamic configuration operations.
- *
+ * 
  * @author Mario Martínez Sánchez ( mmartinez at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -169,20 +169,18 @@ public class OperationsImpl implements Operations {
     /**
      * {@inheritDoc}
      */
+    public DynProperty updateProperty(String configuration, String property) {
+
+        return (configurations.updateProperty(configuration, property, null));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public DynProperty updateProperty(String configuration, String property,
             String value) {
 
-        // Get the required property element to update
-        Element prop = configurations.getProperty(configuration, property);
-        if (prop == null) {
-            return null;
-        }
-
-        // Update property value on configuration
-        prop.getChildNodes().item(3).setTextContent(value);
-        configurations.saveConfiguration(prop);
-
-        return configurations.parseProperty(prop);
+        return (configurations.updateProperty(configuration, property, value));
     }
 
     /**

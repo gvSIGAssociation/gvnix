@@ -98,8 +98,12 @@ public class DynComponent {
             // Show the property and value if exists with format
             buffer.append("\n");
             buffer.append("   - " + prop.getKey());
-            if (prop.getValue() != null && prop.getValue().length() > 0) {
-                buffer.append(" = " + prop.getValue());
+            if (prop.getValue() == null) {
+
+                buffer.append(" = (UNDEFINED)");
+            } else {
+
+                buffer.append(" = \"" + prop.getValue() + "\"");
             }
         }
 

@@ -41,7 +41,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -203,10 +202,26 @@ public class ConfigurationsImpl implements Configurations {
     public DynProperty parseProperty(Element prop) {
 
         // Create a dynamic property from property element
-        NodeList childs = prop.getChildNodes();
-        Node key = childs.item(1);
-        Node value = childs.item(3);
-        return new DynProperty(key.getTextContent(), value.getTextContent());
+        Node key = getKeyElement(prop);
+        Node value = getValueElement(prop);
+        return new DynProperty(key.getTextContent(), value == null ? null
+                : value.getTextContent());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Node getKeyElement(Element prop) {
+
+        return XmlUtils.findFirstElement(KEY_ELEMENT_NAME, prop);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Node getValueElement(Element prop) {
+
+        return XmlUtils.findFirstElement(VALUE_ELEMENT_NAME, prop);
     }
 
     /**
@@ -242,8 +257,7 @@ public class ConfigurationsImpl implements Configurations {
      */
     public Element getProperty(String configuration, String property) {
 
-        // TODO Several properties with same name can exist at different
-        // components
+        // TODO Properties with same name can exist at different components
         return XmlUtils.findFirstElement(CONFIGURATION_XPATH + "[@"
                 + NAME_ATTRIBUTE_NAME + "='" + configuration + "']" + "/"
                 + COMPONENT_ELEMENT_NAME + "/" + PROPERTY_ELEMENT_NAME + "/"
@@ -308,6 +322,47 @@ public class ConfigurationsImpl implements Configurations {
 
         // Add property in base configuration
         addProperty(name, value, compId, compName, getBaseConfiguration());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public DynProperty updateProperty(String configuration, String property,
+            String value) {
+
+        // Get the required property element to update
+        Element prop = getProperty(configuration, property);
+        if (prop == null) {
+            return null;
+        }
+
+        // Get the property value element
+        Node valueElem = getValueElement(prop);
+
+        if (value == null) {
+            if (valueElem != null) {
+
+                // Undefined property value: remove property value element
+                prop.removeChild(valueElem);
+            }
+
+        } else {
+
+            if (valueElem == null) {
+
+                // Undo undefined property value: Create property value element
+                valueElem = prop.getOwnerDocument().createElement(
+                        VALUE_ELEMENT_NAME);
+                prop.appendChild(valueElem);
+            }
+
+            // Set property value
+            valueElem.setTextContent(value);
+        }
+
+        saveConfiguration(prop);
+
+        return parseProperty(prop);
     }
 
     /**
@@ -376,7 +431,7 @@ public class ConfigurationsImpl implements Configurations {
         keyElem.setTextContent(key);
         propElem.appendChild(keyElem);
 
-        // Create value
+        // Create value element
         Element valueElem = doc.createElement(VALUE_ELEMENT_NAME);
         valueElem.setTextContent(value);
         propElem.appendChild(valueElem);

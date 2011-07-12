@@ -95,10 +95,18 @@ public interface Operations {
     public DynConfiguration getBaseProperty(String name);
 
     /**
+     * Set a configuration property with no value.
+     * 
+     * @param configuration
+     *            Configuration name to update
+     * @param property
+     *            Property name to update
+     * @return Dynamic property updated or null if not exists
+     */
+    public DynProperty updateProperty(String configuration, String property);
+
+    /**
      * Set a value on a configuration property.
-     * <p>
-     * If configuration is active, the value is setted on disk too.
-     * </p>
      * 
      * @param configuration
      *            Configuration name to update

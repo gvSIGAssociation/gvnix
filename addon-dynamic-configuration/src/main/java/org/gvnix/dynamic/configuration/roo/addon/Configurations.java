@@ -24,6 +24,7 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * Manage configurations interface.
@@ -166,5 +167,41 @@ public interface Configurations {
      */
     public void addProperties(String name, String value, String compId,
             String compName);
+
+    /**
+     * Get the key element of a property element.
+     * 
+     * @param prop
+     *            Property element
+     * @return
+     */
+    public Node getKeyElement(Element prop);
+
+    /**
+     * Get the value element of a property element.
+     * 
+     * @param prop
+     *            Property element
+     * @return
+     */
+    public Node getValueElement(Element prop);
+
+    /**
+     * Set a value on a configuration property.
+     * 
+     * <p>
+     * If null value, value element no written.
+     * </p>
+     * 
+     * @param configuration
+     *            Configuration name to update
+     * @param property
+     *            Property name to update
+     * @param value
+     *            Value to set
+     * @return Dynamic property updated or null if not exists
+     */
+    public DynProperty updateProperty(String configuration, String property,
+            String value);
 
 }
