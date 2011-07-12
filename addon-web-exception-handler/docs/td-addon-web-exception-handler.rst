@@ -58,8 +58,8 @@ web mvc exception set language - Updates the messages of the Exception in the se
 
 Since version 0.8.0 Exceptions are shown in a Modal Dialog view. This Modal Dialog takes the jspx defined and includes it as part of the view.
 
-Commands
-=========
+Commands Web MVC Exception
+==========================
 
 There are defined four commands in this Add-on:
 
@@ -77,7 +77,37 @@ web mvc exception set language - Updates the messages of the Exception in the se
 
   Parameters: --excepcion Name of the exception e.g. java.lang.Exception,  --title Title of the exception, --description Description of the exception to show in the view and --language The language of the messages [es, en... etc].
 
-web mvc exception setup - Creates a Set of defined exceptions for gvNix
+web mvc exception setup - Creates a Set of defined exceptions for gvNix and setup support for render Exception in modal dialogs using message-box.tagx
+
+Commands Web MVC Modal Dialog
+=============================
+
+web mvc dialog setup - Setups support for modal dialogs::
+
+  When setup is performed, the Add-on installs message-box.tagx (with support for modal dialogs), add message-box component to layouts/default.jspx,
+  adds maven dependency with add-on library and annotates controllers with @GvNIXModalDialogs (without any value). Also it adds some i18n properties to supported
+  languages.
+
+web mvc dialog add - Add a new modal dialog::
+
+  Parameters: --class Name of the controller that uses the modal dialog, --name Name for the modal dialog.
+
+  The command update the value of @GvNIXModalDialogs with value 'name'.
+
+
+ITDs of Web MVC Modal Dialogs
+=============================
+
+The annotation GvNIXModalDialogs defines a ModalDialogMetadata. With it the add-on generates ITD for controllers where the annotation exists.
+
+If GvNIXModalDialogs has not value set the ITD (_Roo_GvNIXModalDialog.aj) will have just one method ``modalDialog(..)``. This method allows
+user to create an instance of the bean Dialog and set it in HTTP Session attribute, so, in the view tier, message-box.tagx will render a modal dialog
+with the data in bean Dialog. This modal dialog only show title and description.
+
+In the other hand, when GvNIXModalDialogs annotation has value set, a sample jspx is created in WEB-INF/dialogs/<name>.jspx. This jspx should be customized
+by user. And in the ITD a new method is created. This method is created with method name the same as the value in annotation and allows user to
+create an instance of the bean Dialog and set it in HTTP Session attribute, as described before, message-box.tagx will render the modal dialog. In this
+case, the modal dialog will include the sample jspx as part of the content.
 
 Proof of Concept
 ================
