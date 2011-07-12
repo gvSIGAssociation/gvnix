@@ -18,11 +18,20 @@
  */
 package org.gvnix.support;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.support.util.FileCopyUtils;
+import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.support.util.TemplateUtils;
 
 /**
  * Utils for Command classes.
@@ -85,4 +94,55 @@ public class OperationUtils {
         return true;
     }
 
+    /**
+     * Installs the Dialog Java class
+     * 
+     * @return
+     */
+    public static String installWebServletDialogClass(String classFullName,
+            PathResolver pathResolver, FileManager fileManager) {
+
+        String classPath = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+                classFullName.replace(".", File.separator).concat(".java"));
+
+        String classPackage = classFullName.replace(".Dialog", "");
+        MutableFile mutableClass = null;
+        if (!fileManager.exists(classPath)) {
+            mutableClass = fileManager.createFile(classPath);
+            // String templatePath = TemplateUtils.getTemplatePath(
+            // OperationUtils.class,
+            // "web/servlet/handler/Dialog.java-template").replaceFirst(
+            // "/", "");
+            // InputStream template = OperationUtils.class
+            // .getResourceAsStream(templatePath);
+            InputStream template = TemplateUtils.getTemplate(
+                    OperationUtils.class,
+                    "web/servlet/handler/Dialog.java-template");
+
+            String javaTemplate;
+            try {
+                javaTemplate = FileCopyUtils
+                        .copyToString(new InputStreamReader(template));
+
+                // Replace package definition
+                javaTemplate = StringUtils.replace(javaTemplate, "${PACKAGE}",
+                        classPackage);
+
+                // Write final java file
+                FileCopyUtils.copy(javaTemplate.getBytes(),
+                        mutableClass.getOutputStream());
+            } catch (IOException ioe) {
+                throw new IllegalStateException(
+                        "Unable load Dialog.java-template template", ioe);
+            } finally {
+                try {
+                    template.close();
+                } catch (IOException e) {
+                    throw new IllegalStateException(
+                            "Error creating Dialog.java in project", e);
+                }
+            }
+        }
+        return classPackage;
+    }
 }

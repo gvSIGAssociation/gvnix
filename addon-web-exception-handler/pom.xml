@@ -179,6 +179,7 @@
                   <version>${gvnix.version}</version>
                   <overWrite>false</overWrite>
                   <includes>**/*.class</includes>
+                  <includes>**/*.java-template</includes>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>${project.build.outputDirectory}</outputDirectory>

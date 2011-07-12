@@ -849,12 +849,16 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Installs Java classes for MessageMappapingExceptionResolver support
      * 
-     * @return
+     * @return string as fully qualified name of MessageMappingExceptionResolver
+     *         Java class installed
      */
     private String installWebServletHandlerClasses() {
         String classPackage = sharedOperations
-                .installWebServletClass("MessageMappingExceptionResolver");
-        sharedOperations.installWebServletClass("Dialog");
+                .installWebServletMessageMappingExceptionResolverClass();
+        // sharedOperations.installWebServletClass("Dialog");
+        OperationUtils.installWebServletDialogClass(
+                sharedOperations.getClassFullQualifiedName("Dialog"),
+                pathResolver, fileManager);
         return classPackage.concat(".MessageMappingExceptionResolver");
     }
 

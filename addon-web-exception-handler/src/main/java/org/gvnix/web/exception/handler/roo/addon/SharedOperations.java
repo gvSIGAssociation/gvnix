@@ -30,15 +30,20 @@ package org.gvnix.web.exception.handler.roo.addon;
 public interface SharedOperations {
 
     /**
-     * Installs the Java class given by its className.
-     * <p>
-     * It expects only "MessageMappingExceptionResolver" or "Dialog" as possible
-     * parameter
+     * Installs the MessageMappingExceptionResolver Java class
+     * 
+     * @return
+     */
+    public String installWebServletMessageMappingExceptionResolverClass();
+
+    /**
+     * Returns the Java class full qualified name given className and based on
+     * the package of App. controllers (classes annotated with @Controller)
      * 
      * @param className
      * @return
      */
-    public String installWebServletClass(String className);
+    public String getClassFullQualifiedName(String className);
 
     /**
      * Installs MVC Artifacts into current project<br/>

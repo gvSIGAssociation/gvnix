@@ -97,7 +97,8 @@ public class SharedOperationsImpl implements SharedOperations {
      * @see org.gvnix.web.exception.handler.roo.addon.SharedOperations#
      * installWebServletClass(java.lang.String)
      */
-    public String installWebServletClass(String className) {
+    public String installWebServletMessageMappingExceptionResolverClass() {
+        String className = "MessageMappingExceptionResolver";
         String classFullName = getClassFullQualifiedName(className);
 
         String classPath = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
@@ -140,14 +141,13 @@ public class SharedOperationsImpl implements SharedOperations {
         return classPackage;
     }
 
-    /**
-     * Returns the Java class full qualified name given className and based on
-     * the package of App. controllers (classes annotated with @Controller)
+    /*
+     * (non-Javadoc)
      * 
-     * @param className
-     * @return
+     * @see org.gvnix.web.exception.handler.roo.addon.SharedOperations#
+     * getClassFullQualifiedName(java.lang.String)
      */
-    private String getClassFullQualifiedName(String className) {
+    public String getClassFullQualifiedName(String className) {
         // Search for @Controller annotated class and get its package as
         // base package for MessageMappingExceptionResolver
         Set<ClassOrInterfaceTypeDetails> webMcvControllers = typeLocationService

@@ -214,7 +214,10 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
      */
     public void setupModalDialogsSupport() {
         setupMavenDependency();
-        sharedOperations.installWebServletClass("Dialog");
+        // sharedOperations.installWebServletMessageMappingExceptionResolverClass("Dialog");
+        OperationUtils.installWebServletDialogClass(
+                sharedOperations.getClassFullQualifiedName("Dialog"),
+                pathResolver, fileManager);
         sharedOperations.installMvcArtifacts();
     }
 

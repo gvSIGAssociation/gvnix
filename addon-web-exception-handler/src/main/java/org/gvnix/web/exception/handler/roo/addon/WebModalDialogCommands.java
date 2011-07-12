@@ -45,7 +45,8 @@ public class WebModalDialogCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("web mvc dialog setup")
     public boolean isSetupGvNIXModalDialogAvailable() {
-        return modalDialogOperations.isProjectAvailable();
+        return modalDialogOperations.isProjectAvailable()
+                && !modalDialogOperations.isMessageBoxOfTypeModal();
     }
 
     @CliCommand(value = "web mvc dialog setup", help = "Setup support for Modal Dialogs in current project.")
@@ -62,7 +63,7 @@ public class WebModalDialogCommands implements CommandMarker {
     @CliCommand(value = "web mvc dialog add", help = "Defines gvNIX customizable Dialog.")
     public void addGvNIXModalDialog(
             @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
-            @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name) {
+            @CliOption(key = "name", mandatory = true, help = "Identificication to use for this modal dialog") JavaSymbolName name) {
         modalDialogOperations.addModalDialogAnnotation(controllerClass, name);
     }
 }
