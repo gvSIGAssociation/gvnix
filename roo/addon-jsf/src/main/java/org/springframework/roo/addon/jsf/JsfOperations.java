@@ -12,12 +12,14 @@ import org.springframework.roo.model.JavaType;
 public interface JsfOperations {
 
 	boolean isSetupAvailable();
-	
+
 	boolean isScaffoldAvailable();
 
 	void setup(JsfImplementation jsfImplementation);
 
+	void changeJsfImplementation(JsfImplementation jsfImplementation);
+
 	void generateAll(JavaPackage destinationPackage);
 
-	void createManagedBean(JavaType managedBean, JavaType entity);
+	void createManagedBean(JavaType managedBean, JavaType entity, boolean includeOnMenu);
 }

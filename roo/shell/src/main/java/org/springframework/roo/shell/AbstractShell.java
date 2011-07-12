@@ -1,5 +1,6 @@
 package org.springframework.roo.shell;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,13 +33,21 @@ import org.springframework.roo.support.util.Assert;
  * @author Ben Alex
  */
 public abstract class AbstractShell extends AbstractShellStatusPublisher implements Shell {
-	private static final String MY_SLOT = AbstractShell.class.getName();
-	protected final Logger logger = HandlerUtils.getLogger(getClass());
-    protected boolean inBlockComment = false;
-    protected ExitShellRequest exitShellRequest = null;
-	public static String shellPrompt = "roo> ";
-	public static String completionKeys = "TAB";
 	
+	// Constants
+	private static final String MY_SLOT = AbstractShell.class.getName();
+
+	// Public static fields; don't rename, make final, or make non-public, as
+	// they are part of the public API, e.g. are changed by STS.
+	public static String completionKeys = "TAB";
+	public static String shellPrompt = "roo> ";
+	
+	// Instance fields
+	protected final Logger logger = HandlerUtils.getLogger(getClass());
+    protected boolean inBlockComment;
+    protected ExitShellRequest exitShellRequest;
+	
+    // Abstract methods
 	protected abstract Set<URL> findUrls(String resourceName);
 	protected abstract String getHomeAsString();
 	protected abstract ExecutionStrategy getExecutionStrategy();
@@ -53,7 +62,7 @@ public abstract class AbstractShell extends AbstractShellStatusPublisher impleme
 		long started = new Date().getTime();
 		InputStream inputStream = null;
 		try {
-			inputStream = new FileInputStream(resource);
+			inputStream = new BufferedInputStream(new FileInputStream(resource));
 		} catch (FileNotFoundException tryTheClassLoaderInstead) {}
 		
 		if (inputStream == null) {

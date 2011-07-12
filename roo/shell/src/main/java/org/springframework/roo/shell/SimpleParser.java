@@ -44,10 +44,12 @@ import org.w3c.dom.Element;
  * @since 1.0
  */
 public class SimpleParser implements Parser {
+	
 	private static final Logger logger = HandlerUtils.getLogger(SimpleParser.class);
 	private static final Comparator<String> comparator = new NaturalOrderComparator<String>();
+	
 	private final Object mutex = this;
-	private Set<Converter> converters = new HashSet<Converter>();
+	private final Set<Converter<?>> converters = new HashSet<Converter<?>>();
 	private Set<CommandMarker> commands = new HashSet<CommandMarker>();
 	private Map<String, MethodTarget> availabilityIndicators = new HashMap<String, MethodTarget>();
 	
@@ -55,29 +57,26 @@ public class SimpleParser implements Parser {
 		return availabilityIndicators.get(command);
 	}
 
-	public ParseResult parse(String buffer) {
+	public ParseResult parse(final String rawInput) {
 		synchronized (mutex) {
-			Assert.notNull(buffer, "Buffer required");
-
-			// Replace all multiple spaces with a single space and then trim
-			buffer = buffer.replaceAll(" +", " ");
-			buffer = buffer.trim();
+			Assert.notNull(rawInput, "Raw input required");
+			final String input = normalise(rawInput);
 
 			// Locate the applicable targets which match this buffer
-			Set<MethodTarget> matchingTargets = locateTargets(buffer, true, true);
-			if (matchingTargets.size() == 0) {
+			Set<MethodTarget> matchingTargets = locateTargets(input, true, true);
+			if (matchingTargets.isEmpty()) {
 				// Before we just give up, let's see if we can offer a more informative message to the user
 				// by seeing the command is simply unavailable at this point in time
-				matchingTargets = locateTargets(buffer, true, false);
-				if (matchingTargets.size() == 0) {
-					commandNotFound(logger, buffer);
+				matchingTargets = locateTargets(input, true, false);
+				if (matchingTargets.isEmpty()) {
+					commandNotFound(logger, input);
 				} else {
-					logger.warning("Command '" + buffer + "' was found but is not currently available (type 'help' then ENTER to learn about this command)");
+					logger.warning("Command '" + input + "' was found but is not currently available (type 'help' then ENTER to learn about this command)");
 				}
 				return null;
 			}
 			if (matchingTargets.size() > 1) {
-				logger.warning("Ambigious command '" + buffer + "' (for assistance press " + AbstractShell.completionKeys + " or type \"hint\" then hit ENTER)");
+				logger.warning("Ambigious command '" + input + "' (for assistance press " + AbstractShell.completionKeys + " or type \"hint\" then hit ENTER)");
 				return null;
 			}
 			MethodTarget methodTarget = matchingTargets.iterator().next();
@@ -90,7 +89,7 @@ public class SimpleParser implements Parser {
 			}
 
 			// Oh well, we need to convert some arguments
-			List<Object> arguments = new ArrayList<Object>(methodTarget.method.getParameterTypes().length);
+			final List<Object> arguments = new ArrayList<Object>(methodTarget.method.getParameterTypes().length);
 
 			// Attempt to parse
 			Map<String, String> options = null;
@@ -101,7 +100,7 @@ public class SimpleParser implements Parser {
 				return null;
 			}
 			
-			Set<CliOption> cliOptions = getCliOptions(parameterAnnotations);	
+			final Set<CliOption> cliOptions = getCliOptions(parameterAnnotations);	
 			for (CliOption cliOption : cliOptions) {
 				Class<?> requiredType = methodTarget.method.getParameterTypes()[arguments.size()];
 
@@ -171,8 +170,8 @@ public class SimpleParser implements Parser {
 					CliOptionContext.setOptionContext(cliOption.optionContext());
 					CliSimpleParserContext.setSimpleParserContext(this);
 					Object result;
-					Converter c = null;
-					for (Converter candidate : converters) {
+					Converter<?> c = null;
+					for (Converter<?> candidate : converters) {
 						if (candidate.supports(requiredType, cliOption.optionContext())) {
 							// Found a usable converter
 							c = candidate;
@@ -180,18 +179,22 @@ public class SimpleParser implements Parser {
 						}
 					}
 					if (c == null) {
-						System.out.println("requiredType: " + requiredType);
-						// Fall back to a normal SimpleTypeConverter and attempt conversion
 						throw new IllegalStateException("TODO: Add basic type conversion");
+						// TODO Fall back to a normal SimpleTypeConverter and attempt conversion
 						// SimpleTypeConverter simpleTypeConverter = new SimpleTypeConverter();
 						// result = simpleTypeConverter.convertIfNecessary(value, requiredType, mp);
 					}
 					
 					// Use the converter
 					result = c.convertFromText(value, requiredType, cliOption.optionContext());
+
+					// If the option has been specified to be mandatory then the result should never be null
+					if (result == null && cliOption.mandatory()) {
+						throw new IllegalStateException();
+					}
 					arguments.add(result);
 				} catch (RuntimeException e) {
-					logger.warning("Failed to convert '" + value + "' to type " + requiredType.getSimpleName() + " for option '" + StringUtils.arrayToCommaDelimitedString(cliOption.key()) + "'");
+					logger.warning(e.getClass().getName() + ": Failed to convert '" + value + "' to type " + requiredType.getSimpleName() + " for option '" + StringUtils.arrayToCommaDelimitedString(cliOption.key()) + "'");
 					if (e.getMessage() != null && e.getMessage().length() > 0) {
 						logger.warning(e.getMessage());
 					}
@@ -218,6 +221,17 @@ public class SimpleParser implements Parser {
 
 			return new ParseResult(methodTarget.method, methodTarget.target, arguments.toArray());
 		}
+	}
+
+	/**
+	 * Normalises the given raw user input string ready for parsing
+	 * 
+	 * @param rawInput the string to normalise; can't be <code>null</code>
+	 * @return a non-<code>null</code> string
+	 */
+	String normalise(final String rawInput) {
+		// Replace all multiple spaces with a single space and then trim
+		return rawInput.replaceAll(" +", " ").trim();
 	}
 
 	private Set<String> getSpecifiedUnavailableOptions(Set<CliOption> cliOptions, Map<String, String> options) {
@@ -404,7 +418,7 @@ public class SimpleParser implements Parser {
 
 			// logger.info("RESULTS: '" + translated + "' " + StringUtils.collectionToCommaDelimitedString(targets));
 
-			if (targets.size() == 0) {
+			if (targets.isEmpty()) {
 				// Nothing matches the buffer they've presented
 				return cursor;
 			}
@@ -458,7 +472,7 @@ public class SimpleParser implements Parser {
 			}
 
 			// If they haven't specified any parameters yet, at least verify the command name is fully completed
-			if (options.size() == 0) {
+			if (options.isEmpty()) {
 				for (String value : cmd.value()) {
 					if (value.startsWith(buffer)) {
 						// They are potentially trying to type this command
@@ -558,7 +572,7 @@ public class SimpleParser implements Parser {
 						// Manually determine if this non-mandatory but unspecifiedDefaultValue=* requiring option is able to be bound
 						if (!include.mandatory() && "*".equals(include.unspecifiedDefaultValue()) && !"".equals(value)) {
 							try {
-								for (Converter candidate : converters) {
+								for (Converter<?> candidate : converters) {
 									// Find the target parameter
 									Class<?> paramType = null;
 									int index = -1;
@@ -634,13 +648,13 @@ public class SimpleParser implements Parser {
 					CliOption option = cliOptions.get(i);
 					Class<?> paramType = paramTypes[i];
 
-					for (String value : option.key()) {
-						if (value.equals(lastOptionKey)) {
+					for (String key : option.key()) {
+						if (key.equals(lastOptionKey)) {
 							List<String> allValues = new ArrayList<String>();
 							String suffix = " ";
 
 							// Let's use a Converter if one is available
-							for (Converter candidate : converters) {
+							for (Converter<?> candidate : converters) {
 								if (candidate.supports(paramType, option.optionContext())) {
 									// Found a usable converter
 									boolean addSpace = candidate.getAllPossibleValues(allValues, paramType, lastOptionValue, option.optionContext(), methodTarget);
@@ -651,7 +665,7 @@ public class SimpleParser implements Parser {
 								}
 							}
 
-							if (allValues.size() == 0) {
+							if (allValues.isEmpty()) {
 								// Doesn't appear to be a custom Converter, so let's go and provide defaults for simple types
 
 								// Provide some simple options for common types
@@ -1047,13 +1061,13 @@ public class SimpleParser implements Parser {
 		}
 	}
 
-	public final void add(Converter converter) {
+	public final void add(Converter<?> converter) {
 		synchronized (mutex) {
 			converters.add(converter);
 		}
 	}
 
-	public final void remove(Converter converter) {
+	public final void remove(Converter<?> converter) {
 		synchronized (mutex) {
 			converters.remove(converter);
 		}

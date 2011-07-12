@@ -15,10 +15,10 @@ import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadata
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
-import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
@@ -38,16 +38,25 @@ import org.w3c.dom.Element;
  * @since 1.1
  */
 public class JspViewManager {
-	private List<FieldMetadata> fields;
-	private WebScaffoldAnnotationValues webScaffoldAnnotationValues;
+	
+	// Fields
+	private final JavaType formbackingType;
+	private final JavaTypeMetadataDetails formbackingTypeMetadata;
+	private final JavaTypePersistenceMetadataDetails formbackingTypePersistenceMetadata;
+	private final List<FieldMetadata> fields;
+	private final Map<JavaType, JavaTypeMetadataDetails> relatedDomainTypes;
 	private final String entityName;
 	private final String controllerPath;
-	private final JavaType formbackingType;
-	private Map<JavaType, JavaTypeMetadataDetails> relatedDomainTypes;
-	private JavaTypePersistenceMetadataDetails formbackingTypePersistenceMetadata;
-	private JavaTypeMetadataDetails formbackingTypeMetadata;
+	private final WebScaffoldAnnotationValues webScaffoldAnnotationValues;
 
-	public JspViewManager(List<FieldMetadata> fields, WebScaffoldAnnotationValues webScaffoldAnnotationValues, Map<JavaType, JavaTypeMetadataDetails> relatedDomainTypes) {
+	/**
+	 * Constructor
+	 * 
+	 * @param fields can't be <code>null</code>
+	 * @param webScaffoldAnnotationValues can't be <code>null</code>
+	 * @param relatedDomainTypes can't be <code>null</code>
+	 */
+	public JspViewManager(final List<FieldMetadata> fields, final WebScaffoldAnnotationValues webScaffoldAnnotationValues, final Map<JavaType, JavaTypeMetadataDetails> relatedDomainTypes) {
 		Assert.notNull(fields, "List of fields required");
 		Assert.notNull(webScaffoldAnnotationValues, "Web scaffold annotation values required");
 		Assert.notNull(relatedDomainTypes, "Related domain types required");
@@ -218,11 +227,12 @@ public class JspViewManager {
 		if (!"id".equals(formbackingTypePersistenceMetadata.getIdentifierField().getFieldName().getSymbolName())) {
 			formUpdate.setAttribute("idField", formbackingTypePersistenceMetadata.getIdentifierField().getFieldName().getSymbolName());
 		}
-		if (null == formbackingTypePersistenceMetadata.getVersionAccessorMethod()) {
+		final MethodMetadata versionAccessorMethod = formbackingTypePersistenceMetadata.getVersionAccessorMethod();
+		if (versionAccessorMethod == null) {
 			formUpdate.setAttribute("versionField", "none");
-		} else if (!"version".equals(BeanInfoUtils.getPropertyNameForJavaBeanMethod(formbackingTypePersistenceMetadata.getVersionAccessorMethod()))) {
-			String methodName = formbackingTypePersistenceMetadata.getVersionAccessorMethod().getMethodName().getSymbolName();
-			formUpdate.setAttribute("versionField", methodName.substring(3));
+		} else {
+			final String methodName = versionAccessorMethod.getMethodName().getSymbolName();
+			formUpdate.setAttribute("versionField", methodName.substring("get".length()));
 		}
 
 		createFieldsForCreateAndUpdate(fields, document, formUpdate, false);
@@ -277,7 +287,8 @@ public class JspViewManager {
 				}
 			} else if (type.getFullyQualifiedTypeName().equals(Date.class.getName()) || type.getFullyQualifiedTypeName().equals(Calendar.class.getName())) {
 				fieldElement = new XmlElementBuilder("field:datetime", document).addAttribute("required", "true").addAttribute("dateTimePattern", "${" + entityName + "_" + paramName.getSymbolName().toLowerCase() + "_date_format}").build();
-			} else {
+			} 
+			if (fieldElement == null) {
 				fieldElement = new XmlElementBuilder("field:input", document).addAttribute("required", "true").build();
 			}
 			addCommonAttributes(field, fieldElement);
@@ -382,7 +393,7 @@ public class JspViewManager {
 				return null;
 			}
 			List<JavaType> parameters = field.getFieldType().getParameters();
-			if (parameters.size() == 0) {
+			if (parameters.isEmpty()) {
 				throw new IllegalStateException("Unable to determine the parameter type for the " + field.getFieldName().getSymbolName() + " field in " + formbackingType.getSimpleTypeName());
 			}
 			return parameters.get(0);
@@ -398,17 +409,18 @@ public class JspViewManager {
 
 	private void addCommonAttributes(FieldMetadata field, Element fieldElement) {
 		AnnotationMetadata annotationMetadata;
-		if (field.getFieldType().equals(new JavaType(Integer.class.getName())) || field.getFieldType().getFullyQualifiedTypeName().equals(int.class.getName()) || field.getFieldType().equals(new JavaType(Short.class.getName())) || field.getFieldType().getFullyQualifiedTypeName().equals(short.class.getName()) || field.getFieldType().equals(new JavaType(Long.class.getName())) || field.getFieldType().getFullyQualifiedTypeName().equals(long.class.getName()) || field.getFieldType().equals(new JavaType("java.math.BigInteger"))) {
+		if (field.getFieldType().equals(JavaType.INT_OBJECT) || field.getFieldType().getFullyQualifiedTypeName().equals(int.class.getName()) || field.getFieldType().equals(JavaType.SHORT_OBJECT) || field.getFieldType().getFullyQualifiedTypeName().equals(short.class.getName()) || field.getFieldType().equals(new JavaType(Long.class.getName())) || field.getFieldType().getFullyQualifiedTypeName().equals(long.class.getName()) || field.getFieldType().equals(new JavaType("java.math.BigInteger"))) {
 			fieldElement.setAttribute("validationMessageCode", "field_invalid_integer");
 		} else if (uncapitalize(field.getFieldName().getSymbolName()).contains("email")) {
 			fieldElement.setAttribute("validationMessageCode", "field_invalid_email");
-		} else if (field.getFieldType().equals(new JavaType(Double.class.getName())) || field.getFieldType().getFullyQualifiedTypeName().equals(double.class.getName()) || field.getFieldType().equals(new JavaType(Float.class.getName())) || field.getFieldType().getFullyQualifiedTypeName().equals(float.class.getName()) || field.getFieldType().equals(new JavaType("java.math.BigDecimal"))) {
+		} else if (field.getFieldType().equals(JavaType.DOUBLE_OBJECT) || field.getFieldType().getFullyQualifiedTypeName().equals(double.class.getName()) || field.getFieldType().equals(JavaType.FLOAT_OBJECT) || field.getFieldType().getFullyQualifiedTypeName().equals(float.class.getName()) || field.getFieldType().equals(new JavaType("java.math.BigDecimal"))) {
 			fieldElement.setAttribute("validationMessageCode", "field_invalid_number");
 		}
 		if ("field:input".equals(fieldElement.getTagName()) && null != (annotationMetadata = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Min")))) {
 			AnnotationAttributeValue<?> min = annotationMetadata.getAttribute(new JavaSymbolName("value"));
 			if (min != null) {
 				fieldElement.setAttribute("min", min.getValue().toString());
+				fieldElement.setAttribute("required", "true");
 			}
 		}
 		if ("field:input".equals(fieldElement.getTagName()) && null != (annotationMetadata = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Max"))) && !"field:textarea".equals(fieldElement.getTagName())) {
@@ -421,6 +433,7 @@ public class JspViewManager {
 			AnnotationAttributeValue<?> decimalMin = annotationMetadata.getAttribute(new JavaSymbolName("value"));
 			if (decimalMin != null) {
 				fieldElement.setAttribute("decimalMin", decimalMin.getValue().toString());
+				fieldElement.setAttribute("required", "true");
 			}
 		}
 		if ("field:input".equals(fieldElement.getTagName()) && null != (annotationMetadata = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.DecimalMax")))) {
@@ -443,6 +456,7 @@ public class JspViewManager {
 			AnnotationAttributeValue<?> min = annotationMetadata.getAttribute(new JavaSymbolName("min"));
 			if (min != null) {
 				fieldElement.setAttribute("min", min.getValue().toString());
+				fieldElement.setAttribute("required", "true");
 			}
 		}
 		if (null != (annotationMetadata = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.NotNull")))) {

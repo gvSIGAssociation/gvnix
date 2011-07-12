@@ -13,11 +13,7 @@ import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
-import org.springframework.roo.classpath.details.annotations.ClassAttributeValue;
-import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
-import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
@@ -56,20 +52,22 @@ public class IntegrationTestMetadata extends AbstractItdTypeDetailsProvidingMeta
 	private MethodMetadata mergeMethod;
 	private MethodMetadata persistMethod;
 	private MethodMetadata removeMethod;
+	private String transactionManager;
 	private boolean hasEmbeddedIdentifier;
+	private boolean entityHasSuperclass;
 	
-	public IntegrationTestMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ProjectMetadata projectMetadata, IntegrationTestAnnotationValues annotationValues, DataOnDemandMetadata dataOnDemandMetadata, MethodMetadata identifierAccessorMethod, MethodMetadata versionAccessorMethod, MethodMetadata countMethod, MethodMetadata findMethod, MethodMetadata findAllMethod, MethodMetadata findEntriesMethod, MethodMetadata flushMethod, MethodMetadata mergeMethod, MethodMetadata persistMethod, MethodMetadata removeMethod, boolean hasEmbeddedIdentifier) {
+	public IntegrationTestMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, ProjectMetadata projectMetadata, IntegrationTestAnnotationValues annotationValues, DataOnDemandMetadata dataOnDemandMetadata, MethodMetadata identifierAccessorMethod, MethodMetadata versionAccessorMethod, MethodMetadata countMethod, MethodMetadata findMethod, MethodMetadata findAllMethod, MethodMetadata findEntriesMethod, MethodMetadata flushMethod, MethodMetadata mergeMethod, MethodMetadata persistMethod, MethodMetadata removeMethod, String transactionManager, boolean hasEmbeddedIdentifier, boolean entityHasSuperclass) {
 		super(identifier, aspectName, governorPhysicalTypeMetadata);
 		Assert.isTrue(isValid(identifier), "Metadata identification string '" + identifier + "' does not appear to be a valid");
 		Assert.notNull(projectMetadata, "Project metadata required");
 		Assert.notNull(annotationValues, "Annotation values required");
 		Assert.notNull(dataOnDemandMetadata, "Data on demand metadata required");
-		
-		if (identifierAccessorMethod == null) {
-			valid = false;
-		}
-		
+
 		if (!isValid()) {
+			return;
+		}
+
+		if (findEntriesMethod == null || persistMethod == null || flushMethod == null || findMethod == null) {
 			return;
 		}
 
@@ -85,12 +83,14 @@ public class IntegrationTestMetadata extends AbstractItdTypeDetailsProvidingMeta
 		this.mergeMethod = mergeMethod;
 		this.persistMethod = persistMethod;
 		this.removeMethod = removeMethod;
+		this.transactionManager = transactionManager;
 		this.hasEmbeddedIdentifier = hasEmbeddedIdentifier;
+		this.entityHasSuperclass = entityHasSuperclass;
 		
 		dodGovernor = DataOnDemandMetadata.getJavaType(dataOnDemandMetadata.getId());
 		
 		addRequiredIntegrationTestClassIntroductions();
-		
+
 		// Add GAE LocalServiceTestHelper instance and @BeforeClass/@AfterClass methods if GAE is enabled
 		if (projectMetadata.isGaeEnabled()) {
 			isGaeSupported = true;
@@ -115,21 +115,25 @@ public class IntegrationTestMetadata extends AbstractItdTypeDetailsProvidingMeta
 	public void addRequiredIntegrationTestClassIntroductions() {
 		// Add an @RunWith(SpringJunit4ClassRunner) annotation to the type, if the user did not define it on the governor directly
 		if (MemberFindingUtils.getAnnotationOfType(governorTypeDetails.getAnnotations(), new JavaType("org.junit.runner.RunWith")) == null) {
-			List<AnnotationAttributeValue<?>> runWithAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-			runWithAttributes.add(new ClassAttributeValue(new JavaSymbolName("value"), new JavaType("org.springframework.test.context.junit4.SpringJUnit4ClassRunner")));
-			builder.addAnnotation(new AnnotationMetadataBuilder(new JavaType("org.junit.runner.RunWith"), runWithAttributes));
+			AnnotationMetadataBuilder runWithBuilder = new AnnotationMetadataBuilder(new JavaType("org.junit.runner.RunWith"));
+			runWithBuilder.addClassAttribute("value", "org.springframework.test.context.junit4.SpringJUnit4ClassRunner");
+			builder.addAnnotation(runWithBuilder);
 		}
 		
 		// Add an @ContextConfiguration("classpath:/applicationContext.xml") annotation to the type, if the user did not define it on the governor directly
 		if (MemberFindingUtils.getAnnotationOfType(governorTypeDetails.getAnnotations(), new JavaType("org.springframework.test.context.ContextConfiguration")) == null) {
-			List<AnnotationAttributeValue<?>> ctxCfg = new ArrayList<AnnotationAttributeValue<?>>();
-			ctxCfg.add(new StringAttributeValue(new JavaSymbolName("locations"), "classpath:/META-INF/spring/applicationContext.xml"));
-			builder.addAnnotation(new AnnotationMetadataBuilder(new JavaType("org.springframework.test.context.ContextConfiguration"), ctxCfg));
+			AnnotationMetadataBuilder contextConfigurationBuilder = new AnnotationMetadataBuilder(new JavaType("org.springframework.test.context.ContextConfiguration"));
+			contextConfigurationBuilder.addStringAttribute("locations", "classpath:/META-INF/spring/applicationContext.xml");
+			builder.addAnnotation(contextConfigurationBuilder);
 		}
 		
 		// Add an @Transactional, if the user did not define it on the governor directly
 		if (MemberFindingUtils.getAnnotationOfType(governorTypeDetails.getAnnotations(), new JavaType("org.springframework.transaction.annotation.Transactional")) == null) {
-			builder.addAnnotation(new AnnotationMetadataBuilder(new JavaType("org.springframework.transaction.annotation.Transactional")));
+			AnnotationMetadataBuilder transactionalBuilder = new AnnotationMetadataBuilder(new JavaType("org.springframework.transaction.annotation.Transactional"));
+			if (StringUtils.hasText(transactionManager) && !"transactionManager".equals(transactionManager)) {
+				transactionalBuilder.addStringAttribute("value", transactionManager);
+			}
+			builder.addAnnotation(transactionalBuilder);
 		}
 	
 		// Add the data on demand field if the user did not define it on the governor directly
@@ -401,7 +405,10 @@ public class IntegrationTestMetadata extends AbstractItdTypeDetailsProvidingMeta
 			bodyBuilder.appendFormalLine("obj = " + annotationValues.getEntity().getFullyQualifiedTypeName() + "." + findMethod.getMethodName().getSymbolName() + "(id);");
 			bodyBuilder.appendFormalLine("boolean modified =  dod." + dataOnDemandMetadata.getModifyMethod().getMethodName().getSymbolName() + "(obj);");
 			bodyBuilder.appendFormalLine(versionAccessorMethod.getReturnType().getFullyQualifiedTypeName() + " currentVersion = obj." + versionAccessorMethod.getMethodName().getSymbolName() + "();");
-			bodyBuilder.appendFormalLine(annotationValues.getEntity().getFullyQualifiedTypeName() + " merged = (" + annotationValues.getEntity().getFullyQualifiedTypeName() + ") obj." + mergeMethod.getMethodName().getSymbolName() + "();");
+			
+			String castStr = entityHasSuperclass ? "(" + annotationValues.getEntity().getFullyQualifiedTypeName() + ")" : "";
+			bodyBuilder.appendFormalLine(annotationValues.getEntity().getFullyQualifiedTypeName() + " merged = " + castStr + " obj." + mergeMethod.getMethodName().getSymbolName() + "();");
+			
 			bodyBuilder.appendFormalLine("obj." + flushMethod.getMethodName().getSymbolName() + "();");
 			bodyBuilder.appendFormalLine("org.junit.Assert.assertEquals(\"Identifier of merged object not the same as identifier of original object\", merged." +  identifierAccessorMethod.getMethodName().getSymbolName() + "(), id);");
 			if (versionAccessorMethod.getReturnType().getFullyQualifiedTypeName().equals("java.util.Date")) {
@@ -422,7 +429,7 @@ public class IntegrationTestMetadata extends AbstractItdTypeDetailsProvidingMeta
 	 * @return a test for the persist method, if available and requested (may return null)
 	 */
 	public MethodMetadata getPersistMethodTest() {
-		if (!annotationValues.isPersist() || persistMethod == null) {
+		if (!annotationValues.isPersist() || persistMethod == null || flushMethod == null) {
 			// User does not want this method
 			return null;
 		}
@@ -461,7 +468,7 @@ public class IntegrationTestMetadata extends AbstractItdTypeDetailsProvidingMeta
 	 * @return a test for the persist method, if available and requested (may return null)
 	 */
 	public MethodMetadata getRemoveMethodTest() {
-		if (!annotationValues.isRemove() || findMethod == null || removeMethod == null) {
+		if (!annotationValues.isRemove() || findMethod == null || flushMethod == null || removeMethod == null) {
 			// User does not want this method or one of its core dependencies
 			return null;
 		}
@@ -475,9 +482,12 @@ public class IntegrationTestMetadata extends AbstractItdTypeDetailsProvidingMeta
 			List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
 			annotations.add(new AnnotationMetadataBuilder(TEST));
 			if (isGaeSupported) {
-				List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
-				attributes.add(new EnumAttributeValue(new JavaSymbolName("propagation"), new EnumDetails(new JavaType("org.springframework.transaction.annotation.Propagation"), new JavaSymbolName("SUPPORTS"))));
-				annotations.add(new AnnotationMetadataBuilder(new JavaType("org.springframework.transaction.annotation.Transactional"), attributes));
+				AnnotationMetadataBuilder transactionalBuilder = new AnnotationMetadataBuilder(new JavaType("org.springframework.transaction.annotation.Transactional"));
+				if (StringUtils.hasText(transactionManager) && !"transactionManager".equals(transactionManager)) {
+					transactionalBuilder.addStringAttribute("value", transactionManager);
+				}
+				transactionalBuilder.addEnumAttribute("propagation", new EnumDetails(new JavaType("org.springframework.transaction.annotation.Propagation"), new JavaSymbolName("SUPPORTS")));
+				annotations.add(transactionalBuilder);
 			}
 			
 			InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();

@@ -11,12 +11,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 
 /**
- * Provides {@link ConfigurableMetadata}.
- * 
- * <p>
- * Generally other add-ons which depend on Spring's @Configurable annotation being present will add their
- * annotation as a trigger annotation to instances of {@link ConfigurableMetadataProvider}. This action will
- * guarantee any class with the added trigger annotation will made @Configurable.
+ * Implementation of {@link ConfigurableMetadataProvider}.
  * 
  * @author Ben Alex
  * @since 1.0
@@ -30,6 +25,11 @@ public final class ConfigurableMetadataProviderImpl extends AbstractItdMetadataP
 		addMetadataTrigger(new JavaType(RooConfigurable.class.getName()));
 	}
 	
+	protected void deactivate(ComponentContext context) {
+		metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
+		removeMetadataTrigger(new JavaType(RooConfigurable.class.getName()));
+	}
+
 	protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
 		return new ConfigurableMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata);
 	}

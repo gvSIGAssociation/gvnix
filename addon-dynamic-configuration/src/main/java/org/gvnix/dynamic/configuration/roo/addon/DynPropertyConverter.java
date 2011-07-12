@@ -58,7 +58,7 @@ public class DynPropertyConverter implements Converter {
     /**
      * {@inheritDoc}
      */
-    public Object convertFromText(String value, Class<?> requiredType,
+    public Object convertFromText(String value, Class requiredType,
             String optionContext) {
 
         // Create a dynamic property with key and without value
@@ -68,9 +68,8 @@ public class DynPropertyConverter implements Converter {
     /**
      * {@inheritDoc}
      */
-    public boolean getAllPossibleValues(List<String> completions,
-            Class<?> requiredType, String existingData, String optionContext,
-            MethodTarget target) {
+    public boolean getAllPossibleValues(List completions, Class requiredType,
+            String existingData, String optionContext, MethodTarget target) {
 
         // Option context mark property completions origin
         if (CONFIGURATION_FILE.equals(optionContext)) {
@@ -118,7 +117,7 @@ public class DynPropertyConverter implements Converter {
     /**
      * {@inheritDoc}
      */
-    public boolean supports(Class<?> requiredType, String optionContext) {
+    public boolean supports(Class requiredType, String optionContext) {
 
         // This converter supports dynamic property
         return DynProperty.class.isAssignableFrom(requiredType);

@@ -76,7 +76,7 @@ public class ItdSourceFileComposer {
 		appendMethods();
 		appendInnerTypes();
 		appendTerminator();
-		
+
 		// Now prepend the package declaration and any imports
 		// We need to do this ** at the end ** so we can ensure our compilation unit imports are correct, as they're built as we traverse over the other members
 		prependCompilationUnitDetails();
@@ -138,12 +138,11 @@ public class ItdSourceFileComposer {
 	
 	private void appendTypeAnnotations() {
 		List<? extends AnnotationMetadata> typeAnnotations = itdTypeDetails.getAnnotations();
-		if (typeAnnotations == null || typeAnnotations.size() == 0) {
+		if (typeAnnotations == null || typeAnnotations.isEmpty()) {
 			return;
 		}
 		
 		content = true;
-		
 		for (AnnotationMetadata typeAnnotation : typeAnnotations) {
 			this.appendIndent();
 			this.append("declare @type: ");
@@ -158,12 +157,11 @@ public class ItdSourceFileComposer {
 	
 	private void appendFieldAnnotations() {
 		List<DeclaredFieldAnnotationDetails> fieldAnnotations = itdTypeDetails.getFieldAnnotations();
-		if (fieldAnnotations == null || fieldAnnotations.size() == 0) {
+		if (fieldAnnotations == null || fieldAnnotations.isEmpty()) {
 			return;
 		}
-		
+
 		content = true;
-		
 		for (DeclaredFieldAnnotationDetails fieldDetails : fieldAnnotations) {	
 			this.appendIndent();
 			this.append("declare @field: * ");
@@ -171,7 +169,7 @@ public class ItdSourceFileComposer {
 			this.append(".");
 			this.append(fieldDetails.getFieldMetadata().getFieldName().getSymbolName());
 			this.append(": ");
-            if (fieldDetails.isRemoveAnnotation()) {
+			if (fieldDetails.isRemoveAnnotation()) {
 				this.append("-");
 			}
 			outputAnnotation(fieldDetails.getFieldAnnotation());
@@ -180,15 +178,14 @@ public class ItdSourceFileComposer {
 			this.newLine();
 		}
 	}
-	
+
 	private void appendMethodAnnotations() {
 		List<DeclaredMethodAnnotationDetails> methodAnnotations = itdTypeDetails.getMethodAnnotations();
-		if (methodAnnotations == null || methodAnnotations.size() == 0) {
+		if (methodAnnotations == null || methodAnnotations.isEmpty()) {
 			return;
 		}
 		
 		content = true;
-		
 		for (DeclaredMethodAnnotationDetails methodDetails : methodAnnotations) {	
 			this.appendIndent();
 			this.append("declare @method: ");
@@ -216,12 +213,11 @@ public class ItdSourceFileComposer {
 
 	private void appendExtendsTypes() {
 		List<JavaType> extendsTypes = itdTypeDetails.getExtendsTypes();
-		if (extendsTypes == null || extendsTypes.size() == 0) {
+		if (extendsTypes == null || extendsTypes.isEmpty()) {
 			return;
 		}
 		
 		content = true;
-		
 		for (JavaType extendsType : extendsTypes) {
 			this.appendIndent();
 			this.append("declare parents: ");
@@ -240,13 +236,11 @@ public class ItdSourceFileComposer {
 
 	private void appendImplementsTypes() {
 		List<JavaType> implementsTypes = itdTypeDetails.getImplementsTypes();
-		
-		if (implementsTypes == null || implementsTypes.size() == 0) {
+		if (implementsTypes == null || implementsTypes.isEmpty()) {
 			return;
 		}
 		
 		content = true;
-		
 		for (JavaType extendsType : implementsTypes) {
 			this.appendIndent();
 			this.append("declare parents: ");
@@ -265,13 +259,15 @@ public class ItdSourceFileComposer {
 
 	private void appendConstructors() {
 		List<? extends ConstructorMetadata> constructors = itdTypeDetails.getDeclaredConstructors();
-		if (constructors == null || constructors.size() == 0) {
+		if (constructors == null || constructors.isEmpty()) {
 			return;
 		}
+		
 		content = true;
+		
 		for (ConstructorMetadata constructor : constructors) {
 			Assert.isTrue(constructor.getParameterTypes().size() == constructor.getParameterNames().size(), "Mismatched parameter names against parameter types");
-			
+
 			// Append annotations
 			for (AnnotationMetadata annotation : constructor.getAnnotations()) {
 				this.appendIndent();
@@ -321,18 +317,20 @@ public class ItdSourceFileComposer {
 	
 	private void appendMethods() {
 		List<? extends MethodMetadata> methods = itdTypeDetails.getDeclaredMethods();
-		if (methods == null || methods.size() == 0) {
+		if (methods == null || methods.isEmpty()) {
 			return;
 		}
+		
 		content = true;
 		writeMethods(methods, true);
 	}
 
 	private void appendFields() {
 		List<? extends FieldMetadata> fields = itdTypeDetails.getDeclaredFields();
-		if (fields == null || fields.size() == 0) {
+		if (fields == null || fields.isEmpty()) {
 			return;
 		}
+		
 		content = true;
 		for (FieldMetadata field : fields) {
 			
@@ -413,7 +411,7 @@ public class ItdSourceFileComposer {
 					}
 				}
 			}
-			this.append(" {");
+			this.append("{");
 			this.newLine(false);
 			// Write out fields
 			for (FieldMetadata field: innerType.getDeclaredFields()) {

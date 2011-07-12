@@ -1,5 +1,6 @@
 package org.springframework.roo.addon.gwt;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -129,10 +130,13 @@ public class GwtOperationsImpl implements GwtOperations, MetadataNotificationLis
 		if (!upstreamDependency.equals(ProjectMetadata.getProjectIdentifier())) {
 			return;
 		}
-		
-		boolean isGaeEnabled = projectOperations.getProjectMetadata().isGaeEnabled();
+		ProjectMetadata projectMetdata = projectOperations.getProjectMetadata();
+		if (projectMetdata == null) {
+			return;
+		}
+		boolean isGaeEnabled = projectMetdata.isGaeEnabled();
 		boolean hasGaeStateChanged = wasGaeEnabled == null || isGaeEnabled != wasGaeEnabled;
-		if (projectOperations.getProjectMetadata().isGwtEnabled() && hasGaeStateChanged) {
+		if (projectMetdata.isGwtEnabled() && hasGaeStateChanged) {
 			wasGaeEnabled = isGaeEnabled;
 
 			// Update ApplicationRequestFactory
@@ -147,8 +151,10 @@ public class GwtOperationsImpl implements GwtOperations, MetadataNotificationLis
 			//If there is a class that could possibly import from the appengine sdk, denoted here as having Gae in the type name, then we need to add the appengine-api-1.0-sdk dependency to the pom.xml file
 			String rootPath = projectOperations.getPathResolver().getRoot(Path.ROOT);
 			Set<FileDetails> files = fileManager.findMatchingAntPath(rootPath + "/**/*Gae*.java");
-			if (files.size() > 0) {
-				projectOperations.addDependency("com.google.appengine", "appengine-api-1.0-sdk", "1.4.3");
+			if (!files.isEmpty()) {
+				Element configuration = XmlUtils.getConfiguration(getClass());
+				Element gaeDependency = XmlUtils.findFirstElement("/configuration/gae/dependencies/dependency", configuration);
+				projectOperations.addDependency(new Dependency(gaeDependency));
 			}
 
 			// Copy across any missing files, only if GAE state has changed and is now enabled
@@ -287,7 +293,7 @@ public class GwtOperationsImpl implements GwtOperations, MetadataNotificationLis
 	private void updateGaeHelper(boolean isGaeEnabled) {
 		String sourceAntPath = "module/client/scaffold/gae/GaeHelper-template.java";
 		String segmentPackage = "client.scaffold.gae";
-		String targetDirectory = projectOperations.getProjectMetadata().getPathResolver().getIdentifier(Path.SRC_MAIN_JAVA, projectOperations.getProjectMetadata().getTopLevelPackage().getFullyQualifiedPackageName().replaceAll("\\.", "\\/") + "/client/scaffold/gae");;
+		String targetDirectory = projectOperations.getProjectMetadata().getPathResolver().getIdentifier(Path.SRC_MAIN_JAVA, projectOperations.getProjectMetadata().getTopLevelPackage().getFullyQualifiedPackageName().replace('.', File.separatorChar) + File.separator + "client" + File.separator + "scaffold" + File.separator + "gae");
 		updateFile(sourceAntPath, targetDirectory, segmentPackage, true, isGaeEnabled);
 	}
 
@@ -298,7 +304,7 @@ public class GwtOperationsImpl implements GwtOperations, MetadataNotificationLis
 	}
 
 	private void copyDirectoryContents(GwtPath gwtPath) {
-		String sourceAntPath = gwtPath.sourceAntPath();
+		String sourceAntPath = gwtPath.getSourceAntPath();
 		if (sourceAntPath.contains("gae") && !projectOperations.getProjectMetadata().isGaeEnabled()) {
 			return;
 		}
@@ -307,8 +313,8 @@ public class GwtOperationsImpl implements GwtOperations, MetadataNotificationLis
 	}
 
 	private void updateFile(String sourceAntPath, String targetDirectory, String segmentPackage, boolean overwrite, boolean isGaeEnabled) {
-		if (!targetDirectory.endsWith("/")) {
-			targetDirectory += "/";
+		if (!targetDirectory.endsWith(File.separator)) {
+			targetDirectory += File.separator;
 		}
 		if (!fileManager.exists(targetDirectory)) {
 			fileManager.createDirectory(targetDirectory);
@@ -319,7 +325,7 @@ public class GwtOperationsImpl implements GwtOperations, MetadataNotificationLis
 		Assert.notNull(urls, "Could not search bundles for resources for Ant Path '" + path + "'");
 
 		for (URL url : urls) {
-			String fileName = url.getPath().substring(url.getPath().lastIndexOf("/") + 1);
+			String fileName = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
 			fileName = fileName.replace("-template", "");
 			String targetFilename = targetDirectory + fileName;
 			try {
@@ -337,7 +343,7 @@ public class GwtOperationsImpl implements GwtOperations, MetadataNotificationLis
 					input = input.replace("__SEGMENT_PACKAGE__", segmentPackage);
 					input = input.replace("__PROJECT_NAME__", projectOperations.getProjectMetadata().getProjectName());
 
-					if ( isGaeEnabled) {
+					if (isGaeEnabled) {
 						input = input.replace("__GAE_IMPORT__", "import " + topLevelPackage + ".client.scaffold.gae.*;\n");
 						input = input.replace("__GAE_HOOKUP__", getGaeHookup());
 						input = input.replace("__GAE_REQUEST_TRANSPORT__", ", new GaeAuthRequestTransport(eventBus)");
@@ -358,7 +364,7 @@ public class GwtOperationsImpl implements GwtOperations, MetadataNotificationLis
 
 	private void updateBuildPlugins(boolean isGaeEnabled) {
 		Element configuration = XmlUtils.getConfiguration(getClass());
-		String xPath = "/configuration/gwt/plugins/plugin[@gae-enabled = '" + isGaeEnabled + "']";
+		String xPath = "/configuration/" + (isGaeEnabled ? "gae" : "gwt") + "/plugins/plugin";
 		Element pluginElement = XmlUtils.findFirstElement(xPath, configuration);
 		Assert.notNull(pluginElement, "gwt-maven-plugin required");
 		Plugin defaultPlugin = new Plugin(pluginElement);

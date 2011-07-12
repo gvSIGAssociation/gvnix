@@ -28,7 +28,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 
 /**
- * Provides {@link DbreMetadata}.
+ * Implementation of  {@link DbreMetadataProvider}.
  * 
  * @author Alan Stewart
  * @since 1.1
@@ -67,7 +67,7 @@ public class DbreMetadataProviderImpl extends AbstractItdMetadataProvider implem
 			return null;
 		}
 
-		// Abort if the database couldn't be deserialized. This can occur if the dbre.xml file has been deleted or is empty.
+		// Abort if the database couldn't be deserialized. This can occur if the DBRE XML file has been deleted or is empty.
 		Database database = dbreModelService.getDatabase(false);
 		if (database == null) {
 			return null;

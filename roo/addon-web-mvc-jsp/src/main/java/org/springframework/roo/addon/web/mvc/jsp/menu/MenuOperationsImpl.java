@@ -71,7 +71,7 @@ public class MenuOperationsImpl implements MenuOperations {
 			rootElement = (Element) document.getDocumentElement().appendChild(rootMenu);
 		}
 		
-		// Check for existence of menu category by looking for the indentifier provided
+		// Check for existence of menu category by looking for the identifier provided
 		Element category = XmlUtils.findFirstElement("//*[@id='c_" + menuCategoryName.getSymbolName().toLowerCase() + "']", rootElement);
 			
 		// If not exists, create new one
@@ -81,7 +81,7 @@ public class MenuOperationsImpl implements MenuOperations {
 			properties.put("menu_category_" + menuCategoryName.getSymbolName().toLowerCase() + "_label", menuCategoryName.getReadableSymbolName());
 		}
 		
-		// Check for existence of menu item by looking for the indentifier provided
+		// Check for existence of menu item by looking for the identifier provided
 		Element menuItem = XmlUtils.findFirstElement("//*[@id='" + idPrefix + menuCategoryName.getSymbolName().toLowerCase() + "_" + menuItemId.getSymbolName().toLowerCase() + "']", rootElement);
 		
 		if (menuItem == null) {
@@ -109,7 +109,7 @@ public class MenuOperationsImpl implements MenuOperations {
 		
 		// Find any menu items under this category which have an id that starts with the menuItemIdPrefix
 		List<Element> elements = XmlUtils.findElements("//category[@id='c_" +  menuCategoryName.getSymbolName().toLowerCase() + "']//item[starts-with(@id, '" + FINDER_MENU_ITEM_PREFIX + "')]", document.getDocumentElement());
-		if (elements.size() == 0) {
+		if (elements.isEmpty()) {
 			return;
 		}
 		for (Element element: elements) {

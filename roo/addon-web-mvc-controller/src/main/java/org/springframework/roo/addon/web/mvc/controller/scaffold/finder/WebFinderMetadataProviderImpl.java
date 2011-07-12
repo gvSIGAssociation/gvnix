@@ -2,7 +2,6 @@ package org.springframework.roo.addon.web.mvc.controller.scaffold.finder;
 
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -16,7 +15,6 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnno
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
@@ -24,7 +22,6 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -36,7 +33,6 @@ import org.springframework.roo.support.util.Assert;
 @Component(immediate = true) 
 @Service 
 public final class WebFinderMetadataProviderImpl extends AbstractItdMetadataProvider implements WebFinderMetadataProvider {
-	private static final Logger logger = HandlerUtils.getLogger(WebFinderMetadataProviderImpl.class);
 	@Reference private WebMetadataService webMetadataService;
 
 	protected void activate(ComponentContext context) {
@@ -52,7 +48,7 @@ public final class WebFinderMetadataProviderImpl extends AbstractItdMetadataProv
 	protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
 		// We need to parse the annotation, which we expect to be present
 		WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(governorPhysicalTypeMetadata);
-		if (!annotationValues.isAnnotationFound() || annotationValues.getFormBackingObject() == null || governorPhysicalTypeMetadata.getMemberHoldingTypeDetails() == null) {
+		if (!annotationValues.isAnnotationFound() || !annotationValues.isExposeFinders() || annotationValues.getFormBackingObject() == null || governorPhysicalTypeMetadata.getMemberHoldingTypeDetails() == null) {
 			return null;
 		}
 		
@@ -61,27 +57,22 @@ public final class WebFinderMetadataProviderImpl extends AbstractItdMetadataProv
 		
 		PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA));
 		Assert.notNull(formBackingObjectPhysicalTypeMetadata, "Unable to obtain physical type metadata for type " + formBackingType.getFullyQualifiedTypeName());
-		ClassOrInterfaceTypeDetails formBackingClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadata.getMemberHoldingTypeDetails();
-		MemberDetails formBackingObjectMemberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), formBackingClassOrInterfaceDetails);
-		
-		MemberHoldingTypeDetails memberHoldingTypeDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(formBackingObjectMemberDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
-		if (memberHoldingTypeDetails == null) {
-			logger.warning("Aborting - the form backing object for Roo MVC scaffolded controllers need to be @RooEntity persistent types at this time");
+		MemberDetails formBackingObjectMemberDetails = getMemberDetails(formBackingObjectPhysicalTypeMetadata);
+
+		MemberHoldingTypeDetails formBackingMemberHoldingTypeDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(formBackingObjectMemberDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
+		if (formBackingMemberHoldingTypeDetails == null) {
 			return null;
 		}
 		
 		// We need to be informed if our dependent metadata changes
-		metadataDependencyRegistry.registerDependency(memberHoldingTypeDetails.getDeclaredByMetadataId(), metadataIdentificationString);
+		metadataDependencyRegistry.registerDependency(formBackingMemberHoldingTypeDetails.getDeclaredByMetadataId(), metadataIdentificationString);
 		
-		if (!annotationValues.isExposeFinders()) {
-			return null;
-		}
+		Set<FinderMetadataDetails> dynamicFinderMethods = webMetadataService.getDynamicFinderMethodsAndFields(formBackingType, formBackingObjectMemberDetails, metadataIdentificationString);
 		SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = webMetadataService.getRelatedApplicationTypeMetadata(formBackingType, formBackingObjectMemberDetails, metadataIdentificationString);
-		Set<FinderMetadataDetails> dynamicFinderMethodsAndFields = webMetadataService.getDynamicFinderMethodsAndFields(formBackingType, formBackingObjectMemberDetails, metadataIdentificationString);
 
 		MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
 
-		return new WebFinderMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, annotationValues, memberDetails, relatedApplicationTypeMetadata, dynamicFinderMethodsAndFields);
+		return new WebFinderMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, annotationValues, memberDetails, relatedApplicationTypeMetadata, dynamicFinderMethods);
 	}
 	
 	public String getItdUniquenessFilenameSuffix() {

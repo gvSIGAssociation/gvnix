@@ -50,16 +50,16 @@ public final class SolrMetadataProvider extends AbstractMemberDiscoveringItdMeta
 	}
 
 	protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
-		// Acquire bean info (we need getters details, specifically)
-		JavaType javaType = SolrMetadata.getJavaType(metadataIdentificationString);
-		Path path = SolrMetadata.getPath(metadataIdentificationString);
-		String entityMetadataKey = EntityMetadata.createIdentifier(javaType, path);
-
 		// We need to parse the annotation, which we expect to be present
 		SolrSearchAnnotationValues annotationValues = new SolrSearchAnnotationValues(governorPhysicalTypeMetadata);
 		if (!annotationValues.isAnnotationFound() || annotationValues.searchMethod == null) {
 			return null;
 		}
+		
+		// Acquire bean info (we need getters details, specifically)
+		JavaType javaType = SolrMetadata.getJavaType(metadataIdentificationString);
+		Path path = SolrMetadata.getPath(metadataIdentificationString);
+		String entityMetadataKey = EntityMetadata.createIdentifier(javaType, path);
 		
 		// We want to be notified if the getter info changes in any way 
 		metadataDependencyRegistry.registerDependency(entityMetadataKey, metadataIdentificationString);
@@ -115,7 +115,7 @@ public final class SolrMetadataProvider extends AbstractMemberDiscoveringItdMeta
 	}
 	
 	private boolean isMethodOfInterest(MethodMetadata method) {
-		return method.getMethodName().getSymbolName().startsWith("get") && method.getParameterTypes().size() == 0 && Modifier.isPublic(method.getModifier());
+		return method.getMethodName().getSymbolName().startsWith("get") && method.getParameterTypes().isEmpty() && Modifier.isPublic(method.getModifier());
 	}
 	
 	public String getItdUniquenessFilenameSuffix() {

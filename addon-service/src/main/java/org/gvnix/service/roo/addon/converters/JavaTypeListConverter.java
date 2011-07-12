@@ -21,15 +21,22 @@ package org.gvnix.service.roo.addon.converters;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.SortedSet;
 
-import org.apache.felix.scr.annotations.*;
-import org.gvnix.service.roo.addon.converters.JavaTypeList;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.Service;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.*;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.shell.Converter;
 import org.springframework.roo.shell.MethodTarget;
 import org.springframework.roo.support.util.StringUtils;
@@ -56,7 +63,7 @@ public class JavaTypeListConverter implements Converter {
      * org.springframework.roo.shell.Converter#convertFromText(java.lang.String,
      * java.lang.Class, java.lang.String)
      */
-    public Object convertFromText(String value, Class<?> requiredType,
+    public Object convertFromText(String value, Class requiredType,
             String optionContext) {
 
         JavaTypeList javaTypeList = new JavaTypeList();
@@ -85,9 +92,8 @@ public class JavaTypeListConverter implements Converter {
      * .List, java.lang.Class, java.lang.String, java.lang.String,
      * org.springframework.roo.shell.MethodTarget)
      */
-    public boolean getAllPossibleValues(List<String> completions,
-            Class<?> requiredType, String existingData, String optionContext,
-            MethodTarget target) {
+    public boolean getAllPossibleValues(List completions, Class requiredType,
+            String existingData, String optionContext, MethodTarget target) {
 
         if (existingData == null) {
             existingData = "";
@@ -122,7 +128,7 @@ public class JavaTypeListConverter implements Converter {
      * @see org.springframework.roo.shell.Converter#supports(java.lang.Class,
      * java.lang.String)
      */
-    public boolean supports(Class<?> requiredType, String optionContext) {
+    public boolean supports(Class requiredType, String optionContext) {
         return JavaTypeList.class.isAssignableFrom(requiredType);
     }
 

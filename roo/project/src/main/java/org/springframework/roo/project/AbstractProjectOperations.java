@@ -24,6 +24,7 @@ import org.springframework.roo.support.util.Assert;
  * @author Alan Stewart
  * @since 1.0
  */
+@SuppressWarnings("deprecation")
 @Component(componentAbstract = true)
 public abstract class AbstractProjectOperations implements ProjectOperations {
 	@Reference protected MetadataService metadataService;
@@ -239,14 +240,25 @@ public abstract class AbstractProjectOperations implements ProjectOperations {
 		sendDependencyAdditionNotifications(dependency);
 	}
 	
-	public final void addDependency(String groupId, String artifactId, String version) {
+	public final void addDependency(String groupId, String artifactId, String version, DependencyScope scope, String classifier) {
 		Assert.isTrue(isProjectAvailable(), "Dependency modification prohibited at this time");
 		Assert.notNull(groupId, "Group ID required");
 		Assert.notNull(artifactId, "Artifact ID required");
 		Assert.hasText(version, "Version required");
-		Dependency dependency = new Dependency(groupId, artifactId, version, DependencyType.JAR, DependencyScope.COMPILE);
+		if (scope == null) {
+			scope = DependencyScope.COMPILE;
+		}
+		Dependency dependency = new Dependency(groupId, artifactId, version, DependencyType.JAR, scope, classifier);
 		projectMetadataProvider.addDependency(dependency);
 		sendDependencyAdditionNotifications(dependency);
+	}
+
+	public final void addDependency(String groupId, String artifactId, String version, DependencyScope scope) {
+		addDependency(groupId, artifactId, version, scope, "");
+	}
+
+	public final void addDependency(String groupId, String artifactId, String version) {
+		addDependency(groupId, artifactId, version, DependencyScope.COMPILE);
 	}
 	
 	public final void removeDependencies(List<Dependency> dependencies) {
@@ -265,14 +277,18 @@ public abstract class AbstractProjectOperations implements ProjectOperations {
 		sendDependencyAdditionNotifications(dependency);		
 	}
 
-	public final void removeDependency(String groupId, String artifactId, String version) {
+	public final void removeDependency(String groupId, String artifactId, String version, String classifier) {
 		Assert.isTrue(isProjectAvailable(), "Dependency modification prohibited at this time");
 		Assert.notNull(groupId, "Group ID required");
 		Assert.notNull(artifactId, "Artifact ID required");
 		Assert.hasText(version, "Version required");
-		Dependency dependency = new Dependency(groupId, artifactId, version, DependencyType.JAR, DependencyScope.COMPILE);
+		Dependency dependency = new Dependency(groupId, artifactId, version, DependencyType.JAR, DependencyScope.COMPILE, classifier);
 		projectMetadataProvider.removeDependency(dependency);
 		sendDependencyRemovalNotifications(dependency);
+	}
+
+	public final void removeDependency(String groupId, String artifactId, String version) {
+		removeDependency(groupId, artifactId, version, "");
 	}
 
 	public final void addRepositories(List<Repository> repositories) {

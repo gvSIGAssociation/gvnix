@@ -1,5 +1,7 @@
 package org.springframework.roo.support.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -65,6 +67,9 @@ public final class XmlUtils {
 	public static final Document readXml(InputStream inputStream) {
 		Assert.notNull(inputStream, "InputStream required");
 		try {
+			if (!(inputStream instanceof BufferedInputStream)) {
+				inputStream = new BufferedInputStream(inputStream);
+			}
 			return factory.newDocumentBuilder().parse(inputStream);
 		} catch (Exception e) {
 			throw new IllegalStateException("Could not open input stream", e);
@@ -99,6 +104,9 @@ public final class XmlUtils {
 		
 		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 		try {
+			if (!(outputStream instanceof BufferedOutputStream)) {
+				outputStream = new BufferedOutputStream(outputStream);
+			}
 			StreamResult streamResult = createUnixStreamResultForEntry(outputStream);
 			transformer.transform(new DOMSource(document), streamResult);
 		} catch (Exception e) {

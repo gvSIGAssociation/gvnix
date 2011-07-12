@@ -46,7 +46,7 @@ public class DynConfigurationConverter implements Converter {
     /**
      * {@inheritDoc}
      */
-    public Object convertFromText(String value, Class<?> requiredType,
+    public Object convertFromText(String value, Class requiredType,
             String optionContext) {
 
         // Create a dynamic configuration with name only
@@ -56,9 +56,8 @@ public class DynConfigurationConverter implements Converter {
     /**
      * {@inheritDoc}
      */
-    public boolean getAllPossibleValues(List<String> completions,
-            Class<?> requiredType, String existingData, String optionContext,
-            MethodTarget target) {
+    public boolean getAllPossibleValues(List completions, Class requiredType,
+            String existingData, String optionContext, MethodTarget target) {
 
         // Find all stored configurations
         DynConfigurationList dynConfs = operations.findConfigurations();
@@ -80,7 +79,7 @@ public class DynConfigurationConverter implements Converter {
     /**
      * {@inheritDoc}
      */
-    public boolean supports(Class<?> requiredType, String optionContext) {
+    public boolean supports(Class requiredType, String optionContext) {
 
         // This converter supports dynamic configuration
         return DynConfiguration.class.isAssignableFrom(requiredType);

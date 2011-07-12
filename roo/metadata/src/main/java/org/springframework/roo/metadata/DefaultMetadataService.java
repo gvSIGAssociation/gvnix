@@ -18,7 +18,6 @@ import org.springframework.roo.metadata.internal.AbstractMetadataCache;
 import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
 
-
 /**
  * Default implementation of {@link MetadataService}.
  * 
@@ -29,7 +28,7 @@ import org.springframework.roo.support.util.Assert;
  * @author Ben Alex
  * @since 1.0
  */
-@Component
+@Component(immediate = true)
 @Service
 @Reference(name = "metadataProvider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = MetadataProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class DefaultMetadataService extends AbstractMetadataCache implements MetadataService {
@@ -48,8 +47,8 @@ public class DefaultMetadataService extends AbstractMetadataCache implements Met
 	private Boolean lock = new Boolean(true);
 
 	// Request control
-	private List<String> activeRequests = new ArrayList<String>(); // list to assist output "stacks" which show the order of requests
-	private List<String> keysToRetry = new ArrayList<String>();  // list to help us verify correct operation through logs (predictable ordering)
+	private List<String> activeRequests = new ArrayList<String>(); // List to assist output "stacks" which show the order of requests
+	private List<String> keysToRetry = new ArrayList<String>();  // List to help us verify correct operation through logs (predictable ordering)
 	
 	protected void bindMetadataProvider(MetadataProvider mp) {
 		synchronized (lock) {
@@ -129,15 +128,15 @@ public class DefaultMetadataService extends AbstractMetadataCache implements Met
 					}
 					return null;
 				}
-				
-				// Infinite loop management
-				activeRequests.add(metadataIdentificationString);
 
 				// Get the destination
 				String mdClassId = MetadataIdentificationUtils.create(MetadataIdentificationUtils.getMetadataClass(metadataIdentificationString));
 				MetadataProvider p = providerMap.get(mdClassId);
 				Assert.notNull(p, "No metadata provider is currently registered to provide metadata for identifier '" + metadataIdentificationString + "' (class '" + mdClassId + "')");
-				
+
+				// Infinite loop management
+				activeRequests.add(metadataIdentificationString);
+
 				// Obtain the item
 				if (metadataLogger.getTraceLevel() > 0) {
 					metadataLogger.log("Get " + metadataIdentificationString + " from " + p.getClass().getName());
@@ -174,12 +173,14 @@ public class DefaultMetadataService extends AbstractMetadataCache implements Met
 					metadataLogger.log("Returning " + metadataIdentificationString);
 				}
 				return result;
-
+			} catch (Exception e) {
+				activeRequests.remove(metadataIdentificationString);
+				throw new IllegalStateException(e);
 			} finally {
 				// We use another try..finally block as we want to ensure exceptions don't prevent our metadataLogger.stopEvent()
 				try {
 					// Have we processed all requests? If so, handle any retries we recorded
-					if (activeRequests.size() == 0) {
+					if (activeRequests.isEmpty()) {
 						List<String> thisRetry = new ArrayList<String>();
 						thisRetry.addAll(keysToRetry);
 						keysToRetry.clear();
@@ -232,7 +233,7 @@ public class DefaultMetadataService extends AbstractMetadataCache implements Met
 			if (p instanceof MetadataNotificationListener) {
 				// The provider can directly handle this notification, so we just need to delegate directly to it.
 				// We rely on the provider to evict items from the cache if applicable.
-				((MetadataNotificationListener)p).notify(upstreamDependency, downstreamDependency);
+				((MetadataNotificationListener) p).notify(upstreamDependency, downstreamDependency);
 			} else {
 				// As per interface contract, we just ensure we evict the item and recreate it
 				// However, we only do this if the destination is an instance - if it's a class, "get" is not a meaningful operation.
@@ -264,11 +265,11 @@ public class DefaultMetadataService extends AbstractMetadataCache implements Met
 		synchronized (lock) {
 			// Clear my own cache
 			super.evictAll();
-			
+
 			// Clear the caches of any metadata providers which support the interface
 			for (MetadataProvider p : providers) {
 				if (p instanceof MetadataCache) {
-					((MetadataCache)p).evictAll();
+					((MetadataCache) p).evictAll();
 				}
 			}
 		}

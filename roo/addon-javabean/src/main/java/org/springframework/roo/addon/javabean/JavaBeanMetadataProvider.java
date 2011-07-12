@@ -38,6 +38,7 @@ import org.springframework.roo.support.util.StringUtils;
 @Component(immediate = true)
 @Service
 public final class JavaBeanMetadataProvider extends AbstractItdMetadataProvider {
+	private static final JavaType ROO_ENTITY = new JavaType("org.springframework.roo.addon.entity.RooEntity");
 	@Reference private ProjectOperations projectOperations;
 	@Reference private TypeLocationService typeLocationService;
 	private Set<String> producedMids = new LinkedHashSet<String>();
@@ -55,21 +56,26 @@ public final class JavaBeanMetadataProvider extends AbstractItdMetadataProvider 
 		removeMetadataTrigger(new JavaType(RooJavaBean.class.getName()));
 	}
 
+	// We need to notified when ProjectMetadata changes in order to handle JPA <-> GAE persistence changes
 	@Override
 	protected void notifyForGenericListener(String upstreamDependency) {
+		// If the upstream dependency is null or invalid do not continue
 		if (!StringUtils.hasText(upstreamDependency) || !MetadataIdentificationUtils.isValid(upstreamDependency)) {
 			return;
 		}
+		// If the upstream dependency isn't ProjectMetadata do not continue
 		if (!upstreamDependency.equals(ProjectMetadata.getProjectIdentifier())) {
 			return;
 		}
 		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
+		// If ProjectMetadata isn't valid do not continue
 		if (projectMetadata == null || !projectMetadata.isValid()) {
 			return;
 		}
 		boolean isGaeEnabled = projectMetadata.isGaeEnabled();
+		// We need to determine if the persistence state has changed, we do this by comparing the last known state to the current state
 		boolean hasGaeStateChanged = wasGaeEnabled == null || isGaeEnabled != wasGaeEnabled;
-		if (projectMetadata.isGwtEnabled() && hasGaeStateChanged) {
+		if (hasGaeStateChanged) {
 			wasGaeEnabled = isGaeEnabled;
 			for (String producedMid : producedMids) {
 				metadataService.get(producedMid, true);
@@ -78,6 +84,11 @@ public final class JavaBeanMetadataProvider extends AbstractItdMetadataProvider 
 	}
 
 	protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
+		JavaBeanAnnotationValues annotationValues = new JavaBeanAnnotationValues(governorPhysicalTypeMetadata);
+		if (!annotationValues.isAnnotationFound()) {
+			return null;
+		}
+
 		// Work out the MIDs of the other metadata we depend on
 		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
 		if (projectMetadata == null || !projectMetadata.isValid()) {
@@ -93,8 +104,10 @@ public final class JavaBeanMetadataProvider extends AbstractItdMetadataProvider 
 			}
 		}
 
+		// In order to handle switching between GAE and JPA produced MIDs need to be remembered so they can be regenerated on JPA <-> GAE switch
 		producedMids.add(metadataIdentificationString);
-		return new JavaBeanMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, declaredFields);
+		
+		return new JavaBeanMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, annotationValues, declaredFields);
 	}
 
 	private FieldMetadata isGaeInterested(FieldMetadata field) {
@@ -116,7 +129,7 @@ public final class JavaBeanMetadataProvider extends AbstractItdMetadataProvider 
 		try {
 			ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = typeLocationService.getClassOrInterface(fieldType);
 			FieldMetadata identifierField = null;
-			if (projectOperations.getProjectMetadata().isGaeEnabled() && MemberFindingUtils.getTypeAnnotation(classOrInterfaceTypeDetails, new JavaType("org.springframework.roo.addon.entity.RooEntity")) != null) {
+			if (projectOperations.getProjectMetadata().isGaeEnabled() && MemberFindingUtils.getTypeAnnotation(classOrInterfaceTypeDetails, ROO_ENTITY) != null) {
 				identifierField = getIdentifierField(classOrInterfaceTypeDetails);
 			}
 			return identifierField;
@@ -146,7 +159,7 @@ public final class JavaBeanMetadataProvider extends AbstractItdMetadataProvider 
 
 	private FieldMetadata getIdentifierField(ClassOrInterfaceTypeDetails governorTypeDetails) {
 		for (AnnotationMetadata annotation : governorTypeDetails.getAnnotations()) {
-			if (!annotation.getAnnotationType().getFullyQualifiedTypeName().equals("org.springframework.roo.addon.entity.RooEntity")) {
+			if (!annotation.getAnnotationType().getFullyQualifiedTypeName().equals(ROO_ENTITY.getFullyQualifiedTypeName())) {
 				continue;
 			}
 			AnnotationAttributeValue<?> value = annotation.getAttribute(new JavaSymbolName("identifierField"));
