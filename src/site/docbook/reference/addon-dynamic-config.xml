@@ -71,7 +71,11 @@
     property add</link>. Las propiedades inicialmente tomarán el valor que tuviesen
     definido en el proyecto y podremos modificar dichos valores con <link
     linkend="apendice-comandos_addon-dynamic_config-config_prop_update">configuration
-    property value</link>.</para>
+    property value</link>. En algunos casos, por seguridad, se desea que el valor de
+    una propiedad no esté almacenado en el proyecto, para ello puede utilizarse el
+    comando <link linkend="apendice-comandos_addon-dynamic_config-config_prop_undefined">
+    configuration property undefined</link> de forma que el valor se proporcionará desde
+    la línea de comandos con <emphasis>-D nombre=valor</emphasis>.</para>
     
     <para>Si queremos ver las distintas configuraciones que hemos creado, sus
     propiedades y los valores definidos para cada una de ellas usaremos <link
@@ -102,14 +106,23 @@ roo&gt; <emphasis role="bold">configuration property add --name database.url</em
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
+(use 'configuration property undefined' to set property with no values)
 roo&gt; <emphasis role="bold">configuration property add --name hibernate.hbm2ddl.auto</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
+(use 'configuration property undefined' to set property with no values)
 roo&gt; <emphasis role="bold">configuration property add --name log4j.rootLogger</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
+(use 'configuration property undefined' to set property with no values)
+roo&gt; <emphasis role="bold">configuration property add --name database.password</emphasis>
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Property available for all configurations
+(use 'configuration property value' to set property new values)
+(use 'configuration property undefined' to set property with no values)
 roo&gt; <emphasis role="bold">configuration property value --configuration dev --property database.url --value jdbc:hsqldb:mem:mydevdb</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
@@ -118,11 +131,12 @@ roo&gt; <emphasis role="bold">configuration list</emphasis>
       (Active)      dev
 ----------------------------------------
  * Database Connection Properties
-   - database.url = jdbc:hsqldb:mem:mydevdb
+   - database.url = "jdbc:hsqldb:mem:mydevdb"
+   - database.password = ""
  * Persistence Property Attributes XML
-   - hibernate.hbm2ddl.auto = create
+   - hibernate.hbm2ddl.auto = "create"
  * Logging Service Properties
-   - log4j.rootLogger = INFO, stdout
+   - log4j.rootLogger = "INFO, stdout"
 (use 'configuration export' to write configurations into the project)
 roo&gt; <emphasis role="bold">configuration export</emphasis>
 Updated ROOT/pom.xml
@@ -136,12 +150,13 @@ roo&gt; <emphasis role="bold">configuration create --name pro</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Configuration created with currently available properties
  * Database Connection Properties
-   - database.url = jdbc:hsqldb:mem:petclinic
+   - database.url = "jdbc:hsqldb:mem:petclinic"
+   - database.password = ""
  * Persistence Property Attributes XML
-   - hibernate.hbm2ddl.auto = create
+   - hibernate.hbm2ddl.auto = "create"
  * Logging Service Properties
-   - log4j.rootLogger = INFO, stdout
-(use 'configuration property add' to make a property available for all configurations
+   - log4j.rootLogger = "INFO, stdout"
+(use 'configuration property add' to make a property available for all configurations)
 roo&gt; <emphasis role="bold">configuration property value --configuration pro --property database.url --value jdbc:hsqldb:file:myprodb</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
@@ -154,23 +169,30 @@ roo&gt; <emphasis role="bold">configuration property value --configuration pro -
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
+roo&gt; <emphasis role="bold">configuration property undefined --configuration pro --property database.password</emphasis>
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Property value undefined
+(use '-D propname=propvalue' on maven commands to set the property value)
+(use 'configuration list' to show configurations and their properties)
 roo&gt; <emphasis role="bold">configuration list</emphasis>
       (Active)      dev
 ----------------------------------------
  * Database Connection Properties
-   - database.url = jdbc:hsqldb:mem:mydevdb
+   - database.url = "jdbc:hsqldb:mem:mydevdb"
+   - database.password = ""
  * Persistence Property Attributes XML
-   - hibernate.hbm2ddl.auto = create
+   - hibernate.hbm2ddl.auto = "create"
  * Logging Service Properties
-   - log4j.rootLogger = INFO, stdout
+   - log4j.rootLogger = "INFO, stdout"
                     pro
 ----------------------------------------
  * Database Connection Properties
-   - database.url = jdbc:hsqldb:file:myprodb
+   - database.url = "jdbc:hsqldb:file:myprodb"
+   - database.password = (UNDEFINED)
  * Persistence Property Attributes XML
-   - hibernate.hbm2ddl.auto = update
+   - hibernate.hbm2ddl.auto = "update"
  * Logging Service Properties
-   - log4j.rootLogger = ERROR, stdout
+   - log4j.rootLogger = "ERROR, stdout"
 (use 'configuration export' to write configurations into the project)
 roo&gt; <emphasis role="bold">configuration export</emphasis>
 Updated ROOT/pom.xml
@@ -189,7 +211,7 @@ Total execution time 1657 seconds
 Roo exited with code 0
 shell&gt; <emphasis role="bold">mvn clean tomcat:run -P dev</emphasis>
 ... (Ejecutando aplicación con la configuración llamada dev) ...
-shell&gt; <emphasis role="bold">mvn clean tomcat:run -P pro</emphasis>
+shell&gt; <emphasis role="bold">mvn clean tomcat:run -P pro -D database.password=</emphasis>
 ... (Ejecutando aplicación con la configuración llamada pro) ...
 </programlisting>
   </section>

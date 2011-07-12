@@ -81,7 +81,7 @@ public class Commands implements CommandMarker {
         showDynComponents(dynConf);
         logger.log(
                 Level.INFO,
-                "(use 'configuration property add' to make a property available for all configurations");
+                "(use 'configuration property add' to make a property available for all configurations)");
     }
 
     @CliAvailabilityIndicator("configuration property add")
@@ -120,14 +120,14 @@ public class Commands implements CommandMarker {
     }
 
     @CliAvailabilityIndicator("configuration property value")
-    public boolean isPropertyValueSet() {
+    public boolean isPropertyValue() {
 
         return operations.isProjectAvailable()
                 && !operations.findConfigurations().isEmpty();
     }
 
     @CliCommand(value = "configuration property value", help = "Set new value into a configuration property")
-    public void propertyValueSet(
+    public void propertyValue(
             @CliOption(key = "configuration", mandatory = true, help = "Name of configuration to update") DynConfiguration configuration,
             @CliOption(key = "property", mandatory = true, help = "Name of property to update", optionContext = DynPropertyConverter.CONFIGURATION_FILE) DynProperty property,
             @CliOption(key = "value", mandatory = true, help = "New value to set") String value) {
@@ -153,14 +153,14 @@ public class Commands implements CommandMarker {
     }
 
     @CliAvailabilityIndicator("configuration property undefined")
-    public boolean isPropertyValueUndefined() {
+    public boolean isPropertyUndefined() {
 
         return operations.isProjectAvailable()
                 && !operations.findConfigurations().isEmpty();
     }
 
     @CliCommand(value = "configuration property undefined", help = "Set no value into a configuration property")
-    public void propertyValueUndefined(
+    public void propertyUndefined(
             @CliOption(key = "configuration", mandatory = true, help = "Name of configuration to update") DynConfiguration configuration,
             @CliOption(key = "property", mandatory = true, help = "Name of property to update", optionContext = DynPropertyConverter.CONFIGURATION_FILE) DynProperty property) {
 

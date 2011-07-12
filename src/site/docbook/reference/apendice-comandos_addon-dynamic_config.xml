@@ -144,6 +144,32 @@
       </varlistentry>
     </variablelist>
   </section>
+  
+  <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_undefined">
+    <title>configuration property undefined</title>
+
+    <para>Deja sin valor una propiedad en una configuración.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>--configuration</term>
+
+        <listitem>
+          <para><emphasis>[Requerido] Nombre de la configuración en la que se
+          quiere dejar sin valor una propiedad.</emphasis></para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>--property</term>
+
+        <listitem>
+          <para><emphasis>[Requerido] Nombre de la propiedad cuyo valor se
+          desea dejar sin valor.</emphasis></para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </section>
 
   <section xml:id="apendice-comandos_addon-dynamic_config-config_list">
     <title>configuration list</title>

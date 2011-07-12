@@ -51,6 +51,11 @@ Addon commands
  * configuration: Name of configuration to update
  * property: Name of configuration to update
  * value: New value to set
+ 
+* configuration property undefined - Set no value into a configuration property
+
+ * configuration: Name of configuration to update
+ * property: ame of property to update
 
 * configuration list - List all created configurations and their properties
 
