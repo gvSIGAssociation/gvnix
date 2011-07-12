@@ -72,7 +72,7 @@ public final class ModalDialogMetadataProvider extends
     @Reference
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     @Reference
-    private WebExceptionHandlerOperations webExceptionHandlerOperations;
+    private WebModalDialogOperations webModalDialogOperations;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -125,7 +125,7 @@ public final class ModalDialogMetadataProvider extends
         MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
         JavaType controllerType = ModalDialogMetadata
                 .getJavaType(metadataIdentificationString);
-        webExceptionHandlerOperations
+        webModalDialogOperations
                 .addDefaultModalDialogAnnotation(controllerType);
         List<String> definedModalDialogs = getDefinedModalDialogsIfAny(controllerType);
         return new ModalDialogMetadata(metadataIdentificationString,
@@ -198,7 +198,7 @@ public final class ModalDialogMetadataProvider extends
                         "/servlet/handler/Dialog.java"));
 
         return fileManager.exists(modalDialogTypePath)
-                && webExceptionHandlerOperations.isMessageBoxOfTypeModal();
+                && webModalDialogOperations.isMessageBoxOfTypeModal();
     }
 
     public String getItdUniquenessFilenameSuffix() {

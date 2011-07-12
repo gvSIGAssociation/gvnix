@@ -18,9 +18,6 @@
  */
 package org.gvnix.web.exception.handler.roo.addon;
 
-import org.springframework.roo.model.JavaSymbolName;
-import org.springframework.roo.model.JavaType;
-
 /**
  * Interface for {@link WebExceptionHandlerOperationsImpl}.
  * 
@@ -114,72 +111,4 @@ public interface WebExceptionHandlerOperations {
      * @return
      */
     public boolean isProjectAvailable();
-
-    /**
-     * Annotates given controllerClass with {@link GvNIXModalDialog} or updates
-     * the value of the existing annotation
-     * 
-     * @param controllerClass
-     * @param name
-     */
-    public void addModalDialogAnnotation(JavaType controllerClass,
-            JavaSymbolName name);
-
-    /**
-     * Annotates given controllerClass with {@link GvNIXModalDialog} with empty
-     * attribute value
-     * 
-     * @param controllerClass
-     */
-    public void addDefaultModalDialogAnnotation(JavaType controllerClass);
-
-    /**
-     * Installs the Java class given by its className.
-     * <p>
-     * It expects only "MessageMappingExceptionResolver" or "Dialog" as possible
-     * parameter
-     * 
-     * @param className
-     * @return
-     */
-    public String installWebServletHandlerClass(String className);
-
-    /**
-     * Installs MVC Artifacts into current project<br/>
-     * Artifacts installed:<br/>
-     * <ul>
-     * <li>message-box.tagx</li>
-     * </ul>
-     * Modify default.jspx layout adding in the right position the element
-     * &lt;util:message-box /&gt;
-     * <p>
-     * Also adds needed i18n properties to right message_xx.properties files
-     */
-    public void installMvcArtifacts();
-
-    /**
-     * Setup modal dialogs support for current project
-     * <ul>
-     * <li>Setup maven dependency</li>
-     * <li>Installs bean Dialog.java</li>
-     * <li>Installs MVC Artifacts</li>
-     * </ul>
-     */
-    public void setupModalDialogsSupport();
-
-    /**
-     * Add addon repository and dependency to get annotations.
-     * 
-     * @param configuration
-     *            Configuration element
-     */
-    public void setupMavenDependency();
-
-    /**
-     * Returns true if message-box shows messages as modal dialogs, false
-     * otherwise.
-     * 
-     * @return
-     */
-    public boolean isMessageBoxOfTypeModal();
 }

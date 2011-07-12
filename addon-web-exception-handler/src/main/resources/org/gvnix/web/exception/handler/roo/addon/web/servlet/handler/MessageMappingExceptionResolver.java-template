@@ -7,7 +7,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
-import ${PACKAGE}.ModalDialog;
+import ${PACKAGE}.Dialog;
 
 
 public class MessageMappingExceptionResolver extends
@@ -58,7 +58,7 @@ public class MessageMappingExceptionResolver extends
   }
 
   /**
-   * Create an instance of {@link ModalDialog} and set it as a session attribute.<br/>
+   * Create an instance of {@link Dialog} and set it as a session attribute.<br/>
    * message-box.tagx will process the bean and will show the exception inside a modal window.
    * <p>
    * <strong>Note:</strong><br/>
@@ -78,7 +78,7 @@ public class MessageMappingExceptionResolver extends
     if (page != null && !page.isEmpty()) {
       page = "/WEB-INF/views/".concat(page).concat(".jspx");
     }
-    ModalDialog modalDialog = new ModalDialog(page, ex);
+    Dialog modalDialog = new Dialog(page, ex);
     session.setAttribute(DEFAULT_DIALOGMESSAGE_ATTRIBUTE, modalDialog);
   }
 }
