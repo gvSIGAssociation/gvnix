@@ -34,23 +34,23 @@ Analysis
 
 Analysis for the development of the Add-on displayed by commands::
 
-exception handler list - List the Exceptions handled::
+web mvc exception list - List the Exceptions handled::
 
   * Shows the handled Exceptions that are listed in the SimpleMappingExceptionResolver bean.
 
-exception handler add - Add a new Exception::
+web mvc exception add - Add a new Exception::
 
   * Creates the new mapping in the SimpleMappingExceptionResover bean in webmvc-config.xml.
   * Creates the jspx and defines it in the views.xml file.
   * Creates the multilanguage tags in the messages**.properties files. Set the title and description in the selected language.
 
-exception handler remove - Removes an existing Exception::
+web mvc exception remove - Removes an existing Exception::
 
   * Removes the definition of the Exception in the SimpleMappingExceptionResolver bean in webmvc-config.xml.
   * Removes the .jspx view and its definition in views.xml file.
   * Remove the multilanguage tags in all the messages**.properties files.
 
-exception handler set language - Updates the messages of the Exception in the selected language::
+web mvc exception set language - Updates the messages of the Exception in the selected language::
 
   * Checks if the Exception exists.
 
@@ -63,21 +63,21 @@ Commands
 
 There are defined four commands in this Add-on:
 
-exception handler list - List the Exceptions handled::
+web mvc exception list - List the Exceptions handled::
 
-exception handler add - Add a new Exception::
+web mvc exception add - Add a new Exception::
 
   Parameters: --excepcion Name of the exception e.g. java.lang.Exception,  --title Title of the exception, --description Description of the exception to show in the view and --language The language of the messages [es, en... etc].
 
-exception handler remove - Removes an existing Exception::
+web mvc exception remove - Removes an existing Exception::
 
   Parameters: --excepcion Name of the exception e.g. java.lang.Exception.
 
-exception handler set language - Updates the messages of the Exception in the selected language::
+web mvc exception set language - Updates the messages of the Exception in the selected language::
 
   Parameters: --excepcion Name of the exception e.g. java.lang.Exception,  --title Title of the exception, --description Description of the exception to show in the view and --language The language of the messages [es, en... etc].
 
-exception handler setup gvnix - Creates a Set of defined exceptions for gvNix
+web mvc exception setup - Creates a Set of defined exceptions for gvNix
 
 Proof of Concept
 ================
@@ -107,11 +107,6 @@ Instead of using the Transformer provided by XmlUtils.
 TODO
 =====
 
-* Since gvNIX must support Spanish, Valencian_Catalan languages in WebExceptionHandlerOperationsImpl.installMvcArtifacts()
-  we are creating the message bundle files for these languages (messages_es.properties and messages_ca.properties). We've
-  created two method that should be outsorced to a shared component so, other gvNIX add-ons creating its own i18n properties
-  could use these methods.
-
-* Added a new command "web mvc add modalDialog" that installs message-box.tagx, a new jspx as sample of content of a modal dialog
+* Added a new command "web mvc dialog add" that installs message-box.tagx, a new jspx as sample of content of a modal dialog
   and generate an ITD with a helper method to show a new modal dialog in view.
   TODO: Maybe this method will be moved to another add-on

@@ -109,15 +109,9 @@ public class OperationUtils {
         MutableFile mutableClass = null;
         if (!fileManager.exists(classPath)) {
             mutableClass = fileManager.createFile(classPath);
-            // String templatePath = TemplateUtils.getTemplatePath(
-            // OperationUtils.class,
-            // "web/servlet/handler/Dialog.java-template").replaceFirst(
-            // "/", "");
-            // InputStream template = OperationUtils.class
-            // .getResourceAsStream(templatePath);
+
             InputStream template = TemplateUtils.getTemplate(
-                    OperationUtils.class,
-                    "web/servlet/handler/Dialog.java-template");
+                    OperationUtils.class, "Dialog.java-template");
 
             String javaTemplate;
             try {
