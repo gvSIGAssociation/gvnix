@@ -52,7 +52,7 @@ import org.w3c.dom.Element;
 
 /**
  * Implementation of Exception commands that are available via the Roo shell.
- *
+ * 
  * @author Ricardo García ( rgarcia at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -79,14 +79,11 @@ public class WebExceptionHandlerOperationsImpl implements
     private PathResolver pathResolver;
     @Reference
     private PropFileOperations propFileOperations;
-    @Reference
-    private SharedOperations sharedOperations;
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * 
+     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
      * #getHandledExceptionList()
      */
     public String getHandledExceptionList() {
@@ -129,9 +126,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * 
+     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
      * #addNewHandledException(java.lang.String, java.lang.String,
      * java.lang.String, java.lang.String)
      */
@@ -163,9 +159,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * 
+     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
      * #removeExceptionHandled(java.lang.String)
      */
     public void removeExceptionHandled(String exceptionName) {
@@ -188,9 +183,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * 
+     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
      * #languageExceptionHandled(java.lang.String, java.lang.String,
      * java.lang.String, java.lang.String)
      */
@@ -213,9 +207,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * 
+     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
      * #getLanguagePropertiesFile(java.lang.String)
      */
     public String getLanguagePropertiesFile(String exceptionLanguage) {
@@ -241,7 +234,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Checks if the Exception is mapped in the SimpleMappingExceptionResolver
      * Controller
-     *
+     * 
      * @param exceptionName
      *            Exception Name to Handle.
      */
@@ -276,12 +269,12 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Update the webmvc-config.xml with the new Exception.
-     *
+     * 
      * @param exceptionName
      *            Exception Name to Handle.
      * @return {@link String} The exceptionViewName to create the .jspx view.
      */
-    public String updateWebMvcConfig(String exceptionName) {
+    protected String updateWebMvcConfig(String exceptionName) {
 
         String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
                 "WEB-INF/spring/webmvc-config.xml");
@@ -372,7 +365,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Returns the exception view name checking if exists in the file
      * webmvc-config.xml file.
-     *
+     * 
      * @param exceptionName
      *            to create the view.
      * @param root
@@ -414,7 +407,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Removes the definition of the selected Exception in the webmvc-config.xml
      * file.
-     *
+     * 
      * @param exceptionName
      *            Exception Name to remove.
      */
@@ -473,7 +466,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Update layout.xml to map the new Exception associated View.
-     *
+     * 
      * @param exceptionViewName
      *            to create the view and the definition in the xml
      */
@@ -494,7 +487,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Removes the definition of the Exception view in layout.xml.
-     *
+     * 
      * @param exceptionViewName
      *            Exception Name to remove.
      */
@@ -511,7 +504,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Creates a view for the new Handled Exception.
-     *
+     * 
      * @param exceptionName
      *            Name of the Exception to handle.
      * @param exceptionTitle
@@ -594,7 +587,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Removes Exception view .jspx.
-     *
+     * 
      * @param exceptionViewName
      *            Exception Name to remove.
      */
@@ -610,12 +603,12 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Method to replace the parameters set in the Map into the template.
-     *
+     * 
      * @param template
      *            Template to create a new jspx.
      * @param params
      *            {@link Map} with the specified parameters.
-     *
+     * 
      * @return {@link String} with the updated parameters values.
      */
     private String replaceParams(String template, Map<String, String> params) {
@@ -629,7 +622,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Updates the selected language file with the title and the description of
      * the new Exception.
-     *
+     * 
      * @param exceptionName
      *            Name of the Exception.
      * @param exceptionTitle
@@ -700,7 +693,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /**
      * Updates the selected language file with the title and the description of
      * the new Exception.
-     *
+     * 
      * @param exceptionName
      *            Name of the Exception.
      * @param exceptionTitle
@@ -742,7 +735,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /**
      * Removes the Language messages properties of the Exception.
-     *
+     * 
      * @param exceptionName
      *            Exception Name to remove.
      */
@@ -782,17 +775,11 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * 
+     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
      * #setUpGvNIXExceptions()
      */
     public void setUpGvNIXExceptions() {
-
-        String exceptionResolverBeanClass = installWebServletHandlerClasses();
-        updateExceptionResolverBean(exceptionResolverBeanClass);
-
-        sharedOperations.installMvcArtifacts();
 
         // java.sql.SQLException
         addNewHandledException("java.sql.SQLException", "SQLException",
@@ -844,78 +831,15 @@ public class WebExceptionHandlerOperationsImpl implements
                 "Can not update the record because it has been previously updated.",
                 "en");
 
-    }
-
-    /**
-     * Installs Java classes for MessageMappapingExceptionResolver support
-     *
-     * @return string as fully qualified name of MessageMappingExceptionResolver
-     *         Java class installed
-     */
-    private String installWebServletHandlerClasses() {
-        String classPackage = sharedOperations
-                .installWebServletMessageMappingExceptionResolverClass();
-        // sharedOperations.installWebServletClass("Dialog");
-        OperationUtils.installWebServletDialogClass(
-                sharedOperations.getClassFullQualifiedName("Dialog"),
-                pathResolver, fileManager);
-        return classPackage.concat(".MessageMappingExceptionResolver");
-    }
-
-    /**
-     * Change the class of the bean MappingExceptionResolver by gvNIX's resolver
-     * class. The gvNIX resolver class supports redirect calls and messages in a
-     * modal dialog.
-     *
-     * @param beanClassName
-     *            the name of the new ExceptionResolver Bean
-     */
-    private void updateExceptionResolverBean(String beanClassName) {
-        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-                "WEB-INF/spring/webmvc-config.xml");
-
-        if (!fileManager.exists(webXmlPath)) {
-            return;
-        }
-
-        MutableFile webXmlMutableFile = null;
-        Document webXml;
-
-        try {
-            webXmlMutableFile = fileManager.updateFile(webXmlPath);
-            webXml = XmlUtils.getDocumentBuilder().parse(
-                    webXmlMutableFile.getInputStream());
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        Element root = webXml.getDocumentElement();
-
-        Element simpleMappingExceptionResolverBean = XmlUtils
-                .findFirstElement(
-                        "/beans/bean[@class='org.springframework.web.servlet.handler.SimpleMappingExceptionResolver']",
-                        root);
-
-        // We'll replace the class just if SimpleMappingExceptionResolver is set
-        if (simpleMappingExceptionResolverBean != null) {
-            simpleMappingExceptionResolverBean.setAttribute("class",
-                    beanClassName);
-            simpleMappingExceptionResolverBean.setAttribute("id",
-                    "messageMappingExceptionResolverBean");
-            XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);
-        }
-
-        // Here we need MessageMappingExceptionResolver set as ExceptionResolver
-        Element messageMappingExceptionResolverBean = XmlUtils
-                .findFirstElement("/beans/bean[@class='".concat(beanClassName)
-                        .concat("']"), root);
-        Assert.notNull(messageMappingExceptionResolverBean,
-                "MessageMappingExceptionResolver is not configured. Check webmvc-config.xml");
+        // TODO: Add support for
+        // ConstraintViolationException, DataException,
+        // IdentifierGenerationException
 
     }
 
     /**
      * Retrieves the messages properties files of the application
-     *
+     * 
      * @return {@link SortedSet} with the messages properties files
      */
     private SortedSet<FileDetails> getPropertiesFiles() {
@@ -929,9 +853,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * 
+     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
      * #isExceptionMappingAvailable()
      */
     public boolean isExceptionMappingAvailable() {
@@ -969,9 +892,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * 
+     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
      * #isExceptionMappingAvailable()
      */
     public boolean isMessageMappingAvailable() {
@@ -1008,9 +930,8 @@ public class WebExceptionHandlerOperationsImpl implements
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * 
+     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
      * #isProjectAvailable()
      */
     public boolean isProjectAvailable() {

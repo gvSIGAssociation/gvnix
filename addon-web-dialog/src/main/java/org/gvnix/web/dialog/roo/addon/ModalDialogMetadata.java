@@ -261,8 +261,7 @@ public class ModalDialogMetadata extends
      * <p>
      * Since the add-on installs Dialog class in subpackage
      * <code>controller_package.servlet.handler</code>, it builds the package
-     * name adding <code>.servlet.handler.[className]</code> to the aspect
-     * package.
+     * name adding <code>.dialog.[className]</code> to the aspect package.
      * <p>
      * DialogType is special because is an enum type defined in Dialog class
      * 
@@ -272,7 +271,7 @@ public class ModalDialogMetadata extends
      */
     private JavaType getJavaTypeForClassName(String className) {
         String typePackage = aspectName.getPackage()
-                .getFullyQualifiedPackageName().concat(".servlet.handler.");
+                .getFullyQualifiedPackageName().concat(".dialog.");
         if (className.equals("DialogType")) {
             return new JavaType(typePackage.concat("Dialog.").concat(className));
         }

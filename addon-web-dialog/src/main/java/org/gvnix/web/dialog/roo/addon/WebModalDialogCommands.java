@@ -30,7 +30,7 @@ import org.springframework.roo.shell.CommandMarker;
 
 /**
  * Commands supporting Modal Dialogs
- * 
+ *
  * @author Óscar Rovira ( orovira at disid dot com ) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -42,11 +42,14 @@ public class WebModalDialogCommands implements CommandMarker {
 
     @Reference
     private WebModalDialogOperations modalDialogOperations;
+    @Reference
+    private WebExceptionHandlerOperations exceptionOperations;
 
     @CliAvailabilityIndicator("web mvc dialog setup")
     public boolean isSetupGvNIXModalDialogAvailable() {
         return modalDialogOperations.isProjectAvailable()
-                && !modalDialogOperations.isMessageBoxOfTypeModal();
+          && exceptionOperations.isExceptionMappingAvailable();
+                //&& !modalDialogOperations.isMessageBoxOfTypeModal();
     }
 
     @CliCommand(value = "web mvc dialog setup", help = "Setup support for Modal Dialogs in current project.")

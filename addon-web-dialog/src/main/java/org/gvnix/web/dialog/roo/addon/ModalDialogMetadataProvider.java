@@ -195,7 +195,7 @@ public final class ModalDialogMetadataProvider extends
                 Path.SRC_MAIN_JAVA,
                 File.separator.concat(
                         aspectPackage.replace(".", File.separator)).concat(
-                        "/servlet/handler/Dialog.java"));
+                        "/dialog/Dialog.java"));
 
         return fileManager.exists(modalDialogTypePath)
                 && webModalDialogOperations.isMessageBoxOfTypeModal();

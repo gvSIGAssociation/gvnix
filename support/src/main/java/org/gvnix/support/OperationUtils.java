@@ -97,21 +97,47 @@ public class OperationUtils {
     /**
      * Installs the Dialog Java class
      * 
-     * @return
+     * @param packageFullName
+     *            fullyQualifiedName of destination package for Dialog Bean. ie.
+     *            <code>com.disid.myapp.web.dialog</code>
+     * @param pathResolver
+     * @param fileManager
      */
-    public static String installWebServletDialogClass(String classFullName,
+    public static void installWebDialogClass(String packageFullName,
             PathResolver pathResolver, FileManager fileManager) {
 
-        String classPath = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
-                classFullName.replace(".", File.separator).concat(".java"));
+        String classFullName = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+                packageFullName.concat(".Dialog").replace(".", File.separator)
+                        .concat(".java"));
 
-        String classPackage = classFullName.replace(".Dialog", "");
+        installJavaClassFromTemplate(packageFullName, classFullName,
+                "Dialog.java-template", pathResolver, fileManager);
+    }
+
+    /**
+     * Installs in project a Java Class based on a template.
+     * <p>
+     * Note that class template must be a resource available in this module.
+     * <p>
+     * <strong>This method only performs a replacement of the pattern ${PACKAGE}
+     * in the template</strong>
+     * 
+     * @param packageFullName
+     * @param classFullName
+     * @param javaClassTemplateName
+     * @param pathResolver
+     * @param fileManager
+     */
+    private static void installJavaClassFromTemplate(String packageFullName,
+            String classFullName, String javaClassTemplateName,
+            PathResolver pathResolver, FileManager fileManager) {
+
         MutableFile mutableClass = null;
-        if (!fileManager.exists(classPath)) {
-            mutableClass = fileManager.createFile(classPath);
+        if (!fileManager.exists(classFullName)) {
+            mutableClass = fileManager.createFile(classFullName);
 
             InputStream template = TemplateUtils.getTemplate(
-                    OperationUtils.class, "Dialog.java-template");
+                    OperationUtils.class, javaClassTemplateName);
 
             String javaTemplate;
             try {
@@ -120,23 +146,22 @@ public class OperationUtils {
 
                 // Replace package definition
                 javaTemplate = StringUtils.replace(javaTemplate, "${PACKAGE}",
-                        classPackage);
+                        packageFullName);
 
                 // Write final java file
                 FileCopyUtils.copy(javaTemplate.getBytes(),
                         mutableClass.getOutputStream());
             } catch (IOException ioe) {
-                throw new IllegalStateException(
-                        "Unable load Dialog.java-template template", ioe);
+                throw new IllegalStateException("Unable load ".concat(
+                        javaClassTemplateName).concat(", ioe"));
             } finally {
                 try {
                     template.close();
                 } catch (IOException e) {
-                    throw new IllegalStateException(
-                            "Error creating Dialog.java in project", e);
+                    throw new IllegalStateException("Error creating ".concat(
+                            classFullName).concat(" in project"), e);
                 }
             }
         }
-        return classPackage;
     }
 }
