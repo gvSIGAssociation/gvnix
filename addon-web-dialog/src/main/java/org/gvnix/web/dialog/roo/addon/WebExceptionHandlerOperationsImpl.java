@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
@@ -32,8 +33,10 @@ import java.util.SortedSet;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.OperationUtils;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperationsImpl;
 import org.springframework.roo.file.monitor.event.FileDetails;
@@ -42,6 +45,7 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
 import org.springframework.roo.support.util.StringUtils;
@@ -70,6 +74,8 @@ public class WebExceptionHandlerOperationsImpl implements
     private static final String LANGUAGE_FILENAMES = "WEB-INF/i18n/messages**.properties";
 
     @Reference
+    private ProjectOperations projectOperations;
+    @Reference
     private TilesOperations tilesOperations;
     @Reference
     private FileManager fileManager;
@@ -79,6 +85,8 @@ public class WebExceptionHandlerOperationsImpl implements
     private PathResolver pathResolver;
     @Reference
     private PropFileOperations propFileOperations;
+    @Reference
+    private I18nSupport i18nSupport;
 
     /*
      * (non-Javadoc)
@@ -213,6 +221,10 @@ public class WebExceptionHandlerOperationsImpl implements
      */
     public String getLanguagePropertiesFile(String exceptionLanguage) {
 
+        MessageBundleUtils.installI18nMessages(
+                i18nSupport.getLanguage(new Locale(exceptionLanguage)),
+                projectOperations, fileManager);
+
         String languagePath;
 
         if (exceptionLanguage.compareTo("en") == 0) {
@@ -224,6 +236,7 @@ public class WebExceptionHandlerOperationsImpl implements
 
         String messagesPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
                 languagePath);
+
         Assert.isTrue(
                 fileManager.exists(messagesPath),
                 languagePath
@@ -787,11 +800,17 @@ public class WebExceptionHandlerOperationsImpl implements
                 "es");
 
         languageExceptionHandled("java.sql.SQLException", "SQLException",
+                "S'ha produït un error en l'accés a la Base de dades.", "ca");
+
+        languageExceptionHandled("java.sql.SQLException", "SQLException",
                 "There was an error accessing the database.", "en");
 
         // java.io.IOException
         addNewHandledException("java.io.IOException", "IOException",
                 "Existen problemas para enviar o recibir datos.", "es");
+
+        languageExceptionHandled("java.io.IOException", "IOException",
+                "Hi ha problemes per enviar o rebre dades.", "ca");
 
         languageExceptionHandled("java.io.IOException", "IOException",
                 "There are problems sending or receiving data.", "en");
@@ -806,6 +825,12 @@ public class WebExceptionHandlerOperationsImpl implements
         languageExceptionHandled(
                 "org.springframework.transaction.TransactionException",
                 "TransactionException",
+                "S'ha produït un error en la transacció. No s'han guardat les dades correctament.",
+                "ca");
+
+        languageExceptionHandled(
+                "org.springframework.transaction.TransactionException",
+                "TransactionException",
                 "There was an error in the transaction. No data have been stored properly.",
                 "en");
 
@@ -813,6 +838,10 @@ public class WebExceptionHandlerOperationsImpl implements
         addNewHandledException("java.lang.UnsupportedOperationException",
                 "UnsupportedOperationException",
                 "Se ha producido un error no controlado.", "es");
+
+        languageExceptionHandled("java.lang.UnsupportedOperationException",
+                "UnsupportedOperationException",
+                "S'ha produït un error no controlat.", "ca");
 
         languageExceptionHandled("java.lang.UnsupportedOperationException",
                 "UnsupportedOperationException",
@@ -828,11 +857,17 @@ public class WebExceptionHandlerOperationsImpl implements
         languageExceptionHandled(
                 "javax.persistence.OptimisticLockException",
                 "OptimisticLockException",
+                "No es pot actualitzar el registre a causa de que s'ha actualitzat prèviament.",
+                "ca");
+
+        languageExceptionHandled(
+                "javax.persistence.OptimisticLockException",
+                "OptimisticLockException",
                 "Can not update the record because it has been previously updated.",
                 "en");
 
         // TODO: Add support for
-        // ConstraintViolationException, DataException,
+        // javax.validation.ConstraintViolationException, DataException,
         // IdentifierGenerationException
 
     }
