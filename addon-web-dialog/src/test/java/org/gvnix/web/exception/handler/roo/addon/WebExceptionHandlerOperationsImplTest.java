@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.dialog.roo.addon;
+package org.gvnix.web.exception.handler.roo.addon;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperationsImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.roo.addon.propfiles.PropFileOperations;

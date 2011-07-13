@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.dialog.roo.addon;
+package org.gvnix.web.exception.handler.roo.addon;
 
 import java.io.File;
 import java.io.FileReader;
@@ -91,7 +91,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #getHandledExceptionList()
      */
     public String getHandledExceptionList() {
@@ -135,7 +135,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #addNewHandledException(java.lang.String, java.lang.String,
      * java.lang.String, java.lang.String)
      */
@@ -168,7 +168,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #removeExceptionHandled(java.lang.String)
      */
     public void removeExceptionHandled(String exceptionName) {
@@ -192,7 +192,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #languageExceptionHandled(java.lang.String, java.lang.String,
      * java.lang.String, java.lang.String)
      */
@@ -216,7 +216,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #getLanguagePropertiesFile(java.lang.String)
      */
     public String getLanguagePropertiesFile(String exceptionLanguage) {
@@ -789,7 +789,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #setUpGvNIXExceptions()
      */
     public void setUpGvNIXExceptions() {
@@ -889,7 +889,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isExceptionMappingAvailable()
      */
     public boolean isExceptionMappingAvailable() {
@@ -928,7 +928,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isExceptionMappingAvailable()
      */
     public boolean isMessageMappingAvailable() {
@@ -966,7 +966,7 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperations
+     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isProjectAvailable()
      */
     public boolean isProjectAvailable() {
