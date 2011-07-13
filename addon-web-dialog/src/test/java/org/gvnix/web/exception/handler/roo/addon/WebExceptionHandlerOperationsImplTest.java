@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gvnix.web.dialog.roo.addon.WebExceptionHandlerOperationsImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.roo.addon.propfiles.PropFileOperations;

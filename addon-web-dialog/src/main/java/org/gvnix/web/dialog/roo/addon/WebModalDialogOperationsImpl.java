@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.exception.handler.roo.addon;
+package org.gvnix.web.dialog.roo.addon;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -86,7 +86,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
+     * @see org.gvnix.web.dialog.roo.addon.WebModalDialogOperations#
      * isProjectAvailable()
      */
     public boolean isProjectAvailable() {
@@ -98,7 +98,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
+     * @see org.gvnix.web.dialog.roo.addon.WebModalDialogOperations#
      * addModalDialogAnnotation(org.springframework.roo.model.JavaType,
      * org.springframework.roo.model.JavaSymbolName)
      */
@@ -113,7 +113,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
+     * @see org.gvnix.web.dialog.roo.addon.WebModalDialogOperations#
      * addDefaultModalDialogAnnotation(org.springframework.roo.model.JavaType)
      */
     public void addDefaultModalDialogAnnotation(JavaType controllerClass) {
@@ -209,7 +209,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
+     * @see org.gvnix.web.dialog.roo.addon.WebModalDialogOperations#
      * setupModalDialogsSupport()
      */
     public void setupModalDialogsSupport() {
@@ -224,7 +224,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
+     * @see org.gvnix.web.dialog.roo.addon.WebModalDialogOperations#
      * setupMavenDependency()
      */
     public void setupMavenDependency() {
@@ -250,7 +250,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebModalDialogOperations#
+     * @see org.gvnix.web.dialog.roo.addon.WebModalDialogOperations#
      * isMessageBoxOfTypeModal()
      */
     public boolean isMessageBoxOfTypeModal() {

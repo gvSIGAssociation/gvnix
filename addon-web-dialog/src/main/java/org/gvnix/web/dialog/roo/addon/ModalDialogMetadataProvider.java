@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.exception.handler.roo.addon;
+package org.gvnix.web.dialog.roo.addon;
 
 import java.io.File;
 import java.util.ArrayList;

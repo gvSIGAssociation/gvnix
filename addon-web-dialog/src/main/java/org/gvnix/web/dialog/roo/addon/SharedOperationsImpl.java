@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.exception.handler.roo.addon;
+package org.gvnix.web.dialog.roo.addon;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -94,7 +94,7 @@ public class SharedOperationsImpl implements SharedOperations {
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.SharedOperations#
+     * @see org.gvnix.web.dialog.roo.addon.SharedOperations#
      * installWebServletClass(java.lang.String)
      */
     public String installWebServletMessageMappingExceptionResolverClass() {
@@ -144,7 +144,7 @@ public class SharedOperationsImpl implements SharedOperations {
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.SharedOperations#
+     * @see org.gvnix.web.dialog.roo.addon.SharedOperations#
      * getClassFullQualifiedName(java.lang.String)
      */
     public String getClassFullQualifiedName(String className) {
@@ -169,7 +169,7 @@ public class SharedOperationsImpl implements SharedOperations {
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.SharedOperations#
+     * @see org.gvnix.web.dialog.roo.addon.SharedOperations#
      * installMvcArtifacts()
      */
     public void installMvcArtifacts() {

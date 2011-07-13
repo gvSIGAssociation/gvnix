@@ -58,7 +58,7 @@
     <module>addon-cit-security</module>
     <module>addon-web-pattern</module>
     <module>addon-web-mvc-binding</module> 
-    <module>addon-web-exception-handler</module> 
+    <module>addon-web-dialog</module> 
   </modules>
 
   <!-- Note when doing releases: tagBase is set in release plugin configuration 

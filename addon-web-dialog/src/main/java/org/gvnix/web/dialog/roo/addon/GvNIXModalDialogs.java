@@ -1,10 +1,10 @@
 /*
  * Copyright 2011 DiSiD Technologies S.L.L. All rights reserved.
  *
- * Project  : DiSiD org.gvnix.web.exception.handler.roo.addon
+ * Project  : DiSiD org.gvnix.web.dialog.roo.addon
  * SVN Id   : $Id$
  */
-package org.gvnix.web.exception.handler.roo.addon;
+package org.gvnix.web.dialog.roo.addon;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

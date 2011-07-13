@@ -11,7 +11,7 @@
       <dependencies>
         <dependency>
             <groupId>org.gvnix</groupId>
-            <artifactId>org.gvnix.web.exception.handler.roo.addon</artifactId>
+            <artifactId>org.gvnix.web.dialog.roo.addon</artifactId>
             <version>${gvnix.version}</version>
             <type>jar</type>
             <scope>provided</scope>
