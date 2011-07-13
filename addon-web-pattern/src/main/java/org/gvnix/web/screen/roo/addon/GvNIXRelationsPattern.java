@@ -16,26 +16,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.pattern.roo.addon;
+package org.gvnix.web.screen.roo.addon;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Web MVC Pattern types available
+ * gvNIX Relations Pattern annotation
  * 
- * @author Jose Manuel Vivó (jmvivo at disid dot com) at <a
+ * @author Oscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
- * 
- * @author Óscar Rovira (orovira at disid dot com) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
- * 
  * @since 0.8
  */
-public enum WebPattern {
-    tabular, // tabular pattern
-    register
-    // register pattern
-
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.SOURCE)
+public @interface GvNIXRelationsPattern {
+    /**
+     * @return an array of strings, with each string being the definition of how
+     *         to show related entities in a defined pattern<br/>
+     * 
+     *         e.g: <code>"patternName1: field1=tabular"</code><br/>
+     *         will show field1 entity as tabular for patternName1
+     */
+    String[] value() default "";
 }

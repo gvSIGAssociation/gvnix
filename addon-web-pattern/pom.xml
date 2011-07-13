@@ -35,7 +35,7 @@
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
 
-  <artifactId>org.gvnix.web.pattern.roo.addon</artifactId>
+  <artifactId>org.gvnix.web.screen.roo.addon</artifactId>
   <packaging>bundle</packaging>
   <name>gvNIX - Spring Roo - Addon - Web MVC Screen Patterns</name>
   <organization>
@@ -123,6 +123,6 @@
   <properties>
     <gvnix.version>${parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
-    <repo.folder>org/gvnix/web/pattern/roo/addon</repo.folder>
+    <repo.folder>org/gvnix/web/screen/roo/addon</repo.folder>
   </properties>
 </project>

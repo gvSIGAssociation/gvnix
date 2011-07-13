@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.pattern.roo.addon;
+package org.gvnix.web.screen.roo.addon;
 
 import java.util.List;
 import java.util.SortedMap;
@@ -50,15 +50,14 @@ import org.springframework.roo.support.util.Assert;
  *         Transport</a>
  * @since 0.8
  */
-public class PatternMetadata extends AbstractPatternMetadata
-/* AbstractItdTypeDetailsProvidingMetadataItem */{
+public class RelatedPatternMetadata extends AbstractPatternMetadata {
 
-    private static final String PROVIDES_TYPE_STRING = PatternMetadata.class
+    private static final String PROVIDES_TYPE_STRING = RelatedPatternMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    public PatternMetadata(
+    public RelatedPatternMetadata(
             String identifier,
             JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,

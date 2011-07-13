@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.pattern.roo.addon;
+package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +36,7 @@ import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
+import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
@@ -55,10 +56,10 @@ import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
 
 /**
- * Provides {@link RelatedPatternMetadata}. This type is called by Roo to
- * retrieve the metadata for this add-on. Use this type to reference external
- * types and services needed by the metadata type. Register metadata triggers
- * and dependencies here. Also define the unique add-on ITD identifier.
+ * Provides {@link PatternMetadata}. This type is called by Roo to retrieve the
+ * metadata for this add-on. Use this type to reference external types and
+ * services needed by the metadata type. Register metadata triggers and
+ * dependencies here. Also define the unique add-on ITD identifier.
  * 
  * 
  * @author Oscar Rovira (orovira at disid dot com) at <a
@@ -69,19 +70,22 @@ import org.springframework.roo.support.util.Assert;
  */
 @Component(immediate = true)
 @Service
-public final class RelatedPatternMetadataProvider extends
+public final class PatternMetadataProvider extends
         AbstractPatternMetadataProvider {
 
     /**
-     * {@link GvNIXRelatedPattern} JavaType
+     * {@link GvNIXPattern} JavaType
      */
-    public static final JavaType RELATED_PATTERN_ANNOTATION = new JavaType(
-            GvNIXRelatedPattern.class.getName());
+    public static final JavaType PATTERN_ANNOTATION = new JavaType(
+            GvNIXPattern.class.getName());
     /**
-     * Name of {@link GvNIXRelatedPattern} attribute value
+     * Name of {@link GvNIXPattern} attribute value
      */
-    public static final JavaSymbolName RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
+    public static final JavaSymbolName PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
             "value");
+
+    @Reference
+    private TypeLocationService typeLocationService;
 
     @Reference
     WebScaffoldMetadataProvider webScaffoldMetadataProvider;
@@ -118,7 +122,7 @@ public final class RelatedPatternMetadataProvider extends
         metadataDependencyRegistry.registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        addMetadataTrigger(RELATED_PATTERN_ANNOTATION);
+        addMetadataTrigger(PATTERN_ANNOTATION);
     }
 
     /**
@@ -136,7 +140,7 @@ public final class RelatedPatternMetadataProvider extends
         metadataDependencyRegistry.deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        removeMetadataTrigger(RELATED_PATTERN_ANNOTATION);
+        removeMetadataTrigger(PATTERN_ANNOTATION);
     }
 
     /**
@@ -217,13 +221,12 @@ public final class RelatedPatternMetadataProvider extends
         // Setup project for use annotation
         configService.setup();
 
-        JavaType controllerType = RelatedPatternMetadata
+        JavaType controllerType = PatternMetadata
                 .getJavaType(metadataIdentificationString);
 
         // We need to know the metadata of the Controller through
         // WebScaffoldMetada
-        Path path = RelatedPatternMetadata
-                .getPath(metadataIdentificationString);
+        Path path = PatternMetadata.getPath(metadataIdentificationString);
         String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
                 controllerType, path);
         WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
@@ -248,22 +251,19 @@ public final class RelatedPatternMetadataProvider extends
                 cid,
                 "Governor failed to provide class type details, in violation of superclass contract");
 
-        AnnotationMetadata gvNixRelatedPatternAnnotation = MemberFindingUtils
-                .getAnnotationOfType(cid.getAnnotations(),
-                        RELATED_PATTERN_ANNOTATION);
+        AnnotationMetadata gvNixPatternAnnotation = MemberFindingUtils
+                .getAnnotationOfType(cid.getAnnotations(), PATTERN_ANNOTATION);
 
         // Check if there are pattern names used more than once in project
-        // TODO: change following check checking for related patterns definition
-        // String patternDefinedTwice =
-        // findPatternDefinedMoreThanOnceInProject();
-        // Assert.isNull(patternDefinedTwice,
-        // "There is a pattern name used more than once in the project");
+        String patternDefinedTwice = findPatternDefinedMoreThanOnceInProject();
+        Assert.isNull(patternDefinedTwice,
+                "There is a pattern name used more than once in the project");
 
         List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
 
-        if (gvNixRelatedPatternAnnotation != null) {
-            AnnotationAttributeValue<?> thisAnnotationValue = gvNixRelatedPatternAnnotation
-                    .getAttribute(RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+        if (gvNixPatternAnnotation != null) {
+            AnnotationAttributeValue<?> thisAnnotationValue = gvNixPatternAnnotation
+                    .getAttribute(PATTERN_ANNOTATION_ATTR_VALUE_NAME);
 
             if (thisAnnotationValue != null) {
                 // Check if the controller has defined the same pattern more
@@ -315,8 +315,8 @@ public final class RelatedPatternMetadataProvider extends
         MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
 
         // Pass dependencies required by the metadata in through its constructor
-        return new RelatedPatternMetadata(metadataIdentificationString,
-                aspectName, governorPhysicalTypeMetadata, webScaffoldMetadata,
+        return new PatternMetadata(metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata, webScaffoldMetadata,
                 annotationValues, patternList,
                 MemberFindingUtils.getMethods(memberDetails),
                 MemberFindingUtils.getFields(memberDetails),
@@ -342,55 +342,53 @@ public final class RelatedPatternMetadataProvider extends
     //
     // }
 
-    // private String findPatternDefinedMoreThanOnceInProject() {
-    // List<String> definedPatternsInProject = new ArrayList<String>();
-    // AnnotationMetadata annotationMetadata = null;
-    // for (ClassOrInterfaceTypeDetails cid : typeLocationService
-    // .findClassesOrInterfaceDetailsWithAnnotation(RELATED_PATTERN_ANNOTATION))
-    // {
-    // annotationMetadata = MemberFindingUtils.getAnnotationOfType(
-    // cid.getAnnotations(), RELATED_PATTERN_ANNOTATION);
-    // if (annotationMetadata != null) {
-    // AnnotationAttributeValue<?> annotationValues = annotationMetadata
-    // .getAttribute(RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-    // for (String patternName : getPatternNames(annotationValues)) {
-    // if (definedPatternsInProject.contains(patternName)) {
-    // return patternName;
-    // } else {
-    // definedPatternsInProject.add(patternName);
-    // }
-    // }
-    // }
-    // }
-    // return null;
-    // }
+    private String findPatternDefinedMoreThanOnceInProject() {
+        List<String> definedPatternsInProject = new ArrayList<String>();
+        AnnotationMetadata annotationMetadata = null;
+        for (ClassOrInterfaceTypeDetails cid : typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(PATTERN_ANNOTATION)) {
+            annotationMetadata = MemberFindingUtils.getAnnotationOfType(
+                    cid.getAnnotations(), PATTERN_ANNOTATION);
+            if (annotationMetadata != null) {
+                AnnotationAttributeValue<?> annotationValues = annotationMetadata
+                        .getAttribute(PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+                for (String patternName : getPatternNames(annotationValues)) {
+                    if (definedPatternsInProject.contains(patternName)) {
+                        return patternName;
+                    } else {
+                        definedPatternsInProject.add(patternName);
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * {@inheritDoc}, here the resulting file name will be
-     * **_ROO_GvNIXRelatedPattern.aj
+     * **_ROO_GvNIXPattern.aj
      */
     @Override
     public String getItdUniquenessFilenameSuffix() {
-        return "GvNIXRelatedPattern";
+        return "GvNIXPattern";
     }
 
     @Override
     protected String getGovernorPhysicalTypeIdentifier(
             String metadataIdentificationString) {
-        JavaType javaType = RelatedPatternMetadata
+        JavaType javaType = PatternMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = RelatedPatternMetadata
-                .getPath(metadataIdentificationString);
+        Path path = PatternMetadata.getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
     @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
-        return RelatedPatternMetadata.createIdentifier(javaType, path);
+        return PatternMetadata.createIdentifier(javaType, path);
     }
 
     @Override
     public String getProvidesType() {
-        return RelatedPatternMetadata.getMetadataIdentiferType();
+        return PatternMetadata.getMetadataIdentiferType();
     }
 }
