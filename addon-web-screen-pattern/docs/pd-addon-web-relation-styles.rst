@@ -175,5 +175,5 @@ TODO
   servir como mejor solución.
 
 * Hay un problema con este add-on probocado por el método
-  org.gvnix.web.screen.roo.addon.ScreenMetadataListener.getAnnotatedFields(String, String). Falla
+  org.gvnix.web.pattern.roo.addon.ScreenMetadataListener.getAnnotatedFields(String, String). Falla
   porque no está controllado el caso de que WebScaffoldMetada sea null.

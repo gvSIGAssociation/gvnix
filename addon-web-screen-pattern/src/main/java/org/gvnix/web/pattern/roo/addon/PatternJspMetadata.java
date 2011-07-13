@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.screen.roo.addon;
+package org.gvnix.web.pattern.roo.addon;
 
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.metadata.AbstractMetadataItem;
@@ -27,10 +27,10 @@ import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
 
 /**
- * Metadata built from {@link RelatedPatternMetadata}. The metadata identifier
- * for a {@link RelatedPatternJspMetadata} is the fully qualifier name of the
- * controller, and the source {@link Path} of the controller. This can be
- * created using {@link #createIdentifier(JavaType, Path)}.
+ * Metadata built from {@link PatternMetadata}. The metadata identifier for a
+ * {@link PatternJspMetadata} is the fully qualifier name of the controller, and
+ * the source {@link Path} of the controller. This can be created using
+ * {@link #createIdentifier(JavaType, Path)}.
  * 
  * @author Óscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
@@ -38,23 +38,22 @@ import org.springframework.roo.support.util.Assert;
  *         Transport</a>
  * @since 0.8
  */
-public class RelatedPatternJspMetadata extends AbstractMetadataItem {
+public class PatternJspMetadata extends AbstractMetadataItem {
 
-    private static final String PROVIDES_TYPE_STRING = RelatedPatternJspMetadata.class
+    private static final String PROVIDES_TYPE_STRING = PatternJspMetadata.class
             .getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    private final RelatedPatternMetadata relatedPatternMetadata;
+    private final PatternMetadata patternMetadata;
 
-    public RelatedPatternJspMetadata(String identifier,
-            RelatedPatternMetadata patternMetadata) {
+    public PatternJspMetadata(String identifier, PatternMetadata patternMetadata) {
         super(identifier);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
         Assert.notNull(patternMetadata, "Report metadata required");
 
-        this.relatedPatternMetadata = patternMetadata;
+        this.patternMetadata = patternMetadata;
     }
 
     @Override
@@ -62,7 +61,7 @@ public class RelatedPatternJspMetadata extends AbstractMetadataItem {
         ToStringCreator tsc = new ToStringCreator(this);
         tsc.append("identifier", getId());
         tsc.append("valid", valid);
-        tsc.append("pattern metadata id", relatedPatternMetadata.getId());
+        tsc.append("pattern metadata id", patternMetadata.getId());
         return tsc.toString();
     }
 

@@ -1,7 +1,7 @@
 /*
  * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
  * i Transport - Generalitat Valenciana
- * Copyright (C) 2010 CIT - Generalitat Valenciana
+ * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,48 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.gvnix.web.screen.roo.addon;
+package org.gvnix.web.pattern.roo.addon;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * <p>
- * Web MVC Pattern configuration service
- * </p>
+ * gvNIX Related Pattern annotation
  * 
- * <p>
- * Contains utility method to configure target project
- * </p>
- * 
- * @author Jose Manuel Vivó (jmvivo at disid dot com) at <a
+ * @author Oscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  * @since 0.8
  */
-public interface WebScreenConfigService {
-
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.SOURCE)
+public @interface GvNIXRelatedPattern {
     /**
-     * Setup all add-on artifacts:
-     * <ul>
-     * <li>Maven repositories</>
-     * <li>Maven properties</>
-     * <li>Maven dependencies: the add-on itself</li>
-     * <li>copy all resources needed</>
-     * </ul>
+     * @return an array of strings, with each string being the name of a defined
+     *         pattern and its associated screen pattern.<br/>
      * 
+     *         e.g: <code>"patternName1=table"</code>
+     *         <p>
+     *         patternName1 must exists as value in {@link GvNIXPattern}
      */
-    void setup();
-
-    /**
-     * Indicate if is a Spring MVC project
-     * 
-     * @return
-     */
-    boolean isSpringMvcProject();
-
-    /**
-     * Indicates if Pattern artifacts (tags) are installed in project
-     * 
-     * @return
-     */
-    boolean arePattrenArtifactsInstalled();
+    String[] value() default "";
 }
