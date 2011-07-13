@@ -41,24 +41,24 @@ public class WebExceptionHandlerCommands implements CommandMarker {
     @Reference
     private WebExceptionHandlerOperations exceptionOperations;
 
-    @CliAvailabilityIndicator("web mvc exception list")
+    @CliAvailabilityIndicator("web mvc dialog exception list")
     public boolean isListExceptionHandlerAvailable() {
         return exceptionOperations.isProjectAvailable()
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc exception list", help = "Obtains the list of the Exceptions that handles the application.")
+    @CliCommand(value = "web mvc dialog exception list", help = "Obtains the list of the Exceptions that handles the application.")
     public String listExceptionHandler() {
         return exceptionOperations.getHandledExceptionList();
     }
 
-    @CliAvailabilityIndicator("web mvc exception add")
+    @CliAvailabilityIndicator("web mvc dialog exception add")
     public boolean isAddNewHandledException() {
         return exceptionOperations.isProjectAvailable()
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc exception add", help = "Adds a handler for an Uncaught Exception and creates a view with a specific message.")
+    @CliCommand(value = "web mvc dialog exception add", help = "Adds a handler for an Uncaught Exception and creates a view with a specific message.")
     public void addNewHandledException(
             @CliOption(key = "exception", mandatory = true, help = "The name of the Exception you want to handle with the whole package path. e.g. java.lang.Exception") String exceptionName,
             @CliOption(key = "title", mandatory = true, help = "The title of the Exception you want to handle.\nEnter the title between commas if it is composed of more than one word.") String exceptionTitle,
@@ -69,27 +69,27 @@ public class WebExceptionHandlerCommands implements CommandMarker {
                 exceptionTitle, exceptionDescription, exceptionLanguage);
     }
 
-    @CliAvailabilityIndicator("web mvc exception remove")
+    @CliAvailabilityIndicator("web mvc dialog exception remove")
     public boolean isRemoveExceptionHandledAvailable() {
         return exceptionOperations.isProjectAvailable()
         // && exceptionOperations.isExceptionMappingAvailable();
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc exception remove", help = "Removes the Exception handler select and her view.")
+    @CliCommand(value = "web mvc dialog exception remove", help = "Removes the Exception handler select and her view.")
     public void removeExceptionHandled(
             @CliOption(key = "exception", mandatory = true, help = "The Exception you want to remove.") String exceptionName) {
         exceptionOperations.removeExceptionHandled(exceptionName);
     }
 
-    @CliAvailabilityIndicator("web mvc exception set language")
+    @CliAvailabilityIndicator("web mvc dialog exception set language")
     public boolean isSetLanguageExceptionHandledAvailable() {
         return exceptionOperations.isProjectAvailable()
         // && exceptionOperations.isExceptionMappingAvailable();
                 && exceptionOperations.isMessageMappingAvailable();
     }
 
-    @CliCommand(value = "web mvc exception set language", help = "Set the title and description of the exception selected to the choosed language file.")
+    @CliCommand(value = "web mvc dialog exception set language", help = "Set the title and description of the exception selected to the choosed language file.")
     public void languageExceptionHandled(
             @CliOption(key = "exception", mandatory = true, help = "The name of the Exception you want to set the message with the whole package path. e.g. java.lang.Exception") String exceptionName,
             @CliOption(key = "title", mandatory = true, help = "The title of the Exception you want to handle.\nEnter the title between commas if it is composed of more than one word.") String exceptionTitle,
