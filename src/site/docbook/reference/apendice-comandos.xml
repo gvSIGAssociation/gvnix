@@ -253,7 +253,7 @@
     </section>
   </section>
 
-  <xi:include href="apendice-comandos_addon-web-exception-handler.xml" />
+  <xi:include href="apendice-comandos_addon-web-dialog.xml" />
 
   <xi:include href="apendice-comandos_addon-web-menu.xml" />
 

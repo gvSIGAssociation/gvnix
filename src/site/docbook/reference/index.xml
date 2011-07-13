@@ -160,7 +160,7 @@
 
     <xi:include href="addon-occ.xml" />
 
-    <xi:include href="addon-web-exception-handler.xml" />
+    <xi:include href="addon-web-dialog.xml" />
 
     <xi:include href="addon-cit-security.xml" />
 

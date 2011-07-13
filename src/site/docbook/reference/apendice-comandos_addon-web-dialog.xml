@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section version="5.0" xml:id="apendice-comandos_addon-web-exception-handler"
+<section version="5.0" xml:id="apendice-comandos_addon-web-dialog"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title xml:lang="es">Comandos del Add-on Web Exception Handler</title>
+  <title xml:lang="es">Comandos del Add-on Web Dialog</title>
 
   <para xml:lang="es">Para una descripción general ver <link
-  linkend="addon-web-exception-handler">Add-on Web Exception
-  Handler</link>.</para>
+  linkend="addon-web-dialog">Add-on Web Dialog</link>.</para>
 
   <table>
-    <title>Comandos de Add-on Web Exception Handler</title>
+    <title>Comandos de Add-on Web Dialog</title>
 
     <tgroup cols="2">
       <thead>
@@ -29,8 +28,17 @@
       <tbody>
         <row>
           <entry><link
+          linkend="apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix">web
+          mvc dialog setup</link></entry>
+
+          <entry xml:lang="es">Añade soporte para diálogos modales a la
+          aplicación e instala las excepciones por defecto de gvNIX.</entry>
+        </row>
+
+        <row>
+          <entry><link
           linkend="apendice-comandos_addon-web-exception-handler_exception-handler-list">web
-          mvc exception handler list</link></entry>
+          mvc dialog exception list</link></entry>
 
           <entry xml:lang="es">Muestra las excepciones gestionadas por la
           aplicación.</entry>
@@ -39,7 +47,7 @@
         <row>
           <entry><link
           linkend="apendice-comandos_addon-web-exception-handler_exception-handler-add">web
-          mvc exception handler add</link></entry>
+          mvc dialog exception add</link></entry>
 
           <entry xml:lang="es">Añade una excepción nueva a la aplicación o
           actualiza la definición.</entry>
@@ -48,7 +56,7 @@
         <row>
           <entry><link
           linkend="apendice-comandos_addon-web-exception-handler_exception-handler-set-language">web
-          mvc exception handler set language</link></entry>
+          mvc dialog exception set language</link></entry>
 
           <entry xml:lang="es">Añade un mensaje a una excepción existente en
           el idioma indicado.</entry>
@@ -57,7 +65,7 @@
         <row>
           <entry><link
           linkend="apendice-comandos_addon-web-exception-handler_exception-handler-remove">web
-          mvc exception handler remove</link></entry>
+          mvc dialog exception remove</link></entry>
 
           <entry xml:lang="es">Elimina una excepción de la aplicación.</entry>
         </row>
@@ -65,17 +73,27 @@
         <row>
           <entry><link
           linkend="apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix">web
-          mvc exception handler setup gvnix</link></entry>
+          mvc dialog message add</link></entry>
 
-          <entry xml:lang="es">Instala las excepciones por defecto de gvNIX en
-          la aplicación.</entry>
+          <entry xml:lang="es">Añade un diálogo modal a la aplicación.</entry>
         </row>
       </tbody>
     </tgroup>
   </table>
 
+  <section>
+    <title
+    xml:id="apendice-comandos_addon-web-exception-handler_dialog-setup">web
+    mvc dialog setup</title>
+
+    <para>Añade soporte para diálogos modales a la aplicación e enstala las
+    excepciones por defecto de gvNIX en la aplicación. Ver <link
+    linkend="addon-web-dialog">Add-on Web Dialog</link> para una información
+    más detallada.</para>
+  </section>
+
   <section xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-list">
-    <title xml:lang="es">web mvc exception handler list</title>
+    <title xml:lang="es">web mvc dialog exception list</title>
 
     <para xml:lang="es">Muestra la lista de excepciones definidas en el
     archivo webmvc-config.xml por la consola:</para>
@@ -94,7 +112,7 @@ javax.persistence.OptimisticLockException</programlisting>
   <section>
     <title
     xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-add">web
-    mvc exception handler add</title>
+    mvc dialog exception add</title>
 
     <para xml:lang="es">Añade una excepción nueva a la aplicación o actualiza
     la definición.</para>
@@ -157,70 +175,16 @@ javax.persistence.OptimisticLockException</programlisting>
   <section>
     <title
     xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-set-language">web
-    mvc exception handler set language</title>
+    mvc dialog exception set language</title>
 
     <para xml:lang="es">Añade un mensaje a una excepción existente en el
     idioma indicado.</para>
-
-    <para xml:lang="es">Los parámetros son:<variablelist>
-        <varlistentry>
-          <term>--excepcion</term>
-
-          <listitem>
-            <para xml:lang="es"><emphasis>[Requerido]
-            [Cadena]</emphasis></para>
-
-            <para xml:lang="es">Nombre de la excepción a la que se va a
-            asignar el mensaje. Los nombres son los que aparecen al listar las
-            excepciones con el comando <emphasis>exception handler
-            list</emphasis>.</para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>--title</term>
-
-          <listitem>
-            <para xml:lang="es"><emphasis>[Requerido]
-            [Cadena]</emphasis></para>
-
-            <para xml:lang="es">Título de la excepción que se ha de mostrar
-            por pantalla.</para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>--description</term>
-
-          <listitem>
-            <para xml:lang="es"><emphasis>[Requerido]
-            [Cadena]</emphasis></para>
-
-            <para xml:lang="es">Mensaje que se muestra al capturar la
-            excepción para que el usuario reciba la información del
-            error.</para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>--language</term>
-
-          <listitem>
-            <para xml:lang="es"><emphasis>[Requerido]
-            [Cadena]</emphasis></para>
-
-            <para xml:lang="es">Idioma en el que se define el mensaje para
-            añadirlo al archivo correspondiente <emphasis>[es, de, it, nl, sv,
-            en]</emphasis>.</para>
-          </listitem>
-        </varlistentry>
-      </variablelist></para>
   </section>
 
   <section>
     <title
     xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-remove">web
-    mvc exception handler remove</title>
+    mvc dialog exception remove</title>
 
     <para xml:lang="es">Eimina la excepción seleccionada de la
     aplicación:</para>
@@ -244,12 +208,37 @@ javax.persistence.OptimisticLockException</programlisting>
 
   <section>
     <title
-    xml:id="apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix">web
-    mvc exception handler setup gvnix</title>
+    xml:id="apendice-comandos_addon-web-exception-handler_dialog-add">web mvc
+    dialog message add</title>
 
-    <para xml:lang="es">Instala las excepciones por defecto de gvNIX en la
-    aplicación. Para mas información ver: <link
-    linkend="addon-web-exception-handler">Add-on Web Exception
-    Handler</link>.</para>
+    <para>Añade un nuevo diálogo modal a la aplicación. Ver <link
+    linkend="addon-web-dialog">Add-on Web Dialog</link> para una información
+    más detallada.</para>
+
+    <para xml:lang="es">Los parámetros son:<variablelist>
+        <varlistentry>
+          <term>--class</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>[Requerido] [Nombre del Controller
+            que mostrará el diálogo modal][Autocompletado]</emphasis></para>
+
+            <para xml:lang="es">Nombre de la clase del controlador que
+            mostrará el diálogo modal.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--name</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>[Requerido]
+            [Cadena]</emphasis></para>
+
+            <para xml:lang="es">Nombre que tomará la jspx que se incluirá en
+            el diálogo modal.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
   </section>
 </section>

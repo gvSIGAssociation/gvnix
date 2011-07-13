@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="addon-web-dialog" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Add-on Web Dialog</title>
+
+  <para>Add-on para la gestión de excepciones no controladas.</para>
+
+  <section xml:id="addon-web-exception-handler_descripcion">
+    <title xml:lang="es">Descripción</title>
+
+    <para xml:lang="es">Este Add-on permite gestionar las excepciones no
+    controladas en la aplicación en tiempo de ejecución para mostrar mensajes
+    inteligibles al usuario en una página jspx nueva en un idioma
+    definido.</para>
+
+    <para xml:lang="es">Después de la definición de la excepción se pueden
+    añadir mensajes para cada idioma disponible en la aplicación.</para>
+
+    <para xml:lang="es">Desde la versión 0.8.0 de gvNIX, los mensajes de
+    excepciones se muestran dentro de un dialogo modal. Además permite crear
+    nuevos dialogos modales usando una página jspx como contenido.</para>
+  </section>
+
+  <section>
+    <title>Instalación</title>
+
+    <para>Para tener esta funcionalidad se debe ejecutar el comando <link
+    linkend="apendice-comandos_addon-web-dialog">web mvc dialog setup</link>.
+    Al hacerlo se añade soporte para diálogos modales en la aplicación y a los
+    controladores web se les añade la anotación GvNIXModalDialogs sin ningún
+    valor establecido. Esto hará que se genere un método llamado modalDialog
+    que facilitará al desarrollador mostrar un diálogo modal de manera
+    controlada. La signatura de este método es:</para>
+
+    <programlisting>modalDialog(DialogType dialogType, String title, String description, HttpServletRequest httpRequest)</programlisting>
+
+    <para>donde:</para>
+
+    <para><variablelist>
+        <varlistentry>
+          <term>dialogType</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>es un tipo enumerado que puede tomar
+            como valores: Error, Info, Alert, Suggest. Cada uno define un
+            nivel de severidad en el diálogo.</emphasis></para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>title</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>es el código del recurso i18n que se
+            usará como título del diálogo modal.</emphasis></para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>description</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>es el código del recurso i18n que se
+            usará como descripción del diálogo modal.</emphasis></para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>httpRequest</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>de este objeto se usa internamente
+            en el método para obtener la sesión del usuario y establecer un
+            atributo que será leido por el componente message-box.tagx para
+            mostrar el diálogo.</emphasis></para>
+          </listitem>
+        </varlistentry>
+      </variablelist>Estos diálogos son útilies para mostrar mensajes al
+    usuario informando de cualquier circunstancía tras una operación
+    determinada.</para>
+
+    <para>Al mismo tiempo, tras ejecutar el comando se definen una serie de
+    excepciones y se mapean con sus respectivos diálogos modales. En las
+    siguiente secciones vemos más detalladamente las excepciones y el uso de
+    los diálogos modales.</para>
+  </section>
+
+  <section xml:id="addon-web-exception-handler_excptiones-de-gvnix">
+    <title xml:lang="es">Excepciones de gvNIX</title>
+
+    <para xml:lang="es">Conjunto de excepciones iniciales definidas para
+    gvNIX.</para>
+
+    <para xml:lang="es"><itemizedlist>
+        <listitem>
+          <para xml:lang="es">java.sql.SQLException.</para>
+
+          <para xml:lang="es">Se ha producido un error en el acceso a la Base
+          de datos.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">java.io.IOException.</para>
+
+          <para xml:lang="es">Existen problemas para enviar o recibir
+          datos.</para>
+        </listitem>
+
+        <listitem>
+          <para
+          xml:lang="es">org.springframework.transaction.TransactionException.</para>
+
+          <para xml:lang="es">Se ha producido un error en la transacción. No
+          se han guardado los datos correctamente.</para>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">java.lang.UnsupportedOperationException.</para>
+
+          <para xml:lang="es">Se ha producido un error no controlado.</para>
+        </listitem>
+
+        <listitem>
+          <para
+          xml:lang="es">javax.persistence.OptimisticLockException.</para>
+
+          <para xml:lang="es">No se puede actualizar el registro debido a que
+          ha sido actualizado previamente.</para>
+        </listitem>
+      </itemizedlist></para>
+
+    <para>Desde la versión 0.8.0 de gvNIX, las excepciones se muestran
+    mediante un dialogo modal. Para ello, se modifica la definición, en el
+    archivo webmvc-config.xml, del bean
+    <emphasis>SimpleMappingExceptionResolver</emphasis> cambiando la clase por
+    una propia que se instala en el proyecto (subpaquete
+    <emphasis>servlet.handler</emphasis>, clase
+    <emphasis>MessageMappingExceptionResolver.java</emphasis>). En el mismo
+    subpaquete se instala también <emphasis>Dialog.java</emphasis>, un bean
+    que contendrá la información necesaria para visualizar la excepción en la
+    ventana modal renderizada por el componente
+    <emphasis>dialog-box.tagx</emphasis>.</para>
+
+    <section xml:id="addon-web-exception-handler_funcionalidad">
+      <title xml:lang="es">Añadir más excepciones a la gestión</title>
+
+      <para xml:lang="es">Pasos a seguir para gestionar una excepción en la
+      aplicación.</para>
+
+      <para xml:lang="es">El Add-on nos proporciona las siguientes opciones
+      para gestionar las excepciones:</para>
+
+      <orderedlist>
+        <listitem>
+          <para xml:lang="es">Añadir una excepción a la aplicación</para>
+
+          <itemizedlist>
+            <listitem>
+              <para xml:lang="es">Define la excepción a capturar en el bean
+              <emphasis>SimpleMappingExceptionResolver</emphasis> del archivo
+              <emphasis>webmvc-config.xml</emphasis>.</para>
+            </listitem>
+
+            <listitem>
+              <para xml:lang="es">Crea una dirección asociada a la excepcion
+              en un nuevo bean
+              <emphasis>&lt;mvc:view-controller&gt;</emphasis> con la
+              dirección específica.</para>
+            </listitem>
+
+            <listitem>
+              <para xml:lang="es">Crea la nueva jspx asociada a la
+              excepción.</para>
+            </listitem>
+
+            <listitem>
+              <para xml:lang="es">Instancia la jspx creada en el archivo
+              <emphasis>views.xml</emphasis> en el directorio
+              <emphasis>WEB-INF</emphasis> la aplicación.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Muestra las excepciones gestionadas por la
+          aplicación.</para>
+
+          <itemizedlist>
+            <listitem>
+              <para xml:lang="es">Muestra la lista de excepciones definidas en
+              el bean <emphasis>MessageMappingExceptionResolver</emphasis> del
+              archivo <emphasis>webmvc-config.xml</emphasis>.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+
+        <listitem>
+          <para xml:lang="es">Elimina las excepciones de la aplicación.</para>
+
+          <itemizedlist>
+            <listitem>
+              <para xml:lang="es">Elimina la excepción a partir del nombre que
+              se muestra en la lista de excepciones gestionadas por la
+              aplicación.</para>
+            </listitem>
+
+            <listitem>
+              <para xml:lang="es">Elimina la página jspx asociada.</para>
+            </listitem>
+
+            <listitem>
+              <para xml:lang="es">Elimina las referencias a la excepción en el
+              archivo views.xml.</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </orderedlist>
+
+      <para>Para más informción sobre estos comnados para gestionar las
+      excepciones consultar el apendice <link
+      linkend="apendice-comandos_addon-web-dialog">Comandos del Add-on Web
+      Dialog</link>.</para>
+    </section>
+  </section>
+
+  <section>
+    <title>Nuevos diálogos modales</title>
+
+    <para>Mediante el componente visual <emphasis>message-box.tagx</emphasis>
+    que instala este add-on es posible mostrar en pantalla un diálogo modal.
+    </para>
+
+    <para>Para tener esta funcionalidad se debe ejecutar el comando <link
+    linkend="apendice-comandos_addon-web-exception-handler_dialog-setup">web
+    mvc dialog setup</link>. Al hacerlo se añade soporte para diálogos modales
+    en la aplicación y a los controladores web se les añade la anotación
+    GvNIXModalDialogs</para>
+
+    <para>El comando <link
+    linkend="apendice-comandos_addon-web-exception-handler_dialog-add">web mvc
+    dialog add</link> se ocupa de ofrecer esta funcionalidad. Al ejecutarlo se
+    añade o modifica el valor de la anotación
+    <emphasis>GvNIXModalDialogs</emphasis>, esto hace que se genere un método
+    que toma como nombre el valor del parámetro <emphasis>name</emphasis> dado
+    en el comando y se crea una JSPx en <emphasis>WEB-INF/dialogs</emphasis>
+    con el mismo nombre dado al método que se usará como contenido del diálogo
+    modal.<programlisting><emphasis role="bold">roo&gt;</emphasis> web mvc dialog message add --class ~.web.PetController --name petsdialog</programlisting>En
+    el ejemplo anterior se está definiendo el diálogo modal petsdialog que
+    será mostrado por el controlador PetController. El método que facilita
+    esta función en el controlador tiene como signatura:</para>
+
+    <programlisting>petsdialog(DialogType dialogType, String title, String description, HashMap&lt;String, Object&gt; params, HttpServletRequest httpRequest)</programlisting>
+
+    <para>donde:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>dialogType</term>
+
+        <listitem>
+          <para xml:lang="es"><emphasis>es un tipo enumerado que puede tomar
+          como valores: Error, Info, Alert, Suggest. Cada uno define un nivel
+          de severidad en el diálogo.</emphasis></para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>title</term>
+
+        <listitem>
+          <para xml:lang="es"><emphasis>es el código del recurso i18n que se
+          usará como título del diálogo modal.</emphasis></para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>description</term>
+
+        <listitem>
+          <para xml:lang="es"><emphasis>es el código del recurso i18n que se
+          usará como descripción del diálogo modal.</emphasis></para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>params</term>
+
+        <listitem>
+          <para xml:lang="es"><emphasis>es un Map que se puede usar para pasar
+          tantos parámetros queramos al componente del diálogo modal para
+          confeccionarlo y mostrar en él la información que se
+          necesite.</emphasis></para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>httpRequest</term>
+
+        <listitem>
+          <para xml:lang="es"><emphasis>de este objeto se usa internamente en
+          el método para obtener la sesión del usuario y establecer un
+          atributo que será leido por el componente message-box.tagx para
+          mostrar el diálogo.</emphasis></para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>También con la ejecución del comando del ejemplo se habrá creado en
+    <emphasis>WEB-INF/dialogs</emphasis> una jspx con el nombre
+    <emphasis>petsdialog.jspx</emphasis> que el usuario debería personalizar a
+    su gusto. El Map <emphasis>params</emphasis> llega hasta esta jspx y por
+    tanto el desarrollador puede acceder a él para obtener la información
+    deseada y confeccionar el diálogo que necesite.</para>
+
+    <section>
+      <title>Ejemplos de dialogos personalizados</title>
+
+      <para>TODO</para>
+    </section>
+  </section>
+
+  <section xml:id="addon-web-exception-handler_futuras-versiones">
+    <title xml:lang="es">Futuras versiones</title>
+
+    <para xml:lang="es">Mejoras a incluir en futuras versiones del
+    Add-on.</para>
+
+    <itemizedlist xml:lang="es">
+      <listitem>
+        <para xml:lang="es">Obtención de los mensajes de las excepciones desde
+        un Base de datos.</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Envío de un informe de la excepción que se ha
+        producido por email.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+</chapter>
