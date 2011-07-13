@@ -56,7 +56,7 @@
     <module>addon-service</module>
     <module>addon-occ</module>
     <module>addon-cit-security</module>
-    <module>addon-web-screen-pattern</module>
+    <module>addon-web-pattern</module>
     <module>addon-web-mvc-binding</module> 
     <module>addon-web-exception-handler</module> 
   </modules>
