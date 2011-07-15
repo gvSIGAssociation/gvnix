@@ -45,7 +45,7 @@ import org.springframework.roo.support.util.Assert;
  * {@link ItdTypeDetailsBuilder} provided by
  * {@link AbstractItdTypeDetailsProvidingMetadataItem} to register a field in
  * the ITD and a new method.
- *
+ * 
  * @author Óscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -71,12 +71,13 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
             SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
             SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
             MetadataService metadataService,
-            PropFileOperations propFileOperations, PathResolver pathResolver, FileManager fileManager) {
+            PropFileOperations propFileOperations, PathResolver pathResolver,
+            FileManager fileManager) {
         super(identifier, aspectName, governorPhysicalTypeMetadata,
                 webScaffoldMetadata, annotationValues, definedPatterns,
                 controllerMethods, controllerFields,
                 relatedApplicationTypeMetadata, typesForPopulate,
-                metadataService, propFileOperations, pathResolver, fileManager);
+                metadataService, pathResolver, fileManager);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
     }

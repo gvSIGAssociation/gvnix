@@ -446,6 +446,16 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
                         "/WEB-INF/tags/dialog/modal"));
         addMessageBoxInLayout();
 
+        modifyChangesControlDialogNs();
+
+        addI18nProperties();
+    }
+
+    /**
+     * Takes properties files (messages_xx.properties) and adds their content to
+     * i18n message bundle file in current project
+     */
+    private void addI18nProperties() {
         // Check if Valencian_Catalan language is supported and add properties
         // if so
         Set<I18n> supportedLanguages = i18nSupport.getSupportedLanguages();
@@ -469,6 +479,38 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         // Add properties to default messageBundle
         MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
                 propFileOperations, projectOperations, fileManager);
+    }
+
+    private void modifyChangesControlDialogNs() {
+        String changesControlTagx = pathResolver.getIdentifier(
+                Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/util/changes-control.tagx");
+
+        if (!fileManager.exists(changesControlTagx)) {
+            // tags/util/changes-control.tagx doesn't exist, so nothing to do
+            return;
+        }
+
+        InputStream changesControlTagxIs = fileManager
+                .getInputStream(changesControlTagx);
+
+        Document changesControlTagxXml;
+        try {
+            changesControlTagxXml = XmlUtils.getDocumentBuilder().parse(
+                    changesControlTagxIs);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Could not open default.jspx file",
+                    ex);
+        }
+
+        Element jspRoot = changesControlTagxXml.getDocumentElement();
+
+        // Set dialog tag lib as attribute in html element
+        jspRoot.setAttribute("xmlns:dialog",
+                "urn:jsptagdir:/WEB-INF/tags/dialog/modal");
+
+        writeToDiskIfNecessary(changesControlTagx,
+                changesControlTagxXml.getDocumentElement());
+
     }
 
     /**

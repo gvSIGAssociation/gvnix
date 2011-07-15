@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -39,12 +40,17 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
 
+import org.gvnix.support.MessageBundleUtils;
+import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
@@ -80,7 +86,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * This Abstract Listener gives support for install/create/modify MVC artifacts
- *
+ * 
  * @author Óscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -95,6 +101,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     protected MenuOperations _menuOperations;
     protected ProjectOperations _projectOperations;
     protected PropFileOperations _propFileOperations;
+    protected I18nSupport _i18nSupport;
 
     protected ComponentContext context;
     protected WebScaffoldMetadata webScaffoldMetadata;
@@ -109,7 +116,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     /**
      * For the given pattern it install needed MVC artifacts and generates the
      * pattern JSPx
-     *
+     * 
      * @param pattern
      */
     protected void installMvcArtifacts(String pattern) {
@@ -163,7 +170,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 
     /**
      * Creates a JSPx of the given WebPattern type
-     *
+     * 
      * @param patternType
      * @param destinationDirectory
      * @param controllerPath
@@ -230,7 +237,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      * <strong>This method is based in:</strong>
      * {@link org.springframework.roo.addon.web.mvc.jsp.JspViewManager#getShowDocument()}
      * </p>
-     *
+     * 
      * @return
      */
     private Document getRegisterDocument(String patternName) {
@@ -432,7 +439,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     /**
      * A relation is visible in a view if it's defined in
      * {@link GvNIXRelationsPattern}
-     *
+     * 
      * @param patternName
      * @param symbolName
      * @return
@@ -484,7 +491,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      * <p>
      * It wraps field element into ul/li elements and add a hidden param
      * <code>gvnixpattern</code> and a button
-     *
+     * 
      * @param rooJspx
      */
     private void modifyRooJsp(RooJspx rooJspx) {
@@ -668,8 +675,9 @@ public abstract class AbstractPatternJspMetadataListener implements
         copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(
                 Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"));
         // copy dialog/message to tags/dialog/message
-        copyDirectoryContents("tags/dialog/message/*.tagx", pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/dialog/message"));
+        copyDirectoryContents("tags/dialog/message/*.tagx",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/tags/dialog/message"));
         // copy pattern to tags/pattern
         copyDirectoryContents("tags/pattern/*.tagx",
                 pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
@@ -687,20 +695,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         // add message-box component to default layout
         addMessageBoxInLayout();
 
-        // XXX: add properties needed by artifacts
-        Map<String, String> properties = new LinkedHashMap<String, String>();
-        properties.put("message_alert_title", "Alert");
-        properties.put("message_info_title", "Information");
-        properties.put("message_error_title", "Error");
-        properties.put("message_suggest_title", "Suggestion");
-        properties
-                .put("message_pending_changes_problemdescription",
-                        "There are changes pending to save. SAVE or CANCEL before proceed.");
-
-        _propFileOperations
-                .addProperties(Path.SRC_MAIN_WEBAPP,
-                        "/WEB-INF/i18n/application.properties", properties,
-                        true, false);
+        addI18nProperties();
     }
 
     /**
@@ -863,11 +858,13 @@ public abstract class AbstractPatternJspMetadataListener implements
 
         Element lsHtml = defaultJspxXml.getDocumentElement();
 
-        String dialogNsbUri = lsHtml.getAttribute("xmlns:dialog");
+        String dialogNsUri = lsHtml.getAttribute("xmlns:dialog");
 
-        if(!dialogNsbUri.isEmpty() && dialogNsbUri.equals("urn:jsptagdir:/WEB-INF/tags/dialog/modal")) {
-          // User has applied modal dialog support, so, don't change anything;
-          return;
+        if (!dialogNsUri.isEmpty()
+                && dialogNsUri
+                        .equals("urn:jsptagdir:/WEB-INF/tags/dialog/modal")) {
+            // User has applied modal dialog support, so, don't change anything;
+            return;
         }
 
         // Set dialog tag lib as attribute in html element
@@ -891,9 +888,39 @@ public abstract class AbstractPatternJspMetadataListener implements
     }
 
     /**
+     * Takes properties files (messages_xx.properties) and adds their content to
+     * i18n message bundle file in current project
+     */
+    private void addI18nProperties() {
+        // Check if Valencian_Catalan language is supported and add properties
+        // if so
+        Set<I18n> supportedLanguages = _i18nSupport.getSupportedLanguages();
+        for (I18n i18n : supportedLanguages) {
+            if (i18n.getLocale().equals(new Locale("ca"))) {
+                MessageBundleUtils.installI18nMessages(
+                        new ValencianCatalanLanguage(), _projectOperations,
+                        _fileManager);
+                MessageBundleUtils.addPropertiesToMessageBundle("ca",
+                        getClass(), _propFileOperations, _projectOperations,
+                        _fileManager);
+                break;
+            }
+        }
+        // Add properties to Spanish messageBundle
+        MessageBundleUtils.installI18nMessages(new SpanishLanguage(),
+                _projectOperations, _fileManager);
+        MessageBundleUtils.addPropertiesToMessageBundle("es", getClass(),
+                _propFileOperations, _projectOperations, _fileManager);
+
+        // Add properties to default messageBundle
+        MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
+                _propFileOperations, _projectOperations, _fileManager);
+    }
+
+    /**
      * Installs the resource given by parameter path into the same path inside
      * <code>src/main/webapp/</code>
-     *
+     * 
      * @param path
      */
     private void installStaticResource(String path) {
@@ -919,7 +946,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     /**
      * This method will copy the contents of a directory to another if the
      * resource does not already exist in the target directory
-     *
+     * 
      * @param sourceAntPath
      *            the source path
      * @param targetDirectory
@@ -967,7 +994,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      * <strong>This method is based in:</strong>
      * {@link org.springframework.roo.addon.web.mvc.jsp.JspViewManager#getUpdateDocument()}
      * </p>
-     *
+     * 
      * @return
      */
     private Document getUpdateTabularDocument() {
@@ -992,7 +1019,6 @@ public abstract class AbstractPatternJspMetadataListener implements
                 .addAttribute("xmlns:field",
                         "urn:jsptagdir:/WEB-INF/tags/pattern/form/fields")
                 .addAttribute("xmlns:jsp", "http://java.sun.com/JSP/Page")
-                .addAttribute("xmlns:util", "urn:jsptagdir:/WEB-INF/tags/util")
                 .addAttribute("version", "2.0")
                 .addChild(
                         new XmlElementBuilder("jsp:directive.page", document)
@@ -1002,13 +1028,6 @@ public abstract class AbstractPatternJspMetadataListener implements
                         new XmlElementBuilder("jsp:output", document)
                                 .addAttribute("omit-xml-declaration", "yes")
                                 .build()).build());
-
-        // Add message-box element
-        Element messageBox = new XmlElementBuilder("util:message-box", document)
-                .addAttribute(
-                        "id",
-                        formbackingTypeMetadata.getPlural().toLowerCase()
-                                .concat("_message_box")).build();
 
         // Add form update element
         Element formUpdate = new XmlElementBuilder("form:update", document)
@@ -1044,7 +1063,6 @@ public abstract class AbstractPatternJspMetadataListener implements
             formUpdate.setAttribute("versionField", methodName.substring(3));
         }
 
-        div.appendChild(messageBox);
         createFieldsForCreateAndUpdate(entityName, relatedDomainTypes,
                 eligibleFields, document, formUpdate, false);
         formUpdate.setAttribute("z",
@@ -1410,7 +1428,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     /**
      * Decides if write to disk is needed (ie updated or created)<br/>
      * Used for JSPx files
-     *
+     * 
      * @param jspFilename
      * @param proposed
      */
@@ -1433,7 +1451,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     /**
      * Decides if write to disk is needed (ie updated or created)<br/>
      * Used for TAGx files
-     *
+     * 
      * @param filePath
      * @param body
      * @return

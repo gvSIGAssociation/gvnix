@@ -22,14 +22,11 @@ import java.beans.Introspector;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
 import org.gvnix.support.OperationUtils;
-import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
@@ -95,7 +92,6 @@ public abstract class AbstractPatternMetadata extends
     private List<FieldMetadata> controllerFields;
 
     private MetadataService metadataService;
-    private PropFileOperations propFileOperations;
 
     private String aspectControllerPackageFullyName;
 
@@ -110,8 +106,7 @@ public abstract class AbstractPatternMetadata extends
             List<FieldMetadata> controllerFields,
             SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
             SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
-            MetadataService metadataService,
-            PropFileOperations propFileOperations, PathResolver pathResolver,
+            MetadataService metadataService, PathResolver pathResolver,
             FileManager fileManager) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Assert.notNull(webScaffoldMetadata, "WebScaffoldMetadata required");
@@ -137,7 +132,6 @@ public abstract class AbstractPatternMetadata extends
         this.typesForPopulate = typesForPopulate;
 
         this.metadataService = metadataService;
-        this.propFileOperations = propFileOperations;
 
         /*
          * TODO: Take care of attributes "create, update, delete" in
@@ -205,20 +199,23 @@ public abstract class AbstractPatternMetadata extends
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         String entityNamePlural = javaTypeMetadataHolder.getPlural();
 
-        bodyBuilder.appendFormalLine("String viewName = update(".concat(
+        bodyBuilder.appendFormalLine("update(".concat(
                 formBackingType.getSimpleTypeName().toLowerCase()).concat(
-                ", bindingResult, uiModel, request);"));
+                ", bindingResult, uiModel, httpServletRequest);"));
 
         bodyBuilder.appendFormalLine("if ( bindingResult.hasErrors() ) {");
         bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("return viewName + \"?\" + refererQuery(request);");
+        addBodyLinesForDialogMessage(bodyBuilder, DialogType.Error,
+                "message_errorbinding_problemdescription");
+        bodyBuilder.appendFormalLine("return \"redirect:/".concat(
+                entityNamePlural.toLowerCase()).concat(
+                "?\" + refererQuery(httpServletRequest);"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
         bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
                 .concat(entityNamePlural.toLowerCase())
-                .concat("?gvnixform&\" + refererQuery(request);"));
+                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
@@ -251,14 +248,17 @@ public abstract class AbstractPatternMetadata extends
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         String entityNamePlural = javaTypeMetadataHolder.getPlural();
 
-        bodyBuilder.appendFormalLine("String viewName = create(".concat(
+        bodyBuilder.appendFormalLine("create(".concat(
                 formBackingType.getSimpleTypeName().toLowerCase()).concat(
-                ", bindingResult, uiModel, request);"));
+                ", bindingResult, uiModel, httpServletRequest);"));
 
         bodyBuilder.appendFormalLine("if ( bindingResult.hasErrors() ) {");
         bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("return viewName + \"?\" + refererQuery(request);");
+        addBodyLinesForDialogMessage(bodyBuilder, DialogType.Error,
+                "message_errorbinding_problemdescription");
+        bodyBuilder.appendFormalLine("return \"redirect:/".concat(
+                entityNamePlural.toLowerCase()).concat(
+                "?\" + refererQuery(httpServletRequest);"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
@@ -274,7 +274,7 @@ public abstract class AbstractPatternMetadata extends
                 .appendFormalLine("return \""
                         .concat("redirect:/")
                         .concat(entityNamePlural.toLowerCase())
-                        .concat("?gvnixform&\" + refererQuery(request, (count == 0 ? 1 : count));"));
+                        .concat("?gvnixform&\" + refererQuery(httpServletRequest, (count == 0 ? 1 : count));"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
@@ -365,14 +365,14 @@ public abstract class AbstractPatternMetadata extends
         }
 
         // Define method parameter names
-        // id, pattern, page, size, uiModel, request
+        // id, pattern, page, size, uiModel, httpServletRequest
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         methodParamNames.add(formBackingObjectIdField.getFieldName());
         methodParamNames.add(new JavaSymbolName("pattern"));
         methodParamNames.add(new JavaSymbolName("page"));
         methodParamNames.add(new JavaSymbolName("size"));
         methodParamNames.add(new JavaSymbolName("uiModel"));
-        methodParamNames.add(new JavaSymbolName("request"));
+        methodParamNames.add(new JavaSymbolName("httpServletRequest"));
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -381,9 +381,11 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("delete(".concat(
                 formBackingObjectIdField.getFieldName().getSymbolName())
                 .concat(", page, size, uiModel);"));
-        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
-                .concat(entityNamePlural.toLowerCase())
-                .concat("?gvnixform&\" + refererQuery(request, 1L);"));
+        bodyBuilder
+                .appendFormalLine("return \""
+                        .concat("redirect:/")
+                        .concat(entityNamePlural.toLowerCase())
+                        .concat("?gvnixform&\" + refererQuery(httpServletRequest, 1L);"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
@@ -438,15 +440,16 @@ public abstract class AbstractPatternMetadata extends
         }
 
         // Define method parameter names
-        // request
+        // httpServletRequest
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
-        methodParamNames.add(new JavaSymbolName("request"));
+        methodParamNames.add(new JavaSymbolName("httpServletRequest"));
         methodParamNames.add(new JavaSymbolName("i"));
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
-        bodyBuilder.appendFormalLine("String query = refererQuery(request);");
+        bodyBuilder
+                .appendFormalLine("String query = refererQuery(httpServletRequest);");
         bodyBuilder.appendFormalLine("int ini = query.indexOf(\"&index=\");");
         bodyBuilder.appendFormalLine("String index = \"&index=\" + i;");
 
@@ -509,16 +512,16 @@ public abstract class AbstractPatternMetadata extends
             return method;
         }
 
-        // Define method parameter names request
+        // Define method parameter names httpServletRequest
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
-        methodParamNames.add(new JavaSymbolName("request"));
+        methodParamNames.add(new JavaSymbolName("httpServletRequest"));
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
         bodyBuilder.appendFormalLine("String url = \"\";");
         bodyBuilder
-                .appendFormalLine("String referer = request.getHeader(\"Referer\");");
+                .appendFormalLine("String referer = httpServletRequest.getHeader(\"Referer\");");
 
         JavaType stringUtils = new JavaType(
                 "org.springframework.util.StringUtils");
@@ -621,14 +624,14 @@ public abstract class AbstractPatternMetadata extends
 
     protected List<JavaSymbolName> getMethodParameterNamesCreateUpdate() {
         // Define method parameter names
-        // pattern, entity, bindingResult, uiModel, request
+        // pattern, entity, bindingResult, uiModel, httpServletRequest
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         methodParamNames.add(new JavaSymbolName("pattern"));
         methodParamNames.add(new JavaSymbolName(formBackingType
                 .getSimpleTypeName().toLowerCase()));
         methodParamNames.add(new JavaSymbolName("bindingResult"));
         methodParamNames.add(new JavaSymbolName("uiModel"));
-        methodParamNames.add(new JavaSymbolName("request"));
+        methodParamNames.add(new JavaSymbolName("httpServletRequest"));
         return methodParamNames;
     }
 
@@ -833,9 +836,6 @@ public abstract class AbstractPatternMetadata extends
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("tabular");
 
-        // Properties defined for the method
-        Map<String, String> properties = new HashMap<String, String>();
-
         // Define method parameter types
         // @RequestParam(value = "gvnixpattern", required = true) String
         // pattern, HttpServletRequest req, Model uiModel)
@@ -867,11 +867,11 @@ public abstract class AbstractPatternMetadata extends
         }
 
         // Define method parameter names
-        // pattern, uiModel, request
+        // pattern, uiModel, httpServletRequest
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         methodParamNames.add(new JavaSymbolName("pattern"));
         methodParamNames.add(new JavaSymbolName("uiModel"));
-        methodParamNames.add(new JavaSymbolName("request"));
+        methodParamNames.add(new JavaSymbolName("httpServletRequest"));
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -911,7 +911,8 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
                 entityNamePlural.toLowerCase()).concat("Tab\", null);"));
 
-        addBodyLinesForDialogMessage(bodyBuilder);
+        addBodyLinesForDialogMessage(bodyBuilder, DialogType.Info,
+                "message_entitynotfound_problemdescription");
 
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
@@ -954,8 +955,6 @@ public abstract class AbstractPatternMetadata extends
                 .concat(entityNamePlural.toLowerCase()).concat(");"));
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
-        properties.put("message_entitynotfound_problemdescription",
-                "There are not data for this entity");
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
@@ -985,19 +984,12 @@ public abstract class AbstractPatternMetadata extends
 
         method = methodBuilder.build();
         controllerMethods.add(method);
-        propFileOperations
-                .addProperties(Path.SRC_MAIN_WEBAPP,
-                        "/WEB-INF/i18n/application.properties", properties,
-                        true, false);
         return method;
     }
 
     protected MethodMetadata getRegisterMethod() {
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("register");
-
-        // Properties defined for the method
-        Map<String, String> properties = new HashMap<String, String>();
 
         // Define method parameter types
         // @RequestParam(value = "gvnixpattern", required = true) String
@@ -1045,11 +1037,11 @@ public abstract class AbstractPatternMetadata extends
         }
 
         // Define method parameter names
-        // pattern, uiModel, request
+        // pattern, uiModel, httpServletRequest
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         methodParamNames.add(new JavaSymbolName("index"));
         methodParamNames.add(new JavaSymbolName("pattern"));
-        methodParamNames.add(new JavaSymbolName("request"));
+        methodParamNames.add(new JavaSymbolName("httpServletRequest"));
         methodParamNames.add(new JavaSymbolName("uiModel"));
 
         // Create method body
@@ -1095,7 +1087,8 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
                 entityName.toLowerCase()).concat("\", null);"));
 
-        addBodyLinesForDialogMessage(bodyBuilder);
+        addBodyLinesForDialogMessage(bodyBuilder, DialogType.Info,
+                "message_entitynotfound_problemdescription");
 
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
@@ -1163,9 +1156,6 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
 
-        properties.put("message_entitynotfound_problemdescription",
-                "There are not data for this entity");
-
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
                 methodParamTypes, methodParamNames, bodyBuilder);
@@ -1194,11 +1184,11 @@ public abstract class AbstractPatternMetadata extends
 
         method = methodBuilder.build();
         controllerMethods.add(method);
-        propFileOperations
-                .addProperties(Path.SRC_MAIN_WEBAPP,
-                        "/WEB-INF/i18n/application.properties", properties,
-                        true, false);
         return method;
+    }
+
+    enum DialogType {
+        Error, Info, Alert, Suggest;
     }
 
     /**
@@ -1206,27 +1196,33 @@ public abstract class AbstractPatternMetadata extends
      * with an instance of Dialog bean
      * 
      * @param bodyBuilder
+     * @param dialogType
+     * @param messageDescriptionCode
      */
     private void addBodyLinesForDialogMessage(
-            InvocableMemberBodyBuilder bodyBuilder) {
+            InvocableMemberBodyBuilder bodyBuilder, DialogType dialogType,
+            String messageDescriptionCode) {
         JavaType httpSession = new JavaType("javax.servlet.http.HttpSession");
         bodyBuilder.appendFormalLine(httpSession
                 .getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver()).concat(
-                        " session = request.getSession();"));
+                        " session = httpServletRequest.getSession();"));
         JavaType dialogJavaType = new JavaType(
                 this.aspectControllerPackageFullyName.concat(".dialog.Dialog"));
         JavaType dialogTypeJavaType = new JavaType(dialogJavaType
                 .getFullyQualifiedTypeName().concat(".DialogType"));
-        bodyBuilder
-                .appendFormalLine(dialogJavaType
+        bodyBuilder.appendFormalLine(dialogJavaType
+                .getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver())
+                .concat(" dialog = new Dialog(")
+                .concat(dialogTypeJavaType
                         .getNameIncludingTypeParameters(false,
                                 builder.getImportRegistrationResolver())
-                        .concat(" dialog = new Dialog(")
-                        .concat(dialogTypeJavaType
-                                .getNameIncludingTypeParameters(false,
-                                        builder.getImportRegistrationResolver())
-                                .concat(".Info, \"message_info_title\", \"message_entitynotfound_problemdescription\");")));
+                        .concat(".").concat(dialogType.name())
+                        .concat(", \"message_")
+                        .concat(dialogType.name().toLowerCase())
+                        .concat("_title\", \"").concat(messageDescriptionCode)
+                        .concat("\");")));
         bodyBuilder
                 .appendFormalLine("session.setAttribute(\"dialogMessage\", dialog);");
     }
@@ -1661,6 +1657,11 @@ public abstract class AbstractPatternMetadata extends
                         builder.getImportRegistrationResolver()).concat(".")
                 .concat(persistenceMethod.getName())
                 .concat("(filterList(entities));"));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("} else {");
+        bodyBuilder.indent();
+        addBodyLinesForDialogMessage(bodyBuilder, DialogType.Error,
+                "message_errorbinding_problemdescription");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
         bodyBuilder

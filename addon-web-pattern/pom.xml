@@ -87,6 +87,14 @@
       <artifactId>org.springframework.roo.addon.propfiles</artifactId>
     </dependency>
 
+    <!-- gvNIX add-ons -->
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.web.i18n.roo.addon</artifactId>
+      <version>${gvnix.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- DiSiD: gvNIX modules required by this addon -->
     <dependency>
       <groupId>org.gvnix</groupId>

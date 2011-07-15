@@ -25,6 +25,7 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.scanner.MemberDetails;
@@ -68,6 +69,8 @@ public class PatternJspMetadataListener extends
     private ProjectOperations projectOperations;
     @Reference
     private PropFileOperations propFileOperations;
+    @Reference
+    private I18nSupport i18nSupport;
 
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -78,6 +81,7 @@ public class PatternJspMetadataListener extends
         _menuOperations = menuOperations;
         _projectOperations = projectOperations;
         _propFileOperations = propFileOperations;
+        _i18nSupport = i18nSupport;
     }
 
     public MetadataItem get(String metadataIdentificationString) {
