@@ -134,8 +134,6 @@ public class OperationUtils {
 
         MutableFile mutableClass = null;
         if (!fileManager.exists(classFullName)) {
-            mutableClass = fileManager.createFile(classFullName);
-
             InputStream template = TemplateUtils.getTemplate(
                     OperationUtils.class, javaClassTemplateName);
 
@@ -149,6 +147,7 @@ public class OperationUtils {
                         packageFullName);
 
                 // Write final java file
+                mutableClass = fileManager.createFile(classFullName);
                 FileCopyUtils.copy(javaTemplate.getBytes(),
                         mutableClass.getOutputStream());
             } catch (IOException ioe) {

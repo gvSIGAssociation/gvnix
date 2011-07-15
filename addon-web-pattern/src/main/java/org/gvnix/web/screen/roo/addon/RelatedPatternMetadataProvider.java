@@ -59,8 +59,8 @@ import org.springframework.roo.support.util.Assert;
  * retrieve the metadata for this add-on. Use this type to reference external
  * types and services needed by the metadata type. Register metadata triggers
  * and dependencies here. Also define the unique add-on ITD identifier.
- * 
- * 
+ *
+ *
  * @author Oscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -105,7 +105,7 @@ public final class RelatedPatternMetadataProvider extends
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
      * command)
-     * 
+     *
      * @param context
      *            the component context can be used to get access to the OSGi
      *            container (ie find out if certain bundles are active)
@@ -125,7 +125,7 @@ public final class RelatedPatternMetadataProvider extends
      * The deactivate method for this OSGi component, this will be called by the
      * OSGi container upon bundle deactivation (result of the 'addon uninstall'
      * command)
-     * 
+     *
      * @param context
      *            the component context can be used to get access to the OSGi
      *            container (ie find out if certain bundles are active)
@@ -324,7 +324,7 @@ public final class RelatedPatternMetadataProvider extends
                         metadataIdentificationString,
                         governorPhysicalTypeMetadata, formBackingType,
                         webMetadataService), metadataService,
-                propFileOperations);
+                propFileOperations, projectOperations.getPathResolver(), fileManager);
     }
 
     // @Override

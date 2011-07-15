@@ -315,7 +315,6 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
         MutableFile mutableClass = null;
         if (!fileManager.exists(classPath)) {
-            mutableClass = fileManager.createFile(classPath);
             InputStream template = TemplateUtils.getTemplate(
                     getClass(),
                     "web/servlet/handler/".concat(className).concat(
@@ -334,6 +333,7 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
                         getControllerFullyQualifiedPackage().concat(".dialog"));
 
                 // Write final java file
+                mutableClass = fileManager.createFile(classPath);
                 FileCopyUtils.copy(javaTemplate.getBytes(),
                         mutableClass.getOutputStream());
             } catch (IOException ioe) {

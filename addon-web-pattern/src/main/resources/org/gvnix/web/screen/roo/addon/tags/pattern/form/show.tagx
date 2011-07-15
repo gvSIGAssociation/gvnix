@@ -34,9 +34,6 @@
       <c:set var="delete" value="true" />
     </c:if>
 
-    <!-- show messages -->
-    <util:message-box/>
-
     <!-- TODO Integrate finders -->
     <!-- URL for tab Buscar -->
     <spring:url value="${path}" var="buscarUrl">

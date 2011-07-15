@@ -365,3 +365,50 @@ td.fu_es_gva_cit_sentencias_domain_Sentencias_col_fauto { min-width: 65px;}
 
 /* show tribunales */
 td.fu_es_gva_cit_sentencias_domain_Tribunales_col_gvnix_checkbox { width: 20px;}
+
+
+/* MESSAGES */
+
+.avisocorto .title {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 18px;
+font-weight:normal;
+color: #FFFFFF;
+text-align: left;
+padding: 10px;
+}
+.avisolargo {
+border-top:3px solid #ccc;
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 11px;
+font-weight: normal;
+color: #4E4E4E;
+text-align: left;
+padding: 20px 10px;
+background: #f5f5f5;
+}
+
+.MessageBox { border: 1px solid #ccc; margin-bottom: 10px;}
+
+.MessageInfo { background-color: #2C658F; }
+
+.MessageError { background-color: #BB000C; }
+
+.MessageAlert { background-color: #FFAB3F; }
+
+.MessageSuggest { background-color: #7A8F2C; }
+
+.MessageCloseIcon {
+    /*background: url(../images/pattern/cerrar.gif) no-repeat scroll right top transparent;*/
+    height: 15px;
+    position: relative;
+    vertical-align: middle;
+    width: 15px;
+    float: right;
+    right: 4px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    font-weight:normal;
+    color: #FFFFFF;
+    cursor: pointer;
+}

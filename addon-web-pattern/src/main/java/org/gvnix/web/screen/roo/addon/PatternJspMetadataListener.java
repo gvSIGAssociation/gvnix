@@ -172,6 +172,8 @@ public class PatternJspMetadataListener extends
                     .contains(downstreamDependency)) {
                 return;
             }
+        } else {
+            return;
         }
 
         // We should now have an instance-specific "downstream dependency"that

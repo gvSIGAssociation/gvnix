@@ -75,9 +75,27 @@
       <c:choose>
         <c:when test="${not empty param.exception}">
           <c:set var="MsgDlgClass" value="MessageErrorBox" />
-          <spring:message code="message_error_title" var="title" htmlEscape="false"/>
+          <!--
+            en el siguiente message 'text' se anyade para no definir el code en los properties i18n
+          -->
+          <spring:message code="message_error_title" text="Message Error Title" var="title" htmlEscape="false" />
           <spring:message code="error_${fn:toLowerCase(param.exception)}_problemdescription" var="description"
             text="${default_message_error_desc}" htmlEscape="false"/>
+        </c:when>
+
+        <!-- MESSAGE_ERROR as param -->
+        <c:when test="${not empty param.MESSAGE_ERROR}">
+          <c:set var="MsgDlgClass" value="MessageErrorBox" />
+          <spring:message code="message_error_title" var="title" htmlEscape="false"/>
+          <spring:message code="${fn:toLowerCase(param.MESSAGE_ERROR)}" var="description"
+            text="${default_message_error_desc}" htmlEscape="false"/>
+        </c:when>
+
+        <c:when test="${not empty param.MESSAGE_INFO}">
+          <c:set var="MsgDlgClass" value="MessageInfo" />
+          <spring:message code="message_info_title" var="title" htmlEscape="false"/>
+          <spring:message code="${fn:toLowerCase(param.MESSAGE_INFO)}" var="description"
+            text="${default_message_info_desc}" htmlEscape="false"/>
         </c:when>
 
         <!-- Lower precedence: Use the message code given as tag attribute -->
@@ -92,34 +110,41 @@
     </c:otherwise>
   </c:choose>
 
+  <c:if test="${!empty sessionScope['dialogMessage']}">
+    <c:set scope="request" var="dialogMessage" value="${sessionScope['dialogMessage']}" />
+    <c:set scope="request" var="dialogPage" value="${dialogMessage.page}" />
+    <c:set scope="request" var="exception" value="${dialogMessage.exception}" />
+    <c:set scope="request" var="titleCode" value="${dialogMessage.title}" />
+    <spring:message code="${titleCode}" text="" var="title" htmlEscape="false" />
+    <c:set scope="request" var="descriptionCode" value="${dialogMessage.description}" />
+    <c:if test="${!empty descriptionCode}">
+      <spring:message code="${descriptionCode}" text="" var="description" htmlEscape="false" />
+    </c:if>
+    <!-- Use dialogParams as extra data container to use in the included JSPx -->
+    <c:set scope="request" var="dialogParams" value="${dialogMessage.params}" />
+    <c:set scope="request" var="MsgDlgClass" value="Message${dialogMessage.dialogType}" />
+    <c:set scope="request" var="dialogId" value="${id}" />
+    <c:remove var="dialogMessage" scope="session"/>
+  </c:if>
+
   <c:if test="${not empty MsgDlgClass}">
-    <spring:message code="button_proceed" var="button_label"
+    <spring:message code="afdasdfdsafsafdfd" text="_" var="blank"
       htmlEscape="false"/>
-    <div dojoType="dijit.Dialog" id="${id}" style="display: none; position: absolute;">
-      <div class="avisocorto">${title}</div>
-      <div class="avisolargo">${description}</div>
-      <div class="closeMessage">
-      <button class="boton" dojoType="dijit.form.Button" type="button"
-        onClick="dijit.byId('${id}').hide();">${button_label}</button>
+    <div id="${id}" class="MessageBox ${MsgDlgClass}" style="display: none;">
+      <div class="avisocorto">
+        <span class="title">${title}</span>
+        <span class="MessageCloseIcon" id="MessageCloseIcon" onclick="dojo.style('${id}', 'display', 'none');">x</span>
       </div>
+      <div class="avisolargo">${description}</div>
     </div>
 
-    <spring:message code="application_name" var="dialogTitle" htmlEscape="false"/>
+    <spring:message code="application_name" var="applicationName" htmlEscape="true"/>
 
     <script type="text/javascript"><![CDATA[
-        dojo.require("dijit.Dialog");
-
-        var dlgContent = dojo.byId('${id}');
-        var messageDlg;
         dojo.addOnLoad(function() {
-          // create the dialog:
-          messageDlg = new dijit.Dialog(
-           { class: "MessageBoxDialog ${MsgDlgClass}",
-             title: "${dialogTitle}",
-             style: "width: 350px" }, dlgContent);
-
+          //basicFadeoutSetup();
           if(${show}) {
-            messageDlg.show();
+              dojo.style("${id}", "display", "block");
           }
         });
     //]]></script>

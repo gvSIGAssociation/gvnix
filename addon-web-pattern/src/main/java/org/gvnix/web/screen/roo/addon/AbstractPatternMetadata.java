@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.gvnix.support.OperationUtils;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
@@ -59,7 +60,9 @@ import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
@@ -94,6 +97,8 @@ public abstract class AbstractPatternMetadata extends
     private MetadataService metadataService;
     private PropFileOperations propFileOperations;
 
+    private String aspectControllerPackageFullyName;
+
     public AbstractPatternMetadata(
             String identifier,
             JavaType aspectName,
@@ -106,7 +111,8 @@ public abstract class AbstractPatternMetadata extends
             SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
             SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
             MetadataService metadataService,
-            PropFileOperations propFileOperations) {
+            PropFileOperations propFileOperations, PathResolver pathResolver,
+            FileManager fileManager) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Assert.notNull(webScaffoldMetadata, "WebScaffoldMetadata required");
         Assert.notNull(annotationValues, "Annotation values required");
@@ -142,6 +148,13 @@ public abstract class AbstractPatternMetadata extends
             definedPatternsList.add(definedPattern.getValue());
         }
 
+        this.aspectControllerPackageFullyName = aspectName.getPackage()
+                .getFullyQualifiedPackageName();
+        // install Dialog Bean
+        OperationUtils.installWebDialogClass(
+                this.aspectControllerPackageFullyName.concat(".dialog"),
+                pathResolver, fileManager);
+
         this.definedPatterns = Collections
                 .unmodifiableList(definedPatternsList);
 
@@ -175,7 +188,7 @@ public abstract class AbstractPatternMetadata extends
 
     protected MethodMetadata getUpdateMethod() {
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("update");
+        JavaSymbolName methodName = new JavaSymbolName("updatePattern");
 
         List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
 
@@ -221,7 +234,7 @@ public abstract class AbstractPatternMetadata extends
 
     protected MethodMetadata getCreateMethod() {
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("create");
+        JavaSymbolName methodName = new JavaSymbolName("createPattern");
 
         List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
 
@@ -277,7 +290,7 @@ public abstract class AbstractPatternMetadata extends
 
     protected MethodMetadata getDeleteMethod() {
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("delete");
+        JavaSymbolName methodName = new JavaSymbolName("deletePattern");
 
         FieldMetadata formBackingObjectIdField = javaTypeMetadataHolder
                 .getPersistenceDetails().getIdentifierField();
@@ -596,7 +609,7 @@ public abstract class AbstractPatternMetadata extends
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(String.class
                 .getName()), methodAttrPatternAnnotations));
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(formBackingType
-                .getSimpleTypeName()), methodAttrValidAnnotations));
+                .getFullyQualifiedTypeName()), methodAttrValidAnnotations));
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(
                 "org.springframework.validation.BindingResult"), null));
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(
@@ -843,8 +856,8 @@ public abstract class AbstractPatternMetadata extends
                 .getName()), methodAttributesAnnotations));
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(
                 "org.springframework.ui.Model"), null));
-        // methodParamTypes.add(new AnnotatedJavaType(new JavaType(
-        // "javax.servlet.http.HttpServletRequest"), null));
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
+                "javax.servlet.http.HttpServletRequest"), null));
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
@@ -858,7 +871,7 @@ public abstract class AbstractPatternMetadata extends
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         methodParamNames.add(new JavaSymbolName("pattern"));
         methodParamNames.add(new JavaSymbolName("uiModel"));
-        // methodParamNames.add(new JavaSymbolName("request"));
+        methodParamNames.add(new JavaSymbolName("request"));
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -897,8 +910,9 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
                 entityNamePlural.toLowerCase()).concat("Tab\", null);"));
-        bodyBuilder
-                .appendFormalLine("uiModel.addAttribute(\"MESSAGE_INFO\",\"message_entitynotfound_problemdescription\");");
+
+        addBodyLinesForDialogMessage(bodyBuilder);
+
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
         bodyBuilder.indentRemove();
@@ -1080,8 +1094,8 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"".concat(
                 entityName.toLowerCase()).concat("\", null);"));
-        bodyBuilder
-                .appendFormalLine("uiModel.addAttribute(\"MESSAGE_INFO\",\"message_entitynotfound_problemdescription\");");
+
+        addBodyLinesForDialogMessage(bodyBuilder);
 
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
@@ -1185,6 +1199,36 @@ public abstract class AbstractPatternMetadata extends
                         "/WEB-INF/i18n/application.properties", properties,
                         true, false);
         return method;
+    }
+
+    /**
+     * Using the given bodyBuilder adds code lines for set a Session Attribute
+     * with an instance of Dialog bean
+     * 
+     * @param bodyBuilder
+     */
+    private void addBodyLinesForDialogMessage(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        JavaType httpSession = new JavaType("javax.servlet.http.HttpSession");
+        bodyBuilder.appendFormalLine(httpSession
+                .getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver()).concat(
+                        " session = request.getSession();"));
+        JavaType dialogJavaType = new JavaType(
+                this.aspectControllerPackageFullyName.concat(".dialog.Dialog"));
+        JavaType dialogTypeJavaType = new JavaType(dialogJavaType
+                .getFullyQualifiedTypeName().concat(".DialogType"));
+        bodyBuilder
+                .appendFormalLine(dialogJavaType
+                        .getNameIncludingTypeParameters(false,
+                                builder.getImportRegistrationResolver())
+                        .concat(" dialog = new Dialog(")
+                        .concat(dialogTypeJavaType
+                                .getNameIncludingTypeParameters(false,
+                                        builder.getImportRegistrationResolver())
+                                .concat(".Info, \"message_info_title\", \"message_entitynotfound_problemdescription\");")));
+        bodyBuilder
+                .appendFormalLine("session.setAttribute(\"dialogMessage\", dialog);");
     }
 
     protected MethodMetadata getIsPatternDefinedMethod() {

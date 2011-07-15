@@ -80,7 +80,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * This Abstract Listener gives support for install/create/modify MVC artifacts
- * 
+ *
  * @author Óscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -109,7 +109,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     /**
      * For the given pattern it install needed MVC artifacts and generates the
      * pattern JSPx
-     * 
+     *
      * @param pattern
      */
     protected void installMvcArtifacts(String pattern) {
@@ -163,7 +163,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 
     /**
      * Creates a JSPx of the given WebPattern type
-     * 
+     *
      * @param patternType
      * @param destinationDirectory
      * @param controllerPath
@@ -230,7 +230,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      * <strong>This method is based in:</strong>
      * {@link org.springframework.roo.addon.web.mvc.jsp.JspViewManager#getShowDocument()}
      * </p>
-     * 
+     *
      * @return
      */
     private Document getRegisterDocument(String patternName) {
@@ -432,7 +432,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     /**
      * A relation is visible in a view if it's defined in
      * {@link GvNIXRelationsPattern}
-     * 
+     *
      * @param patternName
      * @param symbolName
      * @return
@@ -484,7 +484,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      * <p>
      * It wraps field element into ul/li elements and add a hidden param
      * <code>gvnixpattern</code> and a button
-     * 
+     *
      * @param rooJspx
      */
     private void modifyRooJsp(RooJspx rooJspx) {
@@ -667,6 +667,9 @@ public abstract class AbstractPatternJspMetadataListener implements
         // copy util to tags/util
         copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(
                 Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"));
+        // copy dialog/message to tags/dialog/message
+        copyDirectoryContents("tags/dialog/message/*.tagx", pathResolver.getIdentifier(
+                Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/dialog/message"));
         // copy pattern to tags/pattern
         copyDirectoryContents("tags/pattern/*.tagx",
                 pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
@@ -680,6 +683,9 @@ public abstract class AbstractPatternJspMetadataListener implements
 
         // modify load-scripts.tagx
         modifyLoadScriptsTagx();
+
+        // add message-box component to default layout
+        addMessageBoxInLayout();
 
         // XXX: add properties needed by artifacts
         Map<String, String> properties = new LinkedHashMap<String, String>();
@@ -829,9 +835,65 @@ public abstract class AbstractPatternJspMetadataListener implements
     }
 
     /**
+     * Adds the element dialog:message-box in the right place in default.jspx
+     * layout
+     */
+    private void addMessageBoxInLayout() {
+        PathResolver pathResolver = _projectOperations.getPathResolver();
+        String defaultJspx = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "WEB-INF/layouts/default.jspx");
+
+        // TODO: Check if it's necessary to add message-box in home-default.jspx
+        // layout (when exists)
+
+        if (!_fileManager.exists(defaultJspx)) {
+            // layouts/default.jspx doesn't exist, so nothing to do
+            return;
+        }
+
+        InputStream defulatJspxIs = _fileManager.getInputStream(defaultJspx);
+
+        Document defaultJspxXml;
+        try {
+            defaultJspxXml = XmlUtils.getDocumentBuilder().parse(defulatJspxIs);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Could not open default.jspx file",
+                    ex);
+        }
+
+        Element lsHtml = defaultJspxXml.getDocumentElement();
+
+        String dialogNsbUri = lsHtml.getAttribute("xmlns:dialog");
+
+        if(!dialogNsbUri.isEmpty() && dialogNsbUri.equals("urn:jsptagdir:/WEB-INF/tags/dialog/modal")) {
+          // User has applied modal dialog support, so, don't change anything;
+          return;
+        }
+
+        // Set dialog tag lib as attribute in html element
+        lsHtml.setAttribute("xmlns:dialog",
+                "urn:jsptagdir:/WEB-INF/tags/dialog/message");
+
+        Element messageBoxElement = XmlUtils.findFirstElementByName(
+                "dialog:message-box", lsHtml);
+        if (messageBoxElement == null) {
+            Element divMain = XmlUtils.findFirstElement(
+                    "/html/body/div/div[@id='main']", lsHtml);
+            Element insertAttributeBodyElement = XmlUtils.findFirstElement(
+                    "/html/body/div/div/insertAttribute[@name='body']", lsHtml);
+            Element messageBox = new XmlElementBuilder("dialog:message-box",
+                    defaultJspxXml).build();
+            divMain.insertBefore(messageBox, insertAttributeBodyElement);
+        }
+
+        writeToDiskIfNecessary(defaultJspx, defaultJspxXml.getDocumentElement());
+
+    }
+
+    /**
      * Installs the resource given by parameter path into the same path inside
      * <code>src/main/webapp/</code>
-     * 
+     *
      * @param path
      */
     private void installStaticResource(String path) {
@@ -857,7 +919,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     /**
      * This method will copy the contents of a directory to another if the
      * resource does not already exist in the target directory
-     * 
+     *
      * @param sourceAntPath
      *            the source path
      * @param targetDirectory
@@ -905,7 +967,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      * <strong>This method is based in:</strong>
      * {@link org.springframework.roo.addon.web.mvc.jsp.JspViewManager#getUpdateDocument()}
      * </p>
-     * 
+     *
      * @return
      */
     private Document getUpdateTabularDocument() {
@@ -1348,7 +1410,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     /**
      * Decides if write to disk is needed (ie updated or created)<br/>
      * Used for JSPx files
-     * 
+     *
      * @param jspFilename
      * @param proposed
      */
@@ -1371,7 +1433,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     /**
      * Decides if write to disk is needed (ie updated or created)<br/>
      * Used for TAGx files
-     * 
+     *
      * @param filePath
      * @param body
      * @return

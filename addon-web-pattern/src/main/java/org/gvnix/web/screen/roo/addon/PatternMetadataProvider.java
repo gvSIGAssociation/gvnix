@@ -324,7 +324,8 @@ public final class PatternMetadataProvider extends
                         metadataIdentificationString,
                         governorPhysicalTypeMetadata, formBackingType,
                         webMetadataService), metadataService,
-                propFileOperations);
+                propFileOperations, projectOperations.getPathResolver(),
+                fileManager);
     }
 
     // @Override
