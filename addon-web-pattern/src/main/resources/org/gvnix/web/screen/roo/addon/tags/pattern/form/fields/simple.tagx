@@ -15,18 +15,30 @@
     <c:if test="${empty label}">
       <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label" htmlEscape="false" />
     </c:if>
-
+    
+    <c:set var="sec_field">
+      <spring:escapeBody javaScriptEscape="true" >${field}</spring:escapeBody>
+    </c:set>
+    
     <!-- Set var properties required for form elements -->
     <c:set var="secParentId">
       <spring:escapeBody htmlEscape="true" javaScriptEscape="true">${parentId}</spring:escapeBody>
     </c:set>
     <c:set var="fieldPos" value="${pos.count - 1}" scope="request" />
-    <c:set var="secField">
-      <spring:escapeBody htmlEscape="true" javaScriptEscape="true">${field}</spring:escapeBody>
-    </c:set>
-    <c:set var="fieldId" value="_${secParentId}[${fieldPos}]_${secField}_id" scope="request" />
-    <c:set var="fieldName" value="list[${fieldPos}].${secField}" scope="request" />
-    <c:set var="fieldStyle" value="gvNixTableData ${secParentId}_col_${secField}" scope="request" />
+    <!-- Field name with create or update sufix to avoid duplicated -->
+    <c:choose>
+      <c:when test="${empty item}">
+        <c:set var="createOrUpdate" value="create" scope="request" />
+      </c:when>
+      <c:otherwise>
+        <c:set var="createOrUpdate" value="update" scope="request" />
+      </c:otherwise>
+    </c:choose>
+    <c:set var="fieldHiddenId" value="${secParentId}[${fieldPos}]_${sec_field}_id_${createOrUpdate}" scope="request" />
+    <c:set var="fieldId" value="_${fieldHiddenId}" scope="request" />
+    <c:set var="fieldMethod" value="${secParentId}_${fieldPos}_${sec_field}_${createOrUpdate}" scope="request" />
+    <c:set var="fieldName" value="list[${fieldPos}].${sec_field}" scope="request" />
+    <c:set var="fieldStyle" value="gvNixTableData ${secParentId}_col_${sec_field}" scope="request" />
 
     <c:choose>
     
@@ -38,16 +50,20 @@
           <c:set var="colCounter" value="${colCounter + 1}" scope="request" />
         </th>
       </c:when>
-
-      <c:when test="${not empty messageCode}">
-        <td class="${fieldStyle}">
-          <spring:message code="${messageCode}" arguments="${messageCodeAttribute}" />
-        </td>
-      </c:when>
       
       <c:otherwise>
         <td class="${fieldStyle}">
-          <spring:eval expression="text" />
+          <c:choose>
+  
+            <c:when test="${not empty messageCode}">
+              <spring:message code="${messageCode}" arguments="${messageCodeAttribute}" />
+            </c:when>
+            
+            <c:otherwise>
+              <spring:eval expression="text" />
+            </c:otherwise>
+        
+          </c:choose>
         </td>
       </c:otherwise>
       

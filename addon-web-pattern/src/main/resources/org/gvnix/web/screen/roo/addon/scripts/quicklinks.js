@@ -53,6 +53,8 @@ function gvnix_any_selected(element) {
  * Activate all selected rows and submit delete form.
  */
 function gvnix_delete(element) {
+	
+	gvnix_copy_values(element);
 
     // Get all row checkbox
     var forms = dojo.query('input[id^="gvnix_checkbox_' + element + '"]');
@@ -167,11 +169,104 @@ function gvnix_create(element) {
         node2.style.display = "block";
     });
 
-  // Fix element height adding 137px to its previous height definition
+	// Fix element height adding 137px to its previous height definition
     var divToOverflow = dojo.query('#relations > div[class*="dijitTabPaneWrapper"]')[0];
     var divHeight = dojo.style(divToOverflow, 'height');
     dojo.style(divToOverflow, 'height', divHeight + 137 + "px");
     divHeight = dojo.style(dojo.byId('relations'), 'height');
     dojo.style(dojo.byId('relations'), 'height', divHeight + 137 + "px");
 
+}
+
+/*
+ * Disable all not selected rows (not submitted) and submit add form.
+ */
+function gvnix_add(element) {
+
+  // Before form submit, copy each visible field value to it related hidden field
+  gvnix_copy_values(element);
+  
+  // Get all inputs: if some row's inputs has value, submit row 
+  var inputs = dojo.query('input[type="text"][id$="_create"]');        
+  
+  inputs.forEach(function(input) {
+    checkselected = false;
+    // If value and not checkbox type (always has value)
+    if (input.value != '' && input.type != 'checkbox') {
+      checkselected = true;
+    }
+    else {
+      // If input has value, activate it
+      input.disabled = true;
+    }
+    if (checkselected) {
+      // Mark checkbox for row sumit
+      indexPatt = /\[.*\]/;
+      itemIndex = input.id.match(indexPatt);
+      itemCheckbox = dojo.byId('gvnix_checkbox_add_' + element + itemIndex[0]);
+      itemCheckbox.disabled = false;
+    }
+  });
+
+  // Get add form and submit them
+  var forms = dojo.query('form[id^="gvnix_add_form_' + element + '"]');
+  forms[0].submit();
+}
+
+/*
+ * Submit update form.
+ */
+function gvnix_update(element) {
+
+  // Before form submit, copy each visible field value to it related hidden field
+  gvnix_copy_values(element);
+
+  // Get update form and submit them
+  var forms = dojo.query('form[id^="gvnix_form_' + element + '"]');
+  forms[0].submit();
+}
+
+/*
+ * Copy each visible field value to it related hidden field.
+ */
+function gvnix_copy_values(element) {
+
+  // Get hidden input types
+  var hiddens = dojo.query('input[id^="' + element + '"]');
+  hiddens.forEach(function(hidden, index, arr) {
+  
+    // Get different representations of visible input type related to hidden type
+	var inputId = "_" + hidden.id;
+    var input = dojo.byId(inputId);
+    var inputDijit = dijit.byId(inputId);
+    
+    if (input.type == 'checkbox') {
+    
+      // If checkbox type, convert possible null value to unchecked value  
+      var press = input.getAttribute("aria-pressed");
+      if (press == null) {
+        press = 'off';
+      }
+      hidden.value = press;
+    }
+    else if (input.getAttribute("aria-autocomplete") == "list") {
+    	
+      // If select type, get the real value (input value is only for visualization)
+      hidden.value = inputDijit.get("value");
+    }
+    else {
+      // Set visible value to hidden input
+      hidden.value = input.value;
+    }
+  });
+}
+
+/*
+ * Enable update form if any row selected
+ */
+function gvnix_edit_ward(element) {
+  if ( gvnix_any_selected(element) ) {
+      gvNixChangesControl();
+      gvnix_edit(element);
+  }
 }

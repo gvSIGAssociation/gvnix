@@ -1,11 +1,10 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:pattern="urn:jsptagdir:/WEB-INF/tags/pattern/form/fields" version="2.0">
   <jsp:output omit-xml-declaration="yes" />
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
   <jsp:directive.attribute name="field" type="java.lang.String" required="true" rtexprvalue="true" description="The field exposed from the form backing object" />
   <jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this field, will default to a message bundle if not supplied" />
   <jsp:directive.attribute name="labelCode" type="java.lang.String" required="false" rtexprvalue="true" description="Key for label message bundle if label is not supplied" />
-  <jsp:directive.attribute name="value" type="java.lang.String" required="false" rtexprvalue="true" description="The string used as value in input" />
   <jsp:directive.attribute name="required" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicates if this field is required (default false)" />
   <jsp:directive.attribute name="disabled" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Specify if this field should be enabled" />
   <jsp:directive.attribute name="validationRegex" type="java.lang.String" required="false" rtexprvalue="true" description="Specify regular expression to be used for the validation of the input contents" />
@@ -20,30 +19,67 @@
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
   
+  <!-- gvNIX added attributes not included into Roo by default -->
+  <jsp:directive.attribute name="value" type="java.lang.String" required="false" rtexprvalue="true" description="Force this string to be used as value at hidden input" />
+  
   <c:if test="${empty render or render}">
   
     <c:if test="${empty type}">
       <c:set value="text" var="type" />
     </c:if>
     
-    <c:if test="${empty label}">
-      <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label" htmlEscape="false" />
+    <c:if test="${empty disabled}">
+      <c:set value="false" var="disabled" />
     </c:if>
-
+    
+    <c:if test="${empty label}">
+      <c:if test="${empty labelCode}">
+        <c:set var="labelCode" value="${fn:substringAfter(id,'_')}" />
+      </c:if>
+      <spring:message code="label_${fn:toLowerCase(labelCode)}" var="label" htmlEscape="false" />
+    </c:if>
+    
+    <c:if test="${empty validationMessage}">
+      <c:choose>
+        <c:when test="${empty validationMessageCode}">
+          <spring:message arguments="${fn:escapeXml(label)}" code="field_invalid" var="field_invalid" htmlEscape="false" />
+        </c:when>
+        <c:otherwise>
+          <spring:message arguments="${fn:escapeXml(label)}" code="${validationMessageCode}" var="field_invalid" htmlEscape="false" />
+        </c:otherwise>
+      </c:choose>
+    </c:if>
+    
+    <c:if test="${empty required}">
+      <c:set value="false" var="required" />
+    </c:if>
+    
+    <c:set var="sec_field">
+      <spring:escapeBody javaScriptEscape="true" >${field}</spring:escapeBody>
+    </c:set>
+    
     <!-- Set var properties required for form elements -->
     <c:set var="secParentId">
       <spring:escapeBody htmlEscape="true" javaScriptEscape="true">${parentId}</spring:escapeBody>
     </c:set>
     <c:set var="fieldPos" value="${pos.count - 1}" scope="request" />
-    <c:set var="secField">
-      <spring:escapeBody htmlEscape="true" javaScriptEscape="true">${field}</spring:escapeBody>
-    </c:set>
-    <c:set var="fieldId" value="_${secParentId}[${fieldPos}]_${secField}_id" scope="request" />
-    <c:set var="fieldName" value="list[${fieldPos}].${secField}" scope="request" />
-    <c:set var="fieldStyle" value="gvNixTableData ${secParentId}_col_${secField}" scope="request" />
-    
+    <!-- Field name with create or update sufix to avoid duplicated -->
     <c:choose>
-    
+      <c:when test="${empty item}">
+        <c:set var="createOrUpdate" value="create" scope="request" />
+      </c:when>
+      <c:otherwise>
+        <c:set var="createOrUpdate" value="update" scope="request" />
+      </c:otherwise>
+    </c:choose>
+    <c:set var="fieldHiddenId" value="${secParentId}[${fieldPos}]_${sec_field}_id_${createOrUpdate}" scope="request" />
+    <c:set var="fieldId" value="_${fieldHiddenId}" scope="request" />
+    <c:set var="fieldMethod" value="${secParentId}_${fieldPos}_${sec_field}_${createOrUpdate}" scope="request" />
+    <c:set var="fieldName" value="list[${fieldPos}].${sec_field}" scope="request" />
+    <c:set var="fieldStyle" value="gvNixTableData ${secParentId}_col_${sec_field}" scope="request" />
+
+    <c:choose>
+
       <!-- No item: Show a column header -->
       <c:when test="${item eq null}">
         <!-- Create a header column when not hidden input type -->
@@ -57,32 +93,92 @@
 
       <!-- Item is a hidden type: Create a hidden element with defined value without column -->
       <c:when test="${type eq 'hidden'}">
-        <c:choose>
-          <c:when test="${!empty item}">
-            <input id="${fieldId}" name="${fieldName}" type="${type}" value="${value}" />
-          </c:when>
-          <c:otherwise>
-            <input id="${fieldId}" name="${fieldName}" type="${type}" value="${value}" />
-          </c:otherwise>
-        </c:choose>
-      </c:when>      
-  
-      <!-- Item is a empty string: Create a column element without value for creation -->
-      <c:when test="${empty item}">
-        <td class="${fieldStyle}">
-          <input id="${fieldId}" name="${fieldName}" type="${type}" />
-        </td>
+        <!-- Value if specified, else item field value -->
+        <c:if test="${empty value}">
+          <c:set value="${item[field]}" var="value" scope="request" />
+        </c:if>
+        <input id="${fieldId}" name="${fieldName}" type="hidden" value="${value}" />
       </c:when>
-  
-      <!-- Item is not empty: Create a column element with value for update -->
+
       <c:otherwise>
         <td class="${fieldStyle}">
-          <input id="${fieldId}" name="${fieldName}" type="${type}" value="${item[field]}" disabled="disabled" />
+        
+          <c:choose>
+
+            <!-- Item is a empty string: Create a column element without value for creation -->
+            <c:when test="${empty item}">
+              <!-- Visible field: used for user interaction with validations -->
+              <input id="${fieldId}" type="${type}" />
+            </c:when>
+
+            <!-- Item is not empty: Create a column element with value for update -->
+            <c:otherwise>
+              <!-- Visible field: used for user interaction with validations (initialy diabled) -->
+              <input id="${fieldId}" type="${type}" value="${item[field]}" disabled="disabled" />
+            </c:otherwise>
+
+          </c:choose>
+          
+          <!-- Hidden field: used only for form submit -->
+          <input id="${fieldHiddenId}" name="${fieldName}" type="hidden" />
+
+          <!-- Roo input type validation definitions -->
+          <c:choose>
+            <c:when test="${required}">
+              <spring:message code="field_required" var="field_required" htmlEscape="false" />
+              <spring:message argumentSeparator="," arguments="${label},(${field_required})" code="field_simple_validation" var="field_validation" htmlEscape="false" />
+            </c:when>
+            <c:otherwise>
+              <spring:message argumentSeparator="," arguments="${label}, " code="field_simple_validation" var="field_validation" htmlEscape="false" />
+            </c:otherwise>
+          </c:choose>
+          <c:set var="sec_field_validation">
+            <spring:escapeBody javaScriptEscape="true">${field_validation}</spring:escapeBody>
+          </c:set>
+          <c:set var="sec_field_invalid">
+            <spring:escapeBody javaScriptEscape="true" htmlEscape="true">${field_invalid}</spring:escapeBody>
+          </c:set>
+          <c:set var="sec_field_required">
+            <spring:escapeBody javaScriptEscape="true">${field_required}</spring:escapeBody>
+          </c:set>
+          <c:set var="sec_validation_regex" value="" />
+          <c:if test="${!empty validationRegex}">
+            <c:set var="sec_validation_regex" value="regExp : '${validationRegex}', " />
+          </c:if>
+
+          <!-- On update or create button, activate and apply validation decorations to field -->
+          <script type="text/javascript"><![CDATA[
+          function ${fieldMethod}() {
+            // Get update or create button
+            var link = dojo.byId('${parentId}_${createOrUpdate}');
+            dojo.connect(link, "onclick", function(event) {
+              // Prevent an event's default behavior (e.g., a link from loading a new page)
+              event.preventDefault();
+              var decorate = true;
+              // On update, only apply validations if row selected; on create always apply
+              if ('${createOrUpdate}' == 'update') {
+                var checkbox = dojo.byId('gvnix_checkbox_${secParentId}_${fieldPos}');
+                decorate = checkbox.checked;
+              }
+              if (decorate) {
+                // Get field element to decorate
+                var field = dojo.byId('${fieldId}');
+                // Field keep disabled if required by input attribute
+                field.disabled = ${disabled};
+                Spring.addDecoration(new Spring.ElementDecoration({elementId : '${fieldId}', widgetType : 'dijit.form.ValidationTextBox', widgetAttrs : {promptMessage: '${sec_field_validation}', invalidMessage: '${sec_field_invalid}', required : ${required}, ${sec_validation_regex} missingMessage : '${sec_field_required}' }}));
+              }
+            });
+          }
+          dojo.addOnLoad(function() {
+            // On page load, invoke method to connect validation with link click
+            ${fieldMethod}();
+          });
+          ]]></script>
+
         </td>
       </c:otherwise>
-
+      
     </c:choose>
-    
+
   </c:if>
-  
 </jsp:root>

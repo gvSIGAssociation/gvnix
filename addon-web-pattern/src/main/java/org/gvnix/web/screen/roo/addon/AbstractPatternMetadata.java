@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
-import org.gvnix.support.OperationUtils;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
@@ -890,6 +889,10 @@ public abstract class AbstractPatternMetadata extends
 
         List<JavaType> typeParams = new ArrayList<JavaType>();
         typeParams.add(formBackingType);
+
+        // TODO Mario: Only append line if method exists (date field exists)
+        // bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
+
         JavaType javaUtilList = new JavaType("java.util.List", 0,
                 DataType.TYPE, null, typeParams);
         bodyBuilder.appendFormalLine(javaUtilList
