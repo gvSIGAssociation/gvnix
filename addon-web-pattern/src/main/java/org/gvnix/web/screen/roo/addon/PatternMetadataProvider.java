@@ -20,6 +20,7 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 import org.apache.felix.scr.annotations.Component;
@@ -27,6 +28,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
+import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
@@ -314,6 +316,11 @@ public final class PatternMetadataProvider extends
 
         MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
 
+        Map<JavaSymbolName, DateTimeFormatDetails> dateTypes = webMetadataService
+                .getDatePatterns(formBackingType,
+                        formBackingObjectMemberDetails,
+                        metadataIdentificationString);
+
         // Pass dependencies required by the metadata in through its constructor
         return new PatternMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, webScaffoldMetadata,
@@ -325,7 +332,7 @@ public final class PatternMetadataProvider extends
                         governorPhysicalTypeMetadata, formBackingType,
                         webMetadataService), metadataService,
                 propFileOperations, projectOperations.getPathResolver(),
-                fileManager);
+                fileManager, dateTypes);
     }
 
     // @Override

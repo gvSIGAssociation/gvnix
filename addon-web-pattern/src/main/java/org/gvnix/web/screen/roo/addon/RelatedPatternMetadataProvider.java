@@ -20,6 +20,7 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 import org.apache.felix.scr.annotations.Component;
@@ -27,6 +28,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
+import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
@@ -59,8 +61,8 @@ import org.springframework.roo.support.util.Assert;
  * retrieve the metadata for this add-on. Use this type to reference external
  * types and services needed by the metadata type. Register metadata triggers
  * and dependencies here. Also define the unique add-on ITD identifier.
- *
- *
+ * 
+ * 
  * @author Oscar Rovira (orovira at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
@@ -105,7 +107,7 @@ public final class RelatedPatternMetadataProvider extends
      * The activate method for this OSGi component, this will be called by the
      * OSGi container upon bundle activation (result of the 'addon install'
      * command)
-     *
+     * 
      * @param context
      *            the component context can be used to get access to the OSGi
      *            container (ie find out if certain bundles are active)
@@ -125,7 +127,7 @@ public final class RelatedPatternMetadataProvider extends
      * The deactivate method for this OSGi component, this will be called by the
      * OSGi container upon bundle deactivation (result of the 'addon uninstall'
      * command)
-     *
+     * 
      * @param context
      *            the component context can be used to get access to the OSGi
      *            container (ie find out if certain bundles are active)
@@ -314,6 +316,11 @@ public final class RelatedPatternMetadataProvider extends
 
         MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
 
+        Map<JavaSymbolName, DateTimeFormatDetails> dateTypes = webMetadataService
+                .getDatePatterns(formBackingType,
+                        formBackingObjectMemberDetails,
+                        metadataIdentificationString);
+
         // Pass dependencies required by the metadata in through its constructor
         return new RelatedPatternMetadata(metadataIdentificationString,
                 aspectName, governorPhysicalTypeMetadata, webScaffoldMetadata,
@@ -324,7 +331,8 @@ public final class RelatedPatternMetadataProvider extends
                         metadataIdentificationString,
                         governorPhysicalTypeMetadata, formBackingType,
                         webMetadataService), metadataService,
-                propFileOperations, projectOperations.getPathResolver(), fileManager);
+                propFileOperations, projectOperations.getPathResolver(),
+                fileManager, dateTypes);
     }
 
     // @Override

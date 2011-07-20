@@ -23,9 +23,12 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.gvnix.support.OperationUtils;
+import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
@@ -89,6 +92,7 @@ public abstract class AbstractPatternMetadata extends
     private SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate;
     private List<MethodMetadata> controllerMethods;
     private List<FieldMetadata> controllerFields;
+    private Map<JavaSymbolName, DateTimeFormatDetails> dateTypes;
 
     private MetadataService metadataService;
 
@@ -106,7 +110,8 @@ public abstract class AbstractPatternMetadata extends
             SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
             SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
             MetadataService metadataService, PathResolver pathResolver,
-            FileManager fileManager) {
+            FileManager fileManager,
+            Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
         Assert.notNull(webScaffoldMetadata, "WebScaffoldMetadata required");
         Assert.notNull(annotationValues, "Annotation values required");
@@ -122,6 +127,7 @@ public abstract class AbstractPatternMetadata extends
         this.relatedApplicationTypeMetadata = relatedApplicationTypeMetadata;
         this.javaTypeMetadataHolder = relatedApplicationTypeMetadata
                 .get(formBackingType);
+        this.dateTypes = dateTypes;
         Assert.notNull(javaTypeMetadataHolder,
                 "Metadata holder required for form backing type: "
                         + formBackingType);
@@ -890,8 +896,10 @@ public abstract class AbstractPatternMetadata extends
         List<JavaType> typeParams = new ArrayList<JavaType>();
         typeParams.add(formBackingType);
 
-        // TODO Mario: Only append line if method exists (date field exists)
-        // bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
+        // Add date validation pattern to model if some date type field exists
+        if (!dateTypes.isEmpty()) {
+            bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
+        }
 
         JavaType javaUtilList = new JavaType("java.util.List", 0,
                 DataType.TYPE, null, typeParams);

@@ -19,9 +19,11 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 
 import org.springframework.roo.addon.propfiles.PropFileOperations;
+import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
@@ -34,6 +36,7 @@ import org.springframework.roo.classpath.details.annotations.StringAttributeValu
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
@@ -73,12 +76,13 @@ public class PatternMetadata extends AbstractPatternMetadata
             SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
             MetadataService metadataService,
             PropFileOperations propFileOperations, PathResolver pathResolver,
-            FileManager fileManager) {
+            FileManager fileManager,
+            Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
         super(identifier, aspectName, governorPhysicalTypeMetadata,
                 webScaffoldMetadata, annotationValues, definedPatterns,
                 controllerMethods, controllerFields,
                 relatedApplicationTypeMetadata, typesForPopulate,
-                metadataService, pathResolver, fileManager);
+                metadataService, pathResolver, fileManager, dateTypes);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
     }
