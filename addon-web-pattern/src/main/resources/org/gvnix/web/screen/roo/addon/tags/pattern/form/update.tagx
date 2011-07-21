@@ -121,7 +121,7 @@
 
               <!-- Add a checkbox field on each row with a knowned id -->
               <td class="${colStylePrefix}gvnix_checkbox">
-                <input type="checkbox" id="gvnix_checkbox_${secId}" name="selected[${fieldPos}]" value="${fieldPos}" />
+                <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" />
               </td>
 
               <!-- Add an item row in some pos with a parent id -->
