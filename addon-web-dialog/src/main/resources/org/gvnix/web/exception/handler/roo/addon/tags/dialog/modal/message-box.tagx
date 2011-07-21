@@ -66,28 +66,7 @@
     </c:when>
     <c:otherwise>
 
-      <!--
-        Support to receive error codes in request parameters, useful to use
-        with ReferrerHandlerExceptionResolver.
-        Note explicit message has higher precedence, in that case error code
-        won't be used.
-      -->
       <c:choose>
-        <c:when test="${not empty param.exception}">
-          <c:set var="MsgDlgClass" value="MessageErrorBox" />
-          <spring:message code="message_error_title" text="Message Error Title" var="title" htmlEscape="false" />
-          <spring:message code="error_${fn:toLowerCase(param.exception)}_problemdescription" var="description"
-            text="${default_message_error_desc}" htmlEscape="false"/>
-        </c:when>
-
-        <!-- MESSAGE_ERROR as param -->
-        <c:when test="${not empty param.MESSAGE_ERROR}">
-          <c:set var="MsgDlgClass" value="MessageErrorBox" />
-          <spring:message code="message_error_title" var="title" htmlEscape="false"/>
-          <spring:message code="${fn:toLowerCase(param.MESSAGE_ERROR)}" var="description"
-            text="${default_message_error_desc}" htmlEscape="false"/>
-        </c:when>
-
         <!-- Lower precedence: Use the message code given as tag attribute -->
         <c:when test="${not empty code}">
           <c:set var="MsgDlgClass" value="MessageAlertBox" />
@@ -130,8 +109,6 @@
           <div class="avisolargo">${description}</div>
         </c:otherwise>
       </c:choose>
-
-
     </div>
 
     <spring:message code="application_name" var="applicationName" htmlEscape="true"/>
@@ -139,17 +116,21 @@
     <script type="text/javascript"><![CDATA[
         dojo.require("dijit.Dialog");
 
-        var dlgContent = dojo.byId('${id}');
-        var messageDlg;
+        // Vars defined with concatenate id in order to avoid
+        // var names collision when this component is used
+        // more than once in the same jsp context.
+
+        var dlgContent${id} = dojo.byId('${id}');
+        var messageDlg${id};
         dojo.addOnLoad(function() {
           // create the dialog:
-          messageDlg = new dijit.Dialog(
+           messageDlg${id} = new dijit.Dialog(
            { class: "MessageBoxDialog ${MsgDlgClass}",
              title: "${applicationName}",
-             style: "width: 350px" }, dlgContent);
+             style: "width: 350px" }, dlgContent${id});
 
           if(${show}) {
-            messageDlg.show();
+            messageDlg${id}.show();
           }
         });
     //]]></script>

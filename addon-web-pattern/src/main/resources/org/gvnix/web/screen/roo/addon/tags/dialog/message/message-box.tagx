@@ -66,12 +66,6 @@
     </c:when>
     <c:otherwise>
 
-      <!--
-        Support to receive error codes in request parameters, useful to use
-        with ReferrerHandlerExceptionResolver.
-        Note explicit message has higher precedence, in that case error code
-        won't be used.
-      -->
       <c:choose>
         <!-- Lower precedence: Use the message code given as tag attribute -->
         <c:when test="${not empty code}">
@@ -103,8 +97,6 @@
   </c:if>
 
   <c:if test="${not empty MsgDlgClass}">
-    <spring:message code="afdasdfdsafsafdfd" text="_" var="blank"
-      htmlEscape="false"/>
     <div id="${id}" class="MessageBox ${MsgDlgClass}" style="display: none;">
       <div class="avisocorto">
         <span class="title">${title}</span>
@@ -117,7 +109,6 @@
 
     <script type="text/javascript"><![CDATA[
         dojo.addOnLoad(function() {
-          //basicFadeoutSetup();
           if(${show}) {
               dojo.style("${id}", "display", "block");
           }

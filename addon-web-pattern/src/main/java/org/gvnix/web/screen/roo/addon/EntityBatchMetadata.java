@@ -147,6 +147,7 @@ public class EntityBatchMetadata extends
 
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
+        // new ItdSourceFileComposer(itdTypeDetails);
     }
 
     /**
@@ -263,12 +264,22 @@ public class EntityBatchMetadata extends
         JavaType fieldType = new JavaType("java.util.List", 0, DataType.TYPE,
                 null, typeParams);
 
-        FieldMetadataBuilder builder = new FieldMetadataBuilder(getId(),
+        FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(getId(),
                 Modifier.PROTECTED, new JavaSymbolName(name), fieldType,
                 MessageFormat.format("new java.util.ArrayList<{0}>()",
                         new Object[] { listType.getSimpleTypeName() }));
 
-        return builder;
+        if (name.equals("list")) {
+            // Annotate List field with javax.validation.Valid
+            List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                    1);
+            AnnotationMetadataBuilder validAnnotationBuilder = new AnnotationMetadataBuilder(
+                    new JavaType("javax.validation.Valid"));
+            annotations.add(validAnnotationBuilder);
+            fieldBuilder.setAnnotations(annotations);
+        }
+
+        return fieldBuilder;
     }
 
     /**

@@ -53,8 +53,8 @@ function gvnix_any_selected(element) {
  * Activate all selected rows and submit delete form.
  */
 function gvnix_delete(element) {
-	
-	gvnix_copy_values(element);
+
+  gvnix_copy_values(element);
 
     // Get all row checkbox
     var forms = dojo.query('input[id^="gvnix_checkbox_' + element + '"]');
@@ -169,7 +169,7 @@ function gvnix_create(element) {
         node2.style.display = "block";
     });
 
-	// Fix element height adding 137px to its previous height definition
+  // Fix element height adding 137px to its previous height definition
     var divToOverflow = dojo.query('#relations > div[class*="dijitTabPaneWrapper"]')[0];
     var divHeight = dojo.style(divToOverflow, 'height');
     dojo.style(divToOverflow, 'height', divHeight + 137 + "px");
@@ -185,10 +185,10 @@ function gvnix_add(element) {
 
   // Before form submit, copy each visible field value to it related hidden field
   gvnix_copy_values(element);
-  
-  // Get all inputs: if some row's inputs has value, submit row 
-  var inputs = dojo.query('input[type="text"][id$="_create"]');        
-  
+
+  // Get all inputs: if some row's inputs has value, submit row
+  var inputs = dojo.query('input[type="text"][id$="_create"]');
+
   inputs.forEach(function(input) {
     checkselected = false;
     // If value and not checkbox type (always has value)
@@ -205,6 +205,16 @@ function gvnix_add(element) {
       itemIndex = input.id.match(indexPatt);
       itemCheckbox = dojo.byId('gvnix_checkbox_add_' + element + itemIndex[0]);
       itemCheckbox.disabled = false;
+    }
+  });
+
+  var hiddenChecks = dojo.query('input[id^="gvnix_checkbox_add_' + element + '"]');
+  hiddenChecks.forEach(function(input) {
+    if (input.disabled) {
+      indexPatt = /\[.*\]/;
+      itemIndex = input.id.match(indexPatt);
+      var trToRemove = dojo.byId('gvnix_add_row_' + element + itemIndex[0]);
+      trToRemove.parentNode.removeChild(trToRemove);
     }
   });
 
@@ -234,15 +244,15 @@ function gvnix_copy_values(element) {
   // Get hidden input types
   var hiddens = dojo.query('input[id^="' + element + '"]');
   hiddens.forEach(function(hidden, index, arr) {
-  
+
     // Get different representations of visible input type related to hidden type
-	var inputId = "_" + hidden.id;
+  var inputId = "_" + hidden.id;
     var input = dojo.byId(inputId);
     var inputDijit = dijit.byId(inputId);
-    
+
     if (input.type == 'checkbox') {
-    
-      // If checkbox type, convert possible null value to unchecked value  
+
+      // If checkbox type, convert possible null value to unchecked value
       var press = input.getAttribute("aria-pressed");
       if (press == null) {
         press = 'off';
@@ -250,7 +260,7 @@ function gvnix_copy_values(element) {
       hidden.value = press;
     }
     else if (input.getAttribute("aria-autocomplete") == "list") {
-    	
+
       // If select type, get the real value (input value is only for visualization)
       hidden.value = inputDijit.get("value");
     }

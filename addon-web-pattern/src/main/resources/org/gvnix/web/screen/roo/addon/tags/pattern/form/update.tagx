@@ -121,7 +121,7 @@
 
               <!-- Add a checkbox field on each row with a knowned id -->
               <td class="${colStylePrefix}gvnix_checkbox">
-                <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" />
+                <input type="checkbox" id="gvnix_checkbox_${secId}" name="selected[${fieldPos}]" value="${fieldPos}" />
               </td>
 
               <!-- Add an item row in some pos with a parent id -->
@@ -141,11 +141,11 @@
 
             <!-- Include at last table positions 5 empty rows to create new items -->
             <c:forEach begin="0" end="4" varStatus="new">
-              <tr id="gvnix_add_row_${secId}" style="display: none;">
+              <c:set var="fieldPos" value="${new.count - 1}" scope="request" />
+              <tr id="gvnix_add_row_${secId}[${fieldPos}]" style="display: none;">
 
-                <!-- Add a checkbox field on each row with a knowned id -->
+                <!-- Add a checkbox field on each row with a known id -->
                 <td>
-                  <c:set var="fieldPos" value="${new.count - 1}" scope="request" />
                   <input type="hidden" id="gvnix_checkbox_add_${secId}[${fieldPos}]" name="selected[${fieldPos}]" value="${fieldPos}" disabled="disabled"/>
                 </td>
 
