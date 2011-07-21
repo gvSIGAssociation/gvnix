@@ -141,12 +141,8 @@ function gvnix_edit(element) {
 
     // Make visible the update confirmation controls
     if (any == true) {
-
-        var forms2 = dojo.query('div[id^="gvnix_control_update"]');
-        forms2.forEach(function(node2, index2, arr2) {
-
-            node2.style.display = "block";
-        });
+        var controlUpdateDiv = dojo.byId('gvnix_control_update');
+        controlUpdateDiv.style.display = "block";
     }
 }
 
@@ -163,13 +159,10 @@ function gvnix_create(element) {
     });
 
     // Make visible the create confirmation controls
-    var forms2 = dojo.query('div[id^="gvnix_control_add"]');
-    forms2.forEach(function(node2, index2, arr2) {
+    var controlAddDiv = dojo.byId('gvnix_control_add');
+    controlAddDiv.style.display = "block";
 
-        node2.style.display = "block";
-    });
-
-  // Fix element height adding 137px to its previous height definition
+    // Fix element height adding 137px to its previous height definition
     var divToOverflow = dojo.query('#relations > div[class*="dijitTabPaneWrapper"]')[0];
     var divHeight = dojo.style(divToOverflow, 'height');
     dojo.style(divToOverflow, 'height', divHeight + 137 + "px");
