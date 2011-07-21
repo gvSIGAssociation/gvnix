@@ -419,6 +419,20 @@ public class ItdSourceFileComposer {
 				this.newLine(false);
 				this.appendIndent();
 				this.appendIndent();
+        			/*
+			         * XXX: This is a back port from Roo master branch (Git ID 759ee5f57be55a69031d969d3a7c8bffcee04206).
+			         * The Jira issue is ROO-2594.
+			         * Without this change when Roo generates an ITD with an inner class declared,
+			         * field annotations of the inner class are lost.
+			         * In gvNIX Add-on Pattern EntityBatchMetadata.java use this feature. It must generate a field named "list"
+			         * annotated with @Valid (javax.validation.Valid).
+			         */
+			        // Append annotations
+			        for (AnnotationMetadata annotation : field.getAnnotations()) {
+			          this.appendIndent();
+			          outputAnnotation(annotation);
+			          this.newLine(false);
+			        }
 				if (field.getModifier() != 0) {
 					this.append(Modifier.toString(field.getModifier()));
 					this.append(" ");
