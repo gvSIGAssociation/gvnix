@@ -1,4 +1,4 @@
-<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:pattern="urn:jsptagdir:/WEB-INF/tags/pattern" version="2.0">
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:field="urn:jsptagdir:/WEB-INF/tags/pattern/form/fields" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:pattern="urn:jsptagdir:/WEB-INF/tags/pattern" version="2.0">
   <jsp:directive.tag import="java.util.ArrayList" />
   <jsp:output omit-xml-declaration="yes" />
 
@@ -11,6 +11,9 @@
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="openPane" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Control if the title pane is opened or closed by default (default: true)" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+  
+  <!-- gvNIX added attributes not included into Roo by default -->
+  <jsp:directive.attribute name="idDisabled" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Specify if this id field should be enabled" />
 
   <c:if test="${empty render or render}">
 
@@ -85,8 +88,9 @@
                 <input type="checkbox" id="gvnix_select_all_${secId}" onclick="gvnix_select_all('${secId}');" />
               </th>
 
-              <!-- Include column headers when item value is null and count the number of visible columns -->
+              <!-- Include id and body column headers when item value is null and count the number of visible columns -->
               <c:set var="item" value="${null}" scope="request" />
+              <field:input field="${idField}" id="${id}" />
               <jsp:doBody />
 
             </tr>
@@ -111,23 +115,20 @@
               <!-- 0-index position for list and selected collections sended to controller -->
               <c:set var="fieldPos" value="${pos.count - 1}" scope="request" />
 
-              <!-- Include id property and optional version property -->
-              <c:set var="fieldPrefix" value="_${secId}[${fieldPos}]_" scope="request" />
-              <c:set var="namePrefix" value="list[${fieldPos}]." scope="request" />
-              <input type="hidden" id="${fieldPrefix}${idField}_id" name="${namePrefix}${idField}" value="${item[idField]}" disabled="disabled" />
-              <c:if test="${versionField ne 'none'}">
-                <input type="hidden" id="${fieldPrefix}${versionField}_id" name="${namePrefix}${versionField}" value="${item[fn:toLowerCase(versionField)]}" disabled="disabled" />
-              </c:if>
-
               <!-- Add a checkbox field on each row with a knowned id -->
               <td class="${colStylePrefix}gvnix_checkbox">
                 <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" />
               </td>
 
-              <!-- Add an item row in some pos with a parent id -->
+              <!-- Add an item row (id, body and optional hidden version columns) in some pos with a parent id -->
               <c:set var="item" value="${item}" scope="request" />
               <c:set var="pos" value="${pos}" scope="request" />
               <c:set var="parentId" value="${id}" scope="request" />
+              <!-- Identifier input field: always disabled on update -->
+              <field:input disabled="true" field="${idField}" id="${id}" />
+              <c:if test="${versionField ne 'none'}">
+                <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${item[fn:toLowerCase(versionField)]}" disabled="disabled" />
+              </c:if>
               <jsp:doBody />
 
             </tr>
@@ -149,10 +150,12 @@
                   <input type="hidden" id="gvnix_checkbox_add_${secId}[${fieldPos}]" name="selected[${fieldPos}]" value="${fieldPos}" disabled="disabled"/>
                 </td>
 
-                <!-- Add an empty row in some pos with a parent id -->
+                <!-- Add an empty row (id and body columns) in some pos with a parent id -->
                 <c:set var="item" value="" scope="request" />
                 <c:set var="pos" value="${new}" scope="request" />
                 <c:set var="parentId" value="${id}" scope="request" />
+                <!-- Identifier input field: always can be specified on create -->
+                <field:input disabled="${idDisabled}" field="${idField}" id="${id}" />
                 <jsp:doBody />
 
               </tr>
