@@ -41,8 +41,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
 
 import org.gvnix.support.MessageBundleUtils;
+import org.gvnix.support.MetadataUtils;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.addon.plural.PluralMetadata;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
@@ -53,6 +55,8 @@ import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -64,6 +68,7 @@ import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.metadata.MetadataNotificationListener;
 import org.springframework.roo.metadata.MetadataProvider;
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
@@ -102,6 +107,8 @@ public abstract class AbstractPatternJspMetadataListener implements
     protected ProjectOperations _projectOperations;
     protected PropFileOperations _propFileOperations;
     protected I18nSupport _i18nSupport;
+    protected MetadataService _metadataService;
+    protected PhysicalTypeMetadataProvider _physicalTypeMetadataProvider;
 
     protected ComponentContext context;
     protected WebScaffoldMetadata webScaffoldMetadata;
@@ -402,6 +409,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             for (FieldMetadata fieldMetadata : fieldsOfRelations) {
                 String fieldName = uncapitalize(fieldMetadata.getFieldName()
                         .getSymbolName());
+                String webScaffoldFolder = getFieldEntityPlural(fieldMetadata);
                 Element patternRelation = new XmlElementBuilder(
                         "pattern:relation", document)
                         .addAttribute(
@@ -413,6 +421,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                         .addAttribute("object",
                                 "${" + entityName.toLowerCase() + "}")
                         .addAttribute("field", fieldName)
+                        .addAttribute("folder", webScaffoldFolder)
                         .addAttribute("patternName", patternName)
                         .addAttribute("referenceName", entityName.toLowerCase())
                         .addAttribute(
@@ -431,9 +440,36 @@ public abstract class AbstractPatternJspMetadataListener implements
             div.appendChild(patternRelations);
         }
 
-        // div.appendChild(messageBox);
-
         return document;
+    }
+
+    /**
+     * Given a FieldMetadata it returns the pluralized name of its Class in
+     * plural.
+     * <p>
+     * If the FieldMetadata type is a Collection will return the plural of the
+     * parameter in the Collection definition. That is:<br/>
+     * <code>java.util.Set&lt;Foo&gt;</code> will return <code>Foos</code>
+     * 
+     * @param fieldMetadata
+     * @return
+     */
+    private String getFieldEntityPlural(FieldMetadata fieldMetadata) {
+        JavaType fieldEntity = fieldMetadata.getFieldType();
+        if (fieldEntity.isCommonCollectionType()
+                && !fieldEntity.getParameters().isEmpty()) {
+            fieldEntity = fieldEntity.getParameters().get(0);
+        }
+        ClassOrInterfaceTypeDetails cid = MetadataUtils.getPhysicalTypeDetails(
+                fieldEntity, _metadataService, _physicalTypeMetadataProvider);
+        JavaType javaType = cid.getName();
+        Path path = PhysicalTypeIdentifier.getPath(cid
+                .getDeclaredByMetadataId());
+
+        PluralMetadata pluralMetadata = (PluralMetadata) _metadataService
+                .get(PluralMetadata.createIdentifier(javaType, path));
+
+        return pluralMetadata.getPlural().toLowerCase();
     }
 
     /**

@@ -28,6 +28,7 @@ import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataServi
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
+import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
@@ -71,6 +72,8 @@ public class RelatedPatternJspMetadataListener extends
     private PropFileOperations propFileOperations;
     @Reference
     private I18nSupport i18nSupport;
+    @Reference
+    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -83,6 +86,8 @@ public class RelatedPatternJspMetadataListener extends
         _projectOperations = projectOperations;
         _propFileOperations = propFileOperations;
         _i18nSupport = i18nSupport;
+        _metadataService = metadataService;
+        _physicalTypeMetadataProvider = physicalTypeMetadataProvider;
     }
 
     public MetadataItem get(String metadataIdentificationString) {

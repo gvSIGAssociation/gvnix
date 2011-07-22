@@ -4,6 +4,7 @@
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
   <jsp:directive.attribute name="object" type="java.lang.Object" required="true" rtexprvalue="true" description="The form backing object" />
   <jsp:directive.attribute name="field" type="java.lang.String" required="true" rtexprvalue="true" description="Field as related entity" />
+  <jsp:directive.attribute name="folder" type="java.lang.String" required="false" description="Name of the folder where is the included jspx" />
   <jsp:directive.attribute name="patternName" type="java.lang.String" required="true" rtexprvalue="true" description="Pattern Name used to show this relation" />
   <jsp:directive.attribute name="referenceField" type="java.lang.String" required="true" rtexprvalue="true" description="Field of object as reference for relationship" />
   <jsp:directive.attribute name="referenceName" type="java.lang.String" required="true" rtexprvalue="true" description="Field of object as reference for relationship" />
@@ -17,7 +18,7 @@
       <c:set scope="request" value="${object[fn:escapeXml(field)]}" var="data"/>
       <c:set scope="request" value="${referenceName}" var="referenceName"/>
       <c:set scope="request" value="${object[fn:escapeXml(referenceField)]}" var="referenceValue"/>
-      <jsp:include page="../${field}/${patternName}.jspx"/>
+      <jsp:include page="../${folder}/${patternName}.jspx"/>
     </div>
 
   </c:if>
