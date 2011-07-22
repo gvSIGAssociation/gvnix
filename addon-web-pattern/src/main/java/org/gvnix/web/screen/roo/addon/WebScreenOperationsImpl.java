@@ -22,15 +22,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.MessageBundleUtils;
+import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.springframework.roo.addon.entity.EntityMetadata;
+import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
+import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
@@ -44,10 +52,13 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
+import org.springframework.roo.classpath.operations.AbstractOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -58,11 +69,17 @@ import org.springframework.roo.support.util.Assert;
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  * 
+ * @author Óscar Rovira (orovira at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * 
  * @since 0.8
  */
 @Component
 @Service
-public class WebScreenOperationsImpl implements WebScreenOperations {
+public class WebScreenOperationsImpl extends AbstractOperations implements
+        WebScreenOperations {
     private static Logger logger = Logger
             .getLogger(WebScreenOperationsImpl.class.getName());
 
@@ -145,6 +162,15 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
 
     @Reference
     private WebScreenConfigService configService;
+
+    @Reference
+    private ProjectOperations projectOperations;
+
+    @Reference
+    PropFileOperations propFileOperations;
+
+    @Reference
+    private I18nSupport i18nSupport;
 
     /** {@inheritDoc} */
     public boolean isPatternCommandAvailable() {
@@ -926,5 +952,86 @@ public class WebScreenOperationsImpl implements WebScreenOperations {
         sb.append("[ ]*[=]");
         Pattern pattern = Pattern.compile(sb.toString());
         return pattern.matcher(definition).find();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.gvnix.web.screen.roo.addon.WebScreenOperations#updatePattern()
+     */
+    public void updatePattern() {
+        installPatternArtifacts(true);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.gvnix.web.screen.roo.addon.WebScreenOperations#installPatternArtifacts
+     * (boolean)
+     */
+    public void installPatternArtifacts(boolean forceUpdate) {
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        // install pattern images
+        copyDirectoryContents("images/pattern/*.*", pathResolver.getIdentifier(
+                Path.SRC_MAIN_WEBAPP, "/images/pattern"), forceUpdate);
+        // install js
+        copyDirectoryContents("scripts/*.js",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/scripts"),
+                forceUpdate);
+        // install css
+        copyDirectoryContents("styles/*.css",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/styles"),
+                forceUpdate);
+
+        // copy util to tags/util
+        copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(
+                Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"), forceUpdate);
+        // copy dialog/message to tags/dialog/message
+        copyDirectoryContents("tags/dialog/message/*.tagx",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/tags/dialog/message"), forceUpdate);
+        // copy pattern to tags/pattern
+        copyDirectoryContents("tags/pattern/*.tagx",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/tags/pattern"), forceUpdate);
+        copyDirectoryContents("tags/pattern/form/*.tagx",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/tags/pattern/form"), forceUpdate);
+        copyDirectoryContents("tags/pattern/form/fields/*.tagx",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                        "/WEB-INF/tags/pattern/form/fields"), forceUpdate);
+
+        addI18nProperties();
+    }
+
+    /**
+     * Takes properties files (messages_xx.properties) and adds their content to
+     * i18n message bundle file in current project
+     */
+    private void addI18nProperties() {
+        // Check if Valencian_Catalan language is supported and add properties
+        // if so
+        Set<I18n> supportedLanguages = i18nSupport.getSupportedLanguages();
+        for (I18n i18n : supportedLanguages) {
+            if (i18n.getLocale().equals(new Locale("ca"))) {
+                MessageBundleUtils.installI18nMessages(
+                        new ValencianCatalanLanguage(), projectOperations,
+                        fileManager);
+                MessageBundleUtils.addPropertiesToMessageBundle("ca",
+                        getClass(), propFileOperations, projectOperations,
+                        fileManager);
+                break;
+            }
+        }
+        // Add properties to Spanish messageBundle
+        MessageBundleUtils.installI18nMessages(new SpanishLanguage(),
+                projectOperations, fileManager);
+        MessageBundleUtils.addPropertiesToMessageBundle("es", getClass(),
+                propFileOperations, projectOperations, fileManager);
+
+        // Add properties to default messageBundle
+        MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
+                propFileOperations, projectOperations, fileManager);
     }
 }

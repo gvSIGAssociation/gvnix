@@ -25,24 +25,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
 
-import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.MetadataUtils;
-import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.plural.PluralMetadata;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
@@ -50,9 +45,6 @@ import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadata
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
-import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
-import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
-import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -76,11 +68,9 @@ import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.osgi.UrlFindingUtils;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
 import org.springframework.roo.support.util.StringUtils;
-import org.springframework.roo.support.util.TemplateUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlRoundTripUtils;
 import org.springframework.roo.support.util.XmlUtils;
@@ -106,9 +96,9 @@ public abstract class AbstractPatternJspMetadataListener implements
     protected MenuOperations _menuOperations;
     protected ProjectOperations _projectOperations;
     protected PropFileOperations _propFileOperations;
-    protected I18nSupport _i18nSupport;
     protected MetadataService _metadataService;
     protected PhysicalTypeMetadataProvider _physicalTypeMetadataProvider;
+    protected WebScreenOperations _webScreenOperations;
 
     protected ComponentContext context;
     protected WebScaffoldMetadata webScaffoldMetadata;
@@ -697,41 +687,14 @@ public abstract class AbstractPatternJspMetadataListener implements
      * by tagx
      */
     private void installPatternArtifacts() {
-        installStaticResource("images/pattern/enEdicion.gif");
-        installStaticResource("images/pattern/pedi_off.gif");
-        installStaticResource("images/pattern/pedi_on.gif");
-        installStaticResource("images/pattern/pfil_off.gif");
-        installStaticResource("images/pattern/pfil_on.gif");
-        installStaticResource("images/pattern/plis_off.gif");
-        installStaticResource("images/pattern/plis_on.gif");
-        installStaticResource("scripts/quicklinks.js");
-        installStaticResource("styles/pattern.css");
-        PathResolver pathResolver = _projectOperations.getPathResolver();
-        // copy util to tags/util
-        copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"));
-        // copy dialog/message to tags/dialog/message
-        copyDirectoryContents("tags/dialog/message/*.tagx",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-                        "/WEB-INF/tags/dialog/message"));
-        // copy pattern to tags/pattern
-        copyDirectoryContents("tags/pattern/*.tagx",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-                        "/WEB-INF/tags/pattern"));
-        copyDirectoryContents("tags/pattern/form/*.tagx",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-                        "/WEB-INF/tags/pattern/form"));
-        copyDirectoryContents("tags/pattern/form/fields/*.tagx",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-                        "/WEB-INF/tags/pattern/form/fields"));
+
+        _webScreenOperations.installPatternArtifacts(false);
 
         // modify load-scripts.tagx
         modifyLoadScriptsTagx();
 
         // add message-box component to default layout
         addMessageBoxInLayout();
-
-        addI18nProperties();
     }
 
     /**
@@ -924,60 +887,30 @@ public abstract class AbstractPatternJspMetadataListener implements
     }
 
     /**
-     * Takes properties files (messages_xx.properties) and adds their content to
-     * i18n message bundle file in current project
-     */
-    private void addI18nProperties() {
-        // Check if Valencian_Catalan language is supported and add properties
-        // if so
-        Set<I18n> supportedLanguages = _i18nSupport.getSupportedLanguages();
-        for (I18n i18n : supportedLanguages) {
-            if (i18n.getLocale().equals(new Locale("ca"))) {
-                MessageBundleUtils.installI18nMessages(
-                        new ValencianCatalanLanguage(), _projectOperations,
-                        _fileManager);
-                MessageBundleUtils.addPropertiesToMessageBundle("ca",
-                        getClass(), _propFileOperations, _projectOperations,
-                        _fileManager);
-                break;
-            }
-        }
-        // Add properties to Spanish messageBundle
-        MessageBundleUtils.installI18nMessages(new SpanishLanguage(),
-                _projectOperations, _fileManager);
-        MessageBundleUtils.addPropertiesToMessageBundle("es", getClass(),
-                _propFileOperations, _projectOperations, _fileManager);
-
-        // Add properties to default messageBundle
-        MessageBundleUtils.addPropertiesToMessageBundle("en", getClass(),
-                _propFileOperations, _projectOperations, _fileManager);
-    }
-
-    /**
      * Installs the resource given by parameter path into the same path inside
      * <code>src/main/webapp/</code>
      * 
      * @param path
      */
-    private void installStaticResource(String path) {
-        PathResolver pathResolver = _projectOperations.getPathResolver();
-        String imageFile = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-                path);
-        if (!_fileManager.exists(imageFile)) {
-            try {
-                FileCopyUtils.copy(
-                        TemplateUtils.getTemplate(getClass(), path),
-                        _fileManager.createFile(
-                                pathResolver.getIdentifier(
-                                        Path.SRC_MAIN_WEBAPP, path))
-                                .getOutputStream());
-            } catch (Exception e) {
-                throw new IllegalStateException(
-                        "Encountered an error during copying of resources for MVC JSP addon.",
-                        e);
-            }
-        }
-    }
+    // private void installStaticResource(String path) {
+    // PathResolver pathResolver = _projectOperations.getPathResolver();
+    // String imageFile = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+    // path);
+    // if (!_fileManager.exists(imageFile)) {
+    // try {
+    // FileCopyUtils.copy(
+    // TemplateUtils.getTemplate(getClass(), path),
+    // _fileManager.createFile(
+    // pathResolver.getIdentifier(
+    // Path.SRC_MAIN_WEBAPP, path))
+    // .getOutputStream());
+    // } catch (Exception e) {
+    // throw new IllegalStateException(
+    // "Encountered an error during copying of resources for MVC JSP addon.",
+    // e);
+    // }
+    // }
+    // }
 
     /**
      * This method will copy the contents of a directory to another if the
@@ -988,41 +921,41 @@ public abstract class AbstractPatternJspMetadataListener implements
      * @param targetDirectory
      *            the target directory
      */
-    private void copyDirectoryContents(String sourceAntPath,
-            String targetDirectory) {
-        Assert.hasText(sourceAntPath, "Source path required");
-        Assert.hasText(targetDirectory, "Target directory required");
-
-        if (!targetDirectory.endsWith("/")) {
-            targetDirectory += "/";
-        }
-
-        if (!_fileManager.exists(targetDirectory)) {
-            _fileManager.createDirectory(targetDirectory);
-        }
-
-        String path = TemplateUtils.getTemplatePath(getClass(), sourceAntPath);
-        Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(
-                context.getBundleContext(), path);
-        Assert.notNull(urls,
-                "Could not search bundles for resources for Ant Path '" + path
-                        + "'");
-        for (URL url : urls) {
-            String fileName = url.getPath().substring(
-                    url.getPath().lastIndexOf("/") + 1);
-            if (!_fileManager.exists(targetDirectory + fileName)) {
-                try {
-                    FileCopyUtils.copy(url.openStream(), _fileManager
-                            .createFile(targetDirectory + fileName)
-                            .getOutputStream());
-                } catch (IOException e) {
-                    new IllegalStateException(
-                            "Encountered an error during copying of resources for MVC JSP addon.",
-                            e);
-                }
-            }
-        }
-    }
+    // private void copyDirectoryContents(String sourceAntPath,
+    // String targetDirectory) {
+    // Assert.hasText(sourceAntPath, "Source path required");
+    // Assert.hasText(targetDirectory, "Target directory required");
+    //
+    // if (!targetDirectory.endsWith("/")) {
+    // targetDirectory += "/";
+    // }
+    //
+    // if (!_fileManager.exists(targetDirectory)) {
+    // _fileManager.createDirectory(targetDirectory);
+    // }
+    //
+    // String path = TemplateUtils.getTemplatePath(getClass(), sourceAntPath);
+    // Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(
+    // context.getBundleContext(), path);
+    // Assert.notNull(urls,
+    // "Could not search bundles for resources for Ant Path '" + path
+    // + "'");
+    // for (URL url : urls) {
+    // String fileName = url.getPath().substring(
+    // url.getPath().lastIndexOf("/") + 1);
+    // if (!_fileManager.exists(targetDirectory + fileName)) {
+    // try {
+    // FileCopyUtils.copy(url.openStream(), _fileManager
+    // .createFile(targetDirectory + fileName)
+    // .getOutputStream());
+    // } catch (IOException e) {
+    // new IllegalStateException(
+    // "Encountered an error during copying of resources for MVC JSP addon.",
+    // e);
+    // }
+    // }
+    // }
+    // }
 
     /**
      * Returns de XML Document with the JSPx

@@ -99,12 +99,32 @@ public class WebScreenCommands implements CommandMarker {
      * @param type
      *            The pattern to apply
      */
-    @CliCommand(value = "web mvc pattern detail", help = "Add a screen pattern to a controller")
+    @CliCommand(value = "web mvc pattern detail", help = "Add a detail screen pattern to a defined master pattern in a controller")
     public void webRelationPattern(
             @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
             @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name,
             @CliOption(key = "field", mandatory = true, help = "The one-to-many field to apply the pattern to") JavaSymbolName field,
             @CliOption(key = "type", mandatory = true, help = "The pattern to apply") WebPattern type) {
         operations.addRelationPattern(controllerClass, name, field, type);
+    }
+
+    /**
+     * Informs if <code>web mvc pattern update</code> command are available
+     * 
+     * @return true if commands are available
+     */
+    @CliAvailabilityIndicator({ "web mvc pattern update" })
+    public boolean isWebPatternUpdateAvaliable() {
+        // We can use the same condition as the availability of RelationPattern
+        // command
+        return operations.isRelationPatternCommandAvailable();
+    }
+
+    /**
+     * Forces update the static resources (images, css, js) and TAGx
+     */
+    @CliCommand(value = "web mvc pattern update", help = "Updates static resources (images, css, js) and TAGx used by patterns")
+    public void webPatternUpdate() {
+        operations.updatePattern();
     }
 }

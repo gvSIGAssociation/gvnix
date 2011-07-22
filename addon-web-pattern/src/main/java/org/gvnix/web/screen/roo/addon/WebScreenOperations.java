@@ -96,4 +96,31 @@ public interface WebScreenOperations {
      */
     void addRelationPattern(JavaType controllerClass, JavaSymbolName name,
             JavaSymbolName field, WebPattern type);
+
+    /**
+     * Forces the update of pattern Artifacts.
+     * <ul>
+     * <li>images</li>
+     * <li>scripts JS</li>
+     * <li>CSS</li>
+     * <li>TAGx</li>
+     * <li>i18n language properties</li>
+     * <ul>
+     */
+    void updatePattern();
+
+    /**
+     * Installs pattern Artifacts.
+     * <ul>
+     * <li>images</li>
+     * <li>scripts JS</li>
+     * <li>CSS</li>
+     * <li>TAGx</li>
+     * <li>i18n language properties</li>
+     * <ul>
+     * 
+     * @param forceUpdate
+     *            if true forces the update of the existing resources
+     */
+    void installPatternArtifacts(boolean forceUpdate);
 }

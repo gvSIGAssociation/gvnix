@@ -20,6 +20,7 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.List;
 
+import org.gvnix.support.MetadataUtils;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.model.JavaType;
@@ -74,7 +75,12 @@ public interface PatternService {
      * @param type
      * 
      * @return
+     * 
+     * @deprecated use
+     *             {@link MetadataUtils#getPhysicalTypeDetails(JavaType, org.springframework.roo.metadata.MetadataService, org.springframework.roo.classpath.PhysicalTypeMetadataProvider)}
+     *             instead
      */
+    @Deprecated
     public MutableClassOrInterfaceTypeDetails getPhysicalTypeDetails(
             JavaType type);
 

@@ -24,8 +24,7 @@ import java.util.List;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.classpath.PhysicalTypeDetails;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.gvnix.support.MetadataUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
@@ -79,7 +78,9 @@ public class PatternServicesImpl implements PatternService {
     public List<FieldMetadata> getOneToManyFieldsFromEntityJavaType(
             JavaType formBakingObjectType) {
         List<FieldMetadata> oneToManyFields = new ArrayList<FieldMetadata>();
-        MutableClassOrInterfaceTypeDetails formBackingTypeMetadata = getPhysicalTypeDetails(formBakingObjectType);
+        MutableClassOrInterfaceTypeDetails formBackingTypeMetadata = MetadataUtils
+                .getPhysicalTypeDetails(formBakingObjectType, metadataService,
+                        physicalTypeMetadataProvider);
 
         Assert.notNull(formBackingTypeMetadata, "Cannot locate Metadata for '"
                 .concat(formBakingObjectType.getFullyQualifiedTypeName())
@@ -100,32 +101,11 @@ public class PatternServicesImpl implements PatternService {
     }
 
     /** {@inheritDoc} */
+    @Deprecated
     public MutableClassOrInterfaceTypeDetails getPhysicalTypeDetails(
             JavaType type) {
-        // Retrieve metadata for the Java source type the annotation is being
-        // added to
-        String entityId = physicalTypeMetadataProvider.findIdentifier(type);
-        if (entityId == null) {
-            throw new IllegalArgumentException("Cannot locate source for '"
-                    + type.getFullyQualifiedTypeName() + "'");
-        }
 
-        // Obtain the physical type and itd mutable details
-        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
-                .get(entityId, true);
-        Assert.notNull(physicalTypeMetadata,
-                "Java source code unavailable for type ".concat(type
-                        .getFullyQualifiedTypeName()));
-
-        // Obtain physical type details for the target type
-        PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
-                .getMemberHoldingTypeDetails();
-        Assert.notNull(physicalTypeDetails,
-                "Java source code details unavailable for type ".concat(type
-                        .getFullyQualifiedTypeName()));
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-                physicalTypeDetails, "Java source code is immutable for type "
-                        .concat(type.getFullyQualifiedTypeName()));
-        return (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
+        return MetadataUtils.getPhysicalTypeDetails(type, metadataService,
+                physicalTypeMetadataProvider);
     }
 }
