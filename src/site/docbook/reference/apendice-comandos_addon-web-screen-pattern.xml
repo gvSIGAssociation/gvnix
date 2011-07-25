@@ -30,7 +30,7 @@
         <row>
           <entry><link
           linkend="apendice-comandos_addon-web_mvc_pattern"><emphasis>web mvc
-          pattern</emphasis></link></entry>
+          pattern master</emphasis></link></entry>
 
           <entry>Define un patrón de visualización sobre una entidad
           dada</entry>
@@ -39,17 +39,25 @@
         <row>
           <entry><link
           linkend="apendice-comandos_addon-web_mvc_relation_pattern"><emphasis>web
-          mvc relation pattern</emphasis></link></entry>
+          mvc pattern detail</emphasis></link></entry>
 
           <entry>Define un patrón de visualización sobre una entidad
           relacionada con su entidad maestro.</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web_mvc_relation_pattern"><emphasis>web
+          mvc pattern update</emphasis></link></entry>
+
+          <entry>Actualiza los componentes usados por los patrones.</entry>
         </row>
       </tbody>
     </tgroup>
   </table>
 
   <section xml:id="apendice-comandos_addon-web_mvc_pattern">
-    <title xml:lang="es">web mvc pattern</title>
+    <title xml:lang="es">web mvc pattern master</title>
 
     <para xml:lang="es">Define un patron de visualización sobre la entidad
     expuesta por el Controlador seleccionado.</para>
@@ -97,7 +105,7 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-web_mvc_relation_pattern">
-    <title>web mvc relation pattern</title>
+    <title>web mvc pattern detail</title>
 
     <para>Define un patrón de visualización sobre una entidad relacionada con
     su entidad maestro.</para>
@@ -157,5 +165,34 @@
           </listitem>
         </varlistentry>
       </variablelist></para>
+  </section>
+
+  <section>
+    <title>web mvc pattern update</title>
+
+    <para>Fuerza la actualización los componentes utilizados por los patrones.
+    Los componentes son:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>TAGx</para>
+      </listitem>
+
+      <listitem>
+        <para>Imágenes</para>
+      </listitem>
+
+      <listitem>
+        <para>Javascript</para>
+      </listitem>
+
+      <listitem>
+        <para>Hojas de estilo CSS</para>
+      </listitem>
+
+      <listitem>
+        <para>Propiedades de i18n de idiomas</para>
+      </listitem>
+    </itemizedlist>
   </section>
 </section>
