@@ -179,6 +179,60 @@ javax.persistence.OptimisticLockException</programlisting>
 
     <para xml:lang="es">Añade un mensaje a una excepción existente en el
     idioma indicado.</para>
+
+    <para xml:lang="es">Los parámetros son:<variablelist>
+        <varlistentry>
+          <term>--excepcion</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>[Requerido]
+            [Cadena]</emphasis></para>
+
+            <para xml:lang="es">Nombre de la excepción a capturar. Se ha de
+            especificar el paquete java completo del que proviene. Ej:
+            "java.lang.Exception" para que así las definiciones sean
+            únicas.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--title</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>[Requerido]
+            [Cadena]</emphasis></para>
+
+            <para xml:lang="es">Título de la excepción que se ha de mostrar
+            por pantalla.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--description</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>[Requerido]
+            [Cadena]</emphasis></para>
+
+            <para xml:lang="es">Mensaje que se muestra al capturar la
+            excepción para que el usuario reciba la información del
+            error.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--language</term>
+
+          <listitem>
+            <para xml:lang="es"><emphasis>[Requerido]
+            [Cadena]</emphasis></para>
+
+            <para xml:lang="es">Idioma en el que se define el mensaje para
+            añadirlo al archivo correspondiente <emphasis>[es, de, it, nl, sv,
+            en]</emphasis>.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
   </section>
 
   <section>
