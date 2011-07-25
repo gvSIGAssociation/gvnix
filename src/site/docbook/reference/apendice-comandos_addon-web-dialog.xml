@@ -73,7 +73,7 @@
         <row>
           <entry><link
           linkend="apendice-comandos_addon-web-exception-handler_exception-handler-setup-gvnix">web
-          mvc dialog message add</link></entry>
+          mvc dialog add</link></entry>
 
           <entry xml:lang="es">Añade un diálogo modal a la aplicación.</entry>
         </row>
@@ -209,7 +209,7 @@ javax.persistence.OptimisticLockException</programlisting>
   <section>
     <title
     xml:id="apendice-comandos_addon-web-exception-handler_dialog-add">web mvc
-    dialog message add</title>
+    dialog add</title>
 
     <para>Añade un nuevo diálogo modal a la aplicación. Ver <link
     linkend="addon-web-dialog">Add-on Web Dialog</link> para una información
