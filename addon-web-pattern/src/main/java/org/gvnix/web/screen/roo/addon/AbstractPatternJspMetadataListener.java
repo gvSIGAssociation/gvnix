@@ -362,9 +362,8 @@ public abstract class AbstractPatternJspMetadataListener implements
                 if (isRelationVisible(patternName, field.getFieldName()
                         .getSymbolName())) {
                     fieldsOfRelations.add(field);
-                    isRelatationship = true;
                 }
-                // continue;
+                isRelatationship = true;
             }
 
             if (!isRelatationship) {
@@ -373,8 +372,9 @@ public abstract class AbstractPatternJspMetadataListener implements
 
                 li.appendChild(fieldDisplay);
                 divForm.appendChild(ul);
-                isRelatationship = false;
+                // isRelatationship = false;
             }
+            isRelatationship = false;
         }
 
         pageShow.appendChild(divContentPane);
@@ -885,77 +885,6 @@ public abstract class AbstractPatternJspMetadataListener implements
         writeToDiskIfNecessary(defaultJspx, defaultJspxXml.getDocumentElement());
 
     }
-
-    /**
-     * Installs the resource given by parameter path into the same path inside
-     * <code>src/main/webapp/</code>
-     * 
-     * @param path
-     */
-    // private void installStaticResource(String path) {
-    // PathResolver pathResolver = _projectOperations.getPathResolver();
-    // String imageFile = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
-    // path);
-    // if (!_fileManager.exists(imageFile)) {
-    // try {
-    // FileCopyUtils.copy(
-    // TemplateUtils.getTemplate(getClass(), path),
-    // _fileManager.createFile(
-    // pathResolver.getIdentifier(
-    // Path.SRC_MAIN_WEBAPP, path))
-    // .getOutputStream());
-    // } catch (Exception e) {
-    // throw new IllegalStateException(
-    // "Encountered an error during copying of resources for MVC JSP addon.",
-    // e);
-    // }
-    // }
-    // }
-
-    /**
-     * This method will copy the contents of a directory to another if the
-     * resource does not already exist in the target directory
-     * 
-     * @param sourceAntPath
-     *            the source path
-     * @param targetDirectory
-     *            the target directory
-     */
-    // private void copyDirectoryContents(String sourceAntPath,
-    // String targetDirectory) {
-    // Assert.hasText(sourceAntPath, "Source path required");
-    // Assert.hasText(targetDirectory, "Target directory required");
-    //
-    // if (!targetDirectory.endsWith("/")) {
-    // targetDirectory += "/";
-    // }
-    //
-    // if (!_fileManager.exists(targetDirectory)) {
-    // _fileManager.createDirectory(targetDirectory);
-    // }
-    //
-    // String path = TemplateUtils.getTemplatePath(getClass(), sourceAntPath);
-    // Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(
-    // context.getBundleContext(), path);
-    // Assert.notNull(urls,
-    // "Could not search bundles for resources for Ant Path '" + path
-    // + "'");
-    // for (URL url : urls) {
-    // String fileName = url.getPath().substring(
-    // url.getPath().lastIndexOf("/") + 1);
-    // if (!_fileManager.exists(targetDirectory + fileName)) {
-    // try {
-    // FileCopyUtils.copy(url.openStream(), _fileManager
-    // .createFile(targetDirectory + fileName)
-    // .getOutputStream());
-    // } catch (IOException e) {
-    // new IllegalStateException(
-    // "Encountered an error during copying of resources for MVC JSP addon.",
-    // e);
-    // }
-    // }
-    // }
-    // }
 
     /**
      * Returns de XML Document with the JSPx

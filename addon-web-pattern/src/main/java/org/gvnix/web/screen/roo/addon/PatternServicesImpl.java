@@ -27,8 +27,11 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MetadataUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.scanner.MemberDetails;
+import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.support.util.Assert;
@@ -56,6 +59,9 @@ public class PatternServicesImpl implements PatternService {
     @Reference
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
+    @Reference
+    private MemberDetailsScanner memberDetailsScanner;
+
     /** {@inheritDoc} */
     public String findPatternDefinedMoreThanOnceInProject() {
         // TODO Auto-generated method stub
@@ -82,12 +88,18 @@ public class PatternServicesImpl implements PatternService {
                 .getPhysicalTypeDetails(formBakingObjectType, metadataService,
                         physicalTypeMetadataProvider);
 
+        MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(
+                getClass().getName(), formBackingTypeMetadata);
+
+        List<FieldMetadata> fields = MemberFindingUtils
+                .getFields(memberDetails);
+
         Assert.notNull(formBackingTypeMetadata, "Cannot locate Metadata for '"
                 .concat(formBakingObjectType.getFullyQualifiedTypeName())
                 .concat("'."));
 
-        List<? extends FieldMetadata> fields = formBackingTypeMetadata
-                .getDeclaredFields();
+        // List<? extends FieldMetadata> fields = formBackingTypeMetadata
+        // .getDeclaredFields();
 
         for (FieldMetadata field : fields) {
             for (AnnotationMetadata fieldAnnotation : field.getAnnotations()) {

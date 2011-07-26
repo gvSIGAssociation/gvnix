@@ -536,11 +536,11 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                     + formBakingObjectType.getFullyQualifiedTypeName() + "'");
         }
 
-        List<FieldMetadata> fieldAnotations = patternService
+        List<FieldMetadata> oneToManyFields = patternService
                 .getOneToManyFieldsFromEntityJavaType(formBakingObjectType);
         Map<String, String> fieldsPatternIdAndType = getFieldsPatternIdAndType(relationsPatternValues);
         if (!fieldsPatternIdAndType.keySet().isEmpty()) {
-            for (FieldMetadata field : fieldAnotations) {
+            for (FieldMetadata field : oneToManyFields) {
                 if (fieldsPatternIdAndType.keySet().contains(
                         field.getFieldName().getSymbolName())
                         && field.getFieldType().isCommonCollectionType()) {
