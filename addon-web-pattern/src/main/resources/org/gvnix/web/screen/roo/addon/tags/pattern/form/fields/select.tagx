@@ -114,7 +114,8 @@
                       </option>
                     </c:when>
                     <c:otherwise>
-                      <option value="${item2[fn:escapeXml(itemValue)]}">
+                      <spring:eval expression="item2[itemValue]" scope="request" var="field2Value" />
+                      <option value="${field2Value}">
                         <spring:eval expression="item2" />
                       </option>
                     </c:otherwise>
@@ -125,6 +126,7 @@
         
             <!-- Item is not empty: Create a column element with value for update -->
             <c:otherwise>
+              <spring:eval expression="item[field]" scope="request" var="fieldValue" />
               <select id="${fieldId}" disabled="disabled">
                 <c:choose>
                   <c:when test="${empty itemValue}">
@@ -132,7 +134,7 @@
                     <option></option>
                     <c:forEach items="${items}" var="item2">
                       <c:choose>
-                        <c:when test="${item2 == item[field]}">
+                        <c:when test="${item2 == fieldValue}">
                           <option value="${item2}" selected="selected">
                             <spring:eval expression="item2" />
                           </option>
@@ -148,15 +150,17 @@
                   <c:otherwise>
                     <!-- Default value, empty option: avoid default field value submit -->
                     <option></option>
+                    <spring:eval expression="fieldValue[itemValue]" scope="request" var="fieldValue" />
                     <c:forEach items="${items}" var="item2">
+                      <spring:eval expression="item2[itemValue]" scope="request" var="field2Value" />
                       <c:choose>
-                        <c:when test="${item2[fn:escapeXml(itemValue)] == item[field][itemValue]}">
-                          <option value="${item2[fn:escapeXml(itemValue)]}" selected="selected">
+                        <c:when test="${field2Value == fieldValue}">
+                          <option value="${field2Value}" selected="selected">
                             <spring:eval expression="item2" />
                           </option>
                         </c:when>
                         <c:otherwise>
-                          <option value="${item2[fn:escapeXml(itemValue)]}">
+                          <option value="${field2Value}">
                             <spring:eval expression="item2" />
                           </option>
                         </c:otherwise>

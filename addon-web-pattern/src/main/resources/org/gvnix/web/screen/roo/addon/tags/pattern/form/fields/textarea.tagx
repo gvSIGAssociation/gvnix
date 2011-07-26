@@ -74,7 +74,8 @@
         
             <!-- Item is not empty: Create a column element with value for update -->
             <c:otherwise>
-              <textarea id="${fieldId}" rows="2" cols="20" disabled="disabled">${item[field]}</textarea>
+              <spring:eval expression="item[field]" scope="request" var="fieldValue" />
+              <textarea id="${fieldId}" rows="2" cols="20" disabled="disabled">${fieldValue}</textarea>
             </c:otherwise>
           
           </c:choose>

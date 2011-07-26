@@ -65,9 +65,10 @@
             </c:when>
         
             <!-- Item is not empty: Create a column element with value for update -->
+            <spring:eval expression="item[field]" scope="request" var="fieldValue" />
             <c:otherwise>
               <c:choose>
-                <c:when test="${item[field] eq true}">
+                <c:when test="${fieldValue eq true}">
                   <input id="${fieldId}" type="checkbox" disabled="disabled" checked="checked" />
                 </c:when>
                 <c:otherwise>

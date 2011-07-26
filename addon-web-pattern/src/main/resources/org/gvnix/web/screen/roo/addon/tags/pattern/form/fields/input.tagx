@@ -95,7 +95,7 @@
       <c:when test="${type eq 'hidden'}">
         <!-- Value if specified, else item field value -->
         <c:if test="${empty value}">
-          <c:set value="${item[field]}" var="value" scope="request" />
+          <spring:eval expression="item[field]" scope="request" var="value" />
         </c:if>
         <input id="${fieldId}" name="${fieldName}" type="hidden" value="${value}" />
       </c:when>
@@ -114,7 +114,8 @@
             <!-- Item is not empty: Create a column element with value for update -->
             <c:otherwise>
               <!-- Visible field: used for user interaction with validations (initialy diabled) -->
-              <input id="${fieldId}" type="${type}" value="${item[field]}" disabled="disabled" />
+              <spring:eval expression="item[field]" scope="request" var="fieldValue" />
+              <input id="${fieldId}" type="${type}" value="${fieldValue}" disabled="disabled" />
             </c:otherwise>
 
           </c:choose>
