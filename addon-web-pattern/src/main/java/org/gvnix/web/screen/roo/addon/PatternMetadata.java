@@ -74,6 +74,7 @@ public class PatternMetadata extends AbstractPatternMetadata
             List<FieldMetadata> controllerFields,
             SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
             SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
+            Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes,
             MetadataService metadataService,
             PropFileOperations propFileOperations, PathResolver pathResolver,
             FileManager fileManager,
@@ -82,7 +83,8 @@ public class PatternMetadata extends AbstractPatternMetadata
                 webScaffoldMetadata, annotationValues, definedPatterns,
                 controllerMethods, controllerFields,
                 relatedApplicationTypeMetadata, typesForPopulate,
-                metadataService, pathResolver, fileManager, dateTypes);
+                relationsDateTypes, metadataService, pathResolver, fileManager,
+                dateTypes);
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
     }

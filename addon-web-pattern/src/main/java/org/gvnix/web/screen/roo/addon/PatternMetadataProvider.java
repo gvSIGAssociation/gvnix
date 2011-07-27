@@ -330,6 +330,9 @@ public final class PatternMetadataProvider extends
                 relatedApplicationTypeMetadata, getTypesForPopulate(
                         metadataIdentificationString,
                         governorPhysicalTypeMetadata, formBackingType,
+                        webMetadataService), getRelationsDateTypePatterns(
+                        metadataIdentificationString,
+                        governorPhysicalTypeMetadata, formBackingType,
                         webMetadataService), metadataService,
                 propFileOperations, projectOperations.getPathResolver(),
                 fileManager, dateTypes);

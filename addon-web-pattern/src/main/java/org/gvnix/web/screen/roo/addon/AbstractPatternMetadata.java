@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -90,6 +91,7 @@ public abstract class AbstractPatternMetadata extends
     private SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata;
     private JavaTypeMetadataDetails javaTypeMetadataHolder;
     private SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate;
+    private Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes;
     private List<MethodMetadata> controllerMethods;
     private List<FieldMetadata> controllerFields;
     private Map<JavaSymbolName, DateTimeFormatDetails> dateTypes;
@@ -109,6 +111,7 @@ public abstract class AbstractPatternMetadata extends
             List<FieldMetadata> controllerFields,
             SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
             SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
+            Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes,
             MetadataService metadataService, PathResolver pathResolver,
             FileManager fileManager,
             Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
@@ -135,6 +138,7 @@ public abstract class AbstractPatternMetadata extends
             filterAleadyPopulatedTypes(typesForPopulate);
         }
         this.typesForPopulate = typesForPopulate;
+        this.relationsDateTypes = relationsDateTypes;
 
         this.metadataService = metadataService;
 
@@ -1135,34 +1139,10 @@ public abstract class AbstractPatternMetadata extends
 
         // May we need to populate some Model Attributes with the data of
         // related entities
-        for (JavaType type : typesForPopulate.keySet()) {
-            JavaTypeMetadataDetails javaTypeMd = typesForPopulate.get(type);
-            JavaTypePersistenceMetadataDetails javaTypePersistenceMd = javaTypeMd
-                    .getPersistenceDetails();
-            if (javaTypePersistenceMd != null
-                    && javaTypePersistenceMd.getFindAllMethod() != null) {
-                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-                        .concat(javaTypeMd.getPlural().toLowerCase())
-                        .concat("\", ")
-                        .concat(type.getNameIncludingTypeParameters(false,
-                                builder.getImportRegistrationResolver()))
-                        .concat(".")
-                        .concat(javaTypePersistenceMd.getFindAllMethod()
-                                .getMethodName().getSymbolName())
-                        .concat("());"));
-            } else if (javaTypeMd.isEnumType()) {
-                JavaType arrays = new JavaType("java.util.Arrays");
-                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-                        .concat(javaTypeMd.getPlural().toLowerCase())
-                        .concat("\", ")
-                        .concat(arrays.getNameIncludingTypeParameters(false,
-                                builder.getImportRegistrationResolver()))
-                        .concat(".asList(")
-                        .concat(type.getNameIncludingTypeParameters(false,
-                                builder.getImportRegistrationResolver()))
-                        .concat(".class.getEnumConstants()));"));
-            }
-        }
+        addBodyLinesPopulatingRelatedEntitiesData(bodyBuilder);
+
+        // Add date validation pattern to model if some date type field exists
+        addBodyLinesRegisteringRelatedEntitiesDateTypesFormat(bodyBuilder);
 
         bodyBuilder.appendFormalLine("return \"".concat(
                 entityNamePlural.toLowerCase()).concat("/\".concat(pattern);"));
@@ -1196,6 +1176,99 @@ public abstract class AbstractPatternMetadata extends
         method = methodBuilder.build();
         controllerMethods.add(method);
         return method;
+    }
+
+    /**
+     * Adds body lines which populates required data for the related entities.
+     * <p>
+     * This lines are like Roo's ModelAttribute methods but registering the
+     * model attributes directly in the method. The model attributes are set
+     * with data (usually Sets) needed by the master related entities.
+     * 
+     * @param bodyBuilder
+     */
+    private void addBodyLinesPopulatingRelatedEntitiesData(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        for (JavaType type : typesForPopulate.keySet()) {
+            JavaTypeMetadataDetails javaTypeMd = typesForPopulate.get(type);
+            JavaTypePersistenceMetadataDetails javaTypePersistenceMd = javaTypeMd
+                    .getPersistenceDetails();
+            if (javaTypePersistenceMd != null
+                    && javaTypePersistenceMd.getFindAllMethod() != null) {
+                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                        .concat(javaTypeMd.getPlural().toLowerCase())
+                        .concat("\", ")
+                        .concat(type.getNameIncludingTypeParameters(false,
+                                builder.getImportRegistrationResolver()))
+                        .concat(".")
+                        .concat(javaTypePersistenceMd.getFindAllMethod()
+                                .getMethodName().getSymbolName())
+                        .concat("());"));
+            } else if (javaTypeMd.isEnumType()) {
+                JavaType arrays = new JavaType("java.util.Arrays");
+                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                        .concat(javaTypeMd.getPlural().toLowerCase())
+                        .concat("\", ")
+                        .concat(arrays.getNameIncludingTypeParameters(false,
+                                builder.getImportRegistrationResolver()))
+                        .concat(".asList(")
+                        .concat(type.getNameIncludingTypeParameters(false,
+                                builder.getImportRegistrationResolver()))
+                        .concat(".class.getEnumConstants()));"));
+            }
+        }
+    }
+
+    /**
+     * Adds body lines registering DateTime formats of the related entities.
+     * <p>
+     * If related entity has DateTime fields, we need to register, as model
+     * attribute, the DateTime format in order to render, validate and send
+     * those fields in the right format. This is similar to the Roo's
+     * DateTimeFormatPatterns helper method.
+     * 
+     * @param bodyBuilder
+     */
+    private void addBodyLinesRegisteringRelatedEntitiesDateTypesFormat(
+            InvocableMemberBodyBuilder bodyBuilder) {
+        for (Entry<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> javaTypeDateTimeFormatDetailsEntry : relationsDateTypes
+                .entrySet()) {
+
+            String relatedEntityName = javaTypeDateTimeFormatDetailsEntry
+                    .getKey().getSimpleTypeName();
+            for (Entry<JavaSymbolName, DateTimeFormatDetails> javaSymbolNameDateTimeFormatDetailsEntry : javaTypeDateTimeFormatDetailsEntry
+                    .getValue().entrySet()) {
+
+                String pattern;
+                if (javaSymbolNameDateTimeFormatDetailsEntry.getValue().pattern != null) {
+                    pattern = "\""
+                            + javaSymbolNameDateTimeFormatDetailsEntry
+                                    .getValue().pattern + "\"";
+                } else {
+                    JavaType dateTimeFormat = new JavaType(
+                            "org.joda.time.format.DateTimeFormat");
+                    String dateTimeFormatSimple = dateTimeFormat
+                            .getNameIncludingTypeParameters(false,
+                                    builder.getImportRegistrationResolver());
+                    JavaType localeContextHolder = new JavaType(
+                            "org.springframework.context.i18n.LocaleContextHolder");
+                    String localeContextHolderSimple = localeContextHolder
+                            .getNameIncludingTypeParameters(false,
+                                    builder.getImportRegistrationResolver());
+                    pattern = dateTimeFormatSimple
+                            + ".patternForStyle(\""
+                            + javaSymbolNameDateTimeFormatDetailsEntry
+                                    .getValue().style + "\", "
+                            + localeContextHolderSimple + ".getLocale())";
+                }
+                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+                        + relatedEntityName
+                        + "_"
+                        + javaSymbolNameDateTimeFormatDetailsEntry.getKey()
+                                .getSymbolName().toLowerCase()
+                        + "_date_format\", " + pattern + ");");
+            }
+        }
     }
 
     enum DialogType {

@@ -20,13 +20,16 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
+import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
@@ -164,55 +167,14 @@ public abstract class AbstractPatternMetadataProvider extends
             String metadataIdentificationString,
             PhysicalTypeMetadata controllerPhysicalTypeMetadata,
             JavaType formBackingType, WebMetadataService webMetadataService) {
-        WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
-                controllerPhysicalTypeMetadata);
-        if (!annotationValues.isAnnotationFound()
-                || annotationValues.getFormBackingObject() == null
-                || controllerPhysicalTypeMetadata.getMemberHoldingTypeDetails() == null) {
-            return null;
-        }
 
-        ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) controllerPhysicalTypeMetadata
-                .getMemberHoldingTypeDetails();
-        Assert.notNull(
-                cid,
-                "Governor failed to provide class type details, in violation of superclass contract");
+        Set<String> fields = getDefinedRelations(metadataIdentificationString,
+                controllerPhysicalTypeMetadata, formBackingType,
+                webMetadataService);
 
-        // Retrieve the fields defined as visible relationships in
-        // GvNIXRelationsPattern
-        AnnotationMetadata gvNixRelationsPatternAnnotation = MemberFindingUtils
-                .getAnnotationOfType(cid.getAnnotations(),
-                        RELATIONS_PATTERN_ANNOTATION);
-        Set<String> fields = new HashSet<String>();
-        if (gvNixRelationsPatternAnnotation != null) {
-            AnnotationAttributeValue<?> relationsPatternValues = gvNixRelationsPatternAnnotation
-                    .getAttribute(RELATIONS_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-
-            if (relationsPatternValues != null) {
-                @SuppressWarnings("unchecked")
-                List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues
-                        .getValue();
-
-                String[] patternDef = {};
-                String[] fieldDefinitions = {};
-                String[] fieldPatternType = {};
-                for (StringAttributeValue strAttrValue : relationsPatternList) {
-                    patternDef = strAttrValue.getValue().split(":");
-                    fieldDefinitions = patternDef[1].trim().split(",");
-                    for (String fieldDef : fieldDefinitions) {
-                        fieldPatternType = fieldDef.trim().split("=");
-                        fields.add(fieldPatternType[0]);
-                    }
-                }
-            }
-        }
-
-        MemberDetails formBackingTypeMemberDetails = webMetadataService
-                .getMemberDetails(formBackingType);
-        List<FieldMetadata> eligibleFields = webMetadataService
-                .getScaffoldEligibleFieldMetadata(formBackingType,
-                        formBackingTypeMemberDetails,
-                        metadataIdentificationString);
+        List<FieldMetadata> eligibleFields = getEligibleFieldsFromJavatType(
+                formBackingType, metadataIdentificationString,
+                webMetadataService);
 
         // We're interested only in those types defined in GvNIXRelationsPattern
         // values
@@ -268,6 +230,129 @@ public abstract class AbstractPatternMetadataProvider extends
         }
 
         return relatedApplicationTypeMetadata;
+    }
+
+    /**
+     * Returns a map with Related entities JavaType as key, and their Map of the
+     * Fields-DateTimeFormatDetails as value.
+     * <p>
+     * We need this data in order to register the right DateTimeFormatPattern of
+     * the related entities in a master/detail pattern.
+     * 
+     * @param metadataIdentificationString
+     * @param controllerPhysicalTypeMetadata
+     * @param formBackingType
+     * @param webMetadataService
+     * @return
+     */
+    protected Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> getRelationsDateTypePatterns(
+            String metadataIdentificationString,
+            PhysicalTypeMetadata controllerPhysicalTypeMetadata,
+            JavaType formBackingType, WebMetadataService webMetadataService) {
+
+        Set<String> fields = getDefinedRelations(metadataIdentificationString,
+                controllerPhysicalTypeMetadata, formBackingType,
+                webMetadataService);
+
+        List<FieldMetadata> eligibleFields = getEligibleFieldsFromJavatType(
+                formBackingType, metadataIdentificationString,
+                webMetadataService);
+
+        // We're interested only in those types defined in GvNIXRelationsPattern
+        // values
+        Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedTypesDatePatterns = new LinkedHashMap<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>>();
+        JavaType interestingFieldType = null;
+        for (FieldMetadata fieldMetadata : eligibleFields) {
+            if (fields.contains(fieldMetadata.getFieldName().getSymbolName())) {
+                interestingFieldType = fieldMetadata.getFieldType();
+                if (interestingFieldType.isCommonCollectionType()
+                        && !interestingFieldType.getParameters().isEmpty()) {
+                    interestingFieldType = interestingFieldType.getParameters()
+                            .get(0);
+                }
+                relatedTypesDatePatterns
+                        .put(interestingFieldType,
+                                webMetadataService
+                                        .getDatePatterns(
+                                                interestingFieldType,
+                                                webMetadataService
+                                                        .getMemberDetails(interestingFieldType),
+                                                metadataIdentificationString));
+            }
+        }
+
+        return relatedTypesDatePatterns;
+    }
+
+    /**
+     * For a given controller and formBackingObject, returns a Set with the
+     * defined related field names. It parses the value of the
+     * GvNIXRelationsPattern annotation.
+     * 
+     * @param metadataIdentificationString
+     * @param controllerPhysicalTypeMetadata
+     * @param formBackingType
+     * @param webMetadataService
+     * @return
+     */
+    private Set<String> getDefinedRelations(
+            String metadataIdentificationString,
+            PhysicalTypeMetadata controllerPhysicalTypeMetadata,
+            JavaType formBackingType, WebMetadataService webMetadataService) {
+        WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
+                controllerPhysicalTypeMetadata);
+        if (!annotationValues.isAnnotationFound()
+                || annotationValues.getFormBackingObject() == null
+                || controllerPhysicalTypeMetadata.getMemberHoldingTypeDetails() == null) {
+            return null;
+        }
+
+        ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) controllerPhysicalTypeMetadata
+                .getMemberHoldingTypeDetails();
+        Assert.notNull(
+                cid,
+                "Governor failed to provide class type details, in violation of superclass contract");
+
+        // Retrieve the fields defined as visible relationships in
+        // GvNIXRelationsPattern
+        AnnotationMetadata gvNixRelationsPatternAnnotation = MemberFindingUtils
+                .getAnnotationOfType(cid.getAnnotations(),
+                        RELATIONS_PATTERN_ANNOTATION);
+        Set<String> fields = new HashSet<String>();
+        if (gvNixRelationsPatternAnnotation != null) {
+            AnnotationAttributeValue<?> relationsPatternValues = gvNixRelationsPatternAnnotation
+                    .getAttribute(RELATIONS_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+
+            if (relationsPatternValues != null) {
+                @SuppressWarnings("unchecked")
+                List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues
+                        .getValue();
+
+                String[] patternDef = {};
+                String[] fieldDefinitions = {};
+                String[] fieldPatternType = {};
+                for (StringAttributeValue strAttrValue : relationsPatternList) {
+                    patternDef = strAttrValue.getValue().split(":");
+                    fieldDefinitions = patternDef[1].trim().split(",");
+                    for (String fieldDef : fieldDefinitions) {
+                        fieldPatternType = fieldDef.trim().split("=");
+                        fields.add(fieldPatternType[0]);
+                    }
+                }
+            }
+        }
+
+        return fields;
+    }
+
+    private List<FieldMetadata> getEligibleFieldsFromJavatType(
+            JavaType javaType, String metadataIdentificationString,
+            WebMetadataService webMetadataService) {
+        MemberDetails javaTypeMemberDetails = webMetadataService
+                .getMemberDetails(javaType);
+
+        return webMetadataService.getScaffoldEligibleFieldMetadata(javaType,
+                javaTypeMemberDetails, metadataIdentificationString);
     }
 
     /**
