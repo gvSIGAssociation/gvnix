@@ -1234,8 +1234,8 @@ public abstract class AbstractPatternMetadata extends
         for (Entry<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> javaTypeDateTimeFormatDetailsEntry : relationsDateTypes
                 .entrySet()) {
 
-            String relatedEntityName = javaTypeDateTimeFormatDetailsEntry
-                    .getKey().getSimpleTypeName();
+            String relatedEntityName = uncapitalize(javaTypeDateTimeFormatDetailsEntry
+                    .getKey().getSimpleTypeName());
             for (Entry<JavaSymbolName, DateTimeFormatDetails> javaSymbolNameDateTimeFormatDetailsEntry : javaTypeDateTimeFormatDetailsEntry
                     .getValue().entrySet()) {
 
