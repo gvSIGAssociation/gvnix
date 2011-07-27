@@ -507,7 +507,7 @@
 
       <para>El enumerado <emphasis>Qualifiers</emphasis> sirve para poder
       decidir de entre dos versiones iguales cual es más nueva basado en su
-      cualificador (ej.: 0.7.0 &gt; 0.7.0-SNAPSHOT. La ausencia de
+      cualificador (ej.: X.Y.Z &gt; X.Y.Z-SNAPSHOT. La ausencia de
       cualificador indica que es una versión RELEASE).</para>
 
       <programlisting xml:id="recetas-actualizacion_versiones-VersionInfo">public class VersionInfo {
@@ -773,24 +773,24 @@ ProjectMetadata#getPropertiesExcludingValue(property)</programlisting>
 
         <orderedlist>
           <listitem>
-            <para>Creamos un proyecto con gvNIX 0.7.0.</para>
+            <para>Creamos un proyecto con gvNIX.</para>
           </listitem>
 
           <listitem>
-            <para>Este proyecto hace uso del add-on Service en su versión
-            0.7.0.</para>
+            <para>Este proyecto hace uso del add-on Service en una versión
+            antigua.</para>
           </listitem>
 
           <listitem>
-            <para>Actualizamos gvNIX a 0.8.0 y abrimos el mismo proyecto con
+            <para>Actualizamos gvNIX a una versión posterior y abrimos el mismo proyecto con
             esta nueva versión de gvNIX. Entonces la dependencia con el add-on
-            Service se actualizará a 0.8.0 (casi seguramente).</para>
+            Service se actualizará a la nueva versión (casi seguramente).</para>
           </listitem>
 
           <listitem>
-            <para>Volvemos a abrir gvNIX 0.7.0 sobre el proyecto. La
+            <para>Volvemos a abrir con un gvNIX antiguo sobre el proyecto. La
             dependencia con el add-on Service debe permanecer con la versión
-            más nueva que es 0.8.0.</para>
+            más nueva.</para>
           </listitem>
         </orderedlist>
 

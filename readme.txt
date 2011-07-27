@@ -113,7 +113,7 @@ Package gvNIX
 
 * Update and commit the appropriate Roo and gvNIX versions (GVNIX_VERSION and ROO_VERSION) at build.sh file.
 
-* Update and commit the appropriate gvNIX version in docbook documentacion at src/site/docbook
+* Update and commit the appropriate gvNIX version in docbook documentacion (releaseinfo property) at src/site/docbook/reference/index.xml
 
 * Create the tag for the gvNIX version we want to build using the following command::
 

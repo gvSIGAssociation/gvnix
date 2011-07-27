@@ -155,20 +155,20 @@ OS name: "linux", version: "2.6.35-28-generic", arch: "amd64", family: "unix"</p
     <orderedlist>
       <listitem>
         <para>Descomprimir el fichero ZIP de la versión de gvNIX, por ejemplo
-        gvNIX-0.7.0.RELEASE.zip</para>
+        gvNIX-X.Y.Z.RELEASE.zip</para>
 
         <itemizedlist>
           <listitem>
             <para>Ejemplo para sistemas *nix y Apple:</para>
 
-            <programlisting>bash:~$ unzip gvNIX-0.7.0.RELEASE.zip</programlisting>
+            <programlisting>bash:~$ unzip gvNIX-X.Y.Z.RELEASE.zip</programlisting>
           </listitem>
         </itemizedlist>
       </listitem>
 
       <listitem>
         <para>Al descomprimir el fichero ZIP se creará un nuevo directorio
-        <emphasis>gvNIX-0.7.0.RELEASE</emphasis>. En el resto del documento nos
+        <emphasis>gvNIX-X.Y.Z.RELEASE</emphasis>. En el resto del documento nos
         referiremos a este directorio como
         <emphasis>GVNIX_HOME</emphasis></para>
       </listitem>
@@ -181,8 +181,8 @@ OS name: "linux", version: "2.6.35-28-generic", arch: "amd64", family: "unix"</p
           <listitem>
             <para>Ejemplo para sistemas Unix y Apple:</para>
 
-            <programlisting>bash:~$ cd gvNIX-0.7.0.RELEASE
-bash:~/gvNIX-0.7.0.RELEASE$ export PATH=$PWD/bin:$PATH</programlisting>
+            <programlisting>bash:~$ cd gvNIX-X.Y.Z.RELEASE
+bash:~/gvNIX-X.Y.Z.RELEASE$ export PATH=$PWD/bin:$PATH</programlisting>
 
             <para>Podemos definir la variable <emphasis>GVNIX_HOME</emphasis>
             en el archivo <emphasis>.bash_devel</emphasis> y así tenerla
@@ -190,7 +190,7 @@ bash:~/gvNIX-0.7.0.RELEASE$ export PATH=$PWD/bin:$PATH</programlisting>
             para que quede como sigue:</para>
 
             <programlisting>...
-export GVNIX_HOME=$HOME/software/java/gvNIX-0.7.0.RELEASE
+export GVNIX_HOME=$HOME/software/java/gvNIX-X.Y.Z.RELEASE
 
 export PATH=$JAVA_HOME/bin:$M2:$GVNIX_HOME/bin:$PATH</programlisting>
 
