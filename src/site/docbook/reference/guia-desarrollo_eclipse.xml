@@ -268,11 +268,11 @@ Created ...</programlisting>
       uso de ambos métodos.</para>
 
       <para xml:lang="es">Ahora se ha de importar al entorno de trabajo
-      mediante <command>File -&gt; Import -&gt; Existing Projects into
-      workSpace</command>. Si aparece el mensaje <emphasis>Turn Weaving
-      Service on?</emphasis>, marca la casilla <emphasis>Don't ask again until
-      next upgrade</emphasis> y clic en <emphasis>Yes</emphasis> (tendrás que
-      reiniciar Eclipse).</para>
+      mediante <command>File -&gt; Import -&gt; General -&gt; Existing
+      Projects into workSpace</command>. Si aparece el mensaje <emphasis>Turn
+      Weaving Service on?</emphasis>, marca la casilla <emphasis>Don't ask
+      again until next upgrade</emphasis> y clic en <emphasis>Yes</emphasis>
+      (tendrás que reiniciar Eclipse).</para>
 
       <para xml:lang="es">También es posible borrar la configuración de
       eclipse ejecutando el comando <command>mvn eclipse:clean</command>. Para
@@ -522,6 +522,30 @@ Created ...</programlisting>
         <listitem>
           <para>Las aplicaciones/modulos a lanzar (admite módulos
           externos).</para>
+        </listitem>
+
+        <listitem>
+          <para>Configuración de arranque del servidor.</para>
+
+          <important>
+            <para>Puede ser interesante modificar los parámetros de memoría
+            con los que trabaja el servidor. Para ello:</para>
+
+            <itemizedlist>
+              <listitem>
+                <para>En la pantalla en la que estamos acceder a
+                <emphasis>Open launch configuration</emphasis></para>
+              </listitem>
+
+              <listitem>
+                <para>En la nueva ventana, en la pestaña
+                <emphasis>Arguments</emphasis> añadir al final del texo que
+                aparece en el apartado <emphasis>VM Arguments</emphasis> lo
+                siguiente: <filename>-Xms64m -Xmx256m -XX:MaxPermSize=128m
+                -XX:PermSize=128m</filename></para>
+              </listitem>
+            </itemizedlist>
+          </important>
         </listitem>
       </itemizedlist>
     </section>
