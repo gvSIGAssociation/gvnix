@@ -552,6 +552,33 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
   <section xml:id="guia-desarrollo_gestion-entidades_definicion_modificar-modelo">
     <title xml:lang="es">Modificar una entidad</title>
 
+    <para xml:lang="es">Si queremos añadir un campo a una entidad existente
+    podemos hacerlo desde la línea de comandos de gvNIX. Cuando estamos
+    trabajando sobre entidades en la línea de comandos, gvNIX se situa en el
+    contexto de la entidad (por eso en el ejemplo de la sección anterior, al
+    añadir campos sobre la entidad PizzaOrder no hace falta especificar en
+    cada comando sobre que entidad estamos trabajando).</para>
+
+    <para xml:lang="es">Para añadir un nuevo campo deberemos usar el mismo
+    comando <emphasis role="bold">field</emphasis> indicando sobre que entidad
+    queremos trabajar mediante el parámetro
+    <emphasis>--class.</emphasis><programlisting>roo&gt; <command>field string --fieldName refCode --notNull --sizeMin 2 --class ~.domain.Pizza</command>
+~.domain.Pizza roo&gt; </programlisting>Notar que tras ejecutar el comando
+    <emphasis>field</emphasis> indicando el parámetro
+    <emphasis>--class</emphasis> nos quedamos en el contexto de la entidad
+    Pizza y por tanto si seguimos ejecutando el comando field sin indicar
+    <emphasis>--class</emphasis> los campos se añadirán a esta entidad.</para>
+
+    <note>
+      <para>También podemos situarnos en el contexto de una entidad (o de
+      cualquier clase del proyecto) mediante el comando <emphasis
+      role="bold">focus</emphasis> indicando el parámetro
+      <emphasis>--class</emphasis>.</para>
+
+      <programlisting>roo&gt; <emphasis role="bold">focus --class ~.domain.Pizza</emphasis>
+~.domain.Pizza roo&gt;</programlisting>
+    </note>
+
     <para xml:lang="es">A diferencia de la creación de entidades, la
     modificación del modelo del dominio sólo puede hacerse utilizando nuestro
     IDE habitual.</para>
