@@ -153,20 +153,22 @@
             // Get update or create button
             var link = dojo.byId('${parentId}_${createOrUpdate}');
             dojo.connect(link, "onclick", function(event) {
-              // Prevent an event's default behavior (e.g., a link from loading a new page)
-              event.preventDefault();
-              var decorate = true;
-              // On update, only apply validations if row selected; on create always apply
-              if ('${createOrUpdate}' == 'update') {
-                var checkbox = dojo.byId('gvnix_checkbox_${secParentId}_${fieldPos}');
-                decorate = checkbox.checked;
-              }
-              if (decorate) {
-                // Get field element to decorate
-                var field = dojo.byId('${fieldId}');
-                // Field keep disabled if required by input attribute
-                field.disabled = ${disabled};
-                Spring.addDecoration(new Spring.ElementDecoration({elementId : '${fieldId}', widgetType : 'dijit.form.ValidationTextBox', widgetAttrs : {promptMessage: '${sec_field_validation}', invalidMessage: '${sec_field_invalid}', required : ${required}, ${sec_validation_regex} missingMessage : '${sec_field_required}' }}));
+              if (!gvNixEditMode) {
+                // Prevent an event's default behavior (e.g., a link from loading a new page)
+                event.preventDefault();
+                var decorate = true;
+                // On update, only apply validations if row selected; on create always apply
+                if ('${createOrUpdate}' == 'update') {
+                  var checkbox = dojo.byId('gvnix_checkbox_${secParentId}_${fieldPos}');
+                  decorate = checkbox.checked;
+                }
+                if (decorate) {
+                  // Get field element to decorate
+                  var field = dojo.byId('${fieldId}');
+                  // Field keep disabled if required by input attribute
+                  field.disabled = ${disabled};
+                  Spring.addDecoration(new Spring.ElementDecoration({elementId : '${fieldId}', widgetType : 'dijit.form.ValidationTextBox', widgetAttrs : {promptMessage: '${sec_field_validation}', invalidMessage: '${sec_field_invalid}', required : ${required}, ${sec_validation_regex} missingMessage : '${sec_field_required}' }}));
+                }
               }
             });
           }

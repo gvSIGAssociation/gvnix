@@ -268,8 +268,18 @@ function gvnix_copy_values(element) {
  * Enable update form if any row selected
  */
 function gvnix_edit_ward(element) {
-  if ( gvnix_any_selected(element) ) {
+  if ( gvnix_any_selected(element) && !gvNixEditMode ) {
       gvNixChangesControl();
       gvnix_edit(element);
+  }
+}
+
+/*
+ * Enable create form if we're not in edit mode
+ */
+function gvnix_create_ward(element) {
+  if ( !gvNixEditMode ) {
+      gvNixChangesControl();
+      gvnix_create(element);
   }
 }

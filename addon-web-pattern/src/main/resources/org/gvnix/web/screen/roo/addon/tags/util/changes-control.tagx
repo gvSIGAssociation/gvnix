@@ -20,6 +20,8 @@
   <script type="text/javascript"><![CDATA[
   dojo.require("dijit.Dialog");
 
+  gvNixEditMode = false;
+
   function gvNixChangesControl() {
     // all <A> elements
     dojo.query("A").forEach(
@@ -47,6 +49,7 @@
         });
       }
     );
+    gvNixEditMode = true;
     return true;
   }
 
