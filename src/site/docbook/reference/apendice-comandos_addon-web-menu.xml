@@ -153,7 +153,9 @@
             <para><emphasis>[Requerido si no se especifica <emphasis
             role="bold">messageCode</emphasis>]</emphasis></para>
 
-            <para>Cadena a mostrar en el elemento de menú.</para>
+            <para>Cadena a mostrar en el elemento de menú. Valor que toma la
+            propiedad <emphasis>"Label Code"</emphasis> en el archivo
+            i18n.</para>
           </listitem>
         </varlistentry>
 
@@ -166,7 +168,9 @@
 
             <para>Identificado del la cadena a mostrar en el elemento de menú.
             El identificador debe estar declarado en los ficheros de
-            internacionalización de la aplicación.</para>
+            internacionalización de la aplicación. Toma preferencia sobre el
+            atributo <emphasis>--label</emphasis> (si está definido, se
+            muestra este el valor de este propiedad).</para>
           </listitem>
         </varlistentry>
 
@@ -361,7 +365,9 @@
           <listitem>
             <para><emphasis>[Opcional]</emphasis></para>
 
-            <para>Cadena a mostrar en el elemento de menú.</para>
+            <para>Cadena a mostrar en el elemento de menú. Valor que toma la
+            propiedad <emphasis>"Label Code"</emphasis> en el archivo
+            i18n.</para>
           </listitem>
         </varlistentry>
 
@@ -462,7 +468,7 @@ Children     :
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-list">
-    <title xml:lang="es">page list</title>
+    <title xml:lang="es">menu tree</title>
 
     <para xml:lang="es">Muestra por consola una lista con las páginas
     registradas a partir de un elemento del menú.</para>
@@ -488,7 +494,8 @@ Children     :
             [booleano]</emphasis></para>
 
             <para>Añadir información del valor <varname>label</varname> a los
-            elementos del listado.</para>
+            elementos del listado. Valor que toma la propiedad
+            <emphasis>"Label Code"</emphasis> en el archivo i18n.</para>
           </listitem>
         </varlistentry>
 
