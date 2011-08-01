@@ -27,7 +27,6 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MetadataUtils;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
@@ -142,13 +141,11 @@ public final class ModalDialogMetadataProvider extends
         if (controllerDetails == null) {
             return null;
         }
-        // Test if has the @RooWebScaffold
-        Assert.notNull(
-                MemberFindingUtils.getAnnotationOfType(controllerDetails
-                        .getAnnotations(),
-                        new JavaType(RooWebScaffold.class.getName())),
-                aspectName.getSimpleTypeName().concat(
-                        " has not @RooWebScaffold annotation"));
+        // Test if has the @Controller
+        Assert.notNull(MemberFindingUtils.getAnnotationOfType(controllerDetails
+                .getAnnotations(), new JavaType(
+                "org.springframework.stereotype.Controller")), aspectName
+                .getSimpleTypeName().concat(" has not @Controller annotation"));
 
         // Test if the annotation already exists on the target type
         AnnotationMetadata annotationMetadata = MemberFindingUtils

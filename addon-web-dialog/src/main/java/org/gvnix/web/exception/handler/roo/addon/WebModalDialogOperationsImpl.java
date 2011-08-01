@@ -43,7 +43,6 @@ import org.gvnix.support.OperationUtils;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
-import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
@@ -178,13 +177,11 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         MutableClassOrInterfaceTypeDetails controllerDetails = MetadataUtils
                 .getPhysicalTypeDetails(controllerClass, metadataService,
                         physicalTypeMetadataProvider);
-        // Test if has the @RooWebScaffold
-        Assert.notNull(
-                MemberFindingUtils.getAnnotationOfType(controllerDetails
-                        .getAnnotations(),
-                        new JavaType(RooWebScaffold.class.getName())),
-                controllerClass.getSimpleTypeName().concat(
-                        " has not @RooWebScaffold annotation"));
+        // Test if has the @Controller
+        Assert.notNull(MemberFindingUtils.getAnnotationOfType(controllerDetails
+                .getAnnotations(), new JavaType(
+                "org.springframework.stereotype.Controller")), controllerClass
+                .getSimpleTypeName().concat(" has not @Controller annotation"));
 
         // Test if the annotation already exists on the target type
         AnnotationMetadata annotationMetadata = MemberFindingUtils
