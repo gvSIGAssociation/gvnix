@@ -205,6 +205,9 @@ public class WscitAuthenticationProvider extends
 		user.setEnabled(true);// Status info
 
 		ModuloStruct[] modulos = userFromWS.getModulos();
+    	if (modulos == null) {
+	      	throw new BadCredentialsException(" El usuario proporcionado no tiene módulos asignados");
+	    }
 		Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>(
 				modulos.length);
 
