@@ -10,6 +10,7 @@
   <jsp:directive.attribute name="versionField" type="java.lang.String" required="false" rtexprvalue="true" description="Specify the field name of the version field (default 'version'). If specified 'none' the version field will not be inlcuded (versionField='none')." />
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="openPane" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Control if the title pane is opened or closed by default (default: true)" />
+  <jsp:directive.attribute name="finder" type="java.lang.String" required="false" rtexprvalue="true" description="Specify the finder to invoque in panel-tab search if exist." />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <!-- gvNIX added attributes not included into Roo by default -->
@@ -45,7 +46,14 @@
     <spring:message arguments="${typeName}" code="entity_list_all" var="entity_relations"/>
     <spring:url value="${path}" var="listUrl" />
     <util:panel-tabs>
-      <util:panel-tab active="${true}" id="${id}" title="${entity_relations}" type="list"/>
+        <c:if test="${not empty finder}">
+          <spring:url value="${path}" var="buscarUrl">
+            <spring:param name="find" value="${finder}"/>
+            <spring:param name="form"/>
+          </spring:url>
+          <util:panel-tab id="finder_${id}" title="${entity_find}" url="${finderUrl}" type="search"/>
+        </c:if>
+        <util:panel-tab active="${true}" id="edit_${id}" title="${entity_relations}" type="list"/>
     </util:panel-tabs>
 
     <c:if test="${empty label}">

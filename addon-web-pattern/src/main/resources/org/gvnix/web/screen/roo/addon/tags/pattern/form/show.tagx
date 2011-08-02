@@ -11,6 +11,7 @@
   <jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this object, will default to a message bundle if not supplied" />
   <jsp:directive.attribute name="render" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Indicate if the contents of this tag and all enclosed tags should be rendered (default 'true')" />
   <jsp:directive.attribute name="openPane" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Control if the title pane is opened or closed by default (default: true)" />
+  <jsp:directive.attribute name="finder" type="java.lang.String" required="false" rtexprvalue="true" description="Specify the finder to invoque in panel-tab search if exist." />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <c:if test="${empty render or render}">
@@ -34,13 +35,6 @@
       <c:set var="delete" value="true" />
     </c:if>
 
-    <!-- TODO Integrate finders -->
-    <!-- URL for tab Buscar -->
-    <spring:url value="${path}" var="buscarUrl">
-      <spring:param name="find" value="ByReferencia"/>
-      <spring:param name="form"/>
-    </spring:url>
-
     <!-- Locate i18n for entity name -->
     <c:set var="entityCanonicalName" value="${fn:substringAfter(fn:toLowerCase(id), 'ps_')}" />
     <c:set var="entitySimpleName" value="${fn:toLowerCase(fn:split(id,'_')[fn:length(fn:split(id,'_')) - 1])}" />
@@ -57,34 +51,19 @@
 
       <!-- Right side tabs -->
       <util:panel-tabs>
-        <util:panel-tab id="buscar" title="${find_entity}" type="search" url="${buscarUrl}"/>
-        <util:panel-tab active="${true}" id="editar" title="${show_entity}" type="edit"/>
+        <c:if test="${not empty finder}">
+          <spring:url value="${path}" var="finderUrl">
+            <spring:param name="find" value="${finder}"/>
+            <spring:param name="form"/>
+          </spring:url>
+          <util:panel-tab id="finder_${id}" title="${entity_find}" url="${finderUrl}" type="search"/>
+        </c:if>
+        <util:panel-tab active="${true}" id="edit_${id}" title="${show_entity}" type="edit"/>
       </util:panel-tabs>
 
       <spring:message arguments="${label}" code="entity_show" var="title_msg" htmlEscape="false" />
       <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
         <div class="quicklinks">
-          <span>
-            <c:if test="${delete}">
-
-              <spring:url value="${path}/${itemId}" var="delete_form_url" htmlEscape="false">
-                <c:if test="${not empty param.gvnixpattern}">
-                  <spring:param name="gvnixpattern" value="${param.gvnixpattern}" />
-                </c:if>
-              </spring:url>
-
-              <spring:url value="/resources/images/delete.png" var="delete_image_url" />
-              <form:form action="${fn:escapeXml(delete_form_url)}" method="DELETE">
-                <spring:message arguments="${typeName}" code="entity_delete" var="delete_label" htmlEscape="false" />
-                <c:set var="delete_confirm_msg">
-                  <spring:escapeBody javaScriptEscape="true">
-                    <spring:message code="entity_delete_confirm" />
-                  </spring:escapeBody>
-                </c:set>
-                <input alt="${fn:escapeXml(delete_label)}" class="image" src="${fn:escapeXml(delete_image_url)}" title="${fn:escapeXml(delete_label)}" type="image" value="${fn:escapeXml(delete_label)}" onclick="return confirm('${fn:escapeXml(delete_confirm_msg)}');" />
-              </form:form>
-            </c:if>
-          </span>
           <span>
             <c:if test="${update}">
 
@@ -120,6 +99,27 @@
               <a href="${fn:escapeXml(create_form_url)}" alt="${fn:escapeXml(create_label)}" title="${fn:escapeXml(create_label)}">
                 <img alt="${fn:escapeXml(create_label)}" class="image" src="${fn:escapeXml(create_image_url)}" title="${fn:escapeXml(create_label)}" />
               </a>
+            </c:if>
+          </span>
+          <span>
+            <c:if test="${delete}">
+
+              <spring:url value="${path}/${itemId}" var="delete_form_url" htmlEscape="false">
+                <c:if test="${not empty param.gvnixpattern}">
+                  <spring:param name="gvnixpattern" value="${param.gvnixpattern}" />
+                </c:if>
+              </spring:url>
+
+              <spring:url value="/resources/images/delete.png" var="delete_image_url" />
+              <form:form action="${fn:escapeXml(delete_form_url)}" method="DELETE">
+                <spring:message arguments="${typeName}" code="entity_delete" var="delete_label" htmlEscape="false" />
+                <c:set var="delete_confirm_msg">
+                  <spring:escapeBody javaScriptEscape="true">
+                    <spring:message code="entity_delete_confirm" />
+                  </spring:escapeBody>
+                </c:set>
+                <input alt="${fn:escapeXml(delete_label)}" class="image" src="${fn:escapeXml(delete_image_url)}" title="${fn:escapeXml(delete_label)}" type="image" value="${fn:escapeXml(delete_label)}" onclick="return confirm('${fn:escapeXml(delete_confirm_msg)}');" />
+              </form:form>
             </c:if>
           </span>
           <span>
