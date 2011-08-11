@@ -77,7 +77,7 @@
       <div id="${secId}" class="patternContentPane">
 
         <!-- Make available the control to avoid changes when gvNixChangesControl() is called -->
-        <util:changes-control active="false"/>
+        <util:changes-control id="${secId}" active="false"/>
 
         <c:set var="rowStylePrefix" value="gvNixTableRow ${secId}_row_" scope="request" />
         <c:set var="colStylePrefix" value="gvNixTableData ${secId}_col_" scope="request" />
@@ -197,7 +197,7 @@
               <div class="submit">
 
                 <!-- Update layer: not visible by default and and activated by javascript gvnix_edit() function -->
-                <div id="gvnix_control_update" style="display: none;">
+                <div id="gvnix_control_update_${secId}" style="display: none;">
                   <span class="warning">
                     <spring:url value="/resources/images/pattern/enEdicion.gif" var="imgUrl" />
                     <img alt="" src="${fn:escapeXml(imgUrl)}" title="" />
@@ -206,22 +206,22 @@
                   <spring:message code="button_cancel" var="cancel_button" htmlEscape="false"/>
 
                   <!-- Validate fields on save button and submit if all ok -->
-                  <script type="text/javascript">Spring.addDecoration(new Spring.ValidateAllDecoration({elementId:'gvnix_control_update_save', event:'onclick'}));</script>
+                  <script type="text/javascript">Spring.addDecoration(new Spring.ValidateAllDecoration({elementId:'gvnix_control_update_save_${secId}', event:'onclick'}));</script>
 
-                  <input type="button" id="gvnix_control_update_cancel" value="${fn:escapeXml(cancel_button)}" onclick="location.href = '${currentUrl}';" class="button_cancel" />
-                  <input type="button" id="gvnix_control_update_save" value="${fn:escapeXml(save_button)}" onclick="gvnix_update('${secId}');" class="button_save" />
+                  <input type="button" id="gvnix_control_update_cancel_${secId}" value="${fn:escapeXml(cancel_button)}" onclick="location.href = '${currentUrl}';" class="button_cancel" />
+                  <input type="button" id="gvnix_control_update_save_${secId}" value="${fn:escapeXml(save_button)}" onclick="gvnix_update('${secId}');" class="button_save" />
                 </div>
 
                 <!-- Add layer: not visible by default and and activated by javascript gvnix_create() function -->
-                <div id="gvnix_control_add" style="display: none;">
+                <div id="gvnix_control_add_${secId}" style="display: none;">
                   <span class="warning">
                     <spring:url value="/resources/images/pattern/enEdicion.gif" var="imgUrl" />
                     <img alt="" src="${fn:escapeXml(imgUrl)}" title="" />
                   </span>
                   <spring:message code="button_save" var="save_button" htmlEscape="false"/>
                   <spring:message code="button_cancel" var="cancel_button" htmlEscape="false"/>
-                  <input type="button" id="gvnix_control_add_cancel" value="${fn:escapeXml(cancel_button)}" onclick="location.href = '${currentUrl}';" class="button_cancel" />
-                  <input type="button" id="gvnix_control_add_save" value="${fn:escapeXml(save_button)}" onclick="gvnix_add('${secId}');" class="button_save" />
+                  <input type="button" id="gvnix_control_add_cancel_${secId}" value="${fn:escapeXml(cancel_button)}" onclick="location.href = '${currentUrl}';" class="button_cancel" />
+                  <input type="button" id="gvnix_control_add_save_${secId}" value="${fn:escapeXml(save_button)}" onclick="gvnix_add('${secId}', '${compositePkField}');" class="button_save" />
                 </div>
 
               </div>

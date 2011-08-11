@@ -8,14 +8,15 @@
   -->
   <jsp:output omit-xml-declaration="yes" />
 
-  <jsp:directive.attribute name="active" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Active changes control inmediately after page load (default 'true')" />
+  <jsp:directive.attribute name="id" type="java.lang.String" required="false" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute description="Active changes control inmediately after page load (default 'true')" name="active" required="false" rtexprvalue="true" type="java.lang.Boolean"/>
 
   <!-- Set default values -->
   <c:if test="${empty active}">
     <c:set var="active" value="${true}" />
   </c:if>
 
-  <dialog:message-box id="PendingChangesMsgBox" show="${false}" code="message_pending_changes_problemdescription" />
+  <dialog:message-box code="message_pending_changes_problemdescription" id="PendingChangesMsgBox_${id}" show="${false}"/>
 
   <script type="text/javascript"><![CDATA[
   dojo.require("dijit.Dialog");
@@ -40,9 +41,9 @@
 
           // note the message box was created by message-box tag, so we only
           // have to render it
-          var divChangesControl = dojo.byId('PendingChangesMsgBox');
+          var divChangesControl = dojo.byId('PendingChangesMsgBox_${id}');
           if (dojo.hasClass(divChangesControl, "MessageBoxDialog")) {
-            dijit.byId('PendingChangesMsgBox').show();
+            dijit.byId('PendingChangesMsgBox_${id}').show();
           } else {
             dojo.style(divChangesControl, 'display', 'block');
           }

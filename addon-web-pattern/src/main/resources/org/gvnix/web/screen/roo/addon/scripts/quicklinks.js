@@ -141,7 +141,7 @@ function gvnix_edit(element) {
 
     // Make visible the update confirmation controls
     if (any == true) {
-        var controlUpdateDiv = dojo.byId('gvnix_control_update');
+        var controlUpdateDiv = dojo.byId('gvnix_control_update_'+element);
         controlUpdateDiv.style.display = "block";
     }
 }
@@ -159,7 +159,7 @@ function gvnix_create(element) {
     });
 
     // Make visible the create confirmation controls
-    var controlAddDiv = dojo.byId('gvnix_control_add');
+    var controlAddDiv = dojo.byId('gvnix_control_add_'+element);
     controlAddDiv.style.display = "block";
 
     // Fix element height adding 137px to its previous height definition
