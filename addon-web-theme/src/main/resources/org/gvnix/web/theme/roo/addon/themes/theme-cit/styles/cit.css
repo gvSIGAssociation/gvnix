@@ -837,7 +837,7 @@ padding-left: 17px;
 .tundra .dijitTitlePaneContentInner { 
 	padding: 5px 0 0;
 	border: 1px solid #BFBFBF;
-	height: auto;/*!important*/
+	height: 500px;/*!important*/
 	}
 
 .tundra .dijitTitlePaneTitle {
