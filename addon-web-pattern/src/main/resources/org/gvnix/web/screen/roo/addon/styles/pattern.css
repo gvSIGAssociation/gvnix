@@ -155,6 +155,11 @@ li.size170 .dijitTextBox { width: 170px;}
 li.size300 .dijitTextBox { width: 300px;}
 li.size400 .dijitTextBox { width: 400px;}
 li.size500 .dijitTextBox { width: 500px;}
+li.size675 .dijitTextBox { width: 675px;}
+li.height25 .dijitTextBox { height: 25px;}
+li.height40 .dijitTextBox { height: 40px;}
+li.height50 .dijitTextBox { height: 50px;}
+li.height100 .dijitTextBox { height: 100px;}
 
 /* textarea */
 
@@ -179,6 +184,11 @@ li.size170 .box { width: 170px;}
 li.size300 .box { width: 300px;}
 li.size400 .box { width: 400px;}
 li.size500 .box { width: 500px;}
+li.size675 .box { width: 675px;}
+li.height25 .box { height: 25px;}
+li.height40 .box { height: 40px;}
+li.height50 .box { height: 50px;}
+li.height100 .box { height: 100px;}
 
 li.size40 .boxNoedit { width: 40px;}
 li.size80 .boxNoedit { width: 80px;}
@@ -187,6 +197,11 @@ li.size170 .boxNoedit { width: 140px;}
 li.size300 .boxNoedit { width: 300px;}
 li.size400 .boxNoedit { width: 400px;}
 li.size500 .boxNoedit { width: 500px;}
+li.size675 .boxNoedit { width: 675px;}
+li.height25 .boxNoedit { height: 25px;}
+li.height40 .boxNoedit { height: 40px;}
+li.height50 .boxNoedit { height: 50px;}
+li.height100 .boxNoedit { height: 100px;}
 
 li.size40 .boxDisabled { width: 40px;}
 li.size120 .boxDisabled { width: 120px;}
@@ -194,6 +209,11 @@ li.size170 .boxDisabled { width: 170px;}
 li.size300 .boxDisabled { width: 300px;}
 li.size400 .boxDisabled { width: 400px;}
 li.size500 .boxDisabled { width: 500px;}
+li.size675 .boxDisabled { width: 675px;}
+li.height25 .boxDisabled { height: 25px;}
+li.height40 .boxDisabled { height: 40px;}
+li.height50 .boxDisabled { height: 50px;}
+li.height100 .boxDisabled { height: 100px;}
 
 
 .dijitTextBox {
