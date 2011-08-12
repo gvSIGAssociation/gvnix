@@ -30,7 +30,7 @@
        <spring:url var="imgUrl" value="/resources/images/delete.png" />
      </c:when>
      <c:when test="${type eq 'reset'}">
-       <spring:url var="imgUrl" value="/resources/images/refresh.gif" />
+       <spring:url var="imgUrl" value="/resources/images/pattern/refresh.gif" />
      </c:when>
      <c:otherwise>
        <spring:url var="imgUrl" value="/resources/images/quicklink.png" />

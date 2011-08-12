@@ -63,14 +63,16 @@
     <util:panel id="${secId}" title="${title_msg}" openPane="${openPane}">
 
       <!-- Show quick links to make available actions over table rows (create, update, delete, ...) -->
-      <spring:message code="entity_delete" arguments="${typeName}" var="delete_entity" htmlEscape="false"/>
-      <spring:message code="entity_delete_confirm" var="delete_confirm_msg" htmlEscape="false"/>
+      <spring:message code="entity_delete" arguments="${typeName}" var="delete_label" htmlEscape="false"/>
+      <spring:message code="entity_delete_confirm" var="delete_confirm_label" htmlEscape="false"/>
       <spring:message code="entity_create" arguments="${typeName}" var="create_label" />
       <spring:message code="entity_update" arguments="${typeName}" var="update_label" />
+      <spring:message code="entity_reset" arguments="${typeName}" var="reset_label" />
       <util:quicklinks id="${id}">
         <util:quicklink id="${id}_create" label="${create_label}" type="CREATE" onclick="gvnix_create_ward('${secId}');" />
         <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="gvnix_edit_ward('${secId}');" />
-        <util:quicklink id="${id}_delete" label="${delete_entity}" type="DELETE" onclick="gvnix_delete_confirm('${delete_confirm_msg}', '${secId}');" />
+        <util:quicklink id="${id}_delete" label="${delete_label}" type="DELETE" onclick="gvnix_delete_confirm('${delete_confirm_label}', '${secId}');" />
+        <util:quicklink id="${id}_reset" label="${reset_label}" type="RESET" />
       </util:quicklinks>
 
       <!-- Global layer for this entity table -->
