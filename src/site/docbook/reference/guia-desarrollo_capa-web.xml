@@ -38,35 +38,25 @@
     <title xml:lang="es">Crear la capa web con el intérprete de
     comandos</title>
 
-    <!--
-
-      <para xml:lang="es">Para crear los controllers, al igual que las
-      entidades, tenemos la opción de crearlos a mano además de unos comandos
-      que nos aporta el framework.</para>
-
-      <section xml:id="guia-desarrollo_web_definir-controller_usando-comandos">
-        <title xml:lang="es">Crear controller usando comandos</title>
--->
-
     <para xml:lang="es">Desde el intérprete de comandos podemos crear la capa
-    web de forma sencilla, con los tres comandos siguientes:</para>
+    web de forma sencilla, con los comandos siguientes:</para>
 
     <itemizedlist>
       <listitem>
-        <para><command>controller scaffold</command></para>
+        <para><command>web mvc scaffold</command></para>
       </listitem>
 
       <listitem>
-        <para><command>controller all</command></para>
+        <para><command>web mvc all</command></para>
       </listitem>
 
       <listitem>
-        <para><command>controller class</command></para>
+        <para><command>web mvc controller</command></para>
       </listitem>
     </itemizedlist>
 
     <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-scaffold">
-      <title>controller scaffold</title>
+      <title>web mvc scaffold</title>
 
       <para xml:lang="es">Este comando crear un controlador con el CRUDS de
       entidad especifica. No hay restricciones para crear varios controllers
@@ -102,7 +92,7 @@
         </varlistentry>
 
         <varlistentry>
-          <term xml:lang="es">--entity</term>
+          <term xml:lang="es">--backingType</term>
 
           <listitem>
             <para xml:lang="es">Nombre de la clase Entidad que manejará el
@@ -133,11 +123,11 @@
     </section>
 
     <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-scafold">
-      <title>controller all</title>
+      <title>web mvc all</title>
 
       <para xml:lang="es">Este comando ejecuta un <link
-      linkend="guia-desarrollo_web_definir-controller_comandos_controller-scaffold">controller
-      scaffold</link> para cada una de las entidades registradas en la
+      linkend="guia-desarrollo_web_definir-controller_comandos_controller-scaffold">web
+      mvc scaffold</link> para cada una de las entidades registradas en la
       aplicación.</para>
 
       <para xml:lang="es">Los parámetros para este comando son:</para>
@@ -155,7 +145,7 @@
     </section>
 
     <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-class">
-      <title>controller class</title>
+      <title>web mvc controller</title>
 
       <para xml:lang="es">Este comando permite crear un controller plantilla
       no vinculado a ninguna entidad en concreto para su implementación
@@ -187,7 +177,7 @@
 
       <para>Un ejemplo:</para>
 
-      <programlisting>roo&gt; <command>controller class --class ~.web.MyController</command></programlisting>
+      <programlisting>roo&gt; <command>web mvc controller --class ~.web.MyController</command></programlisting>
 
       <para>Genera una clase como esta:</para>
 
@@ -255,7 +245,7 @@ public class MyController {
       secuencia de comandos:</para>
 
       <programlisting>
-~.domain.PizzaOrder roo&gt; <command>controller all --package ~.web</command></programlisting>
+~.domain.PizzaOrder roo&gt; <command>web mvc all --package ~.web</command></programlisting>
     </section>
   </section>
 
