@@ -15,7 +15,6 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffold
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
@@ -54,9 +53,6 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
 
     @Reference
     ProjectOperations projectOperations;
-
-    @Reference
-    PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
     @Reference
     PropFileOperations propFileOperations;

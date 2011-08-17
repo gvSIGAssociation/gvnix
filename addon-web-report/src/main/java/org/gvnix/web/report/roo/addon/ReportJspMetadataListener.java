@@ -106,7 +106,7 @@ public final class ReportJspMetadataListener implements MetadataProvider,
                 path);
         ReportMetadata reportMetadata = (ReportMetadata) metadataService
                 .get(reportMetadataKey);
-        if (reportMetadata == null | !reportMetadata.isValid()) {
+        if (reportMetadata == null || !reportMetadata.isValid()) {
             return null;
         }
 
