@@ -400,7 +400,7 @@ public String update(@Valid Owner owner, BindingResult bindingResult, Model uiMo
 }</programlisting>
 
             <para>Se ha resaltado en negrita la parte específica para definir
-            el díalogo modal.</para>
+            el diálogo modal.</para>
 
             <para>El HashMap <emphasis>dialogParams</emphasis> nos permite
             pasar al componente message-box.tagx más información para
@@ -411,7 +411,7 @@ public String update(@Valid Owner owner, BindingResult bindingResult, Model uiMo
             del Modelo de nuestra aplicación o listas de objetos. En la
             llamada al método confirgopets vemos que un parámetro indica que
             se usará la página jspx que nos ha creado el add-on y que se pasa
-            el HashMap con los parámetros para el díalogo.</para>
+            el HashMap con los parámetros para el diálogo.</para>
           </listitem>
 
           <listitem>
@@ -439,17 +439,17 @@ public String update(@Valid Owner owner, BindingResult bindingResult, Model uiMo
 &lt;/div&gt;</programlisting>
 
             <para>En este caso hemos resaltado el accesso al HashMap de
-            parámetros del díalogo (dialogParams) para mostrar como extraer
-            los datos que hemos querido que le llegaran al díalogo.</para>
+            parámetros del diálogo (dialogParams) para mostrar como extraer
+            los datos que hemos querido que le llegaran al diálogo.</para>
           </listitem>
         </orderedlist>
       </section>
 
       <section>
-        <title>Díalogo modal con formulario</title>
+        <title>Diálogo modal con formulario</title>
 
         <para>En alguna ocasión podemos necesitar mostrar un formulario en un
-        díalogo modal para solicitar información al usuario, siguiendo el
+        diálogo modal para solicitar información al usuario, siguiendo el
         ejemplo anterior, podríamos modificar la jspx que nos crea el add-on
         para incluir un formulario. En este ejemplo, tras crear un nuevo Owner
         en nuestra aplicación, le mostraremos un formulario para que cree su
