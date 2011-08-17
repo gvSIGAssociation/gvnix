@@ -232,8 +232,8 @@
     <title>Nuevos diálogos modales</title>
 
     <para>Mediante el componente visual <emphasis>message-box.tagx</emphasis>
-    que instala este add-on es posible mostrar en pantalla un diálogo modal.
-    </para>
+    que instala este add-on es posible mostrar en pantalla un diálogo
+    modal.</para>
 
     <para>Para tener esta funcionalidad se debe ejecutar el comando <link
     linkend="apendice-comandos_addon-web-exception-handler_dialog-setup">web
@@ -320,7 +320,204 @@
     <section>
       <title>Ejemplos de dialogos personalizados</title>
 
-      <para>TODO</para>
+      <para>Con este nuevo soporte para crear diálogos modales gvNIX nos
+      ofrece una gran libertad para maquetar multitud de mensajes de usuario o
+      diálogos de la aplicación (avisos, errores, mensajes de confirmación,
+      formularios ...).</para>
+
+      <para>Aquí vamos a ofrecer una pequeña guía para implementar alguna de
+      estos mensajes personalizados.</para>
+
+      <section>
+        <title>Mensaje de aviso de aplicación</title>
+
+        <para>En ocasiones podemos necesitar que tras una acción (una
+        petición) se muestre en la respuesta algún mensaje a cerca del
+        resultado de la operación solicitada o, en el caso de pantallas de
+        búsqueda, indicar que no se han encontrado resultados.</para>
+
+        <para>Con el soporte de este add-on podemos incluir la siguiente línea
+        de código en cualquier punto de un método de un controlador para
+        definir un mensaje informativo.</para>
+
+        <programlisting>modalDialog(DialogType.Info, "message_info_title", "message_description_key", httpServletRequest);</programlisting>
+
+        <para>Este caso es el mismo que se ha comentado anteriormente.</para>
+      </section>
+
+      <section>
+        <title>Mensaje de confirmación</title>
+
+        <para>Tal vez queramos que tras una acción, la apliacación nos
+        pregunte si queremos ir a una página en concreto. A continuación
+        veamos cuales son los pasos y cambios en el código de un controller
+        para definir este mensaje de confirmación.</para>
+
+        <para>En el ejemplo, vamos a añadir a la aplicación Pet Clinic un
+        mensaje de cofirmación que preguntará al usuario si quiere ir al
+        formulario de mascotas (Pets) tras actualizar la información de un
+        propietario (Owner).</para>
+
+        <orderedlist>
+          <listitem>
+            <para>Añadir un diálogo modal a la apliacaión mediante
+            "<emphasis>web mvc dialog message add</emphasis>"</para>
+
+            <programlisting>web mvc dialog message add --class ~.web.OwnerController --name confirmgopets</programlisting>
+
+            <para>Esto nos genera un método <emphasis>confirmgopets</emphasis>
+            disponible en <emphasis>OwnerController</emphasis> y una jspx base
+            llamada <emphasis>confirmgopets</emphasis> en
+            <emphasis>WEB-INF/dialogs</emphasis> que personalizaremos.</para>
+          </listitem>
+
+          <listitem>
+            <para>Modificamos el método <emphasis>update</emphasis> de
+            <emphasis>OwnerController</emphasis> para añadir la llamada al
+            método <emphasis>confirmgopets</emphasis> justo antes de la línea
+            de <emphasis>return</emphasis>. Para ello deberemos llevar el
+            método <emphasis>update</emphasis> desde
+            <emphasis>OwnerController_Roo_Controller.aj</emphasis> hasta
+            <emphasis>OwnerController.java</emphasis>, podemos usar la opción
+            Push-in que nos ofrece Eclipse. Una vez movido el método, lo
+            modificamos quedando así:</para>
+
+            <programlisting>@RequestMapping(method = RequestMethod.PUT)
+public String update(@Valid Owner owner, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
+    if (bindingResult.hasErrors()) {
+        uiModel.addAttribute("owner", owner);
+        addDateTimeFormatPatterns(uiModel);
+        return "owners/update";
+    }
+    uiModel.asMap().clear();
+    owner.merge();
+
+    <emphasis role="bold">HashMap&lt;String, Object&gt; dialogParams = new HashMap&lt;String, Object&gt;();
+    dialogParams.put("petsFormLink", "/pets?form");
+    confirmgopets(DialogType.Info, "/WEB-INF/views/owners/confirmgopets.jspx", "message_confirm_action_title", "message_confirm_action_desc", dialogParams, httpServletRequest);</emphasis>
+
+    return "redirect:/owners/" + encodeUrlPathSegment(owner.getId().toString(), httpServletRequest);
+}</programlisting>
+
+            <para>Se ha resaltado en negrita la parte específica para definir
+            el díalogo modal.</para>
+
+            <para>El HashMap <emphasis>dialogParams</emphasis> nos permite
+            pasar al componente message-box.tagx más información para
+            mostrarla, o usarla, como necesitemos. En este caso, necesitamos
+            indicar a qué página dirigir al usuario en caso de que responda
+            afirmativamente a la pregunta de confirmación, pero podríamos
+            definir cualquier tipo de parámetro, desde un String hasta objetos
+            del Modelo de nuestra aplicación o listas de objetos. En la
+            llamada al método confirgopets vemos que un parámetro indica que
+            se usará la página jspx que nos ha creado el add-on y que se pasa
+            el HashMap con los parámetros para el díalogo.</para>
+          </listitem>
+
+          <listitem>
+            <para>Modificamos la jspx que nos ha creado el add-on
+            (confirmgopets.jspx) para adecuarla a nuestras necesidades:</para>
+
+            <programlisting>&lt;div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:fn="http://java.sun.com/jsp/jstl/functions"  xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"&gt;
+  &lt;jsp:directive.page contentType="text/html;charset=UTF-8" /&gt;
+  &lt;jsp:output omit-xml-declaration="yes" /&gt;
+  &lt;spring:message var="title" code="${titleCode}" text="Message title" htmlEscape="false" /&gt;
+  &lt;util:panel id="title" title="${title}"&gt;
+    &lt;h2&gt;${fn:escapeXml(title)}&lt;/h2&gt;
+    &lt;p&gt;
+      &lt;spring:message code="${descriptionCode}" text="This is part of the message to show" /&gt;
+    &lt;/p&gt;
+    &lt;div class="closeMessage"&gt;
+      &lt;button class="boton" dojoType="dijit.form.Button" type="button"
+        onClick="dijit.byId('${dialogId}').hide();"&gt;No&lt;/button&gt;
+      &lt;spring:url value="<emphasis role="bold">${dialogParams['petsFormLink']}</emphasis>" var="locationUrl"/&gt;
+      &lt;spring:message var="confirmButtonValue" code="confirmButtonValue"/&gt;
+      &lt;button class="boton" dojoType="dijit.form.Button" type="button"
+        onClick="location.href = '${locationUrl}';"&gt;${confirmButtonValue}&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/util:panel&gt;
+&lt;/div&gt;</programlisting>
+
+            <para>En este caso hemos resaltado el accesso al HashMap de
+            parámetros del díalogo (dialogParams) para mostrar como extraer
+            los datos que hemos querido que le llegaran al díalogo.</para>
+          </listitem>
+        </orderedlist>
+      </section>
+
+      <section>
+        <title>Díalogo modal con formulario</title>
+
+        <para>En alguna ocasión podemos necesitar mostrar un formulario en un
+        díalogo modal para solicitar información al usuario, siguiendo el
+        ejemplo anterior, podríamos modificar la jspx que nos crea el add-on
+        para incluir un formulario. En este ejemplo, tras crear un nuevo Owner
+        en nuestra aplicación, le mostraremos un formulario para que cree su
+        primera mascota.</para>
+
+        <orderedlist>
+          <listitem>
+            <para>Añadir un diálogo modal a la apliacaión mediante
+            "<emphasis>web mvc dialog message add</emphasis>"</para>
+
+            <programlisting>web mvc dialog message add --class ~.web.OwnerController --name createPetInModal</programlisting>
+
+            <para>Esto nos genera un método <emphasis>confirmgopets</emphasis>
+            disponible en <emphasis>OwnerController</emphasis> y una jspx base
+            llamada <emphasis>createPetInModal</emphasis> en
+            <emphasis>WEB-INF/dialogs</emphasis> que personalizaremos.</para>
+          </listitem>
+
+          <listitem>
+            <para>Modificamos el método create de OwnerController. Al igual
+            que en el ejemplo anterior debemos hacer el Push-in del método. Lo
+            modificamos para que quede como se muestra:</para>
+
+            <programlisting>@RequestMapping(method = RequestMethod.POST)
+public String create(@Valid Owner owner, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
+    if (bindingResult.hasErrors()) {
+        uiModel.addAttribute("owner", owner);
+        addDateTimeFormatPatterns(uiModel);
+        return "owners/create";
+    }
+    uiModel.asMap().clear();
+    owner.persist();
+
+    <emphasis role="bold">HashMap&lt;String, Object&gt; dialogParams = new HashMap&lt;String, Object&gt;();
+    Pet firstPetOfOwner = new Pet();
+    dialogParams.put("pet", firstPetOfOwner);
+    dialogParams.put("pettypes",  Arrays.asList(PetType.class.getEnumConstants()));
+    createPetInModal(DialogType.Info, "/WEB-INF/views/pets/createPetInModal.jspx", "message_create_pet_title", "message_create_pet_desc", dialogParams, httpServletRequest);</emphasis>
+
+    return "redirect:/owners/" + encodeUrlPathSegment(owner.getId().toString(), httpServletRequest);
+}</programlisting>
+          </listitem>
+
+          <listitem>
+            <para>Modificamos la jspx, definiendo el forumulario de creación
+            de mascotas (Pets):</para>
+
+            <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0"&gt;
+    &lt;jsp:directive.page contentType="text/html;charset=UTF-8"/&gt;
+    &lt;jsp:output omit-xml-declaration="yes"/&gt;
+
+    <emphasis role="bold">&lt;c:set scope="request" var="pet" value="${dialogParams['pet']}" /&gt;
+    &lt;c:set scope="request" var="pettypes" value="${dialogParams['pettypes']}" /&gt;
+</emphasis>
+    &lt;form:create id="fc_com_springsource_petclinic_domain_Pet" modelAttribute="pet" path="/pets" render="${empty dependencies}" z="lgvEyAlAYOudDmaPjwU0ABseTIk="&gt;
+        &lt;field:checkbox field="sendReminders" id="c_com_springsource_petclinic_domain_Pet_sendReminders" z="uPpMX+IWb0KONpvd11fpG8x4/4Q="/&gt;
+        &lt;field:input field="name" id="c_com_springsource_petclinic_domain_Pet_name" min="1" required="true" z="ZY+k75JeSo9RmejYZRFNIvs2aBg="/&gt;
+        &lt;field:input field="weight" id="c_com_springsource_petclinic_domain_Pet_weight" min="0" required="true" validationMessageCode="field_invalid_number" z="cOD5zE/z7gy+RZu5kVSPuxCa+/I="/&gt;
+        &lt;input type="hidden" id="c_com_springsource_petclinic_domain_Pet_owner" name="owner" value="${owner.id}" /&gt;
+        &lt;field:select field="owner" id="c_com_springsource_petclinic_domain_Pet_owner" itemValue="id" items="${owners}" path="/owners" render="false" z="fGzswAP4XXvhPhowJKsRVve929c="/&gt;
+        &lt;field:select field="type" id="c_com_springsource_petclinic_domain_Pet_type" items="${pettypes}" path="pettypes" required="true" z="+hDCnUp+Y+A1RlT+AjH07sgipOo="/&gt;
+    &lt;/form:create&gt;
+    &lt;form:dependency dependencies="${dependencies}" id="d_com_springsource_petclinic_domain_Pet" render="${not empty dependencies}" z="kThDNIW+69h9nI/69ynY1WyUieo="/&gt;
+&lt;/div&gt;</programlisting>
+          </listitem>
+        </orderedlist>
+      </section>
     </section>
   </section>
 
