@@ -934,12 +934,16 @@ public class ThemeOperationsImpl implements ThemeOperations {
         for (URL url : urls) {
             String filePath = url.getPath().replaceFirst(
                     sourceDirectory.getPath(), "");
+            if (isVersionControlSystemFile(filePath)) {
+                // nothing to do if the URL is of a file from a Version Control
+                // System
+                continue;
+            }
             File targetFile = new File(targetDirectory, filePath);
 
             try {
                 // only copy files and if target file doesn't exist or overwrite
-                // flag
-                // is true
+                // flag is true
                 if (!targetFile.exists()) {
                     // create file using FileManager to fire creation events
                     FileCopyUtils.copy(url.openStream(), fileManager
@@ -958,6 +962,23 @@ public class ThemeOperationsImpl implements ThemeOperations {
                         e);
             }
         }
+    }
+
+    /**
+     * Says if a file path is the path of a Version Control System control file
+     * <p>
+     * Currently, we only check for SVN, GIT and CVS, but we could include these
+     * other VCS file patterns:<br/>
+     * <code>.hg .bzr MT _MTN .cdv .arch-ids .arch-inventory _darcs RCS</code>
+     * 
+     * @param filePath
+     * @return
+     */
+    private boolean isVersionControlSystemFile(String filePath) {
+        return filePath.contains(".svn")
+                || filePath.contains(".git")
+                || filePath.contains(File.separator.concat("CVS").concat(
+                        File.separator));
     }
 
     /**
