@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.service.roo.addon.util.DependenciesVersionManager;
+import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;

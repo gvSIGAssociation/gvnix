@@ -18,11 +18,10 @@
  */
 package org.gvnix.service.roo.addon.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
-import org.gvnix.service.roo.addon.util.WsdlParserUtils;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
 import org.junit.Test;
 import org.springframework.roo.support.util.XmlUtils;
@@ -123,7 +122,7 @@ public class WsdlParserUtilsTest {
         wsdl = XmlUtils.getDocumentBuilder().parse(EMAIL_VALIDATION_V2_WSDL);
         root = wsdl.getDocumentElement();
         assertEquals(
-                "v2.emailvalidation.xwebemailvalidation.wsuxwebservicesucom.EmailValidation",
+                "v2.emailvalidation.xwebemailvalidation.wsuxwebservicesucom.XWebEmailValidation",
                 WsdlParserUtils.getServiceClassPath(root,
                         CommunicationSense.IMPORT));
 
