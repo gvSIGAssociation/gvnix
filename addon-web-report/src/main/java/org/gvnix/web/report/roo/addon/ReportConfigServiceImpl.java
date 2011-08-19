@@ -29,7 +29,9 @@ import java.util.Set;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.osgi.service.component.ComponentContext;
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
@@ -65,6 +67,8 @@ public class ReportConfigServiceImpl implements ReportConfigService {
     private FileManager fileManager;
     @Reference
     private ProjectOperations projectOperations;
+    @Reference
+    private MetadataService metadataService;
 
     private ComponentContext context;
 
@@ -287,10 +291,8 @@ public class ReportConfigServiceImpl implements ReportConfigService {
 
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", configuration);
-        for (Element depen : depens) {
 
-            projectOperations.addDependency(new Dependency(depen));
-        }
+        DependenciesVersionManager.manageDependencyVersion(metadataService, projectOperations, depens);
     }
 
     /**
@@ -301,9 +303,8 @@ public class ReportConfigServiceImpl implements ReportConfigService {
     private void updatePomProperties(Element configuration) {
         List<Element> addonProperties = XmlUtils.findElements(
                 "/configuration/gvnix/web-report/properties/*", configuration);
-        for (Element property : addonProperties) {
-            projectOperations.addProperty(new Property(property));
-        }
+
+        DependenciesVersionManager.managePropertyVersion(metadataService, projectOperations, addonProperties);
     }
 
     /**
