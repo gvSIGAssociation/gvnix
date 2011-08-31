@@ -36,7 +36,13 @@
   </parent>
 
   <groupId>org.gvnix.wrapping</groupId>
-  <version>10.2.0.4.0</version>
+  <!-- Springsource y Apache Servicemix mantienen la versión del JAR original,
+       es interesante para identificar fácilmente la versión contenida en el 
+       bundle. 
+       La versión gvNIX no aporta ninguna info, da igual en qué versión de 
+       gvNIX se ha empaquetado un wrapper, lo importante es la versión de la
+       librería empaquetada. -->
+  <version>${pkgVersion}</version>
   <artifactId>${pom.groupId}.${pkgArtifactId}</artifactId>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - Wrapping - ${pkgArtifactId}</name>
