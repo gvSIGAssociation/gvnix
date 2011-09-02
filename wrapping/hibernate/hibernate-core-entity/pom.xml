@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <licenses>
+    <license>
+      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <distribution>repo</distribution>
+      <comments>
+      <![CDATA[
+      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+      i Transport - Generalitat Valenciana
+      Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program. If not, see <http://www.gnu.org/licenses />.
+      ]]>
+      </comments>
+    </license>
+  </licenses>
+
+  <parent>
+    <groupId>org.gvnix</groupId>
+    <artifactId>wrapping.hibernate</artifactId>
+    <version>0.8.0-SNAPSHOT</version>
+  </parent>
+
+  <!-- Ver sistema de nominación en ../README.rst -->
+  <groupId>${pkgGroupId}</groupId>
+  <artifactId>${project.parent.groupId}.${project.groupId}</artifactId>
+  <version>${pkgVersion}</version>
+  <packaging>bundle</packaging>
+  <name>gvNIX - OSGi - Wrapping - Hibernate 3</name>
+  <description>Hibernate 3 Bundle. This OSGi bundle wraps ${pkgCoreArtifactId} and ${pkgEntityArtifactId} ${pkgVersion} jar files.</description>
+
+  <organization>
+    <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
+  </organization>
+
+  <properties>
+    <pkgGroupId>org.hibernate</pkgGroupId>
+    <pkgArtifactId>hibernate</pkgArtifactId>
+    <pkgCoreArtifactId>hibernate-core</pkgCoreArtifactId>
+    <pkgEntityArtifactId>hibernate-entitymanager</pkgEntityArtifactId>
+    <pkgVersion>3.6.7.Final</pkgVersion>
+    <pkgVendor>JBoss</pkgVendor>
+    <pkgDocUrl>http://www.hibernate.org/docs</pkgDocUrl>
+    <pkgLicense>http://www.hibernate.org/license</pkgLicense>
+    <pkgExport>!javax.persistence.*,*;version=${pkgVersion}</pkgExport>
+    <pkgImport>!com.ibm.*,!org.apache.tools.ant.taskdefs.*,!javax.servlet.*,*</pkgImport>
+    <pkgPrivate>!*</pkgPrivate>
+    <!-- <bndActivator>org.hibernate.Activator</bndActivator> -->
+    <osgiVersion>${pkgVersion}.0001</osgiVersion>
+  </properties>
+
+  <dependencies>
+    <dependency>
+       <groupId>${pkgGroupId}</groupId>
+       <artifactId>${pkgCoreArtifactId}</artifactId>
+       <version>${pkgVersion}</version>
+       <exclusions>
+         <exclusion>
+           <groupId>antlr</groupId>
+           <artifactId>antlr</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>cglib</groupId>
+           <artifactId>cglib</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>commons-collections</groupId>
+           <artifactId>commons-collections</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>dom4j</groupId>
+           <artifactId>dom4j</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>javassist</groupId>
+           <artifactId>javassist</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>javax.transaction</groupId>
+           <artifactId>jta</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>org.slf4j</groupId>
+           <artifactId>slf4j-api</artifactId>
+         </exclusion>
+       </exclusions>
+    </dependency>
+    <dependency>
+       <groupId>${pkgGroupId}</groupId>
+       <artifactId>${pkgEntityArtifactId}</artifactId>
+       <version>${pkgVersion}</version>
+       <exclusions>
+         <exclusion>
+           <groupId>cglib</groupId>
+           <artifactId>cglib</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>javassist</groupId>
+           <artifactId>javassist</artifactId>
+         </exclusion>
+         <exclusion>
+           <groupId>org.slf4j</groupId>
+           <artifactId>slf4j-api</artifactId>
+         </exclusion>
+       </exclusions>
+    </dependency>
+<!--
+    <dependency>
+	<groupId>org.osgi</groupId>
+	<artifactId>org.osgi.core</artifactId>
+	<scope>provided</scope>
+    </dependency>
+    <dependency>
+	<groupId>org.osgi</groupId>
+	<artifactId>org.osgi.compendium</artifactId>
+	<scope>provided</scope>
+    </dependency>
+-->
+  </dependencies>
+
+</project>

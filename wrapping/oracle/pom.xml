@@ -35,15 +35,10 @@
     <version>0.8.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.gvnix.wrapping</groupId>
-  <!-- Springsource y Apache Servicemix mantienen la versión del JAR original,
-       es interesante para identificar fácilmente la versión contenida en el 
-       bundle. 
-       La versión gvNIX no aporta ninguna info, da igual en qué versión de 
-       gvNIX se ha empaquetado un wrapper, lo importante es la versión de la
-       librería empaquetada. -->
+  <!-- Ver sistema de nominación en ../README.rst -->
+  <groupId>${pkgGroupId}</groupId>
+  <artifactId>${project.parent.groupId}.${project.groupId}.${pkgArtifactId}</artifactId>
   <version>${pkgVersion}</version>
-  <artifactId>${pom.groupId}.${pkgArtifactId}</artifactId>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - Wrapping - ${pkgArtifactId}</name>
   <description>Oracle JDBC driver classes for use with JDK1.4, driverclass:oracle.jdbc.OracleDriver. This bundle wraps the standard Maven artifact: ${pkgArtifactId}-${pkgVersion}.</description>
@@ -53,6 +48,7 @@
   </organization>
 
   <properties>
+    <pkgGroupId>com.oracle</pkgGroupId>
     <pkgArtifactId>ojdbc14</pkgArtifactId>
     <pkgVersion>10.2.0.4.0</pkgVersion>
     <pkgVendor>Oracle Corporation</pkgVendor>
@@ -64,7 +60,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.oracle</groupId>
+      <groupId>${pkgGroupId}</groupId>
       <artifactId>${pkgArtifactId}</artifactId>
       <version>${pkgVersion}</version>
       <optional>true</optional>

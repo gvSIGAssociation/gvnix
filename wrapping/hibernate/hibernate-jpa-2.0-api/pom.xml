@@ -31,45 +31,40 @@
 
   <parent>
     <groupId>org.gvnix</groupId>
-    <artifactId>wrapping</artifactId>
+    <artifactId>wrapping.hibernate</artifactId>
     <version>0.8.0-SNAPSHOT</version>
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
   <groupId>${pkgGroupId}</groupId>
-  <artifactId>${project.parent.groupId}.${project.groupId}</artifactId>
+  <artifactId>${project.parent.groupId}.${pkgGroupId}.jpa-2.0-api</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - Wrapping - AspectJ</name>
-  <description>AspectJ Bundle. This OSGi bundle wraps ${pkgRtArtifactId} and ${pkgWeaverArtifactId} ${pkgVersion} jar files.</description>
+  <name>gvNIX - OSGi - Wrapping - Hibernate JPA 2.0</name>
+  <description>Hibernate JPA 2.0 Bundle. This OSGi bundle wraps Hibernate ${pkgArtifactId} ${pkgVersion} jar files.</description>
 
   <organization>
     <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
   </organization>
 
   <properties>
-    <pkgGroupId>org.aspectj</pkgGroupId>
-    <pkgArtifactId>aspectj</pkgArtifactId>
-    <pkgRtArtifactId>aspectjrt</pkgRtArtifactId>
-    <pkgWeaverArtifactId>aspectjweaver</pkgWeaverArtifactId>
-    <pkgVersion>1.6.11</pkgVersion>
-    <pkgVendor>Eclipse</pkgVendor>
-    <pkgDocUrl>http://www.eclipse.org/aspectj/docs.php</pkgDocUrl>
-    <pkgLicense>http://www.eclipse.org/legal/epl-v10.html</pkgLicense>
-    <pkgImport>org.aspectj.*;resolution:=optional,*;resolution:=optional</pkgImport>
-    <osgiVersion>${pkgVersion}.0001</osgiVersion>
+    <jpaVersion>2.0</jpaVersion>
+    <pkgGroupId>org.hibernate</pkgGroupId>
+    <pkgArtifactId>hibernate-jpa-2.0-api</pkgArtifactId>
+    <pkgVersion>1.0.1.Final</pkgVersion>
+    <pkgVendor>JBoss</pkgVendor>
+    <pkgDocUrl>http://www.hibernate.org/docs</pkgDocUrl>
+    <pkgLicense>http://www.hibernate.org/license</pkgLicense>
+    <pkgExport>*;version=${jpaVersion}</pkgExport>
+    <pkgImport>*</pkgImport>
+    <pkgPrivate>!*</pkgPrivate>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>${pkgGroupId}</groupId>
-      <artifactId>${pkgRtArtifactId}</artifactId>
-      <version>${pkgVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>${pkgGroupId}</groupId>
-      <artifactId>${pkgWeaverArtifactId}</artifactId>
-      <version>${pkgVersion}</version>
+       <groupId>org.hibernate.javax.persistence</groupId>
+       <artifactId>${pkgArtifactId}</artifactId>
+       <version>${pkgVersion}</version>
     </dependency>
   </dependencies>
 

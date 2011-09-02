@@ -37,38 +37,33 @@
 
   <!-- Ver sistema de nominación en ../README.rst -->
   <groupId>${pkgGroupId}</groupId>
-  <artifactId>${project.parent.groupId}.${project.groupId}</artifactId>
+  <artifactId>${project.parent.groupId}.${pkgGroupId}</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - Wrapping - AspectJ</name>
-  <description>AspectJ Bundle. This OSGi bundle wraps ${pkgRtArtifactId} and ${pkgWeaverArtifactId} ${pkgVersion} jar files.</description>
+  <name>gvNIX - OSGi - Wrapping - Javassist</name>
+  <description>Java Programming Assistant. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
 
   <organization>
     <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
   </organization>
 
   <properties>
-    <pkgGroupId>org.aspectj</pkgGroupId>
-    <pkgArtifactId>aspectj</pkgArtifactId>
-    <pkgRtArtifactId>aspectjrt</pkgRtArtifactId>
-    <pkgWeaverArtifactId>aspectjweaver</pkgWeaverArtifactId>
-    <pkgVersion>1.6.11</pkgVersion>
-    <pkgVendor>Eclipse</pkgVendor>
-    <pkgDocUrl>http://www.eclipse.org/aspectj/docs.php</pkgDocUrl>
-    <pkgLicense>http://www.eclipse.org/legal/epl-v10.html</pkgLicense>
-    <pkgImport>org.aspectj.*;resolution:=optional,*;resolution:=optional</pkgImport>
+    <pkgGroupId>javassist</pkgGroupId>
+    <pkgArtifactId>javassist</pkgArtifactId>
+    <pkgVersion>3.12.1.GA</pkgVersion>
+    <pkgVendor>JBoss</pkgVendor>
+    <pkgDocUrl>http://www.jboss.org/docs</pkgDocUrl>
+    <pkgLicense>http://www.jboss.org/license</pkgLicense>
+    <pkgExport>*;version=${pkgVersion}</pkgExport>
+    <pkgImport>*;resolution:=optional</pkgImport>
+    <pkgPrivate>!*</pkgPrivate>
     <osgiVersion>${pkgVersion}.0001</osgiVersion>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>${pkgGroupId}</groupId>
-      <artifactId>${pkgRtArtifactId}</artifactId>
-      <version>${pkgVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>${pkgGroupId}</groupId>
-      <artifactId>${pkgWeaverArtifactId}</artifactId>
+      <artifactId>${pkgArtifactId}</artifactId>
       <version>${pkgVersion}</version>
     </dependency>
   </dependencies>

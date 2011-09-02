@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <licenses>
@@ -35,42 +35,21 @@
     <version>0.8.0-SNAPSHOT</version>
   </parent>
 
-  <!-- Ver sistema de nominación en ../README.rst -->
-  <groupId>${pkgGroupId}</groupId>
-  <artifactId>${project.parent.groupId}.${project.groupId}</artifactId>
-  <version>${pkgVersion}</version>
-  <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - Wrapping - AspectJ</name>
-  <description>AspectJ Bundle. This OSGi bundle wraps ${pkgRtArtifactId} and ${pkgWeaverArtifactId} ${pkgVersion} jar files.</description>
+  <artifactId>wrapping.hibernate</artifactId>
+  <packaging>pom</packaging>
+  <name>gvNIX - OSGi - Hibernate Wrapping</name>
+  <description>Automates the conversion of Hibernate 3 JARs into OSGi bundles.</description>
 
   <organization>
     <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
   </organization>
 
-  <properties>
-    <pkgGroupId>org.aspectj</pkgGroupId>
-    <pkgArtifactId>aspectj</pkgArtifactId>
-    <pkgRtArtifactId>aspectjrt</pkgRtArtifactId>
-    <pkgWeaverArtifactId>aspectjweaver</pkgWeaverArtifactId>
-    <pkgVersion>1.6.11</pkgVersion>
-    <pkgVendor>Eclipse</pkgVendor>
-    <pkgDocUrl>http://www.eclipse.org/aspectj/docs.php</pkgDocUrl>
-    <pkgLicense>http://www.eclipse.org/legal/epl-v10.html</pkgLicense>
-    <pkgImport>org.aspectj.*;resolution:=optional,*;resolution:=optional</pkgImport>
-    <osgiVersion>${pkgVersion}.0001</osgiVersion>
-  </properties>
+  <url>http://www.gvnix.org</url>
 
-  <dependencies>
-    <dependency>
-      <groupId>${pkgGroupId}</groupId>
-      <artifactId>${pkgRtArtifactId}</artifactId>
-      <version>${pkgVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>${pkgGroupId}</groupId>
-      <artifactId>${pkgWeaverArtifactId}</artifactId>
-      <version>${pkgVersion}</version>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>hibernate-core-entity</module>
+    <module>hibernate-jpa-2.0-api</module>
+    <module>hibernate-validator</module>
+  </modules>
 
 </project>
