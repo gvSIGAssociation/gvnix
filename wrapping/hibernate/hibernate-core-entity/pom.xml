@@ -40,7 +40,7 @@
   <artifactId>${project.parent.groupId}.${project.groupId}</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - Wrapping - Hibernate 3</name>
+  <name>gvNIX - OSGi - Hibernate 3</name>
   <description>Hibernate 3 Bundle. This OSGi bundle wraps ${pkgCoreArtifactId} and ${pkgEntityArtifactId} ${pkgVersion} jar files.</description>
 
   <organization>

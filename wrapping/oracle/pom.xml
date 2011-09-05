@@ -40,7 +40,7 @@
   <artifactId>${project.parent.groupId}.${project.groupId}.${pkgArtifactId}</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - Wrapping - ${pkgArtifactId}</name>
+  <name>gvNIX - OSGi - ${pkgArtifactId}</name>
   <description>Oracle JDBC driver classes for use with JDK1.4, driverclass:oracle.jdbc.OracleDriver. This bundle wraps the standard Maven artifact: ${pkgArtifactId}-${pkgVersion}.</description>
 
   <organization>
@@ -54,7 +54,9 @@
     <pkgVendor>Oracle Corporation</pkgVendor>
     <pkgDocUrl>http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/index.html</pkgDocUrl>
     <pkgLicense>http://www.oracle.com/technology/software/htdocs/distlic.html</pkgLicense>
-    <pkgImport>oracle.i18n.*;resolution:=optional,oracle.ons.*;resolution:=optional,oracle.security.pki.*;resolution:=optional,*</pkgImport>
+    <pkgExport>*;version=${pkgVersion}</pkgExport>
+    <pkgImport>*;resolution:=optional</pkgImport>
+    <pkgPrivate>!*</pkgPrivate>
     <osgiVersion>${pkgVersion}.0001</osgiVersion>
   </properties>
 

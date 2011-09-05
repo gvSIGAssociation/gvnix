@@ -48,7 +48,6 @@
 
   <modules>
     <module>hibernate-core-entity</module>
-    <module>hibernate-jpa-2.0-api</module>
     <module>hibernate-validator</module>
   </modules>
 

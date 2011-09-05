@@ -40,7 +40,7 @@
   <artifactId>${project.parent.groupId}.${project.groupId}</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - Wrapping - AspectJ</name>
+  <name>gvNIX - OSGi - AspectJ</name>
   <description>AspectJ Bundle. This OSGi bundle wraps ${pkgRtArtifactId} and ${pkgWeaverArtifactId} ${pkgVersion} jar files.</description>
 
   <organization>
@@ -56,7 +56,10 @@
     <pkgVendor>Eclipse</pkgVendor>
     <pkgDocUrl>http://www.eclipse.org/aspectj/docs.php</pkgDocUrl>
     <pkgLicense>http://www.eclipse.org/legal/epl-v10.html</pkgLicense>
-    <pkgImport>org.aspectj.*;resolution:=optional,*;resolution:=optional</pkgImport>
+<!--    <pkgImport>org.aspectj.*;resolution:=optional,*;resolution:=optional</pkgImport> -->
+    <pkgExport>*;version=${pkgVersion}</pkgExport>
+    <pkgImport>*</pkgImport>
+  <pkgPrivate>!*</pkgPrivate>
     <osgiVersion>${pkgVersion}.0001</osgiVersion>
   </properties>
 

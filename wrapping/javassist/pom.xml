@@ -40,7 +40,7 @@
   <artifactId>${project.parent.groupId}.${pkgGroupId}</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - Wrapping - Javassist</name>
+  <name>gvNIX - OSGi - Javassist</name>
   <description>Java Programming Assistant. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
 
   <organization>

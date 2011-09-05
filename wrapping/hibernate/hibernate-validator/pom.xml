@@ -40,7 +40,7 @@
   <artifactId>${project.parent.groupId}.${pkgGroupId}.validator</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - Wrapping - Hibernate Validator</name>
+  <name>gvNIX - OSGi - Hibernate Validator</name>
   <description>Hibernate Validator Bundle. This OSGi bundle wraps Hibernate Validator ${pkgVersion} jar files.</description>
 
   <organization>
