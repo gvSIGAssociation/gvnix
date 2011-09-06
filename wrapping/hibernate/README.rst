@@ -65,4 +65,5 @@ TODO
 
 * Probar en un OSGi que no sea FUSE porque FUSE incluye muchos componentes como JAXB y hay que probar que el wrap funciona bien en todos los entornos OSGi
 
+* Encontrar una forma de distribuir el features.xml
 
