@@ -36,6 +36,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.gvnix.dynamiclist.dto.DynamiclistConfig;
 import org.gvnix.dynamiclist.exception.DynamiclistException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 
 /**
  * 
@@ -281,4 +284,22 @@ public class DynamicListUtil {
 		}		
 		return dataExport;		
     }
+	
+	/**
+	 * Get user login of SPRING_SECURITY AUTHENTICATION
+	 * 
+	 * @param request HttpServletRequest
+	 * @return String
+	 */
+	public static String getLoginUser(HttpServletRequest request){
+		//SPRING_SECURITY_LAST_USERNAME		
+		String loginUser = (String)request.getSession().getAttribute(TagConstants.AUTHENTICATION_USERNAME);
+		if (StringUtils.isEmpty(loginUser)){
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			loginUser = ((User)(authentication.getPrincipal())).getUsername();
+		} 
+		return loginUser;
+	} 
+	
+	
 }

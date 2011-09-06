@@ -51,7 +51,7 @@ public interface UserFilterDao {
     /**
      * Deletes UserFilter.
      */
-    public void delete(UserFilter userFilter); 
+    public void delete(UserFilter userFilter) throws Exception; 
 
 }
 

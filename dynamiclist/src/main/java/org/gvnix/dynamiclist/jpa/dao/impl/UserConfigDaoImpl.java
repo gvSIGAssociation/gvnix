@@ -20,11 +20,13 @@ package org.gvnix.dynamiclist.jpa.dao.impl;
 
 import java.util.Collection;
 
+import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.gvnix.dynamiclist.jpa.bean.UserConfig;
 import org.gvnix.dynamiclist.jpa.dao.UserConfigDao;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,18 +35,20 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * UserConfig DAO implementation.
  */
+@Configurable
 @Repository
 @Transactional(readOnly = true)
 public class UserConfigDaoImpl implements UserConfigDao {
 
-    private EntityManager em = null;
+	
+    transient EntityManager entityManager;
 
     /**
      * Sets the entity manager.
      */
-    @PersistenceContext
-    public void setEntityManager(EntityManager em) {
-        this.em = em;
+    @PersistenceContext   
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     /*
@@ -53,7 +57,7 @@ public class UserConfigDaoImpl implements UserConfigDao {
      */
     @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void delete(UserConfig userConfig) {
-    	 em.remove(em.merge(userConfig));
+    	entityManager.remove(entityManager.merge(userConfig));
 	}
 
 	/*
@@ -62,7 +66,7 @@ public class UserConfigDaoImpl implements UserConfigDao {
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<UserConfig> findUserConfigByEntityAndIdUser(String entity, String idUser) {
-		return em.createQuery("select u from UserConfig u where u.entity = :entity and u.idUser = :idUser")
+		return entityManager.createQuery("select u from UserConfig u where u.entity = :entity and u.idUser = :idUser")
         	.setParameter("entity", entity).setParameter("idUser", idUser).getResultList();
 	}
 
@@ -71,7 +75,7 @@ public class UserConfigDaoImpl implements UserConfigDao {
 	 * @see org.gvnix.dynamiclist.jpa.dao.UserConfigDao#findUserConfigById(java.lang.Integer)
 	 */
 	public UserConfig findUserConfigById(Integer id) {
-		return em.find(UserConfig.class, id);
+		return entityManager.find(UserConfig.class, id);
 	}
 
 	/*
@@ -80,7 +84,7 @@ public class UserConfigDaoImpl implements UserConfigDao {
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<UserConfig> findUserConfigs() {		
-		return em.createQuery("select u from UserConfig u order by u.entity, u.idUser").getResultList();
+		return entityManager.createQuery("select u from UserConfig u order by u.entity, u.idUser").getResultList();
 	}
 
 	/*
@@ -89,7 +93,9 @@ public class UserConfigDaoImpl implements UserConfigDao {
 	 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public UserConfig save(UserConfig userConfig) {
-		return em.merge(userConfig);
+		userConfig = entityManager.merge(userConfig);
+		this.entityManager.flush();
+		return userConfig;
 	}
 
 }

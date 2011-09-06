@@ -66,7 +66,8 @@ public class DynamiclistConfig implements Serializable {
 	private String actualOrderBy = "";
 	private String actualOrderByColumn = "";
 	private String actualGroupBy = "";
-
+	
+	private Integer actualPage = null;
 	
 	public GlobalConfig getGlobalConfig() {
 		return globalConfig;
@@ -199,5 +200,13 @@ public class DynamiclistConfig implements Serializable {
 
 	public void setActualWhereFilter(String actualWhereFilter) {
 		this.actualWhereFilter = actualWhereFilter;
+	}
+
+	public Integer getActualPage() {
+		return actualPage;
+	}
+
+	public void setActualPage(Integer actualPage) {
+		this.actualPage = actualPage;
 	}	
 }

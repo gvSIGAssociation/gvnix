@@ -169,7 +169,7 @@ public class FooterTableTag extends TagSupport{
 		}		
 		buffer.append("</td>\n");
 		
-		buffer.append("<td width=\"9\" >&nbsp;</td>\n </tr>\n </table> </div>");		
+		buffer.append("<td width=\"9\" >&nbsp;</td>\n </tr>\n </table>");		
 		
 		try {
 			pageContext.getOut().write(buffer.toString());			

@@ -21,10 +21,12 @@ package org.gvnix.dynamiclist.jpa.dao.impl;
 import java.util.Collection;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 
 import org.gvnix.dynamiclist.jpa.bean.UserFilter;
 import org.gvnix.dynamiclist.jpa.dao.UserFilterDao;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,27 +35,56 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * UserFilter DAO implementation.
  */
+@Configurable
 @Repository
-@Transactional(readOnly = true)
 public class UserFilterDaoImpl implements UserFilterDao {
 
-    private EntityManager em = null;
+	@PersistenceContext
+	private EntityManager em;
 
-    /**
-     * Sets the entity manager.
-     */
-    @PersistenceContext
-    public void setEntityManager(EntityManager em) {
-        this.em = em;
-    }
+	
+	/*@PersistenceUnit(unitName = "springappPU")
+	private EntityManagerFactory emf;
+	public void setEntityManagerFactory(EntityManagerFactory emf) {
+	this.emf = emf;
+	}
 
+	private EntityManager getEntityManager() {
+	return emf.createEntityManager();
+	}
+
+	public Long create(PaymentAmount paymentAmount) {
+	EntityManager entityManager = getEntityManager();
+	EntityTransaction t = entityManager.getTransaction();
+	t.begin();
+	try {
+	entityManager.persist(paymentAmount);
+	}
+	catch (Exception up) {
+	t.rollback();
+	throw up;
+	}
+	finally{
+	try {
+	if(t.isActive())
+	{
+	t.commit();
+	}
+	} catch (Exception ex) {
+	t.rollback();
+	}
+	}
+	return paymentAmount.getId();
+	}
+	*/
+	
    /*
     * (non-Javadoc)
     * @see org.gvnix.dynamiclist.jpa.dao.UserFilterDao#delete(org.gvnix.dynamiclist.jpa.bean.UserFilter)
     */
-    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void delete(UserFilter userFilter) {
-    	 em.remove(em.merge(userFilter));    	
+	@Transactional
+	public void delete(UserFilter userFilter) throws Exception{
+		em.remove(em.merge(userFilter));		    	
 	}
 
 	/*
@@ -86,8 +117,8 @@ public class UserFilterDaoImpl implements UserFilterDao {
 	/*
 	 * (non-Javadoc)
 	 * @see org.gvnix.dynamiclist.jpa.dao.UserFilterDao#save(org.gvnix.dynamiclist.jpa.bean.UserFilter)
-	 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	 */	
+	@Transactional
 	public UserFilter save(UserFilter userFilter) {
 		return em.merge(userFilter);
 	}

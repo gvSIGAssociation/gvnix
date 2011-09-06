@@ -164,13 +164,14 @@ function checkDisplaySelect() {
  * 
  */
 function undo(){
-	document.getElementById('humanTextFilter').value = "";
-	document.getElementById('textFilter').value = "";	
-	concatenate = true;
-	booUndo = true;
-	booYO = false;
-	finished = false;
-	document.getElementById("valueFilter").value = "";
+		document.getElementById('humanTextFilter').value = "";
+		document.getElementById('textFilter').value = "";	
+		concatenate = true;
+		booUndo = true;
+		booYO = false;
+		finished = false;
+		document.getElementById("valueFilter").value = "";
+		document.getElementById('columns').selectedIndex = 0;
 }
 
 
@@ -282,13 +283,15 @@ function getLeftValueQL(leftValue, activeSelect, conditionProperties){
 			leftValueQL = "LOWER(" + leftValue + ")";			
 		}
 		else if (activeSelect == 'select_date') {
-			leftValueQL = "CONCAT(" + leftValue + ", '')";
-		} else {
+			leftValueQL = "SUBSTRING(CONCAT(" + leftValue + ", ''), 1, 10)";			
+		} 
+		else {
 			leftValueQL = leftValue;
 		}
 	}	 
 	return leftValueQL;
 }
+
 
 /**
  * 
@@ -429,13 +432,22 @@ function filterSearch(){
 	 		hidden.setAttribute('name','textFilter');
 	 		hidden.setAttribute('value',textFilter.value);
 
+	 		var hiddenReset = document.createElement("input");
+	 		hiddenReset.setAttribute('type','hidden');
+	 		hiddenReset.setAttribute('id','resetSelectedFilter');
+	 		hiddenReset.setAttribute('name','resetSelectedFilter');
+	 		hiddenReset.setAttribute('value',booUndo);
+	 		
+	 		
+	 		
 	 		var f = document.createElement("form");
 	 		f.setAttribute("name", "dynamiclistForm");
 	 		f.setAttribute("method", "POST");	 		
 	 		f.setAttribute("action", '<c:out value="${urlMapping}"/>');
 	 		f.appendChild(visible);
 	 		f.appendChild(hidden);
-
+	 		f.appendChild(hiddenReset);
+	 		
 	 		var formOpener = window.opener.document.body.appendChild(f);
 	 		formOpener.submit();
 	 		window.close();		 			 		

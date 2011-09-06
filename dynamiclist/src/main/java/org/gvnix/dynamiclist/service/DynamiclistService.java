@@ -89,7 +89,7 @@ public interface DynamiclistService {
 	 * @param id
 	 * @throws DynamiclistException
 	 */
-	public void deleteUserFilter(Integer id) throws DynamiclistException;
+	public void deleteUserFilter(Integer id) throws Exception, DynamiclistException;
 	
 	/**
 	 * Delete a userConfig entity persistent

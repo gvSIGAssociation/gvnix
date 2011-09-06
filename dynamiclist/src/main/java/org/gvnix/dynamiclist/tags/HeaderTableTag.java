@@ -62,7 +62,7 @@ public class HeaderTableTag extends javax.servlet.jsp.tagext.TagSupport {
 		String contextPath = request.getContextPath();
 		String imagesPath = (String)pageContext.getAttribute(TagConstants.IMAGES_PATH);
 		String url_base = contextPath + "/" + pageContext.getAttribute(TagConstants.URL_BASE);
-		String classObject = pageContext.getAttribute(TagConstants.URL_BASE) + ".";
+		String classObject = pageContext.getAttribute(TagConstants.CLASS_OBJECT) + ".";
 		
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("<table width=\"99%\" height=\"24\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"colorAcciones\">\n");

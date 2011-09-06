@@ -171,8 +171,13 @@ function dl_order(urlMapping){
  * @param urlMapping
  * @return
  */
-function dl_orderBySearch(column, urlMapping){
-	window.location.href = urlMapping + "?orderBy=" + column;
+function dl_orderBySearch(column, urlMapping, deleteOrderByColumn){
+	var href = urlMapping + "?orderBy=" + column;	
+	if (deleteOrderByColumn){
+		href = href + "&orderByColumn=deleteOrderByColumn"
+	}
+	
+	window.location.href = href;
 }
 
 

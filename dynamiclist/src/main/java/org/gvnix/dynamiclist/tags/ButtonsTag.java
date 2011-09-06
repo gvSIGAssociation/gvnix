@@ -73,6 +73,7 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 		//cooperate labels
 		pageContext.setAttribute(TagConstants.IMAGES_PATH, imagesPath);
 		pageContext.setAttribute(TagConstants.URL_BASE, url_base);
+		pageContext.setAttribute(TagConstants.CLASS_OBJECT, classObject);
 		pageContext.getRequest().setAttribute(TagConstants.URL_CONTEXT_BASE, contextPath + "/" + url_base);
 		pageContext.getRequest().setAttribute(TagConstants.IMAGES_PATH, imagesPath);
 		
@@ -119,6 +120,20 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 			buffer.append("/icono03.gif' name='Image2' class='botonAlta' id='Image2' title=\"");
 			buffer.append(Messages.getMessage("button.add", request));
 			buffer.append("\" ></a></td>\n");			
+		}		
+		if (update){
+			buffer.append("<td width='31'><a href='javascript:dl_write(\"");
+			buffer.append(contextPath);			
+			buffer.append("/");
+			buffer.append(url_base);
+			buffer.append("\",\"");
+			buffer.append(Messages.getMessage("dynamiclist.alert.select", request));
+			buffer.append("\");'>");
+			buffer.append("<img src='");	
+			buffer.append(imagesPath);
+			buffer.append("/icono04.gif' name='Image4' class='botonAlta' id='Image4' title=\"");
+			buffer.append(Messages.getMessage("button.write", request));
+			buffer.append("\" ></a></td>\n");
 		}
 		if (read){
 			buffer.append("<td width='31'><a id='read' href='javascript:dl_read(\"");			
@@ -133,20 +148,6 @@ public class ButtonsTag extends javax.servlet.jsp.tagext.TagSupport {
 			buffer.append("/icono05.gif' name='Image5' class='botonVisualizacion' id='Image5' title=\"");
 			buffer.append(Messages.getMessage("button.read", request));
 			buffer.append("\" ></a></td>\n");			
-		}
-		if (update){
-			buffer.append("<td width='31'><a href='javascript:dl_write(\"");
-			buffer.append(contextPath);			
-			buffer.append("/");
-			buffer.append(url_base);
-			buffer.append("\",\"");
-			buffer.append(Messages.getMessage("dynamiclist.alert.select", request));
-			buffer.append("\");'>");
-			buffer.append("<img src='");	
-			buffer.append(imagesPath);
-			buffer.append("/icono04.gif' name='Image4' class='botonAlta' id='Image4' title=\"");
-			buffer.append(Messages.getMessage("button.write", request));
-			buffer.append("\" ></a></td>\n");
 		}
 		if (delete){
 			buffer.append("<td width='31'><a href='javascript:dl_delete(\"");

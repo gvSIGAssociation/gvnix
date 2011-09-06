@@ -35,8 +35,12 @@
 					</td>
 					<td colspan="2">
 						<FONT FACE=Verdana SIZE=1 COLOR=black>
-							<c:set var="labelFilterDefault" value='<spring:message code="exportList.defaultFilterName"/>' />
-							<spring:message code="${labelFilter}" text="${labelFilterDefault}" />
+							<c:if test="${not empty nameFilter}">
+								<c:out value="${nameFilter}"/>
+							</c:if>
+							<c:if test="${empty nameFilter}">
+								<spring:message code="filterInfo.undefined"/>
+							</c:if>	
 						</FONT>
 					</td>
 					<td colspan="10">

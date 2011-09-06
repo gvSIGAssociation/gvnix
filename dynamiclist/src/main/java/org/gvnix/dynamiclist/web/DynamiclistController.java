@@ -20,6 +20,7 @@ package org.gvnix.dynamiclist.web;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,9 +35,9 @@ import org.gvnix.dynamiclist.util.DynamicListUtil;
 import org.gvnix.dynamiclist.util.Messages;
 import org.gvnix.dynamiclist.util.TagConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.userdetails.User;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -108,7 +109,6 @@ public class DynamiclistController {
     	DynamiclistConfig config= (DynamiclistConfig)request.getSession().getAttribute(TagConstants.DYNAMICLIST_CONFIG);    	
     	modelmap.addAttribute("simpleNameClass", config.getClassObjectSimpleName());
     	modelmap.addAttribute(TagConstants.URL_BASE, urlBase);    	
-    	modelmap.addAttribute("labelFilter", config.getClassObjectSimpleName());
     	modelmap.addAttribute("humanTextFilter", config.getActualHumanWhereFilter());
     	
     	modelmap.addAttribute("columns", config.getActualFieldsNames());
@@ -119,6 +119,32 @@ public class DynamiclistController {
     	Collection<?> dataList = dynamiclistService.searchExport(config.getClassObjectSimpleName(), config);
     	
     	modelmap.addAttribute("objectList", DynamicListUtil.getDataCollectionExport(dataList, config.getActualFieldsNames()));
+    	
+    	String nameFilter = "";
+    	if (config.getIdActualFilter() != null){
+    		if (StringUtils.isNotEmpty(config.getTypeActualFilter()) &&  config.getTypeActualFilter().equals(TagConstants.TYPE_FILTER_USER)){
+    			//filter scope User
+    			Collection<UserFilter> userFilters = config.getUserFilters();
+    			for (UserFilter userFilter : userFilters) {
+					if(userFilter.getId().equals(config.getIdActualFilter())){
+						nameFilter = Messages.getMessage(userFilter.getLabelFilter(), request);
+					}
+				}
+    		} else {
+    			//filter scope Global
+    			Collection<GlobalFilter> globalFilters = config.getGlobalFilters();
+    			for (GlobalFilter globalFilter : globalFilters) {
+					if (globalFilter.getId().equals(config.getIdActualFilter())){
+						nameFilter = Messages.getMessage(globalFilter.getLabelFilter(), request);
+						break;
+					}
+				}
+    		}
+    	} else {
+    		nameFilter = Messages.getMessage("filterInfo.undefined", request);
+    	}
+    	modelmap.addAttribute("nameFilter", nameFilter);
+    	
     	
     	return "dynamiclist/exportList";
     }
@@ -205,6 +231,12 @@ public class DynamiclistController {
     	config.setActualWhereFilter(null);
     	config.setIdActualFilter(null);
     	config.setTypeActualFilter(null);
+    	config.setActualPage(1);
+    	
+    	if (config.getUserConfig() != null){
+    		config.getUserConfig().setWhereFilter(null);
+    		config.getUserConfig().setInfoFilter(null);
+    	}
     	
     	return "redirect:/" + urlBaseMapping + TagConstants.URL_SEARCH;
     }
@@ -217,15 +249,20 @@ public class DynamiclistController {
     @RequestMapping(value="/dynamiclist/searchFilter", method=RequestMethod.POST)
     public String searchFilter(@RequestParam(value = "humanTextFilter", required = true) String humanTextFilter,
     		@RequestParam(value = "textFilter", required = true) String textFilter,
-    		@RequestParam(value = "urlBaseMapping", required = true) String urlBaseMapping,
+    		@RequestParam(value = "resetSelectedFilter", required = true) Boolean resetFilter,
+    		@RequestParam(value = "urlBaseMapping", required = true) String urlBaseMapping,    		
     		HttpServletRequest request) throws DynamiclistException {
     	
     	//update filter actual values of the config 
     	DynamiclistConfig config= (DynamiclistConfig)request.getSession().getAttribute(TagConstants.DYNAMICLIST_CONFIG);
     	config.setActualHumanWhereFilter(humanTextFilter);
     	config.setActualWhereFilter(textFilter);
-    	request.getSession().setAttribute(TagConstants.DYNAMICLIST_CONFIG, config);
-    	
+    	config.setActualPage(1);
+    	if (resetFilter){
+    		config.setIdActualFilter(null);
+    		config.setTypeActualFilter(null);
+    	}
+    	request.getSession().setAttribute(TagConstants.DYNAMICLIST_CONFIG, config);    	
     	return "redirect:/" + urlBaseMapping + TagConstants.URL_SEARCH;
     }
     
@@ -346,11 +383,7 @@ public class DynamiclistController {
     	}
     	
     	//SPRING_SECURITY_LAST_USERNAME		
-		String loginUser = (String)request.getSession().getAttribute(TagConstants.AUTHENTICATION_USERNAME);
-		if (StringUtils.isEmpty(loginUser)){
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			loginUser = ((User)(authentication.getPrincipal())).getUsername();
-		}    	    	
+    	String loginUser = DynamicListUtil.getLoginUser(request);  	    	
     	userFilter.setEntity(config.getClassObjectSimpleName());
     	userFilter.setIdUser(loginUser);
     	userFilter.setInfoFilter(config.getActualHumanWhereFilter());
@@ -398,7 +431,7 @@ public class DynamiclistController {
      */
     @RequestMapping(value="/dynamiclist/persistenceDeleteFilter", method=RequestMethod.GET)
     public String persistenceDeleteFilter(@RequestParam(value = "id", required = true) Integer id,    		
-    		HttpServletRequest request, ModelMap modelmap) throws DynamiclistException {
+    		HttpServletRequest request, ModelMap modelmap) throws Exception, DynamiclistException {
     	
     	dynamiclistService.deleteUserFilter(id);
     	
@@ -409,8 +442,7 @@ public class DynamiclistController {
     		config.setIdActualFilter(null);
     		config.setTypeActualFilter(null);
     	}   	
-    	config.setUserFilters(dynamiclistService.searchUserFilters(config.getClassObjectSimpleName(), 
-    			(String)request.getSession().getAttribute(TagConstants.AUTHENTICATION_USERNAME)));    	    	
+    	config.setUserFilters(dynamiclistService.searchUserFilters(config.getClassObjectSimpleName(), DynamicListUtil.getLoginUser(request)));    	    	
     	request.getSession().setAttribute(TagConstants.DYNAMICLIST_CONFIG, config);
     	
     	return "redirect:" + TagConstants.URL_DELETE_FILTER;
@@ -428,12 +460,13 @@ public class DynamiclistController {
     @RequestMapping(value="/dynamiclist/executeFilter", method=RequestMethod.GET)
     public String executeFilter(@RequestParam(value = "id", required = true) Integer id,
     		@RequestParam(value = "typeFilter", required = true) String typeFilter,    		
-    		@RequestParam(value = "urlBaseMapping", required = true) String urlBaseMapping, 
+    		@RequestParam(value = "urlBaseMapping", required = true) String urlBaseMapping,    		
     		HttpServletRequest request) throws DynamiclistException {
     	
     	DynamiclistConfig config = (DynamiclistConfig)request.getSession().getAttribute(TagConstants.DYNAMICLIST_CONFIG);
     	config.setIdActualFilter(id);    	
     	config.setTypeActualFilter(typeFilter);
+    	config.setActualPage(1);
     	
     	String whereFilter = null;
     	String humanWhereFilter = null;
@@ -504,14 +537,38 @@ public class DynamiclistController {
     		userConfig = new UserConfig();
     	}
     	    	
-    	userConfig.setIdUser((String)request.getSession().getAttribute(TagConstants.AUTHENTICATION_USERNAME));
-    	userConfig.setEntity(config.getClassObjectName());
-    	userConfig.setEntityProperties(config.getActualFieldsNames().toString());
+    	userConfig.setIdUser(DynamicListUtil.getLoginUser(request));
+    	userConfig.setEntity(config.getClassObjectSimpleName());
+    	
+    	if(config.getActualFieldsNames()!=null && config.getActualFieldsNames().size()>0){
+    		Collection<String> fields = config.getActualFieldsNames();
+    		String aux = "";
+    		for (Iterator<String> iterator = fields.iterator(); iterator.hasNext();) {
+				aux += (String) iterator.next();
+				if (iterator.hasNext()){
+					aux += ",";
+				}
+			}
+    		userConfig.setEntityProperties(aux);
+    	}
+    	
     	userConfig.setWhereFilter(config.getActualWhereFilter());
     	userConfig.setInfoFilter(config.getActualHumanWhereFilter());
+    	
+    	String order = ""; 
+    	if (StringUtils.isNotEmpty(config.getActualOrderByColumn())){
+    		order = config.getActualOrderByColumn();
+    	}
+    	if (StringUtils.isNotEmpty(config.getActualOrderBy())){
+    		if (StringUtils.isNotEmpty(order)){
+    			order = order + ", ";
+    		}
+    		order += config.getActualOrderBy();
+    	}
+    	userConfig.setOrderBy(order);
+    	
     	userConfig.setGroupBy(config.getActualGroupBy());
-    	userConfig.setOrderBy(config.getActualOrderBy());
-    	    	
+    	    	    	
     	config.setUserConfig(dynamiclistService.saveUserConfig(userConfig));
     	request.getSession().setAttribute(TagConstants.DYNAMICLIST_CONFIG, config);    	 
     	return "redirect:/" + urlBaseMapping + TagConstants.URL_SEARCH;

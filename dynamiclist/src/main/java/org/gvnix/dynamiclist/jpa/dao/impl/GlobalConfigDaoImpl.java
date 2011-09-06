@@ -25,6 +25,7 @@ import javax.persistence.PersistenceContext;
 
 import org.gvnix.dynamiclist.jpa.bean.GlobalConfig;
 import org.gvnix.dynamiclist.jpa.dao.GlobalConfigDao;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * GlobalConfig DAO implementation.
  */
+@Configurable
 @Repository
 @Transactional(readOnly = true)
 public class GlobalConfigDaoImpl implements GlobalConfigDao {

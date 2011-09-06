@@ -44,9 +44,6 @@ import org.gvnix.dynamiclist.service.DynamiclistService;
 import org.gvnix.dynamiclist.util.DynamicListUtil;
 import org.gvnix.dynamiclist.util.TagConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -104,9 +101,16 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 							"DynamiclistServiceImpl", "searchMetaFields");
 			}
 			
-			//recorremos las propiedades visibles de la case desde el config y las comparamos con los nombres de las propiedades
+			//recorremos las propiedades visibles de la clase desde el config y las comparamos con los nombres de las propiedades
 			//si existe la añadimos en finalFieldsNames
-			String[] arrayDisplay = StringUtils.split(config.getGlobalConfig().getEntityProperties(), ',');
+			
+			String[] arrayDisplay;
+			if (config.getUserConfig()!=null && StringUtils.isNotEmpty(config.getUserConfig().getEntityProperties())){
+				arrayDisplay = StringUtils.split(config.getUserConfig().getEntityProperties(), ',');
+			} else {
+				arrayDisplay = StringUtils.split(config.getGlobalConfig().getEntityProperties(), ',');
+			}
+			
 			for (int i = 0; i < arrayDisplay.length; i++) {
 				String displayColumn = arrayDisplay[i].trim();
 				for (String fieldName : fieldsNames) {
@@ -145,12 +149,17 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 		
 		// --- orderBy
 		String order = "";		
-		//ordernación desde una columna del listado
-		//TODO: delete actualOrderByColumn of config
+		//ordernación desde una columna del listado		
 		if (StringUtils.isNotEmpty(orderByColumn)){
-			order = orderByColumn;
-			//update orderBycolumn in dynamiclistConfig
-			config.setActualOrderByColumn(orderByColumn);			
+			
+			if (orderByColumn.equals("deleteOrderByColumn")){
+				//delete actualOrderByColumn of config
+				config.setActualOrderByColumn(null);
+			} else {
+				order = orderByColumn;
+				//update orderBycolumn in dynamiclistConfig
+				config.setActualOrderByColumn(orderByColumn);
+			}						
 		} else if (StringUtils.isNotEmpty(config.getActualOrderByColumn())) {
 			order = config.getActualOrderByColumn();
 		} 		
@@ -204,10 +213,14 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 		String filter = "";
 		if (StringUtils.isNotEmpty(config.getActualWhereFilter())){
 			filter = config.getActualWhereFilter();
+		} else if (config.getUserConfig()!=null && StringUtils.isNotEmpty(config.getUserConfig().getWhereFilter())){
+			filter = config.getUserConfig().getWhereFilter();
+			config.setActualWhereFilter(config.getUserConfig().getWhereFilter());
+			config.setActualHumanWhereFilter(config.getUserConfig().getInfoFilter());
 		}
 		
 		// --- add GlobalConfig or UserConfig if exist
-		String finalFilter = this.addFilterGlobalUserConfig(filter, config);
+		String finalFilter = this.addFilterGlobalConfig(filter, config);
 		String finalOrder = this.addOrderGlobalUserConfig(order, config);
 		
 		
@@ -215,7 +228,26 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 		int sizeNo = size == null ? TagConstants.SIZE_PAGE_DEFAULT : size.intValue();
 		float nrOfPages = (float) countEntities / sizeNo;		
 				
-		model.addAttribute(TagConstants.PAGE_NAME, page == null ? 1 : page.intValue());
+		if (page != null){
+			config.setActualPage(page);
+		} else {
+			if (config.getActualPage() != null){
+				page = config.getActualPage();
+			} 
+		}
+		
+		//comprobamos el número de páginas y la página actual
+		if ( page != null && page != 1){
+			if (countEntities <= ((page-1) * sizeNo)){
+				page = (int)nrOfPages;
+				config.setActualPage(page);
+			}
+		} else {
+			page = 1;
+			config.setActualPage(page);
+		}
+				
+		model.addAttribute(TagConstants.PAGE_NAME, page.intValue());
 		model.addAttribute(TagConstants.MAX_PAGES_NAME, (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? 
 				nrOfPages + 1 : nrOfPages));
 		model.addAttribute(TagConstants.COUNTLIST_NAME, countEntities);
@@ -242,7 +274,7 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 	 */
 	public Collection<?> searchExport(String ClassObjectSimpleName, DynamiclistConfig config) throws DynamiclistException {
 		
-		String filter = this.addFilterGlobalUserConfig(config.getActualWhereFilter(), config);
+		String filter = this.addFilterGlobalConfig(config.getActualWhereFilter(), config);
 		String order = this.addOrderGlobalUserConfig(config.getActualOrderBy(), config);
 		
 		return dynamiclistDao.findEntities(config.getClassObjectSimpleName(), 0, 2000, filter, order);
@@ -252,7 +284,7 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 	/* (non-Javadoc)
 	 * @see org.gvnix.dynamiclist.service.DynamiclistService#deleteUserFilter(java.lang.Integer)
 	 */
-	public void deleteUserFilter(Integer id) throws DynamiclistException {
+	public void deleteUserFilter(Integer id) throws Exception, DynamiclistException {
 		UserFilter filter = userFilterDao.findUserFilterById(id);		
 		userFilterDao.delete(filter);		
 	}
@@ -357,29 +389,18 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 	 * @return
 	 * @throws DynamiclistException
 	 */
-	private String addFilterGlobalUserConfig (String filter, DynamiclistConfig config) throws DynamiclistException {
+	private String addFilterGlobalConfig (String filter, DynamiclistConfig config) throws DynamiclistException {
 		
 		String finalFilter = "";
-		
-		//Add GlobalConfig or UserConfig if exist
-		if (config.getUserConfig() != null && StringUtils.isNotEmpty(config.getUserConfig().getWhereFilter())){
-			//put whereFilter of UserConfig in the dynamic search
+		//put whereFilterFix and orderBy of GlobalConfig in the dynamic search
+		if (StringUtils.isNotEmpty(config.getGlobalConfig().getWhereFilterFix())){
 			if (StringUtils.isNotEmpty(filter)){
-				finalFilter = "(" + config.getUserConfig().getWhereFilter() + ")" + " AND " + filter;
+				finalFilter = "(" + config.getGlobalConfig().getWhereFilterFix() + ")" + " AND " + filter;					
 			} else {
-				finalFilter = config.getUserConfig().getWhereFilter();
+				finalFilter = config.getGlobalConfig().getWhereFilterFix();					
 			}
 		} else {
-			//put whereFilterFix and orderBy of GlobalConfig in the dynamic search
-			if (StringUtils.isNotEmpty(config.getGlobalConfig().getWhereFilterFix())){
-				if (StringUtils.isNotEmpty(filter)){
-					finalFilter = "(" + config.getGlobalConfig().getWhereFilterFix() + ")" + " AND " + filter;
-				} else {
-					finalFilter = config.getGlobalConfig().getWhereFilterFix();
-				}
-			} else {
-				finalFilter = filter;
-			}
+			finalFilter = filter;
 		}
 		
 		return finalFilter;
@@ -397,8 +418,8 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 		
 		StringBuffer finalOrder = new StringBuffer();
 		
-		//Add GlobalConfig or UserConfig if exist
-		if (config.getUserConfig() != null && StringUtils.isNotEmpty(config.getUserConfig().getOrderBy())){			
+		//Add GlobalConfig 
+		/*if (config.getUserConfig() != null && StringUtils.isNotEmpty(config.getUserConfig().getOrderBy())){			
 			//put orderBy of UserConfig in the dynamic search
 				
 				//If exist actualGroupBy, it´s 1º order and globalConfig.orderBy 2º
@@ -450,7 +471,7 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 					finalOrder.append(order);
 				}
 			
-		} else {			
+		} else { */		
 			//put orderBy of GlobalConfig in the dynamic search
 			if (StringUtils.isNotEmpty(config.getGlobalConfig().getOrderBy())){
 				//if exist actualGroupBy, it´s 1º order and globalConfig.orderBy 2º
@@ -506,7 +527,7 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 					finalOrder.append(order);
 				}
 			}
-		}
+		//}
 		
 		return finalOrder.toString();
 	}
@@ -549,11 +570,7 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 			
 			//SPRING_SECURITY_LAST_USERNAME
 			//Authentication.Principal.Username
-			String loginUser = (String)request.getSession().getAttribute(TagConstants.AUTHENTICATION_USERNAME);
-			if (StringUtils.isEmpty(loginUser)){
-				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-				loginUser = ((User)(authentication.getPrincipal())).getUsername();
-			}
+			String loginUser = DynamicListUtil.getLoginUser(request);
 			
 			// --- UserConfig ---			
 			Collection<UserConfig> userConfigs = userConfigDao.findUserConfigByEntityAndIdUser(objectClass.getSimpleName(), loginUser);		
@@ -570,6 +587,26 @@ public class DynamiclistServiceImpl implements DynamiclistService{
 			config.setUserFilters(userFilterDao.findUserFilterByEntityAndIdUser(objectClass.getSimpleName(), loginUser));			
 			config.setClassObjectName(objectClass.getName());
 			config.setClassObjectSimpleName(objectClass.getSimpleName());
+			
+			// --- Inicializamos actualOrderBy, actualGroupBy y actualFieldNames de userConfig
+			if(config.getUserConfig() != null){
+				if(StringUtils.isNotEmpty(config.getUserConfig().getOrderBy())){
+					config.setActualOrderBy(config.getUserConfig().getOrderBy());
+				}
+				if(StringUtils.isNotEmpty(config.getUserConfig().getGroupBy())){
+					config.setActualGroupBy(config.getUserConfig().getGroupBy());
+				}				
+								
+				if (config.getUserConfig()!=null && StringUtils.isNotEmpty(config.getUserConfig().getEntityProperties())){
+					List<String> fieldsNames = new ArrayList<String>();
+					String[] fieldsArray = StringUtils.split(config.getUserConfig().getEntityProperties(), ',');
+					for (String string : fieldsArray) {
+						fieldsNames.add(string);
+					}
+					config.setActualFieldsNames(fieldsNames);
+				}
+				
+			}
 		}
 				
 		// set dynamiclistConfig in session

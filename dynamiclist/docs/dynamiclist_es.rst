@@ -25,13 +25,13 @@ Introduction
 Dynamiclist es un componente (Custom Tag) que añade a una aplicación web la visualización de los listados 
 de las diferentes entidades de la aplicación.
 Este listado ofrece de forma dinámica opciones de creación, visualización, borrado, modificación y 
-otras acciones adicionales de la entidad, así como filtrado, agrupación, ordenación, paginación del listado mostrado.     
+otras acciones adicionales de la entidad, así como filtrado, agrupación, ordenación, paginación etc.     
 
 
 Requerimientos
 ==============
 Aplicación web basada en springmvc.
-Seguridad desarrollada con Spring-security (se utilizan las credenciales para guardar los filtros referenciando al usuario logeado)
+Seguridad desarrollada con Spring-security (se utilizan las credenciales para guardar los filtros referenciando al usuario logueado)
 Acceso a datos mediante JPA
 
 
@@ -39,8 +39,8 @@ Pasos a seguir para la utilización del componente:
 =================================================
 
 La aplicación se distribuye en un fichero .zip generado por la orden de maven 'mvn assembly:assembly', 
-este fichero se compone de el jar de dinamiclist más los jar de sus dependencias, ficheros documentación, 
-el código fuente, y los recursos no empaquetados en el .jar.  
+este fichero se compone del jar de dynamiclist más los jar de sus dependencias, ficheros documentación, 
+el código fuente y los recursos no empaquetados en el .jar.  
 
 Para una mayor comprensión se van a indicar los diferentes pasos que se deberían seguir para utilizar este componente. No es necesario 
 realizarlo en el orden indicado en este documento.
@@ -100,18 +100,21 @@ El componente se puede dividir en tres partes:
 		Los ficheros jsp´s deben ubicarse en la ruta /WEB-INF/jsp/dynamiclist de la applicación web
 
 	resources/webapp/css
-		El fichero 'estilos.css' debe ser copiado en la aplicación a desarrollar en directorio de despliege '/css/estilos.css'
+		El fichero 'estilos.css' debe ser copiado en la aplicación a desarrollar en directorio de despliegue '/css/estilos.css'
 		
 		Ejemplo de línea que debe ser añadida en los jsp´s que utilicen el componente:		
 		<link rel="stylesheet" type="text/css" href="<c:url value="/css/estilos.css"/>" />
-
-
-
+	
+	resources/webapp/tiles/dynamiclist-tiles.xml
+		El fichero dynamiclist-tiles.xml debe ser copiado en la aplicación en un directorio conocido de despliegue (ejemplo: /WEB-INF/layouts/) 
+		y añadido a las definiciones del configurador de tiles en los ficheros de configuración de spring.
+		(Se explica en 'Configuración del contexto de Spring').
+		
 		
 Ficheros de la aplicación web que deben ser configurados:
 
 	web.xml:
-		Se debe añadir un servlet de spring para recuperar los recursos de los .jar (dynamiclis.js)
+		Se debe añadir un servlet de spring para recuperar los recursos de los .jar (dynamicist.js)
 		<servlet>
 			<servlet-name>Resource Servlet</servlet-name>
 			<servlet-class>org.springframework.js.resource.ResourceServlet</servlet-class>
@@ -120,6 +123,14 @@ Ficheros de la aplicación web que deben ser configurados:
 			<servlet-name>Resource Servlet</servlet-name>
 			<url-pattern>/resources/*</url-pattern>
 		</servlet-mapping>
+		
+		//necesita dependencia, se debe añadir al pom.xml de maven
+		<dependency>
+    		<groupId>org.springframework.webflow</groupId>
+    		<artifactId>org.springframework.js</artifactId>
+    		<version>2.0.5.RELEASE</version>
+		</dependency>
+		
 		
 		
 	ficheros.jsp:
@@ -145,11 +156,20 @@ Ficheros de la aplicación web que deben ser configurados:
 				<dynamiclist:buttonsTag url_base="client" classObject="client">
  					<dynamiclist:actionsTag /> 	
  					<dynamiclist:headerTableTag>
- 						<dynamiclist:tableTag list="${clients}"/>
+ 						<dynamiclist:tableTag list="${list}"/>
  					</dynamiclist:headerTableTag>
  					<dynamiclist:footerTableTag/> 	
 				</dynamiclist:buttonsTag>
 	
+	
+	Se deben añadir los correspondientes mapeos a las tablas utilizadas por dynamiclist.
+	En fichero persistence.xml se debe añadir: 
+	
+		<!-- dynamic list persistence classes -->
+        <class>org.gvnix.dynamiclist.jpa.bean.GlobalConfig</class>
+        <class>org.gvnix.dynamiclist.jpa.bean.GlobalFilter</class>
+        <class>org.gvnix.dynamiclist.jpa.bean.UserConfig</class>
+        <class>org.gvnix.dynamiclist.jpa.bean.UserFilter</class>   
 	
 
 	Configuración del contexto de spring:
@@ -164,7 +184,7 @@ Ficheros de la aplicación web que deben ser configurados:
 			
 			En el resolutor de fuente de mensajes se deben añadir los proporcionados en dynamiclist: 
 			
-			Por ejemplo si el basename de la aplicación es "messages" se debe añadir el basename "dynamiclistmessages"
+				Por ejemplo si el basename de la aplicación es "messages" se debe añadir el basename "dynamiclistmessages"
 				<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource" >
 					<property name="basenames">
 						<list>
@@ -172,7 +192,30 @@ Ficheros de la aplicación web que deben ser configurados:
 							<value>org.gvnix.dynamiclist.dynamiclistmessages</value>												
 						</list>
 					</property>
-				</bean>	
+				</bean>
+				
+				Otro ejemplo:
+				<!-- Resolves localized messages*.properties and application.properties files in the application to	allow for internationalization. 
+				The messages*.properties files translate Roo generated messages which are part of the admin interface, the application.properties
+				resource bundle localizes all application specific messages such as entity names and menu items. -->
+				<bean class="org.springframework.context.support.ReloadableResourceBundleMessageSource" id="messageSource" 
+					p:basenames="WEB-INF/i18n/messages,WEB-INF/i18n/application,WEB-INF/i18n/dynamiclistmessages" 
+					p:fallbackToSystemLocale="false"/>
+				
+				
+			Añadimos el fichero dynamiclist-tiles.xml previamente copiado a las definiciones del configurador de tiles. 
+				Ejemplo:
+				<bean class="org.springframework.web.servlet.view.tiles2.TilesConfigurer" id="tilesConfigurer">
+				    <property name="definitions">
+				      <list>
+					<value>/WEB-INF/layouts/layouts.xml</value>
+					<!-- Scan views directory for Tiles configurations -->
+					<value>/WEB-INF/views/**/views.xml</value>
+					<!-- Añadimos fichero tiles para dynamiclist -->
+					<value>/WEB-INF/layouts/dynamiclist-tiles.xml</value>
+				      </list>
+				    </property>
+				 </bean>
 			
 		
 		- Para la parte correspondiente a la declaración de beans:
@@ -224,7 +267,13 @@ Ficheros de la aplicación web que deben ser configurados:
     		}
 	
 			La función 'search' el parámetro 'size' por defecto es de 10 elementos (es decir el número de filas por página del listado), 
-			si se requiere un valor distinto es posible cambiarlo en la llamada de busqueda del servicio 'dynamiclistService'.
+			si se requiere un valor distinto es posible cambiarlo en la llamada de búsqueda del servicio 'dynamiclistService'.
+			
+			
+	- Transacciones:
+		Si se utiliza la anotación para las transacciones en modo 'aspectj' no es posible añadir el dynamiclist.jar en las dependencias del proyecto ya que las clases DAO de dynamiclist utilizan anotaciones mode='proxy'.
+		Para estos casos se soluciona añadiendo las fuentes al proyecto como se ha realizado para la prueba de concepto Pizza Shop con dynamiclist.  
+		(<tx:annotation-driven mode="aspectj" transaction-manager="transactionManager"/>)
 			 
 
 Dependencias de proyecto

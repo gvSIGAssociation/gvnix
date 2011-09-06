@@ -124,7 +124,7 @@ public class ActionsTag extends TagSupport{
 		//FILTERS
 		if ((config.getGlobalFilters() != null && config.getGlobalFilters().size() > 0) || 
 				(config.getUserFilters() != null && config.getUserFilters().size() > 0)) {
-			buffer.append("<select id=\"selectFilters\" class=\"txpuerto3\"");			
+			buffer.append("<select id=\"selectFilters\" class=\"txpuerto3\" ");			
 			buffer.append("onchange=\"javascript:dl_executeFilter('");
 			buffer.append(contextPath);				
 			buffer.append(TagConstants.URL_EXECUTE_FILTER);

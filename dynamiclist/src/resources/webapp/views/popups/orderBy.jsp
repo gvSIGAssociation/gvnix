@@ -17,18 +17,21 @@
 
 <script type="text/javascript">
 
+var deleteOrderByColumn = false;
+
 function orderBySearch(){
 	var orderSQL = document.getElementById("value(orderText)").value;
 	if (document.getElementById("value(humanOrderText)").value == '') {
 		var orderSQL = 'false';
 	}
-	window.opener.dl_orderBySearch(orderSQL, '<c:out value="${urlMapping}"/>');
+	window.opener.dl_orderBySearch(orderSQL, '<c:out value="${urlMapping}"/>', deleteOrderByColumn);
   	window.close();
 }
 
 function deleteOrder() {
 	document.getElementById("value(orderText)").value='';
 	document.getElementById("value(humanOrderText)").value='';
+	deleteOrderByColumn = true;
 }
 
 function addOrder() {

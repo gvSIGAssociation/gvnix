@@ -28,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.gvnix.dynamiclist.jpa.dao.DynamiclistDao;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Dynamiclist DAO implementation.
  *
  */
+@Configurable
 @Repository (value = "dynamiclistDao")
 @Transactional(readOnly = true)
 public class DynamiclistDaoImpl implements DynamiclistDao{
@@ -72,7 +74,7 @@ public class DynamiclistDaoImpl implements DynamiclistDao{
     	if (log.isDebugEnabled()){
     		log.debug("createQuery qlString ["+ buffer.toString() + "]");
     	}
-    	
+    	    	
     	Query query = em.createQuery(buffer.toString());
     	// add the pagination
     	query.setFirstResult(startIndex).setMaxResults(maxResults).getResultList();    	
@@ -107,6 +109,4 @@ public class DynamiclistDaoImpl implements DynamiclistDao{
 		return ((Number)em.createQuery(buffer.toString()).getSingleResult()).intValue();
 	}
 	
-    
-    
 }

@@ -44,8 +44,8 @@ public class UserConfig implements Serializable {
     private String entityProperties = null;
     private String whereFilter = null;
     private String infoFilter = null;
-    private String orderBy = null;;	
-	private String groupBy = null;;
+    private String orderBy = null;	
+	private String groupBy = null;
         
     /**
      * Gets id (primary key).

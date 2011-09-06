@@ -136,14 +136,16 @@ public class TableTag extends TagSupport {
 			boolean changeValueGroupBy = false;
 			for (String name : metaFieldsNames) {
 				Method method;
-				String value;
+				String value = "";
 				try{
 					method = object.getClass().getMethod("get" + StringUtils.capitalize(name));
-					//Format the attribute Date type 
-					if (method.getGenericReturnType() == Date.class) {
-						value = simpleDateFormat.format(method.invoke(object));
-					} else {
-						value = method.invoke(object).toString();
+					if (method.invoke(object) != null){
+						//Format the attribute Date type 
+						if (method.getGenericReturnType() == Date.class) {						
+							value = simpleDateFormat.format(method.invoke(object));
+						} else {
+							value = method.invoke(object).toString();
+						}
 					}
 				} catch (NoSuchMethodException e) {
 					e.printStackTrace();
