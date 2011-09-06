@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures,
+      Territori i Medi Ambient - Generalitat Valenciana
+      Copyright (C) 2011 CIT - Generalitat Valenciana
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program. If not, see <http://www.gnu.org/licenses />.
+-->
+<features name="gvnix-hibernate-features-repository">
+
+    <!--
+    Karaf Feature Descriptor to install Hibernate 3 in Servicemix 4
+    -->
+    <feature name="gvnix-hibernate" version="${project.version}">
+
+        <!-- TODO: Check there is any feature dependency -->
+        <!-- <feature>FEATURE_NAME</feature> -->
+
+        <!-- Hibernate required dependencies -->
+        <bundle dependency="true">mvn:org.antlr/com.springsource.antlr/2.7.7</bundle>
+        <bundle dependency="true">mvn:org.objectweb.asm/com.springsource.org.objectweb.asm/1.5.3</bundle>
+        <bundle dependency="true">mvn:net.sourceforge.cglib/com.springsource.net.sf.cglib/2.2.0</bundle>
+        <bundle dependency="true">mvn:org.apache.commons/com.springsource.org.apache.commons.collections/3.2.1</bundle>
+        <bundle dependency="true">mvn:org.dom4j/com.springsource.org.dom4j/1.6.1</bundle>
+        <bundle dependency="true">mvn:org.apache.log4j/com.springsource.org.apache.log4j/1.2.16</bundle>
+        <bundle dependency="true">mvn:org.slf4j/com.springsource.slf4j.api/1.6.1</bundle>
+        <bundle dependency="true">mvn:org.slf4j/com.springsource.slf4j.log4j/1.6.1</bundle>
+        <bundle dependency="true">mvn:org.apache.commons/com.springsource.org.apache.commons.dbcp/1.2.2.osgi</bundle>
+        <bundle dependency="true">mvn:javassist/org.gvnix.javassist/3.12.1.GA</bundle>
+
+        <!-- Hibernate Validator required dependencies -->
+        <bundle dependency="true">mvn:org.joda/com.springsource.org.joda.time/1.6.0</bundle>
+        <bundle dependency="true">mvn:org.jsoup/jsoup/1.6.1</bundle>
+
+        <!-- Spring -->
+        <bundle dependency="true">mvn:org.springframework/spring-jdbc/3.0.5.RELEASE</bundle>
+        <bundle dependency="true">mvn:org.springframework/spring-orm/3.0.5.RELEASE</bundle>
+
+        <!-- Specs -->
+        <!-- IMPORTANT: Some Java EE specifications don't work well in OSGi
+
+        The mean reason is that the implementation is discovered using 
+        different mechanisms by the API. The most commonly used one is to find 
+        a file on the classpath in the 'META-INF/services' directory and find 
+        the main entry point class of the implementation (SPI mechanism).
+
+        ServiceMix and Geronimo groups have done a good work on this area
+        and it's recommendable/needed to use their bundles for JEE specs
+        because these bundles include an OSGi specific discovery mechanism
+        that let these spec bundles to be able to locate dynamically the 
+        implementation to use.
+
+        Ref: http://gnodet.blogspot.com/2008/05/jee-specs-in-osgi.html
+
+        MVN repos:
+          http://repo1.maven.org/maven2/org/apache/servicemix/specs/
+          http://repo1.maven.org/maven2/org/apache/geronimo/specs/
+        -->
+        <bundle dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.java-persistence-api-2.0/1.8.0</bundle>
+        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
+        <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jacc_1.1_spec/1.0.2</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr303-api-1.0.0/1.8.0</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/1.8.0</bundle>
+
+        <!-- Hibernate3 -->
+        <bundle>mvn:org.hibernate/org.gvnix.org.hibernate.validator/4.2.0.Final/</bundle>
+        <bundle>mvn:org.hibernate/org.gvnix.org.hibernate/3.6.7.Final</bundle>
+    </feature>
+
+</features>

@@ -1,1 +1,0 @@
-Hacer features.xml para Karaf
