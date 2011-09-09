@@ -256,10 +256,10 @@ li.height100 .boxDisabled { height: 100px;}
 
 .boxNoedit .box {
     font-family: Verdana,Arial,Helvetica,sans-serif;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: normal;
     height: 18px;
-    color: #ADADAD;
+    color: #234372;
     border: 1px solid #C1CADD;
     background-color: #E2E4E9;
 }
