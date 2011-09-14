@@ -252,7 +252,34 @@ public class JavaParserMethodMetadata extends AbstractCustomDataAccessorProvider
 			if (methodParameter.getJavaType().isPrimitive()) {
 				parameterType = JavaParserUtils.getType(methodParameter.getJavaType());
 			} else {
-				parameterType = JavaParserMutableClassOrInterfaceTypeDetails.getResolvedName(compilationUnitServices.getEnclosingTypeName(), AnnotatedJavaType.convertFromAnnotatedJavaTypes(Collections.singletonList(methodParameter)).get(0), compilationUnitServices);
+        /*
+         * XXX: This is a back port from Roo master branch (Git ID 97d1a898f0604765ced3461b4fd3faede94442a4).
+         * The Jira issue is ROO-2744.
+         * Without this change when Roo creates a physical type with an array parameter,
+         * the array modifier "[]" is lost writting to file.
+         * In gvNIX Add-on Service WSExportOperationsImpl.getMethodParameterAnnotations use this feature.
+         */
+			  NameExpr type = JavaParserUtils.importTypeIfRequired(compilationUnitServices.getEnclosingTypeName(), compilationUnitServices.getImports(), methodParameter.getJavaType());
+        ClassOrInterfaceType cit = JavaParserUtils.getClassOrInterfaceType(type);
+
+        // Add any type arguments presented for the return type
+        if (methodParameter.getJavaType().getParameters().size() > 0) {
+                List<Type> typeArgs = new ArrayList<Type>();
+                cit.setTypeArgs(typeArgs);
+                for (JavaType parameter : methodParameter.getJavaType().getParameters()) {
+                        typeArgs.add(JavaParserUtils.importParametersForType(compilationUnitServices.getEnclosingTypeName(), compilationUnitServices.getImports(), parameter));
+                }
+        }
+
+        // Handle arrays
+        if (methodParameter.getJavaType().isArray()) {
+                ReferenceType rt = new ReferenceType();
+                rt.setArrayCount(methodParameter.getJavaType().getArray());
+                rt.setType(cit);
+                parameterType = rt;
+        } else {
+                parameterType = cit;
+        }
 			}
 
 			// Create a Java Parser method parameter and add it to the list of parameters
