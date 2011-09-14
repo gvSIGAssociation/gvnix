@@ -444,70 +444,13 @@ Children     :
             especifica se muestran todas las página del menú.</para>
           </listitem>
         </varlistentry>
-
-        <varlistentry>
-          <term>--label</term>
-
-          <listitem>
-            <para><emphasis>[Opcional] [Valor por defecto 'false']
-            [booleano]</emphasis></para>
-
-            <para>Añadir información del valor <varname>label</varname> a los
-            elementos del listado. Valor que toma la propiedad
-            <emphasis>"Label Code"</emphasis> en el archivo i18n.</para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>--messageCode</term>
-
-          <listitem>
-            <para><emphasis>[Opcional] [Valor por defecto 'false']
-            [booleano]</emphasis></para>
-
-            <para>Añadir información del valor <varname>messageCode</varname>
-            a los elementos del listado.</para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>--lang</term>
-
-          <listitem>
-            <para><emphasis>[Opcional] [Valor por defecto 'false']
-            [booleano]</emphasis></para>
-
-            <para>Añadir información del valor <varname>lang</varname> a los
-            elementos del listado.</para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>--roles</term>
-
-          <listitem>
-            <para><emphasis>[Opcional] [Valor por defecto 'false']
-            [booleano]</emphasis></para>
-
-            <para>Añadir información del valor <varname>roles</varname> a los
-            elementos del listado.</para>
-          </listitem>
-        </varlistentry>
       </variablelist></para>
 
     <para>Estos son ejemplos que muestran la salida del
-    comando:<programlisting>roo&gt; <emphasis role="bold">menu tree --id c_person</emphasis>
-[c_person]
-URL          : No
-Hidden       : false
-Children     : 
-               [i_person_new]
-               URL          : /people?form
-               Hidden       : false
-
-               [i_person_list]
-               URL          : /people?page=1&amp;size=${empty param.size ? 10 : param.size}
-               Hidden       : false
+    comando:<programlisting>roo&gt; <emphasis role="bold">menu tree --id c_owner</emphasis>
+[c_owner, visible, no-URL]
+          /owners?form  [i_owner_new, visible]
+          /owners?page=1&amp;size=${empty param.size ? 10 : param.size}  [i_owner_list, visible]
 </programlisting></para>
   </section>
 </section>
