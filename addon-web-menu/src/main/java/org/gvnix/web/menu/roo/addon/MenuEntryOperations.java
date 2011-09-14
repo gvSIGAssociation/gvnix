@@ -219,6 +219,16 @@ public interface MenuEntryOperations {
     String getFormatedInfo(JavaSymbolName pageId, I18n lang);
 
     /**
+     * Return a formated string that shows compact menu tree info.
+     * <p>
+     * Info about labels, roles is not shown
+     * 
+     * @param pageId
+     * @return
+     */
+    String getCompactInfo(JavaSymbolName pageId);
+
+    /**
      * Return a formated string with a list representation of a subtree.
      * <p>
      * By default shows all menu entry Ids plus target URLs.

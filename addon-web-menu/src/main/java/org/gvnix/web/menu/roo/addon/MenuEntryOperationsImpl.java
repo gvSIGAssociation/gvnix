@@ -530,19 +530,118 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     }
 
     /** {@inheritDoc} */
+    public String getCompactInfo(JavaSymbolName pageId) {
+        Element rootElement = getMenuRootElement();
+
+        // if no entry selected, show the info of all 1st level Elements
+        if (pageId == null) {
+            return getCompactInfo(rootElement.getChildNodes(), 0);
+        }
+
+        // check for existence of menu category by looking for the identifier
+        // provided
+        Element pageElement = XmlUtils.findFirstElement(
+                "//*[@id='".concat(pageId.getSymbolName()).concat("']"),
+                rootElement);
+
+        // if selected entry doesn't exist, error
+        Assert.notNull(pageElement, "Page '".concat(pageId.getSymbolName())
+                .concat("' not found [No info found]"));
+
+        // show the info of selected menu entry
+        return getCompactInfo(pageElement, 0);
+    }
+
+    /**
+     * Iterates over a list of menu entry Nodes and call
+     * {@link #getCompactInfo(Element, int)} to get the info of all the menu
+     * entry Nodes in the given list.
+     * 
+     * @param nodes
+     * @param tabSize
+     * @return
+     */
+    private String getCompactInfo(NodeList nodes, int tabSize) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+
+            // filter nodes that aren't menuItems
+            if (node.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            String nodeName = node.getNodeName();
+            if (!nodeName.equals("menu-item")) {
+                continue;
+            }
+
+            builder.append(getCompactInfo((Element) node, tabSize));
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Shows menu info in compact mode: <br/>
+     * <code>
+     * &nbsp;&nbsp;/tribunales  [c_tribunales, visible]<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;/tribunales?form  [i_tribunales_new, visible]<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;/tribunales?page=1&size=${empty param.size ? 10 : param.size}  [i_tribunales_list, hidden]<br/>
+     * </code>
+     * 
+     * @param element
+     * @param tabSize
+     * @return
+     */
+    private String getCompactInfo(Element element, int tabSize) {
+        StringBuilder builder = new StringBuilder();
+        StringBuilder indent = new StringBuilder();
+
+        // tab string to align children
+        for (int i = 0; i < tabSize; i++) {
+            indent.append(" ");
+        }
+
+        String url = element.getAttribute("url");
+        if (StringUtils.hasText(url)) {
+            builder.append(indent).append(url).append("  ");
+        }
+
+        // string containing "[ID, visibility]: "
+        StringBuilder idVisibility = new StringBuilder();
+        idVisibility.append("[").append(element.getAttribute("id"));
+        String hidden = element.getAttribute("hidden");
+        if (!StringUtils.hasText(hidden)) {
+            hidden = "false"; // visible by default
+        }
+        if (Boolean.getBoolean(hidden)) {
+            idVisibility.append(", hidden");
+        } else {
+            idVisibility.append(", visible");
+        }
+        if (!StringUtils.hasText(url)) {
+            idVisibility.append(", no-URL");
+        }
+        idVisibility.append("]");
+
+        // build Element info
+        builder.append(idVisibility);
+
+        // get children info
+        if (element.hasChildNodes()) {
+            builder.append("\n")
+                    .append(getCompactInfo(element.getChildNodes(),
+                            tabSize + 10)).append("\n");
+        } else {
+            builder.append("\n"); // empty line
+        }
+        return builder.toString();
+    }
+
+    /** {@inheritDoc} */
     public String getFormatedInfo(JavaSymbolName pageId, boolean label,
             boolean messageCode, boolean roles, I18n lang) {
-        Document document = getMenuDocument();
-
-        // make the root element of the menu the one with the menu identifier
-        // allowing for different decorations of menu
-        Element rootElement = XmlUtils.findFirstElement("//*[@id='_menu']",
-                (Element) document.getFirstChild());
-
-        if (!rootElement.getNodeName().equals("gvnix-menu")) {
-            throw new IllegalArgumentException(
-                    "menu.xml hasn't valid XML structure.");
-        }
+        Element rootElement = getMenuRootElement();
 
         // if no entry selected, show the info of all 1st level Elements
         if (pageId == null) {
@@ -562,6 +661,27 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // show the info of selected menu entry
         return getFormatedInfo(pageElement, label, messageCode, roles, lang, 0);
+    }
+
+    /**
+     * Returns the Root element of the menu.xml file
+     * 
+     * @return
+     */
+    private Element getMenuRootElement() {
+        Document document = getMenuDocument();
+
+        // make the root element of the menu the one with the menu identifier
+        // allowing for different decorations of menu
+        Element rootElement = XmlUtils.findFirstElement("//*[@id='_menu']",
+                (Element) document.getFirstChild());
+
+        if (!rootElement.getNodeName().equals("gvnix-menu")) {
+            throw new IllegalArgumentException(
+                    "menu.xml hasn't valid XML structure.");
+        }
+
+        return rootElement;
     }
 
     /** {@inheritDoc} */

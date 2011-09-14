@@ -197,14 +197,9 @@ public class MenuEntryCommands implements CommandMarker { // all command types
 
     @CliCommand(value = "menu tree", help = "List current menu tree structure.")
     public String list(
-            @CliOption(key = "id", mandatory = false, help = "Menu entry id to show its tree structure. Default show all entries.") MenuEntry menuEntryId,
-            @CliOption(key = "label", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Show label texts.") boolean label,
-            @CliOption(key = "messageCode", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Show message codes.") boolean messageCode,
-            @CliOption(key = "lang", mandatory = false, help = "Show messages in this language.") I18n lang,
-            @CliOption(key = "roles", mandatory = false, unspecifiedDefaultValue = "false", specifiedDefaultValue = "true", help = "Show roles.") boolean roles) {
-        return operations.getFormatedInfo(
-                menuEntryId != null ? menuEntryId.getJavaSymbolName() : null,
-                label, messageCode, roles, lang);
+            @CliOption(key = "id", mandatory = false, help = "Menu entry id to show its tree structure. Default show all entries.") MenuEntry menuEntryId) {
+        return operations.getCompactInfo(menuEntryId != null ? menuEntryId
+                .getJavaSymbolName() : null);
     }
 
     @CliCommand(value = "menu entry info", help = "Shows all information about a menu entry.")
