@@ -614,7 +614,7 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
         if (!StringUtils.hasText(hidden)) {
             hidden = "false"; // visible by default
         }
-        if (Boolean.getBoolean(hidden)) {
+        if (Boolean.valueOf(hidden)) {
             idVisibility.append(", hidden");
         } else {
             idVisibility.append(", visible");
