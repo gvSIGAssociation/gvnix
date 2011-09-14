@@ -61,14 +61,6 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web-menu_page-remove">menu entry
-          remove</link></entry>
-
-          <entry>Elimina una página</entry>
-        </row>
-
-        <row>
-          <entry><link
           linkend="apendice-comandos_addon-web-menu_page-move">menu entry
           move</link></entry>
 
@@ -245,39 +237,6 @@
 
             <para>Lista (separados por comas sin espacios) de roles de
             usuarios que pueden ver esta entrada dle menú.</para>
-          </listitem>
-        </varlistentry>
-      </variablelist></para>
-  </section>
-
-  <section xml:id="apendice-comandos_addon-web-menu_page-remove">
-    <title xml:lang="es">menu entry remove</title>
-
-    <para xml:lang="es">Elimina un página. Si la página está generada por un
-    Add-on externo sólo se cambia la visibilidad a oculto. No permite eliminar
-    páginas que contenga otras a no ser que se use el parámetro <emphasis
-    role="bold">force</emphasis>.</para>
-
-    <para xml:lang="es">Los parámetros son:<variablelist>
-        <varlistentry>
-          <term>--id</term>
-
-          <listitem>
-            <para><emphasis>[Requerido] [Identificador del elemento del menú]
-            [autocompletado]</emphasis></para>
-
-            <para>Ruta de la página a eliminar.</para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>--force</term>
-
-          <listitem>
-            <para><emphasis>[Opcional] [booleano]</emphasis></para>
-
-            <para>Fuerza la eliminación de páginas aunque contengan
-            elementos.</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
