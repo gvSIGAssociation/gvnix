@@ -144,7 +144,8 @@
               <!-- Identifier input field: always disabled on update -->
               <field:input disabled="true" field="${idField}" id="${id}" />
               <c:if test="${versionField ne 'none'}">
-                <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${item[fn:toLowerCase(versionField)]}" disabled="disabled" />
+                <spring:eval expression="item[versionField]" scope="request" var="versionValue" />
+                <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${versionValue}" disabled="disabled" />
               </c:if>
               <jsp:doBody />
 
