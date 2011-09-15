@@ -117,7 +117,13 @@ public class GwtConfigServiceImpl implements GwtConfigService {
 	}
 
 	private void copyDirectoryContents(GwtPath gwtPath) {
-		String sourceAntPath = gwtPath.sourceAntPath();
+//    String sourceAntPath = gwtPath.sourceAntPath();
+	  /* Old method used, change to new method
+	   *  http://forum.springsource.org/showthread.php?111918-Roo-1.1.5.RELEASE-source-code-compilation-error
+	   *  http://projects.disid.com/issues/5377
+	   * This class would be deleted ?
+	   */
+		String sourceAntPath = gwtPath.getSourceAntPath();
 		String targetDirectory = gwtPath.canonicalFileSystemPath(projectOperations.getProjectMetadata());
 
 		if (!projectOperations.getProjectMetadata().isGaeEnabled() && targetDirectory.contains("/gae")) {
