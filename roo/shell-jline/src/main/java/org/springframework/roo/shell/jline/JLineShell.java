@@ -150,9 +150,9 @@ public abstract class JLineShell extends AbstractShell implements CommandMarker,
 		if (reader.getTerminal().isANSISupported()) {
 			ANSIBuffer ansi = JLineLogHandler.getANSIBuffer();
 			if ("".equals(path) || path == null) {
-				shellPrompt = ansi.yellow("roo> ").toString();
+				shellPrompt = ansi.yellow("roo-gvNIX> ").toString();
 			} else {
-				shellPrompt = ansi.cyan(path).yellow(" roo> ").toString();
+				shellPrompt = ansi.cyan(path).yellow(" roo-gvNIX> ").toString();
 			}
 		} else {
 			// the superclass will do for this non-ANSI terminal
