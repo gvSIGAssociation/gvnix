@@ -9,10 +9,10 @@
     <script type="text/javascript"><![CDATA[
       // On page load, create the cancel button placed after the save button (with 'proceed' id)
       dojo.addOnLoad(function() {
-          var cancelButton = '<input id="${id}" type="button" name="cancel" value="${fn:escapeXml(cancel_button)}" onclick="window.history.back();"/>';
-          dojo.place(cancelButton, dojo.byId("proceed"), "after"); 
+          var cancelButton = '<span> </span><input id="${id}" type="button" name="cancel" value="${fn:escapeXml(cancel_button)}" onclick="window.history.back();"/>';
+          dojo.place(cancelButton, dojo.byId("proceed"), "after");
       });
     ]]></script>
   </c:if>
-  
+
 </jsp:root>
