@@ -58,6 +58,7 @@ However, Roo source code can be updated to a new tag with next commands:
 * Save in SVN:					svn commit
 
 Update gvNIX parent pom roo.version property to new value.
+Be careful, git deleted files could be no deleted into SVN ! 
 
 Other userful Git commands:
 
