@@ -56,17 +56,21 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+<!-- DiSiD: Remove because error with Git new versions
             <_include>${project.build.directory}/build-number.mf</_include>
+-->
             <Export-Package>${project.artifactId}.*;version=${project.version}</Export-Package>
-            <Bundle-Activator>${osgi.Activator}</Bundle-Activator>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
             <Bundle-Copyright>Copyright ${project.organization.name}.
               All Rights Reserved.</Bundle-Copyright>
             <Bundle-DocURL>${project.url}</Bundle-DocURL>
           </instructions>
+          
+          <!-- gvNIX google code publishing -->
           <remoteOBR>true</remoteOBR>
           <bundleUrl>httppgp://${google.code.project.name}.googlecode.com/svn/repo/org/gvnix/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar</bundleUrl>
+          
         </configuration>
       </plugin>
       <plugin>
@@ -95,6 +99,7 @@
         <version>1.6</version>
         <executions>
           <execution>
+			<!-- copies the JARs we have built locally (eg bootstrap JAR) that noone else depends on into the target/all -->
             <id>copy-jars-for-roo-dev-or-assembly</id>
             <phase>package</phase>
             <configuration>
