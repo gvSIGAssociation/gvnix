@@ -64,8 +64,9 @@
       <spring:message arguments="${label}" code="entity_show" var="title_msg" htmlEscape="false" />
       <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
         <div class="quicklinks">
-          <span>
+          <ul>
             <c:if test="${create}">
+              <li>
               <spring:url value="${path}" var="create_form_url" htmlEscape="false">
                 <spring:param name="form" />
                 <c:forEach var="p" items="${param}">
@@ -80,11 +81,11 @@
               <a href="${fn:escapeXml(create_form_url)}" alt="${fn:escapeXml(create_label)}" title="${fn:escapeXml(create_label)}">
                 <img alt="${fn:escapeXml(create_label)}" class="image" src="${fn:escapeXml(create_image_url)}" title="${fn:escapeXml(create_label)}" />
               </a>
+              </li>
             </c:if>
-          </span>
-          <span>
-            <c:if test="${update}">
 
+            <c:if test="${update}">
+              <li>
               <spring:url value="${path}/${itemId}" var="update_form_url" htmlEscape="false">
                 <spring:param name="form" />
                 <c:forEach var="p" items="${param}">
@@ -99,11 +100,11 @@
               <a href="${fn:escapeXml(update_form_url)}" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}">
                 <img alt="${fn:escapeXml(update_label)}" class="image" src="${fn:escapeXml(update_image_url)}" title="${fn:escapeXml(update_label)}" />
               </a>
+              </li>
             </c:if>
-          </span>
-          <span>
-            <c:if test="${delete}">
 
+            <c:if test="${delete}">
+              <li>
               <spring:url value="${path}/${itemId}" var="delete_form_url" htmlEscape="false">
                 <c:if test="${not empty param.gvnixpattern}">
                   <spring:param name="gvnixpattern" value="${param.gvnixpattern}" />
@@ -120,11 +121,11 @@
                 </c:set>
                 <input alt="${fn:escapeXml(delete_label)}" class="image" src="${fn:escapeXml(delete_image_url)}" title="${fn:escapeXml(delete_label)}" type="image" value="${fn:escapeXml(delete_label)}" onclick="return confirm('${fn:escapeXml(delete_confirm_msg)}');" />
               </form:form>
+              </li>
             </c:if>
-          </span>
-          <span>
-            <c:if test="${list}">
 
+            <c:if test="${list}">
+              <li>
               <spring:url value="${path}" var="list_form_url" htmlEscape="false">
                 <spring:param name="gvnixform" />
                 <c:forEach var="p" items="${param}" >
@@ -139,8 +140,9 @@
               <a href="${fn:escapeXml(list_form_url)}" alt="${fn:escapeXml(reset_label)}" title="${fn:escapeXml(reset_label)}">
                 <img alt="${fn:escapeXml(reset_label)}" class="image" src="${fn:escapeXml(reset_image_url)}" title="${fn:escapeXml(reset_label)}" />
               </a>
+              </li>
             </c:if>
-          </span>
+          </ul>
         </div>
         <c:choose>
           <c:when test="${not empty object}">

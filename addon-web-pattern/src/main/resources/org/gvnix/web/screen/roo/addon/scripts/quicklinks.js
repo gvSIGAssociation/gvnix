@@ -161,14 +161,6 @@ function gvnix_create(element) {
     // Make visible the create confirmation controls
     var controlAddDiv = dojo.byId('gvnix_control_add_'+element);
     controlAddDiv.style.display = "block";
-
-    // Fix element height adding 137px to its previous height definition
-    var divToOverflow = dojo.query('#relations > div[class*="dijitTabPaneWrapper"]')[0];
-    var divHeight = dojo.style(divToOverflow, 'height');
-    dojo.style(divToOverflow, 'height', divHeight + 137 + "px");
-    divHeight = dojo.style(dojo.byId('relations'), 'height');
-    dojo.style(dojo.byId('relations'), 'height', divHeight + 137 + "px");
-
 }
 
 /*

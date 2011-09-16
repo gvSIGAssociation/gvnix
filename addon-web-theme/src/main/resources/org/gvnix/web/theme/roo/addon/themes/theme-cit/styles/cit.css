@@ -1,5 +1,5 @@
 BR {
-	clear: both;
+  clear: both;
 }
 
 /* PATTERN ELEMENTS */
@@ -33,23 +33,23 @@ div.quicklinks {
     position: absolute;
     top: 0px;
     right: 0px;
-    /* 
-    Absolute position works because it is positioned in rapport to its div 
+    /*
+    Absolute position works because it is positioned in rapport to its div
     container that has a property position with a value different than "static".
-    We have set property 'position: relative;' to the uppest div container, 
+    We have set property 'position: relative;' to the uppest div container,
     the one with .dijitTitlePane class, so absolute:0,0 is relative to
     .dijitTitlePane.
-    */ 
+    */
     width: auto;
     text-align: right;
 }
 
-.quicklinks form { 
-	display: inline;
+.quicklinks form {
+  display: inline;
 }
 
-.quicklinks form input { 
-	vertical-align: middle;
+.quicklinks form input {
+  vertical-align: middle;
 }
 
 .quicklinks ul {
@@ -93,7 +93,7 @@ body {
     height: 0;
     clear: both;
     visibility: hidden;
-}   
+}
 
 
 /* text styles */
@@ -127,7 +127,7 @@ h1.titulo_aplicacion {
   font-size: 100px;
   font-weight: bold;
   color: #2C658F;
-  text-align: center;  
+  text-align: center;
 }
 
 p.descrip_titaplic {
@@ -332,7 +332,7 @@ table tr.footer td {
   text-align: left;
   border: none;
   padding: 7px 0 0 7px;
-  
+
 }
 table tr.footer td a:link {
     font-family: Verdana, Arial, Helvetica, sans-serif;
@@ -361,7 +361,7 @@ table tr.footer td a:visited {
     border-left: 2px;
     border-right: 2px;
 }
-    
+
 table tr.footer td a:hover {
     font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 11px;
@@ -371,7 +371,7 @@ table tr.footer td a:hover {
     border-left: 2px;
     border-right: 2px;
 }
-    
+
 table#application_menu {
   border-style: none;
   width: 100%;
@@ -462,14 +462,14 @@ h2.descrip_titaplic {
   font-weight: bold;
   color: #000000;
 }
-                                                         
+
 #main {
   /*overflow:hidden;*/
   display:box;
   min-height: 200px;
   width: 95%;
-  margin: 20px auto 0; 
-  
+  margin: 20px auto 0;
+
 }
 
 #home #main {
@@ -493,7 +493,7 @@ h2.descrip_titaplic {
 #menu {
   background: #eee;
   position:relative;
-  /* float:right; */    
+  /* float:right; */
   left:0px;
   width:100%;
   margin-left:0;
@@ -593,8 +593,8 @@ li#appmenu {
 
 /* MENU ELEMENTS */
 
-a.menu, a.menu:link, a.menu:visited {display:block; width:150px; height:25px;} 
-  
+a.menu, a.menu:link, a.menu:visited {display:block; width:150px; height:25px;}
+
 .flag {
   height: 11px;
   width: 16px;
@@ -632,7 +632,7 @@ a.menu, a.menu:link, a.menu:visited {display:block; width:150px; height:25px;}
 }
 
 .menu_modulos table {
-  text-align: left; 
+  text-align: left;
   height: 100%;
   width: 80%;
   vertical-align: top;
@@ -655,7 +655,7 @@ tr.txtcabecera {
   font-weight: normal;
   height: 20px;
   border-bottom: 7px solid #dfdfdf;
-} 
+}
 .txtcabecera td {
   color: #FFFFFF;
   padding: 0px;
@@ -701,10 +701,10 @@ tr.txtcabecera td ul {
          text-decoration:none;
 }
 
-.home #menu a.txtopcion_menu:hover, 
+.home #menu a.txtopcion_menu:hover,
 .home a.txtopcion_menu:hover {
-	color: #E1590B;
-	text-decoration:underline;
+  color: #E1590B;
+  text-decoration:underline;
 }
 
 .home div#showMenu {  visibility: visible;}
@@ -739,15 +739,15 @@ div .OpcionSubMenu {
   width: 150px;
   z-index: 100;
   position: absolute;
-  display: block; 
+  display: block;
 }
 
 .home div#subMenu li:hover {
-	margin:0;
-	padding:0;
-	padding:2px 10px;
-	color: #fff;
-	background: #ccc;
+  margin:0;
+  padding:0;
+  padding:2px 10px;
+  color: #fff;
+  background: #ccc;
 }
 .home div#subMenu li:selected {
 color: #E1590B;
@@ -822,8 +822,8 @@ div#exit_menu span {
 /* STYLES dijit.css*/
 
 .dijitTitlePane {
-	margin-bottom: 20px;
-	position: relative;
+  margin-bottom: 20px;
+  position: relative;
 }
 
 .dijitTitlePaneTextNode {
@@ -834,11 +834,11 @@ color: #FFFFFF;
 padding-left: 17px;
 }
 
-.tundra .dijitTitlePaneContentInner { 
-	padding: 5px 0 0;
-	border: 1px solid #BFBFBF;
-	height: 500px;/*!important*/
-	}
+.tundra .dijitTitlePaneContentInner {
+  padding: 5px 0 0;
+  border: 1px solid #BFBFBF;
+	height: auto;/*!important*/
+  }
 
 .tundra .dijitTitlePaneTitle {
     border: 1px solid #BFBFBF;
@@ -849,30 +849,30 @@ padding-left: 17px;
 
 /* styles dijitTab */
 
-.dijitLayoutContainer {	
-	border-bottom: 1px solid #BFBFBF;
-	height: auto;
-	/*overflow: visible;*/
+.dijitLayoutContainer {
+  border-bottom: 1px solid #BFBFBF;
+  height: auto;
+  /*overflow: visible;*/
 }
 
 .tundra .dijitTabContainerTop-tabs, .tundra .dijitTabContainerBottom-tabs {
-	background: #8F8F8F;
-	border: 1px solid #BFBFBF;
-	padding: 1px;
-	margin-bottom: -1px;	
+  background: #8F8F8F;
+  border: 1px solid #BFBFBF;
+  padding: 1px;
+  margin-bottom: -1px;
 }
 .tundra .dijitTab {
-	border: none;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
-	font-weight: bold;
-	padding-left: 7px;
-	background: #d3d3d3 url(../images/pestanya.jpg) no-repeat 100% 0;
-	padding-right: 20px;
+  border: none;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  padding-left: 7px;
+  background: #d3d3d3 url(../images/pestanya.jpg) no-repeat 100% 0;
+  padding-right: 20px;
 }
 
 .tundra .dijitTabChecked {
-	background: #f5f5f5 url(../images/pestanya-activa.jpg) no-repeat 100% 0;
+  background: #f5f5f5 url(../images/pestanya-activa.jpg) no-repeat 100% 0;
 }
 
 .tundra .dijitTabChecked .tabLabel { color:#2D6893;}
@@ -960,7 +960,7 @@ text-align: right;
     vertical-align: middle;
     width: 15px;
 }
-    
+
 .tundra .MessageAlertBox { background: url(../images/cit/theme/imagenes/aviso-amarillo.gif) no-repeat 0 0;}
 
 .tundra .MessageAlertBox .dijitDialogCloseIcon {
@@ -972,7 +972,7 @@ text-align: right;
     vertical-align: middle;
     width: 15px;
 }
-    
+
 .tundra .MessageSuggestBox { background: url(../images/cit/theme/imagenes/aviso-verde.gif) no-repeat 0 0;}
 
 .tundra .MessageSuggestBox .dijitDialogCloseIcon {
@@ -1005,18 +1005,18 @@ text-align: right;
 }
 
 .boton:hover {
-	font-family: Verdana;
-	font-size: 11px;
-	color: #FFFFFF;
-	border: thin #FFFFFF solid;
-	background:  #ED7936 url(../images/cit/theme/41-white.gif) no-repeat;
-	background-position: 4px 3px;
+  font-family: Verdana;
+  font-size: 11px;
+  color: #FFFFFF;
+  border: thin #FFFFFF solid;
+  background:  #ED7936 url(../images/cit/theme/41-white.gif) no-repeat;
+  background-position: 4px 3px;
  }
 
 /* buttons forms */
 
 div.submit {
-	background-color: #DFDFDF;
+  background-color: #DFDFDF;
     border: 1px solid #BFBFBF;
     border-top: none;
     float: right;
@@ -1050,8 +1050,8 @@ div.submit input {
 }
 
 .patternContentPane table tr.footer td div.submit {
-	width: 50%;
-	border: none;
+  width: 50%;
+  border: none;
 }
 
 .patternContentPane table tr.footer td div.submit span.warning {
@@ -1063,57 +1063,57 @@ div.submit input {
 
 .submit #button_save,
 .patternContentPane .submit .button_save {
-	background: #fff url(../images/cit/theme/41.gif) no-repeat;
+  background: #fff url(../images/cit/theme/41.gif) no-repeat;
     background-position: 4px 3px;
     }
 
 .submit #button_save:hover,
 .patternContentPane .submit .button_save:hover {
-	background:  #ED7936 url(../images/cit/theme/41-white.gif) no-repeat;
-	color: #fff;
-	background-position: 4px 3px;
+  background:  #ED7936 url(../images/cit/theme/41-white.gif) no-repeat;
+  color: #fff;
+  background-position: 4px 3px;
 }
 
 .submit #button_cancel,
 .patternContentPane .submit .button_cancel {
-	background: #fff url(../images/cit/theme/42.gif) no-repeat;
-	background-position: 4px 3px;
+  background: #fff url(../images/cit/theme/42.gif) no-repeat;
+  background-position: 4px 3px;
 }
 .submit #button_cancel:hover,
 .patternContentPane .submit .button_cancel:hover {
-	background:  #ED7936 url(../images/cit/theme/42-white.gif) no-repeat;
-	background-position: 4px 3px;
-	color: #fff;
+  background:  #ED7936 url(../images/cit/theme/42-white.gif) no-repeat;
+  background-position: 4px 3px;
+  color: #fff;
 }
 
 .submit #button_find,
 .patternContentPane .submit .button_find {
-	background: #fff url(../images/cit/theme/50.gif) no-repeat;
-	background-position: 4px 3px;
+  background: #fff url(../images/cit/theme/50.gif) no-repeat;
+  background-position: 4px 3px;
 }
 
 .submit #button_find:hover,
 .patternContentPane .submit .button_find:hover {
-	background:  #ED7936 url(../images/cit/theme/50-white.gif) no-repeat;
-	color: #fff;
-	background-position: 4px 3px;
+  background:  #ED7936 url(../images/cit/theme/50-white.gif) no-repeat;
+  color: #fff;
+  background-position: 4px 3px;
 }
 
 .submit #button_update,
 .patternContentPane .submit .button_update {
-	background: #fff url(../images/cit/theme/41.gif) no-repeat;
-	background-position: 4px 3px;
+  background: #fff url(../images/cit/theme/41.gif) no-repeat;
+  background-position: 4px 3px;
 }
 
 .submit #button_update:hover,
 .patternContentPane .submit .button_update:hover {
-	background:  #ED7936 url(../images/cit/theme/41-white.gif) no-repeat;
-	color: #fff;
-	background-position: 4px 3px;
+  background:  #ED7936 url(../images/cit/theme/41-white.gif) no-repeat;
+  color: #fff;
+  background-position: 4px 3px;
 }
-    
-   
-   
+
+
+
 
 
 /* DIV FORMULARIOS */
@@ -1139,7 +1139,7 @@ form#command h3 {
     margin:0;
     padding: 5px 0 0;
 }
-  
+
 /* trescols */
 
 .formularios ul.tresCols {
@@ -1149,43 +1149,43 @@ form#command h3 {
 }
 
 .formularios ul.tresCols li {
-	float: left;
-	margin: 0 10px 0 0;
+  float: left;
+  margin: 0 10px 0 0;
 }
 
 .formularios ul.tresCols li ul {
-	padding: 0;
-	margin: 0 auto;
+  padding: 0;
+  margin: 0 auto;
 }
 
 .formularios ul.tresCols li ul li {
-	float: left;
-	width: 110px;/*important*/
-	margin: 0;
+  float: left;
+  width: 110px;/*important*/
+  margin: 0;
 }
 
 /* dosCols */
 .formularios ul.dosCols {
-	margin:0;
+  margin:0;
     padding:0 5px 0;
     width: 100%;
     }
 
 .formularios ul.dosCols li {
-	float: left;
-	margin: 0 10px 0 0;
-	width: 48%;
+  float: left;
+  margin: 0 10px 0 0;
+  width: 48%;
 }
 .formularios ul.dosCols li ul {
-	padding: 0;
-	margin: 0 auto;
+  padding: 0;
+  margin: 0 auto;
 }
 .formularios ul.dosCols li ul li {
-	float: left;
-	width: 110px;/*important*/
-	margin: 0;
+  float: left;
+  width: 110px;/*important*/
+  margin: 0;
 }
-    
+
 /* Checkbox */
 .formularios ul.checkbox { margin:0 auto;}
 
@@ -1202,17 +1202,17 @@ li.size500 .dijitTextBox { width: 500px;}
 /* textarea */
 
 li.observaciones .dijitTextBox {
-	min-height:5.5em !important;
+  min-height:5.5em !important;
     max-height:22em !important;
     overflow-y: auto !important;
     min-width: 600px;
     margin: 3px;
     background: none;
-  	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
-	font-weight: normal;
-	border: 1px solid #C1CADD;
-	height: 66px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: normal;
+  border: 1px solid #C1CADD;
+  height: 66px;
 }
 
 li.size40 .box { width: 40px;}
@@ -1253,9 +1253,9 @@ li.size500 .boxDisabled { width: 500px;}
     height: 18px;
     padding-left: 2px;
  }
- 
+
 .formularios span.listTitle {
-	height: 20px;
+  height: 20px;
     width: 100%;
     display: block;
     text-align: center;
@@ -1310,36 +1310,36 @@ li.size500 .boxDisabled { width: 500px;}
 }
 
 label {
-	width:150px;
-	margin-left: 0px;
-	margin-top: 3px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
-	font-weight: normal;
-	color: #4E4E4E;
-	text-align: right;
-	padding-right: 5px;
-	float: left;
+  width:150px;
+  margin-left: 0px;
+  margin-top: 3px;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: normal;
+  color: #4E4E4E;
+  text-align: right;
+  padding-right: 5px;
+  float: left;
 }
 
 ul.checkbox label {
-	vertical-align: middle;
-	width: auto;
+  vertical-align: middle;
+  width: auto;
 }
 
 ul.tresCols label {
-	text-align: left;
-	width: 100px;
+  text-align: left;
+  width: 100px;
 }
 
 ul.dosCols label {
-	text-align: left;
-	width: 100px;
+  text-align: left;
+  width: 100px;
 }
 
 ul.tresCols .dijitTextBox, ul.dosCols .dijitTextBox {
-	clear: both;
-	text-align: left;
+  clear: both;
+  text-align: left;
 }
 
 ul.formInline li {float: left;}
@@ -1351,27 +1351,27 @@ ul.formInline li {float: left;}
 /* pattern table */
 
 .patternContentPane table tr td input {
-	border: 1px solid #C1CADD;
-	color: #234372;
-	font-family: Verdana,Arial,Helvetica,sans-serif;
-	font-size: 11px;
-	font-weight: normal;
-	height: 18px;
-	text-align: left;
-	background: none repeat scroll 0 0 #FFFFFF;
+  border: 1px solid #C1CADD;
+  color: #234372;
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-size: 11px;
+  font-weight: normal;
+  height: 18px;
+  text-align: left;
+  background: none repeat scroll 0 0 #FFFFFF;
 }
 
 .patternContentPane table tr td select[disabled] {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
-	font-weight: normal;
-	border: none;
-	text-align: left;
-	color: #000000;
-	background: none;
-	text-align: left;
-	height: 18px;
-	border: none;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: normal;
+  border: none;
+  text-align: left;
+  color: #000000;
+  background: none;
+  text-align: left;
+  height: 18px;
+  border: none;
 }
 
 /* pattern table Sentencias */
