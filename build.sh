@@ -59,11 +59,6 @@ cd roo
 # Remove bundles Felix cache
 rm -rf bootstrap/target/osgi
 
-# Install OSGI wrapping jars
-cd wrapping
-mvn clean install
-cd ..
-
 # Test, install, site, assembly and package Roo modules
 mvn clean install
 cd deployment-support
