@@ -262,6 +262,7 @@ li.height100 .boxDisabled { height: 100px;}
     color: #234372;
     border: 1px solid #C1CADD;
     background-color: #E2E4E9;
+    float: left;
 }
 
 .boxDisabled .box {
@@ -272,11 +273,11 @@ li.height100 .boxDisabled { height: 100px;}
     height: 18px;
     border: 1px solid #D2D2D2;
     background: none repeat scroll 0 0 #FFFFFF;
+    float: left;
 }
 
 .box {
     width: 100px;
-    float: left;
     background: none repeat scroll 0 0 #FFFFFF;
     border: 1px solid #C1CADD;
     color: #234372;
