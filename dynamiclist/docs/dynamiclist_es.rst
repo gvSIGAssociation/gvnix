@@ -276,6 +276,11 @@ Ficheros de la aplicación web que deben ser configurados:
 		(<tx:annotation-driven mode="aspectj" transaction-manager="transactionManager"/>)
 			 
 
+	Nota: 
+	- Descriptiones de librerias de etiquetas de dynamiclist (dynamicList.tld).
+	  Al no añadir el dynamiclist.jar se debe copiar el fichero 'dynamicList.tld' en el mismo lugar que el web.xml
+
+
 Dependencias de proyecto
 ------------------------
 
