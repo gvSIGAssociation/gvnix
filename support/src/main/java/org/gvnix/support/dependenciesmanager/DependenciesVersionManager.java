@@ -72,12 +72,12 @@ public class DependenciesVersionManager {
 
             VersionInfo existingDepVersionInfo = null;
             VersionInfo newDepVersionInfo = VersionInfo
-                    .extractVersionInfoFromString(dependency.getVersionId());
+                    .extractVersionInfoFromString(dependency.getVersion());
 
             for (Dependency existingDependency : results) {
                 existingDepVersionInfo = VersionInfo
                         .extractVersionInfoFromString(existingDependency
-                                .getVersionId());
+                                .getVersion());
                 if (existingDepVersionInfo != null) {
                     // Remove existing dependency in pom.xml just if it's older
                     // than the new one
