@@ -45,11 +45,6 @@ Create a web application
 
 Create a web application with gvNIX/Roo Shell script::
 
-    project --topLevelPackage org.gvnix.test.report
-    persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
-    entity --class ~.domain.Person --testAutomatically
-    field string --fieldName name --notNull
-    controller all --package ~.web
 
 Run the add-on command:
-    web binding setup --class ~.web.binding.MyBindingClass
+    web mvc binding stringTrimmer

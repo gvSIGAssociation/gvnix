@@ -21,91 +21,41 @@
 package org.gvnix.web.mvc.binding.roo.addon;
 
 import org.springframework.roo.model.JavaType;
-import org.w3c.dom.Document;
 
+/**
+ * Operations of Add-on
+ * 
+ * @author Oscar Rovira (orovira at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * @since 0.8
+ */
 public interface WebBinderOperations {
 
     /**
-     * Returns <code>true</true> if setup command must be available for user
+     * Indicate commands should be available
      * 
-     * @return
+     * @return true if it should be available, otherwise false
      */
-    public boolean isSetupAvailable();
+    boolean isStringTrimmerAvailable();
 
     /**
-     * Prepares the configuration of XML MVC config file and generates a default
-     * class.
+     * Annotate provided Java type with @GvNIXStringTrimmerBinder
      * 
-     * <b>Note:</b> currently <code>intializerCalss</code> will be override if
-     * it exists.
-     * 
-     * @param initializerClass
-     *            class to generate to use as initializer
-     * @param stringEmptyAsNull
-     *            Adds to the generated class the
-     *            <code>StringTrimmerEditor</code> to prevent persisting empty
-     *            strings.
+     * @param emptyAsNull
      */
-    public void setup(JavaType initializerClass, boolean stringEmptyAsNull);
+    void bindStringTrimmer(JavaType controller, boolean emptyAsNull);
 
     /**
-     * Returns if <code>drop</code> command should be available.
+     * Annotate all Java types annotated with @Controller with @GvNIXStringTrimmerBinder
      * 
-     * @return
+     * @param emptyAsNull
      */
-    public boolean isDropAvailable();
+    void bindStringTrimmerAll(boolean emptyAsNull);
 
     /**
-     * Removes default binding config from XML MVC config file
-     * 
-     * <b>Note:</b> Currently this dosen't modify the current initializer class
+     * Setup all add-on artifacts (dependencies in this case)
      */
-    public void drop();
-
-    /**
-     * Returns if <code>add</code> command must be available
-     * 
-     * @return
-     */
-    public boolean isAddAvailable();
-
-    /**
-     * Add a PropertyEditor configuration to the current initializer class
-     * 
-     * @param target
-     *            class that will be managed by the editor
-     * @param editor
-     *            editor's class
-     */
-    public void add(JavaType target, JavaType editor);
-
-    /**
-     * Return the asbolute path to the XML MVC config file.
-     * 
-     * @return
-     */
-    public String getPathToMvcConfig();
-
-    /**
-     * Clear the current Initializer class cache
-     */
-    public void clearCurrentIntializer();
-
-    /**
-     * Returns the current Initializer class
-     * 
-     * @return
-     */
-    public JavaType getCurrentInitializer();
-
-    public void renameInitializer(JavaType newType);
-
-    /**
-     * Checks if exists AnnotationMethodHandlerAdapter bean
-     * 
-     * @param mvcXml
-     *            webmvc-config.xml document.
-     * @return true if exits.
-     */
-    public boolean hasMvcWebInitBinderNode(Document mvcXml);
+    void setup();
 }

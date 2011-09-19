@@ -1,6 +1,22 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.gvnix.web.mvc.binding.roo.addon;
-
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -12,59 +28,50 @@ import org.springframework.roo.shell.CliOption;
 import org.springframework.roo.shell.CommandMarker;
 
 /**
- * TODO
+ * Commands of WebBinder Add-on
+ * 
+ * @author Oscar Rovira (orovira at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * @since 0.8
  */
 @Component
 @Service
 public class WebBinderCommands implements CommandMarker {
 
-    private static Logger logger = Logger.getLogger(WebBinderCommands.class
-            .getName());
-
+    /**
+     * Get a reference to the WebBinderOperations from the underlying OSGi
+     * container
+     */
     @Reference
     private WebBinderOperations webBinderOperations;
 
-    // SETUP //
-
-    @CliAvailabilityIndicator("web binding setup")
+    /**
+     * Check if stringTrimmer command is available
+     * 
+     * @return true (default) if the command should be visible at this stage,
+     *         false otherwise
+     */
+    @CliAvailabilityIndicator("web mvc binding stringTrimmer")
     public boolean isSetupAvailable() {
-        return webBinderOperations.isSetupAvailable();
+        return webBinderOperations.isStringTrimmerAvailable();
     }
 
-    @CliCommand(value = "web binding setup", help = "Initializes Web default Property editors bindings")
-    public void setup(
-            @CliOption(key = "class", mandatory = true, help = "Class to create for binding intialization") JavaType initializerClass,
-            @CliOption(key = "stringEmptyAsNull", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false", help = "Adds Editor for String that set Empty String to Null") boolean stringEmptyAsNull) {
-        webBinderOperations.setup(initializerClass, stringEmptyAsNull);
+    /**
+     * This method registers a command with the Roo shell. It also offers a
+     * mandatory command attribute.
+     * 
+     * @param type
+     */
+    @CliCommand(value = "web mvc binding stringTrimmer", help = "Declares StringTrimmerEditor on all Web MVC Controller classes")
+    public void webBindingStringTrimmer(
+            @CliOption(key = { "class", "" }, mandatory = false, help = "The path and name of the controller on which declare de StringTrimmerEditor") JavaType controller,
+            @CliOption(key = "emptyAsNull", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "true", help = "Editor that sets Empty String to Null") boolean emptyAsNull) {
+        if (controller == null) {
+            webBinderOperations.bindStringTrimmerAll(emptyAsNull);
+        } else {
+            webBinderOperations.bindStringTrimmer(controller, emptyAsNull);
+        }
     }
-
-    // DROP //
-
-    @CliAvailabilityIndicator("web binding drop")
-    public boolean isDropAvailable() {
-        return webBinderOperations.isDropAvailable();
-    }
-
-    @CliCommand(value = "web binding drop", help = "Removes the default Property editors bindings configuration")
-    public void drop() {
-        webBinderOperations.drop();
-    }
-
-    // Add //
-
-    // @CliAvailabilityIndicator("web binding add")
-    // public boolean isAddAvailable() {
-    // return webBinderOperations.isAddAvailable();
-    // }
-    //
-    // @CliCommand(value = "web binding add", help =
-    // "Add a new Property editor to the default list")
-    // public void add(
-    // @CliOption(key = "target", mandatory = true, help =
-    // "Class that manage the PropertyEditor") JavaType target,
-    // @CliOption(key = "editor", mandatory = true, help = "Editors class")
-    // JavaType editor) {
-    // webBinderOperations.add(target, editor);
-    // }
-
 }
