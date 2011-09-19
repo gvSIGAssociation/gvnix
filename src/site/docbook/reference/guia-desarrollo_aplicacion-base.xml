@@ -18,7 +18,7 @@
     modelo. Volvemos a teclear <command>hint</command> para que nos muestre el
     siguiente paso y las opciones existentes:</para>
 
-    <programlisting>roo&gt; <command>hint</command>
+    <programlisting>roo-gvNIX&gt; <command>hint</command>
 <computeroutput>You can create entities either via Roo or your IDE.
 Using the Roo shell is fast and easy, especially thanks to the TAB completion.
 
@@ -34,7 +34,7 @@ need any optional arguments, but let's select the --testAutomatically option
 and hit ENTER. You can always use this approach to view optional arguments.
 
 After creating an entity, use 'hint' for the next suggestion.</computeroutput>
-roo&gt;</programlisting>
+roo-gvNIX&gt;</programlisting>
 
     <para xml:lang="es">El comando <command>entity</command> tiene un número
     de atributos opcionales mientras que el atributo requerido es
@@ -43,7 +43,7 @@ roo&gt;</programlisting>
     test de integración para el <emphasis>Domain Object</emphasis>. Para
     empezar crearemos la entidad <classname>Topping:</classname></para>
 
-    <programlisting>roo&gt; <command>entity --class ~.domain.Topping --testAutomatically</command>
+    <programlisting>roo-gvNIX&gt; <command>entity --class ~.domain.Topping --testAutomatically</command>
 <computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain
 Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping.java
 Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain
@@ -56,7 +56,7 @@ Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingIntegrationTe
 Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingDataOnDemand_Roo_DataOnDemand.aj
 Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingIntegrationTest_Roo_IntegrationTest.aj
 Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingDataOnDemand_Roo_Configurable.aj</computeroutput>
-~.domain.Topping roo&gt;</programlisting>
+~.domain.Topping roo-gvNIX&gt;</programlisting>
 
     <para xml:lang="es">Se ha utilizado para la creación de la entidad el
     carácter <literal>~</literal> para situarlo en el paquete base del
@@ -66,7 +66,7 @@ Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingDataOnDemand_
     <command>entity</command>. Volvemos a teclear <command>hint</command> para
     que Roo nos muestre el siguiente paso a seguir:</para>
 
-    <programlisting>~.domain.Topping roo&gt; <command>hint</command>
+    <programlisting>~.domain.Topping roo-gvNIX&gt; <command>hint</command>
 <computeroutput>You can add fields to your entities using either Roo or your IDE.
 
 To add a new field, type 'field' and then hit TAB. Be sure to select
@@ -82,12 +82,12 @@ If creating multiple fields, use the UP arrow to access command history.
 
 After adding your fields, type 'hint' for the next suggestion.
 To learn about setting up many-to-one fields, type 'hint relationships'.</computeroutput>
-~.domain.Topping roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+~.domain.Topping roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
 <computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping.java
 Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping_Roo_JavaBean.aj
 Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/ToppingDataOnDemand_Roo_DataOnDemand.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping_Roo_ToString.aj</computeroutput>
-~.domain.Topping roo&gt; </programlisting>
+~.domain.Topping roo-gvNIX&gt; </programlisting>
 
     <para xml:lang="es">Utilizando el comando <command>field {tipo}</command>
     se pueden añadir restricciones (constraints) a los campos usando los
@@ -102,33 +102,33 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping_Roo_ToString
     <para xml:lang="es">Ahora se han de crear las demás entidades y sus
     respectivos atributos correspondientes al modelo definido:</para>
 
-    <programlisting>~.domain.Topping roo&gt; <command>entity --class ~.domain.Base --testAutomatically</command> 
+    <programlisting>~.domain.Topping roo-gvNIX&gt; <command>entity --class ~.domain.Base --testAutomatically</command> 
 <computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base.java
 Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseDataOnDemand.java
 ...
 ...
 Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseDataOnDemand_Roo_Configurable.aj</computeroutput>
-~.domain.Base roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+~.domain.Base roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
 <computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base.java
 Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base_Roo_JavaBean.aj
 Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseDataOnDemand_Roo_DataOnDemand.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base_Roo_ToString.aj</computeroutput>
-~.domain.Base roo&gt; <command>entity --class ~.domain.Pizza --testAutomatically</command>
+~.domain.Base roo-gvNIX&gt; <command>entity --class ~.domain.Pizza --testAutomatically</command>
 <computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
 ...
 ...
 Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaIntegrationTest_Roo_IntegrationTest.aj</computeroutput>
-~.domain.Pizza roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+~.domain.Pizza roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
 <computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
 Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_JavaBean.aj
 Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaDataOnDemand_Roo_DataOnDemand.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.aj</computeroutput>
-~.domain.Pizza roo&gt; <command>field number --fieldName price --type java.lang.Float</command>
+~.domain.Pizza roo-gvNIX&gt; <command>field number --fieldName price --type java.lang.Float</command>
 <computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_JavaBean.aj
 Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaDataOnDemand_Roo_DataOnDemand.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.aj</computeroutput>
-~.domain.Pizza roo&gt; </programlisting>
+~.domain.Pizza roo-gvNIX&gt; </programlisting>
 
     <para xml:lang="es">Después de añadir el <varname>nombre</varname> y el
     <varname>precio</varname> a la entidad <classname>Pizza</classname> hay
@@ -141,56 +141,56 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.a
     una relación <emphasis>many-to-many</emphasis> Roo proporciona el
     siguiente comando:</para>
 
-    <programlisting>~.domain.Pizza roo&gt; <command>field set --fieldName toppings --element ~.domain.Topping</command>
+    <programlisting>~.domain.Pizza roo-gvNIX&gt; <command>field set --fieldName toppings --element ~.domain.Topping</command>
 <computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_JavaBean.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.aj</computeroutput>
-~.domain.Pizza roo&gt;</programlisting>
+~.domain.Pizza roo-gvNIX&gt;</programlisting>
 
     <para xml:lang="es">De una manera parecida se definen las relaciones
     <emphasis>1:1</emphasis> entre las entidades Pizza y Base usando el
     comando:</para>
 
-    <programlisting>~.domain.Pizza roo&gt; <command>field reference --fieldName base --type ~.domain.Base</command>
+    <programlisting>~.domain.Pizza roo-gvNIX&gt; <command>field reference --fieldName base --type ~.domain.Base</command>
 <computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_JavaBean.aj
 Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaDataOnDemand_Roo_DataOnDemand.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.aj</computeroutput>
-~.domain.Pizza roo&gt;</programlisting>
+~.domain.Pizza roo-gvNIX&gt;</programlisting>
 
     <para xml:lang="es">De la misma manera se han de crear las entidades y
     relaciones <classname>PizzaOrder</classname>:</para>
 
-    <programlisting>~.domain.Pizza roo&gt; <command>entity --class ~.domain.PizzaOrder --testAutomatically</command> 
+    <programlisting>~.domain.Pizza roo-gvNIX&gt; <command>entity --class ~.domain.PizzaOrder --testAutomatically</command> 
 <computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
 ...
 ...
 Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderIntegrationTest_Roo_IntegrationTest.aj</computeroutput>
-~.domain.PizzaOrder roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+~.domain.PizzaOrder roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
 <computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
 Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_JavaBean.aj
 Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand_Roo_DataOnDemand.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj</computeroutput>
-~.domain.PizzaOrder roo&gt; <command>field string --fieldName address --sizeMax 30</command>
+~.domain.PizzaOrder roo-gvNIX&gt; <command>field string --fieldName address --sizeMax 30</command>
 <computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_JavaBean.aj
 Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand_Roo_DataOnDemand.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj</computeroutput>
-~.domain.PizzaOrder roo&gt; <command>field number --fieldName total --type java.lang.Float</command> 
+~.domain.PizzaOrder roo-gvNIX&gt; <command>field number --fieldName total --type java.lang.Float</command> 
 <computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_JavaBean.aj
 Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand_Roo_DataOnDemand.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj</computeroutput>
-~.domain.PizzaOrder roo&gt; <command>field date --fieldName deliveryDate --type java.util.Date</command>
+~.domain.PizzaOrder roo-gvNIX&gt; <command>field date --fieldName deliveryDate --type java.util.Date</command>
 <computeroutput>Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_JavaBean.aj
 Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrderDataOnDemand_Roo_DataOnDemand.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj</computeroutput>
-~.domain.PizzaOrder roo&gt; <command>field set --fieldName pizzas --element ~.domain.Pizza</command>
+~.domain.PizzaOrder roo-gvNIX&gt; <command>field set --fieldName pizzas --element ~.domain.Pizza</command>
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_JavaBean.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToString.aj
-~.domain.PizzaOrder roo&gt; </programlisting>
+~.domain.PizzaOrder roo-gvNIX&gt; </programlisting>
 
     <para xml:lang="es">Con esto concluye el diseño del modelo de
     entidades.</para>
@@ -203,7 +203,7 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToStr
     poder visualizar la aplicación web mediante el comando de Roo
     <command>controller</command>:</para>
 
-    <programlisting>~.domain.PizzaOrder roo&gt; <command>controller all --package ~.web</command>
+    <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>controller all --package ~.web</command>
 <computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/web
 Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/web/ToppingController.java
 Created SRC_MAIN_WEBAPP/WEB-INF/spring
@@ -222,7 +222,7 @@ Created SRC_MAIN_WEBAPP/WEB-INF/views/bases/update.jspx
 Managed SRC_MAIN_WEBAPP/WEB-INF/views/bases/views.xml
 Managed SRC_MAIN_WEBAPP/WEB-INF/i18n/application.properties
 Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
-~.web roo&gt; </computeroutput></programlisting>
+~.web roo-gvNIX&gt; </computeroutput></programlisting>
 
     <para xml:lang="es">Este comando ha creado la estructura de visualización
     y los controllers asociados a partir de la definición de las
@@ -238,7 +238,7 @@ Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     naturalmente funcionarán correctamente). Para ejecutar los test
     utilizaremos el comando <command>perform tests</command>:</para>
 
-    <programlisting>~.domain.PizzaOrder roo&gt; <command>perform test</command>
+    <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>perform test</command>
 <computeroutput>[Thread-4] [INFO] Scanning for projects...
 [Thread-4] [INFO] ------------------------------------------------------------------------
 [Thread-4] [INFO] Building pizzashop
@@ -258,11 +258,11 @@ Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
 [Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.145 sec
 [Thread-4] Running com.springsource.roo.pizzashop.domain.BaseIntegrationTest
 [Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.137 sec
-[Thread-4] zzaOrder roo&gt; 
-[Thread-4] Results :roo&gt; 
-[Thread-4] zzaOrder roo&gt; 
+[Thread-4] zzaOrder roo-gvNIX&gt; 
+[Thread-4] Results :roo-gvNIX&gt; 
+[Thread-4] zzaOrder roo-gvNIX&gt; 
 [Thread-4] Tests run: 36, Failures: 0, Errors: 0, Skipped: 0
-[Thread-4] zzaOrder roo&gt; 
+[Thread-4] zzaOrder roo-gvNIX&gt; 
 [Thread-4] [INFO] ------------------------------------------------------------------------
 [Thread-4] [INFO] BUILD SUCCESSFUL
 [Thread-4] [INFO] ------------------------------------------------------------------------
@@ -270,7 +270,7 @@ Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
 [Thread-4] [INFO] Finished at: Wed Jun 16 21:10:22 CEST 2010
 [Thread-4] [INFO] Final Memory: 45M/299M
 [Thread-4] [INFO] ------------------------------------------------------------------------</computeroutput>
-~.domain.PizzaOrder roo&gt;</programlisting>
+~.domain.PizzaOrder roo-gvNIX&gt;</programlisting>
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_usar-eclipse">
@@ -279,7 +279,7 @@ Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     <para xml:lang="es">Para crear una estructura de proyecto eclipse Roo hay
     que utilizar el comando <command>perform eclipse</command>:</para>
 
-    <programlisting>~.domain.PizzaOrder roo&gt; <command>perform eclipse</command>
+    <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>perform eclipse</command>
 <computeroutput>[Thread-6] Warning: JAVA_HOME environment variable is not set.
 [Thread-6] [INFO] Scanning for projects...
 [Thread-6] [INFO] ------------------------------------------------------------------------
@@ -298,7 +298,7 @@ Managed SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
 [Thread-6] [INFO] Finished at: Wed Jun 16 21:21:49 CEST 2010
 [Thread-6] [INFO] Final Memory: 36M/330M
 [Thread-6] [INFO] ------------------------------------------------------------------------</computeroutput>
-~.domain.PizzaOrder roo&gt;</programlisting>
+~.domain.PizzaOrder roo-gvNIX&gt;</programlisting>
 
     <para xml:lang="es">Este comando termina ejecutando un <command>mvn
     eclipse:eclipse</command> para el proyecto, por lo que es indiferente el

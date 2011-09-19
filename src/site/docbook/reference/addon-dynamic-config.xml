@@ -95,39 +95,39 @@
 
     <para>Veamoslo en funcionamiento:</para>
 
-    <programlisting>roo&gt; <emphasis role="bold">script --file clinic.roo</emphasis>
+    <programlisting>roo-gvNIX&gt; <emphasis role="bold">script --file clinic.roo</emphasis>
 ...
-roo&gt; <emphasis role="bold">configuration create --name dev</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration create --name dev</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Configuration created with currently available properties
 First created configuration set as default
 (use 'configuration property add' to make a property available for all configurations
-roo&gt; <emphasis role="bold">configuration property add --name database.url</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property add --name database.url</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo&gt; <emphasis role="bold">configuration property add --name hibernate.hbm2ddl.auto</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property add --name hibernate.hbm2ddl.auto</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo&gt; <emphasis role="bold">configuration property add --name log4j.rootLogger</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property add --name log4j.rootLogger</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo&gt; <emphasis role="bold">configuration property add --name database.password</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property add --name database.password</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo&gt; <emphasis role="bold">configuration property value --configuration dev --property database.url --value jdbc:hsqldb:mem:mydevdb</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration dev --property database.url --value jdbc:hsqldb:mem:mydevdb</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo&gt; <emphasis role="bold">configuration list</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration list</emphasis>
       (Active)      dev
 ----------------------------------------
  * Database Connection Properties
@@ -138,7 +138,7 @@ roo&gt; <emphasis role="bold">configuration list</emphasis>
  * Logging Service Properties
    - log4j.rootLogger = "INFO, stdout"
 (use 'configuration export' to write configurations into the project)
-roo&gt; <emphasis role="bold">configuration export</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration export</emphasis>
 Updated ROOT/pom.xml
 Updated SRC_MAIN_RESOURCES/META-INF/spring/database.properties
 Updated SRC_MAIN_RESOURCES/log4j.properties
@@ -146,7 +146,7 @@ Updated SRC_MAIN_RESOURCES/META-INF/persistence.xml
 Configurations exported into project
 (use '-P name' on maven commands to use a configuration)
 (use 'configuration create' to define a new configuration)
-roo&gt; <emphasis role="bold">configuration create --name pro</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration create --name pro</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Configuration created with currently available properties
  * Database Connection Properties
@@ -157,24 +157,24 @@ Configuration created with currently available properties
  * Logging Service Properties
    - log4j.rootLogger = "INFO, stdout"
 (use 'configuration property add' to make a property available for all configurations)
-roo&gt; <emphasis role="bold">configuration property value --configuration pro --property database.url --value jdbc:hsqldb:file:myprodb</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration pro --property database.url --value jdbc:hsqldb:file:myprodb</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo&gt; <emphasis role="bold">configuration property value --configuration pro --property hibernate.hbm2ddl.auto --value update</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration pro --property hibernate.hbm2ddl.auto --value update</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo&gt; <emphasis role="bold">configuration property value --configuration pro --property log4j.rootLogger --value "ERROR, stdout"</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration pro --property log4j.rootLogger --value "ERROR, stdout"</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo&gt; <emphasis role="bold">configuration property undefined --configuration pro --property database.password</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property undefined --configuration pro --property database.password</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value undefined
 (use '-D propname=propvalue' on maven commands to set the property value)
 (use 'configuration list' to show configurations and their properties)
-roo&gt; <emphasis role="bold">configuration list</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration list</emphasis>
       (Active)      dev
 ----------------------------------------
  * Database Connection Properties
@@ -194,7 +194,7 @@ roo&gt; <emphasis role="bold">configuration list</emphasis>
  * Logging Service Properties
    - log4j.rootLogger = "ERROR, stdout"
 (use 'configuration export' to write configurations into the project)
-roo&gt; <emphasis role="bold">configuration export</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration export</emphasis>
 Updated ROOT/pom.xml
 Updated ROOT/pom.xml
 Updated SRC_MAIN_RESOURCES/META-INF/spring/database.properties
@@ -206,7 +206,7 @@ Updated SRC_MAIN_RESOURCES/META-INF/persistence.xml
 Configurations exported into project
 (use '-P name' on maven commands to use a configuration)
 (use 'configuration create' to define a new configuration)
-roo&gt; <emphasis role="bold">quit</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">quit</emphasis>
 Total execution time 1657 seconds
 Roo exited with code 0
 shell&gt; <emphasis role="bold">mvn clean tomcat:run -P dev</emphasis>

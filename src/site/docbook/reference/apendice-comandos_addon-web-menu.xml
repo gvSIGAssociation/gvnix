@@ -447,7 +447,7 @@ Children     :
       </variablelist></para>
 
     <para>Estos son ejemplos que muestran la salida del
-    comando:<programlisting>roo&gt; <emphasis role="bold">menu tree --id c_owner</emphasis>
+    comando:<programlisting>roo-gvNIX&gt; <emphasis role="bold">menu tree --id c_owner</emphasis>
 [c_owner, visible, no-URL]
           /owners?form  [i_owner_new, visible]
           /owners?page=1&amp;size=${empty param.size ? 10 : param.size}  [i_owner_list, visible]

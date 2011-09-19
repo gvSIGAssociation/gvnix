@@ -356,28 +356,28 @@ public class Entity1 {
         <listitem>
           <para xml:lang="es">Topping:</para>
 
-          <programlisting>roo&gt; <command>entity --class ~.domain.Topping --testAutomatically</command>
-~.domain.Topping roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+          <programlisting>roo-gvNIX&gt; <command>entity --class ~.domain.Topping --testAutomatically</command>
+~.domain.Topping roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
                 </programlisting>
         </listitem>
 
         <listitem>
           <para xml:lang="es">Base:</para>
 
-          <programlisting>~.domain.Topping roo&gt; <command>entity --class ~.domain.Base --testAutomatically</command>
-~.domain.Base roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+          <programlisting>~.domain.Topping roo-gvNIX&gt; <command>entity --class ~.domain.Base --testAutomatically</command>
+~.domain.Base roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
                 </programlisting>
         </listitem>
 
         <listitem>
           <para xml:lang="es">Pizza:</para>
 
-          <programlisting>~.domain.Base roo&gt; <command>entity --class ~.domain.Pizza --testAutomatically</command>
-~.domain.Pizza roo&gt; <command>field string --fieldName name --notNull --sizeMin 2 
+          <programlisting>~.domain.Base roo-gvNIX&gt; <command>entity --class ~.domain.Pizza --testAutomatically</command>
+~.domain.Pizza roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2 
 --comment "Nombre de la pizza" --column pizza_nombre --regexp [A-Za-z0-9].*</command>
-~.domain.Pizza roo&gt; <command>field number --fieldName price --type java.lang.Float</command>
-~.domain.Pizza roo&gt; <command>field set --fieldName toppings --type ~.domain.Topping</command>
-~.domain.Pizza roo&gt; <command>field reference --fieldName base --type ~.domain.Base</command>
+~.domain.Pizza roo-gvNIX&gt; <command>field number --fieldName price --type java.lang.Float</command>
+~.domain.Pizza roo-gvNIX&gt; <command>field set --fieldName toppings --type ~.domain.Topping</command>
+~.domain.Pizza roo-gvNIX&gt; <command>field reference --fieldName base --type ~.domain.Base</command>
                 </programlisting>
 
           <para xml:lang="es">Esta secuencia de comandos genera la siguiente
@@ -435,12 +435,12 @@ public class Pizza {
         <listitem>
           <para xml:lang="es">PizzaOrder:</para>
 
-          <programlisting>~.domain.Pizza roo&gt; <command>entity --class ~.domain.PizzaOrder --testAutomatically</command>
-~.domain.PizzaOrder roo&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
-~.domain.PizzaOrder roo&gt; <command>field string --fieldName address --notNull --sizeMax 30</command>
-~.domain.PizzaOrder roo&gt; <command>field number --fieldName total --type java.lang.Float</command>
-~.domain.PizzaOrder roo&gt; <command>field date --fieldName deliveryDate --type java.util.Date</command>
-~.domain.PizzaOrder roo&gt; <command>field set --fieldName pizzas --type ~.domain.Pizza</command>
+          <programlisting>~.domain.Pizza roo-gvNIX&gt; <command>entity --class ~.domain.PizzaOrder --testAutomatically</command>
+~.domain.PizzaOrder roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
+~.domain.PizzaOrder roo-gvNIX&gt; <command>field string --fieldName address --notNull --sizeMax 30</command>
+~.domain.PizzaOrder roo-gvNIX&gt; <command>field number --fieldName total --type java.lang.Float</command>
+~.domain.PizzaOrder roo-gvNIX&gt; <command>field date --fieldName deliveryDate --type java.util.Date</command>
+~.domain.PizzaOrder roo-gvNIX&gt; <command>field set --fieldName pizzas --type ~.domain.Pizza</command>
                 </programlisting>
         </listitem>
       </orderedlist>
@@ -567,8 +567,8 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
           <para xml:lang="es">Para añadir un nuevo campo deberemos usar el
           mismo comando <emphasis role="bold">field</emphasis> indicando sobre
           que entidad queremos trabajar mediante el parámetro
-          <emphasis>--class.</emphasis><programlisting>roo&gt; <command>field string --fieldName refCode --notNull --sizeMin 2 --class ~.domain.Pizza</command>
-~.domain.Pizza roo&gt; </programlisting>Notar que tras ejecutar el comando
+          <emphasis>--class.</emphasis><programlisting>roo-gvNIX&gt; <command>field string --fieldName refCode --notNull --sizeMin 2 --class ~.domain.Pizza</command>
+~.domain.Pizza roo-gvNIX&gt; </programlisting>Notar que tras ejecutar el comando
           <emphasis>field</emphasis> indicando el parámetro
           <emphasis>--class</emphasis> nos quedamos en el contexto de la
           entidad Pizza y por tanto si seguimos ejecutando el comando field
@@ -581,8 +581,8 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
             role="bold">focus</emphasis> indicando el parámetro
             <emphasis>--class</emphasis>.</para>
 
-            <programlisting>roo&gt; <emphasis role="bold">focus --class ~.domain.Pizza</emphasis>
-~.domain.Pizza roo&gt;</programlisting>
+            <programlisting>roo-gvNIX&gt; <emphasis role="bold">focus --class ~.domain.Pizza</emphasis>
+~.domain.Pizza roo-gvNIX&gt;</programlisting>
           </note>
         </listitem>
       </varlistentry>
@@ -1043,18 +1043,18 @@ public class Repartidor {
       definimos la relación entre PizzaOrder y el Repartidor del pedido.
       También generamos el controlador que gestionará la nueva entidad.</para>
 
-      <programlisting>roo&gt; <command>test integration --entity ~.domain.Repartidor</command>
+      <programlisting>roo-gvNIX&gt; <command>test integration --entity ~.domain.Repartidor</command>
 ...
-roo&gt; <command>field reference --class ~.domain.PizzaOrder --fieldName repartidor --type ~.domain.Repartidor
+roo-gvNIX&gt; <command>field reference --class ~.domain.PizzaOrder --fieldName repartidor --type ~.domain.Repartidor
 </command>...
-roo&gt; <command>controller scaffold --entity ~.domain.Repartidor --class ~.web.RepartidorController</command>
+roo-gvNIX&gt; <command>controller scaffold --entity ~.domain.Repartidor --class ~.web.RepartidorController</command>
 ...
 </programlisting>
 
       <para>Podemos volver a lanzar los test de integración para confirmar que
       todo se ha generado correctamente.</para>
 
-      <programlisting>roo&gt; <command>perform tests
+      <programlisting>roo-gvNIX&gt; <command>perform tests
 </command>...
 [INFO] BUILD SUCCESSFUL</programlisting>
     </section>
@@ -1097,7 +1097,7 @@ roo&gt; <command>controller scaffold --entity ~.domain.Repartidor --class ~.web.
           proyecto que usa HYPERSONIC_IN_MEMORY como BBDD nos indicará que no
           hay driver disponible para HSQLDB.</para>
         </warning>Si lo hacemos en un proyecto que tenga MySQL como
-      BBDD:<programlisting>roo&gt; <emphasis role="bold">database introspect --schema no-schema-required</emphasis>
+      BBDD:<programlisting>roo-gvNIX&gt; <emphasis role="bold">database introspect --schema no-schema-required</emphasis>
 Located add-on that may offer this JDBC driver
 1 found, sorted by rank; T = trusted developer; R = Roo 1.1 compatible
 <emphasis role="bold">ID T R DESCRIPTION -------------------------------------------------------------
@@ -1114,18 +1114,18 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
 
       <para>Podemos obtener más información sobre el dirver mediante:</para>
 
-      <programlisting>roo&gt; <command>addon info id --searchResultId 01</command></programlisting>
+      <programlisting>roo-gvNIX&gt; <command>addon info id --searchResultId 01</command></programlisting>
 
       <para>Donde le estamos diciendo que nos ofreca más información
       (--searchResultId) del Add-on 01 que nos ha devuelto el comando
       anterior.</para>
 
       <para>Para instalarlo se puede hacer usando el id del Add-on o bien su
-      nombre simbólico.<programlisting>roo&gt; <command>addon install id --searchResultId 01</command></programlisting></para>
+      nombre simbólico.<programlisting>roo-gvNIX&gt; <command>addon install id --searchResultId 01</command></programlisting></para>
 
       <para>o</para>
 
-      <programlisting>roo&gt; <command>addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.mysql-connector-java;&lt;version&gt;</command></programlisting>
+      <programlisting>roo-gvNIX&gt; <command>addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.mysql-connector-java;&lt;version&gt;</command></programlisting>
 
       <para>Al instante tendremos disponible el driver JDBC y podremos empezar
       a usar los comandos <emphasis>database introspect</emphasis> o
@@ -1138,7 +1138,7 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
       <para>DBRE ofrece dos comandos: <emphasis>database introspect</emphasis>
       o <emphasis>database reverse engineer.</emphasis></para>
 
-      <programlisting>roo&gt; <command>database introspect --schema</command> &lt;nombre del esquema&gt; --file &lt;nombre del fichero&gt; --enableViews</programlisting>
+      <programlisting>roo-gvNIX&gt; <command>database introspect --schema</command> &lt;nombre del esquema&gt; --file &lt;nombre del fichero&gt; --enableViews</programlisting>
 
       <para>el comando nos mostrará la estructura de la BBDD en formato XML.
       Es obligatorio indicar el esquema al que nos referimos, para ello
@@ -1149,7 +1149,7 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
       guarde la información también en un fichero determinado y --enableViews
       especifica que también debe recoger información sobre las vistas.</para>
 
-      <programlisting>roo&gt; <command>database reverse engineer --schema</command> --package --testAutomatically --enableViews --includeTables --excludeTables</programlisting>
+      <programlisting>roo-gvNIX&gt; <command>database reverse engineer --schema</command> --package --testAutomatically --enableViews --includeTables --excludeTables</programlisting>
 
       <para>este comando crea las entidades JPA de nuestro proyecto
       representando las tablas y columnas de nuestra BBDD. Al igual que antes
@@ -1178,7 +1178,7 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
       tenidas en cuenta durante la ingeniería inversa y admite el mismo uso de
       * y ?. Por ejemplo:</para>
 
-      <programlisting>roo&gt; database reverse engineer --schema no-schema-required --package ~.domain --includeTables "foo* bar?"</programlisting>
+      <programlisting>roo-gvNIX&gt; database reverse engineer --schema no-schema-required --package ~.domain --includeTables "foo* bar?"</programlisting>
 
       <para>Con este comando se generarían las entidades de aquellas tablas de
       la BBDD que tengan como nombre foo&lt;cualquier cosa&gt; y bar&lt;otro
@@ -1334,7 +1334,7 @@ public class LineItemPK {
     <para>Para ejecutar los test utilizaremos el comando <command>perform
     tests</command>:</para>
 
-    <programlisting>~.domain.PizzaOrder roo&gt; <command>perform test</command>
+    <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>perform test</command>
 <computeroutput>[Thread-4] [INFO] Scanning for projects...
 [Thread-4] [INFO] ------------------------------------------------------------------------
 [Thread-4] [INFO] Building pizzashop
@@ -1354,11 +1354,11 @@ public class LineItemPK {
 [Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.145 sec
 [Thread-4] Running com.springsource.roo.pizzashop.domain.BaseIntegrationTest
 [Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.137 sec
-[Thread-4] zzaOrder roo&gt; 
-[Thread-4] Results :roo&gt; 
-[Thread-4] zzaOrder roo&gt; 
+[Thread-4] zzaOrder roo-gvNIX&gt; 
+[Thread-4] Results :roo-gvNIX&gt; 
+[Thread-4] zzaOrder roo-gvNIX&gt; 
 [Thread-4] Tests run: 36, Failures: 0, Errors: 0, Skipped: 0
-[Thread-4] zzaOrder roo&gt; 
+[Thread-4] zzaOrder roo-gvNIX&gt; 
 [Thread-4] [INFO] ------------------------------------------------------------------------
 [Thread-4] [INFO] BUILD SUCCESSFUL
 [Thread-4] [INFO] ------------------------------------------------------------------------
@@ -1366,6 +1366,6 @@ public class LineItemPK {
 [Thread-4] [INFO] Finished at: Wed Jun 16 21:10:22 CEST 2010
 [Thread-4] [INFO] Final Memory: 45M/299M
 [Thread-4] [INFO] ------------------------------------------------------------------------</computeroutput>
-~.domain.PizzaOrder roo&gt;</programlisting>
+~.domain.PizzaOrder roo-gvNIX&gt;</programlisting>
   </section>
 </chapter>

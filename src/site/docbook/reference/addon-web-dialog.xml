@@ -249,7 +249,7 @@
     que toma como nombre el valor del parámetro <emphasis>name</emphasis> dado
     en el comando y se crea una JSPx en <emphasis>WEB-INF/dialogs</emphasis>
     con el mismo nombre dado al método que se usará como contenido del diálogo
-    modal.<programlisting><emphasis role="bold">roo&gt;</emphasis> web mvc dialog message add --class ~.web.PetController --name petsdialog</programlisting>En
+    modal.<programlisting><emphasis role="bold">roo-gvNIX&gt;</emphasis> web mvc dialog message add --class ~.web.PetController --name petsdialog</programlisting>En
     el ejemplo anterior se está definiendo el diálogo modal petsdialog que
     será mostrado por el controlador PetController. El método que facilita
     esta función en el controlador tiene como signatura:</para>

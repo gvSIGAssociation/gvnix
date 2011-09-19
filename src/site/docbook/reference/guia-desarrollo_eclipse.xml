@@ -185,11 +185,11 @@
       <para xml:lang="es">En este punto ya tiene un proyecto Maven de
       aplicación web preparado.</para>
 
-      <programlisting>roo&gt; <emphasis role="bold">persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
+      <programlisting>roo-gvNIX&gt; <emphasis role="bold">persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
 Created ...
-~.Timer roo&gt;<emphasis role="bold"> entity --class ~.Timer --testAutomatically</emphasis> 
+~.Timer roo-gvNIX&gt;<emphasis role="bold"> entity --class ~.Timer --testAutomatically</emphasis> 
 Created ...
-~.Timer roo&gt;<emphasis role="bold"> field string --fieldName message --notNull</emphasis>
+~.Timer roo-gvNIX&gt;<emphasis role="bold"> field string --fieldName message --notNull</emphasis>
 Managed ...</programlisting>
 
       <para xml:lang="es">El comando <emphasis role="bold">persistence
@@ -205,7 +205,7 @@ Managed ...</programlisting>
       generar todas las entidades de nuestra aplicación mediante el proceso de
       ingenieria inversa conta un esquema de BBDD existente.</para>
 
-      <programlisting>~.Timer roo&gt; <emphasis role="bold">controller all --package ~.web</emphasis>
+      <programlisting>~.Timer roo-gvNIX&gt; <emphasis role="bold">controller all --package ~.web</emphasis>
 Created ...</programlisting>
 
       <para><emphasis role="bold">controller</emphasis> crea controladores de
@@ -214,7 +214,7 @@ Created ...</programlisting>
       linkend="guia-desarrollo_web_definir-controller">Crear la capa web con
       el intérprete de comandos</link>.</para>
 
-      <programlisting>~.web roo&gt; <emphasis role="bold">selenium test --controller ~.web.TimerController</emphasis>
+      <programlisting>~.web roo-gvNIX&gt; <emphasis role="bold">selenium test --controller ~.web.TimerController</emphasis>
 Created ...</programlisting>
 
       <para>Si queremos incluir en el proyecto test de integración tenemos a
@@ -225,8 +225,8 @@ Created ...</programlisting>
       corriendo, se ejecutará el conjunto de tests sobre una nueva instancia
       del navegador FireFox.</para>
 
-      <programlisting>~.web roo&gt; <emphasis role="bold">theme install --id cit</emphasis>
-~.web roo&gt; <emphasis role="bold">theme set --id cit</emphasis></programlisting>
+      <programlisting>~.web roo-gvNIX&gt; <emphasis role="bold">theme install --id cit</emphasis>
+~.web roo-gvNIX&gt; <emphasis role="bold">theme set --id cit</emphasis></programlisting>
 
       <para>Mediante el comando <emphasis role="bold">theme</emphasis>, del
       <emphasis>Add-on Theme Manager</emphasis> propio de gvNIX, podemos
@@ -242,7 +242,7 @@ Created ...</programlisting>
       bastaría con ejecutar el comando <command>perform eclipse</command> para
       crear una estructura de proyecto Eclipse:</para>
 
-      <programlisting>~.domain.PizzaOrder roo&gt; <command>perform eclipse</command>
+      <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>perform eclipse</command>
 <computeroutput>[Thread-6] Warning: JAVA_HOME environment variable is not set.
 [Thread-6] [INFO] Scanning for projects...
 [Thread-6] [INFO] ------------------------------------------------------------------------
@@ -261,7 +261,7 @@ Created ...</programlisting>
 [Thread-6] [INFO] Finished at: Wed Jun 16 21:21:49 CEST 2010
 [Thread-6] [INFO] Final Memory: 36M/330M
 [Thread-6] [INFO] ------------------------------------------------------------------------</computeroutput>
-~.domain.PizzaOrder roo&gt;</programlisting>
+~.domain.PizzaOrder roo-gvNIX&gt;</programlisting>
 
       <para xml:lang="es">Este comando termina ejecutando un <command>mvn
       eclipse:eclipse</command> para el proyecto, por lo que es indiferente el

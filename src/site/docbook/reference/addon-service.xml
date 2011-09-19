@@ -236,7 +236,7 @@ public class MyWebService {
 
       <para>El resultado es una salida como esta:</para>
 
-      <programlisting>roo&gt; service ws list
+      <programlisting>roo-gvNIX&gt; service ws list
 service     exported     imported
 ---------   ---------   ----------
 Service1       X

@@ -18,11 +18,11 @@
   <programlisting>bash$ <emphasis role="bold">mkdir sample</emphasis>
 bash$ <emphasis role="bold">cd sample</emphasis>
 bash:sample$ <emphasis role="bold">gvnix</emphasis>
-roo&gt; <emphasis role="bold">script --file SCRIPT.roo</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">script --file SCRIPT.roo</emphasis>
 project ...
 ...
 Milliseconds required:
-~.web roo&gt; <emphasis role="bold">quit</emphasis>
+~.web roo-gvNIX&gt; <emphasis role="bold">quit</emphasis>
 $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
 
   <para>Donde <filename>SCRIPT.roo</filename> es el nombre del fichero de

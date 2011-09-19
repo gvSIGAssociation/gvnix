@@ -436,7 +436,7 @@
     tanto los exportados como los importados. El resultado se formatea de la
     siguiente forma:</para>
 
-    <programlisting>roo&gt; service ws list
+    <programlisting>roo-gvNIX&gt; service ws list
 service     exported     imported
 ---------   ---------   ----------
 Service1       X

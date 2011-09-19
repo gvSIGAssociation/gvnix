@@ -86,13 +86,13 @@ bash&gt; <command>gvnix</command>
 
 
 Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.</computeroutput>
-roo&gt;</programlisting>
+roo-gvNIX&gt;</programlisting>
 
     <para xml:lang="es">Después accedemos a la consola de Roo y tecleamos
     <command>hint</command> para mostrar la guía en el proceso de creación del
     proyecto:</para>
 
-    <programlisting>roo&gt; <command>hint</command> 
+    <programlisting>roo-gvNIX&gt; <command>hint</command> 
 <computeroutput>Welcome to Roo! We hope you enjoy your stay!
 
 Before you can use many features of Roo, you need to start a new project.
@@ -118,7 +118,7 @@ You're also welcome to visit http://forum.springframework.org for Roo help.</com
     JDK utilizado, en este caso JDK 1.5, si no se especifica Roo por defecto
     utiliza el JDK 1.6</para>
 
-    <programlisting>roo&gt; <command>project --topLevelPackage com.springsource.roo.pizzashop --java 5</command>
+    <programlisting>roo-gvNIX&gt; <command>project --topLevelPackage com.springsource.roo.pizzashop --java 5</command>
 <computeroutput>Created .../pom.xml
 Managed .../pom.xml [Added dependency javax.annotation:jsr250-api:1.0]
 Created SRC_MAIN_JAVA
@@ -149,7 +149,7 @@ Created SRC_MAIN_RESOURCES/log4j.properties</computeroutput></programlisting>
     posición del shell ha cambiado, ahora estamos dentro del proyecto
     indicándolo con el nombre del paquete que hemos creado como base</para>
 
-    <programlisting>com.springsource.roo.pizzashop roo&gt;</programlisting>
+    <programlisting>com.springsource.roo.pizzashop roo-gvNIX&gt;</programlisting>
 
     <para xml:lang="es">Por otro lado, la estructura de directorios creada
     esta basada en las recomendaciones de Maven.</para>

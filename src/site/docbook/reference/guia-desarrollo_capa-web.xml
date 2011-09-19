@@ -177,7 +177,7 @@
 
       <para>Un ejemplo:</para>
 
-      <programlisting>roo&gt; <command>web mvc controller --class ~.web.MyController</command></programlisting>
+      <programlisting>roo-gvNIX&gt; <command>web mvc controller --class ~.web.MyController</command></programlisting>
 
       <para>Genera una clase como esta:</para>
 
@@ -245,7 +245,7 @@ public class MyController {
       secuencia de comandos:</para>
 
       <programlisting>
-~.domain.PizzaOrder roo&gt; <command>web mvc all --package ~.web</command></programlisting>
+~.domain.PizzaOrder roo-gvNIX&gt; <command>web mvc all --package ~.web</command></programlisting>
     </section>
   </section>
 
