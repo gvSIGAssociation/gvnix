@@ -559,17 +559,6 @@ public abstract class AbstractPatternJspMetadataListener implements
                     "urn:jsptagdir:/WEB-INF/tags/pattern");
         }
 
-        String idPrefix = rooJspx.equals(RooJspx.create) ? "fc:" : rooJspx
-                .equals(RooJspx.update) ? "fu:" : "ps:";
-
-        Element form = XmlUtils.findFirstElement(
-                "/div/"
-                        + rooJspx.name()
-                        + "[@id='"
-                        + XmlUtils.convertId(idPrefix
-                                + formbackingType.getFullyQualifiedTypeName())
-                        + "']", docRoot);
-
         String divContPaneId = XmlUtils.convertId("div:"
                 + formbackingType.getFullyQualifiedTypeName() + "_contentPane");
         Element divContentPane = XmlUtils.findFirstElement(
@@ -592,89 +581,101 @@ public abstract class AbstractPatternJspMetadataListener implements
             divContentPane.appendChild(divForm);
         }
 
-        // Wrap fields into <ul><li/></ul>
-        NodeList fields = form.getChildNodes();
-        if (fields.getLength() > 0) {
-            Node thisField;
-            for (int i = 0; i < fields.getLength(); i++) {
-                thisField = fields.item(i);
+        String idPrefix = rooJspx.equals(RooJspx.create) ? "fc:" : rooJspx
+                .equals(RooJspx.update) ? "fu:" : "ps:";
 
-                if (thisField.getNodeName().startsWith("field:")
-                        && !thisField.getParentNode().getNodeName()
-                                .equalsIgnoreCase("li")) {
-                    if (null != thisField.getAttributes()
-                    /*
-                     * && null != thisField.getAttributes().getNamedItem(
-                     * "type") &&
-                     * !thisField.getAttributes().getNamedItem("type")
-                     * .getNodeValue().equalsIgnoreCase("hidden")
-                     */) {
-                        Node thisNodeCpy = thisField.cloneNode(true);
-                        String fieldAttValue = thisNodeCpy.getAttributes()
-                                .getNamedItem("field").getNodeValue();
-                        Element li = new XmlElementBuilder("li", docJspXml)
-                                .addAttribute("class", "size120")
-                                .addAttribute(
-                                        "id",
-                                        XmlUtils.convertId("li:"
-                                                .concat(formbackingType
-                                                        .getFullyQualifiedTypeName())
-                                                .concat(".")
-                                                .concat(fieldAttValue)))
-                                .addChild(thisNodeCpy).build();
-                        Element ul = new XmlElementBuilder("ul", docJspXml)
-                                .addAttribute("class", "formInline")
-                                .addAttribute(
-                                        "id",
-                                        XmlUtils.convertId("ul:"
-                                                .concat(formbackingType
-                                                        .getFullyQualifiedTypeName())
-                                                .concat(".")
-                                                .concat(fieldAttValue)))
-                                .addChild(li).build();
-                        divForm.appendChild(ul);
-                        form.removeChild(thisField);
-                        // form.replaceChild(ul, thisField);
+        Element form = XmlUtils.findFirstElement(
+                "/div/"
+                        + rooJspx.name()
+                        + "[@id='"
+                        + XmlUtils.convertId(idPrefix
+                                + formbackingType.getFullyQualifiedTypeName())
+                        + "']", docRoot);
+
+        if (form != null) {
+            // Wrap fields into <ul><li/></ul>
+            NodeList fields = form.getChildNodes();
+            if (fields.getLength() > 0) {
+                Node thisField;
+                for (int i = 0; i < fields.getLength(); i++) {
+                    thisField = fields.item(i);
+
+                    if (thisField.getNodeName().startsWith("field:")
+                            && !thisField.getParentNode().getNodeName()
+                                    .equalsIgnoreCase("li")) {
+                        if (null != thisField.getAttributes()
+                        /*
+                         * && null != thisField.getAttributes().getNamedItem(
+                         * "type") &&
+                         * !thisField.getAttributes().getNamedItem("type")
+                         * .getNodeValue().equalsIgnoreCase("hidden")
+                         */) {
+                            Node thisNodeCpy = thisField.cloneNode(true);
+                            String fieldAttValue = thisNodeCpy.getAttributes()
+                                    .getNamedItem("field").getNodeValue();
+                            Element li = new XmlElementBuilder("li", docJspXml)
+                                    .addAttribute("class", "size120")
+                                    .addAttribute(
+                                            "id",
+                                            XmlUtils.convertId("li:"
+                                                    .concat(formbackingType
+                                                            .getFullyQualifiedTypeName())
+                                                    .concat(".")
+                                                    .concat(fieldAttValue)))
+                                    .addChild(thisNodeCpy).build();
+                            Element ul = new XmlElementBuilder("ul", docJspXml)
+                                    .addAttribute("class", "formInline")
+                                    .addAttribute(
+                                            "id",
+                                            XmlUtils.convertId("ul:"
+                                                    .concat(formbackingType
+                                                            .getFullyQualifiedTypeName())
+                                                    .concat(".")
+                                                    .concat(fieldAttValue)))
+                                    .addChild(li).build();
+                            divForm.appendChild(ul);
+                            form.removeChild(thisField);
+                            // form.replaceChild(ul, thisField);
+                        }
                     }
                 }
             }
-        }
-
-        if (rooJspx.equals(RooJspx.create) || rooJspx.equals(RooJspx.update)) {
-            // Add a hidden field holding gvnixpattern parameter if exists
-            String hiddenFieldId = XmlUtils.convertId("c:"
-                    + formbackingType.getFullyQualifiedTypeName()
-                    + "_gvnixpattern");
-            Element hiddenField = XmlUtils.findFirstElement(
-                    "/div/" + rooJspx.name()
-                            + "/div/div/hiddengvnixpattern[@id='"
-                            + hiddenFieldId + "']", docRoot);
-            if (null == hiddenField) {
-                hiddenField = new XmlElementBuilder(
-                        "pattern:hiddengvnixpattern", docJspXml)
-                        .addAttribute("id", hiddenFieldId)
-                        .addAttribute("value", "${param.gvnixpattern}")
-                        .addAttribute("render",
-                                "${not empty param.gvnixpattern}").build();
-                divForm.appendChild(hiddenField);
+            if (rooJspx.equals(RooJspx.create)
+                    || rooJspx.equals(RooJspx.update)) {
+                // Add a hidden field holding gvnixpattern parameter if exists
+                String hiddenFieldId = XmlUtils.convertId("c:"
+                        + formbackingType.getFullyQualifiedTypeName()
+                        + "_gvnixpattern");
+                Element hiddenField = XmlUtils.findFirstElement("/div/"
+                        + rooJspx.name() + "/div/div/hiddengvnixpattern[@id='"
+                        + hiddenFieldId + "']", docRoot);
+                if (null == hiddenField) {
+                    hiddenField = new XmlElementBuilder(
+                            "pattern:hiddengvnixpattern", docJspXml)
+                            .addAttribute("id", hiddenFieldId)
+                            .addAttribute("value", "${param.gvnixpattern}")
+                            .addAttribute("render",
+                                    "${not empty param.gvnixpattern}").build();
+                    divForm.appendChild(hiddenField);
+                }
+                // Add a cancel button
+                String cancelId = XmlUtils.convertId(idPrefix
+                        + formbackingType.getFullyQualifiedTypeName()
+                        + "_cancel");
+                Element cancelButton = XmlUtils.findFirstElement("/div/"
+                        + rooJspx.name() + "/div/div/cancelbutton[@id='"
+                        + cancelId + "']", docRoot);
+                if (null == cancelButton) {
+                    cancelButton = new XmlElementBuilder(
+                            "pattern:cancelbutton", docJspXml)
+                            .addAttribute("id", cancelId)
+                            .addAttribute("render",
+                                    "${not empty param.gvnixpattern}").build();
+                    divForm.appendChild(cancelButton);
+                }
             }
-            // Add a cancel button
-            String cancelId = XmlUtils.convertId(idPrefix
-                    + formbackingType.getFullyQualifiedTypeName() + "_cancel");
-            Element cancelButton = XmlUtils.findFirstElement(
-                    "/div/" + rooJspx.name() + "/div/div/cancelbutton[@id='"
-                            + cancelId + "']", docRoot);
-            if (null == cancelButton) {
-                cancelButton = new XmlElementBuilder("pattern:cancelbutton",
-                        docJspXml)
-                        .addAttribute("id", cancelId)
-                        .addAttribute("render",
-                                "${not empty param.gvnixpattern}").build();
-                divForm.appendChild(cancelButton);
-            }
+            form.appendChild(divContentPane);
         }
-        form.appendChild(divContentPane);
-
         XmlUtils.removeTextNodes(docJspXml);
         _fileManager.createOrUpdateTextFileIfRequired(docJspx,
                 XmlUtils.nodeToString(docJspXml), true);
