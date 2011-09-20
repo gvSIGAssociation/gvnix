@@ -6,93 +6,75 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-    <title xml:lang="es">Comandos del Add-on Web MVC Binding</title>
+  <title xml:lang="es">Comandos del Add-on Web MVC Binding</title>
 
-    <para xml:lang="es">Para una descripción general ver <link
-    linkend="addon-web-mvc-binding">Add-on CIT Security</link>.</para>
+  <para xml:lang="es">Para una descripción general ver <link
+  linkend="addon-web-mvc-binding">Add-on Web MVC Binding</link>.</para>
 
-    <table>
-        <title xml:lang="es">Comandos de Add-on Web MVC Binding</title>
+  <table>
+    <title xml:lang="es">Comandos de Add-on Web MVC Binding</title>
 
-        <tgroup cols="2">
-        <thead>
-          <colspec colwidth="150" />
+    <tgroup cols="2">
+      <thead>
+        <colspec colwidth="150" />
 
-          <row>
-            <entry align="center">Comando</entry>
+        <row>
+          <entry align="center">Comando</entry>
 
-            <entry align="center">Descripción</entry>
-          </row>
-        </thead>
+          <entry align="center">Descripción</entry>
+        </row>
+      </thead>
 
-        <tbody>
-          <row>
-            <entry><link
-            linkend="apendice-comandos_addon-web-mvc-binding_web-binding-setup">web
-            binding setup</link></entry>
+      <tbody>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web-mvc-binding_web-binding-setup">web
+          mvc binding stringTrimmer</link></entry>
 
-            <entry xml:lang="es">Instala el inicializador de editores.</entry>
-          </row>
+          <entry xml:lang="es">Registra el StringTrimmerEditor.</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
 
-          <row>
-            <entry><link
-            linkend="apendice-comandos_addon-web-mvc-binding_web-binding-drop">web
-            binding drop</link></entry>
+  <section xml:id="apendice-comandos_addon-web-mvc-binding_web-binding-setup">
+    <title>web mvc binding stringTrimmer</title>
 
-            <entry xml:lang="es">Desactiva el inicializador de
-            editores.</entry>
-          </row>
-        </tbody>
-        </tgroup>
-    </table>
+    <para xml:lang="es">Registra el <link
+    xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/beans/propertyeditors/StringTrimmerEditor.html">StringTrimmerEditor</link>
+    en los Controllers del proyecto, o en aquel que se indique mediante la
+    opción class.</para>
 
-    <section xml:id="apendice-comandos_addon-web-mvc-binding_web-binding-setup">
-        <title>web binding setup</title>
+    <para xml:lang="es">Para ello anota el/los controllers con
+    @GvNIXStringTrimmerBinder que disparará la generación del método que
+    registrará el Editor.</para>
 
-        <para xml:lang="es">Instala el inicializador de editores en la
-        aplicación actual.</para>
+    <para xml:lang="es">Los parámetros son:<variablelist>
+        <varlistentry>
+          <term>--class</term>
 
-        <para xml:lang="es">Para ello crea una clase que implementa <link
-        xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/web/bind/support/WebBindingInitializer.html">WebBindingInitializer</link>
-        y la registra en el fichero
-        <filename>WEB-INF/spring/webmvc-config.xml</filename>.</para>
+          <listitem>
+            <para><emphasis>[Opcional] [clase Java]</emphasis></para>
 
-        <para xml:lang="es">Los parámetros son:<variablelist>
-          <varlistentry>
-            <term>--class</term>
+            <para>Nombre de la clase Java del controller para el que se quiere
+            registrar el StringTrimmerEditor. Si no se indica se registrará el
+            Editor para todos los controllers del proyecto.</para>
+          </listitem>
+        </varlistentry>
 
-            <listitem>
-              <para><emphasis>[Requerido] [clase Java]</emphasis></para>
+        <varlistentry>
+          <term>--emptyAsNull</term>
 
-              <para>Nombre de la clase Java para el inicializador. Si la clase
-              existe, comprueba que implementa el interface <link
-              xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/web/bind/support/WebBindingInitializer.html">WebBindingInitializer</link>
-              para poder usarla.</para>
-            </listitem>
-          </varlistentry>
+          <listitem>
+            <para><emphasis>[Opcional] [true por defecto]
+            [Booleano]</emphasis></para>
 
-          <varlistentry>
-            <term>--stringEmptyAsNull</term>
-
-            <listitem>
-              <para><emphasis>[Opcional] [false por defecto]
-              [Booleano]</emphasis></para>
-
-              <para>Añadir el editor <link
-              xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/beans/propertyeditors/StringTrimmerEditor.html">StringTrimmerEditor</link>
-              con el constructor a <literal>True</literal>. De esta forma, las
-              cadenas vacias se almacenará como
-              <literal>null</literal>.</para>
-            </listitem>
-          </varlistentry>
-        </variablelist></para>
-    </section>
-
-    <section xml:id="apendice-comandos_addon-web-mvc-binding_web-binding-drop">
-        <title>web binding drop</title>
-
-        <para>Descativa el inicializador de editores. Este comando no elimina la
-        clase creada para el inicializador. Sólo elmina la configuración del
-        fichero <filename>WEB-INF/spring/webmvc-config.xml</filename>.</para>
-    </section>
+            <para>Añadir el editor <link
+            xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/beans/propertyeditors/StringTrimmerEditor.html">StringTrimmerEditor</link>
+            con el constructor a <literal>True</literal>. De esta forma, las
+            cadenas vacias se almacenará como <literal>null</literal>.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
 </section>

@@ -12,8 +12,8 @@
   <section xml:id="addon-web-mvc-binding_descripcion">
     <title xml:lang="es">Descripción</title>
 
-    <para xml:lang="es">Este add-on prepara la configuración de los editores
-    por defecto de propiedades para Spring MVC en un una clase.</para>
+    <para xml:lang="es">Este add-on registra editores por defecto de
+    propiedades para Spring MVC en los controllers del proyecto.</para>
 
     <para xml:lang="es">Para ver más información sobre los editores de
     propiedades ver la <link
@@ -22,20 +22,12 @@
 
     <para xml:lang="es">Al ejecutar el comando <link
     linkend="apendice-comandos_addon-web-mvc-binding_web-binding-setup">web
-    binding setup</link> el add-on creará un clase, que implementa el
-    interface <link
-    xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/web/bind/support/WebBindingInitializer.html">WebBindingInitializer</link>,
-    para ir registrando los editores comunes a todos los controllers.
-    Posteriormente se pueden ir añadiendo mas editores conforme sea
-    necesario.</para>
-
-    <para xml:lang="es">Uno de los más útiles es el <link
-    xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/beans/propertyeditors/StringTrimmerEditor.html">StringTrimmerEditor</link>
-    que hace que las cadenas en blanco se transformen a Nulos. En el comando
-    <link
-    linkend="apendice-comandos_addon-web-mvc-binding_web-binding-setup">web
-    binding setup</link> hay un parámetro para que se incluya este editor por
-    defecto.</para>
+    mvc binding stringTrimmer</link> el add-on anotará las clases de los
+    Controllers del proyecto con @GvNIXStringTrimmerBinder. Esto generará el
+    código necesario para registrar el <link
+    xlink:href="http://static.springsource.org/spring/docs/3.0.x/javadoc-api/org/springframework/beans/propertyeditors/StringTrimmerEditor.html">StringTrimmerEditor</link>,
+    que elimina los espacios en blanco del principio y final de las cadenas y
+    por defecto, transforma las cadenas vacías en Nulos.</para>
 
     <para xml:lang="es">Para ver mas detalles ver el <link
     linkend="apendice-comandos_addon-web-mvc-binding">apéndice de
@@ -45,7 +37,9 @@
   <section>
     <title xml:lang="es">Futuras versiones</title>
 
-    <para xml:lang="es">Para futuras versiones este add-on permitirá gestionar
-    los editores registrados.</para>
+    <para xml:lang="es">Para futuras versiones este add-on permitirá registrar
+    los Editores enumerados en la Tabla 5.2 de la <link
+    xlink:href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/validation.html#beans-beans-conversion">documentación
+    de Spring</link>.</para>
   </section>
 </chapter>
