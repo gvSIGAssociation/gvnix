@@ -9,7 +9,7 @@
   <title xml:lang="es">Add-on Web Screen Patterns</title>
 
   <para xml:lang="es">Add-on para aplicar patrones de visualización sobre
-  entidades. </para>
+  entidades.</para>
 
   <para xml:lang="es">¿Qué entendemos por patrón de visualización? <link
   xlink:href="http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns">"12
@@ -131,7 +131,7 @@ public class Controlador2 {
 
       <para>El patrón tabular define una visualización de varios registros a
       la vez con la posibildad de paginar entre todos los registros
-      existentes. </para>
+      existentes.</para>
 
       <para>Este formato de visualización implica que si se realiza alguna
       acción sobre los registros visualizados en pantalla, mediante la
@@ -140,6 +140,29 @@ public class Controlador2 {
       con lo que el fallo de una de las modificaciones / creaciones, provocará
       que todo el proceso falle y los registros visualizados permanecerán
       inalterados.</para>
+
+      <para>El Add-on Web Screen Pattern, genera los componentes para poder
+      mostrar una entidad en formato patrón tabular. Por defecto, la jspx
+      asociada a este patrón utiliza el componente
+      <emphasis>&lt;form:update/&gt;</emphasis> de la librearía de tags
+      <emphasis>/pattern/form</emphasis>. </para>
+
+      <para>Este componente por defecto muestra y deja habilitado el campo
+      identificador de la entidad en el formulario de creación y actualización
+      en formato tabular. En ocasiones esto puede ser útil porque puede que
+      nuestra entidad tenga como identificador una cadena la cual ha de ser
+      establecida por el usuario. Otras veces, en cambio, no es lo que
+      queremos, ya que el identificador es una secuencia autogenerada. El
+      componente <emphasis>&lt;form:update/&gt;</emphasis> dispone de un
+      atributo <emphasis role="bold">idDisabled</emphasis> que establecido a
+      <emphasis>true</emphasis>, deshabilita el campo en los formularios de
+      forma que el usuario no puede establecer ningún valor en este campo para
+      evitar confusiones, pues será el proveedor de persistencia el que se
+      ocupe de establecer el valor de este campo usando la secuencia
+      predefinida. El mismo componente espera que el campo identificador de la
+      entidad es el campo id, si por algún motivo no fuese el caso, podemos
+      indicar que campo hace las veces de identificador mediante el atributo
+      <emphasis role="bold">idField</emphasis>.</para>
     </section>
 
     <section>
@@ -148,6 +171,55 @@ public class Controlador2 {
       <para>Este patrón es la visualización de un único registro pero con la
       posibilidad de avanzar, mediante paginación de uno en uno, entre todos
       los registros existentes.</para>
+
+      <para>La generación automática de código de este patrón posiciona los
+      campos de la entidad unos debajo de otros. En ocasiones, podemos querer
+      posicionar los campos de la entidad de otra forma. Aparte de generar la
+      jspx propia del patrón, se modifican las jspx generales de la entidad
+      <emphasis>create, update y show</emphasis>. En esta operación
+      automática, los campos de la entidad se incrustan dentro de elementos
+      HTML
+      <emphasis>&lt;ul&gt;&lt;li&gt;campo_entidad&lt;/li&gt;&lt;/ul&gt;</emphasis>,
+      esto nos permite personalizar el posicionamiento de los campos de la
+      entidad en estas jspx moviendo los elementos
+      <emphasis>&lt;li&gt;campo_entidad&lt;/li&gt;</emphasis> a otro elemento
+      <emphasis>&lt;ul/&gt;</emphasis> de forma que los campos se mostrarán en
+      columnas. El CSS de la aplicación está preparado para ello. Por ejemplo,
+      de el siguiente código extraído de
+      <emphasis>show.jspx</emphasis>:</para>
+
+      <programlisting>&lt;ul class="formInline" id="ul_com_springsource_petclinic_domain_Pet_name"&gt;
+  &lt;li class="size120" id="li_com_springsource_petclinic_domain_Pet_name"&gt;
+    &lt;field:input field="name" id="c_com_springsource_petclinic_domain_Pet_name" min="1" required="true" z="ZY+k75JeSo9RmejYZRFNIvs2aBg="/&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul class="formInline" id="ul_com_springsource_petclinic_domain_Pet_weight"&gt;
+  &lt;li class="size120" id="li_com_springsource_petclinic_domain_Pet_weight"&gt;
+    &lt;field:input field="weight" id="c_com_springsource_petclinic_domain_Pet_weight" min="0" required="true" validationMessageCode="field_invalid_number" z="cOD5zE/z7gy+RZu5kVSPuxCa+/I="/&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</programlisting>
+
+      <para>podemos pasar a:</para>
+
+      <programlisting>&lt;ul class="formInline" id="ul_com_springsource_petclinic_domain_Pet_name"&gt;
+  &lt;li class="size120" id="li_com_springsource_petclinic_domain_Pet_name"&gt;
+    &lt;field:input field="name" id="c_com_springsource_petclinic_domain_Pet_name" min="1" required="true" z="ZY+k75JeSo9RmejYZRFNIvs2aBg="/&gt;
+  &lt;/li&gt;
+  &lt;li class="size120" id="li_com_springsource_petclinic_domain_Pet_weight"&gt;
+    &lt;field:input field="weight" id="c_com_springsource_petclinic_domain_Pet_weight" min="0" required="true" validationMessageCode="field_invalid_number" z="cOD5zE/z7gy+RZu5kVSPuxCa+/I="/&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</programlisting>
+
+      <para>posicionando los campos <emphasis>name</emphasis> y
+      <emphasis>weight</emphasis> uno al lado del otro.</para>
+    </section>
+
+    <section>
+      <title>Vinculación de patrones de visualización con finder</title>
+
+      <para>TBC: atributo <emphasis>finder</emphasis> de los componentes
+      &lt;page:show/&gt; y &lt;form:update/&gt; de la librería de tags de
+      pattern.</para>
     </section>
   </section>
 </chapter>
