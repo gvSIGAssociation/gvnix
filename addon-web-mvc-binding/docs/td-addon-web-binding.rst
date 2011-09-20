@@ -32,24 +32,26 @@ This document contents relative to this add-on.
 Requirements
 =============
 
-In the first release of this add-on, it have to setup configuration for Spring MVC default editors.
+This add-on has been reimplemented due to an issue appeared in Spring 3.0.1GA
+(https://jira.springsource.org/browse/SPR-7077). Looks like old way to register property editors
+globally doesn't work. Right now the solution is to use methods annotated with @InitBinder in order
+to register custom editors.
 
-When the command ``web binding setup`` is issued, the add-on will create a new class implementing
-``WeBinidingInitializer`` interface and will modify ``webmvc-config.xml`` registering the bean of the
-new class.
+In the first release of this revisited add-on, it have to register StringTrimmerEditor for all the
+Controllers, or one provided.
+
+When the command ``web mvc binding stringTrimmer`` is issued, the add-on will annotate all the classes
+annotated with @Controller with @GvNIXStringTrimmerBinder(emptyAsNull=true). This triggers the generation
+of an ITD with the method initStringTrimmerBinder annotated with @InitBinder. This method registers
+StringTrimmerEditor
 
 Operations
 ===========
 
-setup
+web mvc binding stringTrimmer [--class path_to_controller] [--emptyAsNull true|false]
 -----
 
 Performs the needed operations for match the requirements described above.
-
-drop
--------
-
-Remove the bean registration from ``webmvc-config.xml``.
 
 Proof of concept
 ================
@@ -59,5 +61,6 @@ Proof of concept
 TODO
 ====
 
-Catch the file RENAMED event on file change and modify the bean registration in ``webmvc-config.xml``. Now when
-file rename operation (mv file new_file) is performed two events are raised: CREATED and DELETED.
+In future versions of this add-on it would support, at least, Spring Editors listed in
+http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/validation.html#beans-beans-conversion
+Table 5.2

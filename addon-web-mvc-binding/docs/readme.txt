@@ -38,12 +38,13 @@ Installation Proof
 Install the Add-on.
 --------------------
 
-Install the Add-on in gvNIX/Roo shell with the required commands for 1.1.3-RELEASE version.
+Install the Add-on in gvNIX/Roo shell with the required commands for 1.1.5-RELEASE version.
 
 Create a web application
 -------------------------
 
 Create a web application with gvNIX/Roo Shell script::
+    script clinic.roo
 
 
 Run the add-on command:

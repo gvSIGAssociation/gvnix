@@ -9,10 +9,16 @@ import org.gvnix.web.mvc.binding.roo.addon.metadata.StringTrimmerBinderMetadata;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.BooleanAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.support.util.Assert;
 
 /**
  * Provides {@link StringTrimmerBinderMetadata}. This type is called by Roo to
@@ -20,12 +26,15 @@ import org.springframework.roo.project.Path;
  * types and services needed by the metadata type. Register metadata triggers
  * and dependencies here. Also define the unique add-on ITD identifier.
  * 
- * @since 1.1
+ * @since 0.8
  */
 @Component
 @Service
 public final class StringTrimmerBinderMetadataProvider extends
         AbstractItdMetadataProvider {
+
+    private static final JavaType GVNIX_STRING_TRIMMER_BINDER = new JavaType(
+            GvNIXStringTrimmerBinder.class.getName());
 
     @Reference
     private WebBinderOperations webBindingOperations;
@@ -43,8 +52,7 @@ public final class StringTrimmerBinderMetadataProvider extends
         metadataDependencyRegistry.registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        addMetadataTrigger(new JavaType(
-                GvNIXStringTrimmerBinder.class.getName()));
+        addMetadataTrigger(GVNIX_STRING_TRIMMER_BINDER);
     }
 
     /**
@@ -60,8 +68,7 @@ public final class StringTrimmerBinderMetadataProvider extends
         metadataDependencyRegistry.deregisterDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
-        removeMetadataTrigger(new JavaType(
-                GvNIXStringTrimmerBinder.class.getName()));
+        removeMetadataTrigger(GVNIX_STRING_TRIMMER_BINDER);
     }
 
     /**
@@ -75,14 +82,29 @@ public final class StringTrimmerBinderMetadataProvider extends
 
         webBindingOperations.setup();
 
+        // We know governor type details are non-null and can be safely cast
+        ClassOrInterfaceTypeDetails controllerClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
+                .getMemberHoldingTypeDetails();
+        Assert.notNull(
+                controllerClassOrInterfaceDetails,
+                "Governor failed to provide class type details, in violation of superclass contract");
+
+        AnnotationMetadata stringTrimmerAnnotation = MemberFindingUtils
+                .getAnnotationOfType(
+                        controllerClassOrInterfaceDetails.getAnnotations(),
+                        GVNIX_STRING_TRIMMER_BINDER);
+
+        boolean emptyAsNull = ((BooleanAttributeValue) stringTrimmerAnnotation
+                .getAttribute(new JavaSymbolName("emptyAsNull"))).getValue()
+                .booleanValue();
         // Pass dependencies required by the metadata in through its constructor
         return new StringTrimmerBinderMetadata(metadataIdentificationString,
-                aspectName, governorPhysicalTypeMetadata);
+                aspectName, governorPhysicalTypeMetadata, emptyAsNull);
     }
 
     /**
      * Define the unique ITD file name extension, here the resulting file name
-     * will be **_ROO_Addon.aj
+     * will be **_ROO_GvNIXStringTrimmerBinder.aj
      */
     public String getItdUniquenessFilenameSuffix() {
         return "GvNIXStringTrimmerBinder";

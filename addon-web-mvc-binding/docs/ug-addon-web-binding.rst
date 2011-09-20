@@ -40,8 +40,8 @@ Install Addon Services Management
 
 Options:
 
-* To install gvNIX 0.7.0 that contains the add-on installed.
-* OR, to install in Spring Roo 1.1.3
+* To install gvNIX 0.8.0 that contains the add-on installed.
+* OR, to install in Spring Roo 1.1.5
 
   - Trust on PGP KEY ID used to sign the add-on. Note that gvNIX project members have their PGP KEYs IDs published at https://code.google.com/p/gvnix/people/list::
 
@@ -51,8 +51,8 @@ Options:
 
       addon install bundle --bundleSymbolicName org.gvnix.web.binding.roo.addon
 
-Use case: Reports support in Pet clinic
-============================================
+Use case: PropertyEditors Binding in Pet clinic
+================================================
 
 Create a new directory for the project::
 
@@ -67,20 +67,20 @@ Start gvNIX::
       ____  ____  ____
      / __ \/ __ \/ __ \
     / /_/ / / / / / / /
-   / _, _/ /_/ / /_/ /   1.1.3.RELEASE [rev xxxxxx]
-  /_/ |_|\____/\____/   gvNIX distribution 0.7.0
+   / _, _/ /_/ / /_/ /   1.1.5.RELEASE [rev xxxxxx]
+  /_/ |_|\____/\____/   gvNIX distribution 0.8.0
 
 
   Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
-  roo>
+  roo-gvNIX>
 
 Create the project::
 
-  roo> script clinic.roo
+  roo-gvNIX> script clinic.roo
 
 Add a new report::
 
-  roo> web binding setup --class ~.web.MyBindingClass
+  roo-gvNIX> web binding stringTrimmer
 
 
 About the command
@@ -88,9 +88,12 @@ About the command
 
 The command performs the following operations:
 
-* Creates a new class called MyBindingClass implementing the WeBinidingInitializer interface.
-* Registers the property editor bean in *webmv-config.xml*
+* Annotates all the classes annotated with @Controller with @GvNIXStringTrimmerBinder(emptyAsNull=true).
+* Generation of an ITD with the method initStringTrimmerBinder annotated with @InitBinder.
+  This method registers StringTrimmerEditor.
 
 The command accepts the parameters below:
 
-* *class*: Is the class that will be created or an existing one implementing WeBinidingInitializer interface.
+* *class*: Is the class of the Controller we want to register the StringTrimmerEditor.
+* *emptyAsNull*: Based on this option the StringTrimmerEditor will convert empty Strings to null (emptyAsNull=true)
+  or not.
