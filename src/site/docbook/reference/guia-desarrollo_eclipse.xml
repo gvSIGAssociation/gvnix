@@ -590,7 +590,8 @@ Created ...</programlisting>
       <para>Una vez arrancado nuestro servidor podemos navegar por nuestra
       aplicación bien desde un navegador externo (Firefox) o bien desde un
       navegador que incorpora Eclipse. Para abrir el navegador interno de
-      Eclipse: Window &gt; Show view &gt; Internal Web Browser.</para>
+      Eclipse: <emphasis>Window &gt; Show view &gt; Internal Web
+      Browser</emphasis>.</para>
 
       <figure>
         <title>Navegador interno de Eclipse</title>
@@ -630,5 +631,130 @@ Created ...</programlisting>
       configuraciones de ejecución de tareas Maven desde <emphasis>Run As &gt;
       Maven build ... </emphasis>en Eclipse.</emphasis></para>
     </important>
+  </section>
+
+  <section>
+    <title>Trabajando con el código de la aplicación en Eclipse</title>
+
+    <para>Cuando hemos generado un proyecto con gvNIX/Roo tendremos que
+    trabajar sobre el código de la aplicación para añadir más funcionalidades
+    y/o modificar alguna de las que "mágicamente" se ha generado. Vamos a
+    explicar un par de detalles que nos simplificaran esta tarea usando
+    Eclipse y el plugin STS que hemos instalado.</para>
+
+    <figure>
+      <title>Vista de editor y Cross References en Eclipse</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/eclipse_crossreference.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <para>En la imagen anterior vemos el editor de Eclipse con el archivo
+    Timer.java que se ha generado cuando hemos ejecutado los comandos
+    <emphasis>entity</emphasis> y <emphasis>field</emphasis> anteriormente. En
+    la parte derecha de la captura podemos ver una ventana que muestra
+    información de la clase Timer. Se trata de la vista <emphasis>Cross
+    Reference</emphasis>. Si no la tenemos disponible en nuestra perspectiva
+    de trabajo, la podemos incorporar desde el menú <emphasis>Window &gt; Show
+    view &gt; Cross References</emphasis>. Esta vista es similar a la vista
+    <emphasis>Outline</emphasis> que nos muestra los campos y métodos
+    declarados en una clase.</para>
+
+    <para>La particularidad de la vista Cross References es que nos muestra
+    los campos y métodos asociados a la clase Java mediante AspectJ de los que
+    hablaremos en el Cápitulo sobre el <link
+    linkend="guia-desarrollo_generacion-codigo">código que genera
+    gvNIX/Roo</link>. </para>
+
+    <para>Esta información también está disponible desde un menú contextual
+    accesible haciendo click con el botón derecho sobre la flecha que hay a la
+    izquierda de la declaración de la clase. El menú contextual es el
+    siguiente.</para>
+
+    <figure>
+      <title>Contextual Cross References</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/eclipse_cross-contextual.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <para>Si hacemos click sobre una de las entradas que aparecen en la
+    ventana <emphasis>Cross References</emphasis> o en el menú contextual, se
+    abrirá el fichero .aj que tiene declarado ese campo o método. Por ejemplo,
+    si accedemos al <emphasis>Timer.toString()</emphasis> se abrirá el editor
+    con el archivo <emphasis>Timer_Roo_ToString.aj</emphasis>.</para>
+
+    <important>
+      <para>Cabe destacar que para que aparezca esta información sobre el
+      código asociado a una clase Java mediante AspectJ, la clase debe estar
+      libre de errores de compilación.</para>
+    </important>
+
+    <section xml:id="guia-desarrollo_eclipse-modificar-codigo">
+      <title>Modificación del código generado</title>
+
+      <para>Como hemos comentado, seguramente necesitemos añadir nuevas
+      funcionalidades o modificar algunas de las que se han generado
+      automáticamente para adapatar el código a los requisitos de la
+      aplicación. En estos casos hay que tener en cuenta que <emphasis
+      role="bold">no debemos hacer ningún cambio sobre los AspectJ asociados a
+      una clase Java</emphasis>. gvNIX/Roo ya nos lo avisa en la primera línea
+      del archivo .aj. El motivo de esto es, que teniendo la consola gvNIX
+      funcionando, o al arrancarl, gvNIX/Roo volvería a generar el código
+      automáticamente perdiendo las modificaciones que hubiésemos
+      realizado.</para>
+
+      <figure>
+        <title>Edición archivo Timer_Roo_ToString.aj</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/eclipse_edicion-aj.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <para>Para modificar el código de un método o la declaración de un campo
+      que se encuentre en un AspectJ, debemos mover el método, o el campo, a
+      la clase Java, al archivo .java, del que depende el AspectJ. En el
+      ejemplo, moveríamos lo que quisieramos modificar a la clase
+      <emphasis>Timer.java</emphasis>. Podemos hacerlo mediante cortar y
+      pegar, pero Eclipse con el plugin STS nos ofrece una opción para
+      hacerlo.</para>
+
+      <para>Selecionando el nombre del método que queremos mover y a través
+      del menú contextual <emphasis>AspectJ Refactoring &gt; Push In
+      ...</emphasis> Eclipse se ocupará de eliminar el código del .aj y
+      moverlo al .java.</para>
+
+      <figure>
+        <title>Menú contextual AspecJ Refactoring</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/eclipse_pushincontextual.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <para>Una vez en el .java, podemos hacer cuantas modificaciones
+      necesitemos sin peligro de que se pierdan por la acción de
+      gvNIX/Roo.</para>
+
+      <important>
+        <para>Es interesante tener abierta la consola gvNIX para que los
+        cambios realizados sobre los ficheros del proyecto disparen los
+        cambios automáticos que realiza gvNIX/Roo.</para>
+      </important>
+
+      <para>Del mismo modo, si necesitamos añadir nuevos métodos o campos a la
+      clase Java, lo podemos hacer directamente en el .java.</para>
+    </section>
   </section>
 </chapter>

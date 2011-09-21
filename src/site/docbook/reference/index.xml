@@ -72,6 +72,10 @@
         </listitem>
 
         <listitem>
+          <para>Código genereado automáticamente.</para>
+        </listitem>
+
+        <listitem>
           <para>Gestión del modelo de entidades.</para>
 
           <itemizedlist>
@@ -95,6 +99,8 @@
     <xi:include href="guia-desarrollo_crear-app.xml" />
 
     <xi:include href="guia-desarrollo_acceso-datos.xml" />
+
+    <xi:include href="guia-desarrollo_generacion-codigo.xml" />
 
     <xi:include href="guia-desarrollo_entidades.xml" />
 

@@ -413,8 +413,8 @@ public class MyController {
       <section>
         <title>Motor de plantillas: Tiles</title>
 
-        <para>Dentro de views hay varios ficheros jspx y varias carpetas. De
-        entre los ficheros comentemos la función de
+        <para>Dentro de <emphasis>views</emphasis> hay varios ficheros jspx y
+        varias carpetas. De entre los ficheros comentemos la función de
         <emphasis>views.xm</emphasis>l. Este fichero es el que establece la
         configuración de vistas que Tiles deberá generar. Tiles se basa en que
         todas las vistas de una aplicación web son similares, tienen el mismo
@@ -531,7 +531,7 @@ public class MyController {
         ejecución y por tanto no se dibujaría la página.</para>
 
         <para>Ahora ya conocemos el funcionamiento del motor de plantillas
-        usado por gvNIX, veamos, a continuación el resto de directorios y
+        usado por gvNIX, veamos, a continuación, el resto de directorios y
         ficheros que componen el front-end de nuestra aplicación.</para>
       </section>
 
@@ -653,6 +653,59 @@ public class MyController {
         registro.</para>
       </section>
     </section>
+  </section>
+
+  <section>
+    <title>Visualización de entidades en la capa web</title>
+
+    <para>Con los componentes &lt;table:table/&gt;, &lt;table:column/&gt; y
+    &lt;fiedl:.../&gt; se consigue que se muestren datos de las entidades de
+    la aplicación, es decir, en nuestro proyecto de ejemplo de PizzaShop, si
+    tenemos en una jspx el siguiente componente:</para>
+
+    <programlisting>&lt;field:display <emphasis role="bold">field="pizzas"</emphasis> id="s_com_disid_roo_pizzashop_domain_<emphasis
+        role="bold">PizzaOrder</emphasis>_pizzas" object="${pizzaorder}" \
+       z="WSxjsiiEWhA5vo8ecxRoox5EjKA="/&gt;</programlisting>
+
+    <para>en la página se mostraría información sobre las Pizzas ligadas a un
+    PizzaOrder. gvNIX/Roo usa para la visualización de estos objetos en la
+    capa web los <emphasis role="bold">Conveters</emphasis>. Los Conveters son
+    clases java que, como su nombre indica, convierten un objeto dado en otro.
+    En este uso particular de los Converters, el framework convierte un objeto
+    de nuestro modelo en una cadena, en un String.</para>
+
+    <para>Este mecanismo está implementado en la clase java
+    <emphasis>ApplicationConversionServiceFactoryBean.java</emphasis> que
+    podemos encontrar en el mismo paquete donde están los controladores de la
+    aplicación. Esta clase la genera gvNIX/Roo automáticamente al generar la
+    capa web. Como hemos comentado en el apartado de <link
+    linkend="guia-desarrollo_generacion-codigo">generación de código</link>,
+    asociado al
+    <emphasis>ApplicationConversionServiceFactoryBean.java</emphasis> existe
+    un AspectJ con la declaración de los Converters y un método que los
+    registra para que estén disponibles a la hora de "convertir" una entidad
+    del modelo a la cadena que se mostrara en la página web.</para>
+
+    <para>Si la cadena que vemos en la página web, no muestra la información
+    que queremos de una entidad podemos modificar el Conveter de esa entidad y
+    adaptarlo a nuestro gusto. En la sección sobre modificación de código se
+    explica como hacerlo. Solo hay que tener en cuenta que al hacer el push In
+    del Controller que vamos a modificar, se elimina, del método
+    <emphasis>installLabelConverters(..)</emphasis> que está declarado en el
+    .aj, la línea de código que registra el Converter para que esté
+    disponible. Por ello, debemos añadir la línea necesaria en el método
+    <emphasis>installFormatters(..)</emphasis> que hay declarado en
+    <emphasis>ApplicationConversionServiceFactoryBean.java.</emphasis><programlisting>protected void installFormatters(FormatterRegistry registry) {
+    super.installFormatters(registry);
+    // Register application converters and formatters
+    <emphasis role="bold">registry.addConverter(new PizzaConverter());</emphasis>
+}
+
+static class PizzaConverter implements Converter&lt;Pizza, String&gt; {
+    public String convert(Pizza pizza) {
+        return new StringBuilder().append(pizza.getName()).append(" ").append(pizza.getPrice()).toString();
+    }
+}</programlisting></para>
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_test-funcional">
