@@ -568,8 +568,8 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
           mismo comando <emphasis role="bold">field</emphasis> indicando sobre
           que entidad queremos trabajar mediante el parámetro
           <emphasis>--class.</emphasis><programlisting>roo-gvNIX&gt; <command>field string --fieldName refCode --notNull --sizeMin 2 --class ~.domain.Pizza</command>
-~.domain.Pizza roo-gvNIX&gt; </programlisting>Notar que tras ejecutar el comando
-          <emphasis>field</emphasis> indicando el parámetro
+~.domain.Pizza roo-gvNIX&gt; </programlisting>Notar que tras ejecutar el
+          comando <emphasis>field</emphasis> indicando el parámetro
           <emphasis>--class</emphasis> nos quedamos en el contexto de la
           entidad Pizza y por tanto si seguimos ejecutando el comando field
           sin indicar <emphasis>--class</emphasis> los campos se añadirán a
@@ -629,26 +629,28 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
   <section xml:id="guia-desarrollo_gestion-entidades_definicion_identificadores-compuestos">
     <title xml:lang="es">Identificadores compuestos</title>
 
-    <para><emphasis>TBC</emphasis></para>
+    <para>En el caso que necesitemos que alguna de nuestras entidades tenga
+    definida una clave primaria compuesta de varios campos se puede hacer de
+    la siguiente forma.</para>
 
-    <!--
-        <para xml:lang="es">Ahora mismo no está completo el soporte para
-        identificadores que estén compuestos de mas de un campo.</para>
+    <programlisting>roo-gvNIX&gt; entity --class ~.domain.ClassWithCompisitePK --identifierType ~.domain.CompositePK</programlisting>
 
-        <para xml:lang="es">Para más información ver:</para>
+    <para>De esta forma se genera una clase <emphasis>CompositePK</emphasis>
+    sobre la que podemos definir los campos que conformarán la clave primaria
+    que usará la entidad que precisa de una clave compuesta, en el ejemplo
+    <emphasis>ClassWithCompisitePK</emphasis>.</para>
 
-        <itemizedlist>
-          <listitem>
-            <para><link
-            xlink:href="https://jira.springsource.org/browse/ROO-505">ROO-505</link></para>
-          </listitem>
+    <programlisting>roo-gvNIX&gt; field number --fieldName campo1 --type java.lang.Long --class ~.domain.CompositePK
+...
+roo-gvNIX&gt; field string --fieldName campo2
+...</programlisting>
 
-          <listitem>
-            <para><link
-            xlink:href="https://jira.springsource.org/browse/ROO-345">ROO-345</link></para>
-          </listitem>
-        </itemizedlist>
--->
+    <para>Lo que obtenemos es una entidad en la que su campo identificador es
+    un objeto con distintos campos. Este mecanismo es el mismo que se emplea
+    al realizar la <link
+    linkend="guia-desarrollo_entidades-dbre_clave_compuesta">ingeniería
+    inversa</link> de una BBDD en el caso de que se encuentre en esta
+    situación.</para>
   </section>
 
   <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente">
@@ -1063,18 +1065,6 @@ roo-gvNIX&gt; <command>controller scaffold --entity ~.domain.Repartidor --class 
   <section xml:id="guia-desarrollo_gestion-entidades_ingenieria-inversa">
     <title xml:lang="es">Ingeniería inversa de entidades</title>
 
-    <!--
-      <para xml:lang="es">En el proyecto de Spring Roo se tiene planeado añadir
-      soporte para soportar ingeniería inversa de entidades. En un principio
-      nosotros sugerimos el uso de Hiberate Tools para realizar la tarea, pero
-      desde el proyecto pretenden dar un soporte nativo a ello.</para>
-
-      <para xml:lang="es">En la versión en desarrollo (v1.1.0M2) se ha
-      iniciado ya el desarrollo del mecanismo para ello. Se puede ver más
-      información en: <link
-      xlink:href="https://jira.springsource.org/browse/ROO-435">ROO-435</link>.</para>
--->
-
     <para xml:lang="es">gvNIX permite la utilización de ingeniería inversa
     para gestionar las entidades JPA del proyecto, lo cual nos ofrece la
     opción de, que basado en la metainformación recopilada de la BBDD
@@ -1247,7 +1237,7 @@ public class Pizza {
         <emphasis>entity</emphasis>.</para>
       </section>
 
-      <section>
+      <section xml:id="guia-desarrollo_entidades-dbre_clave_compuesta">
         <title>Claves primarias compuestas</title>
 
         <para>En este caso DBRE realiza una solución más elaborada. Crea una
