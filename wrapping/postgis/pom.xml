@@ -37,43 +37,42 @@
 
   <!-- Ver sistema de nominación en ../README.rst -->
   <groupId>${pkgGroupId}</groupId>
-  <artifactId>${project.parent.groupId}.${project.groupId}</artifactId>
+  <artifactId>${project.parent.groupId}.${pkgArtifactId}</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - AspectJ</name>
-  <description>AspectJ Bundle. This OSGi bundle wraps ${pkgRtArtifactId} and ${pkgWeaverArtifactId} ${pkgVersion} jar files.</description>
+  <name>gvNIX - OSGi - PostGIS JDBC driver</name>
+  <description>PostGIS JDBC driver. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
 
   <organization>
     <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
   </organization>
 
   <properties>
-    <pkgGroupId>org.aspectj</pkgGroupId>
-    <pkgArtifactId>aspectj</pkgArtifactId>
-    <pkgRtArtifactId>aspectjrt</pkgRtArtifactId>
-    <pkgWeaverArtifactId>aspectjweaver</pkgWeaverArtifactId>
-    <pkgVersion>1.6.11</pkgVersion>
-    <pkgVendor>Eclipse</pkgVendor>
-    <pkgDocUrl>http://www.eclipse.org/aspectj/docs.php</pkgDocUrl>
-    <pkgLicense>http://www.eclipse.org/legal/epl-v10.html</pkgLicense>
-<!--    <pkgImport>org.aspectj.*;resolution:=optional,*;resolution:=optional</pkgImport> -->
+    <pkgGroupId>org.postgis</pkgGroupId>
+    <pkgArtifactId>postgis-jdbc</pkgArtifactId>
+    <pkgVersion>1.5.3</pkgVersion>
+    <pkgVendor>Refractions Research</pkgVendor>
+    <pkgDocUrl>http://www.postgis.org/documentation/</pkgDocUrl>
+    <pkgLicense>http://www.opensource.org/licenses/gpl-2.0.php</pkgLicense>
     <pkgExport>*;version=${pkgVersion}</pkgExport>
-    <pkgImport>!com.bea.jvm.*,*</pkgImport>
-  <pkgPrivate>!*</pkgPrivate>
-    <osgiVersion>${pkgVersion}.0001</osgiVersion>
+    <pkgImport>*;version="[8.3,9.1]"</pkgImport><!-- Requires PostgreSQL 8.3 or higher -->
+    <pkgPrivate>!*</pkgPrivate>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>${pkgGroupId}</groupId>
-      <artifactId>${pkgRtArtifactId}</artifactId>
+      <artifactId>${pkgArtifactId}</artifactId>
       <version>${pkgVersion}</version>
     </dependency>
+<!--
     <dependency>
-      <groupId>${pkgGroupId}</groupId>
-      <artifactId>${pkgWeaverArtifactId}</artifactId>
-      <version>${pkgVersion}</version>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>8.3</version>
+      <scope>provided</scope>
     </dependency>
+-->
   </dependencies>
 
 </project>

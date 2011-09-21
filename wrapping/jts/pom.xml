@@ -37,42 +37,40 @@
 
   <!-- Ver sistema de nominación en ../README.rst -->
   <groupId>${pkgGroupId}</groupId>
-  <artifactId>${project.parent.groupId}.${project.groupId}</artifactId>
+  <artifactId>${project.parent.groupId}.${pkgGroupId}.${pkgArtifactId}</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - AspectJ</name>
-  <description>AspectJ Bundle. This OSGi bundle wraps ${pkgRtArtifactId} and ${pkgWeaverArtifactId} ${pkgVersion} jar files.</description>
+  <name>gvNIX - OSGi - JTS Topology Suite</name>
+  <description>JTS Topology Suite. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
 
   <organization>
     <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
   </organization>
 
   <properties>
-    <pkgGroupId>org.aspectj</pkgGroupId>
-    <pkgArtifactId>aspectj</pkgArtifactId>
-    <pkgRtArtifactId>aspectjrt</pkgRtArtifactId>
-    <pkgWeaverArtifactId>aspectjweaver</pkgWeaverArtifactId>
-    <pkgVersion>1.6.11</pkgVersion>
-    <pkgVendor>Eclipse</pkgVendor>
-    <pkgDocUrl>http://www.eclipse.org/aspectj/docs.php</pkgDocUrl>
-    <pkgLicense>http://www.eclipse.org/legal/epl-v10.html</pkgLicense>
-<!--    <pkgImport>org.aspectj.*;resolution:=optional,*;resolution:=optional</pkgImport> -->
+    <pkgGroupId>com.vividsolutions</pkgGroupId>
+    <pkgArtifactId>jts</pkgArtifactId>
+    <pkgVersion>1.12</pkgVersion>
+    <pkgVendor>Vivid Solutions Inc.</pkgVendor>
+    <pkgDocUrl>http://www.vividsolutions.com/jts/JTSHome.htm</pkgDocUrl>
+    <pkgLicense>http://www.gnu.org/copyleft/lesser.html</pkgLicense>
     <pkgExport>*;version=${pkgVersion}</pkgExport>
-    <pkgImport>!com.bea.jvm.*,*</pkgImport>
-  <pkgPrivate>!*</pkgPrivate>
+    <pkgImport>*;resolution:=optional</pkgImport>
+    <pkgPrivate>!*</pkgPrivate>
     <osgiVersion>${pkgVersion}.0001</osgiVersion>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>${pkgGroupId}</groupId>
-      <artifactId>${pkgRtArtifactId}</artifactId>
+      <artifactId>${pkgArtifactId}</artifactId>
       <version>${pkgVersion}</version>
-    </dependency>
-    <dependency>
-      <groupId>${pkgGroupId}</groupId>
-      <artifactId>${pkgWeaverArtifactId}</artifactId>
-      <version>${pkgVersion}</version>
+      <exclusions><!-- Should be provided by their own bundles -->
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 

@@ -19,13 +19,8 @@
 -->
 <features name="gvnix-hibernate-features-repository">
 
-    <!--
-    Karaf Feature Descriptor to install Hibernate 3 in Servicemix 4
-    -->
+    <!-- Karaf Feature Descriptor to install Hibernate 3 in Servicemix 4 -->
     <feature name="gvnix-hibernate" version="${project.version}">
-
-        <!-- TODO: Check there is any feature dependency -->
-        <!-- <feature>FEATURE_NAME</feature> -->
 
         <!-- Hibernate required dependencies -->
         <bundle dependency="true">mvn:org.antlr/com.springsource.antlr/2.7.7</bundle>
@@ -78,4 +73,16 @@
         <bundle>mvn:org.hibernate/org.gvnix.org.hibernate/3.6.7.Final</bundle>
     </feature>
 
+    <!-- Karaf Feature Descriptor for Hibernate Spatial in Servicemix 4 -->
+    <feature name="gvnix-hibernate-spatial" version="${project.version}">
+      <feature>gvnix-hibernate</feature>
+
+      <!-- dependencies -->
+
+      <!-- Java Topology Suite, spatial geometry model-->
+      <bundle dependency="true">mvn:com.vividsolutions/org.gvnix.com.vividsolutions.jts/1.12</bundle>
+
+      <!-- Hibernate Spatial -->
+      <bundle>mvn:org.hibernatespatial/org.gvnix.hibernate-spatial/1.1</bundle>
+    </feature>
 </features>

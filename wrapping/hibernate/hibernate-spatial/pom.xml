@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <licenses>
+    <license>
+      <name>&gt;GNU General Public License (GPL), Version 3.0</name>
+      <url>http://www.gnu.org/copyleft/gpl.html</url>
+      <distribution>repo</distribution>
+      <comments>
+      <![CDATA[
+      gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+      i Transport - Generalitat Valenciana
+      Copyright (C) 2010, 2011 CIT - Generalitat Valenciana
+
+      This program is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 3 of the License, or
+      (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program. If not, see <http://www.gnu.org/licenses />.
+      ]]>
+      </comments>
+    </license>
+  </licenses>
+
+  <parent>
+    <groupId>org.gvnix</groupId>
+    <artifactId>wrapping.hibernate</artifactId>
+    <version>0.8.0-SNAPSHOT</version>
+  </parent>
+
+  <!-- Ver sistema de nominación en ../README.rst -->
+  <groupId>${pkgGroupId}</groupId>
+  <artifactId>${project.parent.groupId}.${pkgArtifactId}</artifactId>
+  <version>${pkgVersion}</version>
+  <packaging>bundle</packaging>
+  <name>gvNIX - OSGi - Hibernate Spatial</name>
+  <description>Hibernate Spatial Bundle. This OSGi bundle wraps Hibernate Spatial ${pkgVersion} jar files.</description>
+
+  <organization>
+    <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
+  </organization>
+
+  <properties>
+    <pkgGroupId>org.hibernatespatial</pkgGroupId>
+    <pkgArtifactId>hibernate-spatial</pkgArtifactId>
+    <pkgVersion>1.1</pkgVersion>
+    <pkgVendor>Geovise</pkgVendor>
+    <pkgDocUrl>http://www.hibernatespatial.org/tutorial</pkgDocUrl>
+    <pkgLicense>http://www.hibernatespatial.org/license.html</pkgLicense>
+    <pkgExport>*;version=${pkgVersion}</pkgExport>
+    <pkgImport>oracle.jdbc.*;resolution:=optional,oracle.sql;resolution:=optional,org.postgis;resolution:=optional,org.hibernate.*;version="[3.6,4.0)",*</pkgImport>
+    <pkgPrivate>!*</pkgPrivate>
+  </properties>
+
+  <repositories>
+    <!-- Hibernate Spatial repository -->
+    <repository>
+      <id>hibernate-spatial-repository</id>
+      <name>Hibernate Spatial Repository</name>
+      <url>http://www.hibernatespatial.org/repository</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <!-- Spatial dialect provider for PostGIS -->
+    <dependency>
+      <groupId>${pkgGroupId}</groupId>
+      <artifactId>hibernate-spatial-postgis</artifactId>
+      <version>${pkgVersion}</version>
+      <exclusions><!-- Should be provided by their own bundles -->
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.vividsolutions</groupId>
+          <artifactId>jts</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Spatial dialect provider for Oracle -->
+    <dependency>
+      <groupId>${pkgGroupId}</groupId>
+      <artifactId>hibernate-spatial-oracle</artifactId>
+      <version>${pkgVersion}</version>
+      <exclusions><!-- Should be provided by their own bundles -->
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.vividsolutions</groupId>
+          <artifactId>jts</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Spatial dialect provider for SqlServer -->
+    <dependency>
+      <groupId>${pkgGroupId}</groupId>
+      <artifactId>hibernate-spatial-sqlserver</artifactId>
+      <version>${pkgVersion}</version>
+      <exclusions><!-- Should be provided by their own bundles -->
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.vividsolutions</groupId>
+          <artifactId>jts</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Spatial dialect provider for MySql -->
+    <dependency>
+      <groupId>${pkgGroupId}</groupId>
+      <artifactId>hibernate-spatial-mysql</artifactId>
+      <version>${pkgVersion}</version>
+      <exclusions><!-- Should be provided by their own bundles -->
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.vividsolutions</groupId>
+          <artifactId>jts</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+</project>

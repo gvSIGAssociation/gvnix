@@ -51,6 +51,8 @@
     <module>javassist</module>
     <module>oracle</module>
     <module>postgresql</module>
+    <module>postgis</module>
+    <module>jts</module>
   </modules>
 
   <!-- Pendiente de URL
