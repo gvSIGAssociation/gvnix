@@ -46,10 +46,10 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.web.theme.roo.addon.util.FileUtils;
 import org.gvnix.web.theme.roo.addon.util.I18nUtils;
 import org.gvnix.web.theme.roo.addon.util.XmlUtils;
-import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.jsp.JspOperationsImpl;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
+import org.springframework.roo.classpath.operations.AbstractOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
@@ -98,13 +98,18 @@ import org.w3c.dom.NodeList;
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
+ * @author Oscar Rovira (orovira at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  * @since 0.6
  */
 @Component
 // use these Apache Felix annotations to register your commands class in the Roo
 // container
 @Service
-public class ThemeOperationsImpl implements ThemeOperations {
+public class ThemeOperationsImpl extends AbstractOperations implements
+        ThemeOperations {
 
     /** Logger */
     private static final Logger logger = HandlerUtils
@@ -130,18 +135,6 @@ public class ThemeOperationsImpl implements ThemeOperations {
     @Reference
     private PropFileOperations propFileOperations;
 
-    /**
-     * Use FileManager to modify the underlying disk storage.
-     */
-    @Reference
-    private FileManager fileManager;
-
-    /**
-     * Use to interact with the OSGi execution context including locating
-     * services by reference name
-     */
-    private ComponentContext componentContext;
-
     /** Path identifier for project themes directory */
     public static final Path SRC_MAIN_THEMES = new Path("SRC_MAIN_THEMES");
 
@@ -153,12 +146,6 @@ public class ThemeOperationsImpl implements ThemeOperations {
 
     /** Themes repository path */
     private PathInformation themesRepositoryPath = null;
-
-    // Initialization methods -----
-
-    protected void activate(ComponentContext context) {
-        componentContext = context;
-    }
 
     // Public operations -----
 
@@ -229,6 +216,7 @@ public class ThemeOperationsImpl implements ThemeOperations {
                 break;
             }
         }
+
     }
 
     /**
@@ -272,6 +260,9 @@ public class ThemeOperationsImpl implements ThemeOperations {
         // copy theme from project installation dir to src/main/webapp
         copyRecursively(source.getRootURI(), destination, true);
 
+        // install application.css in styles folder
+        installApplicationStyle();
+
         // modify load-scripts.tagx
         modifyLoadScriptsTagx();
 
@@ -287,6 +278,16 @@ public class ThemeOperationsImpl implements ThemeOperations {
 
         // update footer to add the active languages
         setInstalledI18n(languages);
+    }
+
+    /**
+     * Installs application.css file in project styles folder
+     */
+    private void installApplicationStyle() {
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        copyDirectoryContents("styles/*.css",
+                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/styles"),
+                false);
     }
 
     /**
@@ -334,6 +335,10 @@ public class ThemeOperationsImpl implements ThemeOperations {
                     loadScriptsXml)
                     .addAttribute("value", "/resources/styles/cit-IE.css")
                     .addAttribute("var", "roo_css-ie_url").build();
+            Element urlApplicationCss = new XmlElementBuilder("spring:url",
+                    loadScriptsXml)
+                    .addAttribute("value", "/resources/styles/application.css")
+                    .addAttribute("var", "application_css_url").build();
             Element urlYuiEventJs = new XmlElementBuilder("spring:url",
                     loadScriptsXml)
                     .addAttribute("value",
@@ -362,6 +367,7 @@ public class ThemeOperationsImpl implements ThemeOperations {
                     nextSibiling = lastSpringUrl.getNextSibling()
                             .getNextSibling();
                     lsRoot.insertBefore(urlCitIECss, nextSibiling);
+                    lsRoot.insertBefore(urlApplicationCss, nextSibiling);
                     lsRoot.insertBefore(urlYuiEventJs, nextSibiling);
                     lsRoot.insertBefore(urlYuiCoreJs, nextSibiling);
                     lsRoot.insertBefore(urlYoiMenuJs, nextSibiling);
@@ -370,6 +376,7 @@ public class ThemeOperationsImpl implements ThemeOperations {
             } else {
                 // Add at the end of the document
                 lsRoot.appendChild(urlCitIECss);
+                lsRoot.appendChild(urlApplicationCss);
                 lsRoot.appendChild(urlYuiEventJs);
                 lsRoot.appendChild(urlYuiCoreJs);
                 lsRoot.appendChild(urlYoiMenuJs);
@@ -400,7 +407,7 @@ public class ThemeOperationsImpl implements ThemeOperations {
             if (linkFaviconNode != null) {
                 nextSibiling = linkFaviconNode.getNextSibling()
                         .getNextSibling();
-                lsRoot.insertBefore(ifIE, nextSibiling);
+                lsRoot.insertBefore(ifIE, linkFaviconNode);
             } else {
                 // Add ass last link element
                 // Element lastLink = null;
@@ -417,6 +424,44 @@ public class ThemeOperationsImpl implements ThemeOperations {
                 } else {
                     // Add at the end of document
                     lsRoot.appendChild(ifIE);
+                }
+            }
+        }
+
+        // pattern.css stylesheet element
+        testElement = org.springframework.roo.support.util.XmlUtils
+                .findFirstElement("/root/link[@href='${application_css_url}']",
+                        lsRoot);
+        if (testElement == null) {
+            Element linkApplicationCss = new XmlElementBuilder("link",
+                    loadScriptsXml).addAttribute("rel", "stylesheet")
+                    .addAttribute("type", "text/css")
+                    .addAttribute("media", "screen")
+                    .addAttribute("href", "${application_css_url}").build();
+            linkApplicationCss.appendChild(loadScriptsXml
+                    .createComment(" required for FF3 and Opera "));
+            Node linkFaviconNode = org.springframework.roo.support.util.XmlUtils
+                    .findFirstElement("/root/link[@href='${favicon}']", lsRoot);
+            if (linkFaviconNode != null) {
+                nextSibiling = linkFaviconNode.getNextSibling()
+                        .getNextSibling();
+                lsRoot.insertBefore(linkApplicationCss, linkFaviconNode);
+            } else {
+                // Add ass last link element
+                // Element lastLink = null;
+                List<Element> linkElements = org.springframework.roo.support.util.XmlUtils
+                        .findElements("/root/link", lsRoot);
+                if (!linkElements.isEmpty()) {
+                    Element lastLink = linkElements
+                            .get(linkElements.size() - 1);
+                    if (lastLink != null) {
+                        nextSibiling = lastLink.getNextSibling()
+                                .getNextSibling();
+                        lsRoot.insertBefore(linkApplicationCss, nextSibiling);
+                    }
+                } else {
+                    // Add at the end of document
+                    lsRoot.appendChild(linkApplicationCss);
                 }
             }
         }
@@ -755,8 +800,7 @@ public class ThemeOperationsImpl implements ThemeOperations {
 
         // URLs to theme descriptors in OSGi bundles
         Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(
-                componentContext.getBundleContext(),
-                "/**/WEB-INF/views/theme.xml");
+                context.getBundleContext(), "/**/WEB-INF/views/theme.xml");
         return urls;
     }
 
@@ -911,7 +955,7 @@ public class ThemeOperationsImpl implements ThemeOperations {
 
             // iterate over bundle entries in the given URI path and add them
             // to URLs to be copied to target dir
-            Enumeration<URL> entries = componentContext.getBundleContext()
+            Enumeration<URL> entries = context.getBundleContext()
                     .getBundle(bundleId)
                     .findEntries(sourceDirectory.getPath(), "*.*", true);
             while (entries.hasMoreElements()) {
