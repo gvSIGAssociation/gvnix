@@ -18,7 +18,6 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -194,17 +193,9 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                     serviceName.getValue(), address.getValue(),
                     fullyQualifiedTypeName.getValue());
 
-            // Like BeanInfoMetdadaProvider to get all related metadata.
-            // TODO: Update in ROO-1.1.0 with new defined service.
-
-            // Create a list of metadata which the metadata should look for
-            // accessors within
-            List<MemberHoldingTypeDetails> memberHoldingTypeDetails = getMemberHoldingDetails(
-                    governorTypeDetails, governorPhysicalTypeMetadata,
-                    metadataIdentificationString);
-
-            // Get public methods to check.
-            List<MethodMetadata> methodMetadataList = getPublicAccessors(memberHoldingTypeDetails);
+            // Get methods to check.
+            List<MethodMetadata> methodMetadataList = MemberFindingUtils
+                    .getMethods(getMemberDetails(physicalTypeDetails.getName()));
 
             BooleanAttributeValue exported = (BooleanAttributeValue) gvNIXWebServiceAnnotation
                     .getAttribute(new JavaSymbolName("exported"));
@@ -883,31 +874,6 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
         }
 
         return memberHoldingTypeDetails;
-    }
-
-    /**
-     * Get public methods from associated {@link MemberHoldingTypeDetails} list.
-     * 
-     * @param memberHoldingTypeDetails
-     *            to get all public methods defined.
-     * @return list of public methods {@link MethodMetadata}.
-     */
-    public List<MethodMetadata> getPublicAccessors(
-            List<MemberHoldingTypeDetails> memberHoldingTypeDetails) {
-
-        // We keep these in a TreeMap so the methods are output in alphabetic
-        // order
-        List<MethodMetadata> sortedByDetectionOrder = new ArrayList<MethodMetadata>();
-
-        for (MemberHoldingTypeDetails holder : memberHoldingTypeDetails) {
-            for (MethodMetadata method : holder.getDeclaredMethods()) {
-                if (Modifier.isPublic(method.getModifier())
-                        && !Modifier.isStatic(method.getModifier())) {
-                    sortedByDetectionOrder.add(method);
-                }
-            }
-        }
-        return sortedByDetectionOrder;
     }
 
     /*
