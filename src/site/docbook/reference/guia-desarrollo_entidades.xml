@@ -640,9 +640,9 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
     que usará la entidad que precisa de una clave compuesta, en el ejemplo
     <emphasis>ClassWithCompisitePK</emphasis>.</para>
 
-    <programlisting>roo-gvNIX&gt; field number --fieldName campo1 --type java.lang.Long --class ~.domain.CompositePK
+    <programlisting>~.domain.ClassWithCompisitePK roo-gvNIX&gt; field number --fieldName campo1 --type java.lang.Long --class ~.domain.CompositePK
 ...
-roo-gvNIX&gt; field string --fieldName campo2
+~.domain.CompositePK roo-gvNIX&gt; field string --fieldName campo2
 ...</programlisting>
 
     <para>Lo que obtenemos es una entidad en la que su campo identificador es
@@ -651,6 +651,21 @@ roo-gvNIX&gt; field string --fieldName campo2
     linkend="guia-desarrollo_entidades-dbre_clave_compuesta">ingeniería
     inversa</link> de una BBDD en el caso de que se encuentre en esta
     situación.</para>
+
+    <para>Otra forma de hacer esto podría ser definir primero la clase que
+    servirá de identificador (en el ejemplo <emphasis>CompositPK</emphasis>) y
+    luego definir la entidad indicando que el identificador es del tipo de la
+    clase que hemos creado previamente.</para>
+
+    <programlisting>roo-gvNIX&gt; embeddable --class ~.domain.CompositePK
+...
+~.domain.CompositePK roo-gvNIX&gt; field number --fieldName campo1 --type java.lang.Long --class ~.domain.CompositePK
+...
+~.domain.CompositePK roo-gvNIX&gt; field string --fieldName campo2
+...
+~.domain.CompositePK roo-gvNIX&gt; entity --class ~.domain.ClassWithCompisitePK --identifierType ~.domain.CompositePK
+...
+</programlisting>
   </section>
 
   <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente">
