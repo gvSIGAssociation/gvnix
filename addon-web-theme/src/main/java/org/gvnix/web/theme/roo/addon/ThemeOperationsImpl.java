@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -53,16 +54,20 @@ import org.springframework.roo.classpath.operations.AbstractOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.Execution;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathInformation;
 import org.springframework.roo.project.PathResolver;
+import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.Property;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.osgi.UrlFindingUtils;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
 import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.support.util.TemplateUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -273,11 +278,169 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         // message bundles locations
         updateSpringWebCtx(id);
 
+        // when setting theme-cit modify pom.xml with required elements
+        if (id.equalsIgnoreCase("cit")) {
+            installApplicationVersionProperties();
+            updatePomFile();
+        }
+
         // update theme anchor to change to this theme
         updateThemeLinks(source);
 
         // update footer to add the active languages
         setInstalledI18n(languages);
+
+    }
+
+    /**
+     * Install applicationversion.properties file in destination project
+     * <p>
+     * This file is used as resource bundle of application version number
+     * message
+     */
+    private void installApplicationVersionProperties() {
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        InputStream appVersionPropIS = TemplateUtils.getTemplate(getClass(),
+                "applicationversion-template.properties");
+        String appVersionPropTemplate;
+        try {
+            appVersionPropTemplate = FileCopyUtils
+                    .copyToString(new InputStreamReader(appVersionPropIS));
+        } catch (IOException ioe) {
+            throw new IllegalStateException(
+                    "Unable load applicationversion-template.properties", ioe);
+        } finally {
+            try {
+                appVersionPropIS.close();
+            } catch (IOException e) {
+                throw new IllegalStateException(
+                        "Error creating jasperreports_extension.properties in project",
+                        e);
+            }
+        }
+
+        String appVersionProp = pathResolver.getIdentifier(
+                Path.SRC_MAIN_RESOURCES, "applicationversion.properties");
+        fileManager.createOrUpdateTextFileIfRequired(appVersionProp,
+                appVersionPropTemplate, false);
+    }
+
+    /**
+     * Update pom.xml adding a plugin maven-resources-plugin or, if it exists,
+     * just adding executions component
+     */
+    private void updatePomFile() {
+        // Add or update project.version property
+        projectOperations.addProperty(new Property("project.version",
+                "${project.version}"));
+
+        Element configuration = org.springframework.roo.support.util.XmlUtils
+                .getConfiguration(getClass(), "configuration.xml");
+        Element pluginElement = org.springframework.roo.support.util.XmlUtils
+                .findFirstElement("/configuration/plugin", configuration);
+
+        Plugin plugin = new Plugin(pluginElement);
+
+        Element executionElement = org.springframework.roo.support.util.XmlUtils
+                .findFirstElement("executions/execution", pluginElement);
+        Execution pluginExecution = createExecutionFromElement(executionElement);
+
+        String pom = projectOperations.getPathResolver().getIdentifier(
+                Path.ROOT, "pom.xml");
+        Document pomDoc = org.springframework.roo.support.util.XmlUtils
+                .readXml(fileManager.getInputStream(pom));
+        Element root = pomDoc.getDocumentElement();
+
+        // Plugins section: find or create if not exists
+        Element build = org.springframework.roo.support.util.XmlUtils
+                .findFirstElement("/project/build", root);
+        Element plugins = null;
+        if (build != null) {
+            plugins = org.springframework.roo.support.util.XmlUtils
+                    .findFirstElement("plugins", build);
+            if (plugins != null) {
+                String pluginXPath = "plugin[groupId='"
+                        .concat(plugin.getGroupId())
+                        .concat("' and artifactId='")
+                        .concat(plugin.getArtifactId())
+                        .concat("' and version='").concat(plugin.getVersion())
+                        .concat("']");
+                Element existingPluginElement = org.springframework.roo.support.util.XmlUtils
+                        .findFirstElement(pluginXPath, plugins);
+                if (existingPluginElement != null) {
+                    String pluginExecutionXPath = "executions/execution[id='"
+                            .concat(pluginExecution.getId())
+                            .concat("' and phase='")
+                            .concat(pluginExecution.getPhase())
+                            .concat("' and goals[goal='")
+                            .concat(pluginExecution.getGoals().get(0))
+                            .concat("']]");
+                    Element existingPluginExecutionElement = org.springframework.roo.support.util.XmlUtils
+                            .findFirstElement(pluginExecutionXPath,
+                                    existingPluginElement);
+                    if (existingPluginExecutionElement == null) {
+                        Element pluginExecutionsElement = org.springframework.roo.support.util.XmlUtils
+                                .findFirstElement("executions",
+                                        existingPluginElement);
+                        if (pluginExecutionsElement == null) {
+                            pluginExecutionsElement = new XmlElementBuilder(
+                                    "executions", pomDoc).build();
+                        }
+                        Node importedExecutionPlugin = pomDoc.importNode(
+                                executionElement, true);
+
+                        pluginExecutionsElement
+                                .appendChild(importedExecutionPlugin);
+                        existingPluginElement
+                                .appendChild(pluginExecutionsElement);
+                    }
+                } else {
+                    // create maven-resources-plugin
+                    Node importedPlugin = pomDoc
+                            .importNode(pluginElement, true);
+                    plugins.appendChild(importedPlugin);
+                }
+            } else {
+                // create plugins with maven-resources-plugin
+                plugins = pomDoc.createElement("plugins");
+                Node importedPlugin = pomDoc.importNode(pluginElement, true);
+                plugins.appendChild(importedPlugin);
+                build.appendChild(plugins);
+            }
+        } else {
+            // create build and plugins with maven-resources-plugin
+            build = pomDoc.createElement("build");
+            plugins = pomDoc.createElement("plugins");
+            Node importedPlugin = pomDoc.importNode(pluginElement, true);
+            plugins.appendChild(importedPlugin);
+            build.appendChild(plugins);
+            root.appendChild(build);
+        }
+
+        fileManager.createOrUpdateTextFileIfRequired(pom,
+                org.springframework.roo.support.util.XmlUtils
+                        .nodeToString(pomDoc), true);
+
+    }
+
+    /**
+     * Returns the @org.springframework.roo.project.Execution instance from XML
+     * Element representing it
+     * 
+     * @param executionElement
+     * @return
+     */
+    private Execution createExecutionFromElement(Element executionElement) {
+        String executionId = org.springframework.roo.support.util.XmlUtils
+                .findFirstElementByName("id", executionElement)
+                .getTextContent();
+        String executionPhase = org.springframework.roo.support.util.XmlUtils
+                .findFirstElementByName("phase", executionElement)
+                .getTextContent();
+        String executionGoal = org.springframework.roo.support.util.XmlUtils
+                .findFirstElement("goals/goal", executionElement)
+                .getTextContent();
+        return new Execution(executionId, executionPhase, executionGoal);
     }
 
     /**
@@ -1122,12 +1285,20 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         // The associated resource bundles will be checked sequentially when
         // resolving a message code.
         // We place theme basenames before the default ones to override ones in
-        // a
-        // later bundle, due to the sequential lookup.
-        String basenames = "WEB-INF/i18n/theme/messages,WEB-INF/i18n/theme/application,"
-                .concat(msgSourceElement.getAttribute("p:basenames"));
-
-        msgSourceElement.setAttribute("p:basenames", basenames);
+        // a later bundle, due to the sequential lookup.
+        String msgSourceBasenames = msgSourceElement
+                .getAttribute("p:basenames");
+        String basenames = "WEB-INF/i18n/theme/messages,WEB-INF/i18n/theme/application";
+        if (!msgSourceBasenames.contains(basenames)) {
+            if (themeId.equalsIgnoreCase("cit")) {
+                // When setting theme-cit we want to show application version
+                // number as a message
+                basenames = basenames
+                        .concat(",WEB-INF/i18n/theme/applicationversion");
+            }
+            msgSourceElement.setAttribute("p:basenames", basenames.concat(",")
+                    .concat(msgSourceBasenames));
+        }
 
         org.springframework.roo.support.util.XmlUtils.writeXml(
                 mutableConfigXml.getOutputStream(), webConfigDoc);
