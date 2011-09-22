@@ -68,7 +68,14 @@
     set</command></link>. Este comando copiará el contenido del tema al
     directorio de la aplicación, sobreescribiendo los fichero ya existentes.
     Este comando <emphasis role="bold">es acumulativo y no implementa ningún
-    mecanismo para revertir los cambios</emphasis>.</para>
+    mecanismo para revertir los cambios</emphasis>. </para>
+
+    <para xml:lang="es">Además, con el comando <emphasis>theme set</emphasis>
+    se instala en el directorio <emphasis>styles</emphasis> del proyecto un
+    archivo (<emphasis>application.css</emphasis>) que permitirá personalizar
+    la hoja de estilos de la aplicación sin tener que modificar las CSS
+    originales de los themas o que instala el <emphasis>framework</emphasis>
+    en otros Add-ons.</para>
 
     <para xml:lang="es">Los temas <emphasis>disponibles</emphasis> están
     ubicados en el directorio <filename>themes</filename> de la instalación de
