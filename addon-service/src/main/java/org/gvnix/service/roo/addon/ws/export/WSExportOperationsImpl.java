@@ -313,7 +313,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
         JavaType returnType = new JavaType(JavaType.VOID_OBJECT.toString());
 
         MethodMetadata methodMetadata = javaParserService
-                .getMethodByNameInClass(serviceClass, methodName);
+                .getMethodByNameInAll(serviceClass, methodName);
 
         if (methodMetadata == null) {
             return null;
@@ -370,7 +370,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
         // Gets target method
         MethodMetadata methodMetadata = javaParserService
-                .getMethodByNameInClass(serviceClass, methodName);
+                .getMethodByNameInAll(serviceClass, methodName);
 
         // Check input parameters.
         if (!methodMetadata.getParameterTypes().isEmpty()
@@ -531,7 +531,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
         // Gets method information
         MethodMetadata methodMetadata = javaParserService
-                .getMethodByNameInClass(serviceClass, methodName);
+                .getMethodByNameInAll(serviceClass, methodName);
 
         if (methodMetadata == null) {
             return false;
@@ -556,7 +556,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
         // Method information
         MethodMetadata methodMetadata = javaParserService
-                .getMethodByNameInClass(serviceClass, methodName);
+                .getMethodByNameInAll(serviceClass, methodName);
 
         // Method parameter types
         List<AnnotatedJavaType> parameterTypesList = methodMetadata

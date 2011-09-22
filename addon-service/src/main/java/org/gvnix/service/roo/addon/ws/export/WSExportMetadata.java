@@ -738,7 +738,13 @@ public class WSExportMetadata extends
                     .getAnnotationOfType(md.getAnnotations(), new JavaType(
                             GvNIXWebMethod.class.getName()));
 
-            if (gvNIXWebMethodMethodAnnotation == null) {
+            // Only export methods in this entity: no parent class methods check
+            String mdClass = md.getDeclaredByMetadataId().substring(
+                    md.getDeclaredByMetadataId().lastIndexOf("?") + 1);
+            String idClass = id.substring(id.lastIndexOf("?") + 1);
+
+            if (gvNIXWebMethodMethodAnnotation == null
+                    && mdClass.equals(idClass)) {
 
                 builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
                         new MethodMetadataBuilder(id, md).build(),

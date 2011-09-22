@@ -183,6 +183,29 @@ public interface JavaParserService {
             JavaSymbolName methodName);
 
     /**
+     * Returns MethodMetadata in selected class and related AJs.
+     * 
+     * @param name
+     *            Class name to search the method.
+     * @param methodName
+     *            to retrieve method.
+     * @return Method with methodName in serviceClass and related AJs. If method
+     *         doesn't exists returns null.
+     */
+    public MethodMetadata getMethodByNameInAll(JavaType name,
+            JavaSymbolName methodName);
+
+    /**
+     * Returns MethodMetadatas in selected class and related AJs.
+     * 
+     * @param name
+     *            Class name to search the method.
+     * @return All methods in serviceClass and related AJs. If method doesn't
+     *         exists returns empty list.
+     */
+    public List<MethodMetadata> getMethodsInAll(JavaType name);
+
+    /**
      * Create GvNIX annotated class.
      * 
      * @param javaType

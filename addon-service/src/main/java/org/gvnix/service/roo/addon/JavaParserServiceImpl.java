@@ -37,6 +37,7 @@ import japa.parser.ast.type.Type;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.felix.scr.annotations.Component;
@@ -55,6 +56,7 @@ import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.ConstructorMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
@@ -66,6 +68,8 @@ import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.javaparser.JavaParserMutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.javaparser.JavaParserUtils;
 import org.springframework.roo.classpath.javaparser.details.JavaParserMethodMetadata;
+import org.springframework.roo.classpath.scanner.MemberDetails;
+import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
@@ -96,6 +100,8 @@ public class JavaParserServiceImpl implements JavaParserService {
     private ProjectOperations projectOperations;
     @Reference
     private TypeLocationService typeLocationService;
+    @Reference
+    protected MemberDetailsScanner memberDetailsScanner;
 
     /**
      * {@inheritDoc}
@@ -272,80 +278,18 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
 
-        // Update method
-        List<? extends MethodMetadata> methodsList = mutableTypeDetails
-                .getDeclaredMethods();
-
-        JavaParserMethodMetadata javaParserMethodMetadata;
-
         List<MethodMetadata> updatedMethodList = new ArrayList<MethodMetadata>();
-        List<AnnotationMetadata> methodAnnotationList = new ArrayList<AnnotationMetadata>();
 
-        MethodMetadata operationMetadata;
+        // Add to list required method and all methods in Java
 
-        for (MethodMetadata methodMetadata : methodsList) {
+        // Search one method in all (Java and AspectJ)
+        updatedMethodList.addAll(searchMethodInAll(className, method,
+                annotationMetadataUpdateList, annotationWebParamMetadataList,
+                targetId));
 
-            javaParserMethodMetadata = (JavaParserMethodMetadata) methodMetadata;
-
-            if (methodMetadata.getMethodName().toString().compareTo(
-                    method.toString()) == 0) {
-
-                Assert.isTrue(!isAnnotationIntroducedInMethod(
-                        GvNIXWebMethod.class.getName(), methodMetadata),
-                        "The method '" + method.toString()
-                                + "' has been annotated with '@"
-                                + GvNIXWebMethod.class.getName() + "' before.");
-
-                methodAnnotationList.addAll(javaParserMethodMetadata
-                        .getAnnotations());
-                methodAnnotationList.addAll(annotationMetadataUpdateList);
-
-                InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-
-                bodyBuilder
-                        .appendFormalLine(javaParserMethodMetadata.getBody());
-                MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
-                        targetId, javaParserMethodMetadata.getModifier(),
-                        javaParserMethodMetadata.getMethodName(),
-                        javaParserMethodMetadata.getReturnType(),
-                        annotationWebParamMetadataList,
-                        javaParserMethodMetadata.getParameterNames(),
-                        bodyBuilder);
-                for (AnnotationMetadata annotationMetadata : methodAnnotationList) {
-                    methodMetadataBuilder.addAnnotation(annotationMetadata);
-                }
-                for (JavaType javaType : javaParserMethodMetadata
-                        .getThrowsTypes()) {
-                    methodMetadataBuilder.addThrowsType(javaType);
-                }
-                operationMetadata = methodMetadataBuilder.build();
-
-            } else {
-
-                InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-                bodyBuilder
-                        .appendFormalLine(javaParserMethodMetadata.getBody());
-                MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
-                        targetId, javaParserMethodMetadata.getModifier(),
-                        javaParserMethodMetadata.getMethodName(),
-                        javaParserMethodMetadata.getReturnType(),
-                        javaParserMethodMetadata.getParameterTypes(),
-                        javaParserMethodMetadata.getParameterNames(),
-                        bodyBuilder);
-                for (AnnotationMetadata annotationMetadata : javaParserMethodMetadata
-                        .getAnnotations()) {
-                    methodMetadataBuilder.addAnnotation(annotationMetadata);
-                }
-                for (JavaType javaType : javaParserMethodMetadata
-                        .getThrowsTypes()) {
-                    methodMetadataBuilder.addThrowsType(javaType);
-                }
-                operationMetadata = methodMetadataBuilder.build();
-
-            }
-            updatedMethodList.add(operationMetadata);
-
-        }
+        // Search methods in Java, excepts one method
+        updatedMethodList.addAll(searchMethodsInJava(method, targetId,
+                mutableTypeDetails));
 
         List<ConstructorMetadata> contructorList = new ArrayList<ConstructorMetadata>();
         contructorList.addAll(mutableTypeDetails.getDeclaredConstructors());
@@ -395,6 +339,127 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // Updates the class in file system.
         updateClass(classOrInterfaceTypeDetails.build());
+    }
+
+    /**
+     * Search method in Java.
+     * 
+     * @param methodName
+     *            Method name to search
+     * @param targetId
+     *            New method destination identifier
+     * @param mutableTypeDetails
+     *            Type to search methods in
+     * @return Methods list
+     */
+    protected List<MethodMetadata> searchMethodsInJava(
+            JavaSymbolName methodName, String targetId,
+            JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails) {
+
+        List<MethodMetadata> methods = new ArrayList<MethodMetadata>();
+
+        for (MethodMetadata method : mutableTypeDetails.getDeclaredMethods()) {
+
+            if (method.getMethodName().toString()
+                    .compareTo(methodName.toString()) != 0) {
+
+                InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+                bodyBuilder.appendFormalLine(method.getBody());
+                MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
+                        targetId, method.getModifier(), method.getMethodName(),
+                        method.getReturnType(), method.getParameterTypes(),
+                        method.getParameterNames(), bodyBuilder);
+                for (AnnotationMetadata annotationMetadata : method
+                        .getAnnotations()) {
+                    methodMetadataBuilder.addAnnotation(annotationMetadata);
+                }
+                for (JavaType javaType : method.getThrowsTypes()) {
+                    methodMetadataBuilder.addThrowsType(javaType);
+                }
+                MethodMetadata operationMetadata = methodMetadataBuilder
+                        .build();
+
+                methods.add(operationMetadata);
+            }
+        }
+
+        return methods;
+    }
+
+    /**
+     * Search method in all (Java and AspectJ).
+     * 
+     * <p>
+     * Add into method and into method params required web service annotations.
+     * </p>
+     * 
+     * @param className
+     *            Class name to seach
+     * @param method
+     *            Method name to search
+     * @param annotationMetadataUpdateList
+     *            Method annotation list
+     * @param annotationWebParamMetadataList
+     *            Method params annotation list
+     * @param targetId
+     *            New method destination identifier
+     * @return Methods list
+     */
+    protected List<MethodMetadata> searchMethodInAll(JavaType className,
+            JavaSymbolName method,
+            List<AnnotationMetadata> annotationMetadataUpdateList,
+            List<AnnotatedJavaType> annotationWebParamMetadataList,
+            String targetId) {
+
+        List<MethodMetadata> methods = new ArrayList<MethodMetadata>();
+
+        List<AnnotationMetadata> methodAnnotationList = new ArrayList<AnnotationMetadata>();
+        MethodMetadata javaParserMethodMetadata;
+        MethodMetadata operationMetadata;
+        List<? extends MethodMetadata> allMethodsList = getMethodsInAll(className);
+        for (MethodMetadata methodMetadata : allMethodsList) {
+
+            javaParserMethodMetadata = methodMetadata;
+
+            if (methodMetadata.getMethodName().toString()
+                    .compareTo(method.toString()) == 0) {
+
+                Assert.isTrue(
+                        !isAnnotationIntroducedInMethod(
+                                GvNIXWebMethod.class.getName(), methodMetadata),
+                        "The method '" + method.toString()
+                                + "' has been annotated with '@"
+                                + GvNIXWebMethod.class.getName() + "' before.");
+
+                methodAnnotationList.addAll(javaParserMethodMetadata
+                        .getAnnotations());
+                methodAnnotationList.addAll(annotationMetadataUpdateList);
+
+                InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+                bodyBuilder
+                        .appendFormalLine(javaParserMethodMetadata.getBody());
+                MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
+                        targetId, javaParserMethodMetadata.getModifier(),
+                        javaParserMethodMetadata.getMethodName(),
+                        javaParserMethodMetadata.getReturnType(),
+                        annotationWebParamMetadataList,
+                        javaParserMethodMetadata.getParameterNames(),
+                        bodyBuilder);
+                for (AnnotationMetadata annotationMetadata : methodAnnotationList) {
+                    methodMetadataBuilder.addAnnotation(annotationMetadata);
+                }
+                for (JavaType javaType : javaParserMethodMetadata
+                        .getThrowsTypes()) {
+                    methodMetadataBuilder.addThrowsType(javaType);
+                }
+                operationMetadata = methodMetadataBuilder.build();
+
+                methods.add(operationMetadata);
+            }
+        }
+
+        return methods;
     }
 
     /**
@@ -525,8 +590,8 @@ public class JavaParserServiceImpl implements JavaParserService {
                             javaIdentifier.concat(".java")));
 
             JavaParserMutableClassOrInterfaceTypeDetails details = new JavaParserMutableClassOrInterfaceTypeDetails(
-                    compilationUnit, clazz, mutableTypeDetails
-                            .getDeclaredByMetadataId(), className,
+                    compilationUnit, clazz,
+                    mutableTypeDetails.getDeclaredByMetadataId(), className,
                     metadataService, physicalTypeMetadataProvider, fileManager,
                     javaIdentifier);
 
@@ -594,8 +659,8 @@ public class JavaParserServiceImpl implements JavaParserService {
 
             javaParserMethodMetadata = (JavaParserMethodMetadata) methodMetadata;
 
-            if (methodMetadata.getMethodName().toString().compareTo(
-                    method.toString()) == 0) {
+            if (methodMetadata.getMethodName().toString()
+                    .compareTo(method.toString()) == 0) {
 
                 Assert.isTrue(!javaParserMethodMetadata.getParameterNames()
                         .contains(parameterName),
@@ -742,7 +807,7 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         List<JavaType> throwList = new ArrayList<JavaType>();
 
-        MethodMetadata methodMetadata = getMethodByNameInClass(serviceClass,
+        MethodMetadata methodMetadata = getMethodByNameInAll(serviceClass,
                 methodName);
 
         if (methodMetadata != null) {
@@ -789,7 +854,7 @@ public class JavaParserServiceImpl implements JavaParserService {
     /**
      * {@inheritDoc}
      * <p>
-     * Search the method by name.
+     * Search the method by name in class.
      * </p>
      */
     public MethodMetadata getMethodByNameInClass(JavaType serviceClass,
@@ -800,8 +865,8 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // Checks if it's mutable
         Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-                tmpServiceDetails, "Can't modify "
-                        + tmpServiceDetails.getName());
+                tmpServiceDetails,
+                "Can't modify " + tmpServiceDetails.getName());
 
         MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
 
@@ -815,6 +880,78 @@ public class JavaParserServiceImpl implements JavaParserService {
         }
 
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Search the method by name in class and related AJs.
+     * </p>
+     */
+    public MethodMetadata getMethodByNameInAll(JavaType serviceClass,
+            JavaSymbolName methodName) {
+
+        MethodMetadata method = null;
+
+        Iterator<MemberHoldingTypeDetails> members = getMemberDetails(
+                serviceClass).iterator();
+        while (method == null && members.hasNext()) {
+
+            @SuppressWarnings("unchecked")
+            List<MethodMetadata> methods = (List<MethodMetadata>) members
+                    .next().getDeclaredMethods();
+            Iterator<MethodMetadata> methodsIter = methods.iterator();
+            while (method == null && methodsIter.hasNext()) {
+
+                MethodMetadata tmpMethod = methodsIter.next();
+                if (tmpMethod.getMethodName().getSymbolName()
+                        .equals(methodName.getSymbolName())) {
+                    method = tmpMethod;
+                }
+            }
+        }
+
+        return method;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Search all methods in class and related AJs.
+     * </p>
+     */
+    public List<MethodMetadata> getMethodsInAll(JavaType name) {
+
+        List<MethodMetadata> methods = new ArrayList<MethodMetadata>();
+        for (MemberHoldingTypeDetails member : getMemberDetails(name)) {
+            methods.addAll(member.getDeclaredMethods());
+        }
+
+        return methods;
+    }
+
+    /**
+     * Get the list of type details (Java and AJs) from a Java type.
+     * 
+     * @param name
+     *            Java type to get details
+     * @return List of type details
+     */
+    protected List<MemberHoldingTypeDetails> getMemberDetails(JavaType name) {
+
+        String identifier = PhysicalTypeIdentifier.createIdentifier(name,
+                Path.SRC_MAIN_JAVA);
+        PhysicalTypeMetadata physicalType = (PhysicalTypeMetadata) metadataService
+                .get(identifier);
+        String className = getClass().getName();
+        ClassOrInterfaceTypeDetails typeDetails = (ClassOrInterfaceTypeDetails) physicalType
+                .getMemberHoldingTypeDetails();
+        MemberDetails member = memberDetailsScanner.getMemberDetails(className,
+                typeDetails);
+
+        return member.getDetails();
     }
 
     /**
