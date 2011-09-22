@@ -336,6 +336,10 @@ public class JavaParserServiceImpl implements JavaParserService {
                 classOrInterfaceTypeDetails.addEnumConstant(enumConstant);
             }
         }
+        // Add old class imports into new class to avoid undefined imports
+        // Example: Not included HashSet import when exporting method in petclinic Owner
+        classOrInterfaceTypeDetails.setRegisteredImports(mutableTypeDetails
+                .getRegisteredImports());
 
         // Updates the class in file system.
         updateClass(classOrInterfaceTypeDetails.build());
@@ -421,8 +425,17 @@ public class JavaParserServiceImpl implements JavaParserService {
 
             javaParserMethodMetadata = methodMetadata;
 
+            // Only export methods in this entity: no parent class methods check
+            // Example: Duplicated method when exporting toString method in petclinic Owner
+            String mdClass = methodMetadata.getDeclaredByMetadataId()
+                    .substring(
+                            methodMetadata.getDeclaredByMetadataId()
+                                    .lastIndexOf("?") + 1);
+            String idClass = targetId.substring(targetId.lastIndexOf("?") + 1);
+
             if (methodMetadata.getMethodName().toString()
-                    .compareTo(method.toString()) == 0) {
+                    .compareTo(method.toString()) == 0
+                    && mdClass.equals(idClass)) {
 
                 Assert.isTrue(
                         !isAnnotationIntroducedInMethod(
