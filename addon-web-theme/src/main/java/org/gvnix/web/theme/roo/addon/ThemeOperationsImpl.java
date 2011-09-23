@@ -61,7 +61,6 @@ import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.project.Property;
 import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.osgi.UrlFindingUtils;
 import org.springframework.roo.support.util.Assert;
@@ -328,11 +327,16 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     /**
      * Update pom.xml adding a plugin maven-resources-plugin or, if it exists,
      * just adding executions component
+     * <p>
+     * TODO
+     * <p>
+     * This source is so because Roo doesn't support Execution with
+     * Configuration. When it support the thing we could change this code with
+     * something like:
+     * <code>projectOperations.updateBuildPlugin(pluginWithExecutionConfigured)</code>
+     * This issue is solved in 1.2.0.M1 as ROO-2658 says
      */
     private void updatePomFile() {
-        // Add or update project.version property
-        projectOperations.addProperty(new Property("project.version",
-                "${project.version}"));
 
         Element configuration = org.springframework.roo.support.util.XmlUtils
                 .getConfiguration(getClass(), "configuration.xml");
