@@ -33,6 +33,7 @@ import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.itd.ItdTriggerBasedMetadataProvider;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
@@ -173,6 +174,23 @@ public class OCCChecksumMetadataProvider implements
         EntityMetadata entityMetadata = (EntityMetadata) metadataService
                 .get(entityMetadataKey);
 
+        FieldMetadata versionField = entityMetadata.getVersionField();
+
+        if (versionField != null) {
+            String declaredByType = entityMetadataKey
+                    .substring(entityMetadataKey.lastIndexOf("?") + 1);
+            if (!versionField.getDeclaredByMetadataId()
+                    .endsWith(declaredByType)) {
+                throw new IllegalStateException(
+                        "You are trying to apply OCC Checksum on an Entity "
+                                .concat("that extends of another one with a ")
+                                .concat("@javax.persistence.Version fiel. ")
+                                .concat("You should to apply OCC Checksum ")
+                                .concat("over that Entity, in your class: ")
+                                .concat(declaredByType));
+            }
+        }
+
         // We get governor's BeanInfo
         // DiSiD: beanInfoMetadata unused
         // BeanInfoMetadata beanInfoMetadata = (BeanInfoMetadata)
@@ -181,21 +199,8 @@ public class OCCChecksumMetadataProvider implements
 
         // Now we walk the inheritance hierarchy until we find some existing
         // EntityMetadata
-        EntityMetadata parent = null;
+        // EntityMetadata parent = null;
 
-        ClassOrInterfaceTypeDetails superCid = ((ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
-                .getMemberHoldingTypeDetails()).getSuperclass();
-        // ClassOrInterfaceTypeDetails superCid = ((ClassOrInterfaceTypeDetails)
-        // governorPhysicalTypeMetadata
-        // .getPhysicalTypeDetails()).getSuperclass();
-
-        while (superCid != null && parent == null) {
-            String superCidLocalIdentifier = EntityMetadata.createIdentifier(
-                    superCid.getName(), path);
-            parent = (EntityMetadata) metadataService
-                    .get(superCidLocalIdentifier);
-            superCid = superCid.getSuperclass();
-        }
 
         OCCChecksumMetadata metadata = new OCCChecksumMetadata(
                 metadataIdentificationString, aspectName,
