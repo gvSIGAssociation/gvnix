@@ -45,6 +45,10 @@
   </organization>
   <url>http://www.gvnix.org</url>
 
+  <properties>
+    <bndPluginVersion>2.3.5</bndPluginVersion>
+  </properties>
+
   <modules>
     <module>aspectj</module>
     <module>hibernate</module>
@@ -93,7 +97,7 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.3.5</version>
+        <version>${bndPluginVersion}</version>
         <extensions>true</extensions>
         <configuration>
           <!-- Pendiente de determinar cómo se distribuye internamente: http://projects.disid.com/issues/4907 

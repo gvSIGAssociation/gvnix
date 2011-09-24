@@ -38,7 +38,7 @@
   <!-- Ver sistema de nominación en ../README.rst -->
   <groupId>${pkgGroupId}</groupId>
   <artifactId>${project.parent.groupId}.${pkgGroupId}</artifactId>
-  <version>${pkgVersion}</version>
+  <version>${depVersion}</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - PostgreSQL JDBC driver</name>
   <description>PostgreSQL JDBC driver. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
@@ -50,7 +50,8 @@
   <properties>
     <pkgGroupId>postgresql</pkgGroupId>
     <pkgArtifactId>postgresql</pkgArtifactId>
-    <pkgVersion>8.4-702.jdbc3</pkgVersion>
+    <pkgVersion>8.4.702.jdbc3</pkgVersion><!-- Bundle plugin change -702 to .0 for Bundle-Version, so change -702 to .702 -->
+    <depVersion>8.4-702.jdbc3</depVersion>
     <pkgVendor>PostgreSQL Global Development Group</pkgVendor>
     <pkgDocUrl>http://jdbc.postgresql.org/documentation/docs.html</pkgDocUrl>
     <pkgLicense>http://jdbc.postgresql.org/license.html</pkgLicense>
@@ -64,7 +65,7 @@
     <dependency>
       <groupId>${pkgGroupId}</groupId>
       <artifactId>${pkgArtifactId}</artifactId>
-      <version>${pkgVersion}</version>
+      <version>${depVersion}</version>
     </dependency>
   </dependencies>
 

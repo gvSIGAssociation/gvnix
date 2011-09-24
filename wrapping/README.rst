@@ -1,4 +1,8 @@
 
+======================================
+ gvNIX - RAD tool for Java developers
+======================================
+
 Sistema de nominación de wrappers
 ===========================================
 
@@ -71,5 +75,10 @@ Conclusión
 Este sistema de nominación permite una identificación visual del proyecto que genera el bundle y de la librería empaquetada.
 
 El bundle generado se instala en el repositorio Maven dentro del grupo de la librería original, de forma que permite un acceso sencillo ya que los bundles se buscan por la librería que contiene y no por el proyecto que lo empaqueta.
+
+Wrappers analysis
+==================
+
+Use Eclipse to analyze bundle relations (imports and exports), just open generated MANIFEST.MF with Eclipse and you will get an easy way.
 
 

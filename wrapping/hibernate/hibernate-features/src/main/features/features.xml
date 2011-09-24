@@ -83,6 +83,6 @@
       <bundle dependency="true">mvn:com.vividsolutions/org.gvnix.com.vividsolutions.jts/1.12</bundle>
 
       <!-- Hibernate Spatial -->
-      <bundle>mvn:org.hibernatespatial/org.gvnix.hibernate-spatial/1.1</bundle>
+      <bundle>mvn:org.hibernatespatial/org.gvnix.hibernate-spatial-postgis/1.1</bundle>
     </feature>
 </features>

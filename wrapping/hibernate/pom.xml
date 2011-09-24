@@ -49,7 +49,8 @@
   <modules>
     <module>hibernate-core-entity</module>
     <module>hibernate-validator</module>
-    <module>hibernate-spatial</module>
+    <module>hibernate-spatial-postgis</module>
+    <module>hibernate-features</module>
   </modules>
 
 </project>

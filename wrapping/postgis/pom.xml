@@ -40,8 +40,8 @@
   <artifactId>${project.parent.groupId}.${pkgArtifactId}</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - PostGIS JDBC driver</name>
-  <description>PostGIS JDBC driver. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
+  <name>gvNIX - OSGi - PostgreSQL Fragment - PostGIS JDBC driver</name>
+  <description>PostGIS JDBC driver Fragment. This OSGi fragment adds spatial database extension for PostgreSQL.</description>
 
   <organization>
     <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
@@ -54,8 +54,9 @@
     <pkgVendor>Refractions Research</pkgVendor>
     <pkgDocUrl>http://www.postgis.org/documentation/</pkgDocUrl>
     <pkgLicense>http://www.opensource.org/licenses/gpl-2.0.php</pkgLicense>
-    <pkgExport>*;version=${pkgVersion}</pkgExport>
-    <pkgImport>*;version="[8.3,9.1]"</pkgImport><!-- Requires PostgreSQL 8.3 or higher -->
+    <pkgExport>!org.postgresql.*,!examples.*,*;version=${pkgVersion}</pkgExport>
+    <pkgImport>*</pkgImport>
+    <!-- <pkgImport>*;version="[8.3,9.1]"</pkgImport>--><!-- Requires PostgreSQL 8.3 or higher -->
     <pkgPrivate>!*</pkgPrivate>
   </properties>
 
@@ -65,14 +66,32 @@
       <artifactId>${pkgArtifactId}</artifactId>
       <version>${pkgVersion}</version>
     </dependency>
-<!--
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.3</version>
-      <scope>provided</scope>
-    </dependency>
--->
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>${bndPluginVersion}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-Vendor>${pkgVendor} (wrapped into an OSGi bundle by the gvNIX project build system)</Bundle-Vendor>
+            <Bundle-Version>${pkgVersion}</Bundle-Version>
+            <Bundle-DocURL>${pkgDocUrl}</Bundle-DocURL>
+            <Bundle-License>${pkgLicense}</Bundle-License>
+            <Fragment-Host>org.gvnix.postgresql;bundle-version=8.4.702.jdbc3</Fragment-Host>
+            <Export-Package>${pkgExport}</Export-Package>
+            <Implementation-Title>gvNIX Project</Implementation-Title>
+            <Implementation-Version>${project.parent.version}</Implementation-Version>
+            <Import-Package>${pkgImport}</Import-Package>
+            <Include-Resource>${pkgInclude}</Include-Resource>
+            <Private-Package>${pkgPrivate}</Private-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -40,7 +40,7 @@
   <artifactId>${project.parent.groupId}.${project.groupId}.${pkgArtifactId}</artifactId>
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
-  <name>gvNIX - OSGi - ${pkgArtifactId}</name>
+  <name>gvNIX - OSGi - Oracle JDBC driver</name>
   <description>Oracle JDBC driver classes for use with JDK1.4, driverclass:oracle.jdbc.OracleDriver. This bundle wraps the standard Maven artifact: ${pkgArtifactId}-${pkgVersion}.</description>
 
   <organization>

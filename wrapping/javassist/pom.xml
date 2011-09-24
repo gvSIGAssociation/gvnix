@@ -41,7 +41,7 @@
   <version>${pkgVersion}</version>
   <packaging>bundle</packaging>
   <name>gvNIX - OSGi - Javassist</name>
-  <description>Java Programming Assistant. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
+  <description>JAVA programming ASSISTant. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
 
   <organization>
     <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
