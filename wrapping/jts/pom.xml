@@ -54,7 +54,7 @@
     <pkgVendor>Vivid Solutions Inc.</pkgVendor>
     <pkgDocUrl>http://www.vividsolutions.com/jts/JTSHome.htm</pkgDocUrl>
     <pkgLicense>http://www.gnu.org/copyleft/lesser.html</pkgLicense>
-    <pkgExport>*;version=${pkgVersion}</pkgExport>
+    <pkgExport>!com.vividsolutions.jtsexample.*,*;version=${pkgVersion}</pkgExport>
     <pkgImport>*;resolution:=optional</pkgImport>
     <pkgPrivate>!*</pkgPrivate>
     <osgiVersion>${pkgVersion}.0001</osgiVersion>
