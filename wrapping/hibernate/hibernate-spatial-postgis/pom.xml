@@ -161,7 +161,7 @@
       </exclusions>
     </dependency>
   </dependencies>
-
+<!--
   <build>
     <plugins>
       <plugin>
@@ -177,7 +177,6 @@
             <Bundle-DocURL>${pkgDocUrl}</Bundle-DocURL>
             <Bundle-License>${pkgLicense}</Bundle-License>
             <Fragment-Host>org.gvnix.org.hibernate;bundle-version=3.6.7.Final</Fragment-Host>
-<!--            <Fragment-Host>system.bundle;extension=bootclasspath</Fragment-Host> -->
             <Export-Package>${pkgExport}</Export-Package>
             <Implementation-Title>gvNIX Project</Implementation-Title>
             <Implementation-Version>${project.parent.version}</Implementation-Version>
@@ -189,4 +188,5 @@
       </plugin>
     </plugins>
   </build>
+-->
 </project>
