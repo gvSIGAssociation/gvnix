@@ -81,4 +81,9 @@ Wrappers analysis
 
 Use Eclipse to analyze bundle relations (imports and exports), just open generated MANIFEST.MF with Eclipse and you will get an easy way.
 
+TODO
+=====
+
+* Todas los bundles incluidos en las *features* estan con una versión concreta. Los archivos *features.xml* soportan el uso de variables ${XYZ}, por lo que se pueden utilizar versiones definidas en los pom.xml. Es lo más adecuado.
+
 
