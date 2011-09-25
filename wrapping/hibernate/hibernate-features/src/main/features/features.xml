@@ -17,6 +17,14 @@
       You should have received a copy of the GNU General Public License
       along with this program. If not, see <http://www.gnu.org/licenses />.
 -->
+<!--
+  Karaf features allow you to load a collection of bundles using a single name.
+
+  A feature consists of one or more OSGi bundles grouped to collectively 
+  provide a specific feature or functionality. When a feature is loaded, the 
+  container loads any required bundles that are not already present into the 
+  container and activates them.
+-->
 <features name="gvnix-hibernate-features-repository">
 
     <!-- Karaf Feature Descriptor to install Hibernate 3 in Servicemix 4 -->
@@ -77,10 +85,14 @@
     <feature name="gvnix-hibernate-spatial" version="${project.version}">
       <feature>gvnix-hibernate</feature>
 
-      <!-- dependencies -->
+      <!-- Required dependencies -->
 
       <!-- Java Topology Suite, spatial geometry model-->
       <bundle dependency="true">mvn:com.vividsolutions/org.gvnix.com.vividsolutions.jts/1.12</bundle>
+
+      <!-- PostGIS and PosgreSQL -->
+      <bundle dependency="true">mvn:postgresql/org.gvnix.postgresql/8.4-702.jdbc3</bundle>
+      <bundle dependency="true">mvn:org.postgis/org.gvnix.postgis-jdbc/1.5.3</bundle>
 
       <!-- Hibernate Spatial -->
       <bundle>mvn:org.hibernatespatial/org.gvnix.hibernate-spatial-postgis/1.1</bundle>
