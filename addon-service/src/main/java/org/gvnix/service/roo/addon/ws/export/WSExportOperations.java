@@ -48,13 +48,6 @@ public interface WSExportOperations {
     };
 
     /**
-     * Is service layer web service export command available on Roo console ?
-     * 
-     * @return Service layer web service export command available on Roo console
-     */
-    boolean isProjectAvailable();
-
-    /**
      * <p>
      * Exports a class to Web Service.
      * </p>

@@ -33,13 +33,6 @@ import org.springframework.roo.model.JavaType;
 public interface WSExportWsdlOperations {
 
     /**
-     * Is service layer command available on Roo console ?
-     * 
-     * @return Service layer command available on Roo console
-     */
-    boolean isProjectAvailable();
-
-    /**
      * Export WSDL Web Service Contract First to Java code using GvNIX
      * annotations.
      * 

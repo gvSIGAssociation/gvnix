@@ -55,8 +55,6 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
@@ -93,32 +91,6 @@ public class WSExportOperationsImpl implements WSExportOperations {
     private WSExportValidationService wSExportValidationService;
     @Reference
     private TypeLocationService typeLocationService;
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isProjectAvailable() {
-        if (getPathResolver() == null) {
-            return false;
-        }
-
-        // Checks if it's a web project
-        String webXmlPath = projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "/WEB-INF/web.xml");
-        return fileManager.exists(webXmlPath);
-    }
-
-    /**
-     * @return the path resolver or null if there is no user project
-     */
-    private PathResolver getPathResolver() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
-        if (projectMetadata == null) {
-            return null;
-        }
-        return projectMetadata.getPathResolver();
-    }
 
     /**
      * {@inheritDoc}
@@ -312,8 +284,8 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
         JavaType returnType = new JavaType(JavaType.VOID_OBJECT.toString());
 
-        MethodMetadata methodMetadata = javaParserService
-                .getMethodByNameInAll(serviceClass, methodName);
+        MethodMetadata methodMetadata = javaParserService.getMethodByNameInAll(
+                serviceClass, methodName);
 
         if (methodMetadata == null) {
             return null;
@@ -369,8 +341,8 @@ public class WSExportOperationsImpl implements WSExportOperations {
         annotationAttributeValueList.add(operationNameAttributeValue);
 
         // Gets target method
-        MethodMetadata methodMetadata = javaParserService
-                .getMethodByNameInAll(serviceClass, methodName);
+        MethodMetadata methodMetadata = javaParserService.getMethodByNameInAll(
+                serviceClass, methodName);
 
         // Check input parameters.
         if (!methodMetadata.getParameterTypes().isEmpty()
@@ -530,8 +502,8 @@ public class WSExportOperationsImpl implements WSExportOperations {
         boolean isAnnotated = true;
 
         // Gets method information
-        MethodMetadata methodMetadata = javaParserService
-                .getMethodByNameInAll(serviceClass, methodName);
+        MethodMetadata methodMetadata = javaParserService.getMethodByNameInAll(
+                serviceClass, methodName);
 
         if (methodMetadata == null) {
             return false;
@@ -555,8 +527,8 @@ public class WSExportOperationsImpl implements WSExportOperations {
         List<AnnotatedJavaType> annotatedWebParameterList = new ArrayList<AnnotatedJavaType>();
 
         // Method information
-        MethodMetadata methodMetadata = javaParserService
-                .getMethodByNameInAll(serviceClass, methodName);
+        MethodMetadata methodMetadata = javaParserService.getMethodByNameInAll(
+                serviceClass, methodName);
 
         // Method parameter types
         List<AnnotatedJavaType> parameterTypesList = methodMetadata

@@ -134,157 +134,151 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
         WSExportMetadata serviceLayerMetadata = null;
 
-        if (wSConfigService.isProjectWebAvailable()) {
+        // Configures project
+        configureProject();
 
-            // Configures project
-            configureProject();
+        // Check if Web Service definition is correct.
+        PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
+                .getMemberHoldingTypeDetails();
 
-            // Check if Web Service definition is correct.
-            PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
-                    .getMemberHoldingTypeDetails();
+        ClassOrInterfaceTypeDetails governorTypeDetails;
+        if (physicalTypeDetails == null
+                || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+            // There is a problem
+            return null;
+        } else {
+            // We have reliable physical type details
+            governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
+        }
 
-            ClassOrInterfaceTypeDetails governorTypeDetails;
-            if (physicalTypeDetails == null
-                    || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
-                // There is a problem
-                return null;
-            } else {
-                // We have reliable physical type details
-                governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
+        // Get upstreamDepency Class to check.
+        AnnotationMetadata gvNIXWebServiceAnnotation = MemberFindingUtils
+                .getTypeAnnotation(governorTypeDetails, new JavaType(
+                        GvNIXWebService.class.getName()));
+
+        // Check @GvNIXWebService annotation attributes.
+        checkGvNIXWebServiceAnnotationAttributes(gvNIXWebServiceAnnotation,
+                governorTypeDetails);
+
+        // Default Web Service target Namespace.
+        StringAttributeValue webServiceTargetNamespaceAttributeValue = (StringAttributeValue) gvNIXWebServiceAnnotation
+                .getAttribute(new JavaSymbolName("targetNamespace"));
+        String webServiceTargetNamespace = webServiceTargetNamespaceAttributeValue
+                .getValue();
+
+        // Show info
+        logger.log(Level.FINE,
+                "Check correct format to export the web service class: '"
+                        + governorTypeDetails.getName() + "'");
+
+        // Update CXF XML
+        boolean updateGvNIXWebServiceAnnotation = wSConfigService
+                .publishClassAsWebService(governorTypeDetails.getName(),
+                        gvNIXWebServiceAnnotation);
+
+        // Define Jax-WS plugin and creates and execution build for this
+        // service to generate the wsdl file to check errors before deploy.
+        StringAttributeValue serviceName = (StringAttributeValue) gvNIXWebServiceAnnotation
+                .getAttribute(new JavaSymbolName("serviceName"));
+
+        StringAttributeValue address = (StringAttributeValue) gvNIXWebServiceAnnotation
+                .getAttribute(new JavaSymbolName("address"));
+
+        StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) gvNIXWebServiceAnnotation
+                .getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
+
+        wSConfigService.addToJava2wsPlugin(governorTypeDetails.getName(),
+                serviceName.getValue(), address.getValue(),
+                fullyQualifiedTypeName.getValue());
+
+        // Get methods to check.
+        List<MethodMetadata> methodMetadataList = MemberFindingUtils
+                .getMethods(getMemberDetails(physicalTypeDetails.getName()));
+
+        BooleanAttributeValue exported = (BooleanAttributeValue) gvNIXWebServiceAnnotation
+                .getAttribute(new JavaSymbolName("exported"));
+
+        // For every public exported method checks its signature and
+        // annotations.
+        for (MethodMetadata methodMetadata : methodMetadataList) {
+
+            AnnotationMetadata gvNixWebMethodAnnotation = MemberFindingUtils
+                    .getAnnotationOfType(methodMetadata.getAnnotations(),
+                            new JavaType(GvNIXWebMethod.class.getName()));
+
+            if (gvNixWebMethodAnnotation == null) {
+                // This method is not exported
+                continue;
             }
 
-            // Get upstreamDepency Class to check.
-            AnnotationMetadata gvNIXWebServiceAnnotation = MemberFindingUtils
-                    .getTypeAnnotation(governorTypeDetails, new JavaType(
-                            GvNIXWebService.class.getName()));
+            // If the web service has been exported from WSDL, the
+            // parameters hasn't to be checked
+            if (!exported.getValue()) {
 
-            // Check @GvNIXWebService annotation attributes.
-            checkGvNIXWebServiceAnnotationAttributes(gvNIXWebServiceAnnotation,
-                    governorTypeDetails);
+                // Prepares INPUT/OUTPUT parameters
+                wSExportValidationService
+                        .prepareAuthorizedJavaTypesInOperation(
+                                governorTypeDetails.getName(),
+                                methodMetadata.getMethodName());
 
-            // Default Web Service target Namespace.
-            StringAttributeValue webServiceTargetNamespaceAttributeValue = (StringAttributeValue) gvNIXWebServiceAnnotation
-                    .getAttribute(new JavaSymbolName("targetNamespace"));
-            String webServiceTargetNamespace = webServiceTargetNamespaceAttributeValue
-                    .getValue();
-
-            // Show info
-            logger.log(Level.FINE,
-                    "Check correct format to export the web service class: '"
-                            + governorTypeDetails.getName() + "'");
-
-            // Update CXF XML
-            boolean updateGvNIXWebServiceAnnotation = wSConfigService
-                    .publishClassAsWebService(governorTypeDetails.getName(),
-                            gvNIXWebServiceAnnotation);
-
-            // Define Jax-WS plugin and creates and execution build for this
-            // service to generate the wsdl file to check errors before deploy.
-            StringAttributeValue serviceName = (StringAttributeValue) gvNIXWebServiceAnnotation
-                    .getAttribute(new JavaSymbolName("serviceName"));
-
-            StringAttributeValue address = (StringAttributeValue) gvNIXWebServiceAnnotation
-                    .getAttribute(new JavaSymbolName("address"));
-
-            StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) gvNIXWebServiceAnnotation
-                    .getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
-
-            wSConfigService.addToJava2wsPlugin(governorTypeDetails.getName(),
-                    serviceName.getValue(), address.getValue(),
-                    fullyQualifiedTypeName.getValue());
-
-            // Get methods to check.
-            List<MethodMetadata> methodMetadataList = MemberFindingUtils
-                    .getMethods(getMemberDetails(physicalTypeDetails.getName()));
-
-            BooleanAttributeValue exported = (BooleanAttributeValue) gvNIXWebServiceAnnotation
-                    .getAttribute(new JavaSymbolName("exported"));
-
-            // For every public exported method checks its signature and
-            // annotations.
-            for (MethodMetadata methodMetadata : methodMetadataList) {
-
-                AnnotationMetadata gvNixWebMethodAnnotation = MemberFindingUtils
-                        .getAnnotationOfType(methodMetadata.getAnnotations(),
-                                new JavaType(GvNIXWebMethod.class.getName()));
-
-                if (gvNixWebMethodAnnotation == null) {
-                    // This method is not exported
-                    continue;
-                }
-
-                // If the web service has been exported from WSDL, the
-                // parameters hasn't to be checked
-                if (!exported.getValue()) {
-
-                    // Prepares INPUT/OUTPUT parameters
-                    wSExportValidationService
-                            .prepareAuthorizedJavaTypesInOperation(
-                                    governorTypeDetails.getName(),
-                                    methodMetadata.getMethodName());
-
-                    // Prepares exceptions.
-                    wSExportValidationService.prepareMethodExceptions(
-                            governorTypeDetails.getName(),
-                            methodMetadata.getMethodName(),
-                            webServiceTargetNamespace);
-
-                    // Checks @GvNIXWebMethod has attributes.
-                    Assert.isTrue(
-                            !gvNixWebMethodAnnotation.getAttributeNames()
-                                    .isEmpty(),
-                            "The annotation @GvNIXWebMethod of '"
-                                    .concat(methodMetadata.getMethodName()
-                                            .getSymbolName())
-                                    .concat("' method in class '")
-                                    .concat(governorTypeDetails.getName()
-                                            .getFullyQualifiedTypeName())
-                                    .concat("' must have all its attributes defined."));
-
-                    // Check if @GvNIXWebMethod attributes are correct to
-                    // export method to web service annotation in ITD.
-                    checkGvNIXWebMethodAnnotationAttributes(
-                            gvNixWebMethodAnnotation, governorTypeDetails,
-                            methodMetadata);
-
-                    // Checks @WebParam and @GvNIXWebParam attributes for
-                    // each input parameter in method.
-                    checkGvNIXWebParamsAnnotationAttributes(
-                            governorTypeDetails, methodMetadata);
-                }
-
-            }
-
-            // Update Annotation because Java Class or package has changed.
-            if (updateGvNIXWebServiceAnnotation) {
-
-                List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-                gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
-                        .getAttribute(new JavaSymbolName("name")));
-                gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
-                        .getAttribute(new JavaSymbolName("targetNamespace")));
-                gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
-                        .getAttribute(new JavaSymbolName("serviceName")));
-                gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
-                        .getAttribute(new JavaSymbolName("address")));
-                gvNixAnnotationAttributes.add(new StringAttributeValue(
-                        new JavaSymbolName("fullyQualifiedTypeName"),
-                        governorTypeDetails.getName()
-                                .getFullyQualifiedTypeName()));
-                gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
-                        .getAttribute(new JavaSymbolName("exported")));
-
-                annotationsService.addJavaTypeAnnotation(
+                // Prepares exceptions.
+                wSExportValidationService.prepareMethodExceptions(
                         governorTypeDetails.getName(),
-                        GvNIXWebService.class.getName(),
-                        gvNixAnnotationAttributes, true);
-            }
+                        methodMetadata.getMethodName(),
+                        webServiceTargetNamespace);
 
-            serviceLayerMetadata = new WSExportMetadata(
-                    metadataIdentificationString, aspectName,
-                    governorPhysicalTypeMetadata, methodMetadataList);
+                // Checks @GvNIXWebMethod has attributes.
+                Assert.isTrue(
+                        !gvNixWebMethodAnnotation.getAttributeNames().isEmpty(),
+                        "The annotation @GvNIXWebMethod of '"
+                                .concat(methodMetadata.getMethodName()
+                                        .getSymbolName())
+                                .concat("' method in class '")
+                                .concat(governorTypeDetails.getName()
+                                        .getFullyQualifiedTypeName())
+                                .concat("' must have all its attributes defined."));
+
+                // Check if @GvNIXWebMethod attributes are correct to
+                // export method to web service annotation in ITD.
+                checkGvNIXWebMethodAnnotationAttributes(
+                        gvNixWebMethodAnnotation, governorTypeDetails,
+                        methodMetadata);
+
+                // Checks @WebParam and @GvNIXWebParam attributes for
+                // each input parameter in method.
+                checkGvNIXWebParamsAnnotationAttributes(governorTypeDetails,
+                        methodMetadata);
+            }
 
         }
+
+        // Update Annotation because Java Class or package has changed.
+        if (updateGvNIXWebServiceAnnotation) {
+
+            List<AnnotationAttributeValue<?>> gvNixAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+            gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
+                    .getAttribute(new JavaSymbolName("name")));
+            gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
+                    .getAttribute(new JavaSymbolName("targetNamespace")));
+            gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
+                    .getAttribute(new JavaSymbolName("serviceName")));
+            gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
+                    .getAttribute(new JavaSymbolName("address")));
+            gvNixAnnotationAttributes.add(new StringAttributeValue(
+                    new JavaSymbolName("fullyQualifiedTypeName"),
+                    governorTypeDetails.getName().getFullyQualifiedTypeName()));
+            gvNixAnnotationAttributes.add(gvNIXWebServiceAnnotation
+                    .getAttribute(new JavaSymbolName("exported")));
+
+            annotationsService.addJavaTypeAnnotation(
+                    governorTypeDetails.getName(),
+                    GvNIXWebService.class.getName(), gvNixAnnotationAttributes,
+                    true);
+        }
+
+        serviceLayerMetadata = new WSExportMetadata(
+                metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata, methodMetadataList);
 
         return serviceLayerMetadata;
     }

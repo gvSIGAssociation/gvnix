@@ -28,6 +28,7 @@ import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.support.OperationUtils;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -68,8 +69,9 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
         // Ensure we're notified of all metadata related to physical Java types,
         // in particular their initial creation
-        metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
-                .getMetadataIdentiferType(), getProvidesType());
+        metadataDependencyRegistry.registerDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
         addMetadataTrigger(new JavaType(GvNIXWebServiceProxy.class.getName()));
     }
 
@@ -122,7 +124,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
         WSImportMetadata metadata = null;
 
         // Import service if project has required prerequisites
-        if (wSConfigService.isProjectAvailable()) {
+        if (OperationUtils.isProjectAvailable(metadataService)) {
 
             // Check if Web Service definition is correct.
             PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata

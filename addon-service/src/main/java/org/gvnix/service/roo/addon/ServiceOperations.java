@@ -33,13 +33,6 @@ import org.springframework.roo.model.JavaType;
 public interface ServiceOperations {
 
     /**
-     * Is service layer command available on Roo console ?
-     * 
-     * @return Service layer command available on Roo console
-     */
-    boolean isProjectAvailable();
-
-    /**
      * Create a Service class.
      * 
      * @param serviceClass

@@ -34,6 +34,8 @@ import org.gvnix.service.roo.addon.converters.JavaTypeList;
 import org.gvnix.service.roo.addon.ws.export.WSExportOperations;
 import org.gvnix.service.roo.addon.ws.export.WSExportWsdlOperations;
 import org.gvnix.service.roo.addon.ws.importt.WSImportOperations;
+import org.gvnix.support.OperationUtils;
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
@@ -62,11 +64,13 @@ public class ServiceCommands implements CommandMarker {
     private WSImportOperations wSImportOperations;
     @Reference
     private WSExportWsdlOperations wSExportWsdlOperations;
+    @Reference
+    private MetadataService metadataService;
 
     @CliAvailabilityIndicator({ "service class", "service operation" })
     public boolean isCreateServiceClassAvailable() {
 
-        return serviceOperations.isProjectAvailable();
+        return OperationUtils.isProjectAvailable(metadataService);
     }
 
     @CliCommand(value = "service class", help = "Creates a new Service class in SRC_MAIN_JAVA.")
@@ -139,7 +143,7 @@ public class ServiceCommands implements CommandMarker {
     @CliAvailabilityIndicator("service define ws")
     public boolean isServiceExportAvailable() {
 
-        return wSExportOperations.isProjectAvailable();
+        return OperationUtils.isProjectAvailable(metadataService);
     }
 
     @CliCommand(value = "service define ws", help = "Defines a service endpoint interface (SEI) that will be mapped to a PortType in service contract. If target class doesn't exist the add-on will create it.")
@@ -163,13 +167,13 @@ public class ServiceCommands implements CommandMarker {
     @CliAvailabilityIndicator("service export operation")
     public boolean isServiceExportOperationAvailable() {
 
-        return wSExportOperations.isProjectAvailable();
+        return OperationUtils.isProjectAvailable(metadataService);
     }
 
     @CliAvailabilityIndicator("service list operation")
     public boolean isServiceListOperationAvailable() {
 
-        return wSExportOperations.isProjectAvailable();
+        return OperationUtils.isProjectAvailable(metadataService);
     }
 
     /**
@@ -250,7 +254,7 @@ public class ServiceCommands implements CommandMarker {
     @CliAvailabilityIndicator("service import ws")
     public boolean isServiceImportAvailable() {
 
-        return wSImportOperations.isProjectAvailable();
+        return OperationUtils.isProjectAvailable(metadataService);
     }
 
     @CliCommand(value = "service import ws", help = "Imports a Web Service to Service class. If the class doesn't exists the Addon will create it.")
@@ -271,7 +275,7 @@ public class ServiceCommands implements CommandMarker {
     @CliAvailabilityIndicator("service export ws")
     public boolean isServiceExportWsdl() {
 
-        return wSExportWsdlOperations.isProjectAvailable();
+        return OperationUtils.isProjectAvailable(metadataService);
     }
 
     @CliCommand(value = "service export ws", help = "Exports a Web Service from WSDL to java code with gvNIX annotations to generate this Web Service in project with dummy methods.")
@@ -305,12 +309,12 @@ public class ServiceCommands implements CommandMarker {
 
     @CliAvailabilityIndicator("service ws list")
     public boolean isServiceWsListAvalilable() {
-        return wSImportOperations.isProjectAvailable()
-                || wSExportOperations.isProjectAvailable();
+        return OperationUtils.isProjectAvailable(metadataService);
     }
 
+    @CliAvailabilityIndicator("service security ws")
     public boolean isServiceSecurityWs() {
-        return wSImportOperations.isProjectAvailable();
+        return OperationUtils.isProjectAvailable(metadataService);
     }
 
     @CliCommand(value = "service security ws", help = "Adds Signature to a imported Web Service request")

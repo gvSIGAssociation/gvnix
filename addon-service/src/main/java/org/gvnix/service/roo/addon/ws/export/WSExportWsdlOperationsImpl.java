@@ -42,11 +42,6 @@ public class WSExportWsdlOperationsImpl implements WSExportWsdlOperations {
 
     private static final String GENERATED_CXF_SOURCES_DIR = "target/generated-sources/cxf/server/";
 
-    public boolean isProjectAvailable() {
-
-        return wSExportWsdlConfigService.isProjectAvailable();
-    }
-
     /**
      * {@inheritDoc}
      */

@@ -122,10 +122,6 @@ public class WSExportExceptionMetadataProvider extends
 
         WSExportExceptionMetadata exceptionMetadata = null;
 
-        if (!wSConfigService.isProjectWebAvailable()) {
-            return null;
-        }
-
         // Install configuration to export services if it's not installed.
         wSConfigService.install(CommunicationSense.EXPORT);
         // Installs jax2ws plugin in project.

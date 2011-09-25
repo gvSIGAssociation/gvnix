@@ -137,72 +137,68 @@ public class WSExportXmlElementMetadataProvider extends
 
         WSExportXmlElementMetadata wSExportXmlElementMetadata = null;
 
-        if (wSConfigService.isProjectWebAvailable()) {
+        // Install configuration to export services if it's not installed.
+        wSConfigService.install(CommunicationSense.EXPORT);
+        // Installs jax2ws plugin in project.
+        wSConfigService.installJava2wsPlugin();
+        // Add GvNixAnnotations to the project.
+        annotationsService.addGvNIXAnnotationsDependency();
 
-            // Install configuration to export services if it's not installed.
-            wSConfigService.install(CommunicationSense.EXPORT);
-            // Installs jax2ws plugin in project.
-            wSConfigService.installJava2wsPlugin();
-            // Add GvNixAnnotations to the project.
-            annotationsService.addGvNIXAnnotationsDependency();
+        // We know governor type details are non-null and can be safely cast
 
-            // We know governor type details are non-null and can be safely cast
+        // Work out the MIDs of the other metadata we depend on
+        JavaType javaType = WSExportXmlElementMetadata
+                .getJavaType(metadataIdentificationString);
+        Path path = WSExportXmlElementMetadata
+                .getPath(metadataIdentificationString);
+        String entityMetadataKey = EntityMetadata.createIdentifier(javaType,
+                path);
+        String physicalTypeKey = PhysicalTypeIdentifier.createIdentifier(
+                javaType, path);
 
-            // Work out the MIDs of the other metadata we depend on
-            JavaType javaType = WSExportXmlElementMetadata
-                    .getJavaType(metadataIdentificationString);
-            Path path = WSExportXmlElementMetadata
-                    .getPath(metadataIdentificationString);
-            String entityMetadataKey = EntityMetadata.createIdentifier(
-                    javaType, path);
-            String physicalTypeKey = PhysicalTypeIdentifier.createIdentifier(
-                    javaType, path);
+        // Check if Web Service definition is correct.
+        PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
+                .getMemberHoldingTypeDetails();
 
-            // Check if Web Service definition is correct.
-            PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
-                    .getMemberHoldingTypeDetails();
-
-            ClassOrInterfaceTypeDetails governorTypeDetails;
-            if (physicalTypeDetails == null
-                    || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
-                // There is a problem
-                return null;
-            } else {
-                // We have reliable physical type details
-                governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
-            }
-
-            // Reset entityMetadata.
-            entityMetadata = null;
-            // We need to lookup the metadata we depend on
-            MetadataItem item = metadataService.get(entityMetadataKey);
-            if (item != null) {
-                entityMetadata = (EntityMetadata) item;
-            }
-
-            // We need to be informed if our dependent metadata changes
-            metadataDependencyRegistry.registerDependency(physicalTypeKey,
-                    metadataIdentificationString);
-
-            // Redefine field lists.
-            fieldMetadataElementList = new ArrayList<FieldMetadata>();
-            fieldMetadataTransientList = new ArrayList<FieldMetadata>();
-
-            AnnotationMetadata gvNixXmlElementAnnotationMetadata = MemberFindingUtils
-                    .getTypeAnnotation(governorTypeDetails, new JavaType(
-                            GvNIXXmlElement.class.getName()));
-
-            // Field @XmlElement and @XmlTransient annotations lists.
-            setTransientAndElementFields(governorTypeDetails,
-                    gvNixXmlElementAnnotationMetadata, physicalTypeKey);
-
-            // Create metaData with field list values.
-            wSExportXmlElementMetadata = new WSExportXmlElementMetadata(
-                    metadataIdentificationString, aspectName,
-                    governorPhysicalTypeMetadata, fieldMetadataElementList,
-                    fieldMetadataTransientList);
-
+        ClassOrInterfaceTypeDetails governorTypeDetails;
+        if (physicalTypeDetails == null
+                || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+            // There is a problem
+            return null;
+        } else {
+            // We have reliable physical type details
+            governorTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
         }
+
+        // Reset entityMetadata.
+        entityMetadata = null;
+        // We need to lookup the metadata we depend on
+        MetadataItem item = metadataService.get(entityMetadataKey);
+        if (item != null) {
+            entityMetadata = (EntityMetadata) item;
+        }
+
+        // We need to be informed if our dependent metadata changes
+        metadataDependencyRegistry.registerDependency(physicalTypeKey,
+                metadataIdentificationString);
+
+        // Redefine field lists.
+        fieldMetadataElementList = new ArrayList<FieldMetadata>();
+        fieldMetadataTransientList = new ArrayList<FieldMetadata>();
+
+        AnnotationMetadata gvNixXmlElementAnnotationMetadata = MemberFindingUtils
+                .getTypeAnnotation(governorTypeDetails, new JavaType(
+                        GvNIXXmlElement.class.getName()));
+
+        // Field @XmlElement and @XmlTransient annotations lists.
+        setTransientAndElementFields(governorTypeDetails,
+                gvNixXmlElementAnnotationMetadata, physicalTypeKey);
+
+        // Create metaData with field list values.
+        wSExportXmlElementMetadata = new WSExportXmlElementMetadata(
+                metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata, fieldMetadataElementList,
+                fieldMetadataTransientList);
 
         return wSExportXmlElementMetadata;
     }

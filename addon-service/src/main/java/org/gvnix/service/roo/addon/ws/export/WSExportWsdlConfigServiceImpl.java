@@ -106,7 +106,6 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.Assert;
@@ -156,34 +155,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
     protected static Logger logger = Logger
             .getLogger(WSExportWsdlConfigService.class.getName());
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isProjectAvailable() {
-        if (getPathResolver() == null) {
-            return false;
-        }
-        String webXmlPath = projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "/WEB-INF/web.xml");
-        if (!fileManager.exists(webXmlPath)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @return the path resolver or null if there is no user project
-     */
-    private PathResolver getPathResolver() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
-        if (projectMetadata == null) {
-
-            return null;
-        }
-        return projectMetadata.getPathResolver();
-    }
 
     /**
      * {@inheritDoc}

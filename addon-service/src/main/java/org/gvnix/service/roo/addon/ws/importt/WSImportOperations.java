@@ -35,13 +35,6 @@ import org.w3c.dom.Document;
 public interface WSImportOperations {
 
     /**
-     * Is service layer web service import command available on Roo console ?.
-     * 
-     * @return Service layer web service import command available on Roo console
-     */
-    boolean isProjectAvailable();
-
-    /**
      * Adds the gvNIX import annotation with some wsdl location in a class.
      * 
      * @param className

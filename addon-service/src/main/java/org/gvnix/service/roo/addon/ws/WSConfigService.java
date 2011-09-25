@@ -153,8 +153,7 @@ public interface WSConfigService {
      * @return
      */
     public boolean addExportLocation(String wsdlLocation,
-            Document wsdlDocument,
-            CommunicationSense type);
+            Document wsdlDocument, CommunicationSense type);
 
     /**
      * Imports a Web Service to class.
@@ -200,20 +199,6 @@ public interface WSConfigService {
      * @return true or false if it's configured
      */
     public boolean isLibraryInstalled(CommunicationSense type);
-
-    /**
-     * Is this a web project ?
-     * 
-     * @return true if this is a web project.
-     */
-    boolean isProjectWebAvailable();
-
-    /**
-     * Is this a project ?
-     * 
-     * @return true if this is a project.
-     */
-    boolean isProjectAvailable();
 
     /**
      * Add project properties values to pom.xml.
