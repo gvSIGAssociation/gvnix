@@ -273,8 +273,8 @@ public class WSImportMetadata extends
 
         // Create the method metadata with previous information
         MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
-                getId(), method.getModifiers(), new JavaSymbolName(method
-                        .getName()), returnType, javaTypes, javaNames,
+                getId(), method.getModifiers(), new JavaSymbolName(
+                        method.getName()), returnType, javaTypes, javaNames,
                 new InvocableMemberBodyBuilder().appendFormalLine(body
                         .getOutput()));
         for (JavaType javaType : throwsTypes) {
@@ -392,9 +392,9 @@ public class WSImportMetadata extends
         else if (name.indexOf('.') == -1) {
 
             // If not package separator, add generated client package
-            type = new JavaType(WsdlParserUtils
-                    .getTargetNamespaceRelatedPackage(root)
-                    + name);
+            type = new JavaType(
+                    WsdlParserUtils.getTargetNamespaceRelatedPackage(root)
+                            + name);
         }
         // Collection types
         else if ((index = name.indexOf('<')) != -1) {

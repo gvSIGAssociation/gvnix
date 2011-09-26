@@ -337,7 +337,8 @@ public class JavaParserServiceImpl implements JavaParserService {
             }
         }
         // Add old class imports into new class to avoid undefined imports
-        // Example: Not included HashSet import when exporting method in petclinic Owner
+        // Example: Not included HashSet import when exporting method in
+        // petclinic Owner
         classOrInterfaceTypeDetails.setRegisteredImports(mutableTypeDetails
                 .getRegisteredImports());
 
@@ -426,7 +427,8 @@ public class JavaParserServiceImpl implements JavaParserService {
             javaParserMethodMetadata = methodMetadata;
 
             // Only export methods in this entity: no parent class methods check
-            // Example: Duplicated method when exporting toString method in petclinic Owner
+            // Example: Duplicated method when exporting toString method in
+            // petclinic Owner
             String mdClass = methodMetadata.getDeclaredByMetadataId()
                     .substring(
                             methodMetadata.getDeclaredByMetadataId()

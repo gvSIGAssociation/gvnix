@@ -244,12 +244,13 @@ public class WSConfigServiceImplTest {
         targetNamespaceResult = wSConfigServiceImpl
                 .convertPackageToTargetNamespace(packageName);
 
-        Assert.isTrue(targetNamespaceResult != null
-                && targetNamespaceResult.length() != 0,
+        Assert.isTrue(
+                targetNamespaceResult != null
+                        && targetNamespaceResult.length() != 0,
                 "The method doesn't work properly.");
 
-        assertTrue("The namespace is not well generated", targetNamespaceResult
-                .contains(targetNamespaceExpected));
+        assertTrue("The namespace is not well generated",
+                targetNamespaceResult.contains(targetNamespaceExpected));
 
     }
 

@@ -131,8 +131,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     public boolean prepareMethodExceptions(JavaType serviceClass,
             JavaSymbolName methodName, String webServiceTargetNamespace) {
 
-        MethodMetadata methodToCheck = javaParserService
-                .getMethodByNameInAll(serviceClass, methodName);
+        MethodMetadata methodToCheck = javaParserService.getMethodByNameInAll(
+                serviceClass, methodName);
 
         Assert.isTrue(methodToCheck != null,
                 "The method: '" + methodName + " doesn't exists in the class '"
@@ -474,8 +474,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     public void prepareAuthorizedJavaTypesInOperation(JavaType serviceClass,
             JavaSymbolName methodName) {
 
-        MethodMetadata methodToCheck = javaParserService
-                .getMethodByNameInAll(serviceClass, methodName);
+        MethodMetadata methodToCheck = javaParserService.getMethodByNameInAll(
+                serviceClass, methodName);
 
         Assert.isTrue(methodToCheck != null,
                 "The method: '" + methodName + " doesn't exists in the class '"

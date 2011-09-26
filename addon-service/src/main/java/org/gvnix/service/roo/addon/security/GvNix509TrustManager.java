@@ -87,8 +87,7 @@ public class GvNix509TrustManager implements X509TrustManager {
      * @throws Exception
      */
     public X509Certificate[] addCerts(String host, File keystoreFile,
-            char[] passphrase)
-            throws Exception {
+            char[] passphrase) throws Exception {
 
         // Specific Exceptions thrown in this code
         // NoSuchAlgorithmException, KeyStoreException, CertificateException,
