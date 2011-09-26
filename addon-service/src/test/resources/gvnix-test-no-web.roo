@@ -1,0 +1,8 @@
+project --topLevelPackage es.kk
+service class --class ~.service.Kk
+service operation --name Kk --service ~.service.Kk
+service define ws --class ~.service.Kk
+service export operation --class ~.service.Kk --method Kk
+service list operation --class ~.service.Kk
+service ws list
+service import ws --class ~.service.Kk2 --wsdl http://wsf.cdyne.com/WeatherWS/Weather.asmx?WSDL
