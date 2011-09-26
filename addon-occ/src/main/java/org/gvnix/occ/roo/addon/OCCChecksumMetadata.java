@@ -94,16 +94,10 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     private static final String TO_STRING_CODE_LINE_FORMAT = "\tsb.append((String.valueOf(${property}).equals(\"null\") ? nullstr : String.valueOf(${property})) + separator);\n";
 
-    // DiSiD: Parent entity metadata unused
-    // private EntityMetadata parent;
-
     private EntityMetadata entityMetadata;
 
     // DiSiD: Used to get the type members
     private MemberDetailsScanner memberDetailsScanner;
-
-    // DiSiD: BeanInfoMetadata unused
-    // private BeanInfoMetadata beanInfoMetadata;
 
     private String itdFileContents = null;
 
@@ -132,9 +126,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
         PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
-        // PhysicalTypeDetails physicalTypeDetails =
-        // governorPhysicalTypeMetadata
-        // .getPhysicalTypeDetails();
 
         if (physicalTypeDetails == null
                 || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
@@ -150,20 +141,12 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
 
-        // Assert.notNull(entityMetadata, "EntityMetadata is needed");
         if (entityMetadata != null) {
-
-            // DiSiD: BeanInfoMetadata unused
-            // Assert.notNull(beanInfoMetadata, "BeanInfoMetadata is needed");
             this.entityMetadata = entityMetadata;
-            // this.beanInfoMetadata = beanInfoMetadata;
 
             if (!isValid()) {
                 return;
             }
-
-            // DiSiD: Parent entity metadata unused
-            // this.parent = parent;
 
             // Process values from the annotation, if present
             AnnotationMetadata annotation = MemberFindingUtils
@@ -264,10 +247,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     private String getCodeToTranformFieldsToString() {
         StringBuilder strb = new StringBuilder();
 
-        // DiSiD: Get accessors with memberDetailsScanner instead of use
-        // beanInfoMetadata
-        // for (MethodMetadata method :
-        // beanInfoMetadata.getPublicAccessors(false)) {
         MemberDetails members = memberDetailsScanner.getMemberDetails(
                 governorTypeDetails.getClass().getName(), governorTypeDetails);
         for (MemberHoldingTypeDetails memberHoldingTypeDetails : members
@@ -276,20 +255,12 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                     .getDeclaredMethods()) {
                 if (BeanInfoUtils.isAccessorMethod(method)) {
 
-                    // DiSiD: Use BeanInfoUtils instead of beanInfoMetadata
                     JavaSymbolName propertyName = BeanInfoUtils
                             .getPropertyNameForJavaBeanMethod(method);
-                    // JavaSymbolName propertyName = beanInfoMetadata
-                    // .getPropertyNameForJavaBeanMethod(method);
 
-                    // DiSiD: Use BeanInfoUtils instead of beanInfoMetadata
                     FieldMetadata field = BeanInfoUtils
                             .getFieldForPropertyName(members, propertyName);
                     if (field != null) {
-                        // FieldMetadata field = beanInfoMetadata
-                        // .getFieldForPropertyName(propertyName);
-                        // if (field != null && hasMutator(field)) {
-
                         if (MemberFindingUtils.getAnnotationOfType(field
                                 .getAnnotations(), new JavaType(
                                 "javax.persistence.Version")) != null) {
@@ -334,19 +305,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         return strb.toString();
     }
 
-    // DiSiD: Unused method
-    // private boolean hasMutator(FieldMetadata fieldMetadata) {
-    // for (MethodMetadata mutator : beanInfoMetadata.getPublicMutators()) {
-    // if (fieldMetadata.equals(beanInfoMetadata
-    // .getFieldForPropertyName(BeanInfoUtils
-    // .getPropertyNameForJavaBeanMethod(mutator))))
-    // // .getFieldForPropertyName(beanInfoMetadata
-    // // .getPropertyNameForJavaBeanMethod(mutator))))
-    // return true;
-    // }
-    // return false;
-    // }
-
     private String replaceParams(String template, Map<String, String> params) {
         for (Entry<String, String> entry : params.entrySet()) {
             template = StringUtils.replace(template, "${" + entry.getKey()
@@ -360,8 +318,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
         PhysicalTypeDetails ptd = governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
-        // PhysicalTypeDetails ptd = governorPhysicalTypeMetadata
-        // .getPhysicalTypeDetails();
 
         Assert.isInstanceOf(
                 MutableClassOrInterfaceTypeDetails.class,
@@ -416,15 +372,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
      * @return the checksum (may return null)
      */
     public FieldMetadata getChecksumField() {
-
-        // DiSiD: Parent entity metadata unused
-        // if (parent != null) {
-        // // TODO search for ChecksumField in parent
-        // // FieldMetadata result = parent.getVersionField();
-        // // if (result != null) {
-        // // return result;
-        // // }
-        // }
 
         // Try to locate an existing field with @javax.persistence.Version
         List<FieldMetadata> found = MemberFindingUtils.getFieldsWithAnnotation(
@@ -482,30 +429,20 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
         // We're creating one
         List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
-        // List<AnnotationMetadata> annotations = new
-        // ArrayList<AnnotationMetadata>();
         AnnotationMetadataBuilder idAnnotation = new AnnotationMetadataBuilder(
                 new JavaType("javax.persistence.Version"),
                 new ArrayList<AnnotationAttributeValue<?>>());
-        // AnnotationMetadata idAnnotation = new DefaultAnnotationMetadata(
-        // new JavaType("javax.persistence.Version"),
-        // new ArrayList<AnnotationAttributeValue<?>>());
         annotations.add(idAnnotation);
 
         idAnnotation = new AnnotationMetadataBuilder(new JavaType(
                 "javax.persistence.Transient"),
                 new ArrayList<AnnotationAttributeValue<?>>());
-        // idAnnotation = new DefaultAnnotationMetadata(new JavaType(
-        // "javax.persistence.Transient"),
-        // new ArrayList<AnnotationAttributeValue<?>>());
         annotations.add(idAnnotation);
 
         FieldMetadata field = new FieldMetadataBuilder(getId(),
                 Modifier.PRIVATE, annotations, checksumField,
                 JavaType.STRING_OBJECT).build();
-        // FieldMetadata field = new DefaultFieldMetadata(getId(),
-        // Modifier.PRIVATE, checksumField, JavaType.STRING_OBJECT, null,
-        // annotations);
+
         return field;
     }
 
@@ -517,17 +454,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
      */
     public MethodMetadata getChecksumAccessor() {
         FieldMetadata checksum = getChecksumField();
-
-        // DiSiD: Parent entity metadata unused
-        // if (parent != null) {
-        // // TODO search accesor in parent
-        // // FieldMetadata result = parent.getVersionField();
-        // // if (result != null) {
-        // // // It's the parent's responsibility to provide the accessor, not
-        // // // ours
-        // // return parent.getVersionAccessor();
-        // // }
-        // }
 
         // Compute the name of the accessor that will be produced
         String requiredAccessorName = "get"
@@ -552,12 +478,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                 new JavaSymbolName(requiredAccessorName),
                 checksum.getFieldType(), new ArrayList<AnnotatedJavaType>(),
                 new ArrayList<JavaSymbolName>(), bodyBuilder).build();
-        // return new DefaultMethodMetadata(getId(), Modifier.PUBLIC,
-        // new JavaSymbolName(requiredAccessorName), checksum
-        // .getFieldType(), new ArrayList<AnnotatedJavaType>(),
-        // new ArrayList<JavaSymbolName>(),
-        // new ArrayList<AnnotationMetadata>(), new ArrayList<JavaType>(),
-        // bodyBuilder.getOutput());
     }
 
     /**
@@ -567,17 +487,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
      *         field declared in this class)
      */
     public MethodMetadata getChecksumMutator() {
-
-        // DiSiD: Parent entity metadata unused
-        // if (parent != null) {
-        // // TODO search accesor in parent
-        // // FieldMetadata result = parent.getVersionField();
-        // // if (result != null) {
-        // // // It's the parent's responsibility to provide the accessor, not
-        // // // ours
-        // // return parent.getChecksumMutator();
-        // // }
-        // }
 
         // Locate the version field, and compute the name of the mutator that
         // will be produced
@@ -614,12 +523,6 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                 JavaType.VOID_PRIMITIVE,
                 AnnotatedJavaType.convertFromJavaTypes(paramTypes), paramNames,
                 bodyBuilder).build();
-        // return new DefaultMethodMetadata(getId(), Modifier.PUBLIC,
-        // new JavaSymbolName(requiredMutatorName),
-        // JavaType.VOID_PRIMITIVE, AnnotatedJavaType
-        // .convertFromJavaTypes(paramTypes), paramNames,
-        // new ArrayList<AnnotationMetadata>(), new ArrayList<JavaType>(),
-        // bodyBuilder.getOutput());
     }
 
     public static final String createIdentifier(JavaType javaType, Path path) {

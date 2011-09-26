@@ -61,7 +61,6 @@ import org.springframework.roo.support.util.FileCopyUtils;
 @Service
 public class OCCChecksumMetadataProvider implements
         ItdTriggerBasedMetadataProvider, MetadataNotificationListener {
-    // ItdRoleAwareMetadataProvider, MetadataNotificationListener {
 
     // From AbstractItdMetadataProvider
     private boolean dependsOnGovernorTypeDetailAvailability = true;
@@ -72,7 +71,6 @@ public class OCCChecksumMetadataProvider implements
     protected MetadataDependencyRegistry metadataDependencyRegistry;
     @Reference
     protected FileManager fileManager;
-    // private Set<ItdProviderRole> roles = new HashSet<ItdProviderRole>();
 
     // DiSiD: Used to get the type members
     @Reference
@@ -152,23 +150,13 @@ public class OCCChecksumMetadataProvider implements
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
 
-        // We know governor type details are non-null and can be safely cast
-
-        // We get govenor's EntityMetadata
-
         Path path = Path.SRC_MAIN_JAVA;
 
-        // DiSiD: beanInfoMetadata unused and use getMemberHoldingTypeDetails
-        // instead of getPhysicalTypeDetails
+        // We know governor type details are non-null and can be safely cast
+        // We get govenor's EntityMetadata
         String entityMetadataKey = EntityMetadata.createIdentifier(
                 governorPhysicalTypeMetadata.getMemberHoldingTypeDetails()
                         .getName(), path);
-        // String beanInfoMetadataKey = BeanInfoMetadata
-        // .createIdentifier(governorPhysicalTypeMetadata
-        // .getPhysicalTypeDetails().getName(), path);
-        // String entityMetadataKey = EntityMetadata
-        // .createIdentifier(governorPhysicalTypeMetadata
-        // .getPhysicalTypeDetails().getName(), path);
 
         // We get governor's Entity
         EntityMetadata entityMetadata = (EntityMetadata) metadataService
@@ -186,29 +174,14 @@ public class OCCChecksumMetadataProvider implements
                                 .concat("that extends of another one with a ")
                                 .concat("@javax.persistence.Version fiel. ")
                                 .concat("You should to apply OCC Checksum ")
-                                .concat("over that Entity, in your class: ")
+                                .concat("over that Entity in your class: ")
                                 .concat(declaredByType));
             }
         }
 
-        // We get governor's BeanInfo
-        // DiSiD: beanInfoMetadata unused
-        // BeanInfoMetadata beanInfoMetadata = (BeanInfoMetadata)
-        // metadataService
-        // .get(beanInfoMetadataKey);
-
-        // Now we walk the inheritance hierarchy until we find some existing
-        // EntityMetadata
-        // EntityMetadata parent = null;
-
-
         OCCChecksumMetadata metadata = new OCCChecksumMetadata(
                 metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, entityMetadata,
-
-                // DiSiD: Parent bean info and bean info metadatas unused and
-                // added memberDetailsScanner
-                // , parent, beanInfoMetadata);
                 memberDetailsScanner);
 
         return metadata;
@@ -291,16 +264,6 @@ public class OCCChecksumMetadataProvider implements
         this.metadataTriggers.remove(javaType);
     }
 
-    // protected final void addProviderRole(ItdProviderRole role) {
-    // Assert.notNull(role, "Provider role required");
-    // this.roles.add(role);
-    // }
-
-    // protected final void removeProviderRole(ItdProviderRole role) {
-    // Assert.notNull(role, "Provider role required");
-    // this.roles.remove(role);
-    // }
-
     protected boolean isIgnoreTriggerAnnotations() {
         return ignoreTriggerAnnotations;
     }
@@ -363,11 +326,6 @@ public class OCCChecksumMetadataProvider implements
                 && governorPhysicalTypeMetadata.getMemberHoldingTypeDetails() instanceof ClassOrInterfaceTypeDetails) {
             cid = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
                     .getMemberHoldingTypeDetails();
-            // if (governorPhysicalTypeMetadata.getPhysicalTypeDetails() != null
-            // && governorPhysicalTypeMetadata.getPhysicalTypeDetails()
-            // instanceof ClassOrInterfaceTypeDetails) {
-            // cid = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
-            // .getPhysicalTypeDetails();
 
             // Only create metadata if the type is annotated with one of the
             // metadata triggers
@@ -396,14 +354,6 @@ public class OCCChecksumMetadataProvider implements
                 && cid.getPhysicalTypeCategory() != PhysicalTypeCategory.CLASS) {
             produceMetadata = false;
         }
-
-        // if (fileManager.exists(itdFilename) && !produceMetadata) {
-        // // We don't seem to want metadata anymore, yet the ITD physically
-        // // exists, so get rid of it
-        // // This might be because the trigger annotation has been removed,
-        // // the governor is missing a class declaration etc
-        // fileManager.delete(itdFilename);
-        // }
 
         if (produceMetadata) {
             // This type contains an annotation we were configured to detect, or
@@ -462,8 +412,6 @@ public class OCCChecksumMetadataProvider implements
                         if (mutableFile != null) {
                             FileCopyUtils.copy(itd.getBytes(),
                                     mutableFile.getOutputStream());
-                            // FileCopyUtils.copy(itd, new
-                            // OutputStreamWriter(mutableFile.getOutputStream()));
                         }
                     } catch (IOException ioe) {
                         throw new IllegalStateException("Could not output '"
@@ -532,9 +480,5 @@ public class OCCChecksumMetadataProvider implements
             boolean dependsOnGovernorBeingAClass) {
         this.dependsOnGovernorBeingAClass = dependsOnGovernorBeingAClass;
     }
-
-    // public final Set<ItdProviderRole> getRoles() {
-    // return Collections.unmodifiableSet(this.roles);
-    // }
 
 }

@@ -101,7 +101,6 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
      */
     public boolean isOCCChecksumAvailable() {
         return entityOperations.isPersistentClassAvailable();
-        // return classpathOperations.isPersistentClassAvailable();
     }
 
     /*
@@ -119,6 +118,9 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
     private void doAddOccToEntity(JavaType entity, String fieldName,
             String digestMethod) {
 
+        // Check if given entity has a @Version field declared
+        // Maybe the given entity extends of a class declaring the @Version
+        // field, in this case we must to annotate parent class
         String entityMetadataKey = EntityMetadata.createIdentifier(entity,
                 Path.SRC_MAIN_JAVA);
         EntityMetadata entityMetadata = (EntityMetadata) metadataService
@@ -131,19 +133,15 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
                             versionField.getDeclaredByMetadataId().lastIndexOf(
                                     "?") + 1);
             if (!entityMetadataKey.endsWith(declaredByType)) {
+                // @Version field is declared in a parent class, so annotate
+                // the parent instead of given entity
                 entity = new JavaType(declaredByType);
-                System.out
-                        .println("************ Debemos anotar la clase padre "
-                                + declaredByType);
-                // return;
             }
         }
 
         // Load class details. If class not found an exception will be raised.
         ClassOrInterfaceTypeDetails tmpDetails = typeLocationService
                 .getClassOrInterface(entity);
-        // ClassOrInterfaceTypeDetails tmpDetails = classpathOperations
-        // .getClassOrInterface(entity);
 
         // Checks if it's mutable
         Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
@@ -153,8 +151,6 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
 
         List<? extends AnnotationMetadata> entityAnnotations = entityDetails
                 .getAnnotations();
-        // List<? extends AnnotationMetadata> entityAnnotations = entityDetails
-        // .getTypeAnnotations();
 
         // Looks for @GvNIXEntityOCCChecksumAnnotation and @RooEntity
         AnnotationMetadata occAnnotation = null;
@@ -176,10 +172,6 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
         }
 
         if (rooEntityAnnotation != null) {
-            // Checks it's a RooEntity
-            // Assert.notNull(rooEntityAnnotation, entityDetails.getName()
-            // + " isn't a RooEntity");
-
             if (occAnnotation != null) {
                 // Already set annotation. Nothing to do
                 return;
@@ -203,15 +195,9 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
             occAnnotation = new AnnotationMetadataBuilder(new JavaType(
                     GvNIXEntityOCCChecksum.class.getName()),
                     occAnnotationAttributes).build();
-            // occAnnotation = new DefaultAnnotationMetadata(new JavaType(
-            // GvNIXEntityOCCChecksum.class.getName()),
-            // occAnnotationAttributes);
 
             // Adds GvNIXEntityOCCChecksum to the entity
             entityDetails.addTypeAnnotation(occAnnotation);
-
-            // TODO Does it need to do anything more to make persistent this
-            // changes?
         }
     }
 
@@ -246,17 +232,11 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
                 if (ptm == null
                         || ptm.getMemberHoldingTypeDetails() == null
                         || !(ptm.getMemberHoldingTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
-                    // || ptm.getPhysicalTypeDetails() == null
-                    // || !(ptm.getPhysicalTypeDetails() instanceof
-                    // ClassOrInterfaceTypeDetails)) {
                     continue;
                 }
 
                 ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) ptm
                         .getMemberHoldingTypeDetails();
-                // ClassOrInterfaceTypeDetails cid =
-                // (ClassOrInterfaceTypeDetails) ptm
-                // .getPhysicalTypeDetails();
                 if (Modifier.isAbstract(cid.getModifier())) {
                     continue;
                 }
@@ -266,16 +246,6 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
                 if (metadata != null) {
                     doAddOccToEntity(javaType, fieldName, digestMethod);
                 }
-                // Set<MetadataItem> metadata =
-                // itdMetadataScanner.getMetadata(id);
-                // for (MetadataItem item : metadata) {
-                // if (item instanceof EntityMetadata) {
-                // EntityMetadata em = (EntityMetadata) item;
-                // doAddOccToEntity(javaType, fieldName, digestMethod);
-                // break;
-                // }
-                // }
-
             }
         }
         return;
