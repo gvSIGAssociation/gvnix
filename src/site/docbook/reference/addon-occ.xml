@@ -1,107 +1,205 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter version="5.0" xml:id="addon-persistence"
+<chapter version="5.0" xml:id="addon-persistence" xml:lang="es"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:ns5="http://www.w3.org/1998/Math/MathML"
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
-         xmlns:ns="http://docbook.org/ns/docbook"
-         xml:lang="es">
+         xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Add-on OCC (Optimistic Concurrency Control)</title>
 
   <para xml:lang="es">Add-on de utilidades enfocadas a la persistencia de las
   entidades.</para>
 
+  <para xml:lang="es">Este add-on contiene un conjunto de herramientas
+  enfocadas a la persistencia de Entidades del modelo de datos.</para>
 
-    <para xml:lang="es">Este add-on contiene un conjunto de herramientas
-    enfocadas a la persistencia de Entidades del modelo de datos.</para>
+  <para xml:lang="es">La herramientas disponibles son:</para>
 
-    <para xml:lang="es">La herramientas disponibles son:</para>
+  <variablelist>
+    <varlistentry>
+      <term><link
+      linkend="addon-persistence_occchecksum">OCCCheckSum</link></term>
+
+      <listitem>
+        <para xml:lang="es">Control de <emphasis>Concurrencia
+        Optimista</emphasis> basada en <emphasis>CheckSum</emphasis> de los
+        datos.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+
+  <section xml:id="addon-persistence_occchecksum">
+    <title>OCCCheckSum</title>
+
+    <para xml:lang="es">Esta utilidad añade a las entidades la funcionalidad
+    de <emphasis>Control de Concurrencia</emphasis> basada una operación de
+    <emphasis>Checksum</emphasis> sobre todos los campos persistentes que
+    contiene la entidad.</para>
+
+    <para xml:lang="es">Esta funcionalidad nace de la necesidad de Controlar
+    la concurrencia sobre modelos de datos heredados en los que, por
+    requerimientos del sistema, no podemos alterar el modelo para añadir un
+    campos de control como <emphasis>version</emphasis> (numérico que
+    identifica la versión del objeto) o <emphasis>lastUpdate</emphasis> (fecha
+    de la última actualización) en los que se basa el mecanismo de
+    <emphasis>Control de Concurrencia</emphasis> de la especificación <link
+    xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr220/index.html">JPA</link>.</para>
+
+    <para xml:lang="es">El checksum <emphasis>se calcula en el momento de la
+    carga</emphasis> de la entidad desde la base de datos es almacenado en una
+    <emphasis>propiedad no persistente</emphasis>.</para>
+
+    <para xml:lang="es">En el momento de <emphasis>actualizar o
+    eliminar</emphasis> un elemento de dicha entidad se carga el elemento que
+    está persistido en la Base de dato y <emphasis>se compara el valor de
+    Checksum</emphasis> con el que se calculó en el momento de la carga del
+    elemento editado o a eliminar. <emphasis>Si no coincide se lanza una
+    Excepción </emphasis>(<link
+    xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OptimisticLockException.html">javax.persistence.OptimisticLockException</link>)
+    y la operación no se realizará.</para>
+
+    <para xml:lang="es">Esta operación supone un coste adicional en las tareas
+    de persistencia, pero no debería ser apreciable en condiciones del uso
+    cotidiano de la aplicación excepto de procesos de actualizaciones masivas
+    de registros.</para>
+
+    <para xml:lang="es">Para activar este comportamiento en una Entidad se
+    puede usar los comandos:</para>
 
     <variablelist>
       <varlistentry>
         <term><link
-        linkend="addon-persistence_occchecksum">OCCCheckSum</link></term>
+        linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
+        checksum set</link></term>
 
         <listitem>
-          <para xml:lang="es">Control de <emphasis>Concurrencia
-          Optimista</emphasis> basada en <emphasis>CheckSum</emphasis> de los
-          datos.</para>
+          <para xml:lang="es">Establecer el control de concurrencia a una
+          entidad.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><link
+        linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">occ
+        checksum all</link></term>
+
+        <listitem>
+          <para xml:lang="es">Establecer el control de concurrencia a todas
+          las entidades de la aplicación.</para>
         </listitem>
       </varlistentry>
     </variablelist>
 
-    <section xml:id="addon-persistence_occchecksum">
-      <title>OCCCheckSum</title>
+    <para xml:lang="es">Estos comandos añaden a los ficheros
+    <filename>.java</filename> de las entidades una anotación
+    <classname>@GvNIXEntityOCCChecksum</classname> y un campo no persistente
+    para almacenar el Checksum de la lectura. En base a esta anotación se
+    generará un <emphasis>ITD</emphasis> (fichero
+    <filename>*_gvNIX_occChecksum.aj</filename>) con toda la lógica necesaria.
+    Está lógica sera manejada automáticamente por el add-on.</para>
 
-      <para xml:lang="es">Esta utilidad añade a las entidades la funcionalidad
-      de <emphasis>Control de Concurrencia</emphasis> basada una operación de
-      <emphasis>Checksum</emphasis> sobre todos los campos persistentes que
-      contiene la entidad.</para>
+    <para xml:lang="es">Si se intenta aplicar el control de concurrencia sobre
+    una entidad que extiende de otra y en en la clase padre existe un campo
+    anotado con @javax.persistence.Version, el Add-on detectará esta
+    circunstancia y entonces aplicará el control de concurrencia sobre la
+    clase padre.</para>
 
-      <para xml:lang="es">Esta funcionalidad nace de la necesidad de Controlar
-      la concurrencia sobre modelos de datos heredados en los que, por
-      requerimientos del sistema, no podemos alterar el modelo para añadir un
-      campos de control como <emphasis>version</emphasis> (numérico que
-      identifica la versión del objeto) o <emphasis>lastUpdate</emphasis>
-      (fecha de la última actualización) en los que se basa el mecanismo de
-      <emphasis>Control de Concurrencia</emphasis> de la especificación <link
-      xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr220/index.html">JPA</link>.</para>
+    <para xml:lang="es">Para ver todos los comandos y sus opciones ver el
+    <link linkend="apendice-comandos_addon-persistence_occchecksum">apéndice
+    de comandos</link>.</para>
 
-      <para xml:lang="es">El checksum <emphasis>se calcula en el momento de la
-      carga</emphasis> de la entidad desde la base de datos es almacenado en
-      una <emphasis>propiedad no persistente</emphasis>.</para>
+    <note>
+      <para>Se ha detectado que al aplicar la funcionalidad de este Add-on
+      sobre entidades que tienen generados, o sobre los que se van a generar,
+      tests unitarios e integración (mediante el comando <emphasis>test
+      integration</emphasis>) los tests de integración se generan con errores
+      de compilación. Se debe a como el Add-on Integration Tests de Roo genera
+      el código de los tests. De momento, solo hay dos opciones para
+      solucionarlo:</para>
 
-      <para xml:lang="es">En el momento de <emphasis>actualizar o
-      eliminar</emphasis> un elemento de dicha entidad se carga el elemento
-      que está persistido en la Base de dato y <emphasis>se compara el valor
-      de Checksum</emphasis> con el que se calculó en el momento de la carga
-      del elemento editado o a eliminar. <emphasis>Si no coincide se lanza una
-      Excepción </emphasis>(<link
-      xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OptimisticLockException.html">javax.persistence.OptimisticLockException</link>)
-      y la operación no se realizará.</para>
+      <orderedlist>
+        <listitem>
+          <para>La menos recomendable: Desactivar la generación de los tests
+          de los métodos <emphasis>flush()</emphasis> y
+          <emphasis>merge()</emphasis> (métodos
+          <emphasis>testFlush()</emphasis> y
+          <emphasis>testMerge()</emphasis>). Para ello hay que editar los
+          archivos <emphasis>src/test/java/**/*IntegrationTest.java</emphasis>
+          y añadir a la anotación <emphasis>@RooIntegrationTest</emphasis> los
+          atributos <emphasis>flush = false</emphasis> y <emphasis>merge =
+          false</emphasis>, de esta manera estos dos tests no se generan
+          quedando la batería de pruebas incompleta:</para>
 
-      <para xml:lang="es">Esta operación supone un coste adicional en las
-      tareas de persistencia, pero no debería ser apreciable en condiciones
-      del uso cotidiano de la aplicación excepto de procesos de
-      actualizaciones masivas de registros.</para>
+          <programlisting>@RooIntegrationTest(entity = MiClase.class, <emphasis
+              role="bold">flush = false, merge = false</emphasis>)</programlisting>
+        </listitem>
 
-      <para xml:lang="es">Para activar este comportamiento en una Entidad se
-      puede usar los comandos:</para>
+        <listitem>
+          <para>La más recomendable: Corregir los dos test mencionados en el
+          punto anterior. Para ello debemos hacer <emphasis>pushin</emphasis>
+          de estos dos métodos que se encuentran declarados en
+          <emphasis>src/test/java/**/*IntegrationTest_Roo_IntegrationTest.aj</emphasis>
+          y también el campo &lt;nombre_entidad&gt;DataOnDemand dod, anotado
+          con @Autowired, y llevarlo todo a la clase Java del test de
+          integración. Una vez tengamos los test en la clase Java, corregimos
+          los errores de compilación cambiando el operador
+          <emphasis>"&gt;"</emphasis> por el método
+          <emphasis>equals</emphasis>. A continuación vemos un ejemplo
+          extraido del proyecto de ejemplo PetClinic que se distribuye junto a
+          gvNIX/Roo.</para>
 
-      <variablelist>
-        <varlistentry>
-          <term><link
-          linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ checksum set</link></term>
+          <programlisting>package com.springsource.petclinic.domain;
 
-          <listitem>
-            <para xml:lang="es">Establecer el control de concurrencia a una
-            entidad.</para>
-          </listitem>
-        </varlistentry>
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.roo.addon.test.RooIntegrationTest;
 
-        <varlistentry>
-          <term><link
-          linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">occ checksum all</link></term>
+@RooIntegrationTest(entity = Owner.class)
+public class OwnerIntegrationTest {
+    @Autowired
+    private OwnerDataOnDemand dod;
 
-          <listitem>
-            <para xml:lang="es">Establecer el control de concurrencia a todas
-            las entidades de la aplicación.</para>
-          </listitem>
-        </varlistentry>
-      </variablelist>
+    @Test
+    public void testMarkerMethod() {
 
-      <para xml:lang="es">Estos comandos añaden a los ficheros
-      <filename>.java</filename> de las entidades una anotación
-      <classname>@GvNIXEntityOCCChecksum</classname> y un campo no persistente
-      para almacenar el Checksum de la lectura. En base a esta anotación se
-      generará un <emphasis>ITD</emphasis> (fichero
-      <filename>*_gvNIX_occChecksum.aj</filename>) con toda la lógica
-      necesaria. Está lógica sera manejada automáticamente por el
-      add-on.</para>
+    }
 
-      <para xml:lang="es">Para ver todos los comandos y sus opciones ver el
-      <link linkend="apendice-comandos_addon-persistence_occchecksum">apéndice
-      de comandos</link>.</para>
-    </section>
+    @Test
+    public void testFlush() {
+        com.springsource.petclinic.domain.Owner obj = dod.getRandomOwner();
+        org.junit.Assert.assertNotNull("Data on demand for 'Owner' failed to initialize correctly", obj);
+        java.lang.Long id = obj.getId();
+        org.junit.Assert.assertNotNull("Data on demand for 'Owner' failed to provide an identifier", id);
+        obj = com.springsource.petclinic.domain.Owner.findOwner(id);
+        org.junit.Assert.assertNotNull("Find method for 'Owner' illegally returned null for id '" + id + "'", obj);
+        boolean modified =  dod.modifyOwner(obj);
+        java.lang.String currentVersion = obj.getOccChekcsum();
+        obj.flush();
+        org.junit.Assert.assertTrue("OccCheckSum for 'Owner' failed to modify on flush directive", 
+                                 (currentVersion != null &amp;&amp; <emphasis
+              role="bold">obj.getOccChekcsum().equals(currentVersion)</emphasis>) || !modified);
+    }
+
+    @Test
+    public void testMerge() {
+        com.springsource.petclinic.domain.Owner obj = dod.getRandomOwner();
+        org.junit.Assert.assertNotNull("Data on demand for 'Owner' failed to initialize correctly", obj);
+        java.lang.Long id = obj.getId();
+        org.junit.Assert.assertNotNull("Data on demand for 'Owner' failed to provide an identifier", id);
+        obj = com.springsource.petclinic.domain.Owner.findOwner(id);
+        boolean modified =  dod.modifyOwner(obj);
+        java.lang.String currentVersion = obj.getOccChekcsum();
+        com.springsource.petclinic.domain.Owner merged = (com.springsource.petclinic.domain.Owner) obj.merge();
+        obj.flush();
+        org.junit.Assert.assertEquals("Identifier of merged object not the same as identifier of original object", merged.getId(), id);
+        org.junit.Assert.assertTrue("OccCheckSum for 'Owner' failed to modify on merge and flush directive", 
+                                (currentVersion != null &amp;&amp; <emphasis
+              role="bold">obj.getOccChekcsum().equals(currentVersion)</emphasis>) || !modified);
+    }
+}</programlisting>
+        </listitem>
+      </orderedlist>
+    </note>
+  </section>
 </chapter>
