@@ -145,7 +145,7 @@ public class Controlador2 {
       mostrar una entidad en formato patrón tabular. Por defecto, la jspx
       asociada a este patrón utiliza el componente
       <emphasis>&lt;form:update/&gt;</emphasis> de la librearía de tags
-      <emphasis>/pattern/form</emphasis>. </para>
+      <emphasis>/pattern/form</emphasis>.</para>
 
       <para>Este componente por defecto muestra y deja habilitado el campo
       identificador de la entidad en el formulario de creación y actualización
@@ -163,6 +163,12 @@ public class Controlador2 {
       entidad es el campo id, si por algún motivo no fuese el caso, podemos
       indicar que campo hace las veces de identificador mediante el atributo
       <emphasis role="bold">idField</emphasis>.</para>
+
+      <para>Otro atributo con el que cuenta el componente update es el
+      atributo <emphasis role="bold">finder</emphasis> cuyo valor indica con
+      que buscador enlazará la <emphasis>pestaña lupa</emphasis> que se
+      muestra a la derecha de la caja principal de la vista del patrón
+      tabular.</para>
     </section>
 
     <section>
@@ -212,6 +218,47 @@ public class Controlador2 {
 
       <para>posicionando los campos <emphasis>name</emphasis> y
       <emphasis>weight</emphasis> uno al lado del otro.</para>
+
+      <para>La jspx propia del patrón registro usa el componente
+      <emphasis>show.tag</emphasis> de la librería de <emphasis>tags
+      pattern</emphasis>.</para>
+
+      <programlisting>&lt;page:show id="ps_com_springsource_petclinic_domain_Pet" object="${pet}" path="/pets" z="FrMAP8iVoUnyo/I+XWaK7GumSjc="&gt;</programlisting>
+
+      <para>Este componente acepta algunos atributos interesantes:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>list = true|false</emphasis> indica si queremos que
+          se muestre el icono de enlace a la vista list de la Entidad.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>create = true|false</emphasis> indica si se ha de
+          mostrar el icono que enlaza con el formulario para crear un nuevo
+          registro.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>update = true|false</emphasis> indica si se ha de
+          mostrar el icono que enlaza con el formulario de edición del
+          registro visualizado.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>delete = true|false</emphasis> indica si queremos
+          habilitar el borrado de registros desde esta vista.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>finder = cadena nobre buscador</emphasis> (ejemplo
+          <emphasis>finder="ByOwner"</emphasis>) si está establecido, en la
+          vista del patrón registro se mostrará un enlace que nos lleva al
+          buscador indicado por el valor del atributo. Este enlace es la
+          <emphasis>pestaña lupa</emphasis>, a la derecha de la caja principal
+          de la vista del patrón.</para>
+        </listitem>
+      </itemizedlist>
     </section>
 
     <section>
