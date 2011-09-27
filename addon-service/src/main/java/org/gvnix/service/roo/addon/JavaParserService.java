@@ -206,6 +206,16 @@ public interface JavaParserService {
     public List<MethodMetadata> getMethodsInAll(JavaType name);
 
     /**
+     * Returns FieldMetadata in selected class and related AJs.
+     * 
+     * @param name
+     *            Class name to search the field.
+     * @return All fields in serviceClass and related AJs. If field doesn't
+     *         exists returns empty list.
+     */
+    public List<FieldMetadata> getFieldsInAll(JavaType name);
+
+    /**
      * Create GvNIX annotated class.
      * 
      * @param javaType

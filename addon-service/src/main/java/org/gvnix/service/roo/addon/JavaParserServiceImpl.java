@@ -948,6 +948,23 @@ public class JavaParserServiceImpl implements JavaParserService {
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * <p>
+     * Search all fields in class and related AJs.
+     * </p>
+     */
+    public List<FieldMetadata> getFieldsInAll(JavaType name) {
+
+        List<FieldMetadata> methods = new ArrayList<FieldMetadata>();
+        for (MemberHoldingTypeDetails member : getMemberDetails(name)) {
+            methods.addAll(member.getDeclaredFields());
+        }
+
+        return methods;
+    }
+
+    /**
      * Get the list of type details (Java and AJs) from a Java type.
      * 
      * @param name
