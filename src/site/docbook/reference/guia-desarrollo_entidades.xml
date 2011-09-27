@@ -1097,7 +1097,15 @@ roo-gvNIX&gt; <command>controller scaffold --entity ~.domain.Repartidor --class 
       PostgreSQL). El driver a utilizar lo detecta gvNIX y nos pregunta si
       queremos descargarlo e instalarlo la primera vez que invocamos los
       comandos <emphasis>database introspect</emphasis> o <emphasis>database
-      reverse engineer.</emphasis><warning>
+      reverse engineer.</emphasis></para>
+
+      <para><warning>
+          <para>Si estás trabajando en el entorno de la CIT, antes de seguir
+          adelante es recomendable que añadas el repositorio Maven de la CIT
+          al pom.xml del proyecto. En la <link
+          linkend="recetas-repositorio_maven">sección de recetas</link> hay un
+          ejemplo de como hacerlo.</para>
+        </warning><warning>
           <para>Si lanzamos este comando con la configuración actual del
           proyecto que usa HYPERSONIC_IN_MEMORY como BBDD nos indicará que no
           hay driver disponible para HSQLDB.</para>

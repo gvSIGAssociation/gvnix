@@ -48,9 +48,9 @@
         <row>
           <entry><link
           linkend="apendice-comandos_addon-web_mvc_relation_pattern"><emphasis>web
-          mvc pattern update</emphasis></link></entry>
+          mvc pattern install</emphasis></link></entry>
 
-          <entry>Actualiza los componentes usados por los patrones.</entry>
+          <entry>Instala los componentes usados por los patrones.</entry>
         </row>
       </tbody>
     </tgroup>
@@ -168,10 +168,10 @@
   </section>
 
   <section>
-    <title>web mvc pattern update</title>
+    <title>web mvc pattern install</title>
 
-    <para>Fuerza la actualización los componentes utilizados por los patrones.
-    Los componentes son:</para>
+    <para>Fuerza la instalación/actualización de los componentes utilizados
+    por los patrones. Los componentes son:</para>
 
     <itemizedlist>
       <listitem>

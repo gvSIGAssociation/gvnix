@@ -181,6 +181,12 @@
     <xi:include href="addon-web-mvc-binding.xml" />
   </part>
 
+  <part>
+    <title>Recetas de desarrollo</title>
+
+    <xi:include href="recetas.xml" />
+  </part>
+
   <part xml:id="desarrollo-addons">
     <title xml:lang="es">Desarrollo de nuevos add-ons</title>
 
@@ -203,6 +209,10 @@
     </partintro>
 
     <xi:include href="apendice-comandos.xml" />
+  </part>
+
+  <part>
+    <title>Recursos</title>
 
     <xi:include href="recursos.xml" />
   </part>

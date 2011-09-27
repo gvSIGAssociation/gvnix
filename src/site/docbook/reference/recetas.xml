@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="recetas" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Recetas</title>
+
+  <para>En este capítulo veremos como hacer algunas modificaciones sobre el
+  código que genera gvNIX para adaptarlo a nuestras necesidades.</para>
+
+  <section xml:id="recetas-repositorio_maven">
+    <title>Repositorios Maven</title>
+
+    <para>En la mayoria de casos, cuando una funcionalidad ofrecida por gvNIX
+    requiere de librerías externas, el Add-on en cuestión registra un nuevo
+    repositorio de arterfactos Maven en el pom.xml que gestiona el proyecto.
+    Sin embargo podemos vernos con la necesidad de tener que añadir alguno
+    manualmente.</para>
+
+    <section>
+      <title>Editando pom.xml manualmente</title>
+
+      <para>Para hacerlo tenemos que editar el fichero pom.xml y en la sección
+      &lt;repositories/&gt; añadir la definición de repositorio que
+      necesitemos. Por ejemplo, veamos como definir el repositorio Maven
+      interno de la Conselleria de Infraestructuras, Transportes y Medio
+      Ambiente <emphasis role="bold">(este repositorio es accesible únicamente
+      desde las oficinas de la Conselleria)</emphasis>.</para>
+
+      <programlisting>&lt;repositories&gt;
+    ...
+    &lt;repository&gt;
+        &lt;id&gt;citma-maven-release&lt;/id&gt;
+        &lt;name&gt;CITMA Maven Release Repository&lt;/name&gt;
+        &lt;url&gt;http://scmcit.gva.es/release&lt;/url&gt;
+    &lt;/repository&gt;
+    ...
+&lt;/repositories&gt;</programlisting>
+    </section>
+
+    <section>
+      <title>Mediante plugin M2Eclipse en Eclipse IDE</title>
+
+      <para><emphasis>TBD</emphasis></para>
+    </section>
+  </section>
+
+  <section xml:id="recetas-finders">
+    <title>Desarrollo de buscadores</title>
+
+    <para>gvNIX/Roo ofrece la funcionalidad de generar buscadores por
+    entidades del modelo de la aplicación mediante el comando <emphasis>finder
+    add</emphasis>. El comando espera que especifiquemos el buscador a generar
+    en un formato determinado. Para conocer el formato nos podemos ayudar del
+    comando <emphasis>finder list</emphasis>. Veamos como generar un buscador
+    sobre una de las entidades del proyecto de ejemplo PetClinic que viene con
+    la distribución de gvNIX. Usaremos la entidad Owner.</para>
+
+    <para>Ejecutamos el comando finder list sobre Owner</para>
+
+    <programlisting>roo-gvNIX&gt; finder list --class ~.domain.Owner --depth 2 --filter LastName
+...
+findOwnersByLastNameLikeAndCityLike(String lastName, String city)
+...</programlisting>
+
+    <para>En el comando indicamos sobre que entidad queremos generar el
+    buscador (<emphasis>--class</emphasis>). El resto de parámetros son
+    opcionales, <emphasis>--depth</emphasis> indica que nivel de "profundidad"
+    queremos que tenga en cuenta (debido a una limitación auque indiquemos una
+    profundidad mayor que 3 siempre nos mostrará como máximo 3 niveles) y
+    <emphasis>--filter</emphasis> indica un filtro para hacer que solo se
+    muestren opciones de buscador que contengan la cadena indicada en su
+    definición.</para>
+
+    <para>Nos devuelve varias posibilidades, de ellas para este ejemplo
+    escogemos findOwnersByLastNameLikeAndCityLike que genera un buscador de
+    Owners cuyo <emphasis>lastName</emphasis> contenga la cadena que se le
+    pase como parámetro y cuya <emphasis>city</emphasis> también contenga la
+    cadena dada usando el operador <emphasis>LIKE</emphasis>.</para>
+
+    <para>Si ejecutamos el comando finder add nos generará el buscador a nivel
+    de la entidad y si tenemos definida la capa Web creará el controller y la
+    JSPX necesaria para el formulario que invocará el buscador que hemos
+    definido.</para>
+
+    <programlisting>~.domain.Owner roo-gvNIX&gt; finder add --class ~.domain.Owner --finderName <emphasis
+        role="bold">findOwnersByLastNameLikeAndCityLike</emphasis>
+2840bdf Updated SRC_MAIN_JAVA/com/springsource/petclinic/domain/Owner.java
+eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
+9f5b38e Updated SRC_MAIN_WEBAPP/WEB-INF/views/owners/views.xml
+105ec93 Updated SRC_MAIN_WEBAPP/WEB-INF/i18n/application.properties
+7047c54 <emphasis role="bold">Created SRC_MAIN_JAVA/com/springsource/petclinic/web/OwnerController_Roo_Controller_Finder.aj</emphasis>
+9b1f4dc <emphasis role="bold">Created SRC_MAIN_JAVA/com/springsource/petclinic/domain/Owner_Roo_Finder.aj</emphasis>
+38002fb <emphasis role="bold">Created SRC_MAIN_WEBAPP/WEB-INF/views/owners/findOwnersByLastNameLikeAndCityLike.jspx</emphasis></programlisting>
+
+    <para><emphasis role="bold">El Add-on Finder tiene una limitación que
+    impone el SO Windows en el tamaño máximo del nombre de
+    archivos</emphasis>. Como vemos en el ejemplo anterior se genera el
+    archivo <emphasis>findOwnersByLastNameLikeAndCityLike.jspx</emphasis>. La
+    limitación del tamaño máximo de nombre de archivo limita el comando finder
+    add a nombres de buscadores que generen paths a archivo jspx de tamaño
+    menor de 244 caracteres.</para>
+
+    <para>Hay un truco para poder generar estos buscadores. Consiste en
+    dividir el buscador que queremos en varios más pequeños y al final unir el
+    código que se genera para cada uno de ellos en un unico método. Esto
+    implica tener que modificar el código que se ha generado para el buscador
+    en la Entidad, el Controller y la jspx. Un trabajo manual pero que puede
+    ayudarnos a la hora de montar buscadores por multitud de campos. Al final
+    de este trabajo tendríamos una jspx con un nombre arbitrario (por ejemplo
+    <emphasis>findOwnersByTodo.jspx</emphasis>) en el que tendríamos el
+    formulario que contredría todos los campos de los otros formularios que se
+    hayan generado al ejecutar los distintos comando <emphasis>finder
+    add</emphasis>.</para>
+
+    <section>
+      <title>Modificar buscadores generados</title>
+
+      <para>El comportamiento que se implementa automáticamente al generar un
+      buscador es esperar que todos los campos de busqueda son obligatorios,
+      es decir, en el ejemplo anterior, el buscador siempre intentará ejecutar
+      la consulta "<emphasis>SELECT * FROM Owners WHERE lastName LIKE '%xxx%'
+      AND city LIKE '%yyyy%'</emphasis>", pero si no indicaramos alguno de los
+      parámetros devolverá una excepción indicando que falta un parámetro
+      requerido. En ocasiones no queremos que esto suceda así, es decir,
+      podríamos querer que los filtros del WHERE cuyos parámetros no se han
+      informado no se incluyeran en la consulta. Para hacerlo debemos
+      modificar el código del método <emphasis>finderByXxxx</emphasis> que se
+      encuentra declarado en <emphasis>*_Roo_Finder.aj</emphasis>. Veamos como
+      hacerlo.</para>
+
+      <para>Hacemos <emphasis>Push In</emphasis> del método tal y como
+      comentamos en la sección sobre <link
+      linkend="guia-desarrollo_generacion-codigo">modificación del código
+      generado</link> y lo llevamos al .java de la entidad. Una vez allí lo
+      modificamos para que no requiera los campos y que construya la consulta
+      dependiendo de que parámetros se han informado:</para>
+
+      <programlisting>public static TypedQuery&lt;Owner&gt; findOwnersByLastNameLikeAndCityLike(String lastName, String city) {
+    StringBuilder query = new StringBuilder("SELECT o FROM Owner AS o");
+    StringBuilder whereClause = new StringBuilder();
+
+    if (lastName != null &amp;&amp; lastName.length() &gt; 0) {
+      lastName = lastName.replace('*', '%');
+      if (lastName.charAt(0) != '%') {
+          lastName = "%" + lastName;
+      }
+      if (lastName.charAt(lastName.length() - 1) != '%') {
+          lastName = lastName + "%";
+      }
+      whereClause.append(" WHERE LOWER(o.lastName) LIKE LOWER(:lastName)");
+    }
+
+    if (city != null &amp;&amp; city.length() &gt; 0) {
+      city = city.replace('*', '%');
+      if (city.charAt(0) != '%') {
+          city = "%" + city;
+      }
+      if (city.charAt(city.length() - 1) != '%') {
+          city = city + "%";
+      }
+      if (whereClause.length() &gt; 0) {
+        whereClause.append(" AND LOWER(o.city) LIKE LOWER(:city)");
+      } else {
+        whereClause.append(" WHERE LOWER(o.city) LIKE LOWER(:city)");
+      }
+    }
+    query.append(whereClause);
+
+    EntityManager em = Owner.entityManager();
+    TypedQuery&lt;Owner&gt; q = em.createQuery(query.toString(), Owner.class);
+    if (lastName != null &amp;&amp; lastName.length() &gt; 0) {
+      q.setParameter("lastName", lastName);
+    }
+    if (city != null &amp;&amp; city.length() &gt; 0) {
+      q.setParameter("city", city);
+    }
+    return q;
+}</programlisting>
+
+      <para>En este ejemplo se ha construido la consulta usando un
+      StringBuilder en el que generamos la consulta deseada, pero se podría
+      haber usado cualquier otro como por ejemplo usar Hibernate Criteria
+      Builder.</para>
+
+      <para>Las condiciones </para>
+
+      <programlisting>if (city != null &amp;&amp; city.length() &gt; 0)</programlisting>
+
+      <para>podrían simplificarse a </para>
+
+      <programlisting>if (city != null)</programlisting>
+
+      <para>si usáramos la funcionalidad que ofrece el <link
+      linkend="addon-web-mvc-binding">Add-on Web MVC Binding</link>, que
+      establece el StringTrimmerEditor y que en caso de llegar un parámetro
+      con una cadena vacía la convierte a null.</para>
+
+      <para>Como ya hemos dicho, el código generado indica que todos los
+      parámetros de búsqueda son obligatorios, esto implica también al
+      formulario en la jspx. Tal como se genera, si alguno de los campos no se
+      rellena, no nos deja enviar la petición. Debemos editar la jspx y
+      modificar el atributo <emphasis>required</emphasis> de los campos
+      <emphasis>field</emphasis> y establecer su valor a
+      <emphasis>false</emphasis>, no debemos olvidarnos de cambiar el valor
+      del atributo <emphasis>z</emphasis> a
+      "<emphasis>user-managed</emphasis>" para indicar que lo hemos
+      modificado.</para>
+
+      <programlisting>&lt;field:input disableFormBinding="true" field="city" id="f_com_springsource_petclinic_domain_Owner_city" max="30" <emphasis
+          role="bold">required="false" z="user-managed"</emphasis>/&gt;</programlisting>
+
+      <para>Bueno ya tenemos modificado el buscador para que los parámetros no
+      sean obligatorios. </para>
+
+      <para>En algunos buscadores necesitaremos que uno de los parámetros sea
+      una entidad del modelo, una entidad relacionada con la entidad sobre la
+      que estamos buscando. En estos casos es útil el uso de un selector
+      desplegable en el que indicaremos cual es el registro de la relación que
+      indicará el filtro sobre la entidad que estamos buscando. Pero, el
+      componente <emphasis>select.tagx</emphasis> que se usa en los
+      formularios tiene el inconveniente de que no añade una opción vacía
+      entre las disponibles, con lo que nos vemos obligados a elegir siempre
+      una. Un ejemplo de este caso lo tenemos en el buscador por Owner que se
+      genera para la entidad Pet en el ejemplo de PetClinic.</para>
+
+      <para>La forma de tratar estas peticiones de Spring MVC es intentar
+      cargar el registro de la entidad que llega como parámetro. Por tanto si
+      le llega como parámetro un dato que no concuerda con ningún registro de
+      la entidad parámetro, usará null como parámetro. Pero como hemos dicho
+      el componente <emphasis>select.tagx</emphasis> no ofrece una opción
+      vacía. gvNIX en su <link linkend="addon-web-screen-patterns">Add-on Web
+      MVC Pattern</link> tiene un componente
+      <emphasis>select-withempty.tagx</emphasis> que si lo ofrece. Mediante el
+      comando <emphasis>web mvc pattern install</emphasis> instalamos los
+      componentes de MVC Pattern entre los que se incluye el selector con
+      opción vacía. Podemos modificar la jspx del buscador de Pet por Owner
+      para que use <emphasis>select-withempty</emphasis> en lugar del original
+      de la siguiente forma:</para>
+
+      <programlisting>&lt;div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" ... <emphasis
+          role="bold">xmlns:pattern-field="urn:jsptagdir:/WEB-INF/tags/pattern/form/fields"</emphasis> version="2.0"&gt;
+    &lt;jsp:directive.page contentType="text/html;charset=UTF-8"/&gt;
+    &lt;jsp:output omit-xml-declaration="yes"/&gt;
+    &lt;form:find finderName="ByOwner" id="ff_com_springsource_petclinic_domain_Pet" path="/pets" z="ThIGSmua6R7WM6q2P1BpNC3zMi4="&gt;
+        <emphasis role="bold">&lt;pattern-field:select-withempty disableFormBinding="true" field="owner" emptyValueEnable="true" emptyValue="0" id="f_com_springsource_petclinic_domain_Pet_owner" itemValue="id" items="${owners}" path="/owners" required="false" z="user-managed"/&gt;</emphasis>
+    &lt;/form:find&gt;
+&lt;/div&gt;</programlisting>
+
+      <para>El componente select-withempty tiene los mismos atributos que el
+      select.tagx y otro tres más:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>emptyValueEnable</emphasis> true|false habilita la
+          opción vacía en el selector.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>emtpyValue</emphasis> indica que valor se quiere dar
+          a la opción vacía del selector. Si se corresponde con una entidad,
+          este valor no debería corresponder a ningún identificador existente
+          para esa entidad, de esta forma el valor que llega al buscador es
+          null.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>emptyLabel</emphasis> cadena a mostrar para la
+          opción vacía del selector.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Con este cambio y si tenemos modificado el método finder de Pet
+      para que no sea necesario que llegue el parámetro Owner, de manera
+      similar a lcomo lo hemos explicado antes, nos aseguramos de que podemos
+      hacer búsquedas por parámetros opcionales.</para>
+    </section>
+  </section>
+</chapter>
