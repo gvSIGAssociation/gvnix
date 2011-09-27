@@ -80,8 +80,6 @@ public class WSExportXmlElementMetadataProvider extends
 
     private List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
 
-    private List<FieldMetadata> fieldMetadataTransientList = new ArrayList<FieldMetadata>();
-
     protected void activate(ComponentContext context) {
         // Ensure we're notified of all metadata related to physical Java types,
         // in particular their initial creation
@@ -184,28 +182,26 @@ public class WSExportXmlElementMetadataProvider extends
 
         // Redefine field lists.
         fieldMetadataElementList = new ArrayList<FieldMetadata>();
-        fieldMetadataTransientList = new ArrayList<FieldMetadata>();
 
         AnnotationMetadata gvNixXmlElementAnnotationMetadata = MemberFindingUtils
                 .getTypeAnnotation(governorTypeDetails, new JavaType(
                         GvNIXXmlElement.class.getName()));
 
-        // Field @XmlElement and @XmlTransient annotations lists.
-        setTransientAndElementFields(governorTypeDetails,
+        // Field @XmlElement annotations lists.
+        setElementFields(governorTypeDetails,
                 gvNixXmlElementAnnotationMetadata, physicalTypeKey);
 
         // Create metaData with field list values.
         wSExportXmlElementMetadata = new WSExportXmlElementMetadata(
                 metadataIdentificationString, aspectName,
-                governorPhysicalTypeMetadata, fieldMetadataElementList,
-                fieldMetadataTransientList);
+                governorPhysicalTypeMetadata, fieldMetadataElementList);
 
         return wSExportXmlElementMetadata;
     }
 
     /**
-     * Check correct format for annotation attribute values and define which
-     * fields will be exported in XSD schema.
+     * Check correct format for annotation attribute values and define fields to
+     * be exported in XSD schema.
      * <p>
      * Fields defined in 'elementList' annotation attribute will be exported.
      * </p>
@@ -218,7 +214,7 @@ public class WSExportXmlElementMetadataProvider extends
      *            Physical type identifier for fields
      * @return {@link List} of annotated {@link FieldMetadata}.
      */
-    private void setTransientAndElementFields(
+    private void setElementFields(
             ClassOrInterfaceTypeDetails governorTypeDetails,
             AnnotationMetadata gvNixXmlElementAnnotationMetadata,
             String physicalTypeKey) {
@@ -350,12 +346,10 @@ public class WSExportXmlElementMetadataProvider extends
             for (FieldMetadata fieldMetadata : declaredFieldList) {
 
                 containsValue = false;
-
                 for (StringAttributeValue value : elementListStringValue) {
 
                     containsValue = value.getValue().contains(
                             fieldMetadata.getFieldName().getSymbolName());
-
                     if (containsValue) {
 
                         if (!exportedAttributeValue.getValue()) {
@@ -377,18 +371,12 @@ public class WSExportXmlElementMetadataProvider extends
                                                     .getFullyQualifiedTypeName()
                                             + "'.");
                         }
-
-                        fieldMetadataElementList.add(fieldMetadata);
                         break;
 
                     }
                 }
-
-                if (!containsValue) {
-                    fieldMetadataTransientList.add(fieldMetadata);
-                }
+                fieldMetadataElementList.add(fieldMetadata);
             }
-
         }
 
     }

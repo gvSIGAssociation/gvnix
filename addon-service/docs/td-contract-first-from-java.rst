@@ -184,9 +184,7 @@ Limitations solution
 
 #. Cyclic graphs
 
-   Related entities shall not be processed on the conversion to XML with the @XmlTransient JAX-B annotation. 
-   
-   Another option in the newest versions of JAX-B is to implement an interface that forces us to define operations to be performed to avoid cycles.
+   Used the newest versions of JAX-B to implement an interface that forces us to define operations to be performed to avoid cycles.
    
    More information:
    
@@ -377,8 +375,6 @@ JAXB annotations API: http://download.oracle.com/javaee/5/api/javax/xml/bind/ann
 
    @XmlTransient
    private Long id;
-   
-  TODO Where to use this annotation: on the source property, on the destination poperty or both ?
 
 * To rename an element, just use the name property of the @XmlElement annotation::
 
@@ -521,12 +517,6 @@ Entities annotation
   
 	@XmlElement(name = "persona")
 	
-* Si no se quiere convertir una propiedad de la clase se ha de añadir la anotación @XmlTransient en la declaración de la propiedad.
-  Se utilizará para evitar Grafos cíclicos.
-
-  Después de unas pruebas con entidades relacionadas ('1 a n' y 'n a 1') la configuración correcta es asignar @XmlTransient a la entidad que contiene la lista de entidades (1-n) que no serán mostradas en una consulta por entidades ya que son gestionadas en la otra parte de la relación.
-  Podríamos rumiar un poco más la idea ya que en algunos casos puede ser información muy interesante. Por ejemplo, en los terceros ver la lista de sus domicilios o cuentas puede ser interesante, pero ¿ hasta donde puede llegar el grafo de objetos a transformar ?. Esto colisiona con el requerimiento de rendimiento.
-
 Anotar todas las entidades de la aplicación al "instalar" el Add-on de servicios, es decir al publicar un servicio como servicio web.
 
 * Crear el fichero aj para que anote cada uno de los campos de la entidad con @XmlElement y las relaciones, definidas por @OneToMany, @ManyToOne, etc como transient.

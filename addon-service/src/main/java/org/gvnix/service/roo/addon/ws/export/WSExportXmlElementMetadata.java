@@ -18,6 +18,7 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +33,8 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.DeclaredFieldAnnotationDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MethodMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
@@ -39,6 +42,7 @@ import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue
 import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
@@ -73,8 +77,7 @@ public class WSExportXmlElementMetadata extends
 
     public WSExportXmlElementMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            List<FieldMetadata> fieldMetadataElementList,
-            List<FieldMetadata> fieldmetadataTransientList) {
+            List<FieldMetadata> fieldMetadataElementList) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
@@ -99,16 +102,9 @@ public class WSExportXmlElementMetadata extends
                 builder.addAnnotation(annotationMetadata);
             }
 
-            // If is Java Enum type
+            // If is not a Java Enum type
             if (!governorTypeDetails.getPhysicalTypeCategory().equals(
                     PhysicalTypeCategory.ENUMERATION)) {
-
-                // Declared XmlTransient field annotations.
-                List<DeclaredFieldAnnotationDetails> declaredFieldXmlTransientFieldList = getXmlTransientFieldAnnotations(fieldmetadataTransientList);
-
-                for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlTransientFieldList) {
-                    builder.addFieldAnnotation(declaredFieldAnnotationDetails);
-                }
 
                 // Declared XmlElement field annotations
                 List<DeclaredFieldAnnotationDetails> declaredFieldXmlElementFieldList = getXmlElementFieldAnnotations(fieldMetadataElementList);
@@ -116,6 +112,16 @@ public class WSExportXmlElementMetadata extends
                     builder.addFieldAnnotation(declaredFieldAnnotationDetails);
                 }
 
+                // Avoid if abstract class or interface
+                if (!Modifier.isAbstract(governorTypeDetails.getModifier())
+                        && !Modifier.isInterface(governorTypeDetails
+                                .getModifier())) {
+
+                    // Implements class and create method to avoid XML cycles
+                    builder.addImplementsType(new JavaType(
+                            "com.sun.xml.bind.CycleRecoverable"));
+                    builder.addMethod(getOnCycleDetectedMethod(identifier));
+                }
             }
         }
 
@@ -125,38 +131,33 @@ public class WSExportXmlElementMetadata extends
     }
 
     /**
-     * Converts {@link FieldMetadata} {@link List} to
-     * {@link DeclaredFieldAnnotationDetails} {@link List} using @XmlTransient
-     * annotation.
+     * Create the onCycleDetected method to avoid cycles converting to XML.
      * 
-     * @param fieldTransientList
-     *            list to convert.
-     * @return All the annotated @XmlTransient fields (never null, but may be
-     *         empty).
+     * <p>
+     * Return a new object of the governor type (all properties will be null).
+     * </p>
+     * 
+     * @param identifier
+     *            Declared by metadata id
+     * @return onCycleDetected method
      */
-    public List<DeclaredFieldAnnotationDetails> getXmlTransientFieldAnnotations(
-            List<FieldMetadata> fieldTransientList) {
+    protected MethodMetadataBuilder getOnCycleDetectedMethod(String identifier) {
 
-        List<DeclaredFieldAnnotationDetails> annotationXmlTransientFieldList = new ArrayList<DeclaredFieldAnnotationDetails>();
+        JavaSymbolName methodName = new JavaSymbolName("onCycleDetected");
+        JavaType returnType = new JavaType(Object.class.getName());
+        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>(
+                1);
+        parameterTypes.add(new AnnotatedJavaType(new JavaType(
+                "com.sun.xml.bind.CycleRecoverable.Context"), null));
+        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>(1);
+        parameterNames.add(new JavaSymbolName("context"));
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine("return new "
+                + governorTypeDetails.getName() + " ();");
 
-        // Void list, annotation doesn't need attribute values.
-        List<AnnotationAttributeValue<?>> attributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-        // Creates the annotation.
-        AnnotationMetadata xmlTransientAnnotation = new AnnotationMetadataBuilder(
-                new JavaType("javax.xml.bind.annotation.XmlTransient"),
-                attributeValueList).build();
-
-        DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
-
-        for (FieldMetadata fieldMetadata : fieldTransientList) {
-
-            declaredFieldAnnotationDetails = new DeclaredFieldAnnotationDetails(
-                    fieldMetadata, xmlTransientAnnotation);
-            annotationXmlTransientFieldList.add(declaredFieldAnnotationDetails);
-        }
-
-        return annotationXmlTransientFieldList;
+        return new MethodMetadataBuilder(identifier, Modifier.PUBLIC,
+                methodName, returnType, parameterTypes, parameterNames,
+                bodyBuilder);
     }
 
     /**
@@ -176,7 +177,7 @@ public class WSExportXmlElementMetadata extends
 
         // Void list, annotation doesn't need attribute values.
         List<AnnotationAttributeValue<?>> attributeValueList;
-        AnnotationMetadata xmlTransientAnnotation;
+        AnnotationMetadata xmlElementAnnotation;
         StringAttributeValue nameStringAttributeValue;
 
         DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
@@ -213,12 +214,12 @@ public class WSExportXmlElementMetadata extends
             }
 
             // Creates the annotation.
-            xmlTransientAnnotation = new AnnotationMetadataBuilder(
-                    new JavaType("javax.xml.bind.annotation.XmlElement"),
-                    attributeValueList).build();
+            xmlElementAnnotation = new AnnotationMetadataBuilder(new JavaType(
+                    "javax.xml.bind.annotation.XmlElement"), attributeValueList)
+                    .build();
 
             declaredFieldAnnotationDetails = new DeclaredFieldAnnotationDetails(
-                    fieldMetadata, xmlTransientAnnotation);
+                    fieldMetadata, xmlElementAnnotation);
             annotationXmlElementFieldList.add(declaredFieldAnnotationDetails);
         }
 

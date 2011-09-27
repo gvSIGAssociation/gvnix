@@ -437,10 +437,7 @@ Data types: Project entities
 
 Entities defined in the project.
 Where a method uses an Entity in operation, the Add-on adds **@GvNIXXmlElement** annotation to the entity to generate a metadata that builds a correct xml format to be sent in web service operation as input/output parameter.
-* The fields are checked if they accomplish with web service interoperability.
-
-  * Fields with a database relationship annotation are defined as **@XmlTransient** elements which are not sent in the operation as part of the Entity.
-  * The other ones are defined as **@XmlElement** with ``name`` attribute.
+Then there are defined as **@XmlElement** with ``name`` attribute.
 
 Commands
 =========

@@ -87,11 +87,8 @@ public class WSExportMetadata extends
 
             // Add @javax.jws.WebService and @javax.jws.soap.SOAPBinding.
             AnnotationMetadata webServiceAnnotationMetadata = getWebServiceAnnotation(annotationMetadata);
-
             builder.addAnnotation(webServiceAnnotationMetadata);
-
             AnnotationMetadata soapBindingAnnotationMetadata = getSoapBindingAnnotation(annotationMetadata);
-
             builder.addAnnotation(soapBindingAnnotationMetadata);
 
             // Methods to exclude from web service.
@@ -272,40 +269,7 @@ public class WSExportMetadata extends
 
         List<AnnotationAttributeValue<?>> annotationAttributeValueList;
 
-        AnnotationAttributeValue<?> tmpAnnotationAttributeValue;
-
-        // javax.jws.WebMethod
-        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-        StringAttributeValue operationNameAttributeValue = (StringAttributeValue) methodAnnotation
-                .getAttribute(new JavaSymbolName("operationName"));
-
-        annotationAttributeValueList.add(operationNameAttributeValue);
-
-        // Check if exists action attribute defined.
-        tmpAnnotationAttributeValue = methodAnnotation
-                .getAttribute(new JavaSymbolName("action"));
-
-        StringAttributeValue actionAttribuetValue;
-        if (tmpAnnotationAttributeValue != null) {
-            actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
-                    "action"),
-                    ((StringAttributeValue) tmpAnnotationAttributeValue)
-                            .getValue());
-        } else {
-            actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
-                    "action"), "");
-        }
-
-        annotationAttributeValueList.add(actionAttribuetValue);
-
-        BooleanAttributeValue excludeAttribuetValue = new BooleanAttributeValue(
-                new JavaSymbolName("exclude"), false);
-        annotationAttributeValueList.add(excludeAttribuetValue);
-
-        AnnotationMetadata webMethod = new AnnotationMetadataBuilder(
-                new JavaType("javax.jws.WebMethod"),
-                annotationAttributeValueList).build();
+        AnnotationMetadata webMethod = getWebMethodAnnotation(methodAnnotation);
 
         // Add to AspectJ.
         builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
@@ -381,38 +345,8 @@ public class WSExportMetadata extends
 
             annotationAttributeValueList.add(targetNamespaceAttributeValue);
 
-            // Check parameters header, partName from WebResult.
-            // Parameter webResultHeader.
-            BooleanAttributeValue headerAttributeValue = (BooleanAttributeValue) methodAnnotation
-                    .getAttribute(new JavaSymbolName("webResultHeader"));
-
-            if (headerAttributeValue == null) {
-                headerAttributeValue = new BooleanAttributeValue(
-                        new JavaSymbolName("header"), false);
-            } else {
-                headerAttributeValue = new BooleanAttributeValue(
-                        new JavaSymbolName("header"),
-                        headerAttributeValue.getValue());
-            }
-            annotationAttributeValueList.add(headerAttributeValue);
-
-            // Parameter webResultPartName.
-            StringAttributeValue partNameAttributeValue = (StringAttributeValue) methodAnnotation
-                    .getAttribute(new JavaSymbolName("webResultPartName"));
-
-            if (partNameAttributeValue == null) {
-                partNameAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("partName"), "parameters");
-            } else {
-                partNameAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("partName"),
-                        partNameAttributeValue.getValue());
-            }
-            annotationAttributeValueList.add(partNameAttributeValue);
-
-            AnnotationMetadata webResult = new AnnotationMetadataBuilder(
-                    new JavaType("javax.jws.WebResult"),
-                    annotationAttributeValueList).build();
+            AnnotationMetadata webResult = getWebResultAnnotation(
+                    methodAnnotation, annotationAttributeValueList);
 
             // Add to AspectJ.
             builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
@@ -479,38 +413,7 @@ public class WSExportMetadata extends
 
         AnnotationAttributeValue<?> tmpAnnotationAttributeValue;
 
-        // javax.jws.WebMethod
-        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-        StringAttributeValue operationNameAttributeValue = (StringAttributeValue) methodAnnotation
-                .getAttribute(new JavaSymbolName("operationName"));
-
-        annotationAttributeValueList.add(operationNameAttributeValue);
-
-        // Check if exists action attribute defined.
-        tmpAnnotationAttributeValue = methodAnnotation
-                .getAttribute(new JavaSymbolName("action"));
-
-        StringAttributeValue actionAttribuetValue;
-        if (tmpAnnotationAttributeValue != null) {
-            actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
-                    "action"),
-                    ((StringAttributeValue) tmpAnnotationAttributeValue)
-                            .getValue());
-        } else {
-            actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
-                    "action"), "");
-        }
-
-        annotationAttributeValueList.add(actionAttribuetValue);
-
-        BooleanAttributeValue excludeAttribuetValue = new BooleanAttributeValue(
-                new JavaSymbolName("exclude"), false);
-        annotationAttributeValueList.add(excludeAttribuetValue);
-
-        AnnotationMetadata webMethod = new AnnotationMetadataBuilder(
-                new JavaType("javax.jws.WebMethod"),
-                annotationAttributeValueList).build();
+        AnnotationMetadata webMethod = getWebMethodAnnotation(methodAnnotation);
 
         // Add to AspectJ.
         builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
@@ -610,38 +513,8 @@ public class WSExportMetadata extends
                 annotationAttributeValueList.add(targetNamespaceAttributeValue);
             }
 
-            // Add these attributes to @GvNIXWebMethod.
-            // Parameter webResultHeader.
-            BooleanAttributeValue headerAttributeValue = (BooleanAttributeValue) methodAnnotation
-                    .getAttribute(new JavaSymbolName("webResultHeader"));
-
-            if (headerAttributeValue == null) {
-                headerAttributeValue = new BooleanAttributeValue(
-                        new JavaSymbolName("header"), false);
-            } else {
-                headerAttributeValue = new BooleanAttributeValue(
-                        new JavaSymbolName("header"),
-                        headerAttributeValue.getValue());
-            }
-            annotationAttributeValueList.add(headerAttributeValue);
-
-            // Parameter webResultPartName.
-            StringAttributeValue partNameAttributeValue = (StringAttributeValue) methodAnnotation
-                    .getAttribute(new JavaSymbolName("webResultPartName"));
-
-            if (partNameAttributeValue == null) {
-                partNameAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("partName"), "parameters");
-            } else {
-                partNameAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("partName"),
-                        partNameAttributeValue.getValue());
-            }
-            annotationAttributeValueList.add(partNameAttributeValue);
-
-            AnnotationMetadata webResult = new AnnotationMetadataBuilder(
-                    new JavaType("javax.jws.WebResult"),
-                    annotationAttributeValueList).build();
+            AnnotationMetadata webResult = getWebResultAnnotation(
+                    methodAnnotation, annotationAttributeValueList);
 
             // Add to AspectJ.
             builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
@@ -711,6 +584,101 @@ public class WSExportMetadata extends
                     methodMetadata, oneway));
         }
 
+    }
+
+    /**
+     * Create a @javax.jws.soap.WebMethod annotation from a method annotation.
+     * 
+     * @param methodAnnotation
+     *            Method annotation
+     * @return @javax.jws.soap.WebMethod annotation
+     */
+    protected AnnotationMetadata getWebMethodAnnotation(
+            AnnotationMetadata methodAnnotation) {
+
+        List<AnnotationAttributeValue<?>> annotationAttributeValueList;
+        AnnotationAttributeValue<?> tmpAnnotationAttributeValue;
+
+        // javax.jws.WebMethod
+        annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+
+        StringAttributeValue operationNameAttributeValue = (StringAttributeValue) methodAnnotation
+                .getAttribute(new JavaSymbolName("operationName"));
+
+        annotationAttributeValueList.add(operationNameAttributeValue);
+
+        // Check if exists action attribute defined.
+        tmpAnnotationAttributeValue = methodAnnotation
+                .getAttribute(new JavaSymbolName("action"));
+
+        StringAttributeValue actionAttribuetValue;
+        if (tmpAnnotationAttributeValue != null) {
+            actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
+                    "action"),
+                    ((StringAttributeValue) tmpAnnotationAttributeValue)
+                            .getValue());
+        } else {
+            actionAttribuetValue = new StringAttributeValue(new JavaSymbolName(
+                    "action"), "");
+        }
+
+        annotationAttributeValueList.add(actionAttribuetValue);
+
+        BooleanAttributeValue excludeAttribuetValue = new BooleanAttributeValue(
+                new JavaSymbolName("exclude"), false);
+        annotationAttributeValueList.add(excludeAttribuetValue);
+
+        AnnotationMetadata webMethod = new AnnotationMetadataBuilder(
+                new JavaType("javax.jws.WebMethod"),
+                annotationAttributeValueList).build();
+
+        return webMethod;
+    }
+
+    /**
+     * Create @javax.jws.soap.WebResult from a method annotation and attributes.
+     * 
+     * @param methodAnnotation
+     *            Method annotation
+     * @return @javax.jws.soap.WebResult annotation
+     */
+    protected AnnotationMetadata getWebResultAnnotation(
+            AnnotationMetadata methodAnnotation,
+            List<AnnotationAttributeValue<?>> annotationAttributeValueList) {
+
+        // Check parameters header, partName from WebResult.
+        // Parameter webResultHeader.
+        BooleanAttributeValue headerAttributeValue = (BooleanAttributeValue) methodAnnotation
+                .getAttribute(new JavaSymbolName("webResultHeader"));
+
+        if (headerAttributeValue == null) {
+            headerAttributeValue = new BooleanAttributeValue(
+                    new JavaSymbolName("header"), false);
+        } else {
+            headerAttributeValue = new BooleanAttributeValue(
+                    new JavaSymbolName("header"),
+                    headerAttributeValue.getValue());
+        }
+        annotationAttributeValueList.add(headerAttributeValue);
+
+        // Parameter webResultPartName.
+        StringAttributeValue partNameAttributeValue = (StringAttributeValue) methodAnnotation
+                .getAttribute(new JavaSymbolName("webResultPartName"));
+
+        if (partNameAttributeValue == null) {
+            partNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("partName"), "parameters");
+        } else {
+            partNameAttributeValue = new StringAttributeValue(
+                    new JavaSymbolName("partName"),
+                    partNameAttributeValue.getValue());
+        }
+        annotationAttributeValueList.add(partNameAttributeValue);
+
+        AnnotationMetadata webResult = new AnnotationMetadataBuilder(
+                new JavaType("javax.jws.WebResult"),
+                annotationAttributeValueList).build();
+        return webResult;
     }
 
     /**
