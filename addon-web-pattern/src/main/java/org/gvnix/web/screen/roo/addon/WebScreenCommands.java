@@ -55,7 +55,7 @@ public class WebScreenCommands implements CommandMarker {
      * @return true if commands are available
      */
     @CliAvailabilityIndicator({ "web mvc pattern master",
-            "web mvc pattern update" })
+            "web mvc pattern install" })
     public boolean isWebPatternAvaliable() {
         return operations.isPatternCommandAvailable();
     }
@@ -110,22 +110,10 @@ public class WebScreenCommands implements CommandMarker {
     }
 
     /**
-     * Informs if <code>web mvc pattern update</code> command are available
-     * 
-     * @return true if commands are available
-     */
-    // @CliAvailabilityIndicator({ "web mvc pattern update" })
-    // public boolean isWebPatternUpdateAvaliable() {
-    // // We can use the same condition as the availability of RelationPattern
-    // // command
-    // return operations.isRelationPatternCommandAvailable();
-    // }
-
-    /**
      * Forces update the static resources (images, css, js) and TAGx
      */
-    @CliCommand(value = "web mvc pattern update", help = "Updates static resources (images, css, js) and TAGx used by patterns")
-    public void webPatternUpdate() {
-        operations.updatePattern();
+    @CliCommand(value = "web mvc pattern install", help = "Installs static resources (images, css, js) and TAGx used by patterns forcing overwrite of them")
+    public void webPatternInstall() {
+        operations.installPatternArtifacts(true);
     }
 }
