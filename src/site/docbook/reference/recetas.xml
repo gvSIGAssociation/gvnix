@@ -105,16 +105,54 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     menor de 244 caracteres.</para>
 
     <para>Hay un truco para poder generar estos buscadores. Consiste en
-    dividir el buscador que queremos en varios más pequeños y al final unir el
-    código que se genera para cada uno de ellos en un unico método. Esto
-    implica tener que modificar el código que se ha generado para el buscador
-    en la Entidad, el Controller y la jspx. Un trabajo manual pero que puede
-    ayudarnos a la hora de montar buscadores por multitud de campos. Al final
-    de este trabajo tendríamos una jspx con un nombre arbitrario (por ejemplo
-    <emphasis>findOwnersByTodo.jspx</emphasis>) en el que tendríamos el
-    formulario que contredría todos los campos de los otros formularios que se
-    hayan generado al ejecutar los distintos comando <emphasis>finder
-    add</emphasis>.</para>
+    dividir el buscador que queremos en varios más pequeños, parciales de unos
+    pocos campos cada uno, y al final unir el código que se genera para cada
+    uno de ellos en un unico método. Esto implica tener que modificar el
+    código que se ha generado para el buscador en la Entidad, el Controller y
+    la jspx de la siguiente forma:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>En el .java de la Entidad para la que estamos generando el
+        buscador crear un método al que podemos llamar
+        <emphasis>findByTodo</emphasis> y cuyos parámetros de entrada serán
+        todos los parámetros que reciben los métodos de los buscadores
+        parciales que hemos generado. Del mismo modo, el cuerpo de este nuevo
+        método es la unión de la implementación de todos los buscadores
+        parciales. Podemos aprovechar y modificar el código, según se explica
+        en el siguiente apartado, de forma que los parámetros sean
+        opcionales.</para>
+      </listitem>
+
+      <listitem>
+        <para>De manera similar en el .java del Controller de la entidad
+        crearemos dos métodos: uno <emphasis>findByTodoForm</emphasis> que nos
+        devolverá a la vista del formulario de este buscador, y otro
+        <emphasis>findByTodo</emphasis> que servirá las peticiones que lleguen
+        desde el formulario del buscador. En este último caso, al igual que en
+        caso del método que hemos creado en la Entidad, tendrá como parámetros
+        la unión de todos los de los buscadores parciales. El cuerpo de este
+        método deberá invocar al <emphasis>findByTodo</emphasis> que hemos
+        creado en la Entidad. Para la anotación @RequestMapping de estos dos
+        métodos nos podemos guiar como se define en los buscadores
+        existentes.</para>
+      </listitem>
+
+      <listitem>
+        <para>Finalmente debemos crear una jspx (la podemos llamar
+        findByTodo.jspx) en el directorio WEB-INF/views/&lt;entidad&gt; que
+        contendrá el formulario de nuestro buscador. Por tanto incluye todos
+        los campos que hayan en el resto de buscadores parciales. Hay que
+        recordar, que esta vista se ha de definir también el fichero views.xml
+        que hay en la carpeta de vistas de la entidad y que esta vista es la
+        que devuelve el método findByTodoForm que hemos creado antes en el
+        Controller.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Hemos descrito un trabajo manual, y en parte tedioso, que puede
+    ayudarnos a la hora de montar buscadores por tantos campos como
+    queramos.</para>
 
     <section>
       <title>Modificar buscadores generados</title>
