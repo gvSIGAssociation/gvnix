@@ -291,6 +291,29 @@ public class JavaParserServiceImpl implements JavaParserService {
         updatedMethodList.addAll(searchMethodsInJava(method, targetId,
                 mutableTypeDetails));
 
+        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetails = createTypeDetails(
+                mutableTypeDetails, updatedMethodList);
+        // Add old class imports into new class to avoid undefined imports
+        // Example: Not included HashSet import when exporting method in
+        // petclinic Owner
+        classOrInterfaceTypeDetails.setRegisteredImports(mutableTypeDetails
+                .getRegisteredImports());
+
+        // Updates the class in file system.
+        updateClass(classOrInterfaceTypeDetails.build());
+    }
+
+    /**
+     * Create a class or interface from java parser and add methods.
+     * 
+     * @param mutableTypeDetails
+     * @param updatedMethodList
+     * @return
+     */
+    protected ClassOrInterfaceTypeDetailsBuilder createTypeDetails(
+            JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails,
+            List<MethodMetadata> updatedMethodList) {
+
         List<ConstructorMetadata> contructorList = new ArrayList<ConstructorMetadata>();
         contructorList.addAll(mutableTypeDetails.getDeclaredConstructors());
 
@@ -336,14 +359,7 @@ public class JavaParserServiceImpl implements JavaParserService {
                 classOrInterfaceTypeDetails.addEnumConstant(enumConstant);
             }
         }
-        // Add old class imports into new class to avoid undefined imports
-        // Example: Not included HashSet import when exporting method in
-        // petclinic Owner
-        classOrInterfaceTypeDetails.setRegisteredImports(mutableTypeDetails
-                .getRegisteredImports());
-
-        // Updates the class in file system.
-        updateClass(classOrInterfaceTypeDetails.build());
+        return classOrInterfaceTypeDetails;
     }
 
     /**
@@ -740,51 +756,8 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         }
 
-        List<ConstructorMetadata> contructorList = new ArrayList<ConstructorMetadata>();
-        contructorList.addAll(mutableTypeDetails.getDeclaredConstructors());
-
-        List<FieldMetadata> fieldMetadataList = new ArrayList<FieldMetadata>();
-        fieldMetadataList.addAll(mutableTypeDetails.getDeclaredFields());
-
-        List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
-
-        annotationMetadataList.addAll(mutableTypeDetails.getAnnotations());
-
-        // Replicates the values from the original class.
-        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetails = new ClassOrInterfaceTypeDetailsBuilder(
-                mutableTypeDetails.getDeclaredByMetadataId(),
-                mutableTypeDetails.getModifier(), mutableTypeDetails.getName(),
-                mutableTypeDetails.getPhysicalTypeCategory());
-        for (AnnotationMetadata annotationMetadata : annotationMetadataList) {
-            classOrInterfaceTypeDetails.addAnnotation(annotationMetadata);
-        }
-        for (FieldMetadata fieldMetadata : fieldMetadataList) {
-
-            classOrInterfaceTypeDetails.addField(fieldMetadata);
-        }
-        for (ConstructorMetadata constructorMetadata : contructorList) {
-
-            classOrInterfaceTypeDetails.addConstructor(constructorMetadata);
-        }
-        for (MethodMetadata methodMetadata : updatedMethodList) {
-
-            classOrInterfaceTypeDetails.addMethod(methodMetadata);
-        }
-        for (JavaType declaredClass : mutableTypeDetails.getExtendsTypes()) {
-
-            classOrInterfaceTypeDetails.addExtendsTypes(declaredClass);
-        }
-        for (JavaType declaredClass : mutableTypeDetails.getImplementsTypes()) {
-
-            classOrInterfaceTypeDetails.addImplementsType(declaredClass);
-        }
-        if (mutableTypeDetails.getPhysicalTypeCategory() == PhysicalTypeCategory.ENUMERATION) {
-            for (JavaSymbolName enumConstant : mutableTypeDetails
-                    .getEnumConstants()) {
-
-                classOrInterfaceTypeDetails.addEnumConstant(enumConstant);
-            }
-        }
+        ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetails = createTypeDetails(
+                mutableTypeDetails, updatedMethodList);
         classOrInterfaceTypeDetails
                 .addInnerType(new ClassOrInterfaceTypeDetailsBuilder(
                         mutableTypeDetails.getSuperclass()));
