@@ -1292,20 +1292,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         configuration.appendChild(sourceRoot);
 
         // execution.configuration.defaultOption
-        Element defaultOptions = pom.createElement("defaultOptions");
-        configuration.appendChild(defaultOptions);
-
-        // Soap Headers.
-        // execution.configuration.defaultOption.extendedSoapHeaders <-- true
-        Element extendedSoapHeaders = pom.createElement("extendedSoapHeaders");
-        extendedSoapHeaders.setTextContent("true");
-        defaultOptions.appendChild(extendedSoapHeaders);
-
-        // AutoNameResolution to solve naming conflicts.
-        // execution.configuration.defaultOption.autoNameResolution <-- true
-        Element autoNameResolution = pom.createElement("autoNameResolution");
-        autoNameResolution.setTextContent("true");
-        defaultOptions.appendChild(autoNameResolution);
+        appendDefaultOptions(pom, configuration);
 
         // execution.configuration.wsdlOptions
         Element wsdlOptions = pom.createElement("wsdlOptions");
@@ -1347,6 +1334,31 @@ public class WSConfigServiceImpl implements WSConfigService {
         wsdlOption.appendChild(packagenames);
 
         return newGenerateSourcesCxfServer;
+    }
+
+    /**
+     * Add default options section to the configuration.
+     * 
+     * @param pom
+     * @param configuration
+     */
+    protected void appendDefaultOptions(Document pom, Element configuration) {
+
+        Element defaultOptions;
+        defaultOptions = pom.createElement("defaultOptions");
+        configuration.appendChild(defaultOptions);
+
+        // Soap Headers.
+        // execution.configuration.defaultOption.extendedSoapHeaders <-- true
+        Element extendedSoapHeaders = pom.createElement("extendedSoapHeaders");
+        extendedSoapHeaders.setTextContent("true");
+        defaultOptions.appendChild(extendedSoapHeaders);
+
+        // AutoNameResolution to solve naming conflicts.
+        // execution.configuration.defaultOption.autoNameResolution <-- true
+        Element autoNameResolution = pom.createElement("autoNameResolution");
+        autoNameResolution.setTextContent("true");
+        defaultOptions.appendChild(autoNameResolution);
     }
 
     /**
@@ -1488,19 +1500,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                 "defaultOptions", configuration);
         if (defaultOptions == null) {
 
-            defaultOptions = pom.createElement("defaultOptions");
-            configuration.appendChild(defaultOptions);
-
-            Element extendedSoapHeaders = pom
-                    .createElement("extendedSoapHeaders");
-            extendedSoapHeaders.setTextContent("true");
-            defaultOptions.appendChild(extendedSoapHeaders);
-
-            // AutoNameResolution to solve naming conflicts.
-            Element autoNameResolution = pom
-                    .createElement("autoNameResolution");
-            autoNameResolution.setTextContent("true");
-            defaultOptions.appendChild(autoNameResolution);
+            appendDefaultOptions(pom, configuration);
 
         }
         Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
