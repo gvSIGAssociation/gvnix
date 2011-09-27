@@ -201,8 +201,6 @@ public class WSExportWsdlListener implements FileEventListener {
     public boolean analyzeAnnotations(File file, AnnotationExpr annotationExpr,
             TypeDeclaration type) {
 
-        ClassOrInterfaceDeclaration classOrInterfaceDeclaration;
-
         if (annotationExpr instanceof NormalAnnotationExpr) {
 
             NormalAnnotationExpr normalAnnotationExpr = (NormalAnnotationExpr) annotationExpr;
@@ -226,18 +224,7 @@ public class WSExportWsdlListener implements FileEventListener {
                     || normalAnnotationExpr.getName().toString()
                             .contentEquals(webServiceInterface)) {
 
-                classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
-
-                if (!classOrInterfaceDeclaration.isInterface()) {
-
-                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-                            GvNIXAnnotationType.WEB_SERVICE);
-                } else {
-                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-                            GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
-                }
-
-                return true;
+                return addFileToUpdateAnnotation(file, type);
             }
 
         } else if (annotationExpr instanceof MarkerAnnotationExpr) {
@@ -263,18 +250,7 @@ public class WSExportWsdlListener implements FileEventListener {
                     || markerAnnotationExpr.getName().toString()
                             .contentEquals(webServiceInterface)) {
 
-                classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
-
-                if (!classOrInterfaceDeclaration.isInterface()) {
-
-                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-                            GvNIXAnnotationType.WEB_SERVICE);
-                } else {
-                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-                            GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
-                }
-
-                return true;
+                return addFileToUpdateAnnotation(file, type);
             } else if (markerAnnotationExpr.getName().toString()
                     .contentEquals(xmlEnum)) {
 
@@ -306,21 +282,34 @@ public class WSExportWsdlListener implements FileEventListener {
                     || singleMemberAnnotationExpr.getName().getName()
                             .contains(webServiceInterface)) {
 
-                classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
-
-                if (!classOrInterfaceDeclaration.isInterface()) {
-
-                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-                            GvNIXAnnotationType.WEB_SERVICE);
-                } else {
-                    wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
-                            GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
-                }
-
-                return true;
+                return addFileToUpdateAnnotation(file, type);
             }
         }
         return false;
+    }
+
+    /**
+     * Add file to update annotation.
+     * 
+     * @param file
+     * @param type
+     * @return
+     */
+    protected boolean addFileToUpdateAnnotation(File file, TypeDeclaration type) {
+
+        ClassOrInterfaceDeclaration classOrInterfaceDeclaration;
+        classOrInterfaceDeclaration = (ClassOrInterfaceDeclaration) type;
+
+        if (!classOrInterfaceDeclaration.isInterface()) {
+
+            wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                    GvNIXAnnotationType.WEB_SERVICE);
+        } else {
+            wSExportWsdlConfigService.addFileToUpdateAnnotation(file,
+                    GvNIXAnnotationType.WEB_SERVICE_INTERFACE);
+        }
+
+        return true;
     }
 
     /**
