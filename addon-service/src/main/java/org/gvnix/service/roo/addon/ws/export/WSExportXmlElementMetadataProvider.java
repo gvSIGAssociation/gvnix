@@ -316,21 +316,26 @@ public class WSExportXmlElementMetadataProvider extends
 
                 FieldMetadataBuilder builder;
 
-                builder = getFieldMetadatBuilderForEntityField(entityMetadata
-                        .getIdentifierField());
-                if (builder.getDeclaredByMetadataId().equals(physicalTypeKey)) {
-                    // Adds it only if it's declared in current class (not
-                    // inherited)
-                    declaredFieldList.add(builder.build());
+                if (entityMetadata.getIdentifierField() != null) {
+                    builder = getFieldMetadatBuilderForEntityField(entityMetadata
+                            .getIdentifierField());
+                    if (builder.getDeclaredByMetadataId().equals(
+                            physicalTypeKey)) {
+                        // Adds it only if it's declared in current class (not
+                        // inherited)
+                        declaredFieldList.add(builder.build());
+                    }
                 }
-                builder = getFieldMetadatBuilderForEntityField(entityMetadata
-                        .getVersionField());
-                if (builder.getDeclaredByMetadataId().equals(physicalTypeKey)) {
-                    // Adds it only if it's declared in current class (not
-                    // inherited)
-                    declaredFieldList.add(builder.build());
+                if (entityMetadata.getVersionField() != null) {
+                    builder = getFieldMetadatBuilderForEntityField(entityMetadata
+                            .getVersionField());
+                    if (builder.getDeclaredByMetadataId().equals(
+                            physicalTypeKey)) {
+                        // Adds it only if it's declared in current class (not
+                        // inherited)
+                        declaredFieldList.add(builder.build());
+                    }
                 }
-
             }
             // Check duplicated fields.
             for (FieldMetadata fieldMetadata : governorTypeDetails

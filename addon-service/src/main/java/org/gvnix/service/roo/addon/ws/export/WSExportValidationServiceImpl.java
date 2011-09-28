@@ -729,8 +729,13 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
         // Check if exists add id and version fields.
         if (entityMetadata != null && entityMetadata.isValid()) {
-            fieldMetadataElementList.add(entityMetadata.getIdentifierField());
-            fieldMetadataElementList.add(entityMetadata.getVersionField());
+            if (entityMetadata.getIdentifierField() != null) {
+                fieldMetadataElementList.add(entityMetadata
+                        .getIdentifierField());
+            }
+            if (entityMetadata.getVersionField() != null) {
+                fieldMetadataElementList.add(entityMetadata.getVersionField());
+            }
         }
 
         // Retrieve the fields that are defined as OneToMany relationship.
