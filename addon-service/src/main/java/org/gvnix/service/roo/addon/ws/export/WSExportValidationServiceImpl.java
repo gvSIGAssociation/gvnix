@@ -105,17 +105,17 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     private static final String ITD_FILE_NAME = "_Web_Faults_gvnix_service_layer.aj";
 
-    private static final Set<String> notAllowedClassCollectionTypes = new HashSet<String>();
+    private static final Set<String> invalidClasses = new HashSet<String>();
 
     static {
-        notAllowedClassCollectionTypes.add(HashMap.class.getName());
-        notAllowedClassCollectionTypes.add(TreeMap.class.getName());
+        invalidClasses.add(HashMap.class.getName());
+        invalidClasses.add(TreeMap.class.getName());
     }
 
-    private static final Set<String> notAllowedIntefaceCollectionTypes = new HashSet<String>();
+    private static final Set<String> invalidIntefaces = new HashSet<String>();
 
     static {
-        notAllowedIntefaceCollectionTypes.add(Map.class.getName());
+        invalidIntefaces.add(Map.class.getName());
     }
 
     private static final String ITERABLE = Iterable.class.getName();
@@ -194,15 +194,15 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * Creates AspectJ template if not exists.
-     * </p>
-     * <p>
-     * Updates with exceptionClass annotation values.
-     * </p>
+     * Adds a declaration of <code>@WebFault</code> to exceptionClass in AspectJ
+     * file.
+     * 
+     * @param exceptionClass
+     *            to export as web service exception.
+     * @param annotationAttributeValues
+     *            defined for annotation.
      */
-    public void exportImportedException(JavaType exceptionClass,
+    protected void exportImportedException(JavaType exceptionClass,
             List<AnnotationAttributeValue<?>> annotationAttributeValues) {
 
         String template;
@@ -370,94 +370,93 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     }
 
     /**
-     * Check if javaType extends from 'extendedJavaType' class.
+     * Check if a java type extends another java type name.
      * 
      * @param javaType
-     *            to check if extends from type.
-     * @param extendedJavaType
-     *            Java type to check.
-     * @return true if class extends from extendedJavaType or false if is not
-     *         extending.
+     *            to check if extends a java type name
+     * @param ext
+     *            Extends java type name to check
+     * @return javaType extends ext ?
      */
-    private boolean extendsJavaType(JavaType javaType, String extendedJavaType) {
+    private boolean extendsJavaType(JavaType javaType, String ext) {
 
-        if (javaType.getFullyQualifiedTypeName()
-                .contentEquals(extendedJavaType)) {
+        // Get the java type name
+        String javaName = javaType.getFullyQualifiedTypeName();
+
+        // Java name and extends name are the same
+        if (javaName.contentEquals(ext)) {
             return true;
         }
+
         try {
 
-            Class<?> classToCheck = Class.forName(javaType
-                    .getFullyQualifiedTypeName());
+            // Get java class
+            Class<?> javaClass = Class.forName(javaName);
 
-            if (classToCheck.getSuperclass() == null) {
+            // Java class has no superclass
+            if (javaClass.getSuperclass() == null) {
                 return false;
             }
 
-            return extendsJavaType(new JavaType(classToCheck.getSuperclass()
-                    .getName()), extendedJavaType);
+            // Search on extends for each superclass
+            return extendsJavaType(new JavaType(javaClass.getSuperclass()
+                    .getName()), ext);
 
         } catch (ClassNotFoundException e) {
 
             throw new IllegalArgumentException(
                     "The class: '"
-                            + javaType.getFullyQualifiedTypeName()
+                            + javaName
                             + "' doesn't exist while checking if extends '"
-                            + extendedJavaType
+                            + ext
                             + "'.\nClasses that are not from JDK or project can't be used in Web Services.");
         }
     }
 
     /**
-     * Check if javaType implements from 'implmentedJavaType' class.
+     * Check if a java type implements another java type name.
      * 
      * @param javaType
-     *            to check if implements from type.
-     * @param implmentedJavaType
-     *            Java type to check.
-     * @return true if class implements from implementedJavaType or false if is
-     *         not implementing.
+     *            to check if implements a java type name
+     * @param impl
+     *            Implements java type name to check
+     * @return javaType implements impl ?
      */
-    private boolean implementsJavaType(JavaType javaType,
-            String implmentedJavaType) {
+    private boolean implementsJavaType(JavaType javaType, String impl) {
 
-        if (javaType.getFullyQualifiedTypeName().contentEquals(
-                implmentedJavaType)) {
+        // Get the java type name
+        String javaName = javaType.getFullyQualifiedTypeName();
+
+        // Java name and implements name are the same
+        if (javaName.contentEquals(impl)) {
             return true;
         }
+
         try {
-            Class<?> classToCheck = Class.forName(javaType
-                    .getFullyQualifiedTypeName());
 
-            Class<?>[] interfaceArray = classToCheck.getInterfaces();
+            // Get java name interfaces
+            Class<?>[] javaInterfaces = Class.forName(javaName).getInterfaces();
 
-            if (interfaceArray.length == 0) {
+            // Java class has no interfaces
+            if (javaInterfaces.length == 0) {
                 return false;
-            } else {
-
-                Class<?> interfaceToCheck;
-                boolean implementsJavaType = false;
-                for (int i = 0; i < interfaceArray.length; i++) {
-                    interfaceToCheck = interfaceArray[i];
-
-                    implementsJavaType = implementsJavaType(new JavaType(
-                            interfaceToCheck.getName()), implmentedJavaType);
-
-                    if (implementsJavaType) {
-                        return implementsJavaType;
-                    }
-                }
-                return implementsJavaType;
             }
 
+            // Search on implements for each interface
+            for (int i = 0; i < javaInterfaces.length; i++) {
+                if (implementsJavaType(
+                        new JavaType(javaInterfaces[i].getName()), impl)) {
+                    return true;
+                }
+            }
         } catch (ClassNotFoundException e) {
-            logger.log(Level.WARNING,
-                    "The class: '" + javaType.getFullyQualifiedTypeName()
-                            + "' doesn't exist while checking if extends '"
-                            + implmentedJavaType + "'.");
-            return false;
+
+            logger.warning("The class: '" + javaName
+                    + "' doesn't exist while checking if extends '" + impl
+                    + "'.");
         }
 
+        return false;
     }
 
     /**
@@ -485,8 +484,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         JavaType returnType = methodToCheck.getReturnType();
 
         Assert.isTrue(
-                isJavaTypeAllowed(returnType, MethodParameterType.RETURN,
-                        serviceClass),
+                isTypeAllowed(returnType, MethodParameterType.RETURN),
                 "The '"
                         + MethodParameterType.RETURN
                         + "' type '"
@@ -502,8 +500,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         for (AnnotatedJavaType annotatedJavaType : inputParametersList) {
 
             Assert.isTrue(
-                    isJavaTypeAllowed(annotatedJavaType.getJavaType(),
-                            MethodParameterType.PARAMETER, serviceClass),
+                    isTypeAllowed(annotatedJavaType.getJavaType(),
+                            MethodParameterType.PARAMETER),
                     "The '"
                             + MethodParameterType.PARAMETER
                             + "' type '"
@@ -518,199 +516,229 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Check allowed JavaType:
-     * </p>
-     * <ul>
-     * <li>Java basic types and basic objects.</li>
-     * <li>Project {@link Entity}. Adds @GvNIXXmlElement annotation to Entity.</li>
-     * <li>Collections that don't implement/extend: Map, Set, Tree.</li>
-     * </ul>
      */
-    public boolean isJavaTypeAllowed(JavaType javaType,
-            MethodParameterType methodParameterType, JavaType serviceClass) {
+    public boolean isTypeAllowed(JavaType javaType, MethodParameterType type) {
 
-        // Is not null.
-        Assert.isTrue(javaType != null, "JavaType '" + methodParameterType
+        // javaType is required
+        Assert.isTrue(javaType != null, "JavaType '" + type
                 + "' type can't be 'null'.");
 
-        String fileLocation = projectOperations.getPathResolver()
-                .getIdentifier(
-                        Path.SRC_MAIN_JAVA,
-                        javaType.getFullyQualifiedTypeName()
-                                .replace('.', File.separatorChar)
-                                .concat(".java"));
+        // Get the java type name
+        String javaName = javaType.getFullyQualifiedTypeName();
 
-        // It's an imported collection or map ?
-        // FIX: Only permits to check classes imported into project that are
-        // loaded
-        // in system classLloader.
-        if (!fileManager.exists(fileLocation)
-                && (!javaType.getParameters().isEmpty()
-                        || implementsJavaType(javaType, ITERABLE) || implementsJavaType(
-                        javaType, MAP))) {
+        // Get the file path related with java type name
+        String javaPath = javaName.replace('.', File.separatorChar).concat(
+                ".java");
+        String javaId = projectOperations.getPathResolver().getIdentifier(
+                Path.SRC_MAIN_JAVA, javaPath);
 
-            // Check if javaType is an available collection.
-            if (isNotAllowedCollectionType(javaType)) {
-                logger.log(
-                        Level.WARNING,
-                        "The '"
-                                + methodParameterType
-                                + "' type '"
-                                + javaType.getFullyQualifiedTypeName()
-                                + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is a disallowed collection defined in: '"
-                                + serviceClass.getFullyQualifiedTypeName()
-                                + "'.");
+        // Is an allowed java type in class loader ?
 
-                return false;
+        // File not exists in system class loader
+        // FIXME: Only search in class loader !
+        if (!fileManager.exists(javaId)) {
+
+            // Java type has parameters (array) or is a collection (implements
+            // iterable) or is a map (implements map) ?
+            List<JavaType> params = javaType.getParameters();
+            if ((!params.isEmpty() || implementsJavaType(javaType, ITERABLE) || implementsJavaType(
+                    javaType, MAP))) {
+
+                // Is an allowed java type in our project ?
+                return isClassLoaderTypeAllowed(javaType, type);
             }
-
-            boolean parameterAllowed = true;
-
-            // if its a Collection of Objects.
-            List<JavaType> parameterList = javaType.getParameters();
-            if (!parameterList.isEmpty()) {
-
-                // 1) yes - check if is allowed
-                // Check if is not an allowed collection
-                // 1.1) yes - recursive with its javaType.
-                // 1.2) no - error.
-
-                // Check collection's parameter.
-
-                for (JavaType parameterJavaType : parameterList) {
-                    parameterAllowed = parameterAllowed
-                            && isJavaTypeAllowed(parameterJavaType,
-                                    methodParameterType, serviceClass);
-                }
-            }
-            return parameterAllowed;
         }
 
-        // 2) no continue.
+        // Is an allowed java type in JDK ?
 
-        // Check if is primitive value.
+        // Allowed: Java type is primitive
         if (javaType.isPrimitive()) {
             return true;
         }
 
-        // Java Types in 'java.lang' package that aren't collections.
-        if (javaType.getFullyQualifiedTypeName().startsWith("java.lang")) {
+        // Allowed: Java type is in 'java.lang' package (no collections)
+        if (javaName.startsWith("java.lang")) {
             return true;
         }
 
-        // Java Types in 'java.util' package that aren't collections like Date.
-        if (javaType.getFullyQualifiedTypeName().startsWith("java.util")) {
+        // Allowed: Java type is in 'java.util' package (no collections)
+        if (javaName.startsWith("java.util")) {
             return true;
         }
 
-        if (fileManager.exists(fileLocation)) {
+        // Is an allowed java type in class loader ?
 
-            // If it's an entity field set as not allow.
-            if (methodParameterType.equals(MethodParameterType.XMLENTITY)) {
+        // File exists in system class loader
+        // FIXME: Only search in class loader !
+        if (fileManager.exists(javaId)) {
+
+            // Not allowed: Java type is an XML entity field
+            if (type.equals(MethodParameterType.XMLENTITY)) {
                 return false;
             }
 
-            // MetadataID
-            String targetId = PhysicalTypeIdentifier.createIdentifier(javaType,
-                    Path.SRC_MAIN_JAVA);
+            // Get mutable class or interface type details from java type
+            MutableClassOrInterfaceTypeDetails mutableTypeDetails = getTypeDetails(javaType);
 
-            // Obtain the physical type and itd mutable details
-            PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
-                    .get(targetId);
-            Assert.notNull(ptm, "Java source class doesn't exists.");
-
-            PhysicalTypeDetails ptd = ptm.getMemberHoldingTypeDetails();
-
-            Assert.notNull(ptd,
-                    "Java source code details unavailable for type "
-                            + PhysicalTypeIdentifier.getFriendlyName(targetId));
-            Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, ptd,
-                    "Java source code is immutable for type "
-                            + PhysicalTypeIdentifier.getFriendlyName(targetId));
-            MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
-
-            // Check superclass
-            if (mutableTypeDetails.getSuperclass() != null
-                    && !isJavaTypeAllowed(mutableTypeDetails.getSuperclass()
-                            .getName(), methodParameterType, serviceClass)) {
+            // Not allowed: Type details superclass is not allowed java type
+            ClassOrInterfaceTypeDetails typeDetailsSuper = mutableTypeDetails
+                    .getSuperclass();
+            if (typeDetailsSuper != null
+                    && !isTypeAllowed(typeDetailsSuper.getName(), type)) {
                 return false;
             }
 
-            // Add @GvNIXXmlElement annotation.
-            List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-            StringAttributeValue nameStringAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("name"),
-                    StringUtils.uncapitalize(javaType.getSimpleTypeName()));
-
-            annotationAttributeValueList.add(nameStringAttributeValue);
-
-            StringAttributeValue namespaceStringAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("namespace"),
-                    wSConfigService.convertPackageToTargetNamespace(javaType
-                            .getPackage().toString()));
-
-            annotationAttributeValueList.add(namespaceStringAttributeValue);
-
-            // Create attribute elementList for allowed javaType fields.
-            ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue = getFields(mutableTypeDetails);
-
-            StringAttributeValue xmlTypeNameStringAttributeValue;
-            if (elementListArrayAttributeValue != null
-                    && !elementListArrayAttributeValue.getValue().isEmpty()) {
-
-                xmlTypeNameStringAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("xmlTypeName"),
-                        javaType.getSimpleTypeName());
-                annotationAttributeValueList
-                        .add(xmlTypeNameStringAttributeValue);
-
-            } else {
-
-                xmlTypeNameStringAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("xmlTypeName"), "");
-                annotationAttributeValueList
-                        .add(xmlTypeNameStringAttributeValue);
-            }
-
-            annotationAttributeValueList.add(elementListArrayAttributeValue);
-
-            // Exported attribute value
-            BooleanAttributeValue exportedBooleanAttributeValue = new BooleanAttributeValue(
-                    new JavaSymbolName("exported"), false);
-
-            annotationAttributeValueList.add(exportedBooleanAttributeValue);
-
+            // Add gvNIX XML Element annotation
             annotationsService.addJavaTypeAnnotation(
                     mutableTypeDetails.getName(),
                     GvNIXXmlElement.class.getName(),
-                    annotationAttributeValueList, false);
+                    getGvNIXXmlElementAnnotation(javaType, mutableTypeDetails),
+                    false);
 
             return true;
-
         }
 
-        // TODO: Create an Aj file to declare objects that doesn't belong to
-        // project. In Roo next version fix it with Classpath loaders.
+        // TODO: Create Aj file to declare objects doesn't belong to project
+        // In Roo next version fix it with Classpath loaders.
 
         logger.log(
                 Level.INFO,
-                "The ".concat(methodParameterType.toString())
+                "The ".concat(type.toString())
                         .concat(" parameter type: '")
-                        .concat(javaType.getFullyQualifiedTypeName())
-                        .concat("' in method '' from class '")
-                        .concat(serviceClass.getFullyQualifiedTypeName())
-                        .concat("' does not belong to project class definitions ")
-                        .concat("and its not mapped to be used in web service operation."));
+                        .concat(javaName)
+                        .concat("' does not belong to project class definitions and its not mapped to be used in web service operation."));
 
         return true;
     }
 
     /**
-     * {@inheritDoc}
+     * Is a java type from class loader allowed ?
+     * 
+     * <ul>
+     * <li>Java type is allowed type</li>
+     * <li>Java type parameters are allowed types, if exists</li>
+     * <li></li>
+     * </ul>
+     * 
+     * @param javaType
+     *            Java type
+     * @param type
+     *            Type of the java type
+     * @return Is a java type from class loader allowed ?
      */
-    public ArrayAttributeValue<StringAttributeValue> getFields(
+    protected boolean isClassLoaderTypeAllowed(JavaType javaType,
+            MethodParameterType type) {
+
+        // Not allowed: JavaType is a not allowed type
+        if (isNotAllowedType(javaType)) {
+            logger.log(
+                    Level.WARNING,
+                    "The '"
+                            + type
+                            + "' type '"
+                            + javaType.getFullyQualifiedTypeName()
+                            + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
+                            + "\nThis is a disallowed collection defined");
+            return false;
+        }
+
+        // Java type is a collection of objects
+        List<JavaType> params = javaType.getParameters();
+        if (!params.isEmpty()) {
+
+            // Allowed: All java type parameters are allowed
+            boolean parameterAllowed = true;
+            for (JavaType param : params) {
+                parameterAllowed = parameterAllowed
+                        && isTypeAllowed(param, type);
+            }
+            return parameterAllowed;
+        }
+
+        return true;
+    }
+
+    /**
+     * Create @GvNIXXmlElement annotation for java type with type fields.
+     * 
+     * <ul>
+     * <li>name attribute value from java type simple name</li>
+     * <li>namespace attribute value from java type package</li>
+     * <li>elementList attribute from type details allowed element fields</li>
+     * <li>exported attribute is always false (when code first)</li>
+     * <li>xmlTypeName from java type simple type, if not empty</li>
+     * </ul>
+     * 
+     * @param javaType
+     *            To get name, namespace and xmlTypeName annotation attributes
+     * @param typeDetails
+     *            To get elementList annotation attribute
+     * @return List of annotation attribute values
+     */
+    protected List<AnnotationAttributeValue<?>> getGvNIXXmlElementAnnotation(
+            JavaType javaType, MutableClassOrInterfaceTypeDetails typeDetails) {
+
+        List<AnnotationAttributeValue<?>> annotation = new ArrayList<AnnotationAttributeValue<?>>();
+
+        // name attribute value from java type simple name
+        StringAttributeValue name = new StringAttributeValue(
+                new JavaSymbolName("name"), StringUtils.uncapitalize(javaType
+                        .getSimpleTypeName()));
+        annotation.add(name);
+
+        // namespace attribute value from java type package
+        StringAttributeValue namespace = new StringAttributeValue(
+                new JavaSymbolName("namespace"),
+                wSConfigService.convertPackageToTargetNamespace(javaType
+                        .getPackage().toString()));
+        annotation.add(namespace);
+
+        // elementList attribute from type details allowed element fields
+        ArrayAttributeValue<StringAttributeValue> fields = getFields(typeDetails);
+        annotation.add(fields);
+
+        // xmlTypeName from java type simple type, if not empty
+        if (fields != null && !fields.getValue().isEmpty()) {
+
+            StringAttributeValue xmlTypeName = new StringAttributeValue(
+                    new JavaSymbolName("xmlTypeName"),
+                    javaType.getSimpleTypeName());
+            annotation.add(xmlTypeName);
+
+        } else {
+
+            StringAttributeValue xmlTypeName = new StringAttributeValue(
+                    new JavaSymbolName("xmlTypeName"), "");
+            annotation.add(xmlTypeName);
+        }
+
+        // exported attribute is always false (when code first)
+        BooleanAttributeValue exported = new BooleanAttributeValue(
+                new JavaSymbolName("exported"), false);
+        annotation.add(exported);
+
+        return annotation;
+    }
+
+    /**
+     * Values array of allowed element fields name from governor type (Java).
+     * 
+     * <ul>
+     * <li>Get identifier and version fields from governor related entity
+     * metadata.</li>
+     * <li>Get all fields from governor and remove not allowed types fields:
+     * OneToMany, ManyToOne and OneToOne</li>
+     * <li>Remove not allowed entity types fields for entity.</li>
+     * </ul>
+     * 
+     * TODO Utility class: Remove from interface?
+     * 
+     * @param governorTypeDetails
+     *            class to get fields to check.
+     * @return {@link ArrayAttributeValue} with fields to be published as
+     *         '@XmlElement.'
+     */
+    protected ArrayAttributeValue<StringAttributeValue> getFields(
             ClassOrInterfaceTypeDetails governorTypeDetails) {
 
         // Get the entity metadata (AJ) from governor type (Java) name
@@ -789,9 +817,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         // from governor type (Java) name
         for (FieldMetadata tmpField : tmpFields) {
 
-            boolean isAllowed = isJavaTypeAllowed(tmpField.getFieldType(),
-                    MethodParameterType.XMLENTITY,
-                    governorTypeDetails.getName());
+            boolean isAllowed = isTypeAllowed(tmpField.getFieldType(),
+                    MethodParameterType.XMLENTITY);
 
             // Add field that implements disallowed collection interface
             if (!isAllowed) {
@@ -840,6 +867,32 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     }
 
     /**
+     * Get mutable class or interface type details from java type.
+     * 
+     * @param javaType
+     *            Java type
+     * @return Mutable class or interface type
+     */
+    protected MutableClassOrInterfaceTypeDetails getTypeDetails(
+            JavaType javaType) {
+
+        // Get mutable class or interface type details from java type
+        String id = PhysicalTypeIdentifier.createIdentifier(javaType,
+                Path.SRC_MAIN_JAVA);
+        PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
+                .get(id);
+        Assert.notNull(ptm, "Java source class doesn't exists.");
+        PhysicalTypeDetails ptd = ptm.getMemberHoldingTypeDetails();
+        Assert.notNull(ptd, "Java source code details unavailable for type "
+                + PhysicalTypeIdentifier.getFriendlyName(id));
+        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, ptd,
+                "Java source code is immutable for type "
+                        + PhysicalTypeIdentifier.getFriendlyName(id));
+
+        return (MutableClassOrInterfaceTypeDetails) ptd;
+    }
+
+    /**
      * Get the entity metadata (AJ) from governor type (Java) name.
      * 
      * @param name
@@ -877,42 +930,53 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     }
 
     /**
-     * {@inheritDoc}
+     * Check if a java type is a not allowed type.
+     * 
+     * <p>
+     * The list of not allowed types are some sorted collections:
+     * </p>
+     * <ul>
+     * <li>Is an array</li>
+     * <li>Extends HashMap class</li>
+     * <li>Extends TreeMap class</li>
+     * <li>Implements Map interface</li>
+     * </ul>
+     * 
+     * @param javaType
+     *            The java type to check
+     * @return Is the java type not allowed ?
      */
-    public boolean isNotAllowedCollectionType(JavaType javaType) {
+    protected boolean isNotAllowedType(JavaType javaType) {
 
-        boolean notAllowed = false;
+        // Java type name
+        String javaName = javaType.getFullyQualifiedTypeName();
 
-        // Check if JavaType is or Extends notAllowedClassCollectionTypes.
-        for (String notAllowedClassCollection : notAllowedClassCollectionTypes) {
+        // Check if java type is or extends not allowed classes
+        for (String invalidClass : invalidClasses) {
 
-            notAllowed = extendsJavaType(javaType, notAllowedClassCollection);
-
-            if (notAllowed) {
+            if (extendsJavaType(javaType, invalidClass)) {
 
                 logger.warning("The method parameter '"
-                        + javaType.getFullyQualifiedTypeName()
-                        + "' type '"
-                        + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is or Extends a disallowed collection.");
-                return notAllowed;
+                        + javaName
+                        + "' type is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
+                        + "\nThis is or Extends a disallowed collection.");
+                return true;
             }
         }
 
-        for (String notAllowedInterfaceCollection : notAllowedIntefaceCollectionTypes) {
+        // Check if java type is or implements not allowed interfaces
+        for (String invalidInterface : invalidIntefaces) {
 
-            notAllowed = implementsJavaType(javaType,
-                    notAllowedInterfaceCollection);
-
-            if (notAllowed) {
+            if (implementsJavaType(javaType, invalidInterface)) {
                 logger.warning("The method parameter '"
-                        + javaType.getFullyQualifiedTypeName()
-                        + "' type '"
-                        + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.\nThis is or Implements a disallowed collection.");
-                return notAllowed;
+                        + javaName
+                        + "' type is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
+                        + "\nThis is or Implements a disallowed collection.");
+                return true;
             }
         }
 
-        return notAllowed;
+        return false;
     }
 
     /**
@@ -959,19 +1023,6 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                         + serviceClass.getFullyQualifiedTypeName()
                         + "'has to start with 'http://'.\ni.e.: http://name.of.namespace/");
         return webServiceTargetNamespace;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean checkIsNotRooEntity(JavaType serviceClass) {
-
-        ClassOrInterfaceTypeDetails typeDetails = typeLocationService
-                .getClassOrInterface(serviceClass);
-
-        EntityMetadata entityMetadata = getEntityMetadata(typeDetails.getName());
-
-        return entityMetadata == null;
     }
 
 }

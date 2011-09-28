@@ -18,16 +18,10 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
-import java.util.List;
-
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.ws.export.WSExportOperations.MethodParameterType;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
-import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
-import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
@@ -56,42 +50,33 @@ public interface WSExportValidationService {
             JavaSymbolName methodName);
 
     /**
-     * <p>
-     * Check if JavaType is defined in common collection type Set or extends it.
-     * </p>
-     * <p>
-     * The list of not allowed collections is defined as static in this class.
-     * </p>
-     * <p>
-     * Not allow sorted collections.
-     * </p>
+     * Check java type allowed to be used in a service operation.
+     * 
      * <ul>
-     * <li>Set</li>
-     * <li>Map</li>
-     * <li>TreeMap</li>
-     * <li>Vector</li>
-     * <li>HashSet</li>
+     * <li>Is an allowed java type in class loader: Java type and its parameters
+     * if exists are allowed; if not empty params, implements iterable or
+     * implements map</li>
+     * <li>Is an allowed java type in JDK: Java type is primitive, from
+     * java.lang package or from java.util package</li>
+     * <li>Is an allowed java type in class loader: It's not XML entity and
+     * superclass if exists is an allowed java type</li>
+     * <li></li>
      * </ul>
      * 
-     * @param javaType
-     *            to check.
-     * @return true if exists.
-     */
-    public boolean isNotAllowedCollectionType(JavaType javaType);
-
-    /**
-     * Check id JavaType is allowed type to be used in a service operation.
+     * <p>
+     * Only in last case, GvNIXXmlElement annotation is assigned to java type
+     * with attribute values from java type and elementList attribute from type
+     * details allowed element fields.
+     * </p>
      * 
      * @param javaType
-     *            of the parameter. Can't be null.
+     *            Java type (can't be null)
      * @param methodParameterType
-     *            return or input parameters to check.
-     * @param serviceClass
-     *            where is used the element.
-     * @return true if it's all correct.
+     *            Type of the java type
+     * @return Is it allowed ?
      */
-    public boolean isJavaTypeAllowed(JavaType javaType,
-            MethodParameterType methodParameterType, JavaType serviceClass);
+    public boolean isTypeAllowed(JavaType javaType,
+            MethodParameterType methodParameterType);
 
     /**
      * <p>
@@ -129,18 +114,6 @@ public interface WSExportValidationService {
             JavaSymbolName methodName, String webServiceTargetNamespace);
 
     /**
-     * Adds a declaration of <code>@WebFault</code> to exceptionClass in AspectJ
-     * file.
-     * 
-     * @param exceptionClass
-     *            to export as web service exception.
-     * @param annotationAttributeValues
-     *            defined for annotation.
-     */
-    public void exportImportedException(JavaType exceptionClass,
-            List<AnnotationAttributeValue<?>> annotationAttributeValues);
-
-    /**
      * Checks correct namespace URI format. Suffix 'http://'.
      * 
      * @param namespace
@@ -161,32 +134,4 @@ public interface WSExportValidationService {
      */
     public String getWebServiceDefaultNamespace(JavaType serviceClass);
 
-    /**
-     * Values array of allowed element fields name from governor type (Java).
-     * 
-     * <ul>
-     * <li>Get identifier and version fields from governor related entity
-     * metadata.</li>
-     * <li>Get all fields from governor and remove not allowed types fields:
-     * OneToMany, ManyToOne and OneToOne</li>
-     * <li>Remove not allowed entity types fields for entity.</li>
-     * </ul>
-     * 
-     * TODO Utility class. Remove from interface?
-     * 
-     * @param governorTypeDetails
-     *            class to get fields to check.
-     * @return {@link ArrayAttributeValue} with fields to be published as
-     *         '@XmlElement.'
-     */
-    public ArrayAttributeValue<StringAttributeValue> getFields(
-            ClassOrInterfaceTypeDetails governorTypeDetails);
-
-    /**
-     * Check if serviceClass is a Roo Entity.
-     * 
-     * @param serviceClass
-     * @return true if is not a Roo Entity.
-     */
-    public boolean checkIsNotRooEntity(JavaType serviceClass);
 }

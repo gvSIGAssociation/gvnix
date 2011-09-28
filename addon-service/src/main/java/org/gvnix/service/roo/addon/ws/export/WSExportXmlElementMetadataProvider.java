@@ -360,10 +360,9 @@ public class WSExportXmlElementMetadataProvider extends
                         if (!exportedAttributeValue.getValue()) {
 
                             Assert.isTrue(
-                                    wSExportValidationService.isJavaTypeAllowed(
+                                    wSExportValidationService.isTypeAllowed(
                                             fieldMetadata.getFieldType(),
-                                            MethodParameterType.XMLENTITY,
-                                            governorTypeDetails.getName()),
+                                            MethodParameterType.XMLENTITY),
                                     "The '"
                                             + MethodParameterType.XMLENTITY
                                             + "' type '"
