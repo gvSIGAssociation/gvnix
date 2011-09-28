@@ -1162,7 +1162,7 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
       guarde la información también en un fichero determinado y --enableViews
       especifica que también debe recoger información sobre las vistas.</para>
 
-      <programlisting>roo-gvNIX&gt; <command>database reverse engineer --schema</command> --package --testAutomatically --enableViews --includeTables --excludeTables</programlisting>
+      <programlisting>roo-gvNIX&gt; <command>database reverse engineer --schema</command> --package --testAutomatically --enableViews --includeTables --excludeTables --includeNonPortableAttributes</programlisting>
 
       <para>este comando crea las entidades JPA de nuestro proyecto
       representando las tablas y columnas de nuestra BBDD. Al igual que antes
@@ -1208,12 +1208,43 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
       este comando tantas veces como se necesite y de esta forma gvNIX
       mantendrá todas las entidades JPA de manera automática.</para>
 
+      <para>El parámetro <emphasis
+      role="bold">--includeNonPortableAttributes</emphasis> puede ser de
+      utilidad. En versiones anteriores de la funcionalidad de ingeniería
+      inversa de BBDD este parámetro no existía y, por defecto, cuando se
+      generaban las entidades se incluía en las anotaciones JPA uno atributo
+      que rompía la portabilidad del código Java para trabajar con BBDD
+      distintas a la de origen. El atributo en cuestión es
+      <emphasis>columnDefinition</emphasis>, que sirve para indicar el tipo de
+      dato usado para crear la columna en la BBDD. Este atributo se utiliza en
+      dos fases: cuando se delega en JPA la creación de las tablas de la BBDD
+      (propiedad <emphasis>hibernate.hbm2ddl.auto</emphasis> con valor
+      <emphasis>create</emphasis> de Hibernate), de esta forma se indica el
+      tipo de dato físico utilizado en la BBDD y también se utiliza en la fase
+      de validación del esquema de BBDD en el arranque de la aplicación
+      (propiedad <emphasis>hibernate.hbm2ddl.auto</emphasis> con valor
+      <emphasis>validate</emphasis>), que comprueba que las entidades de
+      nuestro proyecto cumplen en esquema de BBDD y por tanto son
+      compatibles.</para>
+
+      <para>Por tanto hay que tener en cuenta este detalle al hacer la
+      ingeniería inversa de la BBDD. Si vamos a seguir trabajando con la misma
+      BBDD original, podemos optar por requerir que se incluyan los atributos
+      "no portables" en la generación de las entidades. Por contra, si nuestra
+      aplicación se va a ejecutar en una BBDD distinta, es mejor no incluir
+      estos atributos y no usar este parámetro del comando <emphasis>database
+      reverse engineer</emphasis>.</para>
+
       <important>
         <para>Cuando empezamos a usar el Add-on de ingeniería inversa se
         modifica el fichero META-INF/persistence.xml cambiando el valor de la
         propiedad <emphasis>hibernate.hbm2ddl.auto</emphasis> por el de
-        validate para evitar que pongamos en peligro la integridad de la BBDD
-        a la que estamos conectados en nuestro proyecto.</para>
+        <emphasis>validate</emphasis> para evitar que pongamos en peligro la
+        integridad de la BBDD a la que estamos conectados en nuestro proyecto.
+        Si hemos utilizado la opción --includeNonPortableAttributes
+        necesitaremos cambiar el valor de esta propiedad por
+        <emphasis>none</emphasis> para evitar la fase de validación del
+        esquema.</para>
       </important>
     </section>
 
