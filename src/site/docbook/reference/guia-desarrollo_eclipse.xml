@@ -76,6 +76,24 @@
         Preferences &gt; General &gt; Workspace &gt; Refresh
         Automatically</literal></emphasis></emphasis>.</para>
       </listitem>
+
+      <listitem>
+        <para>Opcionalmente podemos instalar el plugin Subeclipse que trabaja
+        sobre el sistema de control de versiones Subversion (SVN).</para>
+
+        <para>Para ello en Eclipse, en el menú <emphasis>Help &gt; Install New
+        Software</emphasis>. En la ventana que se abre hacer click sobre el
+        botón <emphasis>Add</emphasis> que hay a la derecha de <emphasis>Work
+        with</emphasis>. Se nos abre un diálogo en el que indicamos como
+        nombre Subeclipse por ejemplo y en la URL indicamos
+        <emphasis>http://subclipse.tigris.org/update_1.6.x</emphasis>
+        guardamos con <emphasis>OK</emphasis> y la ventana anterior empezará
+        la carga de los plugins que hay disponibles. Los seleccionamos y
+        seguimos con haciendo click en <emphasis>Next</emphasis>. (La URL
+        indicada es de la versión actual, revisar el sitio oficial de <link
+        xlink:href="http://subclipse.tigris.org/servlets/ProjectProcess?pageID=p4wYuA">Subeclipse</link>
+        para más información y futuras versiones).</para>
+      </listitem>
     </itemizedlist>
 
     <para>Para utilizar Eclipse como IDE de desarrollo de los proyectos gvNIX
@@ -667,7 +685,7 @@ Created ...</programlisting>
     los campos y métodos asociados a la clase Java mediante AspectJ de los que
     hablaremos en el Cápitulo sobre el <link
     linkend="guia-desarrollo_generacion-codigo">código que genera
-    gvNIX/Roo</link>. </para>
+    gvNIX/Roo</link>.</para>
 
     <para>Esta información también está disponible desde un menú contextual
     accesible haciendo click con el botón derecho sobre la flecha que hay a la

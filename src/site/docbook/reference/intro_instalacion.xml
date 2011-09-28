@@ -143,7 +143,41 @@ OS name: "linux", version: "2.6.35-28-generic", arch: "amd64", family: "unix"</p
           <para>Es posible que nuestra red de trabajo requiera de la
           configuración de un Proxy de acesso a internet.</para>
 
-          <para>TBC.</para>
+          <para>gvNIX/Roo dispone de un comando que nos indica si nuestra
+          instalación de Java está, o no, configurada para conectar a Internet
+          através de un proxy.</para>
+
+          <programlisting>roo-gvNIX&gt; <emphasis role="bold">proxy configuration</emphasis>
+                     *** Your system has no proxy setup ***
+http://download.oracle.com/javase/6/docs/technotes/guides/net/proxies.html offers useful information.
+For most people, simply edit /etc/java-6-openjdk/net.properties (or equivalent) and set the
+java.net.useSystemProxies=true property to use your operating system-defined proxy settings.</programlisting>
+
+          <para>En el ejemplo anterior nos indica que no tenemos ningún proxy
+          configurado. Si necesitamos hacerlo podemos podemos seguir la guía
+          tal y como indica la salida del comando o, igualmente, usar la
+          propiedad <emphasis>java.net.useSystemProxies=true</emphasis>. En
+          resumen la configuración se hace a nivel de JRE. Si hemos seguido
+          las recomendaciones para instalar Java, podemos ir a
+          /home/usuario/software/java/jdk1.&lt;version&gt;/jre/lib. Aquí
+          tenemos el archivo net.properties que debemos editar y configurarlo
+          según nuestras necesidades (buscar las propiedades descritas a
+          continución y si no existen añadirlas):</para>
+
+          <programlisting>java.net.useSystemProxies=false|true
+
+http.proxyHost=&lt;host_del_proxy_de_red (ejemplo: proxy.mired.com)&gt;
+http.proxyPort=&lt;puerto_del_proxy&gt;
+http.nonProxyHosts=&lt;hosts para los cuales no queremos pasar por el proxy (ejemplo: localhost|127.0.0.1|192.168.1.*|*.mired.com)&gt;
+
+https.proxyHost=&lt;host_del_proxy_para_protocolo_HTTPS&gt;
+https.proxyPort=&lt;puerto_del_proxy&gt;</programlisting>
+
+          <para>Estas son las más comunes.</para>
+
+          <para>Si configuramos alguna de estas porpiedades el comando
+          <emphasis>proxy configuration</emphasis> nos devolverá la propiedad
+          y el valor configurado.</para>
         </listitem>
       </itemizedlist>
     </section>
@@ -168,8 +202,8 @@ OS name: "linux", version: "2.6.35-28-generic", arch: "amd64", family: "unix"</p
 
       <listitem>
         <para>Al descomprimir el fichero ZIP se creará un nuevo directorio
-        <emphasis>gvNIX-X.Y.Z.RELEASE</emphasis>. En el resto del documento nos
-        referiremos a este directorio como
+        <emphasis>gvNIX-X.Y.Z.RELEASE</emphasis>. En el resto del documento
+        nos referiremos a este directorio como
         <emphasis>GVNIX_HOME</emphasis></para>
       </listitem>
 
