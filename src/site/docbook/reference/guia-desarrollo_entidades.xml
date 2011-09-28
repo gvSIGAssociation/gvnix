@@ -922,6 +922,70 @@ public class Entity1 {
           xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/GeneratedValue.html">@GeneratedValue</link></classname>
           ) consultar el <link
           xlink:href="http://java.sun.com/javaee/5/docs/api/index.html?javax/persistence/package-summary.html">API</link>.</para>
+
+          <para>Si usamos Hibernate como proveedor ORM, la anotación
+          <emphasis>@GeneratedValue(strategy =
+          GenerationType.AUTO)</emphasis>, por defecto, indica que se usará la
+          secuencia <emphasis>hibernate_sequence</emphasis> como valor
+          incremental para el identificador de los registros de esta Entidad.
+          Por tanto, esta secuencia debe estar creada en la BBDD sobre la que
+          se ejecuta la aplicación, de lo contrario se producirá un error al
+          no poder obtener el siguiente valor de la sequencia antes de crear
+          un nuevo registro. Además, con el código generado al crear las
+          distintas Entidades, todas ellas usaran la misma secuencia para
+          obtener los identificadores de los registros que se vayan creando.
+          Por lo general, este no es el comportamiento deseado y necesitamos
+          especificar una sequencia distinta para cada Entidad.</para>
+
+          <para>Para especificar que secuencia se usará para obtener el valor
+          identificador del registro a crear en una Entidad determinada,
+          deberemos <link
+          linkend="guia-desarrollo_eclipse-modificar-codigo">modificar el
+          código generado</link>. Debemos llevar el campo anotado con @Id al
+          .java de la Entidad, y una vez allí cambiaremos la declaración del
+          campo @Id de la siguiente forma:</para>
+
+          <programlisting>@Id
+<emphasis role="bold">@SequenceGenerator(name="ent1_seq_generator", sequenceName="entity1_sequence")</emphasis>
+@GeneratedValue(<emphasis role="bold">strategy = GenerationType.SEQUENCE, generator="ent1_seq_generator"</emphasis>)
+@Column(name = "ENT1_ID")
+private Long ent1Id;</programlisting>
+
+          <para>Mediante la anotación
+          <emphasis>@javax.persistence.SequenceGenerator</emphasis> estamos
+          indicando que se usa la sequencia
+          <emphasis>entity1_sequence</emphasis> definida en la BBDD a la que
+          se le asigna el nombre de referencia
+          <emphasis>ent1_seq_generator</emphasis>. Notar que se ha cambiado
+          los atributos de la anotación <emphasis>@GeneratedValue</emphasis>
+          para indicar que se usará la secuencia definida por la anotación
+          <emphasis>@SequenceGenerator</emphasis>.</para>
+
+          <para>Como hemos comentado, recordar que, las secuencias que se usan
+          en las Entidades han de existir en la BBDD. Deberemos crearlas
+          mediante la sintaxis propia de la BBDD o bien, si podemos delegarlo
+          en Hibernate, podemos modificar la propiedad, del archivo
+          <emphasis>persistence.xml</emphasis>,
+          <emphasis>hibernate.hbm2ddl.auto</emphasis> con valor
+          <emphasis>update</emphasis> de forma que, al arrancar la aplicación,
+          creará las secuencias necesarias (<emphasis role="bold">CONSULTAR
+          con el administrador de BBDD si podemos hacerlo
+          así</emphasis>).</para>
+
+          <para>Cuando se usa una secuencia como identificador, antes de
+          insertar un nuevo registro, el ORM debe consultar cual es valor de
+          la secuencia que debe asiganarle. Esto implica una cosulta por cada
+          inserción, con el consecuente sobrecoste. Hibernate, por defecto,
+          intenta evitar este sobrecoste reservando unos cuantos valores de la
+          secuencia la primera vez que se usa tras arrancar la aplicación (por
+          defecto reserva los siguientes 50). Mientras no consuma estos
+          valores, no volverá a solicitar el siguiente valor de la secuencia.
+          Para más información sobre la optimización de generadores de
+          secuencia consultar la <link
+          xlink:href="http://docs.jboss.org/hibernate/core/3.3/reference/en/html/mapping.html#mapping-declaration-id-enhanced-optimizers">documenteación
+          de Hibernate</link>. Podemos modificar este comportamiento añadiendo
+          a la anotación <emphasis>@SequenceGenerator</emphasis> el atributo
+          <emphasis>allocationSize = 1.</emphasis></para>
         </listitem>
       </orderedlist>
     </section>
