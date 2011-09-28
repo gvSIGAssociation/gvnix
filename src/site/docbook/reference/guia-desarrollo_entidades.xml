@@ -855,6 +855,66 @@ public class Entity1 {
       </example>
     </section>
 
+    <section>
+      <title>Campos calculados</title>
+
+      <para>Los campos <emphasis>@Transient</emphasis> son de utildad cuando
+      necesitamos que en el Objeto de la entidad se almacene o se calcule
+      algún dato y que este no se tenga en cuenta al guardar (sentencias
+      insert o update) la instancia en la BBDD. Por ejemplo en una Entidad
+      Persona podríamos tener la siguiente declaración de campos:</para>
+
+      <programlisting>public class Persona {
+
+    private String name;
+    private String lastName;
+
+    <emphasis role="bold">@Transient</emphasis>
+    private String fullName;
+}</programlisting>
+
+      <para>Con esta declaración tenemos la posibildad de guardar
+      temporalemente en el campo <emphasis>fullName</emphasis> la
+      concatenación de <emphasis>name</emphasis> y
+      <emphasis>lastName</emphasis>, por motivos de simplicidad, y sin tener
+      que modificar la estructura de la tabla de la BBDD para ello.</para>
+
+      <para>Si estamos usando Hibernate como proveedor de persistencia, existe
+      otra anotación que en ocasiones nos puede ayudar si necesitamos que,
+      para un registro dado, se calcule algún valor de manera automática
+      haciendo una cosulta sobre la BBDD. Se trata de la anotación
+      <emphasis>org.hibernate.annotations.Formula</emphasis>.</para>
+
+      <para><emphasis>@Formula</emphasis> tiene como atributo una cadena que
+      se usa como sentencia SQL. Esta se ejecuta cada vez que se carga el
+      registro de la BBDD y el resultado se almacena en el campo con esta
+      anotación. Siguiendo con el ejemplo anterior, en esta ocasión podríamos
+      tener lo siguiente:</para>
+
+      <programlisting>public class Persona {
+
+    private String name;
+    private String lastName;
+
+    <emphasis role="bold">@Formula("(SELECT name || ' ' || lastName from persona)")</emphasis>
+    private String fullName;
+}</programlisting>
+
+      <para>En el ejemplo cuando se carga una instancia de la entidad persona
+      se ejecutará la consulta definida y en el campo fullName tendremos
+      disponible el resultado de la consulta. La cosulta puede ser tan
+      compleja como necesitemos, incluso incluir subconsultas. El campo
+      anotado con <emphasis>@Formula</emphasis> es tratado como de solo
+      lectura y, por tanto, no se tendrá en cuenta en las operaciones de
+      escritura de la BBDD.</para>
+
+      <para>Otra forma de calcular valores, sin el uso de campos de la BBDD,
+      consiste en declarar un método en la entidad que realice las operaciones
+      necesarias para devolver el valor calculado. De esta forma, tenemos
+      acceso al cálculo sin tener que declarar un campo (con sus respectivos
+      get/set).</para>
+    </section>
+
     <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_clave-primaria">
       <title>Clave primaria</title>
 
