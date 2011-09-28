@@ -162,30 +162,25 @@ public interface WSExportValidationService {
     public String getWebServiceDefaultNamespace(JavaType serviceClass);
 
     /**
-     * Retrieves all fields with aren't annotated with
+     * Values array of allowed element fields name from governor type (Java).
+     * 
      * <ul>
-     * <li>@OneToMany</li>
-     * <li>@ManyToOne</li>
-     * <li>@OneToOne</li>
-     * </ul>
-     * or are not:
-     * <ul>
-     * <li>Unsupported Collections.</li>
-     * <li>Project Objects.</li>
+     * <li>Get identifier and version fields from governor related entity
+     * metadata.</li>
+     * <li>Get all fields from governor and remove not allowed types fields:
+     * OneToMany, ManyToOne and OneToOne</li>
+     * <li>Remove not allowed entity types fields for entity.</li>
      * </ul>
      * 
      * TODO Utility class. Remove from interface?
      * 
      * @param governorTypeDetails
      *            class to get fields to check.
-     * @param gvNixxmlElementAnnotationMetadata
-     *            to check element values.
      * @return {@link ArrayAttributeValue} with fields to be published as
      *         '@XmlElement.'
      */
-    public ArrayAttributeValue<StringAttributeValue> getElementFields(
-            ClassOrInterfaceTypeDetails governorTypeDetails,
-            MethodParameterType methodParameterType);
+    public ArrayAttributeValue<StringAttributeValue> getFields(
+            ClassOrInterfaceTypeDetails governorTypeDetails);
 
     /**
      * Check if serviceClass is a Roo Entity.

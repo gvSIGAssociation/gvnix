@@ -654,8 +654,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
             annotationAttributeValueList.add(namespaceStringAttributeValue);
 
             // Create attribute elementList for allowed javaType fields.
-            ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue = getElementFields(
-                    mutableTypeDetails, methodParameterType);
+            ArrayAttributeValue<StringAttributeValue> elementListArrayAttributeValue = getFields(mutableTypeDetails);
 
             StringAttributeValue xmlTypeNameStringAttributeValue;
             if (elementListArrayAttributeValue != null
@@ -711,103 +710,146 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * {@inheritDoc}
      */
-    public ArrayAttributeValue<StringAttributeValue> getElementFields(
+    public ArrayAttributeValue<StringAttributeValue> getFields(
+            ClassOrInterfaceTypeDetails governorTypeDetails) {
+
+        // Get the entity metadata (AJ) from governor type (Java) name
+        EntityMetadata entity = getEntityMetadata(governorTypeDetails.getName());
+
+        // Get allowed element fields
+        List<FieldMetadata> fields = getAllowedElementFields(
+                governorTypeDetails, entity);
+
+        // Create a list of values from element list field names
+        List<StringAttributeValue> values = new ArrayList<StringAttributeValue>();
+        for (FieldMetadata field : fields) {
+
+            StringAttributeValue value = new StringAttributeValue(
+                    new JavaSymbolName("ignored"), field.getFieldName()
+                            .getSymbolName());
+            if (!values.contains(value)) {
+                values.add(value);
+            }
+        }
+
+        return new ArrayAttributeValue<StringAttributeValue>(
+                new JavaSymbolName("elementList"), values);
+    }
+
+    /**
+     * Get allowed element fields from governor type and entity metadata.
+     * 
+     * <ul>
+     * <li>Get identifier and version fields from entity.</li>
+     * <li>Get all fields from governor and remove not allowed types fields.</li>
+     * <li>Remove not allowed entity types fields for entity.</li>
+     * </ul>
+     * 
+     * @param governorTypeDetails
+     *            Governor type (Java)
+     * @param entity
+     *            Entity metadata (AJ)
+     * @return Field metadata list of allowed element fields
+     */
+    protected List<FieldMetadata> getAllowedElementFields(
             ClassOrInterfaceTypeDetails governorTypeDetails,
-            MethodParameterType methodParameterType) {
+            EntityMetadata entity) {
 
-        List<FieldMetadata> fieldMetadataTransientList = new ArrayList<FieldMetadata>();
-        List<FieldMetadata> fieldMetadataElementList = new ArrayList<FieldMetadata>();
+        // Element fields list
+        List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
 
-        List<FieldMetadata> tmpFieldMetadataElementList = new ArrayList<FieldMetadata>();
-
-        String identifier = EntityMetadata.createIdentifier(
-                governorTypeDetails.getName(), Path.SRC_MAIN_JAVA);
-
-        // Obtain the entity metadata type and itd mutable details.
-        EntityMetadata entityMetadata = (EntityMetadata) metadataService
-                .get(identifier);
-
-        // Check if exists add id and version fields.
-        if (entityMetadata != null && entityMetadata.isValid()) {
-            if (entityMetadata.getIdentifierField() != null) {
-                fieldMetadataElementList.add(entityMetadata
-                        .getIdentifierField());
+        // Element list: Add identifier and version fields from entity (AJ)
+        if (entity != null && entity.isValid()) {
+            // Identifier and/or version can not exists
+            if (entity.getIdentifierField() != null) {
+                fields.add(entity.getIdentifierField());
             }
-            if (entityMetadata.getVersionField() != null) {
-                fieldMetadataElementList.add(entityMetadata.getVersionField());
+            if (entity.getVersionField() != null) {
+                fields.add(entity.getVersionField());
             }
         }
 
-        // Retrieve the fields that are defined as OneToMany relationship.
-        List<FieldMetadata> oneToManyFieldMetadataList = MemberFindingUtils
-                .getFieldsWithAnnotation(governorTypeDetails, new JavaType(
-                        "javax.persistence.OneToMany"));
-
-        fieldMetadataTransientList.addAll(oneToManyFieldMetadataList);
-
-        // Retrieve the fields that are defined as ManyToOne relationship.
-        List<FieldMetadata> manyToOneFieldMetadataList = MemberFindingUtils
-                .getFieldsWithAnnotation(governorTypeDetails, new JavaType(
-                        "javax.persistence.ManyToOne"));
-
-        fieldMetadataTransientList.addAll(manyToOneFieldMetadataList);
-
-        // Retrieve the fields that are defined as OneToOne relationship.
-        List<FieldMetadata> oneToOneFieldMetadataList = MemberFindingUtils
-                .getFieldsWithAnnotation(governorTypeDetails, new JavaType(
-                        "javax.persistence.OneToOne"));
-
-        fieldMetadataTransientList.addAll(oneToOneFieldMetadataList);
-
-        // Unsupported collection.
-        List<? extends FieldMetadata> declaredFieldList = governorTypeDetails
-                .getDeclaredFields();
-
-        // Remove checked fields from collection.
-        for (FieldMetadata declaredField : declaredFieldList) {
-            if (!fieldMetadataElementList.contains(declaredField)) {
-                fieldMetadataElementList.add(declaredField);
+        // Element list: Add all fields from governor type (Java)
+        // May have transient fields
+        for (FieldMetadata field : governorTypeDetails.getDeclaredFields()) {
+            // Not repeat fields, like previous identifier and/or version
+            if (!fields.contains(field)) {
+                fields.add(field);
             }
         }
 
-        fieldMetadataElementList.removeAll(fieldMetadataTransientList);
-        tmpFieldMetadataElementList.addAll(fieldMetadataElementList);
+        // Element list: Remove transient fields
+        fields.removeAll(getTransientFields(governorTypeDetails));
 
-        boolean isAllowed;
+        // Temporary fields list initialized with element fields
+        List<FieldMetadata> tmpFields = new ArrayList<FieldMetadata>();
+        tmpFields.addAll(fields);
 
-        // Transient collection fields.
-        for (FieldMetadata fieldMetadata : tmpFieldMetadataElementList) {
+        // Element list: Remove not allowed types fields
+        // from governor type (Java) name
+        for (FieldMetadata tmpField : tmpFields) {
 
-            isAllowed = isJavaTypeAllowed(fieldMetadata.getFieldType(),
+            boolean isAllowed = isJavaTypeAllowed(tmpField.getFieldType(),
                     MethodParameterType.XMLENTITY,
                     governorTypeDetails.getName());
 
-            // Add field that implements disallowed collection
-            // interface.
+            // Add field that implements disallowed collection interface
             if (!isAllowed) {
-                fieldMetadataElementList.remove(fieldMetadata);
+                fields.remove(tmpField);
             }
         }
 
-        // Create array Attribute.
-        StringAttributeValue propOrderAttributeValue;
-        List<StringAttributeValue> propOrderList = new ArrayList<StringAttributeValue>();
+        return fields;
+    }
 
-        for (FieldMetadata fieldMetadata : fieldMetadataElementList) {
-            propOrderAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("ignored"), fieldMetadata.getFieldName()
-                            .getSymbolName());
+    /**
+     * Get transient fields from governor type.
+     * 
+     * <ul>
+     * <li>Get OneToMany fields from governor type (Java).</li>
+     * <li>Get ManyToOne fields from governor type (Java).</li>
+     * <li>Get OneToOne fields from governor type (Java).</li>
+     * </ul>
+     * 
+     * @param governorTypeDetails
+     *            Governor type (Java)
+     * @return Field metadata list of transient fields
+     */
+    protected List<FieldMetadata> getTransientFields(
+            ClassOrInterfaceTypeDetails governorTypeDetails) {
 
-            if (!propOrderList.contains(propOrderAttributeValue)) {
-                propOrderList.add(propOrderAttributeValue);
-            }
-        }
+        // Fields list
+        List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
 
-        ArrayAttributeValue<StringAttributeValue> propOrderAttributeList = new ArrayAttributeValue<StringAttributeValue>(
-                new JavaSymbolName("elementList"), propOrderList);
+        // Add OneToMany fields from governor type (Java)
+        fields.addAll(MemberFindingUtils.getFieldsWithAnnotation(
+                governorTypeDetails,
+                new JavaType("javax.persistence.OneToMany")));
 
-        return propOrderAttributeList;
+        // Add ManyToOne fields from governor type (Java)
+        fields.addAll(MemberFindingUtils.getFieldsWithAnnotation(
+                governorTypeDetails,
+                new JavaType("javax.persistence.ManyToOne")));
 
+        // Add OneToOne fields from governor type (Java)
+        fields.addAll(MemberFindingUtils
+                .getFieldsWithAnnotation(governorTypeDetails, new JavaType(
+                        "javax.persistence.OneToOne")));
+
+        return fields;
+    }
+
+    /**
+     * Get the entity metadata (AJ) from governor type (Java) name.
+     * 
+     * @param name
+     *            Gobernor type (Java) name
+     * @return Related entity metadata (AJ)
+     */
+    protected EntityMetadata getEntityMetadata(JavaType name) {
+
+        return (EntityMetadata) metadataService.get(EntityMetadata
+                .createIdentifier(name, Path.SRC_MAIN_JAVA));
     }
 
     /**
@@ -927,11 +969,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         ClassOrInterfaceTypeDetails typeDetails = typeLocationService
                 .getClassOrInterface(serviceClass);
 
-        String identifier = EntityMetadata.createIdentifier(
-                typeDetails.getName(), Path.SRC_MAIN_JAVA);
-
-        EntityMetadata entityMetadata = (EntityMetadata) metadataService
-                .get(identifier);
+        EntityMetadata entityMetadata = getEntityMetadata(typeDetails.getName());
 
         return entityMetadata == null;
     }
