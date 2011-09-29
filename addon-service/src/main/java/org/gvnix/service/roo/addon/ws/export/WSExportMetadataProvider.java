@@ -224,10 +224,10 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
                 // Prepares INPUT/OUTPUT parameters
                 wSExportValidationService
-                        .prepareAuthorizedJavaTypesInOperation(method);
+                        .prepareAllowedJavaTypes(method);
 
                 // Prepares exceptions.
-                wSExportValidationService.prepareMethodExceptions(method,
+                wSExportValidationService.prepareExceptions(method,
                         webServiceTargetNamespace);
 
                 // Checks @GvNIXWebMethod has attributes.

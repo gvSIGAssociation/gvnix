@@ -21,7 +21,6 @@ package org.gvnix.service.roo.addon.ws.export;
 import java.util.List;
 
 import org.springframework.roo.classpath.details.MethodMetadata;
-import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
@@ -73,21 +72,26 @@ public interface WSExportOperations {
             String portTypeName, String targetNamespace, String addressName);
 
     /**
-     * <p>
-     * Exports a class method as a Web Service Operation.
-     * </p>
-     * <p>
-     * <code>serviceClass</code> will be annotated as a Web Service if it's
-     * needed
-     * </p>
+     * Exports a class method as a web service operation.
      * 
-     * @param serviceClass
+     * <ul>
+     * <li>Java class will be created if not exists.</li>
+     * <li>Method searching in Java and AspectJ related files without
+     * GvNIXWebService annotation already.</li>
+     * <li>Check return and parameters types and add GvNIXXmlElement if
+     * required.</li>
+     * <li>Check method throws and update with web fault declaration if needed.</li>
+     * <li>Create GvNIXWebMethod annotation for Method.</li>
+     * <li>Add @GvNIXWebParam & @WebParam parameter annotations.</li>
+     * </ul>
+     * 
+     * @param javaType
      *            Class to export a method.
      * @param methodName
      *            Method to export.
      * @param operationName
      *            Name of the method to be showed as a Web Service operation.
-     * @param resutlName
+     * @param resultName
      *            Method result name.
      * @param resultNamespace
      *            Namespace of the result type.
@@ -101,18 +105,32 @@ public interface WSExportOperations {
      *            Namespace of the Request Wrapper Object.
      * 
      */
-    public void exportOperation(JavaType serviceClass,
-            JavaSymbolName methodName, String operationName, String resutlName,
-            String resultNamespace, String responseWrapperName,
-            String responseWrapperNamespace, String requestWrapperName,
-            String requestWrapperNamespace);
+    public void exportOperation(JavaType javaType, JavaSymbolName methodName,
+            String operationName, String resultName, String resultNamespace,
+            String responseWrapperName, String responseWrapperNamespace,
+            String requestWrapperName, String requestWrapperNamespace);
 
     /**
-     * Creates the list of annotations with the values defined.
+     * Creates a gvNIX web method annotation with the values defined.
      * 
-     * @param serviceClass
-     *            Class to export a method.
-     * @param methodName
+     * <p>
+     * If the values are not set, define them using WS-i standard names.
+     * Attributes created into gvNIX web service annotation are used to
+     * generate:
+     * </p>
+     * 
+     * <ul>
+     * <li>javax.xml.ws.WebMethod: operationName</li>
+     * <li>javax.xml.ws.RequestWrapper: requestWrapperName,
+     * requestWrapperNamespace, requestWrapperClassName</li>
+     * <li>javax.xml.ws.WebResult: resultName, resultNamespace, webResultType</li>
+     * <li>javax.xml.ws.ResponseWrapper: responseWrapperName,
+     * responseWrapperNamespace, responseWrapperClassName</li>
+     * <ul>
+     * 
+     * @param javaType
+     *            Java type to export a method.
+     * @param method
      *            Method to export.
      * @param operationName
      *            Name of the method to be showed as a Web Service operation.
@@ -130,46 +148,16 @@ public interface WSExportOperations {
      *            Name to define the Request Wrapper Object.
      * @param requestWrapperNamespace
      *            Request Wrapper Object Namespace.
-     * @param webServiceTargetNamespace
+     * @param targetNamespace
      *            Web Service Namespace.
-     * 
-     * @return Annotation list for method methodName.
-     * 
+     * @return gvNIX web method annotation for method.
      */
-    public List<AnnotationMetadata> getAnnotationsToExportOperation(
-            JavaType serviceClass, JavaSymbolName methodName,
-            String operationName, String resultName, JavaType returnType,
-            String resultNamespace, String responseWrapperName,
-            String responseWrapperNamespace, String requestWrapperName,
-            String requestWrapperNamespace, String webServiceTargetNamespace);
-
-    /**
-     * Check if the method methodName exists in serviceClass and can be
-     * exported.
-     * 
-     * @param serviceClass
-     *            to check if method exists
-     * @param methodName
-     *            method to check if exists and is annotation defined.
-     * 
-     * @return true if method exists and annotation is not defined.
-     */
-    public boolean isMethodAvailableToExport(MethodMetadata methodMetadata);
-
-    /**
-     * Creates the list of annotations for each method input parameter with
-     * values defined.
-     * 
-     * @param serviceClass
-     *            Service to export operation
-     * @param methodName
-     *            Method to update with annotations.
-     * @param webServiceTargetNamespace
-     *            Web Service Namespace.
-     * @return Annotation
-     */
-    public List<AnnotatedJavaType> getMethodParameterAnnotations(
-            MethodMetadata methodMetadata, String webServiceTargetNamespace);
+    public AnnotationMetadata getGvNIXWebMethodAnnotation(JavaType javaType,
+            MethodMetadata method, String operationName, String resultName,
+            JavaType returnType, String resultNamespace,
+            String responseWrapperName, String responseWrapperNamespace,
+            String requestWrapperName, String requestWrapperNamespace,
+            String targetNamespace);
 
     /**
      * Creates the list of annotations attribute values to export a web service

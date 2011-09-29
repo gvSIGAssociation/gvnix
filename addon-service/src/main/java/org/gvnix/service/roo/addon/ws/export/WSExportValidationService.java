@@ -19,7 +19,6 @@
 package org.gvnix.service.roo.addon.ws.export;
 
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
-import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.ws.export.WSExportOperations.MethodParameterType;
 import org.springframework.roo.classpath.details.MethodMetadata;
@@ -36,17 +35,23 @@ import org.springframework.roo.model.JavaType;
 public interface WSExportValidationService {
 
     /**
-     * Checks if JavaTypes input/output parameters involved in operation are
-     * permitted to be published in web service and adds {@link GvNIXXmlElement}
-     * annotation to any related project type which needs it.
+     * Check method return and parameters types allowed.
      * 
-     * @param serviceClass
-     *            to check if the method is correct to be published.
-     * @param methodName
-     *            method to check if input/output parameters ara permitted to be
-     *            publish in web service.
+     * <p>
+     * Adds {@link GvNIXXmlElement} annotation to allowed types which needs it.
+     * </p>
+     * 
+     * <p>
+     * If exists any disallowed JavaType in operation: Cancel all the process
+     * and show a message explaining that it's not possible to publish this
+     * operation because the parameter can't be Marshalled according Ws-I
+     * standards.
+     * </p>
+     * 
+     * @param method
+     *            Method to check valid return and type parameters.
      */
-    public void prepareAuthorizedJavaTypesInOperation(MethodMetadata method);
+    public void prepareAllowedJavaTypes(MethodMetadata method);
 
     /**
      * Check java type allowed to be used in a service operation.
@@ -78,42 +83,33 @@ public interface WSExportValidationService {
             MethodParameterType methodParameterType);
 
     /**
+     * Set method exception throws to publish as fault in service operation.
+     * 
      * <p>
-     * Check method exceptions to publish in service operation.
+     * Add fault annotations to each founded exception. There are two exceptions
+     * types and two ways to define annotations:
      * </p>
-     * <p>
-     * Add web services annotations to each founded exception.
-     * </p>
-     * <p>
-     * There are two exceptions types and two ways to define annotations:
-     * </p>
+     * 
      * <ul>
-     * <li>Exceptions defined in the project.
-     * <p>
-     * Add {@link GvNIXWebFault} annotation to Exception.
-     * </p>
-     * </li>
-     * <li>Exceptions imported into the project.
-     * <p>
-     * Add web service fault annotation using AspectJ template.
-     * </p>
-     * </li>
+     * <li>Exceptions defined in the project: Add {@link GvNIXWebFault}
+     * annotation to Exception.</li>
+     * <li>Exceptions imported into the project: Add web service fault
+     * annotation using AspectJ template in exceptions sub package.</li>
      * </ul>
      * 
-     * @param serviceClass
-     *            where the method is defined.
-     * @param methodName
-     *            to check its exceptions.
-     * @param webServiceTargetNamespace
-     *            Web Service Namespace.
-     * @return true if the exceptions are published correctly or false if the
-     *         exceptions don't exists or are incorrect.
+     * @param method
+     *            to check its exceptions
+     * @param targetNamespace
+     *            Web Service Namespace
      */
-    public boolean prepareMethodExceptions(MethodMetadata method,
-            String webServiceTargetNamespace);
+    public void prepareExceptions(MethodMetadata method, String targetNamespace);
 
     /**
-     * Checks correct namespace URI format. Suffix 'http://'.
+     * Checks correct namespace URI format (preffix 'http://').
+     * 
+     * <p>
+     * If String is blank is also correct.
+     * </p>
      * 
      * @param namespace
      *            string to check as correct namespace.
@@ -122,15 +118,22 @@ public interface WSExportValidationService {
     public boolean checkNamespaceFormat(String namespace);
 
     /**
-     * Check if serviceClass has defined {@link GvNIXWebService} annotation with
-     * valid 'targetNamespace' attribute and returns it if is correct.
+     * Check java type defined GvNIXWebService and valid target namespace.
      * 
-     * @param serviceClass
-     *            Web Service class to check correct target Namespace and return
-     *            as result.
-     * @return targetNamespace attribute from annotation {@link GvNIXWebService}
-     *         .
+     * <p>
+     * IllegalArgumentException when:
+     * </p>
+     * <ul>
+     * <li>No available mutable java type</li>
+     * <li>No GvNIXWebService in java type</li>
+     * <li>No target namespace attribute in GvNIXWebService</li>
+     * <li>Invalid target namespace value (valid is blank or URI format)</li>
+     * </ul>
+     * 
+     * @param javaType
+     *            Java type to target namespace annotation attribute
+     * @return valid targetNamespace attribute from annotation GvNIXWebService
      */
-    public String getWebServiceDefaultNamespace(JavaType serviceClass);
+    public String getWebServiceDefaultNamespace(JavaType javaType);
 
 }

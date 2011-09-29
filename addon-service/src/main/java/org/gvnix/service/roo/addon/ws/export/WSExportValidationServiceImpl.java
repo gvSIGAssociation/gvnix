@@ -39,7 +39,6 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
-import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
@@ -95,8 +94,6 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     @Reference
     private WSConfigService wSConfigService;
     @Reference
-    private JavaParserService javaParserService;
-    @Reference
     private AnnotationsService annotationsService;
     @Reference
     private TypeLocationService typeLocationService;
@@ -128,75 +125,86 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * {@inheritDoc}
      */
-    public boolean prepareMethodExceptions(MethodMetadata method,
-            String webServiceTargetNamespace) {
+    public void prepareExceptions(MethodMetadata method,
+            String targetNamespace) {
 
+        // Method is required
         Assert.isTrue(method != null, "The method doesn't exists in the class");
 
+        // Get all throws types
         List<JavaType> throwsTypes = method.getThrowsTypes();
+        for (JavaType throwsType : throwsTypes) {
 
-        String fileLocation;
-
-        boolean extendsThrowable = true;
-
-        for (JavaType throwType : throwsTypes) {
-
-            extendsThrowable = checkExceptionExtension(throwType);
-
+            // Check if throws java type extends java.lang.Throwable
+            boolean extendsThrowable = checkExceptionExtension(throwsType);
             Assert.isTrue(
                     extendsThrowable,
                     "The '"
-                            + throwType.getFullyQualifiedTypeName()
+                            + throwsType.getFullyQualifiedTypeName()
                             + "' class doesn't extend from 'java.lang.Throwable'."
                             + "'\nIt can't be used as Exception in method to be thrown.");
 
-            fileLocation = projectOperations.getPathResolver().getIdentifier(
-                    Path.SRC_MAIN_JAVA,
-                    throwType.getFullyQualifiedTypeName().replace('.', '/')
-                            .concat(".java"));
+            // Create annotation attributes
+            List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+            attrs.add(new StringAttributeValue(new JavaSymbolName("name"),
+                    StringUtils.uncapitalize(throwsType.getSimpleTypeName())));
+            attrs.add(new StringAttributeValue(new JavaSymbolName(
+                    "targetNamespace"), targetNamespace));
+            attrs.add(new StringAttributeValue(new JavaSymbolName("faultBean"),
+                    throwsType.getFullyQualifiedTypeName()));
 
-            List<AnnotationAttributeValue<?>> gvNIXWebFaultAnnotationAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-            gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-                    new JavaSymbolName("name"), StringUtils
-                            .uncapitalize(throwType.getSimpleTypeName())));
-            gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-                    new JavaSymbolName("targetNamespace"),
-                    webServiceTargetNamespace));
-            gvNIXWebFaultAnnotationAttributes.add(new StringAttributeValue(
-                    new JavaSymbolName("faultBean"), throwType
-                            .getFullyQualifiedTypeName()));
+            // Is the throws type defined in the project ?
+            String id = getJavaTypeIdentifier(throwsType);
+            if (fileManager.exists(id)) {
 
-            // Exception defined in the project or imported.
-            if (fileManager.exists(fileLocation)) {
-
-                // Define annotation.
-                annotationsService.addJavaTypeAnnotation(throwType,
-                        GvNIXWebFault.class.getName(),
-                        gvNIXWebFaultAnnotationAttributes, false);
+                // Exception defined into project: Define annotation.
+                annotationsService.addJavaTypeAnnotation(throwsType,
+                        GvNIXWebFault.class.getName(), attrs, false);
 
             } else {
-                // Add definition to AspectJ file.
-                exportImportedException(throwType,
-                        gvNIXWebFaultAnnotationAttributes);
+
+                // Exception imported: Add definition in own AspectJ file
+                exportImportedException(throwsType, attrs);
             }
-
         }
-
-        return true;
     }
 
     /**
-     * Adds a declaration of <code>@WebFault</code> to exceptionClass in AspectJ
-     * file.
+     * Add declaration of <code>@WebFault</code> to java type in AspectJ.
      * 
-     * @param exceptionClass
-     *            to export as web service exception.
-     * @param annotationAttributeValues
-     *            defined for annotation.
+     * <p>
+     * This AspectJ declarations are defined for non project exceptions. Are
+     * placed in exceptions subpackage in top level package.
+     * </p>
+     * 
+     * @param javaType
+     *            to add exception ITD with @WebFault declaration
+     * @param attrs
+     *            defined for annotation
      */
-    protected void exportImportedException(JavaType exceptionClass,
-            List<AnnotationAttributeValue<?>> annotationAttributeValues) {
+    protected void exportImportedException(JavaType javaType,
+            List<AnnotationAttributeValue<?>> attrs) {
 
+        Map<String, String> params = new HashMap<String, String>();
+
+        // Add project fully qualified top level package
+        ProjectMetadata project = (ProjectMetadata) metadataService
+                .get(ProjectMetadata.getProjectIdentifier());
+        Assert.isTrue(project != null, "Project is not available.");
+        String topLevelPath = project.getTopLevelPackage()
+                .getFullyQualifiedPackageName();
+        params.put("project_base_package", topLevelPath);
+
+        // Add project name prefix (before '-' char)
+        String projectName = StringUtils.capitalize(project.getProjectName());
+        int index = projectName.indexOf("-");
+        if (index != -1 && index != 0) {
+
+            projectName = projectName.substring(0, index);
+        }
+        params.put("project_name", projectName);
+
+        // Get the ITD template and replace params with values
         String template;
         try {
             template = FileCopyUtils.copyToString(new InputStreamReader(this
@@ -205,164 +213,121 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
             throw new IllegalStateException(
                     "Unable load ITD web fault definitions template", ioe);
         }
-
-        Map<String, String> params = new HashMap<String, String>();
-
-        String topLevelPath = "";
-        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
-
-        Assert.isTrue(projectMetadata != null, "Project is not available.");
-
-        topLevelPath = projectMetadata.getTopLevelPackage()
-                .getFullyQualifiedPackageName();
-
-        // Adds project base package name.
-        params.put("project_base_package", topLevelPath);
-
-        String aspectName = StringUtils.capitalize(projectMetadata
-                .getProjectName());
-
-        int splitIndex = aspectName.indexOf("-");
-        if (splitIndex != -1 && splitIndex != 0) {
-
-            aspectName = aspectName.substring(0, splitIndex);
-        }
-
-        // Adds aspect name.
-        params.put("project_name", aspectName);
-
-        // Adds entity class
         template = replaceParams(template, params);
 
-        // 2) Exists template ?
-        String fileLocation = projectOperations.getPathResolver()
-                .getIdentifier(
-                        Path.SRC_MAIN_JAVA,
-                        topLevelPath.concat(".exceptions.").replace('.', '/')
-                                .concat(aspectName).concat(ITD_FILE_NAME));
-
-        if (!fileManager.exists(fileLocation)) {
-            // Create file.
-            fileManager.createOrUpdateTextFileIfRequired(fileLocation,
-                    template, true);
+        // ITD already exists on disk ?
+        String id = projectOperations.getPathResolver().getIdentifier(
+                Path.SRC_MAIN_JAVA,
+                topLevelPath.concat(".exceptions.").replace('.', '/')
+                        .concat(projectName).concat(ITD_FILE_NAME));
+        if (!fileManager.exists(id)) {
+            // Save ITD on disk if not exists
+            fileManager.createOrUpdateTextFileIfRequired(id, template, true);
         }
 
-        // 3) Add web Fault.
-        String webFaultDeclaration = "declare @type: ${exception_class_name}: @WebFault(name = \"${name}\", targetNamespace = \"${targetNamespace}\", faultBean = \"${faultBean}\");";
-
-        Map<String, String> exceptionDeclaration = new HashMap<String, String>();
-        exceptionDeclaration.put("exception_class_name",
-                exceptionClass.getFullyQualifiedTypeName());
-
-        for (AnnotationAttributeValue<?> annotationAttributeValue : annotationAttributeValues) {
-            exceptionDeclaration
-                    .put(annotationAttributeValue.getName().toString(),
-                            annotationAttributeValue.getValue().toString());
+        // Get web fault declaration replacing atributes with input values
+        String webFault = "declare @type: ${exception_class_name}: @WebFault(name = \"${name}\","
+                + " targetNamespace = \"${targetNamespace}\", faultBean = \"${faultBean}\");";
+        Map<String, String> exceptions = new HashMap<String, String>();
+        exceptions.put("exception_class_name",
+                javaType.getFullyQualifiedTypeName());
+        for (AnnotationAttributeValue<?> attr : attrs) {
+            exceptions.put(attr.getName().toString(), attr.getValue()
+                    .toString());
         }
+        webFault = replaceParams(webFault, exceptions);
 
-        webFaultDeclaration = replaceParams(webFaultDeclaration,
-                exceptionDeclaration);
-
-        // Update file with definition.
-        String fileContents;
+        // Get ITD from disk and add web fault declaration if not exists
+        String content;
         try {
-            fileContents = FileCopyUtils.copyToString(new FileReader(
-                    fileLocation));
+            content = FileCopyUtils.copyToString(new FileReader(id));
         } catch (Exception e) {
-            throw new IllegalStateException("Could not get the file:\t'"
-                    + fileLocation + "'", e.getCause());
+            throw new IllegalStateException("Could not get the file:\t'" + id
+                    + "'", e.getCause());
         }
-
-        // Check if Exception has already been defined.
-        if (!fileContents.contains(webFaultDeclaration)) {
-            String updatedFilecontents;
-
-            int eOFindex = fileContents.lastIndexOf("}");
-
-            updatedFilecontents = fileContents.substring(0, eOFindex)
-                    .concat("    ").concat(webFaultDeclaration).concat("\n\n}");
-
-            fileManager.createOrUpdateTextFileIfRequired(fileLocation,
-                    updatedFilecontents, true);
-
+        if (!content.contains(webFault)) {
+            // Exception is not already defined
+            fileManager.createOrUpdateTextFileIfRequired(
+                    id,
+                    content.substring(0, content.lastIndexOf("}"))
+                            .concat("    ").concat(webFault).concat("\n\n}"),
+                    true);
         } else {
+            // Exception is already defined
             logger.log(Level.FINE,
-                    "Exception '" + exceptionClass.getFullyQualifiedTypeName()
+                    "Exception '" + javaType.getFullyQualifiedTypeName()
                             + "' has already been exported as @WebFault.");
         }
-
     }
 
     /**
-     * Replace parameters defined in template '${paramName}' with parameter map
-     * values.
+     * Replace in template map params keys with map params values.
      * 
      * @param template
-     *            to update.
+     *            to update
      * @param params
-     *            to set in template, key and value.
-     * @return Updated template.
+     *            to replace in template, key and value
+     * @return Updated template
      */
     private String replaceParams(String template, Map<String, String> params) {
+
         for (Entry<String, String> entry : params.entrySet()) {
             template = StringUtils.replace(template, "${" + entry.getKey()
                     + "}", entry.getValue());
         }
+
         return template;
     }
 
     /**
-     * Check for each method exception if its extended classes are extending
-     * from 'java.jang.Throwable'.
+     * Check if throws java type extends java.lang.Throwable.
      * 
-     * @param throwType
-     *            for check.
-     * @return true if is an Exception.
+     * <p>
+     * Check imported exception or project exception and their extends types.
+     * </p>
+     * 
+     * @param throwsType
+     *            Exception java type
+     * @return true if is an Exception
      */
-    private boolean checkExceptionExtension(JavaType throwType) {
+    protected boolean checkExceptionExtension(JavaType throwsType) {
 
-        String fileLocation;
-        boolean extendsThrowable = false;
+        boolean result = false;
 
-        fileLocation = projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_JAVA,
-                throwType.getFullyQualifiedTypeName().replace('.', '/')
-                        .concat(".java"));
-
-        // Exception defined in the project or imported.
+        String fileLocation = getJavaTypeIdentifier(throwsType);
         if (fileManager.exists(fileLocation)) {
 
-            // Load class or interface details.
-            // If class not found an exception will be raised.
-            ClassOrInterfaceTypeDetails typeDetails = typeLocationService
-                    .getClassOrInterface(throwType);
+            // Exception defined in project
 
-            // Check and get mutable instance
+            // Get mutable type details from throws type
+            ClassOrInterfaceTypeDetails typeDetails = typeLocationService
+                    .getClassOrInterface(throwsType);
             Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
                     typeDetails, "Can't modify " + typeDetails.getName());
             MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) typeDetails;
 
+            // Check for each extended class
             for (JavaType extendedJavaType : mutableTypeDetails
                     .getExtendsTypes()) {
-
-                // Check for each extended class.
-                extendsThrowable = checkExceptionExtension(extendedJavaType);
-
+                result = checkExceptionExtension(extendedJavaType);
             }
-
         } else {
 
-            // Check if extends from 'java.lang.Throwable'.
-            extendsThrowable = extendsJavaType(throwType, "java.lang.Throwable");
+            // Exception imported
 
+            // Check if throws type extends from 'java.lang.Throwable'.
+            result = extendsJavaType(throwsType, "java.lang.Throwable");
         }
 
-        return extendsThrowable;
+        return result;
     }
 
     /**
      * Check if a java type extends another java type name.
+     * 
+     * <p>
+     * Check all super classes of this java type.
+     * </p>
      * 
      * @param javaType
      *            to check if extends a java type name
@@ -453,22 +418,13 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
     /**
      * {@inheritDoc}
-     * <p>
-     * If exists any disallowed JavaType in operation:
-     * </p>
-     * <p>
-     * Cancel all the process and show a message explaining that it's not
-     * possible to publish this operation because the parameter can't be
-     * Marshalled according Ws-I standards.
-     * </p>
      */
-    public void prepareAuthorizedJavaTypesInOperation(MethodMetadata method) {
+    public void prepareAllowedJavaTypes(MethodMetadata method) {
 
         Assert.isTrue(method != null, "The method doesn't exists in the class");
 
-        // Check Return type
+        // Check method return type is allowed
         JavaType returnType = method.getReturnType();
-
         Assert.isTrue(
                 isTypeAllowed(returnType, MethodParameterType.RETURN),
                 "The '"
@@ -477,22 +433,19 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                         + returnType.getFullyQualifiedTypeName()
                         + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.");
 
-        // Check Input Parameters
-        List<AnnotatedJavaType> inputParametersList = method
-                .getParameterTypes();
-
-        for (AnnotatedJavaType annotatedJavaType : inputParametersList) {
+        // Check method parameters types are allowed
+        List<AnnotatedJavaType> parameterTypes = method.getParameterTypes();
+        for (AnnotatedJavaType parameterType : parameterTypes) {
 
             Assert.isTrue(
-                    isTypeAllowed(annotatedJavaType.getJavaType(),
+                    isTypeAllowed(parameterType.getJavaType(),
                             MethodParameterType.PARAMETER),
                     "The '"
                             + MethodParameterType.PARAMETER
                             + "' type '"
-                            + annotatedJavaType.getJavaType()
+                            + parameterType.getJavaType()
                                     .getFullyQualifiedTypeName()
                             + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.");
-
         }
     }
 
@@ -888,27 +841,34 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     }
 
     /**
-     * Checks correct namespace URI format. Suffix 'http://'.
-     * <p>
-     * If String is blank is also correct.
-     * </p>
-     * 
-     * @param namespace
-     *            string to check as correct namespace.
-     * @return true if is blank or if has correct URI format.
+     * {@inheritDoc}
      */
     public boolean checkNamespaceFormat(String namespace) {
-        if (StringUtils.hasText(namespace)) {
 
+        if (StringUtils.hasText(namespace)) {
             try {
                 new URI(namespace);
-
             } catch (URISyntaxException e) {
                 return false;
             }
-
         }
+
         return true;
+    }
+
+    /**
+     * Get the path identifier for a java type in the project.
+     * 
+     * @param javaType
+     *            Java type
+     * @return Path identifier in project
+     */
+    protected String getJavaTypeIdentifier(JavaType javaType) {
+
+        return projectOperations.getPathResolver().getIdentifier(
+                Path.SRC_MAIN_JAVA,
+                javaType.getFullyQualifiedTypeName().replace('.', '/')
+                        .concat(".java"));
     }
 
     /**
@@ -964,47 +924,41 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * {@inheritDoc}
      */
-    public String getWebServiceDefaultNamespace(JavaType serviceClass) {
+    public String getWebServiceDefaultNamespace(JavaType javaType) {
 
-        // Retrieve Web Service target Namespace value.
-        ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = typeLocationService
-                .getClassOrInterface(serviceClass);
-
-        // Check and get mutable instance
+        // Get and validate mutable type details
+        ClassOrInterfaceTypeDetails typeDetails = typeLocationService
+                .getClassOrInterface(javaType);
         Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-                classOrInterfaceTypeDetails, "Can't modify "
-                        + classOrInterfaceTypeDetails.getName());
+                typeDetails, "Can't modify " + typeDetails.getName());
 
-        AnnotationMetadata gvNixWebServiceAnnotaionMetadata = MemberFindingUtils
-                .getTypeAnnotation(classOrInterfaceTypeDetails, new JavaType(
-                        GvNIXWebService.class.getName()));
-
+        // Get and validate gvNIX web service annotation
+        AnnotationMetadata annotation = MemberFindingUtils.getTypeAnnotation(
+                typeDetails, new JavaType(GvNIXWebService.class.getName()));
         Assert.isTrue(
-                gvNixWebServiceAnnotaionMetadata != null,
+                annotation != null,
                 "Launch command 'service define ws --class "
-                        + serviceClass.getFullyQualifiedTypeName()
+                        + javaType.getFullyQualifiedTypeName()
                         + "' to export class to Web Service.");
 
-        StringAttributeValue webServiceTargetNamespaceAttributeValue = (StringAttributeValue) gvNixWebServiceAnnotaionMetadata
+        // Get and validate gvNIX web service annotation target namespace attr
+        StringAttributeValue targetNamespace = (StringAttributeValue) annotation
                 .getAttribute(new JavaSymbolName("targetNamespace"));
-
         Assert.isTrue(
-                webServiceTargetNamespaceAttributeValue != null
-                        && StringUtils
-                                .hasText(webServiceTargetNamespaceAttributeValue
-                                        .getValue()),
+                targetNamespace != null
+                        && StringUtils.hasText(targetNamespace.getValue()),
                 "You must define 'targetNamespace' annotation attribute in @GvNIXWebService in class: '"
-                        + serviceClass.getFullyQualifiedTypeName() + "'.");
+                        + javaType.getFullyQualifiedTypeName() + "'.");
 
-        String webServiceTargetNamespace = webServiceTargetNamespaceAttributeValue
-                .getValue();
-
+        // Get and validate gvNIX web service annotation target namespace value
+        String targetNamespaceValue = targetNamespace.getValue();
         Assert.isTrue(
-                checkNamespaceFormat(webServiceTargetNamespace),
+                checkNamespaceFormat(targetNamespaceValue),
                 "Attribute 'targetNamespace' in @GvNIXWebService for Web Service class '"
-                        + serviceClass.getFullyQualifiedTypeName()
+                        + javaType.getFullyQualifiedTypeName()
                         + "'has to start with 'http://'.\ni.e.: http://name.of.namespace/");
-        return webServiceTargetNamespace;
+
+        return targetNamespaceValue;
     }
 
 }

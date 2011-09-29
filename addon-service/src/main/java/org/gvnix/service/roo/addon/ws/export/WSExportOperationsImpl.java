@@ -184,62 +184,53 @@ public class WSExportOperationsImpl implements WSExportOperations {
     /**
      * {@inheritDoc}
      */
-    public void exportOperation(JavaType serviceClass,
-            JavaSymbolName methodName, String operationName, String resultName,
-            String resultNamespace, String responseWrapperName,
-            String responseWrapperNamespace, String requestWrapperName,
-            String requestWrapperNamespace) {
+    public void exportOperation(JavaType javaType, JavaSymbolName methodName,
+            String operationName, String resultName, String resultNamespace,
+            String responseWrapperName, String responseWrapperNamespace,
+            String requestWrapperName, String requestWrapperNamespace) {
 
-        Assert.notNull(serviceClass, "Java type required");
+        // Java type and method name are required
+        Assert.notNull(javaType, "Java type required");
         Assert.notNull(methodName, "Operation name required");
 
-        // Check if serviceClass is a Web Service. If doesn't exist exports as
-        // service
-        if (!isWebServiceClass(serviceClass)) {
-            // Export as a service.
-            exportService(serviceClass, null, null, null, null);
+        // Check service class is a Web Service: If not exist exports as service
+        if (!isWebServiceClass(javaType)) {
+            exportService(javaType, null, null, null, null);
         }
 
-        String webServiceTargetNamespace = wSExportValidationService
-                .getWebServiceDefaultNamespace(serviceClass);
+        // Get target namespace from java type
+        String targetNamespace = wSExportValidationService
+                .getWebServiceDefaultNamespace(javaType);
 
+        // Search method in class and related AJs
         MethodMetadata method = javaParserService.getMethodByNameInAll(
-                serviceClass, methodName);
+                javaType, methodName);
 
-        // Check if method exists in the class.
+        // Check if method exists and has no gvNIX web method annotation already
         Assert.isTrue(isMethodAvailableToExport(method),
                 "The method: '" + methodName + " doesn't exists in the class '"
-                        + serviceClass.getFullyQualifiedTypeName() + "'.");
+                        + javaType.getFullyQualifiedTypeName() + "'.");
 
-        // Check authorized JavaTypes in operation.
-        // Also, adds @GvNIXXmlElement annotation to any related project type
-        // which needs it.
-        wSExportValidationService.prepareAuthorizedJavaTypesInOperation(method);
+        // Check return and parameters types and add GvNIXXmlElement if required
+        wSExportValidationService.prepareAllowedJavaTypes(method);
 
-        // Check if method has return type.
+        // Get method return type (void type if null return type)
         JavaType returnType = returnJavaType(method);
 
-        Assert.isTrue(returnType != null,
-                "The method: '" + methodName + " doesn't exists in the class '"
-                        + serviceClass.getFullyQualifiedTypeName() + "'.");
-
-        boolean isReturnTypeVoid = returnType.equals(JavaType.VOID_OBJECT)
+        // Set void or return name
+        boolean isVoid = returnType.equals(JavaType.VOID_OBJECT)
                 || returnType.equals(JavaType.VOID_PRIMITIVE);
-
-        if (isReturnTypeVoid) {
+        if (isVoid) {
             resultName = "void";
         } else if (!StringUtils.hasText(resultName)) {
-
             resultName = "return";
         }
 
-        // Check if method throws an Exception and update it with annotations
-        // if it's needed.
-        wSExportValidationService.prepareMethodExceptions(method,
-                webServiceTargetNamespace);
+        // Check method throws and update with web fault declaration if needed
+        wSExportValidationService.prepareExceptions(method, targetNamespace);
 
-        // Checks correct namespace format.
-        if (!isReturnTypeVoid) {
+        // If no void return type: check result and response wrapper namespaces
+        if (!isVoid) {
 
             Assert.isTrue(
                     wSExportValidationService
@@ -251,209 +242,332 @@ public class WSExportOperationsImpl implements WSExportOperations {
                     "The namespace for Response Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
         }
 
+        // Check request wrapper namespace
         Assert.isTrue(
                 wSExportValidationService
                         .checkNamespaceFormat(requestWrapperNamespace),
                 "The namespace for Request Wrapper has to start with 'http://'.\ni.e.: http://name.of.namespace/");
 
-        // Create annotations to selected Method
-        List<AnnotationMetadata> annotationMetadataUpdateList = getAnnotationsToExportOperation(
-                serviceClass, methodName, operationName, resultName,
-                returnType, resultNamespace, responseWrapperName,
-                responseWrapperNamespace, requestWrapperName,
-                requestWrapperNamespace, webServiceTargetNamespace);
+        // Create GvNIXWebMethod annotation for Method
+        List<AnnotationMetadata> methodAnnotations = new ArrayList<AnnotationMetadata>();
+        AnnotationMetadata methodAnnotation = getGvNIXWebMethodAnnotation(
+                javaType, method, operationName, resultName, returnType,
+                resultNamespace, responseWrapperName, responseWrapperNamespace,
+                requestWrapperName, requestWrapperNamespace, targetNamespace);
+        methodAnnotations.add(methodAnnotation);
 
-        // Add @GvNIXWebParam & @WebParam parameter annotations.
-        List<AnnotatedJavaType> annotationWebParamMetadataList = getMethodParameterAnnotations(
-                method, webServiceTargetNamespace);
+        // Add @GvNIXWebParam & @WebParam parameter annotations
+        List<AnnotatedJavaType> parametersAnnotations = getMethodParameterAnnotations(
+                method, targetNamespace);
 
-        javaParserService.updateMethodAnnotations(serviceClass, methodName,
-                annotationMetadataUpdateList, annotationWebParamMetadataList);
-
+        // Add method and parameter annotations to method
+        javaParserService.updateMethodAnnotations(javaType, methodName,
+                methodAnnotations, parametersAnnotations);
     }
 
     /**
-     * Returns method return JavaType.
+     * Returns method return java type.
      * 
-     * @param serviceClass
-     *            where the method is defined.
-     * @param methodName
-     *            to search.
-     * @return {@link JavaType}
+     * <p>
+     * If null return type, get void return type.
+     * </p>
+     * 
+     * @param method
+     *            to get return type
+     * @return Method return java type
      */
-    private JavaType returnJavaType(MethodMetadata methodMetadata) {
+    protected JavaType returnJavaType(MethodMetadata method) {
 
-        JavaType returnType = new JavaType(JavaType.VOID_OBJECT.toString());
-
-        if (methodMetadata == null) {
+        // If no method, return null
+        if (method == null) {
             return null;
         }
 
-        if (methodMetadata.getReturnType() != null) {
-            returnType = methodMetadata.getReturnType();
+        // If return type not null, get it
+        if (method.getReturnType() != null) {
+            return method.getReturnType();
         }
 
-        return returnType;
+        // If null return type, get void return type
+        return new JavaType(JavaType.VOID_OBJECT.toString());
     }
 
     /**
      * {@inheritDoc}
+     */
+    public AnnotationMetadata getGvNIXWebMethodAnnotation(JavaType javaType,
+            MethodMetadata method, String operationName, String resultName,
+            JavaType returnType, String resultNamespace,
+            String responseWrapperName, String responseWrapperNamespace,
+            String requestWrapperName, String requestWrapperNamespace,
+            String targetNamespace) {
+
+        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+
+        // gvNIX attribute for javax.xml.ws.WebMethod attribute
+        operationName = StringUtils.hasText(operationName) ? operationName
+                : method.getMethodName().getSymbolName();
+        attrs.add(new StringAttributeValue(new JavaSymbolName("operationName"),
+                operationName));
+
+        // Creates gvNIX web method request attributes
+        attrs.addAll(getRequestAnnotationAttributes(javaType, method,
+                operationName, requestWrapperName, requestWrapperNamespace,
+                targetNamespace));
+
+        // Creates gvNIX web method response attributes
+        attrs.addAll(getResponseAnnotationAttributes(javaType, operationName,
+                resultName, returnType, resultNamespace, responseWrapperName,
+                responseWrapperNamespace, targetNamespace));
+
+        // Create gvNIX web method annotation
+        return new AnnotationMetadataBuilder(new JavaType(
+                GvNIXWebMethod.class.getName()), attrs).build();
+    }
+
+    /**
+     * Creates gvNIX web method request attributes with the values defined.
+     * 
      * <p>
      * If the values are not set, define them using WS-i standard names.
+     * Attributes created into gvNIX web service annotation are used to
+     * generate:
      * </p>
+     * 
+     * <ul>
+     * <li>javax.xml.ws.RequestWrapper: requestWrapperName,
+     * requestWrapperNamespace, requestWrapperClassName</li>
+     * <ul>
+     * 
      * <p>
-     * Annotations to create:
+     * If parameters types or names are empty, empty list will return.
      * </p>
-     * <ul>
-     * <li>@GvNIXWebMethod with params:</li>
-     * <ul>
-     * <li>operationName</li>
-     * <li>webResultType</li>
-     * <li>resultName</li>
-     * <li>resultNamespace</li>
-     * <li>requestWrapperName</li>
-     * <li>requestWrapperNamespace</li>
-     * <li>requestWrapperClassName</li>
-     * <li>responseWrapperName</li>
-     * <li>responseWrapperNamespace</li>
-     * <li>responseWrapperClassName</li>
-     * <li>
-     * <ul>
-     * </ul>
+     * 
+     * @param javaType
+     *            Java type to export a method.
+     * @param method
+     *            Method to export.
+     * @param operationName
+     *            Name of the method to be showed as a Web Service operation.
+     * @param requestWrapperName
+     *            Name to define the Request Wrapper Object.
+     * @param requestWrapperNamespace
+     *            Request Wrapper Object Namespace.
+     * @param targetNamespace
+     *            Web Service Namespace.
+     * @return gvNIX web method request attributes.
      */
-    public List<AnnotationMetadata> getAnnotationsToExportOperation(
-            JavaType serviceClass, JavaSymbolName methodName,
-            String operationName, String resultName, JavaType returnType,
-            String resultNamespace, String responseWrapperName,
-            String responseWrapperNamespace, String requestWrapperName,
-            String requestWrapperNamespace, String webServiceTargetNamespace) {
+    protected List<AnnotationAttributeValue<?>> getRequestAnnotationAttributes(
+            JavaType javaType, MethodMetadata method, String operationName,
+            String requestWrapperName, String requestWrapperNamespace,
+            String targetNamespace) {
 
-        List<AnnotationMetadata> annotationMetadataList = new ArrayList<AnnotationMetadata>();
-        List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-        // @WebMethod.operationName
-        operationName = StringUtils.hasText(operationName) ? operationName
-                : methodName.getSymbolName();
-        StringAttributeValue operationNameAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("operationName"), operationName);
-        annotationAttributeValueList.add(operationNameAttributeValue);
-
-        // Gets target method
-        MethodMetadata methodMetadata = javaParserService.getMethodByNameInAll(
-                serviceClass, methodName);
+        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
 
         // Check input parameters.
-        if (!methodMetadata.getParameterTypes().isEmpty()
-                && !methodMetadata.getParameterNames().isEmpty()) {
-            // no input parameters. Prepare request wrapper
+        if (!method.getParameterTypes().isEmpty()
+                && !method.getParameterNames().isEmpty()) {
 
-            // javax.xml.ws.RequestWrapper
+            // There are input parameters
+
+            // gvNIX attributes for javax.xml.ws.RequestWrapper attributes
+
             requestWrapperName = StringUtils.hasText(requestWrapperName) ? requestWrapperName
                     : operationName;
-            StringAttributeValue requestWrapperNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("requestWrapperName"),
-                    requestWrapperName);
-            annotationAttributeValueList.add(requestWrapperNameAttributeValue);
-
-            requestWrapperNamespace = StringUtils
-                    .hasText(requestWrapperNamespace) ? requestWrapperNamespace
-                    : webServiceTargetNamespace;
+            attrs.add(new StringAttributeValue(new JavaSymbolName(
+                    "requestWrapperName"), requestWrapperName));
 
             // RequestWrapper namespace
-            StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("requestWrapperNamespace"),
-                    requestWrapperNamespace);
-            annotationAttributeValueList.add(targetNamespaceAttributeValue);
+            requestWrapperNamespace = StringUtils
+                    .hasText(requestWrapperNamespace) ? requestWrapperNamespace
+                    : targetNamespace;
+            attrs.add(new StringAttributeValue(new JavaSymbolName(
+                    "requestWrapperNamespace"), requestWrapperNamespace));
 
             // Wrapper class
-            String className = serviceClass
+            String className = javaType
                     .getPackage()
                     .getFullyQualifiedPackageName()
                     .concat(".")
                     .concat(StringUtils.capitalize(requestWrapperName).concat(
                             "RequestWrapper"));
-            StringAttributeValue classNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("requestWrapperClassName"), className);
-            annotationAttributeValueList.add(classNameAttributeValue);
-
+            attrs.add(new StringAttributeValue(new JavaSymbolName(
+                    "requestWrapperClassName"), className));
         }
 
-        // Check return value
+        return attrs;
+    }
+
+    /**
+     * Creates gvNIX web method response attributes with the values defined.
+     * 
+     * <p>
+     * If the values are not set, define them using WS-i standard names.
+     * Attributes created for gvNIX web service annotation are used to generate:
+     * </p>
+     * 
+     * <ul>
+     * <li>javax.xml.ws.WebResult: resultName, resultNamespace, webResultType</li>
+     * <li>javax.xml.ws.ResponseWrapper: responseWrapperName,
+     * responseWrapperNamespace, responseWrapperClassName</li>
+     * <ul>
+     * 
+     * @param javaType
+     *            Java type to export a method.
+     * @param operationName
+     *            Name of the method to be showed as a Web Service operation.
+     * @param resultName
+     *            Method result name.
+     * @param returnType
+     *            JavaType class to return.
+     * @param resultNamespace
+     *            Result type Namespace.
+     * @param responseWrapperName
+     *            Name to define the Response Wrapper Object.
+     * @param responseWrapperNamespace
+     *            Response Wrapper Object Namespace.
+     * @param targetNamespace
+     *            Web Service Namespace.
+     * @return gvNIX web method response attributes.
+     */
+    protected List<AnnotationAttributeValue<?>> getResponseAnnotationAttributes(
+            JavaType javaType, String operationName, String resultName,
+            JavaType returnType, String resultNamespace,
+            String responseWrapperName, String responseWrapperNamespace,
+            String targetNamespace) {
+
+        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+
+        // Check void return type
         if ((resultName != null && returnType != null)
                 && !(returnType.equals(JavaType.VOID_PRIMITIVE) || (returnType
                         .equals(JavaType.VOID_PRIMITIVE)))) {
 
-            // Not void method
-
-            // resultName
-            StringAttributeValue resultNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("resultName"), resultName);
-            annotationAttributeValueList.add(resultNameAttributeValue);
-
-            // resultNamespace
-            resultNamespace = StringUtils.hasText(resultNamespace) ? resultNamespace
-                    : webServiceTargetNamespace;
-            StringAttributeValue targetNamespaceAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("resultNamespace"), resultNamespace);
-            annotationAttributeValueList.add(targetNamespaceAttributeValue);
-
-            // result type
-            ClassAttributeValue resultTypeAttributeValue = new ClassAttributeValue(
-                    new JavaSymbolName("webResultType"), returnType);
-            annotationAttributeValueList.add(resultTypeAttributeValue);
-
-            // javax.xml.ws.ResponseWrapper
-
-            // response wrapper name
-            responseWrapperName = StringUtils.hasText(responseWrapperName) ? responseWrapperName
-                    : operationName.concat("Response");
-            StringAttributeValue responseWrapperNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("responseWrapperName"),
-                    responseWrapperName);
-            annotationAttributeValueList.add(responseWrapperNameAttributeValue);
-
-            // response wrapper namespace
-            responseWrapperNamespace = StringUtils
-                    .hasText(responseWrapperNamespace) ? responseWrapperNamespace
-                    : webServiceTargetNamespace;
-            targetNamespaceAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("responseWrapperNamespace"),
-                    responseWrapperNamespace);
-            annotationAttributeValueList.add(targetNamespaceAttributeValue);
-
-            // Class for response wrapper
-            String className = serviceClass.getPackage()
-                    .getFullyQualifiedPackageName().concat(".")
-                    .concat(StringUtils.capitalize(responseWrapperName));
-            StringAttributeValue classNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("responseWrapperClassName"), className);
-            annotationAttributeValueList.add(classNameAttributeValue);
-
+            // No void method
+            attrs.addAll(getResponseNoVoidAnnotationAttributes(javaType,
+                    operationName, resultName, returnType, resultNamespace,
+                    responseWrapperName, responseWrapperNamespace,
+                    targetNamespace));
         } else {
 
-            // is a void method
-
-            // result name
-            StringAttributeValue localNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("resultName"), "void");
-            annotationAttributeValueList.add(localNameAttributeValue);
-
-            // result type
-            ClassAttributeValue resultTypeAttributeValue = new ClassAttributeValue(
-                    new JavaSymbolName("webResultType"),
-                    JavaType.VOID_PRIMITIVE);
-            annotationAttributeValueList.add(resultTypeAttributeValue);
+            // Void method
+            attrs.addAll(getResponseVoidAnnotationAttributes());
         }
 
-        // Create annotation.
-        // org.gvnix.service.roo.addon.annotations.GvNIXWebMethod
-        AnnotationMetadata gvNIXWebMethod = new AnnotationMetadataBuilder(
-                new JavaType(GvNIXWebMethod.class.getName()),
-                annotationAttributeValueList).build();
+        return attrs;
+    }
 
-        annotationMetadataList.add(gvNIXWebMethod);
+    /**
+     * Creates gvNIX web method response attributes with the values defined.
+     * 
+     * <p>
+     * If the values are not set, define them using WS-i standard names.
+     * Attributes created for gvNIX web service annotation are used to generate:
+     * </p>
+     * 
+     * <ul>
+     * <li>javax.xml.ws.WebResult: resultName, resultNamespace, webResultType</li>
+     * <li>javax.xml.ws.ResponseWrapper: responseWrapperName,
+     * responseWrapperNamespace, responseWrapperClassName</li>
+     * <ul>
+     * 
+     * @param javaType
+     *            Java type to export a method.
+     * @param operationName
+     *            Name of the method to be showed as a Web Service operation.
+     * @param resultName
+     *            Method result name.
+     * @param returnType
+     *            JavaType class to return.
+     * @param resultNamespace
+     *            Result type Namespace.
+     * @param responseWrapperName
+     *            Name to define the Response Wrapper Object.
+     * @param responseWrapperNamespace
+     *            Response Wrapper Object Namespace.
+     * @param targetNamespace
+     *            Web Service Namespace.
+     * @return gvNIX web method response attributes.
+     */
+    protected List<AnnotationAttributeValue<?>> getResponseNoVoidAnnotationAttributes(
+            JavaType javaType, String operationName, String resultName,
+            JavaType returnType, String resultNamespace,
+            String responseWrapperName, String responseWrapperNamespace,
+            String targetNamespace) {
 
-        return annotationMetadataList;
+        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+
+        // gvNIX attributes for javax.xml.ws.WebResult attributes
+
+        // Result name
+        attrs.add(new StringAttributeValue(new JavaSymbolName("resultName"),
+                resultName));
+
+        // Result namespace
+        resultNamespace = StringUtils.hasText(resultNamespace) ? resultNamespace
+                : targetNamespace;
+        attrs.add(new StringAttributeValue(
+                new JavaSymbolName("resultNamespace"), resultNamespace));
+
+        // Web result type
+        attrs.add(new ClassAttributeValue(new JavaSymbolName("webResultType"),
+                returnType));
+
+        // gvNIX attributes for javax.xml.ws.ResponseWrapper attributes
+
+        // Response wrapper name
+        responseWrapperName = StringUtils.hasText(responseWrapperName) ? responseWrapperName
+                : operationName.concat("Response");
+        StringAttributeValue responseWrapperNameAttr = new StringAttributeValue(
+                new JavaSymbolName("responseWrapperName"), responseWrapperName);
+        attrs.add(responseWrapperNameAttr);
+
+        // Response wrapper namespace
+        responseWrapperNamespace = StringUtils
+                .hasText(responseWrapperNamespace) ? responseWrapperNamespace
+                : targetNamespace;
+        attrs.add(new StringAttributeValue(new JavaSymbolName(
+                "responseWrapperNamespace"), responseWrapperNamespace));
+
+        // Response wrapper class name
+        String className = javaType.getPackage().getFullyQualifiedPackageName()
+                .concat(".")
+                .concat(StringUtils.capitalize(responseWrapperName));
+        attrs.add(new StringAttributeValue(new JavaSymbolName(
+                "responseWrapperClassName"), className));
+
+        return attrs;
+    }
+
+    /**
+     * Creates gvNIX web method response attributes for void methods.
+     * 
+     * <p>
+     * If the values are not set, define them using WS-i standard names.
+     * Attributes created for gvNIX web service annotation are used to generate:
+     * </p>
+     * 
+     * <ul>
+     * <li>javax.xml.ws.WebResult: resultName, resultNamespace, webResultType</li>
+     * <ul>
+     * 
+     * @return gvNIX web method response attributes for void methods.
+     */
+    protected List<AnnotationAttributeValue<?>> getResponseVoidAnnotationAttributes() {
+
+        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+
+        // gvNIX attributes for javax.xml.ws.WebResult attributes
+
+        // Result name
+        attrs.add(new StringAttributeValue(new JavaSymbolName("resultName"),
+                "void"));
+
+        // Web result type
+        attrs.add(new ClassAttributeValue(new JavaSymbolName("webResultType"),
+                JavaType.VOID_PRIMITIVE));
+
+        return attrs;
     }
 
     /**
@@ -465,6 +579,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * @return true if the {@link JavaType} contains {@link WSExportMetadata}.
      */
     private boolean isWebServiceClass(JavaType serviceClass) {
+
         // Gets PhysicalTypeIdentifier for serviceClass
         String id = physicalTypeMetadataProvider.findIdentifier(serviceClass);
 
@@ -492,131 +607,165 @@ public class WSExportOperationsImpl implements WSExportOperations {
     }
 
     /**
-     * {@inheritDoc}
+     * Check if method exists and has no gvNIX web method annotation already.
+     * 
+     * @param method
+     *            To check
+     * 
+     * @return true if method exists and annotation is not defined
      */
-    public boolean isMethodAvailableToExport(MethodMetadata methodMetadata) {
+    protected boolean isMethodAvailableToExport(MethodMetadata method) {
 
-        boolean isAnnotated = true;
-
-        if (methodMetadata == null) {
+        // Method not available, because not exists
+        if (method == null) {
             return false;
         }
 
         // Checks if it already has @GvNIXWebMethod
-        isAnnotated = javaParserService.isAnnotationIntroducedInMethod(
-                GvNIXWebMethod.class.getName(), methodMetadata);
-
-        return !isAnnotated;
+        return !javaParserService.isAnnotationIntroducedInMethod(
+                GvNIXWebMethod.class.getName(), method);
     }
 
     /**
-     * {@inheritDoc}
+     * Create annotations for each method parameter, if not empty.
+     * 
+     * <p>
+     * Each parameter with not empty type and name will be related a
+     * GvNIXWebParam annotation and a WebParam annotation.
+     * </p>
+     * 
+     * @param method
+     *            Method to update with annotations
+     * @param targetNamespace
+     *            Web Service Namespace
+     * @return Annotation
      */
-    public List<AnnotatedJavaType> getMethodParameterAnnotations(
-            MethodMetadata methodMetadata, String webServiceTargetNamespace) {
+    protected List<AnnotatedJavaType> getMethodParameterAnnotations(
+            MethodMetadata method, String targetNamespace) {
 
         // List to store annotations for parameters
-        List<AnnotatedJavaType> annotatedWebParameterList = new ArrayList<AnnotatedJavaType>();
+        List<AnnotatedJavaType> annotations = new ArrayList<AnnotatedJavaType>();
 
-        // Method parameter types
-        List<AnnotatedJavaType> parameterTypesList = methodMetadata
-                .getParameterTypes();
-
-        // Method parameter names
-        List<JavaSymbolName> parameterNamesList = methodMetadata
-                .getParameterNames();
-
-        if (parameterTypesList.isEmpty() && parameterNamesList.isEmpty()) {
-            return annotatedWebParameterList;
+        // Get method parameter types and names and return null if empty
+        List<AnnotatedJavaType> paramsType = method.getParameterTypes();
+        List<JavaSymbolName> paramsName = method.getParameterNames();
+        if (paramsType.isEmpty() && paramsName.isEmpty()) {
+            return annotations;
         }
-
-        AnnotatedJavaType parameterWithAnnotations;
-        List<AnnotationMetadata> parameterAnnotationList;
-
-        // prepares @WebParam default values.
-        StringAttributeValue partNameAttributeValue = new StringAttributeValue(
-                new JavaSymbolName("partName"), "parameters");
-        EnumAttributeValue modeAttributeValue = new EnumAttributeValue(
-                new JavaSymbolName("mode"), new EnumDetails(new JavaType(
-                        "javax.jws.WebParam.Mode"), new JavaSymbolName("IN")));
-        BooleanAttributeValue headerAttributeValue = new BooleanAttributeValue(
-                new JavaSymbolName("header"), false);
 
         // for each parameters
-        for (AnnotatedJavaType parameterType : parameterTypesList) {
+        for (AnnotatedJavaType paramType : paramsType) {
 
             // annotation of this parameter
-            parameterAnnotationList = new ArrayList<AnnotationMetadata>();
-
-            // values for @GvNIXWebParam annotation
-            List<AnnotationAttributeValue<?>> gvNIXWebParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+            List<AnnotationMetadata> paramsAnnotations = new ArrayList<AnnotationMetadata>();
 
             // Get current parameter name
-            int index = parameterTypesList.indexOf(parameterType);
-            JavaSymbolName parameterName = parameterNamesList.get(index);
-
-            // @GvNIXWebParam.name
-            StringAttributeValue nameWebParamAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("name"), parameterName.getSymbolName());
-            gvNIXWebParamAttributeValueList.add(nameWebParamAttributeValue);
-
-            // @GvNIXWebParam.type
-            ClassAttributeValue typeClassAttributeValue = new ClassAttributeValue(
-                    new JavaSymbolName("type"), parameterType.getJavaType());
-            gvNIXWebParamAttributeValueList.add(typeClassAttributeValue);
-
-            // Build @GvNIXWebParam annotation
-            AnnotationMetadata gvNixWebParamAnnotationMetadata = new AnnotationMetadataBuilder(
-                    new JavaType(GvNIXWebParam.class.getName()),
-                    gvNIXWebParamAttributeValueList).build();
+            int index = paramsType.indexOf(paramType);
+            JavaSymbolName paramName = paramsName.get(index);
 
             // Add @GvNIXWebParam to annotation list
-            parameterAnnotationList.add(gvNixWebParamAnnotationMetadata);
+            paramsAnnotations.add(getGvNIXWebParamAnnotation(paramType,
+                    paramName));
 
-            // values for @WebParam annotation
-            List<AnnotationAttributeValue<?>> webParamAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
+            // Add @WebParam and add @GvNIXWebParam to annotation list
+            paramsAnnotations.add(getWebParamAnnotation(targetNamespace,
+                    paramType, paramName));
 
-            // @WebParam.name
-            webParamAttributeValueList.add(nameWebParamAttributeValue);
-
-            // if not a primitive or standard type
-            if (!parameterType.getJavaType().isPrimitive()
-                    && !parameterType.getJavaType().isCommonCollectionType()
-                    && !parameterType.getJavaType().getFullyQualifiedTypeName()
-                            .startsWith("java.lang")) {
-
-                // @WebParam.targetnamespace
-                StringAttributeValue targetNamespace = new StringAttributeValue(
-                        new JavaSymbolName("targetNamespace"),
-                        webServiceTargetNamespace);
-                webParamAttributeValueList.add(targetNamespace);
-            }
-
-            // @WebParam.partName <-- parameters (default)
-            webParamAttributeValueList.add(partNameAttributeValue);
-
-            // @WebParam.mode <-- IN (default)
-            webParamAttributeValueList.add(modeAttributeValue);
-
-            // @WebParam.header <-- false (default)
-            webParamAttributeValueList.add(headerAttributeValue);
-
-            // Build annotation @WebParam
-            AnnotationMetadata webParamAnnotationMetadata = new AnnotationMetadataBuilder(
-                    new JavaType("javax.jws.WebParam"),
-                    webParamAttributeValueList).build();
-            // Add @GvNIXWebParam to annotation list
-            parameterAnnotationList.add(webParamAnnotationMetadata);
-
-            // Add annotation list to parameter.
-            parameterWithAnnotations = new AnnotatedJavaType(
-                    parameterType.getJavaType(), parameterAnnotationList);
-
-            annotatedWebParameterList.add(parameterWithAnnotations);
-
+            // Add annotation list to parameter
+            annotations.add(new AnnotatedJavaType(paramType.getJavaType(),
+                    paramsAnnotations));
         }
 
-        return annotatedWebParameterList;
+        return annotations;
+    }
+
+    /**
+     * Create gvNIX web param annotation with some java type and name.
+     * 
+     * @param javaType
+     *            Java type
+     * @param javaName
+     *            Java name
+     * @return gvNIX web param annotation
+     */
+    protected AnnotationMetadata getGvNIXWebParamAnnotation(
+            AnnotatedJavaType javaType, JavaSymbolName javaName) {
+
+        // Attributes for @GvNIXWebParam annotation
+        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+
+        // @GvNIXWebParam.name
+        attrs.add(new StringAttributeValue(new JavaSymbolName("name"), javaName
+                .getSymbolName()));
+
+        // @GvNIXWebParam.type
+        attrs.add(new ClassAttributeValue(new JavaSymbolName("type"), javaType
+                .getJavaType()));
+
+        // Build @GvNIXWebParam annotation
+        return new AnnotationMetadataBuilder(new JavaType(
+                GvNIXWebParam.class.getName()), attrs).build();
+    }
+
+    /**
+     * Create web param annotation with some values.
+     * 
+     * <p>
+     * Filled atributes are:
+     * </p>
+     * 
+     * <ul>
+     * <li>name</li>
+     * <li>targetNamespace: Only if not a primitive, nor common collection, nor
+     * java.lang package</li>
+     * <li>partName: Always 'parameters'</li>
+     * <li>mode: Mode.IN</li>
+     * <li>header: Always false</li>
+     * </ul>
+     * 
+     * @param targetNamespace
+     *            Target namespace
+     * @param javaType
+     *            Java type
+     * @param javaName
+     *            Java name
+     * @return Web para annotation
+     */
+    protected AnnotationMetadata getWebParamAnnotation(String targetNamespace,
+            AnnotatedJavaType javaType, JavaSymbolName javaName) {
+
+        // values for @WebParam annotation
+        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+
+        // @WebParam.name
+        attrs.add(new StringAttributeValue(new JavaSymbolName("name"), javaName
+                .getSymbolName()));
+
+        // Not a primitive, nor common collection, nor java.lang package
+        if (!javaType.getJavaType().isPrimitive()
+                && !javaType.getJavaType().isCommonCollectionType()
+                && !javaType.getJavaType().getFullyQualifiedTypeName()
+                        .startsWith("java.lang")) {
+
+            // @WebParam.targetnamespace
+            attrs.add(new StringAttributeValue(new JavaSymbolName(
+                    "targetNamespace"), targetNamespace));
+        }
+
+        // @WebParam.partName <-- parameters (default)
+        attrs.add(new StringAttributeValue(new JavaSymbolName("partName"),
+                "parameters"));
+
+        // @WebParam.mode <-- IN (default)
+        attrs.add(new EnumAttributeValue(new JavaSymbolName("mode"),
+                new EnumDetails(new JavaType("javax.jws.WebParam.Mode"),
+                        new JavaSymbolName("IN"))));
+
+        // @WebParam.header <-- false (default)
+        attrs.add(new BooleanAttributeValue(new JavaSymbolName("header"), false));
+
+        return new AnnotationMetadataBuilder(
+                new JavaType("javax.jws.WebParam"), attrs).build();
     }
 
     /**
