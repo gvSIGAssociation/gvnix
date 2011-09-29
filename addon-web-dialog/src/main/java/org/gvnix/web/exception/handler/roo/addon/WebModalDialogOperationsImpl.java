@@ -292,6 +292,12 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
         for (Element depen : depens) {
             projectOperations.addDependency(new Dependency(depen));
         }
+
+        depens = XmlUtils.findElements(
+                "/configuration/dependencies/dependency", configuration);
+        for (Element depen : depens) {
+            projectOperations.addDependency(new Dependency(depen));
+        }
     }
 
     /**

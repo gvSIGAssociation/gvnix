@@ -91,7 +91,8 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #getHandledExceptionList()
      */
     public String getHandledExceptionList() {
@@ -135,7 +136,8 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #addNewHandledException(java.lang.String, java.lang.String,
      * java.lang.String, java.lang.String)
      */
@@ -168,7 +170,8 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #removeExceptionHandled(java.lang.String)
      */
     public void removeExceptionHandled(String exceptionName) {
@@ -192,7 +195,8 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #languageExceptionHandled(java.lang.String, java.lang.String,
      * java.lang.String, java.lang.String)
      */
@@ -216,7 +220,8 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #getLanguagePropertiesFile(java.lang.String)
      */
     public String getLanguagePropertiesFile(String exceptionLanguage) {
@@ -789,7 +794,8 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #setUpGvNIXExceptions()
      */
     public void setUpGvNIXExceptions() {
@@ -866,9 +872,81 @@ public class WebExceptionHandlerOperationsImpl implements
                 "Can not update the record because it has been previously updated.",
                 "en");
 
-        // TODO: Add support for
-        // javax.validation.ConstraintViolationException, DataException,
-        // IdentifierGenerationException
+        // org.hibernate.NonUniqueObjectException
+        addNewHandledException(
+                "org.hibernate.NonUniqueObjectException",
+                "NonUniqueObjectException",
+                "No se puede crear el registro porque existe un objeto distinto con el mismo identificador.",
+                "es");
+
+        languageExceptionHandled(
+                "org.hibernate.NonUniqueObjectException",
+                "NonUniqueObjectException",
+                "No es pot crear el registre perque existeix un altre objecte amb el mateix identificador.",
+                "ca");
+
+        languageExceptionHandled(
+                "org.hibernate.NonUniqueObjectException",
+                "NonUniqueObjectException",
+                "Can not create the record because a different object with the same identifier value already exists.",
+                "en");
+
+        // org.hibernate.exception.ConstraintViolationException
+        addNewHandledException(
+                "org.hibernate.exception.ConstraintViolationException",
+                "ConstraintViolationException",
+                "No se puede crear/actualizar el registro porque no se cumple una restricción de integridad.",
+                "es");
+
+        languageExceptionHandled(
+                "org.hibernate.exception.ConstraintViolationException",
+                "ConstraintViolationException",
+                "No es pot crear/actualiztar el registre perque no es compleix una restricció d'integritat.",
+                "ca");
+
+        languageExceptionHandled(
+                "org.hibernate.exception.ConstraintViolationException",
+                "ConstraintViolationException",
+                "Can not create/update the record because a violation of a defined integrity constraint.",
+                "en");
+
+        // org.hibernate.id.IdentifierGenerationException
+        addNewHandledException(
+                "org.hibernate.id.IdentifierGenerationException",
+                "IdentifierGenerationException",
+                "No se puede crear porque alguno de los campos que que conforman el identificador del registro no ha sido informado.",
+                "es");
+
+        languageExceptionHandled(
+                "org.hibernate.id.IdentifierGenerationException",
+                "IdentifierGenerationException",
+                "No es pot crear perque algun dels camps que conformen l'identificador del registre no ha estat informat.",
+                "ca");
+
+        languageExceptionHandled(
+                "org.hibernate.id.IdentifierGenerationException",
+                "IdentifierGenerationException",
+                "Can not create the record because any of the field comprising the identifier of the record has not been informed.",
+                "en");
+
+        // org.hibernate.id.IdentifierGenerationException
+        addNewHandledException(
+                "org.hibernate.id.IdentifierGenerationException",
+                "IdentifierGenerationException",
+                "No se puede crear porque alguno de los campos que que conforman el identificador del registro no ha sido informado.",
+                "es");
+
+        languageExceptionHandled(
+                "org.hibernate.id.IdentifierGenerationException",
+                "IdentifierGenerationException",
+                "No es pot crear perque algun dels camps que conformen l'identificador del registre no ha estat informat.",
+                "ca");
+
+        languageExceptionHandled(
+                "org.hibernate.id.IdentifierGenerationException",
+                "IdentifierGenerationException",
+                "Can not create the record because any of the field comprising the identifier of the record has not been informed.",
+                "en");
 
     }
 
@@ -889,7 +967,8 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isExceptionMappingAvailable()
      */
     public boolean isExceptionMappingAvailable() {
@@ -928,7 +1007,8 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isExceptionMappingAvailable()
      */
     public boolean isMessageMappingAvailable() {
@@ -966,7 +1046,8 @@ public class WebExceptionHandlerOperationsImpl implements
     /*
      * (non-Javadoc)
      * 
-     * @see org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
+     * @see
+     * org.gvnix.web.exception.handler.roo.addon.WebExceptionHandlerOperations
      * #isProjectAvailable()
      */
     public boolean isProjectAvailable() {
