@@ -33,9 +33,9 @@
       <programlisting>&lt;repositories&gt;
     ...
     &lt;repository&gt;
-        &lt;id&gt;citma-maven-release&lt;/id&gt;
-        &lt;name&gt;CITMA Maven Release Repository&lt;/name&gt;
-        &lt;url&gt;http://scmcit.gva.es/release&lt;/url&gt;
+        &lt;id&gt;citma-maven&lt;/id&gt;
+        &lt;name&gt;CITMA Maven Repository&lt;/name&gt;
+        &lt;url&gt;http://benigno.coput.gva.es:8081/nexus/content/groups/public&lt;/url&gt;
     &lt;/repository&gt;
     ...
 &lt;/repositories&gt;</programlisting>
