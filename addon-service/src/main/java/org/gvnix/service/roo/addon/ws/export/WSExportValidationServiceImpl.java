@@ -26,12 +26,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +36,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
+import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
@@ -97,27 +95,12 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     private AnnotationsService annotationsService;
     @Reference
     private TypeLocationService typeLocationService;
+    @Reference
+    private JavaParserService javaParserService;
 
     private static final String ITD_TEMPLATE = "Web_Faults_gvnix_service_layer-template.aj";
 
     private static final String ITD_FILE_NAME = "_Web_Faults_gvnix_service_layer.aj";
-
-    private static final Set<String> invalidClasses = new HashSet<String>();
-
-    static {
-        invalidClasses.add(HashMap.class.getName());
-        invalidClasses.add(TreeMap.class.getName());
-    }
-
-    private static final Set<String> invalidIntefaces = new HashSet<String>();
-
-    static {
-        invalidIntefaces.add(Map.class.getName());
-    }
-
-    private static final String ITERABLE = Iterable.class.getName();
-
-    private static final String MAP = Map.class.getName();
 
     private static Logger logger = Logger
             .getLogger(WSExportValidationServiceImpl.class.getName());
@@ -125,8 +108,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * {@inheritDoc}
      */
-    public void prepareExceptions(MethodMetadata method,
-            String targetNamespace) {
+    public void prepareExceptions(MethodMetadata method, String targetNamespace) {
 
         // Method is required
         Assert.isTrue(method != null, "The method doesn't exists in the class");
@@ -361,59 +343,9 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
         } catch (ClassNotFoundException e) {
 
-            throw new IllegalArgumentException(
-                    "The class: '"
-                            + javaName
-                            + "' doesn't exist while checking if extends '"
-                            + ext
-                            + "'.\nClasses that are not from JDK or project can't be used in Web Services.");
+            // Java type not exists: nor in JDK, nor in project
+            return false;
         }
-    }
-
-    /**
-     * Check if a java type implements another java type name.
-     * 
-     * @param javaType
-     *            to check if implements a java type name
-     * @param impl
-     *            Implements java type name to check
-     * @return javaType implements impl ?
-     */
-    private boolean implementsJavaType(JavaType javaType, String impl) {
-
-        // Get the java type name
-        String javaName = javaType.getFullyQualifiedTypeName();
-
-        // Java name and implements name are the same
-        if (javaName.contentEquals(impl)) {
-            return true;
-        }
-
-        try {
-
-            // Get java name interfaces
-            Class<?>[] javaInterfaces = Class.forName(javaName).getInterfaces();
-
-            // Java class has no interfaces
-            if (javaInterfaces.length == 0) {
-                return false;
-            }
-
-            // Search on implements for each interface
-            for (int i = 0; i < javaInterfaces.length; i++) {
-                if (implementsJavaType(
-                        new JavaType(javaInterfaces[i].getName()), impl)) {
-                    return true;
-                }
-            }
-        } catch (ClassNotFoundException e) {
-
-            logger.warning("The class: '" + javaName
-                    + "' doesn't exist while checking if extends '" + impl
-                    + "'.");
-        }
-
-        return false;
     }
 
     /**
@@ -467,130 +399,65 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         String javaId = projectOperations.getPathResolver().getIdentifier(
                 Path.SRC_MAIN_JAVA, javaPath);
 
-        // Is an allowed java type in class loader ?
+        if (isBasicAllowed(javaType)) {
 
-        // File not exists in system class loader
-        // FIXME: Only search in class loader !
-        if (!fileManager.exists(javaId)) {
-
-            // Java type has parameters (array) or is a collection (implements
-            // iterable) or is a map (implements map) ?
-            List<JavaType> params = javaType.getParameters();
-            if ((!params.isEmpty() || implementsJavaType(javaType, ITERABLE) || implementsJavaType(
-                    javaType, MAP))) {
-
-                // Is an allowed java type in our project ?
-                return isClassLoaderTypeAllowed(javaType, type);
-            }
-        }
-
-        // Is an allowed java type in JDK ?
-
-        // Allowed: Java type is primitive
-        if (javaType.isPrimitive()) {
+            // Allowed: Basic JDK java types
             return true;
-        }
 
-        // Allowed: Java type is in 'java.lang' package (no collections)
-        if (javaName.startsWith("java.lang")) {
-            return true;
-        }
+        } else {
 
-        // Allowed: Java type is in 'java.util' package (no collections)
-        if (javaName.startsWith("java.util")) {
-            return true;
-        }
-
-        // Is an allowed java type in class loader ?
-
-        // File exists in system class loader
-        // FIXME: Only search in class loader !
-        if (fileManager.exists(javaId)) {
-
-            // Not allowed: Java type is an XML entity field
+            // Not allowed: Java type is an XML entity field already
             if (type.equals(MethodParameterType.XMLENTITY)) {
                 return false;
             }
 
-            // Get mutable class or interface type details from java type
-            MutableClassOrInterfaceTypeDetails mutableTypeDetails = getTypeDetails(javaType);
+            if (fileManager.exists(javaId)) {
 
-            // Not allowed: Type details superclass is not allowed java type
-            ClassOrInterfaceTypeDetails typeDetailsSuper = mutableTypeDetails
-                    .getSuperclass();
-            if (typeDetailsSuper != null
-                    && !isTypeAllowed(typeDetailsSuper.getName(), type)) {
+                // File exists in project sources
+
+                // Add gvNIX XML Element annotation
+                MutableClassOrInterfaceTypeDetails mutableTypeDetails = getTypeDetails(javaType);
+                annotationsService.addJavaTypeAnnotation(
+                        mutableTypeDetails.getName(),
+                        GvNIXXmlElement.class.getName(),
+                        getGvNIXXmlElementAnnotation(javaType,
+                                mutableTypeDetails), false);
+
+                return true;
+
+            } else {
+
+                // File not exists in project nor is a JDK basic type
                 return false;
             }
+        }
+    }
 
-            // Add gvNIX XML Element annotation
-            annotationsService.addJavaTypeAnnotation(
-                    mutableTypeDetails.getName(),
-                    GvNIXXmlElement.class.getName(),
-                    getGvNIXXmlElementAnnotation(javaType, mutableTypeDetails),
-                    false);
+    /**
+     * Check basic JDK allowed java types.
+     * 
+     * <ul>
+     * <li>Java type is primitive</li>
+     * <li>Java type is in JDK 'java.lang' package (String)</li>
+     * <li>Java type is in JDK 'java.util' package (Date)</li>
+     * <li>Java type is in JDK 'java.math' package (BigDecimal)</li>
+     * </ul>
+     * 
+     * @param javaType
+     * @return
+     */
+    protected boolean isBasicAllowed(JavaType javaType) {
+
+        // Get the java type name and check primitive or allowed packages
+        String javaName = javaType.getFullyQualifiedTypeName();
+        if (javaType.isPrimitive() || javaName.startsWith("java.lang")
+                || javaName.startsWith("java.util")
+                || javaName.startsWith("java.math")) {
 
             return true;
         }
 
-        // TODO: Create Aj file to declare objects doesn't belong to project
-        // In Roo next version fix it with Classpath loaders.
-
-        logger.log(
-                Level.INFO,
-                "The ".concat(type.toString())
-                        .concat(" parameter type: '")
-                        .concat(javaName)
-                        .concat("' does not belong to project class definitions and its not mapped to be used in web service operation."));
-
-        return true;
-    }
-
-    /**
-     * Is a java type from class loader allowed ?
-     * 
-     * <ul>
-     * <li>Java type is allowed type</li>
-     * <li>Java type parameters are allowed types, if exists</li>
-     * <li></li>
-     * </ul>
-     * 
-     * @param javaType
-     *            Java type
-     * @param type
-     *            Type of the java type
-     * @return Is a java type from class loader allowed ?
-     */
-    protected boolean isClassLoaderTypeAllowed(JavaType javaType,
-            MethodParameterType type) {
-
-        // Not allowed: JavaType is a not allowed type
-        if (isNotAllowedType(javaType)) {
-            logger.log(
-                    Level.WARNING,
-                    "The '"
-                            + type
-                            + "' type '"
-                            + javaType.getFullyQualifiedTypeName()
-                            + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
-                            + "\nThis is a disallowed collection defined");
-            return false;
-        }
-
-        // Java type is a collection of objects
-        List<JavaType> params = javaType.getParameters();
-        if (!params.isEmpty()) {
-
-            // Allowed: All java type parameters are allowed
-            boolean parameterAllowed = true;
-            for (JavaType param : params) {
-                parameterAllowed = parameterAllowed
-                        && isTypeAllowed(param, type);
-            }
-            return parameterAllowed;
-        }
-
-        return true;
+        return false;
     }
 
     /**
@@ -628,12 +495,25 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                         .getPackage().toString()));
         annotation.add(namespace);
 
-        // elementList attribute from type details allowed element fields
-        ArrayAttributeValue<StringAttributeValue> fields = getFields(typeDetails);
-        annotation.add(fields);
+        // Get allowed element fields and create an attribute list with them
+        List<FieldMetadata> fields = getAllowedElementFields(typeDetails);
+        List<StringAttributeValue> values = new ArrayList<StringAttributeValue>();
+        for (FieldMetadata field : fields) {
+
+            StringAttributeValue value = new StringAttributeValue(
+                    new JavaSymbolName("ignored"), field.getFieldName()
+                            .getSymbolName());
+            if (!values.contains(value)) {
+                values.add(value);
+            }
+        }
+        ArrayAttributeValue<StringAttributeValue> attrs = new ArrayAttributeValue<StringAttributeValue>(
+                new JavaSymbolName("elementList"), values);
+
+        annotation.add(attrs);
 
         // xmlTypeName from java type simple type, if not empty
-        if (fields != null && !fields.getValue().isEmpty()) {
+        if (attrs != null && !attrs.getValue().isEmpty()) {
 
             StringAttributeValue xmlTypeName = new StringAttributeValue(
                     new JavaSymbolName("xmlTypeName"),
@@ -656,93 +536,23 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     }
 
     /**
-     * Values array of allowed element fields name from governor type (Java).
+     * Get allowed element fields from type details (Java) and related AJs.
      * 
      * <ul>
-     * <li>Get identifier and version fields from governor related entity
-     * metadata.</li>
-     * <li>Get all fields from governor and remove not allowed types fields:
-     * OneToMany, ManyToOne and OneToOne</li>
-     * <li>Remove not allowed entity types fields for entity.</li>
+     * <li>Get all fields from type details (Java) and related AJs.</li>
+     * <li>Remove not allowed types fields.</li>
      * </ul>
      * 
-     * TODO Utility class: Remove from interface?
-     * 
-     * @param governorTypeDetails
-     *            class to get fields to check.
-     * @return {@link ArrayAttributeValue} with fields to be published as
-     *         '@XmlElement.'
-     */
-    protected ArrayAttributeValue<StringAttributeValue> getFields(
-            ClassOrInterfaceTypeDetails governorTypeDetails) {
-
-        // Get the entity metadata (AJ) from governor type (Java) name
-        EntityMetadata entity = getEntityMetadata(governorTypeDetails.getName());
-
-        // Get allowed element fields
-        List<FieldMetadata> fields = getAllowedElementFields(
-                governorTypeDetails, entity);
-
-        // Create a list of values from element list field names
-        List<StringAttributeValue> values = new ArrayList<StringAttributeValue>();
-        for (FieldMetadata field : fields) {
-
-            StringAttributeValue value = new StringAttributeValue(
-                    new JavaSymbolName("ignored"), field.getFieldName()
-                            .getSymbolName());
-            if (!values.contains(value)) {
-                values.add(value);
-            }
-        }
-
-        return new ArrayAttributeValue<StringAttributeValue>(
-                new JavaSymbolName("elementList"), values);
-    }
-
-    /**
-     * Get allowed element fields from governor type and entity metadata.
-     * 
-     * <ul>
-     * <li>Get identifier and version fields from entity.</li>
-     * <li>Get all fields from governor and remove not allowed types fields.</li>
-     * <li>Remove not allowed entity types fields for entity.</li>
-     * </ul>
-     * 
-     * @param governorTypeDetails
-     *            Governor type (Java)
-     * @param entity
-     *            Entity metadata (AJ)
+     * @param typeDetails
+     *            Type details (Java)
      * @return Field metadata list of allowed element fields
      */
     protected List<FieldMetadata> getAllowedElementFields(
-            ClassOrInterfaceTypeDetails governorTypeDetails,
-            EntityMetadata entity) {
+            ClassOrInterfaceTypeDetails typeDetails) {
 
         // Element fields list
-        List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
-
-        // Element list: Add identifier and version fields from entity (AJ)
-        if (entity != null && entity.isValid()) {
-            // Identifier and/or version can not exists
-            if (entity.getIdentifierField() != null) {
-                fields.add(entity.getIdentifierField());
-            }
-            if (entity.getVersionField() != null) {
-                fields.add(entity.getVersionField());
-            }
-        }
-
-        // Element list: Add all fields from governor type (Java)
-        // May have transient fields
-        for (FieldMetadata field : governorTypeDetails.getDeclaredFields()) {
-            // Not repeat fields, like previous identifier and/or version
-            if (!fields.contains(field)) {
-                fields.add(field);
-            }
-        }
-
-        // Element list: Remove transient fields
-        fields.removeAll(getTransientFields(governorTypeDetails));
+        List<FieldMetadata> fields = javaParserService
+                .getFieldsInAll(typeDetails.getName());
 
         // Temporary fields list initialized with element fields
         List<FieldMetadata> tmpFields = new ArrayList<FieldMetadata>();
@@ -760,43 +570,6 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                 fields.remove(tmpField);
             }
         }
-
-        return fields;
-    }
-
-    /**
-     * Get transient fields from governor type.
-     * 
-     * <ul>
-     * <li>Get OneToMany fields from governor type (Java).</li>
-     * <li>Get ManyToOne fields from governor type (Java).</li>
-     * <li>Get OneToOne fields from governor type (Java).</li>
-     * </ul>
-     * 
-     * @param governorTypeDetails
-     *            Governor type (Java)
-     * @return Field metadata list of transient fields
-     */
-    protected List<FieldMetadata> getTransientFields(
-            ClassOrInterfaceTypeDetails governorTypeDetails) {
-
-        // Fields list
-        List<FieldMetadata> fields = new ArrayList<FieldMetadata>();
-
-        // Add OneToMany fields from governor type (Java)
-        fields.addAll(MemberFindingUtils.getFieldsWithAnnotation(
-                governorTypeDetails,
-                new JavaType("javax.persistence.OneToMany")));
-
-        // Add ManyToOne fields from governor type (Java)
-        fields.addAll(MemberFindingUtils.getFieldsWithAnnotation(
-                governorTypeDetails,
-                new JavaType("javax.persistence.ManyToOne")));
-
-        // Add OneToOne fields from governor type (Java)
-        fields.addAll(MemberFindingUtils
-                .getFieldsWithAnnotation(governorTypeDetails, new JavaType(
-                        "javax.persistence.OneToOne")));
 
         return fields;
     }
@@ -869,56 +642,6 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                 Path.SRC_MAIN_JAVA,
                 javaType.getFullyQualifiedTypeName().replace('.', '/')
                         .concat(".java"));
-    }
-
-    /**
-     * Check if a java type is a not allowed type.
-     * 
-     * <p>
-     * The list of not allowed types are some sorted collections:
-     * </p>
-     * <ul>
-     * <li>Is an array</li>
-     * <li>Extends HashMap class</li>
-     * <li>Extends TreeMap class</li>
-     * <li>Implements Map interface</li>
-     * </ul>
-     * 
-     * @param javaType
-     *            The java type to check
-     * @return Is the java type not allowed ?
-     */
-    protected boolean isNotAllowedType(JavaType javaType) {
-
-        // Java type name
-        String javaName = javaType.getFullyQualifiedTypeName();
-
-        // Check if java type is or extends not allowed classes
-        for (String invalidClass : invalidClasses) {
-
-            if (extendsJavaType(javaType, invalidClass)) {
-
-                logger.warning("The method parameter '"
-                        + javaName
-                        + "' type is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
-                        + "\nThis is or Extends a disallowed collection.");
-                return true;
-            }
-        }
-
-        // Check if java type is or implements not allowed interfaces
-        for (String invalidInterface : invalidIntefaces) {
-
-            if (implementsJavaType(javaType, invalidInterface)) {
-                logger.warning("The method parameter '"
-                        + javaName
-                        + "' type is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
-                        + "\nThis is or Implements a disallowed collection.");
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

@@ -57,30 +57,23 @@ public interface WSExportValidationService {
      * Check java type allowed to be used in a service operation.
      * 
      * <ul>
-     * <li>Is an allowed java type in class loader: Java type and its parameters
-     * if exists are allowed; if not empty params, implements iterable or
-     * implements map</li>
-     * <li>Is an allowed java type in JDK: Java type is primitive, from
-     * java.lang package or from java.util package</li>
-     * <li>Is an allowed java type in class loader: It's not XML entity and
-     * superclass if exists is an allowed java type</li>
+     * <li>Is an allowed basic java type in JDK: Java type is primitive, from
+     * java.lang package or from java.util package or from java.math package</li>
+     * <li>Is a java type in project sources</li>
      * <li></li>
      * </ul>
      * 
      * <p>
-     * Only in last case, GvNIXXmlElement annotation is assigned to java type
-     * with attribute values from java type and elementList attribute from type
-     * details allowed element fields.
+     * Only in last case, GvNIXXmlElement annotation is assigned to java type.
      * </p>
      * 
      * @param javaType
      *            Java type (can't be null)
-     * @param methodParameterType
-     *            Type of the java type
+     * @param type
+     *            Type of parameter to check
      * @return Is it allowed ?
      */
-    public boolean isTypeAllowed(JavaType javaType,
-            MethodParameterType methodParameterType);
+    public boolean isTypeAllowed(JavaType javaType, MethodParameterType type);
 
     /**
      * Set method exception throws to publish as fault in service operation.

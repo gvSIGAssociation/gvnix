@@ -208,8 +208,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
         // Check if method exists and has no gvNIX web method annotation already
         Assert.isTrue(isMethodAvailableToExport(method),
-                "The method: '" + methodName + " doesn't exists in the class '"
-                        + javaType.getFullyQualifiedTypeName() + "'.");
+                "The method not exists or is already exported");
 
         // Check return and parameters types and add GvNIXXmlElement if required
         wSExportValidationService.prepareAllowedJavaTypes(method);
