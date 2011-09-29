@@ -95,7 +95,9 @@
       <c:when test="${type eq 'hidden'}">
         <!-- Value if specified, else item field value -->
         <c:if test="${empty value}">
-          <spring:eval expression="item[field]" scope="request" var="value" />
+          <c:set var="value" scope="request">
+            <spring:eval expression="item[field]" />
+          </c:set>
         </c:if>
         <input id="${fieldId}" name="${fieldName}" type="hidden" value="${value}" />
       </c:when>

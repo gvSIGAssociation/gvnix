@@ -14,12 +14,13 @@
 
   <!-- gvNIX added attributes not included into Roo by default -->
   <jsp:directive.attribute name="idDisabled" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Specify if this id field should be enabled" />
+  <jsp:directive.attribute name="idRender" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Specify if this id field should be rendered" />
   <jsp:directive.attribute name="finder" type="java.lang.String" required="false" rtexprvalue="true" description="Specify the finder to invoque in panel-tab search if exist." />
   <jsp:directive.attribute name="list" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Control if the list link is show in panel-tab." />
 
   <c:if test="${empty render or render}">
 
-    <c:set var="path" value="${path}/list" />
+    <c:set var="path" value="${path}" />
 
     <!-- Secure escaped identifier to be used on html and javascript places -->
     <c:set var="secId">
@@ -40,7 +41,7 @@
     <c:if test="${empty versionField}">
       <c:set var="versionField" value="version" />
     </c:if>
-    
+
     <c:if test="${empty list}">
       <c:set var="list" value="true" />
     </c:if>
@@ -49,17 +50,27 @@
 
     <!-- Show panel tab to access other defined page modes (search, edit, list, ...) -->
     <spring:message arguments="${typeName}" code="entity_list_all" var="entity_relations"/>
-    <spring:url value="${path}" var="listUrl" />
+    <spring:url value="${path}/list" var="listUrl" />
     <util:panel-tabs>
         <c:if test="${not empty finder}">
-          <spring:url value="${path}" var="buscarUrl">
+          <spring:url value="${path}" var="finderUrl">
             <spring:param name="find" value="${finder}"/>
             <spring:param name="form"/>
+            <c:forEach var="p" items="${param}">
+              <c:if test="${p.key ne 'gvnixform' and p.key ne 'index'}">
+                <spring:param name="${p.key}" value="${p.value}" />
+              </c:if>
+            </c:forEach>
           </spring:url>
           <util:panel-tab id="finder_${id}" title="${entity_find}" url="${finderUrl}" type="search"/>
         </c:if>
         <c:if test="${list}">
-          <util:panel-tab active="${true}" id="edit_${id}" title="${entity_relations}" type="list"/>
+          <spring:url value="${path}" var="patternUrl">
+            <c:if test="${not empty param.gvnixpattern}">
+              <spring:param name="gvnixpattern" value="${param.gvnixpattern}" />
+            </c:if>
+          </spring:url>
+          <util:panel-tab active="${true}" id="edit_${id}" title="${entity_relations} safds" url="${patternUrl}" type="list"/>
         </c:if>
     </util:panel-tabs>
 
@@ -107,14 +118,14 @@
 
               <!-- Include id and body column headers when item value is null and count the number of visible columns -->
               <c:set var="item" value="${null}" scope="request" />
-              <field:input field="${idField}" id="${id}" />
+              <field:input field="${idField}" id="${id}" render="${idRender}"/>
               <jsp:doBody />
 
             </tr>
           </thead>
 
           <!-- Action URL for update, delete and add forms -->
-          <spring:url value="${path}" var="formUrl" />
+          <spring:url value="${path}/list" var="formUrl" />
 
           <!-- Form for update and delete (on delete, http method is changed to DELETE) -->
           <form:form id="gvnix_form_${secId}" action="${fn:escapeXml(formUrl)}" method="PUT" modelAttribute="item">
@@ -142,7 +153,16 @@
               <c:set var="pos" value="${pos}" scope="request" />
               <c:set var="parentId" value="${id}" scope="request" />
               <!-- Identifier input field: always disabled on update -->
-              <field:input disabled="true" field="${idField}" id="${id}" />
+              <c:choose>
+                <c:when test="${not idRender}">
+                  <!-- field:input disabled="true" field="${idField}" id="${id}" type="hidden"/-->
+                  <spring:eval expression="item[idField]" scope="request" var="idFieldValue" />
+                  <input type="hidden" id="_${secId}[${fieldPos}]_${idField}_id_update" name="list[${fieldPos}].${idField}" value="${idFieldValue}" disabled="disabled" />
+                </c:when>
+                <c:otherwise>
+                  <field:input disabled="true" field="${idField}" id="${id}" render="true" />
+                </c:otherwise>
+              </c:choose>
               <c:if test="${versionField ne 'none'}">
                 <spring:eval expression="item[versionField]" scope="request" var="versionValue" />
                 <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${versionValue}" disabled="disabled" />
@@ -173,7 +193,7 @@
                 <c:set var="pos" value="${new}" scope="request" />
                 <c:set var="parentId" value="${id}" scope="request" />
                 <!-- Identifier input field: always can be specified on create -->
-                <field:input disabled="${idDisabled}" field="${idField}" id="${id}" />
+                <field:input disabled="${idDisabled}" field="${idField}" id="${id}" render="${idRender}" />
                 <jsp:doBody />
 
               </tr>
