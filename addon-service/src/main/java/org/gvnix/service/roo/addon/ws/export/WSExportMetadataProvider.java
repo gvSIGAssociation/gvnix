@@ -27,6 +27,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
+import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebParam;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
@@ -76,6 +77,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
     private WSConfigService wSConfigService;
     @Reference
     private AnnotationsService annotationsService;
+    @Reference
+    private JavaParserService javaParserService;
 
     private static Logger logger = Logger
             .getLogger(WSExportMetadataProvider.class.getName());
@@ -215,16 +218,16 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
             // parameters hasn't to be checked
             if (!exported.getValue()) {
 
+                MethodMetadata method = javaParserService.getMethodByNameInAll(
+                        governorTypeDetails.getName(),
+                        methodMetadata.getMethodName());
+
                 // Prepares INPUT/OUTPUT parameters
                 wSExportValidationService
-                        .prepareAuthorizedJavaTypesInOperation(
-                                governorTypeDetails.getName(),
-                                methodMetadata.getMethodName());
+                        .prepareAuthorizedJavaTypesInOperation(method);
 
                 // Prepares exceptions.
-                wSExportValidationService.prepareMethodExceptions(
-                        governorTypeDetails.getName(),
-                        methodMetadata.getMethodName(),
+                wSExportValidationService.prepareMethodExceptions(method,
                         webServiceTargetNamespace);
 
                 // Checks @GvNIXWebMethod has attributes.

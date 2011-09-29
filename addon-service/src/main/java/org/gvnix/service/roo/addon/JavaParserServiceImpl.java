@@ -789,24 +789,6 @@ public class JavaParserServiceImpl implements JavaParserService {
 
     /**
      * {@inheritDoc}
-     */
-    public List<JavaType> getMethodExceptionList(JavaType serviceClass,
-            JavaSymbolName methodName) {
-
-        List<JavaType> throwList = new ArrayList<JavaType>();
-
-        MethodMetadata methodMetadata = getMethodByNameInAll(serviceClass,
-                methodName);
-
-        if (methodMetadata != null) {
-            throwList = methodMetadata.getThrowsTypes();
-        }
-
-        return throwList;
-    }
-
-    /**
-     * {@inheritDoc}
      * <p>
      * Checks if annotation is defined in as DeclaredType.
      * </p>

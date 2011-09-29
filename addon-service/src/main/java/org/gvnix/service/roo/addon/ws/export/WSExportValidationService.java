@@ -22,7 +22,7 @@ import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.ws.export.WSExportOperations.MethodParameterType;
-import org.springframework.roo.model.JavaSymbolName;
+import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.model.JavaType;
 
 /**
@@ -46,8 +46,7 @@ public interface WSExportValidationService {
      *            method to check if input/output parameters ara permitted to be
      *            publish in web service.
      */
-    public void prepareAuthorizedJavaTypesInOperation(JavaType serviceClass,
-            JavaSymbolName methodName);
+    public void prepareAuthorizedJavaTypesInOperation(MethodMetadata method);
 
     /**
      * Check java type allowed to be used in a service operation.
@@ -110,8 +109,8 @@ public interface WSExportValidationService {
      * @return true if the exceptions are published correctly or false if the
      *         exceptions don't exists or are incorrect.
      */
-    public boolean prepareMethodExceptions(JavaType serviceClass,
-            JavaSymbolName methodName, String webServiceTargetNamespace);
+    public boolean prepareMethodExceptions(MethodMetadata method,
+            String webServiceTargetNamespace);
 
     /**
      * Checks correct namespace URI format. Suffix 'http://'.

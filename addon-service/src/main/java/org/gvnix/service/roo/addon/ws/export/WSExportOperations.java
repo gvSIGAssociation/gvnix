@@ -20,6 +20,7 @@ package org.gvnix.service.roo.addon.ws.export;
 
 import java.util.List;
 
+import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
@@ -153,8 +154,7 @@ public interface WSExportOperations {
      * 
      * @return true if method exists and annotation is not defined.
      */
-    public boolean isMethodAvailableToExport(JavaType serviceClass,
-            JavaSymbolName methodName);
+    public boolean isMethodAvailableToExport(MethodMetadata methodMetadata);
 
     /**
      * Creates the list of annotations for each method input parameter with
@@ -169,8 +169,7 @@ public interface WSExportOperations {
      * @return Annotation
      */
     public List<AnnotatedJavaType> getMethodParameterAnnotations(
-            JavaType serviceClass, JavaSymbolName methodName,
-            String webServiceTargetNamespace);
+            MethodMetadata methodMetadata, String webServiceTargetNamespace);
 
     /**
      * Creates the list of annotations attribute values to export a web service

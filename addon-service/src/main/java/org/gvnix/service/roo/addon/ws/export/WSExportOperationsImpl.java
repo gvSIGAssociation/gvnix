@@ -203,19 +203,21 @@ public class WSExportOperationsImpl implements WSExportOperations {
         String webServiceTargetNamespace = wSExportValidationService
                 .getWebServiceDefaultNamespace(serviceClass);
 
+        MethodMetadata method = javaParserService.getMethodByNameInAll(
+                serviceClass, methodName);
+
         // Check if method exists in the class.
-        Assert.isTrue(isMethodAvailableToExport(serviceClass, methodName),
+        Assert.isTrue(isMethodAvailableToExport(method),
                 "The method: '" + methodName + " doesn't exists in the class '"
                         + serviceClass.getFullyQualifiedTypeName() + "'.");
 
         // Check authorized JavaTypes in operation.
         // Also, adds @GvNIXXmlElement annotation to any related project type
         // which needs it.
-        wSExportValidationService.prepareAuthorizedJavaTypesInOperation(
-                serviceClass, methodName);
+        wSExportValidationService.prepareAuthorizedJavaTypesInOperation(method);
 
         // Check if method has return type.
-        JavaType returnType = returnJavaType(serviceClass, methodName);
+        JavaType returnType = returnJavaType(method);
 
         Assert.isTrue(returnType != null,
                 "The method: '" + methodName + " doesn't exists in the class '"
@@ -233,8 +235,8 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
         // Check if method throws an Exception and update it with annotations
         // if it's needed.
-        wSExportValidationService.prepareMethodExceptions(serviceClass,
-                methodName, webServiceTargetNamespace);
+        wSExportValidationService.prepareMethodExceptions(method,
+                webServiceTargetNamespace);
 
         // Checks correct namespace format.
         if (!isReturnTypeVoid) {
@@ -263,7 +265,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
         // Add @GvNIXWebParam & @WebParam parameter annotations.
         List<AnnotatedJavaType> annotationWebParamMetadataList = getMethodParameterAnnotations(
-                serviceClass, methodName, webServiceTargetNamespace);
+                method, webServiceTargetNamespace);
 
         javaParserService.updateMethodAnnotations(serviceClass, methodName,
                 annotationMetadataUpdateList, annotationWebParamMetadataList);
@@ -279,13 +281,9 @@ public class WSExportOperationsImpl implements WSExportOperations {
      *            to search.
      * @return {@link JavaType}
      */
-    private JavaType returnJavaType(JavaType serviceClass,
-            JavaSymbolName methodName) {
+    private JavaType returnJavaType(MethodMetadata methodMetadata) {
 
         JavaType returnType = new JavaType(JavaType.VOID_OBJECT.toString());
-
-        MethodMetadata methodMetadata = javaParserService.getMethodByNameInAll(
-                serviceClass, methodName);
 
         if (methodMetadata == null) {
             return null;
@@ -496,14 +494,9 @@ public class WSExportOperationsImpl implements WSExportOperations {
     /**
      * {@inheritDoc}
      */
-    public boolean isMethodAvailableToExport(JavaType serviceClass,
-            JavaSymbolName methodName) {
+    public boolean isMethodAvailableToExport(MethodMetadata methodMetadata) {
 
         boolean isAnnotated = true;
-
-        // Gets method information
-        MethodMetadata methodMetadata = javaParserService.getMethodByNameInAll(
-                serviceClass, methodName);
 
         if (methodMetadata == null) {
             return false;
@@ -520,15 +513,10 @@ public class WSExportOperationsImpl implements WSExportOperations {
      * {@inheritDoc}
      */
     public List<AnnotatedJavaType> getMethodParameterAnnotations(
-            JavaType serviceClass, JavaSymbolName methodName,
-            String webServiceTargetNamespace) {
+            MethodMetadata methodMetadata, String webServiceTargetNamespace) {
 
         // List to store annotations for parameters
         List<AnnotatedJavaType> annotatedWebParameterList = new ArrayList<AnnotatedJavaType>();
-
-        // Method information
-        MethodMetadata methodMetadata = javaParserService.getMethodByNameInAll(
-                serviceClass, methodName);
 
         // Method parameter types
         List<AnnotatedJavaType> parameterTypesList = methodMetadata

@@ -128,17 +128,12 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * {@inheritDoc}
      */
-    public boolean prepareMethodExceptions(JavaType serviceClass,
-            JavaSymbolName methodName, String webServiceTargetNamespace) {
+    public boolean prepareMethodExceptions(MethodMetadata method,
+            String webServiceTargetNamespace) {
 
-        MethodMetadata methodToCheck = javaParserService.getMethodByNameInAll(
-                serviceClass, methodName);
+        Assert.isTrue(method != null, "The method doesn't exists in the class");
 
-        Assert.isTrue(methodToCheck != null,
-                "The method: '" + methodName + " doesn't exists in the class '"
-                        + serviceClass.getFullyQualifiedTypeName() + "'.");
-
-        List<JavaType> throwsTypes = methodToCheck.getThrowsTypes();
+        List<JavaType> throwsTypes = method.getThrowsTypes();
 
         String fileLocation;
 
@@ -152,11 +147,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                     extendsThrowable,
                     "The '"
                             + throwType.getFullyQualifiedTypeName()
-                            + "' class doesn't extend from 'java.lang.Throwable' in method '"
-                            + methodName
-                            + "' from class '"
-                            + serviceClass.getFullyQualifiedTypeName()
-                            + "'.\nIt can't be used as Exception in method to be thrown.");
+                            + "' class doesn't extend from 'java.lang.Throwable'."
+                            + "'\nIt can't be used as Exception in method to be thrown.");
 
             fileLocation = projectOperations.getPathResolver().getIdentifier(
                     Path.SRC_MAIN_JAVA,
@@ -470,18 +462,12 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      * Marshalled according Ws-I standards.
      * </p>
      */
-    public void prepareAuthorizedJavaTypesInOperation(JavaType serviceClass,
-            JavaSymbolName methodName) {
+    public void prepareAuthorizedJavaTypesInOperation(MethodMetadata method) {
 
-        MethodMetadata methodToCheck = javaParserService.getMethodByNameInAll(
-                serviceClass, methodName);
-
-        Assert.isTrue(methodToCheck != null,
-                "The method: '" + methodName + " doesn't exists in the class '"
-                        + serviceClass.getFullyQualifiedTypeName() + "'.");
+        Assert.isTrue(method != null, "The method doesn't exists in the class");
 
         // Check Return type
-        JavaType returnType = methodToCheck.getReturnType();
+        JavaType returnType = method.getReturnType();
 
         Assert.isTrue(
                 isTypeAllowed(returnType, MethodParameterType.RETURN),
@@ -489,12 +475,10 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                         + MethodParameterType.RETURN
                         + "' type '"
                         + returnType.getFullyQualifiedTypeName()
-                        + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
-                        + "\nDefined in: '"
-                        + serviceClass.getFullyQualifiedTypeName() + "'.");
+                        + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.");
 
         // Check Input Parameters
-        List<AnnotatedJavaType> inputParametersList = methodToCheck
+        List<AnnotatedJavaType> inputParametersList = method
                 .getParameterTypes();
 
         for (AnnotatedJavaType annotatedJavaType : inputParametersList) {
@@ -507,9 +491,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                             + "' type '"
                             + annotatedJavaType.getJavaType()
                                     .getFullyQualifiedTypeName()
-                            + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules."
-                            + "\nDefined in: '"
-                            + serviceClass.getFullyQualifiedTypeName() + "'.");
+                            + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.");
 
         }
     }
