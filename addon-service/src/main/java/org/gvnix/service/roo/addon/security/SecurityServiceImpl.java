@@ -261,45 +261,36 @@ public class SecurityServiceImpl implements SecurityService {
 
                 socket.close();
             } catch (SSLException e1) {
-                String alias;
-                // Import new needed certificates to our custom keystore
-                X509Certificate[] neededCertificates = tm.addCerts(host,
-                        keystore, passphrase);
-                if (neededCertificates != null) {
-                    for (int i = 0; i < neededCertificates.length; i++) {
-                        alias = host.concat("-" + (i + 1));
-                        GvNix509TrustManager.saveCertFile(alias,
-                                neededCertificates[i], fileManager,
-                                projectOperations.getPathResolver());
-
-                    }
-                    // Import needed certificates to JVM cacerts keystore
-                    File jvmCacerts = getJVMCacertsKeystore();
-                    tm.addCerts(host, jvmCacerts, passphrase);
-                    /*
-                     * TODO: code to replace directly JVM cacerts by our custom
-                     * keystore
-                     * 
-                     * if (GvNix509TrustManager.replaceJVMCacerts(keystore,
-                     * jvmCacerts, fileManager)) {
-                     * logger.info("JVM cacert has been replaced " +
-                     * jvmCacerts.getAbsolutePath()); } else {
-                     * logger.info("JVM cacerts can not been replaced. "
-                     * .concat(
-                     * "You should to import needed certificates in your ")
-                     * .concat("JVM trustcacerts keystore. ")
-                     * .concat("You have them in src/main/resources/*.cer")
-                     * .concat("Use keytool for that: ") .concat(
-                     * "http://download.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html"
-                     * )); }
-                     */
-                }
+                // Get needed certificates for this host
+                getNeededCertificates(tm, host, keystore, passphrase);
                 parsedDoc = parseWsdlFromUrl(urlStr, keyStorePassphrase);
             } catch (IOException ioe) {
-                throw new IllegalStateException(
-                        "There is not access to the WSDL. Maybe the emited "
-                                .concat("certificate does not match the hostname where WSDL resides. ")
-                                .concat(ioe.getLocalizedMessage()));
+                StringBuffer exceptionMessage = new StringBuffer(
+                        "There is not access to the WSDL.");
+                X509Certificate[] neededCertificates = getNeededCertificates(
+                        tm, host, keystore, passphrase);
+                if (neededCertificates != null) {
+                    exceptionMessage
+                            .append(" Maybe the emited certificate does not match the hostname where WSDL resides.\n");
+                    // X.500 distinguished name
+                    String certDN = null;
+                    // X.500 common name from distinguished name
+                    String certCN = null;
+                    for (X509Certificate x509Certificate : neededCertificates) {
+                        certDN = x509Certificate.getSubjectX500Principal()
+                                .getName();
+                        certCN = getCNfromCertDN(certDN);
+                        if (certCN != null) {
+                            exceptionMessage.append(" * Possible hostname: "
+                                    .concat(certCN).concat("\n"));
+                        } else
+                            exceptionMessage
+                                    .append(" * Possible hostname (check Cert. Distinguished name): "
+                                            .concat(certDN).concat("\n"));
+                    }
+                }
+
+                throw new IllegalStateException(exceptionMessage.toString());
             }
 
             Assert.notNull(parsedDoc, "No valid document format");
@@ -311,6 +302,78 @@ public class SecurityServiceImpl implements SecurityService {
         } catch (IOException e) {
             throw new IllegalStateException("There is not access to the wsdl.");
         }
+    }
+
+    /**
+     * Given a X.500 Subject Distinguished name it returns the Common Name, if
+     * CN exists, null otherwise
+     * 
+     * @param certDN
+     * @return
+     */
+    private String getCNfromCertDN(String certDN) {
+        int i = 0;
+        i = certDN.indexOf("CN=");
+        if (i == -1) {
+            return null;
+        }
+        // get the remaining DN without CN=
+        String fromCN = certDN.substring(i);
+        i = fromCN.indexOf(",");
+        if (i == -1) {
+            return fromCN.substring(3);
+        }
+        return fromCN.substring(3, i);
+    }
+
+    /**
+     * Stores in keystore needed X509 certificates.
+     * 
+     * @param tm
+     * @param host
+     * @param keystore
+     * @param passphrase
+     * @return
+     */
+    private X509Certificate[] getNeededCertificates(GvNix509TrustManager tm,
+            String host, File keystore, char[] passphrase) {
+        String alias;
+        X509Certificate[] neededCertificates = null;
+        try {
+            neededCertificates = tm.addCerts(host, keystore, passphrase);
+            if (neededCertificates != null) {
+                for (int i = 0; i < neededCertificates.length; i++) {
+                    alias = host.concat("-" + (i + 1));
+                    GvNix509TrustManager.saveCertFile(alias,
+                            neededCertificates[i], fileManager,
+                            projectOperations.getPathResolver());
+
+                }
+                // Import needed certificates to JVM cacerts keystore
+                File jvmCacerts = getJVMCacertsKeystore();
+                tm.addCerts(host, jvmCacerts, passphrase);
+                /*
+                 * TODO: code to replace directly JVM cacerts by our custom
+                 * keystore
+                 * 
+                 * if (GvNix509TrustManager.replaceJVMCacerts(keystore,
+                 * jvmCacerts, fileManager)) {
+                 * logger.info("JVM cacert has been replaced " +
+                 * jvmCacerts.getAbsolutePath()); } else {
+                 * logger.info("JVM cacerts can not been replaced. " .concat(
+                 * "You should to import needed certificates in your ")
+                 * .concat("JVM trustcacerts keystore. ")
+                 * .concat("You have them in src/main/resources/*.cer")
+                 * .concat("Use keytool for that: ") .concat(
+                 * "http://download.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html"
+                 * )); }
+                 */
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "Error loading or saving X509 certificates in keystore");
+        }
+        return neededCertificates;
     }
 
     /** {@inheritDoc} */
