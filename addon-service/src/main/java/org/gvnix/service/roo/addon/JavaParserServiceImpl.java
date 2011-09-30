@@ -920,6 +920,34 @@ public class JavaParserServiceImpl implements JavaParserService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public FieldMetadata getFieldByNameInAll(JavaType type, JavaSymbolName name) {
+
+        FieldMetadata field = null;
+
+        Iterator<MemberHoldingTypeDetails> members = getMemberDetails(type)
+                .iterator();
+        while (field == null && members.hasNext()) {
+
+            @SuppressWarnings("unchecked")
+            List<FieldMetadata> fields = (List<FieldMetadata>) members.next()
+                    .getDeclaredFields();
+            Iterator<FieldMetadata> fieldsIter = fields.iterator();
+            while (field == null && fieldsIter.hasNext()) {
+
+                FieldMetadata tmpField = fieldsIter.next();
+                if (tmpField.getFieldName().getSymbolName()
+                        .equals(name.getSymbolName())) {
+                    field = tmpField;
+                }
+            }
+        }
+
+        return field;
+    }
+
+    /**
      * Get the list of type details (Java and AJs) from a Java type.
      * 
      * @param name
