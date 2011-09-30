@@ -30,8 +30,8 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -243,7 +243,7 @@ public class SecurityServiceImpl implements SecurityService {
             URL url = new URL(urlStr);
 
             String host = url.getHost();
-            int port = url.getPort();
+            int port = url.getPort() == -1 ? 443 : url.getPort();
             SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
             socket.setSoTimeout(10000);
             Document parsedDoc = null;
@@ -295,7 +295,13 @@ public class SecurityServiceImpl implements SecurityService {
                      */
                 }
                 parsedDoc = parseWsdlFromUrl(urlStr, keyStorePassphrase);
+            } catch (IOException ioe) {
+                throw new IllegalStateException(
+                        "There is not access to the WSDL. Maybe the emited "
+                                .concat("certificate does not match the hostname where WSDL resides. ")
+                                .concat(ioe.getLocalizedMessage()));
             }
+
             Assert.notNull(parsedDoc, "No valid document format");
             return parsedDoc;
         } catch (SAXException e) {
@@ -303,8 +309,7 @@ public class SecurityServiceImpl implements SecurityService {
             throw new IllegalStateException("The format of the wsdl has errors");
 
         } catch (IOException e) {
-
-            throw new IllegalStateException("There is no access to the wsdl");
+            throw new IllegalStateException("There is not access to the wsdl.");
         }
     }
 
