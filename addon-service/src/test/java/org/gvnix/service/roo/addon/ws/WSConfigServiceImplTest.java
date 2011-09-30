@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.roo.metadata.MetadataService;
@@ -122,7 +122,7 @@ public class WSConfigServiceImplTest {
         Dependency dependency;
 
         List<Element> dependencyList = wSConfigServiceImpl
-                .getRequiredDependencies(CommunicationSense.EXPORT);
+                .getRequiredDependencies(WsType.EXPORT);
 
         for (Element element : dependencyList) {
 
@@ -134,7 +134,7 @@ public class WSConfigServiceImplTest {
         replay(metadataService, projectMetadata);
 
         areCxfDependenciesInstalledResult = wSConfigServiceImpl
-                .isDependenciesInstalled(CommunicationSense.EXPORT);
+                .isDependenciesInstalled(WsType.EXPORT);
 
         assertTrue("There is one or more dependencies not set.",
                 areCxfDependenciesInstalledResult);
@@ -167,7 +167,7 @@ public class WSConfigServiceImplTest {
         replay(metadataService, projectMetadata);
 
         areCxfDependenciesInstalledResult = wSConfigServiceImpl
-                .isDependenciesInstalled(CommunicationSense.EXPORT);
+                .isDependenciesInstalled(WsType.EXPORT);
 
         assertFalse("There are all dependencies set.",
                 areCxfDependenciesInstalledResult);

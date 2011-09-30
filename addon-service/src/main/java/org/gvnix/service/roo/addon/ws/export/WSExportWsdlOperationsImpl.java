@@ -23,7 +23,7 @@ import java.util.List;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.springframework.roo.model.JavaType;
 
 /**
@@ -50,7 +50,7 @@ public class WSExportWsdlOperationsImpl implements WSExportWsdlOperations {
         // Generate java files for WSDL using maven wsdl2java plugin.
         // Generated are paced in GENERATED_CXF_SOURCES_DIR.
         wSExportWsdlConfigService.exportWSDLWebService(url,
-                CommunicationSense.EXPORT_WSDL);
+                WsType.EXPORT_WSDL);
 
         // Add GENERATED_CXF_SOURCES_DIR roo file monitor for get notification
         // of all files create by maven plugin

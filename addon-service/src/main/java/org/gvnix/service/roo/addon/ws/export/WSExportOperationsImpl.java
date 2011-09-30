@@ -34,7 +34,7 @@ import org.gvnix.service.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebParam;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
-import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
@@ -100,7 +100,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
 
         // Checks if Cxf is configured in the project and installs it if it's
         // not available.
-        wSConfigService.install(CommunicationSense.EXPORT);
+        wSConfigService.install(WsType.EXPORT);
 
         // Localizes java file
         String fileLocation = projectOperations.getPathResolver()

@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceProxy;
 import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
-import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
@@ -125,10 +125,10 @@ public class WSImportMetadata extends
                 if (WsdlParserUtils.isRpcEncoded(root)) {
 
                     createAspectMethods(root,
-                            CommunicationSense.IMPORT_RPC_ENCODED);
+                            WsType.IMPORT_RPC_ENCODED);
                 } else {
 
-                    createAspectMethods(root, CommunicationSense.IMPORT);
+                    createAspectMethods(root, WsType.IMPORT);
                 }
 
             } catch (IOException e) {
@@ -170,7 +170,7 @@ public class WSImportMetadata extends
      * @throws ParseException
      *             Generated Java client parse error
      */
-    private void createAspectMethods(Element root, CommunicationSense sense)
+    private void createAspectMethods(Element root, WsType sense)
             throws IOException, ParseException {
 
         // Get the path to the generated service class
@@ -228,7 +228,7 @@ public class WSImportMetadata extends
      */
     private void createAspectMethod(Element root, String servicePath,
             String portTypePath, String portName, MethodDeclaration method,
-            CommunicationSense sense) {
+            WsType sense) {
 
         // List to store method parameters types and names
         List<AnnotatedJavaType> javaTypes = new ArrayList<AnnotatedJavaType>();
@@ -262,7 +262,7 @@ public class WSImportMetadata extends
         JavaType returnType = getJavaTypeByName(root, methodType);
 
         // Rpc Encoded generated clients includes this Exception by default
-        if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
+        if (sense.equals(WsType.IMPORT_RPC_ENCODED)) {
 
             throwsTypes.add(new JavaType("javax.xml.rpc.ServiceException"));
         }

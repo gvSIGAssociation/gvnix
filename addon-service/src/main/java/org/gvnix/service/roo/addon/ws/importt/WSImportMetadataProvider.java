@@ -27,7 +27,7 @@ import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceProxy;
 import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
-import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.gvnix.support.OperationUtils;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
@@ -164,13 +164,13 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
                     // Generate service infraestructure to import the service
                     generate = wSConfigService.importService(
                             governorTypeDetails.getName(), url.getValue(),
-                            CommunicationSense.IMPORT_RPC_ENCODED);
+                            WsType.IMPORT_RPC_ENCODED);
                 } else {
 
                     // Generate service infraestructure to import the service
                     generate = wSConfigService.importService(
                             governorTypeDetails.getName(), url.getValue(),
-                            CommunicationSense.IMPORT);
+                            WsType.IMPORT);
                 }
 
                 // Generate source code client classes if necessary

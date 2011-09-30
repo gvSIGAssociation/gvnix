@@ -32,7 +32,7 @@ import org.gvnix.service.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebParam;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
-import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -291,7 +291,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
      */
     private void configureProject() {
         // Install configuration to export services if it's not installed.
-        wSConfigService.install(CommunicationSense.EXPORT);
+        wSConfigService.install(WsType.EXPORT);
         // Installs jax2ws plugin in project.
         wSConfigService.installJava2wsPlugin();
         // Add GvNixAnnotations to the project.

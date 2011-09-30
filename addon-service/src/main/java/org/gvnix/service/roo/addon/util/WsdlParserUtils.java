@@ -31,7 +31,7 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.gvnix.service.roo.addon.security.SecurityService;
-import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -453,7 +453,7 @@ public class WsdlParserUtils {
      * @return Path to the class
      */
     public static String getServiceClassPath(Element root,
-            CommunicationSense sense) {
+            WsType sense) {
 
         Assert.notNull(root, "Wsdl root element required");
 
@@ -463,7 +463,7 @@ public class WsdlParserUtils {
         // Find a compatible service name
         String name = findFirstCompatibleServiceClassName(root, sense);
 
-        if (sense.equals(CommunicationSense.IMPORT_RPC_ENCODED)) {
+        if (sense.equals(WsType.IMPORT_RPC_ENCODED)) {
 
             // Rpc generated service source ends with this string
             name = name.concat("Locator");
@@ -483,7 +483,7 @@ public class WsdlParserUtils {
      * @return Path to the class
      */
     public static String getPortTypeClassPath(Element root,
-            CommunicationSense sense) {
+            WsType sense) {
 
         Assert.notNull(root, "Wsdl root element required");
 
@@ -495,7 +495,7 @@ public class WsdlParserUtils {
         String port = findFirstCompatiblePortClassName(root, sense);
 
         // RPC Encoded web services adds sufix to port type when equals to port
-        if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)
+        if (WsType.IMPORT_RPC_ENCODED.equals(sense)
                 && portType.equals(port)) {
 
             portType = portType.concat("_PortType");
@@ -515,7 +515,7 @@ public class WsdlParserUtils {
      * @return Java file
      */
     public static File getPortTypeJavaFile(Element root,
-            CommunicationSense sense) {
+            WsType sense) {
 
         return getGeneratedJavaFile(convertTypePathToJavaPath(getPortTypeClassPath(
                 root, sense)));
@@ -564,7 +564,7 @@ public class WsdlParserUtils {
      * @return First compatible service class name
      */
     private static String findFirstCompatibleServiceClassName(Element root,
-            CommunicationSense sense) {
+            WsType sense) {
 
         String name = findFirstCompatibleServiceElementName(root);
 
@@ -739,7 +739,7 @@ public class WsdlParserUtils {
      * @return First compatible port element class name
      */
     public static String findFirstCompatiblePortClassName(Element root,
-            CommunicationSense sense) {
+            WsType sense) {
 
         Assert.notNull(root, "Wsdl root element required");
 
@@ -762,7 +762,7 @@ public class WsdlParserUtils {
      * @return First compatible port type class name
      */
     private static String findFirstCompatiblePortTypeClassName(Element root,
-            CommunicationSense sense) {
+            WsType sense) {
 
         Assert.notNull(root, "Wsdl root element required");
 
@@ -907,9 +907,9 @@ public class WsdlParserUtils {
      * @return Valid java name
      */
     private static String convertNameToJavaFormat(String name,
-            CommunicationSense sense) {
+            WsType sense) {
 
-        if (CommunicationSense.IMPORT_RPC_ENCODED.equals(sense)) {
+        if (WsType.IMPORT_RPC_ENCODED.equals(sense)) {
 
             return convertRpcNameToJavaFormat(name);
         }

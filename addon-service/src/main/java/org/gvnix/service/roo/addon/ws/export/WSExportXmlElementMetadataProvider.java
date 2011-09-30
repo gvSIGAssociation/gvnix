@@ -27,7 +27,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
-import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.gvnix.service.roo.addon.ws.export.WSExportOperations.MethodParameterType;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
@@ -136,7 +136,7 @@ public class WSExportXmlElementMetadataProvider extends
         WSExportXmlElementMetadata wSExportXmlElementMetadata = null;
 
         // Install configuration to export services if it's not installed.
-        wSConfigService.install(CommunicationSense.EXPORT);
+        wSConfigService.install(WsType.EXPORT);
         // Installs jax2ws plugin in project.
         wSConfigService.installJava2wsPlugin();
         // Add GvNixAnnotations to the project.

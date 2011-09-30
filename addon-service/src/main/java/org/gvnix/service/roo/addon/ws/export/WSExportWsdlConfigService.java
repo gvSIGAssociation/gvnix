@@ -31,7 +31,7 @@ import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
-import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
@@ -86,7 +86,7 @@ public interface WSExportWsdlConfigService {
      *            Communication sense type.
      */
     public void exportWSDLWebService(String wsdlLocation,
-            CommunicationSense type);
+            WsType type);
 
     /**
      * <p>

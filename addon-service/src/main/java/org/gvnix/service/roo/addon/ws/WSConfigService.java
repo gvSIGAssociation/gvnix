@@ -51,7 +51,7 @@ public interface WSConfigService {
      * <li>IMPORT_RPC_ENCODED: From external systems to this RPC Encoded.</li>
      * </ul>
      */
-    public enum CommunicationSense {
+    public enum WsType {
         EXPORT, EXPORT_WSDL, IMPORT, IMPORT_RPC_ENCODED
     };
 
@@ -66,7 +66,7 @@ public interface WSConfigService {
      *            Communication type
      * @return
      */
-    public boolean install(CommunicationSense type);
+    public boolean install(WsType type);
 
     /**
      * Publish a class as Web Service.
@@ -132,7 +132,7 @@ public interface WSConfigService {
      * @return wsdl location added, or false if already exists
      */
     public boolean addImportLocation(String wsdlLocation,
-            CommunicationSense type);
+            WsType type);
 
     /**
      * <p>
@@ -153,7 +153,7 @@ public interface WSConfigService {
      * @return
      */
     public boolean addExportLocation(String wsdlLocation,
-            Document wsdlDocument, CommunicationSense type);
+            Document wsdlDocument, WsType type);
 
     /**
      * Imports a Web Service to class.
@@ -167,7 +167,7 @@ public interface WSConfigService {
      * @return Generate sources required ?
      */
     public boolean importService(JavaType className, String wsdlLocation,
-            CommunicationSense type);
+            WsType type);
 
     /**
      * Run maven command with parameters.
@@ -198,13 +198,13 @@ public interface WSConfigService {
      *            Communication type
      * @return true or false if it's configured
      */
-    public boolean isLibraryInstalled(CommunicationSense type);
+    public boolean isLibraryInstalled(WsType type);
 
     /**
      * Add project properties values to pom.xml.
      * 
      * @param type
-     *            of {@link CommunicationSense}
+     *            of {@link WsType}
      */
-    public boolean addProjectProperties(CommunicationSense type);
+    public boolean addProjectProperties(WsType type);
 }

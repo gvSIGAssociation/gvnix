@@ -72,7 +72,7 @@ import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
 import org.gvnix.service.roo.addon.ws.WSCompilationUnit;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
-import org.gvnix.service.roo.addon.ws.WSConfigService.CommunicationSense;
+import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.details.ConstructorMetadata;
@@ -169,7 +169,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
      * </p>
      */
     public void exportWSDLWebService(String wsdlLocation,
-            CommunicationSense type) {
+            WsType type) {
 
         // 1) Check if WSDL is RPC enconded and copy file to project.
         Document wsdlDocument = checkWSDLFile(wsdlLocation);

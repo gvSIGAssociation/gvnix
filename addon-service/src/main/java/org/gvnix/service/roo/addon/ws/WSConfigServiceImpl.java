@@ -105,7 +105,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * @param type
      *            Communication type
      */
-    public boolean install(CommunicationSense type) {
+    public boolean install(WsType type) {
 
         // Check if properties are set in pom.xml
         boolean propertiesUpdated = addProjectProperties(type);
@@ -117,7 +117,7 @@ public class WSConfigServiceImpl implements WSConfigService {
             installDependencies(type);
         }
 
-        if (type == CommunicationSense.EXPORT) {
+        if (type == WsType.EXPORT) {
 
             // Create CXF config file src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
             installCxfConfigurationFile();
@@ -141,13 +141,13 @@ public class WSConfigServiceImpl implements WSConfigService {
      * <li>Cxf configuration file exists</li>
      * </ul>
      */
-    public boolean isLibraryInstalled(CommunicationSense type) {
+    public boolean isLibraryInstalled(WsType type) {
 
         // TODO Check Web configuration file on IMPORT ?
 
         boolean cxfInstalled = isDependenciesInstalled(type);
 
-        if (type == CommunicationSense.EXPORT) {
+        if (type == WsType.EXPORT) {
 
             cxfInstalled = cxfInstalled
                     && fileManager.exists(getCxfConfigurationFilePath());
@@ -240,7 +240,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      *            Communication type
      * @return true if all dependencies are set in pom.xml
      */
-    protected boolean isDependenciesInstalled(CommunicationSense type) {
+    protected boolean isDependenciesInstalled(WsType type) {
 
         boolean cxfDependenciesExists = true;
 
@@ -274,7 +274,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      *            Type of required dependencies
      * @return File name
      */
-    private String getCxfRequiredDependenciesFileName(CommunicationSense type) {
+    private String getCxfRequiredDependenciesFileName(WsType type) {
 
         StringBuffer name = new StringBuffer("dependencies-");
 
@@ -305,7 +305,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      *            Communication type
      * @return List of addon dependencies as xml elements
      */
-    protected List<Element> getRequiredDependencies(CommunicationSense type) {
+    protected List<Element> getRequiredDependencies(WsType type) {
 
         // TODO Unify distinct dependencies files in only one
 
@@ -336,7 +336,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * @param type
      *            Communication type
      */
-    private void installDependencies(CommunicationSense type) {
+    private void installDependencies(WsType type) {
 
         // If dependencies are installed.
         boolean isInstalled = isDependenciesInstalled(type);
@@ -356,7 +356,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * {@inheritDoc}
      */
-    public boolean addProjectProperties(CommunicationSense type) {
+    public boolean addProjectProperties(WsType type) {
 
         // Add project properties, as versions
         List<Element> projectProperties = new ArrayList<Element>();
@@ -1128,13 +1128,13 @@ public class WSConfigServiceImpl implements WSConfigService {
      * {@inheritDoc}
      */
     public boolean addImportLocation(String wsdlLocation,
-            CommunicationSense type) {
+            WsType type) {
 
         // Adds Project properties to pom.xml
         // addProjectProperties(type);
 
         // Identifies the type of library to use
-        if (CommunicationSense.IMPORT_RPC_ENCODED.equals(type)) {
+        if (WsType.IMPORT_RPC_ENCODED.equals(type)) {
             return addImportLocationRpc(wsdlLocation);
         } else {
             return addImportLocationDocument(wsdlLocation);
@@ -1145,7 +1145,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * {@inheritDoc}
      */
     public boolean addExportLocation(String wsdlLocation,
-            Document wsdlDocument, CommunicationSense type) {
+            Document wsdlDocument, WsType type) {
 
         // Project properties to pom.xml
         boolean propertiesUpdated = addProjectProperties(type);
@@ -1661,7 +1661,7 @@ public class WSConfigServiceImpl implements WSConfigService {
      * {@inheritDoc}
      */
     public boolean importService(JavaType serviceClass, String wsdlLocation,
-            CommunicationSense type) {
+            WsType type) {
 
         // Install import WS configuration requirements, if not installed
         boolean propertiesUpdated = install(type);
