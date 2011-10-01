@@ -97,6 +97,12 @@ public class WSConfigServiceImpl implements WSConfigService {
      */
     public boolean install(WsType type) {
 
+        // Add repository and dependency with this addon
+        annotationsService.addAddonDependency();
+
+        // Installs jax2ws plugin in project
+        addPlugin();
+
         // Add library dependencies, if not exists already
         addDependencies(type);
 
@@ -934,7 +940,7 @@ public class WSConfigServiceImpl implements WSConfigService {
             logger.log(Level.INFO,
                     "Jax-Ws plugin is not defined in the pom.xml. Installing in project.");
             // Installs jax2ws plugin.
-            installJava2wsPlugin();
+            addPlugin();
         }
 
         // Checks if already exists the execution.
@@ -1116,17 +1122,18 @@ public class WSConfigServiceImpl implements WSConfigService {
     }
 
     /**
-     * {@inheritDoc}
+     * Installs Java2ws plugin into the pom.xml from a template.
      */
-    public void installJava2wsPlugin() {
-        Element pluginElement = XmlUtils.findFirstElement(
-                "/jaxws-plugin/plugin",
-                XmlUtils.getConfiguration(this.getClass(),
-                        "dependencies-export-jaxws-plugin.xml"));
+    protected void addPlugin() {
 
-        projectOperations.updateBuildPlugin(new Plugin(pluginElement));
+        // Get the plugin from the template and write into de project (pom.xml)
+        projectOperations.updateBuildPlugin(new Plugin(XmlUtils
+                .findFirstElement("/jaxws-plugin/plugin", XmlUtils
+                        .getConfiguration(this.getClass(),
+                                "dependencies-export-jaxws-plugin.xml"))));
+
+        // What is this for ?
         fileManager.commit();
-
     }
 
     /**
@@ -1666,9 +1673,6 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Add wsdl location to pom.xml
         boolean added = addImportLocation(wsdlLocation, type);
-
-        // Add GvNixAnnotations to the project.
-        annotationsService.addGvNIXAnnotationsDependency();
 
         // Target sources folder already exists ?
         boolean sourcesExists = new File(

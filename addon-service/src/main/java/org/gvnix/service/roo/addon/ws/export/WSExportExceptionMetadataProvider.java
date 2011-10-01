@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.service.roo.addon.AnnotationsService;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
@@ -61,8 +60,6 @@ public class WSExportExceptionMetadataProvider extends
     private WSConfigService wSConfigService;
     @Reference
     private WSExportValidationService wSExportValidationService;
-    @Reference
-    private AnnotationsService annotationsService;
 
     private static Logger logger = Logger
             .getLogger(WSExportExceptionMetadataProvider.class.getName());
@@ -124,10 +121,6 @@ public class WSExportExceptionMetadataProvider extends
 
         // Install configuration to export services if it's not installed.
         wSConfigService.install(WsType.EXPORT);
-        // Installs jax2ws plugin in project.
-        wSConfigService.installJava2wsPlugin();
-        // Add GvNixAnnotations to the project.
-        annotationsService.addGvNIXAnnotationsDependency();
 
         // Check if Web Service definition is correct.
         PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata

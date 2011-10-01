@@ -138,7 +138,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
         WSExportMetadata serviceLayerMetadata = null;
 
         // Configures project
-        configureProject();
+        wSConfigService.install(WsType.EXPORT);
 
         // Check if Web Service definition is correct.
         PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
@@ -223,8 +223,7 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                         methodMetadata.getMethodName());
 
                 // Prepares INPUT/OUTPUT parameters
-                wSExportValidationService
-                        .prepareAllowedJavaTypes(method);
+                wSExportValidationService.prepareAllowedJavaTypes(method);
 
                 // Prepares exceptions.
                 wSExportValidationService.prepareExceptions(method,
@@ -284,18 +283,6 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                 governorPhysicalTypeMetadata, methodMetadataList);
 
         return serviceLayerMetadata;
-    }
-
-    /**
-     * Adds dependencies and plugins to project
-     */
-    private void configureProject() {
-        // Install configuration to export services if it's not installed.
-        wSConfigService.install(WsType.EXPORT);
-        // Installs jax2ws plugin in project.
-        wSConfigService.installJava2wsPlugin();
-        // Add GvNixAnnotations to the project.
-        annotationsService.addGvNIXAnnotationsDependency();
     }
 
     /**

@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.service.roo.addon.AnnotationsService;
 import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
@@ -65,13 +64,11 @@ public class WSExportXmlElementMetadataProvider extends
     @Reference
     private WSConfigService wSConfigService;
     @Reference
-    private AnnotationsService annotationsService;
-    @Reference
     private JavaParserService javaParserService;
 
     protected void activate(ComponentContext context) {
 
-        // We will notified when physical type with gvNIX xml element modified
+        // Notify when physical type with gvNIX xml element annotation modified
         metadataDependencyRegistry.registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
@@ -88,6 +85,7 @@ public class WSExportXmlElementMetadataProvider extends
     @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
 
+        // Get annotation identifier for this java type at path
         return WSExportXmlElementMetadata.createIdentifier(javaType, path);
     }
 
@@ -106,6 +104,7 @@ public class WSExportXmlElementMetadataProvider extends
         Path path = WSExportXmlElementMetadata
                 .getPath(metadataIdentificationString);
 
+        // Get physical type identifier for this java type
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
@@ -122,65 +121,55 @@ public class WSExportXmlElementMetadataProvider extends
             JavaType aspectName, PhysicalTypeMetadata physicalType,
             String itdFilename) {
 
-        // Install web service (dependencies, version property and config file)
+        // Install web service (dependencies, properties, plugins and config)
         wSConfigService.install(WsType.EXPORT);
-
-        // Installs jax2ws plugin in project.
-        wSConfigService.installJava2wsPlugin();
-
-        // Add GvNixAnnotations to the project.
-        annotationsService.addGvNIXAnnotationsDependency();
 
         // We know governor type details are non-null and can be safely cast
 
-        // Work out the MIDs of the other metadata we depend on
-        JavaType javaType = WSExportXmlElementMetadata.getJavaType(id);
-        Path path = WSExportXmlElementMetadata.getPath(id);
-        String physicalTypeId = PhysicalTypeIdentifier.createIdentifier(
-                javaType, path);
-
-        // Check if Web Service definition is correct.
+        // Check if Web Service definition is correct
+        // TODO What is this for ?
         PhysicalTypeDetails physicalTypeDetails = physicalType
                 .getMemberHoldingTypeDetails();
-
-        ClassOrInterfaceTypeDetails typeDetails;
         if (physicalTypeDetails == null
                 || !(physicalTypeDetails instanceof ClassOrInterfaceTypeDetails)) {
+
             // There is a problem
             return null;
-        } else {
-            // We have reliable physical type details
-            typeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
         }
 
+        // We have reliable physical type details
+        ClassOrInterfaceTypeDetails typeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
+
+        // Work out the MIDs of the other metadata we depend on
+        String physicalTypeId = PhysicalTypeIdentifier.createIdentifier(
+                WSExportXmlElementMetadata.getJavaType(id),
+                WSExportXmlElementMetadata.getPath(id));
+
         // We need to be informed if our dependent metadata changes
+        // TODO What is this for ?
         metadataDependencyRegistry.registerDependency(physicalTypeId, id);
 
-        AnnotationMetadata gvNixXmlElementAnnotation = MemberFindingUtils
-                .getTypeAnnotation(typeDetails, new JavaType(
-                        GvNIXXmlElement.class.getName()));
+        AnnotationMetadata annotation = MemberFindingUtils.getTypeAnnotation(
+                typeDetails, new JavaType(GvNIXXmlElement.class.getName()));
 
         // Create metaData with field list values.
         return new WSExportXmlElementMetadata(id, aspectName, physicalType,
-                getDeclaredFields(typeDetails, gvNixXmlElementAnnotation));
+                getDeclaredFields(typeDetails, annotation));
     }
 
     /**
-     * Check correct format for annotation attribute values and define fields to
-     * be exported in XSD schema.
-     * <p>
-     * Fields defined in 'elementList' annotation attribute will be exported.
-     * </p>
+     * Get defined fields to be exported as elements in XSD schema.
      * 
-     * Only executed if typeDetails is a class.
+     * <ul>
+     * <li>Fields defined in 'elementList' annotation attribute will exported</li>
+     * <li>Only executed if typeDetails is a class</li>
+     * </ul>
      * 
      * @param typeDetails
-     *            class to get fields to check.
+     *            class to get fields to check
      * @param annotation
      *            to check element values.
-     * @param physicalTypeId
-     *            Physical type identifier for fields
-     * @return {@link List} of annotated {@link FieldMetadata}.
+     * @return {@link List} of annotated {@link FieldMetadata}
      */
     protected List<FieldMetadata> getDeclaredFields(
             ClassOrInterfaceTypeDetails typeDetails,
@@ -218,6 +207,8 @@ public class WSExportXmlElementMetadataProvider extends
      * getItdUniquenessFilenameSuffix()
      */
     public String getItdUniquenessFilenameSuffix() {
+
+        // Aspect Java file name sufix
         return "GvNix_XmlElement";
     }
 
@@ -227,6 +218,8 @@ public class WSExportXmlElementMetadataProvider extends
      * @see org.springframework.roo.metadata.MetadataProvider#getProvidesType()
      */
     public String getProvidesType() {
+
+        // Get metadata identifier for this annotation
         return WSExportXmlElementMetadata.getMetadataIdentiferType();
     }
 

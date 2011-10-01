@@ -69,6 +69,9 @@ public interface WSConfigService {
      * Install web service library, if not already installed.
      * 
      * <ul>
+     * <li>Add repository and dependency with this addon (annotations from this
+     * addon are used along project)</li>
+     * <li>Installs jax2ws plugin</li>
      * <li>Add library dependencies</li>
      * <li>Install library configuration file when export (CXF)</li>
      * <li>Add library version properties</li>
@@ -198,10 +201,5 @@ public interface WSConfigService {
      * @throws IOException
      */
     public void mvn(String parameters, String message) throws IOException;
-
-    /**
-     * Installs Java2ws plugin in pom.xml.
-     */
-    public void installJava2wsPlugin();
 
 }

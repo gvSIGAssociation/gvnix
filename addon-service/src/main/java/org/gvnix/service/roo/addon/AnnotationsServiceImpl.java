@@ -50,27 +50,22 @@ public class AnnotationsServiceImpl implements AnnotationsService {
     /**
      * {@inheritDoc}
      */
-    public void addGvNIXAnnotationsDependency() {
+    public void addAddonDependency() {
 
-        // Install the add-on Google code repository and dependency needed to
-        // get the annotations
-
+        // Get configuration (repository and dependency) XML element
         Element conf = XmlUtils.getConfiguration(this.getClass(),
                 "configuration.xml");
 
-        List<Element> repos = XmlUtils.findElements(
-                "/configuration/gvnix/repositories/repository", conf);
-        for (Element repo : repos) {
-
+        // Find repository elements and add them to the project
+        for (Element repo : XmlUtils.findElements(
+                "/configuration/gvnix/repositories/repository", conf)) {
             projectOperations.addRepository(new Repository(repo));
         }
 
-        List<Element> depens = XmlUtils.findElements(
-                "/configuration/gvnix/dependencies/dependency", conf);
-
-        // Update add-on dependency if needed
+        // Find dependency elements and update them into the project
         DependenciesVersionManager.manageDependencyVersion(metadataService,
-                projectOperations, depens);
+                projectOperations, XmlUtils.findElements(
+                        "/configuration/gvnix/dependencies/dependency", conf));
     }
 
     /**

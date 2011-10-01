@@ -39,7 +39,6 @@ import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceSecurity;
 import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.security.WSServiceSecurityMetadata;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
-import org.gvnix.service.roo.addon.ws.WSConfigService;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
@@ -78,8 +77,6 @@ public class WSImportOperationsImpl implements WSImportOperations {
     private JavaParserService javaParserService;
     @Reference
     private AnnotationsService annotationsService;
-    @Reference
-    private WSConfigService wSConfigService;
     @Reference
     private TypeLocationService typeLocationService;
 
@@ -134,7 +131,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
                     annotationAttributeValues, false);
 
             // Add GvNixAnnotations to the project.
-            annotationsService.addGvNIXAnnotationsDependency();
+            annotationsService.addAddonDependency();
         }
     }
 
@@ -214,7 +211,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
                 annotationAttributeValues, false);
 
         // Add GvNixAnnotations to the project.
-        annotationsService.addGvNIXAnnotationsDependency();
+        annotationsService.addAddonDependency();
 
     }
 

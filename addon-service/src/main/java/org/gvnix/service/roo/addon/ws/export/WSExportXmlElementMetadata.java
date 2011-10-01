@@ -20,10 +20,7 @@ package org.gvnix.service.roo.addon.ws.export;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElementField;
@@ -64,346 +61,336 @@ import org.springframework.roo.support.util.Assert;
 public class WSExportXmlElementMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
-    private static final Set<String> notAllowedIntefaceCollectionTypes = new HashSet<String>();
-
-    static {
-        notAllowedIntefaceCollectionTypes.add(Map.class.getName());
-    }
-
     private static final String XML_ELEMENT_STRING = WSExportXmlElementMetadata.class
             .getName();
 
     private static final String XML_ELEMENT_TYPE = MetadataIdentificationUtils
             .create(XML_ELEMENT_STRING);
 
-    public WSExportXmlElementMetadata(String identifier, JavaType aspectName,
-            PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            List<FieldMetadata> fieldMetadataElementList) {
-        super(identifier, aspectName, governorPhysicalTypeMetadata);
+    public WSExportXmlElementMetadata(String id, JavaType aspectName,
+            PhysicalTypeMetadata physicalType, List<FieldMetadata> fields) {
 
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
-                + identifier + "' does not appear to be a valid");
+        super(id, aspectName, physicalType);
 
+        // Validate metadata identifier is of type gvNIX xml element metadata
+        Assert.isTrue(isValid(id), "Metadata identification string '" + id
+                + "' does not appear to be valid");
         if (!isValid()) {
             return;
         }
 
-        // Create the metadata.
-        AnnotationMetadata gvNIXXmlElementAnnotationMetadata = MemberFindingUtils
-                .getTypeAnnotation(governorTypeDetails, new JavaType(
-                        GvNIXXmlElement.class.getName()));
+        // Get the gvNIX xml element annotation
+        AnnotationMetadata annotation = MemberFindingUtils.getTypeAnnotation(
+                governorTypeDetails,
+                new JavaType(GvNIXXmlElement.class.getName()));
+        if (annotation != null) {
 
-        if (gvNIXXmlElementAnnotationMetadata != null) {
-
-            // Type annotations.
-            List<AnnotationMetadata> annotationTypeList = getXmlElementTypeAnnotation(
-                    gvNIXXmlElementAnnotationMetadata, fieldMetadataElementList);
-
+            // Add to class XmlRoot, XmlType and XmlEnum or XmlAccessorType
+            List<AnnotationMetadata> annotationTypeList = getAnnotations(
+                    annotation, fields);
             for (AnnotationMetadata annotationMetadata : annotationTypeList) {
                 builder.addAnnotation(annotationMetadata);
             }
 
-            // If is not a Java Enum type
+            // If is not a enumeration type
             if (!governorTypeDetails.getPhysicalTypeCategory().equals(
                     PhysicalTypeCategory.ENUMERATION)) {
 
-                // Declared XmlElement field annotations
-                List<DeclaredFieldAnnotationDetails> declaredFieldXmlElementFieldList = getXmlElementFieldAnnotations(fieldMetadataElementList);
+                // Add XmlElement annotation for each field
+                List<DeclaredFieldAnnotationDetails> declaredFieldXmlElementFieldList = getXmlElementFieldAnnotations(fields);
                 for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlElementFieldList) {
                     builder.addFieldAnnotation(declaredFieldAnnotationDetails);
                 }
 
-                // Avoid if abstract class or interface
+                // Avoid if abstract class or interface (can't add method)
                 if (!Modifier.isAbstract(governorTypeDetails.getModifier())
                         && !Modifier.isInterface(governorTypeDetails
                                 .getModifier())) {
 
-                    // Implements class and create method to avoid XML cycles
-                    builder.addImplementsType(new JavaType(
-                            "com.sun.xml.bind.CycleRecoverable"));
-                    builder.addMethod(getOnCycleDetectedMethod(identifier));
+                    // Add annotation and method to avoid cycles convert to XML
+                    addCycleDetection(id);
                 }
             }
         }
 
-        // Create a representation of the desired output ITD
+        // Build the aspect Java defined into builder
         itdTypeDetails = builder.build();
-
     }
 
     /**
-     * Create the onCycleDetected method to avoid cycles converting to XML.
+     * Add annotation and method to avoid cycles converting to XML.
      * 
-     * <p>
-     * Return a new object of the governor type (all properties will be null).
-     * </p>
-     * 
-     * @param identifier
+     * @param id
      *            Declared by metadata id
-     * @return onCycleDetected method
      */
-    protected MethodMetadataBuilder getOnCycleDetectedMethod(String identifier) {
+    protected void addCycleDetection(String id) {
 
+        // Implements class and create method to avoid XML cycles
+        builder.addImplementsType(new JavaType(
+                "com.sun.xml.bind.CycleRecoverable"));
+
+        // Create method executed when cycle detected
         JavaSymbolName methodName = new JavaSymbolName("onCycleDetected");
         JavaType returnType = new JavaType(Object.class.getName());
-        List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>(
-                1);
-        parameterTypes.add(new AnnotatedJavaType(new JavaType(
+        List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>(1);
+        paramTypes.add(new AnnotatedJavaType(new JavaType(
                 "com.sun.xml.bind.CycleRecoverable.Context"), null));
-        List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>(1);
-        parameterNames.add(new JavaSymbolName("context"));
+        List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>(1);
+        paramNames.add(new JavaSymbolName("context"));
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         bodyBuilder.appendFormalLine("return new "
                 + governorTypeDetails.getName() + " ();");
 
-        return new MethodMetadataBuilder(identifier, Modifier.PUBLIC,
-                methodName, returnType, parameterTypes, parameterNames,
-                bodyBuilder);
+        builder.addMethod(new MethodMetadataBuilder(id, Modifier.PUBLIC,
+                methodName, returnType, paramTypes, paramNames, bodyBuilder));
     }
 
     /**
-     * Converts {@link FieldMetadata} {@link List} to
-     * {@link DeclaredFieldAnnotationDetails} {@link List} using @XmlElement
-     * annotation.
+     * Create XmlElement annotation for each field.
      * 
-     * @param fieldMetadataElementList
-     *            list to convert.
-     * @return All the annotated @XmlElement fields (never null, but may be
-     *         empty).
+     * <p>
+     * Field XmlElement annotation has same attributes as GvNIXXmlElementField
+     * or only name attribute with field name if GvNIXXmlElementField not
+     * exists.
+     * </p>
+     * 
+     * @param fields
+     *            Fields to be exported
+     * @return All the annotated @XmlElement fields (may be empty)
      */
     public List<DeclaredFieldAnnotationDetails> getXmlElementFieldAnnotations(
-            List<FieldMetadata> fieldMetadataElementList) {
+            List<FieldMetadata> fields) {
 
-        List<DeclaredFieldAnnotationDetails> annotationXmlElementFieldList = new ArrayList<DeclaredFieldAnnotationDetails>();
+        // Result list of annotations for fields
+        List<DeclaredFieldAnnotationDetails> result = new ArrayList<DeclaredFieldAnnotationDetails>();
 
-        // Void list, annotation doesn't need attribute values.
-        List<AnnotationAttributeValue<?>> attributeValueList;
-        AnnotationMetadata xmlElementAnnotation;
-        StringAttributeValue nameStringAttributeValue;
+        for (FieldMetadata field : fields) {
 
-        DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails;
+            // Get field annotation of GvNIXXmlElementField type
+            AnnotationMetadata annotation = MemberFindingUtils
+                    .getAnnotationOfType(field.getAnnotations(), new JavaType(
+                            GvNIXXmlElementField.class.getName()));
 
-        AnnotationMetadata gVNIXxmlElementFieldAnnotation;
-        for (FieldMetadata fieldMetadata : fieldMetadataElementList) {
+            List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
 
-            gVNIXxmlElementFieldAnnotation = MemberFindingUtils
-                    .getAnnotationOfType(fieldMetadata.getAnnotations(),
-                            new JavaType(GvNIXXmlElementField.class.getName()));
+            if (annotation != null) {
 
-            attributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-            if (gVNIXxmlElementFieldAnnotation != null) {
-
-                List<JavaSymbolName> annotationAttributeNames = gVNIXxmlElementFieldAnnotation
-                        .getAttributeNames();
-
-                AnnotationAttributeValue<?> tmpAnnotationAttributeValue;
-
-                for (JavaSymbolName javaSymbolName : annotationAttributeNames) {
-                    tmpAnnotationAttributeValue = gVNIXxmlElementFieldAnnotation
-                            .getAttribute(javaSymbolName);
-                    attributeValueList.add(tmpAnnotationAttributeValue);
+                // Annotation exists, duplicate all annotation attributes
+                for (JavaSymbolName javaSymbolName : annotation
+                        .getAttributeNames()) {
+                    attrs.add(annotation.getAttribute(javaSymbolName));
                 }
 
             } else {
 
-                nameStringAttributeValue = new StringAttributeValue(
-                        new JavaSymbolName("name"), fieldMetadata
-                                .getFieldName().getSymbolName());
-                attributeValueList.add(nameStringAttributeValue);
-
+                // Annotation not exists, create name attr with field name
+                attrs.add(new StringAttributeValue(new JavaSymbolName("name"),
+                        field.getFieldName().getSymbolName()));
             }
 
-            // Creates the annotation.
-            xmlElementAnnotation = new AnnotationMetadataBuilder(new JavaType(
-                    "javax.xml.bind.annotation.XmlElement"), attributeValueList)
-                    .build();
-
-            declaredFieldAnnotationDetails = new DeclaredFieldAnnotationDetails(
-                    new FieldMetadataBuilder(
-                            governorPhysicalTypeMetadata.getId(), fieldMetadata)
-                            .build(), xmlElementAnnotation);
-            annotationXmlElementFieldList.add(declaredFieldAnnotationDetails);
+            // Create XmlElement annotation for field with attributes
+            result.add(new DeclaredFieldAnnotationDetails(
+                    new FieldMetadataBuilder(governorPhysicalTypeMetadata
+                            .getId(), field).build(),
+                    new AnnotationMetadataBuilder(new JavaType(
+                            "javax.xml.bind.annotation.XmlElement"), attrs)
+                            .build()));
         }
 
-        return annotationXmlElementFieldList;
+        return result;
     }
 
     /**
-     * Method to create Type Annotations.
+     * Class annotations: XmlRoot, XmlType and XmlEnum or XmlAccessorType.
      * 
-     * @param gvNIXXmlElementAnnotationMetadata
-     *            with info to build AspectJ annotations.
-     * @param fieldElementList
-     *            fields order to be published.
-     * @return {@link List} of {@link AnnotationMetadata} to build the ITD.
-     */
-    public List<AnnotationMetadata> getXmlElementTypeAnnotation(
-            AnnotationMetadata gvNIXXmlElementAnnotationMetadata,
-            List<FieldMetadata> fieldElementList) {
-
-        boolean enumerationClass = governorTypeDetails
-                .getPhysicalTypeCategory().equals(
-                        PhysicalTypeCategory.ENUMERATION);
-
-        AnnotationAttributeValue<?> tmpAttribute;
-
-        // Boolean exported attribute.
-        gvNIXXmlElementAnnotationMetadata.getAttribute(new JavaSymbolName(
-                "exported"));
-
-        // Annotation list.
-        List<AnnotationMetadata> annotationTypeList = new ArrayList<AnnotationMetadata>();
-
-        // @XmlRootElement
-        List<AnnotationAttributeValue<?>> xmlRootElementAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-        JavaType xmlRootElement = new JavaType(
-                "javax.xml.bind.annotation.XmlRootElement");
-
-        tmpAttribute = gvNIXXmlElementAnnotationMetadata
-                .getAttribute(new JavaSymbolName("name"));
-
-        if (tmpAttribute != null) {
-            StringAttributeValue nameAttributeValue = (StringAttributeValue) tmpAttribute;
-
-            xmlRootElementAnnotationAttributeValueList.add(nameAttributeValue);
-
-            StringAttributeValue namespaceAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
-                    .getAttribute(new JavaSymbolName("namespace"));
-            xmlRootElementAnnotationAttributeValueList
-                    .add(namespaceAttributeValue);
-
-            AnnotationMetadata xmlRootElementAnnotation = new AnnotationMetadataBuilder(
-                    xmlRootElement, xmlRootElementAnnotationAttributeValueList)
-                    .build();
-
-            annotationTypeList.add(xmlRootElementAnnotation);
-        }
-
-        // @XmlType
-        List<AnnotationAttributeValue<?>> xmlTypeAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-        JavaType xmlType = new JavaType("javax.xml.bind.annotation.XmlType");
-
-        List<StringAttributeValue> propOrderList = new ArrayList<StringAttributeValue>();
-
-        StringAttributeValue propOrderAttributeValue;
-
-        for (FieldMetadata fieldMetadata : fieldElementList) {
-            propOrderAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("ignored"), fieldMetadata.getFieldName()
-                            .getSymbolName());
-            propOrderList.add(propOrderAttributeValue);
-        }
-
-        tmpAttribute = gvNIXXmlElementAnnotationMetadata
-                .getAttribute(new JavaSymbolName("xmlTypeName"));
-
-        StringAttributeValue xmlTypeNameAttributeValue;
-        if (tmpAttribute != null) {
-            xmlTypeNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("name"),
-                    ((StringAttributeValue) tmpAttribute).getValue());
-            xmlTypeAnnotationAttributeValueList.add(xmlTypeNameAttributeValue);
-        } else {
-            xmlTypeNameAttributeValue = new StringAttributeValue(
-                    new JavaSymbolName("name"), "");
-            xmlTypeAnnotationAttributeValueList.add(xmlTypeNameAttributeValue);
-        }
-
-        ArrayAttributeValue<StringAttributeValue> propOrderAttributeList = new ArrayAttributeValue<StringAttributeValue>(
-                new JavaSymbolName("propOrder"), propOrderList);
-
-        xmlTypeAnnotationAttributeValueList.add(propOrderAttributeList);
-
-        StringAttributeValue xmlTypeNamespaceAttributeValue = (StringAttributeValue) gvNIXXmlElementAnnotationMetadata
-                .getAttribute(new JavaSymbolName("namespace"));
-        xmlTypeAnnotationAttributeValueList.add(xmlTypeNamespaceAttributeValue);
-
-        AnnotationMetadata xmlTypeRootElementAnnotation = new AnnotationMetadataBuilder(
-                xmlType, xmlTypeAnnotationAttributeValueList).build();
-
-        annotationTypeList.add(xmlTypeRootElementAnnotation);
-
-        // @XmlAccessorType
-        List<AnnotationAttributeValue<?>> xmlAccessorTypeAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-        JavaType xmlAccessorType = new JavaType(
-                "javax.xml.bind.annotation.XmlAccessorType");
-
-        EnumDetails xmlAccessTypeEnumDetails = new EnumDetails(new JavaType(
-                "javax.xml.bind.annotation.XmlAccessType"), new JavaSymbolName(
-                "FIELD"));
-
-        EnumAttributeValue xmlAccessTypeAttributeValue = new EnumAttributeValue(
-                new JavaSymbolName("value"), xmlAccessTypeEnumDetails);
-
-        xmlAccessorTypeAnnotationAttributeValueList
-                .add(xmlAccessTypeAttributeValue);
-
-        if (!enumerationClass) {
-
-            AnnotationMetadata xmlAccessorTypeAnnotation = new AnnotationMetadataBuilder(
-                    xmlAccessorType,
-                    xmlAccessorTypeAnnotationAttributeValueList).build();
-
-            annotationTypeList.add(xmlAccessorTypeAnnotation);
-        }
-
-        if (enumerationClass) {
-
-            // @XmlEnum
-            List<AnnotationAttributeValue<?>> xmlEnumAnnotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-            JavaType xmlEnum = new JavaType("javax.xml.bind.annotation.XmlEnum");
-
-            AnnotationMetadata xmlEnumAnnotation = new AnnotationMetadataBuilder(
-                    xmlEnum, xmlEnumAnnotationAttributeValueList).build();
-
-            annotationTypeList.add(xmlEnumAnnotation);
-
-        }
-
-        return annotationTypeList;
-
-    }
-
-    /**
-     * Indicates whether the annotation will be introduced via this ITD.
+     * <ul>
+     * <li>XmlRoot: with name and namespace if annotation has name</li>
+     * <li>XmlType: with name, propOrder and namespace</li>
+     * <li>XmlEnum: without attributes</li>
+     * <li>XmlAccessorType: with always field access type.</li>
+     * </ul>
      * 
      * @param annotation
-     *            to be check if exists.
-     * @return true if it will be introduced, false otherwise
+     *            Original gvNIX xml element annotation
+     * @param fields
+     *            Declared fields to be exported
+     * @return {@link List} of {@link AnnotationMetadata} to build the ITD
      */
-    public boolean isAnnotationIntroduced(String annotation) {
-        JavaType javaType = new JavaType(annotation);
-        AnnotationMetadata result = MemberFindingUtils
-                .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+    protected List<AnnotationMetadata> getAnnotations(
+            AnnotationMetadata annotation, List<FieldMetadata> fields) {
 
-        return result == null;
+        // Generated result annotations list
+        List<AnnotationMetadata> result = new ArrayList<AnnotationMetadata>();
+
+        AnnotationMetadata xmlRootAnnotation = getXmlRootAnnotation(annotation);
+        if (xmlRootAnnotation != null) {
+            result.add(getXmlRootAnnotation(annotation));
+        }
+
+        // Add XmlType with name, propOrder and namespace for each field
+        result.add(getXmlTypeAnnotation(annotation, fields));
+
+        if (governorTypeDetails.getPhysicalTypeCategory().equals(
+                PhysicalTypeCategory.ENUMERATION)) {
+
+            // Is an enumeration: add XmlEnum annotation without attributes.
+            result.add(getXmlEnumAnnotation());
+
+        } else {
+
+            // Is not an enumeration: add XmlAccessorType with field access type
+            result.add(getXmlAccesorType());
+        }
+
+        return result;
+    }
+
+    /**
+     * Get XmlRootElement with name and namespace if annotation has name.
+     * 
+     * @param annotation
+     *            Annotation to get name and namespace
+     * @return XmlRootElement annotation
+     */
+    protected AnnotationMetadata getXmlRootAnnotation(
+            AnnotationMetadata annotation) {
+
+        // Get gvNIX xml element annotation name
+        AnnotationAttributeValue<?> nameAttr = annotation
+                .getAttribute(new JavaSymbolName("name"));
+
+        // If name exists, create XmlRootElement annotation
+        if (nameAttr != null) {
+
+            // @XmlRootElement with name and namespace from gvNIX annotation
+            List<AnnotationAttributeValue<?>> xmlRootElementAttrs = new ArrayList<AnnotationAttributeValue<?>>();
+            xmlRootElementAttrs.add(nameAttr);
+            xmlRootElementAttrs.add(annotation.getAttribute(new JavaSymbolName(
+                    "namespace")));
+            return new AnnotationMetadataBuilder(new JavaType(
+                    "javax.xml.bind.annotation.XmlRootElement"),
+                    xmlRootElementAttrs).build();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get XmlType with name, propOrder and namespace.
+     * 
+     * <ul>
+     * <li>name from annotation if annotation has xmlTypeName, else blank</li>
+     * <li>propOrder from fields names</li>
+     * <li>namespace from annotation</li>
+     * </ul>
+     * 
+     * @param annotation
+     * @param fields
+     * @return
+     */
+    protected AnnotationMetadata getXmlTypeAnnotation(
+            AnnotationMetadata annotation, List<FieldMetadata> fields) {
+
+        List<AnnotationAttributeValue<?>> xmlTypeAttrs = new ArrayList<AnnotationAttributeValue<?>>();
+        if (annotation.getAttribute(new JavaSymbolName("xmlTypeName")) != null) {
+
+            // @XmlType name from gvNIX annotation if xml type name exists
+            xmlTypeAttrs.add(new StringAttributeValue(
+                    new JavaSymbolName("name"),
+                    ((StringAttributeValue) annotation
+                            .getAttribute(new JavaSymbolName("name")))
+                            .getValue()));
+        } else {
+
+            // @XmlType without name if xml type name not exists
+            xmlTypeAttrs.add(new StringAttributeValue(
+                    new JavaSymbolName("name"), ""));
+        }
+
+        // @XmlType prop order from declared fields
+        List<StringAttributeValue> propOrderList = new ArrayList<StringAttributeValue>();
+        for (FieldMetadata field : fields) {
+            if (field != null) {
+                propOrderList.add(new StringAttributeValue(new JavaSymbolName(
+                        "ignored"), field.getFieldName()
+                        .getSymbolName()));
+            }
+        }
+        xmlTypeAttrs.add(new ArrayAttributeValue<StringAttributeValue>(
+                new JavaSymbolName("propOrder"), propOrderList));
+
+        // @XmlType prop order from gvNIX annotation
+        xmlTypeAttrs.add(annotation
+                .getAttribute(new JavaSymbolName("namespace")));
+
+        // @XmlType annotation
+        return new AnnotationMetadataBuilder(new JavaType(
+                "javax.xml.bind.annotation.XmlType"), xmlTypeAttrs).build();
+    }
+
+    /**
+     * Get XmlEnum annotation without attributes.
+     * 
+     * @return XmlEnum annotation
+     */
+    protected AnnotationMetadata getXmlEnumAnnotation() {
+
+        // @XmlEnum
+        return new AnnotationMetadataBuilder(new JavaType(
+                "javax.xml.bind.annotation.XmlEnum"),
+                new ArrayList<AnnotationAttributeValue<?>>()).build();
+    }
+
+    /**
+     * Get XmlAccessorType with always field access type.
+     * 
+     * @return XmlAccessorType annotation
+     */
+    protected AnnotationMetadata getXmlAccesorType() {
+
+        // @XmlAccessorType always is field access type
+        List<AnnotationAttributeValue<?>> xmlAccessorTypeAttrs = new ArrayList<AnnotationAttributeValue<?>>();
+        xmlAccessorTypeAttrs.add(new EnumAttributeValue(new JavaSymbolName(
+                "value"), new EnumDetails(new JavaType(
+                "javax.xml.bind.annotation.XmlAccessType"), new JavaSymbolName(
+                "FIELD"))));
+
+        // @XmlAccessorType
+        return new AnnotationMetadataBuilder(new JavaType(
+                "javax.xml.bind.annotation.XmlAccessorType"),
+                xmlAccessorTypeAttrs).build();
     }
 
     public static String getMetadataIdentiferType() {
+
+        // Get metadata identifier for this annotation
         return XML_ELEMENT_TYPE;
     }
 
     public static boolean isValid(String metadataIdentificationString) {
+
+        // Is a valid gvNIX xml element physical type idenfifier ?
         return PhysicalTypeIdentifierNamingUtils.isValid(XML_ELEMENT_STRING,
                 metadataIdentificationString);
     }
 
     public static final JavaType getJavaType(String metadataIdentificationString) {
+
+        // Get java type related to gvNIX xml element physical type idenfifier
         return PhysicalTypeIdentifierNamingUtils.getJavaType(
                 XML_ELEMENT_STRING, metadataIdentificationString);
     }
 
     public static final Path getPath(String metadataIdentificationString) {
+
+        // Get path related to gvNIX xml element physical type idenfifier
         return PhysicalTypeIdentifierNamingUtils.getPath(XML_ELEMENT_STRING,
                 metadataIdentificationString);
     }
 
     public static final String createIdentifier(JavaType javaType, Path path) {
+
+        // Get gvNIX xml element physical type idenfifier for java type in path
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 XML_ELEMENT_STRING, javaType, path);
     }

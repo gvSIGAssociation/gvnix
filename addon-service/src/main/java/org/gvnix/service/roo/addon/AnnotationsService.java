@@ -16,9 +16,18 @@ import org.springframework.roo.model.JavaType;
 public interface AnnotationsService {
 
     /**
-     * Add GvNIX annotations dependency to the current project.
+     * Add repository and dependency with this addon.
+     * 
+     * <p>
+     * Repository and dependency with this addon required in project because
+     * annotations from this addon are used along project.
+     * </p>
+     * 
+     * <p>
+     * Dependency will be updated if version is newer.
+     * </p>
      */
-    public void addGvNIXAnnotationsDependency();
+    public void addAddonDependency();
 
     /**
      * Add an annotation to a JavaType with some attributes.

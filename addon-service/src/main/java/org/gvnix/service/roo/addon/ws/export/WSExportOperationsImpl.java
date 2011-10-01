@@ -127,12 +127,6 @@ public class WSExportOperationsImpl implements WSExportOperations {
         annotationsService.addJavaTypeAnnotation(serviceClass,
                 GvNIXWebService.class.getName(), gvNixAnnotationAttributes,
                 false);
-
-        // Installs jax2ws plugin in project.
-        wSConfigService.installJava2wsPlugin();
-
-        // Add GvNixAnnotations dependency to the project.
-        annotationsService.addGvNIXAnnotationsDependency();
     }
 
     /**

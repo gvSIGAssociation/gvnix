@@ -149,7 +149,7 @@ public class SecurityServiceImpl implements SecurityService {
      */
     protected void addDependencies() {
 
-        annotationsService.addGvNIXAnnotationsDependency();
+        annotationsService.addAddonDependency();
         InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
                 DEPENDENCIES_FILE);
         Assert.notNull(templateInputStream,
