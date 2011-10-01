@@ -94,85 +94,77 @@ public class WSConfigServiceImpl implements WSConfigService {
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Check if Cxf is set in the project.
-     * </p>
-     * <p>
-     * If is not set, then installs dependencies to the pom.xml and creates the
-     * cxf configuration file.
-     * </p>
-     * 
-     * @param type
-     *            Communication type
      */
     public boolean install(WsType type) {
 
-        // Check if properties are set in pom.xml
-        boolean propertiesUpdated = addProjectProperties(type);
+        // Add library dependencies, if not exists already
+        addDependencies(type);
 
-        // Check if it's already installed.
-        if (!isLibraryInstalled(type)) {
-
-            // Add dependencies to project
-            installDependencies(type);
+        // Install library configuration file when export (CXF)
+        if (type == WsType.EXPORT || type == WsType.EXPORT_WSDL) {
+            addCxfConfig();
         }
 
-        if (type == WsType.EXPORT) {
-
-            // Create CXF config file src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
-            installCxfConfigurationFile();
-
-            // Update src/main/webapp/WEB-INF/web.xml :
-            // - Add CXFServlet and map it to /services/*
-            // - Add cxf-PROJECT_NAME.xml to Spring Context Loader
-            installCxfWebConfigurationFile();
-        }
-
-        return propertiesUpdated;
+        // Add library version properties in pom.xml, if not already
+        return addProperties(type);
     }
 
     /**
-     * {@inheritDoc}
+     * Install CXF configuration file if web layer exists.
+     * 
      * <p>
-     * Checks these types:
+     * In projects without web layer, configuration file no created because is
+     * referenced from web.xml and not exists.
      * </p>
-     * <ul>
-     * <li>Cxf Dependencies in pom.xml</li>
-     * <li>Cxf configuration file exists</li>
-     * </ul>
+     * 
+     * <p>
+     * One servlet will be installed in '/services' URL to view the published
+     * web services summary.
+     * </p>
      */
-    public boolean isLibraryInstalled(WsType type) {
+    protected void addCxfConfig() {
 
-        // TODO Check Web configuration file on IMPORT ?
+        String webFilePath = getWebConfigFilePath();
+        if (fileManager.exists(webFilePath)) {
 
-        boolean cxfInstalled = isDependenciesInstalled(type);
+            // Create CXF configuration file
+            createCxfConfigurationFile();
 
-        if (type == WsType.EXPORT) {
-
-            cxfInstalled = cxfInstalled
-                    && fileManager.exists(getCxfConfigurationFilePath());
+            // Update web config file: services servlet and reference cxf config
+            updateWebConfigurationFile();
         }
-
-        return cxfInstalled;
     }
 
     /**
-     * Returns CXF absolute configuration file path in the project.
+     * Returns CXF absolute configuration file path on disk.
+     * 
      * <p>
      * Creates the cxf config file using project name.
      * </p>
      * 
-     * @return Path to the Cxf configuration file or null if not exists
+     * @return Absolute path to the Cxf configuration file
      */
-    private String getCxfConfigurationFilePath() {
+    protected String getCxfConfigAbsoluteFilePath() {
 
-        String cxfFile = "WEB-INF/cxf-".concat(getProjectName()).concat(".xml");
+        String relativePath = getCxfConfigRelativeFilePath();
 
         // Checks for src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
-        String cxfXmlPath = projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, cxfFile);
+        return projectOperations.getPathResolver().getIdentifier(
+                Path.SRC_MAIN_WEBAPP, relativePath);
+    }
 
-        return cxfXmlPath;
+    /**
+     * Returns CXF relative configuration file path in the project.
+     * 
+     * <p>
+     * Creates the cxf config file using project name.
+     * </p>
+     * 
+     * @return Relative path to the Cxf configuration file
+     */
+    protected String getCxfConfigRelativeFilePath() {
+
+        return "WEB-INF/cxf-".concat(getProjectName()).concat(".xml");
     }
 
     /**
@@ -181,105 +173,104 @@ public class WSConfigServiceImpl implements WSConfigService {
      * @return Project Name.
      */
     private String getProjectName() {
-        // Project ID
-        String prjId = ProjectMetadata.getProjectIdentifier();
+
+        // Project metadata from project identifier
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(prjId);
+                .get(ProjectMetadata.getProjectIdentifier());
         Assert.isTrue(projectMetadata != null, "Project metadata required");
 
-        String projectName = projectMetadata.getProjectName();
-
-        return projectName;
+        return projectMetadata.getProjectName();
     }
 
     /**
-     * Add the file <code>src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml</code> from
-     * <code>cxf-template.xml</code> if not exists and exists web layer.
+     * Create CXF configuration file.
+     * 
+     * <p>
+     * Create file src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml from
+     * cxf-template.xml if not exists already.
+     * </p>
      */
-    private void installCxfConfigurationFile() {
+    protected void createCxfConfigurationFile() {
 
-        String webXmlPath = projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml");
-        if (!fileManager.exists(webXmlPath)) {
-
-            // Is not a web application, nothing to do
+        // Configuration file already exists ? Nothing to do
+        String cxfFilePath = getCxfConfigAbsoluteFilePath();
+        if (fileManager.exists(cxfFilePath)) {
             return;
         }
 
-        String cxfXmlPath = getCxfConfigurationFilePath();
-        if (fileManager.exists(cxfXmlPath)) {
-
-            // File exists, nothing to do
-            return;
-        }
-
-        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+        // Create the configuration file from a template
+        MutableFile file = fileManager.createFile(cxfFilePath);
+        InputStream template = TemplateUtils.getTemplate(getClass(),
                 "cxf-template.xml");
-        MutableFile cxfXmlMutableFile = fileManager.createFile(cxfXmlPath);
-
         try {
-
-            FileCopyUtils.copy(templateInputStream,
-                    cxfXmlMutableFile.getOutputStream());
+            FileCopyUtils.copy(template, file.getOutputStream());
         } catch (Exception e) {
-
+            // Error writting configuration file to disk
             throw new IllegalStateException(e);
         }
 
+        // TODO What is it for ?
         fileManager.scan();
     }
 
     /**
-     * Check if dependencies are set in project's pom.xml.
-     * <p>
-     * Search if the dependencies defined in addon sense type xml file
-     * (dependencies-*.xml) are set in pom.xml.
-     * </p>
+     * Check if all dependencies are registered in project (pom.xml).
      * 
      * @param type
-     *            Communication type
-     * @return true if all dependencies are set in pom.xml
+     *            Web service type
+     * @return true if all dependencies are registed already
      */
-    protected boolean isDependenciesInstalled(WsType type) {
+    protected boolean dependenciesRegistered(WsType type) {
 
-        boolean cxfDependenciesExists = true;
-
+        // Get project to check installed dependencies
         ProjectMetadata project = (ProjectMetadata) metadataService
                 .get(ProjectMetadata.getProjectIdentifier());
         if (project == null) {
             return false;
         }
 
-        // Dependencies elements are defined as:
-        // <dependency org="org.apache.cxf" name="cxf-rt-bindings-soap"
-        // rev="2.2.6" />
-        List<Element> cxfDependenciesList = getRequiredDependencies(type);
+        // Iterate all dependencies
+        for (Element dependency : getDependencies(type)) {
 
-        Dependency cxfDependency;
-
-        for (Element element : cxfDependenciesList) {
-
-            cxfDependency = new Dependency(element);
-            cxfDependenciesExists = cxfDependenciesExists
-                    && project.isDependencyRegistered(cxfDependency);
+            // Some dependency not registered: all dependencies not installed
+            if (!project.isDependencyRegistered(new Dependency(dependency))) {
+                return false;
+            }
         }
 
-        return cxfDependenciesExists;
+        // All dependencies are installed
+        return true;
     }
 
     /**
-     * Get the file name of the Cxf required dependencies of certain type.
+     * Get the file with dependencies list for certain web service type.
+     * 
+     * <p>
+     * Different web service type has different dependencies:
+     * </p>
+     * 
+     * <ul>
+     * <li>Export and export from wsdl</li>
+     * <li>Import</li>
+     * <li>Import RPC encoded</li>
+     * </ul>
+     * 
+     * <p>
+     * Files are stored at src/main/resources in same package as this class
+     * (required).
+     * </p>
      * 
      * @param type
-     *            Type of required dependencies
-     * @return File name
+     *            Web service type
+     * @return Dependency definition file name
      */
-    private String getCxfRequiredDependenciesFileName(WsType type) {
+    protected String getDependenciesFileName(WsType type) {
 
         StringBuffer name = new StringBuffer("dependencies-");
 
         switch (type) {
         case EXPORT:
+        case EXPORT_WSDL:
             name.append("export");
             break;
         case IMPORT:
@@ -296,190 +287,232 @@ public class WSConfigServiceImpl implements WSConfigService {
     }
 
     /**
-     * Get Addon dependencies list to install.
+     * Get the dependencies list for certain web service type.
+     * 
+     * @param type
+     *            Web service type
+     * @return List of dependencies as xml elements
+     */
+    protected List<Element> getDependencies(WsType type) {
+
+        // Get the file with dependencies list
+        InputStream dependencies = TemplateUtils.getTemplate(getClass(),
+                getDependenciesFileName(type));
+        Assert.notNull(dependencies, "Can't adquire dependencies file " + type);
+
+        // Find dependencies element list into file
+        return XmlUtils.findElements("/dependencies/dependency",
+                (Element) getInputDocument(dependencies).getFirstChild());
+    }
+
+    /**
+     * Add dependencies to project (pom.xml) if not already.
+     * 
      * <p>
-     * Get addon dependencies defined in dependencies-XXXX.xml
+     * If some dependencies are not installed, will be installed.
      * </p>
      * 
      * @param type
-     *            Communication type
-     * @return List of addon dependencies as xml elements
+     *            Web service type
      */
-    protected List<Element> getRequiredDependencies(WsType type) {
+    private void addDependencies(WsType type) {
 
-        // TODO Unify distinct dependencies files in only one
-
-        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
-                getCxfRequiredDependenciesFileName(type));
-        Assert.notNull(templateInputStream, "Can't adquire dependencies file "
-                + type);
-
-        Document dependencyDoc;
-        try {
-
-            dependencyDoc = XmlUtils.getDocumentBuilder().parse(
-                    templateInputStream);
-        } catch (Exception e) {
-
-            throw new IllegalStateException(e);
+        // If all dependencies are already installed: nothing to do
+        if (dependenciesRegistered(type)) {
+            return;
         }
 
-        Element dependencies = (Element) dependencyDoc.getFirstChild();
-
-        // TODO If only one dependencies file: /dependencies/XXXXX/dependency
-        return XmlUtils.findElements("/dependencies/dependency", dependencies);
+        // Get all dependencies and add them to project (pom.xml)
+        for (Element dependency : getDependencies(type)) {
+            projectOperations.addDependency(new Dependency(dependency));
+        }
     }
 
     /**
-     * Add addon dependencies to project dependencies if necessary.
+     * Add or update library version properties into project (pom.xml).
+     * 
+     * <p>
+     * If newer version property, version will be updated.
+     * </p>
+     * 
+     * <p>
+     * Different web service type has different properties:
+     * </p>
+     * 
+     * <ul>
+     * <li>Import, export and export from wsdl: CXF version property</li>
+     * <li>Import RPC encoded: Axis version property</li>
+     * </ul>
      * 
      * @param type
-     *            Communication type
+     *            Web service type
      */
-    private void installDependencies(WsType type) {
-
-        // If dependencies are installed.
-        boolean isInstalled = isDependenciesInstalled(type);
-
-        // Add project properties values.
-        // addProjectProperties(type);
-
-        if (!isInstalled) {
-            List<Element> cxfDependencies = getRequiredDependencies(type);
-            for (Element dependency : cxfDependencies) {
-
-                projectOperations.addDependency(new Dependency(dependency));
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean addProjectProperties(WsType type) {
+    protected boolean addProperties(WsType type) {
 
         // Add project properties, as versions
-        List<Element> projectProperties = new ArrayList<Element>();
+        List<Element> properties = new ArrayList<Element>();
 
         switch (type) {
 
+        // Import, export and export from wsdl same properties (CXF version)
         case IMPORT:
-
-            projectProperties = XmlUtils
-                    .findElements("/configuration/gvnix/properties/*",
-                            XmlUtils.getConfiguration(this.getClass(),
-                                    "properties.xml"));
-            break;
-
         case EXPORT:
-
-            projectProperties = XmlUtils
-                    .findElements("/configuration/gvnix/properties/*",
-                            XmlUtils.getConfiguration(this.getClass(),
-                                    "properties.xml"));
-            break;
-
         case EXPORT_WSDL:
 
-            projectProperties = XmlUtils
+            properties = XmlUtils
                     .findElements("/configuration/gvnix/properties/*",
                             XmlUtils.getConfiguration(this.getClass(),
                                     "properties.xml"));
             break;
 
+        // Import RPC encoded properties (Axis version)
         case IMPORT_RPC_ENCODED:
 
-            // TODO Check cxf version property before ?
-            projectProperties = XmlUtils.findElements(
+            properties = XmlUtils.findElements(
                     "/configuration/gvnix/properties/*", XmlUtils
                             .getConfiguration(this.getClass(),
                                     "properties-axis.xml"));
             break;
         }
 
+        // Add property if not exists or update if exists and newer
         return DependenciesVersionManager.managePropertyVersion(
-                metadataService, projectOperations, projectProperties);
+                metadataService, projectOperations, properties);
     }
 
     /**
-     * Update WEB-INF/web.xml.
+     * Update web configuration file (web.xml) with CXF configuration.
+     * 
      * <ul>
-     * <li>Create the CXF servlet declaration and mapping</li>
-     * <li>Configure ContextLoader to load cxf-PROJECT_ID.xml</li>
+     * <li>Add the CXF servlet declaration and mapping with '/services/*' URL to
+     * access published web services. All added before forst servlet mapping</li>
+     * <li>Configure Spring context to load cxf configuration file</li>
      * </ul>
+     * 
+     * <p>
+     * If already installed cxf declaration, nothing to do.
+     * </p>
      */
-    private void installCxfWebConfigurationFile() {
+    protected void updateWebConfigurationFile() {
 
-        String webXmlPath = projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml");
-        if (fileManager.exists(webXmlPath)) {
+        // Get web configuration file document and root XML representation
+        MutableFile file = fileManager.updateFile(getWebConfigFilePath());
+        Document web = getInputDocument(file.getInputStream());
+        Element root = web.getDocumentElement();
 
-            MutableFile webXmlMutableFile = null;
-            Document webXml;
-            try {
-
-                webXmlMutableFile = fileManager.updateFile(webXmlPath);
-                webXml = XmlUtils.getDocumentBuilder().parse(
-                        webXmlMutableFile.getInputStream());
-
-            } catch (Exception e) {
-
-                throw new IllegalStateException(e);
-            }
-
-            Element root = webXml.getDocumentElement();
-
-            if (null != XmlUtils
-                    .findFirstElement(
-                            "/web-app/servlet[servlet-class='org.apache.cxf.transport.servlet.CXFServlet']",
-                            root)) {
-                // cxf servlet already installed, nothing to do
-                return;
-            }
-
-            // Insert servlet def
-            Element firstServletMapping = XmlUtils.findRequiredElement(
-                    "/web-app/servlet-mapping", root);
-
-            Element servlet = webXml.createElement("servlet");
-            Element servletName = webXml.createElement("servlet-name");
-
-            // TODO: Create command parameter to set the servlet name
-            servletName.setTextContent("CXFServlet");
-            servlet.appendChild(servletName);
-            Element servletClass = webXml.createElement("servlet-class");
-            servletClass
-                    .setTextContent("org.apache.cxf.transport.servlet.CXFServlet");
-            servlet.appendChild(servletClass);
-            root.insertBefore(servlet, firstServletMapping.getPreviousSibling());
-
-            // Insert servlet mapping
-            Element servletMapping = webXml.createElement("servlet-mapping");
-            Element servletName2 = webXml.createElement("servlet-name");
-            servletName2.setTextContent("CXFServlet");
-            servletMapping.appendChild(servletName2);
-
-            // TODO: Create command parameter to set the servlet mapping
-            Element urlMapping = webXml.createElement("url-pattern");
-            urlMapping.setTextContent("/services/*");
-            servletMapping.appendChild(urlMapping);
-            root.insertBefore(servletMapping, firstServletMapping);
-
-            // Project Name
-            String prjName = getProjectName();
-
-            String cxfFile = "WEB-INF/cxf-".concat(prjName).concat(".xml");
-
-            Element contextConfigLocation = XmlUtils
-                    .findFirstElement(
-                            "/web-app/context-param[param-name='contextConfigLocation']/param-value",
-                            root);
-            String paramValueContent = contextConfigLocation.getTextContent();
-            contextConfigLocation.setTextContent(cxfFile.concat(" ").concat(
-                    paramValueContent));
-
-            XmlUtils.writeXml(webXmlMutableFile.getOutputStream(), webXml);
+        // If CXF servlet already installed: nothing to do
+        if (XmlUtils
+                .findFirstElement(
+                        "/web-app/servlet[servlet-class='org.apache.cxf.transport.servlet.CXFServlet']",
+                        root) != null) {
+            return;
         }
+
+        // Get first servlet mapping declaration
+        Element firstMapping = XmlUtils.findRequiredElement(
+                "/web-app/servlet-mapping", root);
+
+        // Add CXF servlet definition before first mapping
+        root.insertBefore(getServletDefinition(web),
+                firstMapping.getPreviousSibling());
+
+        // Add CXF servlet mapping before first mapping
+        root.insertBefore(getServletMapping(web), firstMapping);
+
+        // Add CXF configuration file path to Spring context
+        Element context = XmlUtils
+                .findFirstElement(
+                        "/web-app/context-param[param-name='contextConfigLocation']/param-value",
+                        root);
+        context.setTextContent(getCxfConfigRelativeFilePath().concat(" ")
+                .concat(context.getTextContent()));
+
+        // Write modified web.xml to disk
+        XmlUtils.writeXml(file.getOutputStream(), web);
+    }
+
+    /**
+     * Get CXF servlet definition element.
+     * 
+     * @param web
+     *            Document representation of web.xml
+     * @return Element representation of CXF servlet definition
+     */
+    private Element getServletDefinition(Document web) {
+
+        // Create servlet element
+        Element servlet = web.createElement("servlet");
+
+        // Create servlet name and add it to servlet
+        Element name = web.createElement("servlet-name");
+        name.setTextContent("CXFServlet");
+        servlet.appendChild(name);
+
+        // Create servlet class and add it to servlet
+        Element clas = web.createElement("servlet-class");
+        clas.setTextContent("org.apache.cxf.transport.servlet.CXFServlet");
+        servlet.appendChild(clas);
+
+        return servlet;
+    }
+
+    /**
+     * Get CXF servlet mapping element.
+     * 
+     * @param web
+     *            Document representation of web.xml
+     * @return Element representation of CXF servlet mapping
+     */
+    private Element getServletMapping(Document web) {
+
+        // Create servlet
+        Element mapping = web.createElement("servlet-mapping");
+
+        // Create servlet name and add it to servlet
+        Element name = web.createElement("servlet-name");
+        name.setTextContent("CXFServlet");
+        mapping.appendChild(name);
+
+        // Create servlet url pattern and add it to servlet
+        Element pattern = web.createElement("url-pattern");
+        pattern.setTextContent("/services/*");
+        mapping.appendChild(pattern);
+
+        return mapping;
+    }
+
+    /**
+     * Get the XML document representation of a input stream.
+     * 
+     * <p>
+     * IllegalStateException if error parsing input stream.
+     * </p>
+     * 
+     * @param input
+     *            Input stream to parse
+     * @return XML document representation of input stream
+     */
+    protected Document getInputDocument(InputStream input) {
+
+        try {
+
+            return XmlUtils.getDocumentBuilder().parse(input);
+
+        } catch (Exception e) {
+
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Get web configuration (web.xml) absolute file path.
+     * 
+     * @return web configuration (web.xml) absolute file path
+     */
+    protected String getWebConfigFilePath() {
+
+        return projectOperations.getPathResolver().getIdentifier(
+                Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml");
     }
 
     /**
@@ -550,7 +583,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         Assert.isTrue(exported != null, "Annotation attribute 'exported' in "
                 + className.getFullyQualifiedTypeName() + "' must be defined.");
 
-        String cxfXmlPath = getCxfConfigurationFilePath();
+        String cxfXmlPath = getCxfConfigAbsoluteFilePath();
 
         boolean updateFullyQualifiedTypeName = false;
         // Check if class name and annotation class name are different.
@@ -561,15 +594,9 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         if (fileManager.exists(cxfXmlPath)) {
 
-            MutableFile cxfXmlMutableFile = null;
-            Document cxfXml;
-            try {
-                cxfXmlMutableFile = fileManager.updateFile(cxfXmlPath);
-                cxfXml = XmlUtils.getDocumentBuilder().parse(
-                        cxfXmlMutableFile.getInputStream());
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
+            MutableFile cxfXmlMutableFile = fileManager.updateFile(cxfXmlPath);
+            Document cxfXml = getInputDocument(cxfXmlMutableFile
+                    .getInputStream());
 
             Element root = cxfXml.getDocumentElement();
 
@@ -891,15 +918,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         String pomPath = getPomFilePath();
         Assert.isTrue(pomPath != null,
                 "Cxf configuration file not found, export again the service.");
-        MutableFile pomMutableFile = null;
-        Document pom;
-        try {
-            pomMutableFile = fileManager.updateFile(pomPath);
-            pom = XmlUtils.getDocumentBuilder().parse(
-                    pomMutableFile.getInputStream());
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        MutableFile pomMutableFile = fileManager.updateFile(pomPath);
+        Document pom = getInputDocument(pomMutableFile.getInputStream());
         Element root = pom.getDocumentElement();
 
         // Gets java2ws plugin element
@@ -1127,8 +1147,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * {@inheritDoc}
      */
-    public boolean addImportLocation(String wsdlLocation,
-            WsType type) {
+    public boolean addImportLocation(String wsdlLocation, WsType type) {
 
         // Adds Project properties to pom.xml
         // addProjectProperties(type);
@@ -1148,7 +1167,7 @@ public class WSConfigServiceImpl implements WSConfigService {
             Document wsdlDocument, WsType type) {
 
         // Project properties to pom.xml
-        boolean propertiesUpdated = addProjectProperties(type);
+        boolean propertiesUpdated = addProperties(type);
 
         switch (type) {
 
@@ -1188,15 +1207,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         Assert.notNull(pomPath, "pom.xml configuration file not found.");
 
         // Get a mutable pom.xml reference to modify it
-        MutableFile pomMutableFile = null;
-        Document pom;
-        try {
-            pomMutableFile = fileManager.updateFile(pomPath);
-            pom = XmlUtils.getDocumentBuilder().parse(
-                    pomMutableFile.getInputStream());
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        MutableFile pomMutableFile = fileManager.updateFile(pomPath);
+        Document pom = getInputDocument(pomMutableFile.getInputStream());
         Element root = pom.getDocumentElement();
 
         // Get plugin element
@@ -1407,15 +1419,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         Assert.notNull(pomPath, "pom.xml configuration file not found.");
 
         // Get a mutable pom.xml reference to modify it
-        MutableFile pomMutableFile = null;
-        Document pom;
-        try {
-            pomMutableFile = fileManager.updateFile(pomPath);
-            pom = XmlUtils.getDocumentBuilder().parse(
-                    pomMutableFile.getInputStream());
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        MutableFile pomMutableFile = fileManager.updateFile(pomPath);
+        Document pom = getInputDocument(pomMutableFile.getInputStream());
 
         Element root = pom.getDocumentElement();
 
@@ -1564,15 +1569,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         Assert.notNull(pomPath, "pom.xml configuration file not found.");
 
         // Get a mutable pom.xml reference to modify it
-        MutableFile pomMutableFile = null;
-        Document pom;
-        try {
-            pomMutableFile = fileManager.updateFile(pomPath);
-            pom = XmlUtils.getDocumentBuilder().parse(
-                    pomMutableFile.getInputStream());
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        MutableFile pomMutableFile = fileManager.updateFile(pomPath);
+        Document pom = getInputDocument(pomMutableFile.getInputStream());
 
         Element root = pom.getDocumentElement();
 

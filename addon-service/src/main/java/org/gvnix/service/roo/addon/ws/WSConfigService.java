@@ -55,16 +55,33 @@ public interface WSConfigService {
         EXPORT, EXPORT_WSDL, IMPORT, IMPORT_RPC_ENCODED
     };
 
+    /**
+     * Maven command for sources generation
+     */
     static final String GENERATE_SOURCES = "clean generate-sources";
 
+    /**
+     * User message when maven is generating sources
+     */
     static final String GENERATE_SOURCES_INFO = "Generating sources";
 
     /**
-     * Install and configure Web Service library, if not already installed.
+     * Install web service library, if not already installed.
+     * 
+     * <ul>
+     * <li>Add library dependencies</li>
+     * <li>Install library configuration file when export (CXF)</li>
+     * <li>Add library version properties</li>
+     * </ul>
+     * 
+     * <p>
+     * When true returned (properties changes) sources regeneration is required
+     * to avoid errors compilation errors.
+     * </p>
      * 
      * @param type
-     *            Communication type
-     * @return
+     *            Web service type to install library
+     * @return Project properties changed ? If true source regeneration required
      */
     public boolean install(WsType type);
 
@@ -131,8 +148,7 @@ public interface WSConfigService {
      *            Communication sense type
      * @return wsdl location added, or false if already exists
      */
-    public boolean addImportLocation(String wsdlLocation,
-            WsType type);
+    public boolean addImportLocation(String wsdlLocation, WsType type);
 
     /**
      * <p>
@@ -188,23 +204,4 @@ public interface WSConfigService {
      */
     public void installJava2wsPlugin();
 
-    /**
-     * Checks if library is properly configured in a project.
-     * <p>
-     * Library dependencies can be different depending of communication sense.
-     * </p>
-     * 
-     * @param type
-     *            Communication type
-     * @return true or false if it's configured
-     */
-    public boolean isLibraryInstalled(WsType type);
-
-    /**
-     * Add project properties values to pom.xml.
-     * 
-     * @param type
-     *            of {@link WsType}
-     */
-    public boolean addProjectProperties(WsType type);
 }

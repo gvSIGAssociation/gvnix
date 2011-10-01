@@ -65,6 +65,7 @@ public class WSExportMetadata extends
     public WSExportMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             List<MethodMetadata> methodMetadataList) {
+
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
         Assert.isTrue(isValid(identifier), "Metadata identification string '"
@@ -719,7 +720,6 @@ public class WSExportMetadata extends
                         methodAnnotation));
             }
         }
-
     }
 
     public static String getMetadataIdentiferType() {

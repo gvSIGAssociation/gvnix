@@ -122,7 +122,7 @@ public class WSConfigServiceImplTest {
         Dependency dependency;
 
         List<Element> dependencyList = wSConfigServiceImpl
-                .getRequiredDependencies(WsType.EXPORT);
+                .getDependencies(WsType.EXPORT);
 
         for (Element element : dependencyList) {
 
@@ -134,7 +134,7 @@ public class WSConfigServiceImplTest {
         replay(metadataService, projectMetadata);
 
         areCxfDependenciesInstalledResult = wSConfigServiceImpl
-                .isDependenciesInstalled(WsType.EXPORT);
+                .dependenciesRegistered(WsType.EXPORT);
 
         assertTrue("There is one or more dependencies not set.",
                 areCxfDependenciesInstalledResult);
@@ -167,7 +167,7 @@ public class WSConfigServiceImplTest {
         replay(metadataService, projectMetadata);
 
         areCxfDependenciesInstalledResult = wSConfigServiceImpl
-                .isDependenciesInstalled(WsType.EXPORT);
+                .dependenciesRegistered(WsType.EXPORT);
 
         assertFalse("There are all dependencies set.",
                 areCxfDependenciesInstalledResult);

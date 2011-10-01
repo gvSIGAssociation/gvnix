@@ -70,8 +70,8 @@ public class WSExportXmlElementMetadataProvider extends
     private JavaParserService javaParserService;
 
     protected void activate(ComponentContext context) {
-        // Ensure we're notified of all metadata related to physical Java types,
-        // in particular their initial creation
+
+        // We will notified when physical type with gvNIX xml element modified
         metadataDependencyRegistry.registerDependency(
                 PhysicalTypeIdentifier.getMetadataIdentiferType(),
                 getProvidesType());
@@ -87,6 +87,7 @@ public class WSExportXmlElementMetadataProvider extends
      */
     @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
+
         return WSExportXmlElementMetadata.createIdentifier(javaType, path);
     }
 
@@ -99,13 +100,13 @@ public class WSExportXmlElementMetadataProvider extends
     @Override
     protected String getGovernorPhysicalTypeIdentifier(
             String metadataIdentificationString) {
+
         JavaType javaType = WSExportXmlElementMetadata
                 .getJavaType(metadataIdentificationString);
         Path path = WSExportXmlElementMetadata
                 .getPath(metadataIdentificationString);
-        String physicalTypeIdentifier = PhysicalTypeIdentifier
-                .createIdentifier(javaType, path);
-        return physicalTypeIdentifier;
+
+        return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
     /*
@@ -121,7 +122,7 @@ public class WSExportXmlElementMetadataProvider extends
             JavaType aspectName, PhysicalTypeMetadata physicalType,
             String itdFilename) {
 
-        // Install configuration to export services if it's not installed.
+        // Install web service (dependencies, version property and config file)
         wSConfigService.install(WsType.EXPORT);
 
         // Installs jax2ws plugin in project.
