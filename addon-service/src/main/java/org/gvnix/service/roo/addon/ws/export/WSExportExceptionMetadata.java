@@ -89,32 +89,30 @@ public class WSExportExceptionMetadata extends
 
         JavaType javaType = new JavaType("javax.xml.ws.WebFault");
 
+        // If annotation already exists in Java, not add it in AJ
         if (isAnnotationIntroduced("javax.xml.ws.WebFault")) {
-
-            List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
-
-            StringAttributeValue nameAttributeValue = (StringAttributeValue) annotationMetadata
-                    .getAttribute(new JavaSymbolName("name"));
-
-            annotationAttributeValueList.add(nameAttributeValue);
-
-            StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) annotationMetadata
-                    .getAttribute(new JavaSymbolName("targetNamespace"));
-
-            annotationAttributeValueList.add(targetNamespaceAttributeValue);
-
-            StringAttributeValue faultBeanAttributeValue = (StringAttributeValue) annotationMetadata
-                    .getAttribute(new JavaSymbolName("faultBean"));
-
-            annotationAttributeValueList.add(faultBeanAttributeValue);
-
-            return new AnnotationMetadataBuilder(javaType,
-                    annotationAttributeValueList).build();
+            return null;
         }
 
-        return MemberFindingUtils.getDeclaredTypeAnnotation(
-                governorTypeDetails, javaType);
+        List<AnnotationAttributeValue<?>> annotationAttributeValueList = new ArrayList<AnnotationAttributeValue<?>>();
 
+        StringAttributeValue nameAttributeValue = (StringAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("name"));
+
+        annotationAttributeValueList.add(nameAttributeValue);
+
+        StringAttributeValue targetNamespaceAttributeValue = (StringAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("targetNamespace"));
+
+        annotationAttributeValueList.add(targetNamespaceAttributeValue);
+
+        StringAttributeValue faultBeanAttributeValue = (StringAttributeValue) annotationMetadata
+                .getAttribute(new JavaSymbolName("faultBean"));
+
+        annotationAttributeValueList.add(faultBeanAttributeValue);
+
+        return new AnnotationMetadataBuilder(javaType,
+                annotationAttributeValueList).build();
     }
 
     /**
@@ -129,7 +127,7 @@ public class WSExportExceptionMetadata extends
         AnnotationMetadata result = MemberFindingUtils
                 .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
 
-        return result == null;
+        return result != null;
     }
 
     public static String getMetadataIdentiferType() {

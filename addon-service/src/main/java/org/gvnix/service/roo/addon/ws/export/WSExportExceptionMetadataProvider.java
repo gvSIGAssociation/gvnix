@@ -18,7 +18,6 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
@@ -153,21 +152,7 @@ public class WSExportExceptionMetadataProvider extends
         exceptionMetadata = new WSExportExceptionMetadata(
                 metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata);
-
-        if (exceptionMetadata.getMemberHoldingTypeDetails().getAnnotations()
-                .isEmpty()) {
-            logger.log(
-                    Level.WARNING,
-                    "The annotation @GvNIXWebFault is not declared correctly for '"
-                            .concat(governorPhysicalTypeMetadata
-                                    .getMemberHoldingTypeDetails().getName()
-                                    .getFullyQualifiedTypeName())
-                            .concat("'.\nThis will not export the Exception ")
-                            .concat("to be used in Web Service.\n@WebParam ")
-                            .concat("annotation will be deleted until the ")
-                            .concat("annotation is defined correctly."));
-        }
-
+        
         return exceptionMetadata;
     }
 
