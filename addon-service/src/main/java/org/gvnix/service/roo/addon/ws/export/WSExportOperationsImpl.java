@@ -218,8 +218,8 @@ public class WSExportOperationsImpl implements WSExportOperations {
         Assert.isTrue(isMethodAvailableToExport(method),
                 "The method not exists or is already exported");
 
-        // Check return and parameters types and add GvNIXXmlElement if required
-        wSExportValidationService.prepareAllowedJavaTypes(method);
+        // Add gvNIX xml element annotation to method return and parameters project types
+        wSExportValidationService.addGvNixXmlElementToTypes(method);
 
         // Get method return type (void type if null return type)
         JavaType returnType = returnJavaType(method);
@@ -233,8 +233,8 @@ public class WSExportOperationsImpl implements WSExportOperations {
             resultName = "return";
         }
 
-        // Check method throws and update with web fault declaration if needed
-        wSExportValidationService.prepareExceptions(method, targetNamespace);
+        // Add gvNIX web fault annotation to method exceptions
+        wSExportValidationService.addGvNixWebFaultToExceptions(method, targetNamespace);
 
         // If no void return type: check result and response wrapper namespaces
         if (!isVoid) {
@@ -699,7 +699,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
             return annotations;
         }
 
-        // for each parameters
+        // For each parameters
         for (AnnotatedJavaType paramType : paramsType) {
 
             // annotation of this parameter
@@ -713,7 +713,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
             paramsAnnotations.add(getGvNIXWebParamAnnotation(paramType,
                     paramName));
 
-            // Add @WebParam and add @GvNIXWebParam to annotation list
+            // Add @WebParam to annotation list
             paramsAnnotations.add(getWebParamAnnotation(targetNamespace,
                     paramType, paramName));
 

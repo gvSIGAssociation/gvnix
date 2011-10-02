@@ -222,11 +222,11 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
                         governorTypeDetails.getName(),
                         methodMetadata.getMethodName());
 
-                // Prepares INPUT/OUTPUT parameters
-                wSExportValidationService.prepareAllowedJavaTypes(method);
+                // Add gvNIX xml element annotation to method return and parameters project types
+                wSExportValidationService.addGvNixXmlElementToTypes(method);
 
-                // Prepares exceptions.
-                wSExportValidationService.prepareExceptions(method,
+                // Add gvNIX web fault annotation to method exceptions
+                wSExportValidationService.addGvNixWebFaultToExceptions(method,
                         webServiceTargetNamespace);
 
                 // Checks @GvNIXWebMethod has attributes.

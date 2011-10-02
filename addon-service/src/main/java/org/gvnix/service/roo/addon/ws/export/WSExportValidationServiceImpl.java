@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -41,8 +42,6 @@ import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.ws.WSConfigService;
-import org.gvnix.service.roo.addon.ws.export.WSExportOperations.MethodParameterType;
-import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -108,7 +107,8 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * {@inheritDoc}
      */
-    public void prepareExceptions(MethodMetadata method, String targetNamespace) {
+    public void addGvNixWebFaultToExceptions(MethodMetadata method,
+            String targetNamespace) {
 
         // Method is required
         Assert.isTrue(method != null, "The method doesn't exists in the class");
@@ -351,39 +351,24 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * {@inheritDoc}
      */
-    public void prepareAllowedJavaTypes(MethodMetadata method) {
+    public void addGvNixXmlElementToTypes(MethodMetadata method) {
 
         Assert.isTrue(method != null, "The method doesn't exists in the class");
 
-        // Check method return type is allowed
-        JavaType returnType = method.getReturnType();
-        Assert.isTrue(
-                isTypeAllowed(returnType),
-                "The '"
-                        + MethodParameterType.RETURN
-                        + "' type '"
-                        + returnType.getFullyQualifiedTypeName()
-                        + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.");
+        // Add gvNIX xml element annotation to method return type in project
+        addGvNixXmlElementToType(method.getReturnType());
 
-        // Check method parameters types are allowed
-        List<AnnotatedJavaType> parameterTypes = method.getParameterTypes();
-        for (AnnotatedJavaType parameterType : parameterTypes) {
+        // Add gvNIX xml element annotation to parameters types in project
+        for (AnnotatedJavaType parameterType : method.getParameterTypes()) {
 
-            Assert.isTrue(
-                    isTypeAllowed(parameterType.getJavaType()),
-                    "The '"
-                            + MethodParameterType.PARAMETER
-                            + "' type '"
-                            + parameterType.getJavaType()
-                                    .getFullyQualifiedTypeName()
-                            + "' is not allow to be used in web a service operation because it does not satisfy web services interoperatibily rules.");
+            addGvNixXmlElementToType(parameterType.getJavaType());
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isTypeAllowed(JavaType javaType) {
+    public void addGvNixXmlElementToType(JavaType javaType) {
 
         // javaType is required
         Assert.isTrue(javaType != null, "JavaType type can't be 'null'.");
@@ -397,188 +382,103 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         String javaId = projectOperations.getPathResolver().getIdentifier(
                 Path.SRC_MAIN_JAVA, javaPath);
 
-        if (isBasicAllowed(javaType)) {
+        // File exists in project sources (not library nor JDK)
+        if (fileManager.exists(javaId)) {
 
-            // Allowed: Basic JDK java types
-            return true;
+            MutableClassOrInterfaceTypeDetails typeDetails = getTypeDetails(javaType);
 
-        } else {
+            // Add gvNIX XML Element annotation
+            addGvNixXmlElementAnnotation(javaType, typeDetails.getName());
 
-            if (fileManager.exists(javaId)) {
-
-                // File exists in project sources
-
-                // Add gvNIX XML Element annotation
-                MutableClassOrInterfaceTypeDetails typeDetails = getTypeDetails(javaType);
-                annotationsService.addJavaTypeAnnotation(typeDetails.getName(),
-                        GvNIXXmlElement.class.getName(),
-                        getGvNIXXmlElementAnnotation(javaType, typeDetails),
-                        false);
-
-                // Check allowed parent type and props (Owner -> AbstractPerson)
-                for (JavaType extend : typeDetails.getExtendsTypes()) {
-                    isTypeAllowed(extend);
-                }
-
-                return true;
-
-            } else {
-
-                // File not exists in project nor is a JDK basic type
-                return false;
+            // Add gvNIX XML Element to parent type (b.e. Owner->AbstractPerson)
+            for (JavaType extend : typeDetails.getExtendsTypes()) {
+                addGvNixXmlElementToType(extend);
             }
         }
-    }
 
-    /**
-     * Check basic JDK allowed java types.
-     * 
-     * <ul>
-     * <li>Java type is primitive</li>
-     * <li>Java type is in JDK 'java.lang' package (String)</li>
-     * <li>Java type is in JDK 'java.util' package (Date)</li>
-     * <li>Java type is in JDK 'java.math' package (BigDecimal)</li>
-     * </ul>
-     * 
-     * @param javaType
-     * @return
-     */
-    protected boolean isBasicAllowed(JavaType javaType) {
-
-        // Get the java type name and check primitive or allowed packages
-        String javaName = javaType.getFullyQualifiedTypeName();
-        if (javaType.isPrimitive() || javaName.startsWith("java.lang")
-                || javaName.startsWith("java.util")
-                || javaName.startsWith("java.math")) {
-
-            return true;
+        // Check parameters types (b.e. List<Owner>)
+        for (JavaType paramType : javaType.getParameters()) {
+            addGvNixXmlElementToType(paramType);
         }
-
-        return false;
     }
 
     /**
-     * Create @GvNIXXmlElement annotation for java type with type fields.
+     * Add @GvNIXXmlElement annotation with attributes to java type.
      * 
      * <ul>
      * <li>name attribute value from java type simple name</li>
      * <li>namespace attribute value from java type package</li>
-     * <li>elementList attribute from type details allowed element fields</li>
-     * <li>exported attribute is always false (when code first)</li>
-     * <li>xmlTypeName from java type simple type, if not empty</li>
+     * <li>elementList attribute from all not transient fields (Java and AJs)</li>
+     * <li>exported attribute is always false</li>
+     * <li>xmlTypeName from java simple type, if not empty</li>
      * </ul>
      * 
-     * <p>
-     * gvNIX xml web element annotation is added to entity if not already.
-     * </p>
-     * 
      * @param javaType
-     *            To get name, namespace and xmlTypeName annotation attributes
-     * @param typeDetails
-     *            To get elementList annotation attribute
-     * @return List of annotation attribute values
+     *            To get attributes for gvNIX annotation
+     * @param typeName
+     *            Type name to add annotation
      */
-    protected List<AnnotationAttributeValue<?>> getGvNIXXmlElementAnnotation(
-            JavaType javaType, MutableClassOrInterfaceTypeDetails typeDetails) {
+    protected void addGvNixXmlElementAnnotation(JavaType javaType,
+            JavaType typeName) {
 
-        List<AnnotationAttributeValue<?>> annotation = new ArrayList<AnnotationAttributeValue<?>>();
+        List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
 
         // name attribute value from java type simple name
         StringAttributeValue name = new StringAttributeValue(
                 new JavaSymbolName("name"), StringUtils.uncapitalize(javaType
                         .getSimpleTypeName()));
-        annotation.add(name);
+        attrs.add(name);
 
         // namespace attribute value from java type package
         StringAttributeValue namespace = new StringAttributeValue(
                 new JavaSymbolName("namespace"),
                 wSConfigService.convertPackageToTargetNamespace(javaType
                         .getPackage().toString()));
-        annotation.add(namespace);
+        attrs.add(namespace);
 
-        // Get allowed element fields and create an attribute list with them
-        List<FieldMetadata> fields = getAllowedElementFields(typeDetails);
+        // Get all (Java & AJs) fields and create an attribute list with them
+        List<FieldMetadata> fields = javaParserService.getFieldsInAll(typeName);
         List<StringAttributeValue> values = new ArrayList<StringAttributeValue>();
         for (FieldMetadata field : fields) {
 
-            StringAttributeValue value = new StringAttributeValue(
-                    new JavaSymbolName("ignored"), field.getFieldName()
-                            .getSymbolName());
-            if (!values.contains(value)) {
-                values.add(value);
+            // Transient fields can't have JAXB annotations (b.e. entityManager)
+            if (field.getModifier() != Modifier.TRANSIENT) {
+
+                StringAttributeValue value = new StringAttributeValue(
+                        new JavaSymbolName("ignored"), field.getFieldName()
+                                .getSymbolName());
+                if (!values.contains(value)) {
+                    values.add(value);
+                }
             }
         }
-        ArrayAttributeValue<StringAttributeValue> attrs = new ArrayAttributeValue<StringAttributeValue>(
+        ArrayAttributeValue<StringAttributeValue> elements = new ArrayAttributeValue<StringAttributeValue>(
                 new JavaSymbolName("elementList"), values);
 
-        annotation.add(attrs);
+        attrs.add(elements);
 
         // xmlTypeName from java type simple type, if not empty
-        if (attrs != null && !attrs.getValue().isEmpty()) {
+        if (elements != null && !elements.getValue().isEmpty()) {
 
             StringAttributeValue xmlTypeName = new StringAttributeValue(
                     new JavaSymbolName("xmlTypeName"),
                     javaType.getSimpleTypeName());
-            annotation.add(xmlTypeName);
+            attrs.add(xmlTypeName);
 
         } else {
 
             StringAttributeValue xmlTypeName = new StringAttributeValue(
                     new JavaSymbolName("xmlTypeName"), "");
-            annotation.add(xmlTypeName);
+            attrs.add(xmlTypeName);
         }
 
         // exported attribute is always false (when code first)
         BooleanAttributeValue exported = new BooleanAttributeValue(
                 new JavaSymbolName("exported"), false);
-        annotation.add(exported);
+        attrs.add(exported);
 
-        return annotation;
-    }
-
-    /**
-     * Get allowed element fields from type details (Java) and related AJs.
-     * 
-     * <ul>
-     * <li>Get all fields from type details (Java) and related AJs.</li>
-     * <li>Remove not allowed types fields.</li>
-     * </ul>
-     * 
-     * <p>
-     * gvNIX xml web element annotation is added to entity if not already.
-     * </p>
-     * 
-     * @param typeDetails
-     *            Type details (Java)
-     * @return Field metadata list of allowed element fields
-     */
-    protected List<FieldMetadata> getAllowedElementFields(
-            ClassOrInterfaceTypeDetails typeDetails) {
-
-        // Element fields list
-        List<FieldMetadata> fields = javaParserService
-                .getFieldsInAll(typeDetails.getName());
-
-        // Temporary fields list initialized with element fields
-        List<FieldMetadata> tmpFields = new ArrayList<FieldMetadata>();
-        tmpFields.addAll(fields);
-
-        // Element list: Remove not allowed types fields
-        // from governor type (Java) name
-        for (FieldMetadata tmpField : tmpFields) {
-
-            // No validate fields with same type as class (avoid infinite loop)
-            if (!tmpField.getFieldType().getFullyQualifiedTypeName()
-                    .equals(typeDetails.getName().getFullyQualifiedTypeName())) {
-
-                // Add field that implements disallowed collection interface
-                if (!isTypeAllowed(tmpField.getFieldType())) {
-                    fields.remove(tmpField);
-                }
-            }
-        }
-
-        return fields;
+        annotationsService.addJavaTypeAnnotation(typeName,
+                GvNIXXmlElement.class.getName(), attrs, false);
     }
 
     /**
@@ -605,19 +505,6 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
                         + PhysicalTypeIdentifier.getFriendlyName(id));
 
         return (MutableClassOrInterfaceTypeDetails) ptd;
-    }
-
-    /**
-     * Get the entity metadata (AJ) from governor type (Java) name.
-     * 
-     * @param name
-     *            Gobernor type (Java) name
-     * @return Related entity metadata (AJ)
-     */
-    protected EntityMetadata getEntityMetadata(JavaType name) {
-
-        return (EntityMetadata) metadataService.get(EntityMetadata
-                .createIdentifier(name, Path.SRC_MAIN_JAVA));
     }
 
     /**

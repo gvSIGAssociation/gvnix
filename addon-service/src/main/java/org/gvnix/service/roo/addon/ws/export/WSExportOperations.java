@@ -73,13 +73,14 @@ public interface WSExportOperations {
      * 
      * <ul>
      * <li>Java class will be created if not exists.</li>
-     * <li>Method searching in Java and AspectJ related files without
+     * <li>Method search in Java and AspectJ related files without
      * GvNIXWebService annotation already.</li>
-     * <li>Check return and parameters types and add GvNIXXmlElement if
-     * required.</li>
-     * <li>Check method throws and update with web fault declaration if needed.</li>
-     * <li>Create GvNIXWebMethod annotation for Method.</li>
-     * <li>Add @GvNIXWebParam & @WebParam parameter annotations.</li>
+     * <li>Add GvNIXXmlElement annotation to method return and parameters types
+     * in project.</li>
+     * <li>Push in method (move to Java) if method is in AJ.</li>
+     * <li>Add GvNIXWebFault annotation to method exceptions in project.</li>
+     * <li>Add GvNIXWebMethod annotation to method.</li>
+     * <li>Add @GvNIXWebParam & @WebParam annotations to method parameters.</li>
      * </ul>
      * 
      * @param javaType

@@ -19,7 +19,6 @@
 package org.gvnix.service.roo.addon.ws.export;
 
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
-import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.model.JavaType;
 
@@ -34,44 +33,31 @@ import org.springframework.roo.model.JavaType;
 public interface WSExportValidationService {
 
     /**
-     * Check method return and parameters types allowed.
+     * Add GvNIXXmlElement to method return and parameters types in project.
      * 
      * <p>
-     * Adds {@link GvNIXXmlElement} annotation to allowed types which needs it
-     * in type and extends types.
-     * </p>
-     * 
-     * <p>
-     * If exists any disallowed JavaType in operation: Cancel all the process
-     * and show a message explaining that it's not possible to publish this
-     * operation because the parameter can't be Marshalled according Ws-I
-     * standards.
+     * GvNIXXmlElement annotation is added to parent extend types in project and
+     * type parameters in project too.
      * </p>
      * 
      * @param method
-     *            Method to check valid return and type parameters.
+     *            Add annotation to method return and parameter types in project
      */
-    public void prepareAllowedJavaTypes(MethodMetadata method);
+    public void addGvNixXmlElementToTypes(MethodMetadata method);
 
     /**
-     * Check java type allowed to be used in a service operation.
-     * 
-     * <ul>
-     * <li>Is an allowed basic java type in JDK: Java type is primitive, from
-     * java.lang package or from java.util package or from java.math package</li>
-     * <li>Is a java type in project sources</li>
-     * </ul>
+     * Add GvNIXXmlElement to java type in project.
      * 
      * <p>
-     * Only in last case, GvNIXXmlElement annotation is assigned to java type
-     * and validate if parent extend types are allowed too.
+     * GvNIXXmlElement annotation is added to parent extend types in project and
+     * type parameters in project too.
      * </p>
      * 
      * @param javaType
      *            Java type (can't be null)
      * @return Is it allowed ?
      */
-    public boolean isTypeAllowed(JavaType javaType);
+    public void addGvNixXmlElementToType(JavaType javaType);
 
     /**
      * Set method exception throws to publish as fault in service operation.
@@ -93,7 +79,8 @@ public interface WSExportValidationService {
      * @param targetNamespace
      *            Web Service Namespace
      */
-    public void prepareExceptions(MethodMetadata method, String targetNamespace);
+    public void addGvNixWebFaultToExceptions(MethodMetadata method,
+            String targetNamespace);
 
     /**
      * Checks correct namespace URI format (preffix 'http://').
