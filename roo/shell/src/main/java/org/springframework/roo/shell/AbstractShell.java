@@ -40,7 +40,7 @@ public abstract class AbstractShell extends AbstractShellStatusPublisher impleme
 	// Public static fields; don't rename, make final, or make non-public, as
 	// they are part of the public API, e.g. are changed by STS.
 	public static String completionKeys = "TAB";
-	public static String shellPrompt = "roo> ";
+	public static String shellPrompt = "roo-gvNIX> ";
 	
 	// Instance fields
 	protected final Logger logger = HandlerUtils.getLogger(getClass());
@@ -269,9 +269,9 @@ public abstract class AbstractShell extends AbstractShellStatusPublisher impleme
 	 */
 	public void setPromptPath(String path) {
 		if ("".equals(path) || path == null) {
-			shellPrompt = "roo> ";
+			shellPrompt = "roo-gvNIX> ";
 		} else {
-			shellPrompt = path + " roo> ";
+			shellPrompt = path + " roo-gvNIX> ";
 		}
 	}
 
