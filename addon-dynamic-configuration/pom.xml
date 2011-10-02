@@ -154,7 +154,7 @@
     <dependency>
       <groupId>org.gvnix</groupId>
       <artifactId>org.gvnix.support</artifactId>
-      <version>${parent.version}</version>
+      <version>${gvnix.version}</version>
       <scope>provided</scope>
       <type>bundle</type>
     </dependency>
@@ -224,7 +224,7 @@
                 <artifactItem>
                   <groupId>org.gvnix</groupId>
                   <artifactId>org.gvnix.support</artifactId>
-                  <version>${parent.version}</version>
+                  <version>${gvnix.version}</version>
                   <overWrite>false</overWrite>
                   <includes>**/*.class</includes>
                 </artifactItem>
@@ -242,6 +242,7 @@
 
   <!-- DiSiD: Add gvnix version from parent pom and google code project name and repo folder values -->
   <properties>
+    <gvnix.version>${parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/dynamicconfiguration/roo/addon</repo.folder>
   </properties>
