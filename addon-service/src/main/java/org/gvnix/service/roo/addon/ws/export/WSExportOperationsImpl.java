@@ -218,7 +218,7 @@ public class WSExportOperationsImpl implements WSExportOperations {
         Assert.isTrue(isMethodAvailableToExport(method),
                 "The method not exists or is already exported");
 
-        // Add gvNIX xml element annotation to method return and parameters project types
+        // Add gvNIX xml element annotation to return and parameters in project
         wSExportValidationService.addGvNixXmlElementToTypes(method);
 
         // Get method return type (void type if null return type)
@@ -233,8 +233,9 @@ public class WSExportOperationsImpl implements WSExportOperations {
             resultName = "return";
         }
 
-        // Add gvNIX web fault annotation to method exceptions
-        wSExportValidationService.addGvNixWebFaultToExceptions(method, targetNamespace);
+        // Add gvNIX web fault annotation to method exceptions in project
+        wSExportValidationService.addGvNixWebFaultToExceptions(method,
+                targetNamespace);
 
         // If no void return type: check result and response wrapper namespaces
         if (!isVoid) {

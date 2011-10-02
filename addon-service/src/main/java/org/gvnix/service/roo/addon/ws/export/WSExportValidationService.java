@@ -18,7 +18,6 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
-import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.model.JavaType;
 
@@ -46,38 +45,17 @@ public interface WSExportValidationService {
     public void addGvNixXmlElementToTypes(MethodMetadata method);
 
     /**
-     * Add GvNIXXmlElement to java type in project.
+     * Add GvNIXWebFault to method exceptions in project.
      * 
      * <p>
-     * GvNIXXmlElement annotation is added to parent extend types in project and
-     * type parameters in project too.
+     * GvNIXWebFault annotation is added to parent extend exceptions in project
+     * too.
      * </p>
-     * 
-     * @param javaType
-     *            Java type (can't be null)
-     * @return Is it allowed ?
-     */
-    public void addGvNixXmlElementToType(JavaType javaType);
-
-    /**
-     * Set method exception throws to publish as fault in service operation.
-     * 
-     * <p>
-     * Add fault annotations to each founded exception. There are two exceptions
-     * types and two ways to define annotations:
-     * </p>
-     * 
-     * <ul>
-     * <li>Exceptions defined in the project: Add {@link GvNIXWebFault}
-     * annotation to Exception.</li>
-     * <li>Exceptions imported into the project: Add web service fault
-     * annotation using AspectJ template in exceptions sub package.</li>
-     * </ul>
      * 
      * @param method
-     *            to check its exceptions
+     *            Add annotation to method exceptions in project
      * @param targetNamespace
-     *            Web Service Namespace
+     *            Target namespace to add as annotation attribute
      */
     public void addGvNixWebFaultToExceptions(MethodMetadata method,
             String targetNamespace);
