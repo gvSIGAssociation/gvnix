@@ -76,22 +76,47 @@ public class OperationUtils {
     /**
      * Check if current project is a Spring MVC one
      * 
+     * <p>
+     * Search webmvc-config.xml file exists.
+     * </p>
+     * 
      * @param metadataService
      *            Metadata Service component
      * @param fileManager
      *            FileManager component
-     * @return
+     * @return Is a Spring MVC project ?
      */
     public static boolean isSpringMvcProject(MetadataService metadataService,
             FileManager fileManager) {
+
         PathResolver pathResolver = getPathResolver(metadataService);
         String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
                 "WEB-INF/spring/webmvc-config.xml");
 
-        if (!fileManager.exists(webXmlPath)) {
-            return false;
-        }
-        return true;
+        return fileManager.exists(webXmlPath);
+    }
+
+    /**
+     * Check if current project is a web project
+     * 
+     * <p>
+     * Search web.xml file exists.
+     * </p>
+     * 
+     * @param metadataService
+     *            Metadata Service component
+     * @param fileManager
+     *            FileManager component
+     * @return Is a web project ?
+     */
+    public static boolean isWebProject(MetadataService metadataService,
+            FileManager fileManager) {
+
+        PathResolver pathResolver = getPathResolver(metadataService);
+        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                "WEB-INF/web.xml");
+
+        return fileManager.exists(webXmlPath);
     }
 
     /**
