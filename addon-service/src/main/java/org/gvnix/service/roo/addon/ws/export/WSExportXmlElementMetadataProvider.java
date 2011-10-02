@@ -154,7 +154,7 @@ public class WSExportXmlElementMetadataProvider extends
 
         // Create metaData with field list values.
         return new WSExportXmlElementMetadata(id, aspectName, physicalType,
-                getDeclaredFields(typeDetails, annotation));
+                getDeclaredFields(typeDetails, annotation), javaParserService);
     }
 
     /**

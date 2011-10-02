@@ -21,6 +21,7 @@ package org.gvnix.service.roo.addon.ws.export;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
@@ -64,7 +65,8 @@ public class WSExportMetadata extends
 
     public WSExportMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            List<MethodMetadata> methodMetadataList) {
+            List<MethodMetadata> methodMetadataList,
+            JavaParserService javaParserService) {
 
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
@@ -123,7 +125,7 @@ public class WSExportMetadata extends
             // Update methods without @GvNIXWebMethod annotation with
             // '@WebMethod(exclude = true)'
             updateMethodWithoutGvNIXAnnotation(methodMetadataListToExclude,
-                    governorPhysicalTypeMetadata.getId());
+                    governorPhysicalTypeMetadata.getId(), javaParserService);
         }
 
         // Create a representation of the desired output ITD
@@ -692,7 +694,8 @@ public class WSExportMetadata extends
      *            Destination type identifier
      */
     public void updateMethodWithoutGvNIXAnnotation(
-            List<MethodMetadata> methodMetadataListToExclude, String id) {
+            List<MethodMetadata> methodMetadataListToExclude, String id,
+            JavaParserService javaParserService) {
 
         List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
         attributes.add(new BooleanAttributeValue(new JavaSymbolName("exclude"),
@@ -708,12 +711,8 @@ public class WSExportMetadata extends
                             GvNIXWebMethod.class.getName()));
 
             // Only export methods in this entity: no parent class methods check
-            String mdClass = md.getDeclaredByMetadataId().substring(
-                    md.getDeclaredByMetadataId().lastIndexOf("?") + 1);
-            String idClass = id.substring(id.lastIndexOf("?") + 1);
-
             if (gvNIXWebMethodMethodAnnotation == null
-                    && mdClass.equals(idClass)) {
+                    && javaParserService.isMetadataId(id, md)) {
 
                 builder.addMethodAnnotation(new DeclaredMethodAnnotationDetails(
                         new MethodMetadataBuilder(id, md).build(),

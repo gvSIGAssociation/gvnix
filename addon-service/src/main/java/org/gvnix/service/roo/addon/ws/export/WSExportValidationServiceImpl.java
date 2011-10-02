@@ -358,7 +358,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         // Check method return type is allowed
         JavaType returnType = method.getReturnType();
         Assert.isTrue(
-                isTypeAllowed(returnType, MethodParameterType.RETURN),
+                isTypeAllowed(returnType),
                 "The '"
                         + MethodParameterType.RETURN
                         + "' type '"
@@ -370,8 +370,7 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         for (AnnotatedJavaType parameterType : parameterTypes) {
 
             Assert.isTrue(
-                    isTypeAllowed(parameterType.getJavaType(),
-                            MethodParameterType.PARAMETER),
+                    isTypeAllowed(parameterType.getJavaType()),
                     "The '"
                             + MethodParameterType.PARAMETER
                             + "' type '"
@@ -384,11 +383,10 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
     /**
      * {@inheritDoc}
      */
-    public boolean isTypeAllowed(JavaType javaType, MethodParameterType type) {
+    public boolean isTypeAllowed(JavaType javaType) {
 
         // javaType is required
-        Assert.isTrue(javaType != null, "JavaType '" + type
-                + "' type can't be 'null'.");
+        Assert.isTrue(javaType != null, "JavaType type can't be 'null'.");
 
         // Get the java type name
         String javaName = javaType.getFullyQualifiedTypeName();
@@ -406,22 +404,21 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
         } else {
 
-            // Not allowed: Java type is an XML entity field already
-            if (type.equals(MethodParameterType.XMLENTITY)) {
-                return false;
-            }
-
             if (fileManager.exists(javaId)) {
 
                 // File exists in project sources
 
                 // Add gvNIX XML Element annotation
-                MutableClassOrInterfaceTypeDetails mutableTypeDetails = getTypeDetails(javaType);
-                annotationsService.addJavaTypeAnnotation(
-                        mutableTypeDetails.getName(),
+                MutableClassOrInterfaceTypeDetails typeDetails = getTypeDetails(javaType);
+                annotationsService.addJavaTypeAnnotation(typeDetails.getName(),
                         GvNIXXmlElement.class.getName(),
-                        getGvNIXXmlElementAnnotation(javaType,
-                                mutableTypeDetails), false);
+                        getGvNIXXmlElementAnnotation(javaType, typeDetails),
+                        false);
+
+                // Check allowed parent type and props (Owner -> AbstractPerson)
+                for (JavaType extend : typeDetails.getExtendsTypes()) {
+                    isTypeAllowed(extend);
+                }
 
                 return true;
 
@@ -470,6 +467,10 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      * <li>exported attribute is always false (when code first)</li>
      * <li>xmlTypeName from java type simple type, if not empty</li>
      * </ul>
+     * 
+     * <p>
+     * gvNIX xml web element annotation is added to entity if not already.
+     * </p>
      * 
      * @param javaType
      *            To get name, namespace and xmlTypeName annotation attributes
@@ -543,6 +544,10 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
      * <li>Remove not allowed types fields.</li>
      * </ul>
      * 
+     * <p>
+     * gvNIX xml web element annotation is added to entity if not already.
+     * </p>
+     * 
      * @param typeDetails
      *            Type details (Java)
      * @return Field metadata list of allowed element fields
@@ -562,12 +567,14 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
         // from governor type (Java) name
         for (FieldMetadata tmpField : tmpFields) {
 
-            boolean isAllowed = isTypeAllowed(tmpField.getFieldType(),
-                    MethodParameterType.XMLENTITY);
+            // No validate fields with same type as class (avoid infinite loop)
+            if (!tmpField.getFieldType().getFullyQualifiedTypeName()
+                    .equals(typeDetails.getName().getFullyQualifiedTypeName())) {
 
-            // Add field that implements disallowed collection interface
-            if (!isAllowed) {
-                fields.remove(tmpField);
+                // Add field that implements disallowed collection interface
+                if (!isTypeAllowed(tmpField.getFieldType())) {
+                    fields.remove(tmpField);
+                }
             }
         }
 

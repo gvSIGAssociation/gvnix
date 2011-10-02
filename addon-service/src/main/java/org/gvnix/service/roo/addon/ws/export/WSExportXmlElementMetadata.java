@@ -22,6 +22,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElementField;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
@@ -68,7 +69,8 @@ public class WSExportXmlElementMetadata extends
             .create(XML_ELEMENT_STRING);
 
     public WSExportXmlElementMetadata(String id, JavaType aspectName,
-            PhysicalTypeMetadata physicalType, List<FieldMetadata> fields) {
+            PhysicalTypeMetadata physicalType, List<FieldMetadata> fields,
+            JavaParserService javaParserService) {
 
         super(id, aspectName, physicalType);
 
@@ -97,9 +99,10 @@ public class WSExportXmlElementMetadata extends
                     PhysicalTypeCategory.ENUMERATION)) {
 
                 // Add XmlElement annotation for each field
-                List<DeclaredFieldAnnotationDetails> declaredFieldXmlElementFieldList = getXmlElementFieldAnnotations(fields);
-                for (DeclaredFieldAnnotationDetails declaredFieldAnnotationDetails : declaredFieldXmlElementFieldList) {
-                    builder.addFieldAnnotation(declaredFieldAnnotationDetails);
+                List<DeclaredFieldAnnotationDetails> declaredFields = getXmlElementFieldAnnotations(
+                        fields, javaParserService);
+                for (DeclaredFieldAnnotationDetails declaredField : declaredFields) {
+                    builder.addFieldAnnotation(declaredField);
                 }
 
                 // Avoid if abstract class or interface (can't add method)
@@ -159,42 +162,53 @@ public class WSExportXmlElementMetadata extends
      * @return All the annotated @XmlElement fields (may be empty)
      */
     public List<DeclaredFieldAnnotationDetails> getXmlElementFieldAnnotations(
-            List<FieldMetadata> fields) {
+            List<FieldMetadata> fields, JavaParserService javaParserService) {
 
         // Result list of annotations for fields
         List<DeclaredFieldAnnotationDetails> result = new ArrayList<DeclaredFieldAnnotationDetails>();
 
         for (FieldMetadata field : fields) {
+            // FIXME In unknow cases, a field can be null
+            if (field != null) {
 
-            // Get field annotation of GvNIXXmlElementField type
-            AnnotationMetadata annotation = MemberFindingUtils
-                    .getAnnotationOfType(field.getAnnotations(), new JavaType(
-                            GvNIXXmlElementField.class.getName()));
+                // Get field annotation of GvNIXXmlElementField type
+                AnnotationMetadata annotation = MemberFindingUtils
+                        .getAnnotationOfType(
+                                field.getAnnotations(),
+                                new JavaType(GvNIXXmlElementField.class
+                                        .getName()));
 
-            List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
+                List<AnnotationAttributeValue<?>> attrs = new ArrayList<AnnotationAttributeValue<?>>();
 
-            if (annotation != null) {
+                if (annotation != null) {
 
-                // Annotation exists, duplicate all annotation attributes
-                for (JavaSymbolName javaSymbolName : annotation
-                        .getAttributeNames()) {
-                    attrs.add(annotation.getAttribute(javaSymbolName));
+                    // Annotation exists, duplicate all annotation attributes
+                    for (JavaSymbolName javaSymbolName : annotation
+                            .getAttributeNames()) {
+                        attrs.add(annotation.getAttribute(javaSymbolName));
+                    }
+
+                } else {
+
+                    // Annotation not exists, create name attr with field name
+                    attrs.add(new StringAttributeValue(new JavaSymbolName(
+                            "name"), field.getFieldName().getSymbolName()));
                 }
 
-            } else {
+                // Add field when defined on same class (avoid parent fields)
+                if (javaParserService.isMetadataId(
+                        governorPhysicalTypeMetadata.getId(), field)) {
 
-                // Annotation not exists, create name attr with field name
-                attrs.add(new StringAttributeValue(new JavaSymbolName("name"),
-                        field.getFieldName().getSymbolName()));
+                    // Create XmlElement annotation for field with attributes
+                    result.add(new DeclaredFieldAnnotationDetails(
+                            new FieldMetadataBuilder(
+                                    governorPhysicalTypeMetadata.getId(), field)
+                                    .build(),
+                            new AnnotationMetadataBuilder(new JavaType(
+                                    "javax.xml.bind.annotation.XmlElement"),
+                                    attrs).build()));
+                }
             }
-
-            // Create XmlElement annotation for field with attributes
-            result.add(new DeclaredFieldAnnotationDetails(
-                    new FieldMetadataBuilder(governorPhysicalTypeMetadata
-                            .getId(), field).build(),
-                    new AnnotationMetadataBuilder(new JavaType(
-                            "javax.xml.bind.annotation.XmlElement"), attrs)
-                            .build()));
         }
 
         return result;
@@ -310,10 +324,10 @@ public class WSExportXmlElementMetadata extends
         // @XmlType prop order from declared fields
         List<StringAttributeValue> propOrderList = new ArrayList<StringAttributeValue>();
         for (FieldMetadata field : fields) {
+            // FIXME In unknow cases, a field can be null
             if (field != null) {
                 propOrderList.add(new StringAttributeValue(new JavaSymbolName(
-                        "ignored"), field.getFieldName()
-                        .getSymbolName()));
+                        "ignored"), field.getFieldName().getSymbolName()));
             }
         }
         xmlTypeAttrs.add(new ArrayAttributeValue<StringAttributeValue>(

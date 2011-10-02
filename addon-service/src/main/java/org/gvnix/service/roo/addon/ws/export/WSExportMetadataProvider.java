@@ -280,7 +280,8 @@ public class WSExportMetadataProvider extends AbstractItdMetadataProvider {
 
         serviceLayerMetadata = new WSExportMetadata(
                 metadataIdentificationString, aspectName,
-                governorPhysicalTypeMetadata, methodMetadataList);
+                governorPhysicalTypeMetadata, methodMetadataList,
+                javaParserService);
 
         return serviceLayerMetadata;
     }

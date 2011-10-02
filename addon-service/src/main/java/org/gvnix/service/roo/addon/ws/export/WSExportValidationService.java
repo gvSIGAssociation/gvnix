@@ -20,7 +20,6 @@ package org.gvnix.service.roo.addon.ws.export;
 
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
-import org.gvnix.service.roo.addon.ws.export.WSExportOperations.MethodParameterType;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.model.JavaType;
 
@@ -38,7 +37,8 @@ public interface WSExportValidationService {
      * Check method return and parameters types allowed.
      * 
      * <p>
-     * Adds {@link GvNIXXmlElement} annotation to allowed types which needs it.
+     * Adds {@link GvNIXXmlElement} annotation to allowed types which needs it
+     * in type and extends types.
      * </p>
      * 
      * <p>
@@ -60,20 +60,18 @@ public interface WSExportValidationService {
      * <li>Is an allowed basic java type in JDK: Java type is primitive, from
      * java.lang package or from java.util package or from java.math package</li>
      * <li>Is a java type in project sources</li>
-     * <li></li>
      * </ul>
      * 
      * <p>
-     * Only in last case, GvNIXXmlElement annotation is assigned to java type.
+     * Only in last case, GvNIXXmlElement annotation is assigned to java type
+     * and validate if parent extend types are allowed too.
      * </p>
      * 
      * @param javaType
      *            Java type (can't be null)
-     * @param type
-     *            Type of parameter to check
      * @return Is it allowed ?
      */
-    public boolean isTypeAllowed(JavaType javaType, MethodParameterType type);
+    public boolean isTypeAllowed(JavaType javaType);
 
     /**
      * Set method exception throws to publish as fault in service operation.

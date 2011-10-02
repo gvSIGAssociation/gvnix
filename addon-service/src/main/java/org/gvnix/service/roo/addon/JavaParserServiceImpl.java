@@ -56,6 +56,7 @@ import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.ConstructorMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.IdentifiableAnnotatedJavaStructure;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
@@ -443,17 +444,12 @@ public class JavaParserServiceImpl implements JavaParserService {
             javaParserMethodMetadata = methodMetadata;
 
             // Only export methods in this entity: no parent class methods check
-            // Example: Duplicated method when exporting toString method in
-            // petclinic Owner
-            String mdClass = methodMetadata.getDeclaredByMetadataId()
-                    .substring(
-                            methodMetadata.getDeclaredByMetadataId()
-                                    .lastIndexOf("?") + 1);
-            String idClass = targetId.substring(targetId.lastIndexOf("?") + 1);
+            // Example: Duplicated method when export toString in Owner
+            boolean equal = isMetadataId(targetId, methodMetadata);
 
             if (methodMetadata.getMethodName().toString()
                     .compareTo(method.toString()) == 0
-                    && mdClass.equals(idClass)) {
+                    && equal) {
 
                 Assert.isTrue(
                         !isAnnotationIntroducedInMethod(
@@ -491,6 +487,19 @@ public class JavaParserServiceImpl implements JavaParserService {
         }
 
         return methods;
+    }
+
+    /**
+     * {@inheritDoc}
+     **/
+    public boolean isMetadataId(String id,
+            IdentifiableAnnotatedJavaStructure metadata) {
+
+        return metadata
+                .getDeclaredByMetadataId()
+                .substring(
+                        metadata.getDeclaredByMetadataId().lastIndexOf("?") + 1)
+                .equals(id.substring(id.lastIndexOf("?") + 1));
     }
 
     /**

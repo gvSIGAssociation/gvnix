@@ -27,6 +27,7 @@ import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ConstructorMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.IdentifiableAnnotatedJavaStructure;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
@@ -209,8 +210,7 @@ public interface JavaParserService {
      *            Class name to search the field.
      * @param methodName
      *            to retrieve field.
-     * @return Field with name in type and related AJs. If field doesn't
-     *         exists returns null.
+     * @return Field with name in type and related AJs. If not return null
      */
     public FieldMetadata getFieldByNameInAll(JavaType type, JavaSymbolName name);
 
@@ -255,4 +255,17 @@ public interface JavaParserService {
      */
     public AnnotationMetadata getAnnotation(String annotation,
             ClassOrInterfaceTypeDetails governorTypeDetails);
+
+    /**
+     * Is a identifier metadata from a defined metadata type ?
+     * 
+     * @param id
+     *            Metatada identifier
+     * @param metadata
+     *            Metadada type
+     * @return Is identifier from metadata type ?
+     */
+    public boolean isMetadataId(String id,
+            IdentifiableAnnotatedJavaStructure metadata);
+
 }
