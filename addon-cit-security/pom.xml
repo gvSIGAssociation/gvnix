@@ -31,7 +31,7 @@
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>0.8.0</version>
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
   <artifactId>org.gvnix.cit.security.roo.addon</artifactId>
