@@ -21,3 +21,7 @@ service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEma
 configuration create --name test
 configuration property add --name wsdl.XWebEmailValidation
 configuration export
+perform tests
+perform eclipse
+perform package
+perform assembly

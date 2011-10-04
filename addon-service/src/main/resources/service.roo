@@ -21,4 +21,6 @@ service export ws --wsdl https://tds2.tradelinksig.com:443/tds/services/tds_clie
 
 // (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/services)
 
+perform tests
 
+perform package

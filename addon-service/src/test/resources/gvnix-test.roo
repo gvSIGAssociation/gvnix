@@ -73,9 +73,6 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 // [CORRECT] Transport: HTTP, Bindings: SOAP, Use: Encoded
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy10 --wsdl http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL
 
-// [CORRECT] Transport: HTTP, Operations: 1, Bindings: SOAP, Use: Encoded
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy11 --wsdl http://www.aswinanand.com/sendsms.php?wsdl
-
 // [CORRECT] Transport: HTTP, Operations: 179, Bindings: SOAP, Use: Encoded, Implementation: AXIS
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy12 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
 
@@ -93,10 +90,9 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 service class --class ~.services.ClaseProxy32
 service import ws --class ~.services.ClaseProxy32 --wsdl http://ws.soatrader.com/easycfm.com/1.0/Captcha?WSDL
 
-// [CORRECT] Export WSDL 2 Java
-service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
-
 // [CORRECT] Import WS from a non confident server
 service import ws --class ~.services.ServiciosMapProxy1 --wsdl https://sleipnir2.accv.es:8448/accv_map_gateway/services/ServiciosMap?wsdl
+
+perform tests
 
 perform assembly

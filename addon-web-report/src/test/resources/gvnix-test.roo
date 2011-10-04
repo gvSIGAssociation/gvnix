@@ -22,5 +22,6 @@ web report setup
 
 web report add --controller ~.web.PersonController --reportName personlist
 
+perform tests
 perform eclipse
 perform assembly

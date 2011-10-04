@@ -6,3 +6,7 @@ web mvc install language --code ca
 
 // (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/)
 
+perform tests
+
+perform assembly
+ 

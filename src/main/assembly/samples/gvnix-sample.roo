@@ -17,3 +17,7 @@ service define ws --class ~.services.ClaseServicio
 service export operation --class ~.services.ClaseServicio --method checkString
 service export operation --class ~.services.ClaseServicio --method inputParameters
 service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
+perform tests
+perform eclipse
+perform package
+perform assembly

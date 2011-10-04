@@ -12,3 +12,6 @@ theme set --id cit
 
 // (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/)
 
+perform tests
+perform eclipse
+perform assembly

@@ -15,3 +15,6 @@ finder add --finderName findEntity1sByAnEnumAndfindEntity1sByField1LikeAndfindEn
 finder add --finderName findEntity1sByAnEnum
 controller all --package ~.web
 menu setup
+
+perform tests
+perform assembly
