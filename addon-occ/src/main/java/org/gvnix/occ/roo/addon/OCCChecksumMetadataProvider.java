@@ -161,6 +161,9 @@ public class OCCChecksumMetadataProvider implements
         // We get governor's Entity
         EntityMetadata entityMetadata = (EntityMetadata) metadataService
                 .get(entityMetadataKey);
+        if (entityMetadata == null) {
+            return null;
+        }
 
         FieldMetadata versionField = entityMetadata.getVersionField();
 
@@ -304,7 +307,8 @@ public class OCCChecksumMetadataProvider implements
         PhysicalTypeMetadata governorPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
                 .get(governorPhysicalTypeIdentifier);
 
-        if (governorPhysicalTypeMetadata == null) {
+        if (governorPhysicalTypeMetadata == null
+                || !governorPhysicalTypeMetadata.isValid()) {
             // We can't get even basic information about the physical type, so
             // abort (the ITD will be deleted by ItdFileDeletionService)
             return null;
