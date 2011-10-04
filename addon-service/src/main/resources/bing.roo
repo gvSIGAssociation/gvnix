@@ -3,9 +3,13 @@ project --topLevelPackage org.gvnix.test.bing --projectName bing-search-app
 
 service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
 
+web mvc setup
+
 controller class --class ~.controller.SearchController
 
+perform tests
 perform eclipse
+perform package
 
 // next steps by hand:
 //
