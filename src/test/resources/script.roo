@@ -1,3 +1,4 @@
+script --file clinic.roo
 theme list
 theme install --id cit
 theme set --id cit
