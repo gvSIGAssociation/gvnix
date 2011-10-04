@@ -3,7 +3,6 @@ theme list
 theme install --id cit
 theme set --id cit
 web mvc install language --code ca
-occ checksum all
 menu setup
 menu tree
 web report setup
