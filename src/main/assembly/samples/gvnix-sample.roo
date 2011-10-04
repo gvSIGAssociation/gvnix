@@ -16,5 +16,4 @@ service operation --name inputParameters --service ~.services.ClaseServicio --re
 service define ws --class ~.services.ClaseServicio
 service export operation --class ~.services.ClaseServicio --method checkString
 service export operation --class ~.services.ClaseServicio --method inputParameters
-service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
 service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
