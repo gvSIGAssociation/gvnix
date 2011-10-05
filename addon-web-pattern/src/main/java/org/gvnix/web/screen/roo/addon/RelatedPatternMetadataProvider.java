@@ -19,6 +19,7 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -34,16 +35,13 @@ import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataServi
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadataProvider;
-import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
@@ -100,8 +98,8 @@ public final class RelatedPatternMetadataProvider extends
     @Reference
     private WebScreenConfigService configService;
 
-    @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    private final Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
+    private final Map<String, JavaType> webScaffoldMidToEntityMap = new LinkedHashMap<String, JavaType>();
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -141,61 +139,13 @@ public final class RelatedPatternMetadataProvider extends
         removeMetadataTrigger(RELATED_PATTERN_ANNOTATION);
     }
 
-    /**
-     * TODO: try to implement again this method optimizing the way we're
-     * deciding if we're interested or not in the JavaType.<br/>
-     * Other examples in
-     * FinderMetadataProviderImpl#getLocalMidToRequest(ItdTypeDetails)
-     */
     @Override
     protected String getLocalMidToRequest(ItdTypeDetails itdTypeDetails) {
         // Determine the governor for this ITD, and whether any metadata is even
         // hoping to hear about changes to that JavaType and its ITDs
         JavaType governor = itdTypeDetails.getName();
-        if (hasGvNIXEntityBatch(governor)) {
-            return getLocalMid(itdTypeDetails);
-        }
-
-        // Not interested in this JavaType, so let's move on
-        return null;
-    }
-
-    private boolean hasGvNIXEntityBatch(JavaType entity) {
-        String formBackingTypeId = physicalTypeMetadataProvider
-                .findIdentifier(entity);
-        if (formBackingTypeId == null) {
-            throw new IllegalArgumentException("Cannot locate source for '"
-                    + entity.getFullyQualifiedTypeName() + "'");
-        }
-
-        // Obtain the physical type and itd mutable details
-        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
-                .get(formBackingTypeId, true);
-        Assert.notNull(physicalTypeMetadata,
-                "Java source code unavailable for type ".concat(entity
-                        .getFullyQualifiedTypeName()));
-
-        // Obtain physical type details for the target type
-        PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
-                .getMemberHoldingTypeDetails();
-        Assert.notNull(physicalTypeDetails,
-                "Java source code details unavailable for type ".concat(entity
-                        .getFullyQualifiedTypeName()));
-
-        // Test if the type is an MutableClassOrInterfaceTypeDetails instance so
-        // the annotation can be added
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-                physicalTypeDetails, "Java source code is immutable for type "
-                        .concat(entity.getFullyQualifiedTypeName()));
-
-        // Test if the annotation already exists on the target type
-        MutableClassOrInterfaceTypeDetails formBakingObjectMutableTypeDetails = (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
-        AnnotationMetadata annotationMetadata = MemberFindingUtils
-                .getAnnotationOfType(
-                        formBakingObjectMutableTypeDetails.getAnnotations(),
-                        ENTITYBATCH_ANNOTATION);
-
-        return (annotationMetadata != null);
+        String localMid = entityToWebScaffoldMidMap.get(governor);
+        return localMid == null ? null : localMid;
     }
 
     /**
@@ -254,13 +204,6 @@ public final class RelatedPatternMetadataProvider extends
                 .getAnnotationOfType(cid.getAnnotations(),
                         RELATED_PATTERN_ANNOTATION);
 
-        // Check if there are pattern names used more than once in project
-        // TODO: change following check checking for related patterns definition
-        // String patternDefinedTwice =
-        // findPatternDefinedMoreThanOnceInProject();
-        // Assert.isNull(patternDefinedTwice,
-        // "There is a pattern name used more than once in the project");
-
         List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
 
         if (gvNixRelatedPatternAnnotation != null) {
@@ -310,9 +253,25 @@ public final class RelatedPatternMetadataProvider extends
                         formBackingObjectMemberDetails,
                         metadataIdentificationString);
         if (memberHoldingTypeDetails == null
-                || relatedApplicationTypeMetadata == null) {
+                || relatedApplicationTypeMetadata == null
+                || relatedApplicationTypeMetadata.get(formBackingType) == null
+                || relatedApplicationTypeMetadata.get(formBackingType)
+                        .getPersistenceDetails() == null) {
             return null;
         }
+        // Remember that this entity JavaType matches up with this metadata
+        // identification string
+        // Start by clearing the previous association
+        // Working in the same way as WebScaffoldMetadataProvider
+        JavaType oldEntity = webScaffoldMidToEntityMap
+                .get(metadataIdentificationString);
+        if (oldEntity != null) {
+            entityToWebScaffoldMidMap.remove(oldEntity);
+        }
+        entityToWebScaffoldMidMap.put(formBackingType,
+                metadataIdentificationString);
+        webScaffoldMidToEntityMap.put(metadataIdentificationString,
+                formBackingType);
 
         MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
 
@@ -337,44 +296,6 @@ public final class RelatedPatternMetadataProvider extends
                 propFileOperations, projectOperations.getPathResolver(),
                 fileManager, dateTypes);
     }
-
-    // @Override
-    // protected boolean arePatternsDefinedOnceInController(
-    // AnnotationAttributeValue<?> values) {
-    // List<String> auxList = new ArrayList<String>();
-    // for (String value : getPatternNames(values)) {
-    // if (auxList.contains(value)) {
-    // return false;
-    // } else {
-    // auxList.add(value);
-    // }
-    // }
-    // return true;
-    //
-    // }
-
-    // private String findPatternDefinedMoreThanOnceInProject() {
-    // List<String> definedPatternsInProject = new ArrayList<String>();
-    // AnnotationMetadata annotationMetadata = null;
-    // for (ClassOrInterfaceTypeDetails cid : typeLocationService
-    // .findClassesOrInterfaceDetailsWithAnnotation(RELATED_PATTERN_ANNOTATION))
-    // {
-    // annotationMetadata = MemberFindingUtils.getAnnotationOfType(
-    // cid.getAnnotations(), RELATED_PATTERN_ANNOTATION);
-    // if (annotationMetadata != null) {
-    // AnnotationAttributeValue<?> annotationValues = annotationMetadata
-    // .getAttribute(RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-    // for (String patternName : getPatternNames(annotationValues)) {
-    // if (definedPatternsInProject.contains(patternName)) {
-    // return patternName;
-    // } else {
-    // definedPatternsInProject.add(patternName);
-    // }
-    // }
-    // }
-    // }
-    // return null;
-    // }
 
     /**
      * {@inheritDoc}, here the resulting file name will be

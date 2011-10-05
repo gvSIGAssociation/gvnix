@@ -18,6 +18,9 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -28,6 +31,8 @@ import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataServi
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
+import org.springframework.roo.classpath.details.ItdTypeDetails;
+import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
@@ -73,6 +78,7 @@ public class RelatedPatternJspMetadataListener extends
     WebScreenOperations webScreenOperations;
     @Reference
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    private final Map<JavaType, String> formBackingObjectTypesToLocalMids = new HashMap<JavaType, String>();
 
     protected void activate(ComponentContext context) {
         metadataDependencyRegistry.registerDependency(
@@ -124,6 +130,8 @@ public class RelatedPatternJspMetadataListener extends
                 formBackingTypeMetadataDetails,
                 "Unable to obtain metadata for type "
                         + formbackingType.getFullyQualifiedTypeName());
+        formBackingObjectTypesToLocalMids.put(formbackingType,
+                metadataIdentificationString);
 
         eligibleFields = webMetadataService.getScaffoldEligibleFieldMetadata(
                 formbackingType, memberDetails, metadataIdentificationString);
@@ -158,14 +166,6 @@ public class RelatedPatternJspMetadataListener extends
     public void notify(String upstreamDependency, String downstreamDependency) {
         if (MetadataIdentificationUtils
                 .isIdentifyingClass(downstreamDependency)) {
-            Assert.isTrue(
-                    MetadataIdentificationUtils.getMetadataClass(
-                            upstreamDependency).equals(
-                            MetadataIdentificationUtils
-                                    .getMetadataClass(RelatedPatternMetadata
-                                            .getMetadataIdentiferType())),
-                    "Expected class-level notifications only for gvNIX Report metadata (not '"
-                            + upstreamDependency + "')");
 
             // A physical Java type has changed, and determine what the
             // corresponding local metadata identification string would have
@@ -185,23 +185,41 @@ public class RelatedPatternJspMetadataListener extends
                 return;
             }
         } else {
+            // This is the generic fallback listener, ie from
+            // MetadataDependencyRegistry.addListener(this) in the activate()
+            // method
+
+            // Get the metadata that just changed
+            MetadataItem metadataItem = metadataService.get(upstreamDependency);
+
+            // We don't have to worry about physical type metadata, as we
+            // monitor the relevant .java once the DOD governor is first
+            // detected
+            if (metadataItem == null
+                    || !metadataItem.isValid()
+                    || !(metadataItem instanceof ItdTypeDetailsProvidingMetadataItem)) {
+                // There's something wrong with it or it's not for an ITD, so
+                // let's gracefully abort
+                return;
+            }
+
+            // Let's ensure we have some ITD type details to actually work with
+            ItdTypeDetailsProvidingMetadataItem itdMetadata = (ItdTypeDetailsProvidingMetadataItem) metadataItem;
+            ItdTypeDetails itdTypeDetails = itdMetadata
+                    .getMemberHoldingTypeDetails();
+            if (itdTypeDetails == null) {
+                return;
+            }
+
+            String localMid = formBackingObjectTypesToLocalMids
+                    .get(itdTypeDetails.getGovernor().getName());
+            if (localMid != null) {
+                metadataService.get(localMid, true);
+            }
             return;
         }
 
-        // We should now have an instance-specific "downstream dependency"that
-        // can be processed by this class
-        Assert.isTrue(
-                MetadataIdentificationUtils.getMetadataClass(
-                        downstreamDependency).equals(
-                        MetadataIdentificationUtils
-                                .getMetadataClass(getProvidesType())),
-                "Unexpected downstream notification for '"
-                        + downstreamDependency
-                        + "' to this provider (which uses '"
-                        + getProvidesType() + "'");
-
         metadataService.get(downstreamDependency, true);
-
     }
 
     @Override

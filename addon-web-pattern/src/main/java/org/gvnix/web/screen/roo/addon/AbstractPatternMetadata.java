@@ -134,8 +134,14 @@ public abstract class AbstractPatternMetadata extends
         Assert.notNull(javaTypeMetadataHolder,
                 "Metadata holder required for form backing type: "
                         + formBackingType);
+        Assert.notNull(javaTypeMetadataHolder.getPersistenceDetails(),
+                "PersistenceMetadata details required for form backing type: "
+                        + formBackingType);
+        Assert.notNull(javaTypeMetadataHolder.getPersistenceDetails(),
+                "PersistenceMetadata details required for form backing type: "
+                        + formBackingType);
         if (annotationValues.isPopulateMethods()) {
-            filterAleadyPopulatedTypes(typesForPopulate);
+            filterAlreadyPopulatedTypes(typesForPopulate);
         }
         this.typesForPopulate = typesForPopulate;
         this.relationsDateTypes = relationsDateTypes;
@@ -166,6 +172,10 @@ public abstract class AbstractPatternMetadata extends
 
         if (isPatternTypeDefined(WebPattern.tabular, this.definedPatterns)) {
             // annotateFormBackingObject();
+            if (javaTypeMetadataHolder.getPersistenceDetails()
+                    .getFindAllMethod() == null) {
+                return;
+            }
             builder.addMethod(getTabularMethod());
             builder.addMethod(getCreateListMethod());
             builder.addMethod(getUpdateListMethod());
@@ -176,6 +186,10 @@ public abstract class AbstractPatternMetadata extends
 
         if (isPatternTypeDefined(WebPattern.register, this.definedPatterns)) {
             // addStaticFields();
+            if (javaTypeMetadataHolder.getPersistenceDetails()
+                    .getFindEntriesMethod() == null) {
+                return;
+            }
             builder.addMethod(getRegisterMethod());
             builder.addMethod(getCreateMethod());
             builder.addMethod(getUpdateMethod());
@@ -671,7 +685,7 @@ public abstract class AbstractPatternMetadata extends
     }
 
     /**
-     * If there is a pattern of givne WebPattern defined in GvNIXPattern it
+     * If there is a pattern of given WebPattern defined in GvNIXPattern it
      * returns true, false otherwise
      * 
      * @param patternType
@@ -936,34 +950,35 @@ public abstract class AbstractPatternMetadata extends
 
         // May we need to populate some Model Attributes with the data of
         // related entities
-        for (JavaType type : typesForPopulate.keySet()) {
-            JavaTypeMetadataDetails javaTypeMd = typesForPopulate.get(type);
-            JavaTypePersistenceMetadataDetails javaTypePersistenceMd = javaTypeMd
-                    .getPersistenceDetails();
-            if (javaTypePersistenceMd != null
-                    && javaTypePersistenceMd.getFindAllMethod() != null) {
-                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-                        .concat(javaTypeMd.getPlural().toLowerCase())
-                        .concat("\", ")
-                        .concat(type.getNameIncludingTypeParameters(false,
-                                builder.getImportRegistrationResolver()))
-                        .concat(".")
-                        .concat(javaTypePersistenceMd.getFindAllMethod()
-                                .getMethodName().getSymbolName())
-                        .concat("());"));
-            } else if (javaTypeMd.isEnumType()) {
-                JavaType arrays = new JavaType("java.util.Arrays");
-                bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-                        .concat(javaTypeMd.getPlural().toLowerCase())
-                        .concat("\", ")
-                        .concat(arrays.getNameIncludingTypeParameters(false,
-                                builder.getImportRegistrationResolver()))
-                        .concat(".asList(")
-                        .concat(type.getNameIncludingTypeParameters(false,
-                                builder.getImportRegistrationResolver()))
-                        .concat(".class.getEnumConstants()));"));
-            }
-        }
+        addBodyLinesPopulatingRelatedEntitiesData(bodyBuilder);
+        // for (JavaType type : typesForPopulate.keySet()) {
+        // JavaTypeMetadataDetails javaTypeMd = typesForPopulate.get(type);
+        // JavaTypePersistenceMetadataDetails javaTypePersistenceMd = javaTypeMd
+        // .getPersistenceDetails();
+        // if (javaTypePersistenceMd != null
+        // && javaTypePersistenceMd.getFindAllMethod() != null) {
+        // bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+        // .concat(javaTypeMd.getPlural().toLowerCase())
+        // .concat("\", ")
+        // .concat(type.getNameIncludingTypeParameters(false,
+        // builder.getImportRegistrationResolver()))
+        // .concat(".")
+        // .concat(javaTypePersistenceMd.getFindAllMethod()
+        // .getMethodName().getSymbolName())
+        // .concat("());"));
+        // } else if (javaTypeMd.isEnumType()) {
+        // JavaType arrays = new JavaType("java.util.Arrays");
+        // bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
+        // .concat(javaTypeMd.getPlural().toLowerCase())
+        // .concat("\", ")
+        // .concat(arrays.getNameIncludingTypeParameters(false,
+        // builder.getImportRegistrationResolver()))
+        // .concat(".asList(")
+        // .concat(type.getNameIncludingTypeParameters(false,
+        // builder.getImportRegistrationResolver()))
+        // .concat(".class.getEnumConstants()));"));
+        // }
+        // }
 
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
                 .concat(entityNamePlural.toLowerCase()).concat("Tab\", ")
@@ -1761,7 +1776,7 @@ public abstract class AbstractPatternMetadata extends
      * 
      * @param typesForPopulate
      */
-    private void filterAleadyPopulatedTypes(
+    private void filterAlreadyPopulatedTypes(
             SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate) {
 
         Set<JavaType> keyTypesForPopulate = typesForPopulate.keySet();
