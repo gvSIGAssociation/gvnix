@@ -47,7 +47,7 @@
   <properties>
     <gvnix.version>${parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
-    <repo.folder>org/gvnix/web/screen/roo/addon</repo.folder>
+    <repo.folder>org/gvnix/web/mvc/binding/roo/addon</repo.folder>
   </properties>
 
 
@@ -101,6 +101,12 @@
       <type>bundle</type>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>Google Code</id>
+      <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
+    </repository>
+  </distributionManagement>
   <build>
     <extensions>
       <extension>
