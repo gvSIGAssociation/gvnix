@@ -95,9 +95,6 @@ public final class RelatedPatternMetadataProvider extends
     @Reference
     WebMetadataService webMetadataService;
 
-    @Reference
-    private WebScreenConfigService configService;
-
     private final Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
     private final Map<String, JavaType> webScaffoldMidToEntityMap = new LinkedHashMap<String, JavaType>();
 
@@ -167,7 +164,7 @@ public final class RelatedPatternMetadataProvider extends
         }
 
         // Setup project for use annotation
-        configService.setup();
+        // configService.setup();
 
         JavaType controllerType = RelatedPatternMetadata
                 .getJavaType(metadataIdentificationString);

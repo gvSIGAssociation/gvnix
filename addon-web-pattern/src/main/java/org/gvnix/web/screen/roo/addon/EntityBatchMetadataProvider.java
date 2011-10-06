@@ -123,7 +123,7 @@ public final class EntityBatchMetadataProvider extends
         }
 
         // Perform project setup (adds dependencies to project)
-        config.setup();
+        // config.setup();
 
         // Pass dependencies required by the metadata in through its constructor
         return new EntityBatchMetadata(metadataIdentificationString,
