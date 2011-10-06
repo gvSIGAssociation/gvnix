@@ -1292,17 +1292,21 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         // a later bundle, due to the sequential lookup.
         String msgSourceBasenames = msgSourceElement
                 .getAttribute("p:basenames");
+        String sourceApplicationversion = "WEB-INF/i18n/theme/applicationversion";
+        String finalMsgSourceBasenames = msgSourceBasenames;
+        if (themeId.equalsIgnoreCase("cit")
+                && !msgSourceBasenames.contains(sourceApplicationversion)) {
+            // When setting theme-cit we want to show application version
+            // number as a message
+            finalMsgSourceBasenames = sourceApplicationversion.concat(",")
+                    .concat(msgSourceBasenames);
+        }
         String basenames = "WEB-INF/i18n/theme/messages,WEB-INF/i18n/theme/application";
         if (!msgSourceBasenames.contains(basenames)) {
-            if (themeId.equalsIgnoreCase("cit")) {
-                // When setting theme-cit we want to show application version
-                // number as a message
-                basenames = basenames
-                        .concat(",WEB-INF/i18n/theme/applicationversion");
-            }
-            msgSourceElement.setAttribute("p:basenames", basenames.concat(",")
-                    .concat(msgSourceBasenames));
+            finalMsgSourceBasenames = basenames.concat(",").concat(
+                    finalMsgSourceBasenames);
         }
+        msgSourceElement.setAttribute("p:basenames", finalMsgSourceBasenames);
 
         org.springframework.roo.support.util.XmlUtils.writeXml(
                 mutableConfigXml.getOutputStream(), webConfigDoc);
