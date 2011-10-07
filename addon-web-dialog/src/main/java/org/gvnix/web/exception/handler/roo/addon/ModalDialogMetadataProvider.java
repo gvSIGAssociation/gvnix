@@ -88,7 +88,9 @@ public final class ModalDialogMetadataProvider extends
                 getProvidesType());
         addMetadataTrigger(new JavaType(
                 "org.springframework.stereotype.Controller"));
-        addMetadataTrigger(MODAL_DIALOGS);
+        // we don't need to listen changes over our Annotation
+        // @GvNIXModalDialogs because it must always be in @Controller class
+        // addMetadataTrigger(MODAL_DIALOGS);
     }
 
     /**
@@ -106,7 +108,7 @@ public final class ModalDialogMetadataProvider extends
                 getProvidesType());
         removeMetadataTrigger(new JavaType(
                 "org.springframework.stereotype.Controller"));
-        removeMetadataTrigger(MODAL_DIALOGS);
+        // removeMetadataTrigger(MODAL_DIALOGS);
     }
 
     @Override

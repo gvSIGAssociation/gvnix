@@ -28,7 +28,7 @@
       </comments>
     </license>
   </licenses>
-  
+
   <!-- DiSiD: Add parent pom reference -->
   <parent>
     <groupId>org.gvnix</groupId>
@@ -36,18 +36,18 @@
     <version>0.8.0</version>
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
-  
+
   <!-- DiSiD: No group specified, there is defined on parent pom
   <groupId>org.gvnix.occ.roo.addon</groupId>
   -->
-  
+
   <artifactId>org.gvnix.occ.roo.addon</artifactId>
   <packaging>bundle</packaging>
-  
+
   <!-- DiSiD: No version specified, there is defined on parent pom
   <version>0.1.0.BUILD-SNAPSHOT</version>
   -->
-  
+
   <!-- DiSiD: Add organization name, license and url -->
   <name>gvNIX - Spring Roo - Addon - Optimistic Concurrency Control</name>
   <organization>
@@ -55,7 +55,7 @@
   </organization>
   <description>JPA Optimistic Control for Spring Roo. For those applications that starts with an unmodifiable schema and the tables don't have the column 'version' for concurrency control.</description>
   <url>http://www.gvnix.org</url>
-  
+
   <!-- DiSiD: No properties, repositories or plugin repositories; there are defined on parent pom
   <properties>
     <roo.version>1.1.2.BUILD-SNAPSHOT</roo.version>
@@ -86,9 +86,9 @@
     <repo.folder>org/gvnix/occ/roo/addon</repo.folder>
   </properties>
 
-  
+
   <dependencies>
-  
+
     <!-- OSGi -->
     <!-- DiSiD: No OSGi dependencies, there are defined on parent pom
     <dependency>
@@ -102,7 +102,7 @@
       <version>4.1.0</version>
     </dependency>
     -->
-    
+
     <!-- Apache Felix -->
     <!-- DiSiD: No Felix dependency, there is defined on parent pom
     <dependency>
@@ -111,7 +111,7 @@
       <version>1.2.0</version>
     </dependency>
     -->
-    
+
     <!-- Spring Roo modules -->
     <!-- DiSiD: No version or type; there are defined on parent pom -->
     <dependency>
@@ -178,7 +178,7 @@
       <type>bundle</type>
       -->
     </dependency>
-    
+
     <!-- DiSiD: Additional Spring Roo modules required by this addon -->
     <dependency>
       <groupId>org.springframework.roo</groupId>
@@ -188,9 +188,17 @@
       <groupId>org.springframework.roo</groupId>
       <artifactId>org.springframework.roo.classpath.javaparser</artifactId>
     </dependency>
-    
+    <!-- DiSiD: gvNIX modules required by this addon -->
+    <dependency>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.support</artifactId>
+      <version>${gvnix.version}</version>
+      <scope>provided</scope>
+      <type>bundle</type>
+    </dependency>
+
   </dependencies>
-  
+
   <!-- DiSiD: No scm or distribution management; there are included on parent pom
   <scm>
     <connection>scm:svn:https://${google.code.project.name}.googlecode.com/svn/trunk</connection>
@@ -204,7 +212,7 @@
     </repository>
   </distributionManagement>
   -->
-  
+
   <!-- DiSiD: No build section, is included on parent pom
   <build>
     <extensions>
@@ -319,9 +327,9 @@
       <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
     </repository>
   </distributionManagement>
-  
+
   <build>
-  
+
     <!-- DiSiD: Add webdav extension to google code  -->
     <extensions>
       <extension>
@@ -330,7 +338,39 @@
         <version>1.0-beta-6</version>
       </extension>
     </extensions>
-    
+
+    <plugins>
+      <!-- Copy gvNIX common support module classes to this module -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.1</version>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.gvnix</groupId>
+                  <artifactId>org.gvnix.support</artifactId>
+                  <version>${gvnix.version}</version>
+                  <overWrite>false</overWrite>
+                  <includes>**/*.class,**/*.java-template</includes>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>true</overWriteSnapshots>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
     <resources>
       <resource>
         <directory>src/main/resources</directory>

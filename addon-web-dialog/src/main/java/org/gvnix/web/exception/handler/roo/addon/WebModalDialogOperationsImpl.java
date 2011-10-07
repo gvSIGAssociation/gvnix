@@ -40,6 +40,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MessageBundleUtils;
 import org.gvnix.support.MetadataUtils;
 import org.gvnix.support.OperationUtils;
+import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
@@ -144,6 +145,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
             JavaSymbolName name) {
         Assert.notNull(controllerClass, "controller is required");
         Assert.notNull(name, "name is required");
+        // setup maven dependency
+        setupMavenDependency();
 
         annotateWithModalDialog(controllerClass, name);
     }
@@ -289,9 +292,8 @@ public class WebModalDialogOperationsImpl implements WebModalDialogOperations {
 
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", configuration);
-        for (Element depen : depens) {
-            projectOperations.addDependency(new Dependency(depen));
-        }
+        DependenciesVersionManager.manageDependencyVersion(metadataService,
+                projectOperations, depens);
 
         depens = XmlUtils.findElements(
                 "/configuration/dependencies/dependency", configuration);

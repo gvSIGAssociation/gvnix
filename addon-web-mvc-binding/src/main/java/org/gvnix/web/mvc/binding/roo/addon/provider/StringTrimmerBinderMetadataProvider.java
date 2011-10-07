@@ -80,8 +80,6 @@ public final class StringTrimmerBinderMetadataProvider extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename) {
 
-        webBindingOperations.setup();
-
         // We know governor type details are non-null and can be safely cast
         ClassOrInterfaceTypeDetails controllerClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();

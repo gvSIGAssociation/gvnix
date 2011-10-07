@@ -85,6 +85,28 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
 
     /** {@inheritDoc} */
     public void bindStringTrimmer(JavaType controller, boolean emptyAsNull) {
+        setup();
+        addBindStringTrimmer(controller, emptyAsNull);
+    }
+
+    /** {@inheritDoc} */
+    public void bindStringTrimmerAll(boolean emptyAsNull) {
+        setup();
+        // Use the TypeLocationService to scan project for all types with a
+        // specific annotation
+        for (JavaType type : typeLocationService
+                .findTypesWithAnnotation(new JavaType(
+                        "org.springframework.stereotype.Controller"))) {
+            addBindStringTrimmer(type, emptyAsNull);
+        }
+    }
+
+    /**
+     * Annotate provided Java type with @GvNIXStringTrimmerBinder
+     * 
+     * @param emptyAsNull
+     */
+    private void addBindStringTrimmer(JavaType controller, boolean emptyAsNull) {
         // Use Roo's Assert type for null checks
         Assert.notNull(controller, "Java type required");
 
@@ -125,17 +147,6 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
 
             // Add annotation to target type
             mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
-        }
-    }
-
-    /** {@inheritDoc} */
-    public void bindStringTrimmerAll(boolean emptyAsNull) {
-        // Use the TypeLocationService to scan project for all types with a
-        // specific annotation
-        for (JavaType type : typeLocationService
-                .findTypesWithAnnotation(new JavaType(
-                        "org.springframework.stereotype.Controller"))) {
-            bindStringTrimmer(type, emptyAsNull);
         }
     }
 

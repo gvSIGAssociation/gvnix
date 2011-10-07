@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.addon.entity.EntityOperations;
@@ -41,7 +42,6 @@ import org.springframework.roo.classpath.details.annotations.StringAttributeValu
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Repository;
@@ -257,9 +257,7 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
 
         List<Element> depens = XmlUtils.findElements(
                 "/configuration/gvnix/dependencies/dependency", conf);
-        for (Element depen : depens) {
-
-            projectOperations.addDependency(new Dependency(depen));
-        }
+        DependenciesVersionManager.manageDependencyVersion(metadataService,
+                projectOperations, depens);
     }
 }
