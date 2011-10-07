@@ -360,7 +360,11 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         // All checks passed OK.
 
-        // We don't need to do Setup because it must be done by addPattern call
+        // We don't need to do Setup because it must be done by a addPattern
+        // call, but just in case the command is used from an old addon version
+        // we must setup dependencies
+        // Setup project for use annotation
+        configService.setup();
 
         // List of pattern to use in annotation
         List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
