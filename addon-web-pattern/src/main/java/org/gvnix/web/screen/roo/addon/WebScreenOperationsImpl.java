@@ -32,6 +32,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MessageBundleUtils;
+import org.gvnix.support.OperationUtils;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.springframework.roo.addon.entity.EntityMetadata;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
@@ -977,8 +978,16 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     public void installPatternArtifacts(boolean forceUpdate) {
         PathResolver pathResolver = projectOperations.getPathResolver();
         // install pattern images
-        copyDirectoryContents("images/pattern/*.*", pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "/images/pattern"), forceUpdate);
+        if (forceUpdate) {
+            OperationUtils.updateDirectoryContents("images/pattern/*.*",
+                    pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                            "/images/pattern"), fileManager, context,
+                    getClass());
+        } else {
+            copyDirectoryContents("images/pattern/*.*",
+                    pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                            "/images/pattern"), false);
+        }
         // install js
         copyDirectoryContents("scripts/*.js",
                 pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/scripts"),

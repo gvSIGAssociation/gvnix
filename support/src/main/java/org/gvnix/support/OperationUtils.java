@@ -22,13 +22,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Set;
 
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.support.osgi.UrlFindingUtils;
+import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.FileCopyUtils;
 import org.springframework.roo.support.util.StringUtils;
 import org.springframework.roo.support.util.TemplateUtils;
@@ -187,5 +192,66 @@ public class OperationUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Updates files in source path into target directory path. <strong>Useful
+     * for copy/update binary resources (images) from Addon bundle resources to
+     * destination directory</strong>. For text resources (tagx, jspx, ...) use
+     * <code>AbstractOperations.copyDirectoryContents(..)</code> instead
+     * 
+     * @param sourceAntPath
+     *            the source path
+     * @param targetDirectory
+     *            the target directory
+     * 
+     * @param fileManager
+     * @param context
+     * @param clazz
+     *            which owns the resources in source path
+     * 
+     * @see org.springframework.roo.classpath.operations.AbstractOperations.
+     *      copyDirectoryContents(String, String, boolean)
+     */
+    public static void updateDirectoryContents(String sourceAntPath,
+            String targetDirectory, FileManager fileManager,
+            ComponentContext context, Class<?> clazz) {
+        Assert.hasText(sourceAntPath, "Source path required");
+        Assert.hasText(targetDirectory, "Target directory required");
+
+        if (!targetDirectory.endsWith("/")) {
+            targetDirectory += "/";
+        }
+
+        if (!fileManager.exists(targetDirectory)) {
+            fileManager.createDirectory(targetDirectory);
+        }
+
+        String path = TemplateUtils.getTemplatePath(clazz, sourceAntPath);
+        Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(
+                context.getBundleContext(), path);
+        Assert.notNull(urls,
+                "Could not search bundles for resources for Ant Path '" + path
+                        + "'");
+        for (URL url : urls) {
+            String fileName = url.getPath().substring(
+                    url.getPath().lastIndexOf("/") + 1);
+            try {
+                if (!fileManager.exists(targetDirectory + fileName)) {
+                    FileCopyUtils.copy(url.openStream(), fileManager
+                            .createFile(targetDirectory + fileName)
+                            .getOutputStream());
+                } else {
+                    FileCopyUtils.copy(url.openStream(), fileManager
+                            .updateFile(targetDirectory + fileName)
+                            .getOutputStream());
+                }
+            } catch (IOException e) {
+                throw new IllegalStateException(
+                        "Encountered an error during updating of resources for the add-on.",
+                        e);
+            }
+        }
+
     }
 }
