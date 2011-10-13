@@ -35,18 +35,38 @@
     <version>0.8.0</version>
   </parent>
 
-  <artifactId>wrapping.postgresql</artifactId>
-  <packaging>pom</packaging>
-  <name>gvNIX - OSGi - PostgreSQL JDBC driver</name>
+  <!-- Ver sistema de nominación en ../README.rst -->
+  <groupId>${pkgGroupId}</groupId>
+  <artifactId>${project.parent.groupId}.${pkgGroupId}</artifactId>
+  <version>${depVersion}</version>
+  <packaging>bundle</packaging>
+  <name>gvNIX - OSGi - PostgreSQL JDBC4 driver</name>
   <description>PostgreSQL JDBC driver. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
 
   <organization>
     <name>Conselleria d'Infraestructures, Territori i Medi Ambient - Generalitat Valenciana</name>
   </organization>
 
-  <modules>
-    <module>jdbc3</module>
-    <module>jdbc4</module>
-  </modules>
+  <properties>
+    <pkgGroupId>postgresql</pkgGroupId>
+    <pkgArtifactId>postgresql</pkgArtifactId>
+    <pkgVersion>9.0.801.jdbc4</pkgVersion><!-- Bundle plugin change -901 to .0 for Bundle-Version, so change -901 to .901 -->
+    <depVersion>9.0-801.jdbc4</depVersion>
+    <pkgVendor>PostgreSQL Global Development Group</pkgVendor>
+    <pkgDocUrl>http://jdbc.postgresql.org/documentation/docs.html</pkgDocUrl>
+    <pkgLicense>http://jdbc.postgresql.org/license.html</pkgLicense>
+    <pkgExport>*;version=${pkgVersion}</pkgExport>
+    <pkgImport>*;resolution:=optional</pkgImport>
+    <pkgPrivate>!*</pkgPrivate>
+    <osgiVersion>${pkgVersion}.0001</osgiVersion>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>${pkgGroupId}</groupId>
+      <artifactId>${pkgArtifactId}</artifactId>
+      <version>${depVersion}</version>
+    </dependency>
+  </dependencies>
 
 </project>
