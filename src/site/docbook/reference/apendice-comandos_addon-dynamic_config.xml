@@ -40,15 +40,17 @@
           linkend="apendice-comandos_addon-dynamic_config-config_prop_add">configuration
           property add</link></entry>
 
-          <entry>Hace que una propiedad esté disponible para su gestión en todas las
-          configuraciones</entry>
+          <entry>Hace que una propiedad esté disponible para su gestión en
+          todas las configuraciones</entry>
         </row>
+
         <row>
           <entry><link
           linkend="apendice-comandos_addon-dynamic_config-config_prop_update">configuration
           property value</link></entry>
 
-          <entry>Establece el valor de una propiedad en una configuración</entry>
+          <entry>Establece el valor de una propiedad en una
+          configuración</entry>
         </row>
 
         <row>
@@ -56,19 +58,28 @@
           linkend="apendice-comandos_addon-dynamic_config-config_list">configuration
           list</link></entry>
 
-          <entry>Lista todas las configuraciones creadas juntos con sus propiedades
-          y valores</entry>
+          <entry>Lista todas las configuraciones creadas juntos con sus
+          propiedades y valores</entry>
         </row>
-        
+
         <row>
           <entry><link
           linkend="apendice-comandos_addon-dynamic_config-config_export">configuration
           export</link></entry>
 
-          <entry>Escribe todas todas las configuraciones en el proyecto. Actualmente se
-          escriben en el formato de perfiles de Maven.</entry>
+          <entry>Escribe todas todas las configuraciones en el proyecto.
+          Actualmente se escriben en el formato de perfiles de Maven.</entry>
         </row>
-        
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-dynamic_config-config_prop_undefined">configuration
+          property undefined</link></entry>
+
+          <entry>Deja sin valor una propiedad en la configuración de forma que
+          se ha de establecer manualmente al ejecutar un objetivo
+          Maven.</entry>
+        </row>
       </tbody>
     </tgroup>
   </table>
@@ -96,7 +107,7 @@
     <title>configuration property add</title>
 
     <para>Hace que una propiedad esté disponible para su gestión en todas las
-          configuraciones.</para>
+    configuraciones.</para>
 
     <variablelist>
       <varlistentry>
@@ -109,7 +120,7 @@
       </varlistentry>
     </variablelist>
   </section>
-  
+
   <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_update">
     <title>configuration property value</title>
 
@@ -144,7 +155,7 @@
       </varlistentry>
     </variablelist>
   </section>
-  
+
   <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_undefined">
     <title>configuration property undefined</title>
 
@@ -174,15 +185,14 @@
   <section xml:id="apendice-comandos_addon-dynamic_config-config_list">
     <title>configuration list</title>
 
-    <para>Lista todas las configuraciones creadas juntos con sus propiedades
-          y valores.</para>
+    <para>Lista todas las configuraciones creadas juntos con sus propiedades y
+    valores.</para>
   </section>
-  
+
   <section xml:id="apendice-comandos_addon-dynamic_config-config_export">
     <title>configuration export</title>
 
     <para>Escribe las configuraciones definidas actualmente en el proyecto
     utilizando para ello el sistema de perfiles de Maven.</para>
   </section>
-  
 </section>
