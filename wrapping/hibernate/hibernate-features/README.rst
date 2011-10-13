@@ -30,8 +30,8 @@ Deploying
 
 #. Install the bundle by executing one of commands below in the ServiceMix shell::
 
-    features:install gvnix-hibernate
-    features:install gvnix-hibernate-spatial
+    features:install gvnix-hibernate/3.6.7.Final
+    features:install gvnix-hibernatespatial-postgis/1.1.jdbc4
 
 #. Confirm the installation by executing the following command in the ServiceMix shell::
 

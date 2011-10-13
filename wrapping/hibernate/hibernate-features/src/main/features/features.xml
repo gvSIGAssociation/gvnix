@@ -84,18 +84,37 @@
         <bundle>mvn:org.hibernate/org.gvnix.org.hibernate/3.6.7.Final</bundle>
     </feature>
 
-    <!-- Karaf Feature Descriptor for Hibernate Spatial in Servicemix 4 -->
-    <feature name="gvnix-hibernate-spatial" version="${project.version}">
-      <feature>gvnix-hibernate</feature>
+    <!-- PostGIS JDBC4 -->
+    <feature name="gvnix-postgis" version="1.5.3.jdbc4">
+      <bundle dependency="true">mvn:postgresql/org.gvnix.postgresql/9.0-801.jdbc4</bundle>
+      <bundle>mvn:org.postgis/org.gvnix.postgis-jdbc/1.5.3</bundle>
+    </feature>
 
-      <!-- Required dependencies -->
+    <!-- PostGIS JDBC3 -->
+    <feature name="gvnix-postgis" version="1.5.3.jdbc3">
+      <bundle dependency="true">mvn:postgresql/org.gvnix.postgresql/9.0-801.jdbc3</bundle>
+      <bundle>mvn:org.postgis/org.gvnix.postgis-jdbc/1.5.3</bundle>
+    </feature>
+
+    <!-- Karaf Feature Descriptor for Hibernate Spatial for PostGIS -->
+    <feature name="gvnix-hibernatespatial-postgis" version="1.1.jdbc4">
+      <feature>gvnix-hibernate</feature>
+      <feature version="1.5.3.jdbc4">gvnix-postgis</feature>
 
       <!-- Java Topology Suite, spatial geometry model-->
       <bundle dependency="true">mvn:com.vividsolutions/org.gvnix.com.vividsolutions.jts/1.12</bundle>
 
-      <!-- PostGIS and PosgreSQL -->
-      <bundle dependency="true">mvn:postgresql/org.gvnix.postgresql/8.4-702.jdbc3</bundle>
-      <bundle dependency="true">mvn:org.postgis/org.gvnix.postgis-jdbc/1.5.3</bundle>
+      <!-- Hibernate Spatial -->
+      <bundle>mvn:org.hibernatespatial/org.gvnix.hibernate-spatial-postgis/1.1</bundle>
+    </feature>
+
+    <!-- Karaf Feature Descriptor for Hibernate Spatial for PostGIS -->
+    <feature name="gvnix-hibernatespatial-postgis" version="1.1.jdbc3">
+      <feature>gvnix-hibernate</feature>
+      <feature version="1.5.3.jdbc3">gvnix-postgis</feature>
+
+      <!-- Java Topology Suite, spatial geometry model-->
+      <bundle dependency="true">mvn:com.vividsolutions/org.gvnix.com.vividsolutions.jts/1.12</bundle>
 
       <!-- Hibernate Spatial -->
       <bundle>mvn:org.hibernatespatial/org.gvnix.hibernate-spatial-postgis/1.1</bundle>

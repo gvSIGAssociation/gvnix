@@ -37,7 +37,7 @@
 
   <artifactId>wrapping.postgresql</artifactId>
   <packaging>pom</packaging>
-  <name>gvNIX - OSGi - PostgreSQL JDBC driver</name>
+  <name>gvNIX - OSGi - PostgreSQL</name>
   <description>PostgreSQL JDBC driver. This OSGi bundle wraps ${pkgArtifactId} ${pkgVersion} jar files.</description>
 
   <organization>
