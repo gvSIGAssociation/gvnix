@@ -31,18 +31,17 @@
 
   <parent>
     <groupId>org.gvnix</groupId>
-    <artifactId>wrapping.hibernate</artifactId>
+    <artifactId>wrapping</artifactId>
     <version>0.8.0</version>
   </parent>
 
   <groupId>${pkgGroupId}</groupId>
-  <artifactId>${project.parent.groupId}.${project.groupId}.features</artifactId>
+  <artifactId>${pkgGroupId}.${pkgArtifactId}</artifactId>
   <packaging>pom</packaging>
-  <version>${pkgVersion}</version>
 
-  <name>gvNIX - OSGi - Hibernate - Features</name>
+  <name>gvNIX - OSGi - Karaf Features</name>
   <description>
-  Hibernate Bundles Features, the easiest and most repeatable way to install bundles.
+  gvNIX features, the easiest and most repeatable way to install bundles in ServiceMix.
   The feature descriptor describes the bundles to be provisioned and installed in ServiceMix to deploy and run gvNIX bundles.
   </description>
 
@@ -51,9 +50,8 @@
   </organization>
 
   <properties>
-    <pkgGroupId>org.hibernate</pkgGroupId>
-    <pkgArtifactId>hibernate-features</pkgArtifactId>
-    <pkgVersion>3.6.7.Final</pkgVersion>
+    <pkgGroupId>org.gvnix</pkgGroupId>
+    <pkgArtifactId>servicemix.features</pkgArtifactId>
   </properties>
 
   <build>

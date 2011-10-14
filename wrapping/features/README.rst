@@ -1,4 +1,17 @@
-Hibernate 3.6.7 wrapper.
+=============================
+ gvNIX - ServiceMix Features
+=============================
+
+:Revision:  $Rev: 322 $
+:Date:      $Date: 2011-09-12 06:59:38 +0200 (lun 12 de sep de 2011) $
+:Copyright: 2011 (C) CITM
+
+Introduction
+=============
+
+gvNIX features, the easiest and most repeatable way to install bundles in ServiceMix.
+
+The feature descriptor describes the bundles to be provisioned and installed in ServiceMix to deploy and run gvNIX bundles.
 
 It has been tested with FUSE ESB 4.4 (Karaf).
 
@@ -6,8 +19,6 @@ Deploying in Apache ServiceMix
 ================================
 
 In order to deploy Hibernate bundle, several additional OSGi bundles must be provisioned. 
-
-The easiest and most repeatable way to provision these bundles is to use a Karaf feature descriptor to describe the bundles to be provisioned. The feature descriptor can be found at *src/main/features*. 
 
 Building
 -----------
@@ -20,16 +31,17 @@ Deploying
 #. Start Apache ServiceMix 4.4
 #. In the ServiceMix shell, add the feature descriptor for Hibernate by executing the following command::
 
-    features:addurl mvn:org.hibernate/org.gvnix.org.hibernate.features/3.6.7.Final/xml/features
+    features:addurl mvn:org.gvnix/org.gvnix.servicemix.features/0.8.0/xml/features
 
    .. note::
 
-    If you did not build the Hibernate bundle locally, you will need to add the Maven repository for gvNIX project to the ServiceMix configuration.
+    If you did not build the gvNIX wrapping bundles locally, you will need to add the Maven repository for gvNIX project to the ServiceMix configuration.
 
     Edit *SERVICEMIX_HOME/etc/org.ops4j.pax.url.mvn.cfg* and add http://gvnix.googlecode.com/svn/repo/ to the ``org.ops4j.pax.url.mvn.repositories`` property.
 
 #. Install the bundle by executing one of commands below in the ServiceMix shell::
 
+    features:install gvnix-postgis/1.5.3.jdbc4
     features:install gvnix-hibernate/3.6.7.Final
     features:install gvnix-hibernatespatial-postgis/1.1.jdbc4
 

@@ -57,6 +57,7 @@
     <module>postgresql</module>
     <module>postgis</module>
     <module>jts</module>
+    <module>features</module>
   </modules>
 
   <!-- Pendiente de URL
