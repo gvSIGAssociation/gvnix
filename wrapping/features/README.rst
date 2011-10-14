@@ -15,21 +15,16 @@ The feature descriptor describes the bundles to be provisioned and installed in 
 
 It has been tested with FUSE ESB 4.4 (Karaf).
 
-Deploying in Apache ServiceMix
-================================
-
-In order to deploy Hibernate bundle, several additional OSGi bundles must be provisioned. 
-
-Building
------------
+Build
+=======
 
 Build the source code by executing ``mvn clean install`` command.
 
-Deploying
-----------
+Deploy
+==========
 
 #. Start Apache ServiceMix 4.4
-#. In the ServiceMix shell, add the feature descriptor for Hibernate by executing the following command::
+#. In the ServiceMix shell, add the feature descriptor for gvNIX OSGi wrappers by executing the following command::
 
     features:addurl mvn:org.gvnix/org.gvnix.servicemix.features/0.8.0/xml/features
 
