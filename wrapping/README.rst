@@ -3,6 +3,11 @@
  gvNIX - RAD tool for Java developers
 ======================================
 
+Introduction
+===============
+
+gvNIX wrapping subproject contains OSGi-ready versions of open source enterprise libraries that are commonly used by OSGi applications.
+
 Sistema de nominación de wrappers
 ===========================================
 

@@ -28,7 +28,7 @@
 <features name="gvnix-hibernate-features-repository">
 
     <!-- Karaf Feature Descriptor to install Hibernate 3 in Servicemix 4 -->
-    <feature name="gvnix-hibernate" version="${project.version}">
+    <feature name="gvnix-hibernate" version="3.6.7.Final">
 
         <!-- Aries JPA -->
         <bundle dependency='true'>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
@@ -98,8 +98,8 @@
 
     <!-- Karaf Feature Descriptor for Hibernate Spatial for PostGIS -->
     <feature name="gvnix-hibernatespatial-postgis" version="1.1.jdbc4">
-      <feature>gvnix-hibernate</feature>
       <feature version="1.5.3.jdbc4">gvnix-postgis</feature>
+      <feature version="3.6.7.Final">gvnix-hibernate</feature>
 
       <!-- Java Topology Suite, spatial geometry model-->
       <bundle dependency="true">mvn:com.vividsolutions/org.gvnix.com.vividsolutions.jts/1.12</bundle>
@@ -110,8 +110,8 @@
 
     <!-- Karaf Feature Descriptor for Hibernate Spatial for PostGIS -->
     <feature name="gvnix-hibernatespatial-postgis" version="1.1.jdbc3">
-      <feature>gvnix-hibernate</feature>
       <feature version="1.5.3.jdbc3">gvnix-postgis</feature>
+      <feature version="3.6.7.Final">gvnix-hibernate</feature>
 
       <!-- Java Topology Suite, spatial geometry model-->
       <bundle dependency="true">mvn:com.vividsolutions/org.gvnix.com.vividsolutions.jts/1.12</bundle>
