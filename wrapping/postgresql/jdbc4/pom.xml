@@ -31,7 +31,7 @@
 
   <parent>
     <groupId>org.gvnix</groupId>
-    <artifactId>wrapping</artifactId>
+    <artifactId>wrapping.postgresql</artifactId>
     <version>0.8.0</version>
   </parent>
 
