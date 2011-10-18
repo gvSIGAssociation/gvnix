@@ -342,6 +342,11 @@ public String VetController.generateInformeusuarios(
   <section>
     <title xml:lang="es">Futuras versiones</title>
 
+    <para>Mejorar el diseño del informe generado, incluyendo la visualización
+    de las relaciones que pueda tener la entidad sobre la que se declara el
+    informe. En sección de recetas se muestra una forma de hacer mediante el
+    <link xlink:href="recetas-reports">uso de subinformes</link>.</para>
+
     <para>TBC</para>
   </section>
 </chapter>
