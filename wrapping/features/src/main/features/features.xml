@@ -25,7 +25,7 @@
   container loads any required bundles that are not already present into the 
   container and activates them.
 -->
-<features name="gvnix-hibernate-features-repository">
+<features name="gvnix-features-repository">
 
     <!-- Karaf Feature Descriptor to install Hibernate 3 in Servicemix 4 -->
     <feature name="gvnix-hibernate" version="3.6.7.Final">
