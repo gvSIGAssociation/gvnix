@@ -35,9 +35,10 @@ How to install
       
         bash shell:
         
-          mvn install:install-file -Dfile=$GVNIX_HOME/wrapping/oracle/lib/ojdbc14-10.2.0.4.0.jar \
-              -DgroupId=com.oracle \
-              -DartifactId=ojdbc14 -Dversion=10.2.0.4.0 -Dpackaging=jar
+          mvn install:install-file \
+           -Dfile=$GVNIX_HOME/wrapping/oracle/lib/ojdbc14-10.2.0.4.0.jar \
+           -DgroupId=com.oracle \
+           -DartifactId=ojdbc14 -Dversion=10.2.0.4.0 -Dpackaging=jar
 
    #. Run ...
 
