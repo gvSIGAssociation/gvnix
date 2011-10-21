@@ -47,6 +47,12 @@ If you have any questions about MAVEN, GIT, GPG or ECLIPSE setup see the followi
 Git
 ---
 
+First, you need a GitHub account:
+
+ http://forum.springsource.org/showthread.php?114239-Spring-Roo-sources-move-to-GitHub!
+
+And your SSH public key from your account settings (http://help.github.com/linux-set-up-git/).
+
 Be aware that Roo source code is commited on gvNIX project at ``roo`` folder.
 However, Roo source code can be updated to a new tag with next commands:
 
