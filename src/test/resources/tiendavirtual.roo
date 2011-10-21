@@ -1,0 +1,198 @@
+// Spring Roo 1.1.5.RELEASE [rev d3a68c3] log opened
+project --topLevelPackage org.gvnix.tiendavirtual --java 6
+persistence setup --provider HIBERNATE --database POSTGRES
+database properties list
+database properties set --key database.url --value jdbc:postgresql://localhost:5432/tiendavirtualDB
+database properties set --key database.username --value tiendavirtual
+database properties set --key database.password --value tiendavirtual
+perform eclipse
+backup
+// scrip --file practica04.roo
+hint
+help entity
+entity --class ~.domain.Producto --testAutomatically
+hint
+help field
+help field string
+field string --fieldName identificador --notNull --unique
+field string --fieldName nombre --sizeMin 3 --notNull
+field string --fieldName descripcion
+field string --fieldName imagen
+help enum
+help enum type
+enum type --class ~.domain.enumerated.Detalles
+enum constant --name Verde
+enum constant --name Rojo
+enum constant --name Azul
+enum constant --name S
+enum constant --name M
+enum constant --name L
+enum constant --name XL
+help field enum
+field enum --fieldName detalles --type ~.domain.enumerated.Detalles --enumType STRING --class ~.domain.Producto
+help field date
+field date --fieldName inicio --type java.util.Date
+field date --fieldName fin --type java.util.Date
+help field number
+field number --fieldName precio --type java.lang.Float --notNull --value 0.0
+entity --class ~.domain.Categoria --testAutomatically
+field string --fieldName nombre --notNull
+help field set
+field set --fieldName productos --type ~.domain.Producto
+entity --class ~.domain.Cliente --testAutomatically
+field string --fieldName username --notNull
+field string --fieldName password --notNull
+field string --fieldName nombreCompleto
+field string --fieldName direccionPostal
+enum type --class ~.domain.enumerated.Paises
+enum constant --name Spain
+enum constant --name Portugal
+field enum --fieldName pais --type ~.domain.enumerated.Paises --enumType STRING --class ~.domain.Cliente
+field string --fieldName telefono
+field boolean --fieldName activo --value true --notNull
+entity --class ~.domain.Pedido --testAutomatically
+field string --fieldName identificadorPedido --notNull
+field reference --fieldName cliente --type ~.domain.Cliente --notNull
+enum type --class ~.domain.enumerated.EstadosPedido
+enum constant --name SinConfirmar
+enum constant --name Confirmado
+enum constant --name Aprobado
+enum constant --name Completado
+field enum --fieldName estado --type ~.domain.enumerated.EstadosPedido --enumType STRING --class ~.domain.Pedido
+enum type --class ~.domain.enumerated.MetodosPagoPedido
+enum constant --name Transferencia
+enum constant --name Tarjeta
+enum constant --name PayPal
+enum constant --name Reembolso
+field enum --fieldName metodoPago --type ~.domain.enumerated.MetodosPagoPedido --enumType STRING --class ~.domain.Pedido
+field number --fieldName total --type java.lang.Float
+entity --class ~.domain.LineaPedido --testAutomatically
+hint relationships
+field set --fieldName lineasPedido --class ~.domain.Pedido --type ~.domain.LineaPedido --mappedBy pedido --cardinality ONE_TO_MANY
+field reference --fieldName pedido  --class ~.domain.LineaPedido --type ~.domain.Pedido --notNull --cardinality MANY_TO_ONE
+field reference --fieldName producto --type ~.domain.Producto --notNull
+field number --fieldName cantidad --type int --notNull --min 1 --max 99 --value 1
+field number --fieldName precio --type java.lang.Float --notNull
+field string --fieldName nombre
+backup
+// script --file practica05.roo
+hint
+hint controllers
+help controller
+help web mvc
+help web mvc setup
+web mvc setup
+help web mvc all
+web mvc all --package ~.web
+perform eclipse
+hint finders
+help finder
+help finder list
+finder list --class ~.domain.Producto
+finder list --class ~.domain.Producto --filter precio
+finder list --class ~.domain.Producto --filter precio --depth 2
+help finder add
+finder list --class ~.domain.Producto --filter precio
+finder add --finderName findProductoesByPrecioBetween --class ~.domain.Producto
+finder list --class ~.domain.Pedido
+finder list --class ~.domain.Pedido --depth 2 --filter Estado
+finder list --class ~.domain.Pedido --depth 3 --filter findPedidoesByTotalGreaterThanEqualsAndEstado
+finder add --finderName findPedidoesByTotalGreaterThanEqualsAndEstadoAndMetodoPago --class ~.domain.Pedido
+backup
+// script --file practica06.roo
+perform tests
+selenium test --controller ~.web.CategoriaController
+selenium test --controller ~.web.ClienteController
+selenium test --controller ~.web.LineaPedidoController
+selenium test --controller ~.web.PedidoController
+selenium test --controller ~.web.ProductoController
+backup
+// script --file practica07.roo
+//help theme
+//theme list
+//theme install --id gvnix
+//theme list
+//theme install --id cit
+//theme list
+//backup
+// script --file practica08.1.roo
+// La práctica anterior se comenta porque no se mantiene para las siguientes prácticas.
+web mvc pattern master --class ~.web.PedidoController --name pedido --type register
+web mvc pattern detail --class ~.web.PedidoController --name pedido --field lineasPedido --type tabular
+//quit
+// Se debe reiniciar la consola para aplicar los cambios introducidos por el patrón detalle.
+web mvc pattern master --class ~.web.ProductoController --name ficha --type register
+web mvc pattern master --class ~.web.ProductoController --name productos --type tabular
+web mvc pattern master --class ~.web.ClienteController --name clientes --type tabular
+perform eclipse
+backup
+// script --file practica08.2.roo
+help menu
+help menu setup
+menu setup
+help menu tree
+menu tree
+menu entry info --id c_producto
+menu entry add --label "Condiciones de compra" --url conditions
+menu tree
+menu entry info --id c_page
+menu entry update --id c_page --label "Sobre nosotros"
+web mvc install view --path / --title "Quienes somos" --viewName aboutUs
+menu tree
+menu entry move --id i_view_aboutus_id --before i_page_condiciones_de_compra
+menu tree
+web mvc install view --path / --title "Metodos de pago" --viewName paymentMethods
+menu tree
+menu entry move --id i_view_paymentmethods_id --before i_page_condiciones_de_compra
+menu tree
+menu entry info --id c_seleniumtests
+menu entry visibility --id c_seleniumtests --hidden true
+menu entry info --id c_seleniumtests
+menu tree
+menu entry visibility --id c_view --hidden true
+menu entry info --id c_view
+backup
+// script --file practica09.roo
+help occ checksum
+help occ checksum set
+occ checksum set --entity ~.domain.Pedido
+perform eclipse
+help occ checksum all
+occ checksum all
+//quit
+// Salimos de la consola para corregir los errores de compilación de los ITDs y para que se apliquen algunos cambios en las vistas
+perform eclipse
+backup
+// script --file practica10.roo
+help web mvc dialog
+help web mvc dialog setup
+web mvc dialog setup
+perform eclipse
+web mvc dialog exception list
+help web mvc dialog exception add
+web mvc dialog exception add --exception java.lang.Exception --title "Ha ocurrido un error" --description "Se ha producido un error deconocido" --language es
+web mvc dialog exception set language --exception java.lang.Exception --title "Error" --description "Unknown error" --language en
+web mvc dialog exception set language --exception java.lang.Exception --title "Error" --description "S'ha produit un error desconegut." --language ca
+help web mvc dialog add
+web mvc dialog add --class ~.web.PedidoController --name orderinstructions
+//quit
+// Reiniciamos la consola para que se apliquen cambios en los controladores.
+backup
+// script --file practica11.roo
+help web mvc install language
+web mvc install language --code es
+web mvc install language --code ca
+web mvc install language --code de
+backup
+// script --file practica12.roo
+help web report
+help web report setup
+web report setup
+help web report add
+web report add --controller ~.web.PedidoController --reportName informepedidos --format pdf,xls,html,csv
+web report add --controller ~.web.PedidoController --reportName pedidoreport
+// Creamos el subreport con iReports y lo añadimos al report generado por el comando anterior
+menu entry visibility --id i_pedido_pedidoreport_report --hidden true
+perform eclipse
+backup
+// script --file practica13.roo
