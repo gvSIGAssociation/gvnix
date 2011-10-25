@@ -249,7 +249,7 @@
     que toma como nombre el valor del parámetro <emphasis>name</emphasis> dado
     en el comando y se crea una JSPx en <emphasis>WEB-INF/dialogs</emphasis>
     con el mismo nombre dado al método que se usará como contenido del diálogo
-    modal.<programlisting><emphasis role="bold">roo-gvNIX&gt;</emphasis> web mvc dialog message add --class ~.web.PetController --name petsdialog</programlisting>En
+    modal.<programlisting><emphasis role="bold">roo-gvNIX&gt;</emphasis> web mvc dialog add --class ~.web.PetController --name petsdialog</programlisting>En
     el ejemplo anterior se está definiendo el diálogo modal petsdialog que
     será mostrado por el controlador PetController. El método que facilita
     esta función en el controlador tiene como signatura:</para>
@@ -363,7 +363,7 @@
             <para>Añadir un diálogo modal a la apliacaión mediante
             "<emphasis>web mvc dialog message add</emphasis>"</para>
 
-            <programlisting>web mvc dialog message add --class ~.web.OwnerController --name confirmgopets</programlisting>
+            <programlisting>web mvc dialog add --class ~.web.OwnerController --name confirmgopets</programlisting>
 
             <para>Esto nos genera un método <emphasis>confirmgopets</emphasis>
             disponible en <emphasis>OwnerController</emphasis> y una jspx base
@@ -394,7 +394,7 @@ public String update(@Valid Owner owner, BindingResult bindingResult, Model uiMo
 
     <emphasis role="bold">HashMap&lt;String, Object&gt; dialogParams = new HashMap&lt;String, Object&gt;();
     dialogParams.put("petsFormLink", "/pets?form");
-    confirmgopets(DialogType.Info, "/WEB-INF/views/owners/confirmgopets.jspx", "message_confirm_action_title", "message_confirm_action_desc", dialogParams, httpServletRequest);</emphasis>
+    confirmgopets(DialogType.Info, "message_confirm_action_title", "message_confirm_action_desc", dialogParams, httpServletRequest);</emphasis>
 
     return "redirect:/owners/" + encodeUrlPathSegment(owner.getId().toString(), httpServletRequest);
 }</programlisting>
@@ -460,7 +460,7 @@ public String update(@Valid Owner owner, BindingResult bindingResult, Model uiMo
             <para>Añadir un diálogo modal a la apliacaión mediante
             "<emphasis>web mvc dialog message add</emphasis>"</para>
 
-            <programlisting>web mvc dialog message add --class ~.web.OwnerController --name createPetInModal</programlisting>
+            <programlisting>web mvc dialog add --class ~.web.OwnerController --name createPetInModal</programlisting>
 
             <para>Esto nos genera un método <emphasis>confirmgopets</emphasis>
             disponible en <emphasis>OwnerController</emphasis> y una jspx base
@@ -487,7 +487,7 @@ public String create(@Valid Owner owner, BindingResult bindingResult, Model uiMo
     Pet firstPetOfOwner = new Pet();
     dialogParams.put("pet", firstPetOfOwner);
     dialogParams.put("pettypes",  Arrays.asList(PetType.class.getEnumConstants()));
-    createPetInModal(DialogType.Info, "/WEB-INF/views/pets/createPetInModal.jspx", "message_create_pet_title", "message_create_pet_desc", dialogParams, httpServletRequest);</emphasis>
+    createPetInModal(DialogType.Info, "message_create_pet_title", "message_create_pet_desc", dialogParams, httpServletRequest);</emphasis>
 
     return "redirect:/owners/" + encodeUrlPathSegment(owner.getId().toString(), httpServletRequest);
 }</programlisting>
