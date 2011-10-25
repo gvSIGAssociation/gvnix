@@ -4,22 +4,19 @@
   <!--
       This is a sample JSPx of a possible modal dialog.
 
-      The tag <util:message-box/> sets in scope 'request' these attributes:
+      The tag <dialog:message-box/> sets in scope 'request' these attributes:
         - titleCode: i18n key in messages bundles
         - descriptionCode: i18n key in messages bundles
         - dialogParams: HashMap<String, Object> so you have available all those attributes
                         you could need to render your modal dialog. Access to them with ${dialogParams['foo']}
         - dialogId: HTML id of the modal dialog
    -->
-  <spring:message var="title" code="${titleCode}" htmlEscape="false"/>
-  <util:panel id="title" title="${title}">
-    <h2>${fn:escapeXml(title)}</h2>
-    <p>
-      <spring:message code="${descriptionCode}" />
-    </p>
-    <div class="closeMessage">
-      <button class="boton" dojoType="dijit.form.Button" type="button"
-        onClick="dijit.byId('${dialogId}').hide();">Close</button>
-    </div>
-  </util:panel>
+   <p>
+     <spring:message code="${descriptionCode}" text="This is the dialog description. Set the right one in i18n message bundles" htmlEscape="false"/>
+   </p>
+   <div class="closeMessage">
+     <spring:message var="closeButtonValue" code="button_close"/>
+     <button class="boton" dojoType="dijit.form.Button" type="button"
+       onClick="dijit.byId('${dialogId}').hide();">${closeButtonValue}</button>
+   </div>
 </div>
