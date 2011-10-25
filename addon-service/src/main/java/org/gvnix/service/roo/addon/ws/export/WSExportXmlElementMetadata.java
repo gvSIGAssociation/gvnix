@@ -99,7 +99,7 @@ public class WSExportXmlElementMetadata extends
                     PhysicalTypeCategory.ENUMERATION)) {
 
                 // Add XmlElement annotation for each field
-                List<DeclaredFieldAnnotationDetails> declaredFields = getXmlElementFieldAnnotations(
+                List<DeclaredFieldAnnotationDetails> declaredFields = getXmlElementAnnotations(
                         fields, javaParserService);
                 for (DeclaredFieldAnnotationDetails declaredField : declaredFields) {
                     builder.addFieldAnnotation(declaredField);
@@ -161,7 +161,7 @@ public class WSExportXmlElementMetadata extends
      *            Fields to be exported
      * @return All the annotated @XmlElement fields (may be empty)
      */
-    public List<DeclaredFieldAnnotationDetails> getXmlElementFieldAnnotations(
+    public List<DeclaredFieldAnnotationDetails> getXmlElementAnnotations(
             List<FieldMetadata> fields, JavaParserService javaParserService) {
 
         // Result list of annotations for fields
@@ -253,7 +253,7 @@ public class WSExportXmlElementMetadata extends
         } else {
 
             // Is not an enumeration: add XmlAccessorType with field access type
-            result.add(getXmlAccesorType());
+            result.add(getXmlAccesorTypeAnnotation());
         }
 
         return result;
@@ -360,7 +360,7 @@ public class WSExportXmlElementMetadata extends
      * 
      * @return XmlAccessorType annotation
      */
-    protected AnnotationMetadata getXmlAccesorType() {
+    protected AnnotationMetadata getXmlAccesorTypeAnnotation() {
 
         // @XmlAccessorType always is field access type
         List<AnnotationAttributeValue<?>> xmlAccessorTypeAttrs = new ArrayList<AnnotationAttributeValue<?>>();

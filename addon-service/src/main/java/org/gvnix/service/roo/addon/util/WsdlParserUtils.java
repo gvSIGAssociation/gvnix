@@ -1217,7 +1217,7 @@ public class WsdlParserUtils {
     /**
      * Check connection and WSDL format from the given url.<br/>
      * If you need SSL support acceding to WSLD you should use
-     * {@link SecurityService#loadWsdlUrl(String)}
+     * {@link SecurityService#getWsdl(String)}
      * 
      * @param url
      *            URL to check

@@ -164,15 +164,12 @@ public interface WSConfigService {
      * </p>
      * 
      * @param wsdlLocation
-     *            WSDL file location.
+     *            WSDL file location
      * @param wsdlDocument
-     *            WSDL file.
-     * @param type
-     *            Communication sense type
+     *            WSDL file
      * @return
      */
-    public boolean addExportLocation(String wsdlLocation,
-            Document wsdlDocument, WsType type);
+    public boolean addWsdlLocation(String wsdlLocation, Document wsdlDocument);
 
     /**
      * Imports a Web Service to class.
@@ -201,5 +198,10 @@ public interface WSConfigService {
      * @throws IOException
      */
     public void mvn(String parameters, String message) throws IOException;
+
+    /**
+     * Remove Cxf wsdl2java plugin execution from pom.xml.
+     */
+    public void disableWsdlLocation();
 
 }

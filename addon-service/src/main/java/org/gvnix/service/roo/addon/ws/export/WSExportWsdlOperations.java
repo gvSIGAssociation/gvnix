@@ -23,33 +23,29 @@ import java.util.List;
 import org.springframework.roo.model.JavaType;
 
 /**
- * Operation for export a web service base on a WSDL declaration (Contract
- * First).
+ * Export web services operation from WSDL (Contract First).
  * 
  * @author Ricardo García at <a href="http://www.disid.com">DiSiD Technologies
  *         S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria
  *         d'Infraestructures i Transport</a>
+ * @See {@link WSExportWsdlListener}
+ * @see {@link WSExportWsdlConfigService}
  */
 public interface WSExportWsdlOperations {
 
     /**
-     * Export WSDL Web Service Contract First to Java code using GvNIX
-     * annotations.
+     * Generate gvNIX server annotated java code from WSDL.
+     * 
+     * <p>
+     * Generate WSDL javas with wsdl2java maven plugin at target folder and
+     * monitoring this folder to create gvNIX javas into src folder from
+     * generated ones.
+     * </p>
      * 
      * @param url
      *            from WSDL file to export.
      * @return implementation classes
      */
-    public List<JavaType> exportWSDL2Java(String url);
+    public List<JavaType> exportWsdl(String url);
 
-    /**
-     * Create new files with '@GvNIX' annotations in SRC_MAIN_JAVA.
-     * 
-     * TODO: To be removed. This method is used internally by service and
-     * depends on a sequence of calls, so its STRONGLY RECOMENDED remove it from
-     * interface and maintain it in implementation
-     * 
-     * @return implementation classes
-     */
-    public List<JavaType> updateAnnotationsToGvNIX();
 }

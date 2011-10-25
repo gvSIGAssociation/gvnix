@@ -312,7 +312,7 @@ public final class WSServiceSecurityMetadataProvider extends
         String wsdlLocation = wsImportMetadata.getWsdlLocation();
 
         // loads wsdl
-        Document wsdl = securityService.loadWsdlUrl(wsdlLocation);
+        Document wsdl = securityService.getWsdl(wsdlLocation);
 
         Assert.notNull(wsdl, "Can't get WSDl from ".concat(wsdlLocation));
 

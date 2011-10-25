@@ -236,7 +236,7 @@ public interface JavaParserService {
      * @param enumConstantsList
      *            List of enum fields defined in class.
      */
-    public void createGvNIXWebServiceClass(JavaType javaType,
+    public void createGvNixWebServiceClass(JavaType javaType,
             List<AnnotationMetadata> typeAnnotationList,
             GvNIXAnnotationType gvNIXAnnotationType,
             List<FieldMetadata> declaredFieldList,

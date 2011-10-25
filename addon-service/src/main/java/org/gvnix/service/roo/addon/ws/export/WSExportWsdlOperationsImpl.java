@@ -23,7 +23,6 @@ import java.util.List;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.springframework.roo.model.JavaType;
 
 /**
@@ -45,43 +44,16 @@ public class WSExportWsdlOperationsImpl implements WSExportWsdlOperations {
     /**
      * {@inheritDoc}
      */
-    public List<JavaType> exportWSDL2Java(String url) {
+    public List<JavaType> exportWsdl(String url) {
 
-        // Generate java files for WSDL using maven wsdl2java plugin.
-        // Generated are paced in GENERATED_CXF_SOURCES_DIR.
-        wSExportWsdlConfigService.exportWSDLWebService(url,
-                WsType.EXPORT_WSDL);
+        // Create WSDL javas with wsdl2java plugin at GENERATED_CXF_SOURCES_DIR
+        wSExportWsdlConfigService.generateJavaFromWsdl(url);
 
-        // Add GENERATED_CXF_SOURCES_DIR roo file monitor for get notification
-        // of all files create by maven plugin
-        wSExportWsdlConfigService
-                .monitoringGeneratedSourcesDirectory(GENERATED_CXF_SOURCES_DIR);
+        // Monitoring GENERATED_CXF_SOURCES_DIR created files
+        wSExportWsdlConfigService.monitorFolder(GENERATED_CXF_SOURCES_DIR);
 
-        // WSExporWsdlListerner register all created files into
-        // GENERATED_CXF_SOURCES_DIR,
-        // Identify file type and call to wSExportWsdlConfigService for every
-        // single file.
-
-        // After maven wsdl2java plugin finished (its is supposed to finish
-        // before this command [!!!]) this command copy generated files into
-        // src folder and annotated with GvNIX classes.
-        return updateAnnotationsToGvNIX();
-
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * TODO this method must changed to private or removed
-     * 
-     * This method calls
-     * {@link WSExportWsdlConfigService#generateGvNIXWebServiceFiles()}
-     * 
-     * @return implementation classes
-     */
-    public List<JavaType> updateAnnotationsToGvNIX() {
-
-        return wSExportWsdlConfigService.generateGvNIXWebServiceFiles();
+        // Generate gvNIX javas into src folder from monitored files
+        return wSExportWsdlConfigService.createGvNixClasses();
     }
 
 }

@@ -21,7 +21,6 @@ package org.gvnix.service.roo.addon.security;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore;
@@ -32,16 +31,14 @@ import java.util.logging.Logger;
 import javax.net.ssl.X509TrustManager;
 
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
 
 /**
  * Implementation of X509TrustManager in order to deal with SSL connection
  * against secure servers that uses certificates not included in the JVM
- * trustcacerts keystore (Usually in $JAVA_HOME/jre/lib/security/cacerts)
+ * keystore (Usually in $JAVA_HOME/jre/lib/security/cacerts)
  * 
  * 
  * @author Óscar Rovira ( orovira at disid dot com ) at <a
@@ -51,6 +48,7 @@ import org.springframework.roo.support.util.FileCopyUtils;
  * 
  */
 public class GvNix509TrustManager implements X509TrustManager {
+
     private static Logger logger = Logger.getLogger(GvNix509TrustManager.class
             .getName());
 
@@ -77,66 +75,46 @@ public class GvNix509TrustManager implements X509TrustManager {
     }
 
     /**
-     * Import certs in <code>this.chain</code> to the keystore given by the file
-     * passed
+     * Import certs in this.chain to the keystore given by the file passed.
      * 
      * @param host
-     * @param keystoreFile
-     * @param passphrase
+     * @param keystore
+     * @param pass
      * @return
      * @throws Exception
      */
-    public X509Certificate[] addCerts(String host, File keystoreFile,
-            char[] passphrase) throws Exception {
+    public X509Certificate[] addCerts(String host, File keystore, char[] pass)
+            throws Exception {
 
-        // Specific Exceptions thrown in this code
-        // NoSuchAlgorithmException, KeyStoreException, CertificateException,
-        // IOException
+        // Specific Exceptions thrown in this code: NoSuchAlgorithmException,
+        // KeyStoreException, CertificateException, IOException
 
         X509Certificate[] chain = this.chain;
         if (chain == null) {
             return null;
         }
 
-        KeyStore ks = loadKeyStore(keystoreFile, passphrase);
+        KeyStore ks = loadKeyStore(keystore, pass);
 
         String alias = host;
-
-        X509Certificate cert;
         for (int i = 0; i < chain.length; i++) {
-            cert = chain[i];
+
+            X509Certificate cert = chain[i];
             alias = alias.concat("-" + (i + 1));
             ks.setCertificateEntry(alias, cert);
             alias = host;
-            // TODO: just in case we want to show a message in the shell prompt.
-            // private static final char[] HEXDIGITS =
-            // "0123456789abcdef".toCharArray();
-            // private static String toHexString(byte[] bytes) {
-            // StringBuilder sb = new StringBuilder(bytes.length * 3);
-            // for (int b : bytes) {
-            // b &= 0xff;
-            // sb.append(HEXDIGITS[b >> 4]);
-            // sb.append(HEXDIGITS[b & 15]);
-            // sb.append(' ');
-            // }
-            // return sb.toString();
-            // }
-            // MessageDigest sha1 = MessageDigest.getInstance("SHA1");
-            // MessageDigest md5 = MessageDigest.getInstance("MD5");
-            // cert.getSubjectDN() + cert.getIssuerDN() +
-            // toHexString(sha1.digest()) + toHexString(md5.digest())
-
         }
-        if (keystoreFile.canWrite()) {
-            OutputStream out = new FileOutputStream(keystoreFile);
-            ks.store(out, passphrase);
+
+        if (keystore.canWrite()) {
+
+            OutputStream out = new FileOutputStream(keystore);
+            ks.store(out, pass);
             out.close();
-            // logger.warning(keystoreFile.getAbsolutePath().concat(
-            // " has bean updated"));
+
         } else {
+
             throw new Exception(
-                    keystoreFile
-                            .getAbsolutePath()
+                    keystore.getAbsolutePath()
                             .concat(" is not writable. ")
                             .concat("You should to import needed certificates in your")
                             .concat(" JVM trustcacerts keystore.\n")
@@ -166,67 +144,41 @@ public class GvNix509TrustManager implements X509TrustManager {
     public static void saveCertFile(String alias, X509Certificate cert,
             FileManager fileManager, PathResolver pathResolver)
             throws Exception {
+
         String aliasCerFileName = alias.concat(".cer");
         String cerFilePath = pathResolver.getIdentifier(
                 Path.SRC_MAIN_RESOURCES, aliasCerFileName);
 
         if (!fileManager.exists(cerFilePath)) {
+
             File cerFile = new File(cerFilePath);
             OutputStream os = new FileOutputStream(cerFile);
             os.write(cert.getEncoded());
             os.close();
             logger.info("Created ".concat(Path.SRC_MAIN_RESOURCES.getName())
                     .concat("/").concat(aliasCerFileName));
-            // MutableFile cerFile = fileManager.createFile(cerFilePath);
-            // FileCopyUtils.copy(cert.getEncoded(), cerFile.getOutputStream());
         }
     }
 
     /**
-     * Copy a file of a keystore to another keystore file. Usually used to
-     * replace the JVM cacerts by a custom created keystore
-     * 
-     * @param gvNixKeystore
-     * @param jvmKeystore
-     * @return true if JVM keystore could be replaced, false otherwise
-     * @throws IOException
-     */
-    public static boolean replaceJVMCacerts(File gvNixKeystore,
-            File jvmKeystore, FileManager fileManager) throws IOException {
-        if (jvmKeystore.isFile() && jvmKeystore.canWrite()) {
-            MutableFile jvmCacerts = fileManager.updateFile(jvmKeystore
-                    .getAbsolutePath());
-            InputStream in = new FileInputStream(gvNixKeystore);
-            FileCopyUtils.copy(in, jvmCacerts.getOutputStream());
-            return true;
-        } else if (jvmKeystore.canWrite()) {
-            MutableFile jvmCacerts = fileManager.createFile(jvmKeystore
-                    .getAbsolutePath());
-            InputStream in = new FileInputStream(gvNixKeystore);
-            FileCopyUtils.copy(in, jvmCacerts.getOutputStream());
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Loads the keystore in the given file using passphrase as keystore
-     * password
+     * Loads keystore in the given file using passphrase as keystore password.
      * 
      * @param keystore
-     * @param passphrase
+     * @param pass
      * @return
      * @throws Exception
      *             will be a IOExecption if the given password is a wrong one
      */
-    public static KeyStore loadKeyStore(File keystore, char[] passphrase)
+    public static KeyStore loadKeyStore(File keystore, char[] pass)
             throws Exception {
-        Assert.notNull(keystore, "keystore must be a vaild keystore file");
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
+        Assert.notNull(keystore, "keystore must be a vaild keystore file");
         InputStream in = new FileInputStream(keystore);
-        ks.load(in, passphrase);
+
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        ks.load(in, pass);
         in.close();
+
         return ks;
     }
 

@@ -283,7 +283,7 @@ public class ServiceCommands implements CommandMarker {
             @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
 
         List<JavaType> serviceClasses = wSExportWsdlOperations
-                .exportWSDL2Java(url);
+                .exportWsdl(url);
         StringBuilder sb = new StringBuilder();
         if (serviceClasses == null || serviceClasses.size() == 0) {
             return null;

@@ -24,8 +24,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,8 +121,7 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     /**
-     * Creates <code>client-config.wssd</code> file in application resources
-     * folder
+     * Creates client-config.wssd file in application resources folder.
      */
     private void createAxisClientConfigFile() {
         String axisClientConfigPath = getAxisClientConfigPath();
@@ -178,211 +183,291 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     /**
-     * {@inheritDoc}
+     * Parse a WSDL location and if it's needed it manage keystore certs.
+     * 
      * <p>
-     * First it tries to parse WSLD from the given URL. If
+     * First it tries to parse WSDL from the given URL. If
      * <code>SSLHandshakeException</code> is catch because our JVM installation
      * is not confident with the host server certificate where WSDL is available
-     * the method tries to get the certificates in the certificates chain of the
-     * host server and import them to:
-     * <ol>
-     * <li>a custom keystore in <code>SRC_MAIN_RESOURCES/gvnix-cacerts</code></li>
-     * <li>the JVM cacerts keystore in
-     * <code>$JAVA_HOME/jre/lib/security/cacerts</code>. Here we can have a
-     * problem if JVM <code>cacerts</code> file is not writable by the user due
-     * to file permissions. In this case We throw an exception informing about
-     * the error.</li>
-     * </ol>
-     * With that operation we can try again to get the WSDL.<br/>
+     * the method tries install required certificates with
+     * {@link SecurityServiceImpl#installCertificates(String, String)} and retry
+     * to parse WSDL from URL.
+     * </p>
      * 
-     * Also it exports the chain certificates to <code>.cer</code> files in
-     * <code>SRC_MAIN_RESOURCES</code>, so the developer can distribute them for
-     * its installation in other environments or just in case we reach the
-     * problem with the JVM <code>cacerts</code> file permissions.
-     * 
-     * @see GvNix509TrustManager#saveCertFile(String, X509Certificate,
-     *      FileManager, PathResolver)
-     * @see <a href=
-     *      "http://download.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html"
-     *      >Java SE keytool</a>.
-     *      </p>
+     * @param loc
+     *            Location
+     * @param pass
+     *            Password
+     * @return WSDL document
+     * @throws Exception
      */
-    public Document parseWsdlFromUrl(String urlStr, String keyStorePassphrase)
-            throws Exception {
+    protected Document getWsdl(String loc, String pass) throws Exception {
 
         try {
+
             // Parse the wsdl location to a DOM document
-            Document wsdl = XmlUtils.getDocumentBuilder().parse(urlStr);
+            Document wsdl = XmlUtils.getDocumentBuilder().parse(loc);
             Assert.notNull(wsdl, "No valid document format");
 
             return wsdl;
 
         } catch (SSLHandshakeException e) {
 
-            // Create a SSL context
-            SSLContext context = SSLContext.getInstance("TLS");
-            TrustManagerFactory tmf = TrustManagerFactory
-                    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            // JVM is not confident with WSDL host server certificate
+            return installCertificates(loc, pass);
 
-            // passphrase of the keystore
-            char[] passphrase = (StringUtils.hasText(keyStorePassphrase) ? keyStorePassphrase
-                    .toCharArray() : "changeit".toCharArray());
-
-            File keystore = createCacertsBasedOnJvmCacerts();
-            Assert.isTrue(keystore.isFile(), "JVM cacerts file does not exist");
-
-            tmf.init(GvNix509TrustManager.loadKeyStore(keystore, passphrase));
-
-            X509TrustManager defaultTrustManager = (X509TrustManager) tmf
-                    .getTrustManagers()[0];
-            GvNix509TrustManager tm = new GvNix509TrustManager(
-                    defaultTrustManager);
-            context.init(null, new TrustManager[] { tm }, null);
-            SSLSocketFactory factory = context.getSocketFactory();
-
-            URL url = new URL(urlStr);
-
-            String host = url.getHost();
-            int port = url.getPort() == -1 ? 443 : url.getPort();
-            SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
-            socket.setSoTimeout(10000);
-            Document parsedDoc = null;
-            InputStream uriStream = null;
-            try {
-                socket.startHandshake();
-                URLConnection connection = url.openConnection();
-                if (connection instanceof HttpsURLConnection) {
-                    ((HttpsURLConnection) connection)
-                            .setSSLSocketFactory(factory);
-                }
-
-                uriStream = connection.getInputStream();
-                parsedDoc = XmlUtils.getDocumentBuilder().parse(uriStream);
-
-                socket.close();
-            } catch (SSLException e1) {
-                // Get needed certificates for this host
-                getNeededCertificates(tm, host, keystore, passphrase);
-                parsedDoc = parseWsdlFromUrl(urlStr, keyStorePassphrase);
-            } catch (IOException ioe) {
-                StringBuffer exceptionMessage = new StringBuffer(
-                        "There is not access to the WSDL.");
-                X509Certificate[] neededCertificates = getNeededCertificates(
-                        tm, host, keystore, passphrase);
-                if (neededCertificates != null) {
-                    exceptionMessage
-                            .append(" Maybe the emited certificate does not match the hostname where WSDL resides.\n");
-                    // X.500 distinguished name
-                    String certDN = null;
-                    // X.500 common name from distinguished name
-                    String certCN = null;
-                    for (X509Certificate x509Certificate : neededCertificates) {
-                        certDN = x509Certificate.getSubjectX500Principal()
-                                .getName();
-                        certCN = getCNfromCertDN(certDN);
-                        if (certCN != null) {
-                            exceptionMessage.append(" * Possible hostname: "
-                                    .concat(certCN).concat("\n"));
-                        } else
-                            exceptionMessage
-                                    .append(" * Possible hostname (check Cert. Distinguished name): "
-                                            .concat(certDN).concat("\n"));
-                    }
-                }
-
-                throw new IllegalStateException(exceptionMessage.toString());
-            }
-
-            Assert.notNull(parsedDoc, "No valid document format");
-            return parsedDoc;
         } catch (SAXException e) {
 
             throw new IllegalStateException("The format of the wsdl has errors");
 
         } catch (IOException e) {
+
             throw new IllegalStateException("There is not access to the wsdl.");
         }
     }
 
     /**
-     * Given a X.500 Subject Distinguished name it returns the Common Name, if
-     * CN exists, null otherwise
+     * Get certificates in the chain of the host server and import them.
      * 
-     * @param certDN
-     * @return
+     * <p>
+     * Tries to get the certificates in the certificates chain of the host
+     * server and import them to:
+     * <ol>
+     * <li>A custom keystore in <code>SRC_MAIN_RESOURCES/gvnix-cacerts</code></li>
+     * <li>The JVM cacerts keystore in
+     * <code>$JAVA_HOME/jre/lib/security/cacerts</code>. Here we can have a
+     * problem if JVM <code>cacerts</code> file is not writable by the user due
+     * to file permissions. In this case we throw an exception informing about
+     * the error.</li>
+     * </ol>
+     * </p>
+     * 
+     * <p>
+     * With that operation we can try again to get the WSDL.<br/>
+     * 
+     * Also it exports the chain certificates to <code>.cer</code> files in
+     * <code>SRC_MAIN_RESOURCES</code>, so the developer can distribute them for
+     * its installation in other environments or just in case we reach the
+     * problem with the JVM <code>cacerts</code> file permissions.
+     * </p>
+     * 
+     * @see GvNix509TrustManager#saveCertFile(String, X509Certificate,
+     *      FileManager, PathResolver)
+     * @see <a href=
+     *      "http://download.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html"
+     *      >Java SE keytool</a>.
      */
-    private String getCNfromCertDN(String certDN) {
-        int i = 0;
-        i = certDN.indexOf("CN=");
-        if (i == -1) {
-            return null;
+    protected Document installCertificates(String loc, String pass)
+            throws NoSuchAlgorithmException, KeyStoreException, Exception,
+            KeyManagementException, MalformedURLException, IOException,
+            UnknownHostException, SocketException, SAXException {
+
+        // Passphrase of the keystore: "changeit" by default
+        char[] passArray = (StringUtils.hasText(pass) ? pass.toCharArray()
+                : "changeit".toCharArray());
+
+        // Get the project keystore and copy it from JVM if not exists
+        File keystore = getProjectKeystore();
+
+        // Get SSL socket replacing default trust manager with our trust manager
+        SSLSocketFactory factory = getGvNixSocketFactory(passArray, keystore);
+
+        // Open URL location (default 443 port if not defined)
+        URL url = new URL(loc);
+        String host = url.getHost();
+        int port = url.getPort() == -1 ? 443 : url.getPort();
+        SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
+        socket.setSoTimeout(10000);
+
+        Document doc = null;
+        try {
+
+            socket.startHandshake();
+            URLConnection connection = url.openConnection();
+            if (connection instanceof HttpsURLConnection) {
+                ((HttpsURLConnection) connection).setSSLSocketFactory(factory);
+            }
+
+            doc = XmlUtils.getDocumentBuilder().parse(
+                    connection.getInputStream());
+
+            socket.close();
+
+        } catch (SSLException ssle) {
+
+            // Get needed certificates for this host
+            getCerts(host, keystore, passArray);
+            doc = getWsdl(loc, pass);
+
+        } catch (IOException ioe) {
+
+            invalidHostCert(passArray, keystore, host);
         }
-        // get the remaining DN without CN=
-        String fromCN = certDN.substring(i);
-        i = fromCN.indexOf(",");
-        if (i == -1) {
-            return fromCN.substring(3);
-        }
-        return fromCN.substring(3, i);
+
+        Assert.notNull(doc, "No valid document format");
+        return doc;
     }
 
     /**
-     * Stores in keystore needed X509 certificates.
+     * Get SSL socket factory with gvNIX trust manager.
+     * 
+     * @param pass
+     *            Password
+     * @param keystore
+     *            Keystore
+     * @return SSL socket factory with gvNIX trust manager
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws Exception
+     * @throws KeyManagementException
+     */
+    protected SSLSocketFactory getGvNixSocketFactory(char[] pass, File keystore)
+            throws NoSuchAlgorithmException, KeyStoreException, Exception,
+            KeyManagementException {
+
+        SSLContext ctx = SSLContext.getInstance("TLS");
+        ctx.init(null,
+                new TrustManager[] { getGvNixTrustManager(pass, keystore) },
+                null);
+
+        return ctx.getSocketFactory();
+    }
+
+    /**
+     * Get gvNIX trust manager.
+     * 
+     * @param pass
+     *            Password
+     * @param keystore
+     *            Keystore
+     * @return gvNIX trust manager
+     * @throws NoSuchAlgorithmException
+     * @throws KeyStoreException
+     * @throws Exception
+     */
+    protected GvNix509TrustManager getGvNixTrustManager(char[] pass,
+            File keystore) throws NoSuchAlgorithmException, KeyStoreException,
+            Exception {
+
+        TrustManagerFactory tmf = TrustManagerFactory
+                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(GvNix509TrustManager.loadKeyStore(keystore, pass));
+        X509TrustManager defTrust = (X509TrustManager) tmf.getTrustManagers()[0];
+
+        return new GvNix509TrustManager(defTrust);
+    }
+
+    /**
+     * Throw an illegal state exception with a invalid host cert message.
+     * 
+     * @param pass
+     *            Password
+     * @param keystore
+     *            Keystore
+     * @param host
+     *            Host destination
+     */
+    protected void invalidHostCert(char[] pass, File keystore, String host) {
+
+        StringBuffer msg = new StringBuffer("There is not access to the WSDL.");
+        X509Certificate[] certs = getCerts(host, keystore, pass);
+        if (certs != null) {
+
+            msg.append(" Maybe the emited certificate does not match the hostname where WSDL resides.\n");
+            for (X509Certificate x509Certificate : certs) {
+
+                // X.500 distinguished name
+                String dn = x509Certificate.getSubjectX500Principal().getName();
+
+                // X.500 common name from distinguished name
+                String cn = getCn(dn);
+                if (cn != null) {
+                    msg.append(" * Possible hostname: ".concat(cn).concat("\n"));
+                } else
+                    msg.append(" * Possible hostname (check Cert. Distinguished name): "
+                            .concat(dn).concat("\n"));
+            }
+        }
+
+        throw new IllegalStateException(msg.toString());
+    }
+
+    /**
+     * Given a X.500 Subject Distinguished name it returns the Common Name.
+     * 
+     * <p>
+     * If CN exists, null otherwise
+     * </p>
+     * 
+     * @param dn
+     *            Distinguished name
+     * @return Common name if exists, null otherwise
+     */
+    private String getCn(String dn) {
+
+        int i = dn.indexOf("CN=");
+        if (i == -1) {
+            return null;
+        }
+
+        // get the remaining DN without CN=
+        String cn = dn.substring(i);
+        i = cn.indexOf(",");
+        if (i == -1) {
+            return cn.substring(3);
+        }
+
+        return cn.substring(3, i);
+    }
+
+    /**
+     * Stores in keystore needed certificates.
      * 
      * @param tm
      * @param host
      * @param keystore
-     * @param passphrase
+     * @param pass
      * @return
      */
-    private X509Certificate[] getNeededCertificates(GvNix509TrustManager tm,
-            String host, File keystore, char[] passphrase) {
-        String alias;
-        X509Certificate[] neededCertificates = null;
-        try {
-            neededCertificates = tm.addCerts(host, keystore, passphrase);
-            if (neededCertificates != null) {
-                for (int i = 0; i < neededCertificates.length; i++) {
-                    alias = host.concat("-" + (i + 1));
-                    GvNix509TrustManager.saveCertFile(alias,
-                            neededCertificates[i], fileManager,
-                            projectOperations.getPathResolver());
+    private X509Certificate[] getCerts(String host, File keystore, char[] pass) {
 
+        X509Certificate[] certs = null;
+
+        try {
+
+            GvNix509TrustManager tm = getGvNixTrustManager(pass, keystore);
+
+            certs = tm.addCerts(host, keystore, pass);
+            if (certs != null) {
+
+                for (int i = 0; i < certs.length; i++) {
+
+                    GvNix509TrustManager.saveCertFile(
+                            host.concat("-" + (i + 1)), certs[i], fileManager,
+                            projectOperations.getPathResolver());
                 }
+
                 // Import needed certificates to JVM cacerts keystore
-                File jvmCacerts = getJVMCacertsKeystore();
-                tm.addCerts(host, jvmCacerts, passphrase);
-                /*
-                 * TODO: code to replace directly JVM cacerts by our custom
-                 * keystore
-                 * 
-                 * if (GvNix509TrustManager.replaceJVMCacerts(keystore,
-                 * jvmCacerts, fileManager)) {
-                 * logger.info("JVM cacert has been replaced " +
-                 * jvmCacerts.getAbsolutePath()); } else {
-                 * logger.info("JVM cacerts can not been replaced. " .concat(
-                 * "You should to import needed certificates in your ")
-                 * .concat("JVM trustcacerts keystore. ")
-                 * .concat("You have them in src/main/resources/*.cer")
-                 * .concat("Use keytool for that: ") .concat(
-                 * "http://download.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html"
-                 * )); }
-                 */
+                tm.addCerts(host, getJvmKeystore(), pass);
             }
         } catch (Exception e) {
             throw new IllegalStateException(
                     "Error loading or saving X509 certificates in keystore");
         }
-        return neededCertificates;
+
+        return certs;
     }
 
-    /** {@inheritDoc} */
-    public Document loadWsdlUrl(String url) {
+    /**
+     * {@inheritDoc}
+     */
+    public Document getWsdl(String url) {
+
         try {
-            // read the WSDL with the support of the Security System
-            // passphrase is null because we only work with default password
-            // 'changeit'
-            return parseWsdlFromUrl(url, null);
+
+            // Read WSDL with the support of the Security System
+            return getWsdl(url, null);
+
         } catch (Exception e) {
             throw new IllegalStateException(
                     "Error parsing WSDL from ".concat(url), e);
@@ -390,47 +475,67 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     /**
-     * Copy, if exists, the cacerts keystore of the JVM in a new keystore file
-     * gvnix-cacerts
+     * Copy, if exists, the JVM keystore file in the project resources folder.
      * 
-     * @return
+     * <p>
+     * Destination resources file name is gvnix-cacerts.
+     * </p>
+     * 
+     * @return File created or existing file
      */
-    private File createCacertsBasedOnJvmCacerts() {
-        File jvmCacerts = getJVMCacertsKeystore();
+    private File getProjectKeystore() {
 
-        String cerFilePath = projectOperations.getPathResolver().getIdentifier(
+        // Get path to file at resources
+        String path = projectOperations.getPathResolver().getIdentifier(
                 Path.SRC_MAIN_RESOURCES, "gvnix-cacerts");
 
-        if (jvmCacerts.isFile()) {
-            if (!fileManager.exists(cerFilePath)) {
-                try {
-                    FileCopyUtils.copy(new FileInputStream(jvmCacerts),
-                            fileManager.createFile(cerFilePath)
-                                    .getOutputStream());
-                    fileManager.commit();
-                } catch (IOException e) {
-                    throw new IllegalStateException(
-                            "Error creatin a copy of ".concat(jvmCacerts
-                                    .getAbsolutePath()));
-                }
+        // Get JVM keystore file and validate it
+        File keystore = getJvmKeystore();
+        Assert.isTrue(keystore.isFile(), "JVM cacerts file does not exist");
+
+        // When JVM keystore is valid file and already not copied to project
+        if (!fileManager.exists(path)) {
+
+            try {
+
+                // Write JVM keystore into resources file path
+                FileCopyUtils.copy(new FileInputStream(keystore), fileManager
+                        .createFile(path).getOutputStream());
+                fileManager.commit();
+
+            } catch (IOException e) {
+                throw new IllegalStateException(
+                        "Error creatin a copy of ".concat(keystore
+                                .getAbsolutePath()));
             }
         }
 
-        return new File(cerFilePath);
+        // Return existing or created project resources keystore
+        return new File(path);
     }
 
-    private File getJVMCacertsKeystore() {
-        String SEP = File.separator;
-        // TODO: intentar cargar el keystore usando el JVM API
-        // System.getProperty("javax.net.ssl.trustStore")
-        return new File(System.getProperty("java.home").concat(SEP)
-                .concat("lib").concat(SEP).concat("security").concat(SEP)
-                .concat("cacerts"));
+    /**
+     * Get JVM keytore file.
+     * 
+     * <p>
+     * "java.home" system property is required.
+     * </p>
+     * 
+     * @return JVM keystore file
+     */
+    private File getJvmKeystore() {
+
+        return new File(System.getProperty("java.home").concat(File.separator)
+                .concat("lib").concat(File.separator).concat("security")
+                .concat(File.separator).concat("cacerts"));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void addOrUpdateAxisClientService(String serviceName,
             Map<String, String> parameters) throws SAXException, IOException {
+
         createAxisClientConfigFile();
         String axisClientPath = getAxisClientConfigPath();
         Document document = XmlUtils.getDocumentBuilder().parse(

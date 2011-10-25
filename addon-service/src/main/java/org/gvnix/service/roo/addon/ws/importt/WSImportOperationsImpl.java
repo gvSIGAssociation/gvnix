@@ -93,7 +93,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
     public void addImportAnnotation(JavaType serviceClass, String wsdlLocation) {
 
         // Check URL connection and WSDL format
-        securityService.loadWsdlUrl(wsdlLocation);
+        securityService.getWsdl(wsdlLocation);
 
         // Service class path
         String fileLocation = projectOperations.getPathResolver()
@@ -336,7 +336,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
             return null;
         }
 
-        Document wsdl = securityService.loadWsdlUrl((String) annotation
+        Document wsdl = securityService.getWsdl((String) annotation
                 .getAttribute(new JavaSymbolName("wsdlLocation")).getValue());
 
         return wsdl;

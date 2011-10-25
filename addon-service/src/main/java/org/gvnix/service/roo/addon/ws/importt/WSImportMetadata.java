@@ -118,7 +118,7 @@ public class WSImportMetadata extends
             try {
 
                 // Check URL connection and WSDL format
-                Element root = securityService.loadWsdlUrl(wsdlLocation)
+                Element root = securityService.getWsdl(wsdlLocation)
                         .getDocumentElement();
 
                 // Create Aspect methods related to this wsdl location

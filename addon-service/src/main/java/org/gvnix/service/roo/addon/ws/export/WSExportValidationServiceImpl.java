@@ -166,13 +166,85 @@ public class WSExportValidationServiceImpl implements WSExportValidationService 
 
         Assert.isTrue(method != null, "The method doesn't exists in the class");
 
-        // Add gvNIX xml element annotation to method return type in project
-        addGvNixXmlElementToType(method.getReturnType());
+        List<JavaType> types = new ArrayList<JavaType>();
+        getProjectTypes(method, types);
+        for (JavaType type : types) {
 
-        // Add gvNIX xml element annotation to parameters types in project
+            MutableClassOrInterfaceTypeDetails typeDetails = getTypeDetails(type);
+
+            // Add gvNIX XML Element annotation
+            addGvNixXmlElementAnnotation(type, typeDetails.getName());
+
+        }
+        // // Add gvNIX xml element annotation to method return type in project
+        // addGvNixXmlElementToType(method.getReturnType());
+        //
+        // // Add gvNIX xml element annotation to parameters types in project
+        // for (AnnotatedJavaType parameterType : method.getParameterTypes()) {
+        //
+        // addGvNixXmlElementToType(parameterType.getJavaType());
+        // }
+    }
+
+    /**
+     * Add to list a method return and params types.
+     * 
+     * <p>
+     * Return and param types and their params only added to list if exists in
+     * project source.
+     * </p>
+     * 
+     * @param method
+     *            Method to check
+     * @param types
+     *            Types list to add types
+     */
+    protected void getProjectTypes(MethodMetadata method, List<JavaType> types) {
+
+        // Get project types from return type, return extends and return params
+        getProjectTypes(method.getReturnType(), types);
+
+        // Get project types from param type, param extends and param params
         for (AnnotatedJavaType parameterType : method.getParameterTypes()) {
+            getProjectTypes(parameterType.getJavaType(), types);
+        }
+    }
 
-            addGvNixXmlElementToType(parameterType.getJavaType());
+    /**
+     * Add to list a type and their params and extends types.
+     * 
+     * <p>
+     * Type and extend types only added to list if exists in project source.
+     * </p>
+     * 
+     * @param type
+     *            Type to check
+     * @param types
+     *            Types list to add types
+     */
+    protected void getProjectTypes(JavaType type, List<JavaType> types) {
+
+        // If type already included do nothing (avoid infinite loop)
+        if (types.contains(type)) {
+
+            return;
+        }
+
+        // If type exists in project source
+        if (fileManager.exists(getJavaTypeIdentifier(type))) {
+
+            // Add type to list
+            types.add(type);
+
+            // Get type project extends types
+            for (JavaType extendsType : getTypeDetails(type).getExtendsTypes()) {
+                getProjectTypes(extendsType, types);
+            }
+        }
+
+        // Get type project parameters types, if exists
+        for (JavaType paramType : type.getParameters()) {
+            getProjectTypes(paramType, types);
         }
     }
 

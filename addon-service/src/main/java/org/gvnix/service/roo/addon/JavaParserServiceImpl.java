@@ -138,64 +138,52 @@ public class JavaParserServiceImpl implements JavaParserService {
      * Only creates the class if not exists in project.
      * </p>
      */
-    public void createGvNIXWebServiceClass(JavaType javaType,
-            List<AnnotationMetadata> typeAnnotationList,
-            GvNIXAnnotationType gvNIXAnnotationType,
-            List<FieldMetadata> declaredFieldList,
-            List<MethodMetadata> declaredMethodList,
-            List<ConstructorMetadata> declaredConstructorList,
-            List<JavaType> declaredClassList,
-            PhysicalTypeCategory physicalTypeCategory,
-            List<JavaSymbolName> enumConstantsList) {
+    public void createGvNixWebServiceClass(JavaType type,
+            List<AnnotationMetadata> annots, GvNIXAnnotationType gvNixAnnot,
+            List<FieldMetadata> fields, List<MethodMetadata> methods,
+            List<ConstructorMetadata> constrs, List<JavaType> exts,
+            PhysicalTypeCategory physicalType, List<JavaSymbolName> enumConsts) {
 
         // Metadata Id.
-        String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
-                javaType, Path.SRC_MAIN_JAVA);
+        String id = PhysicalTypeIdentifier.createIdentifier(type,
+                Path.SRC_MAIN_JAVA);
 
         // Determine the canonical filename
-        String physicalLocationCanonicalPath = typeLocationService
-                .getPhysicalLocationCanonicalPath(declaredByMetadataId);
+        String physicalPath = typeLocationService
+                .getPhysicalLocationCanonicalPath(id);
 
         // Check the file doesn't already exist
-        if (!fileManager.exists(physicalLocationCanonicalPath)) {
+        if (!fileManager.exists(physicalPath)) {
 
-            if (!physicalTypeCategory.equals(PhysicalTypeCategory.ENUMERATION)) {
-                enumConstantsList = null;
+            if (!physicalType.equals(PhysicalTypeCategory.ENUMERATION)) {
+                enumConsts = null;
             }
 
             // Create class
-            ClassOrInterfaceTypeDetailsBuilder serviceDetails = new ClassOrInterfaceTypeDetailsBuilder(
-                    declaredByMetadataId, Modifier.PUBLIC, javaType,
-                    physicalTypeCategory);
-            for (AnnotationMetadata annotationMetadata : typeAnnotationList) {
-                serviceDetails.addAnnotation(annotationMetadata);
+            ClassOrInterfaceTypeDetailsBuilder typeDetails = new ClassOrInterfaceTypeDetailsBuilder(
+                    id, Modifier.PUBLIC, type, physicalType);
+            for (AnnotationMetadata annotationMetadata : annots) {
+                typeDetails.addAnnotation(annotationMetadata);
             }
-
-            for (FieldMetadata fieldMetadata : declaredFieldList) {
-
-                serviceDetails.addField(fieldMetadata);
+            for (FieldMetadata field : fields) {
+                typeDetails.addField(field);
             }
-            for (ConstructorMetadata constructorMetadata : declaredConstructorList) {
-
-                serviceDetails.addConstructor(constructorMetadata);
+            for (ConstructorMetadata constr : constrs) {
+                typeDetails.addConstructor(constr);
             }
-            for (MethodMetadata methodMetadata : declaredMethodList) {
-
-                serviceDetails.addMethod(methodMetadata);
+            for (MethodMetadata method : methods) {
+                typeDetails.addMethod(method);
             }
-            for (JavaType declaredClass : declaredClassList) {
-
-                serviceDetails.addExtendsTypes(declaredClass);
+            for (JavaType ext : exts) {
+                typeDetails.addExtendsTypes(ext);
             }
-            if (enumConstantsList != null) {
-                for (JavaSymbolName enumConstant : enumConstantsList) {
-
-                    serviceDetails.addEnumConstant(enumConstant);
+            if (enumConsts != null) {
+                for (JavaSymbolName enumConst : enumConsts) {
+                    typeDetails.addEnumConstant(enumConst);
                 }
             }
 
-            typeManagementService.generateClassFile(serviceDetails.build());
-
+            typeManagementService.generateClassFile(typeDetails.build());
         }
     }
 

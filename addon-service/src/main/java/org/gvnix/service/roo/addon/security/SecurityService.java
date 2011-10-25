@@ -47,19 +47,6 @@ public interface SecurityService {
     void setupWSSJ4();
 
     /**
-     * Parse a WSDL form given urlStr and if it's needed it manage trustcacerts
-     * in order to allow connection against secure servers with non confiable
-     * certificates
-     * 
-     * @param urlStr
-     * @param keyStorePassphrase
-     * @return
-     * @throws Exception
-     */
-    Document parseWsdlFromUrl(String urlStr, String keyStorePassphrase)
-            throws Exception;
-
-    /**
      * Adds or update a client service definition to client-config.wsdd file
      * 
      * @param serviceName
@@ -71,11 +58,11 @@ public interface SecurityService {
             Map<String, String> properties) throws SAXException, IOException;
 
     /**
-     * Wrapper method of {@link #parseWsdlFromUrl(String, String)}
+     * Wrapper method of {@link #getWsdl(String, String)}
      * 
      * @param url
      * @return
      */
-    Document loadWsdlUrl(String url);
+    Document getWsdl(String url);
 
 }

@@ -1140,14 +1140,12 @@ public class WSConfigServiceImpl implements WSConfigService {
      * Install wsdl2java maven plugin in pom.xml
      */
     public void installWsdl2javaPlugin() {
-        // Get plugin template
-        Element plugin = XmlUtils.findFirstElement(
-                "/cxf-codegen/cxf-codegen-plugin/plugin", XmlUtils
-                        .getConfiguration(this.getClass(),
-                                "dependencies-export-wsdl2java-plugin.xml"));
 
-        // Add plugin
-        projectOperations.updateBuildPlugin(new Plugin(plugin));
+        // Add plugin and write this modifications to disk
+        projectOperations.updateBuildPlugin(new Plugin(XmlUtils
+                .findFirstElement("/cxf-codegen/cxf-codegen-plugin/plugin",
+                        XmlUtils.getConfiguration(this.getClass(),
+                                "dependencies-export-wsdl2java-plugin.xml"))));
         fileManager.commit();
     }
 
@@ -1170,24 +1168,13 @@ public class WSConfigServiceImpl implements WSConfigService {
     /**
      * {@inheritDoc}
      */
-    public boolean addExportLocation(String wsdlLocation,
-            Document wsdlDocument, WsType type) {
+    public boolean addWsdlLocation(String wsdlLocation, Document wsdlDocument) {
 
         // Project properties to pom.xml
-        boolean propertiesUpdated = addProperties(type);
+        boolean propertiesUpdated = addProperties(WsType.EXPORT_WSDL);
 
-        switch (type) {
-
-        case EXPORT:
-            // TODO: Refactor method name to use for all CommunicationSense to
-            // set each plugin.
-            break;
-
-        case EXPORT_WSDL:
-            // Export Wsdl2Java
-            addExportWSDLLocationDocument(wsdlLocation, wsdlDocument);
-            break;
-        }
+        // Export Wsdl2Java
+        addExportWSDLLocationDocument(wsdlLocation, wsdlDocument);
 
         return propertiesUpdated;
     }
@@ -1381,6 +1368,69 @@ public class WSConfigServiceImpl implements WSConfigService {
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * Search the execution element using id defined in
+     * CXF_WSDL2JAVA_EXECUTION_ID field.
+     * </p>
+     */
+    public void disableWsdlLocation() {
+
+        // Get pom.xml
+        String pomPath = getPomFilePath();
+        Assert.notNull(pomPath, "pom.xml configuration file not found.");
+
+        // Get a mutable pom.xml reference to modify it
+        MutableFile pomMutableFile = null;
+        Document pom;
+        try {
+            pomMutableFile = fileManager.updateFile(pomPath);
+            pom = XmlUtils.getDocumentBuilder().parse(
+                    pomMutableFile.getInputStream());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+
+        Element root = pom.getDocumentElement();
+
+        // Get plugin element
+        Element codegenWsPlugin = XmlUtils
+                .findFirstElement(
+                        "/project/build/plugins/plugin[groupId='org.apache.cxf' and artifactId='cxf-codegen-plugin']",
+                        root);
+
+        // If plugin element not exists, message error
+        Assert.notNull(codegenWsPlugin,
+                "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
+
+        // Checks if already exists the execution.
+        Element oldGenerateSourcesCxfServer = XmlUtils.findFirstElement(
+                "/project/build/plugins/plugin/executions/execution[id='"
+                        + CXF_WSDL2JAVA_EXECUTION_ID + "']", root);
+
+        if (oldGenerateSourcesCxfServer != null) {
+
+            Element executionPhase = XmlUtils.findFirstElementByName("phase",
+                    oldGenerateSourcesCxfServer);
+
+            if (executionPhase != null) {
+
+                Element newPhase = pom.createElement("phase");
+                newPhase.setTextContent("none");
+
+                // Remove existing wsdlOption.
+                executionPhase.getParentNode().replaceChild(newPhase,
+                        executionPhase);
+
+                // Write new XML to disk.
+                XmlUtils.writeXml(pomMutableFile.getOutputStream(), pom);
+            }
+
+        }
+
+    }
+
+    /**
      * Remove the "file:" prefix from a location string.
      * 
      * @param location
@@ -1442,7 +1492,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                 "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Check URL connection and WSDL format
-        Element rootElement = securityService.loadWsdlUrl(wsdlLocation)
+        Element rootElement = securityService.getWsdl(wsdlLocation)
                 .getDocumentElement();
 
         // The wsdl location already exists on old plugin format ?
@@ -1592,7 +1642,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                 "Axistools plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Check URL connection and WSDL format
-        Element rootElement = securityService.loadWsdlUrl(wsdlLocation)
+        Element rootElement = securityService.getWsdl(wsdlLocation)
                 .getDocumentElement();
 
         // The wsdl location already exists on old plugin format ?

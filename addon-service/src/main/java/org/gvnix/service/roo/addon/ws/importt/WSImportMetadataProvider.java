@@ -155,7 +155,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
             try {
 
                 // Check URL connection and WSDL format
-                Element root = securityService.loadWsdlUrl(url.getValue())
+                Element root = securityService.getWsdl(url.getValue())
                         .getDocumentElement();
 
                 boolean generate;
