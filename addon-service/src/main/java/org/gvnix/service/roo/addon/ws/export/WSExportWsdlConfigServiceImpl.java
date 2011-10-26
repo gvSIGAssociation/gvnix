@@ -256,7 +256,6 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
 
         // Copy 'package-info.java' from generated to sources folder
         createPackageInfoClass();
-
     }
 
     /**

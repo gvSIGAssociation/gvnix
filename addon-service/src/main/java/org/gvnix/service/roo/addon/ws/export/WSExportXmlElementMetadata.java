@@ -168,7 +168,7 @@ public class WSExportXmlElementMetadata extends
         List<DeclaredFieldAnnotationDetails> result = new ArrayList<DeclaredFieldAnnotationDetails>();
 
         for (FieldMetadata field : fields) {
-            // FIXME In unknow cases, a field can be null
+            // In some cases, a field can be null
             if (field != null) {
 
                 // Get field annotation of GvNIXXmlElementField type
@@ -312,7 +312,7 @@ public class WSExportXmlElementMetadata extends
             xmlTypeAttrs.add(new StringAttributeValue(
                     new JavaSymbolName("name"),
                     ((StringAttributeValue) annotation
-                            .getAttribute(new JavaSymbolName("name")))
+                            .getAttribute(new JavaSymbolName("xmlTypeName")))
                             .getValue()));
         } else {
 
