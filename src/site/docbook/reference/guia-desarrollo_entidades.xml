@@ -1233,21 +1233,24 @@ roo-gvNIX&gt; <command>controller scaffold --entity ~.domain.Repartidor --class 
           <para>Si lanzamos este comando con la configuración actual del
           proyecto que usa HYPERSONIC_IN_MEMORY como BBDD nos indicará que no
           hay driver disponible para HSQLDB.</para>
-        </warning>Si lo hacemos en un proyecto que tenga MySQL como
-      BBDD:<programlisting>roo-gvNIX&gt; <emphasis role="bold">database introspect --schema no-schema-required</emphasis>
-Located add-on that may offer this JDBC driver
-1 found, sorted by rank; T = trusted developer; R = Roo 1.1 compatible
+        </warning>Si lo hacemos en un proyecto que tenga PostgreSQL como
+      BBDD:<programlisting>roo-gvNIX&gt; <emphasis role="bold">database introspect --schema unable-to-obtain-connection</emphasis>
+Located add-ons that may offer this JDBC driver
+2 found, sorted by rank; T = trusted developer; R = Roo 1.1 compatible
 <emphasis role="bold">ID T R DESCRIPTION -------------------------------------------------------------
-01 Y Y 5.1.13.0001 #jdbcdriver driverclass:com.mysql.jdbc.Driver. This...</emphasis>
+</emphasis><emphasis role="bold">01 - Y 9.0.0.801_jdbc4_0001 PostgreSQL #jdbcdriver...
+02 Y Y 9.0.801.0001 Postgres #jdbcdriver driverclass:org.postgresql.Driver....</emphasis>
 --------------------------------------------------------------------------------
 [HINT] use 'addon info id --searchResultId ..' to see details about a search result
 [HINT] use 'addon install id --searchResultId ..' to install a specific search result, or
 [HINT] use 'addon install bundle --bundleSymbolicName TAB' to install a specific add-on version
 JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programlisting>ID T R DESCRIPTION ------------------------------------------------------------- 
-01 Y Y 5.1.13.0001 #jdbcdriver driverclass:com.mysql.jdbc.Driver. This...</programlisting>esta
-      sección de la salida del comando database introspect nos indica que hay
-      disponible un driver para el soporte de DBRE y nos sugiere que hacer a
-      continuación (lineas que empiezan con [HINT]).</para>
+01 - Y 9.0.0.801_jdbc4_0001 PostgreSQL #jdbcdriver...
+02 Y Y 9.0.801.0001 Postgres #jdbcdriver driverclass:org.postgresql.Driver....</programlisting>esta
+      sección de la salida del comando <emphasis>database
+      introspect</emphasis> nos indica que hay disponible dos drivers para el
+      soporte de DBRE y nos sugiere que hacer a continuación (lineas que
+      empiezan con [HINT]).</para>
 
       <para>Podemos obtener más información sobre el dirver mediante:</para>
 
@@ -1262,11 +1265,32 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
 
       <para>o</para>
 
-      <programlisting>roo-gvNIX&gt; <command>addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.mysql-connector-java;&lt;version&gt;</command></programlisting>
+      <programlisting>roo-gvNIX&gt; <command>addon install bundle --bundleSymbolicName org.postgresql.roo.wrapper.postgresql</command></programlisting>
 
       <para>Al instante tendremos disponible el driver JDBC y podremos empezar
       a usar los comandos <emphasis>database introspect</emphasis> o
       <emphasis>database reverse.</emphasis></para>
+
+      <note>
+        <para><emphasis role="bold">Sobre los drivers de PostgreSQL
+        disponibles</emphasis>: como hemos visto en el ejemplo anterior hay
+        disponibles dos drivers para PosgreSQL:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>9.0.0.801_jdbc4_0001</para>
+          </listitem>
+
+          <listitem>
+            <para>9.0.801.0001</para>
+          </listitem>
+        </orderedlist>
+
+        <para>Ambos ofrecen compatibilidad con BBDD PostgreSQL 7.2 ó más
+        modernas, la diferencia entre ambos es que el primero es el indicado
+        para trabajar con JVMs 1.6 ó 1.7 y el segundo con 1.5 ó
+        anteriores.</para>
+      </note>
     </section>
 
     <section>
@@ -1322,7 +1346,7 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
       caracter más&gt;, por ejemplo 'foo_tabla_cool' y 'bars'.</para>
 
       <warning>
-        <para>al excluir tables, además de evitar que se creen las entidades
+        <para>al excluir tablas, además de evitar que se creen las entidades
         de estas tablas se evita tabmién que no se creen las asociaciones y
         relaciones en otras entidades. Esto se hace para evitar problemas de
         compilación en el código del proyecto.</para>
