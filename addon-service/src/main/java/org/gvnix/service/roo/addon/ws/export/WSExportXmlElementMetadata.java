@@ -168,8 +168,12 @@ public class WSExportXmlElementMetadata extends
         List<DeclaredFieldAnnotationDetails> result = new ArrayList<DeclaredFieldAnnotationDetails>();
 
         for (FieldMetadata field : fields) {
+
             // In some cases, a field can be null
-            if (field != null) {
+            // If annotation already exists in Java, don't add it to AJ
+            if (field != null
+                    && !hasAnnotation(field,
+                            "javax.xml.bind.annotation.XmlElement")) {
 
                 // Get field annotation of GvNIXXmlElementField type
                 AnnotationMetadata annotation = MemberFindingUtils
@@ -242,21 +246,67 @@ public class WSExportXmlElementMetadata extends
         }
 
         // Add XmlType with name, propOrder and namespace for each field
-        result.add(getXmlTypeAnnotation(annotation, fields));
+        AnnotationMetadata xmlTypeAnnotation = getXmlTypeAnnotation(annotation,
+                fields);
+        if (xmlTypeAnnotation != null) {
+            result.add(xmlTypeAnnotation);
+        }
 
         if (governorTypeDetails.getPhysicalTypeCategory().equals(
                 PhysicalTypeCategory.ENUMERATION)) {
 
             // Is an enumeration: add XmlEnum annotation without attributes.
-            result.add(getXmlEnumAnnotation());
+            AnnotationMetadata xmlEnumAnnotation = getXmlEnumAnnotation();
+            if (xmlEnumAnnotation != null) {
+                result.add(xmlEnumAnnotation);
+            }
 
         } else {
 
             // Is not an enumeration: add XmlAccessorType with field access type
-            result.add(getXmlAccesorTypeAnnotation());
+            AnnotationMetadata xmlAccesorType = getXmlAccesorTypeAnnotation();
+            if (xmlAccesorType != null) {
+                result.add(xmlAccesorType);
+            }
         }
 
         return result;
+    }
+
+    /**
+     * Indicates whether the annotation will be introduced via this ITD.
+     * 
+     * @param annotation
+     *            to be check if exists
+     * @return true if it will be introduced, false otherwise
+     */
+    public boolean hasAnnotation(String annotation) {
+        JavaType javaType = new JavaType(annotation);
+        AnnotationMetadata result = MemberFindingUtils
+                .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+
+        return result != null;
+    }
+
+    /**
+     * Indicates whether the annotation introduced via this field.
+     * 
+     * @para field
+     *            to be check annotations
+     * @param annotation
+     *            to be check if exists
+     * @return true if annotation exists into field, false otherwise
+     */
+    public boolean hasAnnotation(FieldMetadata field, String annotation) {
+
+        // Get field annotation of GvNIXXmlElementField type
+        AnnotationMetadata annot = MemberFindingUtils.getAnnotationOfType(
+                field.getAnnotations(), new JavaType(annotation));
+        if (annot == null) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -268,6 +318,11 @@ public class WSExportXmlElementMetadata extends
      */
     protected AnnotationMetadata getXmlRootAnnotation(
             AnnotationMetadata annotation) {
+
+        // If annotation already exists in Java, not add it in AJ
+        if (hasAnnotation("javax.xml.bind.annotation.XmlRootElement")) {
+            return null;
+        }
 
         // Get gvNIX xml element annotation name
         AnnotationAttributeValue<?> nameAttr = annotation
@@ -304,6 +359,11 @@ public class WSExportXmlElementMetadata extends
      */
     protected AnnotationMetadata getXmlTypeAnnotation(
             AnnotationMetadata annotation, List<FieldMetadata> fields) {
+
+        // If annotation already exists in Java, not add it in AJ
+        if (hasAnnotation("javax.xml.bind.annotation.XmlType")) {
+            return null;
+        }
 
         List<AnnotationAttributeValue<?>> xmlTypeAttrs = new ArrayList<AnnotationAttributeValue<?>>();
         if (annotation.getAttribute(new JavaSymbolName("xmlTypeName")) != null) {
@@ -349,6 +409,11 @@ public class WSExportXmlElementMetadata extends
      */
     protected AnnotationMetadata getXmlEnumAnnotation() {
 
+        // If annotation already exists in Java, not add it in AJ
+        if (hasAnnotation("javax.xml.bind.annotation.XmlEnum")) {
+            return null;
+        }
+
         // @XmlEnum
         return new AnnotationMetadataBuilder(new JavaType(
                 "javax.xml.bind.annotation.XmlEnum"),
@@ -361,6 +426,11 @@ public class WSExportXmlElementMetadata extends
      * @return XmlAccessorType annotation
      */
     protected AnnotationMetadata getXmlAccesorTypeAnnotation() {
+
+        // If annotation already exists in Java, not add it in AJ
+        if (hasAnnotation("javax.xml.bind.annotation.XmlAccessorType")) {
+            return null;
+        }
 
         // @XmlAccessorType always is field access type
         List<AnnotationAttributeValue<?>> xmlAccessorTypeAttrs = new ArrayList<AnnotationAttributeValue<?>>();
