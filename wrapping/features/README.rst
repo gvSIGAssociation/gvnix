@@ -26,7 +26,7 @@ Deploy
 #. Start Apache ServiceMix 4.4
 #. In the ServiceMix shell, add the feature descriptor for gvNIX OSGi wrappers by executing the following command::
 
-    features:addurl mvn:org.gvnix/org.gvnix.servicemix.features/0.8.0/xml/features
+    features:addurl mvn:org.gvnix/org.gvnix.servicemix.features/X.Y.Z/xml/features
 
    .. note::
 

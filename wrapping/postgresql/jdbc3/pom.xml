@@ -32,7 +32,7 @@
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>wrapping.postgresql</artifactId>
-    <version>0.8.0</version>
+    <version>0.8.1</version>
   </parent>
 
   <!-- Ver sistema de nominación en ../README.rst -->
