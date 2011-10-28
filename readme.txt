@@ -47,13 +47,16 @@ If you have any questions about MAVEN, GIT, GPG or ECLIPSE setup see the followi
 Git
 ---
 
+Git is used for download Roo source code, but Roo is stored into gvNIX SVN too.
+To compile gvNIX project you don't need Git installed, it is only required for upgrade gvNIX based Roo source code.
+
 First, you need a GitHub account:
 
  http://forum.springsource.org/showthread.php?114239-Spring-Roo-sources-move-to-GitHub!
 
 And your SSH public key from your account settings (http://help.github.com/linux-set-up-git/).
 
-Be aware that Roo source code is commited on gvNIX project at ``roo`` folder.
+Roo source code is commited on gvNIX project at ``roo`` folder.
 However, Roo source code can be updated to a new tag with next commands:
 
 * Update git info:				git pull
@@ -64,7 +67,7 @@ However, Roo source code can be updated to a new tag with next commands:
 * Save in SVN:					svn commit
 
 Update gvNIX parent pom roo.version property to new value.
-Be careful, git deleted files could be no deleted into SVN ! 
+Be careful, git deleted files could be not deleted into SVN ! 
 
 Other userful Git commands:
 
@@ -112,15 +115,15 @@ It is recommended that you create an Eclipse project for each add-on, in spite o
 Package gvNIX
 =============
 
-* Update and commit gvNIX version at Roo shell start:
+* Modify and commit gvNIX version at Roo shell start:
 
    roo/shell/src/main/java/org/springframework/roo/shell/AbstractShell.java
 
-* Update and commit the appropriate Roo version (tag or head) with git and set this Roo version reference into gvNIX parent pom.xml.
+* Get and commit the appropriate Roo version (tag or head) with git and update this Roo version reference into gvNIX parent pom.xml.
 
-* Update and commit the appropriate Roo and gvNIX versions (GVNIX_VERSION and ROO_VERSION) at build.sh file.
+* Modify and commit the appropriate Roo and gvNIX versions (GVNIX_VERSION and ROO_VERSION) at build.sh file.
 
-* Update and commit the appropriate gvNIX version in docbook documentacion (releaseinfo property) at src/site/docbook/reference/index.xml
+* Modify and commit the appropriate gvNIX version in docbook documentacion (releaseinfo property) at src/site/docbook/reference/index.xml
 
 * Create the tag for the gvNIX version we want to build using the following command::
 
@@ -207,6 +210,7 @@ Documentation index
 Contact us ?
 ------------
 
+* http://www.gvnix.org
 * https://gvnix.googlecode.com
 * http://listserv.gva.es/cgi-bin/mailman/listinfo/gvNIX_soporte
 * http://www.gvpontis.gva.es/cast/gvnix
