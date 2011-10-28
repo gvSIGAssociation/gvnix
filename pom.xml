@@ -717,6 +717,7 @@
             <id>reference-single-page</id>
             <goals>
               <goal>generate-html</goal>
+              <goal>generate-pdf</goal>
             </goals>
             <configuration>
               <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
