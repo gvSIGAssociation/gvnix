@@ -149,6 +149,16 @@ Package gvNIX
    bash:~/gvnix/tags/{version}$ ./build.sh -d
 
   The ``-d`` option deploy to google code, can be used only by commiters.
+  This requires next configuration in maven configuration file at conf/settings.xml::
+  
+    <server>
+      <id>Google Code</id>
+      <username>gvnixscm@gmail.com</username>
+      <password>XXXXXXXXXXX</password>
+    </server>
+    
+  Get password from redmine project wiki.
+  
   Check if all add-ons are published correctly at http://gvnix.googlecode.com/svn/repo/repository.xml for RooBoot.
   This will create the ZIP file ``target/gvnix-dist/gvNIX-{version}.zip``.
 
