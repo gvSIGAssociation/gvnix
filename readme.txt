@@ -119,7 +119,7 @@ Package gvNIX
 
    roo/shell/src/main/java/org/springframework/roo/shell/AbstractShell.java
 
-* Get and commit the appropriate Roo version (tag or head) with git and update this Roo version reference (roo.version) into gvNIX parent pom.xml.
+* Update if necessary the Roo source code version (tag or head) into 'roo' folder with git and update this Roo version reference into gvNIX parent pom.xml (roo.version).
 
 * Modify and commit the appropriate Roo and gvNIX versions (GVNIX_VERSION and ROO_VERSION) at build.sh file.
 
