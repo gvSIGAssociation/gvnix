@@ -312,22 +312,6 @@ Created ...</programlisting>
     Eclipse y que, además de permitir depurarla, nos permita hacer algunos
     cambios en caliente sobre la aplicación.</para>
 
-    <para xml:lang="es">Para que Eclipse nos permita arrancar la aplicación
-    desde el servidor, nuestro proyecto tienen que tener constancia de que
-    puede usar el plugin de Tomcat. Si hemos creado el proyecto desde Eclipse,
-    nuestro poyecto no tiene esta información. La forma más sencilla de
-    conseguir esto es ejecutando el comando <emphasis role="bold">mvn
-    eclipse:eclipse</emphasis>. Esta operación se puede ejecutar tanto desde
-    Eclipse con la ayuda del plugin <emphasis role="bold">M2Eclipse</emphasis>
-    como desde la linea de comandos del sistema en el directorio raiz del
-    proyecto. En Eclipse desde el menú contextual <emphasis>Run As &gt; Maven
-    build</emphasis> nos mostrará la ventana <emphasis role="bold">Edit
-    configuration</emphasis> en la que podemos indicar como <emphasis
-    role="bold">Goal</emphasis> <emphasis>eclipse:eclipse</emphasis>. Esta
-    configuaración se guardará para próximas veces. Tras ejecutarlo tendremos
-    nuestra aplicación lista para arrancarla en el Tomcat que hemos
-    configurado en el IDE.</para>
-
     <para xml:lang="es">Para ello, debemos tener la aplicación importada en un
     <emphasis>workspace</emphasis> de Eclipse y configurar el servidor dónde
     queremos ejecutarlo. Eclipse es capaz de gestionar distinto tipos de
@@ -571,21 +555,40 @@ Created ...</programlisting>
     <section>
       <title>Ejecución de la aplicación en el Servidor</title>
 
-      <para>Para que Eclipse nos permita arrancar la aplicación desde el
-      servidor, nuestro projecto tienen que tener constancia de que puede usar
-      el plugin de Tomcat. La forma más sencilla de conseguir esto es
-      ejecutando el comando <emphasis role="bold">mvn
-      eclipse:eclipse</emphasis>. Esta operación se puede ejecutar tanto desde
-      Eclipse con la ayuda del plugin <emphasis
+      <para xml:lang="es">Para que Eclipse nos permita arrancar la aplicación
+      desde el servidor, nuestro proyecto tienen que tener constancia de que
+      puede usar el plugin de Tomcat. Si hemos creado el proyecto desde
+      Eclipse, nuestro poyecto no tiene esta información. La forma más
+      sencilla de conseguir esto es ejecutando el comando <emphasis
+      role="bold">mvn eclipse:eclipse</emphasis>. Esta operación se puede
+      ejecutar tanto desde Eclipse con la ayuda del plugin <emphasis
       role="bold">M2Eclipse</emphasis> como desde la linea de comandos del
       sistema en el directorio raiz del proyecto. En Eclipse desde el menú
-      contextual <emphasis>Run As &gt; Maven build</emphasis> nos mostrará una
-      ventana en la que podemos seleccionar el goal eclipse:eclipse. Tras
-      ejecutarlo tendremos nuestra aplicación lista para arrancarla en el
-      Tomcat que hemos configurado en el IDE.</para>
+      contextual <emphasis>Run As &gt; Maven build</emphasis> nos mostrará la
+      ventana <emphasis role="bold">Edit configuration</emphasis> en la que
+      podemos indicar como <emphasis role="bold">Goal</emphasis>
+      <emphasis>eclipse:eclipse</emphasis>. Esta configuaración se guardará
+      para próximas veces. Tras ejecutarlo tendremos nuestra aplicación lista
+      para arrancarla en el Tomcat que hemos configurado en el IDE.</para>
 
-      <para>Una vez configurado el servidor de nuestra aplicación podemos
-      arracar el servidor y probar nuestra aplicación.</para>
+      <para>Una vez configurado el servidor, debemos añadir a este la
+      aplicación que queremos ejecutar en él. Podemos ejecutar más de una a la
+      vez. En la vista Servers, debemos pulsar con el botón derecho y
+      seleccionar la opción "Add and Remove ...". En el diálogo que se abre
+      seleccionamos de la lista de la izquierda nuestra aplicación y pulsamos
+      el botón "Add &gt;". Cerramos el diálogo con Finish.</para>
+
+      <figure>
+        <title>Añadir / Eliminar aplicaciones al Servidor</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/eclipse_servers-addremoveapp.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </figure>
+
+      <para>Ya podemos arracar el servidor y probar nuestra aplicación.</para>
 
       <figure>
         <title>Vista de servidores disponibles en nuestro workspace de
@@ -602,8 +605,19 @@ Created ...</programlisting>
       nuestra aplicación <emphasis>tenminutes</emphasis> disponible para
       ejecutar. Con los botones que tenemos a nuestra disposición podemos,
       arrancar la aplicación en modo debug, arrancar la aplicación de manera
-      normal, arrancar en modo profile, pararlo o re-publicar los cambios que
-      tengamos en la aplicación si estamos haciendo modificaciones.</para>
+      normal (botón verde con triángulo blanco en el centro), arrancar en modo
+      profile, pararlo o re-publicar los cambios que tengamos en la aplicación
+      si estamos haciendo modificaciones.</para>
+
+      <figure>
+        <title>Botones de la vista servidores de Eclipse</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/eclipse_servers-buttons.png"></imagedata>
+          </imageobject>
+        </mediaobject>
+      </figure>
 
       <para>Una vez arrancado nuestro servidor podemos navegar por nuestra
       aplicación bien desde un navegador externo (Firefox) o bien desde un
