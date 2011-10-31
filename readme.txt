@@ -161,21 +161,26 @@ Package gvNIX
   
   Check if all add-ons are published correctly at http://gvnix.googlecode.com/svn/repo/repository.xml for RooBoot.
   This will create the ZIP file ``target/gvnix-dist/gvNIX-{version}.zip``.
+  
+* Deploy wrappings to google code.
 
 * Test uncompress ZIP file, start it a execute some script and check in STS.
 
-* Send to publish on gvPONTIS the gvNIX binary zip, the gvNIX source zip, the html single page reference guide and version changes summary.
+* Publish into gvnix.googlecode.com the gvNIX binary zip, the gvNIX source zip and version changes summary.
+
+* Publish into www.gvnix.org the html single page reference guide. 
 
 * Update (or create if not exists) the wiki page for each add-on from add-on user guide on html format.
 
+* Write a post into Roo forum about new version.
+
 * Send to communication department the final release date and version changes summary to publish on social networks:
 
-  * Forum
-  * Google Code
   * DiSiD blog
   * gvNIX linkedin group
   * gvNIX twit with Google Code link
   * DiSiD twit with DiSiD blog link
+  * Facebook
 
 Source code
 -----------
