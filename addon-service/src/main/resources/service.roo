@@ -1,6 +1,8 @@
 
 script clinic.roo
 
+// Code-first approach -----
+
 // Create service class, then invoke it manually
 service class --class org.gvnix.clinic.service.PetService
 
@@ -13,7 +15,9 @@ service define ws --class org.gvnix.clinic.service.PetService
 // Expose operation
 service export operation --class org.gvnix.clinic.service.PetService --method findPetByWeight --resultName pets
 
-// Contract-first approach
+// Contract-first approach -----
+
+// Create service and entities that satisfies the WSDL contract
 service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
 
 // WSDL at HTTPS with self-signed certificate
