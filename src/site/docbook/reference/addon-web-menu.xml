@@ -66,15 +66,6 @@
           realizadas por las herramientas estándar de Spring Roo.</para>
         </listitem>
       </varlistentry>
-
-      <varlistentry>
-        <term xml:lang="es">Soporte para menús contextuales</term>
-
-        <listitem>
-          <para xml:lang="es">Soporta que los elementos de menú a pintar sean
-          dependientes del la pagina que se está visualizando.</para>
-        </listitem>
-      </varlistentry>
     </variablelist>
   </section>
 
@@ -111,15 +102,6 @@
 
         <listitem>
           <para xml:lang="es">Estructura de árbol de páginas y grupos.</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term xml:lang="es">Menú contextual</term>
-
-        <listitem>
-          <para xml:lang="es">Sub-vista del Menú cuya composición depende de
-          la página en la que se está visualizando.</para>
         </listitem>
       </varlistentry>
 
@@ -200,11 +182,5 @@
     <para xml:lang="es">Para mas información sobre los comandos ver <link
     linkend="apendice-comandos_addon-web-menu">apéndice de comandos de este
     add-on</link>.</para>
-  </section>
-
-  <section>
-    <title xml:lang="es">Uso de menús contextuales.</title>
-
-    <para><emphasis>TBC</emphasis></para>
   </section>
 </chapter>
