@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0">
+    <scr:component enabled="true" name="org.gvnix.weblayer.roo.addon.AddonCommands">
+        <implementation class="org.gvnix.weblayer.roo.addon.AddonCommands"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.shell.CommandMarker"/>
+        </service>
+        <property name="service.pid" value="org.gvnix.weblayer.roo.addon.AddonCommands" private="false"/>
+        <reference name="operations" interface="org.gvnix.weblayer.roo.addon.AddonOperations" cardinality="1..1" policy="static" bind="bindOperations" unbind="unbindOperations" checked="true"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.gvnix.weblayer.roo.addon.AddonOperationsImpl">
+        <implementation class="org.gvnix.weblayer.roo.addon.AddonOperationsImpl"/>
+        <service servicefactory="false">
+            <provide interface="org.gvnix.weblayer.roo.addon.AddonOperations"/>
+        </service>
+        <property name="service.pid" value="org.gvnix.weblayer.roo.addon.AddonOperationsImpl" private="false"/>
+        <reference name="metadataService" interface="org.springframework.roo.metadata.MetadataService" cardinality="1..1" policy="static" bind="bindMetadataService" unbind="unbindMetadataService" checked="true"/>
+        <reference name="physicalTypeMetadataProvider" interface="org.springframework.roo.classpath.PhysicalTypeMetadataProvider" cardinality="1..1" policy="static" bind="bindPhysicalTypeMetadataProvider" unbind="unbindPhysicalTypeMetadataProvider" checked="true"/>
+        <reference name="projectOperations" interface="org.springframework.roo.project.ProjectOperations" cardinality="1..1" policy="static" bind="bindProjectOperations" unbind="unbindProjectOperations" checked="true"/>
+        <reference name="typeLocationService" interface="org.springframework.roo.classpath.TypeLocationService" cardinality="1..1" policy="static" bind="bindTypeLocationService" unbind="unbindTypeLocationService" checked="true"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.gvnix.weblayer.roo.addon.provider.WebLayerShowMetadataProvider">
+        <implementation class="org.gvnix.weblayer.roo.addon.provider.WebLayerShowMetadataProvider"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.classpath.itd.ItdMetadataProvider"/>
+            <provide interface="org.springframework.roo.metadata.MetadataProvider"/>
+            <provide interface="org.springframework.roo.metadata.MetadataNotificationListener"/>
+        </service>
+        <property name="service.pid" value="org.gvnix.weblayer.roo.addon.provider.WebLayerShowMetadataProvider" private="false"/>
+        <reference name="fileManager" interface="org.springframework.roo.process.manager.FileManager" cardinality="1..1" policy="static" bind="bindFileManager" unbind="unbindFileManager" checked="true"/>
+        <reference name="memberDetailsScanner" interface="org.springframework.roo.classpath.scanner.MemberDetailsScanner" cardinality="1..1" policy="static" bind="bindMemberDetailsScanner" unbind="unbindMemberDetailsScanner" checked="true"/>
+        <reference name="metadataDependencyRegistry" interface="org.springframework.roo.metadata.MetadataDependencyRegistry" cardinality="1..1" policy="static" bind="bindMetadataDependencyRegistry" unbind="unbindMetadataDependencyRegistry" checked="true"/>
+        <reference name="metadataService" interface="org.springframework.roo.metadata.MetadataService" cardinality="1..1" policy="static" bind="bindMetadataService" unbind="unbindMetadataService" checked="true"/>
+    </scr:component>
+</components>
