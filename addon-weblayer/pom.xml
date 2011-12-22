@@ -40,7 +40,7 @@
   <organization>
     <name>Conselleria d'Infraestructures i Transport - Generalitat Valenciana</name>
   </organization>
-  <description>gvNIX Web Layer Metadata Add-on</description>
+  <description>Definition of the Web Layer agnostic to the UI technology used</description>
   <url>http://www.gvnix.org</url>
 
   <!-- DiSiD: Add gvnix version from parent pom and google code project name and repo folder values --> 
