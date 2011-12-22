@@ -2,3 +2,7 @@
 addon create advanced --topLevelPackage org.gvnix.web.mvc.roo.addon --description "gvNIX Web MVC Add-on"
 q
 // Spring Roo 1.1.5.RELEASE [rev d3a68c3] log closed at 2011-12-22 15:45:41
+// Spring Roo 1.1.5.RELEASE [rev d3a68c3] log opened at 2011-12-22 15:48:13
+perform eclipse
+q
+// Spring Roo 1.1.5.RELEASE [rev d3a68c3] log closed at 2011-12-22 15:48:29

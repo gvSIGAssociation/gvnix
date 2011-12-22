@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  */
 @Component // Use these Apache Felix annotations to register your commands class in the Roo container
 @Service
-public class AddonOperationsImpl implements AddonOperations {
+public class WebMvcOperationsImpl implements WebMvcOperations {
 	
 	/**
 	 * MetadataService offers access to Roo's metadata model, use it to retrieve any available metadata by its MID

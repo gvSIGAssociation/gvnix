@@ -20,12 +20,12 @@ import org.springframework.roo.shell.CommandMarker;
  */
 @Component // Use these Apache Felix annotations to register your commands class in the Roo container
 @Service
-public class AddonCommands implements CommandMarker { // All command types must implement the CommandMarker interface
+public class WebMvcCommands implements CommandMarker { // All command types must implement the CommandMarker interface
 	
 	/**
-	 * Get a reference to the AddonOperations from the underlying OSGi container
+	 * Get a reference to the WebMvcOperations from the underlying OSGi container
 	 */
-	@Reference private AddonOperations operations;
+	@Reference private WebMvcOperations operations;
 	
 	/**
 	 * This method is optional. It allows automatic command hiding in situations when the command should not be visible.

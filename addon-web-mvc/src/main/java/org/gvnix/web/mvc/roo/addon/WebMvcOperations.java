@@ -7,7 +7,7 @@ import org.springframework.roo.model.JavaType;
  *
  * @since 1.1
  */
-public interface AddonOperations {
+public interface WebMvcOperations {
 
 	/**
 	 * Indicate commands should be available
