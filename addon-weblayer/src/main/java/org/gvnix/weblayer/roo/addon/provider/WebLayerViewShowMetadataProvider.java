@@ -2,8 +2,8 @@ package org.gvnix.weblayer.roo.addon.provider;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.weblayer.roo.addon.annotation.GvNIXWebLayerShow;
-import org.gvnix.weblayer.roo.addon.metadata.WebLayerShowViewMetadata;
+import org.gvnix.weblayer.roo.addon.annotation.GvNIXWebLayerViewShow;
+import org.gvnix.weblayer.roo.addon.metadata.WebLayerViewShowMetadata;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -15,7 +15,7 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
 
 /**
- * Provides {@link WebLayerShowViewMetadata}. This type is called by Roo to
+ * Provides {@link WebLayerViewShowMetadata}. This type is called by Roo to
  * retrieve the metadata for this add-on. Use this type to reference external
  * types and services needed by the metadata type. Register metadata triggers
  * and dependencies here. Also define the unique add-on ITD identifier.
@@ -28,11 +28,11 @@ import org.springframework.roo.support.util.Assert;
  */
 @Component
 @Service
-public final class WebLayerShowViewMetadataProvider extends
+public final class WebLayerViewShowMetadataProvider extends
     AbstractItdMetadataProvider {
 
-  private static final JavaType GVNIX_WEBLAYER_SHOW_VIEW = new JavaType(
-      GvNIXWebLayerShow.class.getName());
+  private static final JavaType GVNIX_WEBLAYER_VIEW_SHOW = new JavaType(
+      GvNIXWebLayerViewShow.class.getName());
 
   /**
    * The activate method for this OSGi component, this will be called by the
@@ -45,7 +45,7 @@ public final class WebLayerShowViewMetadataProvider extends
   protected void activate(ComponentContext context) {
     metadataDependencyRegistry.registerDependency(
         PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-    addMetadataTrigger(GVNIX_WEBLAYER_SHOW_VIEW);
+    addMetadataTrigger(GVNIX_WEBLAYER_VIEW_SHOW);
   }
 
   /**
@@ -59,7 +59,7 @@ public final class WebLayerShowViewMetadataProvider extends
   protected void deactivate(ComponentContext context) {
     metadataDependencyRegistry.deregisterDependency(
         PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-    removeMetadataTrigger(GVNIX_WEBLAYER_SHOW_VIEW);
+    removeMetadataTrigger(GVNIX_WEBLAYER_VIEW_SHOW);
   }
 
   /**
@@ -80,32 +80,32 @@ public final class WebLayerShowViewMetadataProvider extends
             "Governor failed to provide class type details, in violation of superclass contract");
 
     // Pass dependencies required by the metadata in through its constructor
-    return new WebLayerShowViewMetadata(metadataIdentificationString,
+    return new WebLayerViewShowMetadata(metadataIdentificationString,
         aspectName, governorPhysicalTypeMetadata);
   }
 
   /**
    * Define the unique ITD file name extension, here the resulting file name
-   * will be **_ROO_GvNIXStringTrimmerBinder.aj
+   * will be **_ROO_GvNIXWebLayerViewShow.aj
    */
   public String getItdUniquenessFilenameSuffix() {
-    return "GvNIXWebLayerShowView";
+    return "GvNIXWebLayerViewShow";
   }
 
   @Override
   protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
-    JavaType javaType = WebLayerShowViewMetadata
+    JavaType javaType = WebLayerViewShowMetadata
         .getJavaType(metadataIdentificationString);
-    Path path = WebLayerShowViewMetadata.getPath(metadataIdentificationString);
+    Path path = WebLayerViewShowMetadata.getPath(metadataIdentificationString);
     return PhysicalTypeIdentifier.createIdentifier(javaType, path);
   }
 
   @Override
   protected String createLocalIdentifier(JavaType javaType, Path path) {
-    return WebLayerShowViewMetadata.createIdentifier(javaType, path);
+    return WebLayerViewShowMetadata.createIdentifier(javaType, path);
   }
 
   public String getProvidesType() {
-    return WebLayerShowViewMetadata.getMetadataIdentiferType();
+    return WebLayerViewShowMetadata.getMetadataIdentiferType();
   }
 }

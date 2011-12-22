@@ -28,16 +28,16 @@ import org.springframework.roo.support.util.Assert;
  *         Transport</a>
  * @since 0.9
  */
-public class WebLayerShowViewMetadata extends
+public class WebLayerViewShowMetadata extends
     AbstractItdTypeDetailsProvidingMetadataItem {
 
-  private static final String PROVIDES_TYPE_STRING = WebLayerShowViewMetadata.class
+  private static final String PROVIDES_TYPE_STRING = WebLayerViewShowMetadata.class
       .getName();
 
   private static final String PROVIDES_TYPE = MetadataIdentificationUtils
       .create(PROVIDES_TYPE_STRING);
 
-  public WebLayerShowViewMetadata(String identifier, JavaType aspectName,
+  public WebLayerViewShowMetadata(String identifier, JavaType aspectName,
       PhysicalTypeMetadata governorPhysicalTypeMetadata) {
     super(identifier, aspectName, governorPhysicalTypeMetadata);
     Assert.isTrue(isValid(identifier), "Metadata identification string '"

@@ -8,7 +8,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.weblayer.roo.addon.GvNIXRooUtils;
 import org.gvnix.weblayer.roo.addon.annotation.GvNIXWebLayer;
-import org.gvnix.weblayer.roo.addon.entityshow.WebLayerEntityShowHelper;
+import org.gvnix.weblayer.roo.addon.entityshow.WebLayerEntityViewShowHelper;
 import org.gvnix.weblayer.roo.addon.metadata.WebLayerShowMetadata;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.entity.EntityMetadata;
@@ -145,8 +145,8 @@ public final class WebLayerShowMetadataProvider implements MetadataProvider,
           .getAttribute(new JavaSymbolName("viewPackage")).getValue()
           .toString();
 
-      // Create a new WebLayerShowMetadata instance. Currently this is
-      // unnecessary since WebLayerShowMetadata is generating nothing
+      // Create a new WebLayerViewShowMetadata instance. Currently this is
+      // unnecessary since WebLayerViewShowMetadata is generating nothing
       WebLayerShowMetadata showMetadata = new WebLayerShowMetadata(
           metadataIdentificationString, governorType,
           governorPhysicalTypeMetadata, governorTypeMetadata);
@@ -157,7 +157,7 @@ public final class WebLayerShowMetadataProvider implements MetadataProvider,
       // be better if it is done without the template. Without template we have
       // more control in the roundtrips between our generation and the final
       // user customizations (via visual designer). Another way to get more
-      // control could be to modify the WebLayerEntityShowHelper making it
+      // control could be to modify the WebLayerEntityViewShowHelper making it
       // smarter and taking care with the differences between the code it
       // generates and the one in the current state of view class.
       Map<String, String> substitutions = new HashMap<String, String>();
@@ -165,9 +165,9 @@ public final class WebLayerShowMetadataProvider implements MetadataProvider,
       substitutions.put("__ENTITY_SHOW_CLASS__", governorType
           .getSimpleTypeName().concat("ViewShow"));
 
-      WebLayerEntityShowHelper helper = new WebLayerEntityShowHelper(
+      WebLayerEntityViewShowHelper helper = new WebLayerEntityViewShowHelper(
           metadataService, memberDetailsScanner, governorType,
-          WebLayerEntityShowHelper.INDENT, "mainLayout");
+          WebLayerEntityViewShowHelper.INDENT, "mainLayout");
       substitutions
           .put("__FIELD_INSERT_POINT__", helper.getFieldDeclarations());
       substitutions.put("__FIELD_CREATION_INSERT_POINT__",

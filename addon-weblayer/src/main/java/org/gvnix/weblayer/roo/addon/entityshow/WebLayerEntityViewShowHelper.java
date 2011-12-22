@@ -16,7 +16,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.StringUtils;
 
-public class WebLayerEntityShowHelper {
+public class WebLayerEntityViewShowHelper {
 
   public static final String INDENT = "    ";
 
@@ -29,7 +29,7 @@ public class WebLayerEntityShowHelper {
   // map from property name to class name
   private final Map<String, String> fieldMap = new LinkedHashMap<String, String>();
 
-  public WebLayerEntityShowHelper(MetadataService metadataService,
+  public WebLayerEntityViewShowHelper(MetadataService metadataService,
       MemberDetailsScanner memberDetailsScanner, JavaType entityType,
       String indent, String layoutName) {
     this.entityType = entityType;
