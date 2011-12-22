@@ -2,7 +2,6 @@ package org.gvnix.weblayer.roo.addon.provider;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -32,7 +31,6 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.logging.HandlerUtils;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -52,8 +50,8 @@ import org.springframework.roo.support.util.Assert;
 public final class WebLayerShowMetadataProvider implements MetadataProvider,
     MetadataNotificationListener {
 
-  private static final Logger logger = HandlerUtils
-      .getLogger(WebLayerShowMetadataProvider.class);
+  // private static final Logger logger = HandlerUtils
+  // .getLogger(WebLayerShowMetadataProvider.class);
 
   @Reference
   private MetadataDependencyRegistry metadataDependencyRegistry;
@@ -146,8 +144,6 @@ public final class WebLayerShowMetadataProvider implements MetadataProvider,
       String viewPackage = gvNIXWebLayerShow
           .getAttribute(new JavaSymbolName("viewPackage")).getValue()
           .toString();
-      logger.warning("Web Layer Class should be installed in: "
-          .concat(viewPackage));
 
       // Create a new WebLayerShowMetadata instance. Currently this is
       // unnecessary since WebLayerShowMetadata is generating nothing
