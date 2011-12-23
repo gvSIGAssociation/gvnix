@@ -48,6 +48,7 @@
     <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/web/mvc/roo/addon</repo.folder>
+    <pkgEmbed>vaadin;inline=true,gwt-user;inline=true</pkgEmbed>
   </properties>
   <repositories>
     <repository>
@@ -124,6 +125,11 @@
       <artifactId>vaadin</artifactId>
       <version>6.7.3</version>
     </dependency>
+    <dependency>
+		<groupId>com.google.gwt</groupId>
+		<artifactId>gwt-user</artifactId>
+		<version>2.4.0</version>
+	</dependency>
   </dependencies>
   
   <distributionManagement>
@@ -155,6 +161,31 @@
           </execution>
         </executions>
       </plugin-->
+      <!-- plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.3.4</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions> -->
+<!-- DiSiD: Remove because error with Git new versions
+            <_include>${project.build.directory}/build-number.mf</_include>
+-->
+            <!-- <Export-Package>${project.artifactId}.*;version=${project.version}</Export-Package>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
+            <Bundle-Copyright>Copyright ${project.organization.name}.
+              All Rights Reserved.</Bundle-Copyright>
+            <Bundle-DocURL>${project.url}</Bundle-DocURL>
+            <Embed-Dependency>${pkgEmbed}</Embed-Dependency>
+          </instructions> -->
+
+          <!-- gvNIX google code publishing
+          <remoteOBR>true</remoteOBR>
+          <bundleUrl>httppgp://${google.code.project.name}.googlecode.com/svn/repo/org/gvnix/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.jar</bundleUrl> -->
+
+        <!-- </configuration>
+      </plugin> -->
     </plugins>
 
     <resources>
