@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
 import org.gvnix.weblayer.roo.addon.metadata.WebLayerViewShowMetadata;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.plural.PluralMetadata;
@@ -46,8 +44,8 @@ import org.w3c.dom.Document;
  * @author Ben Alex
  * @since 1.0
  */
-@Component(immediate = true)
-@Service
+// @Component(immediate = true)
+// @Service
 public final class JspShowMetadataListener implements MetadataProvider,
         MetadataNotificationListener {
     private static final String WEB_INF_VIEWS = "/WEB-INF/views/";
@@ -100,9 +98,10 @@ public final class JspShowMetadataListener implements MetadataProvider,
 
         JavaType viewType = WebMvcShowMetadata
                 .getJavaType(metadataIdentificationString);
+        Path viewTypePath = WebMvcShowMetadata
+                .getPath(metadataIdentificationString);
         String webLayerShowMetadataKey = WebLayerViewShowMetadata
-                .createIdentifier(viewType, WebMvcShowMetadata
-                        .getPath(metadataIdentificationString));
+                .createIdentifier(viewType, viewTypePath);
 
         WebLayerViewShowMetadata webLayerViewShowMetadata = (WebLayerViewShowMetadata) metadataService
                 .get(webLayerShowMetadataKey);
