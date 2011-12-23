@@ -17,6 +17,9 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffold
 import org.springframework.roo.addon.web.mvc.jsp.JspOperations;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
@@ -103,9 +106,10 @@ public final class WebMvcShowMetadataListener implements MetadataProvider,
 
         JavaType viewType = WebMvcShowMetadata
                 .getJavaType(metadataIdentificationString);
+        Path viewTypePath = WebMvcShowMetadata
+                .getPath(metadataIdentificationString);
         String webLayerShowMetadataKey = WebLayerViewShowMetadata
-                .createIdentifier(viewType, WebMvcShowMetadata
-                        .getPath(metadataIdentificationString));
+                .createIdentifier(viewType, viewTypePath);
 
         WebLayerViewShowMetadata webLayerViewShowMetadata = (WebLayerViewShowMetadata) metadataService
                 .get(webLayerShowMetadataKey);
@@ -150,6 +154,48 @@ public final class WebMvcShowMetadataListener implements MetadataProvider,
         controllerOperations.createAutomaticController(new JavaType(
                 controllerFullyQualifiedTypeName), backingType,
                 new HashSet<String>(), path);
+
+        // XXX Esto es para compilar la vista. Identificamos el archivo físco y
+        // se lo pasamos al MetadataViewCompiler para que lo compile
+        String physicalTypeId = PhysicalTypeIdentifier.createIdentifier(
+                viewType, viewTypePath);
+        PhysicalTypeMetadata governorPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
+                .get(physicalTypeId);
+        if (governorPhysicalTypeMetadata == null
+                || !governorPhysicalTypeMetadata.isValid()
+                || !(governorPhysicalTypeMetadata.getMemberHoldingTypeDetails() instanceof ClassOrInterfaceTypeDetails)) {
+            return null;
+        }
+        ClassOrInterfaceTypeDetails governorTypeDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
+                .getMemberHoldingTypeDetails();
+        Assert.notNull(
+                governorTypeDetails,
+                "Governor failed to provide class type details, in violation of superclass contract");
+        MetadataViewCompiler viewCompiler = new MetadataViewCompiler();
+        boolean compiled = viewCompiler
+                .compileFromSrc(governorPhysicalTypeMetadata
+                        .getPhysicalLocationCanonicalPath());
+        if (compiled) {
+            try {
+                ClassLoader classLoader = getClass().getClassLoader();
+                Object o = classLoader.loadClass(viewType
+                        .getFullyQualifiedTypeName());
+                // Object o =
+                // Class.forName(viewType.getFullyQualifiedTypeName())
+                // .newInstance();
+                // } catch (InstantiationException e) {
+                // // TODO Auto-generated catch block
+                // e.printStackTrace();
+                // } catch (IllegalAccessException e) {
+                // // TODO Auto-generated catch block
+                // e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println(viewCompiler.getDiagnostics());
+        }
 
         //
         // String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
