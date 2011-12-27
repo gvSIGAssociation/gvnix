@@ -1,0 +1,16 @@
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" 
+    xmlns:form="http://www.springframework.org/tags/form" 
+    xmlns:jsp="http://java.sun.com/JSP/Page" 
+    xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes"/>
+  <script type="text/javascript">dojo.require('dijit.TitlePane');dojo.require('dijit.form.SimpleTextarea');dojo.require('dijit.form.FilteringSelect');</script>
+  <div id="_title_div">
+    
+    <script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '_title_div', widgetType : 'dijit.TitlePane', widgetAttrs : {title: '${title_msg}'}})); </script>
+    <spring:url value="/forgotpassword" var="form_url"/>
+    Forgot Password
+    <script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '_title_div', widgetType : 'dijit.TitlePane', widgetAttrs : {title: '${title_msg}'}})); </script>
+    
+    <h3>Your new password is sent to your email address.</h3>
+  </div>
+</div>

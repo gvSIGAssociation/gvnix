@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+	<definition extends="default" name="signup/index">
+		<put-attribute name="body" value="/WEB-INF/views/signup/index.jspx" />
+	</definition>
+	<definition extends="default" name="signup/thanks">
+		<put-attribute name="body" value="/WEB-INF/views/signup/thanks.jspx" />
+	</definition>
+
+	<definition extends="default" name="signup/error">
+		<put-attribute name="body" value="/WEB-INF/views/signup/error.jspx" />
+	</definition>
+
+</tiles-definitions>

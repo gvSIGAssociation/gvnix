@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" 
+    xmlns:form="http://www.springframework.org/tags/form" 
+    xmlns:jsp="http://java.sun.com/JSP/Page" 
+    xmlns:spring="http://www.springframework.org/tags" version="2.0">
+    
+  <jsp:output omit-xml-declaration="yes"/>
+  <script type="text/javascript">dojo.require('dijit.TitlePane');dojo.require('dijit.form.SimpleTextarea');dojo.require('dijit.form.FilteringSelect');</script>
+  <div id="_title_div">
+    Change Password
+    <script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '_title_div', widgetType : 'dijit.TitlePane', widgetAttrs : {title: '${title_msg}'}})); </script>
+    <spring:url value="/changepassword" var="form_url"/>
+    Change Password
+    <script type="text/javascript">Spring.addDecoration(new Spring.ElementDecoration({elementId : '_title_div', widgetType : 'dijit.TitlePane', widgetAttrs : {title: '${title_msg}'}})); </script>
+    <form:form action="update" method="POST" commandName="changePasswordForm">
+      <br/>
+      <div id="changepassword_oldpassword">
+        <label for="_oldpassword_id">Current Password:</label>
+        <form:password cssStyle="width:250px" id="_changepassword_oldpassword" maxlength="30" path="oldPassword"/>
+        <br/>
+        <form:errors cssClass="errors" path="oldPassword"/>
+      </div>
+      <br/>
+      <div id="changepassword_newpassword">
+        <label for="_newpassword_id">New Password:</label>
+        <form:password cssStyle="width:250px" id="_changepassword_newpassword" maxlength="30" path="newPassword"/>
+        <br/>
+        <form:errors cssClass="errors" path="newPassword"/>
+      </div>
+      <br/>
+      <div id="changepassword_newpasswordagain">
+        <label for="_newpasswordagain_id">New Password (again):</label>
+        <form:password cssStyle="width:250px" id="_changepassword_newpasswordagain" maxlength="30" path="newPasswordAgain"/>
+        <br/>
+        <form:errors cssClass="errors" path="newPasswordAgain"/>
+      </div>
+      <br/><br/>
+      <div class="submit" id="changepassword_submit">
+        
+        <script type="text/javascript">Spring.addDecoration(new Spring.ValidateAllDecoration({elementId: 'proceed', event : 'onclick'}));</script>
+        <input id="proceed" type="submit" value="Save"/>
+      </div>
+      <br/>
+      <form:errors cssClass="errors" delimiter="&lt;p/&gt;"/>
+    </form:form>
+  </div>
+</div>
