@@ -2,6 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+    <parent>
+      <groupId>org.gvnix</groupId>
+      <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
+      <version>0.8.1</version>
+      <relativePath>../../osgi-roo-bundle</relativePath>
+    </parent>
 	<groupId>org.springframework.flex.roo.addon</groupId>
 	<artifactId>org.springframework.flex.roo.addon</artifactId>
 	<packaging>bundle</packaging>
@@ -432,6 +438,31 @@
 					<dependenciesAsLibraries>true</dependenciesAsLibraries>
 				</configuration>
 			</plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+			<!-- copies the JARs we have built locally (eg bootstrap JAR) that noone else depends on into the target/all -->
+            <id>copy-jars-for-roo-dev-or-assembly</id>
+            <phase>package</phase>
+            <configuration>
+              <target>
+                <copy todir="${project.build.directory}/../../../target/all" preservelastmodified="true">
+                  <fileset dir="${project.build.directory}">
+                    <include name="*.jar" />
+                    <exclude name="*-tests.jar" />
+                    <exclude name="*-sources.jar" />
+                  </fileset>
+                </copy>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 		</plugins>
 	</build>
 
