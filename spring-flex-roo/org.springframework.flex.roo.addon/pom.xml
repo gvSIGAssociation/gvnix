@@ -12,21 +12,14 @@
 	<artifactId>org.springframework.flex.roo.addon</artifactId>
 	<packaging>bundle</packaging>
 	<name>Spring Flex Roo Addon</name>
-	<version>1.0.0.BUILD-SNAPSHOT</version>
+	<version>1.0.0</version>
 	
-	<distributionManagement>
-		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Milestone Repository</name>
-			<url>s3://maven.springframework.org/milestone</url>
-		</repository>
-
-		<snapshotRepository>
-			<id>spring-snapshot</id>
-			<name>Spring Snapshot Repository</name>
-			<url>s3://maven.springframework.org/snapshot</url>
-		</snapshotRepository>
-	</distributionManagement>
+    <distributionManagement>
+      <repository>
+        <id>Google Code</id>
+        <url>dav:https://${google.code.project.name}.googlecode.com/svn/repo</url>
+      </repository>
+    </distributionManagement>
 
 	<repositories>
 		<repository>
@@ -220,6 +213,13 @@
 	</dependencies>
 
 	<build>
+        <extensions>
+          <extension>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-webdav-jackrabbit</artifactId>
+            <version>1.0-beta-6</version>
+          </extension>
+        </extensions>
 		<plugins>
 			<!--
 				<plugin> <groupId>org.apache.maven.plugins</groupId>
@@ -468,6 +468,8 @@
 
 	<properties>
 		<roo.version>1.1.5.RELEASE</roo.version>
+        <google.code.project.name>gvnix</google.code.project.name>
+        <repo.folder>org/springframework/flex/roo/addon</repo.folder>
 	</properties>
 
 </project>
