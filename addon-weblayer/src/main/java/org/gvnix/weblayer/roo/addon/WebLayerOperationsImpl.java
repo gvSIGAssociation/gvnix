@@ -154,7 +154,7 @@ public class WebLayerOperationsImpl implements WebLayerOperations {
 
     // Install the dependency on the add-on jar (
     dependencies.add(new Dependency("org.gvnix",
-        "org.gvnix.weblayer.roo.addon", "0.8.1", DependencyType.JAR,
+        "org.gvnix.weblayer.roo.addon", "0.8.2", DependencyType.JAR,
         DependencyScope.PROVIDED));
 
     // Install dependencies defined in external XML file
