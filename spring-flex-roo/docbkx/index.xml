@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<book xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    <bookinfo>
+        <title>Flex Addon for Spring Roo Reference Guide</title>
+        <titleabbrev>Flex Addon for Spring Roo</titleabbrev>
+        <productname>Flex Addon for Spring Roo</productname>
+        <releaseinfo>Version &version;</releaseinfo>
+        <pubdate>? 2011</pubdate>
+        <authorgroup>
+            <author>
+                <firstname>Jeremy</firstname>
+                <surname>Grelle</surname>
+                <affiliation>SpringSource</affiliation>
+            </author>
+        </authorgroup>
+        <legalnotice>
+            <para>
+                Copies of this document may be made for your own use and for
+                distribution to others, provided that you do not charge any
+                fee for such copies and further provided that each copy
+                contains this Copyright Notice, whether distributed in print
+                or electronically.
+            </para>
+        </legalnotice>
+    </bookinfo>
+    
+    <toc />
+    
+    <xi:include href="./flexaddon.xml"/>
+    
+</book>
