@@ -166,7 +166,7 @@ Package gvNIX
   
 * Deploy wrappings to google code.
 
-* Test uncompress ZIP file, start it a execute some script and check in STS.
+* Test uncompress ZIP file, start it, execute some script and check in STS.
 
 * Publish into gvnix.googlecode.com the gvNIX binary zip, the gvNIX source zip and version changes summary.
 
