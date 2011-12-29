@@ -38,6 +38,8 @@ mkdir -p "$ROO_HOME"/bootstrap/target/osgi/conf
 # cp -f `find "$GVNIX_HOME" -name org.gvnix.*.roo.addon-*.jar | grep ".*/target/org.gvnix..*.roo.addon-.*.jar" | grep -v ".*sources[.]jar"` "$ROO_HOME"/bootstrap/target/osgi/bundle
 #cp -f "$GVNIX_HOME"/target/all/org.gvnix.* "$ROO_HOME"/target/all
 cp -f "$GVNIX_HOME"/target/all/org.gvnix.* "$ROO_HOME"/bootstrap/target/osgi/bundle
+cp -f "$GVNIX_HOME"/target/all/com.xsoftwarelabs.spring.roo.addon.typicalsecurity* "$ROO_HOME"/bootstrap/target/osgi/bundle
+cp -f "$GVNIX_HOME"/target/all/org.springframework.flex.roo.addon* "$ROO_HOME"/bootstrap/target/osgi/bundle
 
 # gvNIX: copy add-ons dependencies
 # cp `find "$GVNIX_HOME" -name *.jar | grep '.*/code/[^r][^o][^o][^/].*/target/dependency/.*.jar'` "$ROO_HOME"/bootstrap/target/osgi/bundle 2> /dev/null
