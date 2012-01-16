@@ -11,7 +11,7 @@ flex remoting scaffold --name ~.service.AddressService
 focus --class ~.domain.Person
 field reference --fieldName currentAddress --type ~.domain.Address
 field reference --fieldName spouse --type ~.domain.Person --cardinality ONE_TO_ONE 
-field set --fieldName previousAddresses --element ~.domain.Address
+field set --fieldName previousAddresses --type ~.domain.Address
 entity --class ~.domain.BuildingInfo
 field reference --fieldName address --type ~.domain.Address --cardinality ONE_TO_ONE 
 flex remoting scaffold --name BuildingInfoService
