@@ -475,7 +475,7 @@ h2.descrip_titaplic {
 #home #main {
   overflow:hidden;
   display:box;
-  min-height: 200px;
+  min-height: 300px;
   width: 100%;
   margin: 0 auto 0;
 }
