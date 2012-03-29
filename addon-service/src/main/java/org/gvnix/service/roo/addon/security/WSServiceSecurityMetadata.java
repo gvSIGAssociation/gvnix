@@ -148,7 +148,10 @@ public class WSServiceSecurityMetadata extends
         builder.addConstructor(getDefaultConstructor());
 
         // Adding CallBackHandler method
-        builder.addMethod(getCallBackHandlerMethod());
+        MethodMetadata callBackHandler = getCallBackHandlerMethod();
+        if (callBackHandler != null) {
+        	builder.addMethod(callBackHandler);
+        }
 
         // Create output ITD
         itdTypeDetails = builder.build();
@@ -202,11 +205,10 @@ public class WSServiceSecurityMetadata extends
 
         // Check if a method with the same signature already exists in the
         // target type
-        MethodMetadata method = methodExists(methodName, parameters);
-        if (method != null) {
+        if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, methodName, parameterTypes) != null) {
             // If it already exists, just return the method and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method throws types
@@ -403,30 +405,6 @@ public class WSServiceSecurityMetadata extends
         String classpath = serviceClass.getFullyQualifiedTypeName();
         String path = classpath.replace('.', '/');
         return path.concat("Security.properties");
-    }
-
-    /**
-     * Checks if method exist in governor class
-     * 
-     * @param methodName
-     * @param paramTypes
-     * @return
-     */
-    private MethodMetadata methodExists(JavaSymbolName methodName,
-            List<AnnotatedJavaType> paramTypes) {
-        // We have no access to method parameter information, so we scan by name
-        // alone and treat any match as authoritative
-        // We do not scan the superclass, as the caller is expected to know
-        // we'll only scan the current class
-        for (MethodMetadata method : governorTypeDetails.getDeclaredMethods()) {
-            if (method.getMethodName().equals(methodName)
-                    && method.getParameterTypes().equals(paramTypes)) {
-                // Found a method of the expected name; we won't check method
-                // parameters though
-                return method;
-            }
-        }
-        return null;
     }
 
     // Typically, no changes are required beyond this point
