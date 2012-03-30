@@ -235,4 +235,17 @@ for (Element depen : depens) {
       </listitem>
     </itemizedlist>
   </section>
+
+  <section>
+    <title>Actualizar un addon en una instalación de gvNIX</title>
+
+    <para>Puedes actualizar ejecutando el siguiente comando en la consola de
+    gvNIX: </para>
+
+    <programlisting>addon upgrade bundle --bundleSymbolicName org.gvnix.service.roo.addon </programlisting>
+
+    <para>Con este sistema, podemos distribuir de forma muy ágil pequeñas
+    mejoras en algún addon sin necesidad de esperar a hacer una distribución
+    completa del framework. </para>
+  </section>
 </chapter>
