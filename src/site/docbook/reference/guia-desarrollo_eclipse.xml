@@ -139,7 +139,7 @@
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/preferences_roo.png"></imagedata>
+          <imagedata fileref="images/preferences_roo.png"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -160,7 +160,7 @@
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/eclipse_gvNIX_shell.png"></imagedata>
+          <imagedata fileref="images/eclipse_gvNIX_shell.png"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -190,7 +190,7 @@
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_new_roo_project.png"></imagedata>
+            <imagedata fileref="images/eclipse_new_roo_project.png"/>
           </imageobject>
         </mediaobject>
       </figure>
@@ -529,6 +529,11 @@ Created ...</programlisting>
         <listitem>
           <para>Configuración de arranque del servidor.</para>
 
+          <para>El servidor Tomcat arranca con cierta cantidad de memoria que
+          no soportar mas de 4 cambios en el proyecto antes de llenarse y
+          dejar de funcionar. Para evitar esto, se puede incrementar la
+          cantidad de memoria con la que arranca Tomcat.</para>
+
           <important>
             <para>Puede ser interesante modificar los parámetros de memoría
             con los que trabaja el servidor. Para ello:</para>
@@ -583,7 +588,7 @@ Created ...</programlisting>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_servers-addremoveapp.png"></imagedata>
+            <imagedata fileref="images/eclipse_servers-addremoveapp.png"/>
           </imageobject>
         </mediaobject>
       </figure>
@@ -596,7 +601,7 @@ Created ...</programlisting>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_servers.png"></imagedata>
+            <imagedata fileref="images/eclipse_servers.png"/>
           </imageobject>
         </mediaobject>
       </figure>
@@ -614,7 +619,7 @@ Created ...</programlisting>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_servers-buttons.png"></imagedata>
+            <imagedata fileref="images/eclipse_servers-buttons.png"/>
           </imageobject>
         </mediaobject>
       </figure>
@@ -630,7 +635,7 @@ Created ...</programlisting>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_browser.png"></imagedata>
+            <imagedata fileref="images/eclipse_browser.png"/>
           </imageobject>
         </mediaobject>
       </figure>
@@ -679,7 +684,7 @@ Created ...</programlisting>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/eclipse_crossreference.png"></imagedata>
+          <imagedata fileref="images/eclipse_crossreference.png"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -711,7 +716,7 @@ Created ...</programlisting>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/eclipse_cross-contextual.png"></imagedata>
+          <imagedata fileref="images/eclipse_cross-contextual.png"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -747,7 +752,7 @@ Created ...</programlisting>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_edicion-aj.png"></imagedata>
+            <imagedata fileref="images/eclipse_edicion-aj.png"/>
           </imageobject>
         </mediaobject>
       </figure>
@@ -770,7 +775,7 @@ Created ...</programlisting>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_pushincontextual.png"></imagedata>
+            <imagedata fileref="images/eclipse_pushincontextual.png"/>
           </imageobject>
         </mediaobject>
       </figure>
