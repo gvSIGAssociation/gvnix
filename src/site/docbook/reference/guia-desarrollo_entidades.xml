@@ -24,9 +24,9 @@
 
     <programlistingco>
       <areaspec>
-        <area coords="1" xml:id="ex.annot.class"></area>
+        <area coords="1" xml:id="ex.annot.class"/>
 
-        <area coords="7" xml:id="ex.annot.attri"></area>
+        <area coords="7" xml:id="ex.annot.attri"/>
       </areaspec>
 
       <programlisting>@Entity
@@ -385,11 +385,11 @@ public class Entity1 {
 
           <programlistingco>
             <areaspec>
-              <area coords="10" xml:id="ex.regexp"></area>
+              <area coords="10" xml:id="ex.regexp"/>
 
-              <area coords="16" xml:id="ex.set"></area>
+              <area coords="16" xml:id="ex.set"/>
 
-              <area coords="21" xml:id="ex.entity"></area>
+              <area coords="21" xml:id="ex.entity"/>
             </areaspec>
 
             <programlisting>@Entity
@@ -770,17 +770,17 @@ public class Entity1 {
 
         <programlistingco>
           <areaspec>
-            <area coords="8" xml:id="ex.annot.field"></area>
+            <area coords="8" xml:id="ex.annot.field"/>
 
-            <area coords="11" xml:id="ex.annot.trans"></area>
+            <area coords="11" xml:id="ex.annot.trans"/>
 
-            <area coords="13" xml:id="ex.annot.preci"></area>
+            <area coords="13" xml:id="ex.annot.preci"/>
 
-            <area coords="16" xml:id="ex.annot.many"></area>
+            <area coords="16" xml:id="ex.annot.many"/>
 
-            <area coords="17" xml:id="ex.annot.join"></area>
+            <area coords="17" xml:id="ex.annot.join"/>
 
-            <area coords="20" xml:id="ex.annot.one"></area>
+            <area coords="20" xml:id="ex.annot.one"/>
           </areaspec>
 
           <programlisting>@Entity
@@ -1512,6 +1512,78 @@ public class LineItemPK {
     ...
 }</programlisting>
       </section>
+    </section>
+
+    <section>
+      <title>Ingeniería inversa multi esquema</title>
+
+      <para>Cosas que se deben de tener en cuenta cuando realizamos la
+      ingenieria inversa de entidades de varios esquemas. </para>
+
+      <orderedlist>
+        <listitem>
+          <para>Antes de hacer la ingenieria inversa de tablas de un segundo
+          esquema deberemos cerrar la consola de gvnix y hacer los siguientes
+          cambios: </para>
+
+          <orderedlist>
+            <listitem>
+              <para>En las entidades ya creadas con clave primaria simple:
+              </para>
+
+              <para>En el fichero java asociado a la entidad : </para>
+
+              <para>En la anotación @RooDbManaged modificamos la propiedad
+              automaticallyDelete a false.</para>
+
+              <para>En la anotación @RooEntity, eliminamos el esquema.</para>
+
+              <para>Añadir en la anotación @RooEntity la propiedad
+              identifierField = "Nombre campo clave primaria" (Caso de
+              entidades con clave primaria simple).</para>
+
+              <para>Ir al fichero Roo_Entity.aj asociado a la entidad que
+              estamos modificando y hacer push-in del campo de la clave
+              primaria y de sus setters and getters. </para>
+
+              <para>Ir al fichero .java de la entidad y eliminar la anotación
+              @GeneratedValue(strategy = GenerationType.AUTO) que hay en el
+              campo identificador.</para>
+            </listitem>
+
+            <listitem>
+              <para>En las entidades ya creadas con clave primaria compuesta:
+              </para>
+
+              <para>En el fichero PK java asociado a la entidad:</para>
+
+              <para>En la anotación @RooIdentifier moddificamos la propiedad
+              dbManaged a false.</para>
+
+              <para>Ir al fichero PK_Roo_Identifier.aj asociado a la entidad
+              que estamos modificando y hacer push-in de los campos que
+              componen la clave primaria y del constructor con campos.</para>
+            </listitem>
+
+            <listitem>
+              <para>Borrar el fichero dbre.xml </para>
+            </listitem>
+          </orderedlist>
+        </listitem>
+
+        <listitem>
+          <para>Arrancar de nuevo la consola de gvnix y ver que no se realizan
+          cambios al arrancar la consola sobre los ficheros que hemos
+          modificado. </para>
+        </listitem>
+
+        <listitem>
+          <para>Abrir la consola, hacer ingenieria inversa del nuevo esquema y
+          repetir el punto 1.</para>
+        </listitem>
+      </orderedlist>
+
+      <para/>
     </section>
   </section>
 
