@@ -40,28 +40,32 @@ Features
 
 This add-ons have this features:
 
-#. Installs new TAGXs, images, CSS and scripts in the project.
+#. Installs new JSPXs, TAGXs, images, CSS, scripts (js) and modify i18n properties in the project.
 #. Create jspx views using featured tagx from the Add-on.
 #. Create AspectJ files related to entities new applied patterns.
 
-Installation
-============
+Use cases
+=============
 
 Create a web application
 -------------------------
 
-Create a web application with gvNix/Roo Shell script in ``test-roo directory``::
+Developer wants to use new patterns in his Roo application. This are the steeps to get it:
 
-  script --file test-script-roo
+#. Install this add-on if it isn't already installed.
 
-Run the application in Bash Shell and see the actual style::
+#. Create a web application with gvNix/Roo Shell script in ``src/test/resources`` directory::
+
+      script --file test-script-roo
+
+#. Run the application in Eclipse or in Bash Shell with::
 
   mvn tomcat:run
 
-Uninstall the Add-on
-=====================
+Uninstall a pattern
+===================
 
-Remove new patterns jspx views, menu entries and annotations.
+Remove new pattern jspx view, menu entry and this pattern related annotations.
 
 Limitations
 ===========
@@ -76,6 +80,6 @@ Future enhancements
 
 Choose between two types of visualization for oneToMany relationships:
 
-# Tabs: Show the relationships 1-n between entities inside tabs.
-# Accordion: Show the relationships 1-n between entities inside panels (current default option).
-# Remove command: To remove all related entities called with the tagx in jspx (show and update).
+* Tabs: Show the relationships 1-n between entities inside tabs.
+* Accordion: Show the relationships 1-n between entities inside panels (current default option).
+* Remove command: To remove all related entities called with the tagx in jspx (show and update).

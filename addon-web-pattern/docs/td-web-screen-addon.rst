@@ -58,6 +58,62 @@ Tech design
 Command
 ---------
 
+web mvc pattern install
+```````````````````````
+
+::
+
+  web mvc pattern install
+  
+This method adds tagx, iamges, css, javascript, jspx and modify i18 property files.
+
+This doesn't need any parameters.
+
+Copy tagx files from ``src/main/resources/org/gvnix/web/screen/roo/addon`` addon folder into ``src/main/webapp/WEB-INF/`` project folder:
+
+* tags/pattern::
+
+	├── cancelbutton.tagx
+	├── contentpane.tagx
+	├── form
+	│   ├── fields
+	│   │   ├── checkbox.tagx
+	│   │   ├── contentpane.tagx
+	│   │   ├── datetime.tagx
+	│   │   ├── input.tagx
+	│   │   ├── selectRelated.tagx
+	│   │   ├── select.tagx
+	│   │   ├── select-withempty.tagx
+	│   │   ├── simple.tagx
+	│   │   └── textarea.tagx
+	│   ├── show.tagx
+	│   └── update.tagx
+	├── hiddengvnixpattern.tagx
+	├── paginationadd.tagx
+	├── paginationview.tagx
+	├── relations.tagx
+	├── relation.tagx
+	└── tabcontainer.tagx
+
+* tags/util::
+
+	├── changes-control.tagx
+	├── panel-tabs.tagx
+	├── panel-tab.tagx
+	├── quicklinks.tagx
+	├── quicklink.tagx
+	└── slider.tagx
+
+* tags/dialog::
+
+	└── message
+	    └── message-box.tagx
+
+web mvc pattern master
+``````````````````````
+
+This command creates AspectJ files and creates the jspx view pattern of a entity.
+
 ::
 
   web mvc pattern master --class ~.web.PetController --type table --name MyPattern
@@ -80,6 +136,11 @@ The command has to add the GvNIXPattern annotation in the class requested by the
 
 In the same operation, if requested type is "tabular", the Entity exposed by the given class has to be annotated with
 GvNIXEntityBatch also.
+
+web mvc pattern detail
+``````````````````````
+
+This command creates AspectJ files and creates the jspx view pattern of a entity relation.
 
 ::
 
@@ -266,3 +327,10 @@ TODO
 * Se desactiva el soporte de los patrones Maestro tabular - Detalle * y Maestro registro - Detalle registro. En
   WebScreenOperationsImpl.addRelationPattern(JavaType, JavaSymbolName, JavaSymbolName, WebPattern) se comprueba si
   se están definiendo estos patrones y se aborta la ejecución en caso afirmativo.
+
+* ¿ Hay un problema con este add-on probocado por el método
+  org.gvnix.web.screen.roo.addon.ScreenMetadataListener.getAnnotatedFields(String, String). Falla
+  porque no está controllado el caso de que WebScaffoldMetada sea null. ?
+  
+* TODO Set ``render`` attribute in OneToMany relationships to false.
+  
