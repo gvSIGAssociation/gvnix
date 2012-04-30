@@ -172,6 +172,9 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
     @Reference
     private I18nSupport i18nSupport;
+    
+    @Reference
+    private SeleniumServices seleniumServices;
 
     /** {@inheritDoc} */
     public boolean isPatternCommandAvailable() {
@@ -262,6 +265,9 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         if (pattern.equals(WebPattern.tabular)) {
             annotateTypeWithGvNIXEntityBatch(getFormBakingObject(controllerDetails));
         }
+        
+        // TODO Name and URL values ?
+        seleniumServices.generateTest(controllerClass, name.getSymbolName(), "http://localhost:8080/");
     }
 
     /** {@inheritDoc} */
