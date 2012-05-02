@@ -50,8 +50,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
+ * @see SeleniumOperationsImpl
  * @author mmartinez
- *
  */
 @Component
 @Service
@@ -97,7 +97,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
 
-		String relativeTestFilePath = "selenium/test-" + formBackingType.getSimpleTypeName().toLowerCase() + ".xhtml";
+		// DiSiD Use pattern name instead of entity name for compatibility with Roo selenium addon
+		String relativeTestFilePath = "selenium/test-" + name + ".xhtml";
 		String seleniumPath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, relativeTestFilePath);
 
 		Document document;
@@ -114,13 +115,15 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			throw new IllegalArgumentException("Could not parse selenium test case template file!");
 		}
 
-		name = (name != null ? name : "Selenium test for " + controller.getSimpleTypeName());
+		// DiSiD Use pattern name instead of entity name for compatibility with Roo selenium addon
+		name = (name != null ? name : "Selenium test for " + name);
 		XmlUtils.findRequiredElement("/html/head/title", root).setTextContent(name);
 
 		XmlUtils.findRequiredElement("/html/body/table/thead/tr/td", root).setTextContent(name);
 
+		// DiSiD Create pattern test
 		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
-		tbody.appendChild(openCommand(document, serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath() + "?form"));
+		tbody.appendChild(openCommand(document, serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath() + "?form", name));
 
 		PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA));
 		Assert.notNull(formBackingObjectPhysicalTypeMetadata, "Unable to obtain physical type metadata for type " + formBackingType.getFullyQualifiedTypeName());
@@ -163,14 +166,18 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		installMavenPlugin();
 	}
 
-	private Node openCommand(Document document, String linkTarget) {
+	private Node openCommand(Document document, String linkTarget, String name) {
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
 		td1.setTextContent("open");
 
+		// DiSiD Add pattern request attributes
 		Node td2 = tr.appendChild(document.createElement("td"));
-		td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?") + "lang=" + Locale.getDefault());
+		td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
+				+ "gvnixpattern=" + name
+				+ "&index=1"
+				+ "&lang=" + Locale.getDefault());
 
 		Node td3 = tr.appendChild(document.createElement("td"));
 		td3.setTextContent(" ");
