@@ -48,6 +48,9 @@ public class WebScreenCommands implements CommandMarker {
      */
     @Reference
     private WebScreenOperations operations;
+    
+    @Reference
+    private SeleniumServices seleniumServices;
 
     /**
      * Informs if <code>web mvc pattern *</code> command are available
@@ -74,8 +77,24 @@ public class WebScreenCommands implements CommandMarker {
     public void webScreenAdd(
             @CliOption(key = "class", mandatory = true, help = "The controller to apply the pattern to") JavaType controllerClass,
             @CliOption(key = "name", mandatory = true, help = "Identificication to use for this pattern") JavaSymbolName name,
-            @CliOption(key = "type", mandatory = true, help = "The pattern to apply") WebPattern type) {
+            @CliOption(key = "type", mandatory = true, help = "The pattern to apply") WebPattern type,
+    		@CliOption(key = "testAutomatically", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false", help = "Create automatic Selenium test for this controller") boolean testAutomatically,
+    		@CliOption(key = "testName", mandatory = false, help = "Name of the test") String testName, 
+    		@CliOption(key = "testServerUrl", mandatory = false, unspecifiedDefaultValue = "http://localhost:8080/", specifiedDefaultValue = "http://localhost:8080/", help = "URL of the server where the web application is available, including protocol, port and hostname") String url) {
+    	
+    	// Create pattern
         operations.addPattern(controllerClass, name, type);
+        
+        // Generate optionally Selenium tests
+    	if (testAutomatically) {
+    		
+    		// Create test with defined name or with pattern name by default  
+        	if (testName == null) {
+        		testName = name.getSymbolName();
+        	}
+        	
+    		seleniumServices.generateTest(controllerClass, testName, url);
+    	}
     }
 
     /**
