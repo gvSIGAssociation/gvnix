@@ -21,6 +21,7 @@ import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersiste
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
+import org.springframework.roo.addon.web.selenium.SeleniumOperationsImpl;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -101,7 +102,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		Document document;
 		try {
-			InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "selenium-template.xhtml");
+			InputStream templateInputStream = TemplateUtils.getTemplate(SeleniumOperationsImpl.class, "selenium-template.xhtml");
 			Assert.notNull(templateInputStream, "Could not acquire selenium.xhtml template");
 			document = XmlUtils.readXml(templateInputStream);
 		} catch (Exception e) {
@@ -240,7 +241,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			if (fileManager.exists(seleniumPath)) {
 				suite = XmlUtils.readXml(fileManager.getInputStream(seleniumPath));
 			} else {
-				InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "selenium-test-suite-template.xhtml");
+				InputStream templateInputStream = TemplateUtils.getTemplate(SeleniumOperationsImpl.class, "selenium-test-suite-template.xhtml");
 				Assert.notNull(templateInputStream, "Could not acquire selenium test suite template");
 				suite = XmlUtils.readXml(templateInputStream);
 			}
@@ -281,7 +282,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			return;
 		}
 		
-		Element configuration = XmlUtils.getConfiguration(getClass());
+		Element configuration = XmlUtils.getConfiguration(SeleniumOperationsImpl.class);
 		Element plugin = XmlUtils.findFirstElement("/configuration/selenium/plugin", configuration);
 
 		// Now install the plugin itself
