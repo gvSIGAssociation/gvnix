@@ -78,7 +78,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param controller the JavaType of the controller under test (required)
 	 * @param name the name of the test case (optional)
 	 */
-	public void generateTest(JavaType controller, String name, String serverURL) {
+	public void generateTest(JavaType controller, WebPattern type, String name, String serverURL) {
 		Assert.notNull(controller, "Controller type required");
 
 		String webScaffoldMetadataIdentifier = WebScaffoldMetadata.createIdentifier(controller, Path.SRC_MAIN_JAVA);
@@ -123,42 +123,72 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		// DiSiD Create pattern test
 		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
-		tbody.appendChild(openCommand(document, serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath() + "?form", name));
+		tbody.appendChild(openCommand(document, serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath(), type, name));
 
 		PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA));
 		Assert.notNull(formBackingObjectPhysicalTypeMetadata, "Unable to obtain physical type metadata for type " + formBackingType.getFullyQualifiedTypeName());
 		ClassOrInterfaceTypeDetails formBackingClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadata.getMemberHoldingTypeDetails();
 		MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), formBackingClassOrInterfaceDetails);
+		
+		if (type.equals(WebPattern.register)) {
 
-		// Add composite PK identifier fields if needed
-		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(formBackingType, memberDetails, null);
-		if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
-			for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
+			// Add composite PK identifier fields if needed
+			JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(formBackingType, memberDetails, null);
+			if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
+				for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
+					if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+						FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
+						fieldBuilder.setFieldName(new JavaSymbolName(javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
+						tbody.appendChild(typeCommand(document, fieldBuilder.build(), type));
+					}
+				}
+			}
+	
+			// Add all other fields
+			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
+			for (FieldMetadata field : fields) {
 				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-					FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
-					fieldBuilder.setFieldName(new JavaSymbolName(javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
-					tbody.appendChild(typeCommand(document, fieldBuilder.build()));
+					tbody.appendChild(typeCommand(document, field, type));
+				}
+			}
+	
+			tbody.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
+	
+			// Add verifications for all other fields
+			for (FieldMetadata field : fields) {
+				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+					tbody.appendChild(verifyTextCommand(document, formBackingType, field));
 				}
 			}
 		}
+		else if (type.equals(WebPattern.tabular)) {
 
-		// Add all other fields
-		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
-		for (FieldMetadata field : fields) {
-			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-				tbody.appendChild(typeCommand(document, field));
+			// TODO Generate image identifier
+			tbody.appendChild(clickCommand(document, "//img[@id='fu_org_gvnix_test_relation_list_table_domain_Car_create']"));
+			
+			// TODO Composite PK test generation when tabular pattern PK support
+			
+			// TODO Check if other fields are editable (storeEditable)
+			
+			// Add all other fields
+			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
+			for (FieldMetadata field : fields) {
+				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+					tbody.appendChild(typeCommand(document, field, type));
+				}
+			}
+
+			// TODO Generate image identifier
+			tbody.appendChild(clickAndWaitCommand(document, "//input[@id='gvnix_control_add_save_fu_org_gvnix_test_relation_list_table_domain_Car']"));
+			
+			// Add verifications for all other fields
+			for (FieldMetadata field : fields) {
+				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+					tbody.appendChild(verifyValueCommand(document, formBackingType, field));
+				}
 			}
 		}
-
-		tbody.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
-
-		// Add verifications for all other fields
-		for (FieldMetadata field : fields) {
-			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-				tbody.appendChild(verifyTextCommand(document, formBackingType, field));
-			}
-		}
-
+		
 		fileManager.createOrUpdateTextFileIfRequired(seleniumPath, XmlUtils.nodeToString(document), false);
 
 		manageTestSuite(relativeTestFilePath, name, serverURL);
@@ -166,7 +196,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		installMavenPlugin();
 	}
 
-	private Node openCommand(Document document, String linkTarget, String name) {
+	private Node openCommand(Document document, String linkTarget, WebPattern type, String name) {
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
@@ -174,10 +204,19 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		// DiSiD Add pattern request attributes
 		Node td2 = tr.appendChild(document.createElement("td"));
-		td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
-				+ "gvnixpattern=" + name
-				+ "&index=1"
-				+ "&lang=" + Locale.getDefault());
+		
+		if (type.equals(WebPattern.register)) {
+			td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
+					+ "form"
+					+ "&gvnixpattern=" + name
+					+ "&index=1"
+					+ "&lang=" + Locale.getDefault());
+		}
+		else if (type.equals(WebPattern.tabular)) {
+			td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
+					+ "gvnixpattern=" + name
+					+ "&lang=" + Locale.getDefault());
+		}
 
 		Node td3 = tr.appendChild(document.createElement("td"));
 		td3.setTextContent(" ");
@@ -194,14 +233,23 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		return false;
 	}
 
-	private Node typeCommand(Document document, FieldMetadata field) {
+	private Node typeCommand(Document document, FieldMetadata field, WebPattern type) {
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
 		td1.setTextContent("type");
-
+		
 		Node td2 = tr.appendChild(document.createElement("td"));
-		td2.setTextContent("_" + field.getFieldName().getSymbolName() + "_id");
+
+		if (type.equals(WebPattern.register)) {
+			
+			td2.setTextContent("_" + field.getFieldName().getSymbolName() + "_id");
+		}
+		else if (type.equals(WebPattern.tabular)) {
+			
+			// TODO Generate input identifier
+			td2.setTextContent("_fu_org_gvnix_test_relation_list_table_domain_Car[0]_name_id_create");
+		}
 
 		Node td3 = tr.appendChild(document.createElement("td"));
 		td3.setTextContent(convertToInitializer(field));
@@ -224,6 +272,21 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		return tr;
 	}
 
+	private Node clickCommand(Document document, String linkTarget) {
+		Node tr = document.createElement("tr");
+
+		Node td1 = tr.appendChild(document.createElement("td"));
+		td1.setTextContent("click");
+
+		Node td2 = tr.appendChild(document.createElement("td"));
+		td2.setTextContent(linkTarget);
+
+		Node td3 = tr.appendChild(document.createElement("td"));
+		td3.setTextContent(" ");
+
+		return tr;
+	}
+
 	private Node verifyTextCommand(Document document, JavaType formBackingType, FieldMetadata field) {
 		Node tr = document.createElement("tr");
 
@@ -232,6 +295,22 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		Node td2 = tr.appendChild(document.createElement("td"));
 		td2.setTextContent(XmlUtils.convertId("_s_" + formBackingType.getFullyQualifiedTypeName() + "_" + field.getFieldName().getSymbolName() + "_" + field.getFieldName().getSymbolName() + "_id"));
+
+		Node td3 = tr.appendChild(document.createElement("td"));
+		td3.setTextContent(convertToInitializer(field));
+
+		return tr;
+	}
+	
+	private Node verifyValueCommand(Document document, JavaType formBackingType, FieldMetadata field) {
+		Node tr = document.createElement("tr");
+
+		Node td1 = tr.appendChild(document.createElement("td"));
+		td1.setTextContent("verifyValue");
+
+		Node td2 = tr.appendChild(document.createElement("td"));
+		// TODO Generate input identifier
+		td2.setTextContent(XmlUtils.convertId("_fu_org_gvnix_test_relation_list_table_domain_Car[0]_name_id_update"));
 
 		Node td3 = tr.appendChild(document.createElement("td"));
 		td3.setTextContent(convertToInitializer(field));

@@ -23,6 +23,18 @@ field set --fieldName cars --type org.gvnix.test.relation.list.table.domain.Car 
 
 controller all --package org.gvnix.test.relation.list.table.web
 
-web mvc pattern master --class ~.web.PersonController --name personregtab --type register
-web mvc pattern detail --class ~.web.PersonController --name personregtab --field horses --type tabular
-web mvc pattern detail --class ~.web.PersonController --name personregtab --field cars --type tabular
+web mvc pattern master --class ~.web.PersonController --name personreg --type register --testAutomatically
+
+web mvc pattern master --class ~.web.CarController --name carreg --type register --testAutomatically
+
+web mvc pattern master --class ~.web.HorseController --name horsereg --type register --testAutomatically
+
+web mvc pattern master --class ~.web.PersonController --name persontab --type tabular --testAutomatically
+
+web mvc pattern master --class ~.web.CarController --name cartab --type tabular --testAutomatically
+
+web mvc pattern master --class ~.web.HorseController --name horsetab --type tabular --testAutomatically
+
+web mvc pattern master --class ~.web.PersonController --name personregtab --type register --testAutomatically
+web mvc pattern detail --class ~.web.PersonController --name personregtab --field horses --type tabular --testAutomatically
+web mvc pattern detail --class ~.web.PersonController --name personregtab --field cars --type tabular --testAutomatically
