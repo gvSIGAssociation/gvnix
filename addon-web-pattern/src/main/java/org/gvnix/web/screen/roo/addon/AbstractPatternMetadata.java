@@ -1092,6 +1092,12 @@ public abstract class AbstractPatternMetadata extends
 
         List<JavaType> typeParams = new ArrayList<JavaType>();
         typeParams.add(formBackingType);
+        
+        // Add date validation pattern to model if some date type field exists
+        if (!dateTypes.isEmpty()) {
+            bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
+        }
+        
         JavaType javaUtilList = new JavaType("java.util.List", 0,
                 DataType.TYPE, null, typeParams);
         bodyBuilder
