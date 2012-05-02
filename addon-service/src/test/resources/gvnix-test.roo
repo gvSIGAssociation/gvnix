@@ -79,8 +79,6 @@ service import ws --class org.gvnix.test.service.layer.project.services.ClasePro
 // [CORRECT] Transport: HTTP, Operations: 1, Bindings: SOAP, Use: Encoded, Implementation: JAX-RPC, Namespace: urn
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy14 --wsdl http://www.comp.rgu.ac.uk/QueryComputing/query?WSDL
 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy16 --wsdl http://wiki.vanguardsw.com/bin/ws.dsb?wsdl/Finance/Investing/Portfolio%20Simulation
-
 service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy17 --wsdl http://www.unifiedsoftware.co.uk/freeibanvalidate.wsdl
 
 // [CORRECT] Import WS from a non confident server
