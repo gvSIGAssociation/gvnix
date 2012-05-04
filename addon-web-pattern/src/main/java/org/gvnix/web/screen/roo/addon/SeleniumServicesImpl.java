@@ -139,7 +139,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 					if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
 						FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
 						fieldBuilder.setFieldName(new JavaSymbolName(javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
-						tbody.appendChild(typeCommand(document, fieldBuilder.build(), type));
+						tbody.appendChild(typeCommand(document, fieldBuilder.build(), type, formBackingType));
 					}
 				}
 			}
@@ -148,7 +148,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
 			for (FieldMetadata field : fields) {
 				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-					tbody.appendChild(typeCommand(document, field, type));
+					tbody.appendChild(typeCommand(document, field, type, formBackingType));
 				}
 			}
 	
@@ -163,8 +163,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		}
 		else if (type.equals(WebPattern.tabular)) {
 
-			// TODO Generate image identifier
-			tbody.appendChild(clickCommand(document, "//img[@id='fu_org_gvnix_test_relation_list_table_domain_Car_create']"));
+			String imgId = XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName()) + "_create";
+			tbody.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
 			
 			// TODO Composite PK test generation when tabular pattern PK support
 			
@@ -174,12 +174,12 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
 			for (FieldMetadata field : fields) {
 				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-					tbody.appendChild(typeCommand(document, field, type));
+					tbody.appendChild(typeCommand(document, field, type, formBackingType));
 				}
 			}
 
-			// TODO Generate image identifier
-			tbody.appendChild(clickAndWaitCommand(document, "//input[@id='gvnix_control_add_save_fu_org_gvnix_test_relation_list_table_domain_Car']"));
+			String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName());
+			tbody.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
 			
 			// Add verifications for all other fields
 			for (FieldMetadata field : fields) {
@@ -233,7 +233,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		return false;
 	}
 
-	private Node typeCommand(Document document, FieldMetadata field, WebPattern type) {
+	private Node typeCommand(Document document, FieldMetadata field, WebPattern type, JavaType formBackingType) {
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
@@ -247,8 +247,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		}
 		else if (type.equals(WebPattern.tabular)) {
 			
-			// TODO Generate input identifier
-			td2.setTextContent("_fu_org_gvnix_test_relation_list_table_domain_Car[0]_name_id_create");
+			String id = "_" + XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName()) + "[0]_" + field.getFieldName() + "_id_create";
+			td2.setTextContent(id);
 		}
 
 		Node td3 = tr.appendChild(document.createElement("td"));
@@ -309,8 +309,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		td1.setTextContent("verifyValue");
 
 		Node td2 = tr.appendChild(document.createElement("td"));
-		// TODO Generate input identifier
-		td2.setTextContent(XmlUtils.convertId("_fu_org_gvnix_test_relation_list_table_domain_Car[0]_name_id_update"));
+		String id = "_" + XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName()) + "[0]_" + field.getFieldName() + "_id_update";
+		td2.setTextContent(XmlUtils.convertId(id));
 
 		Node td3 = tr.appendChild(document.createElement("td"));
 		td3.setTextContent(convertToInitializer(field));
