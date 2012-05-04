@@ -19,23 +19,17 @@
 package org.gvnix.web.screen.roo.addon;
 
 /**
- * Web MVC Pattern types available
+ * Web MVC Pattern hierarchies available
  * 
- * @author Jose Manuel Vivó (jmvivo at disid dot com) at <a
+ * @author Mario Martínez Sánchez (mmartinez at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
  * 
- * @author Óscar Rovira (orovira at disid dot com) at <a
- *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
- *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
- *         Transport</a>
- * 
- * @since 0.8
+ * @since 0.9
  */
-public enum WebPattern {
-    tabular, // tabular pattern
-    register
-    // register pattern
+public enum WebPatternHierarchy {
+    master, // master pattern
+    detail // detail pattern
 
 }

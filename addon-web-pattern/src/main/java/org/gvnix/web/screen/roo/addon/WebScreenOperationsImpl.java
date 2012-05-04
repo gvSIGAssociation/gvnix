@@ -180,7 +180,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
     /** {@inheritDoc} */
     public void addPattern(JavaType controllerClass, JavaSymbolName name,
-            WebPattern pattern) {
+            WebPatternType pattern) {
 
         Assert.notNull(controllerClass, "controller is required");
         Assert.notNull(name, "id is required");
@@ -259,7 +259,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
             controllerDetails.addTypeAnnotation(annotationBuilder.build());
         }
 
-        if (pattern.equals(WebPattern.tabular)) {
+        if (pattern.equals(WebPatternType.tabular)) {
             annotateTypeWithGvNIXEntityBatch(getFormBakingObject(controllerDetails));
         }
     }
@@ -271,7 +271,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
     /** {@inheritDoc} */
     public void addRelationPattern(JavaType controllerClass,
-            JavaSymbolName name, JavaSymbolName field, WebPattern type) {
+            JavaSymbolName name, JavaSymbolName field, WebPatternType type) {
 
         Assert.notNull(controllerClass, "controller is required");
         Assert.notNull(name, "name is required");
@@ -334,7 +334,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         // Check if user is setting Master register - Detail register
         // if so, this is not supported yet, so abort
         if (isMasterPatternRegister(patternValues, name)
-                && type == WebPattern.register) {
+                && type == WebPatternType.register) {
             logger.warning("Pattern name '"
                     .concat(name.getSymbolName())
                     .concat("' is of type register and you are setting detail as register. Currently gvNIX doesn't support 'Master register / Detail register' pattern"));
@@ -686,7 +686,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         for (StringAttributeValue definedPattern : patternList) {
             definedPatternsList.add(definedPattern.getValue());
         }
-        if (isPatternTypeDefined(WebPattern.tabular, definedPatternsList)) {
+        if (isPatternTypeDefined(WebPatternType.tabular, definedPatternsList)) {
             annotateTypeWithGvNIXEntityBatch(getFormBakingObject(controllerDetails));
         }
     }
@@ -778,14 +778,14 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     * If there is a pattern of given WebPattern defined in GvNIXPattern it
+     * If there is a pattern of given WebPatternType defined in GvNIXPattern it
      * returns true, false otherwise
      * 
      * @param patternType
      * @param definedPatternsList
      * @return
      */
-    private boolean isPatternTypeDefined(WebPattern patternType,
+    private boolean isPatternTypeDefined(WebPatternType patternType,
             List<String> definedPatternsList) {
         for (String definedPattern : definedPatternsList) {
             if (definedPattern.split("=")[1].equalsIgnoreCase(patternType

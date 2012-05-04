@@ -61,7 +61,7 @@ public interface WebScreenOperations {
      *            The pattern to apply
      */
     void addPattern(JavaType controllerClass, JavaSymbolName name,
-            WebPattern pattern);
+            WebPatternType pattern);
 
     /**
      * Indicate commands should be available
@@ -95,7 +95,7 @@ public interface WebScreenOperations {
      *            The pattern to apply
      */
     void addRelationPattern(JavaType controllerClass, JavaSymbolName name,
-            JavaSymbolName field, WebPattern type);
+            JavaSymbolName field, WebPatternType type);
 
     /**
      * Forces the update of pattern Artifacts.

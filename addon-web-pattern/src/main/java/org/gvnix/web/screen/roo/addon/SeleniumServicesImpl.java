@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.gvnix.web.screen.roo.addon;
 
@@ -9,6 +9,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -71,14 +72,14 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 	private static Logger logger = Logger
             .getLogger(SeleniumServicesImpl.class.getName());
-    
+
 	/**
 	 * Creates a new Selenium testcase
-	 * 
+	 *
 	 * @param controller the JavaType of the controller under test (required)
 	 * @param name the name of the test case (optional)
 	 */
-	public void generateTest(JavaType controller, WebPattern type, String name, String serverURL) {
+	public void generateTest(JavaType controller, WebPatternType type, WebPatternHierarchy hierarchy, JavaSymbolName detailField, String name, String serverURL) {
 		Assert.notNull(controller, "Controller type required");
 
 		String webScaffoldMetadataIdentifier = WebScaffoldMetadata.createIdentifier(controller, Path.SRC_MAIN_JAVA);
@@ -98,7 +99,12 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
 
 		// DiSiD Use pattern name instead of entity name for compatibility with Roo selenium addon
-		String relativeTestFilePath = "selenium/test-" + name + ".xhtml";
+		String relativeTestFilePath = "selenium/test-" + name + "-" + hierarchy + "-" + type;
+		if (detailField != null) {
+			relativeTestFilePath = relativeTestFilePath + "-" + detailField;
+		}
+		relativeTestFilePath = relativeTestFilePath + ".xhtml";
+
 		String seleniumPath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, relativeTestFilePath);
 
 		Document document;
@@ -123,14 +129,14 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		// DiSiD Create pattern test
 		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
-		tbody.appendChild(openCommand(document, serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath(), type, name));
+		tbody.appendChild(openCommand(document, serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath(), type, name, hierarchy));
 
 		PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA));
 		Assert.notNull(formBackingObjectPhysicalTypeMetadata, "Unable to obtain physical type metadata for type " + formBackingType.getFullyQualifiedTypeName());
 		ClassOrInterfaceTypeDetails formBackingClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadata.getMemberHoldingTypeDetails();
 		MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), formBackingClassOrInterfaceDetails);
-		
-		if (type.equals(WebPattern.register)) {
+
+		if (hierarchy.equals(WebPatternHierarchy.master) && type.equals(WebPatternType.register)) {
 
 			// Add composite PK identifier fields if needed
 			JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(formBackingType, memberDetails, null);
@@ -143,7 +149,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 					}
 				}
 			}
-	
+
 			// Add all other fields
 			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
 			for (FieldMetadata field : fields) {
@@ -151,9 +157,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 					tbody.appendChild(typeCommand(document, field, type, formBackingType));
 				}
 			}
-	
+
 			tbody.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
-	
+
 			// Add verifications for all other fields
 			for (FieldMetadata field : fields) {
 				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
@@ -161,15 +167,15 @@ public class SeleniumServicesImpl implements SeleniumServices {
 				}
 			}
 		}
-		else if (type.equals(WebPattern.tabular)) {
+		else if (hierarchy.equals(WebPatternHierarchy.master) && type.equals(WebPatternType.tabular)) {
 
 			String imgId = XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName()) + "_create";
 			tbody.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
-			
+
 			// TODO Composite PK test generation when tabular pattern PK support
-			
+
 			// TODO Check if other fields are editable (storeEditable)
-			
+
 			// Add all other fields
 			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
 			for (FieldMetadata field : fields) {
@@ -180,7 +186,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 			String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName());
 			tbody.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
-			
+
 			// Add verifications for all other fields
 			for (FieldMetadata field : fields) {
 				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
@@ -188,7 +194,52 @@ public class SeleniumServicesImpl implements SeleniumServices {
 				}
 			}
 		}
-		
+		else if (hierarchy.equals(WebPatternHierarchy.detail) && type.equals(WebPatternType.tabular)) {
+
+			JavaType detailType = null;
+			Iterator<FieldMetadata> detailTypes = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null).iterator();
+			while (detailTypes.hasNext() && detailType == null) {
+				FieldMetadata tmp = detailTypes.next();
+				if (tmp.getFieldName().equals(detailField)) {
+					detailType = tmp.getFieldType();
+				}
+			}
+
+			if (detailType != null) {
+
+				PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadataField = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(detailType.getParameters().get(0), Path.SRC_MAIN_JAVA));
+				Assert.notNull(formBackingObjectPhysicalTypeMetadataField, "Unable to obtain physical type metadata for type " + detailType.getParameters().get(0).getFullyQualifiedTypeName());
+				ClassOrInterfaceTypeDetails formBackingClassOrInterfaceDetailsField = (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadataField.getMemberHoldingTypeDetails();
+				MemberDetails memberDetailsField = memberDetailsScanner.getMemberDetails(getClass().getName(), formBackingClassOrInterfaceDetailsField);
+
+				String imgId = XmlUtils.convertId("fu:" + detailType.getParameters().get(0).getFullyQualifiedTypeName()) + "_create";
+				tbody.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
+
+				// TODO Composite PK test generation when tabular pattern PK support
+
+				// TODO Check if other fields are editable (storeEditable)
+
+				// Add all other fields
+				List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(detailType.getParameters().get(0), memberDetailsField, null);
+				for (FieldMetadata field : fields) {
+					if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+						tbody.appendChild(typeCommand(document, field, type, detailType.getParameters().get(0)));
+					}
+				}
+
+				String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + detailType.getParameters().get(0).getFullyQualifiedTypeName());
+				tbody.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
+
+				// Add verifications for all other fields
+				for (FieldMetadata field : fields) {
+					if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+						tbody.appendChild(verifyValueCommand(document, detailType.getParameters().get(0), field));
+					}
+				}
+
+			}
+		}
+
 		fileManager.createOrUpdateTextFileIfRequired(seleniumPath, XmlUtils.nodeToString(document), false);
 
 		manageTestSuite(relativeTestFilePath, name, serverURL);
@@ -196,7 +247,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		installMavenPlugin();
 	}
 
-	private Node openCommand(Document document, String linkTarget, WebPattern type, String name) {
+	private Node openCommand(Document document, String linkTarget, WebPatternType type, String name, WebPatternHierarchy hierarchy) {
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
@@ -204,15 +255,22 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		// DiSiD Add pattern request attributes
 		Node td2 = tr.appendChild(document.createElement("td"));
-		
-		if (type.equals(WebPattern.register)) {
+
+		if (hierarchy.equals(WebPatternHierarchy.detail)) {
+			td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
+					+ "gvnixform"
+					+ "&gvnixpattern=" + name
+					+ "&index=1"
+					+ "&lang=" + Locale.getDefault());
+		}
+		else if (type.equals(WebPatternType.register)) {
 			td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
 					+ "form"
 					+ "&gvnixpattern=" + name
 					+ "&index=1"
 					+ "&lang=" + Locale.getDefault());
 		}
-		else if (type.equals(WebPattern.tabular)) {
+		else if (type.equals(WebPatternType.tabular)) {
 			td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
 					+ "gvnixpattern=" + name
 					+ "&lang=" + Locale.getDefault());
@@ -233,20 +291,20 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		return false;
 	}
 
-	private Node typeCommand(Document document, FieldMetadata field, WebPattern type, JavaType formBackingType) {
+	private Node typeCommand(Document document, FieldMetadata field, WebPatternType type, JavaType formBackingType) {
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
 		td1.setTextContent("type");
-		
+
 		Node td2 = tr.appendChild(document.createElement("td"));
 
-		if (type.equals(WebPattern.register)) {
-			
+		if (type.equals(WebPatternType.register)) {
+
 			td2.setTextContent("_" + field.getFieldName().getSymbolName() + "_id");
 		}
-		else if (type.equals(WebPattern.tabular)) {
-			
+		else if (type.equals(WebPatternType.tabular)) {
+
 			String id = "_" + XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName()) + "[0]_" + field.getFieldName() + "_id_create";
 			td2.setTextContent(id);
 		}
@@ -301,7 +359,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		return tr;
 	}
-	
+
 	private Node verifyValueCommand(Document document, JavaType formBackingType, FieldMetadata field) {
 		Node tr = document.createElement("tr");
 
@@ -367,7 +425,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		if (XmlUtils.findFirstElement("/project/build/plugins/plugin[artifactId = 'selenium-maven-plugin']", root) != null) {
 			return;
 		}
-		
+
 		Element configuration = XmlUtils.getConfiguration(SeleniumOperationsImpl.class);
 		Element plugin = XmlUtils.findFirstElement("/configuration/selenium/plugin", configuration);
 
@@ -439,5 +497,5 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		}
 		return initializer;
 	}
-	
+
 }

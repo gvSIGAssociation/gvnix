@@ -170,7 +170,7 @@ public abstract class AbstractPatternMetadata extends
         builder.addField(getDefinedPatternField());
         // builder.addMethod(getIsPatternDefinedMethod());
 
-        if (isPatternTypeDefined(WebPattern.tabular, this.definedPatterns)) {
+        if (isPatternTypeDefined(WebPatternType.tabular, this.definedPatterns)) {
             // annotateFormBackingObject();
             if (javaTypeMetadataHolder.getPersistenceDetails()
                     .getFindAllMethod() == null) {
@@ -184,7 +184,7 @@ public abstract class AbstractPatternMetadata extends
             builder.addMethod(getRefererRedirectMethod());
         }
 
-        if (isPatternTypeDefined(WebPattern.register, this.definedPatterns)) {
+        if (isPatternTypeDefined(WebPatternType.register, this.definedPatterns)) {
             // addStaticFields();
             if (javaTypeMetadataHolder.getPersistenceDetails()
                     .getFindEntriesMethod() == null) {
@@ -685,14 +685,14 @@ public abstract class AbstractPatternMetadata extends
     }
 
     /**
-     * If there is a pattern of given WebPattern defined in GvNIXPattern it
+     * If there is a pattern of given WebPatternType defined in GvNIXPattern it
      * returns true, false otherwise
      * 
      * @param patternType
      * @param definedPatternsList
      * @return
      */
-    protected boolean isPatternTypeDefined(WebPattern patternType,
+    protected boolean isPatternTypeDefined(WebPatternType patternType,
             List<String> definedPatternsList) {
         for (String definedPattern : definedPatternsList) {
             if (definedPattern.split("=")[1].equalsIgnoreCase(patternType

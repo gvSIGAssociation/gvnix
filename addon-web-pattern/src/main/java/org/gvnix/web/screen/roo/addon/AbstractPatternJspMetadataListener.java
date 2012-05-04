@@ -147,12 +147,12 @@ public abstract class AbstractPatternJspMetadataListener implements
          * TODO: next test may be replaced by a test over allow or not create
          * operation of the entity
          */
-        if (patternNameType[1].equalsIgnoreCase(WebPattern.tabular.name())) {
-            installPatternTypeArtifact(WebPattern.tabular,
+        if (patternNameType[1].equalsIgnoreCase(WebPatternType.tabular.name())) {
+            installPatternTypeArtifact(WebPatternType.tabular,
                     destinationDirectory, controllerPath, patternNameType[0]);
-        } else if (patternNameType[1].equalsIgnoreCase(WebPattern.register
+        } else if (patternNameType[1].equalsIgnoreCase(WebPatternType.register
                 .name())) {
-            installPatternTypeArtifact(WebPattern.register,
+            installPatternTypeArtifact(WebPatternType.register,
                     destinationDirectory, controllerPath, patternNameType[0]);
         } else {
             // Pattern type not supported. Nothing to do
@@ -166,21 +166,21 @@ public abstract class AbstractPatternJspMetadataListener implements
     }
 
     /**
-     * Creates a JSPx of the given WebPattern type
+     * Creates a JSPx of the given WebPatternType type
      * 
      * @param patternType
      * @param destinationDirectory
      * @param controllerPath
      * @param patternName
      */
-    private void installPatternTypeArtifact(WebPattern patternType,
+    private void installPatternTypeArtifact(WebPatternType patternType,
             String destinationDirectory, String controllerPath,
             String patternName) {
         String patternTypeStr = patternType.name();
         String patternPath = destinationDirectory.concat("/")
                 .concat(patternName).concat(".jspx");
         // Get the document for the pattern type
-        Document jspDoc = patternType.equals(WebPattern.tabular) ? getUpdateTabularDocument()
+        Document jspDoc = patternType.equals(WebPatternType.tabular) ? getUpdateTabularDocument()
                 : getRegisterDocument(patternName);
         writeToDiskIfNecessary(patternPath, jspDoc);
 
@@ -194,7 +194,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                 formbackingType.getSimpleTypeName());
         JavaSymbolName menuItemId = new JavaSymbolName("list_"
                 .concat(patternTypeStr).concat("_").concat(patternName));
-        String queryString = patternType.equals(WebPattern.tabular) ? "?gvnixpattern="
+        String queryString = patternType.equals(WebPatternType.tabular) ? "?gvnixpattern="
                 .concat(patternName) : "?gvnixform&gvnixpattern=".concat(
                 patternName).concat(
                 "&index=${empty param.index ? 1 : param.index}");
