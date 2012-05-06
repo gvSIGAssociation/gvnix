@@ -1,5 +1,20 @@
-/**
+/*
+ * gvNIX. Spring Roo based RAD tool for Conselleria d'Infraestructures
+ * i Transport - Generalitat Valenciana
+ * Copyright (C) 2010, 2012 CIT - Generalitat Valenciana
  *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.gvnix.web.screen.roo.addon;
 
@@ -51,8 +66,16 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
+ * Selenium tests generation and configurations for screen patterns.
+ *
  * @see SeleniumOperationsImpl
- * @author mmartinez
+ *
+ * @author Mario Martínez Sánchez (mmartinez at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ *
+ * @since 0.9
  */
 @Component
 @Service
@@ -131,113 +154,22 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
 		tbody.appendChild(openCommand(document, serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath(), type, name, hierarchy));
 
-		PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA));
-		Assert.notNull(formBackingObjectPhysicalTypeMetadata, "Unable to obtain physical type metadata for type " + formBackingType.getFullyQualifiedTypeName());
-		ClassOrInterfaceTypeDetails formBackingClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadata.getMemberHoldingTypeDetails();
-		MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), formBackingClassOrInterfaceDetails);
+		MemberDetails memberDetails = getMemberDetails(formBackingType);
 
 		if (hierarchy.equals(WebPatternHierarchy.master) && type.equals(WebPatternType.register)) {
 
-			// Add composite PK identifier fields if needed
-			JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(formBackingType, memberDetails, null);
-			if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
-				for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
-					if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-						FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
-						fieldBuilder.setFieldName(new JavaSymbolName(javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
-						tbody.appendChild(typeCommand(document, fieldBuilder.build(), type, formBackingType));
-					}
-				}
-			}
-
-			// Add all other fields
-			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
-			for (FieldMetadata field : fields) {
-				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-					tbody.appendChild(typeCommand(document, field, type, formBackingType));
-				}
-			}
-
-			tbody.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
-
-			// Add verifications for all other fields
-			for (FieldMetadata field : fields) {
-				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-					tbody.appendChild(verifyTextCommand(document, formBackingType, field));
-				}
-			}
+			generateTestMasterRegister(type, formBackingType, document, tbody,
+					memberDetails);
 		}
 		else if (hierarchy.equals(WebPatternHierarchy.master) && type.equals(WebPatternType.tabular)) {
 
-			String imgId = XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName()) + "_create";
-			tbody.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
-
-			// TODO Composite PK test generation when tabular pattern PK support
-
-			// TODO Check if other fields are editable (storeEditable)
-
-			// Add all other fields
-			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
-			for (FieldMetadata field : fields) {
-				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-					tbody.appendChild(typeCommand(document, field, type, formBackingType));
-				}
-			}
-
-			String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName());
-			tbody.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
-
-			// Add verifications for all other fields
-			for (FieldMetadata field : fields) {
-				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-					tbody.appendChild(verifyValueCommand(document, formBackingType, field));
-				}
-			}
+			generateTestMasterTabular(type, formBackingType, document, tbody,
+					memberDetails);
 		}
 		else if (hierarchy.equals(WebPatternHierarchy.detail) && type.equals(WebPatternType.tabular)) {
 
-			JavaType detailType = null;
-			Iterator<FieldMetadata> detailTypes = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null).iterator();
-			while (detailTypes.hasNext() && detailType == null) {
-				FieldMetadata tmp = detailTypes.next();
-				if (tmp.getFieldName().equals(detailField)) {
-					detailType = tmp.getFieldType();
-				}
-			}
-
-			if (detailType != null) {
-
-				PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadataField = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(detailType.getParameters().get(0), Path.SRC_MAIN_JAVA));
-				Assert.notNull(formBackingObjectPhysicalTypeMetadataField, "Unable to obtain physical type metadata for type " + detailType.getParameters().get(0).getFullyQualifiedTypeName());
-				ClassOrInterfaceTypeDetails formBackingClassOrInterfaceDetailsField = (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadataField.getMemberHoldingTypeDetails();
-				MemberDetails memberDetailsField = memberDetailsScanner.getMemberDetails(getClass().getName(), formBackingClassOrInterfaceDetailsField);
-
-				String imgId = XmlUtils.convertId("fu:" + detailType.getParameters().get(0).getFullyQualifiedTypeName()) + "_create";
-				tbody.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
-
-				// TODO Composite PK test generation when tabular pattern PK support
-
-				// TODO Check if other fields are editable (storeEditable)
-
-				// Add all other fields
-				List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(detailType.getParameters().get(0), memberDetailsField, null);
-				for (FieldMetadata field : fields) {
-					if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-						tbody.appendChild(typeCommand(document, field, type, detailType.getParameters().get(0)));
-					}
-				}
-
-				String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + detailType.getParameters().get(0).getFullyQualifiedTypeName());
-				tbody.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
-
-				// Add verifications for all other fields
-				for (FieldMetadata field : fields) {
-					if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-						tbody.appendChild(verifyValueCommand(document, detailType.getParameters().get(0), field));
-					}
-				}
-
-			}
+			generateTestDetailTabular(type, detailField, formBackingType,
+					document, tbody, memberDetails);
 		}
 
 		fileManager.createOrUpdateTextFileIfRequired(seleniumPath, XmlUtils.nodeToString(document), false);
@@ -245,6 +177,143 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		manageTestSuite(relativeTestFilePath, name, serverURL);
 
 		installMavenPlugin();
+	}
+
+	protected MemberDetails getMemberDetails(JavaType formBackingType) {
+
+		PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA));
+		Assert.notNull(formBackingObjectPhysicalTypeMetadata, "Unable to obtain physical type metadata for type " + formBackingType.getFullyQualifiedTypeName());
+		ClassOrInterfaceTypeDetails formBackingClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadata.getMemberHoldingTypeDetails();
+		MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), formBackingClassOrInterfaceDetails);
+
+		return memberDetails;
+	}
+
+	public void generateTestMasterRegister(WebPatternType type,
+			JavaType formBackingType, Document document, Element tbody,
+			MemberDetails memberDetails) {
+
+		addCompositeIdentifierFields(type, formBackingType, document, tbody,
+				memberDetails);
+
+		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
+
+		addFields(fields, type, formBackingType, document, tbody);
+
+		tbody.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
+
+		// Add verifications for all other fields
+		addVerificationText(formBackingType, document, tbody, fields);
+	}
+
+	public void generateTestMasterTabular(WebPatternType type,
+			JavaType formBackingType, Document document, Element tbody,
+			MemberDetails memberDetails) {
+
+		String imgId = XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName()) + "_create";
+		tbody.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
+
+		// TODO Composite PK test generation when tabular pattern PK support
+
+		// TODO Check if other fields are editable (storeEditable)
+
+		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
+
+		addFields(fields, type, formBackingType, document, tbody);
+
+		String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName());
+		tbody.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
+
+		addVerificationValue(formBackingType, document, tbody, fields);
+	}
+
+	public void generateTestDetailTabular(WebPatternType type,
+			JavaSymbolName detailField, JavaType formBackingType,
+			Document document, Element tbody, MemberDetails memberDetails) {
+
+		JavaType detailType = null;
+		Iterator<FieldMetadata> detailTypes = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null).iterator();
+		while (detailTypes.hasNext() && detailType == null) {
+			FieldMetadata tmp = detailTypes.next();
+			if (tmp.getFieldName().equals(detailField)) {
+				detailType = tmp.getFieldType();
+			}
+		}
+
+		if (detailType != null) {
+
+			JavaType fieldType = detailType.getParameters().get(0);
+
+			MemberDetails memberDetailsField = getMemberDetails(fieldType);
+
+			String imgId = XmlUtils.convertId("fu:" + fieldType.getFullyQualifiedTypeName()) + "_create";
+			tbody.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
+
+			// TODO Composite PK test generation when tabular pattern PK support
+
+			// TODO Check if other fields are editable (storeEditable)
+
+			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(fieldType, memberDetailsField, null);
+
+			// Add all other fields
+			addFields(fields, type, fieldType, document, tbody);
+
+			String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + fieldType.getFullyQualifiedTypeName());
+			tbody.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
+
+			addVerificationValue(fieldType, document, tbody, fields);
+
+		}
+	}
+
+	protected void addCompositeIdentifierFields(WebPatternType type,
+			JavaType formBackingType, Document document, Element tbody,
+			MemberDetails memberDetails) {
+
+		// Add composite PK identifier fields if needed
+		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(formBackingType, memberDetails, null);
+		if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
+			for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
+				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+					FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
+					fieldBuilder.setFieldName(new JavaSymbolName(javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
+					tbody.appendChild(typeCommand(document, fieldBuilder.build(), type, formBackingType));
+				}
+			}
+		}
+	}
+
+	protected void addFields(List<FieldMetadata> fields, WebPatternType type,
+			JavaType formBackingType, Document document, Element tbody) {
+
+		// Add all other fields
+		for (FieldMetadata field : fields) {
+			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+				tbody.appendChild(typeCommand(document, field, type, formBackingType));
+			}
+		}
+	}
+
+	protected void addVerificationValue(JavaType formBackingType,
+			Document document, Element tbody, List<FieldMetadata> fields) {
+
+		// Add verifications for all other fields
+		for (FieldMetadata field : fields) {
+			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+				tbody.appendChild(verifyValueCommand(document, formBackingType, field));
+			}
+		}
+	}
+
+	protected void addVerificationText(JavaType formBackingType,
+			Document document, Element tbody, List<FieldMetadata> fields) {
+
+		// Add verifications for all other fields
+		for (FieldMetadata field : fields) {
+			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+				tbody.appendChild(verifyTextCommand(document, formBackingType, field));
+			}
+		}
 	}
 
 	private Node openCommand(Document document, String linkTarget, WebPatternType type, String name, WebPatternHierarchy hierarchy) {
@@ -283,7 +352,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	}
 
 	private boolean isSpecialType(JavaType javaType) {
+
 		String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(javaType, Path.SRC_MAIN_JAVA);
+
 		// We are only interested if the type is part of our application and if no editor exists for it already
 		if (metadataService.get(physicalTypeIdentifier) != null) {
 			return true;
