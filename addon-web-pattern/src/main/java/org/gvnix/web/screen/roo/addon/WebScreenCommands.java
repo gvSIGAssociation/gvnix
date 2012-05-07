@@ -86,8 +86,23 @@ public class WebScreenCommands implements CommandMarker {
     	// Create pattern
         operations.addPattern(controllerClass, name, type);
 
-        // Generate optionally selenium web tests
-        generateSeleniumTest(controllerClass, name, type, WebPatternHierarchy.master, null, testAutomatically, testName, url);
+		// Generate optionally Selenium tests
+    	if (testAutomatically) {
+
+    		// Create test with defined name or with pattern name by default
+        	if (testName == null) {
+        		testName = name.getSymbolName();
+        	}
+
+        	if (type == WebPatternType.register) {
+
+        		seleniumServices.generateTestMasterRegister(controllerClass, testName, url);
+        	}
+        	else if (type == WebPatternType.tabular) {
+
+        		seleniumServices.generateTestMasterTabular(controllerClass, testName, url);
+        	}
+    	}
     }
 
     /**
@@ -124,8 +139,16 @@ public class WebScreenCommands implements CommandMarker {
 
         operations.addRelationPattern(controllerClass, name, field, type);
 
-        // Generate optionally selenium web tests
-        generateSeleniumTest(controllerClass, name, type, WebPatternHierarchy.detail, field, testAutomatically, testName, url);
+		// Generate optionally Selenium tests
+    	if (testAutomatically) {
+
+    		// Create test with defined name or with pattern name by default
+        	if (testName == null) {
+        		testName = name.getSymbolName();
+        	}
+
+    		seleniumServices.generateTestDetailTabular(controllerClass, field, testName, url);
+    	}
     }
 
     /**
@@ -135,29 +158,5 @@ public class WebScreenCommands implements CommandMarker {
     public void webPatternInstall() {
         operations.installPatternArtifacts(true);
     }
-
-
-	/**
-	 * @param controllerClass
-	 * @param name
-	 * @param testAutomatically
-	 * @param testName
-	 * @param url
-	 */
-	protected void generateSeleniumTest(JavaType controllerClass, JavaSymbolName name,
-			WebPatternType type, WebPatternHierarchy hierarchy, JavaSymbolName field,
-			boolean testAutomatically, String testName, String url) {
-
-		// Generate optionally Selenium tests
-    	if (testAutomatically) {
-
-    		// Create test with defined name or with pattern name by default
-        	if (testName == null) {
-        		testName = name.getSymbolName();
-        	}
-
-    		seleniumServices.generateTest(controllerClass, type, hierarchy, field, testName, url);
-    	}
-	}
 
 }

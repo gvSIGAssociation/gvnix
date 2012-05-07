@@ -97,253 +97,222 @@ public class SeleniumServicesImpl implements SeleniumServices {
             .getLogger(SeleniumServicesImpl.class.getName());
 
 	/**
-	 * Creates a new Selenium testcase
+	 * Creates a new Selenium test for a master register pattern.
 	 *
 	 * @param controller the JavaType of the controller under test (required)
 	 * @param name the name of the test case (optional)
+	 * @param serverURL the application address (optional)
 	 */
-	public void generateTest(JavaType controller, WebPatternType type, WebPatternHierarchy hierarchy, JavaSymbolName detailField, String name, String serverURL) {
+	public void generateTestMasterRegister(JavaType controller, String name, String serverURL) {
+
 		Assert.notNull(controller, "Controller type required");
 
-		String webScaffoldMetadataIdentifier = WebScaffoldMetadata.createIdentifier(controller, Path.SRC_MAIN_JAVA);
-		WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService.get(webScaffoldMetadataIdentifier);
-		Assert.notNull(webScaffoldMetadata, "Web controller '" + controller.getFullyQualifiedTypeName() + "' does not appear to be an automatic, scaffolded controller");
+		// Get web scaffold annotation from controller
+		WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
 
 		// We abort the creation of a selenium test if the controller does not allow the creation of new instances for the form backing object
 		if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
+
 			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
 			return;
 		}
 
+		// Get selenium template
+		Document document = getSeleniumTemplate();
+
+		// Get template html content and update with current name
+		Element root = getHtmlElement(name, document);
+
+		// Get table body element to include test operations
+		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
+
+		// Add pattern URL to open for test
 		if (!serverURL.endsWith("/")) {
 			serverURL = serverURL + "/";
 		}
+		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
+		tbody.appendChild(openCommandRegisterAdd(document, baseURL, name));
 
+		// Add test operations
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
+		addTestMasterRegister(formBackingType, document, tbody);
 
-		// DiSiD Use pattern name instead of entity name for compatibility with Roo selenium addon
-		String relativeTestFilePath = "selenium/test-" + name + "-" + hierarchy + "-" + type;
-		if (detailField != null) {
-			relativeTestFilePath = relativeTestFilePath + "-" + detailField;
+		// Store the test file into project
+		String relativeTestFilePath = "selenium/test-" + name + "-master-register.xhtml";
+		installTest(name, serverURL, document, relativeTestFilePath);
+	}
+
+	/**
+	 * Creates a new Selenium test for a master tabular pattern.
+	 *
+	 * @param controller the JavaType of the controller under test (required)
+	 * @param name the name of the test case (optional)
+	 * @param serverURL the application address (optional)
+	 */
+	public void generateTestMasterTabular(JavaType controller, String name, String serverURL) {
+
+		Assert.notNull(controller, "Controller type required");
+
+		// Get web scaffold annotation from controller
+		WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
+
+		// We abort the creation of a selenium test if the controller does not allow the creation of new instances for the form backing object
+		if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
+
+			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
+			return;
 		}
-		relativeTestFilePath = relativeTestFilePath + ".xhtml";
 
-		String seleniumPath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, relativeTestFilePath);
+		// Get selenium template
+		Document document = getSeleniumTemplate();
 
-		Document document;
+		// Get template html content and update with current name
+		Element root = getHtmlElement(name, document);
+
+		// Get table body element to include test operations
+		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
+
+		// Add pattern URL to open for test
+		if (!serverURL.endsWith("/")) {
+			serverURL = serverURL + "/";
+		}
+		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
+		tbody.appendChild(openCommandTabular(document, baseURL, name));
+
+		// Add test operations
+		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
+		addTestMasterTabular(formBackingType, document, tbody);
+
+		// Store the test file into project
+		String relativeTestFilePath = "selenium/test-" + name + "-master-tabular.xhtml";
+		installTest(name, serverURL, document, relativeTestFilePath);
+	}
+
+	/**
+	 * Creates a new Selenium test for a detail tabular pattern.
+	 *
+	 * @param controller the JavaType of the controller under test (required)
+	 * @param fieldName Related controller entity field name (required)
+	 * @param name the name of the test case (optional)
+	 * @param serverURL the application address (optional)
+	 */
+	public void generateTestDetailTabular(JavaType controller, JavaSymbolName fieldName, String name, String serverURL) {
+
+		Assert.notNull(controller, "Controller type required");
+		Assert.notNull(fieldName, "Field name required");
+
+		// Get web scaffold annotation from controller
+		WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
+
+		// We abort the creation of a selenium test if the controller does not allow the creation of new instances for the form backing object
+		if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
+
+			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
+			return;
+		}
+
+		// Get selenium template
+		Document document = getSeleniumTemplate();
+
+		// Get template html content and update with current name
+		Element root = getHtmlElement(name, document);
+
+		// Get table body element to include test operations
+		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
+
+		// Add pattern URL to open for test
+		if (!serverURL.endsWith("/")) {
+			serverURL = serverURL + "/";
+		}
+		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
+		tbody.appendChild(openCommandRegister(document, baseURL, name));
+
+		// Add test operations
+		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
+		addTestDetailTabular(fieldName, formBackingType, document, tbody);
+
+		// Store the test file into project
+		String relativeTestFilePath = "selenium/test-" + name + "-detail-tabular" + "-" + fieldName + ".xhtml";
+		installTest(name, serverURL, document, relativeTestFilePath);
+	}
+
+	/**
+	 * Get web scaffold annotation from controller.
+	 *
+	 * @param controller Controller java type
+	 * @return Web scaffold metadata from annotation
+	 */
+	private WebScaffoldMetadata getWebScaffoldMetadata(JavaType controller) {
+
+		String identifier = WebScaffoldMetadata.createIdentifier(controller, Path.SRC_MAIN_JAVA);
+		WebScaffoldMetadata metadata = (WebScaffoldMetadata) metadataService.get(identifier);
+		Assert.notNull(metadata, "Web controller '" + controller.getFullyQualifiedTypeName() + "' does not appear to be an automatic, scaffolded controller");
+
+		return metadata;
+	}
+
+	/**
+	 * Get document from selenium template.
+	 *
+	 * @return Selenium template document
+	 */
+	protected Document getSeleniumTemplate() {
+
 		try {
-			InputStream templateInputStream = TemplateUtils.getTemplate(SeleniumOperationsImpl.class, "selenium-template.xhtml");
-			Assert.notNull(templateInputStream, "Could not acquire selenium.xhtml template");
-			document = XmlUtils.readXml(templateInputStream);
+
+			InputStream inputStream = TemplateUtils.getTemplate(SeleniumOperationsImpl.class, "selenium-template.xhtml");
+			Assert.notNull(inputStream, "Could not acquire selenium.xhtml template");
+			return XmlUtils.readXml(inputStream);
+
 		} catch (Exception e) {
+
 			throw new IllegalStateException(e);
 		}
+	}
+
+	/**
+	 * Get template html content and update with current name.
+	 *
+	 * @param name Name to write into html content
+	 * @param document Document to write into
+	 * @return Html element with required name
+	 */
+	protected Element getHtmlElement(String name, Document document) {
 
 		Element root = (Element) document.getLastChild();
 		if (root == null || !"html".equals(root.getNodeName())) {
+
 			throw new IllegalArgumentException("Could not parse selenium test case template file!");
 		}
-
-		// DiSiD Use pattern name instead of entity name for compatibility with Roo selenium addon
-		name = (name != null ? name : "Selenium test for " + name);
 		XmlUtils.findRequiredElement("/html/head/title", root).setTextContent(name);
-
 		XmlUtils.findRequiredElement("/html/body/table/thead/tr/td", root).setTextContent(name);
 
-		// DiSiD Create pattern test
-		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
-		tbody.appendChild(openCommand(document, serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath(), type, name, hierarchy));
-
-		MemberDetails memberDetails = getMemberDetails(formBackingType);
-
-		if (hierarchy.equals(WebPatternHierarchy.master) && type.equals(WebPatternType.register)) {
-
-			generateTestMasterRegister(type, formBackingType, document, tbody,
-					memberDetails);
-		}
-		else if (hierarchy.equals(WebPatternHierarchy.master) && type.equals(WebPatternType.tabular)) {
-
-			generateTestMasterTabular(type, formBackingType, document, tbody,
-					memberDetails);
-		}
-		else if (hierarchy.equals(WebPatternHierarchy.detail) && type.equals(WebPatternType.tabular)) {
-
-			generateTestDetailTabular(type, detailField, formBackingType,
-					document, tbody, memberDetails);
-		}
-
-		fileManager.createOrUpdateTextFileIfRequired(seleniumPath, XmlUtils.nodeToString(document), false);
-
-		manageTestSuite(relativeTestFilePath, name, serverURL);
-
-		installMavenPlugin();
+		return root;
 	}
 
-	protected MemberDetails getMemberDetails(JavaType formBackingType) {
+	/**
+	 * Create a html section to open register pattern URL.
+	 *
+	 * @param document Document where create section
+	 * @param linkTarget Base URL to the server
+	 * @param name Name of pattern
+	 * @return Html node with register pattern open URL
+	 */
+	protected Node openCommandRegister(Document document, String linkTarget, String name) {
 
-		PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA));
-		Assert.notNull(formBackingObjectPhysicalTypeMetadata, "Unable to obtain physical type metadata for type " + formBackingType.getFullyQualifiedTypeName());
-		ClassOrInterfaceTypeDetails formBackingClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadata.getMemberHoldingTypeDetails();
-		MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), formBackingClassOrInterfaceDetails);
-
-		return memberDetails;
-	}
-
-	public void generateTestMasterRegister(WebPatternType type,
-			JavaType formBackingType, Document document, Element tbody,
-			MemberDetails memberDetails) {
-
-		addCompositeIdentifierFields(type, formBackingType, document, tbody,
-				memberDetails);
-
-		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
-
-		addFields(fields, type, formBackingType, document, tbody);
-
-		tbody.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
-
-		// Add verifications for all other fields
-		addVerificationText(formBackingType, document, tbody, fields);
-	}
-
-	public void generateTestMasterTabular(WebPatternType type,
-			JavaType formBackingType, Document document, Element tbody,
-			MemberDetails memberDetails) {
-
-		String imgId = XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName()) + "_create";
-		tbody.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
-
-		// TODO Composite PK test generation when tabular pattern PK support
-
-		// TODO Check if other fields are editable (storeEditable)
-
-		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
-
-		addFields(fields, type, formBackingType, document, tbody);
-
-		String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName());
-		tbody.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
-
-		addVerificationValue(formBackingType, document, tbody, fields);
-	}
-
-	public void generateTestDetailTabular(WebPatternType type,
-			JavaSymbolName detailField, JavaType formBackingType,
-			Document document, Element tbody, MemberDetails memberDetails) {
-
-		JavaType detailType = null;
-		Iterator<FieldMetadata> detailTypes = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null).iterator();
-		while (detailTypes.hasNext() && detailType == null) {
-			FieldMetadata tmp = detailTypes.next();
-			if (tmp.getFieldName().equals(detailField)) {
-				detailType = tmp.getFieldType();
-			}
-		}
-
-		if (detailType != null) {
-
-			JavaType fieldType = detailType.getParameters().get(0);
-
-			MemberDetails memberDetailsField = getMemberDetails(fieldType);
-
-			String imgId = XmlUtils.convertId("fu:" + fieldType.getFullyQualifiedTypeName()) + "_create";
-			tbody.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
-
-			// TODO Composite PK test generation when tabular pattern PK support
-
-			// TODO Check if other fields are editable (storeEditable)
-
-			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(fieldType, memberDetailsField, null);
-
-			// Add all other fields
-			addFields(fields, type, fieldType, document, tbody);
-
-			String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + fieldType.getFullyQualifiedTypeName());
-			tbody.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
-
-			addVerificationValue(fieldType, document, tbody, fields);
-
-		}
-	}
-
-	protected void addCompositeIdentifierFields(WebPatternType type,
-			JavaType formBackingType, Document document, Element tbody,
-			MemberDetails memberDetails) {
-
-		// Add composite PK identifier fields if needed
-		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(formBackingType, memberDetails, null);
-		if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
-			for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
-				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-					FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
-					fieldBuilder.setFieldName(new JavaSymbolName(javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
-					tbody.appendChild(typeCommand(document, fieldBuilder.build(), type, formBackingType));
-				}
-			}
-		}
-	}
-
-	protected void addFields(List<FieldMetadata> fields, WebPatternType type,
-			JavaType formBackingType, Document document, Element tbody) {
-
-		// Add all other fields
-		for (FieldMetadata field : fields) {
-			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-				tbody.appendChild(typeCommand(document, field, type, formBackingType));
-			}
-		}
-	}
-
-	protected void addVerificationValue(JavaType formBackingType,
-			Document document, Element tbody, List<FieldMetadata> fields) {
-
-		// Add verifications for all other fields
-		for (FieldMetadata field : fields) {
-			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-				tbody.appendChild(verifyValueCommand(document, formBackingType, field));
-			}
-		}
-	}
-
-	protected void addVerificationText(JavaType formBackingType,
-			Document document, Element tbody, List<FieldMetadata> fields) {
-
-		// Add verifications for all other fields
-		for (FieldMetadata field : fields) {
-			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-				tbody.appendChild(verifyTextCommand(document, formBackingType, field));
-			}
-		}
-	}
-
-	private Node openCommand(Document document, String linkTarget, WebPatternType type, String name, WebPatternHierarchy hierarchy) {
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
 		td1.setTextContent("open");
 
-		// DiSiD Add pattern request attributes
+		// Add pattern request attributes
 		Node td2 = tr.appendChild(document.createElement("td"));
 
-		if (hierarchy.equals(WebPatternHierarchy.detail)) {
-			td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
-					+ "gvnixform"
-					+ "&gvnixpattern=" + name
-					+ "&index=1"
-					+ "&lang=" + Locale.getDefault());
-		}
-		else if (type.equals(WebPatternType.register)) {
-			td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
-					+ "form"
-					+ "&gvnixpattern=" + name
-					+ "&index=1"
-					+ "&lang=" + Locale.getDefault());
-		}
-		else if (type.equals(WebPatternType.tabular)) {
-			td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
-					+ "gvnixpattern=" + name
-					+ "&lang=" + Locale.getDefault());
-		}
+		td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
+				+ "gvnixform"
+				+ "&gvnixpattern=" + name
+				+ "&index=1"
+				+ "&lang=" + Locale.getDefault());
 
 		Node td3 = tr.appendChild(document.createElement("td"));
 		td3.setTextContent(" ");
@@ -351,42 +320,235 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		return tr;
 	}
 
+	/**
+	 * Create a html section to open register pattern add URL.
+	 *
+	 * @param document Document where create section
+	 * @param linkTarget Base URL to the server
+	 * @param name Name of pattern
+	 * @return Html node with register pattern add open URL
+	 */
+	protected Node openCommandRegisterAdd(Document document, String linkTarget, String name) {
+
+		Node tr = document.createElement("tr");
+
+		Node td1 = tr.appendChild(document.createElement("td"));
+		td1.setTextContent("open");
+
+		// Add pattern request attributes
+		Node td2 = tr.appendChild(document.createElement("td"));
+
+		td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
+				+ "form"
+				+ "&gvnixpattern=" + name
+				+ "&index=1"
+				+ "&lang=" + Locale.getDefault());
+
+		Node td3 = tr.appendChild(document.createElement("td"));
+		td3.setTextContent(" ");
+
+		return tr;
+	}
+
+	/**
+	 * Create a html section to open tabular pattern URL.
+	 *
+	 * @param document Document where create section
+	 * @param linkTarget Base URL to the server
+	 * @param name Name of pattern
+	 * @return Html node with tabular pattern open URL
+	 */
+	protected Node openCommandTabular(Document document, String linkTarget, String name) {
+
+		Node tr = document.createElement("tr");
+
+		Node td1 = tr.appendChild(document.createElement("td"));
+		td1.setTextContent("open");
+
+		// Add pattern request attributes
+		Node td2 = tr.appendChild(document.createElement("td"));
+
+		td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
+				+ "gvnixpattern=" + name
+				+ "&lang=" + Locale.getDefault());
+
+		Node td3 = tr.appendChild(document.createElement("td"));
+		td3.setTextContent(" ");
+
+		return tr;
+	}
+
+	/**
+	 * Add Selenium commands for master register pattern test.
+	 *
+	 * @param entity Entity to test
+	 * @param document Document to write commands
+	 * @param element Element where store commands
+	 */
+	protected void addTestMasterRegister(JavaType entity, Document document, Element element) {
+
+		MemberDetails memberDetails = getMemberDetails(entity);
+
+		// Add register identifier fields
+		addCompositeIdentifierFieldsRegister(entity, document, element, memberDetails);
+
+		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, memberDetails, null);
+
+		// Add register fields
+		addFieldsRegister(fields, document, element);
+
+		// Add submit
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
+
+		// Add register fields verification
+		addVerificationRegister(entity, document, element, fields);
+	}
+
+	/**
+	 * Add Selenium commands for master tabular pattern test.
+	 *
+	 * @param entity Entity to test
+	 * @param document Document to write commands
+	 * @param element Element where store commands
+	 */
+	protected void addTestMasterTabular(JavaType entity, Document document, Element element) {
+
+		MemberDetails memberDetails = getMemberDetails(entity);
+
+		// Add image push to access creation
+		String imgId = XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()) + "_create";
+		element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
+
+		// TODO Composite PK test generation when tabular pattern PK support
+		// TODO Check if other fields are editable (storeEditable)
+
+		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, memberDetails, null);
+
+		// Add tabular fields
+		addFieldsTabular(fields, entity, document, element);
+
+		// Add submit
+		String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName());
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
+
+		// Add tabular fields verification
+		addVerificationTabular(entity, document, element, fields);
+	}
+
+	/**
+	 * Add Selenium commands for detail tabular pattern test.
+	 *
+	 * @param fieldName Property name of entity to test detail pattern
+	 * @param entity Entity to test
+	 * @param document Document to write commands
+	 * @param element Element where store commands
+	 */
+	protected void addTestDetailTabular(JavaSymbolName fieldName, JavaType entity, Document document, Element element) {
+
+		// Get java type for field
+		JavaType fieldParametersType = null;
+		MemberDetails memberDetails = getMemberDetails(entity);
+		Iterator<FieldMetadata> fieldParametersTypes = webMetadataService.getScaffoldEligibleFieldMetadata(entity, memberDetails, null).iterator();
+		while (fieldParametersTypes.hasNext() && fieldParametersType == null) {
+			FieldMetadata tmp = fieldParametersTypes.next();
+			if (tmp.getFieldName().equals(fieldName)) {
+				fieldParametersType = tmp.getFieldType();
+			}
+		}
+
+		if (fieldParametersType != null) {
+
+			JavaType fieldType = fieldParametersType.getParameters().get(0);
+
+			MemberDetails memberDetailsField = getMemberDetails(fieldType);
+
+			// Add image push to access creation
+			String imgId = XmlUtils.convertId("fu:" + fieldType.getFullyQualifiedTypeName()) + "_create";
+			element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
+
+			// TODO Composite PK test generation when tabular pattern PK support
+			// TODO Check if other fields are editable (storeEditable)
+
+			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(fieldType, memberDetailsField, null);
+
+			// Add tabular fields
+			addFieldsTabular(fields, fieldType, document, element);
+
+			// Add submit
+			String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + fieldType.getFullyQualifiedTypeName());
+			element.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
+
+			// Add tabular fields verification
+			addVerificationTabular(fieldType, document, element, fields);
+		}
+	}
+
+	/**
+	 * Get member details from java type.
+	 *
+	 * @param javaType Java type for get member details
+	 * @return Member details from required java type
+	 */
+	private MemberDetails getMemberDetails(JavaType javaType) {
+
+		PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(javaType, Path.SRC_MAIN_JAVA));
+		Assert.notNull(physicalTypeMetadata, "Unable to obtain physical type metadata for type " + javaType.getFullyQualifiedTypeName());
+		ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeMetadata.getMemberHoldingTypeDetails();
+
+		return memberDetailsScanner.getMemberDetails(getClass().getName(), classOrInterfaceTypeDetails);
+	}
+
+	/**
+	 * Add composite PK identifier fields if needed into register pattern.
+	 *
+	 * @param javaType Java type to get register pattern identifier fields
+	 * @param document Document to write fields commands
+	 * @param element Element where add fields commands
+	 * @param memberDetails Java type member details
+	 */
+	protected void addCompositeIdentifierFieldsRegister(JavaType javaType, Document document, Element element, MemberDetails memberDetails) {
+
+		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(javaType, memberDetails, null);
+		if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
+			for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
+				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+
+					FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
+					fieldBuilder.setFieldName(new JavaSymbolName(javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
+					element.appendChild(typeCommandRegister(document, fieldBuilder.build()));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Is special type ?
+	 *
+	 * @param javaType Java type
+	 * @return Is special type
+	 */
 	private boolean isSpecialType(JavaType javaType) {
 
 		String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(javaType, Path.SRC_MAIN_JAVA);
 
 		// We are only interested if the type is part of our application and if no editor exists for it already
 		if (metadataService.get(physicalTypeIdentifier) != null) {
+
 			return true;
 		}
+
 		return false;
 	}
 
-	private Node typeCommand(Document document, FieldMetadata field, WebPatternType type, JavaType formBackingType) {
-		Node tr = document.createElement("tr");
+	/**
+	 * Add command click and wait for a URL.
+	 *
+	 * @param document Document to write command
+	 * @param linkTarget Destination URL
+	 * @return Click and wait node
+	 */
+	protected Node clickAndWaitCommand(Document document, String linkTarget) {
 
-		Node td1 = tr.appendChild(document.createElement("td"));
-		td1.setTextContent("type");
-
-		Node td2 = tr.appendChild(document.createElement("td"));
-
-		if (type.equals(WebPatternType.register)) {
-
-			td2.setTextContent("_" + field.getFieldName().getSymbolName() + "_id");
-		}
-		else if (type.equals(WebPatternType.tabular)) {
-
-			String id = "_" + XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName()) + "[0]_" + field.getFieldName() + "_id_create";
-			td2.setTextContent(id);
-		}
-
-		Node td3 = tr.appendChild(document.createElement("td"));
-		td3.setTextContent(convertToInitializer(field));
-
-		return tr;
-	}
-
-	private Node clickAndWaitCommand(Document document, String linkTarget) {
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
@@ -401,7 +563,15 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		return tr;
 	}
 
-	private Node clickCommand(Document document, String linkTarget) {
+	/**
+	 * Add command click for a URL.
+	 *
+	 * @param document Document to write command
+	 * @param linkTarget Destination URL
+	 * @return Click node
+	 */
+	protected Node clickCommand(Document document, String linkTarget) {
+
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
@@ -416,14 +586,58 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		return tr;
 	}
 
-	private Node verifyTextCommand(Document document, JavaType formBackingType, FieldMetadata field) {
+	/**
+	 * Add fields commands for register pattern.
+	 *
+	 * @param fields Fields to add as selenium command
+	 * @param document Document to write into
+	 * @param element Element to add commands
+	 */
+	protected void addFieldsRegister(List<FieldMetadata> fields, Document document, Element element) {
+
+		// Add all other fields
+		for (FieldMetadata field : fields) {
+			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+				element.appendChild(typeCommandRegister(document, field));
+			}
+		}
+	}
+
+	/**
+	 * Add fields commands for tabular pattern.
+	 *
+	 * @param fields Fields to add as selenium command
+	 * @param entity Parent entity of fields
+	 * @param document Document to write into
+	 * @param element Element to add commands
+	 */
+	protected void addFieldsTabular(List<FieldMetadata> fields, JavaType entity, Document document, Element element) {
+
+		// Add all other fields
+		for (FieldMetadata field : fields) {
+			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+				element.appendChild(typeCommandTabular(document, field, entity));
+			}
+		}
+	}
+
+	/**
+	 * Add type value command for register pattern.
+	 *
+	 * @param document Document to write command
+	 * @param field Field to add value
+	 * @return Type node
+	 */
+	protected Node typeCommandRegister(Document document, FieldMetadata field) {
+
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
-		td1.setTextContent("verifyText");
+		td1.setTextContent("type");
 
 		Node td2 = tr.appendChild(document.createElement("td"));
-		td2.setTextContent(XmlUtils.convertId("_s_" + formBackingType.getFullyQualifiedTypeName() + "_" + field.getFieldName().getSymbolName() + "_" + field.getFieldName().getSymbolName() + "_id"));
+
+		td2.setTextContent("_" + field.getFieldName().getSymbolName() + "_id");
 
 		Node td3 = tr.appendChild(document.createElement("td"));
 		td3.setTextContent(convertToInitializer(field));
@@ -431,14 +645,109 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		return tr;
 	}
 
-	private Node verifyValueCommand(Document document, JavaType formBackingType, FieldMetadata field) {
+	/**
+	 * Add type value command for tabular pattern.
+	 *
+	 * @param document Document to write command
+	 * @param field Field to add value
+	 * @param entity Field parent entity
+	 * @return Type node
+	 */
+	protected Node typeCommandTabular(Document document, FieldMetadata field, JavaType entity) {
+
+		Node tr = document.createElement("tr");
+
+		Node td1 = tr.appendChild(document.createElement("td"));
+		td1.setTextContent("type");
+
+		Node td2 = tr.appendChild(document.createElement("td"));
+
+		String id = "_" + XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()) + "[0]_" + field.getFieldName() + "_id_create";
+		td2.setTextContent(id);
+
+		Node td3 = tr.appendChild(document.createElement("td"));
+		td3.setTextContent(convertToInitializer(field));
+
+		return tr;
+	}
+
+	/**
+	 * Add verification value command for register pattern.
+	 *
+	 * @param entity Field parent entity
+	 * @param document Document to write command
+	 * @param element Element to add commands
+	 * @param fields Fields to verify value
+	 */
+	protected void addVerificationRegister(JavaType entity, Document document, Element element, List<FieldMetadata> fields) {
+
+		// Add verifications for all other fields
+		for (FieldMetadata field : fields) {
+			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+				element.appendChild(verifyCommandRegister(document, entity, field));
+			}
+		}
+	}
+
+	/**
+	 * Add verification value command for tabular pattern.
+	 *
+	 * @param entity Field parent entity
+	 * @param document Document to write command
+	 * @param element Element to add commands
+	 * @param fields Fields to verify value
+	 */
+	protected void addVerificationTabular(JavaType entity, Document document, Element element, List<FieldMetadata> fields) {
+
+		// Add verifications for all other fields
+		for (FieldMetadata field : fields) {
+			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+				element.appendChild(verifyCommandTabular(document, entity, field));
+			}
+		}
+	}
+
+	/**
+	 * Add verification value command for register pattern field.
+	 *
+	 * @param document Document to write command
+	 * @param entity Field parent entity
+	 * @param field Field to verify value
+	 * @return Verification node
+	 */
+	protected Node verifyCommandRegister(Document document, JavaType entity, FieldMetadata field) {
+
+		Node tr = document.createElement("tr");
+
+		Node td1 = tr.appendChild(document.createElement("td"));
+		td1.setTextContent("verifyText");
+
+		Node td2 = tr.appendChild(document.createElement("td"));
+		td2.setTextContent(XmlUtils.convertId("_s_" + entity.getFullyQualifiedTypeName() + "_" + field.getFieldName().getSymbolName() + "_" + field.getFieldName().getSymbolName() + "_id"));
+
+		Node td3 = tr.appendChild(document.createElement("td"));
+		td3.setTextContent(convertToInitializer(field));
+
+		return tr;
+	}
+
+	/**
+	 * Add verification value command for tabular pattern field.
+	 *
+	 * @param document Document to write command
+	 * @param entity Field parent entity
+	 * @param field Field to verify value
+	 * @return Verification node
+	 */
+	protected Node verifyCommandTabular(Document document, JavaType entity, FieldMetadata field) {
+
 		Node tr = document.createElement("tr");
 
 		Node td1 = tr.appendChild(document.createElement("td"));
 		td1.setTextContent("verifyValue");
 
 		Node td2 = tr.appendChild(document.createElement("td"));
-		String id = "_" + XmlUtils.convertId("fu:" + formBackingType.getFullyQualifiedTypeName()) + "[0]_" + field.getFieldName() + "_id_update";
+		String id = "_" + XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()) + "[0]_" + field.getFieldName() + "_id_update";
 		td2.setTextContent(XmlUtils.convertId(id));
 
 		Node td3 = tr.appendChild(document.createElement("td"));
@@ -447,20 +756,54 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		return tr;
 	}
 
-	private void manageTestSuite(String testPath, String name, String serverURL) {
-		String relativeTestFilePath = "selenium/test-suite.xhtml";
-		String seleniumPath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, relativeTestFilePath);
+	/**
+	 * Write new test to disk, reference it from Seleniun and install maven plugin.
+	 *
+	 * @param name Test name
+	 * @param serverURL Application base URL
+	 * @param document Document to write
+	 * @param relativePath Destination path where write
+	 */
+	protected void installTest(String name, String serverURL, Document document, String relativePath) {
+
+		// Store new test
+		String path = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, relativePath);
+		fileManager.createOrUpdateTextFileIfRequired(path, XmlUtils.nodeToString(document), false);
+
+		// Store or update the selenium test suite (all tests list)
+		manageTestSuite(relativePath, name, serverURL);
+
+		// Install selenium maven plugin
+		installMavenPlugin();
+	}
+
+	/**
+	 * Install central Selenium configuration if not already and reference a new test.
+	 *
+	 * @param testPath New test path
+	 * @param name Test name
+	 * @param serverURL Application base URL
+	 */
+	protected void manageTestSuite(String testPath, String name, String serverURL) {
+
+		String relativePath = "selenium/test-suite.xhtml";
+		String seleniumPath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, relativePath);
 
 		Document suite;
 		try {
+
 			if (fileManager.exists(seleniumPath)) {
+
 				suite = XmlUtils.readXml(fileManager.getInputStream(seleniumPath));
+
 			} else {
+
 				InputStream templateInputStream = TemplateUtils.getTemplate(SeleniumOperationsImpl.class, "selenium-test-suite-template.xhtml");
 				Assert.notNull(templateInputStream, "Could not acquire selenium test suite template");
 				suite = XmlUtils.readXml(templateInputStream);
 			}
 		} catch (Exception e) {
+
 			throw new IllegalStateException(e);
 		}
 
@@ -483,10 +826,14 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		fileManager.createOrUpdateTextFileIfRequired(seleniumPath, XmlUtils.nodeToString(suite), false);
 
-		menuOperations.addMenuItem(new JavaSymbolName("SeleniumTests"), new JavaSymbolName("Test"), "Test", "selenium_menu_test_suite", "/resources/" + relativeTestFilePath, "si_");
+		menuOperations.addMenuItem(new JavaSymbolName("SeleniumTests"), new JavaSymbolName("Test"), "Test", "selenium_menu_test_suite", "/resources/" + relativePath, "si_");
 	}
 
-	private void installMavenPlugin() {
+	/**
+	 * Install into Maven if not already the Selenium plugin.
+	 */
+	protected void installMavenPlugin() {
+
 		PathResolver pathResolver = projectOperations.getPathResolver();
 		String pom = pathResolver.getIdentifier(Path.ROOT, "/pom.xml");
 		Document document = XmlUtils.readXml(fileManager.getInputStream(pom));
@@ -506,7 +853,14 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		}
 	}
 
+	/**
+	 * Get test value for a field.
+	 *
+	 * @param field Field to auto generate a value
+	 * @return Field test value
+	 */
 	private String convertToInitializer(FieldMetadata field) {
+
 		String initializer = " ";
 		short index = 1;
 		AnnotationMetadata min = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Min"));
