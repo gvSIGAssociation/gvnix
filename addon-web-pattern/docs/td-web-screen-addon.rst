@@ -64,7 +64,7 @@ web mvc pattern install
 ::
 
   web mvc pattern install
-  
+
 This method adds tagx, iamges, css, javascript, jspx and modify i18 property files.
 
 This doesn't need any parameters.
@@ -130,6 +130,18 @@ Options:
 
 * name: Unique name for the pattern in whole project. *Required*. Type: JavaSymbolName, it avoids non valid characters.
 
+* testAutomatically: Create automatic Selenium test for this pattern in controller ? *Optional*
+
+  Type boolean and false by default.
+
+* testName: Name of the test. *Optional*
+
+  If not defined, test name will take the pattern name.
+
+* testServerUrl: URL of the server where the web application is available, including protocol, port and hostname. *Optional*
+
+  By default "http://localhost:8080/".
+
 The command has to add the GvNIXPattern annotation in the class requested by the option "class" and with the following value::
 
   @GvNIXPattern({"MyPattern=tabular"})
@@ -164,6 +176,18 @@ Options:
 * type: The pattern type to apply pattern to. *Required*
 
   Enum type in WebPattern will define the available pattern types. Nowadays: tabular and register.
+
+* testAutomatically: Create automatic Selenium test for this pattern in controller ? *Optional*
+
+  Type boolean and false by default.
+
+* testName: Name of the test. *Optional*
+
+  If not defined, test name will take the pattern name.
+
+* testServerUrl: URL of the server where the web application is available, including protocol, port and hostname. *Optional*
+
+  By default "http://localhost:8080/".
 
 The command has to add the GvNIXRelationsPattern in the class requested by the option "class" and with the following value::
 
@@ -331,6 +355,5 @@ TODO
 * ¿ Hay un problema con este add-on probocado por el método
   org.gvnix.web.screen.roo.addon.ScreenMetadataListener.getAnnotatedFields(String, String). Falla
   porque no está controllado el caso de que WebScaffoldMetada sea null. ?
-  
+
 * TODO Set ``render`` attribute in OneToMany relationships to false.
-  

@@ -17,7 +17,7 @@
 
     <tgroup cols="2">
       <thead>
-        <colspec colwidth="150" />
+        <colspec colwidth="150"/>
 
         <row>
           <entry align="center">Comando</entry>
@@ -101,6 +101,41 @@
             <para>Tipo de patrón a aplicar sobre la entidad.</para>
           </listitem>
         </varlistentry>
+
+        <varlistentry>
+          <term>--testAutomatically</term>
+
+          <listitem>
+            <para>[Opcional] ¿ Crear de forma automática los tests funcionales
+            de Selenium para este patrón del controlador ?</para>
+
+            <para>Por defecto los tests no se generan.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--testName</term>
+
+          <listitem>
+            <para>[Opcional] Nombre con el que crear el test funcional de
+            Selenium.</para>
+
+            <para>Por defecto, si no se especifica nombre para el test, el
+            test tendrá el mismo nombre que el patrón.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--testServerUrl</term>
+
+          <listitem>
+            <para>[Opcional] Dirección donde responde la aplicación en la que
+            ejecutar los tests; incluyendo protocolo, servidor, puerto y ruta
+            de la aplicación.</para>
+
+            <para>Por defecto, toma el valor "http://localhost:8080/".</para>
+          </listitem>
+        </varlistentry>
       </variablelist></para>
   </section>
 
@@ -162,6 +197,41 @@
 
             <para>Tipo de patrón a aplicar sobre la entidad
             relacionada.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--testAutomatically</term>
+
+          <listitem>
+            <para>[Opcional] ¿ Crear de forma automática los tests funcionales
+            de Selenium para este patrón del controlador ?</para>
+
+            <para>Por defecto los tests no se generan.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--testName</term>
+
+          <listitem>
+            <para>[Opcional] Nombre con el que crear el test funcional de
+            Selenium.</para>
+
+            <para>Por defecto, si no se especifica nombre para el test, el
+            test tendrá el mismo nombre que el patrón.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--testServerUrl</term>
+
+          <listitem>
+            <para>[Opcional] Dirección donde responde la aplicación en la que
+            ejecutar los tests; incluyendo protocolo, servidor, puerto y ruta
+            de la aplicación.</para>
+
+            <para>Por defecto, toma el valor "http://localhost:8080/".</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
