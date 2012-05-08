@@ -31,7 +31,7 @@
     </legalnotice>
   </info>
 
-  <toc></toc>
+  <toc/>
 
   <part>
     <title>TODO</title>
@@ -55,11 +55,91 @@
             <para>Descripción de la tarea
             https://jira.springsource.org/browse/ROO-2066 sobre la
             conveniencia de uso de las distintas clases habituales en un
-            add-on de Roo.</para>
+            add-on de Roo:</para>
+
+            <para>Currently ClasspathOperations is injected into DBRE and MVC
+            services. Roo Operations classes should only be called by other
+            Operations classes. This change will re-factor out all the methods
+            from ClasspathOperations into the existing TypeLocationService and
+            a new TypeManagementService. Also, entity-specific commands will
+            be moved from ClasspathCommands to a new EntityCommands class (and
+            corresponding EntityOperations interface and impl class) located
+            in addon-entity. Methods remaining in ClasspathCommands will be
+            specific to classes and interfaces only. ClasspathOperations and
+            ClasspathOperations will be removed after the MVC dependencies are
+            changed to use TypeLocationService and TypeManagementService.
+            Below is the background from Ben Alex about this change. </para>
+
+            <para>The general pattern is this:</para>
+
+            <itemizedlist>
+              <listitem>
+                <para>Utils are statless public abstract classes with public
+                static methods. They cannot be instantiated or injected with
+                anything. It's OK to pass things into the methods if it helps,
+                but it is fairly unusual to pass services or complex objects
+                given utility methods are simple.</para>
+              </listitem>
+
+              <listitem>
+                <para>Commands contain shell annotations. Generally call
+                Operations, but can call Services as well. Usually deal with
+                formatting for user I/O. Also ensure all types are of the
+                intended format for successful method invocation.</para>
+              </listitem>
+
+              <listitem>
+                <para>Operations are stateless types which respond to UI
+                commands and offer their methods to other Operations types.
+                The point was they were different from Commands because they
+                didn't deal with all the user I/O (preparing method arguments
+                etc) nor did they deal with complex lifecycles requiring state
+                and listener models like most of the metadata infrastructure
+                and services do. They just did something quite simple and
+                returned, with no ongoing lifecycle obligations. They are
+                allowed call services and other Operations objects. They
+                aren't allowed call Commands.</para>
+              </listitem>
+
+              <listitem>
+                <para>Services can be called by anyone, including control
+                flows unrelated to a UI command, such as control flows
+                instigated due to a MetadataProvider or event. Services should
+                never call an Operations or Command object.</para>
+              </listitem>
+
+              <listitem>
+                <para>Listeners are really a special type of Service. Most of
+                the time a so-called Service actually implements one of more
+                Listeners.</para>
+              </listitem>
+
+              <listitem>
+                <para>MetadataProviders and metadata infrastructure can call
+                other metadata infrastructure and Services. They're really
+                just a very special type of service (due to the ability to
+                identify them and invoke and notify them from string-based
+                MIDs). They follow the same rules as Services, namely they
+                cannot call Operations or Commands.</para>
+              </listitem>
+            </itemizedlist>
+
+            <para>As time has gone on, more complex add-ons have needed to do
+            more complex things and as such more and more logic has moved from
+            Operations to Services to make them more sophisticated and
+            generally available. This is what has happened in your case. It is
+            starting to get to the point where I question the value of keeping
+            the Operations concept at all. Sure, they're stateless and not
+            listeners, but aside from that they seem of negligible distinction
+            versus a service. Maybe we should just rename all Operations to
+            Services for consistency? The critical thing is one cannot "call
+            up" to Commands, as it's silly to re-convert missing arguments and
+            figure out defaults etc like the Commands and Converter
+            infrastructure does.</para>
           </listitem>
 
           <listitem>
-            <para>"addon create advanced" y "addon create wrapper" </para>
+            <para>"addon create advanced" y "addon create wrapper"</para>
           </listitem>
 
           <listitem>
@@ -110,11 +190,11 @@
         </itemizedlist></para>
     </partintro>
 
-    <xi:include href="arquitectura-interna.xml" />
+    <xi:include href="arquitectura-interna.xml"/>
 
-    <xi:include href="puntos-entrada.xml" />
+    <xi:include href="puntos-entrada.xml"/>
 
-    <xi:include href="metadatos.xml" />
+    <xi:include href="metadatos.xml"/>
   </part>
 
   <part xml:id="desarrollo-part">
@@ -125,27 +205,27 @@
       información de desarrollo de gvNIX</para>
     </partintro>
 
-    <xi:include href="convenciones.xml" />
+    <xi:include href="convenciones.xml"/>
 
-    <xi:include href="repositorio.xml" />
+    <xi:include href="repositorio.xml"/>
 
-    <xi:include href="metodologia.xml" />
+    <xi:include href="metodologia.xml"/>
 
-    <xi:include href="creacion-addon.xml" />
+    <xi:include href="creacion-addon.xml"/>
 
-    <xi:include href="comandos.xml" />
+    <xi:include href="comandos.xml"/>
 
-    <xi:include href="escucha-eventos.xml" />
+    <xi:include href="escucha-eventos.xml"/>
 
-    <xi:include href="cambios-ficheros.xml" />
+    <xi:include href="cambios-ficheros.xml"/>
 
-    <xi:include href="crear-itd.xml" />
+    <xi:include href="crear-itd.xml"/>
 
-    <xi:include href="compilacion.xml" />
+    <xi:include href="compilacion.xml"/>
 
-    <xi:include href="validacion.xml" />
+    <xi:include href="validacion.xml"/>
 
-    <xi:include href="distribucion.xml" />
+    <xi:include href="distribucion.xml"/>
   </part>
 
   <part>
@@ -156,9 +236,9 @@
       OSGi.</para>
     </partintro>
 
-    <xi:include href="osgi-intro.xml" />
+    <xi:include href="osgi-intro.xml"/>
 
-    <xi:include href="osgi-api.xml" />
+    <xi:include href="osgi-api.xml"/>
   </part>
 
   <part xml:id="recursos-part">
@@ -169,6 +249,6 @@
       el desarrollo de gvNIX</para>
     </partintro>
 
-    <xi:include href="recetas.xml" />
+    <xi:include href="recetas.xml"/>
   </part>
 </book>
