@@ -150,11 +150,15 @@
                   <c:otherwise>
                     <!-- Default value, empty option: avoid default field value submit -->
                     <option></option>
-                    <spring:eval expression="fieldValue[itemValue]" scope="request" var="fieldValue" />
+                    <!-- fieldValue can be null if has no value: show options without selected -->
+                    <c:set scope="request" value="" var="fieldValue2" />
+              		<c:if test="${not empty fieldValue}">
+                      <spring:eval expression="fieldValue[itemValue]" scope="request" var="fieldValue2" />
+                    </c:if>
                     <c:forEach items="${items}" var="item2">
                       <spring:eval expression="item2[itemValue]" scope="request" var="field2Value" />
                       <c:choose>
-                        <c:when test="${field2Value == fieldValue}">
+                        <c:when test="${field2Value == fieldValue2}">
                           <option value="${field2Value}" selected="selected">
                             <spring:eval expression="item2" />
                           </option>
