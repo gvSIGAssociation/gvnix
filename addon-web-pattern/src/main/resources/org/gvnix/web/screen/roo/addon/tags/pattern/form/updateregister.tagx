@@ -84,7 +84,8 @@
       <spring:url value="${path}" var="createUrl" htmlEscape="false">
         <spring:param name="form"/>
         <spring:param name="gvnixpattern" value="${param.gvnixpattern}"/>
-        <spring:param name="codigoDocumento" value="${referenceValue}"/>
+        <!-- TODO Is required some param here ? The entity identifier perhaps ? -->
+        <!--spring:param name="codigoDocumento" value="${referenceValue}"/-->
       </spring:url>
       <util:quicklinks id="${id}">
         <util:quicklink id="${id}_create" label="${create_label}" type="CREATE" onclick="regproy_createItem${typeName}('${createUrl}')" />
@@ -168,7 +169,8 @@
                 </c:otherwise>
               </c:choose>
               <c:if test="${versionField ne 'none'}">
-                <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${item[fn:toLowerCase(versionField)]}" disabled="disabled" />
+                <spring:eval expression="item[versionField]" scope="request" var="versionValue" />
+                <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${versionValue}" disabled="disabled" />
               </c:if>
               <jsp:doBody />
 

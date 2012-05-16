@@ -23,6 +23,7 @@ import java.util.List;
 import org.gvnix.support.MetadataUtils;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.model.JavaType;
 
 /**
@@ -47,6 +48,13 @@ public interface PatternService {
      * 
      */
     String findPatternDefinedMoreThanOnceInProject();
+
+    /**
+     * Check if there are pattern names used more than once in controller
+     * 
+     * @return Is pattern already used in controller ?
+     */
+    public boolean arePatternsDefinedOnceInController(AnnotationAttributeValue<?> values);
 
     /**
      * Look at Entity for a One-to-many field by name

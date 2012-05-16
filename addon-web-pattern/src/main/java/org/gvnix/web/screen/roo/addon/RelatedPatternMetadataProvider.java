@@ -95,6 +95,9 @@ public final class RelatedPatternMetadataProvider extends
     @Reference
     WebMetadataService webMetadataService;
 
+    @Reference
+    PatternService patternService;
+
     private final Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
     private final Map<String, JavaType> webScaffoldMidToEntityMap = new LinkedHashMap<String, JavaType>();
 
@@ -211,7 +214,7 @@ public final class RelatedPatternMetadataProvider extends
                 // Check if the controller has defined the same pattern more
                 // than once
                 Assert.isTrue(
-                        arePatternsDefinedOnceInController(thisAnnotationValue),
+                        patternService.arePatternsDefinedOnceInController(thisAnnotationValue),
                         "Controller "
                                 .concat(cid.getName()
                                         .getFullyQualifiedTypeName())

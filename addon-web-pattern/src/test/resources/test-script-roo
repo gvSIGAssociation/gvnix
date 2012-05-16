@@ -38,3 +38,13 @@ web mvc pattern master --class ~.web.HorseController --name horsetab --type tabu
 web mvc pattern master --class ~.web.PersonController --name personregtab --type register --testAutomatically
 web mvc pattern detail --class ~.web.PersonController --name personregtab --field horses --type tabular --testAutomatically
 web mvc pattern detail --class ~.web.PersonController --name personregtab --field cars --type tabular --testAutomatically
+
+web mvc pattern master --class ~.web.PersonController --name persontabeditreg --type tabular_edit_register
+
+web mvc pattern master --class ~.web.CarController --name cartabeditreg --type tabular_edit_register
+
+web mvc pattern master --class ~.web.HorseController --name horsetabeditreg --type tabular_edit_register
+
+web mvc pattern master --class ~.web.PersonController --name personregtabeditreg --type register
+web mvc pattern detail --class ~.web.PersonController --name personregtabeditreg --type tabular_edit_register  --field horses
+web mvc pattern detail --class ~.web.PersonController --name personregtabeditreg --type tabular_edit_register  --field cars

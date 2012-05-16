@@ -18,7 +18,6 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -120,38 +119,6 @@ public abstract class AbstractPatternMetadataProvider extends
             String metadataIdentificationString, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String itdFilename);
-
-    protected boolean arePatternsDefinedOnceInController(
-            AnnotationAttributeValue<?> values) {
-        List<String> auxList = new ArrayList<String>();
-        for (String value : getPatternNames(values)) {
-            if (auxList.contains(value)) {
-                return false;
-            } else {
-                auxList.add(value);
-            }
-        }
-        return true;
-
-    }
-
-    protected List<String> getPatternNames(AnnotationAttributeValue<?> values) {
-        List<String> patternNames = new ArrayList<String>();
-        if (values != null) {
-            @SuppressWarnings("unchecked")
-            List<StringAttributeValue> attrValues = (List<StringAttributeValue>) values
-                    .getValue();
-
-            if (attrValues != null) {
-                String[] pattern = {};
-                for (StringAttributeValue strAttrValue : attrValues) {
-                    pattern = strAttrValue.getValue().split("=");
-                    patternNames.add(pattern[0]);
-                }
-            }
-        }
-        return patternNames;
-    }
 
     /**
      * Read the values of GvNIXRelationsPattern and for the fields defined as

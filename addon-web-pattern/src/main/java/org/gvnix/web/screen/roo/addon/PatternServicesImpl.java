@@ -26,10 +26,14 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MetadataUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
+import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
@@ -62,10 +66,74 @@ public class PatternServicesImpl implements PatternService {
     @Reference
     private MemberDetailsScanner memberDetailsScanner;
 
+    @Reference
+    private TypeLocationService typeLocationService;
+
     /** {@inheritDoc} */
     public String findPatternDefinedMoreThanOnceInProject() {
-        // TODO Auto-generated method stub
+        List<String> definedPatternsInProject = new ArrayList<String>();
+        AnnotationMetadata annotationMetadata = null;
+        for (ClassOrInterfaceTypeDetails cid : typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(PatternMetadataProvider.PATTERN_ANNOTATION)) {
+        	
+            annotationMetadata = MemberFindingUtils.getAnnotationOfType(cid.getAnnotations(), PatternMetadataProvider.PATTERN_ANNOTATION);
+            if (annotationMetadata != null) {
+            	
+                AnnotationAttributeValue<?> annotationValues = annotationMetadata.getAttribute(PatternMetadataProvider.PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+                for (String patternName : getPatternNames(annotationValues)) {
+                	
+                    if (definedPatternsInProject.contains(patternName)) {
+                    	
+                        return patternName;
+                        
+                    } else {
+                    	
+                        definedPatternsInProject.add(patternName);
+                    }
+                }
+            }
+        }
+        
         return null;
+    }
+
+    protected List<String> getPatternNames(AnnotationAttributeValue<?> values) {
+    	
+        List<String> patternNames = new ArrayList<String>();
+        if (values != null) {
+        	
+            @SuppressWarnings("unchecked")
+            List<StringAttributeValue> attrValues = (List<StringAttributeValue>) values.getValue();
+
+            if (attrValues != null) {
+            	
+                String[] pattern = {};
+                for (StringAttributeValue strAttrValue : attrValues) {
+                	
+                    pattern = strAttrValue.getValue().split("=");
+                    patternNames.add(pattern[0]);
+                }
+            }
+        }
+        
+        return patternNames;
+    }
+
+    public boolean arePatternsDefinedOnceInController(AnnotationAttributeValue<?> values) {
+    	
+        List<String> auxList = new ArrayList<String>();
+        for (String value : getPatternNames(values)) {
+        	
+            if (auxList.contains(value)) {
+            	
+                return false;
+                
+            } else {
+            	
+                auxList.add(value);
+            }
+        }
+        
+        return true;
     }
 
     /** {@inheritDoc} */

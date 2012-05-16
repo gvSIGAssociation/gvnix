@@ -37,7 +37,6 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffold
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
@@ -85,9 +84,6 @@ public final class PatternMetadataProvider extends
             "value");
 
     @Reference
-    private TypeLocationService typeLocationService;
-
-    @Reference
     WebScaffoldMetadataProvider webScaffoldMetadataProvider;
 
     @Reference
@@ -98,6 +94,9 @@ public final class PatternMetadataProvider extends
 
     @Reference
     WebMetadataService webMetadataService;
+    
+    @Reference
+    PatternService patternService;
 
     private final Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
     private final Map<String, JavaType> webScaffoldMidToEntityMap = new LinkedHashMap<String, JavaType>();
@@ -204,7 +203,7 @@ public final class PatternMetadataProvider extends
                 .getAnnotationOfType(cid.getAnnotations(), PATTERN_ANNOTATION);
 
         // Check if there are pattern names used more than once in project
-        String patternDefinedTwice = findPatternDefinedMoreThanOnceInProject();
+        String patternDefinedTwice = patternService.findPatternDefinedMoreThanOnceInProject();
         Assert.isNull(patternDefinedTwice,
                 "There is a pattern name used more than once in the project");
 
@@ -218,7 +217,7 @@ public final class PatternMetadataProvider extends
                 // Check if the controller has defined the same pattern more
                 // than once
                 Assert.isTrue(
-                        arePatternsDefinedOnceInController(thisAnnotationValue),
+                        patternService.arePatternsDefinedOnceInController(thisAnnotationValue),
                         "Controller "
                                 .concat(cid.getName()
                                         .getFullyQualifiedTypeName())
@@ -299,28 +298,6 @@ public final class PatternMetadataProvider extends
                         webMetadataService), metadataService,
                 propFileOperations, projectOperations.getPathResolver(),
                 fileManager, dateTypes);
-    }
-
-    private String findPatternDefinedMoreThanOnceInProject() {
-        List<String> definedPatternsInProject = new ArrayList<String>();
-        AnnotationMetadata annotationMetadata = null;
-        for (ClassOrInterfaceTypeDetails cid : typeLocationService
-                .findClassesOrInterfaceDetailsWithAnnotation(PATTERN_ANNOTATION)) {
-            annotationMetadata = MemberFindingUtils.getAnnotationOfType(
-                    cid.getAnnotations(), PATTERN_ANNOTATION);
-            if (annotationMetadata != null) {
-                AnnotationAttributeValue<?> annotationValues = annotationMetadata
-                        .getAttribute(PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-                for (String patternName : getPatternNames(annotationValues)) {
-                    if (definedPatternsInProject.contains(patternName)) {
-                        return patternName;
-                    } else {
-                        definedPatternsInProject.add(patternName);
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     /**

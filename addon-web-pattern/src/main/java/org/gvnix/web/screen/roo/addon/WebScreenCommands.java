@@ -102,6 +102,7 @@ public class WebScreenCommands implements CommandMarker {
 
         		seleniumServices.generateTestMasterTabular(controllerClass, testName, url);
         	}
+    		// TODO If tabular_edit_register paatern, currently no selenium tests available
     	}
     }
 

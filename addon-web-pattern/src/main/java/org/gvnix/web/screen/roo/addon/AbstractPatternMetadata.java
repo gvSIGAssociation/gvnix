@@ -170,13 +170,17 @@ public abstract class AbstractPatternMetadata extends
         builder.addField(getDefinedPatternField());
         // builder.addMethod(getIsPatternDefinedMethod());
 
-        if (isPatternTypeDefined(WebPatternType.tabular, this.definedPatterns)) {
+        List<String> tabularPatterns = getPatternTypeDefined(WebPatternType.tabular, this.definedPatterns);
+        if (!tabularPatterns.isEmpty()) {
             // annotateFormBackingObject();
             if (javaTypeMetadataHolder.getPersistenceDetails()
                     .getFindAllMethod() == null) {
+            	// TODO: If no find all method, all other patterns are not generated ?
                 return;
             }
-            builder.addMethod(getTabularMethod());
+            for (String tabularPattern : tabularPatterns) {
+	            builder.addMethod(getTabularMethod(tabularPattern));
+            }
             builder.addMethod(getCreateListMethod());
             builder.addMethod(getUpdateListMethod());
             builder.addMethod(getDeleteListMethod());
@@ -184,17 +188,39 @@ public abstract class AbstractPatternMetadata extends
             builder.addMethod(getRefererRedirectMethod());
         }
 
-        if (isPatternTypeDefined(WebPatternType.register, this.definedPatterns)) {
-            // addStaticFields();
+        List<String> registerPatterns = getPatternTypeDefined(WebPatternType.register, this.definedPatterns);
+        if (!registerPatterns.isEmpty()) {
             if (javaTypeMetadataHolder.getPersistenceDetails()
                     .getFindEntriesMethod() == null) {
+            	// TODO: If no find entries method, all other patterns are not generated ?
                 return;
             }
-            builder.addMethod(getRegisterMethod());
-            builder.addMethod(getCreateMethod());
-            builder.addMethod(getUpdateMethod());
-            builder.addMethod(getDeleteMethod());
+            for (String registerPattern : registerPatterns) {
+	            builder.addMethod(getRegisterMethod(registerPattern));
+	            builder.addMethod(getCreateMethod(registerPattern, WebPatternType.register));
+	            builder.addMethod(getUpdateMethod(registerPattern, WebPatternType.register));
+	            builder.addMethod(getDeleteMethod(registerPattern));
+            }
             builder.addMethod(getRefererQueryMethod());
+            builder.addMethod(getRefererQueryNoIndexMethod());
+        }
+
+        List<String> tabularEditPatterns = getPatternTypeDefined(WebPatternType.tabular_edit_register, this.definedPatterns);
+        if (!tabularEditPatterns.isEmpty()) {
+            if (javaTypeMetadataHolder.getPersistenceDetails()
+                    .getFindAllMethod() == null) {
+            	// TODO: If no find all method, all other patterns are not generated ?
+                return;
+            }
+            // TODO Some methods missing (create and update from Roo form to tabular pattern destination)
+            for (String tabularEditPattern : tabularEditPatterns) {
+	            builder.addMethod(getTabularMethod(tabularEditPattern));
+	            builder.addMethod(getCreateMethod(tabularEditPattern, WebPatternType.tabular_edit_register));
+	            builder.addMethod(getUpdateMethod(tabularEditPattern, WebPatternType.tabular_edit_register));
+            }
+            builder.addMethod(getDeleteListMethod());
+            builder.addMethod(getFilterListMethod());
+            builder.addMethod(getRefererRedirectMethod());
             builder.addMethod(getRefererQueryNoIndexMethod());
         }
 
@@ -203,17 +229,17 @@ public abstract class AbstractPatternMetadata extends
         new ItdSourceFileComposer(itdTypeDetails);
     }
 
-    protected MethodMetadata getUpdateMethod() {
+    protected MethodMetadata getUpdateMethod(String patternName, WebPatternType patternType) {
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("updatePattern");
+        JavaSymbolName methodName = new JavaSymbolName("updatePattern" + patternName);
 
         List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         List<JavaSymbolName> methodParamNames = getMethodParameterNamesCreateUpdate();
@@ -236,33 +262,41 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
-                .concat(entityNamePlural.toLowerCase())
-                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
-
+        if (patternType.equals(WebPatternType.tabular_edit_register)) {
+            bodyBuilder
+            .appendFormalLine("return \"".concat("redirect:/")
+                    .concat(entityNamePlural.toLowerCase())
+                    .concat("?gvnixpattern=\" + pattern;"));
+        }
+        else {
+	        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
+	                .concat(entityNamePlural.toLowerCase())
+	                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
+        }
+        
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         methodBuilder
-                .setAnnotations(getRequestMappingAnnotationCreateUpdate(RequestMethod.PUT));
+                .setAnnotations(getRequestMappingAnnotationCreateUpdate(RequestMethod.PUT, patternName));
 
         method = methodBuilder.build();
         controllerMethods.add(method);
         return method;
     }
 
-    protected MethodMetadata getCreateMethod() {
+    protected MethodMetadata getCreateMethod(String patternName, WebPatternType patternType) {
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("createPattern");
+        JavaSymbolName methodName = new JavaSymbolName("createPattern" + patternName);
 
         List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         List<JavaSymbolName> methodParamNames = getMethodParameterNamesCreateUpdate();
@@ -293,27 +327,36 @@ public abstract class AbstractPatternMetadata extends
                 .concat(javaTypeMetadataHolder.getPersistenceDetails()
                         .getCountMethod().getMethodName().getSymbolName())
                 .concat("();"));
-        bodyBuilder
-                .appendFormalLine("return \""
-                        .concat("redirect:/")
-                        .concat(entityNamePlural.toLowerCase())
-                        .concat("?gvnixform&\" + refererQuery(httpServletRequest, (count == 0 ? 1 : count));"));
+        if (patternType.equals(WebPatternType.tabular_edit_register)) {
+            bodyBuilder
+            .appendFormalLine("return \""
+                    .concat("redirect:/")
+                    .concat(entityNamePlural.toLowerCase())
+                    .concat("?gvnixpattern=\" + pattern;"));
+        }
+        else {
+            bodyBuilder
+            .appendFormalLine("return \""
+                    .concat("redirect:/")
+                    .concat(entityNamePlural.toLowerCase())
+                    .concat("?gvnixform&\" + refererQuery(httpServletRequest, (count == 0 ? 1 : count));"));
+        }
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         methodBuilder
-                .setAnnotations(getRequestMappingAnnotationCreateUpdate(RequestMethod.POST));
+                .setAnnotations(getRequestMappingAnnotationCreateUpdate(RequestMethod.POST, patternName));
 
         method = methodBuilder.build();
         controllerMethods.add(method);
         return method;
     }
 
-    protected MethodMetadata getDeleteMethod() {
+    protected MethodMetadata getDeleteMethod(String patternName) {
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("deletePattern");
+        JavaSymbolName methodName = new JavaSymbolName("deletePattern" + patternName);
 
         FieldMetadata formBackingObjectIdField = javaTypeMetadataHolder
                 .getPersistenceDetails().getIdentifierField();
@@ -382,9 +425,9 @@ public abstract class AbstractPatternMetadata extends
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method parameter names
@@ -422,7 +465,7 @@ public abstract class AbstractPatternMetadata extends
                                 .getSymbolName() + "}"));
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
-                "gvnixpattern"));
+                "gvnixpattern=" + patternName));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
@@ -457,9 +500,9 @@ public abstract class AbstractPatternMetadata extends
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method parameter names
@@ -530,9 +573,9 @@ public abstract class AbstractPatternMetadata extends
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method parameter names httpServletRequest
@@ -586,12 +629,12 @@ public abstract class AbstractPatternMetadata extends
     }
 
     protected List<AnnotationMetadataBuilder> getRequestMappingAnnotationCreateUpdate(
-            RequestMethod requestMethod) {
+            RequestMethod requestMethod, String patternName) {
         // Get Method RequestMapping annotation
         List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
-                "gvnixpattern"));
+                "gvnixpattern=" + patternName));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
@@ -685,22 +728,23 @@ public abstract class AbstractPatternMetadata extends
     }
 
     /**
-     * If there is a pattern of given WebPatternType defined in GvNIXPattern it
-     * returns true, false otherwise
+     * If there is patterns of given WebPatternType defined in GvNIXPattern it
+     * returns its names, empty list otherwise
      * 
      * @param patternType
      * @param definedPatternsList
-     * @return
+     * @return Some type pattern names list
      */
-    protected boolean isPatternTypeDefined(WebPatternType patternType,
+    protected List<String> getPatternTypeDefined(WebPatternType patternType,
             List<String> definedPatternsList) {
+    	List<String> patternList = new ArrayList<String>();
         for (String definedPattern : definedPatternsList) {
             if (definedPattern.split("=")[1].equalsIgnoreCase(patternType
                     .name())) {
-                return true;
+                patternList.add(definedPattern.split("=")[0]);
             }
         }
-        return false;
+        return patternList;
     }
 
     /**
@@ -855,9 +899,9 @@ public abstract class AbstractPatternMetadata extends
      * 
      * @return
      */
-    protected MethodMetadata getTabularMethod() {
+    protected MethodMetadata getTabularMethod(String patternName) {
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("tabular");
+        JavaSymbolName methodName = new JavaSymbolName("tabular" + patternName);
 
         // Define method parameter types
         // @RequestParam(value = "gvnixpattern", required = true) String
@@ -884,9 +928,9 @@ public abstract class AbstractPatternMetadata extends
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method parameter names
@@ -994,7 +1038,7 @@ public abstract class AbstractPatternMetadata extends
         List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
-                "gvnixpattern"));
+                "gvnixpattern=" + patternName));
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
                 "!form"));
         requestMappingAttributes
@@ -1017,9 +1061,9 @@ public abstract class AbstractPatternMetadata extends
         return method;
     }
 
-    protected MethodMetadata getRegisterMethod() {
+    protected MethodMetadata getRegisterMethod(String patternName) {
         // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("register");
+        JavaSymbolName methodName = new JavaSymbolName("register" + patternName);
 
         // Define method parameter types
         // @RequestParam(value = "gvnixpattern", required = true) String
@@ -1061,9 +1105,9 @@ public abstract class AbstractPatternMetadata extends
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method parameter names
@@ -1176,7 +1220,7 @@ public abstract class AbstractPatternMetadata extends
         List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
-                "gvnixpattern"));
+                "gvnixpattern=" + patternName));
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
                 "gvnixform"));
         requestMappingAttributes
@@ -1403,9 +1447,9 @@ public abstract class AbstractPatternMetadata extends
         // target type
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method parameter names
@@ -1451,9 +1495,9 @@ public abstract class AbstractPatternMetadata extends
         // target type
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method parameter names
@@ -1499,9 +1543,9 @@ public abstract class AbstractPatternMetadata extends
         // target type
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method parameter names
@@ -1551,9 +1595,9 @@ public abstract class AbstractPatternMetadata extends
         // target type
         MethodMetadata method = methodExists(methodName, parameterTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method parameter names
@@ -1615,9 +1659,9 @@ public abstract class AbstractPatternMetadata extends
         // target type
         MethodMetadata method = methodExists(methodName, parameterTypes);
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method parameter names

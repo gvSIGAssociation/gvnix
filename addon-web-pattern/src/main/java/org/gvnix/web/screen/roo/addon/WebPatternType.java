@@ -30,12 +30,18 @@ package org.gvnix.web.screen.roo.addon;
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
- * 
+ *         
+ * @author Mario Martínez Sánchez (mmartinez at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ *          
  * @since 0.8
  */
 public enum WebPatternType {
     tabular, // tabular pattern
-    register
+    register,
     // register pattern
+    tabular_edit_register // Tabular pattern with register pattern edition 
 
 }

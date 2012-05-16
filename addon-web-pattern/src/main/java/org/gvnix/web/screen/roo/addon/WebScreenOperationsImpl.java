@@ -259,7 +259,8 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
             controllerDetails.addTypeAnnotation(annotationBuilder.build());
         }
 
-        if (pattern.equals(WebPatternType.tabular)) {
+        if (pattern.equals(WebPatternType.tabular) || pattern.equals(WebPatternType.tabular_edit_register)) {
+        	// TODO If tabular_edit_register, only delete entity in batch required
             annotateTypeWithGvNIXEntityBatch(getFormBakingObject(controllerDetails));
         }
     }
