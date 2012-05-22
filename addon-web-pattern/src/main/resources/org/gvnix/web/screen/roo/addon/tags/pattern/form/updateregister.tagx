@@ -82,14 +82,26 @@
       <spring:message code="entity_update" arguments="${label}" var="update_label" />
       <spring:message code="entity_reset" arguments="${label}" var="reset_label" />
       <spring:url value="${path}" var="createUrl" htmlEscape="false">
-        <spring:param name="form"/>
-        <spring:param name="gvnixpattern" value="${param.gvnixpattern}"/>
-        <!-- TODO Is required some param here ? The entity identifier perhaps ? -->
-        <!--spring:param name="codigoDocumento" value="${referenceValue}"/-->
+        <spring:param name="form" />
+        <!-- Put on create URL the reference to the master pattern, if exists -->
+        <spring:param name="gvnixreference" value="${referenceValue}"/>
+        <c:forEach var="p" items="${param}">
+          <c:if test="${p.key ne 'gvnixform'}">
+            <spring:param name="${p.key}" value="${p.value}" />
+          </c:if>
+        </c:forEach>
+      </spring:url>
+      <spring:url value="" var="updateUrl" htmlEscape="false">
+        <spring:param name="form" />
+        <c:forEach var="p" items="${param}">
+          <c:if test="${p.key ne 'gvnixform'}">
+            <spring:param name="${p.key}" value="${p.value}" />
+          </c:if>
+        </c:forEach>
       </spring:url>
       <util:quicklinks id="${id}">
         <util:quicklink id="${id}_create" label="${create_label}" type="CREATE" onclick="regproy_createItem${typeName}('${createUrl}')" />
-        <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="regproy_editItem${typeName}('${secId}');" />
+        <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="regproy_editItem${typeName}('${secId}', '${updateUrl}');" />
         <util:quicklink id="${id}_delete" label="${delete_label}" type="DELETE" onclick="gvnix_delete_confirm('${delete_confirm_label}', '${secId}');" />
         <util:quicklink id="${id}_reset" label="${reset_label}" type="RESET" />
       </util:quicklinks>
@@ -247,7 +259,7 @@
             location.href = url;
           }
 
-          function regproy_editItem${typeName}(element) {
+          function regproy_editItem${typeName}(element, urlParams) {
             var url = "${detailPath}/";
             var checkBoxes = dojo.query('input[id^="gvnix_checkbox_' + element + '"]');
             //var any = 0;
@@ -267,7 +279,7 @@
               var pkId = '_${secId}[' + nodeChecked.value + ']_${idField}_id_update';
             }
             url += dojo.byId(pkId).value;
-            location.href = url + "?form&gvnixpattern=${param.gvnixpattern}";
+            location.href = url + urlParams;
           }
       ]]></script>
 

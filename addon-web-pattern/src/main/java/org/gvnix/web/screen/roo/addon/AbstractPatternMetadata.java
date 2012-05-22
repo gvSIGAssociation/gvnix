@@ -21,10 +21,12 @@ package org.gvnix.web.screen.roo.addon;
 import java.beans.Introspector;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -87,9 +89,11 @@ public abstract class AbstractPatternMetadata extends
 
     private WebScaffoldMetadata webScaffoldMetadata;
     private JavaType formBackingType;
+    private JavaType masterFormBackingType;
     private List<String> definedPatterns;
     private SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata;
     private JavaTypeMetadataDetails javaTypeMetadataHolder;
+    private JavaTypeMetadataDetails masterJavaTypeMetadataHolder;
     private SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate;
     private Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes;
     private List<MethodMetadata> controllerMethods;
@@ -130,6 +134,16 @@ public abstract class AbstractPatternMetadata extends
         this.relatedApplicationTypeMetadata = relatedApplicationTypeMetadata;
         this.javaTypeMetadataHolder = relatedApplicationTypeMetadata
                 .get(formBackingType);
+        this.masterFormBackingType = null;
+        try {
+        	// Is this a related pattern ? Then last key is master pattern java type
+        	if (this instanceof RelatedPatternMetadata) {
+	        	this.masterFormBackingType = relatedApplicationTypeMetadata.lastKey();
+	        	this.masterJavaTypeMetadataHolder = relatedApplicationTypeMetadata.get(masterFormBackingType);
+        	}
+        } catch (NoSuchElementException e) {
+        	// Nothing to do
+		}
         this.dateTypes = dateTypes;
         Assert.notNull(javaTypeMetadataHolder,
                 "Metadata holder required for form backing type: "
@@ -197,7 +211,7 @@ public abstract class AbstractPatternMetadata extends
             }
             for (String registerPattern : registerPatterns) {
 	            builder.addMethod(getRegisterMethod(registerPattern));
-	            builder.addMethod(getCreateMethod(registerPattern, WebPatternType.register));
+	            builder.addMethod(getCreateMethod(registerPattern));
 	            builder.addMethod(getUpdateMethod(registerPattern, WebPatternType.register));
 	            builder.addMethod(getDeleteMethod(registerPattern));
             }
@@ -215,8 +229,11 @@ public abstract class AbstractPatternMetadata extends
             // TODO Some methods missing (create and update from Roo form to tabular pattern destination)
             for (String tabularEditPattern : tabularEditPatterns) {
 	            builder.addMethod(getTabularMethod(tabularEditPattern));
-	            builder.addMethod(getCreateMethod(tabularEditPattern, WebPatternType.tabular_edit_register));
+	            builder.addMethod(getCreateMethod(tabularEditPattern));
 	            builder.addMethod(getUpdateMethod(tabularEditPattern, WebPatternType.tabular_edit_register));
+	            if (masterFormBackingType != null) {
+	            	builder.addMethod(getCreateFormMethod(tabularEditPattern, relatedApplicationTypeMetadata.values()));
+	            }
             }
             builder.addMethod(getDeleteListMethod());
             builder.addMethod(getFilterListMethod());
@@ -262,18 +279,17 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        if (patternType.equals(WebPatternType.tabular_edit_register)) {
-            bodyBuilder
-            .appendFormalLine("return \"".concat("redirect:/")
-                    .concat(entityNamePlural.toLowerCase())
-                    .concat("?gvnixpattern=\" + pattern;"));
-        }
-        else {
+        if (masterFormBackingType == null) { 
 	        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
 	                .concat(entityNamePlural.toLowerCase())
 	                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
         }
-        
+        else {	
+	        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
+	                .concat(masterJavaTypeMetadataHolder.getPlural().toLowerCase())
+	                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
+        }
+
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
                 methodParamTypes, methodParamNames, bodyBuilder);
@@ -286,7 +302,7 @@ public abstract class AbstractPatternMetadata extends
         return method;
     }
 
-    protected MethodMetadata getCreateMethod(String patternName, WebPatternType patternType) {
+    protected MethodMetadata getCreateMethod(String patternName) {
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("createPattern" + patternName);
 
@@ -327,21 +343,22 @@ public abstract class AbstractPatternMetadata extends
                 .concat(javaTypeMetadataHolder.getPersistenceDetails()
                         .getCountMethod().getMethodName().getSymbolName())
                 .concat("();"));
-        if (patternType.equals(WebPatternType.tabular_edit_register)) {
-            bodyBuilder
-            .appendFormalLine("return \""
-                    .concat("redirect:/")
-                    .concat(entityNamePlural.toLowerCase())
-                    .concat("?gvnixpattern=\" + pattern;"));
+
+        if (masterFormBackingType == null) { 
+	        bodyBuilder
+	        .appendFormalLine("return \""
+	                .concat("redirect:/")
+	                .concat(entityNamePlural.toLowerCase())
+	                .concat("?gvnixform&\" + refererQuery(httpServletRequest, (count == 0 ? 1 : count));"));
         }
         else {
-            bodyBuilder
-            .appendFormalLine("return \""
-                    .concat("redirect:/")
-                    .concat(entityNamePlural.toLowerCase())
-                    .concat("?gvnixform&\" + refererQuery(httpServletRequest, (count == 0 ? 1 : count));"));
+	        bodyBuilder
+	        .appendFormalLine("return \""
+	                .concat("redirect:/")
+	                .concat(masterJavaTypeMetadataHolder.getPlural().toLowerCase())
+	                .concat("?gvnixform&\" + refererQuery(httpServletRequest, (count == 0 ? 1 : count));"));
         }
-
+        
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
                 methodParamTypes, methodParamNames, bodyBuilder);
@@ -486,6 +503,89 @@ public abstract class AbstractPatternMetadata extends
         controllerMethods.add(method);
         return method;
     }
+    
+	/**
+	 * @see org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.getCreateFormMethod
+	 * 
+	 * @param patternName
+	 * @param dependentTypes
+	 * @return
+	 */
+	protected MethodMetadata getCreateFormMethod(String patternName, Collection<JavaTypeMetadataDetails> dependentTypes) {
+		JavaSymbolName methodName = new JavaSymbolName("createForm" + patternName);
+
+		List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>();
+		List<AnnotationMetadata> patternAnnotations = new ArrayList<AnnotationMetadata>();
+		AnnotationMetadataBuilder patternRequestParam = new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.RequestParam"));
+		patternRequestParam.addStringAttribute("value", "gvnixpattern");
+		patternRequestParam.addBooleanAttribute("required", true);
+		patternAnnotations.add(patternRequestParam.build());
+		paramTypes.add(new AnnotatedJavaType(new JavaType("java.lang.String"), patternAnnotations));
+		List<AnnotationMetadata> referenceAnnotations = new ArrayList<AnnotationMetadata>();
+		AnnotationMetadataBuilder referenceRequestParam = new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.RequestParam"));
+		referenceRequestParam.addStringAttribute("value", "gvnixreference");
+		referenceRequestParam.addBooleanAttribute("required", true);
+		referenceAnnotations.add(referenceRequestParam.build());
+		paramTypes.add(new AnnotatedJavaType(new JavaType("java.lang.Long"), referenceAnnotations));
+		paramTypes.add(new AnnotatedJavaType(new JavaType("org.springframework.ui.Model"), null));
+		
+		MethodMetadata method = methodExists(methodName, paramTypes);
+		if (method != null) {
+			return null;
+		}
+
+		List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
+		paramNames.add(new JavaSymbolName("gvnixpattern"));
+		paramNames.add(new JavaSymbolName("gvnixreference"));
+		paramNames.add(new JavaSymbolName("uiModel"));
+
+		List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+		List<StringAttributeValue> values = new ArrayList<StringAttributeValue>();
+		values.add(new StringAttributeValue(new JavaSymbolName("value"), "form"));
+		values.add(new StringAttributeValue(new JavaSymbolName("value"), "gvnixpattern=" + patternName));
+		values.add(new StringAttributeValue(new JavaSymbolName("value"), "gvnixreference"));
+		requestMappingAttributes.add(new ArrayAttributeValue<StringAttributeValue>(new JavaSymbolName("params"), values));
+		requestMappingAttributes.add(new EnumAttributeValue(new JavaSymbolName("method"), new EnumDetails(new JavaType("org.springframework.web.bind.annotation.RequestMethod"), new JavaSymbolName("GET"))));
+		AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.RequestMapping"), requestMappingAttributes);
+		List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+		annotations.add(requestMapping);
+
+		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+		bodyBuilder.appendFormalLine(masterFormBackingType.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + " " + masterFormBackingType.getSimpleTypeName().toLowerCase() + " = " + masterFormBackingType.getSimpleTypeName() + "." + masterJavaTypeMetadataHolder.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+		bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName() + " " + formBackingType.getSimpleTypeName().toLowerCase() + " = new " + formBackingType.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
+		bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName().toLowerCase() + ".set" + masterFormBackingType.getSimpleTypeName() + "(" + masterFormBackingType.getSimpleTypeName().toLowerCase() + ");");
+		bodyBuilder.appendFormalLine("uiModel.addAttribute(\"" + formBackingType.getSimpleTypeName().toLowerCase() + "\", " + formBackingType.getSimpleTypeName().toLowerCase() + ");");
+		if (!dateTypes.isEmpty()) {
+			bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
+		}
+		// TODO Remove dependencies or add it from master pattern ?
+//		boolean listAdded = false;
+//		for (JavaTypeMetadataDetails dependentType: dependentTypes) {
+//			if (dependentType.getPersistenceDetails().getCountMethod() == null) {
+//				continue;
+//			}
+//			if (!listAdded) {
+//				String listShort = new JavaType("java.util.List").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
+//				String arrayListShort = new JavaType("java.util.ArrayList").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
+//				bodyBuilder.appendFormalLine(listShort + " dependencies = new " + arrayListShort + "();");
+//				listAdded = true;
+//			}
+//			bodyBuilder.appendFormalLine("if (" + dependentType.getJavaType().getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "." + dependentType.getPersistenceDetails().getCountMethod().getMethodName().getSymbolName() + "() == 0) {");
+//			bodyBuilder.indent();
+//			// Adding string array which has the fieldName at position 0 and the path at position 1
+//			bodyBuilder.appendFormalLine("dependencies.add(new String[]{\"" + dependentType.getJavaType().getSimpleTypeName().toLowerCase() + "\", \"" + dependentType.getPlural().toLowerCase() + "\"});");
+//			bodyBuilder.indentRemove();
+//			bodyBuilder.appendFormalLine("}");
+//		}
+//		if (listAdded) {
+//			bodyBuilder.appendFormalLine("uiModel.addAttribute(\"dependencies\", dependencies);");
+//		}
+		bodyBuilder.appendFormalLine("return \"" + webScaffoldMetadata.getAnnotationValues().getPath() + "/create\";");
+
+		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT, paramTypes, paramNames, bodyBuilder);
+		methodBuilder.setAnnotations(annotations);
+		return methodBuilder.build();
+	}
 
     protected MethodMetadata getRefererQueryMethod() {
         // Specify the desired method name
@@ -603,9 +703,10 @@ public abstract class AbstractPatternMetadata extends
                 netURL.getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver())).concat(
                 "(referer).getQuery();"));
-        bodyBuilder.appendFormalLine("if ( url.contains(\"gvnixpattern\") ) {");
+        bodyBuilder.appendFormalLine("if ( url.contains(\"form\") ) {");
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("return url;");
+        // TODO Error if form attribute in URL last position
+        bodyBuilder.appendFormalLine("return url.substring(0, url.indexOf(\"form\")).concat(url.substring(url.indexOf(\"form\") + 5, url.length()));");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
         bodyBuilder.indentRemove();
