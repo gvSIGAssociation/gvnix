@@ -335,16 +335,16 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
-                .getNameIncludingTypeParameters()
-                .concat(" count = ")
-                .concat(formBackingType.getSimpleTypeName())
-                .concat(".")
-                .concat(javaTypeMetadataHolder.getPersistenceDetails()
-                        .getCountMethod().getMethodName().getSymbolName())
-                .concat("();"));
-
         if (masterFormBackingType == null) { 
+            bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
+                    .getNameIncludingTypeParameters()
+                    .concat(" count = ")
+                    .concat(formBackingType.getSimpleTypeName())
+                    .concat(".")
+                    .concat(javaTypeMetadataHolder.getPersistenceDetails()
+                            .getCountMethod().getMethodName().getSymbolName())
+                    .concat("();"));
+
 	        bodyBuilder
 	        .appendFormalLine("return \""
 	                .concat("redirect:/")
@@ -356,7 +356,7 @@ public abstract class AbstractPatternMetadata extends
 	        .appendFormalLine("return \""
 	                .concat("redirect:/")
 	                .concat(masterJavaTypeMetadataHolder.getPlural().toLowerCase())
-	                .concat("?gvnixform&\" + refererQuery(httpServletRequest, (count == 0 ? 1 : count));"));
+	                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
         }
         
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
