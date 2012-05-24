@@ -323,22 +323,13 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                         .concat(" annotation in controller ")
                         .concat(controllerClass.getFullyQualifiedTypeName()));
 
-        // Check if Patter Pattern is of type register
-        // If is not register, user is setting a Master tabular - Detail pattern
-        // and this is not supported yet
-        if (!isMasterPatternRegister(patternValues, name)) {
-            logger.warning("Pattern name '"
-                    .concat(name.getSymbolName())
-                    .concat("' is of type tabular. Currently gvNIX doesn't support 'Master tabular / Detail' pattern"));
-            return;
-        }
-        // Check if user is setting Master register - Detail register
+        // Check if user is setting Detail register
         // if so, this is not supported yet, so abort
-        if (isMasterPatternRegister(patternValues, name)
+        if (!patternValues.isEmpty()
                 && type == WebPatternType.register) {
-            logger.warning("Pattern name '"
+            logger.warning("For pattern name '"
                     .concat(name.getSymbolName())
-                    .concat("' is of type register and you are setting detail as register. Currently gvNIX doesn't support 'Master register / Detail register' pattern"));
+                    .concat("' you are setting detail as register. Currently gvNIX doesn't support 'Detail register' pattern"));
             return;
         }
 
@@ -492,25 +483,6 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
             // Check if name is already used
             if (equalsPatternName(value, name)) {
                 return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns true if given pattern name is defined in GvNIXPattern as type
-     * register, false otherwise.
-     * 
-     * @param patternValues
-     * @param name
-     * @return
-     */
-    private boolean isMasterPatternRegister(
-            List<StringAttributeValue> patternValues, JavaSymbolName name) {
-        for (StringAttributeValue value : patternValues) {
-            String current = value.getValue().replace(" ", "");
-            if (current.startsWith(name.getSymbolName().concat("="))) {
-                return current.endsWith("=register");
             }
         }
         return false;

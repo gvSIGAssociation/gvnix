@@ -1,0 +1,4 @@
+# Detail register with any master pattern is not supported
+web mvc pattern detail --class ~.web.PersonController --name personreg --type register --field horses
+web mvc pattern detail --class ~.web.PersonController --name persontab --type register --field horses
+web mvc pattern detail --class ~.web.PersonController --name persontabeditreg --type register --field horses
