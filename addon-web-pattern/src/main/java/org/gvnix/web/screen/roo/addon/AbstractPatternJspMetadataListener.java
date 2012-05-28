@@ -184,7 +184,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         String patternPath = destinationDirectory.concat("/")
                 .concat(patternName).concat(".jspx");
         // Get the document for the pattern type
-        Document jspDoc = patternType.equals(WebPatternType.tabular) || patternType.equals(WebPatternType.tabular_edit_register) ? getUpdateTabularDocument(patternType)
+        Document jspDoc = patternType.equals(WebPatternType.tabular) || patternType.equals(WebPatternType.tabular_edit_register) ? getUpdateTabularDocument(patternName, patternType)
                 : getRegisterDocument(patternName);
         writeToDiskIfNecessary(patternPath, jspDoc);
 
@@ -386,56 +386,115 @@ public abstract class AbstractPatternJspMetadataListener implements
         div.appendChild(pageShow);
 
         if (!fieldsOfRelations.isEmpty()) {
-            Element patternRelations = new XmlElementBuilder(
-                    "pattern:relations", document)
-                    .addAttribute(
-                            "id",
-                            XmlUtils.convertId("pr:"
-                                    + formbackingType
-                                            .getFullyQualifiedTypeName() + "."
-                                    + patternName))
-                    .addAttribute(
-                            "render",
-                            "${!empty ".concat(entityName.toLowerCase())
-                                    .concat("}")).build();
-            patternRelations.setAttribute("z",
-                    XmlRoundTripUtils.calculateUniqueKeyFor(patternRelations));
-            for (FieldMetadata fieldMetadata : fieldsOfRelations) {
-                String fieldName = uncapitalize(fieldMetadata.getFieldName()
-                        .getSymbolName());
-                String webScaffoldFolder = getFieldEntityPlural(fieldMetadata);
-                Element patternRelation = new XmlElementBuilder(
-                        "pattern:relation", document)
-                        .addAttribute(
-                                "id",
-                                XmlUtils.convertId("pr:"
-                                        + formbackingType
-                                                .getFullyQualifiedTypeName()
-                                        + "." + fieldName))
-                        .addAttribute("object",
-                                "${" + entityName.toLowerCase() + "}")
-                        .addAttribute("field", fieldName)
-                        .addAttribute("folder", webScaffoldFolder)
-                        .addAttribute("patternName", patternName)
-                        .addAttribute("referenceName", entityName.toLowerCase())
-                        .addAttribute(
-                                "referenceField",
-                                formbackingTypeMetadata.getPersistenceDetails()
-                                        .getIdentifierField().getFieldName()
-                                        .getSymbolName())
-                        .addAttribute(
-                                "render",
-                                "${!empty ".concat(entityName.toLowerCase())
-                                        .concat("}")).build();
-                patternRelation.setAttribute("z", XmlRoundTripUtils
-                        .calculateUniqueKeyFor(patternRelation));
-                patternRelations.appendChild(patternRelation);
-            }
+            Element patternRelations = getRegisterRelationsDocument(patternName,
+					document, fieldsOfRelations);
             div.appendChild(patternRelations);
         }
 
         return document;
     }
+
+	protected Element getRegisterRelationsDocument(String patternName,
+			Document document, List<FieldMetadata> fieldsOfRelations) {
+		
+		Element patternRelations = new XmlElementBuilder(
+		        "pattern:relations", document)
+		        .addAttribute(
+		                "id",
+		                XmlUtils.convertId("pr:"
+		                        + formbackingType
+		                                .getFullyQualifiedTypeName() + "."
+		                        + patternName))
+		        .addAttribute(
+		                "render",
+		                "${!empty ".concat(entityName.toLowerCase())
+		                        .concat("}")).build();
+		patternRelations.setAttribute("z",
+		        XmlRoundTripUtils.calculateUniqueKeyFor(patternRelations));
+		for (FieldMetadata fieldMetadata : fieldsOfRelations) {
+		    String fieldName = uncapitalize(fieldMetadata.getFieldName()
+		            .getSymbolName());
+		    String webScaffoldFolder = getFieldEntityPlural(fieldMetadata);
+		    Element patternRelation = new XmlElementBuilder(
+		            "pattern:relation", document)
+		            .addAttribute(
+		                    "id",
+		                    XmlUtils.convertId("pr:"
+		                            + formbackingType
+		                                    .getFullyQualifiedTypeName()
+		                            + "." + fieldName))
+		            .addAttribute("object",
+		                    "${" + entityName.toLowerCase() + "}")
+		            .addAttribute("field", fieldName)
+		            .addAttribute("folder", webScaffoldFolder)
+		            .addAttribute("patternName", patternName)
+		            .addAttribute("referenceName", entityName.toLowerCase())
+		            .addAttribute(
+		                    "referenceField",
+		                    formbackingTypeMetadata.getPersistenceDetails()
+		                            .getIdentifierField().getFieldName()
+		                            .getSymbolName())
+		            .addAttribute(
+		                    "render",
+		                    "${!empty ".concat(entityName.toLowerCase())
+		                            .concat("}")).build();
+		    patternRelation.setAttribute("z", XmlRoundTripUtils
+		            .calculateUniqueKeyFor(patternRelation));
+		    patternRelations.appendChild(patternRelation);
+		}
+		return patternRelations;
+	}
+
+	protected Element getTabularRelationsDocument(String patternName,
+			Document document, List<FieldMetadata> fieldsOfRelations) {
+		
+		Element patternRelations = new XmlElementBuilder(
+		        "pattern:relations", document)
+		        .addAttribute(
+		                "id",
+		                XmlUtils.convertId("pr:"
+		                        + formbackingType
+		                                .getFullyQualifiedTypeName() + "."
+		                        + patternName))
+		        .addAttribute(
+		                "render",
+		                "${!empty ".concat("object")
+		                        .concat("}")).build();
+		patternRelations.setAttribute("z",
+		        XmlRoundTripUtils.calculateUniqueKeyFor(patternRelations));
+		for (FieldMetadata fieldMetadata : fieldsOfRelations) {
+		    String fieldName = uncapitalize(fieldMetadata.getFieldName()
+		            .getSymbolName());
+		    String webScaffoldFolder = getFieldEntityPlural(fieldMetadata);
+		    Element patternRelation = new XmlElementBuilder(
+		            "pattern:relation", document)
+		            .addAttribute(
+		                    "id",
+		                    XmlUtils.convertId("pr:"
+		                            + formbackingType
+		                                    .getFullyQualifiedTypeName()
+		                            + "." + fieldName))
+		            .addAttribute("object",
+		                    "${object}")
+		            .addAttribute("field", fieldName)
+		            .addAttribute("folder", webScaffoldFolder)
+		            .addAttribute("patternName", patternName)
+		            .addAttribute("referenceName", entityName.toLowerCase())
+		            .addAttribute(
+		                    "referenceField",
+		                    formbackingTypeMetadata.getPersistenceDetails()
+		                            .getIdentifierField().getFieldName()
+		                            .getSymbolName())
+		            .addAttribute(
+		                    "render",
+		                    "${!empty ".concat("object")
+		                            .concat("}")).build();
+		    patternRelation.setAttribute("z", XmlRoundTripUtils
+		            .calculateUniqueKeyFor(patternRelation));
+		    patternRelations.appendChild(patternRelation);
+		}
+		return patternRelations;
+	}
 
     /**
      * Given a FieldMetadata it returns the pluralized name of its Class in
@@ -900,7 +959,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      *
      * @return
      */
-    private Document getUpdateTabularDocument(WebPatternType patternType) {
+    private Document getUpdateTabularDocument(String patternName, WebPatternType patternType) {
 
         String controllerPath = webScaffoldAnnotationValues.getPath();
         Assert.notNull(controllerPath,
@@ -922,6 +981,8 @@ public abstract class AbstractPatternJspMetadataListener implements
                 .addAttribute("xmlns:field",
                         "urn:jsptagdir:/WEB-INF/tags/pattern/form/fields")
                 .addAttribute("xmlns:jsp", "http://java.sun.com/JSP/Page")
+                .addAttribute("xmlns:pattern",
+                        "urn:jsptagdir:/WEB-INF/tags/pattern")
                 .addAttribute("version", "2.0")
                 .addChild(
                         new XmlElementBuilder("jsp:directive.page", document)
@@ -1007,7 +1068,24 @@ public abstract class AbstractPatternJspMetadataListener implements
         formUpdate.setAttribute("z",
                 XmlRoundTripUtils.calculateUniqueKeyFor(formUpdate));
         div.appendChild(formUpdate);
+        
+        List<FieldMetadata> fieldsOfRelations = new ArrayList<FieldMetadata>();
+        for (FieldMetadata field : eligibleFields) {
+        	if (field.getCustomData().keySet()
+                    .contains(PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) && 
+                    isRelationVisible(patternName, field.getFieldName().getSymbolName())) {
+        		fieldsOfRelations.add(field);
+        	}
+        }
 
+        if (!fieldsOfRelations.isEmpty()) {
+            formUpdate.setAttribute("related", "true");
+            Element patternRelations = getTabularRelationsDocument(patternName,
+					document, fieldsOfRelations);
+            div.appendChild(patternRelations);
+        }
+
+        
         return document;
     }
 

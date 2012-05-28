@@ -17,6 +17,7 @@
   <jsp:directive.attribute name="idRender" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Specify if this id field should be rendered" />
   <jsp:directive.attribute name="finder" type="java.lang.String" required="false" rtexprvalue="true" description="Specify the finder to invoque in panel-tab search if exist." />
   <jsp:directive.attribute name="list" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Control if the list link is show in panel-tab." />
+  <jsp:directive.attribute name="related" type="java.lang.Boolean" required="false" rtexprvalue="true" description="There is a detail pattern related with this pattern ? (default: false)" />
 
   <c:if test="${empty render or render}">
 
@@ -44,6 +45,11 @@
 
     <c:if test="${empty list}">
       <c:set var="list" value="true" />
+    </c:if>
+
+	<!-- If related pattern not defined, by default has not detail pattern interaction to backward compatibility -->
+    <c:if test="${empty related}">
+      <c:set var="related" value="false" />
     </c:if>
 
     <c:set var="typeName" value="${fn:split(id,'_')[fn:length(fn:split(id,'_')) - 1]}" scope="request" />
@@ -143,30 +149,55 @@
               <!-- 0-index position for list and selected collections sended to controller -->
               <c:set var="fieldPos" value="${pos.count - 1}" scope="request" />
 
-              <!-- Add a checkbox field on each row with a knowned id -->
+	          <!-- Identifier input field: always disabled on update -->
+	          <spring:eval expression="item[idField]" scope="request" var="idFieldValue" />
+	          <c:choose>
+	            <c:when test="${not idRender}">
+	              <!-- field:input disabled="true" field="${idField}" id="${id}" type="hidden"/-->
+	              <input type="hidden" id="_${secId}[${fieldPos}]_${idField}_id_update" name="list[${fieldPos}].${idField}" value="${idFieldValue}" disabled="disabled" />
+	            </c:when>
+	            <c:otherwise>
+	              <field:input disabled="true" field="${idField}" id="${id}" render="true" />
+	            </c:otherwise>
+	          </c:choose>
+	          <c:if test="${versionField ne 'none'}">
+	            <spring:eval expression="item[versionField]" scope="request" var="versionValue" />
+	            <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${versionValue}" disabled="disabled" />
+	          </c:if>
+
+          	  <!-- Current URL replacing index param value with current item index value -->
+		      <spring:url value="${path}" var="selectUrl" htmlEscape="false">
+		      	<spring:param name="index" value="${idFieldValue}" />
+		        <c:forEach var="p" items="${param}">
+		          <c:if test="${p.key ne 'index'}">
+		            <spring:param name="${p.key}" value="${p.value}" />
+		          </c:if>
+		        </c:forEach>
+		      </spring:url>
+
+              <!-- Add a checkbox field on each row with a knowned id (if related, add onclick event to change selected row in detail pattern) -->
               <td class="${colStylePrefix}gvnix_checkbox">
-                <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" />
+              <c:choose>
+                <c:when test="${related and (param.index eq idFieldValue)}">
+                	<!-- Related pattern active and current item is selected -->
+	                <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" onclick="window.location.href = '${selectUrl}'" checked="checked" />
+              		<c:set var="object" value="${item}" scope="request" />
+                </c:when>
+                <c:when test="${related and not (param.index eq idFieldValue)}">
+					<!-- Related pattern active and current item is not selected -->
+	                <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" onclick="window.location.href = '${selectUrl}'" />
+                </c:when>
+                <c:otherwise>
+                	<!--  Related pattern inactive -->
+    	            <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" />
+                </c:otherwise>
+              </c:choose>
               </td>
 
               <!-- Add an item row (id, body and optional hidden version columns) in some pos with a parent id -->
               <c:set var="item" value="${item}" scope="request" />
               <c:set var="pos" value="${pos}" scope="request" />
               <c:set var="parentId" value="${id}" scope="request" />
-              <!-- Identifier input field: always disabled on update -->
-              <c:choose>
-                <c:when test="${not idRender}">
-                  <!-- field:input disabled="true" field="${idField}" id="${id}" type="hidden"/-->
-                  <spring:eval expression="item[idField]" scope="request" var="idFieldValue" />
-                  <input type="hidden" id="_${secId}[${fieldPos}]_${idField}_id_update" name="list[${fieldPos}].${idField}" value="${idFieldValue}" disabled="disabled" />
-                </c:when>
-                <c:otherwise>
-                  <field:input disabled="true" field="${idField}" id="${id}" render="true" />
-                </c:otherwise>
-              </c:choose>
-              <c:if test="${versionField ne 'none'}">
-                <spring:eval expression="item[versionField]" scope="request" var="versionValue" />
-                <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${versionValue}" disabled="disabled" />
-              </c:if>
               <jsp:doBody />
 
             </tr>
