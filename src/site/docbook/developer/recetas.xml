@@ -782,9 +782,10 @@ ProjectMetadata#getPropertiesExcludingValue(property)</programlisting>
           </listitem>
 
           <listitem>
-            <para>Actualizamos gvNIX a una versión posterior y abrimos el mismo proyecto con
-            esta nueva versión de gvNIX. Entonces la dependencia con el add-on
-            Service se actualizará a la nueva versión (casi seguramente).</para>
+            <para>Actualizamos gvNIX a una versión posterior y abrimos el
+            mismo proyecto con esta nueva versión de gvNIX. Entonces la
+            dependencia con el add-on Service se actualizará a la nueva
+            versión (casi seguramente).</para>
           </listitem>
 
           <listitem>
@@ -808,7 +809,7 @@ ProjectMetadata#getPropertiesExcludingValue(property)</programlisting>
 
     <programlistingco>
       <areaspec>
-        <area coords="???" xml:id="recetas-metadatos_proyecto"></area>
+        <area coords="???" xml:id="recetas-metadatos_proyecto"/>
       </areaspec>
 
       <programlisting>public class PageOperationsImpl implements PageOperations {
@@ -1133,16 +1134,22 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
     <para>La información está recogida de este mensaje en el foro: <link
     xlink:href="http://forum.springsource.org/showpost.php?p=286967&amp;postcount=3">http://forum.springsource.org/showpost.php?p=286967&amp;postcount=3</link></para>
   </section>
-  
 
   <section xml:id="recetas_generar-codigo-aj-inexistente-java">
     <title>Comprobar existencia en Java antes de generar en AJ</title>
 
-    <para>A la hora de generar código en un AJ hay que comprobar si ya existe en el Java.
-    Si se intenta crear en el AJ un método, anotación, etc. y ya existe en Java se producirán
-    comportamientos inesperados que puede que no sean fáciles de resolver si no es debugando
-    la clase Metadata para detectar la excepción que se produce.</para>
-
+    <para>A la hora de generar código en un AJ hay que comprobar si ya existe
+    en el Java. Si se intenta crear en el AJ un método, anotación, etc. y ya
+    existe en Java se producirán comportamientos inesperados que puede que no
+    sean fáciles de resolver si no es debugando la clase Metadata para
+    detectar la excepción que se produce.</para>
   </section>
-  
+
+  <section>
+    <title>Generar tests funcionales de Selenium</title>
+
+    <para>http://projects.disid.com/issues/5823</para>
+
+    <para>org.springframework.roo.addon.web.selenium.SeleniumOperationsImpl</para>
+  </section>
 </chapter>
