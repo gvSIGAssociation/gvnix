@@ -17,6 +17,7 @@
   <jsp:directive.attribute name="compositePkField" type="java.lang.String" required="false" rtexprvalue="true" description="The field name of the composite primary key (only used if a composite PK is present in the form backing object)" />
   <jsp:directive.attribute name="finder" type="java.lang.String" required="false" rtexprvalue="true" description="Specify the finder to invoque in panel-tab search if exist." />
   <jsp:directive.attribute name="list" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Control if the list link is show in panel-tab." />
+  <jsp:directive.attribute name="related" type="java.lang.Boolean" required="false" rtexprvalue="true" description="There is a detail pattern related with this pattern ? (default: false)" />
 
   <c:if test="${empty render or render}">
 
@@ -44,6 +45,11 @@
 
     <c:if test="${empty list}">
       <c:set var="list" value="true" />
+    </c:if>
+
+	<!-- If related pattern not defined, by default has not detail pattern interaction to backward compatibility -->
+    <c:if test="${empty related}">
+      <c:set var="related" value="false" />
     </c:if>
 
     <c:set var="typeName" value="${fn:split(id,'_')[fn:length(fn:split(id,'_')) - 1]}" scope="request" />
@@ -159,9 +165,45 @@
               <!-- 0-index position for list and selected collections sended to controller -->
               <c:set var="fieldPos" value="${pos.count - 1}" scope="request" />
 
-              <!-- Add a checkbox field on each row with a knowned id -->
+			  <!-- Get identifier value: composite or simple -->
+              <c:choose>
+                <c:when test="${not empty compositePkField}">
+                  <!-- Composite primary key value is getted from entity base64 field -->
+                  <spring:eval expression='item["base64"]' scope="request" var="idValue" />
+                </c:when>
+                <c:otherwise>
+                  <!-- Identifier input field: always disabled on update -->
+                  <spring:eval expression='item[idField]' scope="request" var="idValue" />
+                </c:otherwise>
+              </c:choose>
+              
+          	  <!-- Current URL replacing index param value with current item index value -->
+		      <spring:url value="${path}" var="selectUrl" htmlEscape="false">
+		      	<spring:param name="index" value="${idValue}" />
+		        <c:forEach var="p" items="${param}">
+		          <c:if test="${p.key ne 'index'}">
+		            <spring:param name="${p.key}" value="${p.value}" />
+		          </c:if>
+		        </c:forEach>
+		      </spring:url>
+
+              <!-- Add a checkbox field on each row with a knowned id (if related, add onclick event to change selected row in detail pattern) -->
               <td class="${colStylePrefix}gvnix_checkbox">
-                <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" />
+              <c:choose>
+                <c:when test="${related and (param.index eq idValue)}">
+                	<!-- Related pattern active and current item is selected -->
+	                <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" onclick="window.location.href = '${selectUrl}'" checked="checked" />
+              		<c:set var="object" value="${item}" scope="request" />
+                </c:when>
+                <c:when test="${related and not (param.index eq idValue)}">
+					<!-- Related pattern active and current item is not selected -->
+	                <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" onclick="window.location.href = '${selectUrl}'" />
+                </c:when>
+                <c:otherwise>
+                	<!--  Related pattern inactive -->
+    	            <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" />
+                </c:otherwise>
+              </c:choose>
               </td>
 
               <!-- Add an item row (id, body and optional hidden version columns) in some pos with a parent id -->
@@ -170,13 +212,10 @@
               <c:set var="parentId" value="${id}" scope="request" />
               <c:choose>
                 <c:when test="${not empty compositePkField}">
-                  <!-- Composite primary key value is getted from entity base64 field -->
-                  <spring:eval expression='item["base64"]' scope="request" var="idValue" />
                   <!-- TODO Use gvnix input tag -->
                   <input id="_${id}[${pos.count - 1}]_${compositePkField}_id_update" name="list[${pos.count - 1}].${compositePkField}" type="hidden" value="${idValue}" />
                 </c:when>
                 <c:otherwise>
-                  <!-- Identifier input field: always disabled on update -->
                   <field:input disabled="true" field="${idField}" id="${id}" />
                 </c:otherwise>
               </c:choose>
