@@ -149,25 +149,12 @@
               <!-- 0-index position for list and selected collections sended to controller -->
               <c:set var="fieldPos" value="${pos.count - 1}" scope="request" />
 
-	          <!-- Identifier input field: always disabled on update -->
-	          <spring:eval expression="item[idField]" scope="request" var="idFieldValue" />
-	          <c:choose>
-	            <c:when test="${not idRender}">
-	              <!-- field:input disabled="true" field="${idField}" id="${id}" type="hidden"/-->
-	              <input type="hidden" id="_${secId}[${fieldPos}]_${idField}_id_update" name="list[${fieldPos}].${idField}" value="${idFieldValue}" disabled="disabled" />
-	            </c:when>
-	            <c:otherwise>
-	              <field:input disabled="true" field="${idField}" id="${id}" render="true" />
-	            </c:otherwise>
-	          </c:choose>
-	          <c:if test="${versionField ne 'none'}">
-	            <spring:eval expression="item[versionField]" scope="request" var="versionValue" />
-	            <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${versionValue}" disabled="disabled" />
-	          </c:if>
+			  <!-- Get identifier value -->
+	          <spring:eval expression="item[idField]" scope="request" var="idValue" />
 
           	  <!-- Current URL replacing index param value with current item index value -->
 		      <spring:url value="${path}" var="selectUrl" htmlEscape="false">
-		      	<spring:param name="index" value="${idFieldValue}" />
+		      	<spring:param name="index" value="${idValue}" />
 		        <c:forEach var="p" items="${param}">
 		          <c:if test="${p.key ne 'index'}">
 		            <spring:param name="${p.key}" value="${p.value}" />
@@ -178,12 +165,12 @@
               <!-- Add a checkbox field on each row with a knowned id (if related, add onclick event to change selected row in detail pattern) -->
               <td class="${colStylePrefix}gvnix_checkbox">
               <c:choose>
-                <c:when test="${related and (param.index eq idFieldValue)}">
+                <c:when test="${related and (param.index eq idValue)}">
                 	<!-- Related pattern active and current item is selected -->
 	                <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" onclick="window.location.href = '${selectUrl}'" checked="checked" />
               		<c:set var="object" value="${item}" scope="request" />
                 </c:when>
-                <c:when test="${related and not (param.index eq idFieldValue)}">
+                <c:when test="${related and not (param.index eq idValue)}">
 					<!-- Related pattern active and current item is not selected -->
 	                <input type="checkbox" id="gvnix_checkbox_${secId}_${fieldPos}" name="selected[${fieldPos}]" value="${fieldPos}" onclick="window.location.href = '${selectUrl}'" />
                 </c:when>
@@ -198,6 +185,20 @@
               <c:set var="item" value="${item}" scope="request" />
               <c:set var="pos" value="${pos}" scope="request" />
               <c:set var="parentId" value="${id}" scope="request" />
+	          <!-- Identifier input field: always disabled on update -->
+	          <c:choose>
+	            <c:when test="${not idRender}">
+	              <!-- field:input disabled="true" field="${idField}" id="${id}" type="hidden"/-->
+	              <input type="hidden" id="_${secId}[${fieldPos}]_${idField}_id_update" name="list[${fieldPos}].${idField}" value="${idValue}" disabled="disabled" />
+	            </c:when>
+	            <c:otherwise>
+	              <field:input disabled="true" field="${idField}" id="${id}" render="true" />
+	            </c:otherwise>
+	          </c:choose>
+	          <c:if test="${versionField ne 'none'}">
+	            <spring:eval expression="item[versionField]" scope="request" var="versionValue" />
+	            <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${versionValue}" disabled="disabled" />
+	          </c:if>
               <jsp:doBody />
 
             </tr>
