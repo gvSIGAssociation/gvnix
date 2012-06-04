@@ -76,7 +76,7 @@
               <spring:param name="gvnixpattern" value="${param.gvnixpattern}" />
             </c:if>
           </spring:url>
-          <util:panel-tab active="${true}" id="edit_${id}" title="${entity_relations} safds" url="${patternUrl}" type="list"/>
+          <util:panel-tab active="${true}" id="edit_${id}" title="${entity_relations}" url="${patternUrl}" type="list"/>
         </c:if>
     </util:panel-tabs>
 
