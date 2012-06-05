@@ -21,7 +21,8 @@ field reference --fieldName person --type org.gvnix.test.relation.list.table.dom
 focus --class ~.domain.Person
 field set --fieldName cars --type org.gvnix.test.relation.list.table.domain.Car --cardinality ONE_TO_MANY --mappedBy person
 
-controller all --package org.gvnix.test.relation.list.table.web
+web mvc setup
+web mvc all --package ~.web
 
 # Master register
 web mvc pattern master --class ~.web.PersonController --name personreg --type register --testAutomatically
@@ -44,17 +45,17 @@ web mvc pattern master --class ~.web.CarController --name cartabeditreg --type t
 web mvc pattern master --class ~.web.HorseController --name horsetabeditreg --type tabular_edit_register
 
 # Master register / Detail tabular with register edition
-web mvc pattern master --class ~.web.PersonController --name personregtabeditreg --type register
+web mvc pattern master --class ~.web.PersonController --name personregtabeditreg --type register --testAutomatically
 web mvc pattern detail --class ~.web.PersonController --name personregtabeditreg --type tabular_edit_register  --field horses
 web mvc pattern detail --class ~.web.PersonController --name personregtabeditreg --type tabular_edit_register  --field cars
 
 # Master tabular / Detail tabular
-web mvc pattern master --class ~.web.PersonController --name persontabtab --type tabular
+web mvc pattern master --class ~.web.PersonController --name persontabtab --type tabular --testAutomatically
 web mvc pattern detail --class ~.web.PersonController --name persontabtab --type tabular --field horses
 web mvc pattern detail --class ~.web.PersonController --name persontabtab --type tabular --field cars
 
 # Master tabular / Detail tabular with register edition
-web mvc pattern master --class ~.web.PersonController --name persontabtabeditreg --type tabular
+web mvc pattern master --class ~.web.PersonController --name persontabtabeditreg --type tabular  --testAutomatically
 web mvc pattern detail --class ~.web.PersonController --name persontabtabeditreg --type tabular_edit_register --field horses
 web mvc pattern detail --class ~.web.PersonController --name persontabtabeditreg --type tabular_edit_register --field cars
 
@@ -67,3 +68,6 @@ web mvc pattern detail --class ~.web.PersonController --name persontabeditregtab
 web mvc pattern master --class ~.web.PersonController --name persontabeditregtabeditreg --type tabular_edit_register
 web mvc pattern detail --class ~.web.PersonController --name persontabeditregtabeditreg --type tabular_edit_register --field horses
 web mvc pattern detail --class ~.web.PersonController --name persontabeditregtabeditreg --type tabular_edit_register --field cars
+
+perform package
+perform eclipse
