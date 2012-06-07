@@ -94,7 +94,7 @@
       <!-- Item is a hidden type: Create a hidden element with defined value without column -->
       <c:when test="${type eq 'hidden'}">
         <!-- Value if specified, else item field value -->
-        <c:if test="${empty value}">
+        <c:if test="${empty value and disableFormBinding}">
           <c:set var="value" scope="request">
             <spring:eval expression="item[field]" />
           </c:set>
@@ -112,7 +112,9 @@
               <!-- Visible field: used for user interaction with validations -->
               <input id="${fieldId}" type="${type}" />
             </c:when>
-
+            <c:when test="${not empty item and disableFormBinding}">
+              <form:input id="${fieldId}" path="${field}" disabled="true" />
+            </c:when>
             <!-- Item is not empty: Create a column element with value for update -->
             <c:otherwise>
               <!-- Visible field: used for user interaction with validations (initialy diabled) -->

@@ -24,12 +24,12 @@
 /*
  * Show a javascript confirmation message before delete.
  */
-function gvnix_delete_confirm(msg, element) {
+function gvnix_delete_confirm(msg, element, compositePkField) {
 
   if (gvnix_any_selected(element)) {
       var r = confirm(msg);
       if (r == true) {
-          gvnix_delete(element);
+          gvnix_delete(element, compositePkField);
       }
   }
 }
@@ -52,9 +52,9 @@ function gvnix_any_selected(element) {
 /*
  * Activate all selected rows and submit delete form.
  */
-function gvnix_delete(element) {
+function gvnix_delete(element, compositePkField) {
 
-  gvnix_copy_values(element);
+  gvnix_copy_values(element, compositePkField, "update");
 
     // Get all row checkbox
     var forms = dojo.query('input[id^="gvnix_checkbox_' + element + '"]');
@@ -166,10 +166,10 @@ function gvnix_create(element) {
 /*
  * Disable all not selected rows (not submitted) and submit add form.
  */
-function gvnix_add(element) {
+function gvnix_add(element, compositePkField) {
 
   // Before form submit, copy each visible field value to it related hidden field
-  gvnix_copy_values(element);
+  gvnix_copy_values(element, compositePkField, "create");
 
   // Get all inputs: if some row's inputs has value, submit row
   var inputs = dojo.query('input[type="text"][id$="_create"]');
@@ -211,10 +211,10 @@ function gvnix_add(element) {
 /*
  * Submit update form.
  */
-function gvnix_update(element) {
+function gvnix_update(element, compositePkField) {
 
   // Before form submit, copy each visible field value to it related hidden field
-  gvnix_copy_values(element);
+  gvnix_copy_values(element, compositePkField, "update");
 
   // Get update form and submit them
   var forms = dojo.query('form[id^="gvnix_form_' + element + '"]');
@@ -224,18 +224,21 @@ function gvnix_update(element) {
 /*
  * Copy each visible field value to it related hidden field.
  */
-function gvnix_copy_values(element) {
+function gvnix_copy_values(element, compositePkField, mode) {
 
   // Get hidden input types
   var hiddens = dojo.query('input[id^="' + element + '"]');
   hiddens.forEach(function(hidden, index, arr) {
 
     // Get different representations of visible input type related to hidden type
-  var inputId = "_" + hidden.id;
+    var inputId = "_" + hidden.id;
     var input = dojo.byId(inputId);
     var inputDijit = dijit.byId(inputId);
 
-    if (input.type == 'checkbox') {
+    if (compositePkField != '' && hidden.name.indexOf("." + compositePkField) != -1) {
+    	encodePk2(hidden.id.substring(0, hidden.id.length - "_id_xxxxxx".length), mode);
+    }
+    else if (input.type == 'checkbox') {
 
       // If checkbox type, convert possible null value to unchecked value
       var press = input.getAttribute("aria-pressed");
@@ -254,6 +257,26 @@ function gvnix_copy_values(element) {
       hidden.value = input.value;
     }
   });
+}
+
+dojo.require("dojox.encoding.base64");
+function encodePk2(prefix, mode) {
+  var obj = new Object();
+  dojo.query("input[id^=\"_" + prefix + ".\"]").forEach(function(node, index, nodelist){
+	if (node.id.substring(node.id.length - mode.length, node.id.length) == mode) {
+	  obj[node.id.substring(prefix.length + 2, node.id.length - 10)] = node.value;
+	}
+  });
+  var json = dojo.toJson(obj);
+  var tokArr = [];
+  for (var i = 0; i < json.length; i++) {
+    tokArr.push(json.charCodeAt(i));
+  }
+  var encoded = dojox.encoding.base64.encode(tokArr);
+  var id = dojo.byId(prefix + '_id_' + mode);
+  if (id != null) {
+	  id.value = encoded;
+  }
 }
 
 /*

@@ -96,7 +96,7 @@
       <util:quicklinks id="${id}">
         <util:quicklink id="${id}_create" label="${create_label}" type="CREATE" onclick="gvnix_create_ward('${secId}');" />
         <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="gvnix_edit_ward('${secId}');" />
-        <util:quicklink id="${id}_delete" label="${delete_label}" type="DELETE" onclick="gvnix_delete_confirm('${delete_confirm_label}', '${secId}');" />
+        <util:quicklink id="${id}_delete" label="${delete_label}" type="DELETE" onclick="gvnix_delete_confirm('${delete_confirm_label}', '${secId}', '${compositePkField}');" />
         <util:quicklink id="${id}_reset" label="${reset_label}" type="RESET" />
       </util:quicklinks>
 
@@ -157,7 +157,9 @@
               <c:choose>
                 <c:when test="${not empty compositePkField}">
                   <!-- Composite primary key value is getted from entity base64 field -->
+<!-- TODO Calculate PKC
                   <spring:eval expression='item["base64"]' scope="request" var="idValue" />
+-->
                 </c:when>
                 <c:otherwise>
                   <!-- Identifier input field: always disabled on update -->
@@ -201,14 +203,11 @@
               
 	          <!-- Identifier input field: always disabled on update -->
 	          <c:choose>
-	            <c:when test="${not idRender and not empty compositePkField}">
-                  <input type="hidden" id="_${secId}[${fieldPos}]_${compositePkField}_id_update" name="list[${fieldPos}].${compositePkField}" value="${idValue}" disabled="disabled" />
+	            <c:when test="${not empty compositePkField}">
+                  <input type="hidden" id="${secId}[${fieldPos}]_${compositePkField}_id_update" name="list[${fieldPos}].${compositePkField}" />
 	            </c:when>
 	            <c:when test="${not idRender and empty compositePkField}">
 	              <input type="hidden" id="_${secId}[${fieldPos}]_${idField}_id_update" name="list[${fieldPos}].${idField}" value="${idValue}" disabled="disabled" />
-	            </c:when>
-	            <c:when test="${idRender and not empty compositePkField}">
-                  <input id="_${secId}[${fieldPos}]_${compositePkField}_id_update" name="list[${fieldPos}].${compositePkField}" value="${idValue}" disabled="true" />
 	            </c:when>
 	            <c:otherwise>
 	              <field:input field="${idField}" id="${secId}" disabled="true" />
@@ -244,7 +243,19 @@
                 <c:set var="pos" value="${new}" scope="request" />
                 <c:set var="parentId" value="${id}" scope="request" />
                 <!-- Identifier input field: always can be specified on create -->
-                <field:input disabled="${idDisabled}" field="${idField}" id="${id}" render="${idRender}" />
+                
+                <!-- Primary key -->
+	            <c:choose>
+	              <c:when test="${empty compositePkField}">
+                    <!-- Simple -->
+                    <field:input disabled="${idDisabled}" field="${idField}" id="${id}" render="${idRender}" />
+                  </c:when>
+                  <c:otherwise>
+	                <!-- Composite -->
+                    <input name="list[${fieldPos}].${compositePkField}" id="${secId}[${fieldPos}]_${compositePkField}_id_create" render="${idRender}" type="hidden" />
+	              </c:otherwise>
+	            </c:choose>
+                
                 <jsp:doBody />
 
               </tr>
@@ -290,7 +301,7 @@
                   <script type="text/javascript">Spring.addDecoration(new Spring.ValidateAllDecoration({elementId:'gvnix_control_update_save_${secId}', event:'onclick'}));</script>
 
                   <input type="button" id="gvnix_control_update_cancel_${secId}" value="${fn:escapeXml(cancel_button)}" onclick="location.href = '${currentUrl}';" class="button_cancel" />
-                  <input type="button" id="gvnix_control_update_save_${secId}" value="${fn:escapeXml(save_button)}" onclick="gvnix_update('${secId}');" class="button_save" />
+                  <input type="button" id="gvnix_control_update_save_${secId}" value="${fn:escapeXml(save_button)}" onclick="gvnix_update('${secId}', '${compositePkField}');" class="button_save" />
                 </div>
 
                 <!-- Add layer: not visible by default and and activated by javascript gvnix_create() function -->
