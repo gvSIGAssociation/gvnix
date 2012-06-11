@@ -53,6 +53,7 @@ import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
+import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
@@ -1062,15 +1063,27 @@ public abstract class AbstractPatternJspMetadataListener implements
                     .getVersionAccessorMethod().getMethodName().getSymbolName();
             formUpdate.setAttribute("versionField", methodName.substring(3));
         }
-
+    	
+		// Handle Roo identifiers
+		List<FieldMetadata> formFields = new ArrayList<FieldMetadata>();
+		if (formbackingTypePersistenceMetadata.getRooIdentifierFields().size() > 0) {
+			formUpdate.setAttribute("compositePkField", formbackingTypePersistenceMetadata.getIdentifierField().getFieldName().getSymbolName());
+			for (FieldMetadata field : formbackingTypePersistenceMetadata.getRooIdentifierFields()) {
+				FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
+				fieldBuilder.setFieldName(new JavaSymbolName(formbackingTypePersistenceMetadata.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
+				formFields.add(fieldBuilder.build());
+			}
+		}
+		formFields.addAll(eligibleFields);
+		
         createFieldsForCreateAndUpdate(entityName, relatedDomainTypes,
-                eligibleFields, document, formUpdate, false);
+        		formFields, document, formUpdate, false);
         formUpdate.setAttribute("z",
                 XmlRoundTripUtils.calculateUniqueKeyFor(formUpdate));
         div.appendChild(formUpdate);
         
         List<FieldMetadata> fieldsOfRelations = new ArrayList<FieldMetadata>();
-        for (FieldMetadata field : eligibleFields) {
+        for (FieldMetadata field : formFields) {
         	if (field.getCustomData().keySet()
                     .contains(PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) && 
                     isRelationVisible(patternName, field.getFieldName().getSymbolName())) {
