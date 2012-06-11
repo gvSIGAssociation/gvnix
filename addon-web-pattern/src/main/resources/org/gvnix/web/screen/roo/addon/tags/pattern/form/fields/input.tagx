@@ -21,6 +21,7 @@
   
   <!-- gvNIX added attributes not included into Roo by default -->
   <jsp:directive.attribute name="value" type="java.lang.String" required="false" rtexprvalue="true" description="Force this string to be used as value at hidden input" />
+  <jsp:directive.attribute name="size" type="java.lang.String" required="false" rtexprvalue="true" description="Size of the item to display" />
   
   <c:if test="${empty render or render}">
   
@@ -30,6 +31,10 @@
     
     <c:if test="${empty disabled}">
       <c:set value="false" var="disabled" />
+    </c:if>
+    
+    <c:if test="${empty size}">
+      <c:set value="15" var="size" />
     </c:if>
     
     <c:if test="${empty label}">
@@ -113,13 +118,13 @@
               <input id="${fieldId}" type="${type}" />
             </c:when>
             <c:when test="${not empty item and disableFormBinding}">
-              <form:input id="${fieldId}" path="${field}" disabled="true" />
+              <form:input id="${fieldId}" path="${field}" readonly="true" />
             </c:when>
             <!-- Item is not empty: Create a column element with value for update -->
             <c:otherwise>
               <!-- Visible field: used for user interaction with validations (initialy diabled) -->
               <spring:eval expression="item[field]" scope="request" var="fieldValue" />
-              <input id="${fieldId}" type="${type}" value="${fieldValue}" disabled="disabled" />
+              <input id="${fieldId}" type="${type}" value="${fieldValue}" disabled="disabled" size="${size}" />
             </c:otherwise>
 
           </c:choose>
