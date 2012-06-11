@@ -157,9 +157,6 @@
               <c:choose>
                 <c:when test="${not empty compositePkField}">
                   <!-- Composite primary key value is getted from entity base64 field -->
-<!-- TODO Calculate PKC
-                  <spring:eval expression='item["base64"]' scope="request" var="idValue" />
--->
                 </c:when>
                 <c:otherwise>
                   <!-- Identifier input field: always disabled on update -->
@@ -323,7 +320,7 @@
 
         <!-- Ends data table -->
         </table>
-
+        
       </div>
 
     </util:panel>

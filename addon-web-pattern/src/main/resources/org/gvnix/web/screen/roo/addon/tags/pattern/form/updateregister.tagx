@@ -111,10 +111,11 @@
           </c:if>
         </c:forEach>
       </spring:url>
+      <spring:url value="${path}" var="detailPath"/>
       <util:quicklinks id="${id}">
-        <util:quicklink id="${id}_create" label="${create_label}" type="CREATE" onclick="regproy_createItem${typeName}('${createUrl}')" />
-        <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="regproy_editItem${typeName}('${secId}', '${updateUrl}');" />
-        <util:quicklink id="${id}_delete" label="${delete_label}" type="DELETE" onclick="gvnix_delete_confirm('${delete_confirm_label}', '${secId}');" />
+        <util:quicklink id="${id}_create" label="${create_label}" type="CREATE" onclick="gvnix_create_item('${createUrl}')" />
+        <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="regproy_edit_item('${detailPath}', '${secId}', '${updateUrl}', '${compositePkField}', '${idField}');" />
+        <util:quicklink id="${id}_delete" label="${delete_label}" type="DELETE" onclick="gvnix_delete_confirm('${delete_confirm_label}', '${secId}', '${compositePkField}');" />
         <util:quicklink id="${id}_reset" label="${reset_label}" type="RESET" />
       </util:quicklinks>
 
@@ -175,7 +176,6 @@
               <c:choose>
                 <c:when test="${not empty compositePkField}">
                   <!-- Composite primary key value is getted from entity base64 field -->
-                  <spring:eval expression='item["base64"]' scope="request" var="idValue" />
                 </c:when>
                 <c:otherwise>
                   <!-- Identifier input field: always disabled on update -->
@@ -219,14 +219,11 @@
               
 	          <!-- Identifier input field: always disabled on update -->
 	          <c:choose>
-	            <c:when test="${not idRender and not empty compositePkField}">
-                  <input type="hidden" id="_${secId}[${fieldPos}]_${compositePkField}_id_update" name="list[${fieldPos}].${compositePkField}" value="${idValue}" disabled="disabled" />
+	            <c:when test="${not empty compositePkField}">
+                  <input type="hidden" id="${secId}[${fieldPos}]_${compositePkField}_id_update" name="list[${fieldPos}].${compositePkField}" />
 	            </c:when>
 	            <c:when test="${not idRender and empty compositePkField}">
 	              <input type="hidden" id="_${secId}[${fieldPos}]_${idField}_id_update" name="list[${fieldPos}].${idField}" value="${idValue}" disabled="disabled" />
-	            </c:when>
-	            <c:when test="${idRender and not empty compositePkField}">
-                  <input id="_${secId}[${fieldPos}]_${compositePkField}_id_update" name="list[${fieldPos}].${compositePkField}" value="${idValue}" disabled="true" />
 	            </c:when>
 	            <c:otherwise>
 	              <field:input field="${idField}" id="${secId}" disabled="true" />
@@ -271,36 +268,8 @@
 
         <!-- Ends data table -->
         </table>
+        
       </div>
-      <spring:url value="${path}" var="detailPath"/>
-      <script type="text/javascript"><![CDATA[
-          function regproy_createItem${typeName}(url) {
-            location.href = url;
-          }
-
-          function regproy_editItem${typeName}(element, urlParams) {
-            var url = "${detailPath}/";
-            var checkBoxes = dojo.query('input[id^="gvnix_checkbox_' + element + '"]');
-            //var any = 0;
-            var nodeChecked;
-            checkBoxes.forEach(function(node, index, arr) {
-              if (node.checked == true) {
-                if (nodeChecked != undefined) {
-                  alert("Solo es posible editar un unico registro");
-                  return;
-                }
-                nodeChecked = node;
-              }
-            });
-            if ("${compositePkField}" != "") {
-              var pkId = '_' + element + '[' + nodeChecked.value + ']_${compositePkField}_id_update';
-            } else {
-              var pkId = '_${secId}[' + nodeChecked.value + ']_${idField}_id_update';
-            }
-            url += dojo.byId(pkId).value;
-            location.href = url + urlParams;
-          }
-      ]]></script>
 
     </util:panel>
 

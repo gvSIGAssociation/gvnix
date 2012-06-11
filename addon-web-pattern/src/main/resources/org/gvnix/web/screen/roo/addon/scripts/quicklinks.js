@@ -21,6 +21,8 @@
  * Quick links action handlers for relationship add-on
  */
 
+dojo.require("dojox.encoding.base64");
+
 /*
  * Show a javascript confirmation message before delete.
  */
@@ -259,7 +261,6 @@ function gvnix_copy_values(element, compositePkField, mode) {
   });
 }
 
-dojo.require("dojox.encoding.base64");
 function encodePk2(prefix, mode) {
   var obj = new Object();
   dojo.query("input[id^=\"_" + prefix + ".\"]").forEach(function(node, index, nodelist){
@@ -297,4 +298,34 @@ function gvnix_create_ward(element) {
       gvNixChangesControl();
       gvnix_create(element);
   }
+}
+
+function gvnix_create_item(url) {
+  location.href = url;
+}
+
+function regproy_edit_item(detailPath, element, urlParams, compositePkField, idField) {
+
+  // Before edit, copy each visible field value to it related hidden field
+  gvnix_copy_values(element, compositePkField, "update");
+
+  var url = detailPath + "/";
+  var checkBoxes = dojo.query('input[id^="gvnix_checkbox_' + element + '"]');
+  var nodeChecked;
+  checkBoxes.forEach(function(node, index, arr) {
+    if (node.checked == true) {
+      if (nodeChecked != undefined) {
+        alert("Solo es posible editar un unico registro");
+        return;
+      }
+      nodeChecked = node;
+    }
+  });
+  if (compositePkField != "") {
+    var pkId = element + '[' + nodeChecked.value + ']_' + compositePkField + '_id_update';
+  } else {
+    var pkId = '_' + element + '[' + nodeChecked.value + ']_' + idField + '_id_update';
+  }
+  url += dojo.byId(pkId).value;
+  location.href = url + urlParams;
 }
