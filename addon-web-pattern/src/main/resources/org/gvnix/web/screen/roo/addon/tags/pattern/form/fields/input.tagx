@@ -86,7 +86,7 @@
     <c:choose>
 
       <!-- No item: Show a column header -->
-      <c:when test="${item eq null}">
+      <c:when test="${item eq null and referenceName ne field}">
         <!-- Create a header column when not hidden input type -->
         <c:if test="${type != 'hidden'}">
           <th class="${fieldStyle}">
@@ -96,6 +96,18 @@
         </c:if>
       </c:when>
 
+      <!-- When field is a reference, include it as hidden (detail pattern field relation with master pattern) -->      
+      <c:when test="${referenceName eq field}">
+        <c:choose>
+          <c:when test="${empty item}">
+            <input type="hidden" id="${fieldId}" name="${fieldName}" value="${referenceValue}" />
+          </c:when>
+          <c:otherwise>
+            <input type="hidden" id="${fieldId}" name="${fieldName}" value="${referenceValue}" disabled="disabled" />
+          </c:otherwise>
+        </c:choose>
+      </c:when>
+     
       <!-- Item is a hidden type: Create a hidden element with defined value without column -->
       <c:when test="${type eq 'hidden'}">
         <!-- Value if specified, else item field value -->
