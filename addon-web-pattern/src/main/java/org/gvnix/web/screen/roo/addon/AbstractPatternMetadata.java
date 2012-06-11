@@ -238,6 +238,7 @@ public abstract class AbstractPatternMetadata extends
             builder.addMethod(getDeleteListMethod());
             builder.addMethod(getFilterListMethod());
             builder.addMethod(getRefererRedirectMethod());
+            builder.addMethod(getRefererQueryMethod());
             builder.addMethod(getRefererQueryNoIndexMethod());
         }
 
