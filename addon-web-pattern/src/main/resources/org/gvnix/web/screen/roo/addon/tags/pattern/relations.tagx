@@ -17,19 +17,19 @@
               new dijit.layout.ContentPane({
                   // just pass a title: attribute, this, we're stealing from the node
                   title: dojo.attr(n, "title"),
-                  style: "height:460px;"
+                  style: "height:620px;"
               },
               n);
           });
           var tc = new dijit.layout.TabContainer({
-              style: dojo.attr("tab_container_relations_${patternName}", "style") + "height:460px;",
+              style: dojo.attr("tab_container_relations_${patternName}", "style") + "height:620px;",
               tabPosition: 'top'
           },
           "tab_container_relations_${patternName}");
           tc.startup();
       });
     ]]></script>
-    <div id="tab_container_relations_${patternName}">
+    <div id="tab_container_relations_${patternName}" style="height: auto;">
       <jsp:doBody />
     </div>
     <style>body .dijitAlignClient {position: relative;}</style>
