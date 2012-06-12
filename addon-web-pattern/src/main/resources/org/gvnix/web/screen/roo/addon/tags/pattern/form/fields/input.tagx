@@ -79,7 +79,7 @@
     </c:choose>
     <c:set var="fieldHiddenId" value="${secParentId}[${fieldPos}]_${sec_field}_id_${createOrUpdate}" scope="request" />
     <c:set var="fieldId" value="_${fieldHiddenId}" scope="request" />
-    <c:set var="fieldMethod" value="${secParentId}_${fieldPos}_${sec_field}_${createOrUpdate}" scope="request" />
+    <c:set var="fieldMethod" value='${secParentId}_${fieldPos}_${fn:replace(sec_field, ".", "_")}_${createOrUpdate}' scope="request" />
     <c:set var="fieldName" value="list[${fieldPos}].${sec_field}" scope="request" />
     <c:set var="fieldStyle" value="gvNixTableData ${secParentId}_col_${sec_field}" scope="request" />
 
