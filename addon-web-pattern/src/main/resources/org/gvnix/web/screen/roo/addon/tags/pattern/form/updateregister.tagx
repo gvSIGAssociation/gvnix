@@ -175,7 +175,8 @@
 			  <!-- Get identifier value: composite or simple -->
               <c:choose>
                 <c:when test="${not empty compositePkField}">
-                  <!-- Composite primary key value is getted from entity base64 field -->
+                  <!-- Composite primary key value is getted from entity field -->
+        		  <c:set var="idValue"><spring:eval expression="item[compositePkField]"/></c:set>
                 </c:when>
                 <c:otherwise>
                   <!-- Identifier input field: always disabled on update -->

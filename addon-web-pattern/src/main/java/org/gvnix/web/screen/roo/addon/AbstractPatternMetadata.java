@@ -527,7 +527,7 @@ public abstract class AbstractPatternMetadata extends
 		referenceRequestParam.addStringAttribute("value", "gvnixreference");
 		referenceRequestParam.addBooleanAttribute("required", true);
 		referenceAnnotations.add(referenceRequestParam.build());
-		paramTypes.add(new AnnotatedJavaType(new JavaType("java.lang.Long"), referenceAnnotations));
+		paramTypes.add(new AnnotatedJavaType(new JavaType(masterJavaTypeMetadataHolder.getPersistenceDetails().getIdentifierField().getFieldType().getFullyQualifiedTypeName()), referenceAnnotations));
 		paramTypes.add(new AnnotatedJavaType(new JavaType("org.springframework.ui.Model"), null));
 		
 		MethodMetadata method = methodExists(methodName, paramTypes);
