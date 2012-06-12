@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import org.apache.felix.scr.annotations.Component;
@@ -419,7 +420,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		String imgId = XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()) + "_create";
 		element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
 
-		// TODO Composite PK test generation when tabular pattern PK support
+		// Add register identifier fields
+		addCompositeIdentifierFieldsTabular(entity, document, element, memberDetails);
+
 		// TODO Check if other fields are editable (storeEditable)
 
 		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, memberDetails, null);
@@ -466,7 +469,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			String imgId = XmlUtils.convertId("fu:" + fieldType.getFullyQualifiedTypeName()) + "_create";
 			element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
 
-			// TODO Composite PK test generation when tabular pattern PK support
+			// Add register identifier fields
+			addCompositeIdentifierFieldsTabular(fieldType, document, element, memberDetailsField);
+			
 			// TODO Check if other fields are editable (storeEditable)
 
 			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(fieldType, memberDetailsField, null);
@@ -515,7 +520,30 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 					FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
 					fieldBuilder.setFieldName(new JavaSymbolName(javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
-					element.appendChild(typeCommandRegister(document, fieldBuilder.build()));
+					element.appendChild(typeCommandRegister(document, fieldBuilder.build(), true));
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Add composite PK identifier fields if needed into tabular pattern.
+	 *
+	 * @param javaType Java type to get register pattern identifier fields
+	 * @param document Document to write fields commands
+	 * @param element Element where add fields commands
+	 * @param memberDetails Java type member details
+	 */
+	protected void addCompositeIdentifierFieldsTabular(JavaType javaType, Document document, Element element, MemberDetails memberDetails) {
+
+		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(javaType, memberDetails, null);
+		if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
+			for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
+				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
+
+					FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
+					fieldBuilder.setFieldName(new JavaSymbolName(javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
+					element.appendChild(typeCommandTabular(document, fieldBuilder.build(), javaType, true));
 				}
 			}
 		}
@@ -598,7 +626,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// Add all other fields
 		for (FieldMetadata field : fields) {
 			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-				element.appendChild(typeCommandRegister(document, field));
+				element.appendChild(typeCommandRegister(document, field, false));
 			}
 		}
 	}
@@ -616,7 +644,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// Add all other fields
 		for (FieldMetadata field : fields) {
 			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-				element.appendChild(typeCommandTabular(document, field, entity));
+				element.appendChild(typeCommandTabular(document, field, entity, false));
 			}
 		}
 	}
@@ -628,7 +656,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param field Field to add value
 	 * @return Type node
 	 */
-	protected Node typeCommandRegister(Document document, FieldMetadata field) {
+	protected Node typeCommandRegister(Document document, FieldMetadata field, boolean random) {
 
 		Node tr = document.createElement("tr");
 
@@ -640,7 +668,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		td2.setTextContent("_" + field.getFieldName().getSymbolName() + "_id");
 
 		Node td3 = tr.appendChild(document.createElement("td"));
-		td3.setTextContent(convertToInitializer(field));
+		td3.setTextContent(convertToInitializer(field, random));
 
 		return tr;
 	}
@@ -653,7 +681,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param entity Field parent entity
 	 * @return Type node
 	 */
-	protected Node typeCommandTabular(Document document, FieldMetadata field, JavaType entity) {
+	protected Node typeCommandTabular(Document document, FieldMetadata field, JavaType entity, boolean random) {
 
 		Node tr = document.createElement("tr");
 
@@ -666,7 +694,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		td2.setTextContent(id);
 
 		Node td3 = tr.appendChild(document.createElement("td"));
-		td3.setTextContent(convertToInitializer(field));
+		td3.setTextContent(convertToInitializer(field, random));
 
 		return tr;
 	}
@@ -852,7 +880,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			projectOperations.addBuildPlugin(new Plugin(plugin));
 		}
 	}
-
+	
 	/**
 	 * Get test value for a field.
 	 *
@@ -860,9 +888,25 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @return Field test value
 	 */
 	private String convertToInitializer(FieldMetadata field) {
+		return convertToInitializer(field, false);
+	}
+
+	/**
+	 * Get test value for a field.
+	 *
+	 * @param field Field to auto generate a value
+	 * @param random Should be the initialized value generated randomly ?
+	 * @return Field test value
+	 */
+	private String convertToInitializer(FieldMetadata field, boolean random) {
 
 		String initializer = " ";
+		
 		short index = 1;
+		if (random) {
+			index = new Integer(new Random(new Date().getTime()).nextInt()).shortValue();
+		}
+		
 		AnnotationMetadata min = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Min"));
 		if (min != null) {
 			AnnotationAttributeValue<?> value = min.getAttribute(new JavaSymbolName("value"));

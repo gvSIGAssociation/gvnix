@@ -4,6 +4,7 @@
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
   <jsp:directive.attribute name="object" type="java.lang.Object" required="true" rtexprvalue="true" description="The form backing object" />
   <jsp:directive.attribute name="path" type="java.lang.String" required="true" rtexprvalue="true" description="Specify the URL path" />
+  <jsp:directive.attribute name="typeIdFieldName" type="java.lang.String" required="false" rtexprvalue="true" description="The identifier field name for the type (defaults to 'id')" />
   <jsp:directive.attribute name="list" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Include 'list' link into table (default true)" />
   <jsp:directive.attribute name="create" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Include 'create' link into table (default true)" />
   <jsp:directive.attribute name="update" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Include 'update' link into table (default true)" />
@@ -15,8 +16,13 @@
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <c:if test="${empty render or render}">
+  
     <c:if test="${empty label}">
       <spring:message code="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}" var="label" htmlEscape="false" />
+    </c:if>
+
+    <c:if test="${empty typeIdFieldName}">
+      <c:set var="typeIdFieldName" value="id" />
     </c:if>
 
     <c:if test="${empty list}">
@@ -60,6 +66,11 @@
         </c:if>
         <util:panel-tab active="${true}" id="edit_${id}" title="${show_entity}" type="edit"/>
       </util:panel-tabs>
+      
+      <!-- Get identifier value (simple or composite) from item identifier field name-->
+      <c:if test="${object ne null}">
+        <c:set var="itemId"><spring:eval expression="object[typeIdFieldName]"/></c:set>
+      </c:if>
 
       <spring:message arguments="${label}" code="entity_show" var="title_msg" htmlEscape="false" />
       <util:panel id="${id}" title="${title_msg}" openPane="${openPane}">
@@ -78,7 +89,7 @@
 
               <spring:url value="/resources/images/create.png" var="create_image_url" />
               <spring:message arguments="${typeName}" code="entity_create" var="create_label" htmlEscape="false" />
-              <a href="${fn:escapeXml(create_form_url)}" alt="${fn:escapeXml(create_label)}" title="${fn:escapeXml(create_label)}">
+              <a href="${fn:escapeXml(create_form_url)}" alt="${fn:escapeXml(create_label)}" title="${fn:escapeXml(create_label)}" id="${id}_create">
                 <img alt="${fn:escapeXml(create_label)}" class="image" src="${fn:escapeXml(create_image_url)}" title="${fn:escapeXml(create_label)}" />
               </a>
               </li>
@@ -97,7 +108,7 @@
 
               <spring:url value="/resources/images/update.png" var="update_image_url" />
               <spring:message arguments="${typeName}" code="entity_update" var="update_label" htmlEscape="false" />
-              <a href="${fn:escapeXml(update_form_url)}" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}">
+              <a href="${fn:escapeXml(update_form_url)}" alt="${fn:escapeXml(update_label)}" title="${fn:escapeXml(update_label)}" id="${id}_update">
                 <img alt="${fn:escapeXml(update_label)}" class="image" src="${fn:escapeXml(update_image_url)}" title="${fn:escapeXml(update_label)}" />
               </a>
               </li>
@@ -119,7 +130,7 @@
                     <spring:message code="entity_delete_confirm" />
                   </spring:escapeBody>
                 </c:set>
-                <input alt="${fn:escapeXml(delete_label)}" class="image" src="${fn:escapeXml(delete_image_url)}" title="${fn:escapeXml(delete_label)}" type="image" value="${fn:escapeXml(delete_label)}" onclick="return confirm('${fn:escapeXml(delete_confirm_msg)}');" />
+                <input alt="${fn:escapeXml(delete_label)}" class="image" src="${fn:escapeXml(delete_image_url)}" title="${fn:escapeXml(delete_label)}" type="image" value="${fn:escapeXml(delete_label)}" onclick="return confirm('${fn:escapeXml(delete_confirm_msg)}');" id="${id}_delete" />
               </form:form>
               </li>
             </c:if>
@@ -137,7 +148,7 @@
 
               <spring:url value="/resources/images/pattern/refresh.gif" var="reset_image_url" />
               <spring:message arguments="${typeNamePlural}" code="entity_reset" var="reset_label" htmlEscape="false" />
-              <a href="${fn:escapeXml(list_form_url)}" alt="${fn:escapeXml(reset_label)}" title="${fn:escapeXml(reset_label)}">
+              <a href="${fn:escapeXml(list_form_url)}" alt="${fn:escapeXml(reset_label)}" title="${fn:escapeXml(reset_label)}" id="${id}_reset">
                 <img alt="${fn:escapeXml(reset_label)}" class="image" src="${fn:escapeXml(reset_image_url)}" title="${fn:escapeXml(reset_label)}" />
               </a>
               </li>

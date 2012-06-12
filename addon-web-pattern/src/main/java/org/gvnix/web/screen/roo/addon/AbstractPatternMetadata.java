@@ -1284,14 +1284,6 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
                 .concat(entityName.toLowerCase()).concat("\", ")
                 .concat(entityName.toLowerCase()).concat(");"));
-        bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-                .concat("itemId")
-                .concat("\", ")
-                .concat(entityName.toLowerCase())
-                .concat(".")
-                .concat(javaTypeMetadataHolder.getPersistenceDetails()
-                        .getIdentifierAccessorMethod().getMethodName()
-                        .getSymbolName()).concat("());"));
 
         bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
                 .getNameIncludingTypeParameters()

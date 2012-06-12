@@ -292,6 +292,13 @@ public abstract class AbstractPatternJspMetadataListener implements
         if (!webScaffoldAnnotationValues.isDelete()) {
             pageShow.setAttribute("delete", "false");
         }
+        
+        String identifierFieldName = formbackingTypeMetadata.getPersistenceDetails().getIdentifierField().getFieldName().getSymbolName();
+        if (!"id".equals(identifierFieldName)) {
+	        pageShow.setAttribute("typeIdFieldName", 
+	        		formbackingTypeMetadata.getPersistenceDetails().getIdentifierField().getFieldName().getSymbolName());
+        }
+        
         pageShow.setAttribute("z",
                 XmlRoundTripUtils.calculateUniqueKeyFor(pageShow));
 

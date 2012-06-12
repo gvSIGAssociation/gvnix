@@ -7,16 +7,18 @@ field string --fieldName name --notNull
 field number --fieldName age --type java.lang.Integer
 field date --fieldName birthDate --type java.util.Calendar
 
-entity --class ~.domain.Horse
+entity --class ~.domain.Horse --identifierType ~.domain.HorsePk
 field string --fieldName name --notNull
 field reference --fieldName person --type ~.domain.Person
+field string --fieldName pkc1 --class ~.domain.HorsePk
 
 focus --class ~.domain.Person
 field set --fieldName horses --type ~.domain.Horse --cardinality ONE_TO_MANY --mappedBy person
 
-entity --class ~.domain.Car
+entity --class ~.domain.Car --identifierType ~.domain.CarPk
 field string --fieldName name --notNull
 field reference --fieldName person --type ~.domain.Person
+field string --fieldName pkc1 --class ~.domain.CarPk
 
 focus --class ~.domain.Person
 field set --fieldName cars --type ~.domain.Car --cardinality ONE_TO_MANY --mappedBy person
