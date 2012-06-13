@@ -408,19 +408,19 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		addVerificationRegister(entity, document, element, fields);
 		
 		// Update link access and submit opened form
-		element.appendChild(clickAndWaitCommand(document, "//a[@id='" + XmlUtils.convertId("ps:" + entity.getFullyQualifiedTypeName()) + "_update'" + "]"));
+		element.appendChild(clickAndWaitCommand(document, "//a[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_update'" + "]"));
 		element.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
 
 		// Update register fields verification
 		addVerificationRegister(entity, document, element, fields);
 
 		// Delete form submit
-		element.appendChild(clickAndWaitCommand(document, "//input[@id='" + XmlUtils.convertId("ps:" + entity.getFullyQualifiedTypeName()) + "_delete']"));
+		element.appendChild(clickCommand(document, "//input[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_delete']"));
 		
-		// Delete javascript confirmation store required on selenium
-		storeConfirmationCommand(document, "var");
+		// Delete javascript confirmation store required (but not used)
+		element.appendChild(storeConfirmationCommand(document, "var"));
 		
-		// TODO Validate deletion ?
+		// TODO Delete validation ?
 	}
 
 	/**
@@ -435,7 +435,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		MemberDetails memberDetails = getMemberDetails(entity);
 
 		// Add image push to access creation
-		String imgId = XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()) + "_create";
+		String imgId = "fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create";
 		element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
 
 		// Add register identifier fields
@@ -449,11 +449,32 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		addFieldsTabular(fields, entity, document, element);
 
 		// Add submit
-		String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName());
+		String inputId = "gvnix_control_add_save_fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName());
 		element.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
 
 		// Add tabular fields verification
 		addVerificationTabular(entity, document, element, fields);
+		
+		// Update check table first row 
+		element.appendChild(checkCommand(document, entity));
+
+		// Update link access and submit enabled form
+		element.appendChild(clickCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_update'" + "]"));
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='gvnix_control_update_save_fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "']"));
+
+		// Update register fields verification
+		addVerificationTabular(entity, document, element, fields);
+
+		// Delete check table first row 
+		element.appendChild(checkCommand(document, entity));
+
+		// Delete form submit
+		element.appendChild(clickCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_delete']"));
+		
+		// Delete javascript confirmation store required (but not used)
+		element.appendChild(storeConfirmationCommand(document, "var"));
+		
+		// TODO Delete validation ?
 	}
 
 	/**
@@ -818,6 +839,30 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		Node td2 = tr.appendChild(document.createElement("td"));
 		td2.setTextContent(XmlUtils.convertId(varName));
+
+		return tr;
+	}
+
+	/**
+	 * Add check command, to check a checkbox or radio.
+	 *
+	 * @param document Document to write command
+	 * @param entity Entity owner of check property
+	 * @return Check node
+	 */
+	protected Node checkCommand(Document document, JavaType entity) {
+
+		Node tr = document.createElement("tr");
+
+		Node td1 = tr.appendChild(document.createElement("td"));
+		td1.setTextContent("check");
+
+		Node td2 = tr.appendChild(document.createElement("td"));
+		String id = "gvnix_checkbox_fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_0";
+		td2.setTextContent(id);
+		
+		Node td3 = tr.appendChild(document.createElement("td"));
+		td3.setTextContent(" ");
 
 		return tr;
 	}
