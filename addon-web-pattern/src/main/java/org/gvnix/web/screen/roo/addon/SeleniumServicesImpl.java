@@ -139,8 +139,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		addTestMasterRegister(formBackingType, document, tbody);
 
 		// Store the test file into project
-		String relativeTestFilePath = "selenium/test-" + name + "-master-register.xhtml";
-		installTest(name, serverURL, document, relativeTestFilePath);
+		String testName = "test-" + name + "-master-register";
+		String relativeTestFilePath = "selenium/" + testName + ".xhtml";
+		installTest(testName, serverURL, document, relativeTestFilePath);
 	}
 
 	/**
@@ -185,8 +186,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		addTestMasterTabular(formBackingType, document, tbody);
 
 		// Store the test file into project
-		String relativeTestFilePath = "selenium/test-" + name + "-master-tabular.xhtml";
-		installTest(name, serverURL, document, relativeTestFilePath);
+		String testName = "test-" + name + "-master-tabular";
+		String relativeTestFilePath = "selenium/" + testName + ".xhtml";
+		installTest(testName, serverURL, document, relativeTestFilePath);
 	}
 
 	/**
@@ -233,8 +235,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		addTestDetailTabular(fieldName, formBackingType, document, tbody);
 
 		// Store the test file into project
-		String relativeTestFilePath = "selenium/test-" + name + "-detail-tabular" + "-" + fieldName + ".xhtml";
-		installTest(name, serverURL, document, relativeTestFilePath);
+		String testName = "test-" + name + "-detail-tabular" + "-" + fieldName;
+		String relativeTestFilePath = "selenium/" + testName + ".xhtml";
+		installTest(testName, serverURL, document, relativeTestFilePath);
 	}
 
 	/**
@@ -403,6 +406,21 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		// Add register fields verification
 		addVerificationRegister(entity, document, element, fields);
+		
+		// Update link access and submit opened form
+		element.appendChild(clickAndWaitCommand(document, "//a[@id='" + XmlUtils.convertId("ps:" + entity.getFullyQualifiedTypeName()) + "_update'" + "]"));
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
+
+		// Update register fields verification
+		addVerificationRegister(entity, document, element, fields);
+
+		// Delete form submit
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='" + XmlUtils.convertId("ps:" + entity.getFullyQualifiedTypeName()) + "_delete']"));
+		
+		// Delete javascript confirmation store required on selenium
+		storeConfirmationCommand(document, "var");
+		
+		// TODO Validate deletion ?
 	}
 
 	/**
@@ -780,6 +798,26 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		Node td3 = tr.appendChild(document.createElement("td"));
 		td3.setTextContent(convertToInitializer(field));
+
+		return tr;
+	}
+	
+	/**
+	 * Add store confirmation command, required before a javascript confirmation.
+	 *
+	 * @param document Document to write command
+	 * @param varName Name of variable to store confirmation value
+	 * @return Confirmation node
+	 */
+	protected Node storeConfirmationCommand(Document document, String varName) {
+
+		Node tr = document.createElement("tr");
+
+		Node td1 = tr.appendChild(document.createElement("td"));
+		td1.setTextContent("storeConfirmation");
+
+		Node td2 = tr.appendChild(document.createElement("td"));
+		td2.setTextContent(XmlUtils.convertId(varName));
 
 		return tr;
 	}
