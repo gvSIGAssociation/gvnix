@@ -114,7 +114,7 @@
       <spring:url value="${path}" var="detailPath"/>
       <util:quicklinks id="${id}">
         <util:quicklink id="${id}_create" label="${create_label}" type="CREATE" onclick="gvnix_create_item('${createUrl}')" />
-        <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="regproy_edit_item('${detailPath}', '${secId}', '${updateUrl}', '${compositePkField}', '${idField}');" />
+        <util:quicklink id="${id}_update" label="${update_label}" type="UPDATE" onclick="gvnix_edit_item('${detailPath}', '${secId}', '${updateUrl}', '${compositePkField}', '${idField}');" />
         <util:quicklink id="${id}_delete" label="${delete_label}" type="DELETE" onclick="gvnix_delete_confirm('${delete_confirm_label}', '${secId}', '${compositePkField}');" />
         <util:quicklink id="${id}_reset" label="${reset_label}" type="RESET" />
       </util:quicklinks>

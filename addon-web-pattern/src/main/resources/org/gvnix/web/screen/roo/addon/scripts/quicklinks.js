@@ -304,7 +304,7 @@ function gvnix_create_item(url) {
   location.href = url;
 }
 
-function regproy_edit_item(detailPath, element, urlParams, compositePkField, idField) {
+function gvnix_edit_item(detailPath, element, urlParams, compositePkField, idField) {
 
   // Before edit, copy each visible field value to it related hidden field
   gvnix_copy_values(element, compositePkField, "update");

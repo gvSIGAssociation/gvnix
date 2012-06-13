@@ -48,7 +48,7 @@
             findForm = dojo.byId('${formId}');  
           });
         //]]></script>
-        <a onclick="javascript:findForm.reset();" href="#" id="${id}">
+        <a onclick="javascript:findForm.reset();" href="#" id="${id}_link">
           <img id="${id}" name="${id}" class="image" 
             src="${fn:escapeXml(imgUrl)}" title="${fn:escapeXml(label)}" 
             alt="${fn:escapeXml(label)}" />
@@ -58,14 +58,14 @@
     <c:otherwise>
       <li>
         <c:if test="${not empty url}">
-          <a href="${fn:escapeXml(url)}" id="${id}">
+          <a href="${fn:escapeXml(url)}" id="${id}_link">
           <img id="${id}" name="${id}" class="image" 
             src="${fn:escapeXml(imgUrl)}" title="${fn:escapeXml(label)}" 
             alt="${fn:escapeXml(label)}" />
           </a>
         </c:if> 
         <c:if test="${not empty onclick}">
-          <a onclick="${onclick}" id="${id}">
+          <a onclick="${onclick}" id="${id}_link">
           <img id="${id}" name="${id}" class="image" 
             src="${fn:escapeXml(imgUrl)}" title="${fn:escapeXml(label)}" 
             alt="${fn:escapeXml(label)}" />
