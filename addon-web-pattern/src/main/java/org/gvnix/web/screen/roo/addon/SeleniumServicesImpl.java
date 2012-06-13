@@ -839,6 +839,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		Node td2 = tr.appendChild(document.createElement("td"));
 		td2.setTextContent(XmlUtils.convertId(varName));
+		
+		Node td3 = tr.appendChild(document.createElement("td"));
+		td3.setTextContent(" ");
 
 		return tr;
 	}
