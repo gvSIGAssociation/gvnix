@@ -476,12 +476,6 @@ public abstract class AbstractPatternJspMetadataListener implements
 		            .getSymbolName());
 		    String webScaffoldFolder = getFieldEntityPlural(fieldMetadata);
 		    
-		    // Reference name is a field or a identifier portion
-		    String referenceName = entityName.toLowerCase();
-		    if (fieldMetadata.getCustomData().get(PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) != null) {
-		    	referenceName = "id." + ((HashMap<String, String>)fieldMetadata.getCustomData().get(PersistenceCustomDataKeys.ONE_TO_MANY_FIELD)).get("mappedBy");
-		    }
-		    
 		    Element patternRelation = new XmlElementBuilder(
 		            "pattern:relation", document)
 		            .addAttribute(
@@ -495,7 +489,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		            .addAttribute("field", fieldName)
 		            .addAttribute("folder", webScaffoldFolder)
 		            .addAttribute("patternName", patternName)
-		            .addAttribute("referenceName", referenceName)
+		            .addAttribute("referenceName", entityName.toLowerCase())
 		            .addAttribute(
 		                    "referenceField",
 		                    formbackingTypeMetadata.getPersistenceDetails()

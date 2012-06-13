@@ -114,7 +114,7 @@
                       </option>
                     </c:when>
                     <c:otherwise>
-                      <spring:eval expression="item2[itemValue]" scope="request" var="field2Value" />
+                      <c:set scope="request" var="field2Value"><spring:eval expression="item2[itemValue]"/></c:set>
                       <option value="${field2Value}">
                         <spring:eval expression="item2" />
                       </option>
@@ -153,10 +153,10 @@
                     <!-- fieldValue can be null if has no value: show options without selected -->
                     <c:set scope="request" value="" var="fieldValue2" />
               		<c:if test="${not empty fieldValue}">
-                      <spring:eval expression="fieldValue[itemValue]" scope="request" var="fieldValue2" />
+                      <c:set scope="request" var="fieldValue2"><spring:eval expression="fieldValue[itemValue]"/></c:set>
                     </c:if>
                     <c:forEach items="${items}" var="item2">
-                      <spring:eval expression="item2[itemValue]" scope="request" var="field2Value" />
+                      <c:set scope="request" var="field2Value"><spring:eval expression="item2[itemValue]"/></c:set>
                       <c:choose>
                         <c:when test="${field2Value == fieldValue2}">
                           <option value="${field2Value}" selected="selected">
