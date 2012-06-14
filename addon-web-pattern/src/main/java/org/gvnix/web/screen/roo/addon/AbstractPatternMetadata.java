@@ -216,7 +216,6 @@ public abstract class AbstractPatternMetadata extends
 	            builder.addMethod(getDeleteMethod(registerPattern));
             }
             builder.addMethod(getRefererQueryMethod());
-            builder.addMethod(getRefererQueryNoIndexMethod());
         }
 
         List<String> tabularEditPatterns = getPatternTypeDefined(WebPatternType.tabular_edit_register, this.definedPatterns);
@@ -239,7 +238,6 @@ public abstract class AbstractPatternMetadata extends
             builder.addMethod(getFilterListMethod());
             builder.addMethod(getRefererRedirectMethod());
             builder.addMethod(getRefererQueryMethod());
-            builder.addMethod(getRefererQueryNoIndexMethod());
         }
 
         // Create a representation of the desired output ITD
@@ -337,20 +335,11 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("}");
 
         if (masterFormBackingType == null) { 
-            bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
-                    .getNameIncludingTypeParameters()
-                    .concat(" count = ")
-                    .concat(formBackingType.getSimpleTypeName())
-                    .concat(".")
-                    .concat(javaTypeMetadataHolder.getPersistenceDetails()
-                            .getCountMethod().getMethodName().getSymbolName())
-                    .concat("();"));
-
 	        bodyBuilder
 	        .appendFormalLine("return \""
 	                .concat("redirect:/")
 	                .concat(entityNamePlural.toLowerCase())
-	                .concat("?gvnixform&\" + refererQuery(httpServletRequest, (count == 0 ? 1 : count));"));
+	                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
         }
         else {
 	        bodyBuilder
@@ -469,7 +458,7 @@ public abstract class AbstractPatternMetadata extends
                 .appendFormalLine("return \""
                         .concat("redirect:/")
                         .concat(entityNamePlural.toLowerCase())
-                        .concat("?gvnixform&\" + refererQuery(httpServletRequest, 1L);"));
+                        .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
@@ -597,80 +586,6 @@ public abstract class AbstractPatternMetadata extends
 
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(
                 "javax.servlet.http.HttpServletRequest"), null));
-        methodParamTypes.add(new AnnotatedJavaType(JavaType.LONG_OBJECT, null));
-
-        MethodMetadata method = methodExists(methodName, methodParamTypes);
-        if (method != null) {
-            // If it already exists, just return null and omit its
-            // generation via the ITD
-            return null;
-        }
-
-        // Define method parameter names
-        // httpServletRequest
-        List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
-        methodParamNames.add(new JavaSymbolName("httpServletRequest"));
-        methodParamNames.add(new JavaSymbolName("i"));
-
-        // Create method body
-        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-
-        bodyBuilder
-                .appendFormalLine("String query = refererQuery(httpServletRequest);");
-        bodyBuilder.appendFormalLine("int ini = query.indexOf(\"&index=\");");
-        bodyBuilder.appendFormalLine("String index = \"&index=\" + i;");
-
-        bodyBuilder.appendFormalLine("if (ini == -1) {");
-        bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("ini = query.indexOf(\"?index=\");");
-        bodyBuilder.appendFormalLine("index = \"?index=\" + i;");
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-
-        bodyBuilder.appendFormalLine("if (ini == -1) {");
-        bodyBuilder.indent();
-        bodyBuilder
-                .appendFormalLine("ini = query.startsWith(\"index=\") ? 0 : -1;");
-        bodyBuilder.appendFormalLine("index = \"index=\" + i;");
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-
-        bodyBuilder.appendFormalLine("if (ini == -1) {");
-        bodyBuilder.indent();
-        bodyBuilder.appendFormalLine("return \"\";");
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
-
-        bodyBuilder
-                .appendFormalLine("int end = query.indexOf(\"&\", ini + 1);");
-        bodyBuilder.appendFormalLine("end = end == -1 ? query.length() : end;");
-
-        bodyBuilder
-                .appendFormalLine("String prefix = query.substring(0, ini);");
-        bodyBuilder
-                .appendFormalLine("String sufix = query.substring(end, query.length());");
-
-        bodyBuilder
-                .appendFormalLine("return prefix.concat(index).concat(sufix);");
-
-        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), 0, methodName, JavaType.STRING_OBJECT,
-                methodParamTypes, methodParamNames, bodyBuilder);
-
-        method = methodBuilder.build();
-        controllerMethods.add(method);
-        return method;
-    }
-
-    protected MethodMetadata getRefererQueryNoIndexMethod() {
-        // Specify the desired method name
-        JavaSymbolName methodName = new JavaSymbolName("refererQuery");
-
-        // Define method parameter types
-        List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
-
-        methodParamTypes.add(new AnnotatedJavaType(new JavaType(
-                "javax.servlet.http.HttpServletRequest"), null));
 
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
@@ -700,16 +615,10 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("try {");
         bodyBuilder.indent();
         JavaType netURL = new JavaType("java.net.URL");
-        bodyBuilder.appendFormalLine("url = new ".concat(
+        bodyBuilder.appendFormalLine("return new ".concat(
                 netURL.getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver())).concat(
                 "(referer).getQuery();"));
-        bodyBuilder.appendFormalLine("if ( url.contains(\"form\") ) {");
-        bodyBuilder.indent();
-        // TODO Error if form attribute in URL last position
-        bodyBuilder.appendFormalLine("return url.substring(0, url.indexOf(\"form\")).concat(url.substring(url.indexOf(\"form\") + 5, url.length()));");
-        bodyBuilder.indentRemove();
-        bodyBuilder.appendFormalLine("}");
         bodyBuilder.indentRemove();
         JavaType netMalformedEx = new JavaType("java.net.MalformedURLException");
         bodyBuilder.appendFormalLine("} catch ( ".concat(
