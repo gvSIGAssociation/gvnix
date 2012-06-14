@@ -577,7 +577,16 @@ public abstract class AbstractPatternMetadata extends
 		return methodBuilder.build();
 	}
 
+    /**
+     * Get refererQuery method.
+     * 
+     * <p>Get referer url from request header and return query part without "form" parameter.
+     * Remove "form" parameter is required to avoid mapping with create and update Roo patterns.</p>
+     * 
+     * @return Referer url query part without "form" param
+     */
     protected MethodMetadata getRefererQueryMethod() {
+    	
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("refererQuery");
 
@@ -615,14 +624,23 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine("try {");
         bodyBuilder.indent();
         JavaType netURL = new JavaType("java.net.URL");
-        bodyBuilder.appendFormalLine("return new ".concat(
-                netURL.getNameIncludingTypeParameters(false,
-                        builder.getImportRegistrationResolver())).concat(
-                "(referer).getQuery();"));
+        bodyBuilder.appendFormalLine("String[] params = new "
+        		.concat(netURL.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()))
+        		.concat("(referer).getQuery().split(\"&\");"));
+        bodyBuilder.appendFormalLine("for (String param : params) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("if (!param.equals(\"form\")) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("url = url.concat(param).concat(\"&\");");
         bodyBuilder.indentRemove();
-        JavaType netMalformedEx = new JavaType("java.net.MalformedURLException");
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.appendFormalLine("if (url.endsWith(\"&\")) { url = url.substring(0, url.length() - 1); }");
+        bodyBuilder.indentRemove();
+        JavaType exception = new JavaType("java.lang.Exception");
         bodyBuilder.appendFormalLine("} catch ( ".concat(
-                netMalformedEx.getNameIncludingTypeParameters(false,
+                exception.getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver())).concat(
                 " e ) {"));
         bodyBuilder.appendFormalLine("}");
@@ -638,7 +656,7 @@ public abstract class AbstractPatternMetadata extends
         controllerMethods.add(method);
         return method;
     }
-
+    
     protected List<AnnotationMetadataBuilder> getRequestMappingAnnotationCreateUpdate(
             RequestMethod requestMethod, String patternName) {
         // Get Method RequestMapping annotation
