@@ -200,7 +200,8 @@ public abstract class AbstractPatternJspMetadataListener implements
                 formbackingType.getSimpleTypeName());
         JavaSymbolName menuItemId = new JavaSymbolName("list_"
                 .concat(patternTypeStr).concat("_").concat(patternName));
-        String queryString = patternType.equals(WebPatternType.tabular) ? "?gvnixpattern="
+        String queryString = patternType.equals(WebPatternType.tabular) || 
+        		patternType.equals(WebPatternType.tabular_edit_register) ? "?gvnixpattern="
                 .concat(patternName) : "?gvnixform&gvnixpattern=".concat(
                 patternName).concat(
                 "&index=${empty param.index ? 1 : param.index}");

@@ -132,11 +132,10 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			serverURL = serverURL + "/";
 		}
 		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
-		tbody.appendChild(openCommandRegisterAdd(document, baseURL, name));
 
 		// Add test operations
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
-		addTestMasterRegister(formBackingType, document, tbody);
+		addTestMasterRegister(formBackingType, document, tbody, baseURL, name);
 
 		// Store the test file into project
 		String testName = "test-" + name + "-master-register";
@@ -179,11 +178,10 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			serverURL = serverURL + "/";
 		}
 		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
-		tbody.appendChild(openCommandTabular(document, baseURL, name));
 
 		// Add test operations
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
-		addTestMasterTabular(formBackingType, document, tbody);
+		addTestMasterTabular(formBackingType, document, tbody, baseURL, name);
 
 		// Store the test file into project
 		String testName = "test-" + name + "-master-tabular";
@@ -228,12 +226,11 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			serverURL = serverURL + "/";
 		}
 		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
-		tbody.appendChild(openCommandRegister(document, baseURL, name));
 
 		// Add test operations
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
 		JavaType fieldType = getEntityFieldNameJavaType(fieldName, formBackingType);
-		addTestDetailTabular(fieldType.getParameters().get(0), document, tbody);
+		addTestDetailTabular(formBackingType, fieldType.getParameters().get(0), document, tbody, baseURL, name);
 
 		// Store the test file into project
 		String testName = "test-" + name + "-detail-tabular" + "-" + fieldName;
@@ -326,36 +323,6 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	}
 
 	/**
-	 * Create a html section to open register pattern add URL.
-	 *
-	 * @param document Document where create section
-	 * @param linkTarget Base URL to the server
-	 * @param name Name of pattern
-	 * @return Html node with register pattern add open URL
-	 */
-	protected Node openCommandRegisterAdd(Document document, String linkTarget, String name) {
-
-		Node tr = document.createElement("tr");
-
-		Node td1 = tr.appendChild(document.createElement("td"));
-		td1.setTextContent("open");
-
-		// Add pattern request attributes
-		Node td2 = tr.appendChild(document.createElement("td"));
-
-		td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
-				+ "form"
-				+ "&gvnixpattern=" + name
-				+ "&index=1"
-				+ "&lang=" + Locale.getDefault());
-
-		Node td3 = tr.appendChild(document.createElement("td"));
-		td3.setTextContent(" ");
-
-		return tr;
-	}
-
-	/**
 	 * Create a html section to open tabular pattern URL.
 	 *
 	 * @param document Document where create section
@@ -389,18 +356,17 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param entity Entity to test
 	 * @param document Document to write commands
 	 * @param element Element where store commands
+	 * @param baseURL Server and application URL path
+	 * @param name Pattern name
 	 */
-	protected void addTestMasterRegister(JavaType entity, Document document, Element element) {
+	protected void addTestMasterRegister(JavaType entity, Document document, Element element, String baseURL, String name) {
 
 		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
-
-		// Add first row
-		addTestMasterRegisterAdd(entity, document, element, fields);
-
-		// Add link
-		element.appendChild(clickAndWaitCommand(document, "//a[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create'" + "]"));
 		
-		// Add second row
+		// Open register pattern URL 
+		element.appendChild(openCommandRegister(document, baseURL, name));
+
+		// Add register
 		addTestMasterRegisterAdd(entity, document, element, fields);
 
 		// Update link access and submit opened form
@@ -410,13 +376,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// Update register fields verification
 		addVerificationRegister(entity, document, element, fields);
 
-		// Delete form submit
-		element.appendChild(clickCommand(document, "//input[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_delete']"));
-		
-		// Delete javascript confirmation store required (but value not used)
-		element.appendChild(storeConfirmationCommand(document, "var"));
-		
-		// TODO Delete validation ?
+		addTestMasterRegisterDelete(entity, document, element);
 	}
 
 	/**
@@ -428,7 +388,10 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param fields Entity fields to add values
 	 */
 	protected void addTestMasterRegisterAdd(JavaType entity, Document document, Element element, List<FieldMetadata> fields) {
-		
+
+		// Add link
+		element.appendChild(clickAndWaitCommand(document, "//a[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create'" + "]"));
+
 		// Add register identifier fields
 		addCompositeIdentifierFieldsRegister(entity, document, element);
 
@@ -443,15 +406,38 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	}
 
 	/**
-	 * Add Selenium commands for master tabular pattern test.
+	 * Add Selenium commands for master register pattern delete test.
 	 *
 	 * @param entity Entity to test
 	 * @param document Document to write commands
 	 * @param element Element where store commands
 	 */
-	protected void addTestMasterTabular(JavaType entity, Document document, Element element) {
+	protected void addTestMasterRegisterDelete(JavaType entity, Document document, Element element) {
+		
+		// Delete form submit
+		element.appendChild(clickCommand(document, "//input[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_delete']"));
+		
+		// Delete javascript confirmation store required (but value not used)
+		element.appendChild(storeConfirmationCommand(document, "var"));
+		
+		// TODO Delete validation ?
+	}
+
+	/**
+	 * Add Selenium commands for master tabular pattern test.
+	 *
+	 * @param entity Entity to test
+	 * @param document Document to write commands
+	 * @param element Element where store commands
+	 * @param baseURL Server and application URL path
+	 * @param name Pattern name
+	 */
+	protected void addTestMasterTabular(JavaType entity, Document document, Element element, String baseURL, String name) {
 
 		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
+		
+		// Open tabular pattern URL 
+		element.appendChild(openCommandTabular(document, baseURL, name));
 
 		// Add image push to access creation
 		String imgId = "fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create";
@@ -497,14 +483,24 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	/**
 	 * Add Selenium commands for detail tabular pattern test.
 	 *
+	 * @param parentEntity Parent entity of test
 	 * @param entity Entity to test
 	 * @param document Document to write commands
 	 * @param element Element where store commands
+	 * @param baseURL Server and application URL path
+	 * @param name Pattern name
 	 */
-	protected void addTestDetailTabular(JavaType entity, Document document, Element element) {
+	protected void addTestDetailTabular(JavaType parentEntity, JavaType entity, Document document, Element element, String baseURL, String name) {
 
+		List<FieldMetadata> parentFields = webMetadataService.getScaffoldEligibleFieldMetadata(parentEntity, getMemberDetails(parentEntity), null);
 		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
+		
+		// Open master pattern URL 
+		element.appendChild(openCommandRegister(document, baseURL, name));
 
+		// Add master register
+		addTestMasterRegisterAdd(parentEntity, document, element, parentFields);
+		
 		// Add image push to access creation
 		String imgId = XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()) + "_create";
 		element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
@@ -544,6 +540,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		element.appendChild(storeConfirmationCommand(document, "var"));
 		
 		// TODO Delete validation ?
+		
+		// Add register
+		addTestMasterRegisterDelete(parentEntity, document, element);
 	}
 
 	/**
