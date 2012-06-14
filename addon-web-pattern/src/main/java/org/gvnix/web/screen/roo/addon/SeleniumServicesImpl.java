@@ -232,7 +232,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		// Add test operations
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
-		addTestDetailTabular(fieldName, formBackingType, document, tbody);
+		JavaType fieldType = getEntityFieldNameJavaType(fieldName, formBackingType);
+		addTestDetailTabular(fieldType.getParameters().get(0), document, tbody);
 
 		// Store the test file into project
 		String testName = "test-" + name + "-detail-tabular" + "-" + fieldName;
@@ -391,22 +392,17 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 */
 	protected void addTestMasterRegister(JavaType entity, Document document, Element element) {
 
-		MemberDetails memberDetails = getMemberDetails(entity);
+		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
 
-		// Add register identifier fields
-		addCompositeIdentifierFieldsRegister(entity, document, element, memberDetails);
+		// Add first row
+		addTestMasterRegisterAdd(entity, document, element, fields);
 
-		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, memberDetails, null);
-
-		// Add register fields
-		addFieldsRegister(fields, document, element);
-
-		// Add submit
-		element.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
-
-		// Add register fields verification
-		addVerificationRegister(entity, document, element, fields);
+		// Add link
+		element.appendChild(clickAndWaitCommand(document, "//a[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create'" + "]"));
 		
+		// Add second row
+		addTestMasterRegisterAdd(entity, document, element, fields);
+
 		// Update link access and submit opened form
 		element.appendChild(clickAndWaitCommand(document, "//a[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_update'" + "]"));
 		element.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
@@ -417,10 +413,33 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// Delete form submit
 		element.appendChild(clickCommand(document, "//input[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_delete']"));
 		
-		// Delete javascript confirmation store required (but not used)
+		// Delete javascript confirmation store required (but value not used)
 		element.appendChild(storeConfirmationCommand(document, "var"));
 		
 		// TODO Delete validation ?
+	}
+
+	/**
+	 * Add Selenium commands for master register pattern add test.
+	 *
+	 * @param entity Entity to test
+	 * @param document Document to write commands
+	 * @param element Element where store commands
+	 * @param fields Entity fields to add values
+	 */
+	protected void addTestMasterRegisterAdd(JavaType entity, Document document, Element element, List<FieldMetadata> fields) {
+		
+		// Add register identifier fields
+		addCompositeIdentifierFieldsRegister(entity, document, element);
+
+		// Add register fields
+		addFieldsRegister(fields, document, element);
+
+		// Add submit
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
+
+		// Add register fields verification
+		addVerificationRegister(entity, document, element, fields);
 	}
 
 	/**
@@ -432,18 +451,16 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 */
 	protected void addTestMasterTabular(JavaType entity, Document document, Element element) {
 
-		MemberDetails memberDetails = getMemberDetails(entity);
+		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
 
 		// Add image push to access creation
 		String imgId = "fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create";
 		element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
 
 		// Add register identifier fields
-		addCompositeIdentifierFieldsTabular(entity, document, element, memberDetails);
+		addCompositeIdentifierFieldsTabular(entity, document, element);
 
 		// TODO Check if other fields are editable (storeEditable)
-
-		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, memberDetails, null);
 
 		// Add tabular fields
 		addFieldsTabular(fields, entity, document, element);
@@ -471,7 +488,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// Delete form submit
 		element.appendChild(clickCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_delete']"));
 		
-		// Delete javascript confirmation store required (but not used)
+		// Delete javascript confirmation store required (but value not used)
 		element.appendChild(storeConfirmationCommand(document, "var"));
 		
 		// TODO Delete validation ?
@@ -480,51 +497,75 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	/**
 	 * Add Selenium commands for detail tabular pattern test.
 	 *
-	 * @param fieldName Property name of entity to test detail pattern
 	 * @param entity Entity to test
 	 * @param document Document to write commands
 	 * @param element Element where store commands
 	 */
-	protected void addTestDetailTabular(JavaSymbolName fieldName, JavaType entity, Document document, Element element) {
+	protected void addTestDetailTabular(JavaType entity, Document document, Element element) {
 
-		// Get java type for field
-		JavaType fieldParametersType = null;
+		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
+
+		// Add image push to access creation
+		String imgId = XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()) + "_create";
+		element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
+
+		// Add register identifier fields
+		addCompositeIdentifierFieldsTabular(entity, document, element);
+		
+		// TODO Check if other fields are editable (storeEditable)
+
+		// Add tabular fields
+		addFieldsTabular(fields, entity, document, element);
+
+		// Add submit
+		String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName());
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
+
+		// Add tabular fields verification
+		addVerificationTabular(entity, document, element, fields);
+
+		// Update check table first row 
+		element.appendChild(checkCommand(document, entity));
+
+		// Update link access and submit enabled form
+		element.appendChild(clickCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_update'" + "]"));
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='gvnix_control_update_save_fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "']"));
+
+		// Update register fields verification
+		addVerificationTabular(entity, document, element, fields);
+
+		// Delete check table first row 
+		element.appendChild(checkCommand(document, entity));
+
+		// Delete form submit
+		element.appendChild(clickCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_delete']"));
+		
+		// Delete javascript confirmation store required (but value not used)
+		element.appendChild(storeConfirmationCommand(document, "var"));
+		
+		// TODO Delete validation ?
+	}
+
+	/**
+	 * Get java type for field.
+	 * 
+	 * @param fieldName Field name of entity
+	 * @param entity Entity
+	 * @return Java type of field in entity
+	 */
+	protected JavaType getEntityFieldNameJavaType(JavaSymbolName fieldName, JavaType entity) {
+		
+		JavaType fieldType = null;
 		MemberDetails memberDetails = getMemberDetails(entity);
-		Iterator<FieldMetadata> fieldParametersTypes = webMetadataService.getScaffoldEligibleFieldMetadata(entity, memberDetails, null).iterator();
-		while (fieldParametersTypes.hasNext() && fieldParametersType == null) {
-			FieldMetadata tmp = fieldParametersTypes.next();
-			if (tmp.getFieldName().equals(fieldName)) {
-				fieldParametersType = tmp.getFieldType();
+		Iterator<FieldMetadata> fieldsMetadata = webMetadataService.getScaffoldEligibleFieldMetadata(entity, memberDetails, null).iterator();
+		while (fieldsMetadata.hasNext() && fieldType == null) {
+			FieldMetadata fieldMetadata = fieldsMetadata.next();
+			if (fieldMetadata.getFieldName().equals(fieldName)) {
+				fieldType = fieldMetadata.getFieldType();
 			}
 		}
-
-		if (fieldParametersType != null) {
-
-			JavaType fieldType = fieldParametersType.getParameters().get(0);
-
-			MemberDetails memberDetailsField = getMemberDetails(fieldType);
-
-			// Add image push to access creation
-			String imgId = XmlUtils.convertId("fu:" + fieldType.getFullyQualifiedTypeName()) + "_create";
-			element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
-
-			// Add register identifier fields
-			addCompositeIdentifierFieldsTabular(fieldType, document, element, memberDetailsField);
-			
-			// TODO Check if other fields are editable (storeEditable)
-
-			List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(fieldType, memberDetailsField, null);
-
-			// Add tabular fields
-			addFieldsTabular(fields, fieldType, document, element);
-
-			// Add submit
-			String inputId = "gvnix_control_add_save_" + XmlUtils.convertId("fu:" + fieldType.getFullyQualifiedTypeName());
-			element.appendChild(clickAndWaitCommand(document, "//input[@id='" + inputId + "']"));
-
-			// Add tabular fields verification
-			addVerificationTabular(fieldType, document, element, fields);
-		}
+		
+		return fieldType;
 	}
 
 	/**
@@ -550,8 +591,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param element Element where add fields commands
 	 * @param memberDetails Java type member details
 	 */
-	protected void addCompositeIdentifierFieldsRegister(JavaType javaType, Document document, Element element, MemberDetails memberDetails) {
-
+	protected void addCompositeIdentifierFieldsRegister(JavaType javaType, Document document, Element element) {
+		
+		MemberDetails memberDetails = getMemberDetails(javaType);
 		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(javaType, memberDetails, null);
 		if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
 			for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
@@ -573,8 +615,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param element Element where add fields commands
 	 * @param memberDetails Java type member details
 	 */
-	protected void addCompositeIdentifierFieldsTabular(JavaType javaType, Document document, Element element, MemberDetails memberDetails) {
-
+	protected void addCompositeIdentifierFieldsTabular(JavaType javaType, Document document, Element element) {
+		
+		MemberDetails memberDetails = getMemberDetails(javaType);
 		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(javaType, memberDetails, null);
 		if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
 			for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
