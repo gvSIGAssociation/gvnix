@@ -1,3 +1,8 @@
+
+## Test run from hudson integration system.
+## Run example:
+##  ${WORKSPACE}/code/src/test/resources/integration.sh ${BUILD_NUMBER} ${WORKSPACE} 
+
 rm -rf /tmp/gvnixtest*
 mkdir /tmp/gvnixtest$1
 cd /tmp/gvnixtest$1
