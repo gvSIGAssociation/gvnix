@@ -11,5 +11,5 @@ public interface SeleniumServices {
 
 	public void generateTestMasterTabularEditRegister(JavaType controller, String name, String serverURL);
 
-	public void generateTestDetailTabular(JavaType controller, JavaSymbolName field, String name, String serverURL);
+	public void generateTestDetailTabular(JavaType controller, WebPatternType type, JavaSymbolName field, String name, String serverURL);
 }

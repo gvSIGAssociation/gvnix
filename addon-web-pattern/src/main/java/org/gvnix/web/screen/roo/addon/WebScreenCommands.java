@@ -159,7 +159,7 @@ public class WebScreenCommands implements CommandMarker {
         		testName = name.getSymbolName();
         	}
 
-    		seleniumServices.generateTestDetailTabular(controllerClass, field, testName, url);
+    		seleniumServices.generateTestDetailTabular(controllerClass, type, field, testName, url);
     	}
     }
 
