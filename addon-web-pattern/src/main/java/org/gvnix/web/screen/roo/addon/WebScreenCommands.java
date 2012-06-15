@@ -18,6 +18,8 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import java.util.logging.Logger;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -45,6 +47,8 @@ import org.springframework.roo.shell.CommandMarker;
 @Component
 @Service
 public class WebScreenCommands implements CommandMarker {
+	
+	private Logger log = Logger.getLogger(getClass().getName());
 
     /** Get a reference to the operations from the underlying OSGi container */
     @Reference
@@ -102,7 +106,14 @@ public class WebScreenCommands implements CommandMarker {
 
         		seleniumServices.generateTestMasterTabular(controllerClass, testName, url);
         	}
-    		// TODO If tabular_edit_register paatern, currently no selenium tests available
+        	else if (type == WebPatternType.tabular_edit_register) {
+        		
+        		seleniumServices.generateTestMasterTabularEditRegister(controllerClass, testName, url);
+        	}
+        	else {
+        		
+        		log.info("Test automatically not available for pattern type " + type.name());
+        	}
     	}
     }
 

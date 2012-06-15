@@ -195,6 +195,56 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	}
 
 	/**
+	 * Creates a new Selenium test for a master tabular with register edit pattern.
+	 *
+	 * @param controller the JavaType of the controller under test (required)
+	 * @param name the name of the test case (optional)
+	 * @param serverURL the application address (optional)
+	 */
+	public void generateTestMasterTabularEditRegister(JavaType controller, String name, String serverURL) {
+
+		Assert.notNull(controller, "Controller type required");
+
+		// Get web scaffold annotation from controller
+		WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
+
+		// We abort the creation of a selenium test if the controller does not allow the creation of new instances for the form backing object
+		if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
+
+			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
+			return;
+		}
+
+		// Get selenium template
+		Document document = getSeleniumTemplate();
+
+		// Get template html content and update with current name
+		Element root = getHtmlElement(name, document);
+
+		// Get table body element to include test operations
+		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
+
+		// Add pattern URL to open for test
+		if (!serverURL.endsWith("/")) {
+			serverURL = serverURL + "/";
+		}
+		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
+
+		// Open tabular pattern URL 
+		tbody.appendChild(openCommandTabular(document, baseURL, name));
+
+		// Add test operations
+		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
+		addTestMasterTabularEditRegister(formBackingType, document, tbody, baseURL, name);
+
+		// Store the test file into project
+		String testName = "test-" + name + "-master-tabular";
+		String relativeTestFilePath = "selenium/" + testName + ".xhtml";
+		installTest(testName, serverURL, document, relativeTestFilePath);
+	}
+
+	
+	/**
 	 * Creates a new Selenium test for a detail tabular pattern.
 	 *
 	 * @param controller the JavaType of the controller under test (required)
@@ -210,6 +260,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// Get web scaffold annotation from controller
 		WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
 
+		// TODO Create validation should be from field web scaffold metadata
 		// We abort the creation of a selenium test if the controller does not allow the creation of new instances for the form backing object
 		if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
 
@@ -422,6 +473,59 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		addTestMasterRegisterDelete(entity, document, element);
 	}
+	
+	/**
+	 * Add Selenium commands for master tabular with register edit pattern test.
+	 *
+	 * @param entity Entity to test
+	 * @param document Document to write commands
+	 * @param element Element where store commands
+	 * @param baseURL Server and application URL path
+	 * @param name Pattern name
+	 */
+	protected void addTestMasterTabularEditRegister(JavaType entity, Document document, Element element, String baseURL, String name) {
+
+		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
+		
+		// Add register
+		addTestMasterTabularEditRegisterAdd(entity, document, element, fields);
+		
+		// Update check table first row 
+		element.appendChild(checkCommand(document, entity));
+
+		// Update link access
+		element.appendChild(clickAndWaitCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_update'" + "]"));
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
+
+		addTestMasterTabularDelete(entity, document, element);
+	}
+	
+	/**
+	 * Add Selenium commands for master tabular with register edit pattern add test.
+	 *
+	 * @param entity Entity to test
+	 * @param document Document to write commands
+	 * @param element Element where store commands
+	 * @param fields Entity fields to add values
+	 */
+	protected void addTestMasterTabularEditRegisterAdd(JavaType entity, Document document, Element element, List<FieldMetadata> fields) {
+
+		// Add image push to access creation
+		String imgId = "fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create";
+		element.appendChild(clickAndWaitCommand(document, "//img[@id='" + imgId + "']"));
+
+		// Add register identifier fields
+		addCompositeIdentifierFieldsRegister(entity, document, element);
+
+		// Add register fields
+		addFieldsRegister(fields, document, element);
+
+		// Add submit
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
+
+		// Add register fields verification
+		addVerificationTabular(entity, document, element, fields);
+	}
 
 	/**
 	 * Add Selenium commands for master register pattern add test.
@@ -495,8 +599,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		addTestMasterTabularDelete(entity, document, element);
 	}
 
-	protected void addTestMasterTabularDelete(JavaType entity,
-			Document document, Element element) {
+	protected void addTestMasterTabularDelete(JavaType entity, Document document, Element element) {
+		
 		// Delete check table first row 
 		element.appendChild(checkCommand(document, entity));
 
@@ -509,8 +613,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// TODO Delete validation ?
 	}
 
-	protected void addTestMasterTabularAdd(JavaType entity, Document document,
-			Element element, List<FieldMetadata> fields) {
+	protected void addTestMasterTabularAdd(JavaType entity, Document document, Element element, List<FieldMetadata> fields) {
+		
 		// Add image push to access creation
 		String imgId = "fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create";
 		element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
