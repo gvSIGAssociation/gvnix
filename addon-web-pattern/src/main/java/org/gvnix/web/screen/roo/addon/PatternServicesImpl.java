@@ -37,6 +37,7 @@ import org.springframework.roo.classpath.details.annotations.StringAttributeValu
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.support.util.Assert;
 
@@ -181,11 +182,112 @@ public class PatternServicesImpl implements PatternService {
     }
 
     /** {@inheritDoc} */
-    @Deprecated
-    public MutableClassOrInterfaceTypeDetails getPhysicalTypeDetails(
-            JavaType type) {
-
-        return MetadataUtils.getPhysicalTypeDetails(type, metadataService,
-                physicalTypeMetadataProvider);
+    public MutableClassOrInterfaceTypeDetails getControllerMutableTypeDetails(
+            JavaType controllerClass) {
+    	
+        MutableClassOrInterfaceTypeDetails mutableTypeDetails = MetadataUtils.getPhysicalTypeDetails(
+        		controllerClass, metadataService, physicalTypeMetadataProvider);
+        
+        // Test if has the @RooWebScaffold
+        Assert.notNull(
+                MemberFindingUtils.getAnnotationOfType(
+                        mutableTypeDetails.getAnnotations(),
+                        WebScreenOperationsImpl.ROOWEBSCAFFOLD_ANNOTATION),
+                controllerClass.getSimpleTypeName().concat(
+                        " has not @RooWebScaffold annotation"));
+        return mutableTypeDetails;
     }
+
+    /** {@inheritDoc} */
+	public List<StringAttributeValue> getPatternAttributes(JavaType controllerClass) {
+		
+        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
+
+		// Get @GvNIXPattern annotation from controller
+        AnnotationMetadata patternAnnotationMetadata = MemberFindingUtils
+                .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
+                        WebScreenOperationsImpl.PATTERN_ANNOTATION);
+        Assert.notNull(
+                patternAnnotationMetadata,
+                "Missing ".concat(WebScreenOperationsImpl.PATTERN_ANNOTATION.getSimpleTypeName())
+                        .concat(" annotation in controller "
+                                .concat(controllerClass
+                                        .getFullyQualifiedTypeName())));
+
+        // look for pattern name in @GvNIXPattern values
+        AnnotationAttributeValue<?> patternAnnotationValues = patternAnnotationMetadata
+                .getAttribute(WebScreenOperationsImpl.PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+        Assert.notNull(
+                patternAnnotationValues,
+                "Missing values in ".concat(
+                		WebScreenOperationsImpl.PATTERN_ANNOTATION.getSimpleTypeName()).concat(
+                        " annotation in controller ".concat(controllerClass
+                                .getFullyQualifiedTypeName())));
+
+        @SuppressWarnings("unchecked")
+        List<StringAttributeValue> patternValues = (List<StringAttributeValue>) patternAnnotationValues
+                .getValue();
+        Assert.isTrue(
+                patternValues != null && !patternValues.isEmpty(),
+                "Missing values in ".concat(
+                		WebScreenOperationsImpl.PATTERN_ANNOTATION.getSimpleTypeName()).concat(
+                        " annotation in controller ".concat(controllerClass
+                                .getFullyQualifiedTypeName())));
+		return patternValues;
+	}
+
+	/** {@inheritDoc} */
+    public boolean patternExists(List<StringAttributeValue> patternValues, JavaSymbolName name) {
+    	
+        if (pattern(patternValues, name) == null) {
+        	return false;
+        }
+        else {
+        	return true;
+        }
+    }
+
+    /** {@inheritDoc} */
+    public String patternType(List<StringAttributeValue> patternValues, JavaSymbolName name) {
+    	
+        String pattern = pattern(patternValues, name);
+        return patternType(pattern, name);
+    }
+   
+    /** {@inheritDoc} */
+    public String pattern(List<StringAttributeValue> patternValues, JavaSymbolName name) {
+    	
+        for (StringAttributeValue value : patternValues) {
+            // Check if name is already used
+            if (equalsPatternName(value, name)) {
+                return value.getValue();
+            }
+        }
+        
+        return null;
+    }
+     
+    /** {@inheritDoc} */
+    public boolean equalsPatternName(StringAttributeValue value, JavaSymbolName name) {
+    	
+        if (patternType(value.getValue(), name) != null) {
+        	return true;
+        }
+        
+        return false;
+    }
+
+    /** {@inheritDoc} */
+    public String patternType(String value, JavaSymbolName name) {
+    	
+        String current = value.replace(" ", "");
+        String patternName = name.getSymbolName().concat("=");
+        if (current.startsWith(patternName)) {
+        
+        	return current.substring(patternName.length(), current.length());
+        }
+        
+        return null;
+    }
+    
 }

@@ -47,6 +47,7 @@ import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.operations.DateTime;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
@@ -93,6 +94,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	@Reference private MemberDetailsScanner memberDetailsScanner;
 	@Reference private WebMetadataService webMetadataService;
 	@Reference private MenuOperations menuOperations;
+	@Reference private PatternService patternService;
 
 	private static Logger logger = Logger
             .getLogger(SeleniumServicesImpl.class.getName());
@@ -179,6 +181,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		}
 		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
 
+		// Open tabular pattern URL 
+		tbody.appendChild(openCommandTabular(document, baseURL, name));
+
 		// Add test operations
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
 		addTestMasterTabular(formBackingType, document, tbody, baseURL, name);
@@ -226,12 +231,51 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			serverURL = serverURL + "/";
 		}
 		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
+		
+        List<StringAttributeValue> attributes = patternService.getPatternAttributes(controller);
+        String patternType = patternService.patternType(attributes, new JavaSymbolName(name));
+        if (patternType.equalsIgnoreCase(WebPatternType.register.name())) {
 
-		// Add test operations
-		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
-		JavaType fieldType = getEntityFieldNameJavaType(fieldName, formBackingType);
-		addTestDetailTabular(formBackingType, fieldType.getParameters().get(0), document, tbody, baseURL, name);
+			// Add test operations
+			JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
+			JavaType fieldType = getEntityFieldNameJavaType(fieldName, formBackingType);
 
+    		List<FieldMetadata> parentFields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, getMemberDetails(formBackingType), null);
+
+    		// Open master pattern URL 
+        	tbody.appendChild(openCommandRegister(document, baseURL, name));
+
+    		// Add master register
+    		addTestMasterRegisterAdd(formBackingType, document, tbody, parentFields);
+    		
+			addTestDetailTabular(formBackingType, fieldType.getParameters().get(0), document, tbody, baseURL, name);
+
+			// Delete master register
+			addTestMasterRegisterDelete(formBackingType, document, tbody);
+        }
+        else if (patternType.equalsIgnoreCase(WebPatternType.tabular.name())) {
+        	
+			// Add test operations
+			JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
+			JavaType fieldType = getEntityFieldNameJavaType(fieldName, formBackingType);
+
+    		List<FieldMetadata> parentFields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, getMemberDetails(formBackingType), null);
+
+    		// Open master pattern URL 
+        	tbody.appendChild(openCommandTabular(document, baseURL, name));
+
+    		// Add master register
+    		addTestMasterTabularAdd(formBackingType, document, tbody, parentFields);
+
+    		tbody.appendChild(clickAndWaitCommand(document, "gvnix_checkbox_fu_" + XmlUtils.convertId(formBackingType.getFullyQualifiedTypeName()) + "_0"));
+
+    		
+			addTestDetailTabular(formBackingType, fieldType.getParameters().get(0), document, tbody, baseURL, name);
+
+			// Delete master register
+			addTestMasterTabularDelete(formBackingType, document, tbody);
+        }
+        
 		// Store the test file into project
 		String testName = "test-" + name + "-detail-tabular" + "-" + fieldName;
 		String relativeTestFilePath = "selenium/" + testName + ".xhtml";
@@ -436,9 +480,37 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
 		
-		// Open tabular pattern URL 
-		element.appendChild(openCommandTabular(document, baseURL, name));
+		addTestMasterTabularAdd(entity, document, element, fields);
+		
+		// Update check table first row 
+		element.appendChild(checkCommand(document, entity));
 
+		// Update link access and submit enabled form
+		element.appendChild(clickCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_update'" + "]"));
+		element.appendChild(clickAndWaitCommand(document, "//input[@id='gvnix_control_update_save_fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "']"));
+
+		// Update register fields verification
+		addVerificationTabular(entity, document, element, fields);
+
+		addTestMasterTabularDelete(entity, document, element);
+	}
+
+	protected void addTestMasterTabularDelete(JavaType entity,
+			Document document, Element element) {
+		// Delete check table first row 
+		element.appendChild(checkCommand(document, entity));
+
+		// Delete form submit
+		element.appendChild(clickCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_delete']"));
+		
+		// Delete javascript confirmation store required (but value not used)
+		element.appendChild(storeConfirmationCommand(document, "var"));
+		
+		// TODO Delete validation ?
+	}
+
+	protected void addTestMasterTabularAdd(JavaType entity, Document document,
+			Element element, List<FieldMetadata> fields) {
 		// Add image push to access creation
 		String imgId = "fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create";
 		element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
@@ -457,27 +529,6 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		// Add tabular fields verification
 		addVerificationTabular(entity, document, element, fields);
-		
-		// Update check table first row 
-		element.appendChild(checkCommand(document, entity));
-
-		// Update link access and submit enabled form
-		element.appendChild(clickCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_update'" + "]"));
-		element.appendChild(clickAndWaitCommand(document, "//input[@id='gvnix_control_update_save_fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "']"));
-
-		// Update register fields verification
-		addVerificationTabular(entity, document, element, fields);
-
-		// Delete check table first row 
-		element.appendChild(checkCommand(document, entity));
-
-		// Delete form submit
-		element.appendChild(clickCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_delete']"));
-		
-		// Delete javascript confirmation store required (but value not used)
-		element.appendChild(storeConfirmationCommand(document, "var"));
-		
-		// TODO Delete validation ?
 	}
 
 	/**
@@ -492,14 +543,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 */
 	protected void addTestDetailTabular(JavaType parentEntity, JavaType entity, Document document, Element element, String baseURL, String name) {
 
-		List<FieldMetadata> parentFields = webMetadataService.getScaffoldEligibleFieldMetadata(parentEntity, getMemberDetails(parentEntity), null);
 		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
-		
-		// Open master pattern URL 
-		element.appendChild(openCommandRegister(document, baseURL, name));
-
-		// Add master register
-		addTestMasterRegisterAdd(parentEntity, document, element, parentFields);
 		
 		// Add image push to access creation
 		String imgId = XmlUtils.convertId("fu:" + entity.getFullyQualifiedTypeName()) + "_create";
@@ -530,19 +574,10 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// Update register fields verification
 		addVerificationTabular(entity, document, element, fields);
 
-		// Delete check table first row 
-		element.appendChild(checkCommand(document, entity));
-
-		// Delete form submit
-		element.appendChild(clickCommand(document, "//img[@id='fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_delete']"));
-		
-		// Delete javascript confirmation store required (but value not used)
-		element.appendChild(storeConfirmationCommand(document, "var"));
+		addTestMasterTabularDelete(entity, document, element);
 		
 		// TODO Delete validation ?
 		
-		// Add register
-		addTestMasterRegisterDelete(parentEntity, document, element);
 	}
 
 	/**

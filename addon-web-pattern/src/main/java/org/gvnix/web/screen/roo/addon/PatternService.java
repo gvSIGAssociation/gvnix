@@ -20,11 +20,13 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.List;
 
-import org.gvnix.support.MetadataUtils;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
+import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.support.util.Assert;
 
 /**
  * Interface to provide common services to Screen Pattern management components
@@ -75,21 +77,80 @@ public interface PatternService {
      */
     public List<FieldMetadata> getOneToManyFieldsFromEntityJavaType(
             JavaType formBakingObjectType);
+    
+    /**
+     * Gets controller's mutableType physical detail
+     * 
+     * <p>
+     * Also checks if <code>controllerClass</code> is really a controller
+     * (annotated with @RooWebScaffold using {@link Assert})
+     * </p>
+     * 
+     * @param controllerClass
+     * @return
+     */
+    public MutableClassOrInterfaceTypeDetails getControllerMutableTypeDetails(JavaType controllerClass);
+    
+    /**
+     * Get pattern attributes of a controller java type.
+     * 
+     * @param controllerClass Controller java type
+     * @return Pattern attributes list
+     */
+    public List<StringAttributeValue> getPatternAttributes(JavaType controllerClass);
+    
+    /**
+     * Given a pattern name says if it exists defined as Master pattern in
+     * GvNIXPattern attributes
+     * 
+     * @param patternValues Pattern annotation attributes
+     * @param name Pattern name
+     * @return true if exists
+     */
+    public boolean patternExists(List<StringAttributeValue> patternValues, JavaSymbolName name);
+    
+    /**
+     * Get the type of a pattern name from attributes.
+     * 
+     * @param patternValues
+     *            pattern attributes
+     * @param name
+     *            identifier to compare
+     * @return pattern type of pattern name from attributes
+     */
+    public String patternType(List<StringAttributeValue> patternValues, JavaSymbolName name);
 
     /**
-     * Returns an instance of MutableClassOrInterfaceTypeDetails of the type
-     * given
+     * Given a pattern name says if it exists defined as Master pattern in
+     * GvNIXPattern attributes, return this pattern attribute
      * 
-     * @param type
-     * 
-     * @return
-     * 
-     * @deprecated use
-     *             {@link MetadataUtils#getPhysicalTypeDetails(JavaType, org.springframework.roo.metadata.MetadataService, org.springframework.roo.classpath.PhysicalTypeMetadataProvider)}
-     *             instead
+     * @param patternValues Pattern annotation attributes
+     * @param name Pattern name
+     * @return Pattern attribute (i.e. name=type)
      */
-    @Deprecated
-    public MutableClassOrInterfaceTypeDetails getPhysicalTypeDetails(
-            JavaType type);
+    public String pattern(List<StringAttributeValue> patternValues, JavaSymbolName name);
+
+    /**
+     * Checks if pattern annotation attribute uses the very same identifier
+     * than <code>name</code>
+     * 
+     * @param value
+     *            pattern annotation value item
+     * @param name
+     *            identifier to compare
+     * @return true if pattern name exists in attributes
+     */
+    public boolean equalsPatternName(StringAttributeValue value, JavaSymbolName name);
+    
+    /**
+     * Get pattern type with some name defined into attribute value.
+     * 
+     * @param value
+     *            pattern annotation attribute value (i.e. name=type)
+     * @param name
+     *            pattern name to search
+     * @return type of pattern name from attribute value
+     */
+    public String patternType(String value, JavaSymbolName name);
 
 }

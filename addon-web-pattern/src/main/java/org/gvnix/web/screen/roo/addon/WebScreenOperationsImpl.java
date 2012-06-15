@@ -32,6 +32,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MessageBundleUtils;
+import org.gvnix.support.MetadataUtils;
 import org.gvnix.support.OperationUtils;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
 import org.springframework.roo.addon.entity.EntityMetadata;
@@ -40,8 +41,6 @@ import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
-import org.springframework.roo.classpath.PhysicalTypeDetails;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -188,7 +187,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         // Get mutableTypeDetails from controllerClass. Also checks javaType is
         // a controller
-        MutableClassOrInterfaceTypeDetails controllerDetails = getControllerMutableTypeDetails(controllerClass);
+        MutableClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerMutableTypeDetails(controllerClass);
 
         // TODO Refactor to check only this pattern in others controllers
         String patternDefinedTwice = patternService
@@ -227,7 +226,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                 if (previousValues != null && !previousValues.isEmpty()) {
                     for (StringAttributeValue value : previousValues) {
                         // Check if name is already used
-                        Assert.isTrue(!equalsPatternName(value, name),
+                        Assert.isTrue(!patternService.equalsPatternName(value, name),
                                 "Pattern name already used in class");
 
                         patternList.add(value);
@@ -281,42 +280,13 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         // Get mutableTypeDetails from controllerClass. Also checks javaType is
         // a controller
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
+        MutableClassOrInterfaceTypeDetails mutableTypeDetails = patternService.getControllerMutableTypeDetails(controllerClass);
 
-        // Get @GvNIXPattern annotation from controller
-        AnnotationMetadata patternAnnotationMetadata = MemberFindingUtils
-                .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
-                        PATTERN_ANNOTATION);
-        Assert.notNull(
-                patternAnnotationMetadata,
-                "Missing ".concat(PATTERN_ANNOTATION.getSimpleTypeName())
-                        .concat(" annotation in controller "
-                                .concat(controllerClass
-                                        .getFullyQualifiedTypeName())));
-
-        // look for pattern name in @GvNIXPattern values
-        AnnotationAttributeValue<?> patternAnnotationValues = patternAnnotationMetadata
-                .getAttribute(PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-        Assert.notNull(
-                patternAnnotationValues,
-                "Missing values in ".concat(
-                        PATTERN_ANNOTATION.getSimpleTypeName()).concat(
-                        " annotation in controller ".concat(controllerClass
-                                .getFullyQualifiedTypeName())));
-
-        @SuppressWarnings("unchecked")
-        List<StringAttributeValue> patternValues = (List<StringAttributeValue>) patternAnnotationValues
-                .getValue();
-        Assert.isTrue(
-                patternValues != null && !patternValues.isEmpty(),
-                "Missing values in ".concat(
-                        PATTERN_ANNOTATION.getSimpleTypeName()).concat(
-                        " annotation in controller ".concat(controllerClass
-                                .getFullyQualifiedTypeName())));
+		List<StringAttributeValue> patternValues = patternService.getPatternAttributes(controllerClass);
 
         // Check if pattern name is already used as value of @GvNIXPattern
         Assert.isTrue(
-                patternExists(patternValues, name),
+        		patternService.patternExists(patternValues, name),
                 "Pattern name '".concat(name.getSymbolName())
                         .concat("' not found in values of ")
                         .concat(PATTERN_ANNOTATION.getSimpleTypeName())
@@ -470,25 +440,6 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     * Given a pattern name says if it exists defined as Master pattern in
-     * GvNIXPattern
-     * 
-     * @param patternValues
-     * @param name
-     * @return
-     */
-    private boolean patternExists(List<StringAttributeValue> patternValues,
-            JavaSymbolName name) {
-        for (StringAttributeValue value : patternValues) {
-            // Check if name is already used
-            if (equalsPatternName(value, name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * For a given controller, this method inspect the OneToMany fields in its
      * formBackingObjet and, based on GvNIXRelationsPattern annotationValues,
      * annotates the controllers exposing these entities with the needed
@@ -577,7 +528,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     private void addOrUpdateGvNIXRelatedPatternToController(
             JavaType controllerClass, AnnotationMetadata annotation) {
 
-        MutableClassOrInterfaceTypeDetails controllerDetails = getControllerMutableTypeDetails(controllerClass);
+        MutableClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerMutableTypeDetails(controllerClass);
 
         // Test if has the @RooWebScaffold
         Assert.notNull(
@@ -670,7 +621,9 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
      * @param type
      */
     private void annotateTypeWithGvNIXEntityBatch(JavaType type) {
-        MutableClassOrInterfaceTypeDetails typeMutableDetails = getPhysicalTypeDetails(type);
+    	
+        MutableClassOrInterfaceTypeDetails typeMutableDetails = MetadataUtils.getPhysicalTypeDetails(
+        		type, metadataService, physicalTypeMetadataProvider);
         AnnotationMetadata annotationMetadata = MemberFindingUtils
                 .getAnnotationOfType(typeMutableDetails.getAnnotations(),
                         ENTITYBATCH_ANNOTATION);
@@ -815,66 +768,6 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     * Gets controller's mutableType physical detail
-     * 
-     * <p>
-     * Also checks if <code>controllerClass</code> is really a controller
-     * (annotated with @RooWebScaffold using {@link Assert})
-     * </p>
-     * 
-     * @param controllerClass
-     * @return
-     */
-    private MutableClassOrInterfaceTypeDetails getControllerMutableTypeDetails(
-            JavaType controllerClass) {
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getPhysicalTypeDetails(controllerClass);
-        // Test if has the @RooWebScaffold
-        Assert.notNull(
-                MemberFindingUtils.getAnnotationOfType(
-                        mutableTypeDetails.getAnnotations(),
-                        ROOWEBSCAFFOLD_ANNOTATION),
-                controllerClass.getSimpleTypeName().concat(
-                        " has not @RooWebScaffold annotation"));
-        return mutableTypeDetails;
-    }
-
-    /**
-     * Returns an instance of MutableClassOrInterfaceTypeDetails of the type
-     * given
-     * 
-     * @param type
-     * @return
-     */
-    private MutableClassOrInterfaceTypeDetails getPhysicalTypeDetails(
-            JavaType type) {
-        // Retrieve metadata for the Java source type the annotation is being
-        // added to
-        String entityId = physicalTypeMetadataProvider.findIdentifier(type);
-        if (entityId == null) {
-            throw new IllegalArgumentException("Cannot locate source for '"
-                    + type.getFullyQualifiedTypeName() + "'");
-        }
-
-        // Obtain the physical type and itd mutable details
-        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
-                .get(entityId, true);
-        Assert.notNull(physicalTypeMetadata,
-                "Java source code unavailable for type ".concat(type
-                        .getFullyQualifiedTypeName()));
-
-        // Obtain physical type details for the target type
-        PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
-                .getMemberHoldingTypeDetails();
-        Assert.notNull(physicalTypeDetails,
-                "Java source code details unavailable for type ".concat(type
-                        .getFullyQualifiedTypeName()));
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-                physicalTypeDetails, "Java source code is immutable for type "
-                        .concat(type.getFullyQualifiedTypeName()));
-        return (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
-    }
-
-    /**
      * Returns formBackingObject JavaType from the {@link RooWebScaffold}
      * attribute
      * 
@@ -898,23 +791,6 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                         + " must be set");
 
         return formBakingObjectType;
-    }
-
-    /**
-     * Checks if pattern annotation value element uses the very same identifier
-     * than <code>name</code>
-     * 
-     * @param value
-     *            pattern annotation value item
-     * @param name
-     *            identifier to compare
-     * @return
-     */
-    private boolean equalsPatternName(StringAttributeValue value,
-            JavaSymbolName name) {
-        String current = value.getValue().replace(" ", "");
-
-        return current.startsWith(name.getSymbolName().concat("="));
     }
 
     private boolean existsFieldPatternDeclaration(String definition,
