@@ -65,9 +65,6 @@ web mvc pattern detail --class ~.web.PersonController --name persontabeditregtab
 web mvc pattern detail --class ~.web.PersonController --name persontabeditregtab --type tabular --field cars --testAutomatically
 
 # Master tabular with register edition / Detail  tabular with register edition
-web mvc pattern master --class ~.web.PersonController --name persontabeditregtabeditreg --type tabular_edit_register  --testAutomatically
+web mvc pattern master --class ~.web.PersonController --name persontabeditregtabeditreg --type tabular_edit_register --testAutomatically
 web mvc pattern detail --class ~.web.PersonController --name persontabeditregtabeditreg --type tabular_edit_register --field horses --testAutomatically
 web mvc pattern detail --class ~.web.PersonController --name persontabeditregtabeditreg --type tabular_edit_register --field cars --testAutomatically
-
-perform package
-perform eclipse
