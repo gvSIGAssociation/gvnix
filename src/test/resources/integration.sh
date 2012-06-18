@@ -53,15 +53,19 @@ rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/rootunes.roo
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-pattern/src/test/resources/test-script-roo
+$2/code/bin/gvnix-dev hint
 startx -- `which Xvfb` :1 -screen 0 1024x768x24 2>&1 >/dev/null &
 export DISPLAY=:1
 mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc-roo
+$2/code/bin/gvnix-dev hint
 mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc2-roo
+$2/code/bin/gvnix-dev hint
 mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc3-roo
+$2/code/bin/gvnix-dev hint
 mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
