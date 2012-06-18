@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.gvnix.support.OperationUtils;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
@@ -138,8 +139,10 @@ public abstract class AbstractPatternMetadata extends
         try {
         	// Is this a related pattern ? Then last key is master pattern java type
         	if (this instanceof RelatedPatternMetadata) {
-	        	this.masterFormBackingType = relatedApplicationTypeMetadata.lastKey();
-	        	this.masterJavaTypeMetadataHolder = relatedApplicationTypeMetadata.get(masterFormBackingType);
+        		SortedMap<JavaType, JavaTypeMetadataDetails> tempMap = new TreeMap<JavaType, JavaTypeMetadataDetails>(relatedApplicationTypeMetadata);
+        		tempMap.remove(formBackingType);
+	        	this.masterFormBackingType = tempMap.lastKey();
+	        	this.masterJavaTypeMetadataHolder = tempMap.get(masterFormBackingType);
         	}
         } catch (NoSuchElementException e) {
         	// Nothing to do
@@ -544,7 +547,8 @@ public abstract class AbstractPatternMetadata extends
 		bodyBuilder.appendFormalLine(masterFormBackingType.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + " " + masterFormBackingType.getSimpleTypeName().toLowerCase() + " = " + masterFormBackingType.getSimpleTypeName() + "." + masterJavaTypeMetadataHolder.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
 		bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName() + " " + formBackingType.getSimpleTypeName().toLowerCase() + " = new " + formBackingType.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
 		bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName().toLowerCase() + ".set" + masterFormBackingType.getSimpleTypeName() + "(" + masterFormBackingType.getSimpleTypeName().toLowerCase() + ");");
-		bodyBuilder.appendFormalLine("uiModel.addAttribute(\"" + formBackingType.getSimpleTypeName().toLowerCase() + "\", " + formBackingType.getSimpleTypeName().toLowerCase() + ");");
+		// Add attribute with identical name as required by Roo create page
+		bodyBuilder.appendFormalLine("uiModel.addAttribute(\"" + Introspector.decapitalize(StringUtils.capitalize(formBackingType.getSimpleTypeName())) + "\", " + formBackingType.getSimpleTypeName().toLowerCase() + ");");
 		if (!dateTypes.isEmpty()) {
 			bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
 		}
