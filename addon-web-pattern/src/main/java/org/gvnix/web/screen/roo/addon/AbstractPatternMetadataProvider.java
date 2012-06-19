@@ -18,6 +18,7 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -111,135 +112,86 @@ public abstract class AbstractPatternMetadataProvider extends
             String mid, JavaType aspect, PhysicalTypeMetadata controller, String fileName);
 
     /**
-     * Read the values of GvNIXRelationsPattern and for the fields defined as
-     * visible relationships retrieve its JavaTypeMetadataDetails
+     * Read the values of GvNIXRelationsPattern and for each field defined as relation retrieve its java type details.
+     * 
+     * <p>It parses the value of the GvNIXRelationsPattern annotation. GvNIXRelationsPattern example:</p>
+     * <code>{ "PatternName1: field1=tabular, field2=register", "PatternName2: field3=tabular_edit_register" }</code>
      * 
      * @param mid Metadata identification string
      * @param controller Controller physical type metadata
      * @param entity Entity java type
      * @param webMetadataService Web metadata service
-     * @return
+     * @return Map with java types and java type details
      */
-    protected SortedMap<JavaType, JavaTypeMetadataDetails> getTypesForPopulate(
+    protected SortedMap<JavaType, JavaTypeMetadataDetails> getRelationFieldsDetails(
             String mid, PhysicalTypeMetadata controller, JavaType entity, WebMetadataService webMetadataService) {
 
-    	// Fields name defined into relations pattern annotation
-        Set<String> relationsPatternAnnotationFieldsName = getRelationsPatternAnnotationFieldsName(controller);
+        SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = 
+        		new TreeMap<JavaType, JavaTypeMetadataDetails>();
 
-        // Fields available for scaffolding
-        List<FieldMetadata> scaffoldEligibleFields = getScaffoldEligibleFieldMetadata(entity, mid, webMetadataService);
-        
-        SortedMap<JavaType, JavaTypeMetadataDetails> interestingFieldsTypeMetadata = new TreeMap<JavaType, JavaTypeMetadataDetails>();
+        // For each eligible field: put all java types details in the same map
+    	List<JavaType> relations = getRelationFields(
+				mid, controller, entity, webMetadataService);
+        for (JavaType relation : relations) {
 
-        // We're interested only in those types defined in GvNIXRelationsPattern values
-        for (FieldMetadata scaffoldElegibleField : scaffoldEligibleFields) {
-        	
-        	// This scaffold elegible field is defined into relations pattern annotation: is a valid field
-            if (relationsPatternAnnotationFieldsName.contains(scaffoldElegibleField.getFieldName().getSymbolName())) {
+            SortedMap<JavaType, JavaTypeMetadataDetails> tmp = getFieldJavaTypesDetails(
+            		relation, mid, webMetadataService);
+            if (tmp != null) {
             	
-            	// Get valid field type (simple or collection)
-            	JavaType validField = scaffoldElegibleField.getFieldType();
-                if (validField.isCommonCollectionType() && !validField.getParameters().isEmpty()) {
-                
-                    validField = validField.getParameters().get(0);
-                }
-                
-                SortedMap<JavaType, JavaTypeMetadataDetails> relatedAppTypeMetadata = getRelatedAppTypeMetadata(
-                		validField, mid, webMetadataService);
-                if (relatedAppTypeMetadata != null) {
-                	
-                	interestingFieldsTypeMetadata.putAll(relatedAppTypeMetadata);
-                }
+            	relatedApplicationTypeMetadata.putAll(tmp);
             }
-        }
+		}
         
-        return interestingFieldsTypeMetadata;
-    }
-
-    /**
-     * For the given <code>type</code> the method returns a Map with its Related App. Types Metadata
-     * 
-     * @param field
-     * @param mid
-     * @param webMetadataService
-     * @return
-     */
-    private SortedMap<JavaType, JavaTypeMetadataDetails> getRelatedAppTypeMetadata(
-            JavaType field, String mid, WebMetadataService webMetadataService) {
-    	
-    	// Get field metadata, field details and field persistent details
-        PhysicalTypeMetadata fieldMetadata = (PhysicalTypeMetadata) metadataService.get(
-        		PhysicalTypeIdentifier.createIdentifier(field, Path.SRC_MAIN_JAVA));
-        Assert.notNull(fieldMetadata,
-                "Unable to obtain physical type metadata for type " + field.getFullyQualifiedTypeName());
-        MemberDetails fieldDetails = getMemberDetails(fieldMetadata);
-        MemberHoldingTypeDetails fieldPersistentDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(
-        		fieldDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
-        
-        SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = webMetadataService.getRelatedApplicationTypeMetadata(
-        		field, fieldDetails, mid);
-        if (fieldPersistentDetails == null || relatedApplicationTypeMetadata == null) {
-        	
-            return null;
-        }
-
         return relatedApplicationTypeMetadata;
     }
 
     /**
-     * Returns a map with Related entities JavaType as key, and their Map of the
-     * Fields-DateTimeFormatDetails as value.
-     * <p>
-     * We need this data in order to register the right DateTimeFormatPattern of
-     * the related entities in a master/detail pattern.
+     * Read the values of GvNIXRelationsPattern and for each field defined as relation retrieve its java type.
      * 
-     * @param mid
-     * @param controller
-     * @param entity
-     * @param webMetadataService
-     * @return
+     * @param mid Metadata identification string
+     * @param controller Controller physical type metadata
+     * @param entity Entity java type
+     * @param webMetadataService Web metadata service
+     * @return Map with java types and java type details
      */
-    protected Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> getRelationsDateTypePatterns(
-            String mid, PhysicalTypeMetadata controller, JavaType entity, WebMetadataService webMetadataService) {
+	private List<JavaType> getRelationFields(
+			String mid, PhysicalTypeMetadata controller, JavaType entity, WebMetadataService webMetadataService) {
+		
+		// Fields name defined into relations pattern annotation
+        Set<String> relations = getRelationFields(controller);
 
-        Set<String> relationsPatternAnnotationFieldsName = getRelationsPatternAnnotationFieldsName(controller);
-
-        List<FieldMetadata> scaffoldEligibleFields = getScaffoldEligibleFieldMetadata(entity, mid, webMetadataService);
-
-        // We're interested only in those types defined in GvNIXRelationsPattern values
-        Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedTypesDatePatterns = 
-        		new LinkedHashMap<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>>();
+        // Get each relation java type from eligible scaffolding fields
+        List<FieldMetadata> scaffoldFields = getScaffoldEligibleFields(entity, mid, webMetadataService);
         
-        for (FieldMetadata scaffoldEligibleField : scaffoldEligibleFields) {
+        // We're interested only in those types defined in GvNIXRelationsPattern values
+        List<JavaType> validFields = new ArrayList<JavaType>();
+        for (FieldMetadata scaffoldEligibleField : scaffoldFields) {
         	
-            if (relationsPatternAnnotationFieldsName.contains(scaffoldEligibleField.getFieldName().getSymbolName())) {
+        	// This scaffold eligible field is defined into relations pattern annotation: is a valid field
+            if (relations.contains(scaffoldEligibleField.getFieldName().getSymbolName())) {
             	
+            	// Get valid field type (simple or collection)
             	JavaType validField = scaffoldEligibleField.getFieldType();
                 if (validField.isCommonCollectionType() && !validField.getParameters().isEmpty()) {
-                	
+                
                     validField = validField.getParameters().get(0);
                 }
                 
-                relatedTypesDatePatterns.put(
-                		validField, webMetadataService.getDatePatterns(validField, webMetadataService.getMemberDetails(validField), mid));
+                validFields.add(validField);
             }
         }
-
-        return relatedTypesDatePatterns;
-    }
+        
+		return validFields;
+	}
 
     /**
-     * Get fields name defined from a relations pattern annotation defined into a controller metadata.
-     * 
-     * <p>It parses the value of the GvNIXRelationsPattern annotation.
-     * GvNIXRelationsPattern example:</p>
-     * <code>{ "PatternName1: field1=tabular, field2=register", "PatternName2: field3=tabular_edit_register" }</code>
+     * Read the values of GvNIXRelationsPattern and for each field defined as relation retrieve its name.
      * 
      * @param controllerMetadata Controller metadata
      * @return Set with the defined relations field names or null if controller is not a valid web scaffold class or 
      * empty set if not relations pattern annotation
      */
-    private Set<String> getRelationsPatternAnnotationFieldsName(PhysicalTypeMetadata controllerMetadata) {
+    private Set<String> getRelationFields(PhysicalTypeMetadata controllerMetadata) {
     	
     	// Must be a valid web scaffold controller 
         WebScaffoldAnnotationValues webScaffold = new WebScaffoldAnnotationValues(controllerMetadata);
@@ -249,20 +201,21 @@ public abstract class AbstractPatternMetadataProvider extends
             return null;
         }
 
-        ClassOrInterfaceTypeDetails controllerType = (ClassOrInterfaceTypeDetails) controllerMetadata.getMemberHoldingTypeDetails();
+        ClassOrInterfaceTypeDetails controllerType = 
+        		(ClassOrInterfaceTypeDetails) controllerMetadata.getMemberHoldingTypeDetails();
         Assert.notNull(controllerType,
                 "Governor failed to provide class type details, in violation of superclass contract");
         
         Set<String> fields = new HashSet<String>();
 
         // Retrieve the fields defined as relationships in GvNIXRelationsPattern
-        AnnotationMetadata relationsPatternAnnotation = MemberFindingUtils.getAnnotationOfType(
+        AnnotationMetadata relationsAnnotation = MemberFindingUtils.getAnnotationOfType(
         		controllerType.getAnnotations(), RELATIONSPATTERN_ANNOTATION);
-        if (relationsPatternAnnotation != null) {
+        if (relationsAnnotation != null) {
         	
-            AnnotationAttributeValue<?> relationsPatternValues = relationsPatternAnnotation.getAttribute(
+            AnnotationAttributeValue<?> relationsAttribute = relationsAnnotation.getAttribute(
             		RELATIONSPATTERN_ANNOTATION_VALUE);
-            if (relationsPatternValues != null) {
+            if (relationsAttribute != null) {
 
                 // From this relations pattern annotation example:
                 // { "PatternName1: field1=tabular, field2=register", "PatternName2: field3=tabular_edit_register" }
@@ -274,11 +227,11 @@ public abstract class AbstractPatternMetadataProvider extends
                 String[] fieldName = {};
                 
                 @SuppressWarnings("unchecked")
-                List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues.getValue();
-                for (StringAttributeValue strAttrValue : relationsPatternList) {
+                List<StringAttributeValue> relations = (List<StringAttributeValue>) relationsAttribute.getValue();
+                for (StringAttributeValue relation : relations) {
                 	
                 	// "PatternName1: field1=tabular, field2=register"
-                    patternDefinition = strAttrValue.getValue().split(":");
+                    patternDefinition = relation.getValue().split(":");
                     fieldDefinition = patternDefinition[1].trim().split(",");
                     for (String fieldDef : fieldDefinition) {
                     	
@@ -294,16 +247,78 @@ public abstract class AbstractPatternMetadataProvider extends
     }
 
     /**
-     * Get scaffold eligible fields metadata from entity with some mid through web metadata service.
+     * For the given type returns a Map with its related application types metadata.
      * 
-     * @param entityType Entity java type
+     * @param type Field java type
      * @param mid Metadata identification string
      * @param webMetadataService Web metadata service
-     * @return Entity scaffold elegible fields
+     * @return Map with java type and java details related to field
      */
-    private List<FieldMetadata> getScaffoldEligibleFieldMetadata(JavaType entityType, String mid, WebMetadataService webMetadataService) {
+    private SortedMap<JavaType, JavaTypeMetadataDetails> getFieldJavaTypesDetails(
+            JavaType type, String mid, WebMetadataService webMetadataService) {
     	
-        return webMetadataService.getScaffoldEligibleFieldMetadata(entityType, webMetadataService.getMemberDetails(entityType), mid);
+    	// Get field metadata, field details and field persistent details
+        PhysicalTypeMetadata typeMetadata = (PhysicalTypeMetadata) metadataService.get(
+        		PhysicalTypeIdentifier.createIdentifier(type, Path.SRC_MAIN_JAVA));
+        Assert.notNull(typeMetadata,
+                "Unable to obtain physical type metadata for type " + type.getFullyQualifiedTypeName());
+        MemberDetails typeDetails = getMemberDetails(typeMetadata);
+        MemberHoldingTypeDetails typePersistentDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(
+        		typeDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
+        
+        // Get field related application type metadata if field persistent details no null
+        SortedMap<JavaType, JavaTypeMetadataDetails> typeRelatedApplicationTypeMetadata = 
+        		webMetadataService.getRelatedApplicationTypeMetadata(type, typeDetails, mid);
+        if (typePersistentDetails == null || typeRelatedApplicationTypeMetadata == null) {
+        	
+            return null;
+        }
+
+        return typeRelatedApplicationTypeMetadata;
+    }
+
+    /**
+     * Get scaffold eligible fields metadata from entity with some mid through web metadata service.
+     * 
+     * @param entity Entity java type
+     * @param mid Metadata identification string
+     * @param webMetadataService Web metadata service
+     * @return Entity scaffold eligible fields
+     */
+    private List<FieldMetadata> getScaffoldEligibleFields(
+    		JavaType entity, String mid, WebMetadataService webMetadataService) {
+    	
+        return webMetadataService.getScaffoldEligibleFieldMetadata(entity, webMetadataService.getMemberDetails(entity), mid);
+    }
+
+    /**
+     * Returns a map with Related entities JavaType as key, and their Map of the
+     * Fields-DateTimeFormatDetails as value.
+     * <p>
+     * We need this data in order to register the right DateTimeFormatPattern of
+     * the related entities in a master/detail pattern.
+     * 
+     * @param mid
+     * @param controller
+     * @param entity
+     * @param webMetadataService
+     * @return
+     */
+    protected Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> getRelationFieldsDateFormat(
+            String mid, PhysicalTypeMetadata controller, JavaType entity, WebMetadataService webMetadataService) {
+
+        // We're interested only in those types defined in GvNIXRelationsPattern values
+        Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedTypesDatePatterns = 
+        		new LinkedHashMap<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>>();
+        
+        List<JavaType> validFields = getRelationFields(mid, controller, entity, webMetadataService);
+        for (JavaType validField : validFields) {
+            relatedTypesDatePatterns.put(
+            		validField, webMetadataService.getDatePatterns(
+            				validField, webMetadataService.getMemberDetails(validField), mid));
+		}
+
+        return relatedTypesDatePatterns;
     }
 
     /**

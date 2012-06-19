@@ -289,10 +289,10 @@ public final class PatternMetadataProvider extends
                 annotationValues, patternList,
                 MemberFindingUtils.getMethods(memberDetails),
                 MemberFindingUtils.getFields(memberDetails),
-                relatedApplicationTypeMetadata, getTypesForPopulate(
+                relatedApplicationTypeMetadata, getRelationFieldsDetails(
                         metadataIdentificationString,
                         governorPhysicalTypeMetadata, formBackingType,
-                        webMetadataService), getRelationsDateTypePatterns(
+                        webMetadataService), getRelationFieldsDateFormat(
                         metadataIdentificationString,
                         governorPhysicalTypeMetadata, formBackingType,
                         webMetadataService), metadataService,
