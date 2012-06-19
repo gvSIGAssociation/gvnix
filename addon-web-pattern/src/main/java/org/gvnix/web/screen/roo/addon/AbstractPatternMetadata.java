@@ -548,7 +548,7 @@ public abstract class AbstractPatternMetadata extends
 		bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName() + " " + formBackingType.getSimpleTypeName().toLowerCase() + " = new " + formBackingType.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
 		bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName().toLowerCase() + ".set" + masterFormBackingType.getSimpleTypeName() + "(" + masterFormBackingType.getSimpleTypeName().toLowerCase() + ");");
 		// Add attribute with identical name as required by Roo create page
-		bodyBuilder.appendFormalLine("uiModel.addAttribute(\"" + Introspector.decapitalize(StringUtils.capitalize(formBackingType.getSimpleTypeName())) + "\", " + formBackingType.getSimpleTypeName().toLowerCase() + ");");
+		bodyBuilder.appendFormalLine("uiModel.addAttribute(\"" + uncapitalize(formBackingType.getSimpleTypeName()) + "\", " + formBackingType.getSimpleTypeName().toLowerCase() + ");");
 		if (!dateTypes.isEmpty()) {
 			bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
 		}

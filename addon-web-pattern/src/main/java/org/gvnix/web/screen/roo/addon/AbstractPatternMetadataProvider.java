@@ -155,9 +155,12 @@ public abstract class AbstractPatternMetadataProvider extends
                     interestingFieldType = interestingFieldType.getParameters()
                             .get(0);
                 }
-                interestingFieldsTypeMetadata.putAll(getRelatedAppTypeMetadata(
+                SortedMap<JavaType, JavaTypeMetadataDetails> relatedAppTypeMetadata = getRelatedAppTypeMetadata(
                         interestingFieldType, metadataIdentificationString,
-                        webMetadataService));
+                        webMetadataService);
+                if (relatedAppTypeMetadata != null) {
+                	interestingFieldsTypeMetadata.putAll(relatedAppTypeMetadata);
+                }
             }
         }
         return interestingFieldsTypeMetadata;
