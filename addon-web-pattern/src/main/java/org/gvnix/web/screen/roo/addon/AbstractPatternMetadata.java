@@ -80,30 +80,31 @@ import org.springframework.roo.support.util.StringUtils;
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
+ * @author Mario Martínez (mmartinez at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  * @since 0.8
  */
 public abstract class AbstractPatternMetadata extends
         AbstractItdTypeDetailsProvidingMetadataItem {
 
-    private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(
-            GvNIXEntityBatch.class.getName());
+    private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(GvNIXEntityBatch.class.getName());
 
     private WebScaffoldMetadata webScaffoldMetadata;
-    private JavaType formBackingType;
-    private JavaType masterFormBackingType;
+    private SortedMap<JavaType, JavaTypeMetadataDetails> entities;
+    private JavaType entity;
+    private JavaType masterEntity;
+    private JavaTypeMetadataDetails entityMetadataDetails;
+    private JavaTypeMetadataDetails masterEntityMetadataDetails;
     private List<String> definedPatterns;
-    private SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata;
-    private JavaTypeMetadataDetails javaTypeMetadataHolder;
-    private JavaTypeMetadataDetails masterJavaTypeMetadataHolder;
     private SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate;
     private Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes;
     private List<MethodMetadata> controllerMethods;
     private List<FieldMetadata> controllerFields;
     private Map<JavaSymbolName, DateTimeFormatDetails> dateTypes;
-
-    private MetadataService metadataService;
-
     private String aspectControllerPackageFullyName;
+    private MetadataService metadataService;
 
     public AbstractPatternMetadata(
             String identifier,
@@ -120,43 +121,50 @@ public abstract class AbstractPatternMetadata extends
             MetadataService metadataService, PathResolver pathResolver,
             FileManager fileManager,
             Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
+    	
         super(identifier, aspectName, governorPhysicalTypeMetadata);
+        
         Assert.notNull(webScaffoldMetadata, "WebScaffoldMetadata required");
         Assert.notNull(annotationValues, "Annotation values required");
         Assert.notNull(relatedApplicationTypeMetadata,
                 "Related application type metadata required");
+        
         if (!isValid()) {
             return;
         }
+        
         this.webScaffoldMetadata = webScaffoldMetadata;
-        this.formBackingType = annotationValues.getFormBackingObject();
+        this.entity = annotationValues.getFormBackingObject();
         this.controllerMethods = controllerMethods;
         this.controllerFields = controllerFields;
-        this.relatedApplicationTypeMetadata = relatedApplicationTypeMetadata;
-        this.javaTypeMetadataHolder = relatedApplicationTypeMetadata
-                .get(formBackingType);
-        this.masterFormBackingType = null;
-        try {
-        	// Is this a related pattern ? Then last key is master pattern java type
-        	if (this instanceof RelatedPatternMetadata) {
-        		SortedMap<JavaType, JavaTypeMetadataDetails> tempMap = new TreeMap<JavaType, JavaTypeMetadataDetails>(relatedApplicationTypeMetadata);
-        		tempMap.remove(formBackingType);
-	        	this.masterFormBackingType = tempMap.lastKey();
-	        	this.masterJavaTypeMetadataHolder = tempMap.get(masterFormBackingType);
-        	}
-        } catch (NoSuchElementException e) {
-        	// Nothing to do
-		}
+        this.entities = relatedApplicationTypeMetadata;
+        this.entityMetadataDetails = relatedApplicationTypeMetadata.get(entity);
         this.dateTypes = dateTypes;
-        Assert.notNull(javaTypeMetadataHolder,
+        
+        this.masterEntity = null;
+        this.masterEntityMetadataDetails = null;
+    	if (this instanceof RelatedPatternMetadata) {
+    		try {
+	        	// Is this a related pattern ? Then the other key is the master entity
+        		SortedMap<JavaType, JavaTypeMetadataDetails> tempMap = new TreeMap<JavaType, JavaTypeMetadataDetails>(relatedApplicationTypeMetadata);
+        		tempMap.remove(entity);
+	        	this.masterEntity = tempMap.lastKey();
+	        	this.masterEntityMetadataDetails = tempMap.get(masterEntity);
+	        } catch (NoSuchElementException e) {
+	        	// This is a related pattern without master entity. Is this possible ?
+			}
+    	}
+  
+        Assert.notNull(entityMetadataDetails,
                 "Metadata holder required for form backing type: "
-                        + formBackingType);
-        Assert.notNull(javaTypeMetadataHolder.getPersistenceDetails(),
+                        + entity);
+        Assert.notNull(entityMetadataDetails.getPersistenceDetails(),
                 "PersistenceMetadata details required for form backing type: "
-                        + formBackingType);
-        Assert.notNull(javaTypeMetadataHolder.getPersistenceDetails(),
+                        + entity);
+        Assert.notNull(entityMetadataDetails.getPersistenceDetails(),
                 "PersistenceMetadata details required for form backing type: "
-                        + formBackingType);
+                        + entity);
+        
         if (annotationValues.isPopulateMethods()) {
             filterAlreadyPopulatedTypes(typesForPopulate);
         }
@@ -190,7 +198,7 @@ public abstract class AbstractPatternMetadata extends
         List<String> tabularPatterns = getPatternTypeDefined(WebPatternType.tabular, this.definedPatterns);
         if (!tabularPatterns.isEmpty()) {
             // annotateFormBackingObject();
-            if (javaTypeMetadataHolder.getPersistenceDetails()
+            if (entityMetadataDetails.getPersistenceDetails()
                     .getFindAllMethod() == null) {
             	// TODO: If no find all method, all other patterns are not generated ?
                 return;
@@ -207,7 +215,7 @@ public abstract class AbstractPatternMetadata extends
 
         List<String> registerPatterns = getPatternTypeDefined(WebPatternType.register, this.definedPatterns);
         if (!registerPatterns.isEmpty()) {
-            if (javaTypeMetadataHolder.getPersistenceDetails()
+            if (entityMetadataDetails.getPersistenceDetails()
                     .getFindEntriesMethod() == null) {
             	// TODO: If no find entries method, all other patterns are not generated ?
                 return;
@@ -223,7 +231,7 @@ public abstract class AbstractPatternMetadata extends
 
         List<String> tabularEditPatterns = getPatternTypeDefined(WebPatternType.tabular_edit_register, this.definedPatterns);
         if (!tabularEditPatterns.isEmpty()) {
-            if (javaTypeMetadataHolder.getPersistenceDetails()
+            if (entityMetadataDetails.getPersistenceDetails()
                     .getFindAllMethod() == null) {
             	// TODO: If no find all method, all other patterns are not generated ?
                 return;
@@ -233,7 +241,7 @@ public abstract class AbstractPatternMetadata extends
 	            builder.addMethod(getTabularMethod(tabularEditPattern));
 	            builder.addMethod(getCreateMethod(tabularEditPattern));
 	            builder.addMethod(getUpdateMethod(tabularEditPattern, WebPatternType.tabular_edit_register));
-	            if (masterFormBackingType != null) {
+	            if (masterEntity != null) {
 	            	builder.addMethod(getCreateFormMethod(tabularEditPattern, relatedApplicationTypeMetadata.values()));
 	            }
             }
@@ -265,10 +273,10 @@ public abstract class AbstractPatternMetadata extends
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String entityNamePlural = javaTypeMetadataHolder.getPlural();
+        String entityNamePlural = entityMetadataDetails.getPlural();
 
         bodyBuilder.appendFormalLine("update(".concat(
-                formBackingType.getSimpleTypeName().toLowerCase()).concat(
+                entity.getSimpleTypeName().toLowerCase()).concat(
                 ", bindingResult, uiModel, httpServletRequest);"));
 
         bodyBuilder.appendFormalLine("if ( bindingResult.hasErrors() ) {");
@@ -281,14 +289,14 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        if (masterFormBackingType == null) { 
+        if (masterEntity == null) { 
 	        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
 	                .concat(entityNamePlural.toLowerCase())
 	                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
         }
         else {	
 	        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
-	                .concat(masterJavaTypeMetadataHolder.getPlural().toLowerCase())
+	                .concat(masterEntityMetadataDetails.getPlural().toLowerCase())
 	                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
         }
 
@@ -321,10 +329,10 @@ public abstract class AbstractPatternMetadata extends
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String entityNamePlural = javaTypeMetadataHolder.getPlural();
+        String entityNamePlural = entityMetadataDetails.getPlural();
 
         bodyBuilder.appendFormalLine("create(".concat(
-                formBackingType.getSimpleTypeName().toLowerCase()).concat(
+                entity.getSimpleTypeName().toLowerCase()).concat(
                 ", bindingResult, uiModel, httpServletRequest);"));
 
         bodyBuilder.appendFormalLine("if ( bindingResult.hasErrors() ) {");
@@ -337,7 +345,7 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        if (masterFormBackingType == null) { 
+        if (masterEntity == null) { 
 	        bodyBuilder
 	        .appendFormalLine("return \""
 	                .concat("redirect:/")
@@ -348,7 +356,7 @@ public abstract class AbstractPatternMetadata extends
 	        bodyBuilder
 	        .appendFormalLine("return \""
 	                .concat("redirect:/")
-	                .concat(masterJavaTypeMetadataHolder.getPlural().toLowerCase())
+	                .concat(masterEntityMetadataDetails.getPlural().toLowerCase())
 	                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
         }
         
@@ -368,7 +376,7 @@ public abstract class AbstractPatternMetadata extends
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("deletePattern" + patternName);
 
-        FieldMetadata formBackingObjectIdField = javaTypeMetadataHolder
+        FieldMetadata formBackingObjectIdField = entityMetadataDetails
                 .getPersistenceDetails().getIdentifierField();
         // Define method parameter types
         List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
@@ -452,7 +460,7 @@ public abstract class AbstractPatternMetadata extends
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String entityNamePlural = javaTypeMetadataHolder.getPlural();
+        String entityNamePlural = entityMetadataDetails.getPlural();
 
         bodyBuilder.appendFormalLine("delete(".concat(
                 formBackingObjectIdField.getFieldName().getSymbolName())
@@ -505,6 +513,10 @@ public abstract class AbstractPatternMetadata extends
 	 * @return
 	 */
 	protected MethodMetadata getCreateFormMethod(String patternName, Collection<JavaTypeMetadataDetails> dependentTypes) {
+		
+        Assert.notNull(masterEntity, "Master entity required to generate createForm");
+        Assert.notNull(masterEntityMetadataDetails, "Master entity metadata required to generate createForm");
+		
 		JavaSymbolName methodName = new JavaSymbolName("createForm" + patternName);
 
 		List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>();
@@ -519,7 +531,7 @@ public abstract class AbstractPatternMetadata extends
 		referenceRequestParam.addStringAttribute("value", "gvnixreference");
 		referenceRequestParam.addBooleanAttribute("required", true);
 		referenceAnnotations.add(referenceRequestParam.build());
-		paramTypes.add(new AnnotatedJavaType(new JavaType(masterJavaTypeMetadataHolder.getPersistenceDetails().getIdentifierField().getFieldType().getFullyQualifiedTypeName()), referenceAnnotations));
+		paramTypes.add(new AnnotatedJavaType(new JavaType(masterEntityMetadataDetails.getPersistenceDetails().getIdentifierField().getFieldType().getFullyQualifiedTypeName()), referenceAnnotations));
 		paramTypes.add(new AnnotatedJavaType(new JavaType("org.springframework.ui.Model"), null));
 		
 		MethodMetadata method = methodExists(methodName, paramTypes);
@@ -544,16 +556,16 @@ public abstract class AbstractPatternMetadata extends
 		annotations.add(requestMapping);
 
 		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-		bodyBuilder.appendFormalLine(masterFormBackingType.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + " " + masterFormBackingType.getSimpleTypeName().toLowerCase() + " = " + masterFormBackingType.getSimpleTypeName() + "." + masterJavaTypeMetadataHolder.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
-		bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName() + " " + formBackingType.getSimpleTypeName().toLowerCase() + " = new " + formBackingType.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
-		// TODO Validate if detail pattern field is referencing master pattern primary key field 
-		bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName().toLowerCase() + ".set" + masterFormBackingType.getSimpleTypeName() + "(" + masterFormBackingType.getSimpleTypeName().toLowerCase() + ");");
+		bodyBuilder.appendFormalLine(masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + " " + masterEntity.getSimpleTypeName().toLowerCase() + " = " + masterEntity.getSimpleTypeName() + "." + masterEntityMetadataDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+		bodyBuilder.appendFormalLine(entity.getSimpleTypeName() + " " + entity.getSimpleTypeName().toLowerCase() + " = new " + entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
+		// TODO Validate if detail pattern field is referencing entity pattern primary key field 
+		bodyBuilder.appendFormalLine(entity.getSimpleTypeName().toLowerCase() + ".set" + masterEntity.getSimpleTypeName() + "(" + masterEntity.getSimpleTypeName().toLowerCase() + ");");
 		// Add attribute with identical name as required by Roo create page
-		bodyBuilder.appendFormalLine("uiModel.addAttribute(\"" + uncapitalize(formBackingType.getSimpleTypeName()) + "\", " + formBackingType.getSimpleTypeName().toLowerCase() + ");");
+		bodyBuilder.appendFormalLine("uiModel.addAttribute(\"" + uncapitalize(entity.getSimpleTypeName()) + "\", " + entity.getSimpleTypeName().toLowerCase() + ");");
 		if (!dateTypes.isEmpty()) {
 			bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
 		}
-		// TODO Remove dependencies or add it from master pattern ?
+		// TODO Remove dependencies or add it from entity pattern ?
 //		boolean listAdded = false;
 //		for (JavaTypeMetadataDetails dependentType: dependentTypes) {
 //			if (dependentType.getPersistenceDetails().getCountMethod() == null) {
@@ -711,7 +723,7 @@ public abstract class AbstractPatternMetadata extends
 
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(String.class
                 .getName()), methodAttrPatternAnnotations));
-        methodParamTypes.add(new AnnotatedJavaType(new JavaType(formBackingType
+        methodParamTypes.add(new AnnotatedJavaType(new JavaType(entity
                 .getFullyQualifiedTypeName()), methodAttrValidAnnotations));
         methodParamTypes.add(new AnnotatedJavaType(new JavaType(
                 "org.springframework.validation.BindingResult"), null));
@@ -727,7 +739,7 @@ public abstract class AbstractPatternMetadata extends
         // pattern, entity, bindingResult, uiModel, httpServletRequest
         List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
         methodParamNames.add(new JavaSymbolName("pattern"));
-        methodParamNames.add(new JavaSymbolName(formBackingType
+        methodParamNames.add(new JavaSymbolName(entity
                 .getSimpleTypeName().toLowerCase()));
         methodParamNames.add(new JavaSymbolName("bindingResult"));
         methodParamNames.add(new JavaSymbolName("uiModel"));
@@ -816,17 +828,17 @@ public abstract class AbstractPatternMetadata extends
         // Retrieve metadata for the Java source type the annotation is being
         // added to
         String formBackingTypeId = PhysicalTypeIdentifier.createIdentifier(
-                formBackingType, Path.SRC_MAIN_JAVA);
+                entity, Path.SRC_MAIN_JAVA);
         if (formBackingTypeId == null) {
             throw new IllegalArgumentException("Cannot locate source for '"
-                    + formBackingType.getFullyQualifiedTypeName() + "'");
+                    + entity.getFullyQualifiedTypeName() + "'");
         }
 
         // Obtain the physical type and itd mutable details
         PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
                 .get(formBackingTypeId, true);
         Assert.notNull(physicalTypeMetadata,
-                "Java source code unavailable for type ".concat(formBackingType
+                "Java source code unavailable for type ".concat(entity
                         .getFullyQualifiedTypeName()));
 
         // Obtain physical type details for the target type
@@ -834,13 +846,13 @@ public abstract class AbstractPatternMetadata extends
                 .getMemberHoldingTypeDetails();
         Assert.notNull(physicalTypeDetails,
                 "Java source code details unavailable for type "
-                        .concat(formBackingType.getFullyQualifiedTypeName()));
+                        .concat(entity.getFullyQualifiedTypeName()));
 
         // Test if the type is an MutableClassOrInterfaceTypeDetails instance so
         // the annotation can be added
         Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
                 physicalTypeDetails, "Java source code is immutable for type "
-                        .concat(formBackingType.getFullyQualifiedTypeName()));
+                        .concat(entity.getFullyQualifiedTypeName()));
         MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
         return mutableTypeDetails;
     }
@@ -976,7 +988,7 @@ public abstract class AbstractPatternMetadata extends
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String entityNamePlural = javaTypeMetadataHolder.getPlural();
+        String entityNamePlural = entityMetadataDetails.getPlural();
 
         // XXX: Following code generates the part of this method validating
         // defined patterns against a request. By now, we don't want to validate
@@ -990,7 +1002,7 @@ public abstract class AbstractPatternMetadata extends
         // bodyBuilder.appendFormalLine("}");
 
         List<JavaType> typeParams = new ArrayList<JavaType>();
-        typeParams.add(formBackingType);
+        typeParams.add(entity);
 
         // Add date validation pattern to model if some date type field exists
         if (!dateTypes.isEmpty()) {
@@ -1005,10 +1017,10 @@ public abstract class AbstractPatternMetadata extends
                 .concat(" ")
                 .concat(entityNamePlural.toLowerCase())
                 .concat(" = ")
-                .concat(formBackingType.getNameIncludingTypeParameters(false,
+                .concat(entity.getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver()))
                 .concat(".")
-                .concat(javaTypeMetadataHolder.getPersistenceDetails()
+                .concat(entityMetadataDetails.getPersistenceDetails()
                         .getFindAllMethod().getMethodName().getSymbolName()
                         .concat("();")));
 
@@ -1154,8 +1166,8 @@ public abstract class AbstractPatternMetadata extends
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String entityNamePlural = javaTypeMetadataHolder.getPlural();
-        String entityName = uncapitalize(formBackingType.getSimpleTypeName());
+        String entityNamePlural = entityMetadataDetails.getPlural();
+        String entityName = uncapitalize(entity.getSimpleTypeName());
 
         // XXX: Following code generates the part of this method validating
         // defined patterns against a request. By now, we don't want to validate
@@ -1169,7 +1181,7 @@ public abstract class AbstractPatternMetadata extends
         // bodyBuilder.appendFormalLine("}");
 
         List<JavaType> typeParams = new ArrayList<JavaType>();
-        typeParams.add(formBackingType);
+        typeParams.add(entity);
         
         // Add date validation pattern to model if some date type field exists
         if (!dateTypes.isEmpty()) {
@@ -1185,10 +1197,10 @@ public abstract class AbstractPatternMetadata extends
                         .concat(" ")
                         .concat(entityNamePlural.toLowerCase())
                         .concat(" = ")
-                        .concat(formBackingType.getNameIncludingTypeParameters(
+                        .concat(entity.getNameIncludingTypeParameters(
                                 false, builder.getImportRegistrationResolver()))
                         .concat(".")
-                        .concat(javaTypeMetadataHolder
+                        .concat(entityMetadataDetails
                                 .getPersistenceDetails()
                                 .getFindEntriesMethod()
                                 .getMethodName()
@@ -1209,7 +1221,7 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
-        bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName()
+        bodyBuilder.appendFormalLine(entity.getSimpleTypeName()
                 .concat(" ").concat(entityName.toLowerCase()).concat(" = ")
                 .concat(entityNamePlural.toLowerCase()).concat(".get(0);"));
 
@@ -1220,9 +1232,9 @@ public abstract class AbstractPatternMetadata extends
         bodyBuilder.appendFormalLine(JavaType.LONG_PRIMITIVE
                 .getNameIncludingTypeParameters()
                 .concat(" count = ")
-                .concat(formBackingType.getSimpleTypeName())
+                .concat(entity.getSimpleTypeName())
                 .concat(".")
-                .concat(javaTypeMetadataHolder.getPersistenceDetails()
+                .concat(entityMetadataDetails.getPersistenceDetails()
                         .getCountMethod().getMethodName().getSymbolName())
                 .concat("();"));
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"maxEntities"
@@ -1274,7 +1286,7 @@ public abstract class AbstractPatternMetadata extends
      * <p>
      * This lines are like Roo's ModelAttribute methods but registering the
      * model attributes directly in the method. The model attributes are set
-     * with data (usually Sets) needed by the master related entities.
+     * with data (usually Sets) needed by the entity related entities.
      * 
      * @param bodyBuilder
      */
@@ -1612,9 +1624,9 @@ public abstract class AbstractPatternMetadata extends
 
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
-        parameterTypes.add(new AnnotatedJavaType(new JavaType(formBackingType
+        parameterTypes.add(new AnnotatedJavaType(new JavaType(entity
                 .getFullyQualifiedTypeName().concat(".")
-                .concat(formBackingType.getSimpleTypeName()).concat("List")),
+                .concat(entity.getSimpleTypeName()).concat("List")),
                 null));
 
         // Check if a method with the same signature already exists in the
@@ -1632,9 +1644,9 @@ public abstract class AbstractPatternMetadata extends
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName()
+        bodyBuilder.appendFormalLine(entity.getSimpleTypeName()
                 .concat("List list = new ")
-                .concat(formBackingType.getSimpleTypeName()).concat("List();"));
+                .concat(entity.getSimpleTypeName()).concat("List();"));
         bodyBuilder
                 .appendFormalLine("for ( Integer select : entities.getSelected() ) {");
 
@@ -1652,8 +1664,8 @@ public abstract class AbstractPatternMetadata extends
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
                 getId(), Modifier.PUBLIC, methodName, new JavaType(
-                        formBackingType.getFullyQualifiedTypeName().concat(".")
-                                .concat(formBackingType.getSimpleTypeName())
+                        entity.getFullyQualifiedTypeName().concat(".")
+                                .concat(entity.getSimpleTypeName())
                                 .concat("List")), parameterTypes,
                 parameterNames, bodyBuilder);
 
@@ -1770,9 +1782,9 @@ public abstract class AbstractPatternMetadata extends
         methodAttributesAnnotations.add(methodAttributesAnnotation.build());
 
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
-        parameterTypes.add(new AnnotatedJavaType(new JavaType(formBackingType
+        parameterTypes.add(new AnnotatedJavaType(new JavaType(entity
                 .getFullyQualifiedTypeName().concat(".")
-                .concat(formBackingType.getSimpleTypeName()).concat("List")),
+                .concat(entity.getSimpleTypeName()).concat("List")),
                 methodAttributesAnnotations));
         parameterTypes.add(new AnnotatedJavaType(new JavaType(
                 "org.springframework.validation.BindingResult"), null));
@@ -1827,7 +1839,7 @@ public abstract class AbstractPatternMetadata extends
         // test if form has errors
         bodyBuilder.appendFormalLine("if ( !bindingResult.hasErrors() ) {");
         bodyBuilder.indent();
-        bodyBuilder.appendFormalLine(formBackingType
+        bodyBuilder.appendFormalLine(entity
                 .getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver()).concat(".")
                 .concat(persistenceMethod.getName())
@@ -1908,7 +1920,7 @@ public abstract class AbstractPatternMetadata extends
     }
 
     public SortedMap<JavaType, JavaTypeMetadataDetails> getRelatedApplicationTypeMetadata() {
-        return this.relatedApplicationTypeMetadata;
+        return this.entities;
     }
 
     public List<String> getDefinedPatterns() {

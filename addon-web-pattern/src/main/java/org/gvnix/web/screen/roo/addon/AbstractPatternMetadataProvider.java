@@ -56,8 +56,11 @@ import org.springframework.roo.support.util.Assert;
  * services needed by the metadata type. Register metadata triggers and
  * dependencies here. Also define the unique add-on ITD identifier.
  * 
- * 
  * @author Oscar Rovira (orovira at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * @author Mario Martínez (mmartinez at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
@@ -66,28 +69,17 @@ import org.springframework.roo.support.util.Assert;
 public abstract class AbstractPatternMetadataProvider extends
         AbstractMemberDiscoveringItdMetadataProvider {
 
-    /**
-     * {@link RooWebScaffold} JavaType
-     */
-    protected static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(
-            RooWebScaffold.class.getName());
+    /** {@link RooWebScaffold} JavaType */
+    protected static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(RooWebScaffold.class.getName());
 
-    /**
-     * {@link GvNIXEntityBatch} JavaType
-     */
-    protected static final JavaType ENTITYBATCH_ANNOTATION = new JavaType(
-            GvNIXEntityBatch.class.getName());
+    /** {@link GvNIXEntityBatch} JavaType */
+    protected static final JavaType ENTITYBATCH_ANNOTATION = new JavaType(GvNIXEntityBatch.class.getName());
 
-    /**
-     * {@link GvNIXPattern} JavaType
-     */
-    protected static final JavaType RELATIONS_PATTERN_ANNOTATION = new JavaType(
-            GvNIXRelationsPattern.class.getName());
-    /**
-     * Name of {@link GvNIXPattern} attribute value
-     */
-    protected static final JavaSymbolName RELATIONS_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
-            "value");
+    /** {@link GvNIXPattern} JavaType */
+    protected static final JavaType RELATIONS_PATTERN_ANNOTATION = new JavaType(GvNIXRelationsPattern.class.getName());
+    
+    /** Name of {@link GvNIXPattern} attribute value */
+    protected static final JavaSymbolName RELATIONS_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
 
     /**
      * The activate method for this OSGi component, this will be called by the
