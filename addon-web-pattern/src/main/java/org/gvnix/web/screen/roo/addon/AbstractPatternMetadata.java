@@ -546,6 +546,7 @@ public abstract class AbstractPatternMetadata extends
 		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 		bodyBuilder.appendFormalLine(masterFormBackingType.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + " " + masterFormBackingType.getSimpleTypeName().toLowerCase() + " = " + masterFormBackingType.getSimpleTypeName() + "." + masterJavaTypeMetadataHolder.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
 		bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName() + " " + formBackingType.getSimpleTypeName().toLowerCase() + " = new " + formBackingType.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
+		// TODO Validate if detail pattern field is referencing master pattern primary key field 
 		bodyBuilder.appendFormalLine(formBackingType.getSimpleTypeName().toLowerCase() + ".set" + masterFormBackingType.getSimpleTypeName() + "(" + masterFormBackingType.getSimpleTypeName().toLowerCase() + ");");
 		// Add attribute with identical name as required by Roo create page
 		bodyBuilder.appendFormalLine("uiModel.addAttribute(\"" + uncapitalize(formBackingType.getSimpleTypeName()) + "\", " + formBackingType.getSimpleTypeName().toLowerCase() + ");");
