@@ -19,7 +19,9 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -71,24 +73,27 @@ public class PatternServicesImpl implements PatternService {
     private TypeLocationService typeLocationService;
 
     /** {@inheritDoc} */
-    public String findPatternDefinedMoreThanOnceInProject() {
-        List<String> definedPatternsInProject = new ArrayList<String>();
-        AnnotationMetadata annotationMetadata = null;
-        for (ClassOrInterfaceTypeDetails cid : typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(PatternMetadataProvider.PATTERN_ANNOTATION)) {
+    public String findPatternRepeatedly() {
+    	
+        // TODO There are 2 duplicated pattern name methods: Unify ?
+    	
+        List<String> definedPatterns = new ArrayList<String>();
+        AnnotationMetadata patternAnnotation = null;
+        for (ClassOrInterfaceTypeDetails patternAnnotationClass : typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(PatternMetadataProvider.PATTERN_ANNOTATION)) {
         	
-            annotationMetadata = MemberFindingUtils.getAnnotationOfType(cid.getAnnotations(), PatternMetadataProvider.PATTERN_ANNOTATION);
-            if (annotationMetadata != null) {
+            patternAnnotation = MemberFindingUtils.getAnnotationOfType(patternAnnotationClass.getAnnotations(), PatternMetadataProvider.PATTERN_ANNOTATION);
+            if (patternAnnotation != null) {
             	
-                AnnotationAttributeValue<?> annotationValues = annotationMetadata.getAttribute(PatternMetadataProvider.PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-                for (String patternName : getPatternNames(annotationValues)) {
+                AnnotationAttributeValue<?> patternAnnotationValue = patternAnnotation.getAttribute(PatternMetadataProvider.PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+                for (String patternName : getPatternNames(patternAnnotationValue)) {
                 	
-                    if (definedPatternsInProject.contains(patternName)) {
+                    if (definedPatterns.contains(patternName)) {
                     	
                         return patternName;
                         
                     } else {
                     	
-                        definedPatternsInProject.add(patternName);
+                        definedPatterns.add(patternName);
                     }
                 }
             }
@@ -121,6 +126,8 @@ public class PatternServicesImpl implements PatternService {
 
     public boolean arePatternsDefinedOnceInController(AnnotationAttributeValue<?> values) {
     	
+        // TODO There are 2 duplicated pattern name methods: Unify ?
+    	
         List<String> auxList = new ArrayList<String>();
         for (String value : getPatternNames(values)) {
         	
@@ -137,15 +144,17 @@ public class PatternServicesImpl implements PatternService {
         return true;
     }
 
+
     /** {@inheritDoc} */
-    public FieldMetadata getOneToManyFieldFromEntityJavaType(
-            JavaType formBakingObjectType, String fieldName) {
+    public FieldMetadata getOneToManyFieldFromEntityJavaType(JavaType formBakingObjectType, String fieldName) {
+    	
         List<FieldMetadata> oneToManyFields = getOneToManyFieldsFromEntityJavaType(formBakingObjectType);
         for (FieldMetadata field : oneToManyFields) {
             if (field.getFieldName().getSymbolName().equals(fieldName)) {
                 return field;
             }
         }
+        
         return null;
     }
 
@@ -178,6 +187,7 @@ public class PatternServicesImpl implements PatternService {
                 }
             }
         }
+        
         return oneToManyFields;
     }
 
@@ -195,6 +205,7 @@ public class PatternServicesImpl implements PatternService {
                         WebScreenOperationsImpl.ROOWEBSCAFFOLD_ANNOTATION),
                 controllerClass.getSimpleTypeName().concat(
                         " has not @RooWebScaffold annotation"));
+        
         return mutableTypeDetails;
     }
 
@@ -233,6 +244,7 @@ public class PatternServicesImpl implements PatternService {
                 		WebScreenOperationsImpl.PATTERN_ANNOTATION.getSimpleTypeName()).concat(
                         " annotation in controller ".concat(controllerClass
                                 .getFullyQualifiedTypeName())));
+        
 		return patternValues;
 	}
 
@@ -289,5 +301,51 @@ public class PatternServicesImpl implements PatternService {
         
         return null;
     }
-    
+
+    /** {@inheritDoc} */
+    public Map<String, String> getFieldsPatternIdAndType(AnnotationAttributeValue<?> relationsPatternValues) {
+    	
+    	// TODO Unify with other methods here ?
+    	
+        Map<String, String> fieldsPatternIdAndType = new HashMap<String, String>();
+        @SuppressWarnings("unchecked")
+        List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues
+                .getValue();
+
+        // Parse annotationValues finding the field interesting part
+        if (relationsPatternList != null) {
+            String[] patternDef = {};
+            String[] fieldDefinitions = {};
+            String[] fieldPatternType = {};
+            for (StringAttributeValue strAttrValue : relationsPatternList) {
+                patternDef = strAttrValue.getValue().split(":");
+                fieldDefinitions = patternDef[1].trim().split(",");
+                for (String fieldDef : fieldDefinitions) {
+                    fieldPatternType = fieldDef.trim().split("=");
+                    fieldsPatternIdAndType.put(
+                            fieldPatternType[0].trim(),
+                            patternDef[0].trim().concat("=")
+                                    .concat(fieldPatternType[1].trim()));
+                }
+            }
+        }
+        
+        return fieldsPatternIdAndType;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isPatternTypeDefined(WebPatternType patternType, List<String> definedPatternsList) {
+    	
+    	// TODO Unify with other methods here ?
+    	
+        for (String definedPattern : definedPatternsList) {
+            if (definedPattern.split("=")[1].equalsIgnoreCase(patternType
+                    .name())) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
 }

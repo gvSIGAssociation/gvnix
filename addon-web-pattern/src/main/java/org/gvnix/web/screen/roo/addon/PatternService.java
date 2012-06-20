@@ -19,6 +19,7 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
@@ -49,7 +50,7 @@ public interface PatternService {
      * @return duplicated pattern found, otherwise return <code>null</code>
      * 
      */
-    String findPatternDefinedMoreThanOnceInProject();
+    String findPatternRepeatedly();
 
     /**
      * Check if there are pattern names used more than once in controller
@@ -153,4 +154,27 @@ public interface PatternService {
      */
     public String patternType(String value, JavaSymbolName name);
 
+    /**
+     * Given the param relationsPatternValues it returns a Map where keys are
+     * the fieldName part and values are patternId=patternType. That is, for:<br/>
+     * 
+     * relationsPatternValues = {"patternId: field1=tabular, field2=register"}
+     * it returns <br/>
+     * {field1 => "patternId=tabular", field2 => "patternId=register"}
+     * 
+     * @param relationsPatternValues
+     * @return
+     */
+    public Map<String, String> getFieldsPatternIdAndType(AnnotationAttributeValue<?> relationsPatternValues);
+    
+    /**
+     * If there is a pattern of given WebPatternType defined in GvNIXPattern it
+     * returns true, false otherwise
+     * 
+     * @param patternType
+     * @param definedPatternsList
+     * @return
+     */
+    public boolean isPatternTypeDefined(WebPatternType patternType, List<String> definedPatternsList);
+    
 }

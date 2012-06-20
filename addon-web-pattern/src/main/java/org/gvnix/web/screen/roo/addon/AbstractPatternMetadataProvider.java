@@ -67,8 +67,7 @@ import org.springframework.roo.support.util.Assert;
  *         Transport</a>
  * @since 0.8
  */
-public abstract class AbstractPatternMetadataProvider extends
-        AbstractMemberDiscoveringItdMetadataProvider {
+public abstract class AbstractPatternMetadataProvider extends AbstractMemberDiscoveringItdMetadataProvider {
 
     /** {@link RooWebScaffold} java type */
     protected static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(RooWebScaffold.class.getName());

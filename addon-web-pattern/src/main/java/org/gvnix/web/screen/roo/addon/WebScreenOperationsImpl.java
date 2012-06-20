@@ -19,7 +19,6 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -191,7 +190,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         // TODO Refactor to check only this pattern in others controllers
         String patternDefinedTwice = patternService
-                .findPatternDefinedMoreThanOnceInProject();
+                .findPatternRepeatedly();
         Assert.isNull(patternDefinedTwice,
                 "There is a pattern name used more than once in the project");
 
@@ -467,7 +466,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         List<FieldMetadata> oneToManyFields = patternService
                 .getOneToManyFieldsFromEntityJavaType(formBakingObjectType);
-        Map<String, String> fieldsPatternIdAndType = getFieldsPatternIdAndType(relationsPatternValues);
+        Map<String, String> fieldsPatternIdAndType = patternService.getFieldsPatternIdAndType(relationsPatternValues);
         if (!fieldsPatternIdAndType.keySet().isEmpty()) {
             for (FieldMetadata field : oneToManyFields) {
                 if (fieldsPatternIdAndType.keySet().contains(
@@ -610,7 +609,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         for (StringAttributeValue definedPattern : patternList) {
             definedPatternsList.add(definedPattern.getValue());
         }
-        if (isPatternTypeDefined(WebPatternType.tabular, definedPatternsList)) {
+        if (patternService.isPatternTypeDefined(WebPatternType.tabular, definedPatternsList)) {
             annotateTypeWithGvNIXEntityBatch(getFormBakingObject(controllerDetails));
         }
     }
@@ -663,108 +662,6 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         annotationBuilder.setAttributes(attributes);
 
         return annotationBuilder.build();
-    }
-
-    /**
-     * Given the param relationsPatternValues it returns a Map where keys are
-     * the fieldName part and values are patternId=patternType. That is, for:<br/>
-     * 
-     * relationsPatternValues = {"patternId: field1=tabular, field2=register"}
-     * it returns <br/>
-     * {field1 => "patternId=tabular", field2 => "patternId=register"}
-     * 
-     * @param relationsPatternValues
-     * @return
-     */
-    private Map<String, String> getFieldsPatternIdAndType(
-            AnnotationAttributeValue<?> relationsPatternValues) {
-        Map<String, String> fieldsPatternIdAndType = new HashMap<String, String>();
-        @SuppressWarnings("unchecked")
-        List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues
-                .getValue();
-
-        // Parse annotationValues finding the field interesting part
-        if (relationsPatternList != null) {
-            String[] patternDef = {};
-            String[] fieldDefinitions = {};
-            String[] fieldPatternType = {};
-            for (StringAttributeValue strAttrValue : relationsPatternList) {
-                patternDef = strAttrValue.getValue().split(":");
-                fieldDefinitions = patternDef[1].trim().split(",");
-                for (String fieldDef : fieldDefinitions) {
-                    fieldPatternType = fieldDef.trim().split("=");
-                    fieldsPatternIdAndType.put(
-                            fieldPatternType[0].trim(),
-                            patternDef[0].trim().concat("=")
-                                    .concat(fieldPatternType[1].trim()));
-                }
-            }
-        }
-        return fieldsPatternIdAndType;
-    }
-
-    /**
-     * If there is a pattern of given WebPatternType defined in GvNIXPattern it
-     * returns true, false otherwise
-     * 
-     * @param patternType
-     * @param definedPatternsList
-     * @return
-     */
-    private boolean isPatternTypeDefined(WebPatternType patternType,
-            List<String> definedPatternsList) {
-        for (String definedPattern : definedPatternsList) {
-            if (definedPattern.split("=")[1].equalsIgnoreCase(patternType
-                    .name())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @SuppressWarnings("unused")
-    private boolean arePatternsDefinedOnceInController(
-            AnnotationAttributeValue<?> values) {
-        List<String> auxList = new ArrayList<String>();
-        for (String value : getPatternNames(values)) {
-            if (auxList.contains(value)) {
-                return false;
-            } else {
-                auxList.add(value);
-            }
-        }
-        return true;
-
-    }
-
-    /**
-     * For a given AnnotationAttributeValue of GvNIXPattern or
-     * GvNIXRelatedPattern returns a List of Strings with the defined patterns.
-     * i.e.:
-     * <p>
-     * from:<br/>
-     * <code>{"pattern1=tabular", "pattern2=register"}</code> it returns
-     * <code>&lt;"pattern1", "pattern2"&gt;</code>
-     * 
-     * @param values
-     * @return
-     */
-    private List<String> getPatternNames(AnnotationAttributeValue<?> values) {
-        List<String> patternNames = new ArrayList<String>();
-        if (values != null) {
-            @SuppressWarnings("unchecked")
-            List<StringAttributeValue> attrValues = (List<StringAttributeValue>) values
-                    .getValue();
-
-            if (attrValues != null) {
-                String[] pattern = {};
-                for (StringAttributeValue strAttrValue : attrValues) {
-                    pattern = strAttrValue.getValue().split("=");
-                    patternNames.add(pattern[0]);
-                }
-            }
-        }
-        return patternNames;
     }
 
     /**

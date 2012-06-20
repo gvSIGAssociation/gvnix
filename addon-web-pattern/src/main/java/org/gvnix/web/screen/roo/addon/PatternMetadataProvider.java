@@ -69,34 +69,19 @@ import org.springframework.roo.support.util.Assert;
  */
 @Component(immediate = true)
 @Service
-public final class PatternMetadataProvider extends
-        AbstractPatternMetadataProvider {
+public final class PatternMetadataProvider extends AbstractPatternMetadataProvider {
 
-    /**
-     * {@link GvNIXPattern} JavaType
-     */
-    public static final JavaType PATTERN_ANNOTATION = new JavaType(
-            GvNIXPattern.class.getName());
-    /**
-     * Name of {@link GvNIXPattern} attribute value
-     */
-    public static final JavaSymbolName PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
-            "value");
-
-    @Reference
-    WebScaffoldMetadataProvider webScaffoldMetadataProvider;
-
-    @Reference
-    ProjectOperations projectOperations;
-
-    @Reference
-    PropFileOperations propFileOperations;
-
-    @Reference
-    WebMetadataService webMetadataService;
+    /** {@link GvNIXPattern} java type */
+    public static final JavaType PATTERN_ANNOTATION = new JavaType(GvNIXPattern.class.getName());
     
-    @Reference
-    PatternService patternService;
+    /** Name of {@link GvNIXPattern} attribute value */
+    public static final JavaSymbolName PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
+
+    @Reference WebScaffoldMetadataProvider webScaffoldMetadataProvider;
+    @Reference ProjectOperations projectOperations;
+    @Reference PropFileOperations propFileOperations;
+    @Reference WebMetadataService webMetadataService;
+    @Reference PatternService patternService;
 
     private final Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
     private final Map<String, JavaType> webScaffoldMidToEntityMap = new LinkedHashMap<String, JavaType>();
@@ -112,12 +97,10 @@ public final class PatternMetadataProvider extends
      */
     @Override
     protected void activate(ComponentContext context) {
-        // next line adding a notification listener over this class allow method
-        // getLocalMidToRequest(ItdTypeDetails) to be invoked
+    	
+        // Next line adding a notification listener over this class allow method getLocalMidToRequest(ItdTypeDetails) to be invoked
         metadataDependencyRegistry.addNotificationListener(this);
-        metadataDependencyRegistry.registerDependency(
-                PhysicalTypeIdentifier.getMetadataIdentiferType(),
-                getProvidesType());
+        metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
         addMetadataTrigger(PATTERN_ANNOTATION);
     }
 
@@ -132,17 +115,16 @@ public final class PatternMetadataProvider extends
      */
     @Override
     protected void deactivate(ComponentContext context) {
+    	
         metadataDependencyRegistry.removeNotificationListener(this);
-        metadataDependencyRegistry.deregisterDependency(
-                PhysicalTypeIdentifier.getMetadataIdentiferType(),
-                getProvidesType());
+        metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
         removeMetadataTrigger(PATTERN_ANNOTATION);
     }
 
     @Override
     protected String getLocalMidToRequest(ItdTypeDetails itdTypeDetails) {
-        // Determine the governor for this ITD, and whether any metadata is even
-        // hoping to hear about changes to that JavaType and its ITDs
+    	
+        // Determine the governor for this ITD, and whether any metadata is even hoping to hear about changes to that JavaType and its ITDs
         JavaType governor = itdTypeDetails.getName();
         String localMid = entityToWebScaffoldMidMap.get(governor);
         return localMid == null ? null : localMid;
@@ -153,82 +135,54 @@ public final class PatternMetadataProvider extends
      */
     @Override
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
-            String metadataIdentificationString, JavaType aspectName,
-            PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            String itdFilename) {
+    		String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, String fileName) {
 
-        // We need to parse the annotation, which we expect to be present
-        WebScaffoldAnnotationValues annotationValues = new WebScaffoldAnnotationValues(
-                governorPhysicalTypeMetadata);
-        if (!annotationValues.isAnnotationFound()
-                || annotationValues.getFormBackingObject() == null
-                || governorPhysicalTypeMetadata.getMemberHoldingTypeDetails() == null) {
+        // We need to parse the web scaffold annotation, which we expect to be present
+        WebScaffoldAnnotationValues webScaffoldAnnotationValues = new WebScaffoldAnnotationValues(controllerMetadata);
+        if (!webScaffoldAnnotationValues.isAnnotationFound() || webScaffoldAnnotationValues.getFormBackingObject() == null || 
+        		controllerMetadata.getMemberHoldingTypeDetails() == null) {
+        	
             return null;
         }
 
-        // Setup project for use annotation
-        // configService.setup();
+        JavaType controllerType = PatternMetadata.getJavaType(mid);
 
-        JavaType controllerType = PatternMetadata
-                .getJavaType(metadataIdentificationString);
-
-        // We need to know the metadata of the Controller through
-        // WebScaffoldMetada
-        Path path = PatternMetadata.getPath(metadataIdentificationString);
-        String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
-                controllerType, path);
-        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
-                .get(webScaffoldMetadataKey);
+        // We need to know the metadata of the controller through WebScaffoldMetada
+        Path path = PatternMetadata.getPath(mid);
+        String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(controllerType, path);
+        WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService.get(webScaffoldMetadataId);
         if (webScaffoldMetadata == null) {
-            /*
-             * logger.warning(
-             * "The pattern can not be defined over a Controlloer without " +
-             * "@RooWebScaffold annotation and its 'fromBackingObject' attribute "
-             * + "set. Check " + controllerType.getFullyQualifiedTypeName());
-             */
+        	
+            // The pattern can not be defined over a Controller without RooWebScaffold
             return null;
         }
-
-        // metadataDependencyRegistry.registerDependency(webScaffoldMetadataKey,
-        // metadataIdentificationString);
 
         // We know governor type details are non-null and can be safely cast
-        ClassOrInterfaceTypeDetails cid = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
-                .getMemberHoldingTypeDetails();
-        Assert.notNull(
-                cid,
-                "Governor failed to provide class type details, in violation of superclass contract");
+        ClassOrInterfaceTypeDetails controllerDetails = (ClassOrInterfaceTypeDetails) controllerMetadata.getMemberHoldingTypeDetails();
+        Assert.notNull(controllerDetails, "Governor failed to provide class type details, in violation of superclass contract");
 
-        AnnotationMetadata gvNixPatternAnnotation = MemberFindingUtils
-                .getAnnotationOfType(cid.getAnnotations(), PATTERN_ANNOTATION);
+        AnnotationMetadata patternAnnotation = MemberFindingUtils.getAnnotationOfType(controllerDetails.getAnnotations(), PATTERN_ANNOTATION);
 
+        // TODO There are 2 duplicated pattern name validations: Unify ?
+        
         // Check if there are pattern names used more than once in project
-        String patternDefinedTwice = patternService.findPatternDefinedMoreThanOnceInProject();
-        Assert.isNull(patternDefinedTwice,
-                "There is a pattern name used more than once in the project");
+        String patternRepeatedly = patternService.findPatternRepeatedly();
+        Assert.isNull(patternRepeatedly, "There is a pattern name used more than once in the project");
 
         List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
 
-        if (gvNixPatternAnnotation != null) {
-            AnnotationAttributeValue<?> thisAnnotationValue = gvNixPatternAnnotation
-                    .getAttribute(PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-
+        if (patternAnnotation != null) {
+        	
+            AnnotationAttributeValue<?> thisAnnotationValue = patternAnnotation.getAttribute(PATTERN_ANNOTATION_ATTR_VALUE_NAME);
             if (thisAnnotationValue != null) {
-                // Check if the controller has defined the same pattern more
-                // than once
-                Assert.isTrue(
-                        patternService.arePatternsDefinedOnceInController(thisAnnotationValue),
-                        "Controller "
-                                .concat(cid.getName()
-                                        .getFullyQualifiedTypeName())
-                                .concat(" has the same pattern defined more than once"));
+                // Check if the controller has defined the same pattern more than once
+                Assert.isTrue(patternService.arePatternsDefinedOnceInController(thisAnnotationValue),
+                        "Controller ".concat(controllerDetails.getName().getFullyQualifiedTypeName()).concat(" has the same pattern defined more than once"));
 
                 ArrayAttributeValue<?> arrayVal = (ArrayAttributeValue<?>) thisAnnotationValue;
-
                 if (arrayVal != null) {
                     @SuppressWarnings("unchecked")
-                    List<StringAttributeValue> values = (List<StringAttributeValue>) arrayVal
-                            .getValue();
+                    List<StringAttributeValue> values = (List<StringAttributeValue>) arrayVal.getValue();
                     for (StringAttributeValue value : values) {
                         patternList.add(value);
                     }
@@ -237,72 +191,50 @@ public final class PatternMetadataProvider extends
         }
 
         // Lookup the form backing object's metadata and check that
-        JavaType formBackingType = annotationValues.getFormBackingObject();
+        JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
 
-        PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
-                .get(PhysicalTypeIdentifier.createIdentifier(formBackingType,
-                        Path.SRC_MAIN_JAVA));
-        Assert.notNull(formBackingObjectPhysicalTypeMetadata,
-                "Unable to obtain physical type metadata for type "
-                        + formBackingType.getFullyQualifiedTypeName());
-        MemberDetails formBackingObjectMemberDetails = getMemberDetails(formBackingObjectPhysicalTypeMetadata);
+        PhysicalTypeMetadata entityMetadata = (PhysicalTypeMetadata) metadataService.get(
+        		PhysicalTypeIdentifier.createIdentifier(entity, Path.SRC_MAIN_JAVA));
+        Assert.notNull(entityMetadata, "Unable to obtain physical type metadata for type " + entity.getFullyQualifiedTypeName());
+        MemberDetails entityDetails = getMemberDetails(entityMetadata);
 
-        MemberHoldingTypeDetails memberHoldingTypeDetails = MemberFindingUtils
-                .getMostConcreteMemberHoldingTypeDetailsWithTag(
-                        formBackingObjectMemberDetails,
-                        PersistenceCustomDataKeys.PERSISTENT_TYPE);
-        SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = webMetadataService
-                .getRelatedApplicationTypeMetadata(formBackingType,
-                        formBackingObjectMemberDetails,
-                        metadataIdentificationString);
-        if (memberHoldingTypeDetails == null
-                || relatedApplicationTypeMetadata == null
-                || relatedApplicationTypeMetadata.get(formBackingType) == null
-                || relatedApplicationTypeMetadata.get(formBackingType)
-                        .getPersistenceDetails() == null) {
+        MemberHoldingTypeDetails entityPersistentDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(
+                        entityDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
+        SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = webMetadataService.getRelatedApplicationTypeMetadata(
+        		entity, entityDetails, mid);
+        if (entityPersistentDetails == null || relatedApplicationTypeMetadata == null || relatedApplicationTypeMetadata.get(entity) == null
+                || relatedApplicationTypeMetadata.get(entity).getPersistenceDetails() == null) {
+        	
             return null;
         }
-        // Remember that this entity JavaType matches up with this metadata
-        // identification string
+        
+        // Remember that this entity JavaType matches up with this metadata identification string
         // Start by clearing the previous association
         // Working in the same way as WebScaffoldMetadataProvider
-        JavaType oldEntity = webScaffoldMidToEntityMap
-                .get(metadataIdentificationString);
+        JavaType oldEntity = webScaffoldMidToEntityMap.get(mid);
         if (oldEntity != null) {
+        	
             entityToWebScaffoldMidMap.remove(oldEntity);
         }
-        entityToWebScaffoldMidMap.put(formBackingType,
-                metadataIdentificationString);
-        webScaffoldMidToEntityMap.put(metadataIdentificationString,
-                formBackingType);
+        
+        entityToWebScaffoldMidMap.put(entity, mid);
+        webScaffoldMidToEntityMap.put(mid, entity);
 
-        MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
+        MemberDetails memberDetails = getMemberDetails(controllerMetadata);
 
-        Map<JavaSymbolName, DateTimeFormatDetails> dateTypes = webMetadataService
-                .getDatePatterns(formBackingType,
-                        formBackingObjectMemberDetails,
-                        metadataIdentificationString);
+        Map<JavaSymbolName, DateTimeFormatDetails> dateTypes = webMetadataService.getDatePatterns(
+        		entity, entityDetails, mid);
 
         // Pass dependencies required by the metadata in through its constructor
-        return new PatternMetadata(metadataIdentificationString, aspectName,
-                governorPhysicalTypeMetadata, webScaffoldMetadata,
-                annotationValues, patternList,
-                MemberFindingUtils.getMethods(memberDetails),
-                MemberFindingUtils.getFields(memberDetails),
-                relatedApplicationTypeMetadata, getRelationFieldsDetails(
-                        metadataIdentificationString,
-                        governorPhysicalTypeMetadata, formBackingType,
-                        webMetadataService), getRelationFieldsDateFormat(
-                        metadataIdentificationString,
-                        governorPhysicalTypeMetadata, formBackingType,
-                        webMetadataService), metadataService,
-                propFileOperations, projectOperations.getPathResolver(),
-                fileManager, dateTypes);
+        return new PatternMetadata(mid, aspect, controllerMetadata, webScaffoldMetadata, webScaffoldAnnotationValues, patternList, 
+        		MemberFindingUtils.getMethods(memberDetails), MemberFindingUtils.getFields(memberDetails),
+                relatedApplicationTypeMetadata, getRelationFieldsDetails(mid, controllerMetadata, entity, webMetadataService), 
+                getRelationFieldsDateFormat(mid, controllerMetadata, entity, webMetadataService), metadataService,
+                propFileOperations, projectOperations.getPathResolver(), fileManager, dateTypes);
     }
 
     /**
-     * {@inheritDoc}, here the resulting file name will be
-     * **_ROO_GvNIXPattern.aj
+     * {@inheritDoc}, here the resulting file name will be **_ROO_GvNIXPattern.aj
      */
     @Override
     public String getItdUniquenessFilenameSuffix() {
@@ -310,10 +242,9 @@ public final class PatternMetadataProvider extends
     }
 
     @Override
-    protected String getGovernorPhysicalTypeIdentifier(
-            String metadataIdentificationString) {
-        JavaType javaType = PatternMetadata
-                .getJavaType(metadataIdentificationString);
+    protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
+    	
+        JavaType javaType = PatternMetadata.getJavaType(metadataIdentificationString);
         Path path = PatternMetadata.getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
@@ -327,4 +258,5 @@ public final class PatternMetadataProvider extends
     public String getProvidesType() {
         return PatternMetadata.getMetadataIdentiferType();
     }
+    
 }
