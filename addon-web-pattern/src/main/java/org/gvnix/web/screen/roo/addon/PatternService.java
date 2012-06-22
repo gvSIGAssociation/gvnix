@@ -53,6 +53,8 @@ public interface PatternService {
     /** Name of {@link GvNIXRelatedPattern} attribute value */
     public static final JavaSymbolName RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
 
+    public static final JavaType ONETOMANY_ANNOTATION = new JavaType("javax.persistence.OneToMany");
+
     /**
      * Check if there is a pattern name used already in project.
      * 

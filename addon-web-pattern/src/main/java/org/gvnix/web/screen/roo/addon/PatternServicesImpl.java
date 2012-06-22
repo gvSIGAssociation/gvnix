@@ -44,38 +44,28 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.support.util.Assert;
 
 /**
- * Provide common services to Screen Pattern management components
- * 
+ * Provide common services to Screen Pattern management components. 
  * 
  * @author Jose Manuel Vivó (jmvivo at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
- * 
+ * @author Mario Martínez Sánchez (mmartinez at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
  */
 @Component
 @Service
 public class PatternServicesImpl implements PatternService {
 
-    public static final JavaType ONETOMANY_ANNOTATION = new JavaType(
-            "javax.persistence.OneToMany");
-
-    @Reference
-    private MetadataService metadataService;
-
-    @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
-
-    @Reference
-    private MemberDetailsScanner memberDetailsScanner;
-
-    @Reference
-    private TypeLocationService typeLocationService;
+    @Reference private MetadataService metadataService;
+    @Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    @Reference private MemberDetailsScanner memberDetailsScanner;
+    @Reference private TypeLocationService typeLocationService;
 
     /** {@inheritDoc} */
     public boolean isPatternDuplicated(String name) {
-    	
-        // TODO There are 2 duplicated pattern name methods: Unify ?
     	
         List<String> definedPatterns = new ArrayList<String>();
         AnnotationMetadata patternAnnotation = null;
@@ -150,6 +140,7 @@ public class PatternServicesImpl implements PatternService {
     /** {@inheritDoc} */
     public List<FieldMetadata> getOneToManyFieldsFromEntityJavaType(
             JavaType formBakingObjectType) {
+    	
         List<FieldMetadata> oneToManyFields = new ArrayList<FieldMetadata>();
         MutableClassOrInterfaceTypeDetails formBackingTypeMetadata = MetadataUtils
                 .getPhysicalTypeDetails(formBakingObjectType, metadataService,
@@ -164,9 +155,6 @@ public class PatternServicesImpl implements PatternService {
         Assert.notNull(formBackingTypeMetadata, "Cannot locate Metadata for '"
                 .concat(formBakingObjectType.getFullyQualifiedTypeName())
                 .concat("'."));
-
-        // List<? extends FieldMetadata> fields = formBackingTypeMetadata
-        // .getDeclaredFields();
 
         for (FieldMetadata field : fields) {
             for (AnnotationMetadata fieldAnnotation : field.getAnnotations()) {
@@ -284,24 +272,26 @@ public class PatternServicesImpl implements PatternService {
     	// TODO Unify with other methods here ?
     	
         Map<String, String> fieldsPatternIdAndType = new HashMap<String, String>();
-        @SuppressWarnings("unchecked")
-        List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues
-                .getValue();
-
+        
         // Parse annotationValues finding the field interesting part
+        @SuppressWarnings("unchecked")
+        List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues.getValue();
         if (relationsPatternList != null) {
+        	
             String[] patternDef = {};
             String[] fieldDefinitions = {};
             String[] fieldPatternType = {};
+            
             for (StringAttributeValue strAttrValue : relationsPatternList) {
+            	
                 patternDef = strAttrValue.getValue().split(":");
                 fieldDefinitions = patternDef[1].trim().split(",");
                 for (String fieldDef : fieldDefinitions) {
+                	
                     fieldPatternType = fieldDef.trim().split("=");
                     fieldsPatternIdAndType.put(
-                            fieldPatternType[0].trim(),
-                            patternDef[0].trim().concat("=")
-                                    .concat(fieldPatternType[1].trim()));
+                    		fieldPatternType[0].trim(), 
+                    		patternDef[0].trim().concat("=").concat(fieldPatternType[1].trim()));
                 }
             }
         }
@@ -315,8 +305,9 @@ public class PatternServicesImpl implements PatternService {
     	// TODO Unify with other methods here ?
     	
         for (String definedPattern : definedPatternsList) {
-            if (definedPattern.split("=")[1].equalsIgnoreCase(patternType
-                    .name())) {
+        	
+            if (definedPattern.split("=")[1].equalsIgnoreCase(patternType.name())) {
+            	
                 return true;
             }
         }
