@@ -10,21 +10,41 @@
 
   <section xml:id="introduccion_que-es-gvnix">
     <title xml:lang="es">¿Qué es gvNIX?</title>
-
-    <para xml:lang="es">Entorno de trabajo Java para la CIT, productivo y
-    flexible, que no compromete la calidad de los proyectos.</para>
-
-    <para xml:lang="es">Esta versión es la primera que usa como base <link
-    xlink:href="http://www.springsource.org/roo">Spring Roo</link>. Añade
-    funcionalidades de productividad de alto nivel a las prestaciones que ya
+    
+    <para xml:lang="es">gvNIX es un entorno de trabajo Java de código abierto para el desarrollo rápido de aplicaciones web, 
+    altamente productivo, flexible y que no compromete la calidad de los proyectos.</para>
+    
+    <para xml:lang="es">Está compuesto de un conjunto de herramientas de código abierto entre las que destaca su núcleo,
+    <link xlink:href="http://www.springsource.org/roo">Spring Roo</link>.
+    Esto le proporciona un amplio apoyo por parte de importantes organizaciones como Spring Source y VMWare.
+    Añade funcionalidades de productividad de alto nivel a las prestaciones que ya
     se obtienen con <link xlink:href="http://www.springsource.org/roo">Spring
     Roo</link>.</para>
 
+    <para xml:lang="es">gvNIX es un proyecto subvencionado y liderado por la Conselleria de
+    Infraestructuras, Transporte y Medio Ambiente de la Generalitat Valenciana.</para>
+
     <para xml:lang="es">gvNIX está disponible dentro del proyecto de Migración
     a Software de fuentes abiertas de la Conselleria d'Infraestructures i
-    Transports: <link xlink:href="http://www.gvpontis.gva.es">gvPONTIS</link>.
-    <link
-    xlink:href="http://www.gvpontis.gva.es/val/gvnix/">http://www.gvpontis.gva.es/val/gvnix/</link></para>
+    Transports: <link xlink:href="http://www.gvpontis.gva.es">gvPONTIS</link>.</para>
+    
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">
+        	<link xlink:href="http://www.gvnix.org">Comunidad online de gvNIX</link>
+       	</para>
+        <para xml:lang="es">
+        	<link xlink:href="http://gvnix.googlecode.com">Proyecto gvNIX en Google Code</link>
+        </para>
+        <para xml:lang="es">
+			<link xlink:href="http://www.gvpontis.gva.es/cast/gvnix/">Página de gvNIX dentro del proyecto gvPONTIS</link>
+        </para>
+        <para xml:lang="es">
+			<link xlink:href="http://www.springsource.org/spring-roo">Página oficial de Spring Roo</link>
+        </para>
+      </listitem>
+    </itemizedlist>
+    
   </section>
 
   <section>
@@ -55,16 +75,20 @@
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Enfoque DDD (Domain-Driven Development).</para>
+        <para xml:lang="es">Desarrollo dirigido por el dominio (Domain-Driven Development).</para>
 
         <itemizedlist>
           <listitem>
-            <para xml:lang="es">Dirigido por el modelo de entidades.</para>
+            <para xml:lang="es">Diseño dirigido por el modelo de entidades.</para>
           </listitem>
 
           <listitem>
             <para xml:lang="es">Lógica en las entidades (Real Object
             Oriented), elimina capas redundantes.</para>
+          </listitem>
+          
+          <listitem>
+            <para xml:lang="es">Otras capas opcionales (servicios, DAOs, ...).</para>
           </listitem>
         </itemizedlist>
       </listitem>
@@ -130,7 +154,8 @@
         JUnit, configuración Maven para construir las aplicaciones y vistas
         JSP usando Spring MVC como front-end. Este tipo de aplicaciones
         basadas en Spring son probablemente las aplicaciones Java más
-        modernas.</para>
+        populares seguidas de JSF, Struts y GWT según el 
+        <link xlink:href="http://twitpic.com/9mgnd5">Developer Productivity Report 2012</link>.</para>
       </listitem>
     </itemizedlist>
 
