@@ -88,10 +88,10 @@ public class WebScreenCommands implements CommandMarker {
     		@CliOption(key = "testServerUrl", mandatory = false, unspecifiedDefaultValue = "http://localhost:8080/", specifiedDefaultValue = "http://localhost:8080/", help = "URL of the server where the web application is available, including protocol, port and hostname") String url) {
 
     	// Create pattern
-        operations.addPattern(controllerClass, name, type);
+        boolean added = operations.addPattern(controllerClass, name, type);
 
 		// Generate optionally Selenium tests
-    	if (testAutomatically) {
+    	if (added && testAutomatically) {
 
     		// Create test with defined name or with pattern name by default
         	if (testName == null) {
@@ -149,10 +149,10 @@ public class WebScreenCommands implements CommandMarker {
     		@CliOption(key = "testName", mandatory = false, help = "Name of the test") String testName,
     		@CliOption(key = "testServerUrl", mandatory = false, unspecifiedDefaultValue = "http://localhost:8080/", specifiedDefaultValue = "http://localhost:8080/", help = "URL of the server where the web application is available, including protocol, port and hostname") String url) {
 
-        operations.addRelationPattern(controllerClass, name, field, type);
+    	boolean added = operations.addRelationPattern(controllerClass, name, field, type);
 
 		// Generate optionally Selenium tests
-    	if (testAutomatically) {
+    	if (added && testAutomatically) {
 
     		// Create test with defined name or with pattern name by default
         	if (testName == null) {

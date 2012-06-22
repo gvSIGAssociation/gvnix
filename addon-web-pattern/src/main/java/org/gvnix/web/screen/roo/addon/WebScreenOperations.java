@@ -59,8 +59,9 @@ public interface WebScreenOperations {
      *            Identification to use for this pattern
      * @param pattern
      *            The pattern to apply
+     * @return Pattern added
      */
-    void addPattern(JavaType controllerClass, JavaSymbolName name,
+    boolean addPattern(JavaType controllerClass, JavaSymbolName name,
             WebPatternType pattern);
 
     /**
@@ -93,8 +94,9 @@ public interface WebScreenOperations {
      *            controler's entity
      * @param pattern
      *            The pattern to apply
+     * @return Pattern added
      */
-    void addRelationPattern(JavaType controllerClass, JavaSymbolName name,
+    boolean addRelationPattern(JavaType controllerClass, JavaSymbolName name,
             JavaSymbolName field, WebPatternType type);
 
     /**

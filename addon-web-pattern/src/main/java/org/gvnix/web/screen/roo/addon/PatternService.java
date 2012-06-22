@@ -42,22 +42,15 @@ import org.springframework.roo.support.util.Assert;
 public interface PatternService {
 
     /**
-     * Check if there are pattern names used more than once in project
+     * Check if there is a pattern name used already in project.
      * 
-     * TODO: Refactor this method to check <i>only one pattern</i> instead
-     * <i>all patterns</i> in whole project
+     * <p>Check if supplied pattern name exists and checks in all project if there is already repeated names.</p>
      * 
-     * @return duplicated pattern found, otherwise return <code>null</code>
+     * @param Pattern name (can be null)
+     * @return duplicated pattern found
      * 
      */
-    String findPatternRepeatedly();
-
-    /**
-     * Check if there are pattern names used more than once in controller
-     * 
-     * @return Is pattern already used in controller ?
-     */
-    public boolean arePatternsDefinedOnceInController(AnnotationAttributeValue<?> values);
+    boolean isPatternDuplicated(String name);
 
     /**
      * Look at Entity for a One-to-many field by name

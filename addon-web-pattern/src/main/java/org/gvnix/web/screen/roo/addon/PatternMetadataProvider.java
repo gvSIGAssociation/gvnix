@@ -18,7 +18,6 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,9 +41,6 @@ import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.scanner.MemberDetails;
@@ -60,8 +56,11 @@ import org.springframework.roo.support.util.Assert;
  * services needed by the metadata type. Register metadata triggers and
  * dependencies here. Also define the unique add-on ITD identifier.
  * 
- * 
  * @author Oscar Rovira (orovira at disid dot com) at <a
+ *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
+ *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
+ *         Transport</a>
+ * @author Mario Martínez (mmartinez at disid dot com) at <a
  *         href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a
  *         href="http://www.cit.gva.es">Conselleria d'Infraestructures i
  *         Transport</a>
@@ -161,34 +160,11 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
         ClassOrInterfaceTypeDetails controllerDetails = (ClassOrInterfaceTypeDetails) controllerMetadata.getMemberHoldingTypeDetails();
         Assert.notNull(controllerDetails, "Governor failed to provide class type details, in violation of superclass contract");
 
-        AnnotationMetadata patternAnnotation = MemberFindingUtils.getAnnotationOfType(controllerDetails.getAnnotations(), PATTERN_ANNOTATION);
-
-        // TODO There are 2 duplicated pattern name validations: Unify ?
-        
         // Check if there are pattern names used more than once in project
-        String patternRepeatedly = patternService.findPatternRepeatedly();
-        Assert.isNull(patternRepeatedly, "There is a pattern name used more than once in the project");
+        Assert.isTrue(!patternService.isPatternDuplicated(null), "There is a pattern name used more than once in the project");
 
-        List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
-
-        if (patternAnnotation != null) {
-        	
-            AnnotationAttributeValue<?> thisAnnotationValue = patternAnnotation.getAttribute(PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-            if (thisAnnotationValue != null) {
-                // Check if the controller has defined the same pattern more than once
-                Assert.isTrue(patternService.arePatternsDefinedOnceInController(thisAnnotationValue),
-                        "Controller ".concat(controllerDetails.getName().getFullyQualifiedTypeName()).concat(" has the same pattern defined more than once"));
-
-                ArrayAttributeValue<?> arrayVal = (ArrayAttributeValue<?>) thisAnnotationValue;
-                if (arrayVal != null) {
-                    @SuppressWarnings("unchecked")
-                    List<StringAttributeValue> values = (List<StringAttributeValue>) arrayVal.getValue();
-                    for (StringAttributeValue value : values) {
-                        patternList.add(value);
-                    }
-                }
-            }
-        }
+        // Get pattern attributes of the controller
+        List<StringAttributeValue> patternList = patternService.getPatternAttributes(controllerType);
 
         // Lookup the form backing object's metadata and check that
         JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();

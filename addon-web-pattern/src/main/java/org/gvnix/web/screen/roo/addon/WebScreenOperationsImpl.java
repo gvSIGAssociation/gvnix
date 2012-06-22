@@ -82,119 +82,75 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     private static Logger logger = Logger
             .getLogger(WebScreenOperationsImpl.class.getName());
 
-    /**
-     * Name of {@link GvNIXPattern} attribute value
-     */
-    public static final JavaSymbolName PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
-            "value");
+    /** Name of {@link GvNIXPattern} attribute value */
+    public static final JavaSymbolName PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
 
-    /**
-     * {@link GvNIXPattern} JavaType
-     */
-    public static final JavaType PATTERN_ANNOTATION = new JavaType(
-            GvNIXPattern.class.getName());
+    /** {@link GvNIXPattern} JavaType */
+    public static final JavaType PATTERN_ANNOTATION = new JavaType(GvNIXPattern.class.getName());
 
-    /**
-     * Name of {@link GvNIXRelationPattern} attribute value
-     */
-    public static final JavaSymbolName RELATION_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
-            "value");
+    /** Name of {@link GvNIXRelationPattern} attribute value */
+    public static final JavaSymbolName RELATION_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
 
-    /**
-     * {@link GvNIXRelationPattern} JavaType
-     */
-    public static final JavaType RELATION_PATTERN_ANNOTATION = new JavaType(
-            GvNIXRelationsPattern.class.getName());
+    /** {@link GvNIXRelationPattern} JavaType */
+    public static final JavaType RELATION_PATTERN_ANNOTATION = new JavaType(GvNIXRelationsPattern.class.getName());
 
-    /**
-     * {@link GvNIXPattern} JavaType
-     */
-    public static final JavaType RELATED_PATTERN_ANNOTATION = new JavaType(
-            GvNIXRelatedPattern.class.getName());
+    /** {@link GvNIXPattern} JavaType */
+    public static final JavaType RELATED_PATTERN_ANNOTATION = new JavaType(GvNIXRelatedPattern.class.getName());
 
-    /**
-     * Name of {@link GvNIXRelatedPattern} attribute value
-     */
-    public static final JavaSymbolName RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName(
-            "value");
+    /** Name of {@link GvNIXRelatedPattern} attribute value */
+    public static final JavaSymbolName RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
 
-    /**
-     * Name of {@link RooWebScaffold} attribute formBackingObject
-     */
-    public static final JavaSymbolName ROOWEBSCAFFOLD_ANNOTATION_ATTR_VALUE_FORMBACKINGOBJECT = new JavaSymbolName(
-            "formBackingObject");
+    /** Name of {@link RooWebScaffold} attribute formBackingObject */
+    public static final JavaSymbolName ROOWEBSCAFFOLD_ANNOTATION_ATTR_VALUE_FORMBACKINGOBJECT = new JavaSymbolName("formBackingObject");
 
-    /**
-     * {@link RooWebScaffold} JavaType
-     */
-    public static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(
-            RooWebScaffold.class.getName());
+    /** {@link RooWebScaffold} JavaType */
+    public static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(RooWebScaffold.class.getName());
 
-    /**
-     * {@link GvNIXEntityBatch} JavaType
-     */
-    public static final JavaType ENTITYBATCH_ANNOTATION = new JavaType(
-            GvNIXEntityBatch.class.getName());
+    /** {@link GvNIXEntityBatch} JavaType */
+    public static final JavaType ENTITYBATCH_ANNOTATION = new JavaType(GvNIXEntityBatch.class.getName());
 
-    public static final JavaType ONETOMANY_ANNOTATION = new JavaType(
-            "javax.persistence.OneToMany");
+    /** {@link OneToMany} JavaType */
+    public static final JavaType ONETOMANY_ANNOTATION = new JavaType("javax.persistence.OneToMany");
 
-    /**
-     * MetadataService offers access to Roo's metadata model, use it to retrieve
-     * any available metadata by its MID
-     */
-    @Reference
-    private MetadataService metadataService;
+    /** MetadataService offers access to Roo's metadata model, use it to retrieve any available metadata by its MID */
+    @Reference private MetadataService metadataService;
 
-    @Reference
-    private TypeLocationService typeLocationService;
+    @Reference private TypeLocationService typeLocationService;
 
-    /**
-     * Use the PhysicalTypeMetadataProvider to access information about a
-     * physical type in the project
-     */
-    @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    /** Use the PhysicalTypeMetadataProvider to access information about a physical type in the project */
+    @Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
 
-    @Reference
-    private PatternService patternService;
+    @Reference private PatternService patternService;
 
-    @Reference
-    private WebScreenConfigService configService;
+    @Reference private WebScreenConfigService configService;
 
-    @Reference
-    private ProjectOperations projectOperations;
+    @Reference private ProjectOperations projectOperations;
 
-    @Reference
-    PropFileOperations propFileOperations;
+    @Reference PropFileOperations propFileOperations;
 
-    @Reference
-    private I18nSupport i18nSupport;
+    @Reference private I18nSupport i18nSupport;
 
     /** {@inheritDoc} */
     public boolean isPatternCommandAvailable() {
+    	
         return configService.isSpringMvcProject();
     }
 
     /** {@inheritDoc} */
-    public void addPattern(JavaType controllerClass, JavaSymbolName name,
-            WebPatternType pattern) {
+    public boolean addPattern(JavaType controllerClass, JavaSymbolName name, WebPatternType pattern) {
 
-        Assert.notNull(controllerClass, "controller is required");
-        Assert.notNull(name, "id is required");
-        Assert.notNull(pattern, "pattern is required");
+        Assert.notNull(controllerClass, "controller class is required");
+        Assert.notNull(name, "pattern name is required");
+        Assert.notNull(pattern, "pattern type is required");
 
-        // Get mutableTypeDetails from controllerClass. Also checks javaType is
-        // a controller
+        // Get mutableTypeDetails from controllerClass. Also checks javaType is a controller
         MutableClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerMutableTypeDetails(controllerClass);
 
-        // TODO Refactor to check only this pattern in others controllers
-        String patternDefinedTwice = patternService
-                .findPatternRepeatedly();
-        Assert.isNull(patternDefinedTwice,
-                "There is a pattern name used more than once in the project");
+        // Previosly check if some pattern name is repeated
+        Assert.isTrue(!patternService.isPatternDuplicated(name.getSymbolName()),
+        		"There is a pattern name used more than once in the project");
 
-        // All checks passed OK.
+        // All checks passed OK
 
         // Setup project for use annotation
         configService.setup();
@@ -204,63 +160,41 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                 .getAnnotationOfType(controllerDetails.getAnnotations(),
                         PATTERN_ANNOTATION);
 
-        // List of pattern to use
-        List<StringAttributeValue> patternList = new ArrayList<StringAttributeValue>();
+        // Check if there are pattern names used more than once in project
+        Assert.isTrue(!patternService.isPatternDuplicated(null), "There is a pattern name used more than once in the project");
 
-        boolean isAlreadyAnnotated = false;
-        if (annotationMetadata != null) {
-            // @GvNIXPattern alredy exists
+        // Get pattern attributes of the controller
+        List<StringAttributeValue> patternList = patternService.getPatternAttributes(controllerClass);
 
-            // Loads previously registered pattern into patterList
-            // Also checks if name is used previously
-            AnnotationAttributeValue<?> previousAnnotationValues = annotationMetadata
-                    .getAttribute(PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-
-            if (previousAnnotationValues != null) {
-
-                @SuppressWarnings("unchecked")
-                List<StringAttributeValue> previousValues = (List<StringAttributeValue>) previousAnnotationValues
-                        .getValue();
-
-                if (previousValues != null && !previousValues.isEmpty()) {
-                    for (StringAttributeValue value : previousValues) {
-                        // Check if name is already used
-                        Assert.isTrue(!patternService.equalsPatternName(value, name),
-                                "Pattern name already used in class");
-
-                        patternList.add(value);
-                    }
-                }
-            }
-            isAlreadyAnnotated = true;
-        }
         // Build string parameter for the pattern
-        String patternParameter = name.toString().concat("=")
-                .concat(pattern.toString());
+        String patternParameter = name.toString().concat("=").concat(pattern.toString());
 
         // Adds new pattern
-        patternList.add(new StringAttributeValue(new JavaSymbolName(
-                "__ARRAY_ELEMENT__"), patternParameter));
+        patternList.add(new StringAttributeValue(new JavaSymbolName("__ARRAY_ELEMENT__"), patternParameter));
 
         // Prepare annotation builder
-        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
-                PATTERN_ANNOTATION);
-        annotationBuilder
-                .addAttribute(new ArrayAttributeValue<StringAttributeValue>(
-                        PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList));
+        AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(PATTERN_ANNOTATION);
+        annotationBuilder.addAttribute(new ArrayAttributeValue<StringAttributeValue>(
+        		PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList));
 
         // Add or update annotation to target type
-        if (isAlreadyAnnotated) {
-            controllerDetails.updateTypeAnnotation(annotationBuilder.build(),
-                    new HashSet<JavaSymbolName>());
+        if (annotationMetadata != null) {
+        	
+            controllerDetails.updateTypeAnnotation(annotationBuilder.build(), new HashSet<JavaSymbolName>());
+            
         } else {
+        	
             controllerDetails.addTypeAnnotation(annotationBuilder.build());
         }
 
+        // Tabular style patterns requires batch operations 
         if (pattern.equals(WebPatternType.tabular) || pattern.equals(WebPatternType.tabular_edit_register)) {
+        	
         	// TODO If tabular_edit_register, only delete entity in batch required
             annotateTypeWithGvNIXEntityBatch(getFormBakingObject(controllerDetails));
         }
+        
+        return true;
     }
 
     /** {@inheritDoc} */
@@ -269,7 +203,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     }
 
     /** {@inheritDoc} */
-    public void addRelationPattern(JavaType controllerClass,
+    public boolean addRelationPattern(JavaType controllerClass,
             JavaSymbolName name, JavaSymbolName field, WebPatternType type) {
 
         Assert.notNull(controllerClass, "controller is required");
@@ -294,12 +228,12 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         // Check if user is setting Detail register
         // if so, this is not supported yet, so abort
-        if (!patternValues.isEmpty()
-                && type == WebPatternType.register) {
+        if (!patternValues.isEmpty() && type == WebPatternType.register) {
+        	
             logger.warning("For pattern name '"
                     .concat(name.getSymbolName())
                     .concat("' you are setting detail as register. Currently gvNIX doesn't support 'Detail register' pattern"));
-            return;
+            return false;
         }
 
         // Get @RooController annotation to get formbackingObject definition
@@ -436,6 +370,8 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         annotateFormBackingObjectRelationsControllers(mutableTypeDetails,
                 annotationValues);
+        
+        return true;
     }
 
     /**

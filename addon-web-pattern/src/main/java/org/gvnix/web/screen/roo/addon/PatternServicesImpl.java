@@ -73,33 +73,43 @@ public class PatternServicesImpl implements PatternService {
     private TypeLocationService typeLocationService;
 
     /** {@inheritDoc} */
-    public String findPatternRepeatedly() {
+    public boolean isPatternDuplicated(String name) {
     	
         // TODO There are 2 duplicated pattern name methods: Unify ?
     	
         List<String> definedPatterns = new ArrayList<String>();
         AnnotationMetadata patternAnnotation = null;
-        for (ClassOrInterfaceTypeDetails patternAnnotationClass : typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(PatternMetadataProvider.PATTERN_ANNOTATION)) {
+        for (ClassOrInterfaceTypeDetails patternAnnotationClass : typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(
+        		PatternMetadataProvider.PATTERN_ANNOTATION)) {
         	
-            patternAnnotation = MemberFindingUtils.getAnnotationOfType(patternAnnotationClass.getAnnotations(), PatternMetadataProvider.PATTERN_ANNOTATION);
+            patternAnnotation = MemberFindingUtils.getAnnotationOfType(
+            		patternAnnotationClass.getAnnotations(), PatternMetadataProvider.PATTERN_ANNOTATION);
             if (patternAnnotation != null) {
             	
-                AnnotationAttributeValue<?> patternAnnotationValue = patternAnnotation.getAttribute(PatternMetadataProvider.PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+                AnnotationAttributeValue<?> patternAnnotationValue = patternAnnotation.getAttribute(
+                		PatternMetadataProvider.PATTERN_ANNOTATION_ATTR_VALUE_NAME);
                 for (String patternName : getPatternNames(patternAnnotationValue)) {
                 	
+                	if (name != null && name.equals(patternName)) {
+                		
+                		// Supplied name already exists in project
+                		return true;
+                	}
                     if (definedPatterns.contains(patternName)) {
                     	
-                        return patternName;
+                    	// There is already duplicated pattern names in project 
+                        return true;
                         
                     } else {
                     	
+                    	// No duplicated
                         definedPatterns.add(patternName);
                     }
                 }
             }
         }
         
-        return null;
+        return false;
     }
 
     protected List<String> getPatternNames(AnnotationAttributeValue<?> values) {
@@ -123,27 +133,6 @@ public class PatternServicesImpl implements PatternService {
         
         return patternNames;
     }
-
-    public boolean arePatternsDefinedOnceInController(AnnotationAttributeValue<?> values) {
-    	
-        // TODO There are 2 duplicated pattern name methods: Unify ?
-    	
-        List<String> auxList = new ArrayList<String>();
-        for (String value : getPatternNames(values)) {
-        	
-            if (auxList.contains(value)) {
-            	
-                return false;
-                
-            } else {
-            	
-                auxList.add(value);
-            }
-        }
-        
-        return true;
-    }
-
 
     /** {@inheritDoc} */
     public FieldMetadata getOneToManyFieldFromEntityJavaType(JavaType formBakingObjectType, String fieldName) {
@@ -212,38 +201,25 @@ public class PatternServicesImpl implements PatternService {
     /** {@inheritDoc} */
 	public List<StringAttributeValue> getPatternAttributes(JavaType controllerClass) {
 		
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
+        List<StringAttributeValue> patternValues = new ArrayList<StringAttributeValue>();
 
 		// Get @GvNIXPattern annotation from controller
-        AnnotationMetadata patternAnnotationMetadata = MemberFindingUtils
-                .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
-                        WebScreenOperationsImpl.PATTERN_ANNOTATION);
-        Assert.notNull(
-                patternAnnotationMetadata,
-                "Missing ".concat(WebScreenOperationsImpl.PATTERN_ANNOTATION.getSimpleTypeName())
-                        .concat(" annotation in controller "
-                                .concat(controllerClass
-                                        .getFullyQualifiedTypeName())));
+        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
+        AnnotationMetadata patternAnnotationMetadata = MemberFindingUtils.getAnnotationOfType(
+        		mutableTypeDetails.getAnnotations(), WebScreenOperationsImpl.PATTERN_ANNOTATION);
+        if (patternAnnotationMetadata != null) {
 
-        // look for pattern name in @GvNIXPattern values
-        AnnotationAttributeValue<?> patternAnnotationValues = patternAnnotationMetadata
-                .getAttribute(WebScreenOperationsImpl.PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-        Assert.notNull(
-                patternAnnotationValues,
-                "Missing values in ".concat(
-                		WebScreenOperationsImpl.PATTERN_ANNOTATION.getSimpleTypeName()).concat(
-                        " annotation in controller ".concat(controllerClass
-                                .getFullyQualifiedTypeName())));
-
-        @SuppressWarnings("unchecked")
-        List<StringAttributeValue> patternValues = (List<StringAttributeValue>) patternAnnotationValues
-                .getValue();
-        Assert.isTrue(
-                patternValues != null && !patternValues.isEmpty(),
-                "Missing values in ".concat(
-                		WebScreenOperationsImpl.PATTERN_ANNOTATION.getSimpleTypeName()).concat(
-                        " annotation in controller ".concat(controllerClass
-                                .getFullyQualifiedTypeName())));
+	        // look for pattern name in @GvNIXPattern values
+	        AnnotationAttributeValue<?> patternAnnotationValues = patternAnnotationMetadata
+	                .getAttribute(WebScreenOperationsImpl.PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+	        
+	        if (patternAnnotationValues != null) {
+	        
+	        	@SuppressWarnings("unchecked")
+	        	List<StringAttributeValue> values = (List<StringAttributeValue>)patternAnnotationValues.getValue();
+	        	patternValues.addAll(values);
+	        }
+        }
         
 		return patternValues;
 	}
