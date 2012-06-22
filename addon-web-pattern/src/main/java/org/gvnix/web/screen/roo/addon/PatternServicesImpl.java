@@ -80,14 +80,14 @@ public class PatternServicesImpl implements PatternService {
         List<String> definedPatterns = new ArrayList<String>();
         AnnotationMetadata patternAnnotation = null;
         for (ClassOrInterfaceTypeDetails patternAnnotationClass : typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(
-        		PatternMetadataProvider.PATTERN_ANNOTATION)) {
+        		PATTERN_ANNOTATION)) {
         	
             patternAnnotation = MemberFindingUtils.getAnnotationOfType(
-            		patternAnnotationClass.getAnnotations(), PatternMetadataProvider.PATTERN_ANNOTATION);
+            		patternAnnotationClass.getAnnotations(), PATTERN_ANNOTATION);
             if (patternAnnotation != null) {
             	
                 AnnotationAttributeValue<?> patternAnnotationValue = patternAnnotation.getAttribute(
-                		PatternMetadataProvider.PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+                		PATTERN_ANNOTATION_ATTR_VALUE_NAME);
                 for (String patternName : getPatternNames(patternAnnotationValue)) {
                 	
                 	if (name != null && name.equals(patternName)) {

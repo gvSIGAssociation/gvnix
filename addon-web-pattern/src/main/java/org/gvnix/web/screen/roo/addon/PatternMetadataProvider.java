@@ -70,12 +70,6 @@ import org.springframework.roo.support.util.Assert;
 @Service
 public final class PatternMetadataProvider extends AbstractPatternMetadataProvider {
 
-    /** {@link GvNIXPattern} java type */
-    public static final JavaType PATTERN_ANNOTATION = new JavaType(GvNIXPattern.class.getName());
-    
-    /** Name of {@link GvNIXPattern} attribute value */
-    public static final JavaSymbolName PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
-
     @Reference WebScaffoldMetadataProvider webScaffoldMetadataProvider;
     @Reference ProjectOperations projectOperations;
     @Reference PropFileOperations propFileOperations;
@@ -100,7 +94,7 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
         // Next line adding a notification listener over this class allow method getLocalMidToRequest(ItdTypeDetails) to be invoked
         metadataDependencyRegistry.addNotificationListener(this);
         metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-        addMetadataTrigger(PATTERN_ANNOTATION);
+        addMetadataTrigger(PatternService.PATTERN_ANNOTATION);
     }
 
     /**
@@ -117,7 +111,7 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
     	
         metadataDependencyRegistry.removeNotificationListener(this);
         metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-        removeMetadataTrigger(PATTERN_ANNOTATION);
+        removeMetadataTrigger(PatternService.PATTERN_ANNOTATION);
     }
 
     @Override
@@ -126,15 +120,16 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
         // Determine the governor for this ITD, and whether any metadata is even hoping to hear about changes to that JavaType and its ITDs
         JavaType governor = itdTypeDetails.getName();
         String localMid = entityToWebScaffoldMidMap.get(governor);
+        
         return localMid == null ? null : localMid;
     }
 
     /**
-     * Return an instance of the Metadata offered by this add-on
+     * Return an instance of the Metadata offered by this add-on.
      */
     @Override
     protected ItdTypeDetailsProvidingMetadataItem getMetadata(
-    		String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, String fileName) {
+    		String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, String file) {
 
         // We need to parse the web scaffold annotation, which we expect to be present
         WebScaffoldAnnotationValues webScaffoldAnnotationValues = new WebScaffoldAnnotationValues(controllerMetadata);
@@ -144,6 +139,7 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
             return null;
         }
 
+        // Get controller java type from its metadata identification
         JavaType controllerType = PatternMetadata.getJavaType(mid);
 
         // We need to know the metadata of the controller through WebScaffoldMetada
@@ -169,11 +165,11 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
         // Lookup the form backing object's metadata and check that
         JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();
 
+        // Get and validate required details and metadatas
         PhysicalTypeMetadata entityMetadata = (PhysicalTypeMetadata) metadataService.get(
         		PhysicalTypeIdentifier.createIdentifier(entity, Path.SRC_MAIN_JAVA));
         Assert.notNull(entityMetadata, "Unable to obtain physical type metadata for type " + entity.getFullyQualifiedTypeName());
         MemberDetails entityDetails = getMemberDetails(entityMetadata);
-
         MemberHoldingTypeDetails entityPersistentDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(
                         entityDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
         SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = webMetadataService.getRelatedApplicationTypeMetadata(
@@ -214,6 +210,7 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
      */
     @Override
     public String getItdUniquenessFilenameSuffix() {
+    	
         return "GvNIXPattern";
     }
 
@@ -222,16 +219,19 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
     	
         JavaType javaType = PatternMetadata.getJavaType(metadataIdentificationString);
         Path path = PatternMetadata.getPath(metadataIdentificationString);
+        
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
     @Override
     protected String createLocalIdentifier(JavaType javaType, Path path) {
+    	
         return PatternMetadata.createIdentifier(javaType, path);
     }
 
     @Override
     public String getProvidesType() {
+    	
         return PatternMetadata.getMetadataIdentiferType();
     }
     

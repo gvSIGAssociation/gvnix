@@ -41,6 +41,18 @@ import org.springframework.roo.support.util.Assert;
  */
 public interface PatternService {
 
+    /** {@link GvNIXPattern} java type */
+    public static final JavaType PATTERN_ANNOTATION = new JavaType(GvNIXPattern.class.getName());
+    
+    /** Name of {@link GvNIXPattern} attribute value */
+    public static final JavaSymbolName PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
+
+    /** {@link GvNIXRelatedPattern} JavaType */
+    public static final JavaType RELATED_PATTERN_ANNOTATION = new JavaType(GvNIXRelatedPattern.class.getName());
+    
+    /** Name of {@link GvNIXRelatedPattern} attribute value */
+    public static final JavaSymbolName RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
+
     /**
      * Check if there is a pattern name used already in project.
      * 
