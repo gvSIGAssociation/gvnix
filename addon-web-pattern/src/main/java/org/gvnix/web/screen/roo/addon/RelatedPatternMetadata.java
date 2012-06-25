@@ -54,13 +54,14 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
     private static final String PROVIDES_TYPE_STRING = RelatedPatternMetadata.class.getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
 
-    public RelatedPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controller, WebScaffoldMetadata webScaffoldMetadata, 
-    		List<StringAttributeValue> patterns, MemberDetails controllerDetails, PhysicalTypeMetadata entityMetadata,
-    		SortedMap<JavaType, JavaTypeMetadataDetails> entitiesDetails, SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
-    		Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes, Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
+    public RelatedPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, MemberDetails controllerDetails,
+    		WebScaffoldMetadata webScaffoldMetadata, List<StringAttributeValue> patterns,
+    		PhysicalTypeMetadata entityMetadata, JavaTypeMetadataDetails masterEntityDetails,
+    		SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities, SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields,
+    		Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates, Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes) {
     	
-        super(mid, aspect, controller, webScaffoldMetadata, patterns, controllerDetails, entityMetadata, entitiesDetails, typesForPopulate,
-                relationsDateTypes, dateTypes);
+        super(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patterns,
+        		entityMetadata, masterEntityDetails, relatedEntities, relatedFields, relatedDates, entityDateTypes);
         
         Assert.isTrue(isValid(mid), "Metadata identification string '" + mid + "' does not appear to be a valid");
     }

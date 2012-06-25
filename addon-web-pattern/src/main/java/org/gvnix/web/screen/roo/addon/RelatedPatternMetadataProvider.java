@@ -21,7 +21,9 @@ package org.gvnix.web.screen.roo.addon;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -174,10 +176,10 @@ public final class RelatedPatternMetadataProvider extends AbstractPatternMetadat
         MemberDetails entityDetails = getMemberDetails(entityMetadata);
         MemberHoldingTypeDetails entityPersistentDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(
                         entityDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
-        SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = webMetadataService.getRelatedApplicationTypeMetadata(
+        SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities = webMetadataService.getRelatedApplicationTypeMetadata(
         		entity, entityDetails, mid);
-        if (entityPersistentDetails == null || relatedApplicationTypeMetadata == null || relatedApplicationTypeMetadata.get(entity) == null
-                || relatedApplicationTypeMetadata.get(entity).getPersistenceDetails() == null) {
+        if (entityPersistentDetails == null || relatedEntities == null || relatedEntities.get(entity) == null
+                || relatedEntities.get(entity).getPersistenceDetails() == null) {
         	
             return null;
         }
@@ -195,16 +197,35 @@ public final class RelatedPatternMetadataProvider extends AbstractPatternMetadat
         
         MemberDetails controllerDetails = getMemberDetails(controllerMetadata);
 
-        Map<JavaSymbolName, DateTimeFormatDetails> dateTypes = webMetadataService.getDatePatterns(
+        Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes = webMetadataService.getDatePatterns(
         		entity, entityDetails, mid);
 
         // Install Dialog Bean
-        OperationUtils.installWebDialogClass(aspect.getPackage().getFullyQualifiedPackageName().concat(".dialog"), projectOperations.getPathResolver(), fileManager);
+        OperationUtils.installWebDialogClass(
+        		aspect.getPackage().getFullyQualifiedPackageName().concat(".dialog"), projectOperations.getPathResolver(), fileManager);
+        
+        // Related fields and dates
+        SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields = getRelationFieldsDetails(
+        		mid, controllerMetadata, entity, webMetadataService);
+        Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates = getRelationFieldsDateFormat(
+        		mid, controllerMetadata, entity, webMetadataService);
 
+
+        JavaType masterEntity = null;
+        JavaTypeMetadataDetails masterEntityDetails = null;
+		try {
+        	// This a related pattern: Then the other related entity is the master entity
+    		SortedMap<JavaType, JavaTypeMetadataDetails> tempMap = new TreeMap<JavaType, JavaTypeMetadataDetails>(relatedEntities);
+    		tempMap.remove(entity);
+        	masterEntity = tempMap.lastKey();
+        	masterEntityDetails = tempMap.get(masterEntity);
+        } catch (NoSuchElementException e) {
+        	// This is a related pattern without master entity. Is this possible ?
+		}
+        
         // Pass dependencies required by the metadata in through its constructor
-        return new RelatedPatternMetadata(mid, aspect, controllerMetadata, webScaffoldMetadata, patternList, controllerDetails, entityMetadata,
-                relatedApplicationTypeMetadata, getRelationFieldsDetails(mid,controllerMetadata, entity, webMetadataService),
-                getRelationFieldsDateFormat(mid, controllerMetadata, entity, webMetadataService), dateTypes);
+        return new RelatedPatternMetadata(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, 
+        		patternList, entityMetadata, masterEntityDetails, relatedEntities, relatedFields, relatedDates, entityDateTypes);
     }
 
     /**

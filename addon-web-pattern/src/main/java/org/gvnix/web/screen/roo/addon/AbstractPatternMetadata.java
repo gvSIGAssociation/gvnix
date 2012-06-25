@@ -25,10 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
@@ -85,33 +83,31 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
     private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(GvNIXEntityBatch.class.getName());
 
     private WebScaffoldMetadata webScaffoldMetadata;
-    private SortedMap<JavaType, JavaTypeMetadataDetails> entities;
+    private SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities;
     private JavaType entity;
-    private JavaType masterEntity;
     private JavaTypeMetadataDetails entityDetails;
+    private JavaType masterEntity;
     private JavaTypeMetadataDetails masterEntityDetails;
     private List<String> patterns;
-    private SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate;
-    private Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes;
+    private SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields;
+    private Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates;
     private List<MethodMetadata> controllerMethods;
     private List<FieldMetadata> controllerFields;
-    private Map<JavaSymbolName, DateTimeFormatDetails> dateTypes;
+    private Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes;
     private String aspectControllerPackageFullyName;
     private PhysicalTypeMetadata entityMetadata;
 
-    public AbstractPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controller, WebScaffoldMetadata webScaffoldMetadata,
-            List<StringAttributeValue> patterns, MemberDetails controllerDetails, PhysicalTypeMetadata entityMetadata, 
-            SortedMap<JavaType, JavaTypeMetadataDetails> entitiesDetails, SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate, 
-            Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes, Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
+    public AbstractPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, MemberDetails controllerDetails,
+    		WebScaffoldMetadata webScaffoldMetadata, List<StringAttributeValue> patterns, 
+    		PhysicalTypeMetadata entityMetadata, JavaTypeMetadataDetails masterEntityDetails,
+            SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities, SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields, 
+            Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates, Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes) {
     	
-        super(mid, aspect, controller);
+        super(mid, aspect, controllerMetadata);
         
-        WebScaffoldAnnotationValues webScaffoldValues = new WebScaffoldAnnotationValues(controller);
-        
-        // Required parameters: Web scaffold information and entities details (entity and optional master entity)
+        // Required parameters: Web scaffold information and relatedEntities details (entity and optional master entity)
         Assert.notNull(webScaffoldMetadata, "Web scaffold metadata required");
-        Assert.notNull(webScaffoldValues, "Web scaffold values required");
-        Assert.notNull(entitiesDetails, "Related entities type metadata details required");
+        Assert.notNull(relatedEntities, "Related relatedEntities type metadata details required");
         
         if (!isValid()) {
         
@@ -120,39 +116,31 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         }
         
         this.webScaffoldMetadata = webScaffoldMetadata;
-        this.entity = webScaffoldValues.getFormBackingObject();
+        this.entity = entityMetadata.getMemberHoldingTypeDetails().getName();
         this.entityMetadata = entityMetadata;
-        this.entities = entitiesDetails;
-        this.entityDetails = entitiesDetails.get(entity);
-        this.dateTypes = dateTypes;
+        this.relatedEntities = relatedEntities;
+        this.entityDetails = relatedEntities.get(entity);
+        this.entityDateTypes = entityDateTypes;
         
         this.controllerMethods = MemberFindingUtils.getMethods(controllerDetails);
         this.controllerFields = MemberFindingUtils.getFields(controllerDetails);
 		
-        this.masterEntity = null;
-        this.masterEntityDetails = null;
-    	if (this instanceof RelatedPatternMetadata) {
-    		try {
-	        	// Is this a related pattern ? Then the other key is the master entity
-        		SortedMap<JavaType, JavaTypeMetadataDetails> tempMap = new TreeMap<JavaType, JavaTypeMetadataDetails>(entitiesDetails);
-        		tempMap.remove(entity);
-	        	this.masterEntity = tempMap.lastKey();
-	        	this.masterEntityDetails = tempMap.get(masterEntity);
-	        } catch (NoSuchElementException e) {
-	        	// This is a related pattern without master entity. Is this possible ?
-			}
-    	}
-  
+        this.masterEntityDetails = masterEntityDetails;
+        if (masterEntityDetails != null) {
+        	this.masterEntity = masterEntityDetails.getJavaType();
+        }
+
         Assert.notNull(entityDetails, "Metadata holder required for form backing type: " + entity);
         Assert.notNull(entityDetails.getPersistenceDetails(), "PersistenceMetadata details required for form backing type: " + entity);
-        
+
+        WebScaffoldAnnotationValues webScaffoldValues = new WebScaffoldAnnotationValues(controllerMetadata);
         if (webScaffoldValues.isPopulateMethods()) {
         	
-            filterAlreadyPopulatedTypes(typesForPopulate);
+            filterAlreadyPopulatedTypes(relatedFields);
         }
         
-        this.typesForPopulate = typesForPopulate;
-        this.relationsDateTypes = relationsDateTypes;
+        this.relatedFields = relatedFields;
+        this.relatedDates = relatedDates;
 
         // TODO: Take care of attributes "create, update, delete" in RooWebScaffold annotation
         List<String> definedPatternsList = new ArrayList<String>();
@@ -547,7 +535,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 		bodyBuilder.appendFormalLine(entity.getSimpleTypeName().toLowerCase() + ".set" + masterEntity.getSimpleTypeName() + "(" + masterEntity.getSimpleTypeName().toLowerCase() + ");");
 		// Add attribute with identical name as required by Roo create page
 		bodyBuilder.appendFormalLine("uiModel.addAttribute(\"" + uncapitalize(entity.getSimpleTypeName()) + "\", " + entity.getSimpleTypeName().toLowerCase() + ");");
-		if (!dateTypes.isEmpty()) {
+		if (!entityDateTypes.isEmpty()) {
 			bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
 		}
 		// TODO Remove dependencies or add it from entity pattern ?
@@ -970,7 +958,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         typeParams.add(entity);
 
         // Add date validation pattern to model if some date type field exists
-        if (!dateTypes.isEmpty()) {
+        if (!entityDateTypes.isEmpty()) {
             bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
         }
 
@@ -1004,7 +992,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         bodyBuilder.appendFormalLine("}");
 
         // May we need to populate some Model Attributes with the data of
-        // related entities
+        // related relatedEntities
         addBodyLinesPopulatingRelatedEntitiesData(bodyBuilder);
 
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
@@ -1121,7 +1109,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         typeParams.add(entity);
         
         // Add date validation pattern to model if some date type field exists
-        if (!dateTypes.isEmpty()) {
+        if (!entityDateTypes.isEmpty()) {
             bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
         }
         
@@ -1178,7 +1166,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .concat("\", count == 0 ? 1 : count);"));
 
         // May we need to populate some Model Attributes with the data of
-        // related entities
+        // related relatedEntities
         addBodyLinesPopulatingRelatedEntitiesData(bodyBuilder);
 
         // Add date validation pattern to model if some date type field exists
@@ -1219,18 +1207,18 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
     }
 
     /**
-     * Adds body lines which populates required data for the related entities.
+     * Adds body lines which populates required data for the related relatedEntities.
      * <p>
      * This lines are like Roo's ModelAttribute methods but registering the
      * model attributes directly in the method. The model attributes are set
-     * with data (usually Sets) needed by the entity related entities.
+     * with data (usually Sets) needed by the entity related relatedEntities.
      * 
      * @param bodyBuilder
      */
     private void addBodyLinesPopulatingRelatedEntitiesData(
             InvocableMemberBodyBuilder bodyBuilder) {
-        for (JavaType type : typesForPopulate.keySet()) {
-            JavaTypeMetadataDetails javaTypeMd = typesForPopulate.get(type);
+        for (JavaType type : relatedFields.keySet()) {
+            JavaTypeMetadataDetails javaTypeMd = relatedFields.get(type);
             JavaTypePersistenceMetadataDetails javaTypePersistenceMd = javaTypeMd
                     .getPersistenceDetails();
             if (javaTypePersistenceMd != null
@@ -1260,7 +1248,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
     }
 
     /**
-     * Adds body lines registering DateTime formats of the related entities.
+     * Adds body lines registering DateTime formats of the related relatedEntities.
      * <p>
      * If related entity has DateTime fields, we need to register, as model
      * attribute, the DateTime format in order to render, validate and send
@@ -1271,7 +1259,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
      */
     private void addBodyLinesRegisteringRelatedEntitiesDateTypesFormat(
             InvocableMemberBodyBuilder bodyBuilder) {
-        for (Entry<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> javaTypeDateTimeFormatDetailsEntry : relationsDateTypes
+        for (Entry<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> javaTypeDateTimeFormatDetailsEntry : relatedDates
                 .entrySet()) {
 
             String relatedEntityName = uncapitalize(javaTypeDateTimeFormatDetailsEntry
@@ -1577,7 +1565,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-        parameterNames.add(new JavaSymbolName("entities"));
+        parameterNames.add(new JavaSymbolName("relatedEntities"));
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -1585,13 +1573,13 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .concat("List list = new ")
                 .concat(entity.getSimpleTypeName()).concat("List();"));
         bodyBuilder
-                .appendFormalLine("for ( Integer select : entities.getSelected() ) {");
+                .appendFormalLine("for ( Integer select : relatedEntities.getSelected() ) {");
 
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("if ( select != null ) {");
         bodyBuilder.indent();
         bodyBuilder
-                .appendFormalLine("list.getList().add(entities.getList().get(select));");
+                .appendFormalLine("list.getList().add(relatedEntities.getList().get(select));");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
         bodyBuilder.indentRemove();
@@ -1739,16 +1727,16 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
      * Returns the list of parameter names for the methods
      * <p>
      * Returns:<br/>
-     * <code>entities, bindingResult, httpServletRequest</code>
+     * <code>relatedEntities, bindingResult, httpServletRequest</code>
      * </p>
      * 
      * @return
      */
     private List<JavaSymbolName> getMethodParameterNames() {
-        // Define method parameter names (entities, bindingResult,
+        // Define method parameter names (relatedEntities, bindingResult,
         // httpServletRequest)
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-        parameterNames.add(new JavaSymbolName("entities"));
+        parameterNames.add(new JavaSymbolName("relatedEntities"));
         parameterNames.add(new JavaSymbolName("bindingResult"));
         // parameterNames.add(new JavaSymbolName("uiModel"));
         parameterNames.add(new JavaSymbolName("httpServletRequest"));
@@ -1761,7 +1749,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
      * Example:<br/>
      * <code>
      * if ( !bindingResult.hasErrors() ) {<br/>
-     * &nbsp;&nbsp;Car.persist(filterList(entities));<br/>
+     * &nbsp;&nbsp;Car.persist(filterList(relatedEntities));<br/>
      * }<br/>
      * return getRefererRedirectViewName(httpServletRequest);
      * </code>
@@ -1780,7 +1768,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver()).concat(".")
                 .concat(persistenceMethod.getName())
-                .concat("(filterList(entities));"));
+                .concat("(filterList(relatedEntities));"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("} else {");
         bodyBuilder.indent();
@@ -1795,11 +1783,11 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
     }
 
     /**
-     * Remove from <code>typesForPopulate</code> those types that are being
+     * Remove from <code>relatedFields</code> those types that are being
      * returned in any other populate method (these methods have ModelAttribute
      * method annotation)
      * 
-     * @param typesForPopulate
+     * @param relatedFields
      */
     private void filterAlreadyPopulatedTypes(
             SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate) {
@@ -1857,7 +1845,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
     }
 
     public SortedMap<JavaType, JavaTypeMetadataDetails> getRelatedApplicationTypeMetadata() {
-        return this.entities;
+        return this.relatedEntities;
     }
 
     public List<String> getDefinedPatterns() {

@@ -173,10 +173,10 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
         MemberDetails entityDetails = getMemberDetails(entityMetadata);
         MemberHoldingTypeDetails entityPersistentDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(
                         entityDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
-        SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata = webMetadataService.getRelatedApplicationTypeMetadata(
+        SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities = webMetadataService.getRelatedApplicationTypeMetadata(
         		entity, entityDetails, mid);
-        if (entityPersistentDetails == null || relatedApplicationTypeMetadata == null || relatedApplicationTypeMetadata.get(entity) == null
-                || relatedApplicationTypeMetadata.get(entity).getPersistenceDetails() == null) {
+        if (entityPersistentDetails == null || relatedEntities == null || relatedEntities.get(entity) == null
+                || relatedEntities.get(entity).getPersistenceDetails() == null) {
         	
             return null;
         }
@@ -195,16 +195,22 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
 
         MemberDetails controllerDetails = getMemberDetails(controllerMetadata);
 
-        Map<JavaSymbolName, DateTimeFormatDetails> dateTypes = webMetadataService.getDatePatterns(
+        Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes = webMetadataService.getDatePatterns(
         		entity, entityDetails, mid);
 
         // Install Dialog Bean
-        OperationUtils.installWebDialogClass(aspect.getPackage().getFullyQualifiedPackageName().concat(".dialog"), projectOperations.getPathResolver(), fileManager);
+        OperationUtils.installWebDialogClass(
+        		aspect.getPackage().getFullyQualifiedPackageName().concat(".dialog"), projectOperations.getPathResolver(), fileManager);
+        
+        // Related fields and dates
+        SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields = getRelationFieldsDetails(
+        		mid, controllerMetadata, entity, webMetadataService);
+        Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates = getRelationFieldsDateFormat(
+        		mid, controllerMetadata, entity, webMetadataService);
 
         // Pass dependencies required by the metadata in through its constructor
-        return new PatternMetadata(mid, aspect, controllerMetadata, webScaffoldMetadata, patternList, controllerDetails, entityMetadata,
-                relatedApplicationTypeMetadata, getRelationFieldsDetails(mid, controllerMetadata, entity, webMetadataService), 
-                getRelationFieldsDateFormat(mid, controllerMetadata, entity, webMetadataService), dateTypes);
+        return new PatternMetadata(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata,
+        		patternList, entityMetadata, relatedEntities, relatedFields, relatedDates, entityDateTypes);
     }
 
     /**
