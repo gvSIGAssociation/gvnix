@@ -18,6 +18,8 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -28,10 +30,21 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffold
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
+import org.springframework.roo.classpath.details.MethodMetadata;
+import org.springframework.roo.classpath.details.MethodMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
+import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
+import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
+import org.springframework.roo.classpath.itd.ItdSourceFileComposer;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
+import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
@@ -62,9 +75,92 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
     	
         super(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patterns,
         		entityMetadata, masterEntityDetails, relatedEntities, relatedFields, relatedDates, entityDateTypes);
+
+        List<String> tabularEditPatterns = getPatternTypeDefined(WebPatternType.tabular_edit_register, this.patterns);
+        if (!tabularEditPatterns.isEmpty()) {
+        	
+            for (String tabularEditPattern : tabularEditPatterns) {
+            	
+            	// Method only exists when this is a detail pattern (has master entity)
+            	builder.addMethod(getCreateFormMethod(tabularEditPattern));
+            }
+        }
         
+        // Create a representation of the desired output ITD
+        itdTypeDetails = builder.build();
+        new ItdSourceFileComposer(itdTypeDetails);
+
         Assert.isTrue(isValid(mid), "Metadata identification string '" + mid + "' does not appear to be a valid");
     }
+
+	/**
+	 * @see org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.getCreateFormMethod
+	 * 
+	 * @param patternName
+	 * @return
+	 */
+	protected MethodMetadata getCreateFormMethod(String patternName) {
+		
+        Assert.notNull(masterEntity, "Master entity required to generate createForm");
+        Assert.notNull(masterEntityDetails, "Master entity metadata required to generate createForm");
+		
+		JavaSymbolName methodName = new JavaSymbolName("createForm" + patternName);
+
+		List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>();
+		List<AnnotationMetadata> patternAnnotations = new ArrayList<AnnotationMetadata>();
+		AnnotationMetadataBuilder patternRequestParam = new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.RequestParam"));
+		patternRequestParam.addStringAttribute("value", "gvnixpattern");
+		patternRequestParam.addBooleanAttribute("required", true);
+		patternAnnotations.add(patternRequestParam.build());
+		paramTypes.add(new AnnotatedJavaType(new JavaType("java.lang.String"), patternAnnotations));
+		List<AnnotationMetadata> referenceAnnotations = new ArrayList<AnnotationMetadata>();
+		AnnotationMetadataBuilder referenceRequestParam = new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.RequestParam"));
+		referenceRequestParam.addStringAttribute("value", "gvnixreference");
+		referenceRequestParam.addBooleanAttribute("required", true);
+		referenceAnnotations.add(referenceRequestParam.build());
+		paramTypes.add(new AnnotatedJavaType(new JavaType(masterEntityDetails.getPersistenceDetails().getIdentifierField().getFieldType().getFullyQualifiedTypeName()), referenceAnnotations));
+		paramTypes.add(new AnnotatedJavaType(new JavaType("org.springframework.ui.Model"), null));
+		
+		MethodMetadata method = methodExists(methodName, paramTypes);
+		if (method != null) {
+			return null;
+		}
+
+		List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
+		paramNames.add(new JavaSymbolName("gvnixpattern"));
+		paramNames.add(new JavaSymbolName("gvnixreference"));
+		paramNames.add(new JavaSymbolName("uiModel"));
+
+		List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+		List<StringAttributeValue> values = new ArrayList<StringAttributeValue>();
+		values.add(new StringAttributeValue(new JavaSymbolName("value"), "form"));
+		values.add(new StringAttributeValue(new JavaSymbolName("value"), "gvnixpattern=" + patternName));
+		values.add(new StringAttributeValue(new JavaSymbolName("value"), "gvnixreference"));
+		requestMappingAttributes.add(new ArrayAttributeValue<StringAttributeValue>(new JavaSymbolName("params"), values));
+		requestMappingAttributes.add(new EnumAttributeValue(new JavaSymbolName("method"), new EnumDetails(new JavaType("org.springframework.web.bind.annotation.RequestMethod"), new JavaSymbolName("GET"))));
+		AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.RequestMapping"), requestMappingAttributes);
+		List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>();
+		annotations.add(requestMapping);
+
+		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+		bodyBuilder.appendFormalLine(masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + " " + masterEntity.getSimpleTypeName().toLowerCase() + " = " + masterEntity.getSimpleTypeName() + "." + masterEntityDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+		bodyBuilder.appendFormalLine(entity.getSimpleTypeName() + " " + entity.getSimpleTypeName().toLowerCase() + " = new " + entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
+		// TODO Validate if detail pattern field is referencing entity pattern primary key field 
+		bodyBuilder.appendFormalLine(entity.getSimpleTypeName().toLowerCase() + ".set" + masterEntity.getSimpleTypeName() + "(" + masterEntity.getSimpleTypeName().toLowerCase() + ");");
+		// Add attribute with identical name as required by Roo create page
+		bodyBuilder.appendFormalLine("uiModel.addAttribute(\"" + uncapitalize(entity.getSimpleTypeName()) + "\", " + entity.getSimpleTypeName().toLowerCase() + ");");
+		if (!entityDateTypes.isEmpty()) {
+			bodyBuilder.appendFormalLine("addDateTimeFormatPatterns(uiModel);");
+		}
+		
+		// TODO Remove dependencies or add it from entity pattern ?
+
+		bodyBuilder.appendFormalLine("return \"" + webScaffoldMetadata.getAnnotationValues().getPath() + "/create\";");
+
+		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT, paramTypes, paramNames, bodyBuilder);
+		methodBuilder.setAnnotations(annotations);
+		return methodBuilder.build();
+	}
 
     // Typically, no changes are required beyond this point
 

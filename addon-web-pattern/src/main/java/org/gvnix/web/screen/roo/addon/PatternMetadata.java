@@ -30,6 +30,7 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.itd.ItdSourceFileComposer;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
@@ -61,7 +62,11 @@ public class PatternMetadata extends AbstractPatternMetadata {
     	
         super(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patterns,
         		entityMetadata, null, relatedEntities, relatedFields, relatedDates, entityDateTypes);
-        
+
+        // Create a representation of the desired output ITD
+        itdTypeDetails = builder.build();
+        new ItdSourceFileComposer(itdTypeDetails);
+
         Assert.isTrue(isValid(mid), "Metadata identification string '" + mid + "' does not appear to be a valid");
     }
 
