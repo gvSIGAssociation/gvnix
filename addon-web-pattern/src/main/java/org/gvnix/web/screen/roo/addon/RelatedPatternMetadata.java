@@ -57,60 +57,48 @@ import org.springframework.roo.support.util.Assert;
  */
 public class RelatedPatternMetadata extends AbstractPatternMetadata {
 
-    private static final String PROVIDES_TYPE_STRING = RelatedPatternMetadata.class
-            .getName();
-    private static final String PROVIDES_TYPE = MetadataIdentificationUtils
-            .create(PROVIDES_TYPE_STRING);
+    private static final String PROVIDES_TYPE_STRING = RelatedPatternMetadata.class.getName();
+    private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
 
-    public RelatedPatternMetadata(
-            String identifier,
-            JavaType aspectName,
-            PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            WebScaffoldMetadata webScaffoldMetadata,
-            WebScaffoldAnnotationValues annotationValues,
-            List<StringAttributeValue> definedPatterns,
-            List<MethodMetadata> controllerMethods,
-            List<FieldMetadata> controllerFields,
-            SortedMap<JavaType, JavaTypeMetadataDetails> relatedApplicationTypeMetadata,
-            SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
-            Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes,
-            MetadataService metadataService,
-            PropFileOperations propFileOperations, PathResolver pathResolver,
-            FileManager fileManager,
+    public RelatedPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controller, WebScaffoldMetadata webScaffoldMetadata, 
+    		WebScaffoldAnnotationValues webScaffoldValues, List<StringAttributeValue> patterns, List<MethodMetadata> controllerMethods,
+            List<FieldMetadata> controllerFields, SortedMap<JavaType, JavaTypeMetadataDetails> entitiesDetails,
+            SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate, Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes,
+            MetadataService metadataService, PropFileOperations propFileOperations, PathResolver pathResolver, FileManager fileManager,
             Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
-        super(identifier, aspectName, governorPhysicalTypeMetadata,
-                webScaffoldMetadata, annotationValues, definedPatterns,
-                controllerMethods, controllerFields,
-                relatedApplicationTypeMetadata, typesForPopulate,
-                relationsDateTypes, metadataService, pathResolver, fileManager,
-                dateTypes);
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
-                + identifier + "' does not appear to be a valid");
+    	
+        super(mid, aspect, controller, webScaffoldMetadata, webScaffoldValues, patterns,
+                controllerMethods, controllerFields, entitiesDetails, typesForPopulate,
+                relationsDateTypes, metadataService, pathResolver, fileManager, dateTypes);
+        
+        Assert.isTrue(isValid(mid), "Metadata identification string '" + mid + "' does not appear to be a valid");
     }
 
     // Typically, no changes are required beyond this point
 
     public static final String getMetadataIdentiferType() {
+    	
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
-        return PhysicalTypeIdentifierNamingUtils.createIdentifier(
-                PROVIDES_TYPE_STRING, javaType, path);
+    public static final String createIdentifier(JavaType controller, Path path) {
+    	
+        return PhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, controller, path);
     }
 
-    public static final JavaType getJavaType(String metadataIdentificationString) {
-        return PhysicalTypeIdentifierNamingUtils.getJavaType(
-                PROVIDES_TYPE_STRING, metadataIdentificationString);
+    public static final JavaType getJavaType(String mid) {
+    	
+        return PhysicalTypeIdentifierNamingUtils.getJavaType(PROVIDES_TYPE_STRING, mid);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
-        return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
-                metadataIdentificationString);
+    public static final Path getPath(String mid) {
+    	
+        return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, mid);
     }
 
-    public static boolean isValid(String metadataIdentificationString) {
-        return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING,
-                metadataIdentificationString);
+    public static boolean isValid(String mid) {
+    	
+        return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING, mid);
     }
+    
 }
