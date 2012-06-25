@@ -211,6 +211,32 @@ public class PatternServicesImpl implements PatternService {
         
 		return patternValues;
 	}
+	
+    /** {@inheritDoc} */
+	public List<StringAttributeValue> getRelatedPatternAttributes(JavaType controllerClass) {
+		
+        List<StringAttributeValue> patternValues = new ArrayList<StringAttributeValue>();
+
+		// Get @GvNIXPattern annotation from controller
+        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
+        AnnotationMetadata patternAnnotationMetadata = MemberFindingUtils.getAnnotationOfType(
+        		mutableTypeDetails.getAnnotations(), WebScreenOperationsImpl.RELATED_PATTERN_ANNOTATION);
+        if (patternAnnotationMetadata != null) {
+
+	        // look for pattern name in @GvNIXPattern values
+	        AnnotationAttributeValue<?> patternAnnotationValues = patternAnnotationMetadata
+	                .getAttribute(WebScreenOperationsImpl.RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
+	        
+	        if (patternAnnotationValues != null) {
+	        
+	        	@SuppressWarnings("unchecked")
+	        	List<StringAttributeValue> values = (List<StringAttributeValue>)patternAnnotationValues.getValue();
+	        	patternValues.addAll(values);
+	        }
+        }
+        
+		return patternValues;
+	}
 
 	/** {@inheritDoc} */
     public boolean patternExists(List<StringAttributeValue> patternValues, JavaSymbolName name) {

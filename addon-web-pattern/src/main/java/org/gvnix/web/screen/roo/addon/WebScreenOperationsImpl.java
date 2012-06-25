@@ -146,7 +146,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         // Get mutableTypeDetails from controllerClass. Also checks javaType is a controller
         MutableClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerMutableTypeDetails(controllerClass);
 
-        // Previosly check if some pattern name is repeated
+        // Check if there are pattern names used more than once in project
         Assert.isTrue(!patternService.isPatternDuplicated(name.getSymbolName()),
         		"There is a pattern name used more than once in the project");
 
@@ -159,9 +159,6 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         AnnotationMetadata annotationMetadata = MemberFindingUtils
                 .getAnnotationOfType(controllerDetails.getAnnotations(),
                         PATTERN_ANNOTATION);
-
-        // Check if there are pattern names used more than once in project
-        Assert.isTrue(!patternService.isPatternDuplicated(null), "There is a pattern name used more than once in the project");
 
         // Get pattern attributes of the controller
         List<StringAttributeValue> patternList = patternService.getPatternAttributes(controllerClass);

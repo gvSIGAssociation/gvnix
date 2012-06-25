@@ -161,7 +161,7 @@ public final class RelatedPatternMetadataProvider extends AbstractPatternMetadat
         Assert.isTrue(!patternService.isPatternDuplicated(null), "There is a pattern name used more than once in the project");
 
         // Get pattern attributes of the controller
-        List<StringAttributeValue> patternList = patternService.getPatternAttributes(controllerType);
+        List<StringAttributeValue> patternList = patternService.getRelatedPatternAttributes(controllerType);
 
         // Lookup the form backing object's metadata and check that
         JavaType entity = annotationValues.getFormBackingObject();

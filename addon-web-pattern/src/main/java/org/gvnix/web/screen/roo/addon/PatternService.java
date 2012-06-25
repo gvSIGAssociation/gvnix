@@ -102,11 +102,23 @@ public interface PatternService {
     /**
      * Get pattern attributes of a controller java type.
      * 
+     * <p>Get pattern attributes from @GvNIXPattern</p>
+     * 
      * @param controllerClass Controller java type
      * @return Pattern attributes list
      */
     public List<StringAttributeValue> getPatternAttributes(JavaType controllerClass);
     
+    /**
+     * Get related pattern attributes of a controller java type.
+     *
+     * <p>Get pattern attributes from @GvNIXRelatedPattern</p>
+     * 
+     * @param controllerClass Controller java type
+     * @return Related pattern attributes list
+     */
+    public List<StringAttributeValue> getRelatedPatternAttributes(JavaType controllerClass);
+
     /**
      * Given a pattern name says if it exists defined as Master pattern in
      * GvNIXPattern attributes
