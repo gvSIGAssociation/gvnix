@@ -21,7 +21,6 @@ package org.gvnix.web.screen.roo.addon;
 import java.beans.Introspector;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,14 +30,12 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.gvnix.support.OperationUtils;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
@@ -58,14 +55,11 @@ import org.springframework.roo.classpath.details.annotations.StringAttributeValu
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.itd.ItdSourceFileComposer;
-import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.style.ToStringCreator;
 import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.StringUtils;
@@ -86,8 +80,7 @@ import org.springframework.roo.support.util.StringUtils;
  *         Transport</a>
  * @since 0.8
  */
-public abstract class AbstractPatternMetadata extends
-        AbstractItdTypeDetailsProvidingMetadataItem {
+public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 
     private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(GvNIXEntityBatch.class.getName());
 
@@ -104,15 +97,16 @@ public abstract class AbstractPatternMetadata extends
     private List<FieldMetadata> controllerFields;
     private Map<JavaSymbolName, DateTimeFormatDetails> dateTypes;
     private String aspectControllerPackageFullyName;
-    private MetadataService metadataService;
+    private PhysicalTypeMetadata entityMetadata;
 
     public AbstractPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controller, WebScaffoldMetadata webScaffoldMetadata,
-            WebScaffoldAnnotationValues webScaffoldValues, List<StringAttributeValue> patterns, List<MethodMetadata> controllerMethods,
-            List<FieldMetadata> controllerFields, SortedMap<JavaType, JavaTypeMetadataDetails> entitiesDetails,
-            SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate, Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes,
-            MetadataService metadataService, PathResolver pathResolver, FileManager fileManager, Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
+            List<StringAttributeValue> patterns, MemberDetails controllerDetails, PhysicalTypeMetadata entityMetadata, 
+            SortedMap<JavaType, JavaTypeMetadataDetails> entitiesDetails, SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate, 
+            Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes, Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
     	
         super(mid, aspect, controller);
+        
+        WebScaffoldAnnotationValues webScaffoldValues = new WebScaffoldAnnotationValues(controller);
         
         // Required parameters: Web scaffold information and entities details (entity and optional master entity)
         Assert.notNull(webScaffoldMetadata, "Web scaffold metadata required");
@@ -127,12 +121,14 @@ public abstract class AbstractPatternMetadata extends
         
         this.webScaffoldMetadata = webScaffoldMetadata;
         this.entity = webScaffoldValues.getFormBackingObject();
-        this.controllerMethods = controllerMethods;
-        this.controllerFields = controllerFields;
+        this.entityMetadata = entityMetadata;
         this.entities = entitiesDetails;
         this.entityDetails = entitiesDetails.get(entity);
         this.dateTypes = dateTypes;
         
+        this.controllerMethods = MemberFindingUtils.getMethods(controllerDetails);
+        this.controllerFields = MemberFindingUtils.getFields(controllerDetails);
+		
         this.masterEntity = null;
         this.masterEntityDetails = null;
     	if (this instanceof RelatedPatternMetadata) {
@@ -157,7 +153,6 @@ public abstract class AbstractPatternMetadata extends
         
         this.typesForPopulate = typesForPopulate;
         this.relationsDateTypes = relationsDateTypes;
-        this.metadataService = metadataService;
 
         // TODO: Take care of attributes "create, update, delete" in RooWebScaffold annotation
         List<String> definedPatternsList = new ArrayList<String>();
@@ -168,9 +163,6 @@ public abstract class AbstractPatternMetadata extends
 
         this.aspectControllerPackageFullyName = aspect.getPackage().getFullyQualifiedPackageName();
         
-        // Install Dialog Bean
-        OperationUtils.installWebDialogClass(this.aspectControllerPackageFullyName.concat(".dialog"), pathResolver, fileManager);
-
         this.patterns = Collections.unmodifiableList(definedPatternsList);
 
         builder.addField(getDefinedPatternField());
@@ -234,7 +226,7 @@ public abstract class AbstractPatternMetadata extends
 	            if (masterEntity != null) {
 	            
 	            	// Method only exists when this is a detail pattern (has master entity)
-	            	builder.addMethod(getCreateFormMethod(tabularEditPattern, entitiesDetails.values()));
+	            	builder.addMethod(getCreateFormMethod(tabularEditPattern));
 	            }
             }
             
@@ -503,10 +495,9 @@ public abstract class AbstractPatternMetadata extends
 	 * @see org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.getCreateFormMethod
 	 * 
 	 * @param patternName
-	 * @param dependentTypes
 	 * @return
 	 */
-	protected MethodMetadata getCreateFormMethod(String patternName, Collection<JavaTypeMetadataDetails> dependentTypes) {
+	protected MethodMetadata getCreateFormMethod(String patternName) {
 		
         Assert.notNull(masterEntity, "Master entity required to generate createForm");
         Assert.notNull(masterEntityDetails, "Master entity metadata required to generate createForm");
@@ -819,18 +810,9 @@ public abstract class AbstractPatternMetadata extends
      * @return
      */
     private MutableClassOrInterfaceTypeDetails getMutableTypeDetailsFormbakingObject() {
-        // Retrieve metadata for the Java source type the annotation is being
-        // added to
-        String formBackingTypeId = PhysicalTypeIdentifier.createIdentifier(
-                entity, Path.SRC_MAIN_JAVA);
-        if (formBackingTypeId == null) {
-            throw new IllegalArgumentException("Cannot locate source for '"
-                    + entity.getFullyQualifiedTypeName() + "'");
-        }
 
         // Obtain the physical type and itd mutable details
-        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
-                .get(formBackingTypeId, true);
+        PhysicalTypeMetadata physicalTypeMetadata = this.entityMetadata;
         Assert.notNull(physicalTypeMetadata,
                 "Java source code unavailable for type ".concat(entity
                         .getFullyQualifiedTypeName()));
@@ -984,17 +966,6 @@ public abstract class AbstractPatternMetadata extends
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         String entityNamePlural = entityDetails.getPlural();
 
-        // XXX: Following code generates the part of this method validating
-        // defined patterns against a request. By now, we don't want to validate
-        // them
-
-        // bodyBuilder.appendFormalLine("if ( !isPatternDefined(pattern) ) {");
-        // bodyBuilder.indent();
-        // bodyBuilder.appendFormalLine("return \"redirect:/".concat(
-        // entityNamePlural.toLowerCase()).concat("\";"));
-        // bodyBuilder.indentRemove();
-        // bodyBuilder.appendFormalLine("}");
-
         List<JavaType> typeParams = new ArrayList<JavaType>();
         typeParams.add(entity);
 
@@ -1035,34 +1006,6 @@ public abstract class AbstractPatternMetadata extends
         // May we need to populate some Model Attributes with the data of
         // related entities
         addBodyLinesPopulatingRelatedEntitiesData(bodyBuilder);
-        // for (JavaType type : typesForPopulate.keySet()) {
-        // JavaTypeMetadataDetails javaTypeMd = typesForPopulate.get(type);
-        // JavaTypePersistenceMetadataDetails javaTypePersistenceMd = javaTypeMd
-        // .getPersistenceDetails();
-        // if (javaTypePersistenceMd != null
-        // && javaTypePersistenceMd.getFindAllMethod() != null) {
-        // bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-        // .concat(javaTypeMd.getPlural().toLowerCase())
-        // .concat("\", ")
-        // .concat(type.getNameIncludingTypeParameters(false,
-        // builder.getImportRegistrationResolver()))
-        // .concat(".")
-        // .concat(javaTypePersistenceMd.getFindAllMethod()
-        // .getMethodName().getSymbolName())
-        // .concat("());"));
-        // } else if (javaTypeMd.isEnumType()) {
-        // JavaType arrays = new JavaType("java.util.Arrays");
-        // bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
-        // .concat(javaTypeMd.getPlural().toLowerCase())
-        // .concat("\", ")
-        // .concat(arrays.getNameIncludingTypeParameters(false,
-        // builder.getImportRegistrationResolver()))
-        // .concat(".asList(")
-        // .concat(type.getNameIncludingTypeParameters(false,
-        // builder.getImportRegistrationResolver()))
-        // .concat(".class.getEnumConstants()));"));
-        // }
-        // }
 
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
                 .concat(entityNamePlural.toLowerCase()).concat("Tab\", ")

@@ -108,7 +108,7 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
      */
     @Override
     protected abstract ItdTypeDetailsProvidingMetadataItem getMetadata(
-            String mid, JavaType aspect, PhysicalTypeMetadata controller, String fileName);
+            String mid, JavaType aspect, PhysicalTypeMetadata controller, String file);
 
     /**
      * Read the values of GvNIXRelationsPattern and for each field defined as relation retrieve its java type details.

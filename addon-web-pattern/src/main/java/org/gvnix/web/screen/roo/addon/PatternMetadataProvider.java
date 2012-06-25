@@ -26,6 +26,7 @@ import java.util.SortedMap;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.gvnix.support.OperationUtils;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
@@ -153,8 +154,8 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
         }
 
         // We know governor type details are non-null and can be safely cast
-        ClassOrInterfaceTypeDetails controllerDetails = (ClassOrInterfaceTypeDetails) controllerMetadata.getMemberHoldingTypeDetails();
-        Assert.notNull(controllerDetails, "Governor failed to provide class type details, in violation of superclass contract");
+        ClassOrInterfaceTypeDetails controllerTypeDetails = (ClassOrInterfaceTypeDetails) controllerMetadata.getMemberHoldingTypeDetails();
+        Assert.notNull(controllerTypeDetails, "Governor failed to provide class type details, in violation of superclass contract");
 
         // Check if there are pattern names used more than once in project
         Assert.isTrue(!patternService.isPatternDuplicated(null), "There is a pattern name used more than once in the project");
@@ -192,17 +193,18 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
         entityToWebScaffoldMidMap.put(entity, mid);
         webScaffoldMidToEntityMap.put(mid, entity);
 
-        MemberDetails memberDetails = getMemberDetails(controllerMetadata);
+        MemberDetails controllerDetails = getMemberDetails(controllerMetadata);
 
         Map<JavaSymbolName, DateTimeFormatDetails> dateTypes = webMetadataService.getDatePatterns(
         		entity, entityDetails, mid);
 
+        // Install Dialog Bean
+        OperationUtils.installWebDialogClass(aspect.getPackage().getFullyQualifiedPackageName().concat(".dialog"), projectOperations.getPathResolver(), fileManager);
+
         // Pass dependencies required by the metadata in through its constructor
-        return new PatternMetadata(mid, aspect, controllerMetadata, webScaffoldMetadata, webScaffoldAnnotationValues, patternList, 
-        		MemberFindingUtils.getMethods(memberDetails), MemberFindingUtils.getFields(memberDetails),
+        return new PatternMetadata(mid, aspect, controllerMetadata, webScaffoldMetadata, patternList, controllerDetails, entityMetadata,
                 relatedApplicationTypeMetadata, getRelationFieldsDetails(mid, controllerMetadata, entity, webMetadataService), 
-                getRelationFieldsDateFormat(mid, controllerMetadata, entity, webMetadataService), metadataService,
-                propFileOperations, projectOperations.getPathResolver(), fileManager, dateTypes);
+                getRelationFieldsDateFormat(mid, controllerMetadata, entity, webMetadataService), dateTypes);
     }
 
     /**

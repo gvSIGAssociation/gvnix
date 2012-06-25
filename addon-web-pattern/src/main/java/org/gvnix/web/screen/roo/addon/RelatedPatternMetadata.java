@@ -22,25 +22,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
-import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
-import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -61,15 +55,12 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
 
     public RelatedPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controller, WebScaffoldMetadata webScaffoldMetadata, 
-    		WebScaffoldAnnotationValues webScaffoldValues, List<StringAttributeValue> patterns, List<MethodMetadata> controllerMethods,
-            List<FieldMetadata> controllerFields, SortedMap<JavaType, JavaTypeMetadataDetails> entitiesDetails,
-            SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate, Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes,
-            MetadataService metadataService, PropFileOperations propFileOperations, PathResolver pathResolver, FileManager fileManager,
-            Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
+    		List<StringAttributeValue> patterns, MemberDetails controllerDetails, PhysicalTypeMetadata entityMetadata,
+    		SortedMap<JavaType, JavaTypeMetadataDetails> entitiesDetails, SortedMap<JavaType, JavaTypeMetadataDetails> typesForPopulate,
+    		Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relationsDateTypes, Map<JavaSymbolName, DateTimeFormatDetails> dateTypes) {
     	
-        super(mid, aspect, controller, webScaffoldMetadata, webScaffoldValues, patterns,
-                controllerMethods, controllerFields, entitiesDetails, typesForPopulate,
-                relationsDateTypes, metadataService, pathResolver, fileManager, dateTypes);
+        super(mid, aspect, controller, webScaffoldMetadata, patterns, controllerDetails, entityMetadata, entitiesDetails, typesForPopulate,
+                relationsDateTypes, dateTypes);
         
         Assert.isTrue(isValid(mid), "Metadata identification string '" + mid + "' does not appear to be a valid");
     }
