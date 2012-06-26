@@ -76,21 +76,29 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         super(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patterns,
         		entityMetadata, masterEntityDetails, relatedEntities, relatedFields, relatedDates, entityDateTypes);
 
+        if (!isValid()) {
+        
+        	// This metadata instance not be already produced at the time of instantiation (will retry)
+            return;
+        }
+        
         List<String> tabularEditPatterns = getPatternTypeDefined(WebPatternType.tabular_edit_register, this.patterns);
         if (!tabularEditPatterns.isEmpty()) {
         	
             for (String tabularEditPattern : tabularEditPatterns) {
             	
-            	// Method only exists when this is a detail pattern (has master entity)
-            	builder.addMethod(getCreateFormMethod(tabularEditPattern));
+            	// Master entity can be null ...
+	            if (masterEntity != null) {
+
+	            	// Method only exists when this is a detail pattern (has master entity)
+	            	builder.addMethod(getCreateFormMethod(tabularEditPattern));
+	            }
             }
         }
         
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
         new ItdSourceFileComposer(itdTypeDetails);
-
-        Assert.isTrue(isValid(mid), "Metadata identification string '" + mid + "' does not appear to be a valid");
     }
 
 	/**

@@ -36,7 +36,6 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * This type produces metadata for a new ITD. It uses an
@@ -63,11 +62,15 @@ public class PatternMetadata extends AbstractPatternMetadata {
         super(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patterns,
         		entityMetadata, null, relatedEntities, relatedFields, relatedDates, entityDateTypes);
 
+        if (!isValid()) {
+        
+        	// This metadata instance not be already produced at the time of instantiation (will retry)
+            return;
+        }
+        
         // Create a representation of the desired output ITD
         itdTypeDetails = builder.build();
         new ItdSourceFileComposer(itdTypeDetails);
-
-        Assert.isTrue(isValid(mid), "Metadata identification string '" + mid + "' does not appear to be a valid");
     }
 
     // Typically, no changes are required beyond this point
