@@ -20,6 +20,7 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -98,12 +99,8 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         	
             for (String tabularEditPattern : tabularEditPatterns) {
             	
-            	// Master entity can be null ...
-	            if (masterEntity != null) {
-
-	            	// Method only exists when this is a detail pattern (has master entity)
-	            	builder.addMethod(getCreateFormMethod(tabularEditPattern));
-	            }
+            	// Method only exists when this is a detail pattern (has master entity)
+            	builder.addMethod(getCreateFormMethod(tabularEditPattern));
             }
         }
         
@@ -194,26 +191,63 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		 */
 		String masterEntityName = masterEntity.getSimpleTypeName();
 		String entityName = entity.getSimpleTypeName();
-		bodyBuilder.appendFormalLine(
-				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
-				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
-						masterEntityTypeDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
-		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
-						entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
+
 		
 		// Get field from entity related with some master entity defined into the fields names list
-		FieldMetadata fieldMetadata = getField();
-        if (fieldMetadata == null) {
+		FieldMetadata relationField = getFieldRelationMasterEntity();
+		// TODO Unify next 3 cases code
+        if (relationField == null) {
         	
         	// TODO This case is already required ? 
+        	
+    		bodyBuilder.appendFormalLine(
+    				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
+    				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
+    						masterEntityTypeDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+    		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
+    						entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
     		bodyBuilder.appendFormalLine(
     				entityName.toLowerCase() + ".set" + masterEntityName + "(" + masterEntityName.toLowerCase() + ");");
         }
+        else if (entityTypeDetails.getPersistenceDetails().getRooIdentifierFields().contains(relationField)) {
+        	
+            // TODO When field metadata in composite roo identifier: use PK constructor
+        	bodyBuilder.append(entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getNameIncludingTypeParameters(
+        			false, builder.getImportRegistrationResolver()) + 
+        			" " + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getSimpleTypeName().toLowerCase() +
+        			" = new " + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getNameIncludingTypeParameters(
+        					false, builder.getImportRegistrationResolver()) + "(");
+        	Iterator<FieldMetadata> fields = entityTypeDetails.getPersistenceDetails().getRooIdentifierFields().iterator();
+        	while (fields.hasNext()) {
+        		FieldMetadata field = fields.next();
+        		if (field.getFieldName().equals(relationField.getFieldName())) {
+        			bodyBuilder.append("gvnixreference");	
+        		}
+        		else {
+        			bodyBuilder.append("null");
+        		}
+        		if (fields.hasNext()) {
+        			bodyBuilder.append(", ");
+        		}
+			}
+        	bodyBuilder.append(");");
+        	bodyBuilder.newLine(true);
+    		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
+					entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
+    		bodyBuilder.appendFormalLine(entityName.toLowerCase() + ".set" + 
+					entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldName().getSymbolNameCapitalisedFirstLetter() +
+					"(" + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getSimpleTypeName().toLowerCase() + ");");
+        }
         else {
         	
-            // TODO When field metadata in composite roo identifier: use PK constructor   
+    		bodyBuilder.appendFormalLine(
+    				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
+    				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
+    						masterEntityTypeDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+    		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
+    						entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
 			bodyBuilder.appendFormalLine(
-					entityName.toLowerCase() + ".set" + fieldMetadata.getFieldName().getSymbolNameCapitalisedFirstLetter() + "(" + masterEntityName.toLowerCase() + ");");
+					entityName.toLowerCase() + ".set" + relationField.getFieldName().getSymbolNameCapitalisedFirstLetter() + "(" + masterEntityName.toLowerCase() + ");");
         }
 		
 		// Add attribute with identical name as required by Roo create page
@@ -243,7 +277,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 	 * @param entityTypeDetails Entity details
 	 * @return Entity field related with master entity field
 	 */
-	protected FieldMetadata getField() {
+	protected FieldMetadata getFieldRelationMasterEntity() {
 		
         FieldMetadata field = null;
 
@@ -270,21 +304,17 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 	        List<FieldMetadata> fields = MemberFindingUtils.getFields(entityDetails);
 	        fields.addAll(entityTypeDetails.getPersistenceDetails().getRooIdentifierFields());
 	        for (FieldMetadata tmpField : fields) {
-				
-	        	// TODO Remove this check ?
-	        	if (tmpField != null) {
+
+	        	List<AnnotationMetadata> fieldAnnotations = tmpField.getAnnotations();
+	        	for (AnnotationMetadata annotationMetadata : fieldAnnotations) {
 	        		
-		        	List<AnnotationMetadata> fieldAnnotations = tmpField.getAnnotations();
-		        	for (AnnotationMetadata annotationMetadata : fieldAnnotations) {
-		        		
-						if (annotationMetadata.getAnnotationType().equals(new JavaType("javax.persistence.Column")) &&
-								masterField.getValue().toString().equals(annotationMetadata.getAttribute(
-										new JavaSymbolName("name")).getValue().toString())) {
-							
-							field = tmpField;
-						}
+					if (annotationMetadata.getAnnotationType().equals(new JavaType("javax.persistence.Column")) &&
+							masterField.getValue().toString().equals(annotationMetadata.getAttribute(
+									new JavaSymbolName("name")).getValue().toString())) {
+						
+						field = tmpField;
 					}
-	        	}
+				}
 			}
         }
         
