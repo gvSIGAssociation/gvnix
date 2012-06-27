@@ -74,7 +74,9 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
     private MemberDetails entityDetails;
     private MemberDetails masterEntityDetails;
     private Set<String> relationsFields;
-
+    private JavaType masterEntity;
+    private JavaTypeMetadataDetails masterEntityJavaDetails;
+ 
     public RelatedPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, MemberDetails controllerDetails,
     		WebScaffoldMetadata webScaffoldMetadata, List<StringAttributeValue> patterns, PhysicalTypeMetadata entityMetadata, MemberDetails entityDetails,
     		JavaTypeMetadataDetails masterEntityJavaDetails, MemberDetails masterEntityDetails, Set<String> relationsFields,
@@ -82,7 +84,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
     		Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates, Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes) {
     	
         super(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patterns, entityMetadata, 
-        		masterEntityJavaDetails, relatedEntities, relatedFields, relatedDates, entityDateTypes);
+        		relatedEntities, relatedFields, relatedDates, entityDateTypes);
 
         if (!isValid()) {
         
@@ -93,14 +95,44 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         this.entityDetails = entityDetails;
         this.masterEntityDetails = masterEntityDetails;
         this.relationsFields = relationsFields;
+        this.masterEntityJavaDetails = masterEntityJavaDetails;
+        if (masterEntityDetails != null) {
+        	this.masterEntity = masterEntityJavaDetails.getJavaType();
+        }
+
+        List<String> registerPatterns = getPatternTypeDefined(WebPatternType.register, this.patterns);
+        if (!registerPatterns.isEmpty()) {
+        	
+        	// TODO findEntries method required on this pattern ?
+            if (entityTypeDetails.getPersistenceDetails().getFindEntriesMethod() == null) {
+            	
+            	// TODO: If no find entries method, all other patterns are not generated ?
+                return;
+            }
+            
+            for (String registerPattern : registerPatterns) {
+            	
+	            builder.addMethod(getCreateMethod(registerPattern));
+	            builder.addMethod(getUpdateMethod(registerPattern));
+            }
+        }
         
         List<String> tabularEditPatterns = getPatternTypeDefined(WebPatternType.tabular_edit_register, this.patterns);
         if (!tabularEditPatterns.isEmpty()) {
-        	
+
+        	// TODO findAll method required on this pattern ?
+            if (entityTypeDetails.getPersistenceDetails().getFindAllMethod() == null) {
+            	
+            	// TODO: If no find all method, all other patterns are not generated ?
+                return;
+            }
+            
             for (String tabularEditPattern : tabularEditPatterns) {
             	
             	// Method only exists when this is a detail pattern (has master entity)
             	builder.addMethod(getCreateFormMethod(tabularEditPattern));
+	            builder.addMethod(getCreateMethod(tabularEditPattern));
+	            builder.addMethod(getUpdateMethod(tabularEditPattern));
             }
         }
         
@@ -118,7 +150,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 	protected MethodMetadata getCreateFormMethod(String patternName) {
 		
         Assert.notNull(masterEntity, "Master entity required to generate createForm");
-        Assert.notNull(masterEntityTypeDetails, "Master entity metadata required to generate createForm");
+        Assert.notNull(masterEntityJavaDetails, "Master entity metadata required to generate createForm");
 		
 		JavaSymbolName methodName = new JavaSymbolName("createForm" + patternName);
 		
@@ -146,7 +178,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		List<AnnotationMetadata> gvnixreferenceParam = new ArrayList<AnnotationMetadata>();
 		gvnixreferenceParam.add(gvnixreferenceParamBuilder.build());
 		paramTypes.add(new AnnotatedJavaType(
-				new JavaType(masterEntityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getFullyQualifiedTypeName()), 
+				new JavaType(masterEntityJavaDetails.getPersistenceDetails().getIdentifierField().getFieldType().getFullyQualifiedTypeName()), 
 				gvnixreferenceParam));
 
 		// Model uiModel
@@ -203,7 +235,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
     		bodyBuilder.appendFormalLine(
     				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
     				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
-    						masterEntityTypeDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+    						masterEntityJavaDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
     		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
     						entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
     		bodyBuilder.appendFormalLine(
@@ -243,7 +275,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
     		bodyBuilder.appendFormalLine(
     				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
     				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
-    						masterEntityTypeDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+    						masterEntityJavaDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
     		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
     						entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
 			bodyBuilder.appendFormalLine(
@@ -268,6 +300,121 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		
 		return method.build();
 	}
+
+    protected MethodMetadata getCreateMethod(String patternName) {
+    	
+    	// TODO Some code duplicated with same method in PatternMetadata
+    	
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("createPattern" + patternName);
+
+        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
+
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
+        if (method != null) {
+            // If it already exists, just return null and omit its
+            // generation via the ITD
+            return null;
+        }
+
+        List<JavaSymbolName> methodParamNames = getMethodParameterNamesCreateUpdate();
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        String entityNamePlural = entityTypeDetails.getPlural();
+        
+        
+        
+        // TODO Set master pattern reference into this entity if master has composite PK
+        
+        /*
+         *  EntityPK entitypk = new EntityPK(entity.getId().getField1(), ... gvnixreference, ... entity.getId().getFieldN());
+         *  entity.setId(entitypk);
+         */
+    	
+        
+        
+        bodyBuilder.appendFormalLine("create(".concat(
+                entity.getSimpleTypeName().toLowerCase()).concat(
+                ", bindingResult, uiModel, httpServletRequest);"));
+
+        bodyBuilder.appendFormalLine("if ( bindingResult.hasErrors() ) {");
+        bodyBuilder.indent();
+        addBodyLinesForDialogMessage(bodyBuilder, DialogType.Error,
+                "message_errorbinding_problemdescription");
+        bodyBuilder.appendFormalLine("return \"redirect:/".concat(
+                entityNamePlural.toLowerCase()).concat(
+                "?\" + refererQuery(httpServletRequest);"));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder
+        .appendFormalLine("return \""
+                .concat("redirect:/")
+                .concat(masterEntityJavaDetails.getPlural().toLowerCase())
+                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
+        
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
+
+        methodBuilder
+                .setAnnotations(getRequestMappingAnnotationCreateUpdate(RequestMethod.POST, patternName));
+
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
+    }
+
+    protected MethodMetadata getUpdateMethod(String patternName) {
+    	
+        // Specify the desired method name
+        JavaSymbolName methodName = new JavaSymbolName("updatePattern" + patternName);
+
+        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
+
+        MethodMetadata method = methodExists(methodName, methodParamTypes);
+        if (method != null) {
+        	
+            // If it already exists, just return null and omit its generation via the ITD
+            return null;
+        }
+
+        List<JavaSymbolName> methodParamNames = getMethodParameterNamesCreateUpdate();
+
+        // Create method body
+        InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        String entityNamePlural = entityTypeDetails.getPlural();
+
+        bodyBuilder.appendFormalLine("update(".concat(
+                entity.getSimpleTypeName().toLowerCase()).concat(
+                ", bindingResult, uiModel, httpServletRequest);"));
+
+        bodyBuilder.appendFormalLine("if ( bindingResult.hasErrors() ) {");
+        bodyBuilder.indent();
+        addBodyLinesForDialogMessage(bodyBuilder, DialogType.Error,
+                "message_errorbinding_problemdescription");
+        bodyBuilder.appendFormalLine("return \"redirect:/".concat(
+                entityNamePlural.toLowerCase()).concat(
+                "?\" + refererQuery(httpServletRequest);"));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+
+        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
+                .concat(masterEntityJavaDetails.getPlural().toLowerCase())
+                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
+
+        MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                methodParamTypes, methodParamNames, bodyBuilder);
+
+        methodBuilder
+                .setAnnotations(getRequestMappingAnnotationCreateUpdate(RequestMethod.PUT, patternName));
+
+        method = methodBuilder.build();
+        controllerMethods.add(method);
+        return method;
+    }
 
 	/**
 	 * Get field from entity related with some master entity defined into the fields names list.
