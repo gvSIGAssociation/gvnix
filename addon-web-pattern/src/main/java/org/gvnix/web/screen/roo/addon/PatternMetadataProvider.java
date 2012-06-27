@@ -91,6 +91,8 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
      */
     @Override
     protected void activate(ComponentContext context) {
+
+    	_patternService = patternService;
     	
         // Next line adding a notification listener over this class allow method getLocalMidToRequest(ItdTypeDetails) to be invoked
         metadataDependencyRegistry.addNotificationListener(this);

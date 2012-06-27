@@ -20,7 +20,9 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
@@ -52,6 +54,12 @@ public interface PatternService {
     
     /** Name of {@link GvNIXRelatedPattern} attribute value */
     public static final JavaSymbolName RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
+
+    /** {@link GvNIXRelationsPattern} java type */
+    public static final JavaType RELATIONSPATTERN_ANNOTATION = new JavaType(GvNIXRelationsPattern.class.getName());
+    
+    /** Name of {@link GvNIXRelationsPattern} attribute value */
+    public static final JavaSymbolName RELATIONSPATTERN_ANNOTATION_VALUE = new JavaSymbolName("value");
 
     public static final JavaType ONETOMANY_ANNOTATION = new JavaType("javax.persistence.OneToMany");
 
@@ -196,4 +204,21 @@ public interface PatternService {
      */
     public boolean isPatternTypeDefined(WebPatternType patternType, List<String> definedPatternsList);
     
+	/**
+	 * Get entity fields names defined into relations pattern annotation on its related controller. 
+	 * 
+	 * @param entity Entity java type
+	 * @return Relations pattern fields names
+	 */
+    public Set<String> getRelationsFields(JavaType entity);
+    
+    /**
+     * Read the values of GvNIXRelationsPattern and for each field defined as relation retrieve its name.
+     * 
+     * @param controller Controller metadata
+     * @return Set with the defined relations field names or null if controller is not a valid web scaffold class or 
+     * empty set if not relations pattern annotation
+     */
+    public Set<String> getRelationsFields(PhysicalTypeMetadata controller);
+ 
 }

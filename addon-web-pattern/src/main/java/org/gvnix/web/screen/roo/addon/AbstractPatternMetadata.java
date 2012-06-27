@@ -84,16 +84,16 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
     protected WebScaffoldMetadata webScaffoldMetadata;
     private SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities;
     protected JavaType entity;
-    protected JavaTypeMetadataDetails entityDetails;
+    protected JavaTypeMetadataDetails entityTypeDetails;
     protected JavaType masterEntity;
-    protected JavaTypeMetadataDetails masterEntityDetails;
+    protected JavaTypeMetadataDetails masterEntityTypeDetails;
     protected List<String> patterns;
     private SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields;
     private Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates;
     private List<MethodMetadata> controllerMethods;
     private List<FieldMetadata> controllerFields;
     protected Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes;
-    private String aspectControllerPackageFullyName;
+    private String aspectPackage;
     private PhysicalTypeMetadata entityMetadata;
 
     public AbstractPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, MemberDetails controllerDetails,
@@ -118,19 +118,19 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         this.entity = entityMetadata.getMemberHoldingTypeDetails().getName();
         this.entityMetadata = entityMetadata;
         this.relatedEntities = relatedEntities;
-        this.entityDetails = relatedEntities.get(entity);
+        this.entityTypeDetails = relatedEntities.get(entity);
         this.entityDateTypes = entityDateTypes;
         
         this.controllerMethods = MemberFindingUtils.getMethods(controllerDetails);
         this.controllerFields = MemberFindingUtils.getFields(controllerDetails);
 		
-        this.masterEntityDetails = masterEntityDetails;
+        this.masterEntityTypeDetails = masterEntityDetails;
         if (masterEntityDetails != null) {
         	this.masterEntity = masterEntityDetails.getJavaType();
         }
 
-        Assert.notNull(entityDetails, "Metadata holder required for form backing type: " + entity);
-        Assert.notNull(entityDetails.getPersistenceDetails(), "PersistenceMetadata details required for form backing type: " + entity);
+        Assert.notNull(entityTypeDetails, "Metadata holder required for form backing type: " + entity);
+        Assert.notNull(entityTypeDetails.getPersistenceDetails(), "PersistenceMetadata details required for form backing type: " + entity);
 
         WebScaffoldAnnotationValues webScaffoldValues = new WebScaffoldAnnotationValues(controllerMetadata);
         if (webScaffoldValues.isPopulateMethods()) {
@@ -148,7 +148,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
             definedPatternsList.add(definedPattern.getValue());
         }
 
-        this.aspectControllerPackageFullyName = aspect.getPackage().getFullyQualifiedPackageName();
+        this.aspectPackage = aspect.getPackage().getFullyQualifiedPackageName();
         
         this.patterns = Collections.unmodifiableList(definedPatternsList);
 
@@ -157,7 +157,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         List<String> tabularPatterns = getPatternTypeDefined(WebPatternType.tabular, this.patterns);
         if (!tabularPatterns.isEmpty()) {
         	
-            if (entityDetails.getPersistenceDetails().getFindAllMethod() == null) {
+            if (entityTypeDetails.getPersistenceDetails().getFindAllMethod() == null) {
             	
             	// TODO: If no find all method, all other patterns are not generated ?
                 return;
@@ -178,7 +178,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         List<String> registerPatterns = getPatternTypeDefined(WebPatternType.register, this.patterns);
         if (!registerPatterns.isEmpty()) {
         	
-            if (entityDetails.getPersistenceDetails().getFindEntriesMethod() == null) {
+            if (entityTypeDetails.getPersistenceDetails().getFindEntriesMethod() == null) {
             	
             	// TODO: If no find entries method, all other patterns are not generated ?
                 return;
@@ -198,7 +198,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         List<String> tabularEditPatterns = getPatternTypeDefined(WebPatternType.tabular_edit_register, this.patterns);
         if (!tabularEditPatterns.isEmpty()) {
         	
-            if (entityDetails.getPersistenceDetails().getFindAllMethod() == null) {
+            if (entityTypeDetails.getPersistenceDetails().getFindAllMethod() == null) {
             	
             	// TODO: If no find all method, all other patterns are not generated ?
                 return;
@@ -236,7 +236,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String entityNamePlural = entityDetails.getPlural();
+        String entityNamePlural = entityTypeDetails.getPlural();
 
         bodyBuilder.appendFormalLine("update(".concat(
                 entity.getSimpleTypeName().toLowerCase()).concat(
@@ -259,7 +259,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         }
         else {	
 	        bodyBuilder.appendFormalLine("return \"".concat("redirect:/")
-	                .concat(masterEntityDetails.getPlural().toLowerCase())
+	                .concat(masterEntityTypeDetails.getPlural().toLowerCase())
 	                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
         }
 
@@ -292,7 +292,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String entityNamePlural = entityDetails.getPlural();
+        String entityNamePlural = entityTypeDetails.getPlural();
 
         bodyBuilder.appendFormalLine("create(".concat(
                 entity.getSimpleTypeName().toLowerCase()).concat(
@@ -319,7 +319,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 	        bodyBuilder
 	        .appendFormalLine("return \""
 	                .concat("redirect:/")
-	                .concat(masterEntityDetails.getPlural().toLowerCase())
+	                .concat(masterEntityTypeDetails.getPlural().toLowerCase())
 	                .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
         }
         
@@ -339,7 +339,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("deletePattern" + patternName);
 
-        FieldMetadata formBackingObjectIdField = entityDetails
+        FieldMetadata formBackingObjectIdField = entityTypeDetails
                 .getPersistenceDetails().getIdentifierField();
         // Define method parameter types
         List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
@@ -423,7 +423,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String entityNamePlural = entityDetails.getPlural();
+        String entityNamePlural = entityTypeDetails.getPlural();
 
         bodyBuilder.appendFormalLine("delete(".concat(
                 formBackingObjectIdField.getFieldName().getSymbolName())
@@ -853,7 +853,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String entityNamePlural = entityDetails.getPlural();
+        String entityNamePlural = entityTypeDetails.getPlural();
 
         List<JavaType> typeParams = new ArrayList<JavaType>();
         typeParams.add(entity);
@@ -874,7 +874,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .concat(entity.getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver()))
                 .concat(".")
-                .concat(entityDetails.getPersistenceDetails()
+                .concat(entityTypeDetails.getPersistenceDetails()
                         .getFindAllMethod().getMethodName().getSymbolName()
                         .concat("();")));
 
@@ -992,7 +992,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        String entityNamePlural = entityDetails.getPlural();
+        String entityNamePlural = entityTypeDetails.getPlural();
         String entityName = uncapitalize(entity.getSimpleTypeName());
 
         // XXX: Following code generates the part of this method validating
@@ -1026,7 +1026,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                         .concat(entity.getNameIncludingTypeParameters(
                                 false, builder.getImportRegistrationResolver()))
                         .concat(".")
-                        .concat(entityDetails
+                        .concat(entityTypeDetails
                                 .getPersistenceDetails()
                                 .getFindEntriesMethod()
                                 .getMethodName()
@@ -1060,7 +1060,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .concat(" count = ")
                 .concat(entity.getSimpleTypeName())
                 .concat(".")
-                .concat(entityDetails.getPersistenceDetails()
+                .concat(entityTypeDetails.getPersistenceDetails()
                         .getCountMethod().getMethodName().getSymbolName())
                 .concat("();"));
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"maxEntities"
@@ -1221,7 +1221,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                         builder.getImportRegistrationResolver()).concat(
                         " session = httpServletRequest.getSession();"));
         JavaType dialogJavaType = new JavaType(
-                this.aspectControllerPackageFullyName.concat(".dialog.Dialog"));
+                this.aspectPackage.concat(".dialog.Dialog"));
         JavaType dialogTypeJavaType = new JavaType(dialogJavaType
                 .getFullyQualifiedTypeName().concat(".DialogType"));
         bodyBuilder.appendFormalLine(dialogJavaType

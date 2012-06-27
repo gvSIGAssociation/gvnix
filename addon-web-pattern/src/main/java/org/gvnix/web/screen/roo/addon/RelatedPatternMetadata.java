@@ -22,13 +22,17 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
+
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
+import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
@@ -65,21 +69,29 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 
     private static final String PROVIDES_TYPE_STRING = RelatedPatternMetadata.class.getName();
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
+    
+    private MemberDetails entityDetails;
+    private MemberDetails masterEntityDetails;
+    private Set<String> relationsFields;
 
     public RelatedPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, MemberDetails controllerDetails,
-    		WebScaffoldMetadata webScaffoldMetadata, List<StringAttributeValue> patterns,
-    		PhysicalTypeMetadata entityMetadata, JavaTypeMetadataDetails masterEntityDetails,
+    		WebScaffoldMetadata webScaffoldMetadata, List<StringAttributeValue> patterns, PhysicalTypeMetadata entityMetadata, MemberDetails entityDetails,
+    		JavaTypeMetadataDetails masterEntityJavaDetails, MemberDetails masterEntityDetails, Set<String> relationsFields,
     		SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities, SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields,
     		Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates, Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes) {
     	
-        super(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patterns,
-        		entityMetadata, masterEntityDetails, relatedEntities, relatedFields, relatedDates, entityDateTypes);
+        super(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patterns, entityMetadata, 
+        		masterEntityJavaDetails, relatedEntities, relatedFields, relatedDates, entityDateTypes);
 
         if (!isValid()) {
         
         	// This metadata instance not be already produced at the time of instantiation (will retry)
             return;
         }
+        
+        this.entityDetails = entityDetails;
+        this.masterEntityDetails = masterEntityDetails;
+        this.relationsFields = relationsFields;
         
         List<String> tabularEditPatterns = getPatternTypeDefined(WebPatternType.tabular_edit_register, this.patterns);
         if (!tabularEditPatterns.isEmpty()) {
@@ -109,7 +121,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 	protected MethodMetadata getCreateFormMethod(String patternName) {
 		
         Assert.notNull(masterEntity, "Master entity required to generate createForm");
-        Assert.notNull(masterEntityDetails, "Master entity metadata required to generate createForm");
+        Assert.notNull(masterEntityTypeDetails, "Master entity metadata required to generate createForm");
 		
 		JavaSymbolName methodName = new JavaSymbolName("createForm" + patternName);
 		
@@ -137,7 +149,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		List<AnnotationMetadata> gvnixreferenceParam = new ArrayList<AnnotationMetadata>();
 		gvnixreferenceParam.add(gvnixreferenceParamBuilder.build());
 		paramTypes.add(new AnnotatedJavaType(
-				new JavaType(masterEntityDetails.getPersistenceDetails().getIdentifierField().getFieldType().getFullyQualifiedTypeName()), 
+				new JavaType(masterEntityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getFullyQualifiedTypeName()), 
 				gvnixreferenceParam));
 
 		// Model uiModel
@@ -185,13 +197,24 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		bodyBuilder.appendFormalLine(
 				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
 				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
-						masterEntityDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+						masterEntityTypeDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
 		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
 						entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
 		
-		// TODO Validate if detail pattern field is referencing entity pattern primary key field 
-		bodyBuilder.appendFormalLine(
-				entityName.toLowerCase() + ".set" + masterEntityName + "(" + masterEntityName.toLowerCase() + ");");
+		// Get field from entity related with some master entity defined into the fields names list
+		FieldMetadata fieldMetadata = getField();
+        if (fieldMetadata == null) {
+        	
+        	// TODO This case is already required ? 
+    		bodyBuilder.appendFormalLine(
+    				entityName.toLowerCase() + ".set" + masterEntityName + "(" + masterEntityName.toLowerCase() + ");");
+        }
+        else {
+        	
+            // TODO When field metadata in composite roo identifier: use PK constructor   
+			bodyBuilder.appendFormalLine(
+					entityName.toLowerCase() + ".set" + fieldMetadata.getFieldName().getSymbolNameCapitalisedFirstLetter() + "(" + masterEntityName.toLowerCase() + ");");
+        }
 		
 		// Add attribute with identical name as required by Roo create page
 		bodyBuilder.appendFormalLine(
@@ -210,6 +233,62 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		method.setAnnotations(methodAnnotations);
 		
 		return method.build();
+	}
+
+	/**
+	 * Get field from entity related with some master entity defined into the fields names list.
+	 * 
+	 * @param relationsFields Master fields names
+	 * @param masterEntityDetails Master entity details
+	 * @param entityTypeDetails Entity details
+	 * @return Entity field related with master entity field
+	 */
+	protected FieldMetadata getField() {
+		
+        FieldMetadata field = null;
+
+		// Get field from master entity with OneToMany annotation and "mappedBy" attribute some value
+		AnnotationAttributeValue<?> masterField = null;
+        List<FieldMetadata> masterFields = MemberFindingUtils.getFields(masterEntityDetails);
+        for (FieldMetadata tmpMasterField : masterFields) {
+			
+        	List<AnnotationMetadata> masterFieldAnnotations = tmpMasterField.getAnnotations();
+        	for (AnnotationMetadata masterFieldAnnotation : masterFieldAnnotations) {
+        		
+        		// TODO May be more fields on relationsField var
+				if (masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.OneToMany")) &&
+						tmpMasterField.getFieldName().equals(new JavaSymbolName(relationsFields.iterator().next()))) {
+					
+					masterField = masterFieldAnnotation.getAttribute(new JavaSymbolName("mappedBy"));
+				}
+			}
+		}
+        
+        if (masterField != null) {
+
+			// Get field from entity with Column annotation and "name" attribute same as previous "mappedBy"
+	        List<FieldMetadata> fields = MemberFindingUtils.getFields(entityDetails);
+	        fields.addAll(entityTypeDetails.getPersistenceDetails().getRooIdentifierFields());
+	        for (FieldMetadata tmpField : fields) {
+				
+	        	// TODO Remove this check ?
+	        	if (tmpField != null) {
+	        		
+		        	List<AnnotationMetadata> fieldAnnotations = tmpField.getAnnotations();
+		        	for (AnnotationMetadata annotationMetadata : fieldAnnotations) {
+		        		
+						if (annotationMetadata.getAnnotationType().equals(new JavaType("javax.persistence.Column")) &&
+								masterField.getValue().toString().equals(annotationMetadata.getAttribute(
+										new JavaSymbolName("name")).getValue().toString())) {
+							
+							field = tmpField;
+						}
+					}
+	        	}
+			}
+        }
+        
+		return field;
 	}
 
     // Typically, no changes are required beyond this point

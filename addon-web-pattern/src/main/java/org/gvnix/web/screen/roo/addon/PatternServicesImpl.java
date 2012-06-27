@@ -20,13 +20,19 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MetadataUtils;
+import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -41,6 +47,7 @@ import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.Path;
 import org.springframework.roo.support.util.Assert;
 
 /**
@@ -339,6 +346,81 @@ public class PatternServicesImpl implements PatternService {
         }
         
         return false;
+    }
+
+    /** {@inheritDoc} */
+	public Set<String> getRelationsFields(JavaType entity) {
+		
+		// Master controller metadata is the unique controller with a form backing object of master entity type
+		PhysicalTypeMetadata controllerMetadata = null;
+		if (entity != null) {
+			Set<JavaType> controllers = typeLocationService.findTypesWithAnnotation(new JavaType(RooWebScaffold.class.getName()));
+			for (JavaType controller : controllers) {
+				PhysicalTypeMetadata tmpControllerMetadata = (PhysicalTypeMetadata) metadataService.get(
+						PhysicalTypeIdentifier.createIdentifier(controller, Path.SRC_MAIN_JAVA));
+		        if (entity.equals(new WebScaffoldAnnotationValues(tmpControllerMetadata).getFormBackingObject())) {
+		        	controllerMetadata = tmpControllerMetadata;
+		        }
+			}
+		}
+		
+		return getRelationsFields(controllerMetadata);
+	}
+
+    /** {@inheritDoc} */
+    public Set<String> getRelationsFields(PhysicalTypeMetadata controller) {
+    	
+    	// Must be a valid web scaffold controller 
+        WebScaffoldAnnotationValues webScaffold = new WebScaffoldAnnotationValues(controller);
+        if (!webScaffold.isAnnotationFound() || webScaffold.getFormBackingObject() == null
+        		|| controller.getMemberHoldingTypeDetails() == null) {
+        	
+            return null;
+        }
+
+        ClassOrInterfaceTypeDetails controllerType = 
+        		(ClassOrInterfaceTypeDetails) controller.getMemberHoldingTypeDetails();
+        Assert.notNull(controllerType,
+                "Governor failed to provide class type details, in violation of superclass contract");
+        
+        Set<String> fields = new HashSet<String>();
+
+        // Retrieve the fields defined as relationships in GvNIXRelationsPattern
+        AnnotationMetadata relationsAnnotation = MemberFindingUtils.getAnnotationOfType(
+        		controllerType.getAnnotations(), RELATIONSPATTERN_ANNOTATION);
+        if (relationsAnnotation != null) {
+        	
+            AnnotationAttributeValue<?> relationsAttribute = relationsAnnotation.getAttribute(
+            		RELATIONSPATTERN_ANNOTATION_VALUE);
+            if (relationsAttribute != null) {
+
+                // From this relations pattern annotation example:
+                // { "PatternName1: field1=tabular, field2=register", "PatternName2: field3=tabular_edit_register" }
+                // Obtains "field1", "field2" and "field3" 
+                
+            	// Will store portions of relations pattern annotation values
+                String[] patternDefinition = {};
+                String[] fieldDefinition = {};
+                String[] fieldName = {};
+                
+                @SuppressWarnings("unchecked")
+                List<StringAttributeValue> relations = (List<StringAttributeValue>) relationsAttribute.getValue();
+                for (StringAttributeValue relation : relations) {
+                	
+                	// "PatternName1: field1=tabular, field2=register"
+                    patternDefinition = relation.getValue().split(":");
+                    fieldDefinition = patternDefinition[1].trim().split(",");
+                    for (String fieldDef : fieldDefinition) {
+                    	
+                    	// "field1=tabular"
+                        fieldName = fieldDef.trim().split("=");
+                        fields.add(fieldName[0]);
+                    }
+                }
+            }
+        }
+
+        return fields;
     }
 
 }

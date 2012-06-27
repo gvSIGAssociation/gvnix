@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -39,6 +40,7 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffold
 import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
@@ -79,6 +81,7 @@ public final class RelatedPatternMetadataProvider extends AbstractPatternMetadat
     @Reference PropFileOperations propFileOperations;
     @Reference WebMetadataService webMetadataService;
     @Reference PatternService patternService;
+    @Reference TypeLocationService typeLocationService;
 
     private final Map<JavaType, String> entityToWebScaffoldMidMap = new LinkedHashMap<JavaType, String>();
     private final Map<String, JavaType> webScaffoldMidToEntityMap = new LinkedHashMap<String, JavaType>();
@@ -94,6 +97,8 @@ public final class RelatedPatternMetadataProvider extends AbstractPatternMetadat
      */
     @Override
     protected void activate(ComponentContext context) {
+    	
+    	_patternService = patternService;
     	
         // next line adding a notification listener over this class allow method getLocalMidToRequest(ItdTypeDetails) to be invoked
         metadataDependencyRegistry.addNotificationListener(this);
@@ -209,24 +214,53 @@ public final class RelatedPatternMetadataProvider extends AbstractPatternMetadat
         		mid, controllerMetadata, entity, webMetadataService);
         Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates = getRelationFieldsDateFormat(
         		mid, controllerMetadata, entity, webMetadataService);
+        
+		// Get master entity, if not exists nothing to do
+        JavaType masterEntity = getMasterEntity(entity, relatedEntities);
+        if (masterEntity == null) {
+        	
+        	return null;
+        }
+        
+        JavaTypeMetadataDetails masterEntityJavaDetails = relatedEntities.get(masterEntity);
+        
+        // Get entity fields names defined into relations pattern annotation on its related controller
+		Set<String> relationsFields = patternService.getRelationsFields(masterEntity);
+		
+		// Get master entity details
+		MemberDetails masterEntityDetails = getMemberDetails(masterEntity);
+		
+        // Pass dependencies required by the metadata in through its constructor
+        return new RelatedPatternMetadata(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patternList,
+        		entityMetadata, entityDetails, masterEntityJavaDetails, masterEntityDetails, relationsFields, relatedEntities, relatedFields, 
+        		relatedDates, entityDateTypes);
+    }
 
+	/**
+	 * Get master entity.
+	 * 
+	 * @param entity Current entity (entity placed into detail on pattern)
+	 * @param relatedEntities Related entities
+	 * @return Master entity
+	 */
+	protected JavaType getMasterEntity(JavaType entity, SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities) {
 
-        JavaType masterEntity = null;
-        JavaTypeMetadataDetails masterEntityDetails = null;
 		try {
-        	// This a related pattern: Then the other related entity is the master entity
+			
+        	// The other related entity is the master entity
+			// TODO Can be more related entities besides master entity
     		SortedMap<JavaType, JavaTypeMetadataDetails> tempMap = new TreeMap<JavaType, JavaTypeMetadataDetails>(relatedEntities);
     		tempMap.remove(entity);
-        	masterEntity = tempMap.lastKey();
-        	masterEntityDetails = tempMap.get(masterEntity);
+    		
+        	return tempMap.lastKey();
+        	
         } catch (NoSuchElementException e) {
+        	
         	// This is a related pattern without master entity. Is this possible ?
 		}
-        
-        // Pass dependencies required by the metadata in through its constructor
-        return new RelatedPatternMetadata(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, 
-        		patternList, entityMetadata, masterEntityDetails, relatedEntities, relatedFields, relatedDates, entityDateTypes);
-    }
+		
+		return null;
+	}
 
     /**
      * {@inheritDoc}, here the resulting file name will be **_ROO_GvNIXRelatedPattern.aj

@@ -19,7 +19,6 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,17 +31,12 @@ import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
-import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractMemberDiscoveringItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.scanner.MemberDetails;
@@ -74,12 +68,8 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
 
     /** {@link GvNIXEntityBatch} java type */
     protected static final JavaType ENTITYBATCH_ANNOTATION = new JavaType(GvNIXEntityBatch.class.getName());
-
-    /** {@link GvNIXRelationsPattern} java type */
-    protected static final JavaType RELATIONSPATTERN_ANNOTATION = new JavaType(GvNIXRelationsPattern.class.getName());
     
-    /** Name of {@link GvNIXRelationsPattern} attribute value */
-    protected static final JavaSymbolName RELATIONSPATTERN_ANNOTATION_VALUE = new JavaSymbolName("value");
+    protected PatternService _patternService;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -157,7 +147,7 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
 			String mid, PhysicalTypeMetadata controller, JavaType entity, WebMetadataService webMetadataService) {
 		
 		// Fields name defined into relations pattern annotation
-        Set<String> relations = getRelationFields(controller);
+        Set<String> relations = _patternService.getRelationsFields(controller);
 
         // Get each relation java type from eligible scaffolding fields
         List<FieldMetadata> scaffoldFields = getScaffoldEligibleFields(entity, mid, webMetadataService);
@@ -182,68 +172,6 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
         
 		return validFields;
 	}
-
-    /**
-     * Read the values of GvNIXRelationsPattern and for each field defined as relation retrieve its name.
-     * 
-     * @param controllerMetadata Controller metadata
-     * @return Set with the defined relations field names or null if controller is not a valid web scaffold class or 
-     * empty set if not relations pattern annotation
-     */
-    private Set<String> getRelationFields(PhysicalTypeMetadata controllerMetadata) {
-    	
-    	// Must be a valid web scaffold controller 
-        WebScaffoldAnnotationValues webScaffold = new WebScaffoldAnnotationValues(controllerMetadata);
-        if (!webScaffold.isAnnotationFound() || webScaffold.getFormBackingObject() == null
-        		|| controllerMetadata.getMemberHoldingTypeDetails() == null) {
-        	
-            return null;
-        }
-
-        ClassOrInterfaceTypeDetails controllerType = 
-        		(ClassOrInterfaceTypeDetails) controllerMetadata.getMemberHoldingTypeDetails();
-        Assert.notNull(controllerType,
-                "Governor failed to provide class type details, in violation of superclass contract");
-        
-        Set<String> fields = new HashSet<String>();
-
-        // Retrieve the fields defined as relationships in GvNIXRelationsPattern
-        AnnotationMetadata relationsAnnotation = MemberFindingUtils.getAnnotationOfType(
-        		controllerType.getAnnotations(), RELATIONSPATTERN_ANNOTATION);
-        if (relationsAnnotation != null) {
-        	
-            AnnotationAttributeValue<?> relationsAttribute = relationsAnnotation.getAttribute(
-            		RELATIONSPATTERN_ANNOTATION_VALUE);
-            if (relationsAttribute != null) {
-
-                // From this relations pattern annotation example:
-                // { "PatternName1: field1=tabular, field2=register", "PatternName2: field3=tabular_edit_register" }
-                // Obtains "field1", "field2" and "field3" 
-                
-            	// Will store portions of relations pattern annotation values
-                String[] patternDefinition = {};
-                String[] fieldDefinition = {};
-                String[] fieldName = {};
-                
-                @SuppressWarnings("unchecked")
-                List<StringAttributeValue> relations = (List<StringAttributeValue>) relationsAttribute.getValue();
-                for (StringAttributeValue relation : relations) {
-                	
-                	// "PatternName1: field1=tabular, field2=register"
-                    patternDefinition = relation.getValue().split(":");
-                    fieldDefinition = patternDefinition[1].trim().split(",");
-                    for (String fieldDef : fieldDefinition) {
-                    	
-                    	// "field1=tabular"
-                        fieldName = fieldDef.trim().split("=");
-                        fields.add(fieldName[0]);
-                    }
-                }
-            }
-        }
-
-        return fields;
-    }
 
     /**
      * For the given type returns a Map with its related application types metadata.
