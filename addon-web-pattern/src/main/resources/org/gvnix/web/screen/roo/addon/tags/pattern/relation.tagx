@@ -17,6 +17,7 @@
     <div id="${id}_content" class="tab_content_${field}" title="${tab_label}">
       <c:set scope="request" value="${object[fn:escapeXml(field)]}" var="data"/>
       <c:set scope="request" value="${referenceName}" var="referenceName"/>
+      <c:set scope="request" value="${referenceField}" var="referenceField"/>
       <c:set var="referenceValue" scope="request"><spring:eval expression="object[referenceField]"/></c:set>
       <jsp:include page="../${folder}/${patternName}.jspx"/>
     </div>

@@ -96,7 +96,9 @@
       <spring:url value="${path}" var="createUrl" htmlEscape="false">
         <spring:param name="form" />
         <!-- Put on create URL the reference to the master pattern, if exists -->
-        <spring:param name="gvnixreference" value="${referenceValue}"/>
+        <c:if test="${not empty referenceValue}">
+        	<spring:param name="gvnixreference" value="${referenceValue}"/>
+        </c:if>
         <c:forEach var="p" items="${param}">
           <c:if test="${p.key ne 'gvnixform'}">
             <spring:param name="${p.key}" value="${p.value}" />

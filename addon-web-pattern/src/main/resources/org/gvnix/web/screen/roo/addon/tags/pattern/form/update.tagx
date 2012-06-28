@@ -129,6 +129,7 @@
                 <!-- Id column only if not composite primary key -->
                 <field:input field="${idField}" id="${id}" render="${idRender}" />
               </c:if>
+              <c:set var="compositePkField" value="${compositePkField}" scope="request" />
               <jsp:doBody />
 
             </tr>
@@ -240,6 +241,7 @@
                 <c:set var="item" value="" scope="request" />
                 <c:set var="pos" value="${new}" scope="request" />
                 <c:set var="parentId" value="${id}" scope="request" />
+                <c:set var="compositePkField" value="${compositePkField}" scope="request" />
                 <!-- Identifier input field: always can be specified on create -->
                 
                 <!-- Primary key -->

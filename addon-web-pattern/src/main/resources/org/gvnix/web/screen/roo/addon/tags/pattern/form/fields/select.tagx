@@ -60,13 +60,14 @@
     <c:set var="fieldMethod" value='${secParentId}_${fieldPos}_${fn:replace(sec_field, ".", "_")}_${createOrUpdate}' scope="request" />
     <c:set var="fieldName" value="list[${fieldPos}].${sec_field}" scope="request" />
     <c:set var="fieldStyle" value="gvNixTableData ${secParentId}_col_${sec_field}" scope="request" />
+    <c:set var="idField" value="${compositePkField}.${referenceField}" scope="request" />
     
     <!-- TODO: Removed multiple support because Dojo issue: http://jira.springframework.org/browse/ROO-909 -->
 
     <c:choose>
     
       <!-- No item: Show a column header -->
-      <c:when test="${item eq null and referenceName ne field}">
+      <c:when test="${item eq null and referenceField ne field and idField ne field}">
         <!-- Create a header column -->
         <th class="${fieldStyle}">
           <c:out value="${label}" />
@@ -75,7 +76,7 @@
       </c:when>
 
       <!-- When field is a reference, include it as hidden (detail pattern field relation with master pattern) -->      
-      <c:when test="${referenceName eq field}">
+      <c:when test="${referenceField eq field or idField eq field}">
         <c:choose>
           <c:when test="${empty item}">
             <input type="hidden" id="${fieldId}" name="${fieldName}" value="${referenceValue}" />
