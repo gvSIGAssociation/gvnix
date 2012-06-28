@@ -189,74 +189,16 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		
 		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
+		String masterEntityName = masterEntity.getSimpleTypeName();
+		String entityName = entity.getSimpleTypeName();
+
+		appendMasterRelationToEntity(bodyBuilder, masterEntityName, entityName);
+		
 		/*
-		 * MasterEntityName masterentityname = MasterEntityName.findMasterEntityName(gvnixreference);
-		 * EntityName entityname = new EntityName();
-		 * entityname.setMasterEntityName(masterentityname);
 		 * uiModel.addAttribute("entityName", entityname);
 		 * addDateTimeFormatPatterns(uiModel);  // Only if date types exists
 		 * return "entitynames/create";
 		 */
-		String masterEntityName = masterEntity.getSimpleTypeName();
-		String entityName = entity.getSimpleTypeName();
-
-		// Get field from entity related with some master entity defined into the fields names list
-		FieldMetadata relationField = getFieldRelationMasterEntity();
-		
-		// TODO Unify next 3 cases code
-        if (relationField == null) {
-        	
-        	// TODO This case is already required ? 
-        	
-    		bodyBuilder.appendFormalLine(
-    				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
-    				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
-    						masterEntityJavaDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
-    		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
-    						entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
-    		bodyBuilder.appendFormalLine(
-    				entityName.toLowerCase() + ".set" + masterEntityName + "(" + masterEntityName.toLowerCase() + ");");
-        }
-        else if (entityTypeDetails.getPersistenceDetails().getRooIdentifierFields().contains(relationField)) {
-        	
-            // TODO When field metadata in composite roo identifier: use PK constructor
-        	bodyBuilder.append(entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getNameIncludingTypeParameters(
-        			false, builder.getImportRegistrationResolver()) + 
-        			" " + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getSimpleTypeName().toLowerCase() +
-        			" = new " + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getNameIncludingTypeParameters(
-        					false, builder.getImportRegistrationResolver()) + "(");
-        	Iterator<FieldMetadata> fields = entityTypeDetails.getPersistenceDetails().getRooIdentifierFields().iterator();
-        	while (fields.hasNext()) {
-        		FieldMetadata field = fields.next();
-        		if (field.getFieldName().equals(relationField.getFieldName())) {
-        			bodyBuilder.append("gvnixreference");	
-        		}
-        		else {
-        			bodyBuilder.append("null");
-        		}
-        		if (fields.hasNext()) {
-        			bodyBuilder.append(", ");
-        		}
-			}
-        	bodyBuilder.append(");");
-        	bodyBuilder.newLine(true);
-    		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
-					entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
-    		bodyBuilder.appendFormalLine(entityName.toLowerCase() + ".set" + 
-					entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldName().getSymbolNameCapitalisedFirstLetter() +
-					"(" + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getSimpleTypeName().toLowerCase() + ");");
-        }
-        else {
-        	
-    		bodyBuilder.appendFormalLine(
-    				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
-    				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
-    						masterEntityJavaDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
-    		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
-    						entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
-			bodyBuilder.appendFormalLine(
-					entityName.toLowerCase() + ".set" + relationField.getFieldName().getSymbolNameCapitalisedFirstLetter() + "(" + masterEntityName.toLowerCase() + ");");
-        }
 		
 		// Add attribute with identical name as required by Roo create page
 		bodyBuilder.appendFormalLine(
@@ -277,6 +219,89 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		return method.build();
 	}
 
+	protected void appendMasterRelationToEntity(InvocableMemberBodyBuilder bodyBuilder, String masterEntityName, String entityName) {
+		
+        // TODO Support many to many relations
+
+		// Get field from entity related with some master entity defined into the fields names list
+		FieldMetadata relationField = getFieldRelationMasterEntity();
+		
+		// TODO Unify next 3 cases code
+        if (relationField == null) {
+        	
+        	// TODO This case is already required ? 
+        	
+    		/*
+    		 * MasterEntityName masterentityname = MasterEntityName.findMasterEntityName(gvnixreference);
+    		 * EntityName entityname = new EntityName();
+    		 * entityname.setMasterEntityName(masterentityname);
+    		 */
+        	
+    		bodyBuilder.appendFormalLine(
+    				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
+    				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
+    						masterEntityJavaDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+    		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
+    						entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
+    		bodyBuilder.appendFormalLine(
+    				entityName.toLowerCase() + ".set" + masterEntityName + "(" + masterEntityName.toLowerCase() + ");");
+        }
+        else if (entityTypeDetails.getPersistenceDetails().getRooIdentifierFields().contains(relationField)) {
+        	
+    		/*
+    		 * EntityPK entitypk = new EntityPK(null, ... gvnixreference, ... null);
+    		 * EntityName entityname = new EntityName();
+    		 * entity.setId(entitypk);
+             */
+        	
+            // TODO When field metadata in composite roo identifier: use PK constructor
+        	StringBuilder tmpBody = new StringBuilder();
+        	tmpBody.append(entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getNameIncludingTypeParameters(
+        			false, builder.getImportRegistrationResolver()) + 
+        			" " + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getSimpleTypeName().toLowerCase() +
+        			" = new " + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getNameIncludingTypeParameters(
+        					false, builder.getImportRegistrationResolver()) + "(");
+        	Iterator<FieldMetadata> fields = entityTypeDetails.getPersistenceDetails().getRooIdentifierFields().iterator();
+        	while (fields.hasNext()) {
+        		FieldMetadata field = fields.next();
+        		if (field.getFieldName().equals(relationField.getFieldName())) {
+        			tmpBody.append("gvnixreference");	
+        		}
+        		else {
+        			tmpBody.append("null");
+        		}
+        		if (fields.hasNext()) {
+        			tmpBody.append(", ");
+        		}
+			}
+        	tmpBody.append(");");
+        	bodyBuilder.appendFormalLine(tmpBody.toString());
+
+    		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
+					entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
+    		bodyBuilder.appendFormalLine(entityName.toLowerCase() + ".set" + 
+					entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldName().getSymbolNameCapitalisedFirstLetter() +
+					"(" + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getSimpleTypeName().toLowerCase() + ");");
+        }
+        else {
+        	
+    		/*
+    		 * MasterEntityName masterentityname = MasterEntityName.findMasterEntityName(gvnixreference);
+    		 * EntityName entityname = new EntityName();
+    		 * entityname.setRelationFieldName(masterentityname);
+    		 */
+        	
+    		bodyBuilder.appendFormalLine(
+    				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
+    				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
+    						masterEntityJavaDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+    		bodyBuilder.appendFormalLine(entityName + " " + entityName.toLowerCase() + " = new " + 
+    						entity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + "();");
+			bodyBuilder.appendFormalLine(
+					entityName.toLowerCase() + ".set" + relationField.getFieldName().getSymbolNameCapitalisedFirstLetter() + "(" + masterEntityName.toLowerCase() + ");");
+        }
+	}
+
     protected MethodMetadata getCreateMethod(String patternName) {
     	
     	// TODO Some code duplicated with same method in PatternMetadata
@@ -291,6 +316,10 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         
         getRequestParam(methodParamNames, methodParamTypes);
         
+        Entry<JavaSymbolName, AnnotatedJavaType> referenceRequestParam = getReferenceRequestParam();
+        methodParamNames.add(referenceRequestParam.getKey());
+        methodParamTypes.add(referenceRequestParam.getValue());
+        
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
             // If it already exists, just return null and omit its
@@ -301,16 +330,94 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         String entityNamePlural = entityTypeDetails.getPlural();
-        
-        
-        
+
         // TODO Set master pattern reference into this entity if master has composite PK
         
-        /*
-         *  EntityPK entitypk = new EntityPK(entity.getId().getField1(), ... gvnixreference, ... entity.getId().getFieldN());
-         *  entity.setId(entitypk);
-         */
-    	
+        // TODO Support many to many relations
+        
+        // TODO Unify with method appendMasterRelationToEntity
+        
+		/*
+		 * MasterEntityName masterentityname = MasterEntityName.findMasterEntityName(gvnixreference);
+		 * 		EntityName entityname = new EntityName();
+		 * entityname.setMasterEntityName(masterentityname);
+		 * 		uiModel.addAttribute("entityName", entityname);
+		 * 		addDateTimeFormatPatterns(uiModel);  // Only if date types exists
+		 * 		return "entitynames/create";
+		 */
+		String masterEntityName = masterEntity.getSimpleTypeName();
+		String entityName = entity.getSimpleTypeName();
+
+		// Get field from entity related with some master entity defined into the fields names list
+		FieldMetadata relationField = getFieldRelationMasterEntity();
+		
+		// TODO Unify next 3 cases code
+        if (relationField == null) {
+        	
+        	// TODO This case is already required ? 
+
+    		/*
+    		 * MasterEntityName masterentityname = MasterEntityName.findMasterEntityName(gvnixreference);
+    		 * entityname.setMasterEntityName(masterentityname);
+    		 */
+        	
+    		bodyBuilder.appendFormalLine(
+    				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
+    				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
+    						masterEntityJavaDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+    		bodyBuilder.appendFormalLine(
+    				entityName.toLowerCase() + ".set" + masterEntityName + "(" + masterEntityName.toLowerCase() + ");");
+        }
+        else if (entityTypeDetails.getPersistenceDetails().getRooIdentifierFields().contains(relationField)) {
+        	
+            /*
+             *  EntityPK entitypk = new EntityPK(entity.getId().getField1(), ... gvnixreference, ... entity.getId().getFieldN());
+             *  entity.setId(entitypk);
+             */
+        	
+            // When field metadata in composite roo identifier: use PK constructor
+        	StringBuilder tmpBody = new StringBuilder();
+        	tmpBody.append(entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getNameIncludingTypeParameters(
+        			false, builder.getImportRegistrationResolver()) + 
+        			" " + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getSimpleTypeName().toLowerCase() +
+        			" = new " + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getNameIncludingTypeParameters(
+        					false, builder.getImportRegistrationResolver()) + "(");
+        	Iterator<FieldMetadata> fields = entityTypeDetails.getPersistenceDetails().getRooIdentifierFields().iterator();
+        	while (fields.hasNext()) {
+        		FieldMetadata field = fields.next();
+        		if (field.getFieldName().equals(relationField.getFieldName())) {
+        			tmpBody.append("gvnixreference");	
+        		}
+        		else {
+        			tmpBody.append(entityTypeDetails.getJavaType().getSimpleTypeName().toLowerCase() + 
+                			".get" + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldName().getSymbolNameCapitalisedFirstLetter() +
+                			"().get" + field.getFieldName().getSymbolNameCapitalisedFirstLetter() + "()");
+        		}
+        		if (fields.hasNext()) {
+        			tmpBody.append(", ");
+        		}
+			}
+        	tmpBody.append(");");
+        	bodyBuilder.appendFormalLine(tmpBody.toString());
+        	
+    		bodyBuilder.appendFormalLine(entityName.toLowerCase() + ".set" + 
+					entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldName().getSymbolNameCapitalisedFirstLetter() +
+					"(" + entityTypeDetails.getPersistenceDetails().getIdentifierField().getFieldType().getSimpleTypeName().toLowerCase() + ");");
+        }
+        else {
+        	
+    		/*
+    		 * MasterEntityName masterentityname = MasterEntityName.findMasterEntityName(gvnixreference);
+    		 * entityname.setRelationFieldName(masterentityname);
+    		 */
+        	
+    		bodyBuilder.appendFormalLine(
+    				masterEntity.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver()) + 
+    				" " + masterEntityName.toLowerCase() + " = " + masterEntityName + "." + 
+    						masterEntityJavaDetails.getPersistenceDetails().getFindMethod().getMethodName() + "(gvnixreference);");
+			bodyBuilder.appendFormalLine(
+					entityName.toLowerCase() + ".set" + relationField.getFieldName().getSymbolNameCapitalisedFirstLetter() + "(" + masterEntityName.toLowerCase() + ");");
+        }
         
         
         bodyBuilder.appendFormalLine("create(".concat(

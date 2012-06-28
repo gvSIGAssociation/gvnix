@@ -11,5 +11,10 @@
       <spring:escapeBody javaScriptEscape="true" >${value}</spring:escapeBody>
     </c:set>
     <input id="_${sec_value}_id" name="gvnixpattern" type="hidden" value="${sec_value}" />
+    
+    <c:if test="${not empty param.gvnixreference}">
+    	<input id="_${sec_value}_gvnixreference_id" name="gvnixreference" type="hidden" value="${param.gvnixreference}" />
+    </c:if>
+    
   </c:if>
 </jsp:root>
