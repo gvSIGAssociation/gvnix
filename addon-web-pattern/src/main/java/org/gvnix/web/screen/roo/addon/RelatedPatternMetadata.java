@@ -19,10 +19,12 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.lang.reflect.Modifier;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -40,15 +42,12 @@ import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
-import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
-import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.itd.ItdSourceFileComposer;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Path;
@@ -160,55 +159,32 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
 
 		// @RequestParam(value = "gvnixpattern", required = true) String gvnixpattern
-		paramNames.add(new JavaSymbolName("gvnixpattern"));
-		AnnotationMetadataBuilder gvnixpatternParamBuilder = new AnnotationMetadataBuilder(
-				new JavaType("org.springframework.web.bind.annotation.RequestParam"));
-		gvnixpatternParamBuilder.addStringAttribute("value", "gvnixpattern");
-		gvnixpatternParamBuilder.addBooleanAttribute("required", true);
-		List<AnnotationMetadata> gvnixpatternParam = new ArrayList<AnnotationMetadata>();
-		gvnixpatternParam.add(gvnixpatternParamBuilder.build());
-		paramTypes.add(new AnnotatedJavaType(new JavaType("java.lang.String"), gvnixpatternParam));
-
+		Entry<JavaSymbolName, AnnotatedJavaType> gvnixpatternParam = getPatternRequestParam(true);
+		paramNames.add(gvnixpatternParam.getKey());
+		paramTypes.add(gvnixpatternParam.getValue());
+		
 		// @RequestParam(value = "gvnixreference", required = true) MasterEntityIdType gvnixreference
-		paramNames.add(new JavaSymbolName("gvnixreference"));
-		AnnotationMetadataBuilder gvnixreferenceParamBuilder = new AnnotationMetadataBuilder(
-				new JavaType("org.springframework.web.bind.annotation.RequestParam"));
-		gvnixreferenceParamBuilder.addStringAttribute("value", "gvnixreference");
-		gvnixreferenceParamBuilder.addBooleanAttribute("required", true);
-		List<AnnotationMetadata> gvnixreferenceParam = new ArrayList<AnnotationMetadata>();
-		gvnixreferenceParam.add(gvnixreferenceParamBuilder.build());
-		paramTypes.add(new AnnotatedJavaType(
-				new JavaType(masterEntityJavaDetails.getPersistenceDetails().getIdentifierField().getFieldType().getFullyQualifiedTypeName()), 
-				gvnixreferenceParam));
+		Entry<JavaSymbolName, AnnotatedJavaType> gvnixreferenceParam = getReferenceRequestParam();
+		paramNames.add(gvnixreferenceParam.getKey());
+		paramTypes.add(gvnixreferenceParam.getValue());
 
 		// Model uiModel
-		paramNames.add(new JavaSymbolName("uiModel"));
-		paramTypes.add(new AnnotatedJavaType(new JavaType("org.springframework.ui.Model"), null));
+		Entry<JavaSymbolName, AnnotatedJavaType> modelParam = getModelRequestParam();
+		paramNames.add(modelParam.getKey());
+		paramTypes.add(modelParam.getValue());
+
+		// Create method annotation
+		
+		List<AnnotationMetadataBuilder> methodAnnotations = new ArrayList<AnnotationMetadataBuilder>();
+
+		// @RequestMapping(params = { "form", "gvnixpattern=AplicacionListados2", "gvnixreference" }, method = RequestMethod.GET)
+		methodAnnotations.add(getRequestMapping(patternName, RequestMethod.GET));
 
 		// If method exists (in java file, by example) no create it in AspectJ file
 		if (methodExists(methodName, paramTypes) != null) {
 			return null;
 		}
 		
-		// Create method annotation
-		
-		List<AnnotationMetadataBuilder> methodAnnotations = new ArrayList<AnnotationMetadataBuilder>();
-
-		// @RequestMapping(params = { "form", "gvnixpattern=AplicacionListados2", "gvnixreference" }, method = RequestMethod.GET)
-		List<StringAttributeValue> requestMapingAnnotationParams = new ArrayList<StringAttributeValue>();
-		requestMapingAnnotationParams.add(new StringAttributeValue(new JavaSymbolName("value"), "form"));
-		requestMapingAnnotationParams.add(new StringAttributeValue(new JavaSymbolName("value"), "gvnixpattern=" + patternName));
-		requestMapingAnnotationParams.add(new StringAttributeValue(new JavaSymbolName("value"), "gvnixreference"));
-		List<AnnotationAttributeValue<?>> requestMappingAnnotation = new ArrayList<AnnotationAttributeValue<?>>();
-		requestMappingAnnotation.add(new ArrayAttributeValue<StringAttributeValue>(
-				new JavaSymbolName("params"), requestMapingAnnotationParams));
-		requestMappingAnnotation.add(new EnumAttributeValue(
-				new JavaSymbolName("method"), 
-				new EnumDetails(new JavaType("org.springframework.web.bind.annotation.RequestMethod"), new JavaSymbolName("GET"))));
-		AnnotationMetadataBuilder requestMappingAnnotationBuilder = new AnnotationMetadataBuilder(
-				new JavaType("org.springframework.web.bind.annotation.RequestMapping"), requestMappingAnnotation);
-		methodAnnotations.add(requestMappingAnnotationBuilder);
-
 		// Create method body
 		
 		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -224,9 +200,9 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		String masterEntityName = masterEntity.getSimpleTypeName();
 		String entityName = entity.getSimpleTypeName();
 
-		
 		// Get field from entity related with some master entity defined into the fields names list
 		FieldMetadata relationField = getFieldRelationMasterEntity();
+		
 		// TODO Unify next 3 cases code
         if (relationField == null) {
         	
@@ -308,16 +284,19 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("createPattern" + patternName);
 
-        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
-
+        // @RequestParam(value = "gvnixpattern", required = true) String gvnixpattern, @Valid Owner owner, BindingResult bindingResult, HttpServletRequest req, Model uiModel)
+        
+        List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
+        List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
+        
+        getRequestParam(methodParamNames, methodParamTypes);
+        
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
             // If it already exists, just return null and omit its
             // generation via the ITD
             return null;
         }
-
-        List<JavaSymbolName> methodParamNames = getMethodParameterNamesCreateUpdate();
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -371,16 +350,17 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("updatePattern" + patternName);
 
-        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
-
+        List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
+        List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
+        
+        getRequestParam(methodParamNames, methodParamTypes);
+        
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
         	
             // If it already exists, just return null and omit its generation via the ITD
             return null;
         }
-
-        List<JavaSymbolName> methodParamNames = getMethodParameterNamesCreateUpdate();
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -466,6 +446,31 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         }
         
 		return field;
+	}
+
+	/**
+	 * Get the RequestParam annotation for gvnixreference.
+	 * 
+	 * <p>Key has the param name and value has the annotation.</p>
+	 * 
+	 * <code>@RequestParam(value = "gvnixreference", required = true) MasterEntityIdType gvnixreference</code>
+	 * 
+	 * @return Request param name and annotation
+	 */
+	protected Entry<JavaSymbolName, AnnotatedJavaType> getReferenceRequestParam() {
+		
+		AnnotationMetadataBuilder gvnixreferenceParamBuilder = new AnnotationMetadataBuilder(
+				new JavaType("org.springframework.web.bind.annotation.RequestParam"));
+		gvnixreferenceParamBuilder.addStringAttribute("value", "gvnixreference");
+		gvnixreferenceParamBuilder.addBooleanAttribute("required", true);
+		List<AnnotationMetadata> gvnixreferenceParam = new ArrayList<AnnotationMetadata>();
+		gvnixreferenceParam.add(gvnixreferenceParamBuilder.build());
+		
+		return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
+				new JavaSymbolName("gvnixreference"), 
+				new AnnotatedJavaType(new JavaType(
+						masterEntityJavaDetails.getPersistenceDetails().getIdentifierField().getFieldType().getFullyQualifiedTypeName()), 
+						gvnixreferenceParam));
 	}
 
     // Typically, no changes are required beyond this point

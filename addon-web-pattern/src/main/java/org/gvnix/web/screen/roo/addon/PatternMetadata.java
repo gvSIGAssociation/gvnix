@@ -19,6 +19,7 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -120,16 +121,17 @@ public class PatternMetadata extends AbstractPatternMetadata {
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("createPattern" + patternName);
 
-        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
-
+        List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
+        List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
+        
+        getRequestParam(methodParamNames, methodParamTypes);
+        
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
             // If it already exists, just return null and omit its
             // generation via the ITD
             return null;
         }
-
-        List<JavaSymbolName> methodParamNames = getMethodParameterNamesCreateUpdate();
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -174,16 +176,17 @@ public class PatternMetadata extends AbstractPatternMetadata {
         // Specify the desired method name
         JavaSymbolName methodName = new JavaSymbolName("updatePattern" + patternName);
 
-        List<AnnotatedJavaType> methodParamTypes = getMethodParameterTypesCreateUpdate();
-
+        List<JavaSymbolName> methodParamNames = new ArrayList<JavaSymbolName>();
+        List<AnnotatedJavaType> methodParamTypes = new ArrayList<AnnotatedJavaType>();
+        
+        getRequestParam(methodParamNames, methodParamTypes);
+        
         MethodMetadata method = methodExists(methodName, methodParamTypes);
         if (method != null) {
         	
             // If it already exists, just return null and omit its generation via the ITD
             return null;
         }
-
-        List<JavaSymbolName> methodParamNames = getMethodParameterNamesCreateUpdate();
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
