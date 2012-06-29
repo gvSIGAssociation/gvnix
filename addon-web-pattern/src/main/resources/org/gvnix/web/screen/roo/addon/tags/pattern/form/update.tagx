@@ -131,6 +131,8 @@
               </c:if>
               <c:set var="compositePkField" value="${compositePkField}" scope="request" />
               <jsp:doBody />
+              <!-- Remove composite pk field from request to avoid errors on detail pattern -->
+              <c:set var="compositePkField" value="" scope="request" />
 
             </tr>
           </thead>
@@ -257,6 +259,9 @@
 	            </c:choose>
                 
                 <jsp:doBody />
+                
+                <!-- Remove composite pk field from request to avoid errors on detail pattern -->
+                <c:set var="compositePkField" value="" scope="request" />
 
               </tr>
             </c:forEach>

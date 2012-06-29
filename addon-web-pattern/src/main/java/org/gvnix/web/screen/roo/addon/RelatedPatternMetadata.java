@@ -189,10 +189,9 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		
 		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
 
-		String masterEntityName = masterEntity.getSimpleTypeName();
 		String entityName = entity.getSimpleTypeName();
 
-		appendMasterRelationToEntity(bodyBuilder, masterEntityName, entityName);
+		appendMasterRelationToEntity(bodyBuilder);
 		
 		/*
 		 * uiModel.addAttribute("entityName", entityname);
@@ -219,9 +218,12 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		return method.build();
 	}
 
-	protected void appendMasterRelationToEntity(InvocableMemberBodyBuilder bodyBuilder, String masterEntityName, String entityName) {
+	protected void appendMasterRelationToEntity(InvocableMemberBodyBuilder bodyBuilder) {
 		
         // TODO Support many to many relations
+		
+		String masterEntityName = masterEntity.getSimpleTypeName();
+		String entityName = entity.getSimpleTypeName();
 
 		// Get field from entity related with some master entity defined into the fields names list
 		FieldMetadata relationField = getFieldRelationMasterEntity();
@@ -515,8 +517,8 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		
         FieldMetadata field = null;
 
-		// Get field from master entity with OneToMany annotation and "mappedBy" attribute some value
-		AnnotationAttributeValue<?> masterField = null;
+		// Get field from master entity with OneToMany annotation and "mappedBy" attribute has some value
+		String masterField = null;
         List<FieldMetadata> masterFields = MemberFindingUtils.getFields(masterEntityDetails);
         for (FieldMetadata tmpMasterField : masterFields) {
 			
@@ -524,10 +526,11 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         	for (AnnotationMetadata masterFieldAnnotation : masterFieldAnnotations) {
         		
         		// TODO May be more fields on relationsField var
+				AnnotationAttributeValue<?> masterFieldMappedBy = masterFieldAnnotation.getAttribute(new JavaSymbolName("mappedBy"));
 				if (masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.OneToMany")) &&
-						tmpMasterField.getFieldName().equals(new JavaSymbolName(relationsFields.iterator().next()))) {
+						tmpMasterField.getFieldName().getSymbolName().equals(relationsFields.iterator().next())) {
 					
-					masterField = masterFieldAnnotation.getAttribute(new JavaSymbolName("mappedBy"));
+					masterField = masterFieldMappedBy.getValue().toString();
 				}
 			}
 		}
@@ -539,15 +542,9 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 	        fields.addAll(entityTypeDetails.getPersistenceDetails().getRooIdentifierFields());
 	        for (FieldMetadata tmpField : fields) {
 
-	        	List<AnnotationMetadata> fieldAnnotations = tmpField.getAnnotations();
-	        	for (AnnotationMetadata annotationMetadata : fieldAnnotations) {
-	        		
-					if (annotationMetadata.getAnnotationType().equals(new JavaType("javax.persistence.Column")) &&
-							masterField.getValue().toString().equals(annotationMetadata.getAttribute(
-									new JavaSymbolName("name")).getValue().toString())) {
-						
-						field = tmpField;
-					}
+				if (masterField.equals(tmpField.getFieldName().getSymbolName())) {
+					
+					field = tmpField;
 				}
 			}
         }
