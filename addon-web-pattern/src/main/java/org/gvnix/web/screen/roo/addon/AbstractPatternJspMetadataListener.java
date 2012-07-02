@@ -48,6 +48,7 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffold
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
@@ -437,7 +438,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		            .addAttribute("field", fieldName)
 		            .addAttribute("folder", webScaffoldFolder)
 		            .addAttribute("patternName", patternName)
-		            .addAttribute("referenceName", entityName.toLowerCase())
+		            .addAttribute("referenceName", getFieldRelationMasterEntity(fieldMetadata))
 		            .addAttribute(
 		                    "referenceField",
 		                    formbackingTypeMetadata.getPersistenceDetails()
@@ -452,6 +453,36 @@ public abstract class AbstractPatternJspMetadataListener implements
 		    patternRelations.appendChild(patternRelation);
 		}
 		return patternRelations;
+	}
+	
+	/**
+	 * Get field from entity related with some field.
+	 */
+	protected String getFieldRelationMasterEntity(FieldMetadata relationField) {
+		
+		// TODO Some duplicated code with RelatedPatternmetadata.getFieldRelationMasterEntity
+		
+		// Get field from master entity with OneToMany annotation and "mappedBy" attribute has some value
+		String masterField = null;
+		
+		PhysicalTypeMetadata masterEntityDetails = (PhysicalTypeMetadata) _metadataService.get(PhysicalTypeIdentifier.createIdentifier(formbackingType, Path.SRC_MAIN_JAVA));
+        List<FieldMetadata> masterFields = MemberFindingUtils.getFieldsWithAnnotation(masterEntityDetails.getMemberHoldingTypeDetails(), new JavaType("javax.persistence.OneToMany"));
+        for (FieldMetadata tmpMasterField : masterFields) {
+			
+        	List<AnnotationMetadata> masterFieldAnnotations = tmpMasterField.getAnnotations();
+        	for (AnnotationMetadata masterFieldAnnotation : masterFieldAnnotations) {
+        		
+        		// TODO May be more fields on relationsField var
+				AnnotationAttributeValue<?> masterFieldMappedBy = masterFieldAnnotation.getAttribute(new JavaSymbolName("mappedBy"));
+				if (masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.OneToMany")) && 
+						tmpMasterField.getFieldName().equals(relationField.getFieldName())) {
+					
+					masterField = masterFieldMappedBy.getValue().toString();
+				}
+			}
+		}
+        
+		return masterField;
 	}
 
 	protected Element getTabularRelationsDocument(String patternName,
@@ -489,7 +520,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		            .addAttribute("field", fieldName)
 		            .addAttribute("folder", webScaffoldFolder)
 		            .addAttribute("patternName", patternName)
-		            .addAttribute("referenceName", entityName.toLowerCase())
+		            .addAttribute("referenceName", getFieldRelationMasterEntity(fieldMetadata))
 		            .addAttribute(
 		                    "referenceField",
 		                    formbackingTypeMetadata.getPersistenceDetails()
