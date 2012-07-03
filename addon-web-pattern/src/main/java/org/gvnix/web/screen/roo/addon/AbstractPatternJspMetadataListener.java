@@ -425,6 +425,12 @@ public abstract class AbstractPatternJspMetadataListener implements
 		    String fieldName = uncapitalize(fieldMetadata.getFieldName()
 		            .getSymbolName());
 		    String webScaffoldFolder = getFieldEntityPlural(fieldMetadata);
+		    
+		    String referenceName = getFieldRelationMasterEntity(fieldMetadata);
+		    if (referenceName == null) {
+		    	referenceName = entityName.toLowerCase();
+		    }
+		    
 		    Element patternRelation = new XmlElementBuilder(
 		            "pattern:relation", document)
 		            .addAttribute(
@@ -438,7 +444,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		            .addAttribute("field", fieldName)
 		            .addAttribute("folder", webScaffoldFolder)
 		            .addAttribute("patternName", patternName)
-		            .addAttribute("referenceName", getFieldRelationMasterEntity(fieldMetadata))
+		            .addAttribute("referenceName", referenceName)
 		            .addAttribute(
 		                    "referenceField",
 		                    formbackingTypeMetadata.getPersistenceDetails()
@@ -507,6 +513,11 @@ public abstract class AbstractPatternJspMetadataListener implements
 		            .getSymbolName());
 		    String webScaffoldFolder = getFieldEntityPlural(fieldMetadata);
 		    
+		    String referenceName = getFieldRelationMasterEntity(fieldMetadata);
+		    if (referenceName == null) {
+		    	referenceName = entityName.toLowerCase();
+		    }
+		    
 		    Element patternRelation = new XmlElementBuilder(
 		            "pattern:relation", document)
 		            .addAttribute(
@@ -520,7 +531,7 @@ public abstract class AbstractPatternJspMetadataListener implements
 		            .addAttribute("field", fieldName)
 		            .addAttribute("folder", webScaffoldFolder)
 		            .addAttribute("patternName", patternName)
-		            .addAttribute("referenceName", getFieldRelationMasterEntity(fieldMetadata))
+		            .addAttribute("referenceName", referenceName)
 		            .addAttribute(
 		                    "referenceField",
 		                    formbackingTypeMetadata.getPersistenceDetails()

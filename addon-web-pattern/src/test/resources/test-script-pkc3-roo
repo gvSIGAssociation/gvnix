@@ -2,7 +2,7 @@ project --topLevelPackage org.gvnix.test.relation.list.table --projectName displ
 
 persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
-entity --class ~.domain.Person --identifierType ~.domain.PersonPk --entityName MyPerson --identifierColumn Myid --identifierField myId --table PERSON
+entity --class ~.domain.Person --identifierType ~.domain.PersonPk --entityName MyPerson --identifierColumn myidcolumn --identifierField myId --table PERSON
 field string --fieldName name --notNull
 field number --fieldName age --type java.lang.Integer --column my_age
 field date --fieldName birthDate --type java.util.Date
