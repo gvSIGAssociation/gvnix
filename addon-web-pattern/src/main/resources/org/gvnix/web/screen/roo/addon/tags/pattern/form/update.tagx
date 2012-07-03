@@ -201,6 +201,7 @@
               <c:set var="item" value="${item}" scope="request" />
               <c:set var="pos" value="${pos}" scope="request" />
               <c:set var="parentId" value="${id}" scope="request" />
+              <c:set var="compositePkField" value="${compositePkField}" scope="request" />
               
 	          <!-- Identifier input field: always disabled on update -->
 	          <c:choose>
@@ -218,7 +219,11 @@
 	           <spring:eval expression="item[versionField]" scope="request" var="versionValue" />
 	           <input type="hidden" id="_${secId}[${fieldPos}]_${versionField}_id" name="list[${fieldPos}].${versionField}" value="${versionValue}" disabled="disabled" />
 	         </c:if>
-              <jsp:doBody />
+	         
+             <jsp:doBody />
+              
+             <!-- Remove composite pk field from request to avoid errors on detail pattern -->
+             <c:set var="compositePkField" value="" scope="request" />
 
             </tr>
 
