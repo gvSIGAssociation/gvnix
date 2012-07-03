@@ -3,11 +3,10 @@ project --topLevelPackage org.gvnix.test.relation.list.table --projectName displ
 persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
 entity --class ~.domain.Person --entityName MyPerson --identifierType java.lang.Integer --identifierColumn Myid --identifierField myId --table PERSON
-field boolean --fieldName active --column is_active
 field number --fieldName age --type java.lang.Short --column my_age
 field date --fieldName birthDate --type java.util.Calendar --notNull --column birthDate
 
-entity --class ~.domain.Horse --identifierType ~.domain.HorsePk --entityName horse --identifierColumn oneId --identifierField MyId --table horsetable
+entity --class ~.domain.Horse --identifierType ~.domain.HorsePk --entityName horse --identifierColumn oneId --identifierField myidhorse --table horsetable
 field string --fieldName name --notNull --column horsename
 field reference --fieldName person2 --type ~.domain.Person --joinColumnName oneColumn --referencedColumnName Myid
 field date --fieldName birthDate --type java.util.Calendar --column adate
