@@ -220,8 +220,6 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 
 	protected void appendMasterRelationToEntity(InvocableMemberBodyBuilder bodyBuilder) {
 		
-        // TODO Support many to many relations
-		
 		String masterEntityName = masterEntity.getSimpleTypeName();
 		String entityName = entity.getSimpleTypeName();
 
@@ -334,8 +332,6 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         String entityNamePlural = entityTypeDetails.getPlural();
 
         // TODO Set master pattern reference into this entity if master has composite PK
-        
-        // TODO Support many to many relations
         
         // TODO Unify with method appendMasterRelationToEntity
         
@@ -517,7 +513,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		
         FieldMetadata field = null;
 
-		// Get field from master entity with OneToMany annotation and "mappedBy" attribute has some value
+		// Get field from master entity with OneToMany or ManyToMany annotation and "mappedBy" attribute has some value
 		String masterField = null;
         List<FieldMetadata> masterFields = MemberFindingUtils.getFields(masterEntityDetails);
         for (FieldMetadata tmpMasterField : masterFields) {
@@ -527,7 +523,8 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         		
         		// TODO May be more fields on relationsField var
 				AnnotationAttributeValue<?> masterFieldMappedBy = masterFieldAnnotation.getAttribute(new JavaSymbolName("mappedBy"));
-				if (masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.OneToMany")) &&
+				if ((masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.OneToMany")) || 
+						masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.ManyToMany")) ) &&
 						tmpMasterField.getFieldName().getSymbolName().equals(relationsFields.iterator().next())) {
 					
 					masterField = masterFieldMappedBy.getValue().toString();

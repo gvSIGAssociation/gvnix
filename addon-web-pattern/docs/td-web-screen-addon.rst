@@ -51,7 +51,7 @@ TBC: How form fields will be layout, how to change form field layouts, applied t
 Tech design
 ============
 
-#. Create the needed metadata to handle the defined pattern. That is, for a given Entity how this must be shown in CRUD operations, and how its related entities (@OneToMany annotated fields) must be shown in the same context.
+#. Create the needed metadata to handle the defined pattern. That is, for a given Entity how this must be shown in CRUD operations, and how its related entities (@OneToMany and @ManyToMany annotated fields) must be shown in the same context.
 
 #. JSPx, TAGx to work with an entity and its related entities. The layout must follow the defined pattern (master register, mater tabular, detail register, detail tabular).
 
@@ -171,7 +171,7 @@ Options:
 * field: One-to-many property name to apply pattern to. *Required*
 
   The name of the field we want to show as relationship of the master entity (the formBackingObject of controller). By now,
-  this field must be annotated with OneToMany.
+  this field must be annotated with OneToMany or ManyToMany.
 
 * type: The pattern type to apply pattern to. *Required*
 
@@ -336,8 +336,8 @@ TODO
 
 * Rename 'screen' with 'pattern'.
 
-* Los patrones de las entidades relacionadas actualmente funcionan para @OneToMany y deberían
-  funcionar también para los tipos @ManyToMany sin cambios y para ManyToOne con algún pequeño cambio.
+* Los patrones de las entidades relacionadas actualmente funcionan para @OneToMany y @ManyToMany
+  y deberían funcionan para ManyToOne y OneToOne con algún pequeño cambio.
 
 * Ampliar la ejecución del comando de "pattern relation" para que se pueda ejecutar recursivamente.
 
@@ -356,4 +356,4 @@ TODO
   org.gvnix.web.screen.roo.addon.ScreenMetadataListener.getAnnotatedFields(String, String). Falla
   porque no está controllado el caso de que WebScaffoldMetada sea null. ?
 
-* TODO Set ``render`` attribute in OneToMany relationships to false.
+* TODO Set ``render`` attribute in OneToMany (¿ and ManyToMany ?) relationships to false.

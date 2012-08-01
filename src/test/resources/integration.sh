@@ -69,3 +69,7 @@ rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-pattern/src/test/resources/test-script-pkc3-roo
 $2/code/bin/gvnix-dev hint
 mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+rm -rf /tmp/gvnixtest$1/*
+$2/code/bin/gvnix-dev script --file $2/code/addon-web-pattern/src/test/resources/test-script-manytomany-roo
+$2/code/bin/gvnix-dev hint
+mvn tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 

@@ -371,8 +371,9 @@ public abstract class AbstractPatternJspMetadataListener implements
                 fieldDisplay.setAttribute("dateTimePattern", "${" + entityName
                         + "_" + fieldName.toLowerCase() + "_date_format}");
             } else if (field.getFieldType().isCommonCollectionType()
-                    && field.getCustomData().get(
-                            PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) != null) {
+                    && (field.getCustomData().get(
+                            PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) != null || field.getCustomData().get(
+                                    PersistenceCustomDataKeys.MANY_TO_MANY_FIELD) != null)) {
                 if (isRelationVisible(patternName, field.getFieldName()
                         .getSymbolName())) {
                     fieldsOfRelations.add(field);
@@ -468,11 +469,12 @@ public abstract class AbstractPatternJspMetadataListener implements
 		
 		// TODO Some duplicated code with RelatedPatternmetadata.getFieldRelationMasterEntity
 		
-		// Get field from master entity with OneToMany annotation and "mappedBy" attribute has some value
+		// Get field from master entity with OneToMany or ManyToMany annotation and "mappedBy" attribute has some value
 		String masterField = null;
 		
 		PhysicalTypeMetadata masterEntityDetails = (PhysicalTypeMetadata) _metadataService.get(PhysicalTypeIdentifier.createIdentifier(formbackingType, Path.SRC_MAIN_JAVA));
         List<FieldMetadata> masterFields = MemberFindingUtils.getFieldsWithAnnotation(masterEntityDetails.getMemberHoldingTypeDetails(), new JavaType("javax.persistence.OneToMany"));
+        masterFields.addAll(MemberFindingUtils.getFieldsWithAnnotation(masterEntityDetails.getMemberHoldingTypeDetails(), new JavaType("javax.persistence.ManyToMany")));
         for (FieldMetadata tmpMasterField : masterFields) {
 			
         	List<AnnotationMetadata> masterFieldAnnotations = tmpMasterField.getAnnotations();
@@ -480,7 +482,8 @@ public abstract class AbstractPatternJspMetadataListener implements
         		
         		// TODO May be more fields on relationsField var
 				AnnotationAttributeValue<?> masterFieldMappedBy = masterFieldAnnotation.getAttribute(new JavaSymbolName("mappedBy"));
-				if (masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.OneToMany")) && 
+				if ((masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.OneToMany")) || 
+						masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.ManyToMany"))) && 
 						tmpMasterField.getFieldName().equals(relationField.getFieldName())) {
 					
 					masterField = masterFieldMappedBy.getValue().toString();
@@ -1135,8 +1138,9 @@ public abstract class AbstractPatternJspMetadataListener implements
         
         List<FieldMetadata> fieldsOfRelations = new ArrayList<FieldMetadata>();
         for (FieldMetadata field : formFields) {
-        	if (field.getCustomData().keySet()
-                    .contains(PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) && 
+        	if ((field.getCustomData().keySet()
+                    .contains(PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) || field.getCustomData().keySet()
+                    .contains(PersistenceCustomDataKeys.MANY_TO_MANY_FIELD)) && 
                     isRelationVisible(patternName, field.getFieldName().getSymbolName())) {
         		fieldsOfRelations.add(field);
         	}

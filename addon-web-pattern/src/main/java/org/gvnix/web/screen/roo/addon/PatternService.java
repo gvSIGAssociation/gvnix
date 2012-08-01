@@ -62,6 +62,7 @@ public interface PatternService {
     public static final JavaSymbolName RELATIONSPATTERN_ANNOTATION_VALUE = new JavaSymbolName("value");
 
     public static final JavaType ONETOMANY_ANNOTATION = new JavaType("javax.persistence.OneToMany");
+    public static final JavaType MANYTOMANY_ANNOTATION = new JavaType("javax.persistence.ManyToMany");
 
     /**
      * Check if there is a pattern name used already in project.
@@ -81,17 +82,17 @@ public interface PatternService {
      * @param fieldName
      * @return
      */
-    public FieldMetadata getOneToManyFieldFromEntityJavaType(
+    public FieldMetadata getToManyFieldFromEntityJavaType(
             JavaType entityJavaType, String fieldName);
 
     /**
      * Returns the list of fields metadata of those fields annotated with
-     * OneToMany
+     * OneToMany or ManyToMany
      * 
      * @param formBakingObjectType
      * @return
      */
-    public List<FieldMetadata> getOneToManyFieldsFromEntityJavaType(
+    public List<FieldMetadata> getToManyFieldsFromEntityJavaType(
             JavaType formBakingObjectType);
     
     /**

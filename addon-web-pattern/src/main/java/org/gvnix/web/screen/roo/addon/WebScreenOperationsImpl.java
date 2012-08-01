@@ -112,6 +112,9 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     /** {@link OneToMany} JavaType */
     public static final JavaType ONETOMANY_ANNOTATION = new JavaType("javax.persistence.OneToMany");
 
+    /** {@link OneToMany} JavaType */
+    public static final JavaType MANYTOMANY_ANNOTATION = new JavaType("javax.persistence.ManyToMany");
+
     /** MetadataService offers access to Roo's metadata model, use it to retrieve any available metadata by its MID */
     @Reference private MetadataService metadataService;
 
@@ -238,16 +241,16 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                 .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
                         ROOWEBSCAFFOLD_ANNOTATION);
 
-        // Check if filed exists in formBackingObject entity and is OneToMany
+        // Check if filed exists in formBackingObject entity and is OneToMany or ManyToMany
         JavaType formBackingObject = (JavaType) controllerAnnotationMetadata
                 .getAttribute(
                         ROOWEBSCAFFOLD_ANNOTATION_ATTR_VALUE_FORMBACKINGOBJECT)
                 .getValue();
         Assert.notNull(
-                patternService.getOneToManyFieldFromEntityJavaType(
+                patternService.getToManyFieldFromEntityJavaType(
                         formBackingObject, field.getSymbolName()),
                 "Field '".concat(field.getSymbolName())
-                        .concat("' not found or is not OneToMany in '")
+                        .concat("' not found or is not *ToMany in '")
                         .concat(formBackingObject.getFullyQualifiedTypeName())
                         .concat("' entity."));
 
@@ -372,7 +375,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     }
 
     /**
-     * For a given controller, this method inspect the OneToMany fields in its
+     * For a given controller, this method inspect the OneToMany and ManyToMany fields in its
      * formBackingObjet and, based on GvNIXRelationsPattern annotationValues,
      * annotates the controllers exposing these entities with the needed
      * GvNIXPattern annotation
@@ -397,11 +400,11 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                     + formBakingObjectType.getFullyQualifiedTypeName() + "'");
         }
 
-        List<FieldMetadata> oneToManyFields = patternService
-                .getOneToManyFieldsFromEntityJavaType(formBakingObjectType);
+        List<FieldMetadata> toManyFields = patternService
+                .getToManyFieldsFromEntityJavaType(formBakingObjectType);
         Map<String, String> fieldsPatternIdAndType = patternService.getFieldsPatternIdAndType(relationsPatternValues);
         if (!fieldsPatternIdAndType.keySet().isEmpty()) {
-            for (FieldMetadata field : oneToManyFields) {
+            for (FieldMetadata field : toManyFields) {
                 if (fieldsPatternIdAndType.keySet().contains(
                         field.getFieldName().getSymbolName())
                         && field.getFieldType().isCommonCollectionType()) {

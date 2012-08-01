@@ -132,10 +132,10 @@ public class PatternServicesImpl implements PatternService {
     }
 
     /** {@inheritDoc} */
-    public FieldMetadata getOneToManyFieldFromEntityJavaType(JavaType formBakingObjectType, String fieldName) {
+    public FieldMetadata getToManyFieldFromEntityJavaType(JavaType formBakingObjectType, String fieldName) {
     	
-        List<FieldMetadata> oneToManyFields = getOneToManyFieldsFromEntityJavaType(formBakingObjectType);
-        for (FieldMetadata field : oneToManyFields) {
+        List<FieldMetadata> toManyFields = getToManyFieldsFromEntityJavaType(formBakingObjectType);
+        for (FieldMetadata field : toManyFields) {
             if (field.getFieldName().getSymbolName().equals(fieldName)) {
                 return field;
             }
@@ -145,10 +145,10 @@ public class PatternServicesImpl implements PatternService {
     }
 
     /** {@inheritDoc} */
-    public List<FieldMetadata> getOneToManyFieldsFromEntityJavaType(
+    public List<FieldMetadata> getToManyFieldsFromEntityJavaType(
             JavaType formBakingObjectType) {
     	
-        List<FieldMetadata> oneToManyFields = new ArrayList<FieldMetadata>();
+        List<FieldMetadata> toManyFields = new ArrayList<FieldMetadata>();
         MutableClassOrInterfaceTypeDetails formBackingTypeMetadata = MetadataUtils
                 .getPhysicalTypeDetails(formBakingObjectType, metadataService,
                         physicalTypeMetadataProvider);
@@ -166,13 +166,14 @@ public class PatternServicesImpl implements PatternService {
         for (FieldMetadata field : fields) {
             for (AnnotationMetadata fieldAnnotation : field.getAnnotations()) {
                 if (fieldAnnotation.getAnnotationType().equals(
-                        ONETOMANY_ANNOTATION)) {
-                    oneToManyFields.add(field);
+                        ONETOMANY_ANNOTATION) || fieldAnnotation.getAnnotationType().equals(
+                                MANYTOMANY_ANNOTATION)) {
+                    toManyFields.add(field);
                 }
             }
         }
         
-        return oneToManyFields;
+        return toManyFields;
     }
 
     /** {@inheritDoc} */

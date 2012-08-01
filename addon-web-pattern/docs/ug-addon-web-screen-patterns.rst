@@ -29,7 +29,7 @@ Add-on allow jspx views creation for entities showed with different patterns:
   * register: Paginated views of single records
 
 
-Also, allow jspx views creation for OneToMany mapped relationship to show them with tabular pattern or register pattern.
+Also, allow jspx views creation for OneToMany and ManyToMany mapped relationship to show them with tabular pattern or register pattern.
 
   .. admonition:: What is an screen pattern?
 
@@ -78,7 +78,7 @@ Limitations
 Future enhancements
 ====================
 
-Choose between two types of visualization for oneToMany relationships:
+Choose between two types of visualization for oneToMany and manyToMany relationships:
 
 * Tabs: Show the relationships 1-n between entities inside tabs.
 * Accordion: Show the relationships 1-n between entities inside panels (current default option).
