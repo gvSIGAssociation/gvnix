@@ -1,0 +1,21 @@
+project --topLevelPackage org.gvnix.test.relation.list.table --projectName displayRelationsTable
+
+persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+
+entity --class ~.domain.Person 
+field string --fieldName name
+
+entity --class ~.domain.Horse 
+field set --fieldName My_Person --type ~.domain.Person --cardinality MANY_TO_MANY 
+
+focus --class ~.domain.Person
+field set --fieldName My_horses --type ~.domain.Horse --cardinality MANY_TO_MANY --mappedBy My_Person
+
+focus --class ~.domain.Horse
+field string --fieldName name
+
+web mvc setup
+web mvc all --package ~.web
+
+web mvc pattern master --class ~.web.PersonController --name personregtab --type register --testAutomatically
+web mvc pattern detail --class ~.web.PersonController --name personregtab --field My_horses --type tabular --testAutomatically
