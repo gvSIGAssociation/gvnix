@@ -22,6 +22,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 
@@ -55,7 +56,7 @@ public abstract class FileDynamicConfiguration {
      */
     protected MutableFile getFile() {
 
-        String path = pathResolver.getIdentifier(Path.ROOT, getFilePath());
+        String path = pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), getFilePath());
         if (!fileManager.exists(path)) {
 
             return null;

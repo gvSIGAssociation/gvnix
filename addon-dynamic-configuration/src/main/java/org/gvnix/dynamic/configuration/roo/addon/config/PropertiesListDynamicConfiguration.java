@@ -33,6 +33,7 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.support.logging.HandlerUtils;
 
@@ -73,7 +74,7 @@ public abstract class PropertiesListDynamicConfiguration extends
 
             // Get the property files to read from resources
             String resources = pathResolver.getIdentifier(
-                    Path.SRC_MAIN_RESOURCES, "");
+            		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "");
             List<FileDetails> files = getFiles(resources);
             for (FileDetails file : files) {
 
@@ -111,8 +112,7 @@ public abstract class PropertiesListDynamicConfiguration extends
         OutputStream outputStream = null;
 
         // Get the property files to write from resources
-        String resources = pathResolver.getIdentifier(Path.SRC_MAIN_RESOURCES,
-                "");
+        String resources = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "");
         List<FileDetails> files = getFiles(resources);
         for (FileDetails f : files) {
 

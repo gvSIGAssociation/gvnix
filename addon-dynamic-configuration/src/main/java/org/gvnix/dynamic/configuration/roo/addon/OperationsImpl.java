@@ -60,7 +60,7 @@ public class OperationsImpl implements Operations {
 
     public boolean isProjectAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService);
+        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
     }
 
     /**

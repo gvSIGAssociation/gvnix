@@ -28,6 +28,7 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfigurationList;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.XmlUtils;
@@ -60,7 +61,7 @@ public class PomManagerImpl implements PomManager {
 
         // Pom root element
         String pom = projectOperations.getPathResolver().getIdentifier(
-                Path.ROOT, "pom.xml");
+        		LogicalPath.getInstance(Path.ROOT, ""), "pom.xml");
         Document doc = XmlUtils.readXml(fileManager.getInputStream(pom));
 
         // Iterate stored dynamic configurations for export to pom

@@ -19,10 +19,12 @@
 package org.gvnix.dynamic.configuration.roo.addon;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -32,10 +34,10 @@ import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynPropertyList;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -523,18 +525,24 @@ public class ConfigurationsImpl implements Configurations {
      */
     private String getConfigurationFilePath() {
 
-        String path = pathResolver.getIdentifier(Path.SRC_MAIN_RESOURCES,
+        String path = pathResolver.getIdentifier(
+        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
                 DYNAMIC_CONFIGURATION_FILE_NAME);
         if (!fileManager.exists(path)) {
+        	
+        	OutputStream outputStream = null;
             try {
 
-                FileCopyUtils.copy(TemplateUtils.getTemplate(getClass(),
-                        DYNAMIC_CONFIGURATION_TEMPLATE_NAME), fileManager
-                        .createFile(path).getOutputStream());
+        		outputStream = fileManager.createFile(path).getOutputStream();
+        		IOUtils.copy(FileUtils.getInputStream(getClass(), DYNAMIC_CONFIGURATION_TEMPLATE_NAME), outputStream);
+        		
             } catch (IOException ioe) {
 
                 throw new IllegalStateException(ioe);
             }
+            finally {
+     	 	 	IOUtils.closeQuietly(outputStream);
+     	 	}
         }
 
         return path;
