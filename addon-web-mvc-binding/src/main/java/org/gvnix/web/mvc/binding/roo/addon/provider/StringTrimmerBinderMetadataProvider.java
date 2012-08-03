@@ -1,9 +1,9 @@
 package org.gvnix.web.mvc.binding.roo.addon.provider;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.web.mvc.binding.roo.addon.WebBinderOperations;
 import org.gvnix.web.mvc.binding.roo.addon.annotation.GvNIXStringTrimmerBinder;
 import org.gvnix.web.mvc.binding.roo.addon.metadata.StringTrimmerBinderMetadata;
 import org.osgi.service.component.ComponentContext;
@@ -17,8 +17,8 @@ import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.ProjectOperations;
 
 /**
  * Provides {@link StringTrimmerBinderMetadata}. This type is called by Roo to
@@ -35,9 +35,13 @@ public final class StringTrimmerBinderMetadataProvider extends
 
     private static final JavaType GVNIX_STRING_TRIMMER_BINDER = new JavaType(
             GvNIXStringTrimmerBinder.class.getName());
-
+    
+    /**
+     * Use ProjectOperations to install new dependencies, plugins, properties,
+     * etc into the project configuration
+     */
     @Reference
-    private WebBinderOperations webBindingOperations;
+    private ProjectOperations projectOperations;
 
     /**
      * The activate method for this OSGi component, this will be called by the
@@ -83,7 +87,7 @@ public final class StringTrimmerBinderMetadataProvider extends
         // We know governor type details are non-null and can be safely cast
         ClassOrInterfaceTypeDetails controllerClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
-        Assert.notNull(
+        Validate.notNull(
                 controllerClassOrInterfaceDetails,
                 "Governor failed to provide class type details, in violation of superclass contract");
 
@@ -113,13 +117,13 @@ public final class StringTrimmerBinderMetadataProvider extends
             String metadataIdentificationString) {
         JavaType javaType = StringTrimmerBinderMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = StringTrimmerBinderMetadata
+        LogicalPath path = StringTrimmerBinderMetadata
                 .getPath(metadataIdentificationString);
-        return PhysicalTypeIdentifier.createIdentifier(javaType, path);
+        return PhysicalTypeIdentifier.createIdentifier(javaType, LogicalPath.getInstance(path.getPath(), projectOperations.getFocusedModuleName()));
     }
 
     @Override
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
         return StringTrimmerBinderMetadata.createIdentifier(javaType, path);
     }
 

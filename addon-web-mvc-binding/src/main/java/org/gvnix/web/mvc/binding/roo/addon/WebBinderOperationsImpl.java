@@ -4,17 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.support.MetadataUtils;
 import org.gvnix.support.OperationUtils;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.gvnix.web.mvc.binding.roo.addon.annotation.GvNIXStringTrimmerBinder;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.TypeManagementService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
@@ -26,7 +27,6 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
 
@@ -53,13 +53,6 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
     private MetadataService metadataService;
 
     /**
-     * Use the PhysicalTypeMetadataProvider to access information about a
-     * physical type in the project
-     */
-    @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
-
-    /**
      * Use ProjectOperations to install new dependencies, plugins, properties,
      * etc into the project configuration
      */
@@ -75,12 +68,15 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
 
     @Reference
     private FileManager fileManager;
+    
+    @Reference
+    private TypeManagementService typeManagementService;
 
     /** {@inheritDoc} */
     public boolean isStringTrimmerAvailable() {
-        return projectOperations.isProjectAvailable()
+        return projectOperations.isProjectAvailable(projectOperations.getFocusedModuleName())
                 && OperationUtils.isSpringMvcProject(metadataService,
-                        fileManager);
+                        fileManager, projectOperations);
     }
 
     /** {@inheritDoc} */
@@ -108,12 +104,10 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
      */
     private void addBindStringTrimmer(JavaType controller, boolean emptyAsNull) {
         // Use Roo's Assert type for null checks
-        Assert.notNull(controller, "Java type required");
+        Validate.notNull(controller, "Java type required");
 
         // Retrieve the Java source type the annotation is being added to
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = MetadataUtils
-                .getPhysicalTypeDetails(controller, metadataService,
-                        physicalTypeMetadataProvider);
+        ClassOrInterfaceTypeDetails mutableTypeDetails = typeLocationService.getTypeDetails(controller);
 
         // Check if provided JavaType is a @Controller class
         AnnotationMetadata controllerAnnotation = MemberFindingUtils
@@ -145,15 +139,16 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
             AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                     stringTrimmerBinder, attributes);
 
-            // Add annotation to target type
-            mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
+            // Add annotation to target type and save changes to disk
+            ClassOrInterfaceTypeDetailsBuilder classOrInterfaceTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
+            classOrInterfaceTypeDetailsBuilder.addAnnotation(annotationBuilder.build());
+            typeManagementService.createOrUpdateTypeOnDisk(classOrInterfaceTypeDetailsBuilder.build());
         }
     }
 
     /** {@inheritDoc} */
     public void setup() {
-        Element configuration = XmlUtils.getConfiguration(getClass(),
-                "configuration.xml");
+        Element configuration = XmlUtils.getConfiguration(getClass());
 
         // Add addon repository and dependency to get annotations
         addAnnotations(configuration);
@@ -174,7 +169,7 @@ public class WebBinderOperationsImpl implements WebBinderOperations {
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
 
-            projectOperations.addRepository(new Repository(repo));
+            projectOperations.addRepository(projectOperations.getFocusedModuleName(), new Repository(repo));
         }
 
         List<Element> depens = XmlUtils.findElements(

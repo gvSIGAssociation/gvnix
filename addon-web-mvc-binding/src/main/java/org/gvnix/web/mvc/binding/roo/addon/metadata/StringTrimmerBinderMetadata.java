@@ -4,21 +4,22 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * This type produces metadata for a new ITD. It uses an
@@ -43,7 +44,7 @@ public class StringTrimmerBinderMetadata extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             boolean emptyAsNull) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
 
         // Adding a new method definition
@@ -69,7 +70,7 @@ public class StringTrimmerBinderMetadata extends
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
         parameterTypes.add(new AnnotatedJavaType(new JavaType(
-                "org.springframework.web.bind.WebDataBinder"), null));
+                "org.springframework.web.bind.WebDataBinder"), new ArrayList<AnnotationMetadata>()));
 
         // Check if a method with the same name already exists in the
         // target type
@@ -126,7 +127,7 @@ public class StringTrimmerBinderMetadata extends
 
     @Override
     public String toString() {
-        ToStringCreator tsc = new ToStringCreator(this);
+        ToStringBuilder tsc = new ToStringBuilder(this);
         tsc.append("identifier", getId());
         tsc.append("valid", valid);
         tsc.append("aspectName", aspectName);
@@ -140,7 +141,7 @@ public class StringTrimmerBinderMetadata extends
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }
@@ -150,7 +151,7 @@ public class StringTrimmerBinderMetadata extends
                 PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
                 metadataIdentificationString);
     }
