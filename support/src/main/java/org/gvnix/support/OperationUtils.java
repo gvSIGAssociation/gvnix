@@ -22,21 +22,24 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
-import java.util.Set;
+import java.util.Collection;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
-import org.springframework.roo.support.osgi.UrlFindingUtils;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.support.osgi.OSGiUtils;
+import org.springframework.roo.support.util.FileUtils;
 
 /**
  * Utils for Command classes.
@@ -55,8 +58,8 @@ public class OperationUtils {
      *            Metadata Service component
      * @return Is project available ?
      */
-    public static boolean isProjectAvailable(MetadataService metadataService) {
-        return getPathResolver(metadataService) != null;
+    public static boolean isProjectAvailable(MetadataService metadataService, ProjectOperations projectOperations) {
+        return getPathResolver(metadataService, projectOperations) != null;
     }
 
     /**
@@ -64,18 +67,20 @@ public class OperationUtils {
      * 
      * @param metadataService
      *            Metadata Service component
+     * @param projectOperations
+     * 			  Project operations component
      * @return Path resolver or null
      */
-    public static PathResolver getPathResolver(MetadataService metadataService) {
+    public static PathResolver getPathResolver(MetadataService metadataService, ProjectOperations projectOperations) {
 
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
+                .get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
         if (projectMetadata == null) {
 
             return null;
         }
 
-        return projectMetadata.getPathResolver();
+        return projectOperations.getPathResolver();
     }
 
     /**
@@ -88,14 +93,16 @@ public class OperationUtils {
      * @param metadataService
      *            Metadata Service component
      * @param fileManager
-     *            FileManager component
+     *            File manager component
+     * @param projectOperations
+     * 			  Project operations component
      * @return Is a Spring MVC project ?
      */
     public static boolean isSpringMvcProject(MetadataService metadataService,
-            FileManager fileManager) {
+            FileManager fileManager, ProjectOperations projectOperations) {
 
-        PathResolver pathResolver = getPathResolver(metadataService);
-        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+        PathResolver pathResolver = getPathResolver(metadataService, projectOperations);
+        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/spring/webmvc-config.xml");
 
         return fileManager.exists(webXmlPath);
@@ -111,14 +118,16 @@ public class OperationUtils {
      * @param metadataService
      *            Metadata Service component
      * @param fileManager
-     *            FileManager component
+     *            File manager component
+     * @param projectOperations
+     * 			  Project operations component
      * @return Is a web project ?
      */
     public static boolean isWebProject(MetadataService metadataService,
-            FileManager fileManager) {
+            FileManager fileManager, ProjectOperations projectOperations) {
 
-        PathResolver pathResolver = getPathResolver(metadataService);
-        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+        PathResolver pathResolver = getPathResolver(metadataService, projectOperations);
+        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/web.xml");
 
         return fileManager.exists(webXmlPath);
@@ -136,7 +145,7 @@ public class OperationUtils {
     public static void installWebDialogClass(String packageFullName,
             PathResolver pathResolver, FileManager fileManager) {
 
-        String classFullName = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+        String classFullName = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                 packageFullName.concat(".Dialog").replace(".", File.separator)
                         .concat(".java"));
 
@@ -164,13 +173,12 @@ public class OperationUtils {
 
         MutableFile mutableClass = null;
         if (!fileManager.exists(classFullName)) {
-            InputStream template = TemplateUtils.getTemplate(
+            InputStream template = FileUtils.getInputStream(
                     OperationUtils.class, javaClassTemplateName);
 
             String javaTemplate;
             try {
-                javaTemplate = FileCopyUtils
-                        .copyToString(new InputStreamReader(template));
+                javaTemplate = IOUtils.toString(new InputStreamReader(template));
 
                 // Replace package definition
                 javaTemplate = StringUtils.replace(javaTemplate, "${PACKAGE}",
@@ -178,8 +186,19 @@ public class OperationUtils {
 
                 // Write final java file
                 mutableClass = fileManager.createFile(classFullName);
-                FileCopyUtils.copy(javaTemplate.getBytes(),
-                        mutableClass.getOutputStream());
+                
+                OutputStream outputStream = null;
+                InputStream inputStream = null;
+                try { 
+	                outputStream = mutableClass.getOutputStream();
+	                inputStream = IOUtils.toInputStream(javaTemplate);
+	                IOUtils.copy(inputStream, outputStream);
+                }
+                finally {
+                	IOUtils.closeQuietly(outputStream);
+                	IOUtils.closeQuietly(inputStream);
+                }
+                
             } catch (IOException ioe) {
                 throw new IllegalStateException("Unable load ".concat(
                         javaClassTemplateName).concat(", ioe"));
@@ -216,8 +235,8 @@ public class OperationUtils {
     public static void updateDirectoryContents(String sourceAntPath,
             String targetDirectory, FileManager fileManager,
             ComponentContext context, Class<?> clazz) {
-        Assert.hasText(sourceAntPath, "Source path required");
-        Assert.hasText(targetDirectory, "Target directory required");
+    	StringUtils.isNotBlank(sourceAntPath);
+    	StringUtils.isNotBlank(targetDirectory);
 
         if (!targetDirectory.endsWith("/")) {
             targetDirectory += "/";
@@ -227,10 +246,9 @@ public class OperationUtils {
             fileManager.createDirectory(targetDirectory);
         }
 
-        String path = TemplateUtils.getTemplatePath(clazz, sourceAntPath);
-        Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(
-                context.getBundleContext(), path);
-        Assert.notNull(urls,
+        String path = FileUtils.getPath(clazz, sourceAntPath);
+        Collection<URL> urls = OSGiUtils.findEntriesByPattern(context.getBundleContext(), path);
+        Validate.notNull(urls,
                 "Could not search bundles for resources for Ant Path '" + path
                         + "'");
         for (URL url : urls) {
@@ -238,13 +256,25 @@ public class OperationUtils {
                     url.getPath().lastIndexOf("/") + 1);
             try {
                 if (!fileManager.exists(targetDirectory + fileName)) {
-                    FileCopyUtils.copy(url.openStream(), fileManager
-                            .createFile(targetDirectory + fileName)
-                            .getOutputStream());
+                	
+                    OutputStream outputStream = null;
+                    try { 
+	                    outputStream = fileManager.createFile(targetDirectory + fileName).getOutputStream();
+	                    IOUtils.copy(url.openStream(), outputStream);
+                    }
+                    finally {
+                    	IOUtils.closeQuietly(outputStream);
+                    }
                 } else {
-                    FileCopyUtils.copy(url.openStream(), fileManager
-                            .updateFile(targetDirectory + fileName)
-                            .getOutputStream());
+
+                    OutputStream outputStream = null;
+                    try { 
+	                    outputStream = fileManager.createFile(targetDirectory + fileName).getOutputStream();
+	                    IOUtils.copy(url.openStream(), outputStream);
+                    }
+                    finally {
+                    	IOUtils.closeQuietly(outputStream);
+                    }
                 }
             } catch (IOException e) {
                 throw new IllegalStateException(

@@ -18,13 +18,9 @@
  */
 package org.gvnix.support;
 
-import org.springframework.roo.classpath.PhysicalTypeDetails;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
-import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * 
@@ -42,39 +38,18 @@ public class MetadataUtils {
      * Returns an instance of {@link MutableClassOrInterfaceTypeDetails} of the
      * given JavaType
      * 
+     * TODO Delete this method and replace occurences with typeLocationService.getTypeDetails(type)
+     * 
      * @param type
      * @param metadataService
      * @param physicalTypeMetadataProvider
      * @return
+     * 
+     * @deprecated Use typeLocationService.getTypeDetails(type) instead
      */
-    public static MutableClassOrInterfaceTypeDetails getPhysicalTypeDetails(
-            JavaType type, MetadataService metadataService,
-            PhysicalTypeMetadataProvider physicalTypeMetadataProvider) {
-        // Retrieve metadata for the Java source type the annotation is being
-        // added to
-        String entityId = physicalTypeMetadataProvider.findIdentifier(type);
-        if (entityId == null) {
-            throw new IllegalArgumentException("Cannot locate source for '"
-                    + type.getFullyQualifiedTypeName() + "'");
-        }
-
-        // Obtain the physical type and itd mutable details
-        PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
-                .get(entityId, true);
-        Assert.notNull(physicalTypeMetadata,
-                "Java source code unavailable for type ".concat(type
-                        .getFullyQualifiedTypeName()));
-
-        // Obtain physical type details for the target type
-        PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
-                .getMemberHoldingTypeDetails();
-        Assert.notNull(physicalTypeDetails,
-                "Java source code details unavailable for type ".concat(type
-                        .getFullyQualifiedTypeName()));
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-                physicalTypeDetails, "Java source code is immutable for type "
-                        .concat(type.getFullyQualifiedTypeName()));
-        return (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
+    public static ClassOrInterfaceTypeDetails getPhysicalTypeDetails(
+            JavaType type, TypeLocationService typeLocationService) {
+    	return typeLocationService.getTypeDetails(type);
     }
 
 }

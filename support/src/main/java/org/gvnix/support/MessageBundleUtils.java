@@ -19,6 +19,7 @@
 package org.gvnix.support;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -26,13 +27,14 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
 
 /**
  * 
@@ -59,7 +61,7 @@ public class MessageBundleUtils {
      */
     public static void installI18nMessages(I18n i18n,
             ProjectOperations projectOperations, FileManager fileManager) {
-        Assert.notNull(i18n, "Language choice required");
+    	Validate.notNull(i18n, "Language choice required");
 
         if (i18n.getLocale() == null) {
             logger.warning("could not parse language choice");
@@ -67,7 +69,7 @@ public class MessageBundleUtils {
         }
 
         String targetDirectory = projectOperations.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_WEBAPP, "");
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "");
 
         // Install message bundle
         String messageBundle = targetDirectory + "/WEB-INF/i18n/messages_"
@@ -78,13 +80,21 @@ public class MessageBundleUtils {
                     + "/WEB-INF/i18n/messages.properties";
         }
         if (!fileManager.exists(messageBundle)) {
+        	OutputStream outputStream = null;
             try {
-                FileCopyUtils.copy(i18n.getMessageBundle(), fileManager
-                        .createFile(messageBundle).getOutputStream());
+            	
+                outputStream = fileManager.createFile(messageBundle).getOutputStream();
+                IOUtils.copy(i18n.getMessageBundle(), outputStream);
+                
             } catch (IOException e) {
+            	
                 throw new IllegalStateException(
                         "Encountered an error during copying of message bundle MVC JSP addon.",
                         e);
+            }
+            finally {
+            	
+            	IOUtils.closeQuietly(outputStream);
             }
         }
         return;
@@ -119,7 +129,7 @@ public class MessageBundleUtils {
         // Take "en" as default language
         String messageBundleRelativeFilePath = "/WEB-INF/i18n/messages.properties";
         String messageBundle = projectOperations.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_WEBAPP,
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         messageBundleRelativeFilePath);
         try {
             if (language == "en") {
@@ -131,7 +141,7 @@ public class MessageBundleUtils {
                 messageBundleRelativeFilePath = "/WEB-INF/i18n/messages_"
                         .concat(language).concat(".properties");
                 messageBundle = projectOperations.getPathResolver()
-                        .getIdentifier(Path.SRC_MAIN_WEBAPP,
+                        .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                                 messageBundleRelativeFilePath);
 
                 propertiesFolderPath = propertiesFolderPath.concat("/messages_"
@@ -141,7 +151,7 @@ public class MessageBundleUtils {
             }
 
             if (fileManager.exists(messageBundle)) {
-                propFileOperations.addProperties(Path.SRC_MAIN_WEBAPP,
+                propFileOperations.addProperties(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         messageBundleRelativeFilePath,
                         new HashMap<String, String>((Map) properties), true,
                         true);

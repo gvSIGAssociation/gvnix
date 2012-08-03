@@ -39,8 +39,6 @@ import org.w3c.dom.Element;
  * @since 0.7
  */
 public class DependenciesVersionManager {
-    private static final String PROJECT_METADATA_IDENTIFIER = ProjectMetadata
-            .getProjectIdentifier();
 
     /**
      * Given a list of DOM elements representing Maven dependencies determines
@@ -57,7 +55,7 @@ public class DependenciesVersionManager {
             List<Element> dependenciesElements) {
         // Get project metadata in order to check existing properties
         ProjectMetadata md = (ProjectMetadata) metadataService
-                .get(PROJECT_METADATA_IDENTIFIER);
+                .get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
         if (md == null) {
             return false;
         }
@@ -68,7 +66,7 @@ public class DependenciesVersionManager {
         for (Element depen : dependenciesElements) {
             dependency = new Dependency(depen);
             // Get existing dependencies for check them against new dependencies
-            results = md.getDependenciesExcludingVersion(dependency);
+            results = projectOperations.getFocusedModule().getDependenciesExcludingVersion(dependency);
 
             VersionInfo existingDepVersionInfo = null;
             VersionInfo newDepVersionInfo = VersionInfo
@@ -82,7 +80,7 @@ public class DependenciesVersionManager {
                     // Remove existing dependency in pom.xml just if it's older
                     // than the new one
                     if (existingDepVersionInfo.compareTo(newDepVersionInfo) < 0) {
-                        projectOperations.removeDependency(existingDependency);
+                        projectOperations.removeDependency(projectOperations.getFocusedModuleName(), existingDependency);
                         updateDependency = true;
                     } else {
                         updateDependency = false;
@@ -92,7 +90,7 @@ public class DependenciesVersionManager {
         }
         // Add the new dependency just if needed
         if (updateDependency) {
-            projectOperations.addDependency(dependency);
+            projectOperations.addDependency(projectOperations.getFocusedModuleName(), dependency);
         }
         return updateDependency;
     }
@@ -114,7 +112,7 @@ public class DependenciesVersionManager {
 
         // Get project metadata in order to check existing properties
         ProjectMetadata md = (ProjectMetadata) metadataService
-                .get(PROJECT_METADATA_IDENTIFIER);
+                .get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
         if (md == null) {
             return propertiesUpdated;
         }
@@ -130,7 +128,7 @@ public class DependenciesVersionManager {
             newPropVersionInfo = VersionInfo
                     .extractVersionInfoFromString(property.getValue());
             // Get existing properties for check them against new properties
-            results = md.getPropertiesExcludingValue(property);
+            results = projectOperations.getFocusedModule().getPropertiesExcludingValue(property);
             for (Property existingProperty : results) {
                 existingPropVersionInfo = VersionInfo
                         .extractVersionInfoFromString(existingProperty
@@ -151,7 +149,7 @@ public class DependenciesVersionManager {
             }
             // Add the new property just if needed
             if (propertiesUpdated) {
-                projectOperations.addProperty(new Property(elemProperty));
+                projectOperations.addProperty(projectOperations.getFocusedModuleName(), new Property(elemProperty));
             }
         }
         return propertiesUpdated;
