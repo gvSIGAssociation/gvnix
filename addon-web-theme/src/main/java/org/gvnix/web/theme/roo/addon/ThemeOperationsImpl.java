@@ -24,11 +24,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -41,6 +43,9 @@ import java.util.logging.Logger;
 
 import javax.xml.transform.Transformer;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -55,18 +60,15 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Execution;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathInformation;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.osgi.UrlFindingUtils;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.osgi.OSGiUtils;
+import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -139,24 +141,18 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     @Reference
     private PropFileOperations propFileOperations;
 
-    /** Path identifier for project themes directory */
-    public static final Path SRC_MAIN_THEMES = new Path("SRC_MAIN_THEMES");
-
-    /** Path identifier for themes repository */
-    public static final Path THEMES_REPOSITORY = new Path("THEMES_REPOSITORY");
-
     /** Themes installation path */
-    private PathInformation themesPath = null;
+    private File themesPath = null;
 
     /** Themes repository path */
-    private PathInformation themesRepositoryPath = null;
+    private File themesRepositoryPath = null;
 
     // Public operations -----
 
     /** {@inheritDoc} */
     public boolean isProjectAvailable() {
         // Check if a project has been created
-        return projectOperations.isProjectAvailable();
+        return projectOperations.isProjectAvailable(projectOperations.getFocusedModuleName());
     }
 
     /**
@@ -194,7 +190,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * installed themes.
      */
     public void installThemeArtefacts(String id) {
-        Assert.hasText(id, "Theme ID to match is required");
+        StringUtils.isNotBlank(id);
 
         // Iterate over available themes and install the matching theme
         List<Theme> themes = getAvailableThemes();
@@ -203,13 +199,13 @@ public class ThemeOperationsImpl extends AbstractOperations implements
             if (theme.getId().equals(id)) {
 
                 // destination = [PROJECT-THEMES-PATH]/THEME-ID/
-                File destination = new File(getThemesPath().getLocation(), id);
+                File destination = new File(getThemesPath(), id);
 
                 // get source URI from which get Theme artefacts
                 URI sourceURI = theme.getRootURI();
 
                 // it shouldn't occur
-                Assert.notNull(sourceURI,
+                Validate.notNull(sourceURI,
                         "Could not determine schema for resources for Theme '"
                                 .concat(id).concat("'"));
 
@@ -247,12 +243,12 @@ public class ThemeOperationsImpl extends AbstractOperations implements
             }
         }
 
-        Assert.notNull(source, "Theme '".concat(id)
+        Validate.notNull(source, "Theme '".concat(id)
                 .concat("' isn't installed."));
 
         // destination = [PROJECT-THEMES-PATH]/THEME-ID/
         String destinationPath = getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "");
         File destination = new File(destinationPath);
 
         // before overwrite current web artifacts, load active languages. The
@@ -299,12 +295,11 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      */
     private void installApplicationVersionProperties() {
         PathResolver pathResolver = projectOperations.getPathResolver();
-        InputStream appVersionPropIS = TemplateUtils.getTemplate(getClass(),
+        InputStream appVersionPropIS = org.springframework.roo.support.util.FileUtils.getInputStream(getClass(),
                 "applicationversion-template.properties");
         String appVersionPropTemplate;
         try {
-            appVersionPropTemplate = FileCopyUtils
-                    .copyToString(new InputStreamReader(appVersionPropIS));
+            appVersionPropTemplate = IOUtils.toString(new InputStreamReader(appVersionPropIS));
         } catch (IOException ioe) {
             throw new IllegalStateException(
                     "Unable load applicationversion-template.properties", ioe);
@@ -319,7 +314,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         }
 
         String appVersionProp = pathResolver.getIdentifier(
-                Path.SRC_MAIN_RESOURCES, "applicationversion.properties");
+        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "applicationversion.properties");
         fileManager.createOrUpdateTextFileIfRequired(appVersionProp,
                 appVersionPropTemplate, false);
     }
@@ -339,7 +334,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     private void updatePomFile() {
 
         Element configuration = org.springframework.roo.support.util.XmlUtils
-                .getConfiguration(getClass(), "configuration.xml");
+                .getConfiguration(getClass());
         Element pluginElement = org.springframework.roo.support.util.XmlUtils
                 .findFirstElement("/configuration/plugin", configuration);
 
@@ -350,7 +345,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         Execution pluginExecution = createExecutionFromElement(executionElement);
 
         String pom = projectOperations.getPathResolver().getIdentifier(
-                Path.ROOT, "pom.xml");
+        		LogicalPath.getInstance(Path.ROOT, ""), "pom.xml");
         Document pomDoc = org.springframework.roo.support.util.XmlUtils
                 .readXml(fileManager.getInputStream(pom));
         Element root = pomDoc.getDocumentElement();
@@ -435,11 +430,9 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * @return
      */
     private Execution createExecutionFromElement(Element executionElement) {
-        String executionId = org.springframework.roo.support.util.XmlUtils
-                .findFirstElementByName("id", executionElement)
+        String executionId = DomUtils.findFirstElementByName("id", executionElement)
                 .getTextContent();
-        String executionPhase = org.springframework.roo.support.util.XmlUtils
-                .findFirstElementByName("phase", executionElement)
+        String executionPhase = DomUtils.findFirstElementByName("phase", executionElement)
                 .getTextContent();
         String executionGoal = org.springframework.roo.support.util.XmlUtils
                 .findFirstElement("goals/goal", executionElement)
@@ -453,7 +446,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     private void installApplicationStyle() {
         PathResolver pathResolver = projectOperations.getPathResolver();
         copyDirectoryContents("styles/*.css",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/styles"),
+                pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/styles"),
                 false);
     }
 
@@ -468,7 +461,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     private void modifyLoadScriptsTagx() {
         PathResolver pathResolver = projectOperations.getPathResolver();
         String loadScriptsTagx = pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/util/load-scripts.tagx");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/tags/util/load-scripts.tagx");
 
         if (!fileManager.exists(loadScriptsTagx)) {
             // load-scripts.tagx doesn't exist, so nothing to do
@@ -709,7 +702,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
             File f = new File(filePath);
             String existing = null;
             try {
-                existing = FileCopyUtils.copyToString(new FileReader(f));
+                existing = IOUtils.toString(new FileReader(f));
             } catch (IOException ignoreAndJustOverwriteIt) {
             }
 
@@ -718,15 +711,25 @@ public class ThemeOperationsImpl extends AbstractOperations implements
             }
         } else {
             mutableFile = fileManager.createFile(filePath);
-            Assert.notNull(mutableFile, "Could not create '" + filePath + "'");
+            Validate.notNull(mutableFile, "Could not create '" + filePath + "'");
         }
 
         if (mutableFile != null) {
             try {
                 // We need to write the file out (it's a new file, or the
                 // existing file has different contents)
-                FileCopyUtils.copy(viewContent, new OutputStreamWriter(
-                        mutableFile.getOutputStream()));
+                OutputStreamWriter outputStream = null;
+                InputStream inputStream = null;
+                try { 
+	                outputStream = new OutputStreamWriter(mutableFile.getOutputStream());
+	                inputStream = IOUtils.toInputStream(viewContent);
+	                IOUtils.copy(inputStream, outputStream);
+                }
+                finally {
+                	IOUtils.closeQuietly(outputStream);
+                	IOUtils.closeQuietly(inputStream);
+                }
+                
                 // Return and indicate we wrote out the file
                 return true;
             } catch (IOException ioe) {
@@ -743,7 +746,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     public Theme getActiveTheme() {
 
         String activeThemePath = getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/views/theme.xml");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/views/theme.xml");
         File descriptor = new File(activeThemePath);
         Theme active = null;
 
@@ -963,10 +966,10 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * 
      * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Set<URL> findBundleThemeDescriptors() {
+    private Collection<URL> findBundleThemeDescriptors() {
 
         // URLs to theme descriptors in OSGi bundles
-        Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(
+        Collection<URL> urls = OSGiUtils.findEntriesByPattern(
                 context.getBundleContext(), "/**/WEB-INF/views/theme.xml");
         return urls;
     }
@@ -978,7 +981,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * 
      * @return URLs to theme descriptors "WEB-INF/views/theme.xml"
      */
-    private Set<URL> findFileThemeDescriptors(PathInformation path) {
+    private Set<URL> findFileThemeDescriptors(File path) {
         Set<URL> urls = new HashSet<URL>();
 
         // find themes in the local theme repository (if it exists)
@@ -988,15 +991,8 @@ public class ThemeOperationsImpl extends AbstractOperations implements
             return urls;
         }
 
-        File themesLocation = path.getLocation();
-        if (themesLocation == null) {
-            // if null, themes location hasn't been created yet, there isn't any
-            // theme descriptor installed in the project : return empty set
-            return urls;
-        }
-
         // get the list of theme dirs in the repository
-        File[] themeDirs = themesLocation.listFiles();
+        File[] themeDirs = path.listFiles();
         if (themeDirs == null) {
             // if null there isn't any installed theme : return empty set
             return urls;
@@ -1029,14 +1025,14 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      */
     private PathResolver getPathResolver() {
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
-        Assert.notNull(projectMetadata, "Unable to obtain project metadata");
+                .get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
+        Validate.notNull(projectMetadata, "Unable to obtain project metadata");
 
         // Use PathResolver to resolve between {@link File}, {@link Path} and
         // canonical path {@link String}s.
         // See {@link MavenPathResolver} to know location values
-        PathResolver pathResolver = projectMetadata.getPathResolver();
-        Assert.notNull(projectMetadata, "Unable to obtain path resolver");
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        Validate.notNull(projectMetadata, "Unable to obtain path resolver");
 
         return pathResolver;
     }
@@ -1090,8 +1086,8 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     @SuppressWarnings("unchecked")
     private void copyRecursively(URI sourceDirectory, File targetDirectory,
             boolean overwrite) {
-        Assert.notNull(sourceDirectory, "Source URI required");
-        Assert.notNull(targetDirectory, "Target directory required");
+    	Validate.notNull(sourceDirectory, "Source URI required");
+    	Validate.notNull(targetDirectory, "Target directory required");
 
         // if source and target are the same dir, do nothing
         if (targetDirectory.toURI().equals(sourceDirectory)) {
@@ -1136,7 +1132,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                             .concat(sourceDirectory.toString()).concat("'"));
         }
 
-        Assert.notNull(
+        Validate.notNull(
                 urls,
                 "No resources found to copy in '".concat(
                         sourceDirectory.toString()).concat("'"));
@@ -1156,16 +1152,33 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                 // only copy files and if target file doesn't exist or overwrite
                 // flag is true
                 if (!targetFile.exists()) {
+                	
                     // create file using FileManager to fire creation events
-                    FileCopyUtils.copy(url.openStream(), fileManager
-                            .createFile(targetFile.getAbsolutePath())
-                            .getOutputStream());
+                    InputStream inputStream = null;
+                    OutputStream outputStream = null;
+                    try { 
+	                    inputStream = url.openStream();
+	                    outputStream = fileManager.createFile(targetFile.getAbsolutePath()).getOutputStream();
+	                    IOUtils.copy(inputStream, outputStream);
+                    }
+                    finally {
+	                    IOUtils.closeQuietly(inputStream);
+	                    IOUtils.closeQuietly(outputStream);
+                    }
                 }
                 // if file exists and overwrite is true, update the file
                 else if (overwrite) {
-                    FileCopyUtils.copy(url.openStream(), fileManager
-                            .updateFile(targetFile.getAbsolutePath())
-                            .getOutputStream());
+                    InputStream inputStream = null;
+                    OutputStream outputStream = null;
+                    try { 
+	                    inputStream = url.openStream();
+	                    outputStream = fileManager.updateFile(targetFile.getAbsolutePath()).getOutputStream();
+	                    IOUtils.copy(inputStream, outputStream);
+                    }
+                    finally {
+	                    IOUtils.closeQuietly(inputStream);
+	                    IOUtils.closeQuietly(outputStream);
+                    }
                 }
             } catch (IOException e) {
                 new IllegalStateException(
@@ -1211,7 +1224,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
 
             // get the PATH_ID from key
             int index = entry.getKey().indexOf(":");
-            Path path = new Path(entry.getKey().substring(0, index));
+            LogicalPath path = LogicalPath.getInstance(entry.getKey().substring(0, index));
 
             // get filename from key
             String filename = entry.getKey().substring(index);
@@ -1246,7 +1259,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     private void updateSpringWebCtx(String themeId) {
 
         String webMvc = getMvcConfigFile();
-        Assert.isTrue(fileManager.exists(webMvc),
+        Validate.isTrue(fileManager.exists(webMvc),
                 "webmvc-config.xml not found; cannot continue");
 
         MutableFile mutableConfigXml = null;
@@ -1272,7 +1285,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                         (Element) webConfigDoc.getFirstChild());
 
         // throw exception if themeResolver doesn't exist
-        Assert.notNull(resolverElement,
+        Validate.notNull(resolverElement,
                 "Could not find bean 'themeResolver' in ".concat(webMvc));
 
         resolverElement.setAttribute("p:defaultThemeName", themeId);
@@ -1283,7 +1296,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                         (Element) webConfigDoc.getFirstChild());
 
         // throw exception if msgSourceElement doesn't exist
-        Assert.notNull(msgSourceElement,
+        Validate.notNull(msgSourceElement,
                 "Could not find bean 'messageSource' in ".concat(webMvc));
 
         // The associated resource bundles will be checked sequentially when
@@ -1333,7 +1346,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      */
     private void updateThemeLinks(Theme theme) {
         String tagxFileLocation = projectOperations.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_WEBAPP,
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/tags/util/theme.tagx");
         MutableFile tagxFile = null;
 
@@ -1433,14 +1446,13 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * 
      * @return
      */
-    private PathInformation getThemesPath() {
+    private File getThemesPath() {
 
         if (themesPath == null) {
             // resolve project installation directory for themes
-            String root = getPathResolver().getRoot(Path.ROOT);
+            String root = getPathResolver().getRoot(LogicalPath.getInstance(Path.ROOT, projectOperations.getFocusedModuleName()));
 
-            themesPath = new PathInformation(SRC_MAIN_THEMES, true, new File(
-                    root, "src/main/themes"));
+            themesPath = new File(root, "src/main/themes");
         }
 
         return themesPath;
@@ -1451,16 +1463,15 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      * 
      * @return
      */
-    private PathInformation getThemesRepositoryPath() {
+    private File getThemesRepositoryPath() {
 
         if (themesRepositoryPath == null) {
             // load local themes repository path, it won't change in single
             // shell
             // execution. Note it is optional to have local repository
             String repoPath = getLocalRepositoryPath();
-            if (StringUtils.hasText(repoPath)) {
-                themesRepositoryPath = new PathInformation(THEMES_REPOSITORY,
-                        true, new File(repoPath));
+            if (StringUtils.isNotBlank(repoPath)) {
+                themesRepositoryPath = new File(repoPath);
             }
         }
         return themesRepositoryPath;
@@ -1474,7 +1485,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     private String getMvcConfigFile() {
 
         // resolve absolute path for menu.jspx if it hasn't been resolved yet
-        return getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP,
+        return getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, projectOperations.getFocusedModuleName()),
                 "/WEB-INF/spring/webmvc-config.xml");
     }
 
@@ -1488,7 +1499,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
     private String getTilesLayoutsFile() {
 
         // resolve absolute path for menu.jspx if it hasn't been resolved yet
-        return getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP,
+        return getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, projectOperations.getFocusedModuleName()),
                 "/WEB-INF/layouts/layouts.xml");
     }
 
@@ -1499,7 +1510,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
      */
     private Set<I18n> getInstalledI18n() {
         String targetDirectory = projectOperations.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_WEBAPP, "");
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "");
         // Language definition
         String footerFileLocation = targetDirectory
                 + "/WEB-INF/views/footer.jspx";
@@ -1556,7 +1567,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
             return;
         }
         String targetDirectory = projectOperations.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_WEBAPP, "");
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "");
 
         // Language definition
         String footerFileLocation = targetDirectory

@@ -23,10 +23,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.XmlUtils;
+import org.springframework.roo.support.util.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -84,18 +84,16 @@ public class Theme {
     }
 
     this.id = themeEl.getAttribute("id");
-    Assert.notNull(id, "Theme element must have id attribute");
+    Validate.notNull(id, "Theme element must have id attribute");
 
     this.name = themeEl.getAttribute("name");
 
     // Description can be null in custom project themes
-    Element themeDescription = XmlUtils.findFirstElementByName("description",
-        themeEl);
+    Element themeDescription = DomUtils.findFirstElementByName("description", themeEl);
     this.description = themeDescription != null ? themeDescription.getTextContent() : null;
 
     // Properties can be null
-    Element properties = XmlUtils.findFirstElementByName("properties",
-        themeEl);
+    Element properties = DomUtils.findFirstElementByName("properties", themeEl);
     if(properties != null) {
       propertyBundles = parseThemeProperties(properties);
     }

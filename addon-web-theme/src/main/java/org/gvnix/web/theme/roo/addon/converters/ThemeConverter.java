@@ -26,6 +26,7 @@ import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.web.theme.roo.addon.Theme;
 import org.gvnix.web.theme.roo.addon.ThemeOperations;
+import org.springframework.roo.shell.Completion;
 import org.springframework.roo.shell.Converter;
 import org.springframework.roo.shell.MethodTarget;
 
@@ -124,7 +125,7 @@ public class ThemeConverter implements Converter {
 
         // get all theme IDs
         for (Theme theme : themes) {
-            completions.add(theme.getId());
+            completions.add(new Completion(theme.getId()));
         }
         return true;
     }
