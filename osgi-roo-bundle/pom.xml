@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.osgi.bundle</artifactId>
-    <version>0.8.2</version>
+    <version>1.0.0</version>
     <relativePath>../osgi-bundle</relativePath>
   </parent>
   <artifactId>org.gvnix.osgi.roo.bundle</artifactId>

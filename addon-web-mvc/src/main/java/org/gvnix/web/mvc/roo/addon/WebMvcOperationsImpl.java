@@ -141,7 +141,7 @@ public class WebMvcOperationsImpl implements WebMvcOperations {
 
         // Install the dependency on the add-on jar (
         dependencies.add(new Dependency("org.gvnix",
-                "org.gvnix.web.mvc.roo.addon", "0.8.2", DependencyType.JAR,
+                "org.gvnix.web.mvc.roo.addon", "1.0.0", DependencyType.JAR,
                 DependencyScope.PROVIDED));
 
         // Install dependencies defined in external XML file

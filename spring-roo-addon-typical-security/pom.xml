@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.gvnix</groupId>
     <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
-    <version>0.8.2</version>
+    <version>1.0.0</version>
     <relativePath>../osgi-roo-bundle</relativePath>
   </parent>
   <groupId>com.xsoftwarelabs.spring.roo.addon.typicalsecurity</groupId>
@@ -25,7 +25,7 @@
   <description>An add-on created by Spring Roo's addon creator feature.</description>
   <url>http://www.xsoftwarelabs.com</url>
   <properties>
-    <roo.version>1.1.5.RELEASE</roo.version>
+    <roo.version>1.2.2.RELEASE</roo.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>com/xsoftwarelabs/spring/roo/addon/typicalsecurity</repo.folder>

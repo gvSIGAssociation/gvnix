@@ -5,7 +5,7 @@
     <parent>
       <groupId>org.gvnix</groupId>
       <artifactId>org.gvnix.osgi.roo.bundle</artifactId>
-      <version>0.8.2</version>
+      <version>1.0.0</version>
       <relativePath>../../osgi-roo-bundle</relativePath>
     </parent>
 	<groupId>org.springframework.flex.roo.addon</groupId>
@@ -87,7 +87,7 @@
 		<!-- Spring Roo modules -->
 		<dependency>
 			<groupId>org.springframework.roo</groupId>
-			<artifactId>org.springframework.roo.addon.entity</artifactId>
+			<artifactId>org.springframework.roo.addon.jpa</artifactId>
 			<version>${roo.version}</version>
 			<type>bundle</type>
 		</dependency>
@@ -467,7 +467,7 @@
 	</build>
 
 	<properties>
-		<roo.version>1.1.5.RELEASE</roo.version>
+		<roo.version>1.2.2.RELEASE</roo.version>
         <google.code.project.name>gvnix</google.code.project.name>
         <repo.folder>org/springframework/flex/roo/addon</repo.folder>
 	</properties>
