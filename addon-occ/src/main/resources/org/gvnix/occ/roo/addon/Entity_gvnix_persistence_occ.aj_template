@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 privileged aspect ${entity_class}_gvnix_persistence_occ {
 
-    declare precedence: ${entity_class}_gvnix_persistence_occ, ${entity_class}_Roo_Entity;
+    declare precedence: ${entity_class}_gvnix_persistence_occ, ${entity_class}_Roo_Jpa_ActiveRecord;
 
     transient static MessageDigest MESSAGE_DIGEST;
 
@@ -83,7 +83,7 @@ privileged aspect ${entity_class}_gvnix_persistence_occ {
             !this.${checksum_field}.equals(attached.${checksum_field})) { // checksum is not equals
 	    	// TODO Customize this Exception to add more information
 	    	throw new OptimisticLockException(
-		    	"${entity_class} has been changed (${id_field}: " + this.${id_field} + ")");
+		    	"This ${entity_class} has been modified by another user (${id_field}: " + this.${id_field} + ")");
 		}
     }
 

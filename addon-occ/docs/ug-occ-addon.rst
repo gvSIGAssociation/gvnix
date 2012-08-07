@@ -84,7 +84,7 @@ Set concurrency control on *Pet* entity::
   Updated SRC_MAIN_WEBAPP/WEB-INF/views/pets/show.jspx
   Updated SRC_MAIN_WEBAPP/WEB-INF/views/pets/create.jspx
   Updated SRC_MAIN_WEBAPP/WEB-INF/views/pets/update.jspx
-  Updated SRC_MAIN_JAVA/com/springsource/petclinic/domain/Pet_Roo_Entity.aj
+  Updated SRC_MAIN_JAVA/com/springsource/petclinic/domain/Pet_Roo_Jpa_ActiveRecord.aj
   Updated SRC_MAIN_JAVA/com/springsource/petclinic/domain/Pet_Roo_ToString.aj
   Updated SRC_TEST_JAVA/com/springsource/petclinic/domain/PetIntegrationTest_Roo_IntegrationTest.aj
   [Spring Roo Process Manager Background Polling Thread] Updated SRC_MAIN_JAVA/com/springsource/petclinic/domain/Pet_Roo_ToString.aj
@@ -94,7 +94,7 @@ Add-on commands
 
 Two new commands will be available:
 
-#. ``occ checksum set``: Apply this occ implementation to a existing ``@RooEntity``. Add the gvNIX Optimistic Concurrecy Control Checksum based behaivor to a Entity.
+#. ``occ checksum set``: Apply this occ implementation to a existing ``@RooJpaActiveRecord``. Add the gvNIX Optimistic Concurrecy Control Checksum based behaivor to a Entity.
 
    Options:
    
@@ -102,7 +102,7 @@ Two new commands will be available:
    * *fieldName* (optional): The name of the field to use to store de checksum value
    * *digestMethod* (optional): The name of the type of digest method to compute the checksum
 
-#. ``occi checksum all``: Apply this occ implementation to all existing ``@RooEntity``.
+#. ``occi checksum all``: Apply this occ implementation to all existing ``@RooJpaActiveRecord``.
    Add the gvNIX Optimistic Concurrency Control Checksum based behaivor to all entities in project.
    If any of them has already been configure no changes will be applied to this entity.
 

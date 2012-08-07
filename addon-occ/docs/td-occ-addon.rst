@@ -38,7 +38,7 @@ This generate a java compilation exception because it tries to compare version f
 =====================================
 
 This is the annotation for this functionality.
-You can add this manually to any ``@RooEntity`` class or use `occChecksum commands` described at user guide.
+You can add this manually to any ``@RooJpaActiveRecord`` class or use `occChecksum commands` described at user guide.
 This annotations modify the entity in two ways:
 
 #. Adds a property to store entity's state chechsum. Include getter/setter and some control annotations.
@@ -65,7 +65,7 @@ There is a way to replace Itd definitions of other add-on (like build-in add-on)
 	Given a potential conflict between inter-type member declarations in different aspects, if one aspect has precedence over the other its declaration will take effect without any conflict notice from compiler.
 	This is true both when the precedence is declared explicitly with declare precedence as well as when when sub-aspects implicitly have precedence over their super-aspect.
 
-We can use this declaration to override ``Roo_Entity`` merge and remove methods instead to use ``around``.
+We can use this declaration to override ``Roo_Jpa_ActiveRecord`` merge and remove methods instead to use ``around``.
 We have to study what is the better way to do this.
 
 Related links:

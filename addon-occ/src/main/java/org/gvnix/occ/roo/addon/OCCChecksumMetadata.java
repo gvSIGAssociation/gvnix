@@ -28,13 +28,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.springframework.roo.addon.entity.EntityMetadata;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
@@ -42,7 +48,6 @@ import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
@@ -51,18 +56,15 @@ import org.springframework.roo.classpath.details.annotations.populator.AutoPopul
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.persistence.PersistenceMemberLocator;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.AbstractMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
 
 /**
  * gvNIX OCCChecksum Metadata
@@ -94,7 +96,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     private static final String TO_STRING_CODE_LINE_FORMAT = "\tsb.append((String.valueOf(${property}).equals(\"null\") ? nullstr : String.valueOf(${property})) + separator);\n";
 
-    private EntityMetadata entityMetadata;
+    private JpaActiveRecordMetadata entityMetadata;
 
     // DiSiD: Used to get the type members
     private MemberDetailsScanner memberDetailsScanner;
@@ -109,13 +111,14 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     public OCCChecksumMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            EntityMetadata entityMetadata,
-            MemberDetailsScanner memberDetailsScanner) {
+            JpaActiveRecordMetadata entityMetadata,
+            MemberDetailsScanner memberDetailsScanner, TypeManagementService typeManagementService,
+            PersistenceMemberLocator persistenceMemberLocator) {
 
         // From AbstractItdTypeDetailsProvidingMetadataItem
         super(identifier);
-        Assert.notNull(aspectName, "Aspect name required");
-        Assert.notNull(governorPhysicalTypeMetadata,
+        Validate.notNull(aspectName, "Aspect name required");
+        Validate.notNull(governorPhysicalTypeMetadata,
                 "Governor physical type metadata required");
 
         this.aspectName = aspectName;
@@ -138,7 +141,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
         this.destination = governorTypeDetails.getName();
 
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
 
         if (entityMetadata != null) {
@@ -161,14 +164,14 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
             FieldMetadata field = getChecksumField();
             MethodMetadata getter = getChecksumAccessor();
             MethodMetadata setter = getChecksumMutator();
-            addChecksumFieldToEntity(field, getter, setter);
+            addChecksumFieldToEntity(field, getter, setter, typeManagementService);
 
             // Generates ITD
-            itdFileContents = generateITDContents(field);
+            itdFileContents = generateITDContents(field, persistenceMemberLocator);
         }
     }
 
-    private String generateITDContents(FieldMetadata checksumField) {
+    private String generateITDContents(FieldMetadata checksumField, PersistenceMemberLocator persistenceMemberLocator) {
 
         // We use a template for generate ITD because the class
         // org.springframework.roo.classpath.details.DefaultItdTypeDetailsBuilder
@@ -176,7 +179,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
         String template;
         try {
-            template = FileCopyUtils.copyToString(new InputStreamReader(this
+            template = IOUtils.toString(new InputStreamReader(this
                     .getClass().getResourceAsStream(ITD_TEMPLATE)));
         } catch (IOException ioe) {
             throw new IllegalStateException(
@@ -196,25 +199,15 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         params.put("entity_class", governorTypeDetails.getName()
                 .getSimpleTypeName());
 
-        // Adds merge method name ('merge_method')
-        params.put("merge_method", entityMetadata.getMergeMethod()
-                .getMethodName().getSymbolName());
-
-        // Adds merge method name ('remove_method')
-        params.put("remove_method", entityMetadata.getRemoveMethod()
-                .getMethodName().getSymbolName());
-
         // Adds find by id method name ('findById_method')
         params.put("findById_method", entityMetadata.getFindMethod()
                 .getMethodName().getSymbolName());
 
         // Adds id field name ('id_field')
-        params.put("id_field", entityMetadata.getIdentifierField()
+        // TODO Now get identifier is a collection, temporaly getted first
+        params.put("id_field", persistenceMemberLocator.getIdentifierFields(governorPhysicalTypeMetadata.getMemberHoldingTypeDetails()
+                .getName()).get(0)
                 .getFieldName().getSymbolName());
-
-        // Adds id field accessor ('id_accessor')
-        params.put("id_accessor", entityMetadata.getIdentifierAccessor()
-                .getMethodName().getSymbolName());
 
         // Adds checksum field name ('checksum_field')
         params.put("checksum_field", checksumField.getFieldName()
@@ -314,25 +307,26 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     }
 
     private void addChecksumFieldToEntity(FieldMetadata field,
-            MethodMetadata getter, MethodMetadata setter) {
+            MethodMetadata getter, MethodMetadata setter, TypeManagementService typeManagementService) {
 
         PhysicalTypeDetails ptd = governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
 
-        Assert.isInstanceOf(
-                MutableClassOrInterfaceTypeDetails.class,
+        Validate.isInstanceOf(
+                ClassOrInterfaceTypeDetails.class,
                 ptd,
                 "Java source code is immutable for type "
                         + PhysicalTypeIdentifier
                                 .getFriendlyName(governorPhysicalTypeMetadata
                                         .getId()));
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
+        
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetails = new ClassOrInterfaceTypeDetailsBuilder((ClassOrInterfaceTypeDetails)ptd);
 
         // Try to locate an existing field with @javax.persistence.Version
 
         try {
             if (!mutableTypeDetails.getDeclaredFields().contains(field)) {
-                mutableTypeDetails.addField(field);
+                mutableTypeDetails.addField(new FieldMetadataBuilder(governorTypeDetails.getDeclaredByMetadataId(), field));
             }
             if (!mutableTypeDetails.getDeclaredMethods().contains(getter)) {
                 mutableTypeDetails.addMethod(getter);
@@ -340,6 +334,8 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
             if (!mutableTypeDetails.getDeclaredMethods().contains(setter)) {
                 mutableTypeDetails.addMethod(setter);
             }
+            typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetails.build());
+
         } catch (IllegalArgumentException e) {
             // TODO In some cases, one element is added more than one time
         }
@@ -348,7 +344,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
     @Override
     public String toString() {
-        ToStringCreator tsc = new ToStringCreator(this);
+    	ToStringBuilder tsc = new ToStringBuilder(this);
         tsc.append("identifier", getId());
         tsc.append("valid", valid);
         tsc.append("aspectName", aspectName);
@@ -377,18 +373,18 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         List<FieldMetadata> found = MemberFindingUtils.getFieldsWithAnnotation(
                 governorTypeDetails, new JavaType("javax.persistence.Version"));
         if (found.size() > 0) {
-            Assert.isTrue(found.size() == 1,
+        	Validate.isTrue(found.size() == 1,
                     "More than 1 field was annotated with @javax.persistence.Version in '"
                             + governorTypeDetails.getName()
                                     .getFullyQualifiedTypeName() + "'");
             FieldMetadata field = found.get(0);
 
-            Assert.isTrue(
+            Validate.isTrue(
                     field.getFieldType().equals(
                             new JavaType(String.class.getName())), "Field '"
                             + field.getFieldName().getSymbolName()
                             + "' must be java.lang.String");
-            Assert.isTrue(MemberFindingUtils.getAnnotationOfType(field
+            Validate.isTrue(MemberFindingUtils.getAnnotationOfType(field
                     .getAnnotations(), new JavaType(
                     "javax.persistence.Transient")) != null, "Field '"
                     + field.getFieldName().getSymbolName()
@@ -441,7 +437,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
 
         FieldMetadata field = new FieldMetadataBuilder(getId(),
                 Modifier.PRIVATE, annotations, checksumField,
-                JavaType.STRING_OBJECT).build();
+                JavaType.STRING).build();
 
         return field;
     }
@@ -525,7 +521,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                 bodyBuilder).build();
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }
@@ -535,7 +531,7 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                 PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
                 metadataIdentificationString);
     }

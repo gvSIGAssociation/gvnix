@@ -22,31 +22,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.entity.EntityMetadata;
-import org.springframework.roo.addon.entity.EntityOperations;
-import org.springframework.roo.addon.entity.RooEntity;
+import org.springframework.roo.addon.jpa.JpaOperations;
+import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
+import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
+import org.springframework.roo.classpath.persistence.PersistenceMemberLocator;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
 
@@ -70,9 +73,13 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
     @Reference
     private ProjectOperations projectOperations;
     @Reference
-    private EntityOperations entityOperations;
+    private JpaOperations entityOperations;
     @Reference
     private TypeLocationService typeLocationService;
+    @Reference
+    private PersistenceMemberLocator persistenceMemberLocator;
+    @Reference
+    private TypeManagementService typeManagementService;
 
     protected void activate(ComponentContext context) {
 
@@ -122,9 +129,9 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
         // Check if given entity has a @Version field declared
         // Maybe the given entity extends of a class declaring the @Version
         // field, in this case we must to annotate parent class
-        String entityMetadataKey = EntityMetadata.createIdentifier(entity,
-                Path.SRC_MAIN_JAVA);
-        EntityMetadata entityMetadata = (EntityMetadata) metadataService.get(
+        String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(entity,
+        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
+        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService.get(
                 entityMetadataKey, true);
         if (entityMetadata == null) {
             // entity JavaType is not a valid Entity. Nothing to do
@@ -135,7 +142,7 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
         // class or in a parent one. If @Version field is declared in a parent
         // class, this will be the target class for annotate with
         // @GvNIXEntityOCCChecksum
-        FieldMetadata versionField = entityMetadata.getVersionField();
+        FieldMetadata versionField = persistenceMemberLocator.getVersionField(entity);
         if (versionField != null) {
             String declaredByType = versionField.getDeclaredByMetadataId()
                     .substring(
@@ -163,24 +170,23 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
 
         // Load class details. If class not found an exception will be raised.
         ClassOrInterfaceTypeDetails tmpDetails = typeLocationService
-                .getClassOrInterface(entity);
+                .getTypeDetails(entity);
 
         // Checks if it's mutable
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
                 tmpDetails, "Can't modify " + tmpDetails.getName());
 
-        MutableClassOrInterfaceTypeDetails entityDetails = (MutableClassOrInterfaceTypeDetails) tmpDetails;
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder =  new ClassOrInterfaceTypeDetailsBuilder((ClassOrInterfaceTypeDetails)tmpDetails);
 
-        List<? extends AnnotationMetadata> entityAnnotations = entityDetails
-                .getAnnotations();
+        List<? extends AnnotationMetadata> entityAnnotations = mutableTypeDetailsBuilder.build().getAnnotations();
 
-        // Looks for @GvNIXEntityOCCChecksumAnnotation and @RooEntity
+        // Looks for @GvNIXEntityOCCChecksumAnnotation and @RooJpaActiveRecord
         AnnotationMetadata occAnnotation = MemberFindingUtils
                 .getAnnotationOfType(entityAnnotations, new JavaType(
                         GvNIXEntityOCCChecksum.class.getName()));
         AnnotationMetadata rooEntityAnnotation = MemberFindingUtils
                 .getAnnotationOfType(entityAnnotations, new JavaType(
-                        RooEntity.class.getName()));
+                		RooJpaActiveRecord.class.getName()));
 
         if (rooEntityAnnotation != null) {
             if (occAnnotation != null) {
@@ -212,7 +218,9 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
                     occAnnotationAttributes).build();
 
             // Adds GvNIXEntityOCCChecksum to the entity
-            entityDetails.addTypeAnnotation(occAnnotation);
+            mutableTypeDetailsBuilder.addAnnotation(occAnnotation);
+            
+            typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
         }
     }
 
@@ -225,9 +233,9 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
      */
     public void addOccAll(String fieldName, String digestMethod) {
         addGvNIXAnnotationsDependecy();
-        // Look for classes annotated with @RooEntity
+        // Look for classes annotated with @RooJpaActiveRecord
         for (JavaType type : typeLocationService
-                .findTypesWithAnnotation(new JavaType(RooEntity.class.getName()))) {
+                .findTypesWithAnnotation(new JavaType(RooJpaActiveRecord.class.getName()))) {
             doAddOccToEntity(type, fieldName, digestMethod, false);
 
         }
@@ -245,14 +253,13 @@ public class OCCChecksumOperationsImpl implements OCCChecksumOperations {
         // Install the add-on Google code repository and dependency needed to
         // get the annotations
 
-        Element conf = XmlUtils.getConfiguration(this.getClass(),
-                "configuration.xml");
+        Element conf = XmlUtils.getConfiguration(this.getClass());
 
         List<Element> repos = XmlUtils.findElements(
                 "/configuration/gvnix/repositories/repository", conf);
         for (Element repo : repos) {
 
-            projectOperations.addRepository(new Repository(repo));
+            projectOperations.addRepository(projectOperations.getFocusedModuleName(), new Repository(repo));
         }
 
         List<Element> depens = XmlUtils.findElements(

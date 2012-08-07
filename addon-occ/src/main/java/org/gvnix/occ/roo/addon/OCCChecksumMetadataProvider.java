@@ -21,21 +21,27 @@ package org.gvnix.occ.roo.addon;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.entity.EntityMetadata;
+import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.itd.ItdTriggerBasedMetadataProvider;
+import org.springframework.roo.classpath.persistence.PersistenceMemberLocator;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
@@ -45,9 +51,8 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
 
 /**
  * gvNIX OCCChecksum Metadata provider
@@ -75,6 +80,12 @@ public class OCCChecksumMetadataProvider implements
     // DiSiD: Used to get the type members
     @Reference
     protected MemberDetailsScanner memberDetailsScanner;
+    
+    @Reference
+    protected PersistenceMemberLocator persistenceMemberLocator;
+    
+    @Reference
+    protected TypeManagementService typeManagementService;
 
     /**
      * The annotations which, if present on a class or interface, will cause
@@ -106,7 +117,7 @@ public class OCCChecksumMetadataProvider implements
      * createLocalIdentifier(org.springframework.roo.model.JavaType,
      * org.springframework.roo.project.Path)
      */
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
         return OCCChecksumMetadata.createIdentifier(javaType, path);
     }
 
@@ -139,7 +150,7 @@ public class OCCChecksumMetadataProvider implements
             String metadataIdentificationString) {
         JavaType javaType = OCCChecksumMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = OCCChecksumMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = OCCChecksumMetadata.getPath(metadataIdentificationString);
         String physicalTypeIdentifier = PhysicalTypeIdentifier
                 .createIdentifier(javaType, path);
         return physicalTypeIdentifier;
@@ -154,18 +165,18 @@ public class OCCChecksumMetadataProvider implements
 
         // We know governor type details are non-null and can be safely cast
         // We get govenor's EntityMetadata
-        String entityMetadataKey = EntityMetadata.createIdentifier(
+        String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(
                 governorPhysicalTypeMetadata.getMemberHoldingTypeDetails()
-                        .getName(), path);
+                        .getName(), LogicalPath.getInstance(path, ""));
 
         // We get governor's Entity
-        EntityMetadata entityMetadata = (EntityMetadata) metadataService
+        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService
                 .get(entityMetadataKey);
         if (entityMetadata == null) {
             return null;
         }
 
-        FieldMetadata versionField = entityMetadata.getVersionField();
+        FieldMetadata versionField = persistenceMemberLocator.getVersionField(governorPhysicalTypeMetadata.getMemberHoldingTypeDetails().getName());
 
         if (versionField != null) {
             String declaredByType = entityMetadataKey
@@ -185,7 +196,7 @@ public class OCCChecksumMetadataProvider implements
         OCCChecksumMetadata metadata = new OCCChecksumMetadata(
                 metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata, entityMetadata,
-                memberDetailsScanner);
+                memberDetailsScanner, typeManagementService, persistenceMemberLocator);
 
         return metadata;
     }
@@ -195,7 +206,7 @@ public class OCCChecksumMetadataProvider implements
             String downstreamDependency) {
         if (MetadataIdentificationUtils
                 .isIdentifyingClass(downstreamDependency)) {
-            Assert.isTrue(
+        	Validate.isTrue(
                     MetadataIdentificationUtils.getMetadataClass(
                             upstreamDependency).equals(
                             MetadataIdentificationUtils
@@ -209,7 +220,7 @@ public class OCCChecksumMetadataProvider implements
             // been
             JavaType javaType = PhysicalTypeIdentifier
                     .getJavaType(upstreamDependency);
-            Path path = PhysicalTypeIdentifier.getPath(upstreamDependency);
+            LogicalPath path = PhysicalTypeIdentifier.getPath(upstreamDependency);
             downstreamDependency = createLocalIdentifier(javaType, path);
 
             // We only need to proceed if the downstream dependency relationship
@@ -224,7 +235,7 @@ public class OCCChecksumMetadataProvider implements
 
         // We should now have an instance-specific "downstream dependency" that
         // can be processed by this class
-        Assert.isTrue(
+        Validate.isTrue(
                 MetadataIdentificationUtils.getMetadataClass(
                         downstreamDependency).equals(
                         MetadataIdentificationUtils
@@ -249,7 +260,7 @@ public class OCCChecksumMetadataProvider implements
      *            creation (required)
      */
     public void addMetadataTrigger(JavaType javaType) {
-        Assert.notNull(javaType,
+    	Validate.notNull(javaType,
                 "Java type required for metadata trigger registration");
         this.metadataTriggers.add(javaType);
     }
@@ -262,7 +273,7 @@ public class OCCChecksumMetadataProvider implements
      *            to remove (required)
      */
     public void removeMetadataTrigger(JavaType javaType) {
-        Assert.notNull(javaType,
+    	Validate.notNull(javaType,
                 "Java type required for metadata trigger deregistration");
         this.metadataTriggers.remove(javaType);
     }
@@ -285,7 +296,7 @@ public class OCCChecksumMetadataProvider implements
      * org.springframework.roo.metadata.MetadataProvider#get(java.lang.String)
      */
     public final MetadataItem get(String metadataIdentificationString) {
-        Assert.isTrue(
+    	Validate.isTrue(
                 MetadataIdentificationUtils.getMetadataClass(
                         metadataIdentificationString).equals(
                         MetadataIdentificationUtils
@@ -396,8 +407,7 @@ public class OCCChecksumMetadataProvider implements
                         File f = new File(itdFilename);
                         String existing = null;
                         try {
-                            existing = FileCopyUtils
-                                    .copyToString(new FileReader(f));
+                            existing = IOUtils.toString(new FileReader(f));
                         } catch (IOException ignoreAndJustOverwriteIt) {
                         }
 
@@ -407,15 +417,24 @@ public class OCCChecksumMetadataProvider implements
 
                     } else {
                         mutableFile = fileManager.createFile(itdFilename);
-                        Assert.notNull(mutableFile,
+                        Validate.notNull(mutableFile,
                                 "Could not create ITD file '" + itdFilename
                                         + "'");
                     }
 
                     try {
                         if (mutableFile != null) {
-                            FileCopyUtils.copy(itd.getBytes(),
-                                    mutableFile.getOutputStream());
+                            InputStream inputStream = null;
+                            OutputStream outputStream = null;
+                            try { 
+                            	inputStream = IOUtils.toInputStream(itd);
+                            	outputStream = mutableFile.getOutputStream();
+                            	IOUtils.copy(inputStream, outputStream);
+                            }
+                            finally {
+                            	IOUtils.closeQuietly(inputStream);
+                            	IOUtils.closeQuietly(outputStream);
+                            }
                         }
                     } catch (IOException ioe) {
                         throw new IllegalStateException("Could not output '"
@@ -445,7 +464,7 @@ public class OCCChecksumMetadataProvider implements
 
     public final String getIdForPhysicalJavaType(
             String physicalJavaTypeIdentifier) {
-        Assert.isTrue(
+    	Validate.isTrue(
                 MetadataIdentificationUtils.getMetadataClass(
                         physicalJavaTypeIdentifier).equals(
                         MetadataIdentificationUtils
@@ -455,7 +474,7 @@ public class OCCChecksumMetadataProvider implements
                         + physicalJavaTypeIdentifier + "')");
         JavaType javaType = PhysicalTypeIdentifier
                 .getJavaType(physicalJavaTypeIdentifier);
-        Path path = PhysicalTypeIdentifier.getPath(physicalJavaTypeIdentifier);
+        LogicalPath path = PhysicalTypeIdentifier.getPath(physicalJavaTypeIdentifier);
         return createLocalIdentifier(javaType, path);
     }
 

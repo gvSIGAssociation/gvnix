@@ -11,10 +11,10 @@ enum type --class ~.reference.Specialty
 enum constant --name Cardiology
 enum constant --name Nutrition
 
-entity --class ~.domain.Pet
-entity --class ~.domain.AbstractPerson --abstract
-entity --class ~.domain.Vet --extends ~.domain.AbstractPerson
-entity --class ~.domain.Owner --extends ~.domain.AbstractPerson
+entity jpa --class ~.domain.Pet
+entity jpa --class ~.domain.AbstractPerson --abstract
+entity jpa --class ~.domain.Vet --extends ~.domain.AbstractPerson
+entity jpa --class ~.domain.Owner --extends ~.domain.AbstractPerson
 
 field string --fieldName firstName --sizeMin 3 --sizeMax 30 --class ~.domain.AbstractPerson
 field string --fieldName lastName --notNull --sizeMin 3 --sizeMax 30
