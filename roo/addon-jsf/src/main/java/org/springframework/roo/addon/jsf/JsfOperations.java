@@ -2,24 +2,27 @@ package org.springframework.roo.addon.jsf;
 
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.Feature;
 
 /**
- * Provides JSF managed bean operations.
+ * Provides JSF managed-bean operations.
  * 
  * @author Alan Stewart
  * @since 1.2.0
  */
-public interface JsfOperations {
+public interface JsfOperations extends Feature {
 
-	boolean isSetupAvailable();
+    void addMediaSuurce(String url, MediaPlayer mediaPlayer);
 
-	boolean isScaffoldAvailable();
+    void createManagedBean(JavaType managedBean, JavaType entity,
+            String beanName, boolean includeOnMenu);
 
-	void setup(JsfImplementation jsfImplementation);
+    void generateAll(JavaPackage destinationPackage);
 
-	void changeJsfImplementation(JsfImplementation jsfImplementation);
+    boolean isJsfInstallationPossible();
 
-	void generateAll(JavaPackage destinationPackage);
+    boolean isScaffoldOrMediaAdditionAvailable();
 
-	void createManagedBean(JavaType managedBean, JavaType entity, boolean includeOnMenu);
+    void setup(JsfImplementation jsfImplementation, JsfLibrary jsfLibrary,
+            Theme theme);
 }

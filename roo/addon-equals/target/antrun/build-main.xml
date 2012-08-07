@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <copy todir="/home/mmartinez/projects/gvcit/gvnix/trunk/code/roo/addon-equals/target/../../target/all" preservelastmodified="true">
+    <fileset dir="/home/mmartinez/projects/gvcit/gvnix/trunk/code/roo/addon-equals/target">
+      <include name="*.jar"/>
+      <exclude name="*-tests.jar"/>
+      <exclude name="*-sources.jar"/>
+    </fileset>
+  </copy>
+</target>
+</project>

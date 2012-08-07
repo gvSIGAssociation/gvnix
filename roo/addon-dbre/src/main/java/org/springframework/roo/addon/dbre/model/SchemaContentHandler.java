@@ -6,27 +6,38 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * {@link ContentHandler} implementation for finding the schema attribute of the database
- * element in the DBRE XML file and creating a {@link Schema} object.
+ * {@link ContentHandler} for finding the schema attribute of the
+ * <code>database</code> element in the DBRE XML file and creating a
+ * {@link Schema} object.
  * 
  * @author Alan Stewart
  * @since 1.1
  */
-public final class SchemaContentHandler extends DefaultHandler {
-	private Schema schema;
-	
-	public SchemaContentHandler() {
-		super();
-	}
+public class SchemaContentHandler extends DefaultHandler {
 
-	public Schema getSchema() {
-		return schema;
-	}
-	
-	@Override 
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (qName.equals("database")) {
-			schema = new Schema(attributes.getValue("name"));
-		}
-	}
+    private Schema schema;
+
+    /**
+     * Constructor for no schema
+     */
+    public SchemaContentHandler() {
+    }
+
+    /**
+     * Returns the parsed schema
+     * 
+     * @return <code>null</code> if not parsed yet
+     */
+    public Schema getSchema() {
+        return schema;
+    }
+
+    @Override
+    public void startElement(final String uri, final String localName,
+            final String qName, final Attributes attributes)
+            throws SAXException {
+        if (qName.equals("database")) {
+            schema = new Schema(attributes.getValue("name"));
+        }
+    }
 }

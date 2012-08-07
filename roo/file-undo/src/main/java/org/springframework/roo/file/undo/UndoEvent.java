@@ -1,44 +1,42 @@
 package org.springframework.roo.file.undo;
 
-import org.springframework.roo.support.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 /**
  * An event delivered to an {@link UndoListener}.
  * 
  * @author Ben Alex
  * @since 1.1.1
- *
  */
 public class UndoEvent {
-	private UndoOperation operation;
-	
-	public UndoEvent(UndoOperation operation) {
-		Assert.notNull(operation, "Operation required");
-		this.operation = operation;
-	}
-	
-	/**
-	 * @return true if undoing, false if committing
-	 */
-	public boolean isUndoing() {
-		return operation == UndoOperation.UNDO;
-	}
-	
-	public boolean isResetting() {
-		return operation == UndoOperation.RESET;
-	}
 
-	public boolean isFlushing() {
-		return operation == UndoOperation.FLUSH;
-	}
-	
-	public UndoOperation getOperation() {
-		return operation;
-	}
-	
-	public enum UndoOperation {
-		UNDO,
-		RESET,
-		FLUSH
-	}
+    public enum UndoOperation {
+        FLUSH, RESET, UNDO
+    }
+
+    private final UndoOperation operation;
+
+    public UndoEvent(final UndoOperation operation) {
+        Validate.notNull(operation, "Operation required");
+        this.operation = operation;
+    }
+
+    public UndoOperation getOperation() {
+        return operation;
+    }
+
+    public boolean isFlushing() {
+        return operation == UndoOperation.FLUSH;
+    }
+
+    public boolean isResetting() {
+        return operation == UndoOperation.RESET;
+    }
+
+    /**
+     * @return true if undoing, false if committing
+     */
+    public boolean isUndoing() {
+        return operation == UndoOperation.UNDO;
+    }
 }

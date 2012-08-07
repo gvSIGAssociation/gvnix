@@ -6,7 +6,7 @@
                 <dependency>
                     <groupId>com.h2database</groupId>
                     <artifactId>h2</artifactId>
-                    <version>1.3.155</version>
+                    <version>1.3.164</version>
                 </dependency>
             </dependencies>
         </database>
@@ -24,7 +24,7 @@
                 <dependency>
                     <groupId>postgresql</groupId>
                     <artifactId>postgresql</artifactId>
-                    <version>8.4-702.jdbc3</version>
+                    <version>9.1-901.jdbc3</version>
                 </dependency>
             </dependencies>
         </database>
@@ -33,7 +33,7 @@
                 <dependency>
                     <groupId>mysql</groupId>
                     <artifactId>mysql-connector-java</artifactId>
-                    <version>5.1.13</version>
+                    <version>5.1.18</version>
                 </dependency>
             </dependencies>
         </database>
@@ -82,12 +82,21 @@
                 </dependency>
             </dependencies>
         </database>
-        <database id="DERBY">
+        <database id="DERBY_EMBEDDED">
             <dependencies>
                 <dependency>
                     <groupId>org.apache.derby</groupId>
                     <artifactId>derby</artifactId>
-                    <version>10.8.1.2</version>
+                    <version>10.8.2.2</version>
+                </dependency>
+            </dependencies>
+        </database>
+        <database id="DERBY_CLIENT">
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.derby</groupId>
+                    <artifactId>derbyclient</artifactId>
+                    <version>10.8.2.2</version>
                 </dependency>
             </dependencies>
         </database>
@@ -108,7 +117,7 @@
         </database>
         <database id="GAE">
             <properties>
-                <gae.home>${user.home}/.m2/repository/com/google/appengine/appengine-java-sdk/1.5.1/appengine-java-sdk-1.5.1</gae.home>
+                <gae.home>${user.home}/.m2/repository/com/google/appengine/appengine-java-sdk/1.6.5/appengine-java-sdk-1.6.5</gae.home>
             </properties>
             <repositories>
                 <repository>
@@ -128,29 +137,29 @@
                 <dependency>
                     <groupId>com.google.appengine.orm</groupId>
                     <artifactId>datanucleus-appengine</artifactId>
-                    <version>1.0.7.final</version>
+                    <version>2.0.0-final</version>
                 </dependency>
                 <dependency>
                     <groupId>com.google.appengine</groupId>
                     <artifactId>appengine-api-1.0-sdk</artifactId>
-                    <version>1.5.1</version>
+                    <version>1.6.5</version>
                 </dependency>
                 <dependency>
                     <groupId>com.google.appengine</groupId>
                     <artifactId>appengine-testing</artifactId>
-                    <version>1.5.1</version>
+                    <version>1.6.5</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>com.google.appengine</groupId>
                     <artifactId>appengine-api-stubs</artifactId>
-                    <version>1.5.1</version>
+                    <version>1.6.5</version>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>com.google.appengine</groupId>
                     <artifactId>appengine-api-labs</artifactId>
-                    <version>1.5.1</version>
+                    <version>1.6.5</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -158,9 +167,9 @@
                 <plugin>
                     <groupId>net.kindleit</groupId>
                     <artifactId>maven-gae-plugin</artifactId>
-                    <version>0.8.4</version>
+                    <version>0.9.2</version>
                     <configuration>
-                        <unpackVersion>1.5.1</unpackVersion>
+                        <unpackVersion>1.6.5</unpackVersion>
                     </configuration>
                     <executions>
                         <execution>
@@ -173,39 +182,14 @@
                 </plugin>
             </plugins>
         </database>
-        <database id="VMFORCE">
-            <repositories>
-                <repository>
-                    <id>com.force.maven.release</id>
-                    <name>Force.com Maven Repo</name>
-                    <url>http://repo.t.salesforce.com/archiva/repository/releases</url>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
+        <database id="DATABASE.COM">
             <dependencies>
                 <dependency>
                     <groupId>com.force.sdk</groupId>
                     <artifactId>force-jpa</artifactId>
-                    <version>20.0.0</version>
+                    <version>22.0.5-BETA</version>
                 </dependency>
             </dependencies>
-            <filters>
-                <filter>${basedir}/src/main/resources/config.properties</filter>
-            </filters>
-            <resources>
-                <resource>
-                    <directory>src/main/resources</directory>
-                    <filtering>true</filtering>
-                    <includes>
-                        <include>**/persistence.xml</include>
-                    </includes>
-                </resource>
-                <resource>
-                    <directory>src/main/resources</directory>
-                </resource>
-            </resources>
         </database>
     </databases>
     <ormProviders>
@@ -214,12 +198,12 @@
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-core</artifactId>
-                    <version>3.6.4.Final</version>
+                    <version>3.6.9.Final</version>
                 </dependency>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-entitymanager</artifactId>
-                    <version>3.6.4.Final</version>
+                    <version>3.6.9.Final</version>
                     <exclusions>
                         <exclusion>
                             <groupId>cglib</groupId>
@@ -234,8 +218,13 @@
                 <dependency>
                     <groupId>org.hibernate.javax.persistence</groupId>
                     <artifactId>hibernate-jpa-2.0-api</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.1.Final</version>
                 </dependency>
+	            <dependency>
+	                <groupId>commons-collections</groupId>
+	                <artifactId>commons-collections</artifactId>
+	                <version>3.2.1</version>
+	            </dependency>
             </dependencies>
         </provider>
         <provider id="OPENJPA">
@@ -243,7 +232,7 @@
                 <dependency>
                     <groupId>org.apache.openjpa</groupId>
                     <artifactId>openjpa</artifactId>
-                    <version>2.1.0</version>
+                    <version>2.1.1</version>
                     <exclusions>
                         <exclusion>
                             <groupId>commons-logging</groupId>
@@ -279,7 +268,7 @@
                         <dependency>
                             <groupId>org.apache.openjpa</groupId>
                             <artifactId>openjpa</artifactId>
-                            <version>2.1.0</version>
+                            <version>2.1.1</version>
                             <exclusions>
                                 <exclusion>
                                     <groupId>commons-logging</groupId>
@@ -300,14 +289,14 @@
                 <repository>
                     <id>EclipseLink Repo</id>
                     <name>EclipseLink Repo</name>
-                    <url>http://mirrors.ibiblio.org/pub/mirrors/eclipse/rt/eclipselink/maven.repo</url>
+                    <url>http://download.eclipse.org/rt/eclipselink/maven.repo</url>
                 </repository>
             </repositories>
             <dependencies>
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
                     <artifactId>eclipselink</artifactId>
-                    <version>2.2.0</version>
+                    <version>2.2.1</version>
                 </dependency>
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
@@ -319,115 +308,12 @@
         <provider id="DATANUCLEUS">
             <repositories>
                 <repository>
-                    <id>DataNucleus_2</id>
-                    <name>DataNucleus</name>
-                    <url>http://www.datanucleus.org/downloads/maven2/</url>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>DataNucleus_2</id>
-                    <url>http://www.datanucleus.org/downloads/maven2/</url>
-                </pluginRepository>
-            </pluginRepositories>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.persistence</groupId>
-                    <artifactId>persistence-api</artifactId>
-                    <version>1.0</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.datanucleus</groupId>
-                    <artifactId>datanucleus-core</artifactId>
-                    <version>1.1.5</version>
-                    <scope>runtime</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.transaction</groupId>
-                            <artifactId>transaction-api</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>org.datanucleus</groupId>
-                    <artifactId>datanucleus-jpa</artifactId>
-                    <version>1.1.5</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.datanucleus</groupId>
-                    <artifactId>datanucleus-rdbms</artifactId>
-                    <version>1.1.5</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.datanucleus</groupId>
-                    <artifactId>datanucleus-enhancer</artifactId>
-                    <version>1.1.4</version>
-                </dependency>
-                <dependency>
-                    <groupId>javax.jdo</groupId>
-                    <artifactId>jdo2-api</artifactId>
-                    <version>2.3-ec</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.transaction</groupId>
-                            <artifactId>transaction-api</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-            </dependencies>
-            <plugins>
-                <plugin>
-                    <groupId>org.datanucleus</groupId>
-                    <artifactId>maven-datanucleus-plugin</artifactId>
-                    <version>1.1.4</version>
-                    <configuration>
-                        <fork>false</fork>
-                        <log4jConfiguration>${basedir}/src/main/resources/log4j.properties</log4jConfiguration>
-                        <mappingIncludes>**/*.class</mappingIncludes>
-                        <verbose>true</verbose>
-                        <enhancerName>ASM</enhancerName>
-                        <api>JPA</api>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>enhance</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.datanucleus</groupId>
-                            <artifactId>datanucleus-core</artifactId>
-                            <version>1.1.5</version>
-                            <exclusions>
-                                <exclusion>
-                                    <groupId>javax.transaction</groupId>
-                                    <artifactId>transaction-api</artifactId>
-                                </exclusion>
-                            </exclusions>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.datanucleus</groupId>
-                            <artifactId>datanucleus-rdbms</artifactId>
-                            <version>1.1.5</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.datanucleus</groupId>
-                            <artifactId>datanucleus-enhancer</artifactId>
-                            <version>1.1.4</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-            </plugins>
-        </provider>
-        <provider id="DATANUCLEUS_2">
-            <repositories>
-                <repository>
-                    <id>DataNucleus_2</id>
-                    <name>DataNucleus</name>
-                    <url>http://www.datanucleus.org/downloads/maven2/</url>
+                    <id>DataNucleus_Repos2</id>
+                    <name>DataNucleus Repository</name>
+                    <url>http://www.datanucleus.org/downloads/maven2</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
                 </repository>
             </repositories>
             <pluginRepositories>
@@ -445,46 +331,41 @@
                 <dependency>
                     <groupId>org.datanucleus</groupId>
                     <artifactId>datanucleus-core</artifactId>
-                    <version>2.1.4</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.transaction</groupId>
-                            <artifactId>transaction-api</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>org.datanucleus</groupId>
-                    <artifactId>datanucleus-jpa</artifactId>
-                    <version>2.1.4</version>
+                    <version>3.0.10</version>
                 </dependency>
                 <dependency>
                     <groupId>org.datanucleus</groupId>
                     <artifactId>datanucleus-rdbms</artifactId>
-                    <version>2.1.4</version>
+                    <version>3.0.9</version>
                 </dependency>
                 <dependency>
                     <groupId>org.datanucleus</groupId>
-                    <artifactId>datanucleus-enhancer</artifactId>
-                    <version>2.1.2</version>
+                    <artifactId>datanucleus-api-jpa</artifactId>
+                    <version>3.0.9</version>
                 </dependency>
                 <dependency>
                     <groupId>javax.jdo</groupId>
                     <artifactId>jdo-api</artifactId>
                     <version>3.0</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.transaction</groupId>
-                            <artifactId>transaction-api</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
             </dependencies>
             <plugins>
                 <plugin>
                     <groupId>org.datanucleus</groupId>
                     <artifactId>maven-datanucleus-plugin</artifactId>
-                    <version>2.1.0-release</version>
+                    <version>3.0.2</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.datanucleus</groupId>
+                            <artifactId>datanucleus-core</artifactId>
+                            <version>3.0.10</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.datanucleus</groupId>
+                            <artifactId>datanucleus-api-jpa</artifactId>
+                            <version>3.0.9</version>
+                        </dependency>
+                    </dependencies>
                     <configuration>
                         <fork>false</fork>
                         <log4jConfiguration>${basedir}/src/main/resources/log4j.properties</log4jConfiguration>
@@ -501,52 +382,17 @@
                             </goals>
                         </execution>
                     </executions>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.datanucleus</groupId>
-                            <artifactId>datanucleus-core</artifactId>
-                            <version>2.1.4</version>
-                            <exclusions>
-                                <exclusion>
-                                    <groupId>javax.transaction</groupId>
-                                    <artifactId>transaction-api</artifactId>
-                                </exclusion>
-                            </exclusions>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.datanucleus</groupId>
-                            <artifactId>datanucleus-jpa</artifactId>
-                            <version>2.1.4</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.datanucleus</groupId>
-                            <artifactId>datanucleus-rdbms</artifactId>
-                            <version>2.1.4</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.datanucleus</groupId>
-                            <artifactId>datanucleus-enhancer</artifactId>
-                            <version>2.1.2</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
             </plugins>
         </provider>
     </ormProviders>
     <persistence>
         <provider id="JPA">
-            <repositories>
-                <repository>
-                    <id>JBoss Repo</id>
-                    <name>JBoss Repo</name>
-                    <url>https://repository.jboss.org/nexus/content/repositories/releases</url>
-                </repository>
-            </repositories>
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
-                    <version>4.1.0.Final</version>
+                    <version>4.2.0.Final</version>
                     <exclusions>
                         <exclusion>
                             <groupId>javax.xml.bind</groupId>
@@ -571,7 +417,7 @@
             <dependency>
                 <groupId>cglib</groupId>
                 <artifactId>cglib-nodep</artifactId>
-                <version>2.2</version>
+                <version>2.2.2</version>
             </dependency>
             <dependency>
                 <groupId>javax.transaction</groupId>
@@ -591,13 +437,7 @@
             <dependency>
                 <groupId>commons-pool</groupId>
                 <artifactId>commons-pool</artifactId>
-                <version>1.5.4</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
+                <version>1.5.6</version>
             </dependency>
             <dependency>
                 <groupId>commons-dbcp</groupId>
@@ -607,18 +447,6 @@
                     <exclusion>
                         <groupId>commons-logging</groupId>
                         <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-pool</groupId>
-                        <artifactId>commons-pool</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xerces</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xercesImpl</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>xml-apis</groupId>

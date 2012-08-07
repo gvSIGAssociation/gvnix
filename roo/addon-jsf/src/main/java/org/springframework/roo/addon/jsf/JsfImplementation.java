@@ -1,12 +1,16 @@
 package org.springframework.roo.addon.jsf;
 
 /**
- * The JSF 2 implementation.
+ * The JSF implementation.
  * 
  * @author Alan Stewart
  * @since 1.2.0
  */
 public enum JsfImplementation {
-	ORACLE_MOJARRA,
-	APACHE_MYFACES;
+    APACHE_MYFACES, ORACLE_MOJARRA;
+
+    public String getConfigPrefix() {
+        return "/configuration/jsf-implementations/jsf-implementation[@id='"
+                + name() + "']";
+    }
 }

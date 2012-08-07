@@ -1,14 +1,16 @@
 package org.springframework.roo.addon.dbre.model;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.model.JavaPackage;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Represents the database model, ie. the tables in the database.
@@ -18,218 +20,324 @@ import org.springframework.roo.support.util.Assert;
  */
 public class Database {
 
-	/** The name of the database model. Defaults to the catalog name if the schema name is not available. */
-	private String name;
+    // Whether to generate active record CRUD methods for each entity
+    private boolean activeRecord;
 
-	/** All tables. */
-	private Set<Table> tables;
+    /** The JavaPackage where entities are created */
+    private JavaPackage destinationPackage;
 
-	/** The JavaPackage where entities are created */
-	private JavaPackage destinationPackage;
-	
-	/** Whether to create integration tests */
-	private boolean testAutomatically;
-	
-	/** Whether or not to included non-portable JPA attribues in the @Column annotation */
-	private boolean includeNonPortableAttributes;
-	
-	Database(String name, Set<Table> tables) {
-		Assert.hasText(name, "Database name required");
-		Assert.notNull(tables, "Tables required");
-		this.name = name;
-		this.tables = tables;
-		initialize();
-	}
+    /**
+     * Whether or not to included non-portable JPA attributes in the @Column
+     * annotation
+     */
+    private boolean includeNonPortableAttributes;
 
-	public String getName() {
-		return name;
-	}
+    /** The module where the entities are created */
+    private String moduleName;
 
-	public Schema getSchema() {
-		return new Schema(name);
-	}
+    /** Whether or not this database has multiple schemas */
+    private boolean multipleSchemas;
 
-	public Set<Table> getTables() {
-		return Collections.unmodifiableSet(tables);
-	}
+    /** All tables. */
+    private final Set<Table> tables;
 
-	public boolean hasTables() {
-		return !tables.isEmpty();
-	}
+    /** Whether to create integration tests */
+    private boolean testAutomatically;
 
-	public Table getTable(String name) {
-		for (Table table : tables) {
-			if (table.getName().equals(name)) {
-				return table;
-			}
-		}
-		return null;
-	}
+    /**
+     * Constructor
+     * 
+     * @param tables (required)
+     */
+    Database(final Set<Table> tables) {
+        Validate.notNull(tables, "Tables required");
+        this.tables = tables;
+        init();
+    }
 
-	public JavaPackage getDestinationPackage() {
-		return destinationPackage;
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Database other = (Database) obj;
+        if (tables == null) {
+            if (other.tables != null) {
+                return false;
+            }
+        }
+        else if (!tables.equals(other.tables)) {
+            return false;
+        }
+        return true;
+    }
 
-	public void setDestinationPackage(JavaPackage destinationPackage) {
-		this.destinationPackage = destinationPackage;
-	}
+    public JavaPackage getDestinationPackage() {
+        return destinationPackage;
+    }
 
-	public boolean isTestAutomatically() {
-		return testAutomatically;
-	}
+    public String getModuleName() {
+        return moduleName;
+    }
 
-	public void setTestAutomatically(boolean testAutomatically) {
-		this.testAutomatically = testAutomatically;
-	}
+    public Table getTable(final String name, final String schemaName) {
+        for (final Table table : tables) {
+            if (table.getName().equals(name)) {
+                if (StringUtils.isBlank(schemaName)
+                        || DbreModelService.NO_SCHEMA_REQUIRED
+                                .equals(schemaName)
+                        || table.getSchema().getName().equals(schemaName)) {
+                    return table;
+                }
+            }
+        }
+        return null;
+    }
 
-	public boolean isIncludeNonPortableAttributes() {
-		return includeNonPortableAttributes;
-	}
+    public Set<Table> getTables() {
+        return Collections.unmodifiableSet(tables);
+    }
 
-	public void setIncludeNonPortableAttributes(boolean includeNonPortableAttributes) {
-		this.includeNonPortableAttributes = includeNonPortableAttributes;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (tables == null ? 0 : tables.hashCode());
+        return result;
+    }
 
-	/**
-	 * Initialises the model by establishing the relationships between elements in this model eg. in foreign keys etc.
-	 */
-	private void initialize() {
-		for (Table table : tables) {
-			initializeImportedKeys(table);
-			initializeExportedKeys(table);
-			initializeIndices(table);
-			initializeJoinTable(table);
-		}
-	}
+    public boolean hasMultipleSchemas() {
+        return multipleSchemas;
+    }
 
-	private void initializeImportedKeys(Table table) {
-		Map<String, Short> keySequenceMap = new LinkedHashMap<String, Short>();
-		Short keySequence = null;
-		Map<Column, Set<ForeignKey>> repeatedColumns = new LinkedHashMap<Column, Set<ForeignKey>>();
+    public boolean hasTables() {
+        return !tables.isEmpty();
+    }
 
-		for (ForeignKey foreignKey : table.getImportedKeys()) {
-			if (foreignKey.getForeignTable() != null) {
-				continue;
-			}
-			String foreignTableName = foreignKey.getForeignTableName();
-			Table targetTable = getTable(foreignTableName);
-			if (targetTable != null) {
-				keySequence = keySequenceMap.get(foreignTableName);
-				if (keySequence == null) {
-					keySequence = 0;
-					keySequenceMap.put(foreignTableName, keySequence);
-				}
-				foreignKey.setForeignTable(targetTable);
-				if (table.getImportedKeyCountByForeignTableName(foreignTableName) > 1) {
-					keySequenceMap.put(foreignTableName, new Short((short) (keySequence.shortValue() + 1)));
-				}
-				foreignKey.setKeySequence(keySequence);
-			}
+    /**
+     * Initialises the model by establishing the relationships between elements
+     * in this model eg. in foreign keys etc.
+     */
+    private void init() {
+        final Set<Schema> schemas = new HashSet<Schema>();
+        for (final Table table : tables) {
+            schemas.add(table.getSchema());
+            initializeImportedKeys(table);
+            initializeExportedKeys(table);
+            initializeIndices(table);
+            initializeJoinTable(table);
+        }
+        multipleSchemas = schemas.size() > 1;
+    }
 
-			for (Reference reference : foreignKey.getReferences()) {
-				if (reference.getLocalColumn() == null) {
-					Column localColumn = table.findColumn(reference.getLocalColumnName());
-					if (localColumn != null) {
-						reference.setLocalColumn(localColumn);
+    private void initializeExportedKeys(final Table table) {
+        final Map<String, Short> keySequenceMap = new LinkedHashMap<String, Short>();
+        Short keySequence = null;
 
-						Set<ForeignKey> fkSet = repeatedColumns.containsKey(localColumn) ? repeatedColumns.get(localColumn) : new LinkedHashSet<ForeignKey>();
-						fkSet.add(foreignKey);
-						repeatedColumns.put(localColumn, fkSet);
-					}
-				}
-				if (reference.getForeignColumn() == null && foreignKey.getForeignTable() != null) {
-					Column foreignColumn = foreignKey.getForeignTable().findColumn(reference.getForeignColumnName());
-					if (foreignColumn != null) {
-						reference.setForeignColumn(foreignColumn);
-					}
-				}
-			}
-		}
+        for (final ForeignKey exportedKey : table.getExportedKeys()) {
+            if (exportedKey.getForeignTable() != null) {
+                continue;
+            }
+            final String foreignTableName = exportedKey.getForeignTableName();
+            final String foreignSchemaName = exportedKey.getForeignSchemaName();
+            final Table targetTable = getTable(foreignTableName,
+                    foreignSchemaName);
+            if (targetTable != null) {
+                exportedKey.setForeignTable(targetTable);
+                keySequence = keySequenceMap.get(foreignTableName);
+                if (keySequence == null) {
+                    keySequence = 0;
+                    keySequenceMap.put(foreignTableName, keySequence);
+                }
+                if (table
+                        .getExportedKeyCountByForeignTableName(foreignTableName) > 1) {
+                    keySequenceMap.put(foreignTableName,
+                            (short) (keySequence.shortValue() + 1));
+                }
+                exportedKey.setKeySequence(keySequence);
+            }
 
-		// Mark repeated columns with insertable = false and updatable = false
-		for (Map.Entry<Column, Set<ForeignKey>> entrySet : repeatedColumns.entrySet()) {
-			Set<ForeignKey> foreignKeys = entrySet.getValue();
-			for (ForeignKey foreignKey : foreignKeys) {
-				if (foreignKeys.size() > 1 || foreignKey.getForeignTableName().equals(table.getName())) {
-					for (Reference reference : foreignKey.getReferences()) {
-						reference.setInsertableOrUpdatable(false);
-					}
-				}
-			}
-		}
-	}
+            for (final Reference reference : exportedKey.getReferences()) {
+                if (reference.getLocalColumn() == null) {
+                    final Column localColumn = table.findColumn(reference
+                            .getLocalColumnName());
+                    if (localColumn != null) {
+                        reference.setLocalColumn(localColumn);
+                    }
+                }
+                if (reference.getForeignColumn() == null
+                        && exportedKey.getForeignTable() != null) {
+                    final Column foreignColumn = exportedKey.getForeignTable()
+                            .findColumn(reference.getForeignColumnName());
+                    if (foreignColumn != null) {
+                        reference.setForeignColumn(foreignColumn);
+                    }
+                }
+            }
+        }
+    }
 
-	private void initializeExportedKeys(Table table) {
-		Map<String, Short> keySequenceMap = new LinkedHashMap<String, Short>();
-		Short keySequence = null;
+    private void initializeImportedKeys(final Table table) {
+        final Map<String, Short> keySequenceMap = new LinkedHashMap<String, Short>();
+        Short keySequence = null;
+        final Map<Column, Set<ForeignKey>> repeatedColumns = new LinkedHashMap<Column, Set<ForeignKey>>();
 
-		for (ForeignKey exportedKey : table.getExportedKeys()) {
-			if (exportedKey.getForeignTable() != null) {
-				continue;
-			}
-			String foreignTableName = exportedKey.getForeignTableName();
-			Table targetTable = getTable(foreignTableName);
-			if (targetTable != null) {
-				exportedKey.setForeignTable(targetTable);
-				keySequence = keySequenceMap.get(foreignTableName);
-				if (keySequence == null) {
-					keySequence = 0;
-					keySequenceMap.put(foreignTableName, keySequence);
-				}
-				if (table.getExportedKeyCountByForeignTableName(foreignTableName) > 1) {
-					keySequenceMap.put(foreignTableName, new Short((short) (keySequence.shortValue() + 1)));
-				}
-				exportedKey.setKeySequence(keySequence);
-			}
+        for (final ForeignKey foreignKey : table.getImportedKeys()) {
+            if (foreignKey.getForeignTable() != null) {
+                continue;
+            }
+            final String foreignTableName = foreignKey.getForeignTableName();
+            final String foreignSchemaName = foreignKey.getForeignSchemaName();
+            final Table targetTable = getTable(foreignTableName,
+                    foreignSchemaName);
+            if (targetTable != null) {
+                keySequence = keySequenceMap.get(foreignTableName);
+                if (keySequence == null) {
+                    keySequence = 0;
+                    keySequenceMap.put(foreignTableName, keySequence);
+                }
+                foreignKey.setForeignTable(targetTable);
+                if (table
+                        .getImportedKeyCountByForeignTableName(foreignTableName) > 1) {
+                    keySequenceMap.put(foreignTableName,
+                            (short) (keySequence.shortValue() + 1));
+                }
+                foreignKey.setKeySequence(keySequence);
+            }
 
-			for (Reference reference : exportedKey.getReferences()) {
-				if (reference.getLocalColumn() == null) {
-					Column localColumn = table.findColumn(reference.getLocalColumnName());
-					if (localColumn != null) {
-						reference.setLocalColumn(localColumn);
-					}
-				}
-				if (reference.getForeignColumn() == null && exportedKey.getForeignTable() != null) {
-					Column foreignColumn = exportedKey.getForeignTable().findColumn(reference.getForeignColumnName());
-					if (foreignColumn != null) {
-						reference.setForeignColumn(foreignColumn);
-					}
-				}
-			}
-		}
-	}
+            for (final Reference reference : foreignKey.getReferences()) {
+                if (reference.getLocalColumn() == null) {
+                    final Column localColumn = table.findColumn(reference
+                            .getLocalColumnName());
+                    if (localColumn != null) {
+                        reference.setLocalColumn(localColumn);
 
-	private void initializeIndices(Table table) {
-		for (Index index : table.getIndices()) {
-			for (IndexColumn indexColumn : index.getColumns()) {
-				Column column = table.findColumn(indexColumn.getName());
-				if (column != null && index.isUnique()) {
-					column.setUnique(true);
-				}
-			}
-		}
-	}
+                        final Set<ForeignKey> fkSet = repeatedColumns
+                                .containsKey(localColumn) ? repeatedColumns
+                                .get(localColumn)
+                                : new LinkedHashSet<ForeignKey>();
+                        fkSet.add(foreignKey);
+                        repeatedColumns.put(localColumn, fkSet);
+                    }
+                }
+                if (reference.getForeignColumn() == null
+                        && foreignKey.getForeignTable() != null) {
+                    final Column foreignColumn = foreignKey.getForeignTable()
+                            .findColumn(reference.getForeignColumnName());
+                    if (foreignColumn != null) {
+                        reference.setForeignColumn(foreignColumn);
+                    }
+                }
+            }
+        }
 
-	/**
-	 * Determines if a table is a many-to-many join table.
-	 * <p>
-	 * To be identified as a many-to-many join table, the table must have have exactly 
-	 * two primary keys and have exactly two foreign-keys pointing to other 
-	 * entity tables and have no other columns.
-	 */
-	private void initializeJoinTable(Table table) {
-		boolean equals = table.getColumnCount() == 2 && table.getPrimaryKeyCount() == 2 && table.getImportedKeyCount() == 2 && table.getPrimaryKeyCount() == table.getImportedKeyCount();
-		Iterator<Column> iter = table.getColumns().iterator();
-		while (equals && iter.hasNext()) {
-			Column column = iter.next();
-			equals &= table.findImportedKeyByLocalColumnName(column.getName()) != null;
-		}
-		if (equals) {
-			table.setJoinTable(true);
-		}
-	}
+        // Mark repeated columns with insertable = false and updatable = false
+        for (final Map.Entry<Column, Set<ForeignKey>> entrySet : repeatedColumns
+                .entrySet()) {
+            final Set<ForeignKey> foreignKeys = entrySet.getValue();
+            for (final ForeignKey foreignKey : foreignKeys) {
+                if (foreignKeys.size() > 1
+                        || foreignKey.getForeignTableName().equals(
+                                table.getName())) {
+                    for (final Reference reference : foreignKey.getReferences()) {
+                        reference.setInsertableOrUpdatable(false);
+                    }
+                }
+            }
+        }
+    }
 
-	public String toString() {
-		return String.format("Database [name=%s, tables=%s, destinationPackage=%s, testAutomatically=%s, includeNonPortableAttributes=%s]", name, tables, destinationPackage, testAutomatically, includeNonPortableAttributes);
-	}
+    private void initializeIndices(final Table table) {
+        for (final Index index : table.getIndices()) {
+            for (final IndexColumn indexColumn : index.getColumns()) {
+                final Column column = table.findColumn(indexColumn.getName());
+                if (column != null && index.isUnique()) {
+                    column.setUnique(true);
+                }
+            }
+        }
+    }
+
+    /**
+     * Determines if a table is a many-to-many join table.
+     * <p>
+     * To be identified as a many-to-many join table, the table must have have
+     * exactly two primary keys and have exactly two foreign-keys pointing to
+     * other entity tables and have no other columns.
+     */
+    private void initializeJoinTable(final Table table) {
+        boolean equals = table.getColumnCount() == 2
+                && table.getPrimaryKeyCount() == 2
+                && table.getImportedKeyCount() == 2
+                && table.getPrimaryKeyCount() == table.getImportedKeyCount();
+        final Iterator<Column> iter = table.getColumns().iterator();
+        while (equals && iter.hasNext()) {
+            final Column column = iter.next();
+            equals &= table.findImportedKeyByLocalColumnName(column.getName()) != null;
+        }
+        if (equals) {
+            table.setJoinTable(true);
+        }
+    }
+
+    /**
+     * Indicates whether active record CRUD methods should be generated for each
+     * entity
+     * 
+     * @return see above
+     * @since 1.2.0
+     */
+    public boolean isActiveRecord() {
+        return activeRecord;
+    }
+
+    public boolean isIncludeNonPortableAttributes() {
+        return includeNonPortableAttributes;
+    }
+
+    public boolean isTestAutomatically() {
+        return testAutomatically;
+    }
+
+    /**
+     * Sets whether active record CRUD methods should be generated for each
+     * entity
+     * 
+     * @param activeRecord
+     * @since 1.2.0
+     */
+    public void setActiveRecord(final boolean activeRecord) {
+        this.activeRecord = activeRecord;
+    }
+
+    public void setDestinationPackage(final JavaPackage destinationPackage) {
+        this.destinationPackage = destinationPackage;
+    }
+
+    public void setIncludeNonPortableAttributes(
+            final boolean includeNonPortableAttributes) {
+        this.includeNonPortableAttributes = includeNonPortableAttributes;
+    }
+
+    public void setModuleName(final String moduleName) {
+        this.moduleName = moduleName;
+    }
+
+    public void setTestAutomatically(final boolean testAutomatically) {
+        this.testAutomatically = testAutomatically;
+    }
+
+    @Override
+    public String toString() {
+        return String
+                .format("Database [tables=%s, destinationPackage=%s, testAutomatically=%s, includeNonPortableAttributes=%s]",
+                        tables, destinationPackage, testAutomatically,
+                        includeNonPortableAttributes);
+    }
 }

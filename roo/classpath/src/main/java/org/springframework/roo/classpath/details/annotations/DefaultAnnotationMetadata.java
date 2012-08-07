@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Default implementation of {@link AnnotationMetadata}.
@@ -16,43 +16,62 @@ import org.springframework.roo.support.util.Assert;
  * @author Ben Alex
  * @since 1.0
  */
-public final class DefaultAnnotationMetadata implements AnnotationMetadata {
-	private JavaType annotationType;
-	private List<AnnotationAttributeValue<?>> attributes;
-	private Map<JavaSymbolName, AnnotationAttributeValue<?>> attributeMap = new HashMap<JavaSymbolName, AnnotationAttributeValue<?>>();
-	
-	// Package protected to enforce use of AnnotationMetadataBuilder
-	DefaultAnnotationMetadata(JavaType annotationType, List<AnnotationAttributeValue<?>> attributes) {
-		Assert.notNull(annotationType, "Annotation type required");
-		Assert.notNull(attributes, "Attributes required");
-		this.annotationType = annotationType;
-		this.attributes = attributes;
-		for (AnnotationAttributeValue<?> v : attributes) {
-			this.attributeMap.put(v.getName(), v);
-		}
-	}
-	
-	public AnnotationAttributeValue<?> getAttribute(JavaSymbolName attributeName) {
-		Assert.notNull(attributeName, "Attribute name required");
-		return attributeMap.get(attributeName);
-	}
+public class DefaultAnnotationMetadata implements AnnotationMetadata {
 
-	public List<JavaSymbolName> getAttributeNames() {
-		List<JavaSymbolName> result = new ArrayList<JavaSymbolName>();
-		for (AnnotationAttributeValue<?> value : attributes) {
-			result.add(value.getName());
-		}
-		return result;
-	}
+    private final JavaType annotationType;
+    private final Map<JavaSymbolName, AnnotationAttributeValue<?>> attributeMap;
+    private final List<AnnotationAttributeValue<?>> attributes;
 
-	public JavaType getAnnotationType() {
-		return annotationType;
-	}
+    /**
+     * Constructor
+     * 
+     * @param annotationType the type of annotation for which these are the
+     *            metadata (required)
+     * @param attributeValues the given annotation's values; can be
+     *            <code>null</code>
+     */
+    DefaultAnnotationMetadata(final JavaType annotationType,
+            final List<AnnotationAttributeValue<?>> attributeValues) {
+        Validate.notNull(annotationType, "Annotation type required");
+        this.annotationType = annotationType;
+        attributes = new ArrayList<AnnotationAttributeValue<?>>();
+        attributeMap = new HashMap<JavaSymbolName, AnnotationAttributeValue<?>>();
+        if (attributeValues != null) {
+            attributes.addAll(attributeValues);
+            for (final AnnotationAttributeValue<?> value : attributeValues) {
+                attributeMap.put(value.getName(), value);
+            }
+        }
+    }
 
-	public String toString() {
-		ToStringCreator tsc = new ToStringCreator(this);
-		tsc.append("annotationType", annotationType);
-		tsc.append("attributes", attributes);
-		return tsc.toString();
-	}
+    public JavaType getAnnotationType() {
+        return annotationType;
+    }
+
+    public AnnotationAttributeValue<?> getAttribute(
+            final JavaSymbolName attributeName) {
+        Validate.notNull(attributeName, "Attribute name required");
+        return attributeMap.get(attributeName);
+    }
+
+    @SuppressWarnings("unchecked")
+    public AnnotationAttributeValue<?> getAttribute(final String attributeName) {
+        return getAttribute(new JavaSymbolName(attributeName));
+    }
+
+    public List<JavaSymbolName> getAttributeNames() {
+        final List<JavaSymbolName> result = new ArrayList<JavaSymbolName>();
+        for (final AnnotationAttributeValue<?> value : attributes) {
+            result.add(value.getName());
+        }
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        final ToStringBuilder builder = new ToStringBuilder(this);
+        builder.append("annotationType", annotationType);
+        builder.append("attributes", attributes);
+        return builder.toString();
+    }
 }

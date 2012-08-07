@@ -1,17 +1,22 @@
 package org.springframework.roo.project;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.roo.support.util.CollectionUtils;
+import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlUtils;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
  * Simplified immutable representation of a maven build plugin.
- * 
  * <p>
  * Structured after the model used by Maven.
  * 
@@ -19,220 +24,336 @@ import org.w3c.dom.NodeList;
  * @since 1.1
  */
 public class Plugin implements Comparable<Plugin> {
-	private String groupId;
-	private String artifactId;
-	private String version;
-	private Configuration configuration;
-	private List<Dependency> dependencies = new ArrayList<Dependency>();
-	private List<Execution> executions = new ArrayList<Execution>();
 
-	/**
-	 * Creates an immutable {@link Plugin}.
-	 * 
-	 * @param groupId the group ID (required)
-	 * @param artifactId the artifact ID (required)
-	 * @param version the version (required)
-	 */
-	public Plugin(String groupId, String artifactId, String version) {
-		Assert.notNull(groupId, "Group ID required");
-		Assert.notNull(artifactId, "Artifact ID required");
-		Assert.notNull(version, "Version required");
-		this.groupId = groupId;
-		this.artifactId = artifactId;
-		this.version = version;
-	}
-	/**
-	 * Convenience constructor.
-	 * 
-	 * @param groupId the group ID (required)
-	 * @param artifactId the artifact ID (required)
-	 * @param version the version (required)
-	 * @param configuration the configuration for this plugin (optional)
-	 * @param dependencies the dependencies for this plugin (optional)
-	 * @param executions the executions for this plugin (optional)
-	 */
-	public Plugin(String groupId, String artifactId, String version, Configuration configuration, List<Dependency> dependencies, List<Execution> executions) {
-		Assert.hasText(groupId, "Group ID required");
-		Assert.hasText(artifactId, "Artifact ID required");
-		Assert.hasText(version, "Version required");
-		this.groupId = groupId;
-		this.artifactId = artifactId;
-		this.version = version;
-		this.configuration = configuration;
-		this.dependencies = dependencies;
-		this.executions = executions;
-	}
+    /**
+     * The Maven groupId that will be assigned to a plugin if one is not
+     * provided
+     */
+    public static final String DEFAULT_GROUP_ID = "org.apache.maven.plugins";
 
-	/**
-	 * Convenience constructor when an XML element is available that represents a Maven <plugin>.
-	 * 
-	 * @param plugin to parse (required)
-	 */
-	public Plugin(Element plugin) {
-		this.groupId = "org.apache.maven.plugins";
-		if (plugin.getElementsByTagName("groupId").getLength() > 0) {
-			this.groupId = plugin.getElementsByTagName("groupId").item(0).getTextContent();
-		}
+    /**
+     * Parses the given plugin XML element for the plugin's Maven artifactId
+     * 
+     * @param plugin the XML element to parse (required)
+     * @return a non-blank id
+     */
+    private static String getArtifactId(final Element plugin) {
+        return plugin.getElementsByTagName("artifactId").item(0)
+                .getTextContent();
+    }
 
-		this.artifactId = plugin.getElementsByTagName("artifactId").item(0).getTextContent();
+    /**
+     * Parses the configuration of the given plugin (global, not
+     * execution-scoped)
+     * 
+     * @param plugin the XML element to parse (required)
+     * @return <code>null</code> if there isn't one
+     */
+    private static Configuration getConfiguration(final Element plugin) {
+        return Configuration.getInstance(XmlUtils.findFirstElement(
+                "configuration", plugin));
+    }
 
-		NodeList versionElements = plugin.getElementsByTagName("version");
-		if (versionElements.getLength() > 0) {
-			this.version = plugin.getElementsByTagName("version").item(0).getTextContent();
-		} else {
-			this.version = "";
-		}
+    /**
+     * Parses the given XML plugin element for the plugin's dependencies
+     * 
+     * @param plugin the XML element to parse (required)
+     * @return a non-<code>null</code> list
+     */
+    private static List<Dependency> getDependencies(final Element plugin) {
+        final List<Dependency> dependencies = new ArrayList<Dependency>();
+        for (final Element dependencyElement : XmlUtils.findElements(
+                "dependencies/dependency", plugin)) {
+            // groupId
+            final Element groupIdElement = XmlUtils.findFirstElement("groupId",
+                    dependencyElement);
+            final String groupId = DomUtils.getTextContent(groupIdElement, "");
 
-		// Parsing for configuration
-		Element configuration = XmlUtils.findFirstElement("configuration", plugin);
-		if (configuration != null) {
-			this.configuration = new Configuration(configuration);
-		}
+            // artifactId
+            final Element artifactIdElement = XmlUtils.findFirstElement(
+                    "artifactId", dependencyElement);
+            final String artifactId = DomUtils.getTextContent(
+                    artifactIdElement, "");
 
-		// Parsing for executions
-		List<Element> executionList = XmlUtils.findElements("executions/execution", plugin);
-		if (executionList.size() > 0) {
-			for (Element execution : executionList) {
-				Element executionId = XmlUtils.findFirstElement("id", execution);
-				String id = "";
-				if (executionId != null) {
-					id = executionId.getTextContent();
-				}
-				Element executionPhase = XmlUtils.findFirstElement("phase", execution);
-				String phase = "";
-				if (executionPhase != null) {
-					phase = executionPhase.getTextContent();
-				}
-				List<String> goals = new ArrayList<String>();
-				List<Element> goalList = XmlUtils.findElements("goals/goal", execution);
-				if (goalList.size() > 0) {
-					for (Element goal : goalList) {
-						goals.add(goal.getTextContent());
-					}
-				}
-				executions.add(new Execution(id, phase, goals.toArray(new String[] {})));
-			}
-		}
+            // version
+            final Element versionElement = XmlUtils.findFirstElement("version",
+                    dependencyElement);
+            final String version = DomUtils.getTextContent(versionElement, "");
 
-		// Parsing for dependencies
-		List<Element> dependencyList = XmlUtils.findElements("dependencies/dependency", plugin);
-		if (dependencyList.size() > 0) {
-			for (Element dependency : dependencyList) {
-				Element dependencyGroupId = XmlUtils.findFirstElement("groupId", dependency);
-				String groupId = "";
-				if (dependencyGroupId != null) {
-					groupId = dependencyGroupId.getTextContent();
-				}
+            final Dependency dependency = new Dependency(groupId, artifactId,
+                    version);
 
-				Element dependencyArtifactId = XmlUtils.findFirstElement("artifactId", dependency);
-				String artifactId = "";
-				if (dependencyArtifactId != null) {
-					artifactId = dependencyArtifactId.getTextContent();
-				}
+            // Parse any exclusions
+            for (final Element exclusion : XmlUtils.findElements(
+                    "exclusions/exclusion", dependencyElement)) {
+                // groupId
+                final Element exclusionGroupIdElement = XmlUtils
+                        .findFirstElement("groupId", exclusion);
+                final String exclusionGroupId = DomUtils.getTextContent(
+                        exclusionGroupIdElement, "");
 
-				Element dependencyVersion = XmlUtils.findFirstElement("version", dependency);
-				String version = "";
-				if (dependencyVersion != null) {
-					version = dependencyVersion.getTextContent();
-				}
+                // artifactId
+                final Element exclusionArtifactIdElement = XmlUtils
+                        .findFirstElement("artifactId", exclusion);
+                final String exclusionArtifactId = DomUtils.getTextContent(
+                        exclusionArtifactIdElement, "");
 
-				Dependency dependencyElement = new Dependency(groupId, artifactId, version);
+                if (StringUtils.isNotBlank(exclusionGroupId)
+                        && StringUtils.isNotBlank(exclusionArtifactId)) {
+                    dependency.addExclusion(exclusionGroupId,
+                            exclusionArtifactId);
+                }
+            }
+            dependencies.add(dependency);
+        }
+        return dependencies;
+    }
 
-				// Parsing for exclusions
-				List<Element> exclusionList = XmlUtils.findElements("exclusions/exclusion", dependency);
-				if (exclusionList.size() > 0) {
-					for (Element exclusion : exclusionList) {
-						Element exclusionElement = XmlUtils.findFirstElement("groupId", exclusion);
-						String exclusionId = "";
-						if (exclusionElement != null) {
-							exclusionId = exclusionElement.getTextContent();
-						}
-						Element exclusionArtifactE = XmlUtils.findFirstElement("artifactId", exclusion);
-						String exclusionArtifactId = "";
-						if (exclusionArtifactE != null) {
-							exclusionArtifactId = exclusionArtifactE.getTextContent();
-						}
-						if (!(exclusionArtifactId.length() < 1) && !(exclusionId.length() < 1)) {
-							dependencyElement.getExclusions().add(new Dependency(exclusionId, exclusionArtifactId, "ignored"));
-						}
-					}
-				}
+    /**
+     * Parses the given XML plugin element for the plugin's executions
+     * 
+     * @param plugin the XML element to parse (required)
+     * @return a non-<code>null</code> list
+     */
+    private static List<Execution> getExecutions(final Element plugin) {
+        final List<Execution> executions = new ArrayList<Execution>();
+        // Loop through the "execution" elements in the plugin element
+        for (final Element execution : XmlUtils.findElements(
+                "executions/execution", plugin)) {
+            final Element idElement = XmlUtils
+                    .findFirstElement("id", execution);
+            final String id = DomUtils.getTextContent(idElement, "");
+            final Element phaseElement = XmlUtils.findFirstElement("phase",
+                    execution);
+            final String phase = DomUtils.getTextContent(phaseElement, "");
+            final List<String> goals = new ArrayList<String>();
+            for (final Element goalElement : XmlUtils.findElements(
+                    "goals/goal", execution)) {
+                goals.add(goalElement.getTextContent());
+            }
+            final Configuration configuration = Configuration
+                    .getInstance(XmlUtils.findFirstElement("configuration",
+                            execution));
+            executions.add(new Execution(id, phase, configuration, goals
+                    .toArray(new String[goals.size()])));
+        }
+        return executions;
+    }
 
-				this.dependencies.add(dependencyElement);
-			}
-		}
-	}
+    /**
+     * Parses the plugin's Maven groupId from the given element
+     * 
+     * @param plugin the element to parse (required)
+     * @return a non-blank groupId
+     */
+    public static String getGroupId(final Element plugin) {
+        if (plugin.getElementsByTagName("groupId").getLength() > 0) {
+            return plugin.getElementsByTagName("groupId").item(0)
+                    .getTextContent();
+        }
+        return DEFAULT_GROUP_ID;
+    }
 
-	public String getGroupId() {
-		return groupId;
-	}
+    /**
+     * Parses the plugin's version number from the given XML element
+     * 
+     * @param plugin the element to parse (required)
+     * @return a non-<code>null</code> version number (might be empty)
+     */
+    private static String getVersion(final Element plugin) {
+        final NodeList versionElements = plugin.getElementsByTagName("version");
+        if (versionElements.getLength() > 0) {
+            return versionElements.item(0).getTextContent();
+        }
+        return "";
+    }
 
-	public String getArtifactId() {
-		return artifactId;
-	}
+    private final Configuration configuration;
+    private final List<Dependency> dependencies = new ArrayList<Dependency>();
+    private final List<Execution> executions = new ArrayList<Execution>();
+    private final GAV gav;
 
-	public String getVersion() {
-		return version;
-	}
+    /**
+     * Constructor from a POM-style XML element that defines a Maven <plugin>.
+     * 
+     * @param plugin the XML element to parse (required)
+     */
+    public Plugin(final Element plugin) {
+        this(getGroupId(plugin), getArtifactId(plugin), getVersion(plugin),
+                getConfiguration(plugin), getDependencies(plugin),
+                getExecutions(plugin));
+    }
 
-	public Configuration getConfiguration() {
-		return configuration;
-	}
+    /**
+     * Constructor that takes the minimal Maven artifact coordinates.
+     * 
+     * @param groupId the group ID (required)
+     * @param artifactId the artifact ID (required)
+     * @param version the version (required)
+     */
+    public Plugin(final String groupId, final String artifactId,
+            final String version) {
+        this(groupId, artifactId, version, null, null, null);
+    }
 
-	public List<Dependency> getDependencies() {
-		return dependencies;
-	}
+    /**
+     * Constructor that allows all fields to be set.
+     * 
+     * @param groupId the group ID (required)
+     * @param artifactId the artifact ID (required)
+     * @param version the version (required)
+     * @param configuration the configuration for this plugin (optional)
+     * @param dependencies the dependencies for this plugin (can be
+     *            <code>null</code>)
+     * @param executions the executions for this plugin (can be
+     *            <code>null</code>)
+     */
+    public Plugin(final String groupId, final String artifactId,
+            final String version, final Configuration configuration,
+            final Collection<? extends Dependency> dependencies,
+            final Collection<? extends Execution> executions) {
+        Validate.notNull(groupId, "Group ID required");
+        Validate.notNull(artifactId, "Artifact ID required");
+        Validate.notNull(version, "Version required");
+        gav = new GAV(groupId, artifactId, version);
+        this.configuration = configuration;
+        // Defensively copy the given nullable collections
+        CollectionUtils.populate(this.dependencies, dependencies);
+        CollectionUtils.populate(this.executions, executions);
+    }
 
-	public List<Execution> getExecutions() {
-		return executions;
-	}
+    public int compareTo(final Plugin o) {
+        if (o == null) {
+            throw new NullPointerException();
+        }
+        int result = gav.compareTo(o.getGAV());
+        if (result == 0 && configuration != null && o.configuration != null) {
+            result = configuration.compareTo(o.configuration);
+        }
+        return result;
+    }
 
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((groupId == null) ? 0 : groupId.hashCode());
-		result = prime * result + ((artifactId == null) ? 0 : artifactId.hashCode());
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
-		result = prime * result + ((configuration == null) ? 0 : configuration.hashCode());
-		return result;
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof Plugin && compareTo((Plugin) obj) == 0;
+    }
 
-	public boolean equals(Object obj) {
-		return obj != null && obj instanceof Plugin && this.compareTo((Plugin) obj) == 0;
-	}
+    public String getArtifactId() {
+        return gav.getArtifactId();
+    }
 
- 	public int compareTo(Plugin o) {
-		if (o == null) {
-			throw new NullPointerException();
-		}
-		int result = groupId.compareTo(o.groupId);
-		if (result == 0) {
-			result = artifactId.compareTo(o.artifactId);
-		}
-		if (result == 0) {
-			result = version.compareTo(o.version);
-		}
-		if (result == 0 && configuration != null && o.configuration != null) {
-			result = configuration.compareTo(o.configuration);
-		}
-		return result;
-	}
+    /**
+     * Returns the top-level configuration of this plugin, if any. Note that
+     * individual {@link Execution}s may have their own {@link Configuration}s
+     * instead of or in addition to this configuration.
+     * 
+     * @return <code>null</code> if none exists
+     */
+    public Configuration getConfiguration() {
+        return configuration;
+    }
 
-	/**
-	 * @return a simple description, as would be used for console output
-	 */
-	public String getSimpleDescription() {
-		return groupId + ":" + artifactId + ":" + version;
-	}
+    public List<Dependency> getDependencies() {
+        return dependencies;
+    }
 
-	public String toString() {
-		ToStringCreator tsc = new ToStringCreator(this);
-		tsc.append("groupId", groupId);
-		tsc.append("artifactId", artifactId);
-		tsc.append("version", version);
-		if (configuration != null) {
-			tsc.append("configuration", configuration);
-		}
-		return tsc.toString();
-	}
+    /**
+     * Returns the {@link Element} to add to the given POM {@link Document} for
+     * this plugin
+     * 
+     * @param plugin the plugin for which to create an XML Element (required)
+     * @param document the document to which the element will belong (required)
+     * @return a non-<code>null</code> element
+     * @since 1.2.0
+     */
+    public Element getElement(final Document document) {
+        final Element pluginElement = document.createElement("plugin");
+
+        // Basic coordinates
+        pluginElement.appendChild(XmlUtils.createTextElement(document,
+                "groupId", getGroupId()));
+        pluginElement.appendChild(XmlUtils.createTextElement(document,
+                "artifactId", getArtifactId()));
+        pluginElement.appendChild(XmlUtils.createTextElement(document,
+                "version", getVersion()));
+
+        // Configuration
+        if (configuration != null) {
+            final Node configuration = document.importNode(
+                    this.configuration.getConfiguration(), true);
+            pluginElement.appendChild(configuration);
+        }
+
+        // Executions
+        if (!executions.isEmpty()) {
+            final Element executionsElement = DomUtils.createChildElement(
+                    "executions", pluginElement, document);
+            for (final Execution execution : executions) {
+                executionsElement.appendChild(execution.getElement(document));
+            }
+        }
+
+        // Dependencies
+        if (!dependencies.isEmpty()) {
+            final Element dependenciesElement = DomUtils.createChildElement(
+                    "dependencies", pluginElement, document);
+            for (final Dependency dependency : dependencies) {
+                dependenciesElement
+                        .appendChild(dependency.getElement(document));
+            }
+        }
+
+        return pluginElement;
+    }
+
+    public List<Execution> getExecutions() {
+        return executions;
+    }
+
+    /**
+     * Returns the Maven-style coordinates of this plugin
+     * 
+     * @return a non-<code>null</code> set of coordinates
+     */
+    public GAV getGAV() {
+        return gav;
+    }
+
+    /**
+     * Returns this plugin's groupId.
+     * 
+     * @return
+     */
+    public String getGroupId() {
+        return gav.getGroupId();
+    }
+
+    /**
+     * @return a simple description, as would be used for console output
+     */
+    public String getSimpleDescription() {
+        return gav.toString();
+    }
+
+    public String getVersion() {
+        return gav.getVersion();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        final int result = prime * 1 + gav.hashCode();
+        return prime * result
+                + (configuration == null ? 0 : configuration.hashCode());
+    }
+
+    @Override
+    public String toString() {
+        final ToStringBuilder builder = new ToStringBuilder(this);
+        builder.append("gav", gav);
+        if (configuration != null) {
+            builder.append("configuration", configuration);
+        }
+        return builder.toString();
+    }
 }

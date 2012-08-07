@@ -66,9 +66,9 @@
         combination with Hibernate. We have found OpenJPA works reliably in
         all cases, so you might want to consider switching to OpenJPA if you
         are seriously impacted by this issue (the "<link
-        linkend="command-index-persistence-setup">persistence setup</link>"
-        command can be used multiple times, which is useful for experimentally
-        switching between different JPA providers).</para>
+        linkend="command-index-jpa-setup">jpa setup</link>" command can be
+        used multiple times, which is useful for experimentally switching
+        between different JPA providers).</para>
       </listitem>
 
       <listitem>
@@ -113,7 +113,7 @@
         <para>Applications with a scaffolded GWT UI require a manual
         adjustment in
         <code>src/main/webapp/WEB-INF/spring/webmvc-config.xml</code> (this
-        will not be required when using Spring Framework 3.0.5):</para>
+        will not be required when using Spring Framework 3.0.5+):</para>
 
         <programlisting>&lt;mvc:default-servlet-handler <emphasis role="bold">default-servlet-name="_ah_default"</emphasis> /&gt;</programlisting>
       </listitem>
@@ -180,11 +180,12 @@
     <itemizedlist>
       <listitem>
         <para>Run the <link linkend="command-index-backup">backup</link>
-        command using your currently-installed (i.e. existing) version of Spring
-        Roo. This will help create a ZIP of your project, which may help if
-        you need to revert. Don't install the new version of Roo until you've
-        firstly completed this backup. Naturally you can skip this step if you
-        have an alternate backup technique and have confidence in it.</para>
+        command using your currently-installed (i.e. existing) version of
+        Spring Roo. This will help create a ZIP of your project, which may
+        help if you need to revert. Don't install the new version of Roo until
+        you've firstly completed this backup. Naturally you can skip this step
+        if you have an alternate backup technique and have confidence in
+        it.</para>
       </listitem>
 
       <listitem>
@@ -222,6 +223,182 @@
     <para>If you experience any difficulty with upgrading your projects,
     please use the <link linkend="resources-forums">community support
     forum</link> for assistance.</para>
+  </section>
+
+  <section>
+    <title>Upgrading to 1.2.0.RC1</title>
+
+    <para>The main changes you need to be aware of when upgrading from Spring
+    Roo 1.2.0.M1 to Spring Roo 1.2.0.RC1 are as follows:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>To align with the new persistence and repository choices
+        introduced with Roo 1.2.0.M1 the entity command has been adjusted to
+        take the target persistence type into account. Please change your
+        log.roo scripts to use the new <link
+        linkend="command-index-entity-jpa">entity jpa</link> command. More
+        details about the new entity JPA command as well as related annotation
+        changes please refer to <link
+        xlink:href="https://jira.springsource.org/browse/ROO-2833">ROO-2833</link>:</para>
+
+        <table>
+          <title>Old Annotations &amp; Commands</title>
+
+          <tgroup cols="5">
+            <thead>
+              <row>
+                <entry align="center"></entry>
+
+                <entry align="center">Active Record</entry>
+
+                <entry align="center">Repository</entry>
+
+                <entry align="center">Entity</entry>
+
+                <entry align="center">Command</entry>
+              </row>
+            </thead>
+
+            <tbody>
+              <row>
+                <entry>JPA</entry>
+
+                <entry>@RooEntity</entry>
+
+                <entry></entry>
+
+                <entry></entry>
+
+                <entry>entity</entry>
+              </row>
+
+              <row>
+                <entry>Spring Data JPA</entry>
+
+                <entry></entry>
+
+                <entry>@RooRepositoryJpa</entry>
+
+                <entry>@RooJpaEntity</entry>
+
+                <entry>entity --activeRecord false + repository jpa</entry>
+              </row>
+
+              <row>
+                <entry>Spring Data MongoDB</entry>
+
+                <entry></entry>
+
+                <entry>@RooRepositoryMongo</entry>
+
+                <entry>@RooMongoEntity</entry>
+
+                <entry>entity mongo + repository mongo</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+
+        <para></para>
+
+        <para><table>
+            <title>New Annotations &amp; Commands</title>
+
+            <tgroup cols="5">
+              <thead>
+                <row>
+                  <entry align="center"></entry>
+
+                  <entry align="center">Active Record</entry>
+
+                  <entry align="center">Repository</entry>
+
+                  <entry align="center">Entity</entry>
+
+                  <entry align="center">Command</entry>
+                </row>
+              </thead>
+
+              <tbody>
+                <row>
+                  <entry>JPA</entry>
+
+                  <entry><emphasis
+                  role="bold">@RooJpaActiveRecord</emphasis></entry>
+
+                  <entry></entry>
+
+                  <entry></entry>
+
+                  <entry>entity <emphasis role="bold">jpa</emphasis></entry>
+                </row>
+
+                <row>
+                  <entry>Spring Data JPA</entry>
+
+                  <entry></entry>
+
+                  <entry><emphasis
+                  role="bold">@RooJpaRepository</emphasis></entry>
+
+                  <entry>@RooJpaEntity</entry>
+
+                  <entry>entity <emphasis role="bold">jpa</emphasis>
+                  --activeRecord false + repository jpa</entry>
+                </row>
+
+                <row>
+                  <entry>Spring Data MongoDB</entry>
+
+                  <entry></entry>
+
+                  <entry><emphasis
+                  role="bold">@RooMongoRepository</emphasis></entry>
+
+                  <entry>@RooMongoEntity</entry>
+
+                  <entry>entity mongo + repository mongo</entry>
+                </row>
+              </tbody>
+            </tgroup>
+          </table></para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title>Upgrading to 1.2.0.M1</title>
+
+    <para>The main changes you need to be aware of when upgrading from Spring
+    Roo 1.1.5.RELEASE to Spring Roo 1.2.0.M1 are as follows:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>The presence of @RooWebScaffold does not automatically trigger
+        Spring MVC JSON integration any more. The exposeJson attribute in this
+        annotation has been deprecated and will be removed for subsequent
+        releases. To create Spring MVC JSON integration please see the <link
+        linkend="base-json">JSON chapter</link> or simply use the <link
+        linkend="command-index-web-mvc-json-all">web mvc json all</link>
+        command.</para>
+      </listitem>
+
+      <listitem>
+        <para>The presence of @RooWebScaffold does not automatically trigger
+        Spring MVC Finder integration any more. The exposeFinders attribute in
+        this annotation has been deprecated and will be removed for subsequent
+        releases. To create Spring MVC Finder integration please see <link
+        linkend="base-web">MVC chapter</link> or simply use the <link
+        linkend="command-index-web-mvc-finder-all">web mvc finder all</link>
+        command.</para>
+      </listitem>
+
+      <listitem>
+        <para>To update a Roo GWT project please run <link
+        linkend="command-index-web-gwt-setup">web gwt setup</link></para>
+      </listitem>
+    </itemizedlist>
   </section>
 
   <section xml:id="upgrade-1.1.3.RELEASE">

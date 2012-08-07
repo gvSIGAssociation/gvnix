@@ -156,6 +156,165 @@ tomcat_stop_start_get_stop() {
     popd &>/dev/null
 }
 
+jetty_stop_start_get_stop() {
+    type -P wget &>/dev/null || { l_error "wget not found. Aborting." >&2; exit 1; }
+    log "Performing JSF testing; expecting GET success for URL: $@"
+    pushd /tmp/rootest &>/dev/null
+    if [ "$TERM_PROGRAM" = "Apple_Terminal" ]; then
+        MVN_JETTY_PID=`ps -e | grep Launcher | grep jetty:run-exploded | cut -b "1-6" | sed "s/ //g"`
+    else
+        MVN_JETTY_PID=`ps -eo "%p %c %a" | grep Launcher | grep jetty:run-exploded | cut -b "1-6" | sed "s/ //g"`
+    fi
+    if [ ! "$MVN_JETTY_PID" = "" ]; then
+        # doing a kill -9 as it was hanging around for some reason, when it really should have been killed by now
+        log "kill -9 of old mvn jetty:run-exploded with PID $MVN_JETTY_PID"
+        kill -9 $MVN_JETTY_PID
+        sleep 5
+    fi
+    log "Invoking mvn jetty:run-exploded in background"
+    $MVN_CMD -e -B -Djetty.port=8888 jetty:run-exploded &>/dev/null 2>&1 &
+    WGET_OPTS="-q"
+    if [ "$VERBOSE" = "1" ]; then
+        WGET_OPTS="-v"
+    fi
+    wget $WGET_OPTS --retry-connrefused --tries=30 -O /tmp/rootest/wget.html $@
+    EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "wget failed: $@ (returned code $EXITED)" >&2; exit 1;
+    fi
+    if [ "$TERM_PROGRAM" = "Apple_Terminal" ]; then
+        MVN_JETTY_PID=`ps -e | grep Launcher | grep jetty:run-exploded | cut -b "1-6" | sed "s/ //g"`
+    else
+        MVN_JETTY_PID=`ps -eo "%p %c %a" | grep Launcher | grep jetty:run-exploded | cut -b "1-6" | sed "s/ //g"`
+    fi
+    if [ ! "$MVN_JETTY_PID" = "" ]; then
+        log "Terminating background mvn grep jetty:run-exploded process with PID $MVN_JETTY_PID"
+        kill $MVN_JETTY_PID
+        # no need to sleep, as we'll be at least running Roo between now and the next Jetty start
+    fi
+    popd &>/dev/null
+}
+
+pizzashop_tests() {
+	type -P curl &>/dev/null || { l_error "curl not found. Aborting." >&2; exit 1; }
+	log "Performing MVC REST testing;"
+	pushd /tmp/rootest &>/dev/null
+	if [ "$TERM_PROGRAM" = "Apple_Terminal" ]; then
+        MVN_TOMCAT_PID=`ps -e | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    else  
+        MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    fi
+    if [ ! "$MVN_TOMCAT_PID" = "" ]; then
+        # doing a kill -9 as it was hanging around for some reason, when it really should have been killed by now
+        log "kill -9 of old mvn tomcat:run with PID $MVN_TOMCAT_PID"
+        kill -9 $MVN_TOMCAT_PID
+        sleep 5
+    fi
+    log "Invoking mvn tomcat:run in background"
+    $MVN_CMD -e -B -Dmaven.tomcat.port=8888 tomcat:run &>/dev/null 2>&1 &
+
+    wget --retry-connrefused --tries=30 --header 'Accept: application/json' --quiet http://localhost:8888/pizzashop/bases 2>&1
+	
+	log "Testing RESTful POST to PizzaShop application"
+	curl -H "Content-Type: application/json" -H "Accept: application/json" -o /tmp/rootest/curl.txt -i -s -X POST -d "{name: \"Thin Crust\"}" http://localhost:8888/pizzashop/bases
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "curl failed: $@ (returned code $EXITED)" >&2; exit 1;
+    fi
+	head -n 1 /tmp/rootest/curl.txt | grep "201 Created"
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "RESTful POST to PizzaShop application failed" >&2; exit 1;
+    fi
+	log "Testing RESTful array data POST to PizzaShop application"
+	curl -H "Content-Type: application/json" -H "Accept: application/json" -o /tmp/rootest/curl.txt -i -s -X POST -d "[{name: \"Cheesy Crust\"},{name: \"Thick Crust\"}]" http://localhost:8888/pizzashop/bases/jsonArray	
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "curl failed: $@ (returned code $EXITED)" >&2; exit 1;
+    fi
+	head -n 1 /tmp/rootest/curl.txt | grep "201 Created"
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "RESTful array data POST to PizzaShop application failed" >&2; exit 1;
+    fi
+	log "Testing RESTful array data POST to PizzaShop application"
+	curl -H "Content-Type: application/json" -H "Accept: application/json" -o /tmp/rootest/curl.txt -i -s -X POST -d "[{name: \"Fresh Tomato\"},{name: \"Prawns\"},{name: \"Mozarella\"},{name: \"Bogus\"}]" http://localhost:8888/pizzashop/toppings/jsonArray
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "curl failed: $@ (returned code $EXITED)" >&2; exit 1;
+    fi
+	head -n 1 /tmp/rootest/curl.txt | grep "201 Created"
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "RESTful array data POST to PizzaShop application failed" >&2; exit 1;
+    fi
+	log "Testing RESTful PUT to PizzaShop application"
+	curl -i -s -X PUT -H "Content-Type: application/json" -H "Accept: application/json" -o /tmp/rootest/curl.txt -d "{id:6,name:\"Mozzarella\",version:1}" http://localhost:8888/pizzashop/toppings
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "curl failed: $@ (returned code $EXITED)" >&2; exit 1;
+    fi
+	head -n 1 /tmp/rootest/curl.txt | grep "200 OK"
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "RESTful PUT to PizzaShop application failed" >&2; exit 1;
+    fi
+	log "Testing RESTful GET to PizzaShop application"
+	curl -i -s -H "Accept: application/json" -o /tmp/rootest/curl.txt http://localhost:8888/pizzashop/toppings
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "curl failed: $@ (returned code $EXITED)" >&2; exit 1;
+    fi
+	head /tmp/rootest/curl.txt | grep "Tomato" | grep "Prawns" | grep "Mozzarella"
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "RESTful GET to PizzaShop application failed" >&2; exit 1;
+    fi
+	log "Testing RESTful GET to PizzaShop application"
+	curl -i -s -H "Accept: application/json" -o /tmp/rootest/curl.txt http://localhost:8888/pizzashop/toppings/6
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "curl failed: $@ (returned code $EXITED)" >&2; exit 1;
+    fi
+	head /tmp/rootest/curl.txt | grep "Mozzarella"
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "RESTful GET to PizzaShop application failed" >&2; exit 1;
+    fi
+	log "Testing RESTful complex POST to PizzaShop application"
+	curl -i -s -X POST -H "Content-Type: application/json" -H "Accept: application/json"  -o /tmp/rootest/curl.txt -d "{name:\"Napolitana\",price:7.5,base:{id:1},toppings:[{name: \"Anchovy fillets\"},{name: \"Mozzarella\"}]}" http://localhost:8888/pizzashop/pizzas
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "curl failed: $@ (returned code $EXITED)" >&2; exit 1;
+    fi
+	head /tmp/rootest/curl.txt | grep "201 Created"
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "RESTful complex POST to PizzaShop application failed" >&2; exit 1;
+    fi
+	log "Testing RESTful complex POST to PizzaShop application"
+	curl -i -s -X POST -H "Content-Type: application/json" -H "Accept: application/json" -o /tmp/rootest/curl.txt -d "{name:\"Stefan\",total:7.5,address:\"Sydney, AU\",deliveryDate:1314595427866,id:{shopCountry:\"AU\",shopCity:\"Sydney\",shopName:\"Pizza Pan 1\"},pizzas:[{id:8,version:1}]}" http://localhost:8888/pizzashop/pizzaorders	
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "curl failed: $@ (returned code $EXITED)" >&2; exit 1;
+    fi
+	head /tmp/rootest/curl.txt | grep "201 Created"
+	EXITED=$?
+    if [[ ! "$EXITED" = "0" ]]; then
+        l_error "RESTful complex POST to PizzaShop application failed" >&2; exit 1;
+    fi
+    if [ "$TERM_PROGRAM" = "Apple_Terminal" ]; then
+        MVN_TOMCAT_PID=`ps -e | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    else
+        MVN_TOMCAT_PID=`ps -eo "%p %c %a" | grep Launcher | grep tomcat:run | cut -b "1-6" | sed "s/ //g"`
+    fi
+    if [ ! "$MVN_TOMCAT_PID" = "" ]; then
+        log "Terminating background mvn tomcat:run process with PID $MVN_TOMCAT_PID"
+        kill $MVN_TOMCAT_PID
+        # no need to sleep, as we'll be at least running Roo between now and the next Tomcat start
+    fi
+	popd &>/dev/null
+}
 
 COMMAND=
 NEXT=
@@ -297,6 +456,7 @@ if [[ "$COMMAND" = "assembly" ]]; then
     cp $ROO_HOME/annotations/target/*-$VERSION.jar $WORK_DIR/annotations
     cp $ROO_HOME/target/all/*.jar $WORK_DIR/bundle
     rm $WORK_DIR/bundle/org.springframework.roo.annotations-$VERSION.jar
+    rm $WORK_DIR/bundle/*junit*.jar
     rm $WORK_DIR/bundle/*jsch*.jar
     rm $WORK_DIR/bundle/*jgit*.jar
     rm $WORK_DIR/bundle/*git*.jar
@@ -406,7 +566,20 @@ if [[ "$COMMAND" = "assembly" ]]; then
         load_roo_build_and_test script wedding.roo
         tomcat_stop_start_get_stop http://localhost:8888/wedding
 
-        load_roo_build_and_test script expenses.roo
+		load_roo_build_and_test script pizzashop.roo
+        tomcat_stop_start_get_stop http://localhost:8888/pizzashop
+		pizzashop_tests
+
+        load_roo_build_and_test script expenses.roo	
+        
+        load_roo_build_and_test script bikeshop.roo
+        jetty_stop_start_get_stop http://localhost:8888/bikeshop/pages/main.jsf
+
+        load_roo_build_and_test script multimodule.roo
+        tomcat_stop_start_get_stop http://localhost:8888/mvc
+
+        load_roo_build_and_test script embedding.roo
+        tomcat_stop_start_get_stop http://localhost:8888/embedding
 
         log "Removing Roo distribution from test area"
         rm -rf /tmp/$RELEASE_IDENTIFIER

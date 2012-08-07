@@ -1,6 +1,5 @@
 package org.springframework.roo.addon.backup;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,16 +13,17 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.support.util.FileUtils;
 
 /**
  * Operations for the 'backup' add-on.
@@ -33,87 +33,98 @@ import org.springframework.roo.support.util.Assert;
  * @author Alan Stewart
  * @since 1.0
  */
-@Component 
-@Service 
+@Component
+@Service
 public class BackupOperationsImpl implements BackupOperations {
-	private static Logger logger = HandlerUtils.getLogger(BackupOperationsImpl.class);
-	@Reference private FileManager fileManager;
-	@Reference private ProjectOperations projectOperations;
 
-	public boolean isBackupAvailable() {
-		return projectOperations.isProjectAvailable();
-	}
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(BackupOperationsImpl.class);
 
-	public String backup() {
-		Assert.isTrue(isBackupAvailable(), "Project metadata unavailable");
+    @Reference private FileManager fileManager;
+    @Reference private ProjectOperations projectOperations;
 
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+    public String backup() {
+        Validate.isTrue(isBackupPossible(), "Project metadata unavailable");
 
-		if (File.separatorChar == '\\') {
-			// Windows, so make a date format that can legally form part of a filename (ROO-277)
-			df = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
-		}
+        // For Windows, make a date format that can legally form part of a
+        // filename (ROO-277)
+        final String pattern = File.separatorChar == '\\' ? "yyyy-MM-dd_HH.mm.ss"
+                : "yyyy-MM-dd_HH:mm:ss";
+        final DateFormat df = new SimpleDateFormat(pattern);
+        final long start = System.nanoTime();
 
-		long start = System.nanoTime();
-		
-		ZipOutputStream zos = null;
-		try {
-			File projectDirectory = new File(projectOperations.getPathResolver().getIdentifier(Path.ROOT, "."));
-			MutableFile file = fileManager.createFile(FileDetails.getCanonicalPath(new File(projectDirectory, projectOperations.getProjectMetadata().getProjectName() + "_" + df.format(new Date()) + ".zip")));
-			zos = new ZipOutputStream(file.getOutputStream());
-			zip(projectDirectory, projectDirectory, zos);
-		} catch (FileNotFoundException e) {
-			logger.fine("Could not determine project directory");
-		} catch (IOException e) {
-			logger.fine("Could not create backup archive");
-		} finally {
-			if (zos != null) {
-				try {
-					zos.close();
-				} catch (IOException ignored) {}
-			}
-		}
-		
-		long milliseconds = (System.nanoTime() - start) / 1000000;
-		return "Backup completed in " + milliseconds + " ms";
-	}
+        ZipOutputStream zos = null;
+        try {
+            final File projectDirectory = new File(projectOperations
+                    .getPathResolver().getFocusedIdentifier(Path.ROOT, "."));
+            final MutableFile file = fileManager.createFile(FileUtils
+                    .getCanonicalPath(new File(projectDirectory,
+                            projectOperations.getFocusedProjectName() + "_"
+                                    + df.format(new Date()) + ".zip")));
+            zos = new ZipOutputStream(file.getOutputStream());
+            zip(projectDirectory, projectDirectory, zos);
+        }
+        catch (final FileNotFoundException e) {
+            LOGGER.fine("Could not determine project directory");
+        }
+        catch (final IOException e) {
+            LOGGER.fine("Could not create backup archive");
+        }
+        finally {
+            IOUtils.closeQuietly(zos);
+        }
 
-	private void zip(File directory, final File base, ZipOutputStream zos) throws IOException {
-		File[] files = directory.listFiles(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				// Don't use this directory if it's "target" under base
-				if (dir.equals(base) && name.equals("target")) {
-					return false;
-				}
-				
-				// Skip existing backup files
-				if (dir.equals(base) && name.endsWith(".zip")) {
-					return false;
-				}
-				
-				// Skip files that start with "."
-				return !name.startsWith(".");
-			}
-		});
-		
-		byte[] buffer = new byte[8192];
-		int read = 0;
-		for (int i = 0, n = files.length; i < n; i++) {
-			if (files[i].isDirectory()) {
-				if (files[i].listFiles().length == 0) {
-					ZipEntry dirEntry = new ZipEntry(files[i].getPath().substring(base.getPath().length() + 1) + System.getProperty("file.separator"));
-					zos.putNextEntry(dirEntry);
-				}
-				zip(files[i], base, zos);
-			} else {
-				InputStream in = new BufferedInputStream(new FileInputStream(files[i]));
-				ZipEntry entry = new ZipEntry(files[i].getPath().substring(base.getPath().length() + 1));
-				zos.putNextEntry(entry);
-				while (-1 != (read = in.read(buffer))) {
-					zos.write(buffer, 0, read);
-				}
-				in.close();
-			}
-		}
-	}
+        final long milliseconds = (System.nanoTime() - start) / 1000000;
+        return "Backup completed in " + milliseconds + " ms";
+    }
+
+    public boolean isBackupPossible() {
+        return projectOperations.isFocusedProjectAvailable();
+    }
+
+    private void zip(final File directory, final File base,
+            final ZipOutputStream zos) throws IOException {
+        final File[] files = directory.listFiles(new FilenameFilter() {
+            public boolean accept(final File dir, final String name) {
+                // Don't use this directory if it's "target" under base
+                if (dir.equals(base) && name.equals("target")) {
+                    return false;
+                }
+
+                // Skip existing backup files
+                if (dir.equals(base) && name.endsWith(".zip")) {
+                    return false;
+                }
+
+                // Skip files that start with "."
+                return !name.startsWith(".");
+            }
+        });
+
+        for (final File file : files) {
+            if (file.isDirectory()) {
+                if (file.listFiles().length == 0) {
+                    final ZipEntry dirEntry = new ZipEntry(file.getPath()
+                            .substring(base.getPath().length() + 1)
+                            + File.separatorChar);
+                    zos.putNextEntry(dirEntry);
+                }
+                zip(file, base, zos);
+            }
+            else {
+                InputStream inputStream = null;
+                try {
+                    final ZipEntry entry = new ZipEntry(file.getPath()
+                            .substring(base.getPath().length() + 1));
+                    zos.putNextEntry(entry);
+
+                    inputStream = new FileInputStream(file);
+                    IOUtils.write(IOUtils.toByteArray(inputStream), zos);
+                }
+                finally {
+                    IOUtils.closeQuietly(inputStream);
+                }
+            }
+        }
+    }
 }

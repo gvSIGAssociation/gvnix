@@ -17,10 +17,10 @@
   offered by the Spring Roo persistence add-on:</para>
 
   <section>
-    <title>Persistence setup command</title>
+    <title>JPA setup command</title>
 
-    <para>The <link linkend="command-index-persistence-setup">persistence
-    setup</link> command provides the following options and attributes:</para>
+    <para>The <link linkend="command-index-jpa-setup">jpa setup</link> command
+    provides the following options and attributes:</para>
 
     <para>Database Options:</para>
 
@@ -124,34 +124,27 @@
       </listitem>
 
       <listitem>
-        <para><link xlink:href="http://www.datanucleus.org/">Data
-        Nucleus</link></para>
+        <para><link xlink:href="http://www.datanucleus.org/">DataNucleus
+        3.0</link></para>
       </listitem>
     </itemizedlist>
 
-    <para>In relation to Data Nucleus, both version 1 and version 2 are
-    supported. Version 1 does not support JPA 2 and should only be used if you
-    are intending to deploy to Google App Engine. Version 2 should be used if
-    you are intending to deploy to VMforce cloud environments. In most cases
-    we recommend you use Hibernate, OpenJPA or EclipseLink.</para>
-
-    <para>In addition, the <link
-    linkend="command-index-persistence-setup">persistence setup</link> command
-    accepts optional <emphasis>databaseName</emphasis>,
+    <para>In addition, the <link linkend="command-index-jpa-setup">jpa
+    setup</link> command accepts optional <emphasis>databaseName</emphasis>,
     <emphasis>userName</emphasis> and <emphasis>password</emphasis> attributes
     for your convenience. However, it's not necessary to use this command. You
     can easily edit these details in the <code>database.properties</code> file
     at any time. Finally, you can also specify a pre-configured JNDI
     datasource via the <emphasis>jndiDataSource</emphasis> attribute.</para>
 
-    <para>The persistence setup command can be re-run at any time. This means
-    you can change your ORM provider or database when you plan to move your
+    <para>The jpa setup command can be re-run at any time. This means you can
+    change your ORM provider or database when you plan to move your
     application between your development setup (e.g. Hibernate with HSQLDB) to
     your production setup (e.g. EclipseLink with DB2). Of course this is a
     convenience only. You'll naturally experience fewer deployment issues if
     you use the same platform for both development and production.</para>
 
-    <para>Running the persistence setup command in the Roo shell takes care of
+    <para>Running the jpa setup command in the Roo shell takes care of
     configuring several aspects in your project:</para>
 
     <orderedlist>
@@ -213,10 +206,9 @@ database.driverClassName=org.hsqldb.jdbcDriver
         linkend="command-index-properties-set">properties set</link> command,
         or by using the <emphasis>databaseName</emphasis>,
         <emphasis>userName</emphasis> and <emphasis>password</emphasis>
-        attributes of the <link
-        linkend="command-index-persistence-setup">persistence setup</link>
-        command. You can edit the properties file or use any of these commands
-        at any time.</para>
+        attributes of the <link linkend="command-index-jpa-setup">jpa
+        setup</link> command. You can edit the properties file or use any of
+        these commands at any time.</para>
       </listitem>
 
       <listitem>
@@ -247,22 +239,24 @@ database.driverClassName=org.hsqldb.jdbcDriver
   </section>
 
   <section>
-    <title>Entity command</title>
+    <title>Entity JPA command</title>
 
-    <para>Using the <link linkend="command-index-entity">entity</link> command
-    you can create simple Java beans which are annotated with JPA annotations.
-    There are several optional attributes which can be used as part of this
-    command but in its simplest form it will generate the following
-    artifacts:</para>
+    <para>Using the <link linkend="command-index-entity-jpa"><link
+    linkend="command-index-entity">entity</link> jpa</link> command you can
+    create simple Java beans which are annotated with JPA annotations. There
+    are several optional attributes which can be used as part of this command
+    but in its simplest form it will generate the following artifacts:</para>
 
-    <para><programlisting>roo&gt; entity --class ~.Person   
+    <para><programlisting>roo&gt; entity jpa --class ~.Person   
 Created SRC_MAIN_JAVA/com/foo
 Created SRC_MAIN_JAVA/com/foo/Person.java
-Created SRC_MAIN_JAVA/com/foo/Person_Roo_Entity.aj
+Created SRC_MAIN_JAVA/com/foo/Person_Roo_JavaBean.aj
+Created SRC_MAIN_JAVA/com/foo/Person_Roo_Jpa_Entity.aj
+Created SRC_MAIN_JAVA/com/foo/Person_Roo_Jpa_ActiveRecord.aj
 Created SRC_MAIN_JAVA/com/foo/Person_Roo_ToString.aj
 Created SRC_MAIN_JAVA/com/foo/Person_Roo_Configurable.aj
 ~.Person roo&gt;
-</programlisting>As you can see from the Roo shell messages there are 4 files
+</programlisting>As you can see from the Roo shell messages there are 6 files
     generated (also, note that the context has changed to the Person type in
     the Roo shell):</para>
 
@@ -272,7 +266,7 @@ Created SRC_MAIN_JAVA/com/foo/Person_Roo_Configurable.aj
 
         <para><programlisting>@RooJavaBean
 @RooToString
-@RooEntity
+@RooJpaActiveRecord
 public class Person {
 }
 </programlisting>You will notice that by default, the Person type does not
@@ -284,7 +278,7 @@ public class Person {
         <para>Person_Roo_JavaBean.aj (this will only be generated when fields
         are added to the Person type)</para>
 
-        <para>The first annotation added by the entity command is the
+        <para>The first annotation added by the entity jpa command is the
         @RooJavaBean annotation. This annotation will automatically add public
         accessors and mutators via an ITD for each field added to the Person
         type. This annotation (like all Roo annotations) has source retention
@@ -298,7 +292,8 @@ public class Person {
         @RooToString annotation. This annotation will generate a toString
         method for the Person type via an ITD. The
         <emphasis>toString</emphasis>() method will contain a concatenated
-        representation of all field names and their values. If you want to
+        representation of all field names and their values using the
+        commons-lang RefectionToStringBuilder by default. If you want to
         provide your own toString() method alongside the Roo generated
         <emphasis>toString</emphasis>() method you can declare the
         <emphasis>toStringMethod</emphasis> attribute in the @RooToString
@@ -311,28 +306,36 @@ public class Person {
       <listitem>
         <para>Person_Roo_Configurable.aj</para>
 
-        <para>The third annotation takes care of marking the Person type with
-        Spring's @Configurable annotation. This annotation allows you to
-        inject any types from the Spring bean factory into the Person type.
-        The injection of the JPA entity manager (which is defined as a bean in
-        the application context) is possible due to the presence of the
+        <para>This ITD is automatically created and does not require the
+        @RooConfigurable annotation to be introduced into the Person.java
+        type. It takes care of marking the Person type with Spring's
+        @Configurable annotation. This annotation allows you to inject any
+        types from the Spring bean factory into the Person type. The injection
+        of the JPA entity manager (which is defined as a bean in the
+        application context) is possible due to the presence of the
         @Configurable annotation.</para>
       </listitem>
 
       <listitem>
-        <para>Person_Roo_Entity.aj</para>
+        <para>Person_Roo_Jpa_Entity.aj</para>
 
-        <para>The fourth annotation is the @RooEntity annotation. This
-        annotation will introduce a number of persistence related methods into
-        your Person type via an ITD:</para>
+        <para>The forth annotation is the @RooJpaActiveRecord annotation. This
+        annotation triggers the creation of two ITDs: the
+        Person_Roo_Jpa_Entity.aj ITD and the Person_Roo_Jpa_ActiveRecord.aj
+        ITD. Note that If you do not want ActiveRecord-style methods in your
+        domain object you can just use the @RooJpaEntity annotation.</para>
 
-        <para><programlisting>privileged aspect Person_Roo_Entity {
+        <para>The JPA @Entity annotation is added to the
+        Person_Roo_Jpa_Entity.aj ITD. This annotation marks the Person as
+        persistable. By default, the JPA implementation of your choice will
+        create a table definition in your database for this type. Once fields
+        are added to the Person type, they will be added as columns to the
+        Person table.</para>
+
+        <programlisting>privileged aspect Person_Roo_Jpa_Entity {
     
     declare @type: Person: @Entity;   
 
-    @PersistenceContext
-    transient EntityManager Person.entityManager;
-    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -357,6 +360,27 @@ public class Person {
     public void Person.setVersion(Integer version) {
         this.version = version;
     }
+}
+</programlisting>
+
+        <para>As can be seen, the Person_Roo_Jpa_Entity.aj ITD introduces two
+        fields by default. An <emphasis>id</emphasis> field (which is
+        auto-incremented) and a <emphasis>version</emphasis> field (used for
+        JPA-managed optimistic locking).</para>
+      </listitem>
+
+      <listitem>
+        <para>Person_Roo_Jpa_ActiveRecord.aj</para>
+
+        <para>As mentioned previously, the @RooJpaActiveRecord annotation also
+        triggers the creation of the Person_Roo_Jpa_ActiveRecord.aj ITD. This
+        contains a number of persistence related CRUD methods into your Person
+        type via the ITD:</para>
+
+        <programlisting>privileged aspect Person_Roo_Jpa_ActiveRecord {
+    
+    @PersistenceContext
+    transient EntityManager Person.entityManager;
     
     @Transactional
     public void Person.persist() {
@@ -419,25 +443,10 @@ public class Person {
                    .setFirstResult(firstResult).setMaxResults(maxResults).getResultList();
     }
 }
-</programlisting></para>
+</programlisting>
 
-        <para>The JPA @Entity annotation is added to the Person_Roo_Entity.aj
-        ITD. This annotation marks the Person as persistable. By default, the
-        JPA implementation of your choice will create a table definition in
-        your database for this type. Once fields are added to the Person type,
-        they will be added as columns to the Person table.</para>
-
-        <para>As can be seen, the Person_Roo_Entity.aj ITD introduces three
-        fields by default. An <emphasis>id</emphasis> field (which is
-        auto-incremented), a <emphasis>version</emphasis> field (used for
-        JPA-managed optimistic locking), and an
-        <emphasis>entityManager</emphasis> field which can be used by the
-        developer to create additional persistence-related
-        functionality.</para>
-
-        <para>In addition to these three fields, the Person_Roo_Entity.aj ITD
-        introduces a number of methods such as
-        <emphasis>persist<emphasis>()</emphasis></emphasis>,
+        <para>The Person_Roo_Jpa_ActiveRecord.aj ITD introduces a number of
+        methods such as <emphasis>persist<emphasis>()</emphasis></emphasis>,
         <emphasis>remove</emphasis>(), <emphasis>merge</emphasis>(),
         <emphasis>flush</emphasis>() which allow the execution of <link
         xlink:href="http://en.wikipedia.org/wiki/Active_record_pattern">ActiveRecord</link>-style
@@ -455,28 +464,26 @@ public class Person {
 
         <para>Similar to the @RooToString annotation you can change the
         default method name for all persistence-related methods generated
-        through the @RooEntity annotation. Furthermore, if you don't want Roo
-        to generate certain methods as part of this addon at all you can
-        assign an empty String as the method name which will instruct Roo to
-        not generate the method:</para>
+        through the @RooJpaActiveRecord annotation. For example:</para>
 
-        <para><programlisting>@RooEntity(countMethod = "")</programlisting></para>
+        <para><programlisting>@RooJpaActiveRecord(persistMethod = "save")</programlisting></para>
       </listitem>
     </orderedlist>
 
-    <para>The <link linkend="command-index-entity">entity</link> command
-    offers a number of optional (but very useful) attributes worth mentioning.
-    For example the <emphasis role="bold">--testAutomatically</emphasis>
-    attribute can be used to have Roo to generate and maintain integration
-    tests for the Person type (and the persistence methods generated as part
-    of it). Furthermore, the <emphasis role="bold">--abstract</emphasis> and
-    <emphasis role="bold">--extends</emphasis> attributes allow you to mark
-    classes as abstract or inheritance patterns. Of course this can also be
-    done directly in the Java sources of the Person type but sometimes it is
-    useful to do this through a Roo command which can be scripted and replayed
-    if desired. Other attributes allow you to define the identifier field name
-    as well as the identifier field type which, in turn, allows the use of
-    complex identifier types.</para>
+    <para>The <link linkend="command-index-entity-jpa"><link
+    linkend="command-index-entity">entity</link> jpa</link> command offers a
+    number of optional (but very useful) attributes worth mentioning. For
+    example the <emphasis role="bold">--testAutomatically</emphasis> attribute
+    can be used to have Roo to generate and maintain integration tests for the
+    Person type (and the persistence methods generated as part of it).
+    Furthermore, the <emphasis role="bold">--abstract</emphasis> and <emphasis
+    role="bold">--extends</emphasis> attributes allow you to mark classes as
+    abstract or inheritance patterns. Of course this can also be done directly
+    in the Java sources of the Person type but sometimes it is useful to do
+    this through a Roo command which can be scripted and replayed if desired.
+    Other attributes allow you to define the identifier field name as well as
+    the identifier field type which, in turn, allows the use of complex
+    identifier types.</para>
   </section>
 
   <section>
@@ -553,7 +560,7 @@ private Car car;</programlisting>You can add the mappedBy attribute to the
 
         <para><programlisting>@Entity
 @RooJavaBean
-@RooEntity
+@RooJpaActiveRecord
 public class Person {
 
     // Inverse side ("car" table has the FK column)
@@ -564,7 +571,7 @@ public class Person {
 
         <para><programlisting>@Entity
 @RooJavaBean
-@RooEntity
+@RooJpaActiveRecord
 public class Car {
 
     // Owning side (this table has the FK column)
@@ -605,15 +612,15 @@ private Set&lt;Car&gt; cars = new HashSet&lt;Car&gt;();</programlisting>To
       </listitem>
     </orderedlist>
 
-    <para>Like the <link linkend="command-index-entity">entity</link> command,
-    the <link linkend="command-index-field-commands">field</link> command
-    offeres a number of optional (but very useful) attributes worth
-    mentioning. For example, you can change the field / column name
-    translations with the <emphasis role="bold">--column</emphasis> attribute.
-    Furthermore there are a number of attributes which translate directly to
-    their equivalents defined in <link
-    xlink:href="http://jcp.org/en/jsr/detail?id=303">JSR 303 (Bean
-    Validation)</link>. These attributes include <emphasis
+    <para>Like the <link linkend="command-index-entity-jpa"><link
+    linkend="command-index-entity">entity</link> jpa</link> command, the <link
+    linkend="command-index-field-commands">field</link> command offeres a
+    number of optional (but very useful) attributes worth mentioning. For
+    example, you can change the field / column name translations with the
+    <emphasis role="bold">--column</emphasis> attribute. Furthermore there are
+    a number of attributes which translate directly to their equivalents
+    defined in <link xlink:href="http://jcp.org/en/jsr/detail?id=303">JSR 303
+    (Bean Validation)</link>. These attributes include <emphasis
     role="bold">--notNull</emphasis>, <emphasis
     role="bold">--sizeMin</emphasis>, <emphasis
     role="bold">--sizeMax</emphasis> and other related attributes. Please

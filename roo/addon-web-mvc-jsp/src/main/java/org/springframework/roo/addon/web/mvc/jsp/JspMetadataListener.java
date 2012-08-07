@@ -1,6 +1,8 @@
 package org.springframework.roo.addon.web.mvc.jsp;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -9,6 +11,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -18,14 +23,20 @@ import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDe
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.finder.WebFinderMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
+import org.springframework.roo.addon.web.mvc.jsp.roundtrip.XmlRoundTripFileManager;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
+import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
+import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.scanner.MemberDetails;
@@ -37,297 +48,524 @@ import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.RooJavaType;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.TemplateUtils;
-import org.springframework.roo.support.util.XmlRoundTripUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
-import org.w3c.dom.Document;
 
 /**
- * Listens for {@link WebScaffoldMetadata} and produces JSPs when requested by that metadata.
+ * Listens for {@link WebScaffoldMetadata} and produces JSPs when requested by
+ * that metadata.
  * 
  * @author Stefan Schmidt
  * @author Ben Alex
  * @since 1.0
  */
-@Component(immediate = true) 
-@Service 
-public final class JspMetadataListener implements MetadataProvider, MetadataNotificationListener {
-	private static final String WEB_INF_VIEWS = "/WEB-INF/views/";
-	@Reference private FileManager fileManager;
-	@Reference private JspOperations jspOperations;
-	@Reference private MenuOperations menuOperations;
-	@Reference private MetadataDependencyRegistry metadataDependencyRegistry;
-	@Reference private MetadataService metadataService;
-	@Reference private PropFileOperations propFileOperations;
-	@Reference private ProjectOperations projectOperations;
-	@Reference private TilesOperations tilesOperations;
-	@Reference private WebMetadataService webMetadataService;
-	private Map<JavaType, String> formBackingObjectTypesToLocalMids = new HashMap<JavaType, String>();
+@Component(immediate = true)
+@Service
+public class JspMetadataListener implements MetadataProvider,
+        MetadataNotificationListener {
 
-	protected void activate(ComponentContext context) {
-		metadataDependencyRegistry.registerDependency(WebScaffoldMetadata.getMetadataIdentiferType(), getProvidesType());
-		metadataDependencyRegistry.addNotificationListener(this);
-	}
-	
-	protected void deactivate(ComponentContext context) {
-		metadataDependencyRegistry.deregisterDependency(WebScaffoldMetadata.getMetadataIdentiferType(), getProvidesType());
-		metadataDependencyRegistry.removeNotificationListener(this);
-	}
+    private static final String WEB_INF_VIEWS = "/WEB-INF/views/";
 
-	public MetadataItem get(String metadataIdentificationString) {
-		// Work out the MIDs of the other metadata we depend on
-		// NB: The JavaType and Path are to the corresponding web scaffold controller class
+    @Reference private FileManager fileManager;
+    @Reference private JspOperations jspOperations;
+    @Reference private MenuOperations menuOperations;
+    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference private MetadataService metadataService;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private PropFileOperations propFileOperations;
+    @Reference private TilesOperations tilesOperations;
+    @Reference private TypeLocationService typeLocationService;
+    @Reference private WebMetadataService webMetadataService;
+    @Reference private XmlRoundTripFileManager xmlRoundTripFileManager;
 
-		String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(JspMetadata.getJavaType(metadataIdentificationString), JspMetadata.getPath(metadataIdentificationString));
-		WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService.get(webScaffoldMetadataKey);
-		if (webScaffoldMetadata == null || !webScaffoldMetadata.isValid()) {
-			// Can't get the corresponding scaffold, so we certainly don't need to manage any JSPs at this time
-			return null;
-		}
-		
-		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
-		MemberDetails memberDetails = webMetadataService.getMemberDetails(formBackingType);
-		JavaTypeMetadataDetails formBackingTypeMetadataDetails = webMetadataService.getJavaTypeMetadataDetails(formBackingType, memberDetails, metadataIdentificationString);
-		Assert.notNull(formBackingTypeMetadataDetails, "Unable to obtain metadata for type " + formBackingType.getFullyQualifiedTypeName());
-		
-		formBackingObjectTypesToLocalMids.put(formBackingType, metadataIdentificationString);
-		
-		SortedMap<JavaType, JavaTypeMetadataDetails> relatedTypeMd = webMetadataService.getRelatedApplicationTypeMetadata(formBackingType, memberDetails, metadataIdentificationString);
-		JavaTypeMetadataDetails formbackingTypeMetadata = relatedTypeMd.get(formBackingType);
-		Assert.notNull(formbackingTypeMetadata, "Form backing type metadata required");
-		JavaTypePersistenceMetadataDetails formBackingTypePersistenceMetadata = formbackingTypeMetadata.getPersistenceDetails();
-		if (formBackingTypePersistenceMetadata == null) {
-			return null;
-		}
+    private final Map<JavaType, String> formBackingObjectTypesToLocalMids = new HashMap<JavaType, String>();
 
-		metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA), JspMetadata.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA));
-		
-		// Install web artifacts only if Spring MVC config is missing
-		// TODO: Remove this call when 'controller' commands are gone
-		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
-		Assert.notNull(projectMetadata, "Project metadata required");
-		PathResolver pathResolver = projectMetadata.getPathResolver();
-		if (!fileManager.exists(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, WEB_INF_VIEWS))) {
-			jspOperations.installCommonViewArtefacts();
-		}
+    protected void activate(final ComponentContext context) {
+        metadataDependencyRegistry.registerDependency(
+                WebScaffoldMetadata.getMetadataIdentiferType(),
+                getProvidesType());
+        metadataDependencyRegistry
+                .registerDependency(
+                        WebFinderMetadata.getMetadataIdentiferType(),
+                        getProvidesType());
+        metadataDependencyRegistry.addNotificationListener(this);
+    }
 
-		installImage("images/show.png");
-		if (webScaffoldMetadata.getAnnotationValues().isUpdate()) {
-			installImage("images/update.png");
-		}
-		if (webScaffoldMetadata.getAnnotationValues().isDelete()) {
-			installImage("images/delete.png");
-		}
+    protected void deactivate(final ComponentContext context) {
+        metadataDependencyRegistry.deregisterDependency(
+                WebScaffoldMetadata.getMetadataIdentiferType(),
+                getProvidesType());
+        metadataDependencyRegistry
+                .deregisterDependency(
+                        WebFinderMetadata.getMetadataIdentiferType(),
+                        getProvidesType());
+        metadataDependencyRegistry.removeNotificationListener(this);
+    }
 
-		List<FieldMetadata> eligibleFields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, metadataIdentificationString);
-		if (eligibleFields.isEmpty() && formBackingTypePersistenceMetadata.getRooIdentifierFields().isEmpty()) {
-			return null;
-		}
-		JspViewManager viewManager = new JspViewManager(eligibleFields, webScaffoldMetadata.getAnnotationValues(), relatedTypeMd);
+    public MetadataItem get(final String jspMetadataId) {
+        // Work out the MIDs of the other metadata we depend on
+        // NB: The JavaType and Path are to the corresponding web scaffold
+        // controller class
 
-		String controllerPath = webScaffoldMetadata.getAnnotationValues().getPath();
-		if (controllerPath.startsWith("/")) {
-			controllerPath = controllerPath.substring(1);
-		}
-		
-		// Make the holding directory for this controller
-		String destinationDirectory = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, WEB_INF_VIEWS + controllerPath);
-		if (!fileManager.exists(destinationDirectory)) {
-			fileManager.createDirectory(destinationDirectory);
-		} else {
-			File file = new File(destinationDirectory);
-			Assert.isTrue(file.isDirectory(), destinationDirectory + " is a file, when a directory was expected");
-		}
+        final String webScaffoldMetadataKey = WebScaffoldMetadata
+                .createIdentifier(JspMetadata.getJavaType(jspMetadataId),
+                        JspMetadata.getPath(jspMetadataId));
+        final WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+                .get(webScaffoldMetadataKey);
+        if (webScaffoldMetadata == null || !webScaffoldMetadata.isValid()) {
+            // Can't get the corresponding scaffold, so we certainly don't need
+            // to manage any JSPs at this time
+            return null;
+        }
 
-		// By now we have a directory to put the JSPs inside
-		String listPath1 = destinationDirectory + "/list.jspx";
-		writeToDiskIfNecessary(listPath1, viewManager.getListDocument());
-		tilesOperations.addViewDefinition(controllerPath, controllerPath + "/" + "list", TilesOperations.DEFAULT_TEMPLATE, WEB_INF_VIEWS + controllerPath + "/list.jspx");
+        final JavaType formBackingType = webScaffoldMetadata
+                .getAnnotationValues().getFormBackingObject();
+        final MemberDetails memberDetails = webMetadataService
+                .getMemberDetails(formBackingType);
+        final JavaTypeMetadataDetails formBackingTypeMetadataDetails = webMetadataService
+                .getJavaTypeMetadataDetails(formBackingType, memberDetails,
+                        jspMetadataId);
+        Validate.notNull(
+                formBackingTypeMetadataDetails,
+                "Unable to obtain metadata for type "
+                        + formBackingType.getFullyQualifiedTypeName());
 
-		String showPath = destinationDirectory + "/show.jspx";
-		writeToDiskIfNecessary(showPath, viewManager.getShowDocument());
-		tilesOperations.addViewDefinition(controllerPath, controllerPath + "/" + "show", TilesOperations.DEFAULT_TEMPLATE, WEB_INF_VIEWS + controllerPath + "/show.jspx");
+        formBackingObjectTypesToLocalMids.put(formBackingType, jspMetadataId);
 
-		JavaSymbolName categoryName = new JavaSymbolName(formBackingType.getSimpleTypeName());
+        final SortedMap<JavaType, JavaTypeMetadataDetails> relatedTypeMd = webMetadataService
+                .getRelatedApplicationTypeMetadata(formBackingType,
+                        memberDetails, jspMetadataId);
+        final JavaTypeMetadataDetails formbackingTypeMetadata = relatedTypeMd
+                .get(formBackingType);
+        Validate.notNull(formbackingTypeMetadata,
+                "Form backing type metadata required");
+        final JavaTypePersistenceMetadataDetails formBackingTypePersistenceMetadata = formbackingTypeMetadata
+                .getPersistenceDetails();
+        if (formBackingTypePersistenceMetadata == null) {
+            return null;
+        }
+        final ClassOrInterfaceTypeDetails formBackingTypeDetails = typeLocationService
+                .getTypeDetails(formBackingType);
+        final LogicalPath formBackingTypePath = PhysicalTypeIdentifier
+                .getPath(formBackingTypeDetails.getDeclaredByMetadataId());
+        metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier
+                .createIdentifier(formBackingType, formBackingTypePath),
+                JspMetadata.createIdentifier(formBackingType,
+                        formBackingTypePath));
+        final LogicalPath path = JspMetadata.getPath(jspMetadataId);
 
-		Map<String, String> properties = new LinkedHashMap<String, String>();
-		properties.put("menu_category_" + categoryName.getSymbolName().toLowerCase() + "_label", categoryName.getReadableSymbolName());
-		
-		if (webScaffoldMetadata.getAnnotationValues().isCreate()) {
-			String listPath = destinationDirectory + "/create.jspx";
-			writeToDiskIfNecessary(listPath, viewManager.getCreateDocument());
-			JavaSymbolName menuItemId = new JavaSymbolName("new");
-			// Add 'create new' menu item
-			menuOperations.addMenuItem(categoryName, menuItemId, "global_menu_new", "/" + controllerPath + "?form", MenuOperations.DEFAULT_MENU_ITEM_PREFIX);
-			properties.put("menu_item_" + categoryName.getSymbolName().toLowerCase() + "_" + menuItemId.getSymbolName().toLowerCase() + "_label", new JavaSymbolName(formBackingType.getSimpleTypeName()).getReadableSymbolName());
-			tilesOperations.addViewDefinition(controllerPath, controllerPath + "/" + "create", TilesOperations.DEFAULT_TEMPLATE, WEB_INF_VIEWS + controllerPath + "/create.jspx");
-		} else {
-			menuOperations.cleanUpMenuItem(categoryName, new JavaSymbolName("new"), MenuOperations.DEFAULT_MENU_ITEM_PREFIX);
-			tilesOperations.removeViewDefinition(controllerPath + "/" + "create", controllerPath);
-		}
-		if (webScaffoldMetadata.getAnnotationValues().isUpdate()) {
-			String listPath = destinationDirectory + "/update.jspx";
-			writeToDiskIfNecessary(listPath, viewManager.getUpdateDocument());
-			tilesOperations.addViewDefinition(controllerPath, controllerPath + "/" + "update", TilesOperations.DEFAULT_TEMPLATE, WEB_INF_VIEWS + controllerPath + "/update.jspx");
-		} else {
-			tilesOperations.removeViewDefinition(controllerPath + "/" + "update", controllerPath);
-		}
-		
-		// Setup labels for i18n support
-		String resourceId = XmlUtils.convertId("label." + formBackingType.getFullyQualifiedTypeName().toLowerCase());
-		properties.put(resourceId, new JavaSymbolName(formBackingType.getSimpleTypeName()).getReadableSymbolName());
+        // Install web artifacts only if Spring MVC config is missing
+        // TODO: Remove this call when 'controller' commands are gone
+        final PathResolver pathResolver = projectOperations.getPathResolver();
+        final LogicalPath webappPath = LogicalPath.getInstance(
+                Path.SRC_MAIN_WEBAPP, path.getModule());
 
-		String pluralResourceId = XmlUtils.convertId(resourceId + ".plural");
-		properties.put(pluralResourceId, new JavaSymbolName(formBackingTypeMetadataDetails.getPlural()).getReadableSymbolName());
-		
-		if (formBackingTypeMetadataDetails.getPersistenceDetails() != null && !formBackingTypeMetadataDetails.getPersistenceDetails().getRooIdentifierFields().isEmpty()) {
-			for (FieldMetadata idField: formBackingTypeMetadataDetails.getPersistenceDetails().getRooIdentifierFields()) {
-				properties.put(XmlUtils.convertId(resourceId + "." + formBackingTypeMetadataDetails.getPersistenceDetails().getIdentifierField().getFieldName().getSymbolName() + "." + idField.getFieldName().getSymbolName().toLowerCase()), idField.getFieldName().getReadableSymbolName());
-			}
-		}
-		
-		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(formBackingType, memberDetails, metadataIdentificationString);
-		Assert.notNull(javaTypePersistenceMetadataDetails, "Unable to determine persistence metadata for type " + formBackingType.getFullyQualifiedTypeName());
-		
-		for (MethodMetadata method : MemberFindingUtils.getMethods(memberDetails)) {
-			if (!BeanInfoUtils.isAccessorMethod(method)) {
-				continue;
-			}
-			JavaSymbolName fieldName = BeanInfoUtils.getPropertyNameForJavaBeanMethod(method);
-			FieldMetadata field = BeanInfoUtils.getFieldForPropertyName(memberDetails, fieldName);
-			if (field == null) {
-				continue; 
-			}
-			String fieldResourceId = XmlUtils.convertId(resourceId + "." + fieldName.getSymbolName().toLowerCase());
-			if (webMetadataService.isApplicationType(method.getReturnType()) && webMetadataService.isRooIdentifier(method.getReturnType(), webMetadataService.getMemberDetails(method.getReturnType()))) {
-				JavaTypePersistenceMetadataDetails typePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(method.getReturnType(), webMetadataService.getMemberDetails(method.getReturnType()), metadataIdentificationString);
-				if (typePersistenceMetadataDetails != null) {
-					for (FieldMetadata f : typePersistenceMetadataDetails.getRooIdentifierFields()) {
-						String sb = f.getFieldName().getReadableSymbolName();
-						properties.put(XmlUtils.convertId(resourceId + "." + javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + f.getFieldName().getSymbolName().toLowerCase()), (sb == null || sb.length() == 0) ? fieldName.getSymbolName() : sb);
-					}
-				}
-			} else if (!method.getMethodName().equals(javaTypePersistenceMetadataDetails.getIdentifierAccessorMethod().getMethodName()) || (javaTypePersistenceMetadataDetails.getVersionAccessorMethod() != null && !method.getMethodName().equals(javaTypePersistenceMetadataDetails.getVersionAccessorMethod().getMethodName()))) {
-				String sb = fieldName.getReadableSymbolName();
-				properties.put(fieldResourceId, (sb == null || sb.length() == 0) ? fieldName.getSymbolName() : sb);
-			}
-		}
+        if (!fileManager.exists(pathResolver.getIdentifier(webappPath,
+                WEB_INF_VIEWS))) {
+            jspOperations.installCommonViewArtefacts(path.getModule());
+        }
 
-		if (javaTypePersistenceMetadataDetails.getFindAllMethod() != null) {
-			// Add 'list all' menu item
-			JavaSymbolName menuItemId = new JavaSymbolName("list");
-			menuOperations.addMenuItem(categoryName, menuItemId, "global_menu_list", "/" + controllerPath + "?page=1&size=${empty param.size ? 10 : param.size}", MenuOperations.DEFAULT_MENU_ITEM_PREFIX);
-			properties.put("menu_item_" + categoryName.getSymbolName().toLowerCase() + "_" + menuItemId.getSymbolName().toLowerCase() + "_label", new JavaSymbolName(formBackingTypeMetadataDetails.getPlural()).getReadableSymbolName());
-		} else {
-			menuOperations.cleanUpMenuItem(categoryName, new JavaSymbolName("list"), MenuOperations.DEFAULT_MENU_ITEM_PREFIX);
-		}
-		
-		List<String> allowedMenuItems = new ArrayList<String>();
-		if (webScaffoldMetadata.getAnnotationValues().isExposeFinders()) {
-			Set<FinderMetadataDetails> finderMethodsDetails = webMetadataService.getDynamicFinderMethodsAndFields(formBackingType, memberDetails, metadataIdentificationString);
-			for (FinderMetadataDetails finderDetails : finderMethodsDetails) {
-				String finderName = finderDetails.getFinderMethodMetadata().getMethodName().getSymbolName();
-				String listPath = destinationDirectory + "/" + finderName + ".jspx";
-				// Finders only get scaffolded if the finder name is not too long (see ROO-1027)
-				if (listPath.length() > 244) {
-					continue;
-				}
-				writeToDiskIfNecessary(listPath, viewManager.getFinderDocument(finderDetails));
-				JavaSymbolName finderLabel = new JavaSymbolName(finderName.replace("find" + formBackingTypeMetadataDetails.getPlural() + "By", ""));
-				// Add 'Find by' menu item
-				menuOperations.addMenuItem(categoryName, finderLabel, "global_menu_find", "/" + controllerPath + "?find=" + finderName.replace("find" + formBackingTypeMetadataDetails.getPlural(), "") + "&form", MenuOperations.FINDER_MENU_ITEM_PREFIX);
-				properties.put("menu_item_" + categoryName.getSymbolName().toLowerCase() + "_" + finderLabel.getSymbolName().toLowerCase() + "_label", finderLabel.getReadableSymbolName());
-				allowedMenuItems.add(MenuOperations.FINDER_MENU_ITEM_PREFIX + categoryName.getSymbolName().toLowerCase() + "_" + finderLabel.getSymbolName().toLowerCase());
-				for (JavaSymbolName paramName : finderDetails.getFinderMethodMetadata().getParameterNames()) {
-					properties.put(XmlUtils.convertId(resourceId + "." + paramName.getSymbolName().toLowerCase()), paramName.getReadableSymbolName());
-				}
-				tilesOperations.addViewDefinition(controllerPath, controllerPath + "/" + finderName, TilesOperations.DEFAULT_TEMPLATE, WEB_INF_VIEWS + controllerPath + "/" + finderName + ".jspx");
-			}
-		}
-		
-		propFileOperations.addProperties(Path.SRC_MAIN_WEBAPP, "/WEB-INF/i18n/application.properties", properties, true, false);
+        installImage(webappPath, "images/show.png");
+        if (webScaffoldMetadata.getAnnotationValues().isUpdate()) {
+            installImage(webappPath, "images/update.png");
+        }
+        if (webScaffoldMetadata.getAnnotationValues().isDelete()) {
+            installImage(webappPath, "images/delete.png");
+        }
 
-		// Clean up links to finders which are removed by now
-		menuOperations.cleanUpFinderMenuItems(categoryName, allowedMenuItems);
+        final List<FieldMetadata> eligibleFields = webMetadataService
+                .getScaffoldEligibleFieldMetadata(formBackingType,
+                        memberDetails, jspMetadataId);
+        if (eligibleFields.isEmpty()
+                && formBackingTypePersistenceMetadata.getRooIdentifierFields()
+                        .isEmpty()) {
+            return null;
+        }
+        final JspViewManager viewManager = new JspViewManager(eligibleFields,
+                webScaffoldMetadata.getAnnotationValues(), relatedTypeMd);
 
-		return new JspMetadata(metadataIdentificationString, webScaffoldMetadata);
-	}
+        String controllerPath = webScaffoldMetadata.getAnnotationValues()
+                .getPath();
+        if (controllerPath.startsWith("/")) {
+            controllerPath = controllerPath.substring(1);
+        }
 
-	/** return indicates if disk was changed (ie updated or created) */
-	private void writeToDiskIfNecessary(String jspFilename, Document proposed) {
-		Document original = null;
-		if (fileManager.exists(jspFilename)) {
-			original = XmlUtils.readXml(fileManager.getInputStream(jspFilename));
-			if (XmlRoundTripUtils.compareDocuments(original, proposed)) {
-				XmlUtils.removeTextNodes(original);
-				fileManager.createOrUpdateTextFileIfRequired(jspFilename, XmlUtils.nodeToString(original), false);
-			}
-		} else {
-			fileManager.createOrUpdateTextFileIfRequired(jspFilename, XmlUtils.nodeToString(proposed), false);
-		}
-	}
-	
-	public void notify(String upstreamDependency, String downstreamDependency) {
-		if (MetadataIdentificationUtils.isIdentifyingClass(downstreamDependency)) {
-			// A physical Java type has changed, and determine what the corresponding local metadata identification string would have been
-			JavaType javaType = WebScaffoldMetadata.getJavaType(upstreamDependency);
-			Path path = WebScaffoldMetadata.getPath(upstreamDependency);
-			downstreamDependency = JspMetadata.createIdentifier(javaType, path);
+        // Make the holding directory for this controller
+        final String destinationDirectory = pathResolver.getIdentifier(
+                webappPath, WEB_INF_VIEWS + controllerPath);
+        if (!fileManager.exists(destinationDirectory)) {
+            fileManager.createDirectory(destinationDirectory);
+        }
+        else {
+            final File file = new File(destinationDirectory);
+            Validate.isTrue(file.isDirectory(), destinationDirectory
+                    + " is a file, when a directory was expected");
+        }
 
-			// We only need to proceed if the downstream dependency relationship is not already registered
-			// (if it's already registered, the event will be delivered directly later on)
-			if (metadataDependencyRegistry.getDownstream(upstreamDependency).contains(downstreamDependency)) {
-				return;
-			}
-		} else {
-			// This is the generic fallback listener, ie from MetadataDependencyRegistry.addListener(this) in the activate() method
-			
-			// Get the metadata that just changed
-			MetadataItem metadataItem = metadataService.get(upstreamDependency);
-			
-			// We don't have to worry about physical type metadata, as we monitor the relevant .java once the DOD governor is first detected
-			if (metadataItem == null || !metadataItem.isValid() || !(metadataItem instanceof ItdTypeDetailsProvidingMetadataItem)) {
-				// There's something wrong with it or it's not for an ITD, so let's gracefully abort
-				return;
-			}
-			
-			// Let's ensure we have some ITD type details to actually work with
-			ItdTypeDetailsProvidingMetadataItem itdMetadata = (ItdTypeDetailsProvidingMetadataItem) metadataItem;
-			ItdTypeDetails itdTypeDetails = itdMetadata.getMemberHoldingTypeDetails();
-			if (itdTypeDetails == null) {
-				return;
-			}
+        // By now we have a directory to put the JSPs inside
+        final String listPath1 = destinationDirectory + "/list.jspx";
+        xmlRoundTripFileManager.writeToDiskIfNecessary(listPath1,
+                viewManager.getListDocument());
+        tilesOperations.addViewDefinition(controllerPath, webappPath,
+                controllerPath + "/" + "list",
+                TilesOperations.DEFAULT_TEMPLATE, WEB_INF_VIEWS
+                        + controllerPath + "/list.jspx");
 
-			String localMid = formBackingObjectTypesToLocalMids.get(itdTypeDetails.getGovernor().getName());
-			if (localMid != null) {
-				metadataService.get(localMid, true);
-			}
-			return;
-		}
+        final String showPath = destinationDirectory + "/show.jspx";
+        xmlRoundTripFileManager.writeToDiskIfNecessary(showPath,
+                viewManager.getShowDocument());
+        tilesOperations.addViewDefinition(controllerPath, webappPath,
+                controllerPath + "/" + "show",
+                TilesOperations.DEFAULT_TEMPLATE, WEB_INF_VIEWS
+                        + controllerPath + "/show.jspx");
 
-		metadataService.get(downstreamDependency, true);
-	}
+        final Map<String, String> properties = new LinkedHashMap<String, String>();
 
-	public String getProvidesType() {
-		return JspMetadata.getMetadataIdentiferType();
-	}
+        final JavaSymbolName categoryName = new JavaSymbolName(
+                formBackingType.getSimpleTypeName());
+        properties.put("menu_category_"
+                + categoryName.getSymbolName().toLowerCase() + "_label",
+                categoryName.getReadableSymbolName());
 
-	private void installImage(String imagePath) {
-		PathResolver pathResolver = projectOperations.getPathResolver();
-		String imageFile = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, imagePath);
-		if (!fileManager.exists(imageFile)) {
-			try {
-				FileCopyUtils.copy(TemplateUtils.getTemplate(getClass(), imagePath), fileManager.createFile(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, imagePath)).getOutputStream());
-			} catch (Exception e) {
-				throw new IllegalStateException("Encountered an error during copying of resources for MVC JSP addon.", e);
-			}
-		}
-	}
+        final JavaSymbolName newMenuItemId = new JavaSymbolName("new");
+        properties.put("menu_item_"
+                + categoryName.getSymbolName().toLowerCase() + "_"
+                + newMenuItemId.getSymbolName().toLowerCase() + "_label",
+                new JavaSymbolName(formBackingType.getSimpleTypeName())
+                        .getReadableSymbolName());
+
+        if (webScaffoldMetadata.getAnnotationValues().isCreate()) {
+            final String listPath = destinationDirectory + "/create.jspx";
+            xmlRoundTripFileManager.writeToDiskIfNecessary(listPath,
+                    viewManager.getCreateDocument());
+            // Add 'create new' menu item
+            menuOperations.addMenuItem(categoryName, newMenuItemId,
+                    "global_menu_new", "/" + controllerPath + "?form",
+                    MenuOperations.DEFAULT_MENU_ITEM_PREFIX, webappPath);
+            tilesOperations.addViewDefinition(controllerPath, webappPath,
+                    controllerPath + "/" + "create",
+                    TilesOperations.DEFAULT_TEMPLATE, WEB_INF_VIEWS
+                            + controllerPath + "/create.jspx");
+        }
+        else {
+            menuOperations
+                    .cleanUpMenuItem(categoryName, new JavaSymbolName("new"),
+                            MenuOperations.DEFAULT_MENU_ITEM_PREFIX, webappPath);
+            tilesOperations.removeViewDefinition(controllerPath + "/"
+                    + "create", controllerPath, webappPath);
+        }
+        if (webScaffoldMetadata.getAnnotationValues().isUpdate()) {
+            final String listPath = destinationDirectory + "/update.jspx";
+            xmlRoundTripFileManager.writeToDiskIfNecessary(listPath,
+                    viewManager.getUpdateDocument());
+            tilesOperations.addViewDefinition(controllerPath, webappPath,
+                    controllerPath + "/" + "update",
+                    TilesOperations.DEFAULT_TEMPLATE, WEB_INF_VIEWS
+                            + controllerPath + "/update.jspx");
+        }
+        else {
+            tilesOperations.removeViewDefinition(controllerPath + "/"
+                    + "update", controllerPath, webappPath);
+        }
+
+        // Setup labels for i18n support
+        final String resourceId = XmlUtils.convertId("label."
+                + formBackingType.getFullyQualifiedTypeName().toLowerCase());
+        properties.put(resourceId,
+                new JavaSymbolName(formBackingType.getSimpleTypeName())
+                        .getReadableSymbolName());
+
+        final String pluralResourceId = XmlUtils.convertId(resourceId
+                + ".plural");
+        final String plural = formBackingTypeMetadataDetails.getPlural();
+        properties.put(pluralResourceId,
+                new JavaSymbolName(plural).getReadableSymbolName());
+
+        final JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = formBackingTypeMetadataDetails
+                .getPersistenceDetails();
+        Validate.notNull(javaTypePersistenceMetadataDetails,
+                "Unable to determine persistence metadata for type "
+                        + formBackingType.getFullyQualifiedTypeName());
+
+        if (!javaTypePersistenceMetadataDetails.getRooIdentifierFields()
+                .isEmpty()) {
+            for (final FieldMetadata idField : javaTypePersistenceMetadataDetails
+                    .getRooIdentifierFields()) {
+                properties.put(
+                        XmlUtils.convertId(resourceId
+                                + "."
+                                + javaTypePersistenceMetadataDetails
+                                        .getIdentifierField().getFieldName()
+                                        .getSymbolName()
+                                + "."
+                                + idField.getFieldName().getSymbolName()
+                                        .toLowerCase()), idField.getFieldName()
+                                .getReadableSymbolName());
+            }
+        }
+
+        for (final MethodMetadata method : memberDetails.getMethods()) {
+            if (!BeanInfoUtils.isAccessorMethod(method)) {
+                continue;
+            }
+
+            final FieldMetadata field = BeanInfoUtils
+                    .getFieldForJavaBeanMethod(memberDetails, method);
+            if (field == null) {
+                continue;
+            }
+            final JavaSymbolName fieldName = field.getFieldName();
+            final String fieldResourceId = XmlUtils.convertId(resourceId + "."
+                    + fieldName.getSymbolName().toLowerCase());
+            if (typeLocationService.isInProject(method.getReturnType())
+                    && webMetadataService.isRooIdentifier(method
+                            .getReturnType(), webMetadataService
+                            .getMemberDetails(method.getReturnType()))) {
+                final JavaTypePersistenceMetadataDetails typePersistenceMetadataDetails = webMetadataService
+                        .getJavaTypePersistenceMetadataDetails(method
+                                .getReturnType(), webMetadataService
+                                .getMemberDetails(method.getReturnType()),
+                                jspMetadataId);
+                if (typePersistenceMetadataDetails != null) {
+                    for (final FieldMetadata f : typePersistenceMetadataDetails
+                            .getRooIdentifierFields()) {
+                        final String sb = f.getFieldName()
+                                .getReadableSymbolName();
+                        properties.put(
+                                XmlUtils.convertId(resourceId
+                                        + "."
+                                        + javaTypePersistenceMetadataDetails
+                                                .getIdentifierField()
+                                                .getFieldName().getSymbolName()
+                                        + "."
+                                        + f.getFieldName().getSymbolName()
+                                                .toLowerCase()),
+                                StringUtils.isNotBlank(sb) ? sb : fieldName
+                                        .getSymbolName());
+                    }
+                }
+            }
+            else if (!method.getMethodName().equals(
+                    javaTypePersistenceMetadataDetails
+                            .getIdentifierAccessorMethod().getMethodName())
+                    || javaTypePersistenceMetadataDetails
+                            .getVersionAccessorMethod() != null
+                    && !method
+                            .getMethodName()
+                            .equals(javaTypePersistenceMetadataDetails
+                                    .getVersionAccessorMethod().getMethodName())) {
+                final String sb = fieldName.getReadableSymbolName();
+                properties.put(fieldResourceId, StringUtils.isNotBlank(sb) ? sb
+                        : fieldName.getSymbolName());
+            }
+        }
+
+        if (javaTypePersistenceMetadataDetails.getFindAllMethod() != null) {
+            // Add 'list all' menu item
+            final JavaSymbolName listMenuItemId = new JavaSymbolName("list");
+            menuOperations
+                    .addMenuItem(
+                            categoryName,
+                            listMenuItemId,
+                            "global_menu_list",
+                            "/"
+                                    + controllerPath
+                                    + "?page=1&size=${empty param.size ? 10 : param.size}",
+                            MenuOperations.DEFAULT_MENU_ITEM_PREFIX, webappPath);
+            properties.put("menu_item_"
+                    + categoryName.getSymbolName().toLowerCase() + "_"
+                    + listMenuItemId.getSymbolName().toLowerCase() + "_label",
+                    new JavaSymbolName(plural).getReadableSymbolName());
+        }
+        else {
+            menuOperations.cleanUpMenuItem(categoryName, new JavaSymbolName(
+                    "list"), MenuOperations.DEFAULT_MENU_ITEM_PREFIX,
+                    webappPath);
+        }
+
+        final String controllerPhysicalTypeId = PhysicalTypeIdentifier
+                .createIdentifier(JspMetadata.getJavaType(jspMetadataId),
+                        JspMetadata.getPath(jspMetadataId));
+        final PhysicalTypeMetadata controllerPhysicalTypeMd = (PhysicalTypeMetadata) metadataService
+                .get(controllerPhysicalTypeId);
+        if (controllerPhysicalTypeMd == null) {
+            return null;
+        }
+        final MemberHoldingTypeDetails mhtd = controllerPhysicalTypeMd
+                .getMemberHoldingTypeDetails();
+        if (mhtd == null) {
+            return null;
+        }
+        final List<String> allowedMenuItems = new ArrayList<String>();
+        if (MemberFindingUtils.getAnnotationOfType(mhtd.getAnnotations(),
+                RooJavaType.ROO_WEB_FINDER) != null) {
+            // This controller is annotated with @RooWebFinder
+            final Set<FinderMetadataDetails> finderMethodsDetails = webMetadataService
+                    .getDynamicFinderMethodsAndFields(formBackingType,
+                            memberDetails, jspMetadataId);
+            if (finderMethodsDetails == null) {
+                return null;
+            }
+            for (final FinderMetadataDetails finderDetails : finderMethodsDetails) {
+                final String finderName = finderDetails
+                        .getFinderMethodMetadata().getMethodName()
+                        .getSymbolName();
+                final String listPath = destinationDirectory + "/" + finderName
+                        + ".jspx";
+                // Finders only get scaffolded if the finder name is not too
+                // long (see ROO-1027)
+                if (listPath.length() > 244) {
+                    continue;
+                }
+                xmlRoundTripFileManager.writeToDiskIfNecessary(listPath,
+                        viewManager.getFinderDocument(finderDetails));
+                final JavaSymbolName finderLabel = new JavaSymbolName(
+                        finderName.replace("find" + plural + "By", ""));
+                // Add 'Find by' menu item
+
+                menuOperations.addMenuItem(categoryName, finderLabel,
+                        "global_menu_find", "/" + controllerPath + "?find="
+                                + finderName.replace("find" + plural, "")
+                                + "&form",
+                        MenuOperations.FINDER_MENU_ITEM_PREFIX, webappPath);
+                properties.put("menu_item_"
+                        + categoryName.getSymbolName().toLowerCase() + "_"
+                        + finderLabel.getSymbolName().toLowerCase() + "_label",
+                        finderLabel.getReadableSymbolName());
+                allowedMenuItems.add(MenuOperations.FINDER_MENU_ITEM_PREFIX
+                        + categoryName.getSymbolName().toLowerCase() + "_"
+                        + finderLabel.getSymbolName().toLowerCase());
+                for (final JavaSymbolName paramName : finderDetails
+                        .getFinderMethodMetadata().getParameterNames()) {
+                    properties.put(
+                            XmlUtils.convertId(resourceId + "."
+                                    + paramName.getSymbolName().toLowerCase()),
+                            paramName.getReadableSymbolName());
+                }
+                tilesOperations.addViewDefinition(controllerPath, webappPath,
+                        controllerPath + "/" + finderName,
+                        TilesOperations.DEFAULT_TEMPLATE, WEB_INF_VIEWS
+                                + controllerPath + "/" + finderName + ".jspx");
+            }
+        }
+
+        menuOperations.cleanUpFinderMenuItems(categoryName, allowedMenuItems,
+                webappPath);
+
+        propFileOperations.addProperties(webappPath,
+                "WEB-INF/i18n/application.properties", properties, true, false);
+
+        return new JspMetadata(jspMetadataId, webScaffoldMetadata);
+    }
+
+    public String getProvidesType() {
+        return JspMetadata.getMetadataIdentiferType();
+    }
+
+    private void installImage(final LogicalPath path, final String imagePath) {
+        final PathResolver pathResolver = projectOperations.getPathResolver();
+        final String imageFile = pathResolver.getIdentifier(path, imagePath);
+        if (!fileManager.exists(imageFile)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = FileUtils.getInputStream(getClass(), imagePath);
+                outputStream = fileManager.createFile(
+                        pathResolver.getIdentifier(path, imagePath))
+                        .getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            }
+            catch (final Exception e) {
+                throw new IllegalStateException(
+                        "Encountered an error during copying of resources for MVC JSP addon.",
+                        e);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
+    }
+
+    public void notify(final String upstreamDependency,
+            String downstreamDependency) {
+        if (MetadataIdentificationUtils
+                .isIdentifyingClass(downstreamDependency)) {
+            // A physical Java type has changed, and determine what the
+            // corresponding local metadata identification string would have
+            // been
+            if (WebScaffoldMetadata.isValid(upstreamDependency)) {
+                final JavaType javaType = WebScaffoldMetadata
+                        .getJavaType(upstreamDependency);
+                final LogicalPath path = WebScaffoldMetadata
+                        .getPath(upstreamDependency);
+                downstreamDependency = JspMetadata.createIdentifier(javaType,
+                        path);
+            }
+            else if (WebFinderMetadata.isValid(upstreamDependency)) {
+                final JavaType javaType = WebFinderMetadata
+                        .getJavaType(upstreamDependency);
+                final LogicalPath path = WebFinderMetadata
+                        .getPath(upstreamDependency);
+                downstreamDependency = JspMetadata.createIdentifier(javaType,
+                        path);
+            }
+
+            // We only need to proceed if the downstream dependency relationship
+            // is not already registered
+            // (if it's already registered, the event will be delivered directly
+            // later on)
+            if (metadataDependencyRegistry.getDownstream(upstreamDependency)
+                    .contains(downstreamDependency)) {
+                return;
+            }
+        }
+        else if (MetadataIdentificationUtils
+                .isIdentifyingInstance(upstreamDependency)) {
+            // This is the generic fallback listener, ie from
+            // MetadataDependencyRegistry.addListener(this) in the activate()
+            // method
+
+            // Get the metadata that just changed
+            final MetadataItem metadataItem = metadataService
+                    .get(upstreamDependency);
+
+            // We don't have to worry about physical type metadata, as we
+            // monitor the relevant .java once the DOD governor is first
+            // detected
+            if (metadataItem == null
+                    || !metadataItem.isValid()
+                    || !(metadataItem instanceof ItdTypeDetailsProvidingMetadataItem)) {
+                // There's something wrong with it or it's not for an ITD, so
+                // let's gracefully abort
+                return;
+            }
+
+            // Let's ensure we have some ITD type details to actually work with
+            final ItdTypeDetailsProvidingMetadataItem itdMetadata = (ItdTypeDetailsProvidingMetadataItem) metadataItem;
+            final ItdTypeDetails itdTypeDetails = itdMetadata
+                    .getMemberHoldingTypeDetails();
+            if (itdTypeDetails == null) {
+                return;
+            }
+
+            final String localMid = formBackingObjectTypesToLocalMids
+                    .get(itdTypeDetails.getGovernor().getName());
+            if (localMid != null) {
+                metadataService.evictAndGet(localMid);
+            }
+            return;
+        }
+
+        if (MetadataIdentificationUtils
+                .isIdentifyingInstance(downstreamDependency)) {
+            metadataService.evictAndGet(downstreamDependency);
+        }
+    }
 }

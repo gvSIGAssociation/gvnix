@@ -1,16 +1,16 @@
 package org.springframework.roo.addon.configurable;
 
+import static org.springframework.roo.model.SpringJavaType.CONFIGURABLE;
+
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Metadata for {@link RooConfigurable}.
@@ -18,84 +18,78 @@ import org.springframework.roo.support.util.Assert;
  * @author Ben Alex
  * @since 1.0
  */
-public class ConfigurableMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
-	private static final String PROVIDES_TYPE_STRING = ConfigurableMetadata.class.getName();
-	private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
+public class ConfigurableMetadata extends
+        AbstractItdTypeDetailsProvidingMetadataItem {
 
-	public ConfigurableMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-		super(identifier, aspectName, governorPhysicalTypeMetadata);
-		Assert.isTrue(isValid(identifier), "Metadata identification string '" + identifier + "' does not appear to be a valid");
+    private static final String PROVIDES_TYPE_STRING = ConfigurableMetadata.class
+            .getName();
+    private static final String PROVIDES_TYPE = MetadataIdentificationUtils
+            .create(PROVIDES_TYPE_STRING);
 
-		if (!isValid()) {
-			return;
-		}
+    public static String createIdentifier(final JavaType javaType,
+            final LogicalPath path) {
+        return PhysicalTypeIdentifierNamingUtils.createIdentifier(
+                PROVIDES_TYPE_STRING, javaType, path);
+    }
 
-		if (isConfigurableAnnotationIntroduced()) {
-			builder.addAnnotation(getConfigurableAnnotation());
-		}
+    public static JavaType getJavaType(final String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.getJavaType(
+                PROVIDES_TYPE_STRING, metadataIdentificationString);
+    }
 
-		// Create a representation of the desired output ITD
-		itdTypeDetails = builder.build();
-	}
+    public static String getMetadataIdentiferType() {
+        return PROVIDES_TYPE;
+    }
 
-	/**
-	 * Adds the @org.springframework.beans.factory.annotation.Configurable annotation to the type, unless
-	 * it already exists.
-	 * 
-	 * @return the annotation is already exists or will be created, or null if it will not be created (required)
-	 */
-	public AnnotationMetadata getConfigurableAnnotation() {
-		JavaType javaType = new JavaType("org.springframework.beans.factory.annotation.Configurable");
+    public static LogicalPath getPath(final String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
+                metadataIdentificationString);
+    }
 
-		if (isConfigurableAnnotationIntroduced()) {
-			AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(javaType);
-			return annotationBuilder.build();
-		}
+    public static boolean isValid(final String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING,
+                metadataIdentificationString);
+    }
 
-		return MemberFindingUtils.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
-	}
+    public ConfigurableMetadata(final String identifier,
+            final JavaType aspectName,
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+        super(identifier, aspectName, governorPhysicalTypeMetadata);
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
+                + identifier + "' does not appear to be a valid");
 
-	/**
-	 * Indicates whether the @org.springframework.beans.factory.annotation.Configurable annotation will
-	 * be introduced via this ITD.
-	 * 
-	 * @return true if it will be introduced, false otherwise
-	 */
-	public boolean isConfigurableAnnotationIntroduced() {
-		JavaType javaType = new JavaType("org.springframework.beans.factory.annotation.Configurable");
-		AnnotationMetadata result = MemberFindingUtils.getDeclaredTypeAnnotation(governorTypeDetails, javaType);
-		return result == null;
-	}
+        if (!isValid()) {
+            return;
+        }
 
-	public String toString() {
-		ToStringCreator tsc = new ToStringCreator(this);
-		tsc.append("identifier", getId());
-		tsc.append("valid", valid);
-		tsc.append("aspectName", aspectName);
-		tsc.append("destinationType", destination);
-		tsc.append("governor", governorPhysicalTypeMetadata.getId());
-		tsc.append("configurableIntroduced", isConfigurableAnnotationIntroduced());
-		tsc.append("itdTypeDetails", itdTypeDetails);
-		return tsc.toString();
-	}
+        builder.addAnnotation(getConfigurableAnnotation());
 
-	public static String getMetadataIdentiferType() {
-		return PROVIDES_TYPE;
-	}
+        // Create a representation of the desired output ITD
+        itdTypeDetails = builder.build();
+    }
 
-	public static String createIdentifier(JavaType javaType, Path path) {
-		return PhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, javaType, path);
-	}
+    /**
+     * Adds the @org.springframework.beans.factory.annotation.Configurable
+     * annotation to the type, unless it already exists.
+     * 
+     * @return the annotation is already exists or will be created, or null if
+     *         it will not be created (required)
+     */
+    private AnnotationMetadata getConfigurableAnnotation() {
+        return getTypeAnnotation(CONFIGURABLE);
+    }
 
-	public static JavaType getJavaType(String metadataIdentificationString) {
-		return PhysicalTypeIdentifierNamingUtils.getJavaType(PROVIDES_TYPE_STRING, metadataIdentificationString);
-	}
-
-	public static Path getPath(String metadataIdentificationString) {
-		return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, metadataIdentificationString);
-	}
-
-	public static boolean isValid(String metadataIdentificationString) {
-		return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING, metadataIdentificationString);
-	}
+    @Override
+    public String toString() {
+        final ToStringBuilder builder = new ToStringBuilder(this);
+        builder.append("identifier", getId());
+        builder.append("valid", valid);
+        builder.append("aspectName", aspectName);
+        builder.append("destinationType", destination);
+        builder.append("governor", governorPhysicalTypeMetadata.getId());
+        builder.append("configurableIntroduced",
+                getTypeAnnotation(CONFIGURABLE) != null);
+        builder.append("itdTypeDetails", itdTypeDetails);
+        return builder.toString();
+    }
 }

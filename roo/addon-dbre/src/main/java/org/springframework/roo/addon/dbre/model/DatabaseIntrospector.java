@@ -10,8 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.springframework.roo.addon.dbre.model.dialect.Dialect;
-import org.springframework.roo.support.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Creates a {@link Database database} model from a live database using JDBC.
@@ -20,343 +19,320 @@ import org.springframework.roo.support.util.StringUtils;
  * @since 1.1
  */
 public class DatabaseIntrospector extends AbstractIntrospector {
-	private String catalogName;
-	private Schema schema;
-	private boolean view;
-	private Set<String> includeTables = null;
-	private Set<String> excludeTables = null;
-	private String tableName;
-	private String columnName;
 
-	public DatabaseIntrospector(Connection connection, Schema schema, boolean view, Set<String> includeTables, Set<String> excludeTables) throws SQLException {
-		super(connection);
-		this.schema = schema;
-		this.view = view;
-		this.includeTables = includeTables;
-		this.excludeTables = excludeTables;
-	}
+    private final Set<String> excludeTables;
+    private final Set<String> includeTables;
+    private final Set<Schema> schemas;
+    private final boolean view;
 
-	public String getCatalogName() {
-		return catalogName;
-	}
+    public DatabaseIntrospector(final Connection connection,
+            final Set<Schema> schemas, final boolean view,
+            final Set<String> includeTables, final Set<String> excludeTables)
+            throws SQLException {
+        super(connection);
+        this.schemas = schemas;
+        this.view = view;
+        this.includeTables = includeTables;
+        this.excludeTables = excludeTables;
+    }
 
-	public Schema getSchema() {
-		return schema;
-	}
+    public Database createDatabase() throws SQLException {
+        final Set<Table> tables = new LinkedHashSet<Table>();
+        for (final Schema schema : schemas) {
+            tables.addAll(getTables(schema));
+        }
+        return new Database(tables);
+    }
 
-	public String getSchemaName() {
-		return schema != null ? schema.getName() : null;
-	}
+    private Index findIndex(final String name, final Set<Index> indices) {
+        for (final Index index : indices) {
+            if (index.getName().equalsIgnoreCase(name)) {
+                return index;
+            }
+        }
+        return null;
+    }
 
-	public String getTableName() {
-		return tableName;
-	}
+    private String getArtifact(final String artifactName) throws SQLException {
+        if (databaseMetaData.storesLowerCaseIdentifiers()) {
+            return StringUtils.lowerCase(artifactName);
+        }
+        else if (databaseMetaData.storesUpperCaseIdentifiers()) {
+            return StringUtils.upperCase(artifactName);
+        }
+        else {
+            return artifactName;
+        }
+    }
 
-	public String getColumnName() {
-		return columnName;
-	}
+    private CascadeAction getCascadeAction(final Short actionValue) {
+        CascadeAction cascadeAction;
+        switch (actionValue.intValue()) {
+        case DatabaseMetaData.importedKeyCascade:
+            cascadeAction = CascadeAction.CASCADE;
+            break;
+        case DatabaseMetaData.importedKeySetNull:
+            cascadeAction = CascadeAction.SET_NULL;
+            break;
+        case DatabaseMetaData.importedKeySetDefault:
+            cascadeAction = CascadeAction.SET_DEFAULT;
+            break;
+        case DatabaseMetaData.importedKeyRestrict:
+            cascadeAction = CascadeAction.RESTRICT;
+            break;
+        case DatabaseMetaData.importedKeyNoAction:
+            cascadeAction = CascadeAction.NONE;
+            break;
+        default:
+            cascadeAction = CascadeAction.NONE;
+        }
+        return cascadeAction;
+    }
 
-	public Set<Schema> getSchemas() throws SQLException {
-		Set<Schema> schemas = new LinkedHashSet<Schema>();
+    private Set<Table> getTables(final Schema schema) throws SQLException {
+        final Set<Table> tables = new LinkedHashSet<Table>();
 
-		ResultSet rs = databaseMetaData.getSchemas();
-		try {
-			while (rs.next()) {
-				schemas.add(new Schema(rs.getString("TABLE_SCHEM")));
-			}
-		} finally {
-			rs.close();
-		}
+        final String[] types = view ? new String[] { TableType.TABLE.name(),
+                TableType.VIEW.name() }
+                : new String[] { TableType.TABLE.name() };
+        final ResultSet rs = databaseMetaData.getTables(null,
+                getArtifact(schema.getName()), null, types);
+        try {
+            while (rs.next()) {
+                final String tableName = rs.getString("TABLE_NAME");
 
-		return schemas;
-	}
+                // Check for certain tables such as Oracle recycle bin tables,
+                // and ignore
+                if (ignoreTables(tableName)) {
+                    continue;
+                }
 
-	public Database createDatabase() throws SQLException {
-		String name = schema != null && StringUtils.hasText(schema.getName()) ? schema.getName() : catalogName;
-		return new Database(name, getTables());
-	}
+                if (hasIncludedTable(tableName) && !hasExcludedTable(tableName)) {
+                    final Table table = new Table(tableName, new Schema(
+                            rs.getString("TABLE_SCHEM")));
+                    table.setCatalog(rs.getString("TABLE_CAT"));
+                    table.setDescription(rs.getString("REMARKS"));
 
-	private Set<Table> getTables() throws SQLException {
-		Set<Table> tables = new LinkedHashSet<Table>();
+                    readColumns(table);
+                    readForeignKeys(table, false);
+                    readForeignKeys(table, true);
+                    readIndices(table);
 
-		String[] types = view ? new String[] { TableType.TABLE.name(), TableType.VIEW.name() } : new String[] { TableType.TABLE.name() };
-		ResultSet rs = databaseMetaData.getTables(getCatalog(), getSchemaPattern(), getTableNamePattern(), types);
-		try {
-			while (rs.next()) {
-				tableName = rs.getString("TABLE_NAME");
-				catalogName = rs.getString("TABLE_CAT");
-				schema = new Schema(rs.getString("TABLE_SCHEM"));
+                    for (final String columnName : readPrimaryKeyNames(table)) {
+                        final Column column = table.findColumn(columnName);
+                        if (column != null) {
+                            column.setPrimaryKey(true);
+                        }
+                    }
 
-				// Check for certain tables such as Oracle recycle bin tables, and ignore
-				if (ignoreTables()) {
-					continue;
-				}
+                    tables.add(table);
+                }
+            }
+        }
+        finally {
+            rs.close();
+        }
 
-				if (hasIncludedTable(tableName) && !hasExcludedTable(tableName)) {
-					Table table = new Table();
-					table.setName(tableName);
-					table.setCatalog(catalogName);
-					table.setSchema(schema);
-					table.setDescription(rs.getString("REMARKS"));
+        return tables;
+    }
 
-					readColumns(table);
-					readForeignKeys(table, false);
-					readForeignKeys(table, true);
-					readIndices(table);
+    private boolean hasExcludedTable(final String tableName) {
+        if (excludeTables == null || excludeTables.isEmpty()) {
+            return false;
+        }
+        return hasTable(excludeTables, tableName);
+    }
 
-					for (String columnName : readPrimaryKeyNames()) {
-						Column column = table.findColumn(columnName);
-						if (column != null) {
-							column.setPrimaryKey(true);
-						}
-					}
+    private boolean hasIncludedTable(final String tableName) {
+        if (includeTables == null || includeTables.isEmpty()) {
+            return true;
+        }
+        return hasTable(includeTables, tableName);
+    }
 
-					tables.add(table);
-				}
-			}
-		} finally {
-			rs.close();
-		}
+    private boolean hasTable(final Set<String> tables, final String tableName) {
+        for (final String table : tables) {
+            final String regex = table.replaceAll("\\*", ".*").replaceAll(
+                    "\\?", ".?");
+            final Pattern pattern = Pattern.compile(regex);
+            if (pattern.matcher(tableName).matches()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-		return tables;
-	}
+    private boolean ignoreTables(final String tableName) {
+        boolean ignore = false;
+        try {
+            if ("Oracle".equalsIgnoreCase(databaseMetaData
+                    .getDatabaseProductName()) && tableName.startsWith("BIN$")) {
+                ignore = true;
+            }
+            if ("MySQL".equalsIgnoreCase(databaseMetaData
+                    .getDatabaseProductName()) && tableName.equals("SEQUENCE")) {
+                ignore = true;
+            }
+        }
+        catch (final SQLException ignored) {
+        }
+        return ignore;
+    }
 
-	private boolean ignoreTables() {
-		boolean ignore = false;
-		try {
-			if ("Oracle".equalsIgnoreCase(databaseMetaData.getDatabaseProductName()) && tableName.startsWith("BIN$")) {
-				ignore = true;
-			}
-		} catch (SQLException ignored) {}
-		return ignore;
-	}
+    private void readColumns(final Table table) throws SQLException {
+        final ResultSet rs = databaseMetaData.getColumns(table.getCatalog(),
+                table.getSchema().getName(), table.getName(), null);
+        try {
+            while (rs.next()) {
+                final Column column = new Column(rs.getString("COLUMN_NAME"),
+                        rs.getInt("DATA_TYPE"), rs.getString("TYPE_NAME"),
+                        rs.getInt("COLUMN_SIZE"), rs.getInt("DECIMAL_DIGITS"));
+                column.setDescription(rs.getString("REMARKS"));
+                column.setDefaultValue(rs.getString("COLUMN_DEF"));
+                column.setRequired("NO".equalsIgnoreCase(rs
+                        .getString("IS_NULLABLE")));
 
-	private void readColumns(Table table) throws SQLException {
-		ResultSet rs = databaseMetaData.getColumns(catalogName, getSchemaName(), tableName, getColumnNamePattern());
-		try {
-			while (rs.next()) {
-				Column column = new Column(rs.getString("COLUMN_NAME"), rs.getInt("DATA_TYPE"), rs.getString("TYPE_NAME"), rs.getInt("COLUMN_SIZE"), rs.getInt("DECIMAL_DIGITS"));
-				column.setDescription(rs.getString("REMARKS"));
-				column.setDefaultValue(rs.getString("COLUMN_DEF"));
-				column.setRequired("NO".equalsIgnoreCase(rs.getString("IS_NULLABLE")));
+                table.addColumn(column);
+            }
+        }
+        finally {
+            rs.close();
+        }
+    }
 
-				table.addColumn(column);
-			}
-		} finally {
-			rs.close();
-		}
-	}
+    private void readForeignKeys(final Table table, final boolean exported)
+            throws SQLException {
+        final Map<String, ForeignKey> foreignKeys = new LinkedHashMap<String, ForeignKey>();
 
-	private void readForeignKeys(Table table, boolean exported) throws SQLException {
-		Map<String, ForeignKey> foreignKeys = new LinkedHashMap<String, ForeignKey>();
+        ResultSet rs;
+        if (exported) {
+            rs = databaseMetaData.getExportedKeys(table.getCatalog(), table
+                    .getSchema().getName(), table.getName());
+        }
+        else {
+            rs = databaseMetaData.getImportedKeys(table.getCatalog(), table
+                    .getSchema().getName(), table.getName());
+        }
 
-		ResultSet rs;
-		if (exported) {
-			rs = databaseMetaData.getExportedKeys(catalogName, getSchemaName(), tableName);
-		} else {
-			rs = databaseMetaData.getImportedKeys(catalogName, getSchemaName(), tableName);
-		}
+        try {
+            while (rs.next()) {
+                final String name = rs.getString("FK_NAME");
+                final String foreignTableName = rs
+                        .getString(exported ? "FKTABLE_NAME" : "PKTABLE_NAME");
+                final String key = name + "_" + foreignTableName;
 
-		try {
-			while (rs.next()) {
-				String name = rs.getString("FK_NAME");
-				String foreignTableName = rs.getString(exported ? "FKTABLE_NAME" : "PKTABLE_NAME");
-				String key = name + "_" + foreignTableName;
+                if (!hasExcludedTable(foreignTableName)) {
+                    final ForeignKey foreignKey = new ForeignKey(name,
+                            foreignTableName);
+                    foreignKey.setForeignSchemaName(StringUtils.defaultIfEmpty(
+                            rs.getString(exported ? "FKTABLE_SCHEM"
+                                    : "PKTABLE_SCHEM"),
+                            DbreModelService.NO_SCHEMA_REQUIRED));
+                    foreignKey.setOnUpdate(getCascadeAction(rs
+                            .getShort("UPDATE_RULE")));
+                    foreignKey.setOnDelete(getCascadeAction(rs
+                            .getShort("DELETE_RULE")));
+                    foreignKey.setExported(exported);
 
-				if (!hasExcludedTable(foreignTableName)) {
-					ForeignKey foreignKey = new ForeignKey(name, foreignTableName);
-					foreignKey.setOnUpdate(getCascadeAction(rs.getShort("UPDATE_RULE")));
-					foreignKey.setOnDelete(getCascadeAction(rs.getShort("DELETE_RULE")));
-					foreignKey.setExported(exported);
+                    final String localColumnName = rs
+                            .getString(exported ? "PKCOLUMN_NAME"
+                                    : "FKCOLUMN_NAME");
+                    final String foreignColumnName = rs
+                            .getString(exported ? "FKCOLUMN_NAME"
+                                    : "PKCOLUMN_NAME");
+                    final Reference reference = new Reference(localColumnName,
+                            foreignColumnName);
 
-					String localColumnName = rs.getString(exported ? "PKCOLUMN_NAME" : "FKCOLUMN_NAME");
-					String foreignColumnName = rs.getString(exported ? "FKCOLUMN_NAME" : "PKCOLUMN_NAME");
-					Reference reference = new Reference(localColumnName, foreignColumnName);
+                    if (foreignKeys.containsKey(key)) {
+                        foreignKeys.get(key).addReference(reference);
+                    }
+                    else {
+                        foreignKey.addReference(reference);
+                        foreignKeys.put(key, foreignKey);
+                    }
+                }
+            }
+        }
+        finally {
+            rs.close();
+        }
 
-					if (foreignKeys.containsKey(key)) {
-						foreignKeys.get(key).addReference(reference);
-					} else {
-						foreignKey.addReference(reference);
-						foreignKeys.put(key, foreignKey);
-					}
-				}
-			}
-		} finally {
-			rs.close();
-		}
+        for (final ForeignKey foreignKey : foreignKeys.values()) {
+            if (exported) {
+                table.addExportedKey(foreignKey);
+            }
+            else {
+                table.addImportedKey(foreignKey);
+            }
+        }
+    }
 
-		for (ForeignKey foreignKey : foreignKeys.values()) {
-			if (exported) {
-				table.addExportedKey(foreignKey);
-			} else {
-				table.addImportedKey(foreignKey);
-			}
-		}
-	}
+    private void readIndices(final Table table) throws SQLException {
+        final Set<Index> indices = new LinkedHashSet<Index>();
 
-	private CascadeAction getCascadeAction(Short actionValue) {
-		CascadeAction cascadeAction;
-		switch (actionValue.intValue()) {
-			case DatabaseMetaData.importedKeyCascade:
-				cascadeAction = CascadeAction.CASCADE;
-				break;
-			case DatabaseMetaData.importedKeySetNull:
-				cascadeAction = CascadeAction.SET_NULL;
-				break;
-			case DatabaseMetaData.importedKeySetDefault:
-				cascadeAction = CascadeAction.SET_DEFAULT;
-				break;
-			case DatabaseMetaData.importedKeyRestrict:
-				cascadeAction = CascadeAction.RESTRICT;
-				break;
-			case DatabaseMetaData.importedKeyNoAction:
-				cascadeAction = CascadeAction.NONE;
-				break;
-			default:
-				cascadeAction = CascadeAction.NONE;
-		}
-		return cascadeAction;
-	}
+        ResultSet rs;
+        try {
+            // Catching SQLException here due to Oracle throwing exception when
+            // attempting to retrieve indices for deleted tables that exist in
+            // Oracle's recycle bin
+            rs = databaseMetaData.getIndexInfo(table.getCatalog(), table
+                    .getSchema().getName(), table.getName(), false, false);
+        }
+        catch (final SQLException e) {
+            return;
+        }
 
-	private boolean hasIncludedTable(String tableName) {
-		if (includeTables == null || includeTables.isEmpty()) {
-			return true;
-		}
-		return hasTable(includeTables, tableName);
-	}
+        if (rs != null) {
+            try {
+                while (rs.next()) {
+                    final Short type = rs.getShort("TYPE");
+                    if (type == DatabaseMetaData.tableIndexStatistic) {
+                        continue;
+                    }
 
-	private boolean hasExcludedTable(String tableName) {
-		if (excludeTables == null || excludeTables.isEmpty()) {
-			return false;
-		}
-		return hasTable(excludeTables, tableName);
-	}
+                    final String indexName = rs.getString("INDEX_NAME");
+                    Index index = findIndex(indexName, indices);
+                    if (index == null) {
+                        index = new Index(indexName);
+                    }
+                    else {
+                        indices.remove(index);
+                    }
+                    index.setUnique(!rs.getBoolean("NON_UNIQUE"));
 
-	private boolean hasTable(Set<String> tables, String tableName) {
-		for (String table : tables) {
-			String regex = table.replaceAll("\\*", ".*").replaceAll("\\?", ".?");
-			Pattern pattern = Pattern.compile(regex);
-			if (pattern.matcher(tableName).matches()) {
-				return true;
-			}
-		}
-		return false;
-	}
+                    final IndexColumn indexColumn = new IndexColumn(
+                            rs.getString("COLUMN_NAME"));
+                    index.addColumn(indexColumn);
 
-	private void readIndices(Table table) throws SQLException {
-		Set<Index> indices = new LinkedHashSet<Index>();
+                    indices.add(index);
+                }
+            }
+            finally {
+                rs.close();
+            }
+        }
 
-		ResultSet rs;
-		try {
-			// Catching SQLException here due to Oracle throwing exception when attempting to retrieve indices for deleted tables that exist in Oracle's recycle bin
-			rs = databaseMetaData.getIndexInfo(catalogName, getSchemaName(), tableName, false, false);
-		} catch (SQLException e) {
-			return;
-		}
+        for (final Index index : indices) {
+            table.addIndex(index);
+        }
+    }
 
-		if (rs != null) {
-			try {
-				while (rs.next()) {
-					Short type = rs.getShort("TYPE");
-					if (type == DatabaseMetaData.tableIndexStatistic) {
-						continue;
-					}
+    private Set<String> readPrimaryKeyNames(final Table table)
+            throws SQLException {
+        final Set<String> columnNames = new LinkedHashSet<String>();
 
-					String indexName = rs.getString("INDEX_NAME");
-					Index index = findIndex(indexName, indices);
-					if (index == null) {
-						index = new Index(indexName);
-					} else {
-						indices.remove(index);
-					}
-					index.setUnique(!rs.getBoolean("NON_UNIQUE"));
+        final ResultSet rs = databaseMetaData.getPrimaryKeys(
+                table.getCatalog(), table.getSchema().getName(),
+                table.getName());
+        try {
+            while (rs.next()) {
+                columnNames.add(rs.getString("COLUMN_NAME"));
+            }
+        }
+        finally {
+            rs.close();
+        }
 
-					IndexColumn indexColumn = new IndexColumn(rs.getString("COLUMN_NAME"));
-					index.addColumn(indexColumn);
-
-					indices.add(index);
-				}
-			} finally {
-				rs.close();
-			}
-		}
-
-		for (Index index : indices) {
-			table.addIndex(index);
-		}
-	}
-
-	private Index findIndex(String name, Set<Index> indices) {
-		for (Index index : indices) {
-			if (index.getName().equalsIgnoreCase(name)) {
-				return index;
-			}
-		}
-		return null;
-	}
-
-	private Set<String> readPrimaryKeyNames() throws SQLException {
-		Set<String> columnNames = new LinkedHashSet<String>();
-
-		ResultSet rs = databaseMetaData.getPrimaryKeys(catalogName, getSchemaName(), tableName);
-		try {
-			while (rs.next()) {
-				columnNames.add(rs.getString("COLUMN_NAME"));
-			}
-		} finally {
-			rs.close();
-		}
-
-		return columnNames;
-	}
-
-	private String getCatalog() throws SQLException {
-		if (databaseMetaData.storesLowerCaseIdentifiers()) {
-			return StringUtils.toLowerCase(catalogName);
-		} else if (databaseMetaData.storesUpperCaseIdentifiers()) {
-			return StringUtils.toUpperCase(catalogName);
-		} else {
-			return catalogName;
-		}
-	}
-
-	private String getSchemaPattern() throws SQLException {
-		if (databaseMetaData.storesLowerCaseIdentifiers()) {
-			return StringUtils.toLowerCase(getSchemaName());
-		} else if (databaseMetaData.storesUpperCaseIdentifiers()) {
-			return StringUtils.toUpperCase(getSchemaName());
-		} else {
-			return getSchemaName();
-		}
-	}
-
-	private String getTableNamePattern() throws SQLException {
-		if (databaseMetaData.storesLowerCaseIdentifiers()) {
-			return StringUtils.toLowerCase(tableName);
-		} else if (databaseMetaData.storesUpperCaseIdentifiers()) {
-			return StringUtils.toUpperCase(tableName);
-		} else {
-			return tableName;
-		}
-	}
-
-	private String getColumnNamePattern() throws SQLException {
-		if (databaseMetaData.storesLowerCaseIdentifiers()) {
-			return StringUtils.toLowerCase(columnName);
-		} else if (databaseMetaData.storesUpperCaseIdentifiers()) {
-			return StringUtils.toUpperCase(columnName);
-		} else {
-			return columnName;
-		}
-	}
-
-	@SuppressWarnings("unused") 
-	private Dialect getDialect() {
-		try {
-			String productName = databaseMetaData.getDatabaseProductName();
-			return (Dialect) Class.forName("org.springframework.roo.addon.dbre.model.dialect." + productName + "Dialect").newInstance();
-		} catch (Exception e) {
-			return null;
-		}
-	}
+        return columnNames;
+    }
 }

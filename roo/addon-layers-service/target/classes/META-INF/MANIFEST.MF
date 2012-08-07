@@ -1,0 +1,48 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1344269109525
+Build-Jdk: 1.6.0_31
+Built-By: mmartinez
+Bundle-Copyright: Copyright VMware, Inc. All Rights Reserved.
+Bundle-Description: Support for common layering options in Java Enterpri
+ se Applications
+Bundle-ManifestVersion: 2
+Bundle-Name: Spring Roo - Addon - Service Layer
+Bundle-SymbolicName: org.springframework.roo.addon.layers.service
+Bundle-Vendor: VMware, Inc
+Bundle-Version: 1.2.2.RELEASE
+Created-By: Apache Maven Bundle Plugin
+Export-Package: org.springframework.roo.addon.layers.service;uses:="org.
+ springframework.roo.model,org.springframework.roo.classpath.details.ann
+ otations,org.springframework.roo.classpath.itd,org.springframework.roo.
+ classpath,org.springframework.roo.classpath.details.annotations.populat
+ or,org.springframework.roo.classpath.details,org.springframework.roo.me
+ tadata,org.springframework.roo.project,org.springframework.roo.classpat
+ h.scanner,org.springframework.roo.classpath.layers,org.apache.commons.l
+ ang3,org.apache.commons.lang3.builder,org.osgi.service.component,org.sp
+ ringframework.roo.support.util,org.springframework.roo.classpath.persis
+ tence,org.springframework.roo.addon.plural,org.springframework.roo.shel
+ l,org.springframework.roo.classpath.customdata.taggers,org.springframew
+ ork.roo.classpath.customdata.tagkeys,org.springframework.roo.classpath.
+ customdata,org.apache.commons.lang3.tuple,org.springframework.roo.proce
+ ss.manager";version="1.2.2.RELEASE"
+Git-Commit-Hash: 7d75659afedb7a95b84b0f5c0c017e2e70f625f0
+Import-Package: org.apache.commons.lang3;version="[3.1,4)",org.apache.co
+ mmons.lang3.builder;version="[3.1,4)",org.apache.commons.lang3.tuple;ve
+ rsion="[3.1,4)",org.osgi.service.component;version="[1.1,2)",org.spring
+ framework.roo.addon.plural;version="[1.2,2)",org.springframework.roo.cl
+ asspath;version="[1.2,2)",org.springframework.roo.classpath.customdata;
+ version="[1.2,2)",org.springframework.roo.classpath.customdata.taggers;
+ version="[1.2,2)",org.springframework.roo.classpath.customdata.tagkeys;
+ version="[1.2,2)",org.springframework.roo.classpath.details;version="[1
+ .2,2)",org.springframework.roo.classpath.details.annotations;version="[
+ 1.2,2)",org.springframework.roo.classpath.details.annotations.populator
+ ;version="[1.2,2)",org.springframework.roo.classpath.itd;version="[1.2,
+ 2)",org.springframework.roo.classpath.layers;version="[1.2,2)",org.spri
+ ngframework.roo.classpath.persistence;version="[1.2,2)",org.springframe
+ work.roo.classpath.scanner;version="[1.2,2)",org.springframework.roo.me
+ tadata;version="[1.2,2)",org.springframework.roo.model;version="[1.2,2)
+ ",org.springframework.roo.process.manager;version="[1.2,2)",org.springf
+ ramework.roo.project;version="[1.2,2)",org.springframework.roo.shell;ve
+ rsion="[1.2,2)",org.springframework.roo.support.util;version="[1.2,2)"
+Service-Component: OSGI-INF/serviceComponents.xml
+Tool: Bnd-1.50.0

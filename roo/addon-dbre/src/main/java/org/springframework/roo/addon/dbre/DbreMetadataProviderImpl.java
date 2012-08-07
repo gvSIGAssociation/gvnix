@@ -1,9 +1,8 @@
 package org.springframework.roo.addon.dbre;
 
-import java.lang.reflect.Modifier;
-import java.util.LinkedList;
+import static org.springframework.roo.model.RooJavaType.ROO_DB_MANAGED;
+
 import java.util.List;
-import java.util.Set;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
@@ -13,150 +12,147 @@ import org.springframework.roo.addon.dbre.model.Database;
 import org.springframework.roo.addon.dbre.model.DbreModelService;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
-import org.springframework.roo.classpath.TypeLocationService;
-import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
+import org.springframework.roo.classpath.TypeManagementService;
+import org.springframework.roo.classpath.customdata.CustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
-import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
-import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
 
 /**
- * Implementation of  {@link DbreMetadataProvider}.
+ * Implementation of {@link DbreMetadataProvider}.
  * 
  * @author Alan Stewart
  * @since 1.1
  */
 @Component(immediate = true)
 @Service
-public class DbreMetadataProviderImpl extends AbstractItdMetadataProvider implements DbreMetadataProvider {
-	@Reference private DbreModelService dbreModelService;
-	@Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
-	@Reference private TypeLocationService typeLocationService;
+public class DbreMetadataProviderImpl extends AbstractItdMetadataProvider
+        implements DbreMetadataProvider {
 
-	protected void activate(ComponentContext context) {
-		metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-		addMetadataTrigger(new JavaType(RooDbManaged.class.getName()));
-	}
+    @Reference private DbreModelService dbreModelService;
+    @Reference private TypeManagementService typeManagementService;
 
-	protected void deactivate(ComponentContext context) {
-		metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-		removeMetadataTrigger(new JavaType(RooDbManaged.class.getName()));
-	}
+    protected void activate(final ComponentContext context) {
+        metadataDependencyRegistry.registerDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        addMetadataTrigger(ROO_DB_MANAGED);
+    }
 
-	protected String createLocalIdentifier(JavaType javaType, Path path) {
-		return DbreMetadata.createIdentifier(javaType, path);
-	}
+    @Override
+    protected String createLocalIdentifier(final JavaType javaType,
+            final LogicalPath path) {
+        return DbreMetadata.createIdentifier(javaType, path);
+    }
 
-	protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
-		JavaType javaType = DbreMetadata.getJavaType(metadataIdentificationString);
-		Path path = DbreMetadata.getPath(metadataIdentificationString);
-		return PhysicalTypeIdentifier.createIdentifier(javaType, path);
-	}
+    protected void deactivate(final ComponentContext context) {
+        metadataDependencyRegistry.deregisterDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        removeMetadataTrigger(ROO_DB_MANAGED);
+    }
 
-	protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
-		// We need to parse the annotation, which we expect to be present
-		DbManagedAnnotationValues annotationValues = new DbManagedAnnotationValues(governorPhysicalTypeMetadata);
-		if (!annotationValues.isAnnotationFound()) {
-			return null;
-		}
+    @Override
+    protected String getGovernorPhysicalTypeIdentifier(
+            final String metadataIdentificationString) {
+        final JavaType javaType = DbreMetadata
+                .getJavaType(metadataIdentificationString);
+        final LogicalPath path = DbreMetadata
+                .getPath(metadataIdentificationString);
+        return PhysicalTypeIdentifier.createIdentifier(javaType, path);
+    }
 
-		// Abort if the database couldn't be deserialized. This can occur if the DBRE XML file has been deleted or is empty.
-		Database database = dbreModelService.getDatabase(false);
-		if (database == null) {
-			return null;
-		}
-		// We know governor type details are non-null and can be safely cast
-		JavaType javaType = governorPhysicalTypeMetadata.getMemberHoldingTypeDetails().getName();
+    private IdentifierHolder getIdentifierHolder(final JavaType javaType) {
+        final List<FieldMetadata> identifierFields = persistenceMemberLocator
+                .getIdentifierFields(javaType);
+        if (identifierFields.isEmpty()) {
+            return null;
+        }
 
-		MemberDetails memberDetails = getMemberDetails(governorPhysicalTypeMetadata);
-		if (memberDetails == null) {
-			return null;
-		}
+        final FieldMetadata identifierField = identifierFields.get(0);
+        final boolean embeddedIdField = identifierField.getCustomData().get(
+                CustomDataKeys.EMBEDDED_ID_FIELD) != null;
+        final List<FieldMetadata> embeddedIdFields = persistenceMemberLocator
+                .getEmbeddedIdentifierFields(javaType);
+        return new IdentifierHolder(identifierField, embeddedIdField,
+                embeddedIdFields);
+    }
 
-		MemberHoldingTypeDetails persistenceMemberHoldingTypeDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(memberDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
-		if (persistenceMemberHoldingTypeDetails == null) {
-			return null;
-		}
+    public String getItdUniquenessFilenameSuffix() {
+        return "DbManaged";
+    }
 
-		List<? extends FieldMetadata> entityFields = persistenceMemberHoldingTypeDetails.getDeclaredFields();
-		List<? extends MethodMetadata> entityMethods = persistenceMemberHoldingTypeDetails.getDeclaredMethods();
-		FieldMetadata identifierField = getIdentifierField(memberDetails, metadataIdentificationString);
-		EmbeddedIdentifierHolder embeddedIdentifierHolder = getEmbeddedIdentifierHolder(memberDetails, metadataIdentificationString);
-		FieldMetadata versionField = getVersionField(memberDetails, metadataIdentificationString);
+    @Override
+    protected ItdTypeDetailsProvidingMetadataItem getMetadata(
+            final String metadataIdentificationString,
+            final JavaType aspectName,
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            final String itdFilename) {
+        // We need to parse the annotation, which we expect to be present
+        final DbManagedAnnotationValues annotationValues = new DbManagedAnnotationValues(
+                governorPhysicalTypeMetadata);
+        if (!annotationValues.isAnnotationFound()) {
+            return null;
+        }
 
-		// Search for database-managed entities
-		Set<ClassOrInterfaceTypeDetails> managedEntities = typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(new JavaType(RooDbManaged.class.getName()));
+        // Abort if the database couldn't be deserialized. This can occur if the
+        // DBRE XML file has been deleted or is empty.
+        final Database database = dbreModelService.getDatabase(false);
+        if (database == null) {
+            return null;
+        }
 
-		boolean found = false;
-		for (ClassOrInterfaceTypeDetails managedEntity : managedEntities) {
-			if (managedEntity.getName().equals(javaType)) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			String mid = physicalTypeMetadataProvider.findIdentifier(javaType);
-			metadataDependencyRegistry.registerDependency(mid, metadataIdentificationString);
-			return null;
-		}
+        // We know governor type details are non-null and can be safely cast
+        final JavaType javaType = governorPhysicalTypeMetadata
+                .getMemberHoldingTypeDetails().getName();
+        final IdentifierHolder identifierHolder = getIdentifierHolder(javaType);
+        if (identifierHolder == null) {
+            return null;
+        }
 
-		return new DbreMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, annotationValues, entityFields, entityMethods, identifierField, embeddedIdentifierHolder, versionField, managedEntities, database);
-	}
+        final FieldMetadata versionField = getVersionField(javaType,
+                metadataIdentificationString);
 
-	private FieldMetadata getIdentifierField(MemberDetails memberDetails, String metadataIdentificationString) {
-		List<FieldMetadata> identifierFields = MemberFindingUtils.getFieldsWithTag(memberDetails, PersistenceCustomDataKeys.IDENTIFIER_FIELD);
-		if (!identifierFields.isEmpty()) {
-			return identifierFields.get(0);
-		}
-		return null;
-	}
+        // Search for database-managed entities
+        final Iterable<ClassOrInterfaceTypeDetails> managedEntities = typeLocationService
+                .findClassesOrInterfaceDetailsWithAnnotation(ROO_DB_MANAGED);
 
-	private EmbeddedIdentifierHolder getEmbeddedIdentifierHolder(MemberDetails memberDetails, String metadataIdentificationString) {
-		List<FieldMetadata> embeddedIdFields = MemberFindingUtils.getFieldsWithTag(memberDetails, PersistenceCustomDataKeys.EMBEDDED_ID_FIELD);
-		if (embeddedIdFields.isEmpty()) {
-			return null;
-		}
-		FieldMetadata embeddedIdentifierField = embeddedIdFields.get(0);
-		MemberDetails identifierMemberDetails = getMemberDetails(embeddedIdentifierField.getFieldType());
-		if (identifierMemberDetails == null) {
-			return null;
-		}
-		MemberHoldingTypeDetails identifierMemberHoldingTypeDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(identifierMemberDetails, PersistenceCustomDataKeys.IDENTIFIER_TYPE);
-		if (identifierMemberHoldingTypeDetails == null) {
-			return null;
-		}
-		List<FieldMetadata> identifierFields = new LinkedList<FieldMetadata>();
-		for (FieldMetadata field : MemberFindingUtils.getFields(identifierMemberDetails)) {
-			if (!(Modifier.isStatic(field.getModifier()) || Modifier.isFinal(field.getModifier()) || Modifier.isTransient(field.getModifier()))) {
-				metadataDependencyRegistry.registerDependency(field.getDeclaredByMetadataId(), metadataIdentificationString);
-				identifierFields.add(field);
-			}
-		}
-		return new EmbeddedIdentifierHolder(embeddedIdentifierField, identifierFields);
-	}
+        boolean found = false;
+        for (final ClassOrInterfaceTypeDetails managedEntity : managedEntities) {
+            if (managedEntity.getName().equals(javaType)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            final String mid = typeLocationService
+                    .getPhysicalTypeIdentifier(javaType);
+            metadataDependencyRegistry.registerDependency(mid,
+                    metadataIdentificationString);
+            return null;
+        }
 
-	private FieldMetadata getVersionField(MemberDetails memberDetails, String metadataIdentificationString) {
-		FieldMetadata versionField = null;
-		List<FieldMetadata> fields = MemberFindingUtils.getFieldsWithTag(memberDetails, PersistenceCustomDataKeys.VERSION_FIELD);
-		if (!fields.isEmpty()) {
-			versionField = fields.get(0);
-			metadataDependencyRegistry.registerDependency(versionField.getDeclaredByMetadataId(), metadataIdentificationString);
-		}
-		return versionField;
-	}
+        final DbreMetadata dbreMetadata = new DbreMetadata(
+                metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata, annotationValues,
+                identifierHolder, versionField, managedEntities, database);
+        final ClassOrInterfaceTypeDetails updatedGovernor = dbreMetadata
+                .getUpdatedGovernor();
+        if (updatedGovernor != null) {
+            typeManagementService.createOrUpdateTypeOnDisk(updatedGovernor);
+        }
+        return dbreMetadata;
+    }
 
-	public String getItdUniquenessFilenameSuffix() {
-		return "DbManaged";
-	}
+    public String getProvidesType() {
+        return DbreMetadata.getMetadataIdentiferType();
+    }
 
-	public String getProvidesType() {
-		return DbreMetadata.getMetadataIdentiferType();
-	}
+    private FieldMetadata getVersionField(final JavaType domainType,
+            final String metadataIdentificationString) {
+        return persistenceMemberLocator.getVersionField(domainType);
+    }
 }

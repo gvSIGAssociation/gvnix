@@ -1,11 +1,23 @@
 package org.springframework.roo.addon.web.mvc.jsp;
 
-import java.io.IOException;
+import static org.springframework.roo.model.SpringJavaType.CONTROLLER;
+import static org.springframework.roo.model.SpringJavaType.MODEL_MAP;
+import static org.springframework.roo.model.SpringJavaType.PATH_VARIABLE;
+import static org.springframework.roo.model.SpringJavaType.REQUEST_MAPPING;
+import static org.springframework.roo.model.SpringJavaType.REQUEST_METHOD;
+import static org.springframework.roo.project.Path.SRC_MAIN_WEBAPP;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -16,16 +28,13 @@ import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
-import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperationsImpl;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
@@ -35,12 +44,12 @@ import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.FeatureNames;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.osgi.BundleFindingUtils;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlUtils;
 import org.springframework.roo.uaa.UaaRegistrationService;
@@ -49,404 +58,614 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * Provides operations to create various view layer resources.
+ * Implementation of {@link JspOperations}.
  * 
  * @author Stefan Schmidt
  * @author Jeremy Grelle
  * @since 1.0
  */
-@Component 
-@Service 
-public class JspOperationsImpl extends AbstractOperations implements JspOperations {
-	@Reference private TypeManagementService typeManagementService;
-	@Reference private TypeLocationService typeLocationService;
-	@Reference private WebMvcOperations webMvcOperations;
-	@Reference private MenuOperations menuOperations;
-	@Reference private TilesOperations tilesOperations;
-	@Reference private ProjectOperations projectOperations;
-	@Reference private PropFileOperations propFileOperations;
-	@Reference private I18nSupport i18nSupport;
-	@Reference private UaaRegistrationService uaaRegistrationService;
-	@Reference private BackupOperations backupOperations;
-	
-	public boolean isControllerAvailable() {
-		return fileManager.exists(projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml"));
-	}
+@Component
+@Service
+public class JspOperationsImpl extends AbstractOperations implements
+        JspOperations {
 
-	private boolean isProjectAvailable() {
-		return projectOperations.isProjectAvailable();
-	}
-	
-	public boolean isSetupAvailable() {
-		return isProjectAvailable() && !isControllerAvailable();
-	}
+    private static final JavaType HTTP_SERVLET_REQUEST = new JavaType(
+            "javax.servlet.http.HttpServletRequest");
+    private static final JavaType HTTP_SERVLET_RESPONSE = new JavaType(
+            "javax.servlet.http.HttpServletResponse");
 
-	public boolean isInstallLanguageCommandAvailable() {
-		return isProjectAvailable() && fileManager.exists(projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/footer.jspx"));
-	}
+    /**
+     * Returns the folder name and mapping value for the given preferred maaping
+     * 
+     * @param preferredMapping (can be blank)
+     * @param controller the associated controller type (required)
+     * @return a non-<code>null</code> pair
+     */
+    static ImmutablePair<String, String> getFolderAndMapping(
+            final String preferredMapping, final JavaType controller) {
+        if (StringUtils.isNotBlank(preferredMapping)) {
+            String folderName = StringUtils.removeStart(preferredMapping, "/");
+            folderName = StringUtils.removeEnd(folderName, "**");
+            folderName = StringUtils.removeEnd(folderName, "/");
 
-	public void installCommonViewArtefacts() {
-		Assert.isTrue(isProjectAvailable(), "Project metadata required");
-		
-		if (!isControllerAvailable()) {
-			webMvcOperations.installAllWebMvcArtifacts();
-		}
-		
-		PathResolver pathResolver = projectOperations.getPathResolver();
+            String mapping = (preferredMapping.startsWith("/") ? "" : "/")
+                    + preferredMapping;
+            mapping = StringUtils.removeEnd(mapping, "/");
+            mapping = mapping + (mapping.endsWith("/**") ? "" : "/**");
 
-		// Install tiles config
-		updateConfiguration();
+            return new ImmutablePair<String, String>(folderName, mapping);
+        }
 
-		// Install styles
-		copyDirectoryContents("images/*.*", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/images"), false);
+        // Use sensible defaults
+        final String typeNameLower = StringUtils.removeEnd(
+                controller.getSimpleTypeName(), "Controller").toLowerCase();
+        return new ImmutablePair<String, String>(typeNameLower, "/"
+                + typeNameLower + "/**");
+    }
 
-		// Install styles
-		copyDirectoryContents("styles/*.css", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/styles"), false);
-		copyDirectoryContents("styles/*.properties", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/classes"), false);
+    @Reference private BackupOperations backupOperations;
+    @Reference private I18nSupport i18nSupport;
+    @Reference private MenuOperations menuOperations;
+    @Reference private PathResolver pathResolver;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private PropFileOperations propFileOperations;
+    @Reference private TilesOperations tilesOperations;
+    @Reference private TypeManagementService typeManagementService;
+    @Reference private UaaRegistrationService uaaRegistrationService;
+    @Reference private WebMvcOperations webMvcOperations;
 
-		// Install layout
-		copyDirectoryContents("tiles/default.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/layouts/"), false);
-		copyDirectoryContents("tiles/layouts.xml", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/layouts/"), false);
-		copyDirectoryContents("tiles/header.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"), false);
-		copyDirectoryContents("tiles/footer.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"), false);
-		copyDirectoryContents("tiles/views.xml", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"), false);
+    private String cleanPath(String path) {
+        if ("/".equals(path)) {
+            return "";
+        }
+        path = "/" + path;
+        if (path.contains(".")) {
+            path = path.substring(0, path.indexOf(".") - 1);
+        }
+        return path;
+    }
 
-		// Install common view files
-		copyDirectoryContents("*.jspx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/"), false);
+    private String cleanViewName(String viewName) {
+        if (viewName.startsWith("/")) {
+            viewName = viewName.substring(1);
+        }
+        if (viewName.contains(".")) {
+            viewName = viewName.substring(0, viewName.indexOf(".") - 1);
+        }
+        return viewName;
+    }
 
-		// Install tags
-		copyDirectoryContents("tags/form/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/form"), false);
-		copyDirectoryContents("tags/form/fields/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/form/fields"), false);
-		copyDirectoryContents("tags/menu/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/menu"), false);
-		copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"), false);
+    /**
+     * Creates a new Spring MVC controller.
+     * <p>
+     * Request mappings assigned by this method will always commence with "/"
+     * and end with "/**". You may present this prefix and/or this suffix if you
+     * wish, although it will automatically be added should it not be provided.
+     * 
+     * @param controller the controller class to create (required)
+     * @param preferredMapping the mapping this controller should adopt
+     *            (optional; if unspecified it will be based on the controller
+     *            name)
+     */
+    public void createManualController(final JavaType controller,
+            final String preferredMapping, final LogicalPath webappPath) {
+        Validate.notNull(controller, "Controller Java Type required");
 
-		// Install default language 'en'
-		installI18n(i18nSupport.getLanguage(Locale.ENGLISH));
+        // Create annotation @RequestMapping("/myobject/**")
+        final ImmutablePair<String, String> folderAndMapping = getFolderAndMapping(
+                preferredMapping, controller);
+        final String folderName = folderAndMapping.getKey();
 
-		String i18nDirectory = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/i18n/application.properties");
-		if (!fileManager.exists(i18nDirectory)) {
-			try {
-				String projectName = projectOperations.getProjectMetadata().getProjectName();
-				fileManager.createFile(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/i18n/application.properties"));
-				propFileOperations.addPropertyIfNotExists(Path.SRC_MAIN_WEBAPP, "/WEB-INF/i18n/application.properties", "application_name", projectName.substring(0, 1).toUpperCase() + projectName.substring(1), true);
-			} catch (Exception e) {
-				throw new IllegalStateException("Encountered an error during copying of resources for MVC JSP addon.", e);
-			}
-		}
-	}
+        final String resourceIdentifier = pathResolver.getFocusedCanonicalPath(
+                Path.SRC_MAIN_JAVA, controller);
+        final String declaredByMetadataId = PhysicalTypeIdentifier
+                .createIdentifier(controller, projectOperations
+                        .getPathResolver().getPath(resourceIdentifier));
+        final List<MethodMetadataBuilder> methods = new ArrayList<MethodMetadataBuilder>();
 
-	public void installView(String path, String viewName, String title, String category) {
-		installView(path, viewName, title, category, null, true);
-	}
+        // Add HTTP post method
+        methods.add(getHttpPostMethod(declaredByMetadataId));
 
-	public void installView(String path, String viewName, String title, String category, Document document) {
-		installView(path, viewName, title, category, document, true);
-	}
+        // Add index method
+        methods.add(getIndexMethod(folderName, declaredByMetadataId));
 
-	private void installView(String path, String viewName, String title, String category, Document document, boolean registerStaticController) {
-		Assert.hasText(path, "Path required");
-		Assert.hasText(viewName, "View name required");
-		Assert.hasText(title, "Title required");
-		path = cleanPath(path);
-		viewName = cleanViewName(viewName);
-		String lcViewName = viewName.toLowerCase();
-		if (document == null) {
-			try {
-				document = getDocumentTemplate("index-template.jspx");
-				XmlUtils.findRequiredElement("/div/message", document.getDocumentElement()).setAttribute("code", "label" + path.replace("/", "_") + "_" + lcViewName);
-			} catch (Exception e) {
-				throw new IllegalStateException("Encountered an error during copying of resources for controller class.", e);
-			}
-		}
+        // Create Type definition
+        final List<AnnotationMetadataBuilder> typeAnnotations = new ArrayList<AnnotationMetadataBuilder>();
 
-		String viewFile = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/views" + path + "/" + lcViewName + ".jspx");
-		fileManager.createOrUpdateTextFileIfRequired(viewFile, XmlUtils.nodeToString(document), false);
+        final List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        requestMappingAttributes.add(new StringAttributeValue(
+                new JavaSymbolName("value"), folderAndMapping.getValue()));
+        final AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
+                REQUEST_MAPPING, requestMappingAttributes);
+        typeAnnotations.add(requestMapping);
 
-		installView(new JavaSymbolName(viewName), path, title, category, registerStaticController);
-	}
+        // Create annotation @Controller
+        final List<AnnotationAttributeValue<?>> controllerAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        final AnnotationMetadataBuilder controllerAnnotation = new AnnotationMetadataBuilder(
+                CONTROLLER, controllerAttributes);
+        typeAnnotations.add(controllerAnnotation);
 
-	/**
-	 * Creates a new Spring MVC static view.
-	 * 
-	 * @param viewName the mapping this view should adopt (required, ie 'index')
-	 * @param folderName the folder name
-	 * @param category the category
-	 * @param registerStaticController whether to register a static controller
-	 */
-	private void installView(JavaSymbolName viewName, String folderName, String title, String category, boolean registerStaticController) {
-		// Probe if common web artifacts exist, and install them if needed
-		PathResolver pathResolver = projectOperations.getPathResolver();
-		
-		if (!fileManager.exists(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/layouts/default.jspx"))) {
-			installCommonViewArtefacts();
-		}
-		String lcViewName = viewName.getSymbolName().toLowerCase();
-		propFileOperations.addPropertyIfNotExists(Path.SRC_MAIN_WEBAPP, "/WEB-INF/i18n/application.properties", "label" + folderName.replace("/", "_") + "_" + lcViewName, title, true);
-		menuOperations.addMenuItem(new JavaSymbolName(category), new JavaSymbolName(folderName.replace("/", "_") + lcViewName + "_id"), title, "global_generic", folderName + "/" + lcViewName, null);
-		tilesOperations.addViewDefinition(folderName, folderName + "/" + lcViewName, TilesOperationsImpl.DEFAULT_TEMPLATE, "/WEB-INF/views" + folderName + "/" + lcViewName + ".jspx");
+        final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                declaredByMetadataId, Modifier.PUBLIC, controller,
+                PhysicalTypeCategory.CLASS);
+        cidBuilder.setAnnotations(typeAnnotations);
+        cidBuilder.setDeclaredMethods(methods);
+        typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
 
-		String mvcConfig = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/spring/webmvc-config.xml");
-		if (registerStaticController && fileManager.exists(mvcConfig)) {
-			Document document = XmlUtils.readXml(fileManager.getInputStream(mvcConfig));
+        installView(
+                folderName,
+                "/index",
+                new JavaSymbolName(controller.getSimpleTypeName())
+                        .getReadableSymbolName() + " View", "Controller", null,
+                false, webappPath);
+    }
 
-			if (null == XmlUtils.findFirstElement("/beans/view-controller[@path='" + folderName + "/" + lcViewName + "']", document.getDocumentElement())) {
-				Element sibling = XmlUtils.findFirstElement("/beans/view-controller", document.getDocumentElement());
-				Element view = new XmlElementBuilder("mvc:view-controller", document).addAttribute("path", folderName + "/" + lcViewName).build();
-				if (sibling != null) {
-					sibling.getParentNode().insertBefore(view, sibling);
-				} else {
-					document.getDocumentElement().appendChild(view);
-				}
-				fileManager.createOrUpdateTextFileIfRequired(mvcConfig, XmlUtils.nodeToString(document), false);
-			}
-		}
-	}
-	
-	public void updateTags(boolean backup) {
-		if (backup) {
-			backupOperations.backup();
-		}
-		PathResolver pathResolver = projectOperations.getPathResolver();
-		// Update tags
-		copyDirectoryContents("tags/form/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/form"), true);
-		copyDirectoryContents("tags/form/fields/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/form/fields"), true);
-		copyDirectoryContents("tags/menu/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/menu"), true);
-		copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"), true);
-	}
+    private MethodMetadataBuilder getHttpPostMethod(
+            final String declaredByMetadataId) {
+        final List<AnnotationMetadataBuilder> postMethodAnnotations = new ArrayList<AnnotationMetadataBuilder>();
+        final List<AnnotationAttributeValue<?>> postMethodAttributes = new ArrayList<AnnotationAttributeValue<?>>();
+        postMethodAttributes.add(new EnumAttributeValue(new JavaSymbolName(
+                "method"), new EnumDetails(REQUEST_METHOD, new JavaSymbolName(
+                "POST"))));
+        postMethodAttributes.add(new StringAttributeValue(new JavaSymbolName(
+                "value"), "{id}"));
+        postMethodAnnotations.add(new AnnotationMetadataBuilder(
+                REQUEST_MAPPING, postMethodAttributes));
 
-	/**
-	 * Creates a new Spring MVC controller.
-	 * <p>
-	 * Request mappings assigned by this method will always commence with "/" and end with "/**". You may present this prefix and/or this suffix if you wish, although it will automatically be added
-	 * should it not be provided.
-	 * 
-	 * @param controller the controller class to create (required)
-	 * @param preferredMapping the mapping this controller should adopt (optional; if unspecified it will be based on the controller name)
-	 */
-	public void createManualController(JavaType controller, String preferredMapping) {
-		Assert.notNull(controller, "Controller Java Type required");
+        final List<AnnotatedJavaType> postParamTypes = new ArrayList<AnnotatedJavaType>();
+        final AnnotationMetadataBuilder idParamAnnotation = new AnnotationMetadataBuilder(
+                PATH_VARIABLE);
+        postParamTypes.add(new AnnotatedJavaType(
+                new JavaType("java.lang.Long"), idParamAnnotation.build()));
+        postParamTypes.add(new AnnotatedJavaType(MODEL_MAP));
+        postParamTypes.add(new AnnotatedJavaType(HTTP_SERVLET_REQUEST));
+        postParamTypes.add(new AnnotatedJavaType(HTTP_SERVLET_RESPONSE));
 
-		String resourceIdentifier = typeLocationService.getPhysicalLocationCanonicalPath(controller, Path.SRC_MAIN_JAVA);
-		String folderName = null;
+        final List<JavaSymbolName> postParamNames = new ArrayList<JavaSymbolName>();
+        postParamNames.add(new JavaSymbolName("id"));
+        postParamNames.add(new JavaSymbolName("modelMap"));
+        postParamNames.add(new JavaSymbolName("request"));
+        postParamNames.add(new JavaSymbolName("response"));
 
-		// Create annotation @RequestMapping("/myobject/**")
-		List<AnnotationAttributeValue<?>> requestMappingAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-		if (preferredMapping == null || preferredMapping.length() == 0) {
-			String typeName = controller.getSimpleTypeName();
-			int dropFrom = typeName.lastIndexOf("Controller");
-			if (dropFrom > -1) {
-				typeName = typeName.substring(0, dropFrom);
-			}
-			folderName = typeName.toLowerCase();
-			preferredMapping = "/" + folderName + "/**";
-		}
-		if (!preferredMapping.startsWith("/")) {
-			folderName = preferredMapping;
-			preferredMapping = "/" + preferredMapping;
-		} else {
-			folderName = preferredMapping.substring(1);
-		}
-		if (preferredMapping.endsWith("/")) {
-			folderName = folderName.substring(0, folderName.length() - 1);
-			preferredMapping = preferredMapping + "**";
-		} else if (!preferredMapping.endsWith("/**")) {
-			preferredMapping = preferredMapping + "/**";
-		} else {
-			folderName = folderName.replace("/**", "");
-		}
-		
-		String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(controller, projectOperations.getPathResolver().getPath(resourceIdentifier));
-		List<MethodMetadataBuilder> methods = new ArrayList<MethodMetadataBuilder>();
-		
-		// Add HTTP get method
-		methods.add(getHttpGetMethod(declaredByMetadataId));
+        final MethodMetadataBuilder postMethodBuilder = new MethodMetadataBuilder(
+                declaredByMetadataId, Modifier.PUBLIC, new JavaSymbolName(
+                        "post"), JavaType.VOID_PRIMITIVE, postParamTypes,
+                postParamNames, new InvocableMemberBodyBuilder());
+        postMethodBuilder.setAnnotations(postMethodAnnotations);
+        return postMethodBuilder;
+    }
 
-		// Add HTTP post method
-		methods.add(getHttpPostMethod(declaredByMetadataId));
-		
-		// Add index method
-		methods.add(getIndexMethod(folderName, declaredByMetadataId));
+    private MethodMetadataBuilder getIndexMethod(final String folderName,
+            final String declaredByMetadataId) {
+        final List<AnnotationMetadataBuilder> indexMethodAnnotations = new ArrayList<AnnotationMetadataBuilder>();
+        indexMethodAnnotations.add(new AnnotationMetadataBuilder(
+                REQUEST_MAPPING, new ArrayList<AnnotationAttributeValue<?>>()));
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine("return \"" + folderName + "/index\";");
+        final MethodMetadataBuilder indexMethodBuilder = new MethodMetadataBuilder(
+                declaredByMetadataId, Modifier.PUBLIC, new JavaSymbolName(
+                        "index"), JavaType.STRING,
+                new ArrayList<AnnotatedJavaType>(),
+                new ArrayList<JavaSymbolName>(), bodyBuilder);
+        indexMethodBuilder.setAnnotations(indexMethodAnnotations);
+        return indexMethodBuilder;
+    }
 
-		// Create Type definition
-		List<AnnotationMetadataBuilder> typeAnnotations = new ArrayList<AnnotationMetadataBuilder>();
+    public String getName() {
+        return FeatureNames.MVC;
+    }
 
-		requestMappingAttributes.add(new StringAttributeValue(new JavaSymbolName("value"), preferredMapping));
-		AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.RequestMapping"), requestMappingAttributes);
-		typeAnnotations.add(requestMapping);
+    public void installCommonViewArtefacts() {
+        installCommonViewArtefacts(projectOperations.getFocusedModuleName());
+    }
 
-		// Create annotation @Controller
-		List<AnnotationAttributeValue<?>> controllerAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-		AnnotationMetadataBuilder controllerAnnotation = new AnnotationMetadataBuilder(new JavaType("org.springframework.stereotype.Controller"), controllerAttributes);
-		typeAnnotations.add(controllerAnnotation);
-		
-		ClassOrInterfaceTypeDetailsBuilder typeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(declaredByMetadataId, Modifier.PUBLIC, controller, PhysicalTypeCategory.CLASS);
-		typeDetailsBuilder.setAnnotations(typeAnnotations);
-		typeDetailsBuilder.setDeclaredMethods(methods);
-		typeManagementService.generateClassFile(typeDetailsBuilder.build());
+    public void installCommonViewArtefacts(final String moduleName) {
+        Validate.isTrue(isProjectAvailable(), "Project metadata required");
+        final LogicalPath webappPath = Path.SRC_MAIN_WEBAPP
+                .getModulePathId(moduleName);
+        if (!isControllerAvailable()) {
+            webMvcOperations.installAllWebMvcArtifacts();
+        }
 
-		installView(folderName, "/index", new JavaSymbolName(controller.getSimpleTypeName()).getReadableSymbolName() + " View", "Controller", null, false);
-	}
+        // Install tiles config
+        updateConfiguration();
 
-	private MethodMetadataBuilder getIndexMethod(String folderName, String declaredByMetadataId) {
-		List<AnnotationMetadataBuilder> indexMethodAnnotations = new ArrayList<AnnotationMetadataBuilder>();
-		indexMethodAnnotations.add(new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.RequestMapping"), new ArrayList<AnnotationAttributeValue<?>>()));
-		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-		bodyBuilder.appendFormalLine("return \"" + folderName + "/index\";");
-		MethodMetadataBuilder indexMethodBuilder = new MethodMetadataBuilder(declaredByMetadataId, Modifier.PUBLIC, new JavaSymbolName("index"), JavaType.STRING_OBJECT, new ArrayList<AnnotatedJavaType>(), new ArrayList<JavaSymbolName>(), bodyBuilder);
-		indexMethodBuilder.setAnnotations(indexMethodAnnotations);
-		return indexMethodBuilder;
-	}
+        // Install styles
+        copyDirectoryContents("images/*.*",
+                pathResolver.getIdentifier(webappPath, "images"), false);
 
-	private MethodMetadataBuilder getHttpPostMethod(String declaredByMetadataId) {
-		List<AnnotationMetadataBuilder> postMethodAnnotations = new ArrayList<AnnotationMetadataBuilder>();
-		List<AnnotationAttributeValue<?>> postMethodAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-		postMethodAttributes.add(new EnumAttributeValue(new JavaSymbolName("method"), new EnumDetails(new JavaType("org.springframework.web.bind.annotation.RequestMethod"), new JavaSymbolName("POST"))));
-		postMethodAttributes.add(new StringAttributeValue(new JavaSymbolName("value"), "{id}"));
-		postMethodAnnotations.add(new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.RequestMapping"), postMethodAttributes));
+        // Install styles
+        copyDirectoryContents("styles/*.css",
+                pathResolver.getIdentifier(webappPath, "styles"), false);
+        copyDirectoryContents("styles/*.properties",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/classes"),
+                false);
 
-		List<AnnotatedJavaType> postParamTypes = new ArrayList<AnnotatedJavaType>();
-		List<AnnotationMetadata> idParamAnnotations = new ArrayList<AnnotationMetadata>();
-		AnnotationMetadataBuilder idParamAnnotation = new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.PathVariable"));
-		idParamAnnotations.add(idParamAnnotation.build());
-		postParamTypes.add(new AnnotatedJavaType(new JavaType("java.lang.Long"), idParamAnnotations));
-		postParamTypes.add(new AnnotatedJavaType(new JavaType("org.springframework.ui.ModelMap"), null));
-		postParamTypes.add(new AnnotatedJavaType(new JavaType("javax.servlet.http.HttpServletRequest"), null));
-		postParamTypes.add(new AnnotatedJavaType(new JavaType("javax.servlet.http.HttpServletResponse"), null));
-		
-		List<JavaSymbolName> postParamNames = new ArrayList<JavaSymbolName>();
-		postParamNames.add(new JavaSymbolName("id"));
-		postParamNames.add(new JavaSymbolName("modelMap"));
-		postParamNames.add(new JavaSymbolName("request"));
-		postParamNames.add(new JavaSymbolName("response"));
+        // Install layout
+        copyDirectoryContents("tiles/default.jspx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/layouts/"),
+                false);
+        copyDirectoryContents("tiles/layouts.xml",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/layouts/"),
+                false);
+        copyDirectoryContents("tiles/header.jspx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/views/"), false);
+        copyDirectoryContents("tiles/menu.jspx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/views/"), false);
+        copyDirectoryContents("tiles/footer.jspx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/views/"), false);
+        copyDirectoryContents("tiles/views.xml",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/views/"), false);
 
-		MethodMetadataBuilder postMethodBuilder = new MethodMetadataBuilder(declaredByMetadataId, Modifier.PUBLIC, new JavaSymbolName("post"), JavaType.VOID_PRIMITIVE, postParamTypes, postParamNames, new InvocableMemberBodyBuilder());
-		postMethodBuilder.setAnnotations(postMethodAnnotations);
-		return postMethodBuilder;
-	}
+        // Install common view files
+        copyDirectoryContents("*.jspx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/views/"), false);
 
-	private MethodMetadataBuilder getHttpGetMethod(String declaredByMetadataId) {
-		List<AnnotationMetadataBuilder> getMethodAnnotations = new ArrayList<AnnotationMetadataBuilder>();
-		List<AnnotationAttributeValue<?>> getMethodAttributes = new ArrayList<AnnotationAttributeValue<?>>();
-		getMethodAnnotations.add(new AnnotationMetadataBuilder(new JavaType("org.springframework.web.bind.annotation.RequestMapping"), getMethodAttributes));
-		
-		List<AnnotatedJavaType> getParamTypes = new ArrayList<AnnotatedJavaType>();
-		getParamTypes.add(new AnnotatedJavaType(new JavaType("org.springframework.ui.ModelMap"), null));
-		getParamTypes.add(new AnnotatedJavaType(new JavaType("javax.servlet.http.HttpServletRequest"), null));
-		getParamTypes.add(new AnnotatedJavaType(new JavaType("javax.servlet.http.HttpServletResponse"), null));
-		
-		List<JavaSymbolName> getParamNames = new ArrayList<JavaSymbolName>();
-		getParamNames.add(new JavaSymbolName("modelMap"));
-		getParamNames.add(new JavaSymbolName("request"));
-		getParamNames.add(new JavaSymbolName("response"));
+        // Install tags
+        copyDirectoryContents("tags/form/*.tagx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/tags/form"),
+                false);
+        copyDirectoryContents("tags/form/fields/*.tagx",
+                pathResolver.getIdentifier(webappPath,
+                        "WEB-INF/tags/form/fields"), false);
+        copyDirectoryContents("tags/menu/*.tagx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/tags/menu"),
+                false);
+        copyDirectoryContents("tags/util/*.tagx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/tags/util"),
+                false);
 
-		MethodMetadataBuilder getMethodBuilder = new MethodMetadataBuilder(declaredByMetadataId, Modifier.PUBLIC, new JavaSymbolName("get"), JavaType.VOID_PRIMITIVE, getParamTypes, getParamNames, new InvocableMemberBodyBuilder());
-		getMethodBuilder.setAnnotations(getMethodAnnotations);
-		return getMethodBuilder;
-	}
+        // Install default language 'en'
+        installI18n(i18nSupport.getLanguage(Locale.ENGLISH), webappPath);
 
-	/**
-	 * Adds Tiles Maven dependencies and updates the MVC config to include Tiles view support
-	 */
-	private void updateConfiguration() {
-		// Add tiles dependencies to pom
-		Element configuration = XmlUtils.getConfiguration(getClass(), "tiles/configuration.xml");
+        final String i18nDirectory = pathResolver.getIdentifier(webappPath,
+                "WEB-INF/i18n/application.properties");
+        if (!fileManager.exists(i18nDirectory)) {
+            try {
+                final String projectName = projectOperations
+                        .getProjectName(projectOperations
+                                .getFocusedModuleName());
+                fileManager.createFile(pathResolver.getIdentifier(webappPath,
+                        "WEB-INF/i18n/application.properties"));
+                propFileOperations
+                        .addPropertyIfNotExists(webappPath,
+                                "WEB-INF/i18n/application.properties",
+                                "application_name",
+                                projectName.substring(0, 1).toUpperCase()
+                                        + projectName.substring(1), true);
+            }
+            catch (final Exception e) {
+                throw new IllegalStateException(
+                        "Encountered an error during copying of resources for MVC JSP addon.",
+                        e);
+            }
+        }
+    }
 
-		List<Dependency> dependencies = new ArrayList<Dependency>();
-		List<Element> springDependencies = XmlUtils.findElements("/configuration/tiles/dependencies/dependency", configuration);
-		for (Element dependencyElement : springDependencies) {
-			dependencies.add(new Dependency(dependencyElement));
-		}
-		projectOperations.addDependencies(dependencies);
+    public void installI18n(final I18n i18n, final LogicalPath webappPath) {
+        Validate.notNull(i18n, "Language choice required");
 
-		// Add config to MVC app context
-		String mvcConfig = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml");
-		Document mvcConfigDocument = XmlUtils.readXml(fileManager.getInputStream(mvcConfig));
-		Element beans = mvcConfigDocument.getDocumentElement();
+        if (i18n.getLocale() == null) {
+            LOGGER.warning("could not parse language choice");
+            return;
+        }
 
-		if (null != XmlUtils.findFirstElement("/beans/bean[@id = 'tilesViewResolver']", beans) || null != XmlUtils.findFirstElement("/beans/bean[@id = 'tilesConfigurer']", beans)) {
-			return; // Tiles is already configured, nothing to do
-		}
-		Document configDoc = getDocumentTemplate("tiles/tiles-mvc-config-template.xml");
-		Element configElement = configDoc.getDocumentElement();
-		List<Element> tilesConfig = XmlUtils.findElements("/config/bean", configElement);
-		for (Element bean : tilesConfig) {
-			Node importedBean = mvcConfigDocument.importNode(bean, true);
-			beans.appendChild(importedBean);
-		}
-		fileManager.createOrUpdateTextFileIfRequired(mvcConfig, XmlUtils.nodeToString(mvcConfigDocument), true);
-	}
+        final String targetDirectory = pathResolver.getIdentifier(webappPath,
+                "");
 
-	public void installI18n(I18n i18n) {
-		Assert.notNull(i18n, "Language choice required");
+        // Install message bundle
+        String messageBundle = targetDirectory + "/WEB-INF/i18n/messages_"
+                + i18n.getLocale().getLanguage() /* + country */+ ".properties";
+        // Special case for english locale (default)
+        if (i18n.getLocale().equals(Locale.ENGLISH)) {
+            messageBundle = targetDirectory
+                    + "/WEB-INF/i18n/messages.properties";
+        }
+        if (!fileManager.exists(messageBundle)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = i18n.getMessageBundle();
+                outputStream = fileManager.createFile(messageBundle)
+                        .getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            }
+            catch (final Exception e) {
+                throw new IllegalStateException(
+                        "Encountered an error during copying of message bundle MVC JSP addon.",
+                        e);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
 
-		if (i18n.getLocale() == null) {
-			logger.warning("could not parse language choice");
-			return;
-		}
+        // Install flag
+        final String flagGraphic = targetDirectory + "/images/"
+                + i18n.getLocale().getLanguage() /* + country */+ ".png";
+        if (!fileManager.exists(flagGraphic)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try {
+                inputStream = i18n.getFlagGraphic();
+                outputStream = fileManager.createFile(flagGraphic)
+                        .getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            }
+            catch (final Exception e) {
+                throw new IllegalStateException(
+                        "Encountered an error during copying of flag graphic for MVC JSP addon.",
+                        e);
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
+        }
 
-		String targetDirectory = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "");
-		
-		// Install message bundle
-		String messageBundle = targetDirectory + "/WEB-INF/i18n/messages_" + i18n.getLocale().getLanguage() /*+ country*/ + ".properties";
-		// Special case for english locale (default)
-		if (i18n.getLocale().equals(Locale.ENGLISH)) {
-			messageBundle = targetDirectory + "/WEB-INF/i18n/messages.properties";
-		}
-		if (!fileManager.exists(messageBundle)) {
-			try {
-				FileCopyUtils.copy(i18n.getMessageBundle(), fileManager.createFile(messageBundle).getOutputStream());
-			} catch (IOException e) {
-				throw new IllegalStateException("Encountered an error during copying of message bundle MVC JSP addon.", e);
-			}
-		}
+        // Setup language definition in languages.jspx
+        final String footerFileLocation = targetDirectory
+                + "/WEB-INF/views/footer.jspx";
+        final Document footer = XmlUtils.readXml(fileManager
+                .getInputStream(footerFileLocation));
 
-		// Install flag
-		String flagGraphic = targetDirectory + "/images/" + i18n.getLocale().getLanguage() /*+ country*/ + ".png";
-		if (!fileManager.exists(flagGraphic)) {
-			try {
-				FileCopyUtils.copy(i18n.getFlagGraphic(), fileManager.createFile(flagGraphic).getOutputStream());
-			} catch (IOException e) {
-				throw new IllegalStateException("Encountered an error during copying of flag graphic for MVC JSP addon.", e);
-			}
-		}
+        if (XmlUtils.findFirstElement(
+                "//span[@id='language']/language[@locale='"
+                        + i18n.getLocale().getLanguage() + "']",
+                footer.getDocumentElement()) == null) {
+            final Element span = XmlUtils.findRequiredElement(
+                    "//span[@id='language']", footer.getDocumentElement());
+            span.appendChild(new XmlElementBuilder("util:language", footer)
+                    .addAttribute("locale", i18n.getLocale().getLanguage())
+                    .addAttribute("label", i18n.getLanguage()).build());
+            fileManager.createOrUpdateTextFileIfRequired(footerFileLocation,
+                    XmlUtils.nodeToString(footer), false);
+        }
 
-		// Setup language definition in languages.jspx
-		String footerFileLocation = targetDirectory + "/WEB-INF/views/footer.jspx";
-		Document footer = XmlUtils.readXml(fileManager.getInputStream(footerFileLocation));
+        // Record use of add-on (most languages are implemented via public
+        // add-ons)
+        final String bundleSymbolicName = BundleFindingUtils
+                .findFirstBundleForTypeName(context.getBundleContext(), i18n
+                        .getClass().getName());
+        if (bundleSymbolicName != null) {
+            uaaRegistrationService.registerBundleSymbolicNameUse(
+                    bundleSymbolicName, null);
+        }
+    }
 
-		if (null == XmlUtils.findFirstElement("//span[@id='language']/language[@locale='" + i18n.getLocale().getLanguage() + "']", footer.getDocumentElement())) {
-			Element span = XmlUtils.findRequiredElement("//span[@id='language']", footer.getDocumentElement());
-			span.appendChild(new XmlElementBuilder("util:language", footer).addAttribute("locale", i18n.getLocale().getLanguage()).addAttribute("label", i18n.getLanguage()).build());
-			fileManager.createOrUpdateTextFileIfRequired(footerFileLocation, XmlUtils.nodeToString(footer), false);
-		}
-		
-		// Record use of add-on (most languages are implemented via public add-ons)
-		String bundleSymbolicName = BundleFindingUtils.findFirstBundleForTypeName(context.getBundleContext(), i18n.getClass().getName());
-		if (bundleSymbolicName != null) {
-			uaaRegistrationService.registerBundleSymbolicNameUse(bundleSymbolicName, null);
-		}
-	}
+    /**
+     * Creates a new Spring MVC static view.
+     * 
+     * @param viewName the bare logical name of the new view (required, e.g.
+     *            "index")
+     * @param folderName the folder in which to create the view; must be empty
+     *            or start with a slash
+     * @param title the title
+     * @param category the menu category in which to list the new view
+     *            (required)
+     * @param registerStaticController whether to register a static controller
+     *            in the Spring MVC configuration file
+     */
+    private void installView(final JavaSymbolName viewName,
+            final String folderName, final String title, final String category,
+            final boolean registerStaticController, final LogicalPath webappPath) {
+        // Probe if common web artifacts exist, and install them if needed
+        final PathResolver pathResolver = projectOperations.getPathResolver();
+        if (!fileManager.exists(pathResolver.getIdentifier(webappPath,
+                "WEB-INF/layouts/default.jspx"))) {
+            installCommonViewArtefacts(webappPath.getModule());
+        }
 
-	private String cleanPath(String path) {
-		if (path.equals("/")) {
-			return "";
-		}
-		if (!path.startsWith("/")) {
-			path = "/".concat(path);
-		}
-		if (path.contains(".")) {
-			path = path.substring(0, path.indexOf(".") - 1);
-		}
-		return path.toLowerCase();
-	}
+        final String lcViewName = viewName.getSymbolName().toLowerCase();
 
-	private String cleanViewName(String viewName) {
-		if (viewName.startsWith("/")) {
-			viewName = viewName.substring(1);
-		}
-		if (viewName.contains(".")) {
-			viewName = viewName.substring(0, viewName.indexOf(".") - 1);
-		}
-		return viewName;
-	}
+        // Update the application-specific resource bundle (i.e. default
+        // translation)
+        final String messageCode = "label"
+                + folderName.replace("/", "_").toLowerCase() + "_" + lcViewName;
+        propFileOperations
+                .addPropertyIfNotExists(
+                        pathResolver.getFocusedPath(Path.SRC_MAIN_WEBAPP),
+                        "WEB-INF/i18n/application.properties", messageCode,
+                        title, true);
+
+        // Add the menu item
+        final String relativeUrl = folderName + "/" + lcViewName;
+        menuOperations.addMenuItem(new JavaSymbolName(category),
+                new JavaSymbolName(folderName.replace("/", "_").toLowerCase()
+                        + lcViewName + "_id"), title, "global_generic",
+                relativeUrl, null, webappPath);
+
+        // Add the view definition
+        tilesOperations.addViewDefinition(folderName.toLowerCase(),
+                pathResolver.getFocusedPath(Path.SRC_MAIN_WEBAPP), relativeUrl,
+                TilesOperations.DEFAULT_TEMPLATE,
+                "/WEB-INF/views" + folderName.toLowerCase() + "/" + lcViewName
+                        + ".jspx");
+
+        if (registerStaticController) {
+            // Update the Spring MVC config file
+            registerStaticSpringMvcController(relativeUrl, webappPath);
+        }
+    }
+
+    private void installView(final String path, final String viewName,
+            final String title, final String category, Document document,
+            final boolean registerStaticController, final LogicalPath webappPath) {
+        Validate.notBlank(path, "Path required");
+        Validate.notBlank(viewName, "View name required");
+        Validate.notBlank(title, "Title required");
+
+        final String cleanedPath = cleanPath(path);
+        final String cleanedViewName = cleanViewName(viewName);
+        final String lcViewName = cleanedViewName.toLowerCase();
+
+        if (document == null) {
+            try {
+                document = getDocumentTemplate("index-template.jspx");
+                XmlUtils.findRequiredElement("/div/message",
+                        document.getDocumentElement()).setAttribute(
+                        "code",
+                        "label" + cleanedPath.replace("/", "_").toLowerCase()
+                                + "_" + lcViewName);
+            }
+            catch (final Exception e) {
+                throw new IllegalStateException(
+                        "Encountered an error during copying of resources for controller class.",
+                        e);
+            }
+        }
+
+        final String viewFile = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP,
+                "WEB-INF/views" + cleanedPath.toLowerCase() + "/" + lcViewName
+                        + ".jspx");
+        fileManager.createOrUpdateTextFileIfRequired(viewFile,
+                XmlUtils.nodeToString(document), false);
+
+        installView(new JavaSymbolName(lcViewName), cleanedPath, title,
+                category, registerStaticController, webappPath);
+    }
+
+    public void installView(final String path, final String viewName,
+            final String title, final String category, final Document document,
+            final LogicalPath webappPath) {
+        installView(path, viewName, title, category, document, true, webappPath);
+    }
+
+    public void installView(final String path, final String viewName,
+            final String title, final String category,
+            final LogicalPath webappPath) {
+        installView(path, viewName, title, category, null, true, webappPath);
+    }
+
+    public boolean isControllerAvailable() {
+        return fileManager.exists(pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, "WEB-INF/views"))
+                && !projectOperations
+                        .isFeatureInstalledInFocusedModule(FeatureNames.JSF);
+    }
+
+    public boolean isInstalledInModule(final String moduleName) {
+        final LogicalPath webAppPath = LogicalPath.getInstance(
+                Path.SRC_MAIN_WEBAPP, moduleName);
+        return fileManager.exists(projectOperations.getPathResolver()
+                .getIdentifier(webAppPath, "WEB-INF/spring/webmvc-config.xml"));
+    }
+
+    public boolean isInstallLanguageCommandAvailable() {
+        return isProjectAvailable()
+                && fileManager.exists(pathResolver.getFocusedIdentifier(
+                        Path.SRC_MAIN_WEBAPP, "WEB-INF/views/footer.jspx"));
+    }
+
+    public boolean isMvcInstallationPossible() {
+        return isProjectAvailable()
+                && !isControllerAvailable()
+                && !projectOperations
+                        .isFeatureInstalledInFocusedModule(FeatureNames.JSF);
+    }
+
+    private boolean isProjectAvailable() {
+        return projectOperations.isFocusedProjectAvailable();
+    }
+
+    /**
+     * Registers a static Spring MVC controller to handle the given relative
+     * URL.
+     * 
+     * @param relativeUrl the relative URL to handle (required); a leading slash
+     *            will be added if required
+     */
+    private void registerStaticSpringMvcController(final String relativeUrl,
+            final LogicalPath webappPath) {
+        final String mvcConfig = projectOperations.getPathResolver()
+                .getIdentifier(webappPath, "WEB-INF/spring/webmvc-config.xml");
+        if (fileManager.exists(mvcConfig)) {
+            final Document document = XmlUtils.readXml(fileManager
+                    .getInputStream(mvcConfig));
+            final String prefixedUrl = "/" + relativeUrl;
+            if (XmlUtils.findFirstElement("/beans/view-controller[@path='"
+                    + prefixedUrl + "']", document.getDocumentElement()) == null) {
+                final Element sibling = XmlUtils
+                        .findFirstElement("/beans/view-controller",
+                                document.getDocumentElement());
+                final Element view = new XmlElementBuilder(
+                        "mvc:view-controller", document).addAttribute("path",
+                        prefixedUrl).build();
+                if (sibling != null) {
+                    sibling.getParentNode().insertBefore(view, sibling);
+                }
+                else {
+                    document.getDocumentElement().appendChild(view);
+                }
+                fileManager.createOrUpdateTextFileIfRequired(mvcConfig,
+                        XmlUtils.nodeToString(document), false);
+            }
+        }
+    }
+
+    /**
+     * Adds Tiles Maven dependencies and updates the MVC config to include Tiles
+     * view support
+     */
+    private void updateConfiguration() {
+        // Add tiles dependencies to pom
+        final Element configuration = XmlUtils.getRootElement(getClass(),
+                "tiles/configuration.xml");
+
+        final List<Dependency> dependencies = new ArrayList<Dependency>();
+        final List<Element> springDependencies = XmlUtils.findElements(
+                "/configuration/tiles/dependencies/dependency", configuration);
+        for (final Element dependencyElement : springDependencies) {
+            dependencies.add(new Dependency(dependencyElement));
+        }
+        projectOperations.addDependencies(
+                projectOperations.getFocusedModuleName(), dependencies);
+
+        // Add config to MVC app context
+        final String mvcConfig = pathResolver.getFocusedIdentifier(
+                SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml");
+        final Document mvcConfigDocument = XmlUtils.readXml(fileManager
+                .getInputStream(mvcConfig));
+        final Element beans = mvcConfigDocument.getDocumentElement();
+
+        if (XmlUtils.findFirstElement("/beans/bean[@id = 'tilesViewResolver']",
+                beans) != null
+                || XmlUtils.findFirstElement(
+                        "/beans/bean[@id = 'tilesConfigurer']", beans) != null) {
+            return; // Tiles is already configured, nothing to do
+        }
+
+        final Document configDoc = getDocumentTemplate("tiles/tiles-mvc-config-template.xml");
+        final Element configElement = configDoc.getDocumentElement();
+        final List<Element> tilesConfig = XmlUtils.findElements("/config/bean",
+                configElement);
+        for (final Element bean : tilesConfig) {
+            final Node importedBean = mvcConfigDocument.importNode(bean, true);
+            beans.appendChild(importedBean);
+        }
+        fileManager.createOrUpdateTextFileIfRequired(mvcConfig,
+                XmlUtils.nodeToString(mvcConfigDocument), true);
+    }
+
+    public void updateTags(final boolean backup, final LogicalPath webappPath) {
+        if (backup) {
+            backupOperations.backup();
+        }
+
+        // Update tags
+        copyDirectoryContents("tags/form/*.tagx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/tags/form"),
+                true);
+        copyDirectoryContents("tags/form/fields/*.tagx",
+                pathResolver.getIdentifier(webappPath,
+                        "WEB-INF/tags/form/fields"), true);
+        copyDirectoryContents("tags/menu/*.tagx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/tags/menu"),
+                true);
+        copyDirectoryContents("tags/util/*.tagx",
+                pathResolver.getIdentifier(webappPath, "WEB-INF/tags/util"),
+                true);
+    }
 }

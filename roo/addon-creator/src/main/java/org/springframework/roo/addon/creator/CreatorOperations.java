@@ -11,14 +11,21 @@ import org.springframework.roo.model.JavaPackage;
  * @author Stefan Schmidt
  */
 public interface CreatorOperations {
-	
-	boolean isCommandAvailable();
 
-	void createI18nAddon(JavaPackage topLevelPackage, String language, Locale locale, File messageBundle, File flagGraphic, String description, String projectName);
-	
-	void createSimpleAddon(JavaPackage topLevelPackage, String description, String projectName);
-	
-	void createAdvancedAddon(JavaPackage topLevelPackage, String description, String projectName);
-	
-	void createWrapperAddon(JavaPackage topLevelPackage, String groupId, String artifactId, String version, String vendorName, String lincenseUrl, String docUrl, String osgiImports, String description, String projectName);
+    void createAdvancedAddon(JavaPackage topLevelPackage, String description,
+            String projectName);
+
+    void createI18nAddon(JavaPackage topLevelPackage, String language,
+            Locale locale, File messageBundle, File flagGraphic,
+            String description, String projectName);
+
+    void createSimpleAddon(JavaPackage topLevelPackage, String description,
+            String projectName);
+
+    void createWrapperAddon(JavaPackage topLevelPackage, String groupId,
+            String artifactId, String version, String vendorName,
+            String lincenseUrl, String docUrl, String osgiImports,
+            String description, String projectName);
+
+    boolean isAddonCreatePossible();
 }

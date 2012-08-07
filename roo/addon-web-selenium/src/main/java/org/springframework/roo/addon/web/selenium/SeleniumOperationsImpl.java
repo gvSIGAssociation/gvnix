@@ -1,5 +1,12 @@
 package org.springframework.roo.addon.web.selenium;
 
+import static org.springframework.roo.model.JavaType.LONG_OBJECT;
+import static org.springframework.roo.model.JdkJavaType.BIG_DECIMAL;
+import static org.springframework.roo.model.Jsr303JavaType.FUTURE;
+import static org.springframework.roo.model.Jsr303JavaType.MIN;
+import static org.springframework.roo.model.Jsr303JavaType.PAST;
+import static org.springframework.roo.model.SpringJavaType.DATE_TIME_FORMAT;
+
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DateFormat;
@@ -10,15 +17,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
@@ -26,325 +33,429 @@ import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.operations.DateTime;
+import org.springframework.roo.classpath.persistence.PersistenceMemberLocator;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.FeatureNames;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
-import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * Provides property file configuration operations.
- *
+ * Implementation of {@link SeleniumOperations}.
+ * 
  * @author Stefan Schmidt
  * @since 1.0
  */
 @Component
 @Service
 public class SeleniumOperationsImpl implements SeleniumOperations {
-	private static final Logger logger = HandlerUtils.getLogger(SeleniumOperationsImpl.class);
-	@Reference private FileManager fileManager;
-	@Reference private MetadataService metadataService;
-	@Reference private MenuOperations menuOperations;
-	@Reference private MemberDetailsScanner memberDetailsScanner;
-	@Reference private ProjectOperations projectOperations;
-	@Reference private WebMetadataService webMetadataService;
-	
-	public boolean isProjectAvailable() {
-		return projectOperations.isProjectAvailable() && fileManager.exists(projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml"));
-	}
 
-	/**
-	 * Creates a new Selenium testcase
-	 * 
-	 * @param controller the JavaType of the controller under test (required)
-	 * @param name the name of the test case (optional)
-	 */
-	public void generateTest(JavaType controller, String name, String serverURL) {
-		Assert.notNull(controller, "Controller type required");
+    private static final Logger LOGGER = HandlerUtils
+            .getLogger(SeleniumOperationsImpl.class);
 
-		String webScaffoldMetadataIdentifier = WebScaffoldMetadata.createIdentifier(controller, Path.SRC_MAIN_JAVA);
-		WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService.get(webScaffoldMetadataIdentifier);
-		Assert.notNull(webScaffoldMetadata, "Web controller '" + controller.getFullyQualifiedTypeName() + "' does not appear to be an automatic, scaffolded controller");
+    @Reference private FileManager fileManager;
+    @Reference private MemberDetailsScanner memberDetailsScanner;
+    @Reference private MenuOperations menuOperations;
+    @Reference private MetadataService metadataService;
+    @Reference private PathResolver pathResolver;
+    @Reference private PersistenceMemberLocator persistenceMemberLocator;
+    @Reference private ProjectOperations projectOperations;
+    @Reference private TypeLocationService typeLocationService;
+    @Reference private WebMetadataService webMetadataService;
 
-		// We abort the creation of a selenium test if the controller does not allow the creation of new instances for the form backing object
-		if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
-			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
-			return;
-		}
+    private Node clickAndWaitCommand(final Document document,
+            final String linkTarget) {
+        final Node tr = document.createElement("tr");
 
-		if (!serverURL.endsWith("/")) {
-			serverURL = serverURL + "/";
-		}
+        final Node td1 = tr.appendChild(document.createElement("td"));
+        td1.setTextContent("clickAndWait");
 
-		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
+        final Node td2 = tr.appendChild(document.createElement("td"));
+        td2.setTextContent(linkTarget);
 
-		String relativeTestFilePath = "selenium/test-" + formBackingType.getSimpleTypeName().toLowerCase() + ".xhtml";
-		String seleniumPath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, relativeTestFilePath);
+        final Node td3 = tr.appendChild(document.createElement("td"));
+        td3.setTextContent(" ");
 
-		Document document;
-		try {
-			InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "selenium-template.xhtml");
-			Assert.notNull(templateInputStream, "Could not acquire selenium.xhtml template");
-			document = XmlUtils.readXml(templateInputStream);
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
+        return tr;
+    }
 
-		Element root = (Element) document.getLastChild();
-		if (root == null || !"html".equals(root.getNodeName())) {
-			throw new IllegalArgumentException("Could not parse selenium test case template file!");
-		}
+    private String convertToInitializer(final FieldMetadata field) {
+        String initializer = " ";
+        short index = 1;
+        final AnnotationMetadata min = MemberFindingUtils.getAnnotationOfType(
+                field.getAnnotations(), MIN);
+        if (min != null) {
+            final AnnotationAttributeValue<?> value = min
+                    .getAttribute(new JavaSymbolName("value"));
+            if (value != null) {
+                index = new Short(value.getValue().toString());
+            }
+        }
+        final JavaType fieldType = field.getFieldType();
+        if (field.getFieldName().getSymbolName().contains("email")
+                || field.getFieldName().getSymbolName().contains("Email")) {
+            initializer = "some@email.com";
+        }
+        else if (fieldType.equals(JavaType.STRING)) {
+            initializer = "some"
+                    + field.getFieldName()
+                            .getSymbolNameCapitalisedFirstLetter() + index;
+        }
+        else if (fieldType.equals(new JavaType(Date.class.getName()))
+                || fieldType.equals(new JavaType(Calendar.class.getName()))) {
+            final Calendar cal = Calendar.getInstance();
+            AnnotationMetadata dateTimeFormat = null;
+            String style = null;
+            if ((dateTimeFormat = MemberFindingUtils.getAnnotationOfType(
+                    field.getAnnotations(), DATE_TIME_FORMAT)) != null) {
+                final AnnotationAttributeValue<?> value = dateTimeFormat
+                        .getAttribute(new JavaSymbolName("style"));
+                if (value != null) {
+                    style = value.getValue().toString();
+                }
+            }
+            if (MemberFindingUtils.getAnnotationOfType(field.getAnnotations(),
+                    PAST) != null) {
+                cal.add(Calendar.YEAR, -1);
+                cal.add(Calendar.MONTH, -1);
+                cal.add(Calendar.DAY_OF_MONTH, -1);
+            }
+            else if (MemberFindingUtils.getAnnotationOfType(
+                    field.getAnnotations(), FUTURE) != null) {
+                cal.add(Calendar.YEAR, 1);
+                cal.add(Calendar.MONTH, 1);
+                cal.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            if (style != null) {
+                if (style.startsWith("-")) {
+                    initializer = ((SimpleDateFormat) DateFormat
+                            .getTimeInstance(
+                                    DateTime.parseDateFormat(style.charAt(1)),
+                                    Locale.getDefault())).format(cal.getTime());
+                }
+                else if (style.endsWith("-")) {
+                    initializer = ((SimpleDateFormat) DateFormat
+                            .getDateInstance(
+                                    DateTime.parseDateFormat(style.charAt(0)),
+                                    Locale.getDefault())).format(cal.getTime());
+                }
+                else {
+                    initializer = ((SimpleDateFormat) DateFormat
+                            .getDateTimeInstance(
+                                    DateTime.parseDateFormat(style.charAt(0)),
+                                    DateTime.parseDateFormat(style.charAt(1)),
+                                    Locale.getDefault())).format(cal.getTime());
+                }
+            }
+            else {
+                initializer = ((SimpleDateFormat) DateFormat.getDateInstance(
+                        DateFormat.SHORT, Locale.getDefault())).format(cal
+                        .getTime());
+            }
 
-		name = (name != null ? name : "Selenium test for " + controller.getSimpleTypeName());
-		XmlUtils.findRequiredElement("/html/head/title", root).setTextContent(name);
+        }
+        else if (fieldType.equals(JavaType.BOOLEAN_OBJECT)
+                || fieldType.equals(JavaType.BOOLEAN_PRIMITIVE)) {
+            initializer = Boolean.valueOf(false).toString();
+        }
+        else if (fieldType.equals(JavaType.INT_OBJECT)
+                || fieldType.equals(JavaType.INT_PRIMITIVE)) {
+            initializer = Integer.valueOf(index).toString();
+        }
+        else if (fieldType.equals(JavaType.DOUBLE_OBJECT)
+                || fieldType.equals(JavaType.DOUBLE_PRIMITIVE)) {
+            initializer = Double.toString(index);
+        }
+        else if (fieldType.equals(JavaType.FLOAT_OBJECT)
+                || fieldType.equals(JavaType.FLOAT_PRIMITIVE)) {
+            initializer = Float.toString(index);
+        }
+        else if (fieldType.equals(LONG_OBJECT)
+                || fieldType.equals(JavaType.LONG_PRIMITIVE)) {
+            initializer = Long.valueOf(index).toString();
+        }
+        else if (fieldType.equals(JavaType.SHORT_OBJECT)
+                || fieldType.equals(JavaType.SHORT_PRIMITIVE)) {
+            initializer = Short.valueOf(index).toString();
+        }
+        else if (fieldType.equals(BIG_DECIMAL)) {
+            initializer = new BigDecimal(index).toString();
+        }
+        return initializer;
+    }
 
-		XmlUtils.findRequiredElement("/html/body/table/thead/tr/td", root).setTextContent(name);
+    /**
+     * Creates a new Selenium testcase
+     * 
+     * @param controller the JavaType of the controller under test (required)
+     * @param name the name of the test case (optional)
+     */
+    public void generateTest(final JavaType controller, String name,
+            String serverURL) {
+        Validate.notNull(controller, "Controller type required");
 
-		Element tbody = XmlUtils.findRequiredElement("/html/body/table/tbody", root);
-		tbody.appendChild(openCommand(document, serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath() + "?form"));
+        final ClassOrInterfaceTypeDetails controllerTypeDetails = typeLocationService
+                .getTypeDetails(controller);
+        Validate.notNull(controllerTypeDetails,
+                "Class or interface type details for type '" + controller
+                        + "' could not be resolved");
 
-		PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(formBackingType, Path.SRC_MAIN_JAVA));
-		Assert.notNull(formBackingObjectPhysicalTypeMetadata, "Unable to obtain physical type metadata for type " + formBackingType.getFullyQualifiedTypeName());
-		ClassOrInterfaceTypeDetails formBackingClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) formBackingObjectPhysicalTypeMetadata.getMemberHoldingTypeDetails();
-		MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), formBackingClassOrInterfaceDetails);
+        final LogicalPath path = PhysicalTypeIdentifier
+                .getPath(controllerTypeDetails.getDeclaredByMetadataId());
+        final String webScaffoldMetadataIdentifier = WebScaffoldMetadata
+                .createIdentifier(controller, path);
+        final WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService
+                .get(webScaffoldMetadataIdentifier);
+        Validate.notNull(
+                webScaffoldMetadata,
+                "Web controller '"
+                        + controller.getFullyQualifiedTypeName()
+                        + "' does not appear to be an automatic, scaffolded controller");
 
-		// Add composite PK identifier fields if needed
-		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(formBackingType, memberDetails, null);
-		if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
-			for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
-				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-					FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(field);
-					fieldBuilder.setFieldName(new JavaSymbolName(javaTypePersistenceMetadataDetails.getIdentifierField().getFieldName().getSymbolName() + "." + field.getFieldName().getSymbolName()));
-					tbody.appendChild(typeCommand(document, fieldBuilder.build()));
-				}
-			}
-		}
+        // We abort the creation of a selenium test if the controller does not
+        // allow the creation of new instances for the form backing object
+        if (!webScaffoldMetadata.getAnnotationValues().isCreate()) {
+            LOGGER.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
+            return;
+        }
 
-		// Add all other fields
-		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, memberDetails, null);
-		for (FieldMetadata field : fields) {
-			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-				tbody.appendChild(typeCommand(document, field));
-			}
-		}
+        if (!serverURL.endsWith("/")) {
+            serverURL = serverURL + "/";
+        }
 
-		tbody.appendChild(clickAndWaitCommand(document, "//input[@id='proceed']"));
+        final JavaType formBackingType = webScaffoldMetadata
+                .getAnnotationValues().getFormBackingObject();
+        final String relativeTestFilePath = "selenium/test-"
+                + formBackingType.getSimpleTypeName().toLowerCase() + ".xhtml";
+        final String seleniumPath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, relativeTestFilePath);
 
-		// Add verifications for all other fields
-		for (FieldMetadata field : fields) {
-			if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
-				tbody.appendChild(verifyTextCommand(document, formBackingType, field));
-			}
-		}
+        final InputStream templateInputStream = FileUtils.getInputStream(
+                getClass(), "selenium-template.xhtml");
+        Validate.notNull(templateInputStream,
+                "Could not acquire selenium.xhtml template");
+        final Document document = XmlUtils.readXml(templateInputStream);
 
-		fileManager.createOrUpdateTextFileIfRequired(seleniumPath, XmlUtils.nodeToString(document), false);
+        final Element root = (Element) document.getLastChild();
+        if (root == null || !"html".equals(root.getNodeName())) {
+            throw new IllegalArgumentException(
+                    "Could not parse selenium test case template file!");
+        }
 
-		manageTestSuite(relativeTestFilePath, name, serverURL);
+        name = name != null ? name : "Selenium test for "
+                + controller.getSimpleTypeName();
+        XmlUtils.findRequiredElement("/html/head/title", root).setTextContent(
+                name);
 
-		installMavenPlugin();
-	}
+        XmlUtils.findRequiredElement("/html/body/table/thead/tr/td", root)
+                .setTextContent(name);
 
-	private void manageTestSuite(String testPath, String name, String serverURL) {
-		String relativeTestFilePath = "selenium/test-suite.xhtml";
-		String seleniumPath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, relativeTestFilePath);
+        final Element tbody = XmlUtils.findRequiredElement(
+                "/html/body/table/tbody", root);
+        tbody.appendChild(openCommand(
+                document,
+                serverURL
+                        + projectOperations.getProjectName(projectOperations
+                                .getFocusedModuleName()) + "/"
+                        + webScaffoldMetadata.getAnnotationValues().getPath()
+                        + "?form"));
 
-		Document suite;
-		try {
-			if (fileManager.exists(seleniumPath)) {
-				suite = XmlUtils.readXml(fileManager.getInputStream(seleniumPath));
-			} else {
-				InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "selenium-test-suite-template.xhtml");
-				Assert.notNull(templateInputStream, "Could not acquire selenium test suite template");
-				suite = XmlUtils.readXml(templateInputStream);
-			}
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
+        final ClassOrInterfaceTypeDetails formBackingTypeDetails = typeLocationService
+                .getTypeDetails(formBackingType);
+        Validate.notNull(formBackingType,
+                "Class or interface type details for type '" + formBackingType
+                        + "' could not be resolved");
+        final MemberDetails memberDetails = memberDetailsScanner
+                .getMemberDetails(getClass().getName(), formBackingTypeDetails);
 
-		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
-		Assert.notNull(projectMetadata, "Unable to obtain project metadata");
+        // Add composite PK identifier fields if needed
+        for (final FieldMetadata field : persistenceMemberLocator
+                .getEmbeddedIdentifierFields(formBackingType)) {
+            final JavaType fieldType = field.getFieldType();
+            if (!fieldType.isCommonCollectionType()
+                    && !isSpecialType(fieldType)) {
+                final FieldMetadataBuilder fieldBuilder = new FieldMetadataBuilder(
+                        field);
+                final String fieldName = field.getFieldName().getSymbolName();
+                fieldBuilder.setFieldName(new JavaSymbolName(fieldName + "."
+                        + fieldName));
+                tbody.appendChild(typeCommand(document, fieldBuilder.build()));
+            }
+        }
 
-		Element root = (Element) suite.getLastChild();
+        // Add all other fields
+        final List<FieldMetadata> fields = webMetadataService
+                .getScaffoldEligibleFieldMetadata(formBackingType,
+                        memberDetails, null);
+        for (final FieldMetadata field : fields) {
+            final JavaType fieldType = field.getFieldType();
+            if (!fieldType.isCommonCollectionType()
+                    && !isSpecialType(fieldType)) {
+                tbody.appendChild(typeCommand(document, field));
+            }
+        }
 
-		XmlUtils.findRequiredElement("/html/head/title", root).setTextContent("Test suite for " + projectMetadata.getProjectName() + "project");
+        tbody.appendChild(clickAndWaitCommand(document,
+                "//input[@id = 'proceed']"));
 
-		Element tr = suite.createElement("tr");
-		Element td = suite.createElement("td");
-		tr.appendChild(td);
-		Element a = suite.createElement("a");
-		a.setAttribute("href", serverURL + projectMetadata.getProjectName() + "/resources/" + testPath);
-		a.setTextContent(name);
-		td.appendChild(a);
+        // Add verifications for all other fields
+        for (final FieldMetadata field : fields) {
+            final JavaType fieldType = field.getFieldType();
+            if (!fieldType.isCommonCollectionType()
+                    && !isSpecialType(fieldType)) {
+                tbody.appendChild(verifyTextCommand(document, formBackingType,
+                        field));
+            }
+        }
 
-		XmlUtils.findRequiredElement("/html/body/table", root).appendChild(tr);
+        fileManager.createOrUpdateTextFileIfRequired(seleniumPath,
+                XmlUtils.nodeToString(document), false);
 
-		fileManager.createOrUpdateTextFileIfRequired(seleniumPath, XmlUtils.nodeToString(suite), false);
+        manageTestSuite(relativeTestFilePath, name, serverURL);
 
-		menuOperations.addMenuItem(new JavaSymbolName("SeleniumTests"), new JavaSymbolName("Test"), "Test", "selenium_menu_test_suite", "/resources/" + relativeTestFilePath, "si_");
-	}
+        // Install selenium-maven-plugin
+        installMavenPlugin();
+    }
 
-	private void installMavenPlugin() {
-		PathResolver pathResolver = projectOperations.getPathResolver();
-		String pom = pathResolver.getIdentifier(Path.ROOT, "/pom.xml");
-		Document document = XmlUtils.readXml(fileManager.getInputStream(pom));
-		Element root = (Element) document.getLastChild();
+    private void installMavenPlugin() {
+        // Stop if the plugin is already installed
+        for (final Plugin plugin : projectOperations.getFocusedModule()
+                .getBuildPlugins()) {
+            if (plugin.getArtifactId().equals("selenium-maven-plugin")) {
+                return;
+            }
+        }
 
-		// Stop if the plugin is already installed
-		if (XmlUtils.findFirstElement("/project/build/plugins/plugin[artifactId = 'selenium-maven-plugin']", root) != null) {
-			return;
-		}
-		
-		Element configuration = XmlUtils.getConfiguration(getClass());
-		Element plugin = XmlUtils.findFirstElement("/configuration/selenium/plugin", configuration);
+        final Element configuration = XmlUtils.getConfiguration(getClass());
+        final Element plugin = XmlUtils.findFirstElement(
+                "/configuration/selenium/plugin", configuration);
 
-		// Now install the plugin itself
-		if (plugin != null) {
-			projectOperations.addBuildPlugin(new Plugin(plugin));
-		}
-	}
+        // Now install the plugin itself
+        if (plugin != null) {
+            projectOperations.addBuildPlugin(
+                    projectOperations.getFocusedModuleName(),
+                    new Plugin(plugin));
+        }
+    }
 
-	private Node clickAndWaitCommand(Document document, String linkTarget) {
-		Node tr = document.createElement("tr");
+    public boolean isSeleniumInstallationPossible() {
+        return projectOperations.isFocusedProjectAvailable()
+                && projectOperations.isFeatureInstalled(FeatureNames.MVC);
+    }
 
-		Node td1 = tr.appendChild(document.createElement("td"));
-		td1.setTextContent("clickAndWait");
+    private boolean isSpecialType(final JavaType javaType) {
+        return typeLocationService.isInProject(javaType);
+    }
 
-		Node td2 = tr.appendChild(document.createElement("td"));
-		td2.setTextContent(linkTarget);
+    private void manageTestSuite(final String testPath, final String name,
+            final String serverURL) {
+        final String relativeTestFilePath = "selenium/test-suite.xhtml";
+        final String seleniumPath = pathResolver.getFocusedIdentifier(
+                Path.SRC_MAIN_WEBAPP, relativeTestFilePath);
 
-		Node td3 = tr.appendChild(document.createElement("td"));
-		td3.setTextContent(" ");
+        final InputStream inputStream;
+        if (fileManager.exists(seleniumPath)) {
+            inputStream = fileManager.getInputStream(seleniumPath);
+        }
+        else {
+            inputStream = FileUtils.getInputStream(getClass(),
+                    "selenium-test-suite-template.xhtml");
+            Validate.notNull(inputStream,
+                    "Could not acquire selenium test suite template");
+        }
 
-		return tr;
-	}
+        final Document suite = XmlUtils.readXml(inputStream);
+        final Element root = (Element) suite.getLastChild();
 
-	private Node typeCommand(Document document, FieldMetadata field) {
-		Node tr = document.createElement("tr");
+        XmlUtils.findRequiredElement("/html/head/title", root).setTextContent(
+                "Test suite for "
+                        + projectOperations.getProjectName(projectOperations
+                                .getFocusedModuleName()) + "project");
 
-		Node td1 = tr.appendChild(document.createElement("td"));
-		td1.setTextContent("type");
+        final Element tr = suite.createElement("tr");
+        final Element td = suite.createElement("td");
+        tr.appendChild(td);
+        final Element a = suite.createElement("a");
+        a.setAttribute(
+                "href",
+                serverURL
+                        + projectOperations.getProjectName(projectOperations
+                                .getFocusedModuleName()) + "/resources/"
+                        + testPath);
+        a.setTextContent(name);
+        td.appendChild(a);
 
-		Node td2 = tr.appendChild(document.createElement("td"));
-		td2.setTextContent("_" + field.getFieldName().getSymbolName() + "_id");
+        XmlUtils.findRequiredElement("/html/body/table", root).appendChild(tr);
 
-		Node td3 = tr.appendChild(document.createElement("td"));
-		td3.setTextContent(convertToInitializer(field));
+        fileManager.createOrUpdateTextFileIfRequired(seleniumPath,
+                XmlUtils.nodeToString(suite), false);
 
-		return tr;
-	}
+        menuOperations.addMenuItem(new JavaSymbolName("SeleniumTests"),
+                new JavaSymbolName("Test"), "Test", "selenium_menu_test_suite",
+                "/resources/" + relativeTestFilePath, "si_",
+                pathResolver.getFocusedPath(Path.SRC_MAIN_WEBAPP));
+    }
 
-	private Node verifyTextCommand(Document document, JavaType formBackingType, FieldMetadata field) {
-		Node tr = document.createElement("tr");
+    private Node openCommand(final Document document, final String linkTarget) {
+        final Node tr = document.createElement("tr");
 
-		Node td1 = tr.appendChild(document.createElement("td"));
-		td1.setTextContent("verifyText");
+        final Node td1 = tr.appendChild(document.createElement("td"));
+        td1.setTextContent("open");
 
-		Node td2 = tr.appendChild(document.createElement("td"));
-		td2.setTextContent(XmlUtils.convertId("_s_" + formBackingType.getFullyQualifiedTypeName() + "_" + field.getFieldName().getSymbolName() + "_" + field.getFieldName().getSymbolName() + "_id"));
+        final Node td2 = tr.appendChild(document.createElement("td"));
+        td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?")
+                + "lang=" + Locale.getDefault());
 
-		Node td3 = tr.appendChild(document.createElement("td"));
-		td3.setTextContent(convertToInitializer(field));
+        final Node td3 = tr.appendChild(document.createElement("td"));
+        td3.setTextContent(" ");
 
-		return tr;
-	}
+        return tr;
+    }
 
-	private String convertToInitializer(FieldMetadata field) {
-		String initializer = " ";
-		short index = 1;
-		AnnotationMetadata min = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Min"));
-		if (min != null) {
-			AnnotationAttributeValue<?> value = min.getAttribute(new JavaSymbolName("value"));
-			if (value != null) {
-				index = new Short(value.getValue().toString());
-			}
-		}
-		if (field.getFieldName().getSymbolName().contains("email") || field.getFieldName().getSymbolName().contains("Email")) {
-			initializer = "some@email.com";
-		} else if (field.getFieldType().equals(JavaType.STRING_OBJECT)) {
-			initializer = "some" + field.getFieldName().getSymbolNameCapitalisedFirstLetter() + index;
-		} else if (field.getFieldType().equals(new JavaType(Date.class.getName())) || field.getFieldType().equals(new JavaType(Calendar.class.getName()))) {
-			Calendar cal = Calendar.getInstance();
-			AnnotationMetadata dateTimeFormat = null;
-			String style = null;
-			if (null != (dateTimeFormat = MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("org.springframework.format.annotation.DateTimeFormat")))) {
-				AnnotationAttributeValue<?> value = dateTimeFormat.getAttribute(new JavaSymbolName("style"));
-				if (value != null) {
-					style = value.getValue().toString();
-				}
-			}
-			if (null != MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Past"))) {
-				cal.add(Calendar.YEAR, -1);
-				cal.add(Calendar.MONTH, -1);
-				cal.add(Calendar.DAY_OF_MONTH, -1);
-			} else if (null != MemberFindingUtils.getAnnotationOfType(field.getAnnotations(), new JavaType("javax.validation.constraints.Future"))) {
-				cal.add(Calendar.YEAR, +1);
-				cal.add(Calendar.MONTH, +1);
-				cal.add(Calendar.DAY_OF_MONTH, +1);
-			}
-			if (style != null) {
-				if (style.startsWith("-")) {
-					initializer = ((SimpleDateFormat) DateFormat.getTimeInstance(DateTime.parseDateFormat(style.charAt(1)), Locale.getDefault())).format(cal.getTime());
-				} else if (style.endsWith("-")) {
-					initializer = ((SimpleDateFormat) DateFormat.getDateInstance(DateTime.parseDateFormat(style.charAt(0)), Locale.getDefault())).format(cal.getTime());
-				} else {
-					initializer = ((SimpleDateFormat) DateFormat.getDateTimeInstance(DateTime.parseDateFormat(style.charAt(0)), DateTime.parseDateFormat(style.charAt(1)), Locale.getDefault())).format(cal.getTime());
-				}
-			} else {
-				initializer = ((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault())).format(cal.getTime());
-			}
+    private Node typeCommand(final Document document, final FieldMetadata field) {
+        final Node tr = document.createElement("tr");
 
-		} else if (field.getFieldType().equals(JavaType.BOOLEAN_OBJECT) || field.getFieldType().equals(JavaType.BOOLEAN_PRIMITIVE)) {
-			initializer = new Boolean(false).toString();
-		} else if (field.getFieldType().equals(JavaType.INT_OBJECT) || field.getFieldType().equals(JavaType.INT_PRIMITIVE)) {
-			initializer = new Integer(index).toString();
-		} else if (field.getFieldType().equals(JavaType.DOUBLE_OBJECT) || field.getFieldType().equals(JavaType.DOUBLE_PRIMITIVE)) {
-			initializer = new Double(index).toString();
-		} else if (field.getFieldType().equals(JavaType.FLOAT_OBJECT) || field.getFieldType().equals(JavaType.FLOAT_PRIMITIVE)) {
-			initializer = new Float(index).toString();
-		} else if (field.getFieldType().equals(JavaType.LONG_OBJECT) || field.getFieldType().equals(JavaType.LONG_PRIMITIVE)) {
-			initializer = new Long(index).toString();
-		} else if (field.getFieldType().equals(JavaType.SHORT_OBJECT) || field.getFieldType().equals(JavaType.SHORT_PRIMITIVE)) {
-			initializer = new Short(index).toString();
-		} else if (field.getFieldType().equals(new JavaType("java.math.BigDecimal"))) {
-			initializer = new BigDecimal(index).toString();
-		}
-		return initializer;
-	}
+        final Node td1 = tr.appendChild(document.createElement("td"));
+        td1.setTextContent("type");
 
-	private Node openCommand(Document document, String linkTarget) {
-		Node tr = document.createElement("tr");
+        final Node td2 = tr.appendChild(document.createElement("td"));
+        td2.setTextContent("_" + field.getFieldName().getSymbolName() + "_id");
 
-		Node td1 = tr.appendChild(document.createElement("td"));
-		td1.setTextContent("open");
+        final Node td3 = tr.appendChild(document.createElement("td"));
+        td3.setTextContent(convertToInitializer(field));
 
-		Node td2 = tr.appendChild(document.createElement("td"));
-		td2.setTextContent(linkTarget + (linkTarget.contains("?") ? "&" : "?") + "lang=" + Locale.getDefault());
+        return tr;
+    }
 
-		Node td3 = tr.appendChild(document.createElement("td"));
-		td3.setTextContent(" ");
+    private Node verifyTextCommand(final Document document,
+            final JavaType formBackingType, final FieldMetadata field) {
+        final Node tr = document.createElement("tr");
 
-		return tr;
-	}
+        final Node td1 = tr.appendChild(document.createElement("td"));
+        td1.setTextContent("verifyText");
 
-	private boolean isSpecialType(JavaType javaType) {
-		String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(javaType, Path.SRC_MAIN_JAVA);
-		// We are only interested if the type is part of our application and if no editor exists for it already
-		if (metadataService.get(physicalTypeIdentifier) != null) {
-			return true;
-		}
-		return false;
-	}
+        final Node td2 = tr.appendChild(document.createElement("td"));
+        td2.setTextContent(XmlUtils.convertId("_s_"
+                + formBackingType.getFullyQualifiedTypeName() + "_"
+                + field.getFieldName().getSymbolName() + "_"
+                + field.getFieldName().getSymbolName() + "_id"));
+
+        final Node td3 = tr.appendChild(document.createElement("td"));
+        td3.setTextContent(convertToInitializer(field));
+
+        return tr;
+    }
 }

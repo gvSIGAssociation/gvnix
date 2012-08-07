@@ -1,5 +1,14 @@
 package org.springframework.roo.classpath.operations.jsr303;
 
+import static org.springframework.roo.model.JdkJavaType.HASH_SET;
+import static org.springframework.roo.model.JpaJavaType.CASCADE_TYPE;
+import static org.springframework.roo.model.JpaJavaType.ELEMENT_COLLECTION;
+import static org.springframework.roo.model.JpaJavaType.FETCH_TYPE;
+import static org.springframework.roo.model.JpaJavaType.MANY_TO_MANY;
+import static org.springframework.roo.model.JpaJavaType.MANY_TO_ONE;
+import static org.springframework.roo.model.JpaJavaType.ONE_TO_MANY;
+import static org.springframework.roo.model.JpaJavaType.ONE_TO_ONE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,91 +24,112 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 
 /**
- * Properties used by the one side of a many-to-one relationship or an @ElementCollection of enums (called a "set").
- * 
+ * Properties used by the one side of a many-to-one relationship or an @ElementCollection
+ * of enums (called a "set").
  * <p>
- * For example, an Order-LineItem link would have the Order contain a "set" of Orders.
- *  
+ * For example, an Order-LineItem link would have the Order contain a "set" of
+ * Orders.
  * <p>
- * Limited support for collection mapping is provided. This reflects the pragmatic goals of the tool and the fact a user can
- * edit the generated files by hand anyway.
- * 
+ * Limited support for collection mapping is provided. This reflects the
+ * pragmatic goals of the tool and the fact a user can edit the generated files
+ * by hand anyway.
  * <p>
- * This field is intended for use with JSR 220 and will create a @OneToMany annotation or in the case of enums,
- * an @ElementCollection annotation will be created.
+ * This field is intended for use with JSR 220 and will create a @OneToMany
+ * annotation or in the case of enums, an @ElementCollection annotation will be
+ * created.
  * 
  * @author Ben Alex
  * @since 1.0
  */
 public class SetField extends CollectionField {
-	
-	/** Whether the JSR 220 @OneToMany.mappedBy annotation attribute will be added */
-	private JavaSymbolName mappedBy = null;
-	
-	private Cardinality cardinality = null;
-	private Fetch fetch = null;
-	
-	public SetField(String physicalTypeIdentifier, JavaType fieldType, JavaSymbolName fieldName, JavaType genericParameterTypeName, Cardinality cardinality) {
-		super(physicalTypeIdentifier, fieldType, fieldName, genericParameterTypeName);
-		this.cardinality = cardinality;
-	}
 
-	public Fetch getFetch() {
-		return fetch;
-	}
+    private final Cardinality cardinality;
 
-	public void setFetch(Fetch fetch) {
-		this.fetch = fetch;
-	}
+    private Fetch fetch;
+    /**
+     * Whether the JSR 220 @OneToMany.mappedBy annotation attribute will be
+     * added
+     */
+    private JavaSymbolName mappedBy;
 
-	public void decorateAnnotationsList(List<AnnotationMetadataBuilder> annotations) {
-		super.decorateAnnotationsList(annotations);
-		List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
+    public SetField(final String physicalTypeIdentifier,
+            final JavaType fieldType, final JavaSymbolName fieldName,
+            final JavaType genericParameterTypeName,
+            final Cardinality cardinality) {
+        super(physicalTypeIdentifier, fieldType, fieldName,
+                genericParameterTypeName);
+        this.cardinality = cardinality;
+    }
 
-		if (cardinality == null) {
-			// Assume set field is an enum
-			annotations.add(new AnnotationMetadataBuilder(new JavaType("javax.persistence.ElementCollection")));
-		} else {
-			attributes.add(new EnumAttributeValue(new JavaSymbolName("cascade"), new EnumDetails(new JavaType("javax.persistence.CascadeType"), new JavaSymbolName("ALL"))));
-			if (fetch != null) {
-				JavaSymbolName value = new JavaSymbolName("EAGER");
-				if (fetch == Fetch.LAZY) {
-					value = new JavaSymbolName("LAZY");
-				}
-				attributes.add(new EnumAttributeValue(new JavaSymbolName("fetch"), new EnumDetails(new JavaType("javax.persistence.FetchType"), value)));
-			}
-			if (mappedBy != null) {
-				attributes.add(new StringAttributeValue(new JavaSymbolName("mappedBy"), mappedBy.getSymbolName()));
-			}
+    @Override
+    public void decorateAnnotationsList(
+            final List<AnnotationMetadataBuilder> annotations) {
+        super.decorateAnnotationsList(annotations);
+        final List<AnnotationAttributeValue<?>> attributes = new ArrayList<AnnotationAttributeValue<?>>();
 
-			switch (cardinality) {
-				case ONE_TO_MANY:
-					annotations.add(new AnnotationMetadataBuilder(new JavaType("javax.persistence.OneToMany"), attributes));
-					break;
-				case MANY_TO_ONE:
-					annotations.add(new AnnotationMetadataBuilder(new JavaType("javax.persistence.ManyToOne"), attributes));
-					break;
-				case ONE_TO_ONE:
-					annotations.add(new AnnotationMetadataBuilder(new JavaType("javax.persistence.OneToOne"), attributes));
-					break;
-				default:
-					annotations.add(new AnnotationMetadataBuilder(new JavaType("javax.persistence.ManyToMany"), attributes));
-					break;
-			}
-		}
-	}
+        if (cardinality == null) {
+            // Assume set field is an enum
+            annotations.add(new AnnotationMetadataBuilder(ELEMENT_COLLECTION));
+        }
+        else {
+            attributes.add(new EnumAttributeValue(
+                    new JavaSymbolName("cascade"), new EnumDetails(
+                            CASCADE_TYPE, new JavaSymbolName("ALL"))));
+            if (fetch != null) {
+                JavaSymbolName value = new JavaSymbolName("EAGER");
+                if (fetch == Fetch.LAZY) {
+                    value = new JavaSymbolName("LAZY");
+                }
+                attributes.add(new EnumAttributeValue(new JavaSymbolName(
+                        "fetch"), new EnumDetails(FETCH_TYPE, value)));
+            }
+            if (mappedBy != null) {
+                attributes.add(new StringAttributeValue(new JavaSymbolName(
+                        "mappedBy"), mappedBy.getSymbolName()));
+            }
 
-	public JavaType getInitializer() {
-		List<JavaType> params = new ArrayList<JavaType>();
-		params.add(getGenericParameterTypeName());
-		return new JavaType("java.util.HashSet", 0, DataType.TYPE, null, params);
-	}
+            switch (cardinality) {
+            case ONE_TO_MANY:
+                annotations.add(new AnnotationMetadataBuilder(ONE_TO_MANY,
+                        attributes));
+                break;
+            case MANY_TO_MANY:
+                annotations.add(new AnnotationMetadataBuilder(MANY_TO_MANY,
+                        attributes));
+                break;
+            case ONE_TO_ONE:
+                annotations.add(new AnnotationMetadataBuilder(ONE_TO_ONE,
+                        attributes));
+                break;
+            default:
+                annotations.add(new AnnotationMetadataBuilder(MANY_TO_ONE,
+                        attributes));
+                break;
+            }
+        }
+    }
 
-	public JavaSymbolName getMappedBy() {
-		return mappedBy;
-	}
+    public Fetch getFetch() {
+        return fetch;
+    }
 
-	public void setMappedBy(JavaSymbolName mappedBy) {
-		this.mappedBy = mappedBy;
-	}
+    @Override
+    public JavaType getInitializer() {
+        final List<JavaType> params = new ArrayList<JavaType>();
+        params.add(getGenericParameterTypeName());
+        return new JavaType(HASH_SET.getFullyQualifiedTypeName(), 0,
+                DataType.TYPE, null, params);
+    }
+
+    public JavaSymbolName getMappedBy() {
+        return mappedBy;
+    }
+
+    public void setFetch(final Fetch fetch) {
+        this.fetch = fetch;
+    }
+
+    public void setMappedBy(final JavaSymbolName mappedBy) {
+        this.mappedBy = mappedBy;
+    }
 }

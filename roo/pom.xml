@@ -4,7 +4,7 @@
     <groupId>org.springframework.roo</groupId>
     <artifactId>org.springframework.roo.root</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.5.RELEASE</version>
+    <version>1.2.2.RELEASE</version>
     <name>Spring Roo</name>
     <description>Spring Roo is a next-generation rapid application development tool for Java developers. It focuses on higher productivity, stock-standard Java APIs, high usability, avoiding engineering trade-offs and facilitating easy Roo removal.</description>
     <inceptionYear>2009</inceptionYear>
@@ -36,6 +36,7 @@
         <module>classpath</module>
         <module>classpath-javaparser</module>
         <module>addon-tostring</module>
+        <module>addon-equals</module>
         <module>addon-javabean</module>
         <module>addon-plural</module>
         <module>addon-propfiles</module>
@@ -43,7 +44,6 @@
         <module>addon-email</module>
         <module>addon-jpa</module>
         <module>addon-jms</module>
-        <module>addon-entity</module>
         <module>addon-finder</module>
         <module>addon-logging</module>
         <module>addon-property-editor</module>
@@ -64,10 +64,15 @@
         <module>addon-creator</module>
         <module>addon-roobot-client</module>
         <module>addon-json</module>
-        <!-- module>addon-jsf</module -->
+        <module>addon-jsf</module>
         <module>addon-op4j</module>
         <module>addon-git</module>
         <module>addon-cloud-foundry</module>
+        <module>addon-layers-service</module>
+        <module>addon-layers-repository-jpa</module>
+        <module>addon-layers-repository-mongo</module>
+        <module>addon-oscommands</module>
+        <module>addon-tailor</module>
         <module>annotations</module>
     </modules>
     <organization>
@@ -101,6 +106,7 @@
             <url>http://spring-roo-repository.springsource.org/snapshot</url>
             <snapshots>
                 <updatePolicy>never</updatePolicy>
+                <enabled>true</enabled>
             </snapshots>
         </repository>
     </repositories>
@@ -115,33 +121,17 @@
             <name>Spring Roo Repository</name>
             <url>http://spring-roo-repository.springsource.org/release</url>
         </pluginRepository>
+        <pluginRepository>
+            <id>maven-java-formatter-plugin</id>
+            <name>Maven2 Java Formatter Plugin repository</name>
+            <url>https://raw.github.com/benalexau/maven-java-formatter-plugin/master/releases/</url>
+        </pluginRepository>
     </pluginRepositories>
     <developers>
-        <developer>
-            <name>Ben Alex</name>
-            <id>balex</id>
-            <email>balex at vmware.com</email>
-            <organization>VMware</organization>
-            <timezone>+10</timezone>
-        </developer>
-        <developer>
-            <name>Stefan Schmidt</name>
-            <id>schmidts</id>
-            <email>schmidts at vmware.com</email>
-            <organization>VMware</organization>
-            <timezone>+10</timezone>
-        </developer>
         <developer>
             <name>Alan Stewart</name>
             <id>stewarta</id>
             <email>stewarta at vmware.com</email>
-            <organization>VMware</organization>
-            <timezone>+10</timezone>
-        </developer>
-        <developer>
-            <name>James Tyrrell</name>
-            <id>jtyrrell</id>
-            <email>jtyrrell at vmware.com</email>
             <organization>VMware</organization>
             <timezone>+10</timezone>
         </developer>
@@ -162,6 +152,26 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -169,13 +179,31 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.8.2</version>
+                <version>4.10</version>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.hamcrest</groupId>
+                        <artifactId>hamcrest-core</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
-                <version>1.8.2</version>
+                <version>1.8.5</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermock.version}</version>
                 <scope>test</scope>
             </dependency>
             <!-- OSGi APIs -->
@@ -193,7 +221,7 @@
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.bundlerepository</artifactId>
-                <version>1.6.4</version>
+                <version>1.6.6</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.easymock</groupId>
@@ -204,7 +232,7 @@
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.framework</artifactId>
-                <version>3.0.7</version>
+                <version>3.2.2</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.osgi</groupId>
@@ -219,7 +247,7 @@
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.ipojo</artifactId>
-                <version>1.6.8</version>
+                <version>1.8.0</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.osgi</groupId>
@@ -242,7 +270,7 @@
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.log</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.felix</groupId>
@@ -276,7 +304,7 @@
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.scr.annotations</artifactId>
-                <version>1.4.0</version>
+                <version>1.6.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
@@ -290,9 +318,14 @@
                 <version>1.0.2.RELEASE</version>
             </dependency>
             <dependency>
+                <groupId>net.sourceforge.jline</groupId>
+                <artifactId>jline</artifactId>
+                <version>1.0.S2-B</version>
+            </dependency>
+            <dependency>
                 <groupId>org.fusesource.jansi</groupId>
                 <artifactId>jansi</artifactId>
-                <version>1.5</version>
+                <version>1.6</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
@@ -307,17 +340,32 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.6.1</version>
+                <version>1.6.4</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-nop</artifactId>
-                <version>1.6.1</version>
+                <version>1.6.4</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl-over-slf4j</artifactId>
-                <version>1.6.1</version>
+                <version>1.6.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.1</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.6</version>
             </dependency>
             <dependency>
                 <groupId>org.mortbay.jetty</groupId>
@@ -327,7 +375,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
-                <version>3.0.5.RELEASE</version>
+                <version>${spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -342,7 +390,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-asm</artifactId>
-                <version>3.0.5.RELEASE</version>
+                <version>${spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -357,7 +405,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
-                <version>3.0.5.RELEASE</version>
+                <version>${spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -372,7 +420,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>3.0.5.RELEASE</version>
+                <version>${spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -387,7 +435,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>3.0.5.RELEASE</version>
+                <version>${spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -402,7 +450,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-expression</artifactId>
-                <version>3.0.5.RELEASE</version>
+                <version>${spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -417,7 +465,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>3.0.5.RELEASE</version>
+                <version>${spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>aopalliance</groupId>
@@ -480,11 +528,6 @@
                 <artifactId>org.springframework.roo.wrapping.json-simple</artifactId>
                 <version>1.1.0.0010</version>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.roo.wrapping</groupId>
-                <artifactId>org.springframework.roo.wrapping.jline</artifactId>
-                <version>0.9.94.0010</version>
-            </dependency>
             <!-- Roo Modules -->
             <dependency>
                 <groupId>org.springframework.roo</groupId>
@@ -514,11 +557,6 @@
             <dependency>
                 <groupId>org.springframework.roo</groupId>
                 <artifactId>org.springframework.roo.addon.email</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.roo</groupId>
-                <artifactId>org.springframework.roo.addon.entity</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -618,6 +656,11 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.roo</groupId>
+                <artifactId>org.springframework.roo.addon.equals</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.roo</groupId>
                 <artifactId>org.springframework.roo.addon.web.flow</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -641,13 +684,11 @@
                 <artifactId>org.springframework.roo.addon.web.mvc.selenium</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <!-- 
-            <dependency> 
-                <groupId>org.springframework.roo</groupId> 
-                <artifactId>org.springframework.roo.addon.jsf</artifactId> 
-                <version>${project.version}</version> 
+            <dependency>
+                <groupId>org.springframework.roo</groupId>
+                <artifactId>org.springframework.roo.addon.jsf</artifactId>
+                <version>${project.version}</version>
             </dependency>
-            -->
             <dependency>
                 <groupId>org.springframework.roo</groupId>
                 <artifactId>org.springframework.roo.bootstrap</artifactId>
@@ -773,6 +814,31 @@
                 <artifactId>org.springframework.roo.url.stream.jdk</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.roo</groupId>
+                <artifactId>org.springframework.roo.addon.layers.service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.roo</groupId>
+                <artifactId>org.springframework.roo.addon.layers.repository.jpa</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.roo</groupId>
+                <artifactId>org.springframework.roo.addon.layers.repository.mongo</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.roo</groupId>
+                <artifactId>org.springframework.roo.addon.oscommands</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.roo</groupId>
+                <artifactId>org.springframework.roo.addon.tailor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
@@ -803,7 +869,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.6</version>
+                <version>1.7</version>
                 <dependencies>
                     <dependency>
                         <groupId>ant-contrib</groupId>
@@ -825,12 +891,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>2.5</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.4.3</version>
+                <version>2.5</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                 </configuration>
@@ -838,7 +904,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.8</version>
+                <version>2.12</version>
                 <configuration>
                     <printSummary>false</printSummary>
                 </configuration>
@@ -846,10 +912,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>2.4</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -870,7 +936,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.0</version>
+                <version>1.0.1</version>
                 <configuration>
                     <rules>
                         <DependencyConvergence />
@@ -899,7 +965,27 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.7</version>
+            </plugin>
+            <plugin>
+                <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+                <artifactId>maven-java-formatter-plugin</artifactId>
+                <version>0.4.0.e371sr1</version>
+                <configuration>
+                    <configFile>../deployment-support/eclipse-formatter-config.xml</configFile>
+                    <lineEnding>LF</lineEnding>
+                    <excludes>
+                        <exclude>org/springframework/roo/bootstrap/Main.java</exclude>
+                        <exclude>org/springframework/roo/bootstrap/AutoProcessor.java</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!-- IDE -->
             <plugin>
@@ -923,31 +1009,8 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>triemax</groupId>
-                        <artifactId>jalopy-maven</artifactId>
-                        <version>1.9.4-108</version>
-                        <configuration>
-                            <compile>true</compile>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>process-sources</phase>
-                                <goals>
-                                    <goal>format</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
     <properties>
+        <powermock.version>1.4.10</powermock.version>
+        <spring.version>3.1.1.RELEASE</spring.version>
     </properties>
 </project>

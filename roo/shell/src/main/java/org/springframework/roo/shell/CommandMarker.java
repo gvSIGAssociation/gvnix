@@ -1,3 +1,7 @@
 package org.springframework.roo.shell;
 
-public interface CommandMarker {}
+/**
+ * Marker interface indicating a provider of one or more shell commands.
+ */
+public interface CommandMarker {
+}

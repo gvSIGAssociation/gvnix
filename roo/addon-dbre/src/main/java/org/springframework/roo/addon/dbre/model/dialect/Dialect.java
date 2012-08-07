@@ -4,7 +4,6 @@ import org.springframework.roo.addon.dbre.model.Schema;
 
 /**
  * Represents a dialect of SQL implemented by a particular RDBMS.
- * 
  * <p>
  * Support for querying sequences is only provided at this stage.
  * 
@@ -12,8 +11,8 @@ import org.springframework.roo.addon.dbre.model.Schema;
  * @since 1.1
  */
 public interface Dialect {
-	
-	boolean supportsSequences();
-	
-	String getQuerySequencesString(Schema schema) throws RuntimeException;
+
+    String getQuerySequencesString(Schema schema) throws RuntimeException;
+
+    boolean supportsSequences();
 }

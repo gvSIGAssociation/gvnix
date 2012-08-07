@@ -1,6 +1,6 @@
 package org.springframework.roo.classpath.operations;
 
-import org.springframework.roo.support.style.ToStringCreator;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Provides enum types for JPA use.
@@ -9,11 +9,12 @@ import org.springframework.roo.support.style.ToStringCreator;
  * @since 1.0
  */
 public enum EnumType {
-	ORDINAL, STRING;
-	
-	public String toString() {
-		ToStringCreator tsc = new ToStringCreator(this);
-		tsc.append("name", name());
-		return tsc.toString();
-	}
+    ORDINAL, STRING;
+
+    @Override
+    public String toString() {
+        final ToStringBuilder builder = new ToStringBuilder(this);
+        builder.append("name", name());
+        return builder.toString();
+    }
 }

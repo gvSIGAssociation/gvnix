@@ -4,7 +4,7 @@ import __TOP_LEVEL_PACKAGE__.client.scaffold.ui.LoginWidget;
 import __TOP_LEVEL_PACKAGE__.shared.gae.GaeUser;
 import __TOP_LEVEL_PACKAGE__.shared.gae.GaeUserServiceRequest;
 import __TOP_LEVEL_PACKAGE__.shared.gae.MakesGaeRequests;
-import com.google.gwt.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.gwt.user.client.Window.Location;
 
 /**
@@ -19,7 +19,6 @@ public class GaeLoginWidgetDriver {
 
 	public void setWidget(final LoginWidget widget) {
 		GaeUserServiceRequest request = requests.userServiceRequest();
-
 		request.createLogoutURL(Location.getHref()).to(new Receiver<String>() {
 			public void onSuccess(String response) {
 				widget.setLogoutUrl(response);

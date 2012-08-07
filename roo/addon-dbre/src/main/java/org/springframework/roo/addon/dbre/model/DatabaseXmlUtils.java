@@ -9,9 +9,8 @@ import java.util.Set;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.roo.model.JavaPackage;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -24,237 +23,330 @@ import org.w3c.dom.Element;
  * @since 1.1
  */
 public abstract class DatabaseXmlUtils {
-	public static final String NAME = "name";
-	public static final String LOCAL = "local";
-	public static final String FOREIGN = "foreign";
-	public static final String FOREIGN_TABLE = "foreignTable";
-	public static final String DESCRIPTION = "description";
-	public static final String REFERENCE = "reference";
-	public static final String ON_UPDATE = "onUpdate";
-	public static final String ON_DELETE = "onDelete";
 
-	public static enum IndexType {
-		INDEX, UNIQUE
-	}
+    public static enum IndexType {
+        INDEX, UNIQUE
+    }
 
-	static Schema readSchemaWithDom(InputStream inputStream) {
-		Assert.notNull("Input stream required");
-		Document document = XmlUtils.readXml(inputStream);
-		Element databaseElement = document.getDocumentElement();
-		return new Schema(databaseElement.getAttribute("schema"));
-	}
+    public static final String DESCRIPTION = "description";
+    public static final String FOREIGN = "foreign";
+    public static final String FOREIGN_TABLE = "foreignTable";
+    public static final String LOCAL = "local";
+    public static final String NAME = "name";
+    public static final String ON_DELETE = "onDelete";
+    public static final String ON_UPDATE = "onUpdate";
 
-	static Schema readSchema(InputStream inputStream) {
-		Assert.notNull("Input stream required");
-		try {
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser parser = spf.newSAXParser();
-			SchemaContentHandler contentHandler = new SchemaContentHandler();
-			parser.parse(inputStream, contentHandler);
-			return contentHandler.getSchema();
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
+    public static final String REFERENCE = "reference";
 
-	static Database readDatabase(InputStream inputStream) {
-		try {
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser parser = spf.newSAXParser();
-			DatabaseContentHandler contentHandler = new DatabaseContentHandler();
-			parser.parse(inputStream, contentHandler);
-			return contentHandler.getDatabase();
-		} catch (EmptyStackException e) {
-			throw new IllegalStateException("Unable to read database from XML file", e);
-		} catch (Exception e) {
-			if (e.getMessage().contains("Invalid byte")) {
-				throw new IllegalStateException("Invalid content in XML file. There may hidden characters in the file, such as the byte order mark (BOM). Try re-saving the xml in a text editor", e);
-			}
-			throw new IllegalStateException(e);
-		}
-	}
+    /**
+     * Adds an <option key="foo" value="true"> element as a child of the given
+     * parent element
+     * 
+     * @param document the XML document containing the parent and child
+     *            (required)
+     * @param parent the parent element to which to add a child (required)
+     * @param key the option key/name (required)
+     * @param value the option value
+     */
+    private static void addBooleanOptionElement(final Document document,
+            final Element parent, final String key, final boolean value) {
+        parent.appendChild(createOptionElement(key, String.valueOf(value),
+                document));
+    }
 
-	static Database readDatabaseWithDom(InputStream inputStream) {
-		Document document = XmlUtils.readXml(inputStream);
-		Element databaseElement = document.getDocumentElement();
+    private static void addForeignKeyElements(
+            final Set<ForeignKey> foreignKeys, final boolean exported,
+            final Element tableElement, final Document document) {
+        for (final ForeignKey foreignKey : foreignKeys) {
+            final Element foreignKeyElement = document
+                    .createElement("foreign-key");
+            foreignKeyElement.setAttribute(NAME, foreignKey.getName());
+            foreignKeyElement.setAttribute(FOREIGN_TABLE,
+                    foreignKey.getForeignTableName());
+            foreignKeyElement.setAttribute(ON_DELETE, foreignKey.getOnDelete()
+                    .getCode());
+            foreignKeyElement.setAttribute(ON_UPDATE, foreignKey.getOnUpdate()
+                    .getCode());
 
-		Set<Table> tables = new LinkedHashSet<Table>();
+            final String foreignSchemaName = foreignKey.getForeignSchemaName();
+            if (!DbreModelService.NO_SCHEMA_REQUIRED.equals(foreignSchemaName)) {
+                foreignKeyElement.appendChild(createOptionElement(
+                        "foreignSchemaName", foreignSchemaName, document));
+            }
 
-		List<Element> tableElements = XmlUtils.findElements("table", databaseElement);
-		for (Element tableElement : tableElements) {
-			Table table = new Table();
-			table.setName(tableElement.getAttribute(NAME));
-			if (StringUtils.hasText(tableElement.getAttribute(DESCRIPTION))) {
-				table.setDescription(tableElement.getAttribute(DESCRIPTION));
-			}
+            foreignKeyElement.appendChild(createOptionElement("exported",
+                    String.valueOf(exported), document));
 
-			List<Element> columnElements = XmlUtils.findElements("column", tableElement);
-			for (Element columnElement : columnElements) {
-				String type = columnElement.getAttribute("type");
-				String[] dataTypeAndName = StringUtils.split(type, ",");
-				int dataType = Integer.parseInt(dataTypeAndName[0]);
-				String typeName = dataTypeAndName[1];
+            for (final Reference reference : foreignKey.getReferences()) {
+                final Element referenceElement = document
+                        .createElement(REFERENCE);
+                referenceElement.setAttribute(FOREIGN,
+                        reference.getForeignColumnName());
+                referenceElement.setAttribute(LOCAL,
+                        reference.getLocalColumnName());
+                foreignKeyElement.appendChild(referenceElement);
+            }
+            tableElement.appendChild(foreignKeyElement);
+        }
+    }
 
-				int columnSize = Integer.parseInt(columnElement.getAttribute("size"));
-				int scale = Integer.parseInt(columnElement.getAttribute("scale"));
+    private static void addIndices(final Table table,
+            final Element tableElement, final IndexType indexType) {
+        final List<Element> elements = XmlUtils.findElements(indexType.name()
+                .toLowerCase(), tableElement);
+        for (final Element element : elements) {
+            final Index index = new Index(element.getAttribute(NAME));
+            index.setUnique(indexType == IndexType.UNIQUE);
+            final List<Element> indexColumnElements = XmlUtils.findElements(
+                    indexType.name().toLowerCase() + "-column", element);
+            for (final Element indexColumnElement : indexColumnElements) {
+                final IndexColumn indexColumn = new IndexColumn(
+                        indexColumnElement.getAttribute(NAME));
+                index.addColumn(indexColumn);
+            }
+            table.addIndex(index);
+        }
+    }
 
-				Column column = new Column(columnElement.getAttribute(NAME), dataType, typeName, columnSize, scale);
-				column.setDescription(columnElement.getAttribute(DESCRIPTION));
-				column.setPrimaryKey(Boolean.parseBoolean(columnElement.getAttribute("primaryKey")));
-				column.setRequired(Boolean.parseBoolean(columnElement.getAttribute("required")));
+    private static Element createOptionElement(final String key,
+            final String value, final Document document) {
+        final Element option = document.createElement("option");
+        option.setAttribute("key", key);
+        option.setAttribute("value", value);
+        return option;
+    }
 
-				table.addColumn(column);
-			}
+    public static Document getDatabaseDocument(final Database database) {
+        final Document document = XmlUtils.getDocumentBuilder().newDocument();
+        final Comment comment = document
+                .createComment("WARNING: DO NOT EDIT THIS FILE. THIS FILE IS MANAGED BY SPRING ROO.");
+        document.appendChild(comment);
 
-			List<Element> foreignKeyElements = XmlUtils.findElements("foreign-key", tableElement);
-			for (Element foreignKeyElement : foreignKeyElements) {
-				ForeignKey foreignKey = new ForeignKey(foreignKeyElement.getAttribute(NAME), foreignKeyElement.getAttribute(FOREIGN_TABLE));
-				foreignKey.setOnDelete(CascadeAction.getCascadeAction(foreignKeyElement.getAttribute(ON_DELETE)));
-				foreignKey.setOnUpdate(CascadeAction.getCascadeAction(foreignKeyElement.getAttribute(ON_UPDATE)));
+        final Element databaseElement = document.createElement("database");
+        databaseElement.setAttribute(NAME, "deprecated");
 
-				List<Element> optionElements = XmlUtils.findElements("option", foreignKeyElement);
-				for (Element optionElement : optionElements) {
-					if (optionElement.getAttribute("key").equals("exported")) {
-						foreignKey.setExported(Boolean.parseBoolean(optionElement.getAttribute("value")));
-						break; // Don't process any more <option> elements
-					}
-				}
+        if (database.getDestinationPackage() != null) {
+            databaseElement.setAttribute("package", database
+                    .getDestinationPackage().getFullyQualifiedPackageName());
+        }
 
-				List<Element> referenceElements = XmlUtils.findElements(REFERENCE, foreignKeyElement);
-				for (Element referenceElement : referenceElements) {
-					Reference reference = new Reference(referenceElement.getAttribute(LOCAL), referenceElement.getAttribute(FOREIGN));
-					foreignKey.addReference(reference);
-				}
-				table.addImportedKey(foreignKey);
-			}
+        databaseElement.appendChild(createOptionElement("moduleName",
+                database.getModuleName(), document));
+        addBooleanOptionElement(document, databaseElement, "activeRecord",
+                database.isActiveRecord());
+        addBooleanOptionElement(document, databaseElement,
+                "includeNonPortableAttributes",
+                database.isIncludeNonPortableAttributes());
+        addBooleanOptionElement(document, databaseElement, "testAutomatically",
+                database.isTestAutomatically());
 
-			addIndices(table, tableElement, IndexType.INDEX);
-			addIndices(table, tableElement, IndexType.UNIQUE);
+        for (final Table table : database.getTables()) {
+            final Element tableElement = document.createElement("table");
+            tableElement.setAttribute(NAME, table.getName());
+            final String schemaName = table.getSchema().getName();
+            if (!DbreModelService.NO_SCHEMA_REQUIRED.equals(schemaName)) {
+                tableElement.setAttribute("alias", schemaName);
+            }
+            if (StringUtils.isNotBlank(table.getDescription())) {
+                tableElement.setAttribute(DESCRIPTION, table.getDescription());
+            }
 
-			tables.add(table);
-		}
+            for (final Column column : table.getColumns()) {
+                final Element columnElement = document.createElement("column");
+                columnElement.setAttribute(NAME, column.getName());
+                if (StringUtils.isNotBlank(column.getDescription())) {
+                    columnElement.setAttribute(DESCRIPTION,
+                            column.getDescription());
+                }
 
-		JavaPackage destinationPackage = null;
-		if (StringUtils.hasText(databaseElement.getAttribute("package"))) {
-			destinationPackage = new JavaPackage(databaseElement.getAttribute("package"));
-		}
+                columnElement.setAttribute("primaryKey",
+                        String.valueOf(column.isPrimaryKey()));
+                columnElement.setAttribute("required",
+                        String.valueOf(column.isRequired()));
+                columnElement.setAttribute("size",
+                        String.valueOf(column.getColumnSize()));
+                columnElement.setAttribute("scale",
+                        String.valueOf(column.getScale()));
+                columnElement.setAttribute("type", column.getDataType() + ","
+                        + column.getTypeName());
 
-		Database database = new Database(databaseElement.getAttribute(NAME), tables);
-		database.setDestinationPackage(destinationPackage);
+                tableElement.appendChild(columnElement);
+            }
 
-		List<Element> optionElements = XmlUtils.findElements("option", databaseElement);
-		for (Element optionElement : optionElements) {
-			if (optionElement.getAttribute("key").equals("testAutomatically")) {
-				database.setTestAutomatically(Boolean.parseBoolean(optionElement.getAttribute("value")));
-			}
-			if (optionElement.getAttribute("key").equals("includeNonPortableAttributes")) {
-				database.setIncludeNonPortableAttributes(Boolean.parseBoolean(optionElement.getAttribute("value")));
-			}
-		}
+            addForeignKeyElements(table.getImportedKeys(), false, tableElement,
+                    document);
+            addForeignKeyElements(table.getExportedKeys(), true, tableElement,
+                    document);
 
-		return database;
-	}
+            for (final Index index : table.getIndices()) {
+                final Element indexElement = document.createElement(index
+                        .isUnique() ? IndexType.UNIQUE.name().toLowerCase()
+                        : IndexType.INDEX.name().toLowerCase());
+                indexElement.setAttribute(NAME, index.getName());
+                for (final IndexColumn indexColumn : index.getColumns()) {
+                    final Element indexColumnElement = document
+                            .createElement((index.isUnique() ? IndexType.UNIQUE
+                                    .name().toLowerCase() : IndexType.INDEX
+                                    .name().toLowerCase())
+                                    + "-column");
+                    indexColumnElement
+                            .setAttribute(NAME, indexColumn.getName());
+                    indexElement.appendChild(indexColumnElement);
+                }
+                tableElement.appendChild(indexElement);
+            }
 
-	public static Document getDatabaseDocument(Database database) {
-		Document document = XmlUtils.getDocumentBuilder().newDocument();
-		Comment comment = document.createComment("WARNING: DO NOT EDIT THIS FILE. THIS FILE IS MANAGED BY SPRING ROO.");
-		document.appendChild(comment);
+            databaseElement.appendChild(tableElement);
+        }
 
-		Element databaseElement = document.createElement("database");
-		databaseElement.setAttribute(NAME, database.getName());
+        document.appendChild(databaseElement);
 
-		if (database.getDestinationPackage() != null) {
-			databaseElement.setAttribute("package", database.getDestinationPackage().getFullyQualifiedPackageName());
-		}
+        // ROO-2355: transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,
+        // "http://db.apache.org/torque/dtd/database_3_3.dtd");
 
-		databaseElement.appendChild(createOptionElement("testAutomatically", String.valueOf(database.isTestAutomatically()), document));
-		databaseElement.appendChild(createOptionElement("includeNonPortableAttributes", String.valueOf(database.isIncludeNonPortableAttributes()), document));
+        return document;
+    }
 
-		for (Table table : database.getTables()) {
-			Element tableElement = document.createElement("table");
-			tableElement.setAttribute(NAME, table.getName());
-			if (StringUtils.hasText(table.getDescription())) {
-				tableElement.setAttribute(DESCRIPTION, table.getDescription());
-			}
+    static Database readDatabase(final InputStream inputStream) {
+        try {
+            final SAXParserFactory spf = SAXParserFactory.newInstance();
+            final SAXParser parser = spf.newSAXParser();
+            final DatabaseContentHandler contentHandler = new DatabaseContentHandler();
+            parser.parse(inputStream, contentHandler);
+            return contentHandler.getDatabase();
+        }
+        catch (final EmptyStackException e) {
+            throw new IllegalStateException(
+                    "Unable to read database from XML file", e);
+        }
+        catch (final Exception e) {
+            if (e.getMessage().contains("Invalid byte")) {
+                throw new IllegalStateException(
+                        "Invalid content in XML file. There may hidden characters in the file, such as the byte order mark (BOM). Try re-saving the xml in a text editor",
+                        e);
+            }
+            throw new IllegalStateException(e);
+        }
+    }
 
-			for (Column column : table.getColumns()) {
-				Element columnElement = document.createElement("column");
-				columnElement.setAttribute(NAME, column.getName());
-				if (StringUtils.hasText(column.getDescription())) {
-					columnElement.setAttribute(DESCRIPTION, column.getDescription());
-				}
+    static Database readDatabaseWithDom(final InputStream inputStream) {
+        final Document document = XmlUtils.readXml(inputStream);
+        final Element databaseElement = document.getDocumentElement();
 
-				columnElement.setAttribute("primaryKey", String.valueOf(column.isPrimaryKey()));
-				columnElement.setAttribute("required", String.valueOf(column.isRequired()));
-				columnElement.setAttribute("size", String.valueOf(column.getColumnSize()));
-				columnElement.setAttribute("scale", String.valueOf(column.getScale()));
-				columnElement.setAttribute("type", column.getDataType() + "," + column.getTypeName());
+        final Set<Table> tables = new LinkedHashSet<Table>();
 
-				tableElement.appendChild(columnElement);
-			}
+        final List<Element> tableElements = XmlUtils.findElements("table",
+                databaseElement);
+        for (final Element tableElement : tableElements) {
+            final String alias = tableElement.getAttribute("alias");
+            final String schemaName = StringUtils.defaultIfEmpty(alias,
+                    databaseElement.getAttribute(NAME));
+            final Table table = new Table(tableElement.getAttribute(NAME),
+                    new Schema(schemaName));
+            if (StringUtils.isNotBlank(tableElement.getAttribute(DESCRIPTION))) {
+                table.setDescription(tableElement.getAttribute(DESCRIPTION));
+            }
 
-			addForeignKeyElements(table.getImportedKeys(), false, tableElement, document);
-			addForeignKeyElements(table.getExportedKeys(), true, tableElement, document);
+            final List<Element> columnElements = XmlUtils.findElements(
+                    "column", tableElement);
+            for (final Element columnElement : columnElements) {
+                final String type = columnElement.getAttribute("type");
+                final String[] dataTypeAndName = StringUtils.split(type, ",");
+                final int dataType = Integer.parseInt(dataTypeAndName[0]);
+                final String typeName = dataTypeAndName[1];
 
-			for (Index index : table.getIndices()) {
-				Element indexElement = document.createElement(index.isUnique() ? IndexType.UNIQUE.name().toLowerCase() : IndexType.INDEX.name().toLowerCase());
-				indexElement.setAttribute(NAME, index.getName());
-				for (IndexColumn indexColumn : index.getColumns()) {
-					Element indexColumnElement = document.createElement((index.isUnique() ? IndexType.UNIQUE.name().toLowerCase() : IndexType.INDEX.name().toLowerCase()) + "-column");
-					indexColumnElement.setAttribute(NAME, indexColumn.getName());
-					indexElement.appendChild(indexColumnElement);
-				}
-				tableElement.appendChild(indexElement);
-			}
+                final int columnSize = Integer.parseInt(columnElement
+                        .getAttribute("size"));
+                final int scale = Integer.parseInt(columnElement
+                        .getAttribute("scale"));
 
-			databaseElement.appendChild(tableElement);
-		}
+                final Column column = new Column(
+                        columnElement.getAttribute(NAME), dataType, typeName,
+                        columnSize, scale);
+                column.setDescription(columnElement.getAttribute(DESCRIPTION));
+                column.setPrimaryKey(Boolean.parseBoolean(columnElement
+                        .getAttribute("primaryKey")));
+                column.setRequired(Boolean.parseBoolean(columnElement
+                        .getAttribute("required")));
 
-		document.appendChild(databaseElement);
+                table.addColumn(column);
+            }
 
-		// ROO-2355: transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "http://db.apache.org/torque/dtd/database_3_3.dtd");
-		
-		return document;
-	}
+            final List<Element> foreignKeyElements = XmlUtils.findElements(
+                    "foreign-key", tableElement);
+            for (final Element foreignKeyElement : foreignKeyElements) {
+                final ForeignKey foreignKey = new ForeignKey(
+                        foreignKeyElement.getAttribute(NAME),
+                        foreignKeyElement.getAttribute(FOREIGN_TABLE));
+                foreignKey.setOnDelete(CascadeAction
+                        .getCascadeAction(foreignKeyElement
+                                .getAttribute(ON_DELETE)));
+                foreignKey.setOnUpdate(CascadeAction
+                        .getCascadeAction(foreignKeyElement
+                                .getAttribute(ON_UPDATE)));
 
-	private static void addForeignKeyElements(Set<ForeignKey> foreignKeys, boolean exported, Element tableElement, Document document) {
-		for (ForeignKey foreignKey : foreignKeys) {
-			Element foreignKeyElement = document.createElement("foreign-key");
-			String foreignTableName = foreignKey.getForeignTableName();
-			foreignKeyElement.setAttribute(NAME, foreignKey.getName());
-			foreignKeyElement.setAttribute(FOREIGN_TABLE, foreignTableName);
-			foreignKeyElement.setAttribute(ON_DELETE, foreignKey.getOnDelete().getCode());
-			foreignKeyElement.setAttribute(ON_UPDATE, foreignKey.getOnUpdate().getCode());
-			foreignKeyElement.appendChild(createOptionElement("exported", String.valueOf(exported), document));
+                final List<Element> optionElements = XmlUtils.findElements(
+                        "option", foreignKeyElement);
+                for (final Element optionElement : optionElements) {
+                    if (optionElement.getAttribute("key").equals("exported")) {
+                        foreignKey.setExported(Boolean
+                                .parseBoolean(optionElement
+                                        .getAttribute("value")));
+                    }
+                    if (optionElement.getAttribute("key").equals(
+                            "foreignSchemaName")) {
+                        foreignKey.setForeignSchemaName(optionElement
+                                .getAttribute("value"));
+                    }
+                }
 
-			for (Reference reference : foreignKey.getReferences()) {
-				Element referenceElement = document.createElement(REFERENCE);
-				referenceElement.setAttribute(FOREIGN, reference.getForeignColumnName());
-				referenceElement.setAttribute(LOCAL, reference.getLocalColumnName());
-				foreignKeyElement.appendChild(referenceElement);
-			}
-			tableElement.appendChild(foreignKeyElement);
-		}
-	}
+                final List<Element> referenceElements = XmlUtils.findElements(
+                        REFERENCE, foreignKeyElement);
+                for (final Element referenceElement : referenceElements) {
+                    final Reference reference = new Reference(
+                            referenceElement.getAttribute(LOCAL),
+                            referenceElement.getAttribute(FOREIGN));
+                    foreignKey.addReference(reference);
+                }
+                table.addImportedKey(foreignKey);
+            }
 
-	private static Element createOptionElement(String key, String value, Document document) {
-		Element option = document.createElement("option");
-		option.setAttribute("key", key);
-		option.setAttribute("value", value);
-		return option;
-	}
+            addIndices(table, tableElement, IndexType.INDEX);
+            addIndices(table, tableElement, IndexType.UNIQUE);
 
-	private static void addIndices(Table table, Element tableElement, IndexType indexType) {
-		List<Element> elements = XmlUtils.findElements(indexType.name().toLowerCase(), tableElement);
-		for (Element element : elements) {
-			Index index = new Index(element.getAttribute(NAME));
-			index.setUnique(indexType == IndexType.UNIQUE);
-			List<Element> indexColumnElements = XmlUtils.findElements(indexType.name().toLowerCase() + "-column", element);
-			for (Element indexColumnElement : indexColumnElements) {
-				IndexColumn indexColumn = new IndexColumn(indexColumnElement.getAttribute(NAME));
-				index.addColumn(indexColumn);
-			}
-			table.addIndex(index);
-		}
-	}
+            tables.add(table);
+        }
+
+        JavaPackage destinationPackage = null;
+        if (StringUtils.isNotBlank(databaseElement.getAttribute("package"))) {
+            destinationPackage = new JavaPackage(
+                    databaseElement.getAttribute("package"));
+        }
+
+        final Database database = new Database(tables);
+        database.setDestinationPackage(destinationPackage);
+
+        final List<Element> optionElements = XmlUtils.findElements("option",
+                databaseElement);
+        for (final Element optionElement : optionElements) {
+            if (optionElement.getAttribute("key").equals("moduleName")) {
+                database.setModuleName(optionElement.getAttribute("value"));
+            }
+            if (optionElement.getAttribute("key").equals("activeRecord")) {
+                database.setActiveRecord(Boolean.parseBoolean(optionElement
+                        .getAttribute("value")));
+            }
+            if (optionElement.getAttribute("key").equals("testAutomatically")) {
+                database.setTestAutomatically(Boolean
+                        .parseBoolean(optionElement.getAttribute("value")));
+            }
+            if (optionElement.getAttribute("key").equals(
+                    "includeNonPortableAttributes")) {
+                database.setIncludeNonPortableAttributes(Boolean
+                        .parseBoolean(optionElement.getAttribute("value")));
+            }
+        }
+
+        return database;
+    }
 }

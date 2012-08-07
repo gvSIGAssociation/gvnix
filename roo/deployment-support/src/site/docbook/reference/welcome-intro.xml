@@ -570,7 +570,7 @@ Created SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
 roo&gt; <emphasis role="bold">hint</emphasis>
 Roo requires the installation of a JPA provider and associated database.
 
-Type 'persistence setup' and then hit TAB three times.
+Type 'jpa setup' and then hit TAB three times.
 We suggest you type 'H' then TAB to complete "HIBERNATE".
 After the --provider, press TAB twice for database choices.
 For testing purposes, type (or TAB) HYPERSONIC_IN_MEMORY.
@@ -585,13 +585,14 @@ Once JPA is installed, type 'hint' and ENTER for the next suggestion.</programli
     the TAB key when using the shell, as it will save you from having to type
     most of these commands:</para>
 
-    <programlisting>roo&gt; <emphasis role="bold">persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
+    <programlisting>roo&gt; <emphasis role="bold">jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
 roo&gt; <emphasis role="bold">hint</emphasis>
-roo&gt; <emphasis role="bold">entity --class ~.Timer --testAutomatically</emphasis>
+roo&gt; <emphasis role="bold">entity jpa --class ~.Timer --testAutomatically</emphasis>
 roo&gt; <emphasis role="bold">hint</emphasis>
 roo&gt; <emphasis role="bold">field string --fieldName message --notNull</emphasis>
-roo&gt; <emphasis role="bold">hint controllers</emphasis>
-roo&gt; <emphasis role="bold">controller all --package ~.web</emphasis>
+roo&gt; <emphasis role="bold"><emphasis role="bold">hint </emphasis>web mvc</emphasis>
+roo&gt; <emphasis role="bold">web mvc setup</emphasis>
+roo&gt; <emphasis role="bold">web mvc all --package ~.web</emphasis>
 roo&gt; <emphasis role="bold">selenium test --controller ~.web.TimerController</emphasis>
 roo&gt; <emphasis role="bold">perform tests</emphasis>
 roo&gt; <emphasis role="bold">perform package</emphasis>
@@ -689,6 +690,17 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
         xlink:href="http://code.google.com/webtoolkit/">Google Web
         Toolkit</link> (GWT) application using Spring Roo. This shows you the
         new GWT scaffolding support we added to Roo 1.1.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>pizzashop.roo</emphasis>: The PizzaShop sample script
+        demonstrates Roo's integration of JPA composite primary keys. It
+        produces a headless application which is accessible via JSON
+        (available through Spring MVC REST integration). To add a Web UI on
+        top of it, simply run the <link
+        linkend="command-index-web-mvc-all">web mvc all</link> command. The
+        application is described in greater detail in our <link
+        linkend="beginning">tutorial</link>.</para>
       </listitem>
     </itemizedlist>
   </section>

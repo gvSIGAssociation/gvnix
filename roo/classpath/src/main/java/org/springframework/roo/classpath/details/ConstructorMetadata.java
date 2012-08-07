@@ -5,6 +5,6 @@ package org.springframework.roo.classpath.details;
  * 
  * @author Ben Alex
  * @since 1.0
- *
  */
-public interface ConstructorMetadata extends InvocableMemberMetadata {}
+public interface ConstructorMetadata extends InvocableMemberMetadata {
+}

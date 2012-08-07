@@ -6,21 +6,42 @@ package org.springframework.roo.classpath.details;
  * @author Ben Alex
  * @since 1.1
  */
-public final class ConstructorMetadataBuilder extends AbstractInvocableMemberMetadataBuilder<ConstructorMetadata> {
+public class ConstructorMetadataBuilder extends
+        AbstractInvocableMemberMetadataBuilder<ConstructorMetadata> {
 
-	public ConstructorMetadataBuilder(String declaredbyMetadataId) {
-		super(declaredbyMetadataId);
-	}
+    /**
+     * Constructor
+     * 
+     * @param existing
+     */
+    public ConstructorMetadataBuilder(final ConstructorMetadata existing) {
+        super(existing);
+    }
 
-	public ConstructorMetadataBuilder(ConstructorMetadata existing) {
-		super(existing);
-	}
+    /**
+     * Constructor
+     * 
+     * @param declaredbyMetadataId
+     */
+    public ConstructorMetadataBuilder(final String declaredbyMetadataId) {
+        super(declaredbyMetadataId);
+    }
 
-	public ConstructorMetadataBuilder(String declaredbyMetadataId, ConstructorMetadata existing) {
-		super(declaredbyMetadataId, existing);
-	}
+    /**
+     * Constructor
+     * 
+     * @param declaredbyMetadataId
+     * @param existing
+     */
+    public ConstructorMetadataBuilder(final String declaredbyMetadataId,
+            final ConstructorMetadata existing) {
+        super(declaredbyMetadataId, existing);
+    }
 
-	public ConstructorMetadata build() {
-		return new DefaultConstructorMetadata(getCustomData().build(), getDeclaredByMetadataId(), getModifier(), buildAnnotations(), getParameterTypes(), getParameterNames(), getThrowsTypes(), getBodyBuilder().getOutput());
-	}
+    public ConstructorMetadata build() {
+        return new DefaultConstructorMetadata(getCustomData().build(),
+                getDeclaredByMetadataId(), getModifier(), buildAnnotations(),
+                getParameterTypes(), getParameterNames(), getThrowsTypes(),
+                getBodyBuilder().getOutput());
+    }
 }

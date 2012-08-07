@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.roo</groupId>
         <artifactId>org.springframework.roo.osgi.roo.bundle</artifactId>
-        <version>1.1.5.RELEASE</version>
+        <version>1.2.2.RELEASE</version>
         <relativePath>../osgi-roo-bundle</relativePath>
     </parent>
     <artifactId>org.springframework.roo.shell.jline.osgi</artifactId>
@@ -44,8 +44,8 @@
         </dependency>
         <!-- External modules -->
         <dependency>
-            <groupId>org.springframework.roo.wrapping</groupId>
-            <artifactId>org.springframework.roo.wrapping.jline</artifactId>
+            <groupId>net.sourceforge.jline</groupId>
+            <artifactId>jline</artifactId>
         </dependency>
         <dependency>
             <groupId>org.fusesource.jansi</groupId>

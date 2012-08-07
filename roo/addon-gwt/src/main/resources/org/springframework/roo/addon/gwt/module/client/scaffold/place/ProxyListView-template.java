@@ -1,6 +1,6 @@
 package __TOP_LEVEL_PACKAGE__.client.scaffold.place;
 
-import com.google.gwt.requestfactory.shared.EntityProxy;
+import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.view.client.HasData;
 
@@ -22,7 +22,7 @@ public interface ProxyListView<P extends EntityProxy> extends IsWidget {
 	 * @param <R> the type of the records to display
 	 */
 	interface Delegate<R extends EntityProxy> {
-		
+
 		void createClicked();
 	}
 

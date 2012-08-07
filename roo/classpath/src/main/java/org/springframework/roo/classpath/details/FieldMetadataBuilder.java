@@ -12,70 +12,102 @@ import org.springframework.roo.model.JavaType;
  * @author Ben Alex
  * @since 1.1
  */
-public final class FieldMetadataBuilder extends AbstractIdentifiableAnnotatedJavaStructureBuilder<FieldMetadata> {
-	private JavaSymbolName fieldName;
-	private JavaType fieldType;
-	private String fieldInitializer;
-	
-	public FieldMetadataBuilder(String declaredbyMetadataId) {
-		super(declaredbyMetadataId);
-	}
-	
-	public FieldMetadataBuilder(FieldMetadata existing) {
-		super(existing);
-		init(existing.getFieldName(), existing.getFieldType(), existing.getFieldInitializer());
-	}
-	
-	public FieldMetadataBuilder(String declaredbyMetadataId, FieldMetadata existing) {
-		super(declaredbyMetadataId, existing);
-		init(existing.getFieldName(), existing.getFieldType(), existing.getFieldInitializer());
-	}
+public class FieldMetadataBuilder extends
+        AbstractIdentifiableAnnotatedJavaStructureBuilder<FieldMetadata> {
 
-	public FieldMetadataBuilder(String declaredbyMetadataId, int modifier, JavaSymbolName fieldName, JavaType fieldType, String fieldInitializer) {
-		this(declaredbyMetadataId);
-		setModifier(modifier);
-		init(fieldName, fieldType, fieldInitializer);
-	}
+    private String fieldInitializer;
+    private JavaSymbolName fieldName;
+    private JavaType fieldType;
 
-	public FieldMetadataBuilder(String declaredbyMetadataId, int modifier, List<AnnotationMetadataBuilder> annotations, JavaSymbolName fieldName, JavaType fieldType) {
-		this(declaredbyMetadataId);
-		setModifier(modifier);
-		setAnnotations(annotations);
-		this.fieldName = fieldName;
-		this.fieldType = fieldType;
-	}
-	
-	public FieldMetadata build() {
-		return new DefaultFieldMetadata(getCustomData().build(), getDeclaredByMetadataId(), getModifier(), buildAnnotations(), getFieldName(), getFieldType(), getFieldInitializer());
-	}
+    public FieldMetadataBuilder(final FieldMetadata existing) {
+        super(existing);
+        init(existing.getFieldName(), existing.getFieldType(),
+                existing.getFieldInitializer());
+    }
 
-	private void init(JavaSymbolName fieldName, JavaType fieldType, String fieldInitializer) {
-		this.fieldName = fieldName;
-		this.fieldType = fieldType;
-		this.fieldInitializer = fieldInitializer;
-	}
+    public FieldMetadataBuilder(final String declaredbyMetadataId) {
+        super(declaredbyMetadataId);
+    }
 
-	public String getFieldInitializer() {
-		return fieldInitializer;
-	}
+    public FieldMetadataBuilder(final String declaredbyMetadataId,
+            final FieldMetadata existing) {
+        super(declaredbyMetadataId, existing);
+        init(existing.getFieldName(), existing.getFieldType(),
+                existing.getFieldInitializer());
+    }
 
-	public void setFieldInitializer(String fieldInitializer) {
-		this.fieldInitializer = fieldInitializer;
-	}
+    /**
+     * Constructor for a builder with the given field values
+     * 
+     * @param declaredbyMetadataId a MID for a specific instance
+     * @param modifier as per {@link java.lang.reflect.Modifier}
+     * @param fieldName the field name (required)
+     * @param fieldType the field type (required)
+     * @param fieldInitializer the Java expression for the field's initial value
+     *            (can be <code>null</code> for none)
+     */
+    public FieldMetadataBuilder(final String declaredbyMetadataId,
+            final int modifier, final JavaSymbolName fieldName,
+            final JavaType fieldType, final String fieldInitializer) {
+        this(declaredbyMetadataId);
+        setModifier(modifier);
+        init(fieldName, fieldType, fieldInitializer);
+    }
 
-	public JavaSymbolName getFieldName() {
-		return fieldName;
-	}
+    /**
+     * Constructor
+     * 
+     * @param declaredbyMetadataId
+     * @param modifier
+     * @param annotations
+     * @param fieldName
+     * @param fieldType
+     */
+    public FieldMetadataBuilder(final String declaredbyMetadataId,
+            final int modifier,
+            final List<AnnotationMetadataBuilder> annotations,
+            final JavaSymbolName fieldName, final JavaType fieldType) {
+        this(declaredbyMetadataId);
+        setModifier(modifier);
+        setAnnotations(annotations);
+        this.fieldName = fieldName;
+        this.fieldType = fieldType;
+    }
 
-	public void setFieldName(JavaSymbolName fieldName) {
-		this.fieldName = fieldName;
-	}
+    public FieldMetadata build() {
+        return new DefaultFieldMetadata(getCustomData().build(),
+                getDeclaredByMetadataId(), getModifier(), buildAnnotations(),
+                getFieldName(), getFieldType(), getFieldInitializer());
+    }
 
-	public JavaType getFieldType() {
-		return fieldType;
-	}
+    public String getFieldInitializer() {
+        return fieldInitializer;
+    }
 
-	public void setFieldType(JavaType fieldType) {
-		this.fieldType = fieldType;
-	}
+    public JavaSymbolName getFieldName() {
+        return fieldName;
+    }
+
+    public JavaType getFieldType() {
+        return fieldType;
+    }
+
+    private void init(final JavaSymbolName fieldName, final JavaType fieldType,
+            final String fieldInitializer) {
+        this.fieldName = fieldName;
+        this.fieldType = fieldType;
+        this.fieldInitializer = fieldInitializer;
+    }
+
+    public void setFieldInitializer(final String fieldInitializer) {
+        this.fieldInitializer = fieldInitializer;
+    }
+
+    public void setFieldName(final JavaSymbolName fieldName) {
+        this.fieldName = fieldName;
+    }
+
+    public void setFieldType(final JavaType fieldType) {
+        this.fieldType = fieldType;
+    }
 }

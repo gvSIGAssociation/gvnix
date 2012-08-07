@@ -1,46 +1,78 @@
 package org.springframework.roo.classpath.details;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.AbstractCustomDataAccessorBuilder;
 import org.springframework.roo.model.Builder;
-import org.springframework.roo.support.util.Assert;
 
 /**
- * Assists in the creation of a {@link Builder} for types that eventually implement {@link IdentifiableJavaStructure}.
+ * Assists in the creation of a {@link Builder} for types that eventually
+ * implement {@link IdentifiableJavaStructure}.
  * 
  * @author Ben Alex
  * @since 1.1
  */
-public abstract class AbstractIdentifiableJavaStructureBuilder<T extends IdentifiableJavaStructure> extends AbstractCustomDataAccessorBuilder<T> {
-	private String declaredByMetadataId;
-	private int modifier;
+public abstract class AbstractIdentifiableJavaStructureBuilder<T extends IdentifiableJavaStructure>
+        extends AbstractCustomDataAccessorBuilder<T> {
 
-	protected AbstractIdentifiableJavaStructureBuilder(String declaredByMetadataId) {
-		Assert.isTrue(MetadataIdentificationUtils.isIdentifyingInstance(declaredByMetadataId), "Declared by metadata ID must identify a specific instance (not '" + declaredByMetadataId + "')");
-		this.declaredByMetadataId = declaredByMetadataId;
-	}
+    private final String declaredByMetadataId;
+    private int modifier;
 
-	protected AbstractIdentifiableJavaStructureBuilder(IdentifiableJavaStructure existing) {
-		super(existing);
-		this.declaredByMetadataId = existing.getDeclaredByMetadataId();
-		this.modifier = existing.getModifier();
-	}
+    /**
+     * Constructor
+     * 
+     * @param existing
+     */
+    protected AbstractIdentifiableJavaStructureBuilder(
+            final IdentifiableJavaStructure existing) {
+        super(existing);
+        this.declaredByMetadataId = existing.getDeclaredByMetadataId();
+        this.modifier = existing.getModifier();
+    }
 
-	protected AbstractIdentifiableJavaStructureBuilder(String declaredbyMetadataId, IdentifiableJavaStructure existing) {
-		super(existing);
-		this.declaredByMetadataId = declaredbyMetadataId;
-		this.modifier = existing.getModifier();		
-	}
+    /**
+     * Constructor
+     * 
+     * @param declaredByMetadataId
+     */
+    protected AbstractIdentifiableJavaStructureBuilder(
+            final String declaredByMetadataId) {
+        Validate.isTrue(MetadataIdentificationUtils
+                .isIdentifyingInstance(declaredByMetadataId),
+                "Declared by metadata ID must identify a specific instance (not '"
+                        + declaredByMetadataId + "')");
+        this.declaredByMetadataId = declaredByMetadataId;
+    }
 
-	public final String getDeclaredByMetadataId() {
-		return declaredByMetadataId;
-	}
+    /**
+     * Constructor
+     * 
+     * @param declaredbyMetadataId
+     * @param existing
+     */
+    protected AbstractIdentifiableJavaStructureBuilder(
+            final String declaredbyMetadataId,
+            final IdentifiableJavaStructure existing) {
+        super(existing);
+        this.declaredByMetadataId = declaredbyMetadataId;
+        this.modifier = existing.getModifier();
+    }
 
-	public final int getModifier() {
-		return modifier;
-	}
+    public String getDeclaredByMetadataId() {
+        return declaredByMetadataId;
+    }
 
-	public final void setModifier(int modifier) {
-		this.modifier = modifier;
-	}
+    public final int getModifier() {
+        return modifier;
+    }
+
+    /**
+     * Sets the modifier of the built Java structure
+     * 
+     * @param modifier the modifier to set
+     * @see Modifier#PUBLIC, etc.
+     */
+    public final void setModifier(final int modifier) {
+        this.modifier = modifier;
+    }
 }

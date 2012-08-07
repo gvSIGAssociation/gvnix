@@ -12,24 +12,23 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.logging.client.LogConfiguration;
 import com.google.gwt.place.shared.*;
-import com.google.gwt.requestfactory.client.RequestFactoryLogHandler;
-import com.google.gwt.requestfactory.shared.LoggingRequest;
+import com.google.web.bindery.requestfactory.shared.LoggingRequest;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HasConstrainedValue;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.inject.Inject;
+import com.google.web.bindery.requestfactory.gwt.client.RequestFactoryLogHandler;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 __GAE_IMPORT__
 
 /**
  * Application for browsing entities.
  */
 public class ScaffoldDesktopApp extends ScaffoldApp {
-	private static final Logger log = Logger.getLogger(Scaffold.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Scaffold.class.getName());
 	private final ScaffoldDesktopShell shell;
 	private final ApplicationRequestFactory requestFactory;
 	private final EventBus eventBus;
@@ -65,7 +64,7 @@ public class ScaffoldDesktopApp extends ScaffoldApp {
 		GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
 			public void onUncaughtException(Throwable e) {
 				Window.alert("Error: " + e.getMessage());
-				log.log(Level.SEVERE, e.getMessage(), e);
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			}
 		});
 

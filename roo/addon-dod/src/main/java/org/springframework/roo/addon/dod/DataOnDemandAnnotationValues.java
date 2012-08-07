@@ -1,5 +1,7 @@
 package org.springframework.roo.addon.dod;
 
+import static org.springframework.roo.model.RooJavaType.ROO_DATA_ON_DEMAND;
+
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
@@ -13,20 +15,21 @@ import org.springframework.roo.model.JavaType;
  * @since 1.0
  */
 public class DataOnDemandAnnotationValues extends AbstractAnnotationValues {
-	// From annotation
-	@AutoPopulate private JavaType entity = null;
-	@AutoPopulate private int quantity = 10;
 
-	public DataOnDemandAnnotationValues(PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-		super(governorPhysicalTypeMetadata, new JavaType(RooDataOnDemand.class.getName()));
-		AutoPopulationUtils.populate(this, annotationMetadata);
-	}
+    @AutoPopulate private JavaType entity;
+    @AutoPopulate private int quantity = 10;
 
-	public JavaType getEntity() {
-		return entity;
-	}
+    public DataOnDemandAnnotationValues(
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+        super(governorPhysicalTypeMetadata, ROO_DATA_ON_DEMAND);
+        AutoPopulationUtils.populate(this, annotationMetadata);
+    }
 
-	public int getQuantity() {
-		return quantity;
-	}
+    public JavaType getEntity() {
+        return entity;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
 }

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0">
+    <scr:component enabled="true" name="org.springframework.roo.addon.layers.repository.mongo.MongoCommands">
+        <implementation class="org.springframework.roo.addon.layers.repository.mongo.MongoCommands"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.shell.CommandMarker"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.repository.mongo.MongoCommands"/>
+        <reference name="mongoOperations" interface="org.springframework.roo.addon.layers.repository.mongo.MongoOperations" cardinality="1..1" policy="static" bind="bindMongoOperations" unbind="unbindMongoOperations"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.layers.repository.mongo.MongoIdTypeConverter">
+        <implementation class="org.springframework.roo.addon.layers.repository.mongo.MongoIdTypeConverter"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.shell.Converter"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.repository.mongo.MongoIdTypeConverter"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.layers.repository.mongo.MongoOperationsImpl">
+        <implementation class="org.springframework.roo.addon.layers.repository.mongo.MongoOperationsImpl"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.layers.repository.mongo.MongoOperations"/>
+            <provide interface="org.springframework.roo.project.Feature"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.repository.mongo.MongoOperationsImpl"/>
+        <reference name="dataOnDemandOperations" interface="org.springframework.roo.addon.dod.DataOnDemandOperations" cardinality="1..1" policy="static" bind="bindDataOnDemandOperations" unbind="unbindDataOnDemandOperations"/>
+        <reference name="fileManager" interface="org.springframework.roo.process.manager.FileManager" cardinality="1..1" policy="static" bind="bindFileManager" unbind="unbindFileManager"/>
+        <reference name="integrationTestOperations" interface="org.springframework.roo.addon.test.IntegrationTestOperations" cardinality="1..1" policy="static" bind="bindIntegrationTestOperations" unbind="unbindIntegrationTestOperations"/>
+        <reference name="pathResolver" interface="org.springframework.roo.project.PathResolver" cardinality="1..1" policy="static" bind="bindPathResolver" unbind="unbindPathResolver"/>
+        <reference name="projectOperations" interface="org.springframework.roo.project.ProjectOperations" cardinality="1..1" policy="static" bind="bindProjectOperations" unbind="unbindProjectOperations"/>
+        <reference name="propFileOperations" interface="org.springframework.roo.addon.propfiles.PropFileOperations" cardinality="1..1" policy="static" bind="bindPropFileOperations" unbind="unbindPropFileOperations"/>
+        <reference name="typeLocationService" interface="org.springframework.roo.classpath.TypeLocationService" cardinality="1..1" policy="static" bind="bindTypeLocationService" unbind="unbindTypeLocationService"/>
+        <reference name="typeManagementService" interface="org.springframework.roo.classpath.TypeManagementService" cardinality="1..1" policy="static" bind="bindTypeManagementService" unbind="unbindTypeManagementService"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoLocatorImpl">
+        <implementation class="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoLocatorImpl"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoLocator"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoLocatorImpl"/>
+        <reference name="typeLocationService" interface="org.springframework.roo.classpath.TypeLocationService" cardinality="1..1" policy="static" bind="bindTypeLocationService" unbind="unbindTypeLocationService"/>
+    </scr:component>
+    <scr:component enabled="true" immediate="true" name="org.springframework.roo.addon.layers.repository.mongo.MongoEntityMetadataProviderImpl">
+        <implementation class="org.springframework.roo.addon.layers.repository.mongo.MongoEntityMetadataProviderImpl"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.layers.repository.mongo.MongoEntityMetadataProvider"/>
+            <provide interface="org.springframework.roo.classpath.itd.ItdTriggerBasedMetadataProvider"/>
+            <provide interface="org.springframework.roo.classpath.itd.ItdMetadataProvider"/>
+            <provide interface="org.springframework.roo.metadata.MetadataProvider"/>
+            <provide interface="org.springframework.roo.classpath.TriggerBasedMetadataProvider"/>
+            <provide interface="org.springframework.roo.metadata.MetadataNotificationListener"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.repository.mongo.MongoEntityMetadataProviderImpl"/>
+        <reference name="customDataKeyDecorator" interface="org.springframework.roo.classpath.customdata.taggers.CustomDataKeyDecorator" cardinality="1..1" policy="static" bind="bindCustomDataKeyDecorator" unbind="unbindCustomDataKeyDecorator"/>
+        <reference name="fileManager" interface="org.springframework.roo.process.manager.FileManager" cardinality="1..1" policy="static" bind="bindFileManager" unbind="unbindFileManager"/>
+        <reference name="itdDiscoveryService" interface="org.springframework.roo.classpath.ItdDiscoveryService" cardinality="1..1" policy="static" bind="bindItdDiscoveryService" unbind="unbindItdDiscoveryService"/>
+        <reference name="memberDetailsScanner" interface="org.springframework.roo.classpath.scanner.MemberDetailsScanner" cardinality="1..1" policy="static" bind="bindMemberDetailsScanner" unbind="unbindMemberDetailsScanner"/>
+        <reference name="persistenceMemberLocator" interface="org.springframework.roo.classpath.persistence.PersistenceMemberLocator" cardinality="1..1" policy="static" bind="bindPersistenceMemberLocator" unbind="unbindPersistenceMemberLocator"/>
+        <reference name="typeLocationService" interface="org.springframework.roo.classpath.TypeLocationService" cardinality="1..1" policy="static" bind="bindTypeLocationService" unbind="unbindTypeLocationService"/>
+        <reference name="metadataDependencyRegistry" interface="org.springframework.roo.metadata.MetadataDependencyRegistry" cardinality="1..1" policy="static" bind="bindMetadataDependencyRegistry" unbind="unbindMetadataDependencyRegistry"/>
+        <reference name="metadataService" interface="org.springframework.roo.metadata.MetadataService" cardinality="1..1" policy="static" bind="bindMetadataService" unbind="unbindMetadataService"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoLayerProvider">
+        <implementation class="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoLayerProvider"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.classpath.layers.LayerProvider"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoLayerProvider"/>
+        <reference name="repositoryLocator" interface="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoLocator" cardinality="1..1" policy="static" bind="bindRepositoryLocator" unbind="unbindRepositoryLocator"/>
+    </scr:component>
+    <scr:component enabled="true" immediate="true" name="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoMetadataProviderImpl">
+        <implementation class="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoMetadataProviderImpl"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoMetadataProvider"/>
+            <provide interface="org.springframework.roo.classpath.itd.ItdTriggerBasedMetadataProvider"/>
+            <provide interface="org.springframework.roo.classpath.itd.ItdMetadataProvider"/>
+            <provide interface="org.springframework.roo.metadata.MetadataProvider"/>
+            <provide interface="org.springframework.roo.classpath.TriggerBasedMetadataProvider"/>
+            <provide interface="org.springframework.roo.metadata.MetadataNotificationListener"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.repository.mongo.RepositoryMongoMetadataProviderImpl"/>
+        <reference name="customDataKeyDecorator" interface="org.springframework.roo.classpath.customdata.taggers.CustomDataKeyDecorator" cardinality="1..1" policy="static" bind="bindCustomDataKeyDecorator" unbind="unbindCustomDataKeyDecorator"/>
+        <reference name="fileManager" interface="org.springframework.roo.process.manager.FileManager" cardinality="1..1" policy="static" bind="bindFileManager" unbind="unbindFileManager"/>
+        <reference name="itdDiscoveryService" interface="org.springframework.roo.classpath.ItdDiscoveryService" cardinality="1..1" policy="static" bind="bindItdDiscoveryService" unbind="unbindItdDiscoveryService"/>
+        <reference name="memberDetailsScanner" interface="org.springframework.roo.classpath.scanner.MemberDetailsScanner" cardinality="1..1" policy="static" bind="bindMemberDetailsScanner" unbind="unbindMemberDetailsScanner"/>
+        <reference name="persistenceMemberLocator" interface="org.springframework.roo.classpath.persistence.PersistenceMemberLocator" cardinality="1..1" policy="static" bind="bindPersistenceMemberLocator" unbind="unbindPersistenceMemberLocator"/>
+        <reference name="typeLocationService" interface="org.springframework.roo.classpath.TypeLocationService" cardinality="1..1" policy="static" bind="bindTypeLocationService" unbind="unbindTypeLocationService"/>
+        <reference name="metadataDependencyRegistry" interface="org.springframework.roo.metadata.MetadataDependencyRegistry" cardinality="1..1" policy="static" bind="bindMetadataDependencyRegistry" unbind="unbindMetadataDependencyRegistry"/>
+        <reference name="metadataService" interface="org.springframework.roo.metadata.MetadataService" cardinality="1..1" policy="static" bind="bindMetadataService" unbind="unbindMetadataService"/>
+    </scr:component>
+</components>

@@ -1,6 +1,6 @@
 project --topLevelPackage com.springsource.petclinic
 
-persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
 enum type --class ~.reference.PetType
 enum constant --name Dog
@@ -12,11 +12,11 @@ enum constant --name Cardiology
 enum constant --name Dentistry
 enum constant --name Nutrition
 
-entity --class ~.domain.Pet --testAutomatically
-entity --class ~.domain.Visit --testAutomatically
-entity --class ~.domain.AbstractPerson --abstract
-entity --class ~.domain.Vet --extends ~.domain.AbstractPerson --testAutomatically
-entity --class ~.domain.Owner --extends ~.domain.AbstractPerson --testAutomatically
+entity jpa --class ~.domain.Pet --sequenceName PET_SEQ
+entity jpa --class ~.domain.Visit --sequenceName VISIT_SEQ
+entity jpa --class ~.domain.AbstractPerson --abstract
+entity jpa --class ~.domain.Vet --extends ~.domain.AbstractPerson
+entity jpa --class ~.domain.Owner --extends ~.domain.AbstractPerson
 
 field string --fieldName firstName --sizeMin 3 --sizeMax 30 --class ~.domain.AbstractPerson
 field string --fieldName lastName --notNull --sizeMin 3 --sizeMax 30
@@ -52,8 +52,14 @@ finder add --finderName findVisitsByDescriptionAndVisitDate --class ~.domain.Vis
 finder add --finderName findVisitsByVisitDateBetween
 finder add --finderName findVisitsByDescriptionLike
 
+test integration --entity ~.domain.Vet
+test integration --entity ~.domain.Owner
+test integration --entity ~.domain.Pet
+test integration --entity ~.domain.Visit
+
 web mvc setup
 web mvc all --package ~.web
+web mvc finder all
 
 web mvc language --code de
 web mvc language --code es

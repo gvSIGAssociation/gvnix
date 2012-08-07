@@ -1,5 +1,7 @@
 package org.springframework.roo.url.stream.jdk;
 
+import static org.apache.commons.io.IOUtils.LINE_SEPARATOR;
+
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
@@ -17,29 +19,33 @@ import org.springframework.uaa.client.ProxyService;
  * 
  * @author Ben Alex
  * @since 1.1
- *
  */
 @Component
 @Service
 public class ProxyConfigurationCommands implements CommandMarker {
 
-	@Reference private ProxyService proxyService;
+    @Reference private ProxyService proxyService;
 
-	private static final String NEW_LINE = System.getProperty("line.separator");
-
-	@CliCommand(value="proxy configuration", help="Shows the proxy server configuration")
-	public String proxyConfiguration() throws MalformedURLException {
-		Proxy p = proxyService.setupProxy(new URL("http://www.springsource.org/roo"));
-		StringBuilder sb = new StringBuilder();
-		if (p == null) {
-			sb.append("                     *** Your system has no proxy setup ***").append(NEW_LINE);
-			sb.append("http://download.oracle.com/javase/6/docs/technotes/guides/net/proxies.html offers useful information.").append(NEW_LINE);
-			sb.append("For most people, simply edit /etc/java-6-openjdk/net.properties (or equivalent) and set the").append(NEW_LINE);
-			sb.append("java.net.useSystemProxies=true property to use your operating system-defined proxy settings.");
-		} else {
-			sb.append("Proxy to use: ").append(p);
-		}
-		return sb.toString();
-	}
-	
+    @CliCommand(value = "proxy configuration", help = "Shows the proxy server configuration")
+    public String proxyConfiguration() throws MalformedURLException {
+        final Proxy p = proxyService.setupProxy(new URL(
+                "http://www.springsource.org/roo"));
+        final StringBuilder sb = new StringBuilder();
+        if (p == null) {
+            sb.append(
+                    "                     *** Your system has no proxy setup ***")
+                    .append(LINE_SEPARATOR);
+            sb.append(
+                    "http://download.oracle.com/javase/6/docs/technotes/guides/net/proxies.html offers useful information.")
+                    .append(LINE_SEPARATOR);
+            sb.append(
+                    "For most people, simply edit /etc/java-6-openjdk/net.properties (or equivalent) and set the")
+                    .append(LINE_SEPARATOR);
+            sb.append("java.net.useSystemProxies=true property to use your operating system-defined proxy settings.");
+        }
+        else {
+            sb.append("Proxy to use: ").append(p);
+        }
+        return sb.toString();
+    }
 }

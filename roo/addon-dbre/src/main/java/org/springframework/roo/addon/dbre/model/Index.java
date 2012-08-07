@@ -3,77 +3,89 @@ package org.springframework.roo.addon.dbre.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.springframework.roo.support.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 /**
- * Represents an index definition for a table which may be either unique or non-unique.
+ * Represents an index definition for a table which may be either unique or
+ * non-unique.
  * 
  * @author Alan Stewart
  * @since 1.1
  */
-public class Index{
-	private String name;
-	private boolean unique;
-	private Set<IndexColumn> columns = new LinkedHashSet<IndexColumn>();
+public class Index {
 
-	Index(String name) {
-		this.name = name;
-	}
+    private final Set<IndexColumn> columns = new LinkedHashSet<IndexColumn>();
+    private String name;
+    private boolean unique;
 
-	public String getName() {
-		return name;
-	}
+    /**
+     * Constructor
+     * 
+     * @param name
+     */
+    Index(final String name) {
+        this.name = name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public boolean addColumn(final IndexColumn indexColumn) {
+        Validate.notNull(indexColumn, "Column required");
+        return columns.add(indexColumn);
+    }
 
-	public boolean isUnique() {
-		return unique;
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Index)) {
+            return false;
+        }
+        final Index other = (Index) obj;
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        }
+        else if (!name.equals(other.name)) {
+            return false;
+        }
+        return true;
+    }
 
-	public void setUnique(boolean unique) {
-		this.unique = unique;
-	}
+    public Set<IndexColumn> getColumns() {
+        return columns;
+    }
 
-	public Set<IndexColumn> getColumns() {
-		return columns;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public boolean addColumn(IndexColumn indexColumn) {
-		Assert.notNull(indexColumn, "Column required");
-		return columns.add(indexColumn);
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        return result;
+    }
 
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
+    public boolean isUnique() {
+        return unique;
+    }
 
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Index)) {
-			return false;
-		}
-		Index other = (Index) obj;
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		return true;
-	}
+    public void setName(final String name) {
+        this.name = name;
+    }
 
-	public String toString() {
-		return String.format("Index [name=%s, unique=%s, columns=%s]", name, unique, columns);
-	}
+    public void setUnique(final boolean unique) {
+        this.unique = unique;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Index [name=%s, unique=%s, columns=%s]", name,
+                unique, columns);
+    }
 }

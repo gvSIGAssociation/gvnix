@@ -1,11 +1,12 @@
 package org.springframework.roo.addon.web.mvc.controller.scaffold;
 
-import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.RooJavaType;
 
 /**
  * Represents a parsed {@link RooWebScaffold} annotation.
@@ -15,55 +16,73 @@ import org.springframework.roo.model.JavaType;
  * @since 1.0
  */
 public class WebScaffoldAnnotationValues extends AbstractAnnotationValues {
-	// From annotation
-	@AutoPopulate String path;
-	@AutoPopulate JavaType formBackingObject = null;
-	@AutoPopulate boolean delete = true;
-	@AutoPopulate boolean create = true;
-	@AutoPopulate boolean update = true;
-	@AutoPopulate boolean exposeFinders = true;
-	@AutoPopulate boolean registerConverters = true;
-	@AutoPopulate boolean exposeJson = true;
-	@AutoPopulate boolean populateMethods = true;
 
-	public WebScaffoldAnnotationValues(PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-		super(governorPhysicalTypeMetadata, new JavaType(RooWebScaffold.class.getName()));
-		AutoPopulationUtils.populate(this, annotationMetadata);
-	}
+    @AutoPopulate boolean create = true;
+    @AutoPopulate boolean delete = true;
+    @AutoPopulate boolean exposeFinders = true;
+    @AutoPopulate JavaType formBackingObject;
+    @AutoPopulate String path;
+    @AutoPopulate boolean populateMethods = true;
+    @AutoPopulate boolean registerConverters = true;
+    @AutoPopulate boolean update = true;
 
-	public String getPath() {
-		return path;
-	}
+    public WebScaffoldAnnotationValues(
+            final ClassOrInterfaceTypeDetails governorPhysicalTypeDetails) {
+        super(governorPhysicalTypeDetails, RooJavaType.ROO_WEB_SCAFFOLD);
+        AutoPopulationUtils.populate(this, annotationMetadata);
+    }
 
-	public JavaType getFormBackingObject() {
-		return formBackingObject;
-	}
+    /**
+     * Constructor
+     * 
+     * @param governorPhysicalTypeMetadata
+     */
+    public WebScaffoldAnnotationValues(
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+        super(governorPhysicalTypeMetadata, RooJavaType.ROO_WEB_SCAFFOLD);
+        AutoPopulationUtils.populate(this, annotationMetadata);
+    }
 
-	public boolean isDelete() {
-		return delete;
-	}
+    public JavaType getFormBackingObject() {
+        return formBackingObject;
+    }
 
-	public boolean isCreate() {
-		return create;
-	}
+    public String getPath() {
+        return path;
+    }
 
-	public boolean isUpdate() {
-		return update;
-	}
+    public boolean isCreate() {
+        return create;
+    }
 
-	public boolean isExposeFinders() {
-		return exposeFinders;
-	}
+    public boolean isDelete() {
+        return delete;
+    }
 
-	public boolean isRegisterConverters() {
-		return registerConverters;
-	}
+    public boolean isExposeFinders() {
+        return exposeFinders;
+    }
 
-	public boolean isExposeJson() {
-		return exposeJson;
-	}
-	
-	public boolean isPopulateMethods() {
-		return populateMethods;
-	}
+    public boolean isPopulateMethods() {
+        return populateMethods;
+    }
+
+    public boolean isRegisterConverters() {
+        return registerConverters;
+    }
+
+    public boolean isUpdate() {
+        return update;
+    }
+
+    @Override
+    public String toString() {
+        // For debugging
+        return "WebScaffoldAnnotationValues [" + "create=" + create
+                + ", delete=" + delete + ", exposeFinders=" + exposeFinders
+                + ", populateMethods=" + populateMethods
+                + ", registerConverters=" + registerConverters + ", update="
+                + update + ", formBackingObject=" + formBackingObject
+                + ", path=" + path + "]";
+    }
 }

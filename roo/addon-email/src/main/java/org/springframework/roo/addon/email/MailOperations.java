@@ -10,13 +10,26 @@ import org.springframework.roo.model.JavaType;
  */
 public interface MailOperations {
 
-	boolean isInstallEmailAvailable();
+    void configureTemplateMessage(String from, String subject);
 
-	boolean isManageEmailAvailable();
+    void injectEmailTemplate(JavaType targetType, JavaSymbolName fieldName,
+            boolean async);
 
-	void installEmail(String hostServer, MailProtocol protocol, String port, String encoding, String username, String password);
+    void installEmail(String hostServer, MailProtocol protocol, String port,
+            String encoding, String username, String password);
 
-	void configureTemplateMessage(String from, String subject);
+    /**
+     * Indicates whether the command for adding a JavaMailSender to the user's
+     * project is available.
+     * 
+     * @return see above
+     */
+    boolean isEmailInstallationPossible();
 
-	void injectEmailTemplate(JavaType targetType, JavaSymbolName fieldName, boolean async);
+    /**
+     * Indicates whether the commands relating to mail templates are available
+     * 
+     * @return see above
+     */
+    boolean isManageEmailAvailable();
 }

@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
-import org.springframework.roo.support.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Abstract base class for obtaining {@link DatabaseMetaData}.
@@ -13,11 +13,11 @@ import org.springframework.roo.support.util.Assert;
  * @since 1.1.2
  */
 public abstract class AbstractIntrospector {
-	protected DatabaseMetaData databaseMetaData;
+    protected DatabaseMetaData databaseMetaData;
 
-	AbstractIntrospector(Connection connection) throws SQLException {
-		Assert.notNull(connection, "Connection required");
-		databaseMetaData = connection.getMetaData();
-		Assert.notNull(databaseMetaData, "Database metadata is null");
-	}
+    AbstractIntrospector(final Connection connection) throws SQLException {
+        Validate.notNull(connection, "Connection required");
+        databaseMetaData = connection.getMetaData();
+        Validate.notNull(databaseMetaData, "Database metadata is null");
+    }
 }

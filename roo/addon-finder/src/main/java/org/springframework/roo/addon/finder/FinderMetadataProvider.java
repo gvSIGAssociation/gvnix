@@ -8,4 +8,5 @@ import org.springframework.roo.classpath.itd.ItdTriggerBasedMetadataProvider;
  * @author Alan Stewart
  * @since 1.1.2
  */
-public interface FinderMetadataProvider extends ItdTriggerBasedMetadataProvider {}
+public interface FinderMetadataProvider extends ItdTriggerBasedMetadataProvider {
+}

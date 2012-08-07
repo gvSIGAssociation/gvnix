@@ -1,92 +1,107 @@
 package org.springframework.roo.addon.web.mvc.controller.details;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.support.util.Assert;
 
 /**
- * Aggregates metadata for a given {@link JavaType} which is needed by Web scaffolding add-ons.
+ * Aggregates metadata for a given {@link JavaType} which is needed by Web
+ * scaffolding add-ons.
  * 
  * @author Stefan Schmidt
  * @since 1.1.2
  */
 public class JavaTypeMetadataDetails {
 
-	private JavaType javaType;
-	private String plural;
-	private boolean isEnumType;
-	private boolean isApplicationType;
-	private JavaTypePersistenceMetadataDetails persistenceDetails;
-	private String controllerPath;
-	
-	/**
-	 * Constructor for JavaTypeMetadataDetails.
-	 * 
-	 * @param javaType (must not be null)
-	 * @param plural (must contain text)
-	 * @param isEnumType 
-	 * @param isApplicationType
-	 * @param persistenceDetails (may be null if no persistence metadata is present for the javaType)
-	 * @param controllerPath (must contain text)
-	 */
-	public JavaTypeMetadataDetails(JavaType javaType, String plural, boolean isEnumType, boolean isApplicationType, JavaTypePersistenceMetadataDetails persistenceDetails, String controllerPath) {
-		Assert.notNull(javaType, "Java type required");
-		Assert.hasText(plural, "Plural required");
-		Assert.hasText(controllerPath, "Controller path required");
-		//Assert.notNull(persistenceDetails, "Java type persistence metadata details required");
-		this.javaType = javaType;
-		this.plural = plural;
-		this.isEnumType = isEnumType;
-		this.isApplicationType = isApplicationType;
-		this.persistenceDetails = persistenceDetails;
-		this.controllerPath = controllerPath;
-	}
-	
-	public JavaType getJavaType() {
-		return javaType;
-	}
+    private final String controllerPath;
+    private final boolean isApplicationType;
+    private final boolean isEnumType;
+    private final JavaType javaType;
+    private final JavaTypePersistenceMetadataDetails persistenceDetails;
+    private final String plural;
 
-	public String getPlural() {
-		return plural;
-	}
+    /**
+     * Constructor for JavaTypeMetadataDetails.
+     * 
+     * @param javaType (must not be null)
+     * @param plural (must contain text)
+     * @param isEnumType
+     * @param isApplicationType
+     * @param persistenceDetails (may be null if no persistence metadata is
+     *            present for the javaType)
+     * @param controllerPath (must contain text)
+     */
+    public JavaTypeMetadataDetails(final JavaType javaType,
+            final String plural, final boolean isEnumType,
+            final boolean isApplicationType,
+            final JavaTypePersistenceMetadataDetails persistenceDetails,
+            final String controllerPath) {
+        Validate.notNull(javaType, "Java type required");
+        Validate.notBlank(plural, "Plural required");
+        Validate.notBlank(controllerPath, "Controller path required");
+        this.javaType = javaType;
+        this.plural = plural;
+        this.isEnumType = isEnumType;
+        this.isApplicationType = isApplicationType;
+        this.persistenceDetails = persistenceDetails;
+        this.controllerPath = controllerPath;
+    }
 
-	public boolean isEnumType() {
-		return isEnumType;
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof JavaTypeMetadataDetails)) {
+            return false;
+        }
+        return javaType.equals(((JavaTypeMetadataDetails) obj).getJavaType());
+    }
 
-	public boolean isApplicationType() {
-		return isApplicationType;
-	}
+    public String getControllerPath() {
+        return controllerPath;
+    }
 
-	public JavaTypePersistenceMetadataDetails getPersistenceDetails() {
-		return persistenceDetails;
-	}
-	
-	public String getControllerPath() {
-		return controllerPath;
-	}
+    public JavaType getJavaType() {
+        return javaType;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((javaType == null) ? 0 : javaType.hashCode());
-		return result;
-	}
+    public JavaTypePersistenceMetadataDetails getPersistenceDetails() {
+        return persistenceDetails;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		JavaTypeMetadataDetails other = (JavaTypeMetadataDetails) obj;
-		if (javaType == null) {
-			if (other.javaType != null)
-				return false;
-		} else if (!javaType.equals(other.javaType))
-			return false;
-		return true;
-	}
+    public String getPlural() {
+        return plural;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (javaType == null ? 0 : javaType.hashCode());
+        return result;
+    }
+
+    public boolean isApplicationType() {
+        return isApplicationType;
+    }
+
+    public boolean isEnumType() {
+        return isEnumType;
+    }
+
+    /**
+     * Indicates whether this {@link JavaType} is persisted by the application.
+     * 
+     * @return <code>false</code> if for example it's an enum type
+     * @since 1.2.1
+     */
+    public boolean isPersistent() {
+        return isApplicationType && persistenceDetails != null;
+    }
+
+    @Override
+    public String toString() {
+        // For debugging
+        return javaType.getFullyQualifiedTypeName();
+    }
 }

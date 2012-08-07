@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.roo</groupId>
         <artifactId>org.springframework.roo.osgi.roo.bundle</artifactId>
-        <version>1.1.5.RELEASE</version>
+        <version>1.2.2.RELEASE</version>
         <relativePath>../osgi-roo-bundle</relativePath>
     </parent>
     <artifactId>org.springframework.roo.addon.cloud.foundry</artifactId>
@@ -81,6 +81,10 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

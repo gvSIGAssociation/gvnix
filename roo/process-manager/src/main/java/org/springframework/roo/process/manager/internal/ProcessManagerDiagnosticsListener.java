@@ -23,30 +23,33 @@ import org.springframework.roo.shell.osgi.AbstractFlashingObject;
  * @since 1.1
  */
 @Service
-@Component(immediate=true)
-public class ProcessManagerDiagnosticsListener extends AbstractFlashingObject implements ProcessManagerStatusListener, CommandMarker {
+@Component(immediate = true)
+public class ProcessManagerDiagnosticsListener extends AbstractFlashingObject
+        implements ProcessManagerStatusListener, CommandMarker {
 
-	@Reference private ProcessManagerStatusProvider processManagerStatusProvider;
-	private boolean isDebug = false;
-	
-	protected void activate(ComponentContext context) {
-		processManagerStatusProvider.addProcessManagerStatusListener(this);
-		isDebug = System.getProperty("roo-args") != null && isDevelopmentMode();
-	}
+    private boolean isDebug = false;
+    @Reference private ProcessManagerStatusProvider processManagerStatusProvider;
 
-	protected void deactivate(ComponentContext context) {
-		processManagerStatusProvider.removeProcessManagerStatusListener(this);
-	}
+    protected void activate(final ComponentContext context) {
+        processManagerStatusProvider.addProcessManagerStatusListener(this);
+        isDebug = System.getProperty("roo-args") != null && isDevelopmentMode();
+    }
 
-	public void onProcessManagerStatusChange(ProcessManagerStatus oldStatus, ProcessManagerStatus newStatus) {
-		if (isDebug) {
-			flash(Level.FINE, newStatus.name(), MY_SLOT);
-		}
-	}
-	
-	@CliCommand(value="process manager debug", help="Indicates if process manager debugging is desired")
-	public void processManagerDebug (@CliOption(key={"","enabled"}, mandatory=false, specifiedDefaultValue="true", unspecifiedDefaultValue="true", help="Activates debug mode") boolean debug) {
-		this.isDebug = debug;
-	}
+    protected void deactivate(final ComponentContext context) {
+        processManagerStatusProvider.removeProcessManagerStatusListener(this);
+    }
 
+    public void onProcessManagerStatusChange(
+            final ProcessManagerStatus oldStatus,
+            final ProcessManagerStatus newStatus) {
+        if (isDebug) {
+            flash(Level.FINE, newStatus.name(), MY_SLOT);
+        }
+    }
+
+    @CliCommand(value = "process manager debug", help = "Indicates if process manager debugging is desired")
+    public void processManagerDebug(
+            @CliOption(key = { "", "enabled" }, mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "true", help = "Activates debug mode") final boolean debug) {
+        isDebug = debug;
+    }
 }

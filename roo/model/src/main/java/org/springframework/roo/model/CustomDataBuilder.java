@@ -5,62 +5,77 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.roo.support.util.Assert;
-
 /**
  * Builder for {@link CustomData}.
- * 
  * <p>
- * Can be used to create new instances from scratch, or based on an existing {@link CustomData} instance.
+ * Can be used to create new instances from scratch, or based on an existing
+ * {@link CustomData} instance.
  * 
  * @author Ben Alex
  * @since 1.1
  */
-public final class CustomDataBuilder implements Builder<CustomData> {
-	private Map<Object, Object> customData = new LinkedHashMap<Object, Object>();
-	
-	public CustomDataBuilder() {}
-	
-	public CustomDataBuilder(CustomData existing) {
-		append(existing);
-	}
-	
-	public CustomData build() {
-		return new CustomDataImpl(customData);
-	}
-	
-	public void clear() {
-		customData.clear();
-	}
+public class CustomDataBuilder implements Builder<CustomData> {
 
-	public void append(CustomData existing) {
-		Assert.notNull(existing, "Existing custom data required");
-		for (Object key : existing.keySet()) {
-			customData.put(key, existing.get(key));
-		}
-	}
-	
-	public Object get(Object key) {
-		return customData.get(key);
-	}
+    private final Map<Object, Object> customData = new LinkedHashMap<Object, Object>();
 
-	public Set<Object> keySet() {
-		return customData.keySet();
-	}
+    /**
+     * Constructor for an empty builder
+     */
+    public CustomDataBuilder() {
+    }
 
-	public Object put(Object key, Object value) {
-		return customData.put(key, value);
-	}
+    /**
+     * Constructor for a builder initialised with the given contents
+     * 
+     * @param existing can be <code>null</code>
+     */
+    public CustomDataBuilder(final CustomData existing) {
+        append(existing);
+    }
 
-	public Object remove(Object key) {
-		return customData.remove(key);
-	}
+    /**
+     * Appends the given custom data to this builder
+     * 
+     * @param customData the custom data to append; can be <code>null</code> to
+     *            make no changes
+     */
+    public void append(final CustomData customData) {
+        if (customData != null) {
+            for (final Object key : customData.keySet()) {
+                this.customData.put(key, customData.get(key));
+            }
+        }
+    }
 
-	public int size() {
-		return customData.size();
-	}
+    public CustomData build() {
+        return new CustomDataImpl(customData);
+    }
 
-	public Collection<Object> values() {
-		return customData.values();
-	}
+    public void clear() {
+        customData.clear();
+    }
+
+    public Object get(final Object key) {
+        return customData.get(key);
+    }
+
+    public Set<Object> keySet() {
+        return customData.keySet();
+    }
+
+    public Object put(final Object key, final Object value) {
+        return customData.put(key, value);
+    }
+
+    public Object remove(final Object key) {
+        return customData.remove(key);
+    }
+
+    public int size() {
+        return customData.size();
+    }
+
+    public Collection<Object> values() {
+        return customData.values();
+    }
 }

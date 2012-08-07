@@ -11,28 +11,28 @@ import org.springframework.roo.model.JavaType;
  * 
  * @author Ben Alex
  * @since 1.0
- *
  */
-public interface InvocableMemberMetadata extends IdentifiableAnnotatedJavaStructure {
-	
-	/**
-	 * @return the parameter types (never null, but may be an empty)
-	 */
-	List<AnnotatedJavaType> getParameterTypes();
+public interface InvocableMemberMetadata extends
+        IdentifiableAnnotatedJavaStructure {
 
-	/**
-	 * @return the parameter names, if available (never null, but may be an empty)
-	 */
-	List<JavaSymbolName> getParameterNames();
+    /**
+     * @return the body of the method, if available (can be null if unavailable)
+     */
+    String getBody();
 
-	/**
-	 * @return a list of types that the invocable member can throw (never null)
-	 */
-	List<JavaType> getThrowsTypes();
+    /**
+     * @return the parameter names, if available (never null, but may be an
+     *         empty)
+     */
+    List<JavaSymbolName> getParameterNames();
 
-	 /**
-	  * @return the body of the method, if available (can be null if unavailable)
-	  */
-	 String getBody();
+    /**
+     * @return the parameter types (never null, but may be an empty)
+     */
+    List<AnnotatedJavaType> getParameterTypes();
 
+    /**
+     * @return a list of types that the invocable member can throw (never null)
+     */
+    List<JavaType> getThrowsTypes();
 }

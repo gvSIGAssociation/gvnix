@@ -5,9 +5,8 @@ package org.springframework.roo.addon.web.mvc.embedded;
  * 
  * @author Stefan Schmidt
  * @since 1.1
- *
  */
 public interface EmbeddedCompletor {
-	
-	String name();
+
+    String name();
 }

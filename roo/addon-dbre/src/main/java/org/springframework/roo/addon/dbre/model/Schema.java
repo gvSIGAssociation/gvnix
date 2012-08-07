@@ -1,5 +1,6 @@
 package org.springframework.roo.addon.dbre.model;
 
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Represents a schema in the database model.
@@ -8,45 +9,50 @@ package org.springframework.roo.addon.dbre.model;
  * @since 1.1
  */
 public class Schema {
-	private String name;
+    private final String name;
 
-	public Schema(String name) {
-		this.name = name;
-	}
+    public Schema(final String name) {
+        this.name = StringUtils.defaultIfEmpty(name,
+                DbreModelService.NO_SCHEMA_REQUIRED);
+    }
 
-	public String getName() {
-		return name;
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Schema)) {
+            return false;
+        }
+        final Schema other = (Schema) obj;
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        }
+        else if (!name.equals(other.name)) {
+            return false;
+        }
+        return true;
+    }
 
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Schema)) {
-			return false;
-		}
-		Schema other = (Schema) obj;
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + name.hashCode();
+        return result;
+    }
 
-	public String toString() {
-		return name;
-	}
+    @Override
+    public String toString() {
+        return name;
+    }
 }

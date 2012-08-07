@@ -7,60 +7,70 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import org.springframework.roo.support.util.Assert;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 
 /**
- * Wraps an {@link OutputStream} and automatically passes each line to the {@link Logger}
- * when {@link OutputStream#flush()} or {@link OutputStream#close()} is called.
+ * Wraps an {@link OutputStream} and automatically passes each line to the
+ * {@link Logger} when {@link OutputStream#flush()} or
+ * {@link OutputStream#close()} is called.
  * 
  * @author Ben Alex
  * @since 1.1
- *
  */
 public class LoggingOutputStream extends OutputStream {
-	private Level level;
-	private String sourceClassName = LoggingOutputStream.class.getName();
-	protected static final Logger logger = HandlerUtils.getLogger(LoggingOutputStream.class);
 
-	private int count = 0;
-	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	
-	public LoggingOutputStream(Level level) {
-		Assert.notNull(level, "A logging level is required");
-		this.level = level;
-	}
-	
-	@Override
-	public void write(int b) throws IOException {
-		baos.write(b);
-		count++;
-	}
-	
-	@Override
-	public void flush() throws IOException {
-		if (count > 0) {
-			String msg  = new String(baos.toByteArray());
-			LogRecord record = new LogRecord(level, msg);
-			record.setSourceClassName(sourceClassName);
-			try {
-				logger.log(record);
-			} finally {
-				count = 0;
-				baos = new ByteArrayOutputStream();
-			}
-		}
-	}
+    protected static final Logger LOGGER = HandlerUtils
+            .getLogger(LoggingOutputStream.class);
 
-	@Override
-	public void close() throws IOException {
-		flush();
-	}
+    private ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    private int count;
+    private final Level level;
+    private String sourceClassName = LoggingOutputStream.class.getName();
 
-	public String getSourceClassName() {
-		return sourceClassName;
-	}
+    /**
+     * Constructor
+     * 
+     * @param level the level at which to log (required)
+     */
+    public LoggingOutputStream(final Level level) {
+        Validate.notNull(level, "A logging level is required");
+        this.level = level;
+    }
 
-	public void setSourceClassName(String sourceClassName) {
-		this.sourceClassName = sourceClassName;
-	}
+    @Override
+    public void close() throws IOException {
+        flush();
+    }
+
+    @Override
+    public void flush() throws IOException {
+        if (count > 0) {
+            final String msg = new String(baos.toByteArray());
+            final LogRecord record = new LogRecord(level, msg);
+            record.setSourceClassName(sourceClassName);
+            try {
+                LOGGER.log(record);
+            }
+            finally {
+                count = 0;
+                IOUtils.closeQuietly(baos);
+                baos = new ByteArrayOutputStream();
+            }
+        }
+    }
+
+    public String getSourceClassName() {
+        return sourceClassName;
+    }
+
+    public void setSourceClassName(final String sourceClassName) {
+        this.sourceClassName = sourceClassName;
+    }
+
+    @Override
+    public void write(final int b) throws IOException {
+        baos.write(b);
+        count++;
+    }
 }

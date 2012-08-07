@@ -8,9 +8,9 @@ package org.springframework.roo.addon.security;
  */
 public interface SecurityOperations {
 
-	String SECURITY_FILTER_NAME = "springSecurityFilterChain";
+    String SECURITY_FILTER_NAME = "springSecurityFilterChain";
 
-	boolean isInstallSecurityAvailable();
+    void installSecurity();
 
-	void installSecurity();
+    boolean isSecurityInstallationPossible();
 }

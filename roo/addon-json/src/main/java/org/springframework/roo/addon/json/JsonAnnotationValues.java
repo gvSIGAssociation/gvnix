@@ -4,7 +4,7 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
-import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.RooJavaType;
 
 /**
  * Represents a parsed {@link RooJson} annotation.
@@ -13,39 +13,46 @@ import org.springframework.roo.model.JavaType;
  * @since 1.1
  */
 public class JsonAnnotationValues extends AbstractAnnotationValues {
-	@AutoPopulate String toJsonMethod = "toJson";
-	@AutoPopulate String fromJsonMethod = "fromJsonTo<TypeName>";
-	@AutoPopulate String fromJsonArrayMethod = "fromJsonArrayTo<TypeNamePlural>";
-	@AutoPopulate String toJsonArrayMethod = "toJsonArray";
-	@AutoPopulate String rootName = "";
-	@AutoPopulate boolean deepSerialize = false;
 
-	public JsonAnnotationValues(PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-		super(governorPhysicalTypeMetadata, new JavaType(RooJson.class.getName()));
-		AutoPopulationUtils.populate(this, annotationMetadata);
-	}
+    @AutoPopulate boolean deepSerialize;
+    @AutoPopulate String fromJsonArrayMethod = "fromJsonArrayTo<TypeNamePlural>";
+    @AutoPopulate String fromJsonMethod = "fromJsonTo<TypeName>";
+    @AutoPopulate String rootName = "";
+    @AutoPopulate String toJsonArrayMethod = "toJsonArray";
+    @AutoPopulate String toJsonMethod = "toJson";
 
-	public String getToJsonMethod() {
-		return toJsonMethod;
-	}
+    /**
+     * Constructor
+     * 
+     * @param governorPhysicalTypeMetadata
+     */
+    public JsonAnnotationValues(
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+        super(governorPhysicalTypeMetadata, RooJavaType.ROO_JSON);
+        AutoPopulationUtils.populate(this, annotationMetadata);
+    }
 
-	public String getFromJsonMethod() {
-		return fromJsonMethod;
-	}
+    public String getFromJsonArrayMethod() {
+        return fromJsonArrayMethod;
+    }
 
-	public String getToJsonArrayMethod() {
-		return toJsonArrayMethod;
-	}
+    public String getFromJsonMethod() {
+        return fromJsonMethod;
+    }
 
-	public String getFromJsonArrayMethod() {
-		return fromJsonArrayMethod;
-	}
-	
-	public String getRootName() {
-		return rootName;
-	}
-	
-	public boolean isDeepSerialize() {
-		return deepSerialize;
-	}
+    public String getRootName() {
+        return rootName;
+    }
+
+    public String getToJsonArrayMethod() {
+        return toJsonArrayMethod;
+    }
+
+    public String getToJsonMethod() {
+        return toJsonMethod;
+    }
+
+    public boolean isDeepSerialize() {
+        return deepSerialize;
+    }
 }

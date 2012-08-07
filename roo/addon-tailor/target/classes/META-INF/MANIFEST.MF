@@ -1,0 +1,44 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1344269118538
+Build-Jdk: 1.6.0_31
+Built-By: mmartinez
+Bundle-Copyright: Copyright VMware, Inc. All Rights Reserved.
+Bundle-Description: TODO
+Bundle-ManifestVersion: 2
+Bundle-Name: Spring Roo - Addon - Tailor
+Bundle-SymbolicName: org.springframework.roo.addon.tailor
+Bundle-Vendor: VMware, Inc
+Bundle-Version: 1.2.2.RELEASE
+Created-By: Apache Maven Bundle Plugin
+Export-Package: org.springframework.roo.addon.tailor;uses:="org.springfr
+ amework.roo.shell,org.apache.commons.lang3,org.springframework.roo.supp
+ ort.logging,org.springframework.roo.addon.tailor.service,org.osgi.servi
+ ce.component,org.springframework.roo.addon.tailor.config,org.springfram
+ ework.roo.addon.tailor.util,org.springframework.roo.addon.tailor.action
+ s";version="1.2.2.RELEASE",org.springframework.roo.addon.tailor.service
+ ;uses:="org.springframework.roo.addon.tailor.actions,org.springframewor
+ k.roo.addon.tailor.config,org.springframework.roo.support.util,org.spri
+ ngframework.roo.support.logging";version="1.2.2.RELEASE",org.springfram
+ ework.roo.addon.tailor.config.xml;uses:="org.apache.commons.lang3,org.s
+ pringframework.roo.support.util,org.springframework.roo.support.logging
+ ,org.w3c.dom,org.springframework.roo.addon.tailor.actions,org.springfra
+ mework.roo.addon.tailor.config,org.osgi.service.component,org.springfra
+ mework.roo.support.osgi,org.springframework.roo.process.manager";versio
+ n="1.2.2.RELEASE",org.springframework.roo.addon.tailor.actions;uses:="o
+ rg.springframework.roo.support.logging,org.springframework.roo.addon.ta
+ ilor,org.springframework.roo.addon.tailor.util,org.apache.commons.lang3
+ ,org.springframework.roo.project";version="1.2.2.RELEASE",org.springfra
+ mework.roo.addon.tailor.config;uses:="org.springframework.roo.addon.tai
+ lor.actions";version="1.2.2.RELEASE",org.springframework.roo.addon.tail
+ or.util;uses:="org.apache.commons.lang3,org.springframework.roo.addon.t
+ ailor";version="1.2.2.RELEASE"
+Git-Commit-Hash: 7d75659afedb7a95b84b0f5c0c017e2e70f625f0
+Import-Package: org.apache.commons.lang3;version="[3.1,4)",org.osgi.serv
+ ice.component;version="[1.1,2)",org.springframework.roo.process.manager
+ ;version="[1.2,2)",org.springframework.roo.project;version="[1.2,2)",or
+ g.springframework.roo.shell;version="[1.2,2)",org.springframework.roo.s
+ upport.logging;version="[1.2,2)",org.springframework.roo.support.osgi;v
+ ersion="[1.2,2)",org.springframework.roo.support.util;version="[1.2,2)"
+ ,org.w3c.dom
+Service-Component: OSGI-INF/serviceComponents.xml
+Tool: Bnd-1.50.0

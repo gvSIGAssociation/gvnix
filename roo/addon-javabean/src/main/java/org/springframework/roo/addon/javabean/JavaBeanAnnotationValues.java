@@ -4,7 +4,7 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.annotations.populator.AbstractAnnotationValues;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
-import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.RooJavaType;
 
 /**
  * Represents a parsed {@link RooJavaBean} annotation.
@@ -13,20 +13,26 @@ import org.springframework.roo.model.JavaType;
  * @since 1.2.0
  */
 public class JavaBeanAnnotationValues extends AbstractAnnotationValues {
-	// From annotation
-	@AutoPopulate private boolean gettersByDefault = true;
-	@AutoPopulate private boolean settersByDefault = true;
 
-	public JavaBeanAnnotationValues(PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-		super(governorPhysicalTypeMetadata, new JavaType(RooJavaBean.class.getName()));
-		AutoPopulationUtils.populate(this, annotationMetadata);
-	}
+    @AutoPopulate private boolean gettersByDefault = true;
+    @AutoPopulate private boolean settersByDefault = true;
 
-	public boolean isGettersByDefault() {
-		return gettersByDefault;
-	}
+    /**
+     * Constructor
+     * 
+     * @param governorPhysicalTypeMetadata
+     */
+    public JavaBeanAnnotationValues(
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+        super(governorPhysicalTypeMetadata, RooJavaType.ROO_JAVA_BEAN);
+        AutoPopulationUtils.populate(this, annotationMetadata);
+    }
 
-	public boolean isSettersByDefault() {
-		return settersByDefault;
-	}
+    public boolean isGettersByDefault() {
+        return gettersByDefault;
+    }
+
+    public boolean isSettersByDefault() {
+        return settersByDefault;
+    }
 }

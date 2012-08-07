@@ -1,24 +1,26 @@
 package org.springframework.roo.classpath.converters;
 
-import java.io.File;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.SortedSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.file.monitor.event.FileDetails;
-import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.model.JavaPackage;
+import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.project.maven.Pom;
+import org.springframework.roo.shell.Completion;
 import org.springframework.roo.shell.Converter;
 import org.springframework.roo.shell.MethodTarget;
 
 /**
- * Provides conversion to and from {@link JavaPackage}, with full support for using "~" as denoting the user's top-level package.
+ * A {@link Converter} for {@link JavaPackage}s, with support for using
+ * {@value #TOP_LEVEL_PACKAGE_SYMBOL} to denote the user's top-level package.
  * 
  * @author Ben Alex
  * @since 1.0
@@ -26,91 +28,92 @@ import org.springframework.roo.shell.MethodTarget;
 @Component
 @Service
 public class JavaPackageConverter implements Converter<JavaPackage> {
-	
-	@Reference private LastUsed lastUsed;
-	@Reference private MetadataService metadataService;
-	@Reference private FileManager fileManager;
-	
-	public JavaPackage convertFromText(String value, Class<?> requiredType, String optionContext) {
-		if (value == null || "".equals(value)) {
-			return null;
-		}
-		String newValue = value.toLowerCase();
-		if (value.startsWith("~")) {
-			try {
-				String topLevelPath = "";
-				ProjectMetadata projectMetadata = (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
-				if (projectMetadata != null) {
-					topLevelPath = projectMetadata.getTopLevelPackage().getFullyQualifiedPackageName();
-				}
-				if (value.length() > 1) {
-					newValue = (!(value.charAt(1) == '.') ? topLevelPath + "." : topLevelPath) + value.substring(1);
-				} else {
-					newValue = topLevelPath;
-				}
-			} catch (RuntimeException ignored) {}
-		}
-		if (newValue.endsWith(".")) {
-			newValue = newValue.substring(0, newValue.length() - 1);
-		}
-		JavaPackage result = new JavaPackage(newValue);
-		if (optionContext.contains("update")) {
-			lastUsed.setPackage(result);
-		}
-		return result;
-	}
 
-	public boolean supports(Class<?> requiredType, String optionContext) {
-		return JavaPackage.class.isAssignableFrom(requiredType);
-	}
+    /**
+     * The shell character that represents the current project or module's top
+     * level Java package.
+     */
+    public static final String TOP_LEVEL_PACKAGE_SYMBOL = "~";
 
-	public boolean getAllPossibleValues(List<String> completions, Class<?> requiredType, String existingData, String optionContext, MethodTarget target) {
-		if (existingData == null) {
-			existingData = "";
-		}
+    @Reference FileManager fileManager;
+    @Reference LastUsed lastUsed;
+    @Reference ProjectOperations projectOperations;
+    @Reference TypeLocationService typeLocationService;
 
-		ProjectMetadata projectMetadata = (ProjectMetadata) metadataService.get(ProjectMetadata.getProjectIdentifier());
-		if (projectMetadata == null) {
-			return false;
-		}
+    public JavaPackage convertFromText(final String value,
+            final Class<?> requiredType, final String optionContext) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        final JavaPackage result = new JavaPackage(
+                convertToFullyQualifiedPackageName(value));
+        if (optionContext != null && optionContext.contains("update")) {
+            lastUsed.setPackage(result);
+        }
+        return result;
+    }
 
-		String topLevelPath = projectMetadata.getTopLevelPackage().getFullyQualifiedPackageName();
+    private String convertToFullyQualifiedPackageName(final String text) {
+        final String normalisedText = StringUtils.removeEnd(text, ".")
+                .toLowerCase();
+        if (normalisedText.startsWith(TOP_LEVEL_PACKAGE_SYMBOL)) {
+            return replaceTopLevelPackageSymbol(normalisedText);
+        }
+        return normalisedText;
+    }
 
-		String newValue = existingData;
-		if (existingData.startsWith("~")) {
-			if (existingData.length() > 1) {
-				newValue = (existingData.charAt(1) == '.' ? topLevelPath : topLevelPath + ".") + existingData.substring(1);
-			} else {
-				newValue = topLevelPath + File.separator;
-			}
-		}
+    public boolean getAllPossibleValues(final List<Completion> completions,
+            final Class<?> requiredType, final String existingData,
+            final String optionContext, final MethodTarget target) {
+        if (projectOperations.isFocusedProjectAvailable()) {
+            completions.addAll(getCompletionsForAllKnownPackages());
+        }
+        return false;
+    }
 
-		PathResolver pathResolver = projectMetadata.getPathResolver();
-		String antPath = pathResolver.getRoot(Path.SRC_MAIN_JAVA) + File.separatorChar + newValue.replace(".", File.separator).toLowerCase() + "*";
-		SortedSet<FileDetails> entries = fileManager.findMatchingAntPath(antPath);
+    private Collection<Completion> getCompletionsForAllKnownPackages() {
+        final Collection<Completion> completions = new LinkedHashSet<Completion>();
+        for (final Pom pom : projectOperations.getPoms()) {
+            for (final JavaType javaType : typeLocationService
+                    .getTypesForModule(pom)) {
+                final String type = javaType.getFullyQualifiedTypeName();
+                completions.add(new Completion(type.substring(0,
+                        type.lastIndexOf('.'))));
+            }
+        }
+        return completions;
+    }
 
-		for (FileDetails fileIdentifier : entries) {
-			String candidate = pathResolver.getRelativeSegment(fileIdentifier.getCanonicalPath()).substring(1); // Drop the leading "/"
-			boolean include = false;
-			// Do not include directories that start with ., as this is used for purposes like SVN (see ROO-125)
-			if (fileIdentifier.getFile().isDirectory() && !fileIdentifier.getFile().getName().startsWith(".")) {
-				include = true;
-			}
+    private String getTopLevelPackage() {
+        if (projectOperations.isFocusedProjectAvailable()) {
+            return typeLocationService
+                    .getTopLevelPackageForModule(projectOperations
+                            .getFocusedModule());
+        }
+        // Shouldn't happen if there's a project, i.e. most of the time
+        return "";
+    }
 
-			if (include) {
-				// Convert this path back into something the user would type
-				if (existingData.startsWith("~")) {
-					if (existingData.length() > 1) {
-						candidate = (existingData.charAt(1) == '.' ? "~." : "~") + candidate.substring(topLevelPath.length() + 1);
-					} else {
-						candidate = "~" + candidate.substring(topLevelPath.length() + 1);
-					}
-				}
-				candidate = candidate.replace(File.separator, ".");
-				completions.add(candidate);
-			}
-		}
+    /**
+     * Replaces the {@link #TOP_LEVEL_PACKAGE_SYMBOL} at the beginning of the
+     * given text with the current project/module's top-level package
+     * 
+     * @param text
+     * @return a well-formed Java package name (might have a trailing dot)
+     */
+    private String replaceTopLevelPackageSymbol(final String text) {
+        final String topLevelPackage = getTopLevelPackage();
+        if (TOP_LEVEL_PACKAGE_SYMBOL.equals(text)) {
+            return topLevelPackage;
+        }
+        final String textWithoutSymbol = StringUtils.removeStart(text,
+                TOP_LEVEL_PACKAGE_SYMBOL);
+        return topLevelPackage + "."
+                + StringUtils.removeStart(textWithoutSymbol, ".");
+    }
 
-		return false;
-	}
+    public boolean supports(final Class<?> requiredType,
+            final String optionContext) {
+        return JavaPackage.class.isAssignableFrom(requiredType);
+    }
 }

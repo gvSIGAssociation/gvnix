@@ -1,319 +1,392 @@
 package org.springframework.roo.addon.gwt;
 
+import static org.springframework.roo.model.JavaType.LONG_OBJECT;
+import static org.springframework.roo.model.JavaType.OBJECT;
+import static org.springframework.roo.model.JdkJavaType.BIG_DECIMAL;
+import static org.springframework.roo.model.JdkJavaType.BIG_INTEGER;
+import static org.springframework.roo.model.JdkJavaType.DATE;
+import static org.springframework.roo.model.JpaJavaType.EMBEDDABLE;
+import static org.springframework.roo.model.SpringJavaType.DATE_TIME_FORMAT;
+import static org.springframework.roo.model.SpringJavaType.NUMBER_FORMAT;
+
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
+import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.ProjectMetadata;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 
-class GwtProxyProperty {
-	private ProjectMetadata projectMetadata;
-	private PhysicalTypeMetadata ptmd;
-	private JavaType type;
-	private String name;
-	private List<AnnotationMetadata> annotations;
-	private String getter;
+public class GwtProxyProperty {
 
-	public GwtProxyProperty(ProjectMetadata projectMetadata, PhysicalTypeMetadata ptmd, JavaType type) {
-		Assert.notNull(type, "Type required");
-		this.projectMetadata = projectMetadata;
-		this.ptmd = ptmd;
-		this.type = type;
-	}
+    public static String getProxyRendererType(
+            final JavaPackage topLevelPackage, final JavaType javaType) {
+        return GwtType.EDIT_RENDERER.getPath().packageName(topLevelPackage)
+                + "." + javaType.getSimpleTypeName() + "Renderer";
+    }
 
-	public GwtProxyProperty(ProjectMetadata projectMetadata, PhysicalTypeMetadata ptmd, JavaType type, String name, List<AnnotationMetadata> annotations, String getter) {
-		this(projectMetadata, ptmd, type);
-		this.name = name;
-		this.annotations = annotations;
-		this.getter = getter;
-	}
+    private List<AnnotationMetadata> annotations;
+    private String getter;
+    private String name;
+    private final ClassOrInterfaceTypeDetails ptmd;
+    private final JavaPackage topLevelPackage;
 
-	public String getName() {
-		return name;
-	}
+    private final JavaType type;
 
-	public String getGetter() {
-		return getter;
-	}
+    public GwtProxyProperty(final JavaPackage topLevelPackage,
+            final ClassOrInterfaceTypeDetails ptmd, final JavaType type) {
+        Validate.notNull(type, "Type required");
+        this.topLevelPackage = topLevelPackage;
+        this.ptmd = ptmd;
+        this.type = type;
+    }
 
-	public String getType() {
-		return type.getFullyQualifiedTypeName();
-	}
+    public GwtProxyProperty(final JavaPackage topLevelPackage,
+            final ClassOrInterfaceTypeDetails ptmd, final JavaType type,
+            final String name, final List<AnnotationMetadata> annotations,
+            final String getter) {
+        this(topLevelPackage, ptmd, type);
+        this.name = name;
+        this.annotations = annotations;
+        this.getter = getter;
+    }
 
-	public JavaType getPropertyType() {
-		return type;
-	}
+    public String forEditView() {
+        String initializer = "";
 
-	public boolean isBoolean() {
-		return type.equals(JavaType.BOOLEAN_OBJECT);
-	}
+        if (isBoolean()) {
+            initializer = " = " + getCheckboxSubtype();
+        }
 
-	public boolean isDate() {
-		return type.equals(new JavaType("java.util.Date"));
-	}
+        if (isEnum() && !isCollection()) {
+            initializer = String.format(" = new ValueListBox<%s>(%s)",
+                    type.getFullyQualifiedTypeName(), getRenderer());
+        }
 
-	public boolean isPrimitive() {
-		return type.isPrimitive()
-				|| isDate()
-				|| isString()
-				|| isBoolean()
-				|| type.equals(JavaType.DOUBLE_OBJECT)
-				|| type.equals(JavaType.LONG_OBJECT)
-				|| type.equals(JavaType.INT_OBJECT)
-				|| type.equals(JavaType.FLOAT_OBJECT)
-				|| type.equals(JavaType.BYTE_OBJECT)
-				|| type.equals(JavaType.SHORT_OBJECT)
-				|| type.equals(JavaType.CHAR_OBJECT)
-				|| type.equals(new JavaType("java.math.BigDecimal"));
-	}
+        if (isProxy()) {
+            initializer = String
+                    .format(" = new ValueListBox<%1$s>(%2$s.instance(), new com.google.web.bindery.requestfactory.gwt.ui.client.EntityProxyKeyProvider<%1$s>())",
+                            type.getFullyQualifiedTypeName(),
+                            getProxyRendererType());
+        }
 
-	public boolean isString() {
-		return type.equals(JavaType.STRING_OBJECT);
-	}
+        return String.format("@UiField %s %s %s", getEditor(), getName(),
+                initializer);
+    }
 
-	public String getBinder() {
-		if (type.equals(JavaType.DOUBLE_OBJECT)) {
-			return "g:DoubleBox";
-		}
-		if (type.equals(JavaType.LONG_OBJECT)) {
-			return "g:LongBox";
-		}
-		if (type.equals(JavaType.INT_OBJECT)) {
-			return "g:IntegerBox";
-		}
-		if (type.equals(JavaType.FLOAT_OBJECT)) {
-			return "r:FloatBox";
-		}
-		if (type.equals(JavaType.BYTE_OBJECT)) {
-			return "r:ByteBox";
-		}
-		if (type.equals(JavaType.SHORT_OBJECT)) {
-			return "r:ShortBox";
-		}
-		if (type.equals(JavaType.CHAR_OBJECT)) {
-			return "r:CharBox";
-		}
-		if (type.equals(new JavaType("java.math.BigDecimal"))) {
-			return "r:BigDecimalBox";
-		}
-		return isCollection() ? "a:" + getSetEditor() : isDate() ? "d:DateBox" : isBoolean() ? "g:CheckBox" : isString() ? "g:TextBox" : "g:ValueListBox";
-	}
+    public String forMobileListView(final String rendererName) {
+        return new StringBuilder("if (value.").append(getGetter())
+                .append("() != null) {\n\t\t\t\tsb.appendEscaped(")
+                .append(rendererName).append(".render(value.")
+                .append(getGetter()).append("()));\n\t\t\t}").toString();
+    }
 
-	private String getSetEditor() {
-		String typeName = "java.lang.Object";
-		if (type.getParameters().size() > 0) {
-			typeName = type.getParameters().get(0).getSimpleTypeName();
-		}
-		if (typeName.endsWith(GwtType.PROXY.getSuffix())) {
-			typeName = typeName.substring(0, typeName.length() - GwtType.PROXY.getSuffix().length());
-		}
-		return typeName + (type.getSimpleTypeName().equals("Set") ? GwtType.SET_EDITOR.getSuffix() : GwtType.LIST_EDITOR.getSuffix());
-	}
+    public String getBinder() {
+        if (type.equals(JavaType.DOUBLE_OBJECT)) {
+            return "g:DoubleBox";
+        }
+        if (type.equals(LONG_OBJECT)) {
+            return "g:LongBox";
+        }
+        if (type.equals(JavaType.INT_OBJECT)) {
+            return "g:IntegerBox";
+        }
+        if (type.equals(JavaType.FLOAT_OBJECT)) {
+            return "r:FloatBox";
+        }
+        if (type.equals(JavaType.BYTE_OBJECT)) {
+            return "r:ByteBox";
+        }
+        if (type.equals(JavaType.SHORT_OBJECT)) {
+            return "r:ShortBox";
+        }
+        if (type.equals(JavaType.CHAR_OBJECT)) {
+            return "r:CharBox";
+        }
+        if (type.equals(BIG_DECIMAL)) {
+            return "r:BigDecimalBox";
+        }
+        return isCollection() ? "a:" + getSetEditor() : isDate() ? "d:DateBox"
+                : isBoolean() ? "g:CheckBox" : isString() ? "g:TextBox"
+                        : "g:ValueListBox";
+    }
 
-	public JavaType getSetEditorType() {
-		return new JavaType(GwtType.SET_EDITOR.getPath().packageName(projectMetadata) + "." + getSetEditor());
-	}
+    public String getCheckboxSubtype() {
+        // TODO: Ugly hack, fix in M4
+        return "new CheckBox() { public void setValue(Boolean value) { super.setValue(value == null ? Boolean.FALSE : value); } }";
+    }
 
-	private String getEditor() {
-		if (type.equals(JavaType.DOUBLE_OBJECT)) {
-			return "DoubleBox";
-		}
-		if (type.equals(JavaType.LONG_OBJECT)) {
-			return "LongBox";
-		}
-		if (type.equals(JavaType.INT_OBJECT)) {
-			return "IntegerBox";
-		}
-		if (type.equals(JavaType.FLOAT_OBJECT)) {
-			return "FloatBox";
-		}
-		if (type.equals(JavaType.BYTE_OBJECT)) {
-			return "ByteBox";
-		}
-		if (type.equals(JavaType.SHORT_OBJECT)) {
-			return "ShortBox";
-		}
-		if (type.equals(JavaType.CHAR_OBJECT)) {
-			return "CharBox";
-		}
-		if (type.equals(new JavaType("java.math.BigDecimal"))) {
-			return "BigDecimalBox";
-		}
-		if (isBoolean()) {
-			return "(provided = true) CheckBox";
-		}
-		return isCollection() ? getSetEditor() : isDate() ? "DateBox" : isString() ? "TextBox" : "(provided = true) ValueListBox<" + type.getFullyQualifiedTypeName() + ">";
-	}
+    public String getCollectionRenderer() {
+        JavaType arg = OBJECT;
+        if (type.getParameters().size() > 0) {
+            arg = type.getParameters().get(0);
+        }
+        return GwtPath.SCAFFOLD_PLACE.packageName(topLevelPackage)
+                + ".CollectionRenderer.of("
+                + new GwtProxyProperty(topLevelPackage, ptmd, arg)
+                        .getRenderer() + ")";
+    }
 
-	public String getCollectionRenderer() {
-		JavaType arg = new JavaType("java.lang.Object");
-		if (type.getParameters().size() > 0) {
-			arg = type.getParameters().get(0);
-		}
-		return GwtPath.SCAFFOLD_PLACE.packageName(projectMetadata) + ".CollectionRenderer.of(" + new GwtProxyProperty(projectMetadata, ptmd, arg).getRenderer() + ")";
-	}
+    private String getDateTimeFormat() {
+        String format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_SHORT)";
+        if (annotations == null || annotations.isEmpty()) {
+            return format;
+        }
 
-	public String getFormatter() {
-		if (isCollectionOfProxy()) {
-			return getCollectionRenderer() + ".render";
-		} else if (isDate()) {
-			return getDateTimeFormat() + ".format";
-		} else if (type.equals(JavaType.INT_OBJECT) || type.equals(JavaType.FLOAT_OBJECT) || type.equals(JavaType.DOUBLE_OBJECT) || type.equals(new JavaType("java.math.BigInteger")) || type.equals(new JavaType("java.math.BigDecimal"))) {
-			String formatter = "String.valueOf";
-			if (annotations == null || annotations.isEmpty()) {
-				return formatter;
-			}
-			
-			AnnotationMetadata annotation = MemberFindingUtils.getAnnotationOfType(annotations, new JavaType("org.springframework.format.annotation.NumberFormat"));
-			if (annotation != null) {
-				AnnotationAttributeValue<?> attr = annotation.getAttribute(new JavaSymbolName("style"));
-				if (attr != null) {
-					String style =  attr.getValue().toString();
-					if ("org.springframework.format.annotation.NumberFormat.Style.CURRENCY".equals(style)) {
-						formatter = "NumberFormat.getCurrencyFormat().format";
-					} else if ("org.springframework.format.annotation.NumberFormat.Style.PERCENT".equals(style)) {
-						formatter = "NumberFormat.getPercentFormat().format";
-					} else {
-						formatter = "NumberFormat.getDecimalFormat().format";
-					}
-				} else {
-					formatter = "NumberFormat.getDecimalFormat().format";
-				}
-			}
-			return formatter;
-		} else if (isProxy()) {
-			return getProxyRendererType() + ".instance().render";
-		} else {
-			return "String.valueOf";
-		}
-	}
+        String style = "";
+        final AnnotationMetadata annotation = MemberFindingUtils
+                .getAnnotationOfType(annotations, DATE_TIME_FORMAT);
+        if (annotation != null) {
+            final AnnotationAttributeValue<?> attr = annotation
+                    .getAttribute(new JavaSymbolName("style"));
+            if (attr != null) {
+                style = (String) attr.getValue();
+            }
+        }
+        if (StringUtils.isNotBlank(style)) {
+            if (style.equals("S")) {
+                format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_SHORT)";
+            }
+            else if (style.equals("M")) {
+                format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_MEDIUM)";
+            }
+            else if (style.equals("F")) {
+                format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_FULL)";
+            }
+            else if (style.equals("S-")) {
+                format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_SHORT)";
+            }
+            else if (style.equals("M-")) {
+                format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM)";
+            }
+            else if (style.equals("F-")) {
+                format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_FULL)";
+            }
+        }
+        return format;
+    }
 
-	private String getDateTimeFormat() {
-		String format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_SHORT)";
-		if (annotations == null || annotations.isEmpty()) {
-			return format;
-		}
+    private String getEditor() {
+        if (type.equals(JavaType.DOUBLE_OBJECT)) {
+            return "DoubleBox";
+        }
+        if (type.equals(LONG_OBJECT)) {
+            return "LongBox";
+        }
+        if (type.equals(JavaType.INT_OBJECT)) {
+            return "IntegerBox";
+        }
+        if (type.equals(JavaType.FLOAT_OBJECT)) {
+            return "FloatBox";
+        }
+        if (type.equals(JavaType.BYTE_OBJECT)) {
+            return "ByteBox";
+        }
+        if (type.equals(JavaType.SHORT_OBJECT)) {
+            return "ShortBox";
+        }
+        if (type.equals(JavaType.CHAR_OBJECT)) {
+            return "CharBox";
+        }
+        if (type.equals(BIG_DECIMAL)) {
+            return "BigDecimalBox";
+        }
+        if (isBoolean()) {
+            return "(provided = true) CheckBox";
+        }
+        return isCollection() ? getSetEditor() : isDate() ? "DateBox"
+                : isString() ? "TextBox" : "(provided = true) ValueListBox<"
+                        + type.getFullyQualifiedTypeName() + ">";
+    }
 
-		String style = "";
-		AnnotationMetadata annotation = MemberFindingUtils.getAnnotationOfType(annotations, new JavaType("org.springframework.format.annotation.DateTimeFormat"));
-		if (annotation != null) {
-			AnnotationAttributeValue<?> attr = annotation.getAttribute(new JavaSymbolName("style"));
-			if (attr != null) {
-				style = (String) attr.getValue();
-			}
-		}
-		if (StringUtils.hasText(style)) {
-			if (style.equals("S")) {
-				format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_SHORT)";
-			} else if (style.equals("M")) {
-				format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_MEDIUM)";
-			} else if (style.equals("F")) {
-				format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_TIME_FULL)";
-			} else if (style.equals("S-")) {
-				format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_SHORT)";
-			} else if (style.equals("M-")) {
-				format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_MEDIUM)";
-			} else if (style.equals("F-")) {
-				format = "DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.DATE_FULL)";
-			}
-		}
-		return format;
-	}
+    public String getFormatter() {
+        if (isCollectionOfProxy()) {
+            return getCollectionRenderer() + ".render";
+        }
+        else if (isDate()) {
+            return getDateTimeFormat() + ".format";
+        }
+        else if (type.equals(JavaType.INT_OBJECT)
+                || type.equals(JavaType.FLOAT_OBJECT)
+                || type.equals(JavaType.DOUBLE_OBJECT)
+                || type.equals(BIG_INTEGER) || type.equals(BIG_DECIMAL)) {
+            String formatter = "String.valueOf";
+            if (annotations == null || annotations.isEmpty()) {
+                return formatter;
+            }
 
-	public String getRenderer() {
-		return isCollection() ? getCollectionRenderer() : isDate() ? "new DateTimeFormatRenderer(" + getDateTimeFormat() + ")" : isPrimitive() || isEnum() || isEmbeddable() || type.equals(new JavaType("java.lang.Object")) ? "new AbstractRenderer<" + getType() + ">() {\n        public String render(" + getType() + " obj) {\n          return obj == null ? \"\" : String.valueOf(obj);\n        }\n      }" : getProxyRendererType() + ".instance()";
-	}
+            final AnnotationMetadata annotation = MemberFindingUtils
+                    .getAnnotationOfType(annotations, NUMBER_FORMAT);
+            if (annotation != null) {
+                final AnnotationAttributeValue<?> attr = annotation
+                        .getAttribute(new JavaSymbolName("style"));
+                if (attr != null) {
+                    final String style = attr.getValue().toString();
+                    if ("org.springframework.format.annotation.NumberFormat.Style.CURRENCY"
+                            .equals(style)) {
+                        formatter = "NumberFormat.getCurrencyFormat().format";
+                    }
+                    else if ("org.springframework.format.annotation.NumberFormat.Style.PERCENT"
+                            .equals(style)) {
+                        formatter = "NumberFormat.getPercentFormat().format";
+                    }
+                    else {
+                        formatter = "NumberFormat.getDecimalFormat().format";
+                    }
+                }
+                else {
+                    formatter = "NumberFormat.getDecimalFormat().format";
+                }
+            }
+            return formatter;
+        }
+        else if (isProxy()) {
+            return getProxyRendererType() + ".instance().render";
+        }
+        else {
+            return "String.valueOf";
+        }
+    }
 
-	String getProxyRendererType() {
-		return getProxyRendererType(projectMetadata, isCollectionOfProxy() ? type.getParameters().get(0) : type);
-	}
+    public String getGetter() {
+        return getter;
+    }
 
-	public static String getProxyRendererType(ProjectMetadata projectMetadata, JavaType javaType) {
-		return GwtType.EDIT_RENDERER.getPath().packageName(projectMetadata) + "." + javaType.getSimpleTypeName() + "Renderer";
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getCheckboxSubtype() {
-		// TODO: Ugly hack, fix in M4
-		return "new CheckBox() { public void setValue(Boolean value) { super.setValue(value == null ? Boolean.FALSE : value); } }";
-	}
+    public JavaType getPropertyType() {
+        return type;
+    }
 
-	public String getReadableName() {
-		return new JavaSymbolName(name).getReadableSymbolName();
-	}
+    String getProxyRendererType() {
+        return getProxyRendererType(topLevelPackage,
+                isCollectionOfProxy() ? type.getParameters().get(0) : type);
+    }
 
-	public String forEditView() {
-		String initializer = "";
+    public String getReadableName() {
+        return new JavaSymbolName(name).getReadableSymbolName();
+    }
 
-		if (isBoolean()) {
-			initializer = " = " + getCheckboxSubtype();
-		}
+    public String getRenderer() {
+        return isCollection() ? getCollectionRenderer()
+                : isDate() ? "new DateTimeFormatRenderer("
+                        + getDateTimeFormat() + ")"
+                        : isPrimitive() || isEnum() || isEmbeddable()
+                                || type.equals(OBJECT) ? "new AbstractRenderer<"
+                                + getType()
+                                + ">() {\n        public String render("
+                                + getType()
+                                + " obj) {\n          return obj == null ? \"\" : String.valueOf(obj);\n        }\n      }"
+                                : getProxyRendererType() + ".instance()";
+    }
 
-		if (isEnum() && !isCollection()) {
-			initializer = String.format(" = new ValueListBox<%s>(%s)", type.getFullyQualifiedTypeName(), getRenderer());
-		}
+    private String getSetEditor() {
+        String typeName = OBJECT.getFullyQualifiedTypeName();
+        if (type.getParameters().size() > 0) {
+            typeName = type.getParameters().get(0).getSimpleTypeName();
+        }
+        if (typeName.endsWith(GwtType.PROXY.getSuffix())) {
+            typeName = typeName.substring(0, typeName.length()
+                    - GwtType.PROXY.getSuffix().length());
+        }
+        return typeName
+                + (type.getSimpleTypeName().equals("Set") ? GwtType.SET_EDITOR
+                        .getSuffix() : GwtType.LIST_EDITOR.getSuffix());
+    }
 
-		if (isProxy()) {
-			initializer = String.format(" = new ValueListBox<%1$s>(%2$s.instance(), new com.google.gwt.requestfactory.ui.client.EntityProxyKeyProvider<%1$s>())", type.getFullyQualifiedTypeName(), getProxyRendererType());
-		}
+    public JavaType getSetEditorType() {
+        return new JavaType(GwtType.SET_EDITOR.getPath().packageName(
+                topLevelPackage)
+                + "." + getSetEditor());
+    }
 
-		return String.format("@UiField %s %s %s", getEditor(), getName(), initializer);
-	}
+    public String getSetValuePickerMethod() {
+        return "\tpublic void "
+                + getSetValuePickerMethodName()
+                + "(Collection<"
+                + (isCollection() ? type.getParameters().get(0)
+                        .getSimpleTypeName() : type.getSimpleTypeName())
+                + "> values) {\n" + "\t\t" + getName()
+                + ".setAcceptableValues(values);\n" + "\t}\n";
+    }
 
-	public String forMobileListView(String rendererName) {
-		return new StringBuilder("if (value.").append(getGetter()).append("() != null) {\n\t\t\t\tsb.appendEscaped(").append(rendererName).append(".render(value.").append(getGetter()).append("()));\n\t\t\t}").toString();
-	}
+    String getSetValuePickerMethodName() {
+        return "set" + StringUtils.capitalize(getName()) + "PickerValues";
+    }
 
-	public boolean isProxy() {
-		return ptmd != null && !isDate() && !isString() && !isPrimitive() && !isEnum() && !isCollection() && !isEmbeddable() && !type.getFullyQualifiedTypeName().equals("java.lang.Object");
-	}
+    public String getType() {
+        return type.getFullyQualifiedTypeName();
+    }
 
-	public boolean isCollection() {
-		return type.getFullyQualifiedTypeName().equals("java.util.List") || type.getFullyQualifiedTypeName().equals("java.util.Set");
-	}
+    public JavaType getValueType() {
+        if (isCollection()) {
+            return type.getParameters().get(0);
+        }
+        return type;
+    }
 
-	boolean isEnum() {
-		return ptmd != null && ptmd.getMemberHoldingTypeDetails() != null && ptmd.getMemberHoldingTypeDetails().getPhysicalTypeCategory() == PhysicalTypeCategory.ENUMERATION;
-	}
+    public boolean isBoolean() {
+        return type.equals(JavaType.BOOLEAN_OBJECT);
+    }
 
-	public boolean isEmbeddable() {
-		if (ptmd != null && ptmd.getMemberHoldingTypeDetails() != null) {
-			if (ptmd.getMemberHoldingTypeDetails() instanceof ClassOrInterfaceTypeDetails) {
-				List<AnnotationMetadata> annotations = ptmd.getMemberHoldingTypeDetails().getAnnotations();
-				for (AnnotationMetadata annotation : annotations) {
-					if (annotation.getAnnotationType().equals(new JavaType("javax.persistence.Embeddable"))) {
-						return true;
-					}
-				}
-			}
-		}
+    public boolean isCollection() {
+        return type.isCommonCollectionType();
+    }
 
-		return false;
-	}
+    public boolean isCollectionOfProxy() {
+        return type.getParameters().size() != 0
+                && isCollection()
+                && new GwtProxyProperty(topLevelPackage, ptmd, type
+                        .getParameters().get(0)).isProxy();
+    }
 
-	public String getSetValuePickerMethod() {
-		return "\tpublic void " + getSetValuePickerMethodName() + "(Collection<" + (isCollection() ? type.getParameters().get(0).getSimpleTypeName() : type.getSimpleTypeName()) + "> values) {\n" + "\t\t" + getName() + ".setAcceptableValues(values);\n" + "\t}\n";
-	}
+    public boolean isDate() {
+        return type.equals(DATE);
+    }
 
-	String getSetValuePickerMethodName() {
-		return "set" + StringUtils.capitalize(getName()) + "PickerValues";
-	}
+    public boolean isEmbeddable() {
+        if (ptmd != null) {
+            final List<AnnotationMetadata> annotations = ptmd.getAnnotations();
+            for (final AnnotationMetadata annotation : annotations) {
+                if (annotation.getAnnotationType().equals(EMBEDDABLE)) {
+                    return true;
+                }
+            }
+        }
 
-	public boolean isCollectionOfProxy() {
-		return type.getParameters().size() != 0 && isCollection() && new GwtProxyProperty(projectMetadata, ptmd, type.getParameters().get(0)).isProxy();
-	}
+        return false;
+    }
 
-	public JavaType getValueType() {
-		if (isCollection()) {
-			return type.getParameters().get(0);
-		}
-		return type;
-	}
+    boolean isEnum() {
+        return ptmd != null
+                && ptmd.getPhysicalTypeCategory() == PhysicalTypeCategory.ENUMERATION;
+    }
+
+    public boolean isPrimitive() {
+        return type.isPrimitive() || isDate() || isString() || isBoolean()
+                || type.equals(JavaType.DOUBLE_OBJECT)
+                || type.equals(LONG_OBJECT) || type.equals(JavaType.INT_OBJECT)
+                || type.equals(JavaType.FLOAT_OBJECT)
+                || type.equals(JavaType.BYTE_OBJECT)
+                || type.equals(JavaType.SHORT_OBJECT)
+                || type.equals(JavaType.CHAR_OBJECT)
+                || type.equals(BIG_DECIMAL);
+    }
+
+    public boolean isProxy() {
+        return ptmd != null && !isDate() && !isString() && !isPrimitive()
+                && !isEnum() && !isCollection() && !isEmbeddable()
+                && !type.equals(OBJECT);
+    }
+
+    public boolean isString() {
+        return type.equals(JavaType.STRING);
+    }
 }

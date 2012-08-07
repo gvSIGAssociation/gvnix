@@ -2,8 +2,8 @@ package org.springframework.roo.classpath.details;
 
 import java.lang.reflect.Modifier;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.roo.model.CustomData;
-import org.springframework.roo.support.style.ToStringCreator;
 
 /**
  * Default implementation of {@link InitializerMetadata}.
@@ -11,33 +11,38 @@ import org.springframework.roo.support.style.ToStringCreator;
  * @author James Tyrrell
  * @since 1.1.1
  */
-public class DefaultInitializerMetadata extends AbstractIdentifiableJavaStructureProvider implements InitializerMetadata {
+public class DefaultInitializerMetadata extends
+        AbstractIdentifiableJavaStructureProvider implements
+        InitializerMetadata {
 
-    private String body;
-    private boolean isStatic;
+    private final String body;
+    private final boolean isStatic;
 
-	// Package protected to mandate the use of InitializerMetadataBuilder
-	DefaultInitializerMetadata(CustomData customData, String declaredByMetadataId, int modifier,boolean isStatic, String body) {
+    // Package protected to mandate the use of InitializerMetadataBuilder
+    DefaultInitializerMetadata(final CustomData customData,
+            final String declaredByMetadataId, final int modifier,
+            final boolean isStatic, final String body) {
         super(customData, declaredByMetadataId, modifier);
         this.isStatic = isStatic;
         this.body = body;
-	}
+    }
+
+    public final String getBody() {
+        return body;
+    }
 
     public boolean isStatic() {
         return isStatic;
     }
 
-    public final String getBody() {
-		return body;
-	}
-
-	public String toString() {
-		ToStringCreator tsc = new ToStringCreator(this);
-		tsc.append("declaredByMetadataId", getDeclaredByMetadataId());
-		tsc.append("modifier", Modifier.toString(getModifier()));
-		tsc.append("customData", getCustomData());
-        tsc.append("isStatic", isStatic());
-        tsc.append("body", getBody());
-		return tsc.toString();
-	}
+    @Override
+    public String toString() {
+        final ToStringBuilder builder = new ToStringBuilder(this);
+        builder.append("declaredByMetadataId", getDeclaredByMetadataId());
+        builder.append("modifier", Modifier.toString(getModifier()));
+        builder.append("customData", getCustomData());
+        builder.append("isStatic", isStatic());
+        builder.append("body", getBody());
+        return builder.toString();
+    }
 }

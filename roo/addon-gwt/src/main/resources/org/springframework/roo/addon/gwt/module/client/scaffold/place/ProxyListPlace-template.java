@@ -3,8 +3,8 @@ package __TOP_LEVEL_PACKAGE__.client.scaffold.place;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
-import com.google.gwt.requestfactory.shared.EntityProxy;
-import com.google.gwt.requestfactory.shared.RequestFactory;
+import com.google.web.bindery.requestfactory.shared.EntityProxy;
+import com.google.web.bindery.requestfactory.shared.RequestFactory;
 
 /**
  * A place in the app that deals with lists of {@link EntityProxy}.
@@ -39,20 +39,14 @@ public class ProxyListPlace extends Place {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (!(obj instanceof ProxyListPlace)) {
+			return false;
+		}
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
 		ProxyListPlace other = (ProxyListPlace) obj;
-		if (!proxyType.equals(other.proxyType)) {
-			return false;
-		}
-		return true;
+		return proxyType.equals(other.proxyType);
 	}
 
 	public Class<? extends EntityProxy> getProxyClass() {

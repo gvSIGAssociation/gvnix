@@ -1,35 +1,35 @@
 package org.springframework.roo.addon.cloud.foundry;
 
+import java.util.List;
+import java.util.Map;
+
 import com.vmware.appcloud.client.AppCloudClient;
 import com.vmware.appcloud.client.CloudService;
 import com.vmware.appcloud.client.ServiceConfiguration;
 
-import java.util.List;
-import java.util.Map;
-
 public interface CloudFoundrySession {
 
-	void login(String email, String password, String cloudControllerUrl);
+    void clearStoredLoginDetails();
 
-	AppCloudClient getClient();
+    List<Integer> getApplicationMemoryOptions();
 
-	List<String> getApplicationNames();
+    List<String> getApplicationNames();
 
-	List<String> getServiceTypes();
+    Map<String, List<String>> getBoundUrlMap();
 
-	List<String> getProvisionedServices();
+    AppCloudClient getClient();
 
-	CloudService getProvisionedService(String provisionedServiceName);
+    CloudService getProvisionedService(String provisionedServiceName);
 
-	ServiceConfiguration getService(String serviceVendor);
+    List<String> getProvisionedServices();
 
-	Map<String, List<String>> getBoundUrlMap();
+    ServiceConfiguration getService(String serviceVendor);
 
-	List<Integer> getApplicationMemoryOptions();
+    List<String> getServiceTypes();
 
-	List<String> getStoredEmails();
+    List<String> getStoredEmails();
 
-	List<String> getStoredUrls();
+    List<String> getStoredUrls();
 
-	void clearStoredLoginDetails();
+    void login(String email, String password, String cloudControllerUrl);
 }

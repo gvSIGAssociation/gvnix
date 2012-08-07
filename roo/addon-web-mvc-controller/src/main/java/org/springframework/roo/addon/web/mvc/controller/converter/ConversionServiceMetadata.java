@@ -1,200 +1,415 @@
 package org.springframework.roo.addon.web.mvc.controller.converter;
 
+import static org.springframework.roo.model.SpringJavaType.CONFIGURABLE;
+import static org.springframework.roo.model.SpringJavaType.FORMATTER_REGISTRY;
+
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.addon.json.CustomDataJsonTags;
-import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
-import org.springframework.roo.model.DataType;
+import org.springframework.roo.classpath.layers.MemberTypeAdditions;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.model.SpringJavaType;
 
 /**
- * Represents metadata for the application-wide conversion service. Generates the following ITD methods:
+ * Represents metadata for the application-wide conversion service. Generates
+ * the following ITD methods:
  * <ul>
- * 	<li>afterPropertiesSet() - overrides InitializingBean lifecycle parent method</li>
- * 	<li>installLabelConverters(FormatterRegistry registry) - registers all converter methods</li>
- * 	<li>a converter method for all scaffolded domain types as well their associations</li>
+ * <li>afterPropertiesSet() - overrides InitializingBean lifecycle parent method
+ * </li>
+ * <li>installLabelConverters(FormatterRegistry registry) - registers all
+ * converter methods</li>
+ * <li>a converter method for all scaffolded domain types as well their
+ * associations</li>
  * </ul>
  * 
  * @author Rossen Stoyanchev
  * @author Stefan Schmidt
  * @since 1.1.1
  */
-public class ConversionServiceMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
+public class ConversionServiceMetadata extends
+        AbstractItdTypeDetailsProvidingMetadataItem {
 
-	ConversionServiceMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-		super(identifier, aspectName, governorPhysicalTypeMetadata);
-		// For testing
-	}
+    private static final JavaType BASE_64 = new JavaType(
+            "org.apache.commons.codec.binary.Base64");
+    private static final String CONVERTER = "Converter";
+    private static final JavaSymbolName INSTALL_LABEL_CONVERTERS = new JavaSymbolName(
+            "installLabelConverters");
 
-	public ConversionServiceMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, Map<JavaType, List<MethodMetadata>> relevantDomainTypes, Map<JavaType, Map<Object, JavaSymbolName>> compositePrimaryKeyTypes) {
-		super(identifier, aspectName, governorPhysicalTypeMetadata);
-		Assert.notNull(relevantDomainTypes, "List of domain types required");
-		Assert.notNull(compositePrimaryKeyTypes, "List of PK types required");
-		
-		if (!isValid()) {
-			return;
-		}
-		
-		if (relevantDomainTypes.isEmpty() && compositePrimaryKeyTypes.isEmpty()) { 
-			return;
-		}
+    private Map<JavaType, Map<Object, JavaSymbolName>> compositePrimaryKeyTypes;
+    private Map<JavaType, MemberTypeAdditions> findMethods;
+    private Map<JavaType, JavaType> idTypes;
+    private Set<JavaType> relevantDomainTypes;
+    private Map<JavaType, List<MethodMetadata>> toStringMethods;
 
-		MethodMetadataBuilder installMethodBuilder = getInstallMethodBuilder();
-		//loading the keyset of the domain type map into a TreeSet to create a consistent ordering of the generated methods across shell restarts
-		for (JavaType type: new TreeSet<JavaType>(relevantDomainTypes.keySet())) {
-			JavaType converterName = new JavaType(type.getSimpleTypeName() + "Converter");
-			ClassOrInterfaceTypeDetails converter = getConverter(type, converterName, relevantDomainTypes.get(type));
-			if (converter != null) {
-				builder.addInnerType(converter);
-				installMethodBuilder.getBodyBuilder().appendFormalLine("registry.addConverter(new " + converterName + "());");
-			}
-		}
-		for (JavaType type: compositePrimaryKeyTypes.keySet()) {
-			for (ClassOrInterfaceTypeDetails converter: getCompositePkConverters(type, compositePrimaryKeyTypes.get(type))) {
-				builder.addInnerType(converter);
-				installMethodBuilder.getBodyBuilder().appendFormalLine("registry.addConverter(new " + converter.getName().getSimpleTypeName() + "());");
-			}
-		}
-		MethodMetadata installMethod = installMethodBuilder.build();
-		builder.addMethod(installMethod);
-		builder.addMethod(getAfterPropertiesSetMethod(installMethod));
-		
-		itdTypeDetails = builder.build();
-	}
-	
-	private List<ClassOrInterfaceTypeDetails> getCompositePkConverters(JavaType targetType, Map<Object, JavaSymbolName> jsonMethodNames) {
-		List<ClassOrInterfaceTypeDetails> converters = new LinkedList<ClassOrInterfaceTypeDetails>();
-		
-		JavaType innerType = new JavaType("JsonTo" + targetType.getSimpleTypeName() + "Converter");
-		JavaType base64 = new JavaType("org.apache.commons.codec.binary.Base64");
-		String base64Name = base64.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
-		String typeName = targetType.getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
-		
-		if (MemberFindingUtils.getDeclaredInnerType(governorTypeDetails, innerType) == null) {
-			List<JavaType> parameters = new ArrayList<JavaType>();
-			parameters.add(JavaType.STRING_OBJECT);
-			parameters.add(targetType);
-			JavaType converterJavaType = new JavaType("org.springframework.core.convert.converter.Converter", 0, DataType.TYPE, null, parameters);
-			
-			InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-			bodyBuilder.appendFormalLine("return " + typeName + "." + jsonMethodNames.get(CustomDataJsonTags.FROM_JSON_METHOD).getSymbolName() + "(new String(" + base64Name + ".decodeBase64(encodedJson)));");
-			
-			MethodMetadataBuilder convert = new MethodMetadataBuilder(getId(), Modifier.PUBLIC, new JavaSymbolName("convert"), targetType, bodyBuilder);
-			convert.addParameterType(new AnnotatedJavaType(JavaType.STRING_OBJECT, null));
-			convert.addParameterName(new JavaSymbolName("encodedJson"));
-			ClassOrInterfaceTypeDetailsBuilder converterBuilder = new ClassOrInterfaceTypeDetailsBuilder(getId(), Modifier.STATIC, innerType, PhysicalTypeCategory.CLASS);
-			converterBuilder.addImplementsType(converterJavaType);
-			converterBuilder.addMethod(convert);
-			converters.add(converterBuilder.build());
-		}
-		
-		innerType = new JavaType(targetType.getSimpleTypeName() + "ToJsonConverter");
-		if (MemberFindingUtils.getDeclaredInnerType(governorTypeDetails, innerType) == null) {
-			List<JavaType> parameters = new ArrayList<JavaType>();
-			parameters.add(targetType);
-			parameters.add(JavaType.STRING_OBJECT);
-			JavaType converterJavaType = new JavaType("org.springframework.core.convert.converter.Converter", 0, DataType.TYPE, null, parameters);
-			
-			InvocableMemberBodyBuilder bodyBuilder2 = new InvocableMemberBodyBuilder();
-			bodyBuilder2.appendFormalLine("return " + base64Name + ".encodeBase64URLSafeString(" + StringUtils.uncapitalize(targetType.getSimpleTypeName()) + "." + jsonMethodNames.get(CustomDataJsonTags.TO_JSON_METHOD).getSymbolName() + "().getBytes());");
-			
-			MethodMetadataBuilder convert = new MethodMetadataBuilder(getId(), Modifier.PUBLIC, new JavaSymbolName("convert"), JavaType.STRING_OBJECT, bodyBuilder2);
-			convert.addParameterType(new AnnotatedJavaType(targetType, null));
-			convert.addParameterName(new JavaSymbolName(StringUtils.uncapitalize(targetType.getSimpleTypeName())));
-			ClassOrInterfaceTypeDetailsBuilder converterBuilder = new ClassOrInterfaceTypeDetailsBuilder(getId(), Modifier.STATIC, innerType, PhysicalTypeCategory.CLASS);
-			converterBuilder.addImplementsType(converterJavaType);
-			converterBuilder.addMethod(convert);
-			converters.add(converterBuilder.build());
-		}
-		return converters;
-	}
-	
-	private ClassOrInterfaceTypeDetails getConverter(JavaType targetType, JavaType innerType, List<MethodMetadata> methods) {
-		if (MemberFindingUtils.getDeclaredInnerType(governorTypeDetails, innerType) != null) {
-			return null;
-		}
-		List<JavaType> parameters = new ArrayList<JavaType>();
-		parameters.add(targetType);
-		parameters.add(JavaType.STRING_OBJECT);
-		
-		JavaType converterJavaType = new JavaType("org.springframework.core.convert.converter.Converter", 0, DataType.TYPE, null, parameters);
-		String targetTypeName = StringUtils.uncapitalize(targetType.getSimpleTypeName());
-		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-		bodyBuilder.indent();
-		
-		StringBuilder sb = new StringBuilder("return new StringBuilder()");
-		for (int i=0; i < methods.size(); i++) {
-			if (i > 0) {
-				sb.append(".append(\" \")");
-			}
-			sb.append(".append(").append(targetTypeName).append(".").append(methods.get(i).getMethodName().getSymbolName()).append("())");
-		}
-		sb.append(".toString();");
-		
-		bodyBuilder.appendFormalLine(sb.toString()); 
-		bodyBuilder.indentRemove();
+    /**
+     * Production constructor
+     * 
+     * @param identifier
+     * @param aspectName
+     * @param governorPhysicalTypeMetadata
+     * @param findMethods
+     * @param idTypes the ID types of the domain types for which to generate
+     *            converters (required); must be one for each domain type
+     * @param relevantDomainTypes the types for which to generate converters
+     *            (required)
+     * @param compositePrimaryKeyTypes (required)
+     */
+    public ConversionServiceMetadata(
+            final String identifier,
+            final JavaType aspectName,
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            final Map<JavaType, MemberTypeAdditions> findMethods,
+            final Map<JavaType, JavaType> idTypes,
+            final Set<JavaType> relevantDomainTypes,
+            final Map<JavaType, Map<Object, JavaSymbolName>> compositePrimaryKeyTypes,
+            final Map<JavaType, List<MethodMetadata>> toStringMethods) {
+        super(identifier, aspectName, governorPhysicalTypeMetadata);
+        Validate.notNull(findMethods, "Find methods required");
+        Validate.notNull(compositePrimaryKeyTypes, "List of PK types required");
+        Validate.notNull(idTypes, "List of ID types required");
+        Validate.notNull(relevantDomainTypes,
+                "List of relevant domain types required");
+        Validate.isTrue(relevantDomainTypes.size() == idTypes.size(),
+                "Expected " + relevantDomainTypes.size()
+                        + " ID types, but was " + idTypes.size());
+        Validate.notNull(toStringMethods, "ToString methods required");
 
-		MethodMetadataBuilder convert = new MethodMetadataBuilder(getId(), Modifier.PUBLIC, new JavaSymbolName("convert"), JavaType.STRING_OBJECT, bodyBuilder);
-		convert.addParameterType(new AnnotatedJavaType(targetType, null));
-		convert.addParameterName(new JavaSymbolName(targetTypeName));
-		ClassOrInterfaceTypeDetailsBuilder classBuilder = new ClassOrInterfaceTypeDetailsBuilder(getId(), Modifier.STATIC, innerType, PhysicalTypeCategory.CLASS);
-		classBuilder.addImplementsType(converterJavaType);
-		classBuilder.addMethod(convert);
-		return classBuilder.build();
-	}
-	
-	private MethodMetadataBuilder getInstallMethodBuilder() {
-		JavaSymbolName methodName = new JavaSymbolName("installLabelConverters");
-		List<AnnotatedJavaType> parameters = new ArrayList<AnnotatedJavaType>();
-		parameters.add(new AnnotatedJavaType(new JavaType("org.springframework.format.FormatterRegistry"), null));
-		
-		MethodMetadata method = getGovernorMethod(methodName, parameters);
-		if (getGovernorMethod(methodName, parameters) != null) {
-			return new MethodMetadataBuilder(method);
-		}
-		
-		List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-		parameterNames.add(new JavaSymbolName("registry"));
-		return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, JavaType.VOID_PRIMITIVE, parameters, parameterNames, new InvocableMemberBodyBuilder());
-	}
+        if (!isValid() || relevantDomainTypes.isEmpty()
+                && compositePrimaryKeyTypes.isEmpty()) {
+            valid = false;
+            return;
+        }
 
-	private MethodMetadataBuilder getAfterPropertiesSetMethod(MethodMetadata installConvertersMethod) {
-		JavaSymbolName methodName = new JavaSymbolName("afterPropertiesSet");
-		
-		List<AnnotatedJavaType> parameters = Collections.emptyList();
-		List<JavaSymbolName> parameterNames = Collections.emptyList();
+        this.findMethods = findMethods;
+        this.compositePrimaryKeyTypes = compositePrimaryKeyTypes;
+        this.idTypes = idTypes;
+        this.relevantDomainTypes = relevantDomainTypes;
+        this.toStringMethods = toStringMethods;
 
-		MethodMetadata method = getGovernorMethod(methodName, parameters);
-		if (method != null) {
-			return new MethodMetadataBuilder(method);
-		}
+        builder.addAnnotation(getTypeAnnotation(CONFIGURABLE));
+        builder.addMethod(getInstallLabelConvertersMethod());
+        builder.addMethod(getAfterPropertiesSetMethod());
 
-		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-		bodyBuilder.appendFormalLine("super.afterPropertiesSet();");
-		bodyBuilder.appendFormalLine(installConvertersMethod.getMethodName().getSymbolName() + "(getObject());");
+        itdTypeDetails = builder.build();
+    }
 
-		return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, JavaType.VOID_PRIMITIVE, parameters, parameterNames, bodyBuilder);
-	}
+    private MethodMetadataBuilder getAfterPropertiesSetMethod() {
+        final JavaSymbolName methodName = new JavaSymbolName(
+                "afterPropertiesSet");
+        if (governorHasMethod(methodName)) {
+            return null;
+        }
 
-	private MethodMetadata getGovernorMethod(JavaSymbolName methodName, List<AnnotatedJavaType> parameters) {
-		return MemberFindingUtils.getDeclaredMethod(governorTypeDetails, methodName, AnnotatedJavaType.convertFromAnnotatedJavaTypes(parameters));
-	}
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine("super.afterPropertiesSet();");
+        bodyBuilder.appendFormalLine(INSTALL_LABEL_CONVERTERS.getSymbolName()
+                + "(getObject());");
+
+        return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName,
+                JavaType.VOID_PRIMITIVE, bodyBuilder);
+    }
+
+    private MethodMetadataBuilder getInstallLabelConvertersMethod() {
+        final List<JavaType> sortedRelevantDomainTypes = new ArrayList<JavaType>(
+                relevantDomainTypes);
+        Collections.sort(sortedRelevantDomainTypes);
+
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+
+        final Set<String> methodNames = new HashSet<String>();
+        for (final JavaType formBackingObject : sortedRelevantDomainTypes) {
+            String simpleName = formBackingObject.getSimpleTypeName();
+            while (methodNames.contains(simpleName)) {
+                simpleName += "_";
+            }
+            methodNames.add(simpleName);
+
+            final JavaSymbolName toIdMethodName = new JavaSymbolName("get"
+                    + simpleName + "ToStringConverter");
+            builder.addMethod(getToStringConverterMethod(formBackingObject,
+                    toIdMethodName, toStringMethods.get(formBackingObject)));
+            bodyBuilder.appendFormalLine("registry.addConverter("
+                    + toIdMethodName.getSymbolName() + "());");
+
+            final JavaSymbolName toTypeMethodName = new JavaSymbolName(
+                    "getIdTo" + simpleName + CONVERTER);
+            final MethodMetadataBuilder toTypeConverterMethod = getToTypeConverterMethod(
+                    formBackingObject, toTypeMethodName,
+                    findMethods.get(formBackingObject),
+                    idTypes.get(formBackingObject));
+            if (toTypeConverterMethod != null) {
+                builder.addMethod(toTypeConverterMethod);
+                bodyBuilder.appendFormalLine("registry.addConverter("
+                        + toTypeMethodName.getSymbolName() + "());");
+            }
+
+            // Only allow conversion if ID type is not String already.
+            if (!idTypes.get(formBackingObject).equals(JavaType.STRING)) {
+                final JavaSymbolName stringToTypeMethodName = new JavaSymbolName(
+                        "getStringTo" + simpleName + CONVERTER);
+                builder.addMethod(getStringToTypeConverterMethod(
+                        formBackingObject, stringToTypeMethodName,
+                        idTypes.get(formBackingObject)));
+                bodyBuilder.appendFormalLine("registry.addConverter("
+                        + stringToTypeMethodName.getSymbolName() + "());");
+            }
+        }
+
+        for (final Entry<JavaType, Map<Object, JavaSymbolName>> entry : compositePrimaryKeyTypes
+                .entrySet()) {
+            final JavaType targetType = entry.getKey();
+            final Map<Object, JavaSymbolName> jsonMethodNames = entry
+                    .getValue();
+
+            final MethodMetadataBuilder jsonToConverterMethod = getJsonToConverterMethod(
+                    targetType,
+                    jsonMethodNames.get(CustomDataJsonTags.FROM_JSON_METHOD));
+            builder.addMethod(jsonToConverterMethod);
+            bodyBuilder.appendFormalLine("registry.addConverter("
+                    + jsonToConverterMethod.getMethodName().getSymbolName()
+                    + "());");
+
+            final MethodMetadataBuilder toJsonConverterMethod = getToJsonConverterMethod(
+                    targetType,
+                    jsonMethodNames.get(CustomDataJsonTags.TO_JSON_METHOD));
+            builder.addMethod(toJsonConverterMethod);
+            bodyBuilder.appendFormalLine("registry.addConverter("
+                    + toJsonConverterMethod.getMethodName().getSymbolName()
+                    + "());");
+        }
+
+        final JavaType parameterType = FORMATTER_REGISTRY;
+        if (governorHasMethod(INSTALL_LABEL_CONVERTERS, parameterType)) {
+            return null;
+        }
+
+        final List<JavaSymbolName> parameterNames = Arrays
+                .asList(new JavaSymbolName("registry"));
+        builder.getImportRegistrationResolver().addImport(parameterType);
+
+        return new MethodMetadataBuilder(getId(), Modifier.PUBLIC,
+                INSTALL_LABEL_CONVERTERS, JavaType.VOID_PRIMITIVE,
+                AnnotatedJavaType.convertFromJavaTypes(parameterType),
+                parameterNames, bodyBuilder);
+    }
+
+    private MethodMetadataBuilder getJsonToConverterMethod(
+            final JavaType targetType, final JavaSymbolName jsonMethodName) {
+        final JavaSymbolName methodName = new JavaSymbolName("getJsonTo"
+                + targetType.getSimpleTypeName() + CONVERTER);
+        if (governorHasMethod(methodName)) {
+            return null;
+        }
+
+        final JavaType converterJavaType = SpringJavaType.getConverterType(
+                JavaType.STRING, targetType);
+
+        final String base64Name = BASE_64.getNameIncludingTypeParameters(false,
+                builder.getImportRegistrationResolver());
+        final String typeName = targetType.getNameIncludingTypeParameters(
+                false, builder.getImportRegistrationResolver());
+
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine("return new "
+                + converterJavaType.getNameIncludingTypeParameters() + "() {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("public " + targetType.getSimpleTypeName()
+                + " convert(String encodedJson) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return " + typeName + "."
+                + jsonMethodName.getSymbolName() + "(new String(" + base64Name
+                + ".decodeBase64(encodedJson)));");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+        return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName,
+                converterJavaType, bodyBuilder);
+    }
+
+    /**
+     * Returns the "string to type" converter method to be generated, if any
+     * 
+     * @param targetType the type being converted into (required)
+     * @param methodName the name of the method to generate if necessary
+     *            (required)
+     * @param idType the ID type of the given target type (required)
+     * @return <code>null</code> if none is to be generated
+     */
+    private MethodMetadataBuilder getStringToTypeConverterMethod(
+            final JavaType targetType, final JavaSymbolName methodName,
+            final JavaType idType) {
+        if (governorHasMethod(methodName)) {
+            return null;
+        }
+
+        final JavaType converterJavaType = SpringJavaType.getConverterType(
+                JavaType.STRING, targetType);
+        final String idTypeName = idType.getNameIncludingTypeParameters(false,
+                builder.getImportRegistrationResolver());
+
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine("return new "
+                + converterJavaType.getNameIncludingTypeParameters() + "() {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("public "
+                + targetType.getFullyQualifiedTypeName()
+                + " convert(String id) {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("return getObject().convert(getObject().convert(id, "
+                        + idTypeName
+                        + ".class), "
+                        + targetType.getSimpleTypeName() + ".class);");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+        return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName,
+                converterJavaType, bodyBuilder);
+    }
+
+    private MethodMetadataBuilder getToJsonConverterMethod(
+            final JavaType targetType, final JavaSymbolName jsonMethodName) {
+        final JavaSymbolName methodName = new JavaSymbolName("get"
+                + targetType.getSimpleTypeName() + "ToJsonConverter");
+        if (governorHasMethod(methodName)) {
+            return null;
+        }
+
+        final JavaType converterJavaType = SpringJavaType.getConverterType(
+                targetType, JavaType.STRING);
+
+        final String base64Name = BASE_64.getNameIncludingTypeParameters(false,
+                builder.getImportRegistrationResolver());
+        final String targetTypeName = StringUtils.uncapitalize(targetType
+                .getSimpleTypeName());
+
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine("return new "
+                + converterJavaType.getNameIncludingTypeParameters() + "() {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("public String convert("
+                        + targetType.getSimpleTypeName() + " " + targetTypeName
+                        + ") {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return " + base64Name
+                + ".encodeBase64URLSafeString(" + targetTypeName + "."
+                + jsonMethodName.getSymbolName() + "().getBytes());");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+        return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName,
+                converterJavaType, bodyBuilder);
+    }
+
+    private MethodMetadataBuilder getToStringConverterMethod(
+            final JavaType targetType, final JavaSymbolName methodName,
+            final List<MethodMetadata> toStringMethods) {
+        if (governorHasMethod(methodName)) {
+            return null;
+        }
+
+        final JavaType converterJavaType = SpringJavaType.getConverterType(
+                targetType, JavaType.STRING);
+        final String targetTypeName = StringUtils.uncapitalize(targetType
+                .getSimpleTypeName());
+
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine("return new "
+                + converterJavaType.getNameIncludingTypeParameters() + "() {");
+        bodyBuilder.indent();
+        bodyBuilder
+                .appendFormalLine("public String convert("
+                        + targetType.getSimpleTypeName() + " " + targetTypeName
+                        + ") {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine(getTypeToStringLine(targetType,
+                targetTypeName, toStringMethods));
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+        return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName,
+                converterJavaType, bodyBuilder);
+    }
+
+    private String getTypeToStringLine(final JavaType targetType,
+            final String targetTypeName,
+            final List<MethodMetadata> toStringMethods) {
+        if (toStringMethods.isEmpty()) {
+            return "return \"(no displayable fields)\";";
+        }
+
+        final StringBuilder sb = new StringBuilder("return new StringBuilder()");
+        for (int i = 0; i < toStringMethods.size(); i++) {
+            if (i > 0) {
+                sb.append(".append(' ')");
+            }
+            sb.append(".append(");
+            sb.append(targetTypeName);
+            sb.append(".");
+            sb.append(toStringMethods.get(i).getMethodName().getSymbolName());
+            sb.append("())");
+        }
+        sb.append(".toString();");
+        return sb.toString();
+    }
+
+    private MethodMetadataBuilder getToTypeConverterMethod(
+            final JavaType targetType, final JavaSymbolName methodName,
+            final MemberTypeAdditions findMethod, final JavaType idType) {
+        final MethodMetadata toTypeConverterMethod = getGovernorMethod(methodName);
+        if (findMethod == null) {
+            return null;
+        }
+        if (toTypeConverterMethod != null) {
+            return new MethodMetadataBuilder(toTypeConverterMethod);
+        }
+
+        findMethod.copyAdditionsTo(builder, governorTypeDetails);
+        final JavaType converterJavaType = SpringJavaType.getConverterType(
+                idType, targetType);
+
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        bodyBuilder.appendFormalLine("return new "
+                + converterJavaType.getNameIncludingTypeParameters() + "() {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("public "
+                + targetType.getFullyQualifiedTypeName() + " convert(" + idType
+                + " id) {");
+        bodyBuilder.indent();
+        bodyBuilder.appendFormalLine("return " + findMethod.getMethodCall()
+                + ";");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("}");
+        bodyBuilder.indentRemove();
+        bodyBuilder.appendFormalLine("};");
+
+        return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName,
+                converterJavaType, bodyBuilder);
+    }
 }

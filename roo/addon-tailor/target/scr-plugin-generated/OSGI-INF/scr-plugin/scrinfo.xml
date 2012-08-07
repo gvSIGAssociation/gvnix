@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0">
+    <scr:component enabled="true" immediate="true" name="org.springframework.roo.addon.tailor.DefaultTailorImpl">
+        <implementation class="org.springframework.roo.addon.tailor.DefaultTailorImpl"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.shell.Tailor"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.tailor.DefaultTailorImpl" private="false"/>
+        <reference name="actionLocator" interface="org.springframework.roo.addon.tailor.service.ActionLocator" cardinality="1..1" policy="static" bind="bindActionLocator" unbind="unbindActionLocator" checked="true" strategy="event"/>
+        <reference name="configLocator" interface="org.springframework.roo.addon.tailor.service.ConfigurationLocator" cardinality="1..1" policy="static" bind="bindConfigLocator" unbind="unbindConfigLocator" checked="true" strategy="event"/>
+        <reference name="shell" interface="org.springframework.roo.shell.Shell" cardinality="1..1" policy="static" bind="bindShell" unbind="unbindShell" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.tailor.TailorCommands">
+        <implementation class="org.springframework.roo.addon.tailor.TailorCommands"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.shell.CommandMarker"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.tailor.TailorCommands" private="false"/>
+        <reference name="configLocator" interface="org.springframework.roo.addon.tailor.service.ConfigurationLocator" cardinality="1..1" policy="static" bind="bindConfigLocator" unbind="unbindConfigLocator" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.tailor.config.xml.XMLTailorConfigurationFactory">
+        <implementation class="org.springframework.roo.addon.tailor.config.xml.XMLTailorConfigurationFactory"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.tailor.config.TailorConfigurationFactory"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.tailor.config.xml.XMLTailorConfigurationFactory" private="false"/>
+        <reference name="fileManager" interface="org.springframework.roo.process.manager.FileManager" cardinality="1..1" policy="static" bind="bindFileManager" unbind="unbindFileManager" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" immediate="true" name="org.springframework.roo.addon.tailor.service.DefaultActionLocator">
+        <implementation class="org.springframework.roo.addon.tailor.service.DefaultActionLocator"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.tailor.service.ActionLocator"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.tailor.service.DefaultActionLocator" private="false"/>
+        <reference name="action" interface="org.springframework.roo.addon.tailor.actions.Action" cardinality="0..n" policy="dynamic" bind="bindAction" unbind="unbindAction" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" immediate="true" name="org.springframework.roo.addon.tailor.service.DefaultConfigurationLocator">
+        <implementation class="org.springframework.roo.addon.tailor.service.DefaultConfigurationLocator"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.tailor.service.ConfigurationLocator"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.tailor.service.DefaultConfigurationLocator" private="false"/>
+        <reference name="config" interface="org.springframework.roo.addon.tailor.config.TailorConfigurationFactory" cardinality="0..n" policy="dynamic" bind="bindConfig" unbind="unbindConfig" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.tailor.actions.DefaultValue">
+        <implementation class="org.springframework.roo.addon.tailor.actions.DefaultValue"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.tailor.actions.Action"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.tailor.actions.DefaultValue" private="false"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.tailor.actions.Execute">
+        <implementation class="org.springframework.roo.addon.tailor.actions.Execute"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.tailor.actions.Action"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.tailor.actions.Execute" private="false"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.tailor.actions.Focus">
+        <implementation class="org.springframework.roo.addon.tailor.actions.Focus"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.tailor.actions.Action"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.tailor.actions.Focus" private="false"/>
+        <reference name="projectOperations" interface="org.springframework.roo.project.ProjectOperations" cardinality="1..1" policy="static" bind="bindProjectOperations" unbind="unbindProjectOperations" checked="true" strategy="event"/>
+    </scr:component>
+</components>

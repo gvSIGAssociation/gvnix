@@ -15,7 +15,7 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.service.startlevel.StartLevel;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked", "rawtypes" }) // **** CHANGE FROM ORIGINAL FELIX VERSION ****
 public class AutoProcessor
 {
     /**
@@ -65,7 +65,7 @@ public class AutoProcessor
      * @param configMap Map of configuration properties.
      * @param context The system bundle context.
     **/
-    public static void process(Map configMap, BundleContext context)
+	public static void process(Map configMap, BundleContext context)
     {
         configMap = (configMap == null) ? new HashMap() : configMap;
         processAutoDeploy(configMap, context);
@@ -78,7 +78,7 @@ public class AutoProcessor
      * specified deploy actions.
      * </p>
      */
-	private static void processAutoDeploy(Map configMap, BundleContext context)
+    private static void processAutoDeploy(Map configMap, BundleContext context)
     {
         // Determine if auto deploy actions to perform.
         String action = (String) configMap.get(AUTO_DEPLOY_ACTION_PROPERY);
@@ -168,7 +168,7 @@ public class AutoProcessor
                     }
                     // If the bundle is already installed, then update it
                     // if the 'update' action is present.
-                    else if (actionList.contains(AUTO_DEPLOY_UPDATE_VALUE))
+                    else if ((b != null) && actionList.contains(AUTO_DEPLOY_UPDATE_VALUE))
                     {
                         b.update();
                     }

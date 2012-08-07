@@ -1,22 +1,19 @@
 package org.springframework.roo.classpath.operations;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
-import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.osgi.UrlFindingUtils;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.osgi.OSGiUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 
@@ -28,80 +25,83 @@ import org.w3c.dom.Document;
  */
 @Component(componentAbstract = true)
 public abstract class AbstractOperations {
-	protected static Logger logger = HandlerUtils.getLogger(AbstractOperations.class);
-	@Reference protected FileManager fileManager;
-	protected ComponentContext context;
 
-	protected void activate(ComponentContext context) {
-		this.context = context;
-	}
-	
-	public Document getDocumentTemplate(String templateName) {
-		Document document;
-		try {
-			InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), templateName);
-			Assert.notNull(templateInputStream, "Could not acquire " + templateName + " template");
-			document = XmlUtils.readXml(templateInputStream);
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-		return document;
-	}
+    protected static Logger LOGGER = HandlerUtils
+            .getLogger(AbstractOperations.class);
 
-	/**
-	 * This method will copy the contents of a directory to another if the resource does not already exist in the target directory
-	 * 
-	 * @param sourceAntPath the source path
-	 * @param targetDirectory the target directory
-	 */
-	public void copyDirectoryContents(String sourceAntPath, String targetDirectory, boolean replace) {
-		Assert.hasText(sourceAntPath, "Source path required");
-		Assert.hasText(targetDirectory, "Target directory required");
+    @Reference protected FileManager fileManager;
 
-		if (!targetDirectory.endsWith("/")) {
-			targetDirectory += "/";
-		}
+    protected ComponentContext context;
 
-		if (!fileManager.exists(targetDirectory)) {
-			fileManager.createDirectory(targetDirectory);
-		}
+    protected void activate(final ComponentContext context) {
+        this.context = context;
+    }
 
-		String path = TemplateUtils.getTemplatePath(getClass(), sourceAntPath);
-		Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(context.getBundleContext(), path);
-		Assert.notNull(urls, "Could not search bundles for resources for Ant Path '" + path + "'");
-		for (URL url : urls) {
-			String fileName = url.getPath().substring(url.getPath().lastIndexOf("/") + 1);
-			if (replace) {
-				BufferedReader in = null;
-				StringBuilder sb = new StringBuilder();
-				try {
-					in = new BufferedReader(new InputStreamReader(url.openConnection().getInputStream()));
-					while (true) {
-						int ch = in.read();
-						if (ch < 0) {
-							break;
-						}
-						sb.append((char) ch);
-					}
-				} catch (Exception e) {
-					throw new IllegalStateException(e);
-				} finally {
-					if (in != null) {
-						try {
-							in.close();
-						} catch (IOException ignored) {}
-					}
-				}
-				fileManager.createOrUpdateTextFileIfRequired(targetDirectory + fileName, sb.toString(), false);
-			} else {
-				if (!fileManager.exists(targetDirectory + fileName)) {
-					try {
-						FileCopyUtils.copy(url.openStream(), fileManager.createFile(targetDirectory + fileName).getOutputStream());
-					} catch (IOException e) {
-						throw new IllegalStateException("Encountered an error during copying of resources for the add-on.", e);
-					}
-				}
-			}
-		}
-	}
+    /**
+     * This method will copy the contents of a directory to another if the
+     * resource does not already exist in the target directory
+     * 
+     * @param sourceAntPath the source path
+     * @param targetDirectory the target directory
+     */
+    public void copyDirectoryContents(final String sourceAntPath,
+            String targetDirectory, final boolean replace) {
+        Validate.notBlank(sourceAntPath, "Source path required");
+        Validate.notBlank(targetDirectory, "Target directory required");
+
+        if (!targetDirectory.endsWith("/")) {
+            targetDirectory += "/";
+        }
+
+        if (!fileManager.exists(targetDirectory)) {
+            fileManager.createDirectory(targetDirectory);
+        }
+
+        final String path = FileUtils.getPath(getClass(), sourceAntPath);
+        final Iterable<URL> urls = OSGiUtils.findEntriesByPattern(
+                context.getBundleContext(), path);
+        Validate.notNull(urls,
+                "Could not search bundles for resources for Ant Path '" + path
+                        + "'");
+        for (final URL url : urls) {
+            final String fileName = url.getPath().substring(
+                    url.getPath().lastIndexOf("/") + 1);
+            if (replace) {
+                try {
+                    String contents = IOUtils.toString(url);
+                    fileManager.createOrUpdateTextFileIfRequired(
+                            targetDirectory + fileName, contents, false);
+                }
+                catch (final Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+            else {
+                if (!fileManager.exists(targetDirectory + fileName)) {
+                    InputStream inputStream = null;
+                    OutputStream outputStream = null;
+                    try {
+                        inputStream = url.openStream();
+                        outputStream = fileManager.createFile(
+                                targetDirectory + fileName).getOutputStream();
+                        IOUtils.copy(inputStream, outputStream);
+                    }
+                    catch (final Exception e) {
+                        throw new IllegalStateException(
+                                "Encountered an error during copying of resources for the add-on.",
+                                e);
+                    }
+                    finally {
+                        IOUtils.closeQuietly(inputStream);
+                        IOUtils.closeQuietly(outputStream);
+                    }
+                }
+            }
+        }
+    }
+
+    public Document getDocumentTemplate(final String templateName) {
+        return XmlUtils.readXml(FileUtils.getInputStream(getClass(),
+                templateName));
+    }
 }

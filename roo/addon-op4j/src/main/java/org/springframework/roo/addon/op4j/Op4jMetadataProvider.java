@@ -1,5 +1,7 @@
 package org.springframework.roo.addon.op4j;
 
+import static org.springframework.roo.model.RooJavaType.ROO_OP4J;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
@@ -8,7 +10,7 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Provides {@link Op4jMetadata}.
@@ -17,38 +19,54 @@ import org.springframework.roo.project.Path;
  * @since 1.1
  */
 @Component(immediate = true)
-@Service 
-public final class Op4jMetadataProvider extends AbstractItdMetadataProvider {
+@Service
+public class Op4jMetadataProvider extends AbstractItdMetadataProvider {
 
-	protected void activate(ComponentContext context) {
-		metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-		addMetadataTrigger(new JavaType(RooOp4j.class.getName()));
-	}
+    protected void activate(final ComponentContext context) {
+        metadataDependencyRegistry.registerDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        addMetadataTrigger(ROO_OP4J);
+    }
 
-	protected void deactivate(ComponentContext context) {
-		metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-		removeMetadataTrigger(new JavaType(RooOp4j.class.getName()));
-	}
+    @Override
+    protected String createLocalIdentifier(final JavaType javaType,
+            final LogicalPath path) {
+        return Op4jMetadata.createIdentifier(javaType, path);
+    }
 
-	protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
-		return new Op4jMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata);
-	}
+    protected void deactivate(final ComponentContext context) {
+        metadataDependencyRegistry.deregisterDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        removeMetadataTrigger(ROO_OP4J);
+    }
 
-	public String getItdUniquenessFilenameSuffix() {
-		return "Op4j";
-	}
+    @Override
+    protected String getGovernorPhysicalTypeIdentifier(
+            final String metadataIdentificationString) {
+        final JavaType javaType = Op4jMetadata
+                .getJavaType(metadataIdentificationString);
+        final LogicalPath path = Op4jMetadata
+                .getPath(metadataIdentificationString);
+        return PhysicalTypeIdentifier.createIdentifier(javaType, path);
+    }
 
-	protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
-		JavaType javaType = Op4jMetadata.getJavaType(metadataIdentificationString);
-		Path path = Op4jMetadata.getPath(metadataIdentificationString);
-		return PhysicalTypeIdentifier.createIdentifier(javaType, path);
-	}
+    public String getItdUniquenessFilenameSuffix() {
+        return "Op4j";
+    }
 
-	protected String createLocalIdentifier(JavaType javaType, Path path) {
-		return Op4jMetadata.createIdentifier(javaType, path);
-	}
+    @Override
+    protected ItdTypeDetailsProvidingMetadataItem getMetadata(
+            final String metadataIdentificationString,
+            final JavaType aspectName,
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            final String itdFilename) {
+        return new Op4jMetadata(metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata);
+    }
 
-	public String getProvidesType() {
-		return Op4jMetadata.getMetadataIdentiferType();
-	}
+    public String getProvidesType() {
+        return Op4jMetadata.getMetadataIdentiferType();
+    }
 }

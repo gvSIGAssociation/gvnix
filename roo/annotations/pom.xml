@@ -4,17 +4,17 @@
     <parent>
         <groupId>org.springframework.roo</groupId>
         <artifactId>org.springframework.roo.osgi.bundle</artifactId>
-        <version>1.1.5.RELEASE</version>
+        <version>1.2.2.RELEASE</version>
         <relativePath>../osgi-bundle</relativePath>
     </parent>
     <artifactId>org.springframework.roo.annotations</artifactId>
     <packaging>bundle</packaging>
-    <name>Spring Roo - Annotations (ASLv2/GPLv3 Dual Licensed)</name>
+    <name>Spring Roo - Annotations (ASLv2 Licensed)</name>
     <build>
         <plugins>
-            <plugin> <!-- should move antrun to a pluginManagement section in root POM; similarly do this for all other plugins -->
+            <plugin> <!-- Should move antrun to a pluginManagement section in root POM; similarly do this for all other plugins -->
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.6</version>
+                <version>1.7</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -26,6 +26,7 @@
                                     <fileset dir="${basedir}/..">
                                         <include name="**/Roo*.java" />
                                         <exclude name="core/**" />
+                                        <exclude name="**/RooJavaType.java" />
                                     </fileset>
                                     <!-- Discard the module names prefixes from each file path -->
                                     <regexpmapper from="^(.*).src.main.java.(.*)$$" to="\2" />

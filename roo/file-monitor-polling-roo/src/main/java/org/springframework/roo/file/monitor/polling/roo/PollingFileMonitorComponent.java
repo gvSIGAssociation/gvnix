@@ -10,23 +10,23 @@ import org.springframework.roo.file.monitor.event.FileEventListener;
 import org.springframework.roo.file.monitor.polling.PollingFileMonitorService;
 
 /**
- * Extends {@link PollingFileMonitorService} by making it available as an OSGi component
- * that automatically monitors the environment's {@link FileEventListener} components.
+ * Extends {@link PollingFileMonitorService} by making it available as an OSGi
+ * component that automatically monitors the environment's
+ * {@link FileEventListener} components.
  * 
  * @author Ben Alex
  * @since 1.1
  */
 @Component
 @Service
-@Reference(name = "fileEventListener", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = FileEventListener.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE) 
+@Reference(name = "fileEventListener", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = FileEventListener.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE)
 public class PollingFileMonitorComponent extends PollingFileMonitorService {
 
-	protected void bindFileEventListener(FileEventListener listener) {
-		add(listener);
-	}
-	
-	protected void unbindFileEventListener(FileEventListener listener) {
-		remove(listener);
-	}
+    protected void bindFileEventListener(final FileEventListener listener) {
+        add(listener);
+    }
 
+    protected void unbindFileEventListener(final FileEventListener listener) {
+        remove(listener);
+    }
 }

@@ -1,9 +1,15 @@
 package org.springframework.roo.project;
 
-import java.io.File;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import static org.springframework.roo.file.monitor.event.FileOperation.CREATED;
+import static org.springframework.roo.file.monitor.event.FileOperation.DELETED;
+import static org.springframework.roo.file.monitor.event.FileOperation.MONITORING_FINISH;
+import static org.springframework.roo.file.monitor.event.FileOperation.MONITORING_START;
+import static org.springframework.roo.file.monitor.event.FileOperation.RENAMED;
+import static org.springframework.roo.file.monitor.event.FileOperation.UPDATED;
 
+import java.io.File;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -12,80 +18,72 @@ import org.springframework.roo.file.monitor.DirectoryMonitoringRequest;
 import org.springframework.roo.file.monitor.MonitoringRequest;
 import org.springframework.roo.file.monitor.NotifiableFileMonitorService;
 import org.springframework.roo.file.monitor.event.FileOperation;
-import org.springframework.roo.file.undo.CreateDirectory;
-import org.springframework.roo.file.undo.FilenameResolver;
 import org.springframework.roo.file.undo.UndoManager;
 import org.springframework.roo.metadata.MetadataDependencyRegistry;
-import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.metadata.MetadataNotificationListener;
-import org.springframework.roo.metadata.MetadataService;
-import org.springframework.roo.support.util.Assert;
 
 @Component(immediate = true)
 @Service
-public class ProjectPathMonitoringInitializer implements MetadataNotificationListener {
-	@Reference private FilenameResolver filenameResolver;
-	@Reference private MetadataDependencyRegistry metadataDependencyRegistry;
-	@Reference private MetadataService metadataService;
-	@Reference private NotifiableFileMonitorService fileMonitorService;
-	@Reference private UndoManager undoManager;
-	private boolean pathsRegistered = false;
+public class ProjectPathMonitoringInitializer implements
+        MetadataNotificationListener {
 
-	protected void activate(ComponentContext context) {
-		metadataDependencyRegistry.addNotificationListener(this);
-	}
+    private static final FileOperation[] MONITORED_OPERATIONS = {
+            MONITORING_START, MONITORING_FINISH, CREATED, RENAMED, UPDATED,
+            DELETED };
 
-	protected void deactivate(ComponentContext context) {
-		metadataDependencyRegistry.removeNotificationListener(this);
-	}
+    @Reference private NotifiableFileMonitorService fileMonitorService;
+    @Reference private MetadataDependencyRegistry metadataDependencyRegistry;
+    @Reference private PathResolver pathResolver;
+    private boolean pathsRegistered;
+    @Reference private UndoManager undoManager;
 
-	public void notify(String upstreamDependency, String downstreamDependency) {
-		if (pathsRegistered) {
-			return;
-		}
+    protected void activate(final ComponentContext context) {
+        metadataDependencyRegistry.addNotificationListener(this);
+    }
 
-		Assert.isTrue(MetadataIdentificationUtils.isValid(upstreamDependency), "Upstream dependency is an invalid metadata identification string ('" + upstreamDependency + "')");
+    protected void deactivate(final ComponentContext context) {
+        metadataDependencyRegistry.removeNotificationListener(this);
+    }
 
-		if (!upstreamDependency.equals(ProjectMetadata.getProjectIdentifier())) {
-			return;
-		}
+    private void monitorPathIfExists(final LogicalPath logicalPath) {
+        final String canonicalPath = pathResolver.getRoot(logicalPath);
+        // The path can be blank if a sub-folder contains a POM that doesn't
+        // belong to a module
+        if (StringUtils.isNotBlank(canonicalPath)) {
+            final File directory = new File(canonicalPath);
+            if (directory.isDirectory()) {
+                final MonitoringRequest request = new DirectoryMonitoringRequest(
+                        directory, true, MONITORED_OPERATIONS);
+                new UndoableMonitoringRequest(undoManager, fileMonitorService,
+                        request, true);
+            }
+        }
+    }
 
-		// Acquire the Project Metadata, if available
-		ProjectMetadata md = (ProjectMetadata) metadataService.get(upstreamDependency);
-		if (md == null) {
-			return;
-		}
+    private void monitorProjectPaths() {
+        for (final LogicalPath logicalPath : pathResolver.getPaths()) {
+            if (requiresMonitoring(logicalPath)) {
+                monitorPathIfExists(logicalPath);
+            }
+        }
+    }
 
-		PathResolver pathResolver = md.getPathResolver();
-		Assert.notNull(pathResolver, "Path resolver could not be acquired from changed metadata '" + md + "'");
+    public void notify(final String upstreamDependency,
+            final String downstreamDependency) {
+        if (pathsRegistered) {
+            return;
+        }
+        monitorProjectPaths();
+        pathsRegistered = true;
+    }
 
-		Set<FileOperation> notifyOn = new LinkedHashSet<FileOperation>();
-		notifyOn.add(FileOperation.MONITORING_START);
-		notifyOn.add(FileOperation.MONITORING_FINISH);
-		notifyOn.add(FileOperation.CREATED);
-		notifyOn.add(FileOperation.RENAMED);
-		notifyOn.add(FileOperation.UPDATED);
-		notifyOn.add(FileOperation.DELETED);
-
-		for (Path p : pathResolver.getPaths()) {
-			// Verify path exists and ensure it's monitored, except root (which we assume is already monitored via ProcessManager)
-			if (!Path.ROOT.equals(p)) {
-				String fileIdentifier = pathResolver.getRoot(p);
-				File file = new File(fileIdentifier);
-				Assert.isTrue(!file.exists() || (file.exists() && file.isDirectory()), "Path '" + fileIdentifier + "' must either not exist or be a directory");
-				if (!file.exists()) {
-					// Create directory, but no notifications as that will happen once we start monitoring it below
-					new CreateDirectory(undoManager, filenameResolver, file);
-				}
-				MonitoringRequest request = new DirectoryMonitoringRequest(file, true, notifyOn);
-				new UndoableMonitoringRequest(undoManager, fileMonitorService, request, md.isValid());
-			}
-		}
-
-		// Avoid doing this operation again unless the validity changes
-		pathsRegistered = md.isValid();
-
-		// Explicitly perform a scan now that we've added all the directories we wish to monitor
-		fileMonitorService.scanAll();
-	}
+    private boolean requiresMonitoring(final LogicalPath logicalPath) {
+        if (logicalPath.isProjectRoot()) {
+            return false; // already monitored by ProcessManager
+        }
+        if (StringUtils.isBlank(logicalPath.getModule())) {
+            return true; // non-root path within root module
+        }
+        return logicalPath.isModuleRoot();
+    }
 }

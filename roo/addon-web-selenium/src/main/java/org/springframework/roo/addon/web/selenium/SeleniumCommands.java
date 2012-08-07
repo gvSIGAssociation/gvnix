@@ -18,19 +18,20 @@ import org.springframework.roo.shell.CommandMarker;
 @Component
 @Service
 public class SeleniumCommands implements CommandMarker {
-	@Reference private SeleniumOperations seleniumOperations;
-	
-	@CliAvailabilityIndicator({"selenium test"})
-	public boolean isJdkFieldManagementAvailable() {
-		return seleniumOperations.isProjectAvailable();
-	}
-	
-	@CliCommand(value = "selenium test", help = "Creates a new Selenium test for a particular controller")
-	public void generateTest(
-		@CliOption(key = "controller", mandatory = true, help = "Controller to create a Selenium test for") JavaType controller, 
-		@CliOption(key = "name", mandatory = false, help = "Name of the test") String name, 
-		@CliOption(key = "serverUrl", mandatory = false, unspecifiedDefaultValue = "http://localhost:8080/", specifiedDefaultValue = "http://localhost:8080/", help = "URL of the server where the web application is available, including protocol, port and hostname") String url) {
 
-		seleniumOperations.generateTest(controller, name, url);
-	}
+    @Reference private SeleniumOperations seleniumOperations;
+
+    @CliCommand(value = "selenium test", help = "Creates a new Selenium test for a particular controller")
+    public void generateTest(
+            @CliOption(key = "controller", mandatory = true, help = "Controller to create a Selenium test for") final JavaType controller,
+            @CliOption(key = "name", mandatory = false, help = "Name of the test") final String name,
+            @CliOption(key = "serverUrl", mandatory = false, unspecifiedDefaultValue = "http://localhost:8080/", specifiedDefaultValue = "http://localhost:8080/", help = "URL of the server where the web application is available, including protocol, port and hostname") final String url) {
+
+        seleniumOperations.generateTest(controller, name, url);
+    }
+
+    @CliAvailabilityIndicator({ "selenium test" })
+    public boolean isJdkFieldManagementAvailable() {
+        return seleniumOperations.isSeleniumInstallationPossible();
+    }
 }

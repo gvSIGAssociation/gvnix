@@ -1,14 +1,20 @@
 package org.springframework.roo.addon.json;
 
+import static org.springframework.roo.model.JavaType.STRING;
+import static org.springframework.roo.model.JdkJavaType.ARRAY_LIST;
+import static org.springframework.roo.model.JdkJavaType.COLLECTION;
+import static org.springframework.roo.model.JdkJavaType.LIST;
+
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
@@ -17,9 +23,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Metadata to be triggered by {@link RooJson} annotation
@@ -28,215 +32,269 @@ import org.springframework.roo.support.util.Assert;
  * @since 1.1
  */
 public class JsonMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
-	private static final String PROVIDES_TYPE_STRING = JsonMetadata.class.getName();
-	private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
-	private JsonAnnotationValues annotationValues;
-	private String typeNamePlural;
 
-	public JsonMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String typeNamePlural, JsonAnnotationValues annotationValues) {
-		super(identifier, aspectName, governorPhysicalTypeMetadata);
-		Assert.notNull(annotationValues, "Annotation values required");
-		Assert.hasText(typeNamePlural, "Plural of the target type required");
-		Assert.isTrue(isValid(identifier), "Metadata identification string '" + identifier + "' does not appear to be a valid");
+    private static final JavaType JSON_DESERIALIZER = new JavaType(
+            "flexjson.JSONDeserializer");
+    private static final JavaType JSON_SERIALIZER = new JavaType(
+            "flexjson.JSONSerializer");
+    private static final String PROVIDES_TYPE_STRING = JsonMetadata.class
+            .getName();
+    private static final String PROVIDES_TYPE = MetadataIdentificationUtils
+            .create(PROVIDES_TYPE_STRING);
 
-		if (!isValid()) {
-			return;
-		}
-		this.annotationValues = annotationValues;
-		this.typeNamePlural = typeNamePlural;
+    public static String createIdentifier(final JavaType javaType,
+            final LogicalPath path) {
+        return PhysicalTypeIdentifierNamingUtils.createIdentifier(
+                PROVIDES_TYPE_STRING, javaType, path);
+    }
 
-		builder.addMethod(getToJsonMethod());
-		builder.addMethod(getFromJsonMethod());
-		builder.addMethod(getToJsonArrayMethod());
-		builder.addMethod(getFromJsonArrayMethod());
+    public static JavaType getJavaType(final String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.getJavaType(
+                PROVIDES_TYPE_STRING, metadataIdentificationString);
+    }
 
-		// Create a representation of the desired output ITD
-		itdTypeDetails = builder.build();
-	}
+    public static String getMetadataIdentiferType() {
+        return PROVIDES_TYPE;
+    }
 
-	public JavaSymbolName getToJsonMethodName() {
-		String methodLabel = annotationValues.getToJsonMethod();
-		if (methodLabel == null || methodLabel.length() == 0) {
-			return null;
-		}
-		return new JavaSymbolName(methodLabel);
-	}
+    public static LogicalPath getPath(final String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
+                metadataIdentificationString);
+    }
 
-	private MethodMetadata getToJsonMethod() {
-		// Compute the relevant method name
-		JavaSymbolName methodName = getToJsonMethodName();
+    public static boolean isValid(final String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING,
+                metadataIdentificationString);
+    }
 
-		if (methodName == null) {
-			return null;
-		}
+    private JsonAnnotationValues annotationValues;
 
-		// See if the type itself declared the method
-		MethodMetadata result = MemberFindingUtils.getDeclaredMethod(governorTypeDetails, methodName, null);
-		if (result != null) {
-			return result;
-		}
+    private String typeNamePlural;
 
-		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-		String serializer = new JavaType("flexjson.JSONSerializer").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
-		String root = annotationValues.getRootName() != null && annotationValues.getRootName().length() > 0 ? ".rootName(\"" + annotationValues.getRootName() + "\")" : "";
-		bodyBuilder.appendFormalLine("return new " + serializer + "()" + root + ".exclude(\"*.class\")" + (annotationValues.isDeepSerialize() ? ".deepSerialize(this)" : ".serialize(this)") + ";");
+    public JsonMetadata(final String identifier, final JavaType aspectName,
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            final String typeNamePlural,
+            final JsonAnnotationValues annotationValues) {
+        super(identifier, aspectName, governorPhysicalTypeMetadata);
+        Validate.notNull(annotationValues, "Annotation values required");
+        Validate.notBlank(typeNamePlural, "Plural of the target type required");
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
+                + identifier + "' does not appear to be a valid");
 
-		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, new JavaType("java.lang.String"), bodyBuilder);
-		methodBuilder.putCustomData(CustomDataJsonTags.TO_JSON_METHOD, null);
-		return methodBuilder.build();
-	}
+        if (!isValid()) {
+            return;
+        }
 
-	public JavaSymbolName getToJsonArrayMethodName() {
-		String methodLabel = annotationValues.getToJsonArrayMethod();
-		if (methodLabel == null || methodLabel.length() == 0) {
-			return null;
-		}
-		return new JavaSymbolName(methodLabel);
-	}
+        this.annotationValues = annotationValues;
+        this.typeNamePlural = typeNamePlural;
 
-	private MethodMetadata getToJsonArrayMethod() {
-		// Compute the relevant method name
-		JavaSymbolName methodName = getToJsonArrayMethodName();
+        builder.addMethod(getToJsonMethod());
+        builder.addMethod(getFromJsonMethod());
+        builder.addMethod(getToJsonArrayMethod());
+        builder.addMethod(getFromJsonArrayMethod());
 
-		if (methodName == null) {
-			return null;
-		}
+        // Create a representation of the desired output ITD
+        itdTypeDetails = builder.build();
+    }
 
-		List<JavaType> typeParams = new ArrayList<JavaType>();
-		typeParams.add(destination);
-		List<AnnotatedJavaType> parameters = new ArrayList<AnnotatedJavaType>();
-		parameters.add(new AnnotatedJavaType(new JavaType(Collection.class.getName(), 0, DataType.TYPE, null, typeParams), null));
+    private MethodMetadataBuilder getFromJsonArrayMethod() {
+        // Compute the relevant method name
+        final JavaSymbolName methodName = getFromJsonArrayMethodName();
+        if (methodName == null) {
+            return null;
+        }
 
-		// See if the type itself declared the method
-		MethodMetadata result = MemberFindingUtils.getDeclaredMethod(governorTypeDetails, methodName, AnnotatedJavaType.convertFromAnnotatedJavaTypes(parameters));
-		if (result != null) {
-			return result;
-		}
+        final JavaType parameterType = JavaType.STRING;
+        if (governorHasMethod(methodName, parameterType)) {
+            return null;
+        }
 
-		List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
-		paramNames.add(new JavaSymbolName("collection"));
+        final String list = LIST.getNameIncludingTypeParameters(false,
+                builder.getImportRegistrationResolver());
+        final String arrayList = ARRAY_LIST.getNameIncludingTypeParameters(
+                false, builder.getImportRegistrationResolver());
+        final String bean = destination.getSimpleTypeName();
 
-		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-		String serializer = new JavaType("flexjson.JSONSerializer").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
-		String root = annotationValues.getRootName() != null && annotationValues.getRootName().length() > 0 ? ".rootName(\"" + annotationValues.getRootName() + "\")" : "";
-		bodyBuilder.appendFormalLine("return new " + serializer + "()" + root + ".exclude(\"*.class\")" + (annotationValues.isDeepSerialize() ? ".deepSerialize(collection)" : ".serialize(collection)") + ";");
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        final String deserializer = JSON_DESERIALIZER
+                .getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver());
+        bodyBuilder.appendFormalLine("return new " + deserializer + "<" + list
+                + "<" + bean + ">>().use(null, " + arrayList
+                + ".class).use(\"values\", " + bean
+                + ".class).deserialize(json);");
 
-		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC | Modifier.STATIC, methodName, new JavaType("java.lang.String"), parameters, paramNames, bodyBuilder);
-		methodBuilder.putCustomData(CustomDataJsonTags.TO_JSON_ARRAY_METHOD, null);
-		return methodBuilder.build();
-	}
+        final List<JavaSymbolName> parameterNames = Arrays
+                .asList(new JavaSymbolName("json"));
 
-	public JavaSymbolName getFromJsonArrayMethodName() {
-		String methodLabel = annotationValues.getFromJsonArrayMethod();
-		if (methodLabel == null || methodLabel.length() == 0) {
-			return null;
-		}
+        final JavaType collection = new JavaType(
+                COLLECTION.getFullyQualifiedTypeName(), 0, DataType.TYPE, null,
+                Arrays.asList(destination));
 
-		return new JavaSymbolName(methodLabel.replace("<TypeNamePlural>", typeNamePlural));
-	}
+        final MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC | Modifier.STATIC, methodName,
+                collection,
+                AnnotatedJavaType.convertFromJavaTypes(parameterType),
+                parameterNames, bodyBuilder);
+        methodBuilder.putCustomData(CustomDataJsonTags.FROM_JSON_ARRAY_METHOD,
+                null);
+        return methodBuilder;
+    }
 
-	private MethodMetadata getFromJsonArrayMethod() {
-		// Compute the relevant method name
-		JavaSymbolName methodName = getFromJsonArrayMethodName();
+    public JavaSymbolName getFromJsonArrayMethodName() {
+        final String methodLabel = annotationValues.getFromJsonArrayMethod();
+        if (StringUtils.isBlank(methodLabel)) {
+            return null;
+        }
 
-		if (methodName == null) {
-			return null;
-		}
+        return new JavaSymbolName(methodLabel.replace("<TypeNamePlural>",
+                typeNamePlural));
+    }
 
-		List<AnnotatedJavaType> parameters = new ArrayList<AnnotatedJavaType>();
-		parameters.add(new AnnotatedJavaType(JavaType.STRING_OBJECT, null));
+    private MethodMetadataBuilder getFromJsonMethod() {
+        final JavaSymbolName methodName = getFromJsonMethodName();
+        if (methodName == null) {
+            return null;
+        }
 
-		// See if the type itself declared the method
-		MethodMetadata result = MemberFindingUtils.getDeclaredMethod(governorTypeDetails, methodName, AnnotatedJavaType.convertFromAnnotatedJavaTypes(parameters));
-		if (result != null) {
-			return result;
-		}
+        final JavaType parameterType = JavaType.STRING;
+        if (governorHasMethod(methodName, parameterType)) {
+            return null;
+        }
 
-		String list = new JavaType("java.util.List").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
-		String arrayList = new JavaType("java.util.ArrayList").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
-		String bean = destination.getSimpleTypeName();
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        final String deserializer = JSON_DESERIALIZER
+                .getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver());
+        bodyBuilder.appendFormalLine("return new " + deserializer + "<"
+                + destination.getSimpleTypeName() + ">().use(null, "
+                + destination.getSimpleTypeName()
+                + ".class).deserialize(json);");
 
-		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-		String deserializer = new JavaType("flexjson.JSONDeserializer").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
-		bodyBuilder.appendFormalLine("return new " + deserializer + "<" + list + "<" + bean + ">>().use(null, " + arrayList + ".class).use(\"values\", " + bean + ".class).deserialize(json);");
+        final List<JavaSymbolName> parameterNames = Arrays
+                .asList(new JavaSymbolName("json"));
 
-		List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
-		paramNames.add(new JavaSymbolName("json"));
+        final MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC | Modifier.STATIC, methodName,
+                destination,
+                AnnotatedJavaType.convertFromJavaTypes(parameterType),
+                parameterNames, bodyBuilder);
+        methodBuilder.putCustomData(CustomDataJsonTags.FROM_JSON_METHOD, null);
+        return methodBuilder;
+    }
 
-		List<JavaType> params = new ArrayList<JavaType>();
-		params.add(destination);
-		JavaType collection = new JavaType("java.util.Collection", 0, DataType.TYPE, null, params);
+    public JavaSymbolName getFromJsonMethodName() {
+        final String methodLabel = annotationValues.getFromJsonMethod();
+        if (StringUtils.isBlank(methodLabel)) {
+            return null;
+        }
 
-		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC | Modifier.STATIC, methodName, collection, parameters, paramNames, bodyBuilder);
-		methodBuilder.putCustomData(CustomDataJsonTags.FROM_JSON_ARRAY_METHOD, null);
-		return methodBuilder.build();
-	}
+        // Compute the relevant method name
+        return new JavaSymbolName(methodLabel.replace("<TypeName>",
+                destination.getSimpleTypeName()));
+    }
 
-	public JavaSymbolName getFromJsonMethodName() {
-		String methodLabel = annotationValues.getFromJsonMethod();
-		if (methodLabel == null || methodLabel.length() == 0) {
-			return null;
-		}
+    private MethodMetadataBuilder getToJsonArrayMethod() {
+        // Compute the relevant method name
+        final JavaSymbolName methodName = getToJsonArrayMethodName();
+        if (methodName == null) {
+            return null;
+        }
 
-		// Compute the relevant method name
-		return new JavaSymbolName(methodLabel.replace("<TypeName>", destination.getSimpleTypeName()));
-	}
+        final JavaType parameterType = new JavaType(Collection.class.getName(),
+                0, DataType.TYPE, null, Arrays.asList(destination));
 
-	private MethodMetadata getFromJsonMethod() {
-		JavaSymbolName methodName = getFromJsonMethodName();
-		if (methodName == null) {
-			return null;
-		}
+        // See if the type itself declared the method
+        if (governorHasMethod(methodName, parameterType)) {
+            return null;
+        }
 
-		List<AnnotatedJavaType> parameters = new ArrayList<AnnotatedJavaType>();
-		parameters.add(new AnnotatedJavaType(JavaType.STRING_OBJECT, null));
+        final List<JavaSymbolName> parameterNames = Arrays
+                .asList(new JavaSymbolName("collection"));
 
-		// See if the type itself declared the method
-		MethodMetadata result = MemberFindingUtils.getDeclaredMethod(governorTypeDetails, methodName, AnnotatedJavaType.convertFromAnnotatedJavaTypes(parameters));
-		if (result != null) {
-			return result;
-		}
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        final String serializer = JSON_SERIALIZER
+                .getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver());
+        final String root = annotationValues.getRootName() != null
+                && annotationValues.getRootName().length() > 0 ? ".rootName(\""
+                + annotationValues.getRootName() + "\")" : "";
+        bodyBuilder
+                .appendFormalLine("return new "
+                        + serializer
+                        + "()"
+                        + root
+                        + ".exclude(\"*.class\")"
+                        + (annotationValues.isDeepSerialize() ? ".deepSerialize(collection)"
+                                : ".serialize(collection)") + ";");
 
-		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-		String deserializer = new JavaType("flexjson.JSONDeserializer").getNameIncludingTypeParameters(false, builder.getImportRegistrationResolver());
-		bodyBuilder.appendFormalLine("return new " + deserializer + "<" + destination.getSimpleTypeName() + ">().use(null, " + destination.getSimpleTypeName() + ".class).deserialize(json);");
+        final MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC | Modifier.STATIC, methodName, STRING,
+                AnnotatedJavaType.convertFromJavaTypes(parameterType),
+                parameterNames, bodyBuilder);
+        methodBuilder.putCustomData(CustomDataJsonTags.TO_JSON_ARRAY_METHOD,
+                null);
+        return methodBuilder;
+    }
 
-		List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
-		paramNames.add(new JavaSymbolName("json"));
+    public JavaSymbolName getToJsonArrayMethodName() {
+        final String methodLabel = annotationValues.getToJsonArrayMethod();
+        if (StringUtils.isBlank(methodLabel)) {
+            return null;
+        }
+        return new JavaSymbolName(methodLabel);
+    }
 
-		MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC | Modifier.STATIC, methodName, destination, parameters, paramNames, bodyBuilder);
-		methodBuilder.putCustomData(CustomDataJsonTags.FROM_JSON_METHOD, null);
-		return methodBuilder.build();
-	}
+    private MethodMetadataBuilder getToJsonMethod() {
+        // Compute the relevant method name
+        final JavaSymbolName methodName = getToJsonMethodName();
+        if (methodName == null) {
+            return null;
+        }
 
-	public String toString() {
-		ToStringCreator tsc = new ToStringCreator(this);
-		tsc.append("identifier", getId());
-		tsc.append("valid", valid);
-		tsc.append("aspectName", aspectName);
-		tsc.append("destinationType", destination);
-		tsc.append("governor", governorPhysicalTypeMetadata.getId());
-		tsc.append("itdTypeDetails", itdTypeDetails);
-		return tsc.toString();
-	}
+        // See if the type itself declared the method
+        if (governorHasMethod(methodName)) {
+            return null;
+        }
 
-	public static final String getMetadataIdentiferType() {
-		return PROVIDES_TYPE;
-	}
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        final String serializer = JSON_SERIALIZER
+                .getNameIncludingTypeParameters(false,
+                        builder.getImportRegistrationResolver());
+        final String root = annotationValues.getRootName() != null
+                && annotationValues.getRootName().length() > 0 ? ".rootName(\""
+                + annotationValues.getRootName() + "\")" : "";
+        bodyBuilder.appendFormalLine("return new "
+                + serializer
+                + "()"
+                + root
+                + ".exclude(\"*.class\")"
+                + (annotationValues.isDeepSerialize() ? ".deepSerialize(this)"
+                        : ".serialize(this)") + ";");
 
-	public static final String createIdentifier(JavaType javaType, Path path) {
-		return PhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, javaType, path);
-	}
+        final MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
+                getId(), Modifier.PUBLIC, methodName, STRING, bodyBuilder);
+        methodBuilder.putCustomData(CustomDataJsonTags.TO_JSON_METHOD, null);
+        return methodBuilder;
+    }
 
-	public static final JavaType getJavaType(String metadataIdentificationString) {
-		return PhysicalTypeIdentifierNamingUtils.getJavaType(PROVIDES_TYPE_STRING, metadataIdentificationString);
-	}
+    public JavaSymbolName getToJsonMethodName() {
+        final String methodLabel = annotationValues.getToJsonMethod();
+        if (StringUtils.isBlank(methodLabel)) {
+            return null;
+        }
+        return new JavaSymbolName(methodLabel);
+    }
 
-	public static final Path getPath(String metadataIdentificationString) {
-		return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, metadataIdentificationString);
-	}
-
-	public static boolean isValid(String metadataIdentificationString) {
-		return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING, metadataIdentificationString);
-	}
+    @Override
+    public String toString() {
+        final ToStringBuilder builder = new ToStringBuilder(this);
+        builder.append("identifier", getId());
+        builder.append("valid", valid);
+        builder.append("aspectName", aspectName);
+        builder.append("destinationType", destination);
+        builder.append("governor", governorPhysicalTypeMetadata.getId());
+        builder.append("itdTypeDetails", itdTypeDetails);
+        return builder.toString();
+    }
 }

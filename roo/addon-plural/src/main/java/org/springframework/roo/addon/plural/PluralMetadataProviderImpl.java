@@ -8,47 +8,70 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Implementation of {@link PluralMetadataProvider}.
+ * <p>
+ * It's odd that this class extends {@link AbstractItdMetadataProvider}, as it
+ * doesn't produce an ITD, it just provides a plural String via
+ * {@link PluralMetadata#getPlural()}. We should probably refactor it.
  * 
  * @author Ben Alex
  * @since 1.0
  */
-@Component(immediate = true) 
-@Service 
-public final class PluralMetadataProviderImpl extends AbstractItdMetadataProvider implements PluralMetadataProvider {
+@Component(immediate = true)
+@Service
+public class PluralMetadataProviderImpl extends AbstractItdMetadataProvider
+        implements PluralMetadataProvider {
 
-	protected void activate(ComponentContext context) {
-		metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-		setIgnoreTriggerAnnotations(true);
-		setDependsOnGovernorBeingAClass(false);
-	}
+    protected void activate(final ComponentContext context) {
+        metadataDependencyRegistry.registerDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        setIgnoreTriggerAnnotations(true);
+        setDependsOnGovernorBeingAClass(false);
+    }
 
-	protected void deactivate(ComponentContext context) {
-		metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-	}
+    @Override
+    protected String createLocalIdentifier(final JavaType javaType,
+            final LogicalPath path) {
+        return PluralMetadata.createIdentifier(javaType, path);
+    }
 
-	protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
-		return new PluralMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata);
-	}
+    protected void deactivate(final ComponentContext context) {
+        metadataDependencyRegistry.deregisterDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+    }
 
-	public String getItdUniquenessFilenameSuffix() {
-		return "Plural";
-	}
+    @Override
+    protected String getGovernorPhysicalTypeIdentifier(
+            final String metadataIdentificationString) {
+        final JavaType javaType = PluralMetadata
+                .getJavaType(metadataIdentificationString);
+        final LogicalPath path = PluralMetadata
+                .getPath(metadataIdentificationString);
+        return PhysicalTypeIdentifier.createIdentifier(javaType, path);
+    }
 
-	protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
-		JavaType javaType = PluralMetadata.getJavaType(metadataIdentificationString);
-		Path path = PluralMetadata.getPath(metadataIdentificationString);
-		return PhysicalTypeIdentifier.createIdentifier(javaType, path);
-	}
+    public String getItdUniquenessFilenameSuffix() {
+        return "Plural";
+    }
 
-	protected String createLocalIdentifier(JavaType javaType, Path path) {
-		return PluralMetadata.createIdentifier(javaType, path);
-	}
+    @Override
+    protected ItdTypeDetailsProvidingMetadataItem getMetadata(
+            final String metadataIdentificationString,
+            final JavaType aspectName,
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            final String itdFilename) {
+        final PluralAnnotationValues pluralAnnotationValues = new PluralAnnotationValues(
+                governorPhysicalTypeMetadata);
+        return new PluralMetadata(metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata, pluralAnnotationValues);
+    }
 
-	public String getProvidesType() {
-		return PluralMetadata.getMetadataIdentiferType();
-	}
+    public String getProvidesType() {
+        return PluralMetadata.getMetadataIdentiferType();
+    }
 }

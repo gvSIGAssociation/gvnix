@@ -1,20 +1,20 @@
 package org.springframework.roo.addon.json;
 
+import static org.springframework.roo.model.RooJavaType.ROO_JAVA_BEAN;
+
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.classpath.PhysicalTypeDetails;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
-import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.TypeManagementService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
-import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.ProjectMetadata;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.model.RooJavaType;
+import org.springframework.roo.project.ProjectOperations;
 
 /**
  * Implementation of addon-json operations interface.
@@ -22,60 +22,58 @@ import org.springframework.roo.support.util.Assert;
  * @author Stefan Schmidt
  * @since 1.1
  */
-@Component 
-@Service 
+@Component
+@Service
 public class JsonOperationsImpl implements JsonOperations {
-	
-	@Reference private MetadataService metadataService;
-	@Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
-	@Reference private TypeLocationService typeLocationService;
 
-	public boolean isCommandAvailable() {
-		return metadataService.get(ProjectMetadata.getProjectIdentifier()) != null;
-	}
+    @Reference private ProjectOperations projectOperations;
+    @Reference private TypeLocationService typeLocationService;
+    @Reference private TypeManagementService typeManagementService;
 
-	public void annotateType(JavaType javaType, String rootName, boolean deepSerialize) {
-		Assert.notNull(javaType, "Java type required");
+    public void annotateAll() {
+        annotateAll(false);
+    }
 
-		String id = physicalTypeMetadataProvider.findIdentifier(javaType);
-		if (id == null) {
-			throw new IllegalArgumentException("Cannot locate source for '" + javaType.getFullyQualifiedTypeName() + "'");
-		}
+    public void annotateAll(final boolean deepSerialize) {
+        for (final JavaType type : typeLocationService
+                .findTypesWithAnnotation(ROO_JAVA_BEAN)) {
+            annotateType(type, "", deepSerialize);
+        }
+    }
 
-		// Obtain the physical type and itd mutable details
-		PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService.get(id);
-		Assert.notNull(ptm, "Java source code unavailable for type " + PhysicalTypeIdentifier.getFriendlyName(id));
-		PhysicalTypeDetails ptd = ptm.getMemberHoldingTypeDetails();
-		Assert.notNull(ptd, "Java source code details unavailable for type " + PhysicalTypeIdentifier.getFriendlyName(id));
-		Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, ptd, "Java source code is immutable for type " + PhysicalTypeIdentifier.getFriendlyName(id));
-		MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
+    public void annotateType(final JavaType javaType, final String rootName) {
+        annotateType(javaType, rootName, false);
+    }
 
-		if (null == MemberFindingUtils.getAnnotationOfType(mutableTypeDetails.getAnnotations(), new JavaType(RooJson.class.getName()))) {
-			JavaType rooJson = new JavaType(RooJson.class.getName());
-			if (!mutableTypeDetails.getAnnotations().contains(rooJson)) {
-				AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(rooJson);
-				if (rootName != null && rootName.length() > 0) {
-					annotationBuilder.addStringAttribute("rootName", rootName);
-				}
-				if (deepSerialize) {
-					annotationBuilder.addBooleanAttribute("deepSerialize", true);
-				}
-				mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
-			}
-		}
-	}
-	
-	public void annotateType(JavaType javaType, String rootName) {
-		annotateType(javaType, rootName, false);
-	}
-	
-	public void annotateAll(boolean deepSerialize) {
-		for (JavaType type: typeLocationService.findTypesWithAnnotation(new JavaType("org.springframework.roo.addon.javabean.RooJavaBean"))) {
-			annotateType(type, "", deepSerialize);
-		}
-	}
-	
-	public void annotateAll() {
-		annotateAll(false);
-	}
+    public void annotateType(final JavaType javaType, final String rootName,
+            final boolean deepSerialize) {
+        Validate.notNull(javaType, "Java type required");
+
+        final ClassOrInterfaceTypeDetails cid = typeLocationService
+                .getTypeDetails(javaType);
+        if (cid == null) {
+            throw new IllegalArgumentException("Cannot locate source for '"
+                    + javaType.getFullyQualifiedTypeName() + "'");
+        }
+
+        if (MemberFindingUtils.getAnnotationOfType(cid.getAnnotations(),
+                RooJavaType.ROO_JSON) == null) {
+            final AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
+                    RooJavaType.ROO_JSON);
+            if (rootName != null && rootName.length() > 0) {
+                annotationBuilder.addStringAttribute("rootName", rootName);
+            }
+            if (deepSerialize) {
+                annotationBuilder.addBooleanAttribute("deepSerialize", true);
+            }
+            final ClassOrInterfaceTypeDetailsBuilder cidBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                    cid);
+            cidBuilder.addAnnotation(annotationBuilder);
+            typeManagementService.createOrUpdateTypeOnDisk(cidBuilder.build());
+        }
+    }
+
+    public boolean isJsonInstallationPossible() {
+        return projectOperations.isFocusedProjectAvailable();
+    }
 }

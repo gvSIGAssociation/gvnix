@@ -14,36 +14,39 @@ import org.springframework.roo.shell.CommandMarker;
  * 
  * @author Stefan Schmidt
  * @since 1.1
- *
  */
 @Component
 @Service
 public class SolrCommands implements CommandMarker {
-	
-	@Reference private SolrOperations searchOperations;
-	
-	@CliAvailabilityIndicator({"solr setup"})
-	public boolean setupCommandAvailable() {
-		return searchOperations.isInstallSearchAvailable();
-	}
-	
-	@CliAvailabilityIndicator({"solr add","solr all"})
-	public boolean solrCommandAvailable() {
-		return searchOperations.isSearchAvailable();
-	}
-	
-	@CliCommand(value="solr setup", help="Install a support for Solr search integration")
-	public void setup(@CliOption(key={"searchServerUrl"}, mandatory=false, unspecifiedDefaultValue="http://localhost:8983/solr", specifiedDefaultValue="http://localhost:8983/solr", help="The Url of the Solr search server") String searchServerUrl) {
-		searchOperations.setupConfig(searchServerUrl);
-	}
-	
-	@CliCommand(value="solr add", help="Make target type searchable")
-	public void setup(@CliOption(key="class", mandatory=false, unspecifiedDefaultValue="*", optionContext="update,project", help="The target type which is made searchable") JavaType javaType) {
-		searchOperations.addSearch(javaType);
-	}
-	
-	@CliCommand(value="solr all", help="Make all elegible project types searchable")
-	public void setup() {
-		searchOperations.addAll();
-	}
+
+    @Reference private SolrOperations solrOperations;
+
+    @CliAvailabilityIndicator({ "solr setup" })
+    public boolean setupCommandAvailable() {
+        return solrOperations.isSolrInstallationPossible();
+    }
+
+    @CliCommand(value = "solr add", help = "Make target type searchable")
+    public void solrAdd(
+            @CliOption(key = "class", mandatory = false, unspecifiedDefaultValue = "*", optionContext = "update,project", help = "The type to be made searchable") final JavaType javaType) {
+
+        solrOperations.addSearch(javaType);
+    }
+
+    @CliCommand(value = "solr all", help = "Make all eligible project types searchable")
+    public void solrAll() {
+        solrOperations.addAll();
+    }
+
+    @CliAvailabilityIndicator({ "solr add", "solr all" })
+    public boolean solrCommandAvailable() {
+        return solrOperations.isSearchAvailable();
+    }
+
+    @CliCommand(value = "solr setup", help = "Install support for Solr search integration")
+    public void solrSetup(
+            @CliOption(key = { "searchServerUrl" }, mandatory = false, unspecifiedDefaultValue = "http://localhost:8983/solr", specifiedDefaultValue = "http://localhost:8983/solr", help = "The URL of the Solr search server") final String searchServerUrl) {
+
+        solrOperations.setupConfig(searchServerUrl);
+    }
 }

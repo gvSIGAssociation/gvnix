@@ -1,11 +1,12 @@
 package org.springframework.roo.classpath.scanner;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
@@ -22,148 +23,183 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.metadata.MetadataItem;
 import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.metadata.MetadataService;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Default implementation of {@link MemberDetailsScanner}.
- * 
  * <p>
- * Automatically detects all {@link MemberDetailsDecorator} instances in the OSGi container and will delegate to them
- * during execution of the {@link #getMemberDetails(String, ClassOrInterfaceTypeDetails)} method.
- * 
+ * Automatically detects all {@link MemberDetailsDecorator} instances in the
+ * OSGi container and will delegate to them during execution of the
+ * {@link #getMemberDetails(String, ClassOrInterfaceTypeDetails)} method.
  * <p>
- * While internally this implementation will visit {@link MetadataProvider}s and {@link MemberDetailsDecorator}s in the order
- * of their type name, it is essential an add-on developer does not rely on this behaviour. Correct use of the metadata
- * infrastructure does not require special type naming approaches to be employed. The ordering behaviour exists solely
- * to simplify debugging for add-on developers and log comparison between invocations.
+ * While internally this implementation will visit {@link MetadataProvider}s and
+ * {@link MemberDetailsDecorator}s in the order of their type name, it is
+ * essential an add-on developer does not rely on this behaviour. Correct use of
+ * the metadata infrastructure does not require special type naming approaches
+ * to be employed. The ordering behaviour exists solely to simplify debugging
+ * for add-on developers and log comparison between invocations.
  * 
  * @author Ben Alex
  * @since 1.1
  */
 @Component(immediate = true)
 @Service
-@References(
-	value = { 
-		@Reference(name = "memberHoldingDecorator", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = MemberDetailsDecorator.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE), 
-		@Reference(name = "metadataProvider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = MetadataProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE) 
-	}
-)
-public final class MemberDetailsScannerImpl implements MemberDetailsScanner {
-	@Reference protected MetadataService metadataService;
+@References(value = {
+        @Reference(name = "memberHoldingDecorator", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = MemberDetailsDecorator.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE),
+        @Reference(name = "metadataProvider", strategy = ReferenceStrategy.EVENT, policy = ReferencePolicy.DYNAMIC, referenceInterface = MetadataProvider.class, cardinality = ReferenceCardinality.OPTIONAL_MULTIPLE) })
+public class MemberDetailsScannerImpl implements MemberDetailsScanner {
 
-	// Mutex
-	private final Object lock = new Object();
+    private final SortedSet<MemberDetailsDecorator> decorators = new TreeSet<MemberDetailsDecorator>(
+            new Comparator<MemberDetailsDecorator>() {
+                public int compare(final MemberDetailsDecorator o1,
+                        final MemberDetailsDecorator o2) {
+                    return o1.getClass().getName()
+                            .compareTo(o2.getClass().getName());
+                }
+            });
 
-	private SortedSet<MetadataProvider> providers = new TreeSet<MetadataProvider>(new Comparator<MetadataProvider>() {
-		public int compare(MetadataProvider o1, MetadataProvider o2) {
-			return o1.getClass().getName().compareTo(o2.getClass().getName());
-		}
-	});
-	
-	private SortedSet<MemberDetailsDecorator> decorators = new TreeSet<MemberDetailsDecorator>(new Comparator<MemberDetailsDecorator>() {
-		public int compare(MemberDetailsDecorator o1, MemberDetailsDecorator o2) {
-			return o1.getClass().getName().compareTo(o2.getClass().getName());
-		}
-	});
-	
-	protected void bindMemberHoldingDecorator(MemberDetailsDecorator decorator) {
-		synchronized (lock) {
-			decorators.add(decorator);
-		}
-	}
+    // Mutex
+    private final Object lock = new Object();
 
-	protected void unbindMemberHoldingDecorator(MemberDetailsDecorator decorator) {
-		synchronized (lock) {
-			decorators.remove(decorator);
-		}
-	}
+    @Reference protected MetadataService metadataService;
 
-	protected void bindMetadataProvider(MetadataProvider mp) {
-		synchronized (lock) {
-			Assert.notNull(mp, "Metadata provider required");
-			String mid = mp.getProvidesType();
-			Assert.isTrue(MetadataIdentificationUtils.isIdentifyingClass(mid), "Metadata provider '" + mp + "' violated interface contract by returning '" + mid + "'");
-			providers.add(mp);
-		}
-	}
-	
-	protected void unbindMetadataProvider(MetadataProvider mp) {
-		synchronized (lock) {
-			Assert.notNull(mp, "Metadata provider required");
-			providers.remove(mp);
-		}
-	}
+    private final SortedSet<MetadataProvider> providers = new TreeSet<MetadataProvider>(
+            new Comparator<MetadataProvider>() {
+                public int compare(final MetadataProvider o1,
+                        final MetadataProvider o2) {
+                    return o1.getClass().getName()
+                            .compareTo(o2.getClass().getName());
+                }
+            });
 
-	protected void deactivate(ComponentContext componentContext) {
-		synchronized (lock) {}
-	}
+    protected void bindMemberHoldingDecorator(
+            final MemberDetailsDecorator decorator) {
+        synchronized (lock) {
+            decorators.add(decorator);
+        }
+    }
 
-	public final MemberDetails getMemberDetails(String requestingClass, ClassOrInterfaceTypeDetails cid) {
-		synchronized (lock) {
-			// Create a list of discovered members
-			List<MemberHoldingTypeDetails> memberHoldingTypeDetails = new LinkedList<MemberHoldingTypeDetails>();
-			
-			// Build a List representing the class hierarchy, where the first element is the absolute superclass
-			List<ClassOrInterfaceTypeDetails> cidHierarchy = new LinkedList<ClassOrInterfaceTypeDetails>();
-			while (cid != null) {
-				cidHierarchy.add(0, cid);  // Note to the top of the list
-				cid = cid.getSuperclass();
-			}
-			
-			// Now we add this governor, plus all of its superclasses
-			for (ClassOrInterfaceTypeDetails currentClass : cidHierarchy) {
-				memberHoldingTypeDetails.add(currentClass);
-				
-				// Locate all MetadataProvider instances that provide ITDs and thus MemberHoldingTypeDetails information
-				for (MetadataProvider mp : providers) {
-					// Skip non-ITD providers
-					if (!(mp instanceof ItdMetadataProvider)) {
-						continue;
-					}
-					
-					// Skip myself
-					if (mp.getClass().getName().equals(requestingClass)) {
-						continue;
-					}
-					
-					// Determine the key the ITD provider uses for this particular type
-					String key = ((ItdMetadataProvider) mp).getIdForPhysicalJavaType(currentClass.getDeclaredByMetadataId());
-					Assert.isTrue(MetadataIdentificationUtils.isIdentifyingInstance(key), "ITD metadata provider '" + mp + "' returned an illegal key ('" + key + "'");
+    protected void bindMetadataProvider(final MetadataProvider mp) {
+        synchronized (lock) {
+            Validate.notNull(mp, "Metadata provider required");
+            final String mid = mp.getProvidesType();
+            Validate.isTrue(
+                    MetadataIdentificationUtils.isIdentifyingClass(mid),
+                    "Metadata provider '" + mp
+                            + "' violated interface contract by returning '"
+                            + mid + "'");
+            providers.add(mp);
+        }
+    }
 
-					// Get the metadata and ensure we have ITD type details available
-					MetadataItem metadataItem = metadataService.get(key);
-					if (metadataItem == null || !metadataItem.isValid()) {
-						continue;
-					}
-					Assert.isInstanceOf(ItdTypeDetailsProvidingMetadataItem.class, metadataItem, "ITD metadata provider '" + mp + "' failed to return the correct metadata type");
-					ItdTypeDetailsProvidingMetadataItem itdTypeDetailsMd = (ItdTypeDetailsProvidingMetadataItem) metadataItem;
-					if (itdTypeDetailsMd.getMemberHoldingTypeDetails() == null) {
-						continue;
-					}
-		
-					// Capture the member details
-					memberHoldingTypeDetails.add(itdTypeDetailsMd.getMemberHoldingTypeDetails());
-				}
-			}
+    protected void deactivate(final ComponentContext componentContext) {
+        // Empty
+    }
 
-			// Turn out list of discovered members into a result
-			MemberDetails result = new MemberDetailsImpl(memberHoldingTypeDetails);
-			
-			// Loop until such time as we complete a full loop where no changes are made to the result
-			boolean additionalLoopRequired = true;
-			while (additionalLoopRequired) {
-				additionalLoopRequired = false;
-				for (MemberDetailsDecorator decorator : decorators) {
-					MemberDetails newResult = decorator.decorate(requestingClass, result);
-					Assert.isTrue(newResult != null, "Decorator '" + decorator.getClass().getName() + "' returned an illegal result");
-					if (newResult != null && !newResult.equals(result)) {
-						additionalLoopRequired = true;
-					}
-					result = newResult;
-				}
-			}
-			
-			return result;
-		}
-	}
+    public final MemberDetails getMemberDetails(final String requestingClass,
+            ClassOrInterfaceTypeDetails cid) {
+        if (cid == null) {
+            return null;
+        }
+        synchronized (lock) {
+            // Create a list of discovered members
+            final List<MemberHoldingTypeDetails> memberHoldingTypeDetails = new ArrayList<MemberHoldingTypeDetails>();
+
+            // Build a List representing the class hierarchy, where the first
+            // element is the absolute superclass
+            final List<ClassOrInterfaceTypeDetails> cidHierarchy = new ArrayList<ClassOrInterfaceTypeDetails>();
+            while (cid != null) {
+                cidHierarchy.add(0, cid); // Note to the top of the list
+                cid = cid.getSuperclass();
+            }
+
+            // Now we add this governor, plus all of its superclasses
+            for (final ClassOrInterfaceTypeDetails currentClass : cidHierarchy) {
+                memberHoldingTypeDetails.add(currentClass);
+
+                // Locate all MetadataProvider instances that provide ITDs and
+                // thus MemberHoldingTypeDetails information
+                for (final MetadataProvider mp : providers) {
+                    // Skip non-ITD providers
+                    if (!(mp instanceof ItdMetadataProvider)) {
+                        continue;
+                    }
+
+                    // Skip myself
+                    if (mp.getClass().getName().equals(requestingClass)) {
+                        continue;
+                    }
+
+                    // Determine the key the ITD provider uses for this
+                    // particular type
+                    final String key = ((ItdMetadataProvider) mp)
+                            .getIdForPhysicalJavaType(currentClass
+                                    .getDeclaredByMetadataId());
+                    Validate.isTrue(MetadataIdentificationUtils
+                            .isIdentifyingInstance(key),
+                            "ITD metadata provider '" + mp
+                                    + "' returned an illegal key ('" + key
+                                    + "'");
+
+                    // Get the metadata and ensure we have ITD type details
+                    // available
+                    final MetadataItem metadataItem = metadataService.get(key);
+                    if (metadataItem == null || !metadataItem.isValid()) {
+                        continue;
+                    }
+                    Validate.isInstanceOf(
+                            ItdTypeDetailsProvidingMetadataItem.class,
+                            metadataItem,
+                            "ITD metadata provider '"
+                                    + mp
+                                    + "' failed to return the correct metadata type");
+                    final ItdTypeDetailsProvidingMetadataItem itdTypeDetailsMd = (ItdTypeDetailsProvidingMetadataItem) metadataItem;
+                    if (itdTypeDetailsMd.getMemberHoldingTypeDetails() == null) {
+                        continue;
+                    }
+
+                    // Capture the member details
+                    memberHoldingTypeDetails.add(itdTypeDetailsMd
+                            .getMemberHoldingTypeDetails());
+                }
+            }
+
+            // Turn out list of discovered members into a result
+            MemberDetails result = new MemberDetailsImpl(
+                    memberHoldingTypeDetails);
+
+            // Loop until such time as we complete a full loop where no changes
+            // are made to the result
+            boolean additionalLoopRequired = true;
+            while (additionalLoopRequired) {
+                additionalLoopRequired = false;
+                for (final MemberDetailsDecorator decorator : decorators) {
+                    final MemberDetails newResult = decorator.decorate(
+                            requestingClass, result);
+                    Validate.isTrue(newResult != null, "Decorator '"
+                            + decorator.getClass().getName()
+                            + "' returned an illegal result");
+                    if (newResult != null && !newResult.equals(result)) {
+                        additionalLoopRequired = true;
+                    }
+                    result = newResult;
+                }
+            }
+
+            return result;
+        }
+    }
+
+    protected void unbindMemberHoldingDecorator(
+            final MemberDetailsDecorator decorator) {
+        synchronized (lock) {
+            decorators.remove(decorator);
+        }
+    }
+
+    protected void unbindMetadataProvider(final MetadataProvider mp) {
+        synchronized (lock) {
+            Validate.notNull(mp, "Metadata provider required");
+            providers.remove(mp);
+        }
+    }
 }

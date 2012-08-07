@@ -1,7 +1,7 @@
 package org.springframework.roo.classpath.details.annotations;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.model.JavaSymbolName;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Represents a nested annotation attribute value.
@@ -9,20 +9,23 @@ import org.springframework.roo.support.util.Assert;
  * @author Ben Alex
  * @since 1.0
  */
-public class NestedAnnotationAttributeValue extends AbstractAnnotationAttributeValue<AnnotationMetadata> {
-	private AnnotationMetadata value;
+public class NestedAnnotationAttributeValue extends
+        AbstractAnnotationAttributeValue<AnnotationMetadata> {
+    private final AnnotationMetadata value;
 
-	public NestedAnnotationAttributeValue(JavaSymbolName name, AnnotationMetadata value) {
-		super(name);
-		Assert.notNull(value, "Value required");
-		this.value = value;
-	}
+    public NestedAnnotationAttributeValue(final JavaSymbolName name,
+            final AnnotationMetadata value) {
+        super(name);
+        Validate.notNull(value, "Value required");
+        this.value = value;
+    }
 
-	public AnnotationMetadata getValue() {
-		return value;
-	}
+    public AnnotationMetadata getValue() {
+        return value;
+    }
 
-	public String toString() {
-		return getName() + " -> " + value.toString();
-	}
+    @Override
+    public String toString() {
+        return getName() + " -> " + value.toString();
+    }
 }

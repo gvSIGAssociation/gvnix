@@ -1,5 +1,8 @@
 package org.springframework.roo.addon.json;
 
+import static org.springframework.roo.model.RooJavaType.ROO_IDENTIFIER;
+import static org.springframework.roo.model.RooJavaType.ROO_JSON;
+
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
@@ -9,7 +12,7 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Provides {@link JsonMetadata}.
@@ -18,54 +21,74 @@ import org.springframework.roo.project.Path;
  * @since 1.1
  */
 @Component(immediate = true)
-@Service 
-public final class JsonMetadataProvider extends AbstractItdMetadataProvider {
+@Service
+public class JsonMetadataProvider extends AbstractItdMetadataProvider {
 
-	protected void activate(ComponentContext context) {
-		metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-		addMetadataTrigger(new JavaType(RooJson.class.getName()));
-		addMetadataTrigger(new JavaType("org.springframework.roo.addon.entity.RooIdentifier"));
-	}
+    protected void activate(final ComponentContext context) {
+        metadataDependencyRegistry.registerDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        addMetadataTriggers(ROO_JSON, ROO_IDENTIFIER);
+    }
 
-	protected void deactivate(ComponentContext context) {
-		metadataDependencyRegistry.deregisterDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
-		removeMetadataTrigger(new JavaType(RooJson.class.getName()));
-		removeMetadataTrigger(new JavaType("org.springframework.roo.addon.entity.RooIdentifier"));
-	}
+    @Override
+    protected String createLocalIdentifier(final JavaType javaType,
+            final LogicalPath path) {
+        return JsonMetadata.createIdentifier(javaType, path);
+    }
 
-	protected ItdTypeDetailsProvidingMetadataItem getMetadata(String metadataIdentificationString, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, String itdFilename) {
-		// Acquire bean info (we need getters details, specifically)
-		JavaType javaType = JsonMetadata.getJavaType(metadataIdentificationString);
-		Path path = JsonMetadata.getPath(metadataIdentificationString);
+    protected void deactivate(final ComponentContext context) {
+        metadataDependencyRegistry.deregisterDependency(
+                PhysicalTypeIdentifier.getMetadataIdentiferType(),
+                getProvidesType());
+        removeMetadataTriggers(ROO_JSON, ROO_IDENTIFIER);
+    }
 
-		// We need to parse the annotation, if it is not present we will simply get the default annotation values
-		JsonAnnotationValues annotationValues = new JsonAnnotationValues(governorPhysicalTypeMetadata);
-		
-		String plural = javaType.getSimpleTypeName() + "s";
-		PluralMetadata pluralMetadata = (PluralMetadata) metadataService.get(PluralMetadata.createIdentifier(javaType, path));
-		if (pluralMetadata != null) {
-			plural = pluralMetadata.getPlural();
-		}
+    @Override
+    protected String getGovernorPhysicalTypeIdentifier(
+            final String metadataIdentificationString) {
+        final JavaType javaType = JsonMetadata
+                .getJavaType(metadataIdentificationString);
+        final LogicalPath path = JsonMetadata
+                .getPath(metadataIdentificationString);
+        final String physicalTypeIdentifier = PhysicalTypeIdentifier
+                .createIdentifier(javaType, path);
+        return physicalTypeIdentifier;
+    }
 
-		return new JsonMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, plural, annotationValues);
-	}
+    public String getItdUniquenessFilenameSuffix() {
+        return "Json";
+    }
 
-	public String getItdUniquenessFilenameSuffix() {
-		return "Json";
-	}
+    @Override
+    protected ItdTypeDetailsProvidingMetadataItem getMetadata(
+            final String metadataIdentificationString,
+            final JavaType aspectName,
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            final String itdFilename) {
+        // Acquire bean info (we need getters details, specifically)
+        final JavaType javaType = JsonMetadata
+                .getJavaType(metadataIdentificationString);
+        final LogicalPath path = JsonMetadata
+                .getPath(metadataIdentificationString);
 
-	protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
-		JavaType javaType = JsonMetadata.getJavaType(metadataIdentificationString);
-		Path path = JsonMetadata.getPath(metadataIdentificationString);
-		String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(javaType, path);
-		return physicalTypeIdentifier;
-	}
+        // We need to parse the annotation, if it is not present we will simply
+        // get the default annotation values
+        final JsonAnnotationValues annotationValues = new JsonAnnotationValues(
+                governorPhysicalTypeMetadata);
 
-	protected String createLocalIdentifier(JavaType javaType, Path path) {
-		return JsonMetadata.createIdentifier(javaType, path);
-	}
+        String plural = javaType.getSimpleTypeName() + "s";
+        final PluralMetadata pluralMetadata = (PluralMetadata) metadataService
+                .get(PluralMetadata.createIdentifier(javaType, path));
+        if (pluralMetadata != null) {
+            plural = pluralMetadata.getPlural();
+        }
 
-	public String getProvidesType() {
-		return JsonMetadata.getMetadataIdentiferType();
-	}
+        return new JsonMetadata(metadataIdentificationString, aspectName,
+                governorPhysicalTypeMetadata, plural, annotationValues);
+    }
+
+    public String getProvidesType() {
+        return JsonMetadata.getMetadataIdentiferType();
+    }
 }

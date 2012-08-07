@@ -5,6 +5,7 @@ import org.springframework.roo.classpath.details.annotations.populator.AbstractA
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
 import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.RooJavaType;
 
 /**
  * Represents a parsed {@link RooIntegrationTest} annotation.
@@ -13,61 +14,66 @@ import org.springframework.roo.model.JavaType;
  * @since 1.0
  */
 public class IntegrationTestAnnotationValues extends AbstractAnnotationValues {
-	
-	// From annotation
-	@AutoPopulate private JavaType entity = null;
-	@AutoPopulate private boolean count = true; 
-	@AutoPopulate private boolean find = true; 
-	@AutoPopulate private boolean findEntries = true; 
-	@AutoPopulate private boolean findAll = true;
-	@AutoPopulate private int findAllMaximum = 250;
-	@AutoPopulate private boolean flush = true; 
-	@AutoPopulate private boolean persist = true; 
-	@AutoPopulate private boolean remove = true; 
-	@AutoPopulate private boolean merge = true; 
 
-	public IntegrationTestAnnotationValues(PhysicalTypeMetadata governorPhysicalTypeMetadata) {
-		super(governorPhysicalTypeMetadata, new JavaType(RooIntegrationTest.class.getName()));
-		AutoPopulationUtils.populate(this, annotationMetadata);
-	}
+    @AutoPopulate private boolean count = true;
+    @AutoPopulate private JavaType entity;
+    @AutoPopulate private boolean find = true;
+    @AutoPopulate private boolean findAll = true;
+    @AutoPopulate private int findAllMaximum = 250;
+    @AutoPopulate private boolean findEntries = true;
+    @AutoPopulate private boolean flush = true;
+    @AutoPopulate private boolean merge = true;
+    @AutoPopulate private boolean persist = true;
+    @AutoPopulate private boolean remove = true;
+    @AutoPopulate private boolean transactional = true;
 
-	public JavaType getEntity() {
-		return entity;
-	}
+    public IntegrationTestAnnotationValues(
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata) {
+        super(governorPhysicalTypeMetadata, RooJavaType.ROO_INTEGRATION_TEST);
+        AutoPopulationUtils.populate(this, annotationMetadata);
+    }
 
-	public boolean isCount() {
-		return count;
-	}
+    public JavaType getEntity() {
+        return entity;
+    }
 
-	public boolean isFind() {
-		return find;
-	}
+    public int getFindAllMaximum() {
+        return findAllMaximum;
+    }
 
-	public boolean isFindEntries() {
-		return findEntries;
-	}
+    public boolean isCount() {
+        return count;
+    }
 
-	public boolean isFindAll() {
-		return findAll;
-	}
+    public boolean isFind() {
+        return find;
+    }
 
-	public int getFindAllMaximum() {
-		return findAllMaximum;
-	}
+    public boolean isFindAll() {
+        return findAll;
+    }
 
-	public boolean isFlush() {
-		return flush;
-	}
+    public boolean isFindEntries() {
+        return findEntries;
+    }
 
-	public boolean isPersist() {
-		return persist;
-	}
+    public boolean isFlush() {
+        return flush;
+    }
 
-	public boolean isRemove() {
-		return remove;
-	}
+    public boolean isMerge() {
+        return merge;
+    }
 
-	public boolean isMerge() {
-		return merge;
-	}
+    public boolean isPersist() {
+        return persist;
+    }
+
+    public boolean isRemove() {
+        return remove;
+    }
+
+    public boolean isTransactional() {
+        return transactional;
+    }
 }

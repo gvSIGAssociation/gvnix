@@ -2,7 +2,7 @@
 SPRING ROO - DEVELOPER INSTRUCTIONS
 ======================================================================
 
-Thanks for checkout out Spring Roo from Git. These instructions detail
+Thanks for checking out Spring Roo from Git. These instructions detail
 how to get started with your freshly checked-out source tree.
 
 These instructions are aimed at experienced developers looking to
@@ -21,7 +21,7 @@ We'll assume you typed the following to checkout Roo (if not, adjust
 the paths in the following instructions accordingly):
 
   cd ~
-  git clone git://git.springsource.org/roo/roo.git
+  git clone git@github.com:SpringSource/spring-roo.git
 
 In the instructions below, $ROO_HOME refers to the location where you
 checked out Roo (in this case it would be ROO_HOME="~/roo"). You do NOT
@@ -32,6 +32,8 @@ Next double-check you meet the installation requirements:
  * A proper installation of Java 6 or above
  * Maven 3.0.1+ properly installed and working with your Java 6+
  * Internet access so that Maven can download required dependencies
+ * A Git *command line* client installed (required by Roo's Maven build for
+   inserting the current revision number into OSGi bundle manifests)
 
 Next you need to setup an environment variable called MAVEN_OPTS.
 If you already have a MAVEN_OPTS, just check it has the memory sizes
@@ -83,11 +85,16 @@ changing the key ID at the end). Most public key servers share keys,
 so you don't need to send your public key to multiple key servers.
 
 Finally, every time you build you will be prompted for the password of
-your key. You have three options:
+your key. You have several options:
 
  * Type the password in every time
  * Include a -Dgpg.passphrase=thephrase argument when calling "mvn"
  * Edit ~/.bashrc and add -Dgpg.passphrase=thephrase to MAVEN_OPTS
+ * Edit your active Maven profile to include a "gpg.passphrase" property:
+     <profiles>
+         <profile>
+             <properties>
+                 <gpg.passphrase>roorules</gpg.passphrase>
 
 Of course the most secure option is to type the password every time.
 However, if you're doing a lot of builds you might prefer automation.
@@ -189,7 +196,7 @@ Setup Git correctly before you do anything else:
 
 Perform the initial checkout with this:
 
-  git clone git@git.springsource.org:roo/roo.git
+  git clone git@github.com:SpringSource/spring-roo.git
 
 Let's take the simple case where you just want to make a minor change
 against master. You don't want a new branch etc, and you only want a
@@ -274,7 +281,6 @@ RELEASE PROCEDURE:
 2. Verify the assembly ZIP ($ROO_HOME/target/roo-deploy/dist/*.zip) looks good:
 
    * Assembly ZIP unzips and is of a sensible size
-   * Assembly ZIP contains both PDF and HTML documentation
    * Assembly ZIP runs correctly when installed on major platforms
    * Create Jira Task ticket "Release Spring Roo x.y.z.aaaaaa"
    * Run the "reference guide" command in the Roo shell, copy the resulting XML file
@@ -284,7 +290,7 @@ RELEASE PROCEDURE:
 3. Tag the release (update the key ID, Jira ID and tag ID):
 
    cd $ROO_HOME
-   git tag -u 00B5050F -a -m "ROO-XXXX: Release" 3.4.5.RELEASE
+   git tag -u 00B5050F -a -m "ROO-XXXX: Release 3.4.5.RELEASE"
 
 4. Build JARs:
 

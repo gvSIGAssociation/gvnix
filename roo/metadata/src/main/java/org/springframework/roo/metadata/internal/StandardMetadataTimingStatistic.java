@@ -1,73 +1,96 @@
 package org.springframework.roo.metadata.internal;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.metadata.MetadataTimingStatistic;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Standard implementation of {@link MetadataTimingStatistic}.
  * 
  * @author Ben Alex
- *
  */
 public class StandardMetadataTimingStatistic implements MetadataTimingStatistic {
 
-	private String name;
-	private long time;
-	private long invocations;
-	
-	public StandardMetadataTimingStatistic(String name, long time, long invocations) {
-		Assert.hasText(name, "Name required");
-		this.name = name;
-		this.time = time;
-		this.invocations = invocations;
-	}
+    // Chosen to match the maximum
+    private static final int MAXIMUM_EXPECTED_INVOCATIONS = 5;
 
-	public String getName() {
-		return name;
-	}
+    private static final String INVOCATION_COUNT_FORMAT = "%"
+            + MAXIMUM_EXPECTED_INVOCATIONS + "d";
 
-	public long getTime() {
-		return time;
-	}
+    static final long NANOSECONDS_IN_MILLISECOND = 1000000L;
+    private static final String TIME_FORMAT = "%"
+            + (String.valueOf(NANOSECONDS_IN_MILLISECOND).length() - 1) + "d";
 
-	public long getInvocations() {
-		return invocations;
-	}
+    private final long invocations;
+    private final String name;
+    private final long nanoseconds;
 
-	public int compareTo(MetadataTimingStatistic o) {
-		int result = new Long(time).compareTo(o.getTime());
-		if (result == 0) {
-			result = new Long(invocations).compareTo(o.getInvocations());
-		}
-		if (result == 0) {
-			result = name.compareTo(o.getName());
-		}
-		return result;
-	}
+    /**
+     * Constructor
+     * 
+     * @param name (required)
+     * @param nanoseconds the elasped time in nanoseconds (zero or more)
+     * @param invocations (zero or more)
+     */
+    public StandardMetadataTimingStatistic(final String name,
+            final long nanoseconds, final long invocations) {
+        Validate.notBlank(name, "Name required");
+        Validate.isTrue(invocations >= 0, "Invocations must be zero or more");
+        Validate.isTrue(nanoseconds >= 0, "Nanoseconds must be zero or more");
+        this.invocations = invocations;
+        this.name = name;
+        this.nanoseconds = nanoseconds;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		return obj != null && obj instanceof MetadataTimingStatistic && this.compareTo((MetadataTimingStatistic)obj) == 0;
-	}
+    public int compareTo(final MetadataTimingStatistic o) {
+        int result = Long.valueOf(nanoseconds).compareTo(o.getTime());
+        if (result == 0) {
+            result = Long.valueOf(invocations).compareTo(o.getInvocations());
+        }
+        if (result == 0) {
+            result = name.compareTo(o.getName());
+        }
+        return result;
+    }
 
-	@Override
-	public int hashCode() {
-		return new Long(time).hashCode() * new Long(invocations).hashCode() * name.hashCode();
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof MetadataTimingStatistic
+                && compareTo((MetadataTimingStatistic) obj) == 0;
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		if (time < 1000000) {
-			// nanosecond precision
-			sb.append(String.format("%06d", time)).append(" ns; ");
-		} else {
-			// millisecond precision
-			sb.append(String.format("%06d", time/1000000)).append(" ms; ");
-		}
-		sb.append(String.format("%06d", invocations)).append(" call(s): ");
-		sb.append(name);
-		return sb.toString();
-	}
+    public long getInvocations() {
+        return invocations;
+    }
 
+    public String getName() {
+        return name;
+    }
+
+    public long getTime() {
+        return nanoseconds;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.valueOf(nanoseconds).hashCode()
+                * Long.valueOf(invocations).hashCode() * name.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        if (nanoseconds < NANOSECONDS_IN_MILLISECOND) {
+            // Display as nanoseconds
+            sb.append(String.format(TIME_FORMAT, nanoseconds)).append(" ns; ");
+        }
+        else {
+            // Display as milliseconds
+            sb.append(String.format(TIME_FORMAT, nanoseconds / 1000000))
+                    .append(" ms; ");
+        }
+        sb.append(String.format(INVOCATION_COUNT_FORMAT, invocations)).append(
+                " call(s): ");
+        sb.append(name);
+        return sb.toString();
+    }
 }

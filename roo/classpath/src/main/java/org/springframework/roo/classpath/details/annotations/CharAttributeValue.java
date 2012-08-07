@@ -8,19 +8,28 @@ import org.springframework.roo.model.JavaSymbolName;
  * @author Ben Alex
  * @since 1.0
  */
-public class CharAttributeValue extends AbstractAnnotationAttributeValue<Character> {
-	private char value;
-	
-	public CharAttributeValue(JavaSymbolName name, char value) {
-		super(name);
-		this.value = value;
-	}
+public class CharAttributeValue extends
+        AbstractAnnotationAttributeValue<Character> {
 
-	public Character getValue() {
-		return value;
-	}
+    private final char value;
 
-	public String toString() {
-		return getName() + " -> " + new Character(value).toString();
-	}
+    /**
+     * Constructor
+     * 
+     * @param name
+     * @param value
+     */
+    public CharAttributeValue(final JavaSymbolName name, final char value) {
+        super(name);
+        this.value = value;
+    }
+
+    public Character getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " -> " + value;
+    }
 }

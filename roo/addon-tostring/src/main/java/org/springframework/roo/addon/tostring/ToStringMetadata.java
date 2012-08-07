@@ -1,33 +1,21 @@
 package org.springframework.roo.addon.tostring;
 
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.springframework.roo.model.JavaType.STRING;
 
+import java.lang.reflect.Modifier;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.BeanInfoUtils;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
-import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
-import org.springframework.roo.classpath.details.annotations.populator.AutoPopulate;
-import org.springframework.roo.classpath.details.annotations.populator.AutoPopulationUtils;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Metadata for {@link RooToString}.
@@ -35,143 +23,131 @@ import org.springframework.roo.support.util.StringUtils;
  * @author Ben Alex
  * @since 1.0
  */
-public class ToStringMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
-	private static final String PROVIDES_TYPE_STRING = ToStringMetadata.class.getName();
-	private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
-	private List<MethodMetadata> locatedAccessors;
+public class ToStringMetadata extends
+        AbstractItdTypeDetailsProvidingMetadataItem {
 
-	// From annotation
-	@AutoPopulate private String toStringMethod = "toString";
-	@AutoPopulate private String[] excludeFields;
+    private static final String PROVIDES_TYPE_STRING = ToStringMetadata.class
+            .getName();
+    private static final String PROVIDES_TYPE = MetadataIdentificationUtils
+            .create(PROVIDES_TYPE_STRING);
+    private static final String STYLE = "SHORT_PREFIX_STYLE";
+    private static final JavaType TO_STRING_BUILDER = new JavaType(
+            "org.apache.commons.lang3.builder.ReflectionToStringBuilder");
+    private static final JavaType TO_STRING_STYLE = new JavaType(
+            "org.apache.commons.lang3.builder.ToStringStyle");
 
-	public ToStringMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, List<MethodMetadata> locatedAccessors) {
-		super(identifier, aspectName, governorPhysicalTypeMetadata);
-		Assert.isTrue(isValid(identifier), "Metadata identification string '" + identifier + "' does not appear to be a valid");
-		Assert.notNull(locatedAccessors, "Public accessors required");
+    public static String createIdentifier(final JavaType javaType,
+            final LogicalPath path) {
+        return PhysicalTypeIdentifierNamingUtils.createIdentifier(
+                PROVIDES_TYPE_STRING, javaType, path);
+    }
 
-		this.locatedAccessors = locatedAccessors;
+    public static JavaType getJavaType(final String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.getJavaType(
+                PROVIDES_TYPE_STRING, metadataIdentificationString);
+    }
 
-		// Process values from the annotation, if present
-		AnnotationMetadata annotation = MemberFindingUtils.getDeclaredTypeAnnotation(governorTypeDetails, new JavaType(RooToString.class.getName()));
-		if (annotation != null) {
-			AutoPopulationUtils.populate(this, annotation);
-		}
+    public static String getMetadataIdentiferType() {
+        return PROVIDES_TYPE;
+    }
 
-		// Generate the toString
-		builder.addMethod(getToStringMethod());
+    public static LogicalPath getPath(final String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
+                metadataIdentificationString);
+    }
 
-		// Create a representation of the desired output ITD
-		itdTypeDetails = builder.build();
-	}
+    public static boolean isValid(final String metadataIdentificationString) {
+        return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING,
+                metadataIdentificationString);
+    }
 
-	/**
-	 * Obtains the "toString" method for this type, if available.
-	 * <p>
-	 * If the user provided a non-default name for "toString", that method will be returned.
-	 * 
-	 * @return the "toString" method declared on this type or that will be introduced (or null if undeclared and not introduced)
-	 */
-	public MethodMetadata getToStringMethod() {
-		// Compute the relevant toString method name
-		JavaSymbolName methodName = new JavaSymbolName("toString");
-		if (!this.toStringMethod.equals("")) {
-			methodName = new JavaSymbolName(this.toStringMethod);
-		}
+    private final ToStringAnnotationValues annotationValues;
 
-		// See if the type itself declared the method
-		MethodMetadata result = MemberFindingUtils.getDeclaredMethod(governorTypeDetails, methodName, null);
-		if (result != null) {
-			return result;
-		}
+    /**
+     * Constructor
+     * 
+     * @param identifier
+     * @param aspectName
+     * @param governorPhysicalTypeMetadata
+     * @param annotationValues
+     */
+    public ToStringMetadata(final String identifier, final JavaType aspectName,
+            final PhysicalTypeMetadata governorPhysicalTypeMetadata,
+            final ToStringAnnotationValues annotationValues) {
+        super(identifier, aspectName, governorPhysicalTypeMetadata);
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
+                + identifier + "' does not appear to be a valid");
+        Validate.notNull(annotationValues, "Annotation values required");
 
-		// Decide whether we need to produce the toString method
-		if (this.toStringMethod.equals("")) {
-			return null;
-		}
-		
-		InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-		bodyBuilder.appendFormalLine("StringBuilder sb = new StringBuilder();");
+        this.annotationValues = annotationValues;
 
-		/** Key: field name, Value: accessor name */
-		Map<String, String> map = new LinkedHashMap<String, String>();
+        // Generate the toString() method
+        builder.addMethod(getToStringMethod());
 
-		/** Field names */
-		List<String> order = new ArrayList<String>();
+        // Create a representation of the desired output ITD
+        itdTypeDetails = builder.build();
+    }
 
-		Set<String> excludeFieldsSet = new LinkedHashSet<String>();
-		if (excludeFields != null && excludeFields.length > 0) {
-			Collections.addAll(excludeFieldsSet, excludeFields);
-		}
+    /**
+     * Obtains the "toString" method for this type, if available.
+     * <p>
+     * If the user provided a non-default name for "toString", that method will
+     * be returned.
+     * 
+     * @return the "toString" method declared on this type or that will be
+     *         introduced (or null if undeclared and not introduced)
+     */
+    private MethodMetadataBuilder getToStringMethod() {
+        final String toStringMethod = annotationValues.getToStringMethod();
+        if (StringUtils.isBlank(toStringMethod)) {
+            return null;
+        }
 
-		for (MethodMetadata accessor : locatedAccessors) {
-			String accessorName = accessor.getMethodName().getSymbolName();
-			String fieldName = BeanInfoUtils.getPropertyNameForJavaBeanMethod(accessor).getSymbolName();
-			if (!excludeFieldsSet.contains(StringUtils.uncapitalize(fieldName)) && !map.containsKey(fieldName)) {
-				String accessorText = accessorName + "()";
-				if (accessor.getReturnType().isCommonCollectionType()) {
-					accessorText = accessorName + "() == null ? \"null\" : " + accessorName + "().size()";
-				} else if (accessor.getReturnType().isArray()) {
-					accessorText = "java.util.Arrays.toString(" + accessorName + "())";
-				} else if (Calendar.class.getName().equals(accessor.getReturnType().getFullyQualifiedTypeName())) {
-					accessorText = accessorName + "() == null ? \"null\" : " + accessorName + "().getTime()";
-				}
-				map.put(fieldName, accessorText);
-				order.add(fieldName);
-			}
-		}
+        // Compute the relevant toString method name
+        final JavaSymbolName methodName = new JavaSymbolName(toStringMethod);
 
-		if (!order.isEmpty()) {
-			int index = 0;
-			int size = map.keySet().size();
-			for (String fieldName : order) {
-				index++;
-				String accessorText = map.get(fieldName);
-				StringBuilder string = new StringBuilder();
-				string.append("sb.append(\"" + fieldName + ": \").append(" + accessorText + ")");
-				if (index < size) {
-					string.append(".append(\", \")");
-				}
-				string.append(";");
-				bodyBuilder.appendFormalLine(string.toString());
-			}
+        // See if the type itself declared the method
+        if (governorHasMethod(methodName)) {
+            return null;
+        }
 
-			bodyBuilder.appendFormalLine("return sb.toString();");
+        builder.getImportRegistrationResolver().addImports(TO_STRING_BUILDER,
+                TO_STRING_STYLE);
 
-			MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, new JavaType("java.lang.String"), bodyBuilder);
-			result = methodBuilder.build();
-		}
+        final InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
+        final String[] excludeFields = annotationValues.getExcludeFields();
+        String str;
+        if (excludeFields != null && excludeFields.length > 0) {
+            final StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < excludeFields.length; i++) {
+                if (i > 0) {
+                    builder.append(", ");
+                }
+                builder.append("\"").append(excludeFields[i]).append("\"");
+            }
+            str = "new ReflectionToStringBuilder(this, ToStringStyle." + STYLE
+                    + ").setExcludeFieldNames(" + builder.toString()
+                    + ").toString();";
+        }
+        else {
+            str = "ReflectionToStringBuilder.toString(this, ToStringStyle."
+                    + STYLE + ");";
+        }
+        bodyBuilder.appendFormalLine("return " + str);
 
-		return result;
-	}
+        return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName,
+                STRING, bodyBuilder);
+    }
 
-	public String toString() {
-		ToStringCreator tsc = new ToStringCreator(this);
-		tsc.append("identifier", getId());
-		tsc.append("valid", valid);
-		tsc.append("aspectName", aspectName);
-		tsc.append("destinationType", destination);
-		tsc.append("governor", governorPhysicalTypeMetadata.getId());
-		tsc.append("itdTypeDetails", itdTypeDetails);
-		return tsc.toString();
-	}
-
-	public static final String getMetadataIdentiferType() {
-		return PROVIDES_TYPE;
-	}
-
-	public static final String createIdentifier(JavaType javaType, Path path) {
-		return PhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, javaType, path);
-	}
-
-	public static final JavaType getJavaType(String metadataIdentificationString) {
-		return PhysicalTypeIdentifierNamingUtils.getJavaType(PROVIDES_TYPE_STRING, metadataIdentificationString);
-	}
-
-	public static final Path getPath(String metadataIdentificationString) {
-		return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, metadataIdentificationString);
-	}
-
-	public static boolean isValid(String metadataIdentificationString) {
-		return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING, metadataIdentificationString);
-	}
+    @Override
+    public String toString() {
+        final ToStringBuilder builder = new ToStringBuilder(this);
+        builder.append("identifier", getId());
+        builder.append("valid", valid);
+        builder.append("aspectName", aspectName);
+        builder.append("destinationType", destination);
+        builder.append("governor", governorPhysicalTypeMetadata.getId());
+        builder.append("itdTypeDetails", itdTypeDetails);
+        return builder.toString();
+    }
 }

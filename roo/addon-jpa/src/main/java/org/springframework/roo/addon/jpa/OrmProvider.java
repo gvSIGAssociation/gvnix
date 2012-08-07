@@ -1,6 +1,7 @@
 package org.springframework.roo.addon.jpa;
 
-import org.springframework.roo.support.style.ToStringCreator;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * ORM providers known to the JPA add-on.
@@ -10,35 +11,37 @@ import org.springframework.roo.support.style.ToStringCreator;
  * @since 1.0
  */
 public enum OrmProvider {
-	HIBERNATE("org.hibernate.ejb.HibernatePersistence"), 
-	OPENJPA("org.apache.openjpa.persistence.PersistenceProviderImpl"), 
-	ECLIPSELINK("org.eclipse.persistence.jpa.PersistenceProvider"),
-	DATANUCLEUS("org.datanucleus.jpa.PersistenceProviderImpl", "org.datanucleus.store.appengine.jpa.DatastorePersistenceProvider"),
-	DATANUCLEUS_2("org.datanucleus.jpa.PersistenceProviderImpl", "com.force.sdk.jpa.PersistenceProviderImpl");
 
-	private String adapter;
-	private String alternateAdapter;
+    DATANUCLEUS("org.datanucleus.api.jpa.PersistenceProviderImpl"), ECLIPSELINK(
+            "org.eclipse.persistence.jpa.PersistenceProvider"), HIBERNATE(
+            "org.hibernate.ejb.HibernatePersistence"), OPENJPA(
+            "org.apache.openjpa.persistence.PersistenceProviderImpl");
 
-	private OrmProvider(String adapter, String alternateAdapter) {
-		this.adapter = adapter;
-		this.alternateAdapter = alternateAdapter;
-	}
+    private final String adapter;
 
-	private OrmProvider(String adapter) {
-		this(adapter, "");
-	}
+    /**
+     * Constructor
+     * 
+     * @param adapter (required)
+     */
+    private OrmProvider(final String adapter) {
+        Validate.notBlank(adapter, "Adapter is required");
+        this.adapter = adapter;
+    }
 
-	public String getAdapter() {
-		return adapter;
-	}
+    public String getAdapter() {
+        return adapter;
+    }
 
-	public String getAlternateAdapter() {
-		return alternateAdapter;
-	}
+    public String getConfigPrefix() {
+        return "/configuration/ormProviders/provider[@id='" + name() + "']";
+    }
 
-	public String toString() {
-		ToStringCreator tsc = new ToStringCreator(this);
-		tsc.append("provider", name());
-		return tsc.toString();
-	}
+    @Override
+    public String toString() {
+        final ToStringBuilder builder = new ToStringBuilder(this);
+        builder.append("provider", name());
+        builder.append("adapter", adapter);
+        return builder.toString();
+    }
 }

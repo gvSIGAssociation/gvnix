@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0">
+    <scr:component enabled="true" name="org.springframework.roo.addon.layers.service.ServiceAnnotationValuesFactoryImpl">
+        <implementation class="org.springframework.roo.addon.layers.service.ServiceAnnotationValuesFactoryImpl"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.layers.service.ServiceAnnotationValuesFactory"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.service.ServiceAnnotationValuesFactoryImpl" private="false"/>
+        <reference name="metadataService" interface="org.springframework.roo.metadata.MetadataService" cardinality="1..1" policy="static" bind="bindMetadataService" unbind="unbindMetadataService" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.layers.service.ServiceCommands">
+        <implementation class="org.springframework.roo.addon.layers.service.ServiceCommands"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.shell.CommandMarker"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.service.ServiceCommands" private="false"/>
+        <reference name="serviceOperations" interface="org.springframework.roo.addon.layers.service.ServiceOperations" cardinality="1..1" policy="static" bind="bindServiceOperations" unbind="unbindServiceOperations" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.layers.service.ServiceInterfaceLocatorImpl">
+        <implementation class="org.springframework.roo.addon.layers.service.ServiceInterfaceLocatorImpl"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.layers.service.ServiceInterfaceLocator"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.service.ServiceInterfaceLocatorImpl" private="false"/>
+        <reference name="typeLocationService" interface="org.springframework.roo.classpath.TypeLocationService" cardinality="1..1" policy="static" bind="bindTypeLocationService" unbind="unbindTypeLocationService" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.layers.service.ServiceOperationsImpl">
+        <implementation class="org.springframework.roo.addon.layers.service.ServiceOperationsImpl"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.addon.layers.service.ServiceOperations"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.service.ServiceOperationsImpl" private="false"/>
+        <reference name="fileManager" interface="org.springframework.roo.process.manager.FileManager" cardinality="1..1" policy="static" bind="bindFileManager" unbind="unbindFileManager" checked="true" strategy="event"/>
+        <reference name="pathResolver" interface="org.springframework.roo.project.PathResolver" cardinality="1..1" policy="static" bind="bindPathResolver" unbind="unbindPathResolver" checked="true" strategy="event"/>
+        <reference name="projectOperations" interface="org.springframework.roo.project.ProjectOperations" cardinality="1..1" policy="static" bind="bindProjectOperations" unbind="unbindProjectOperations" checked="true" strategy="event"/>
+        <reference name="typeManagementService" interface="org.springframework.roo.classpath.TypeManagementService" cardinality="1..1" policy="static" bind="bindTypeManagementService" unbind="unbindTypeManagementService" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" name="org.springframework.roo.addon.layers.service.ServiceLayerProvider">
+        <implementation class="org.springframework.roo.addon.layers.service.ServiceLayerProvider"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.classpath.layers.LayerProvider"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.service.ServiceLayerProvider" private="false"/>
+        <reference name="metadataService" interface="org.springframework.roo.metadata.MetadataService" cardinality="1..1" policy="static" bind="bindMetadataService" unbind="unbindMetadataService" checked="true" strategy="event"/>
+        <reference name="serviceAnnotationValuesFactory" interface="org.springframework.roo.addon.layers.service.ServiceAnnotationValuesFactory" cardinality="1..1" policy="static" bind="bindServiceAnnotationValuesFactory" unbind="unbindServiceAnnotationValuesFactory" checked="true" strategy="event"/>
+        <reference name="serviceInterfaceLocator" interface="org.springframework.roo.addon.layers.service.ServiceInterfaceLocator" cardinality="1..1" policy="static" bind="bindServiceInterfaceLocator" unbind="unbindServiceInterfaceLocator" checked="true" strategy="event"/>
+        <reference name="typeLocationService" interface="org.springframework.roo.classpath.TypeLocationService" cardinality="1..1" policy="static" bind="bindTypeLocationService" unbind="unbindTypeLocationService" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" immediate="true" name="org.springframework.roo.addon.layers.service.ServiceClassMetadataProvider">
+        <implementation class="org.springframework.roo.addon.layers.service.ServiceClassMetadataProvider"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.classpath.itd.ItdTriggerBasedMetadataProvider"/>
+            <provide interface="org.springframework.roo.classpath.itd.ItdMetadataProvider"/>
+            <provide interface="org.springframework.roo.metadata.MetadataProvider"/>
+            <provide interface="org.springframework.roo.classpath.TriggerBasedMetadataProvider"/>
+            <provide interface="org.springframework.roo.metadata.MetadataNotificationListener"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.service.ServiceClassMetadataProvider" private="false"/>
+        <reference name="layerService" interface="org.springframework.roo.classpath.layers.LayerService" cardinality="1..1" policy="static" bind="bindLayerService" unbind="unbindLayerService" checked="true" strategy="event"/>
+        <reference name="fileManager" interface="org.springframework.roo.process.manager.FileManager" cardinality="1..1" policy="static" bind="bindFileManager" unbind="unbindFileManager" checked="true" strategy="event"/>
+        <reference name="itdDiscoveryService" interface="org.springframework.roo.classpath.ItdDiscoveryService" cardinality="1..1" policy="static" bind="bindItdDiscoveryService" unbind="unbindItdDiscoveryService" checked="true" strategy="event"/>
+        <reference name="memberDetailsScanner" interface="org.springframework.roo.classpath.scanner.MemberDetailsScanner" cardinality="1..1" policy="static" bind="bindMemberDetailsScanner" unbind="unbindMemberDetailsScanner" checked="true" strategy="event"/>
+        <reference name="persistenceMemberLocator" interface="org.springframework.roo.classpath.persistence.PersistenceMemberLocator" cardinality="1..1" policy="static" bind="bindPersistenceMemberLocator" unbind="unbindPersistenceMemberLocator" checked="true" strategy="event"/>
+        <reference name="typeLocationService" interface="org.springframework.roo.classpath.TypeLocationService" cardinality="1..1" policy="static" bind="bindTypeLocationService" unbind="unbindTypeLocationService" checked="true" strategy="event"/>
+        <reference name="metadataDependencyRegistry" interface="org.springframework.roo.metadata.MetadataDependencyRegistry" cardinality="1..1" policy="static" bind="bindMetadataDependencyRegistry" unbind="unbindMetadataDependencyRegistry" checked="true" strategy="event"/>
+        <reference name="metadataService" interface="org.springframework.roo.metadata.MetadataService" cardinality="1..1" policy="static" bind="bindMetadataService" unbind="unbindMetadataService" checked="true" strategy="event"/>
+    </scr:component>
+    <scr:component enabled="true" immediate="true" name="org.springframework.roo.addon.layers.service.ServiceInterfaceMetadataProvider">
+        <implementation class="org.springframework.roo.addon.layers.service.ServiceInterfaceMetadataProvider"/>
+        <service servicefactory="false">
+            <provide interface="org.springframework.roo.classpath.itd.ItdTriggerBasedMetadataProvider"/>
+            <provide interface="org.springframework.roo.classpath.itd.ItdMetadataProvider"/>
+            <provide interface="org.springframework.roo.metadata.MetadataProvider"/>
+            <provide interface="org.springframework.roo.classpath.TriggerBasedMetadataProvider"/>
+            <provide interface="org.springframework.roo.metadata.MetadataNotificationListener"/>
+        </service>
+        <property name="service.pid" value="org.springframework.roo.addon.layers.service.ServiceInterfaceMetadataProvider" private="false"/>
+        <reference name="customDataKeyDecorator" interface="org.springframework.roo.classpath.customdata.taggers.CustomDataKeyDecorator" cardinality="1..1" policy="static" bind="bindCustomDataKeyDecorator" unbind="unbindCustomDataKeyDecorator" checked="true" strategy="event"/>
+        <reference name="fileManager" interface="org.springframework.roo.process.manager.FileManager" cardinality="1..1" policy="static" bind="bindFileManager" unbind="unbindFileManager" checked="true" strategy="event"/>
+        <reference name="itdDiscoveryService" interface="org.springframework.roo.classpath.ItdDiscoveryService" cardinality="1..1" policy="static" bind="bindItdDiscoveryService" unbind="unbindItdDiscoveryService" checked="true" strategy="event"/>
+        <reference name="memberDetailsScanner" interface="org.springframework.roo.classpath.scanner.MemberDetailsScanner" cardinality="1..1" policy="static" bind="bindMemberDetailsScanner" unbind="unbindMemberDetailsScanner" checked="true" strategy="event"/>
+        <reference name="persistenceMemberLocator" interface="org.springframework.roo.classpath.persistence.PersistenceMemberLocator" cardinality="1..1" policy="static" bind="bindPersistenceMemberLocator" unbind="unbindPersistenceMemberLocator" checked="true" strategy="event"/>
+        <reference name="typeLocationService" interface="org.springframework.roo.classpath.TypeLocationService" cardinality="1..1" policy="static" bind="bindTypeLocationService" unbind="unbindTypeLocationService" checked="true" strategy="event"/>
+        <reference name="metadataDependencyRegistry" interface="org.springframework.roo.metadata.MetadataDependencyRegistry" cardinality="1..1" policy="static" bind="bindMetadataDependencyRegistry" unbind="unbindMetadataDependencyRegistry" checked="true" strategy="event"/>
+        <reference name="metadataService" interface="org.springframework.roo.metadata.MetadataService" cardinality="1..1" policy="static" bind="bindMetadataService" unbind="unbindMetadataService" checked="true" strategy="event"/>
+    </scr:component>
+</components>

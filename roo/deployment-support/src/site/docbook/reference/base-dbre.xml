@@ -206,10 +206,9 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting></para>
     <title xml:id="dbre_commands">DBRE Add-On commands</title>
 
     <para>After you have configured your persistence layer with the <link
-    linkend="command-index-persistence-setup">persistence setup</link> command
-    and installed all the JDBC drivers, you can introspect and reverse
-    engineer the database configured for your project. DBRE contains two
-    commands:</para>
+    linkend="command-index-jpa-setup">jpa setup</link> command and installed
+    all the JDBC drivers, you can introspect and reverse engineer the database
+    configured for your project. DBRE contains two commands:</para>
 
     <orderedlist>
       <listitem>
@@ -224,11 +223,21 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting></para>
         <para>The --enableViews option when specified will also retrieve
         database views and display them with the table information.</para>
 
-        <para><emphasis role="bold">Note</emphasis>: the term "schema" is not
-        used by all databases, such as MySQL and Firebird, and for these
-        databases the target database name is contained in the JDBC URL
-        connection string. However the --schema option is still required but
-        Roo's tab assist feature will display "no-schema-required".</para>
+        <para><emphasis role="bold">Notes</emphasis>:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>The term "schema" is not used by all databases, such as
+            MySQL and Firebird, and for these databases the target database
+            name is contained in the JDBC URL connection string. However the
+            --schema option is still required but Roo's tab assist feature
+            will display "no-schema-required".</para>
+          </listitem>
+
+          <listitem>
+            <para>PostgreSQL upper case schema names are not supported.</para>
+          </listitem>
+        </itemizedlist>
       </listitem>
 
       <listitem>
@@ -253,35 +262,8 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting></para>
         option should only be used in specialised use cases only, such as
         those with database triggers.</para>
 
-        <para>You can use the --includeTables and --excludeTables option to
-        specify tables that you want or do not want reverse engineered
-        respectively. The options can take one or more table names. If more
-        than one table is required, the tables must be enclosed in double
-        quotes and each separated by a space. Wild-card searching is also
-        permitted using the asterisk (*) character to match one or more
-        characters or the '?' character to match exactly one character. For
-        example:</para>
-
-        <para><programlisting>roo&gt; database reverse engineer --schema order --package ~.domain --includeTables "foo* bar?"</programlisting></para>
-
-        <para>This will reverse engineer all tables who table whose name
-        starts with 'foo' and any table called bar with one extra character,
-        such as 'bar1' or 'bars'.</para>
-
-        <para><programlisting>roo&gt; database reverse engineer --schema order --package ~.domain --excludeTables "foo* bar?"</programlisting></para>
-
-        <para>This will reverse engineer all tables
-        <emphasis>except</emphasis> any table whose name starts with 'foo' and
-        any table called bar with one extra character, such as 'bar1' or
-        'bars'.</para>
-
-        <para><emphasis role="bold">Note</emphasis>: excluding tables not only
-        prevent entities from being created but associations are also not
-        created in other entities. This is done to prevent compile errors in
-        the source code.</para>
-
-        <para>You can also generate non-portable JPA @Column attributes, such
-        as 'columnDefinition' by specifying the --includeNonPortableAttributes
+        <para>You can generate non-portable JPA @Column attributes, such as
+        'columnDefinition' by specifying the --includeNonPortableAttributes
         option.</para>
 
         <para>Since the DBRE Add-on provides incremental database reverse
@@ -290,6 +272,53 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting></para>
         be added if new columns are added to a table, or fields will be
         removed if columns are deleted. Entities are also deleted in certain
         circumstances if their corresponding tables are dropped.</para>
+
+        <para>Examples of the database reverse engineer command:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><programlisting>roo&gt; database reverse engineer --schema order --package ~.domain --excludeTables "foo* bar?"</programlisting></para>
+
+            <para>This will reverse engineer all tables
+            <emphasis>except</emphasis> any table whose name starts with 'foo'
+            and any table called bar with one extra character, such as 'bar1'
+            or 'bars'.</para>
+
+            <para>You can use the --includeTables and --excludeTables option
+            to specify tables that you want or do not want reverse engineered
+            respectively. The options can take one or more table names. If
+            more than one table is required, the tables must be enclosed in
+            double quotes and each separated by a space. Wild-card searching
+            is also permitted using the asterisk (*) character to match one or
+            more characters or the '?' character to match exactly one
+            character. For example:</para>
+
+            <para><emphasis role="bold">Note</emphasis>: excluding tables not
+            only prevent entities from being created but associations are also
+            not created in other entities. This is done to prevent compile
+            errors in the source code.</para>
+          </listitem>
+
+          <listitem>
+            <para><programlisting>roo&gt; database reverse engineer --schema order --package ~.domain --includeTables "foo* bar?"</programlisting></para>
+
+            <para>This will reverse engineer all tables who table whose name
+            starts with 'foo' and any table called bar with one extra
+            character, such as 'bar1' or 'bars'.</para>
+          </listitem>
+
+          <listitem>
+            <para>You can also reverse engineer more than one schema by
+            specifying a doubled-quoted space-separated list of schemas.
+            Reverse engineering of foreign-key releationships between tables
+            in different schemas is supported. For example:</para>
+
+            <para><programlisting>roo&gt; database reverse engineer --schema "schema1 schema2 schema3" --package ~.domain</programlisting></para>
+
+            <para>This will reverse engineer all tables from schemas
+            "schema1", "schema2", and "schema3".</para>
+          </listitem>
+        </itemizedlist>
       </listitem>
     </orderedlist>
   </section>
@@ -299,13 +328,14 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting></para>
 
     <para>The @RooDbManaged annotation is added to all new entities created by
     executing the database reverse engineer command. Other Roo annotations,
-    @RooEntity, @RooJavaBean, and @RooToString are also added to the entity
-    class. The attribute "automaticallyDelete" is added to the @RooDbManaged
-    annotation and is set to "true" so that Roo can delete the entity if the
-    associated table has been dropped. However, if "automaticallyDelete" is
-    set to "false", or if any annotations, fields, constructors, or methods
-    have been added to the entity (i.e in the .java file), or if any of the
-    Roo annotations are removed, the entity will not be deleted.</para>
+    @RooJpaActiveRecord, @RooJavaBean, and @RooToString are also added to the
+    entity class. The attribute "automaticallyDelete" is added to the
+    @RooDbManaged annotation and is set to "true" so that Roo can delete the
+    entity if the associated table has been dropped. However, if
+    "automaticallyDelete" is set to "false", or if any annotations, fields,
+    constructors, or methods have been added to the entity (i.e in the .java
+    file), or if any of the Roo annotations are removed, the entity will not
+    be deleted.</para>
 
     <para>The presence of the @RooDbmanaged annotation on an entity class
     triggers the creation of an AspectJ inter-type declaration (ITD) ".aj"
@@ -320,7 +350,7 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting></para>
     <para><programlisting>@RooJavaBean
 @RooToString
 @RooDbManaged(automaticallyDelete = true)
-@RooEntity(table = "employee", schema = "expenses")
+@RooJpaActiveRecord(table = "employee", schema = "expenses")
 public class Employee {
 }</programlisting></para>
 
@@ -391,7 +421,8 @@ public class Employee {
 
       <para>For a table with a single primary key column, DBRE causes an
       identifier field to be created in the entity ITD annotated with @Id and
-      @Column. This is similar to executing the entity command by
+      @Column. This is similar to executing the <link
+      linkend="command-index-entity-jpa">entity jpa</link> command by
       itself.</para>
     </section>
 
@@ -401,15 +432,15 @@ public class Employee {
       <para>For tables with two or more primary key columns, DBRE will create
       a primary key class annotated with @RooIdentifier(dbManaged = true) and
       add the "identifierType" attribute with the identifier class name to the
-      @RooEntity annotation in the entity class. For example, a line_item
-      table has two primary keys, line_item_id and order_id. DBRE will create
-      the LineItem entity class and LineItemPK identifier class as
+      @RooJpaActiveRecord annotation in the entity class. For example, a
+      line_item table has two primary keys, line_item_id and order_id. DBRE
+      will create the LineItem entity class and LineItemPK identifier class as
       follows:</para>
 
       <para><programlisting>@RooJavaBean
 @RooToString
 @RooDbManaged(automaticallyDelete = true)
-@RooEntity(identifierType = LineItemPK.class, table = "line_item", schema = "order")
+@RooJpaActiveRecord(identifierType = LineItemPK.class, table = "line_item", schema = "order")
 public class LineItem {
 }</programlisting></para>
 
@@ -417,17 +448,14 @@ public class LineItem {
 public class LineItemPK {
 }</programlisting></para>
 
-      <para>Roo will automatically create the entity ITD containing a field
-      annotated with @EmbeddedId with type LineItemPK as follows:</para>
+      <para>Roo will automatically create the JPA entity ITD containing a
+      field annotated with @EmbeddedId with type LineItemPK as follows:</para>
 
-      <para><programlisting>privileged aspect LineItem_Roo_Entity {
+      <para><programlisting>privileged aspect LineItem_Roo_JpaEntity {
     
     declare @type: LineItem: @Entity;
     
     declare @type: LineItem: @Table(name = "line_item", schema = "order");
-    
-    @PersistenceContext
-    transient EntityManager LineItem.entityManager;
     
     @EmbeddedId
     private LineItemPK LineItem.id;
@@ -692,9 +720,16 @@ public class LineItemPK {
         java.lang.NoClassDefFoundError: javax/resource/ResourceException' to
         be displayed</emphasis></para>
 
-        <para>This is due to the Firebird JDBC driver not having been
-        installed. The driver must be installed if you have installed Roo for
-        the first time. See <xref linkend="dbre_installation" /></para>
+        <para>This is due to the javax.resource connector jar not installed.
+        Remove the cache directory under your Roo installation directory,
+        start the Roo shell, and run the command:</para>
+
+        <para><programlisting>osgi start --url
+        http://spring-roo-repository.springsource.org/release/org/springframework/roo/wrapping/org.springframework.roo.wrapping.connector/1.0.0010/org.springframework.roo.wrapping.connector-1.0.0010.jar
+        </programlisting></para>
+
+        <para>Re-install the Firebird driver. See <xref
+        linkend="dbre_installation" />.</para>
       </listitem>
 
       <listitem>
@@ -730,11 +765,11 @@ public class LineItemPK {
         engineering</emphasis></para>
 
         <para>When DBRE first creates an entity it puts in the table name in
-        the 'table' attribute of the @RooEntity annotation. This is the only
-        mechanism DBRE has for associating an entity with a table. If you
-        remove the 'table' attribute, DBRE has no way of determining what the
-        entity's corresponding table is and as a result cannot maintain the
-        entity's fields and associations.</para>
+        the 'table' attribute of the @RooJpaActiveRecord annotation. This is
+        the only mechanism DBRE has for associating an entity with a table. If
+        you remove the 'table' attribute, DBRE has no way of determining what
+        the entity's corresponding table is and as a result cannot maintain
+        the entity's fields and associations.</para>
       </listitem>
     </itemizedlist>
   </section>
