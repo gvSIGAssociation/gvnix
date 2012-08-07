@@ -50,17 +50,25 @@
     <module>support</module>
     <module>addon-dynamic-configuration</module>
     <module>addon-web-i18n</module>
+<!--
     <module>addon-web-menu</module>
     <module>addon-web-report</module>
+-->
     <module>addon-web-theme</module>
+<!--
     <module>addon-service</module>
+-->
     <module>addon-occ</module>
+<!--
     <module>addon-cit-security</module>
     <module>addon-web-pattern</module>
+-->
     <module>addon-web-mvc-binding</module>
+<!--
     <module>addon-web-dialog</module>
     <module>spring-roo-addon-typical-security</module>
     <module>spring-flex-roo</module>
+-->
   </modules>
 
   <!-- Note when doing releases: tagBase is set in release plugin configuration 
@@ -994,7 +1002,7 @@
   </reporting>
   <properties>
     <spring.version>3.0.5.RELEASE</spring.version>
-    <roo.version>1.1.5.RELEASE</roo.version>
+    <roo.version>1.2.2.RELEASE</roo.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- DiSiD: Add google code project name -->
     <google.code.project.name>gvnix</google.code.project.name>
