@@ -2,13 +2,13 @@ project --topLevelPackage org.gvnix.test.relation.list.table --projectName displ
 
 persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
-entity --class ~.domain.Person --identifierType ~.domain.PersonPk --entityName MyPerson --identifierColumn myidcolumn --identifierField myidfield --table PERSON
+entity jpa --class ~.domain.Person --identifierType ~.domain.PersonPk --entityName MyPerson --identifierColumn myidcolumn --identifierField myidfield --table PERSON
 field string --fieldName name --notNull
 field number --fieldName age --type java.lang.Integer --column my_age
 field date --fieldName birthDate --type java.util.Date
 field string --fieldName pkc1 --class ~.domain.PersonPk --column mypkc
 
-entity --class ~.domain.Horse --identifierType ~.domain.HorsePk
+entity jpa --class ~.domain.Horse --identifierType ~.domain.HorsePk
 field string --fieldName name --notNull
 field reference --fieldName person --type ~.domain.Person
 field string --fieldName pkc1 --class ~.domain.HorsePk
@@ -16,7 +16,7 @@ field string --fieldName pkc1 --class ~.domain.HorsePk
 focus --class ~.domain.Person
 field set --fieldName horses --type ~.domain.Horse --cardinality ONE_TO_MANY --mappedBy person
 
-entity --class ~.domain.Car --identifierType ~.domain.CarPk --entityName car --identifierColumn OneId --identifierField mycar --table CarTable
+entity jpa --class ~.domain.Car --identifierType ~.domain.CarPk --entityName car --identifierColumn OneId --identifierField mycar --table CarTable
 field string --fieldName name --notNull
 field reference --fieldName person --type ~.domain.Person --joinColumnName Onecolumn --referencedColumnName mypkc
 field string --fieldName pkc1 --class ~.domain.CarPk --column one_id

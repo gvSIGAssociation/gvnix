@@ -2,10 +2,10 @@ project --topLevelPackage org.gvnix.test.relation.list.table --projectName displ
 
 persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
-entity --class ~.domain.Person 
+entity jpa --class ~.domain.Person 
 field string --fieldName name
 
-entity --class ~.domain.Horse 
+entity jpa --class ~.domain.Horse 
 field set --fieldName My_Person --type ~.domain.Person --cardinality MANY_TO_MANY 
 
 focus --class ~.domain.Person

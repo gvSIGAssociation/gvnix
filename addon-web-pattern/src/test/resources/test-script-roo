@@ -2,19 +2,19 @@ project --topLevelPackage org.gvnix.test.relation.list.table --projectName displ
 
 persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
-entity --class ~.domain.Person --entityName myPerson --identifierType java.lang.Integer --identifierColumn myid --identifierField MyId --table persontable
+entity jpa --class ~.domain.Person --entityName myPerson --identifierType java.lang.Integer --identifierColumn myid --identifierField MyId --table persontable
 field string --fieldName name --column my_name
 field number --fieldName AGE --type short --column myage --notNull
 field date --fieldName birth_date --type java.util.Date --column my_birthDate
 
-entity --class ~.domain.Horse --entityName MyHorse --identifierType java.lang.Integer --identifierColumn OneId --identifierField myId --table HorseTable
+entity jpa --class ~.domain.Horse --entityName MyHorse --identifierType java.lang.Integer --identifierColumn OneId --identifierField myId --table HorseTable
 field string --fieldName name --notNull --column HORSENAME
 field reference --fieldName My_Person --type ~.domain.Person --joinColumnName onecolumn --referencedColumnName myid
 
 focus --class ~.domain.Person
 field set --fieldName My_horses --type ~.domain.Horse --cardinality ONE_TO_MANY --mappedBy My_Person --notNull
 
-entity --class ~.domain.Car --entityName car --identifierType java.lang.Integer --identifierColumn OneId --identifierField myId --table CarTable
+entity jpa --class ~.domain.Car --entityName car --identifierType java.lang.Integer --identifierColumn OneId --identifierField myId --table CarTable
 field string --fieldName name --notNull
 field reference --fieldName person --type ~.domain.Person --joinColumnName Onecolumn --referencedColumnName myid
 
