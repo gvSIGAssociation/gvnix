@@ -18,8 +18,6 @@
  */
 package org.gvnix.cit.security.roo.addon;
 
-import java.util.logging.Logger;
-
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -39,9 +37,6 @@ import org.springframework.roo.shell.CommandMarker;
 @Component
 @Service
 public class CitSecurityCommands implements CommandMarker {
-
-  private static Logger logger = Logger.getLogger(CitSecurityCommands.class
-      .getName());
 
   @Reference
   private CitSecurityOperations citSecurityOperations;

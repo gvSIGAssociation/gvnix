@@ -25,6 +25,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.springframework.roo.file.monitor.event.FileEvent;
 import org.springframework.roo.file.monitor.event.FileEventListener;
 import org.springframework.roo.file.monitor.event.FileOperation;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 
@@ -66,7 +67,7 @@ public class CitSecurityFileEventListener implements FileEventListener {
 
     // TODO No está definida la lógica de esta clase
 
-    String classPath = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+    String classPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
         CitSecurityOperationsImpl.CLASSES_PATH);
 
     // Changes in security's Classes
@@ -80,8 +81,6 @@ public class CitSecurityFileEventListener implements FileEventListener {
 
     }
 
-    String appSecurityXMLPath = pathResolver.getIdentifier(
-        Path.SPRING_CONFIG_ROOT, "applicationContext-security.xml");
     // Changes in applicationContext-security.xml
     if (fileEvent.getFileDetails().matchesAntPath(classPath + "**")) {
 

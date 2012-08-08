@@ -22,13 +22,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -38,15 +43,13 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.osgi.UrlFindingUtils;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.osgi.OSGiUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -72,9 +75,6 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     static final String CLASSES_PATH = CLASSES_PACKAGE.replace(".",
             File.separator);
 
-    private static final String PROVIDER_CLASS_NAME = CLASSES_PACKAGE
-            + "WscitAuthenticationProvider";
-
     private static final String PROVIDER_CLASS_FILENAME = PROVIDER_CLASS_SHORT_NAME
             + ".java";
 
@@ -91,8 +91,6 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             "ServerWSAuthServiceLocator.java" };
 
     private static final String WSAUTH_PROPERTIES_NAME = "CITWSAuth.properties";
-
-    private static final String SECURITY_XML_TEMPLATE = "applicationContext-security-template.xml";
 
     private static final Dependency AXIS_DEPENDENCY = new Dependency("axis",
             "axis", "1.4");
@@ -126,7 +124,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     public boolean isSetupAvailable() {
         // Si no esta configurada la seguriad pero se puede configurar
         // ya lo haremos nosotros
-        if (securityOperations.isInstallSecurityAvailable()) {
+        if (securityOperations.isSecurityInstallationPossible()) {
             return true;
         }
 
@@ -134,7 +132,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         // configurada
         // no estara disponible el comando
         String appSecurityXMLPath = pathResolver.getIdentifier(
-                Path.SPRING_CONFIG_ROOT, "applicationContext-security.xml");
+        		LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""), "applicationContext-security.xml");
         if (!fileManager.exists(appSecurityXMLPath)) {
             return false;
         }
@@ -161,7 +159,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     public boolean checkIsAlredyInstalled() {
         // Si no existe la ruta de nuestas clases no estan instaladas: estamos
         // disponibles
-        String classPath = pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+        String classPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                 CLASSES_PATH);
         if (!fileManager.exists(classPath)) {
             return false;
@@ -170,7 +168,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         // si no existe la clase provider no estamos instalados: estamos
         // disonible
         return fileManager.exists(pathResolver.getIdentifier(
-                Path.SRC_MAIN_JAVA, PROVIDER_TARGET_CLASS_FILENAME));
+        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""), PROVIDER_TARGET_CLASS_FILENAME));
     }
 
     /**
@@ -192,7 +190,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private String getSpringMvcConfigFile() {
         // resolve path for webmvc-config.xml if it hasn't been resolved yet
         return projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/webmvc-config.xml");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/spring/webmvc-config.xml");
     }
 
     /**
@@ -205,13 +203,13 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private String getTilesLayoutsFile() {
         // resolve absolute path for layouts.xml if it hasn't been resolved yet
         return projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "/WEB-INF/layouts/layouts.xml");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/WEB-INF/layouts/layouts.xml");
     }
 
     public void setup(String url, String login, String password, String appName) {
         // Si no esta configurada la seguriad pero se puede configurar
         // ya lo haremos nosotros
-        if (securityOperations.isInstallSecurityAvailable()) {
+        if (securityOperations.isSecurityInstallationPossible()) {
             securityOperations.installSecurity();
             // Forced write of web.xml modified by previous command because we
             // need to modify it too in following lines
@@ -225,9 +223,6 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
              * login.jspx a mano. Redmine #4886. Relacionado con
              * https://jira.springsource.org/browse/ROO-2173
              */
-            String loginJspxPath = pathResolver.getIdentifier(
-                    Path.SRC_MAIN_WEBAPP, "/WEB-INF/views/login.jspx");
-
         }
 
         // Copiamos las clases necesarias para el servicio
@@ -245,19 +240,16 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     }
 
     private void addDependencies() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
 
-        Set<Dependency> dependencies = projectMetadata
-                .getDependenciesExcludingVersion(AXIS_DEPENDENCY);
+        Set<Dependency> dependencies = projectOperations.getFocusedModule().getDependenciesExcludingVersion(AXIS_DEPENDENCY);
 
         if (!dependencies.isEmpty()) {
-            Assert.isTrue(dependencies.size() == 1,
+        	Validate.isTrue(dependencies.size() == 1,
                     "Duplicate AXIS library dependecy");
             Dependency current = dependencies.iterator().next();
-            String[] currentVersion = current.getVersionId().split("[.]");
+            String[] currentVersion = current.getVersion().split("[.]");
             if (currentVersion.length > 1) {
-                String[] requiredVersion = AXIS_DEPENDENCY.getVersionId()
+                String[] requiredVersion = AXIS_DEPENDENCY.getVersion()
                         .split("[.]");
                 int cur, req;
                 for (int i = 0; i < currentVersion.length
@@ -267,7 +259,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                         req = Integer.parseInt(requiredVersion[i]);
                     } catch (NumberFormatException e) {
                         // Actualizamos la dependencia por si acaso.
-                        projectOperations.addDependency(AXIS_DEPENDENCY);
+                        projectOperations.addDependency(projectOperations.getFocusedModuleName(), AXIS_DEPENDENCY);
                         return;
                     }
                     if (cur > req) {
@@ -283,7 +275,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             }
 
         }
-        projectOperations.addDependency(AXIS_DEPENDENCY);
+        projectOperations.addDependency(projectOperations.getFocusedModuleName(), AXIS_DEPENDENCY);
 
     }
 
@@ -298,24 +290,34 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private void copyConfigFiles(String url, String login, String password,
             String appName) {
 
-        String properties = pathResolver.getIdentifier(Path.SPRING_CONFIG_ROOT,
+        String properties = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""),
                 WSAUTH_PROPERTIES_NAME);
         if (fileManager.exists(properties)) {
             return;
         }
         InputStream templateInputStream = null;
         try {
-            templateInputStream = TemplateUtils.getTemplate(getClass(),
+            templateInputStream = FileUtils.getInputStream(getClass(),
                     "config/" + WSAUTH_PROPERTIES_NAME);
-            String template = FileCopyUtils.copyToString(new InputStreamReader(
+            String template = IOUtils.toString(new InputStreamReader(
                     templateInputStream));
             template = StringUtils.replace(template, "__URL__", url);
             template = StringUtils.replace(template, "__LOGIN__", login);
             template = StringUtils.replace(template, "__PASSWORD__", password);
             template = StringUtils.replace(template, "__APPNAME__", appName);
 
-            FileCopyUtils.copy(template, new OutputStreamWriter(fileManager
-                    .createFile(properties).getOutputStream()));
+            InputStream inputStream = null;
+            OutputStreamWriter outputStream = null;
+            try { 
+            	inputStream = IOUtils.toInputStream(template);
+            	outputStream = new OutputStreamWriter(fileManager.createFile(properties).getOutputStream());
+	            IOUtils.copy(inputStream, outputStream);
+            }
+            finally {
+            	IOUtils.closeQuietly(inputStream);
+            	IOUtils.closeQuietly(outputStream);
+            }
+            
         } catch (IOException e) {
             throw new IllegalStateException("Unable to create '"
                     + WSAUTH_PROPERTIES_NAME + "'", e);
@@ -334,7 +336,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     private void updateSecurityConfig() {
 
         String secTemplate = "config/applicationContext-security-template.xml";
-        String secXmlPath = pathResolver.getIdentifier(Path.SPRING_CONFIG_ROOT,
+        String secXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SPRING_CONFIG_ROOT, ""),
                 "applicationContext-security.xml");
 
         Document secXmlDoc;
@@ -347,7 +349,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             mutableFile = fileManager.createFile(secXmlPath);
         }
 
-        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+        InputStream templateInputStream = FileUtils.getInputStream(getClass(),
                 secTemplate);
         try {
             secXmlDoc = XmlUtils.getDocumentBuilder()
@@ -384,9 +386,9 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      * @param sessionTimeout
      */
     private void updateSessionTimeout(Integer sessionTimeout) {
-        Assert.notNull(sessionTimeout, "Session timeout must not be null");
+    	Validate.notNull(sessionTimeout, "Session timeout must not be null");
 
-        String webXmlPath = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+        String webXmlPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/web.xml");
 
         Document webXmlDoc;
@@ -417,7 +419,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
     private void copyJavaFiles() {
 
-        String prjId = ProjectMetadata.getProjectIdentifier();
+        String prjId = ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName());
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
                 .get(prjId);
 
@@ -436,7 +438,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
         // Copiamos los ficheros de los xsd del servicio WSAuth
         copyDirectoryContents("java-src/**",
-                pathResolver.getRoot(Path.SRC_MAIN_JAVA));
+                pathResolver.getRoot(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
     }
 
     /***
@@ -481,15 +483,14 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             String targetPackage, ProjectMetadata projectMetadata,
             Map<String, String> parameters, boolean override) {
         // default package
-        String packagePath = projectMetadata.getTopLevelPackage()
+        String packagePath = projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName())
                 .getFullyQualifiedPackageName().replace('.', '/');
 
         // setting targetPackage change default package
         String finalTargetPackage = null;
         if (targetPackage != null) {
             if (targetPackage.startsWith("~")) {
-                finalTargetPackage = targetPackage.replace("~", projectMetadata
-                        .getTopLevelPackage().getFullyQualifiedPackageName());
+                finalTargetPackage = targetPackage.replace("~", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName());
             } else {
                 finalTargetPackage = targetPackage;
             }
@@ -498,25 +499,23 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             finalTargetPackage = getClass().getPackage().getName();
         }
 
-        String destinationFile = projectMetadata.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_JAVA,
+        String destinationFile = projectOperations.getPathResolver()
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                         packagePath + "/" + targetFilename);
 
         if ((!fileManager.exists(destinationFile)) || override) {
             InputStream templateInputStream;
             if (sourceFolder == null) {
-                templateInputStream = TemplateUtils.getTemplate(getClass(),
+                templateInputStream = FileUtils.getInputStream(getClass(),
                         targetFilename + "-template");
             } else {
-                templateInputStream = TemplateUtils.getTemplate(getClass(),
+                templateInputStream = FileUtils.getInputStream(getClass(),
                         sourceFolder + "/" + targetFilename + "-template");
             }
             try {
                 // Read template and insert the user's package
-                String input = FileCopyUtils
-                        .copyToString(new InputStreamReader(templateInputStream));
-                input = input.replace("__TOP_LEVEL_PACKAGE__", projectMetadata
-                        .getTopLevelPackage().getFullyQualifiedPackageName());
+                String input = IOUtils.toString(new InputStreamReader(templateInputStream));
+                input = input.replace("__TOP_LEVEL_PACKAGE__", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName());
 
                 input = input.replace("__TARGET_PACKAGE__", finalTargetPackage);
 
@@ -530,8 +529,19 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                 // Output the file for the user
                 MutableFile mutableFile = fileManager
                         .createFile(destinationFile);
-                FileCopyUtils.copy(input.getBytes(),
-                        mutableFile.getOutputStream());
+                
+                InputStream inputStream = null;
+                OutputStream outputStream = null;
+                try { 
+                	inputStream = IOUtils.toInputStream(input);
+                	outputStream = mutableFile.getOutputStream();
+    	            IOUtils.copy(inputStream, outputStream);
+                }
+                finally {
+                	IOUtils.closeQuietly(inputStream);
+                	IOUtils.closeQuietly(outputStream);
+                }
+                
             } catch (IOException ioe) {
                 throw new IllegalStateException("Unable to create '"
                         + targetFilename + "'", ioe);
@@ -550,8 +560,8 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
      */
     private void copyDirectoryContents(String sourceAntPath,
             String targetDirectory) {
-        Assert.hasText(sourceAntPath, "Source path required");
-        Assert.hasText(targetDirectory, "Target directory required");
+        StringUtils.isNotBlank(sourceAntPath);
+        StringUtils.isNotBlank(targetDirectory);
 
         if (!targetDirectory.endsWith("/")) {
             targetDirectory += "/";
@@ -561,11 +571,11 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             fileManager.createDirectory(targetDirectory);
         }
 
-        String path = TemplateUtils.getTemplatePath(getClass(), sourceAntPath);
-        Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(
+        String path = FileUtils.getPath(getClass(), sourceAntPath);
+        Collection<URL> urls = OSGiUtils.findEntriesByPattern(
                 context.getBundleContext(), path);
 
-        Assert.notNull(urls,
+        Validate.notNull(urls,
                 "Could not search bundles for resources for Ant Path '" + path
                         + "'");
         for (URL url : urls) {
@@ -575,9 +585,19 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             if (fileName.endsWith(".java")) {
                 if (!fileManager.exists(targetDirectory + fileName)) {
                     try {
-                        FileCopyUtils.copy(url.openStream(), fileManager
-                                .createFile(targetDirectory + fileName)
-                                .getOutputStream());
+                    	
+                        InputStream inputStream = null;
+                        OutputStream outputStream = null;
+                        try { 
+                        	inputStream = url.openStream();
+                        	outputStream = fileManager.createFile(targetDirectory + fileName).getOutputStream();
+            	            IOUtils.copy(inputStream, outputStream);
+                        }
+                        finally {
+                        	IOUtils.closeQuietly(inputStream);
+                        	IOUtils.closeQuietly(outputStream);
+                        }
+                        
                     } catch (IOException e) {
                         new IllegalStateException(
                                 "Encountered an error during copying of resources for MVC JSP addon.",
