@@ -1,9 +1,9 @@
 project --topLevelPackage org.gvnix.sample
 persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
-entity --class ~.domain.Entity1
+entity jpa --class ~.domain.Entity1
 field string field1
 field string field2
-entity --class ~.domain.Entity2
+entity jpa --class ~.domain.Entity2
 field string otherField1
 field string otherField2
 occ checksum all

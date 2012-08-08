@@ -8,16 +8,16 @@ persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
 // logging setup --level INFO
 
-entity --class ~.domain.Person --testAutomatically
+entity jpa --class ~.domain.Person --testAutomatically
 field string --fieldName name --notNull
 field number --fieldName edad --type java.lang.Integer
 field date --fieldName fecha --type java.util.Calendar
-entity --class org.gvnix.test.service.layer.project.domain.Horse --testAutomatically
+entity jpa --class org.gvnix.test.service.layer.project.domain.Horse --testAutomatically
 field string --fieldName name --notNull
 field reference --fieldName person --type org.gvnix.test.service.layer.project.domain.Person
 focus --class ~.domain.Person
 field set --fieldName horses --type org.gvnix.test.service.layer.project.domain.Horse --cardinality ONE_TO_MANY --mappedBy person
-entity --class org.gvnix.test.service.layer.project.domain.Car --testAutomatically
+entity jpa --class org.gvnix.test.service.layer.project.domain.Car --testAutomatically
 field string --fieldName name --notNull
 field reference --fieldName person --type org.gvnix.test.service.layer.project.domain.Person
 focus --class ~.domain.Person

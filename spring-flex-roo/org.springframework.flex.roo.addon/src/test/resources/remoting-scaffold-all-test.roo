@@ -4,15 +4,15 @@ ent --class ~.domain.Person
 field string --fieldName name
 field set --fieldName children --type ~.domain.Person
 flex setup
-entity --class ~.domain.Address
+entity jpa --class ~.domain.Address
 field string --fieldName street
 focus --class ~.domain.Person
 field reference --fieldName currentAddress --type ~.domain.Address
 field reference --fieldName spouse --type ~.domain.Person --cardinality ONE_TO_ONE 
 field set --fieldName previousAddresses --type ~.domain.Address
-entity --class ~.domain.BuildingInfo
+entity jpa --class ~.domain.BuildingInfo
 field reference --fieldName address --type ~.domain.Address --cardinality ONE_TO_ONE 
-entity --class ~.domain.TaxRecord
+entity jpa --class ~.domain.TaxRecord
 field string --fieldName taxId
 focus --class ~.domain.Address
 field reference --type ~.domain.TaxRecord --fieldName taxRecord --cardinality ONE_TO_ONE

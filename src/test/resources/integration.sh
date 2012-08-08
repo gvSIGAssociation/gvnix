@@ -12,9 +12,15 @@ $2/code/bin/gvnix-dev script --file vote.roo
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file expenses.roo
 rm -rf /tmp/gvnixtest$1/*
-$2/code/bin/gvnix-dev script --file gwtNoEntities.roo
-rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file wedding.roo
+rm -rf /tmp/gvnixtest$1/*
+$2/code/bin/gvnix-dev script --file pizzashop.roo
+rm -rf /tmp/gvnixtest$1/*
+$2/code/bin/gvnix-dev script --file multimodule.roo
+rm -rf /tmp/gvnixtest$1/*
+$2/code/bin/gvnix-dev script --file bikeshop.roo
+rm -rf /tmp/gvnixtest$1/*
+$2/code/bin/gvnix-dev script --file embedding.roo
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-report/src/main/resources/report.roo
 rm -rf /tmp/gvnixtest$1/*

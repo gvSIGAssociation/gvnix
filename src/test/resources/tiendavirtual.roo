@@ -9,8 +9,8 @@ perform eclipse
 backup
 // scrip --file practica04.roo
 hint
-help entity
-entity --class ~.domain.Producto --testAutomatically
+help entity jpa
+entity jpa --class ~.domain.Producto --testAutomatically
 hint
 help field
 help field string
@@ -35,11 +35,11 @@ field date --fieldName inicio --type java.util.Date
 field date --fieldName fin --type java.util.Date
 help field number
 field number --fieldName precio --type java.lang.Float --notNull --value 0.0
-entity --class ~.domain.Categoria --testAutomatically
+entity jpa --class ~.domain.Categoria --testAutomatically
 field string --fieldName nombre --notNull
 help field set
 field set --fieldName productos --type ~.domain.Producto
-entity --class ~.domain.Cliente --testAutomatically
+entity jpa --class ~.domain.Cliente --testAutomatically
 field string --fieldName username --notNull
 field string --fieldName password --notNull
 field string --fieldName nombreCompleto
@@ -50,7 +50,7 @@ enum constant --name Portugal
 field enum --fieldName pais --type ~.domain.enumerated.Paises --enumType STRING --class ~.domain.Cliente
 field string --fieldName telefono
 field boolean --fieldName activo --value true --notNull
-entity --class ~.domain.Pedido --testAutomatically
+entity jpa --class ~.domain.Pedido --testAutomatically
 field string --fieldName identificadorPedido --notNull
 field reference --fieldName cliente --type ~.domain.Cliente --notNull
 enum type --class ~.domain.enumerated.EstadosPedido
@@ -66,7 +66,7 @@ enum constant --name PayPal
 enum constant --name Reembolso
 field enum --fieldName metodoPago --type ~.domain.enumerated.MetodosPagoPedido --enumType STRING --class ~.domain.Pedido
 field number --fieldName total --type java.lang.Float
-entity --class ~.domain.LineaPedido --testAutomatically
+entity jpa --class ~.domain.LineaPedido --testAutomatically
 hint relationships
 field set --fieldName lineasPedido --class ~.domain.Pedido --type ~.domain.LineaPedido --mappedBy pedido --cardinality ONE_TO_MANY
 field reference --fieldName pedido  --class ~.domain.LineaPedido --type ~.domain.Pedido --notNull --cardinality MANY_TO_ONE

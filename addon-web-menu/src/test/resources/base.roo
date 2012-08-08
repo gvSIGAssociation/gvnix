@@ -1,7 +1,7 @@
 // Spring Roo ENGINEERING BUILD [rev unknown] log opened at 2010-04-06 11:43:45
 project --topLevelPackage org.gvnix.test.tomcat5compat --java 5
 persistence setup --provider HIBERNATE --database H2_IN_MEMORY 
-entity --class ~.domain.Entity1
+entity jpa --class ~.domain.Entity1
 field string --fieldName field1
 field string --fieldName field2
 dependency add --groupId javax.xml.bind --artifactId jaxb-api --version 2.1
