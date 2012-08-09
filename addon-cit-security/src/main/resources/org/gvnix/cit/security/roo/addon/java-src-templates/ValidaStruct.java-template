@@ -21,7 +21,7 @@
  *  You may obtain a copy of the License at http://www.gnu.org/licenses/gpl-2.0.html
  */
 
-package es.gva.cit.WSAuth.xsd;
+package __TARGET_PACKAGE__;
 
 /**
  * 
@@ -54,7 +54,7 @@ public class ValidaStruct implements java.io.Serializable {
 
     private java.lang.String version;
 
-    private es.gva.cit.WSAuth.xsd.ModuloStruct[] modulos;
+    private ModuloStruct[] modulos;
 
     private java.lang.String ultentra;
 
@@ -85,7 +85,7 @@ public class ValidaStruct implements java.io.Serializable {
 	    java.lang.String dgral, java.lang.String cserv,
 	    java.lang.String tipousu, java.lang.String daplicacion,
 	    java.lang.String version,
-	    es.gva.cit.WSAuth.xsd.ModuloStruct[] modulos,
+	    ModuloStruct[] modulos,
 	    java.lang.String ultentra, java.lang.String ultentra_s,
 	    java.lang.String param1, java.lang.String param2,
 	    java.lang.String param3, java.lang.String rolusuar,
@@ -337,7 +337,7 @@ public class ValidaStruct implements java.io.Serializable {
      * 
      * @return modulos
      */
-    public es.gva.cit.WSAuth.xsd.ModuloStruct[] getModulos() {
+    public ModuloStruct[] getModulos() {
 	return modulos;
     }
 
@@ -346,7 +346,7 @@ public class ValidaStruct implements java.io.Serializable {
      * 
      * @param modulos
      */
-    public void setModulos(es.gva.cit.WSAuth.xsd.ModuloStruct[] modulos) {
+    public void setModulos(ModuloStruct[] modulos) {
 	this.modulos = modulos;
     }
 

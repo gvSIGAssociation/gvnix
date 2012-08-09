@@ -36,10 +36,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import es.gva.cit.WSAuth.xsd.ModuloStruct;
-import es.gva.cit.WSAuth.xsd.ValidaStruct;
-import es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT;
-
 /**
  * This class implements the security authentication of C.I.T.
  * It uses C.I.T WsAuth service.
@@ -66,7 +62,7 @@ public class WscitAuthenticationProvider extends
     private String applicationName;
 
 	// WSAth client
-	private ServerWSAuth.ServerWSAuthPortProxy serverWSAuthPortProxy;
+	private ServerWSAuthPortProxy serverWSAuthPortProxy;
 
 	// Password encoder for User instances
 	private PasswordEncoder passwordEncoder = new PlaintextPasswordEncoder();
@@ -249,7 +245,7 @@ public class WscitAuthenticationProvider extends
 						this.credentialCitPassword);
 			}
 
-			es.gva.cit.WSAuth.xsd.ValidaStruct validaReturn = getServerWSAuthPortProxy()
+			ValidaStruct validaReturn = getServerWSAuthPortProxy()
 					.valida(credentialCit, userName, password, this.applicationName);
 
 			if (logger.isLoggable(Level.FINE)) {
@@ -310,11 +306,11 @@ public class WscitAuthenticationProvider extends
 	}
 
 	public void setServerWSAuthPortProxy(
-			ServerWSAuth.ServerWSAuthPortProxy serverWSAuthPortProxy) {
+			ServerWSAuthPortProxy serverWSAuthPortProxy) {
 		this.serverWSAuthPortProxy = serverWSAuthPortProxy;
 	}
 
-	public ServerWSAuth.ServerWSAuthPortProxy getServerWSAuthPortProxy() {
+	public ServerWSAuthPortProxy getServerWSAuthPortProxy() {
 		return serverWSAuthPortProxy;
 	}
 

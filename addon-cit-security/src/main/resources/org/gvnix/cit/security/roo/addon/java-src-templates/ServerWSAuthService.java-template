@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ServerWSAuth;
+package __TARGET_PACKAGE__;
 
 /**
  *
@@ -27,7 +27,7 @@ package ServerWSAuth;
 public interface ServerWSAuthService extends javax.xml.rpc.Service {
     public java.lang.String getServerWSAuthPortAddress();
 
-    public ServerWSAuth.ServerWSAuthPort getServerWSAuthPort() throws javax.xml.rpc.ServiceException;
+    public ServerWSAuthPort getServerWSAuthPort() throws javax.xml.rpc.ServiceException;
 
-    public ServerWSAuth.ServerWSAuthPort getServerWSAuthPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
+    public ServerWSAuthPort getServerWSAuthPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
 }

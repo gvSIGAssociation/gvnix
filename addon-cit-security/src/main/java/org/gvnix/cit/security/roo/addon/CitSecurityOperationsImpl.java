@@ -24,8 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.URL;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -48,7 +46,6 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.osgi.OSGiUtils;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -89,6 +86,9 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             "ServerWSAuthBindingStub.java", "ServerWSAuthPort.java",
             "ServerWSAuthPortProxy.java", "ServerWSAuthService.java",
             "ServerWSAuthServiceLocator.java" };
+
+    private static final String[] JAVA_XSD_CLASS_FILENAMES = new String[] {
+            "CredencialCIT.java", "ModuloStruct.java", "ValidaStruct.java" };
 
     private static final String WSAUTH_PROPERTIES_NAME = "CITWSAuth.properties";
 
@@ -360,13 +360,13 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                     "/beans/bean[@id='wscitAuthenticationProvider']", root);
             String clazz = bean.getAttribute("class");
             bean.setAttribute("class",
-                    clazz.replace("__TARGET_PACKAGE__", CLASSES_PACKAGE));
+                    clazz.replace("__TARGET_PACKAGE__", projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(".security.authentication.wscit")));
 
             bean = XmlUtils.findFirstElement(
                     "/beans/bean[@id='serverWSAuthPortProxy']", root);
             clazz = bean.getAttribute("class");
             bean.setAttribute("class",
-                    clazz.replace("__TARGET_PACKAGE__", CLASSES_PACKAGE));
+                    clazz.replace("__TARGET_PACKAGE__", projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(".security.authentication.wscit")));
 
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
@@ -425,20 +425,22 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
         // Copiamos los ficheros del cliente del servicio WSAuth
         for (String className : JAVA_WS_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, "ServerWSAuth",
+            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(".security.authentication.wscit"),
                     projectMetadata, null, false);
         }
 
         // Copiamos los ficheros del Provider, usuarios y el cliente del
         // servicio WSAuth
         for (String className : JAVA_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, CLASSES_PACKAGE,
+            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(".security.authentication.wscit"),
                     projectMetadata, null, false);
         }
 
         // Copiamos los ficheros de los xsd del servicio WSAuth
-        copyDirectoryContents("java-src/**",
-                pathResolver.getRoot(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
+        for (String className : JAVA_XSD_CLASS_FILENAMES) {
+            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(".security.authentication.wscit"),
+                    projectMetadata, null, false);
+        }
     }
 
     /***
@@ -515,9 +517,9 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             try {
                 // Read template and insert the user's package
                 String input = IOUtils.toString(new InputStreamReader(templateInputStream));
-                input = input.replace("__TOP_LEVEL_PACKAGE__", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName());
+                input = input.replace("__TOP_LEVEL_PACKAGE__", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName().concat(".security.authentication.wscit"));
 
-                input = input.replace("__TARGET_PACKAGE__", finalTargetPackage);
+                input = input.replace("__TARGET_PACKAGE__", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName().concat(".security.authentication.wscit"));
 
                 if (parameters != null) {
                     for (Entry<String, String> entry : parameters.entrySet()) {
@@ -549,62 +551,4 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         }
     }
 
-    /**
-     * This method will copy the contents of a directory to another if the
-     * resource does not already exist in the target directory
-     * 
-     * @param sourceAntPath
-     *            directory
-     * @param target
-     *            directory
-     */
-    private void copyDirectoryContents(String sourceAntPath,
-            String targetDirectory) {
-        StringUtils.isNotBlank(sourceAntPath);
-        StringUtils.isNotBlank(targetDirectory);
-
-        if (!targetDirectory.endsWith("/")) {
-            targetDirectory += "/";
-        }
-
-        if (!fileManager.exists(targetDirectory)) {
-            fileManager.createDirectory(targetDirectory);
-        }
-
-        String path = FileUtils.getPath(getClass(), sourceAntPath);
-        Collection<URL> urls = OSGiUtils.findEntriesByPattern(
-                context.getBundleContext(), path);
-
-        Validate.notNull(urls,
-                "Could not search bundles for resources for Ant Path '" + path
-                        + "'");
-        for (URL url : urls) {
-            String fileName = url.getPath().substring(
-                    url.getPath().lastIndexOf("java-src/") + 9);
-
-            if (fileName.endsWith(".java")) {
-                if (!fileManager.exists(targetDirectory + fileName)) {
-                    try {
-                    	
-                        InputStream inputStream = null;
-                        OutputStream outputStream = null;
-                        try { 
-                        	inputStream = url.openStream();
-                        	outputStream = fileManager.createFile(targetDirectory + fileName).getOutputStream();
-            	            IOUtils.copy(inputStream, outputStream);
-                        }
-                        finally {
-                        	IOUtils.closeQuietly(inputStream);
-                        	IOUtils.closeQuietly(outputStream);
-                        }
-                        
-                    } catch (IOException e) {
-                        new IllegalStateException(
-                                "Encountered an error during copying of resources for MVC JSP addon.",
-                                e);
-                    }
-                }
-            }
-        }
-    }
 }

@@ -21,7 +21,7 @@
  *  You may obtain a copy of the License at http://www.gnu.org/licenses/gpl-2.0.html
  */
 
-package es.gva.cit.WS_CIT_Credencial.xsd;
+package __TARGET_PACKAGE__;
 
 /**
  *

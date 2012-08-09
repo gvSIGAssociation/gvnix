@@ -47,12 +47,10 @@ Gv CIT has a Web service for authenticate user. The return values of this servic
 
 The classes needed to perform service call will be copied to target application on setup. Apart of it, a property file will be created to configure the application name and service password for make service's call.
 
-The artifact installed in this step will be:
+The artifact installed in this step will be at ``security/authentication/wscit``:
 
-* ``es/gva/cit/WS_CIT_Credencial/xsd/**`` : XSD definiton used by service client.
-* ``ServerWSAuth/*``: Service client
-
-We use 'ServerWSAuth' package for service client to make easier the WS client regeneration if it's needed.
+* XSD definiton used by service client.
+* Service client
 
 User model
 ----------------------------

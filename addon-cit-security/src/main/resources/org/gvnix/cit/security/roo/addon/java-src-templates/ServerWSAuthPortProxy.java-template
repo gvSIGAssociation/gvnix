@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ServerWSAuth;
+package __TARGET_PACKAGE__;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,9 +27,9 @@ import java.net.URL;
  *         Fernandez</a>
  *
  */
-public class ServerWSAuthPortProxy implements ServerWSAuth.ServerWSAuthPort {
+public class ServerWSAuthPortProxy implements ServerWSAuthPort {
   private String _endpoint = null;
-  private ServerWSAuth.ServerWSAuthPort serverWSAuthPort = null;
+  private ServerWSAuthPort serverWSAuthPort = null;
 
   public ServerWSAuthPortProxy() {
     _initServerWSAuthPortProxy();
@@ -42,7 +42,7 @@ public class ServerWSAuthPortProxy implements ServerWSAuth.ServerWSAuthPort {
 
     private void _initServerWSAuthPortProxy() {
 	try {
-	    serverWSAuthPort = (new ServerWSAuth.ServerWSAuthServiceLocator())
+	    serverWSAuthPort = (new ServerWSAuthServiceLocator())
 		    .getServerWSAuthPort(new URL(_endpoint));
 	    if (serverWSAuthPort != null) {
 		if (_endpoint != null)
@@ -71,19 +71,19 @@ public class ServerWSAuthPortProxy implements ServerWSAuth.ServerWSAuthPort {
 
   }
 
-  public ServerWSAuth.ServerWSAuthPort getServerWSAuthPort() {
+  public ServerWSAuthPort getServerWSAuthPort() {
     if (serverWSAuthPort == null)
       _initServerWSAuthPortProxy();
     return serverWSAuthPort;
   }
 
-  public es.gva.cit.WSAuth.xsd.ValidaStruct valida(es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException{
+  public ValidaStruct valida(CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException{
     if (serverWSAuthPort == null)
       _initServerWSAuthPortProxy();
     return serverWSAuthPort.valida(credencial, usuario, password, aplicacion);
   }
 
-  public es.gva.cit.WSAuth.xsd.ValidaStruct valida_ldap(es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException{
+  public ValidaStruct valida_ldap(CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException{
     if (serverWSAuthPort == null)
       _initServerWSAuthPortProxy();
     return serverWSAuthPort.valida_ldap(credencial, usuario, password, aplicacion);

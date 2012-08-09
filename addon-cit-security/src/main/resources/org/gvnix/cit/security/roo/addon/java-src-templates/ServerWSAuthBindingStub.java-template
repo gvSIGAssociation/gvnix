@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ServerWSAuth;
+package __TARGET_PACKAGE__;
 
 /**
  *
@@ -25,7 +25,7 @@ package ServerWSAuth;
  *
  */
 public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
-	implements ServerWSAuth.ServerWSAuthPort {
+	implements ServerWSAuthPort {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
     private java.util.Vector cachedSerFactories = new java.util.Vector();
@@ -43,7 +43,7 @@ public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("valida");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "credencial"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://WS_CIT_Credencial.cit.gva.es/xsd", "credencialCIT"), es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "credencial"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://WS_CIT_Credencial.cit.gva.es/xsd", "credencialCIT"), CredencialCIT.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "usuario"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
@@ -52,7 +52,7 @@ public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "aplicacion"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://WSAuth.cit.gva.es/xsd", "validaStruct"));
-        oper.setReturnClass(es.gva.cit.WSAuth.xsd.ValidaStruct.class);
+        oper.setReturnClass(ValidaStruct.class);
         oper.setReturnQName(new javax.xml.namespace.QName("", "resultado"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
@@ -60,7 +60,7 @@ public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("valida_ldap");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "credencial"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://WS_CIT_Credencial.cit.gva.es/xsd", "credencialCIT"), es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "credencial"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://WS_CIT_Credencial.cit.gva.es/xsd", "credencialCIT"), CredencialCIT.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "usuario"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
@@ -69,7 +69,7 @@ public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "aplicacion"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://WSAuth.cit.gva.es/xsd", "validaStruct"));
-        oper.setReturnClass(es.gva.cit.WSAuth.xsd.ValidaStruct.class);
+        oper.setReturnClass(ValidaStruct.class);
         oper.setReturnQName(new javax.xml.namespace.QName("", "resultado"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
@@ -108,21 +108,21 @@ public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
             java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
             qName = new javax.xml.namespace.QName("http://WS_CIT_Credencial.cit.gva.es/xsd", "credencialCIT");
             cachedSerQNames.add(qName);
-            cls = es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT.class;
+            cls = CredencialCIT.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://WSAuth.cit.gva.es/xsd", "ModuloStruct");
             cachedSerQNames.add(qName);
-            cls = es.gva.cit.WSAuth.xsd.ModuloStruct.class;
+            cls = ModuloStruct.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://WSAuth.cit.gva.es/xsd", "ModulosValidaStruct");
             cachedSerQNames.add(qName);
-            cls = es.gva.cit.WSAuth.xsd.ModuloStruct[].class;
+            cls = ModuloStruct[].class;
             cachedSerClasses.add(cls);
             qName = new javax.xml.namespace.QName("http://WSAuth.cit.gva.es/xsd", "ModuloStruct");
             qName2 = null;
@@ -131,7 +131,7 @@ public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
 
             qName = new javax.xml.namespace.QName("http://WSAuth.cit.gva.es/xsd", "validaStruct");
             cachedSerQNames.add(qName);
-            cls = es.gva.cit.WSAuth.xsd.ValidaStruct.class;
+            cls = ValidaStruct.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
@@ -203,7 +203,7 @@ public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
         }
     }
 
-    public es.gva.cit.WSAuth.xsd.ValidaStruct valida(es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException {
+    public ValidaStruct valida(CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -224,9 +224,9 @@ public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
         else {
             extractAttachments(_call);
             try {
-                return (es.gva.cit.WSAuth.xsd.ValidaStruct) _resp;
+                return (ValidaStruct) _resp;
             } catch (java.lang.Exception _exception) {
-                return (es.gva.cit.WSAuth.xsd.ValidaStruct) org.apache.axis.utils.JavaUtils.convert(_resp, es.gva.cit.WSAuth.xsd.ValidaStruct.class);
+                return (ValidaStruct) org.apache.axis.utils.JavaUtils.convert(_resp, ValidaStruct.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -234,7 +234,7 @@ public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
 }
     }
 
-    public es.gva.cit.WSAuth.xsd.ValidaStruct valida_ldap(es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException {
+    public ValidaStruct valida_ldap(CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -255,9 +255,9 @@ public class ServerWSAuthBindingStub extends org.apache.axis.client.Stub
         else {
             extractAttachments(_call);
             try {
-                return (es.gva.cit.WSAuth.xsd.ValidaStruct) _resp;
+                return (ValidaStruct) _resp;
             } catch (java.lang.Exception _exception) {
-                return (es.gva.cit.WSAuth.xsd.ValidaStruct) org.apache.axis.utils.JavaUtils.convert(_resp, es.gva.cit.WSAuth.xsd.ValidaStruct.class);
+                return (ValidaStruct) org.apache.axis.utils.JavaUtils.convert(_resp, ValidaStruct.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {

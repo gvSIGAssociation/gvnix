@@ -16,8 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package ServerWSAuth;
+package __TARGET_PACKAGE__;
 
 
 /**
@@ -27,6 +26,6 @@ package ServerWSAuth;
  *
  */
 public interface ServerWSAuthPort extends java.rmi.Remote {
-    public es.gva.cit.WSAuth.xsd.ValidaStruct valida(es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException;
-    public es.gva.cit.WSAuth.xsd.ValidaStruct valida_ldap(es.gva.cit.WS_CIT_Credencial.xsd.CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException;
+    public ValidaStruct valida(CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException;
+    public ValidaStruct valida_ldap(CredencialCIT credencial, java.lang.String usuario, java.lang.String password, java.lang.String aplicacion) throws java.rmi.RemoteException;
 }
