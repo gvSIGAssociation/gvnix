@@ -1,6 +1,6 @@
 project --topLevelPackage org.example.flexrocks --projectName flexrocks
 persistence setup --provider HIBERNATE --database H2_IN_MEMORY 
-ent --class ~.domain.Person
+entity jpa --class ~.domain.Person
 field string --fieldName name
 field set --fieldName children --type ~.domain.Person
 flex setup
