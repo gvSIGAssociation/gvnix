@@ -63,7 +63,9 @@ import org.w3c.dom.Element;
 @Service
 public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
-    static final Integer DEFAUL_SESSION_TIMEOUT = 45;
+    public static final String AUTHENTICATION_SUBPACKAGE = ".security.authentication.wscit";
+
+	static final Integer DEFAUL_SESSION_TIMEOUT = 45;
 
     static final String CLASSES_PACKAGE = "org.gvnix.security.authentication.wscit";
 
@@ -360,13 +362,13 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                     "/beans/bean[@id='wscitAuthenticationProvider']", root);
             String clazz = bean.getAttribute("class");
             bean.setAttribute("class",
-                    clazz.replace("__TARGET_PACKAGE__", projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(".security.authentication.wscit")));
+                    clazz.replace("__TARGET_PACKAGE__", projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE)));
 
             bean = XmlUtils.findFirstElement(
                     "/beans/bean[@id='serverWSAuthPortProxy']", root);
             clazz = bean.getAttribute("class");
             bean.setAttribute("class",
-                    clazz.replace("__TARGET_PACKAGE__", projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(".security.authentication.wscit")));
+                    clazz.replace("__TARGET_PACKAGE__", projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE)));
 
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
@@ -425,20 +427,20 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
         // Copiamos los ficheros del cliente del servicio WSAuth
         for (String className : JAVA_WS_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(".security.authentication.wscit"),
+            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE),
                     projectMetadata, null, false);
         }
 
         // Copiamos los ficheros del Provider, usuarios y el cliente del
         // servicio WSAuth
         for (String className : JAVA_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(".security.authentication.wscit"),
+            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE),
                     projectMetadata, null, false);
         }
 
         // Copiamos los ficheros de los xsd del servicio WSAuth
         for (String className : JAVA_XSD_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(".security.authentication.wscit"),
+            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE),
                     projectMetadata, null, false);
         }
     }
@@ -517,9 +519,9 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
             try {
                 // Read template and insert the user's package
                 String input = IOUtils.toString(new InputStreamReader(templateInputStream));
-                input = input.replace("__TOP_LEVEL_PACKAGE__", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName().concat(".security.authentication.wscit"));
+                input = input.replace("__TOP_LEVEL_PACKAGE__", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE));
 
-                input = input.replace("__TARGET_PACKAGE__", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName().concat(".security.authentication.wscit"));
+                input = input.replace("__TARGET_PACKAGE__", projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE));
 
                 if (parameters != null) {
                     for (Entry<String, String> entry : parameters.entrySet()) {
