@@ -34,7 +34,7 @@ public abstract class StringUtils {
    * @return the new String
    */
   public static String underscoreAllWhitespace(String str) {
-    if (!org.springframework.roo.support.util.StringUtils.hasLength(str)) {
+    if (str == null || str.length() == 0) {
       return str;
     }
     StringBuilder sb = new StringBuilder(str);

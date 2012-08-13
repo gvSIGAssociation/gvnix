@@ -21,8 +21,8 @@ package org.gvnix.web.menu.roo.addon;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.springframework.roo.metadata.MetadataNotificationListener;
 import org.springframework.roo.project.Dependency;
-import org.springframework.roo.project.listeners.DependencyListener;
 
 /**
  * Dependency listener to be notified of changes to project dependencies.
@@ -31,8 +31,13 @@ import org.springframework.roo.project.listeners.DependencyListener;
  */
 @Component
 @Service
-public class DependencyListenerImpl implements DependencyListener {
+public class DependencyListenerImpl implements MetadataNotificationListener {
 
+  public void notify(String upstreamDependency, String downstreamDependency) {
+    // Required when implements change from DependencyListener to MetadataNotificationListener
+	// TODO Is required now some extra code here ? 
+  }
+  
   /**
    * Use PageOperations to execute operations 
    */

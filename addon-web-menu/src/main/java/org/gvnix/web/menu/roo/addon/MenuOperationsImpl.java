@@ -20,12 +20,13 @@ package org.gvnix.web.menu.roo.addon;
 
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.model.JavaSymbolName;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -52,7 +53,8 @@ public class MenuOperationsImpl implements MenuOperations {
   /** {@inheritDoc} */
   public void addMenuItem(JavaSymbolName menuCategoryName,
                           JavaSymbolName menuItemId, String globalMessageCode,
-                          String link, String idPrefix) {
+                          String link, String idPrefix, LogicalPath logicalPath) {
+	// TODO Added logicalPath param to method: related methods modification required ? 
     operations.addMenuItem(menuCategoryName, menuItemId, globalMessageCode, link,
         idPrefix);
   }
@@ -60,14 +62,17 @@ public class MenuOperationsImpl implements MenuOperations {
   /** {@inheritDoc} */
   public void addMenuItem(JavaSymbolName menuCategoryName,
                           JavaSymbolName menuItemId, String menuItemLabel,
-                          String globalMessageCode, String link, String idPrefix) {
+                          String globalMessageCode, String link, String idPrefix, LogicalPath logicalPath) {
+	// TODO Added logicalPath param to method: related methods modification required ? 
     operations.addMenuItem(menuCategoryName, menuItemId, menuItemLabel,
         globalMessageCode, link, idPrefix);
   }
 
-  public void cleanUpFinderMenuItems(JavaSymbolName menuCategoryName, List<String> allowedFinderMenuIds) {
-    Assert.notNull(menuCategoryName, "Menu category identifier required");
-    Assert.notNull(allowedFinderMenuIds, "List of allowed menu items required");
+  public void cleanUpFinderMenuItems(JavaSymbolName menuCategoryName, List<String> allowedFinderMenuIds, LogicalPath logicalPath) {
+	  
+	// TODO Added logicalPath param to method: related methods modification required ? 
+	Validate.notNull(menuCategoryName, "Menu category identifier required");
+	Validate.notNull(allowedFinderMenuIds, "List of allowed menu items required");
     
     Document document = operations.getMenuDocument();
 
@@ -99,9 +104,10 @@ public class MenuOperationsImpl implements MenuOperations {
    * @param menuItemName the menu item identifier (required)
    * @param idPrefix the prefix to be used for this menu item (optional, MenuOperations.DEFAULT_MENU_ITEM_PREFIX is default)
    */
-  public void cleanUpMenuItem(JavaSymbolName menuCategoryName, JavaSymbolName menuItemName, String idPrefix) {
-    Assert.notNull(menuCategoryName, "Menu category identifier required");
-    Assert.notNull(menuItemName, "Menu item id required");
+  public void cleanUpMenuItem(JavaSymbolName menuCategoryName, JavaSymbolName menuItemName, String idPrefix, LogicalPath logicalPath) {
+	// TODO Added logicalPath param to method: related methods modification required ? 
+	Validate.notNull(menuCategoryName, "Menu category identifier required");
+	Validate.notNull(menuItemName, "Menu item id required");
     
     if (idPrefix == null || idPrefix.length() == 0) {
       idPrefix = DEFAULT_MENU_ITEM_PREFIX;

@@ -21,6 +21,7 @@ package org.gvnix.web.menu.roo.addon;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -33,7 +34,6 @@ import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
 import org.springframework.roo.shell.CommandMarker;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Command class. The command class is registered by the Roo shell following an
@@ -152,7 +152,7 @@ public class MenuEntryCommands implements CommandMarker { // all command types
             @CliOption(key = "id", mandatory = true, help = "Item to move") MenuEntry menuEntryId,
             @CliOption(key = "into", mandatory = false, optionContext = MenuEntryOperations.CATEGORY_MENU_ITEM_PREFIX, help = "Insert the menu entry into this.") MenuEntry intoEntryId,
             @CliOption(key = "before", mandatory = false, help = "   .") MenuEntry beforeEntryId) {
-        Assert.notNull(menuEntryId, "A page is required");
+    	Validate.notNull(menuEntryId, "A page is required");
         if (intoEntryId == null && beforeEntryId == null) {
             logger.log(Level.SEVERE, "'into' or 'before' parameter must be set");
             return;
