@@ -27,25 +27,25 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.MessageBundleUtils;
-import org.gvnix.support.MetadataUtils;
 import org.gvnix.support.OperationUtils;
 import org.gvnix.web.i18n.roo.addon.ValencianCatalanLanguage;
-import org.springframework.roo.addon.entity.EntityMetadata;
+import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
-import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18nSupport;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.languages.SpanishLanguage;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
@@ -55,10 +55,10 @@ import org.springframework.roo.classpath.operations.AbstractOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Implementation of web MVC screen patterns operations.
@@ -120,9 +120,6 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
     @Reference private TypeLocationService typeLocationService;
 
-    /** Use the PhysicalTypeMetadataProvider to access information about a physical type in the project */
-    @Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
-
     @Reference private PatternService patternService;
 
     @Reference private WebScreenConfigService configService;
@@ -132,6 +129,8 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     @Reference PropFileOperations propFileOperations;
 
     @Reference private I18nSupport i18nSupport;
+    
+    @Reference private TypeManagementService typeManagementService;
 
     /** {@inheritDoc} */
     public boolean isPatternCommandAvailable() {
@@ -142,15 +141,15 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     /** {@inheritDoc} */
     public boolean addPattern(JavaType controllerClass, JavaSymbolName name, WebPatternType pattern) {
 
-        Assert.notNull(controllerClass, "controller class is required");
-        Assert.notNull(name, "pattern name is required");
-        Assert.notNull(pattern, "pattern type is required");
+    	Validate.notNull(controllerClass, "controller class is required");
+    	Validate.notNull(name, "pattern name is required");
+    	Validate.notNull(pattern, "pattern type is required");
 
         // Get mutableTypeDetails from controllerClass. Also checks javaType is a controller
-        MutableClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerMutableTypeDetails(controllerClass);
+    	ClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerMutableTypeDetails(controllerClass);
 
         // Check if there are pattern names used more than once in project
-        Assert.isTrue(!patternService.isPatternDuplicated(name.getSymbolName()),
+        Validate.isTrue(!patternService.isPatternDuplicated(name.getSymbolName()),
         		"There is a pattern name used more than once in the project");
 
         // All checks passed OK
@@ -178,14 +177,16 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         		PATTERN_ANNOTATION_ATTR_VALUE_NAME, patternList));
 
         // Add or update annotation to target type
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(controllerDetails);
         if (annotationMetadata != null) {
         	
-            controllerDetails.updateTypeAnnotation(annotationBuilder.build(), new HashSet<JavaSymbolName>());
+        	mutableTypeDetailsBuilder.updateTypeAnnotation(annotationBuilder.build(), new HashSet<JavaSymbolName>());
             
         } else {
         	
-            controllerDetails.addTypeAnnotation(annotationBuilder.build());
+        	mutableTypeDetailsBuilder.addAnnotation(annotationBuilder.build());
         }
+        typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
 
         // Tabular style patterns requires batch operations 
         if (pattern.equals(WebPatternType.tabular) || pattern.equals(WebPatternType.tabular_edit_register)) {
@@ -206,19 +207,19 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     public boolean addRelationPattern(JavaType controllerClass,
             JavaSymbolName name, JavaSymbolName field, WebPatternType type) {
 
-        Assert.notNull(controllerClass, "controller is required");
-        Assert.notNull(name, "name is required");
-        Assert.notNull(field, "field is required");
-        Assert.notNull(type, "type is required");
+    	Validate.notNull(controllerClass, "controller is required");
+    	Validate.notNull(name, "name is required");
+        Validate.notNull(field, "field is required");
+        Validate.notNull(type, "type is required");
 
         // Get mutableTypeDetails from controllerClass. Also checks javaType is
         // a controller
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = patternService.getControllerMutableTypeDetails(controllerClass);
+        ClassOrInterfaceTypeDetails mutableTypeDetails = patternService.getControllerMutableTypeDetails(controllerClass);
 
 		List<StringAttributeValue> patternValues = patternService.getPatternAttributes(controllerClass);
 
         // Check if pattern name is already used as value of @GvNIXPattern
-        Assert.isTrue(
+		Validate.isTrue(
         		patternService.patternExists(patternValues, name),
                 "Pattern name '".concat(name.getSymbolName())
                         .concat("' not found in values of ")
@@ -246,7 +247,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                 .getAttribute(
                         ROOWEBSCAFFOLD_ANNOTATION_ATTR_VALUE_FORMBACKINGOBJECT)
                 .getValue();
-        Assert.notNull(
+        Validate.notNull(
                 patternService.getToManyFieldFromEntityJavaType(
                         formBackingObject, field.getSymbolName()),
                 "Field '".concat(field.getSymbolName())
@@ -302,7 +303,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                             // Found previous
 
                             // Check for duplicates pattern definition
-                            Assert.isTrue(
+                        	Validate.isTrue(
                                     previousValueIndex < 0,
                                     "Duplicate definition for pattern '"
                                             .concat(name.getSymbolName())
@@ -317,7 +318,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                             // pattern name
                             boolean existsField = existsFieldPatternDeclaration(
                                     strValue, field);
-                            Assert.isTrue(
+                            Validate.isTrue(
                                     !existsField,
                                     "Field '"
                                             .concat(field.getSymbolName())
@@ -361,12 +362,14 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         annotationBuilder.addAttribute(annotationValues);
 
         // Add or update annotation to target type
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
         if (isAlreadyAnnotated) {
-            mutableTypeDetails.updateTypeAnnotation(annotationBuilder.build(),
+        	mutableTypeDetailsBuilder.updateTypeAnnotation(annotationBuilder.build(),
                     new HashSet<JavaSymbolName>());
         } else {
-            mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
+        	mutableTypeDetailsBuilder.addAnnotation(annotationBuilder.build());
         }
+        typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
 
         annotateFormBackingObjectRelationsControllers(mutableTypeDetails,
                 annotationValues);
@@ -384,17 +387,17 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
      * @param relationsPatternValues
      */
     private void annotateFormBackingObjectRelationsControllers(
-            MutableClassOrInterfaceTypeDetails controllerDetails,
+    		ClassOrInterfaceTypeDetails controllerDetails,
             AnnotationAttributeValue<?> relationsPatternValues) {
 
         JavaType formBakingObjectType = getFormBakingObject(controllerDetails);
 
         // Retrieve metadata for the Java source type the annotation is being
         // added to
-        String formBackingTypeId = EntityMetadata.createIdentifier(
-                formBakingObjectType, Path.SRC_MAIN_JAVA);
-        EntityMetadata formBackingTypeMetadata = (EntityMetadata) metadataService
-                .get(formBackingTypeId, true);
+        String formBackingTypeId = JpaActiveRecordMetadata.createIdentifier(
+                formBakingObjectType, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
+        JpaActiveRecordMetadata formBackingTypeMetadata = (JpaActiveRecordMetadata) metadataService
+                .evictAndGet(formBackingTypeId);
         if (formBackingTypeMetadata == null) {
             throw new IllegalArgumentException("Cannot locate Metadata for '"
                     + formBakingObjectType.getFullyQualifiedTypeName() + "'");
@@ -463,10 +466,10 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     private void addOrUpdateGvNIXRelatedPatternToController(
             JavaType controllerClass, AnnotationMetadata annotation) {
 
-        MutableClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerMutableTypeDetails(controllerClass);
+    	ClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerMutableTypeDetails(controllerClass);
 
         // Test if has the @RooWebScaffold
-        Assert.notNull(
+        Validate.notNull(
                 MemberFindingUtils.getAnnotationOfType(
                         controllerDetails.getAnnotations(),
                         ROOWEBSCAFFOLD_ANNOTATION),
@@ -534,12 +537,14 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         annotationBuilder.addAttribute(gvNIXRelatedPatternValue);
 
         // Add or update annotation to target type
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(controllerDetails);
         if (isAlreadyAnnotated) {
-            controllerDetails.updateTypeAnnotation(annotationBuilder.build(),
+        	mutableTypeDetailsBuilder.updateTypeAnnotation(annotationBuilder.build(),
                     new HashSet<JavaSymbolName>());
         } else {
-            controllerDetails.addTypeAnnotation(annotationBuilder.build());
+        	mutableTypeDetailsBuilder.addAnnotation(annotationBuilder.build());
         }
+        typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
 
         List<String> definedPatternsList = new ArrayList<String>();
         for (StringAttributeValue definedPattern : patternList) {
@@ -557,8 +562,8 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
      */
     private void annotateTypeWithGvNIXEntityBatch(JavaType type) {
     	
-        MutableClassOrInterfaceTypeDetails typeMutableDetails = MetadataUtils.getPhysicalTypeDetails(
-        		type, metadataService, physicalTypeMetadataProvider);
+    	ClassOrInterfaceTypeDetails typeMutableDetails = typeLocationService.getTypeDetails(
+        		type);
         AnnotationMetadata annotationMetadata = MemberFindingUtils
                 .getAnnotationOfType(typeMutableDetails.getAnnotations(),
                         ENTITYBATCH_ANNOTATION);
@@ -569,7 +574,9 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
             // Prepare annotation builder
             AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                     ENTITYBATCH_ANNOTATION);
-            typeMutableDetails.addTypeAnnotation(annotationBuilder.build());
+            ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(typeMutableDetails);
+            mutableTypeDetailsBuilder.addAnnotation(annotationBuilder.build());
+            typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
         }
     }
 
@@ -608,7 +615,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
      * @return
      */
     private JavaType getFormBakingObject(
-            MutableClassOrInterfaceTypeDetails controllerDetails) {
+    		ClassOrInterfaceTypeDetails controllerDetails) {
         AnnotationMetadata rooWebScaffoldAnnotationMetadata = MemberFindingUtils
                 .getAnnotationOfType(controllerDetails.getAnnotations(),
                         ROOWEBSCAFFOLD_ANNOTATION);
@@ -618,7 +625,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         JavaType formBakingObjectType = (JavaType) formbakingObjectAttValue
                 .getValue();
-        Assert.notNull(formBakingObjectType,
+        Validate.notNull(formBakingObjectType,
                 "formBakingObject attribute of RooWebScaffold in "
                         + controllerDetails.getName().getSimpleTypeName()
                         + " must be set");
@@ -662,39 +669,39 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         // install pattern images
         if (forceUpdate) {
             OperationUtils.updateDirectoryContents("images/pattern/*.*",
-                    pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                    pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                             "/images/pattern"), fileManager, context,
                     getClass());
         } else {
             copyDirectoryContents("images/pattern/*.*",
-                    pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                    pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                             "/images/pattern"), false);
         }
         // install js
         copyDirectoryContents("scripts/*.js",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/scripts"),
+                pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/scripts"),
                 forceUpdate);
         // install css
         copyDirectoryContents("styles/*.css",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "/styles"),
+                pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/styles"),
                 forceUpdate);
 
         // copy util to tags/util
         copyDirectoryContents("tags/util/*.tagx", pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "/WEB-INF/tags/util"), forceUpdate);
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/WEB-INF/tags/util"), forceUpdate);
         // copy dialog/message to tags/dialog/message
         copyDirectoryContents("tags/dialog/message/*.tagx",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/tags/dialog/message"), forceUpdate);
         // copy pattern to tags/pattern
         copyDirectoryContents("tags/pattern/*.tagx",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/tags/pattern"), forceUpdate);
         copyDirectoryContents("tags/pattern/form/*.tagx",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/tags/pattern/form"), forceUpdate);
         copyDirectoryContents("tags/pattern/form/fields/*.tagx",
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/tags/pattern/form/fields"), forceUpdate);
 
         addI18nProperties();

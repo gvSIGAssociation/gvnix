@@ -26,14 +26,15 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.Validate;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
+import org.springframework.roo.classpath.customdata.CustomDataKeys;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
@@ -42,8 +43,8 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Provides {@link PatternMetadata}. This type is called by Roo to retrieve the
@@ -186,12 +187,12 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
     	
     	// Get field metadata, field details and field persistent details
         PhysicalTypeMetadata typeMetadata = (PhysicalTypeMetadata) metadataService.get(
-        		PhysicalTypeIdentifier.createIdentifier(type, Path.SRC_MAIN_JAVA));
-        Assert.notNull(typeMetadata,
+        		PhysicalTypeIdentifier.createIdentifier(type, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
+        Validate.notNull(typeMetadata,
                 "Unable to obtain physical type metadata for type " + type.getFullyQualifiedTypeName());
         MemberDetails typeDetails = getMemberDetails(typeMetadata);
         MemberHoldingTypeDetails typePersistentDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(
-        		typeDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
+        		typeDetails, CustomDataKeys.PERSISTENT_TYPE);
         
         // Get field related application type metadata if field persistent details no null
         SortedMap<JavaType, JavaTypeMetadataDetails> typeRelatedApplicationTypeMetadata = 
@@ -257,7 +258,7 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
     protected abstract String getGovernorPhysicalTypeIdentifier(String mid);
 
     @Override
-    protected abstract String createLocalIdentifier(JavaType javaType, Path path);
+    protected abstract String createLocalIdentifier(JavaType javaType, LogicalPath path);
 
     public abstract String getProvidesType();
     

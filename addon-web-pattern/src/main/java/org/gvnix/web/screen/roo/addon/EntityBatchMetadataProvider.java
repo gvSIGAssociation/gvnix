@@ -18,11 +18,12 @@
  */
 package org.gvnix.web.screen.roo.addon;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.entity.EntityMetadata;
+import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -30,9 +31,8 @@ import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Provides {@link EntityBatchMetadataProvider}.
@@ -107,15 +107,15 @@ public final class EntityBatchMetadataProvider extends
         // We know governor type details are non-null and can be safely cast
         ClassOrInterfaceTypeDetails classOrInterfaceDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
-        Assert.notNull(
+        Validate.notNull(
                 classOrInterfaceDetails,
                 "Governor failed to provide class type details, in violation of superclass contract");
 
         // We need to know the metadata of the Entity through
-        Path path = EntityBatchMetadata.getPath(metadataIdentificationString);
-        String entityMetadataKey = EntityMetadata.createIdentifier(entityType,
-                path);
-        EntityMetadata entityMetadata = (EntityMetadata) metadataService
+        LogicalPath path = EntityBatchMetadata.getPath(metadataIdentificationString);
+        String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(entityType,
+        		path);
+        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService
                 .get(entityMetadataKey);
         if (entityMetadata == null) {
             // Metadata not available yet, do nothing on this invoke
@@ -143,12 +143,12 @@ public final class EntityBatchMetadataProvider extends
             String metadataIdentificationString) {
         JavaType javaType = EntityBatchMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = EntityBatchMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = EntityBatchMetadata.getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
     @Override
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
         return EntityBatchMetadata.createIdentifier(javaType, path);
     }
 

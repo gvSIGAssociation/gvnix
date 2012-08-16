@@ -21,6 +21,7 @@ package org.gvnix.web.screen.roo.addon;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -31,6 +32,7 @@ import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataServi
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
+import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.scanner.MemberDetails;
@@ -40,9 +42,9 @@ import org.springframework.roo.metadata.MetadataItem;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * This Listener produces MVC artifacts for a given RelatedPatternJspMetadata
@@ -78,6 +80,10 @@ public class RelatedPatternJspMetadataListener extends
     WebScreenOperations webScreenOperations;
     @Reference
     private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    @Reference
+    private PathResolver pathResolver;
+    @Reference
+    private TypeLocationService typeLocationService;
     private final Map<JavaType, String> formBackingObjectTypesToLocalMids = new HashMap<JavaType, String>();
 
     protected void activate(ComponentContext context) {
@@ -93,12 +99,14 @@ public class RelatedPatternJspMetadataListener extends
         _webScreenOperations = webScreenOperations;
         _metadataService = metadataService;
         _physicalTypeMetadataProvider = physicalTypeMetadataProvider;
+        _pathResolver = pathResolver;
+        _typeLocationService = typeLocationService;
     }
 
     public MetadataItem get(String metadataIdentificationString) {
         JavaType javaType = RelatedPatternJspMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = RelatedPatternJspMetadata
+        LogicalPath path = RelatedPatternJspMetadata
                 .getPath(metadataIdentificationString);
         String patternMetadataKey = RelatedPatternMetadata.createIdentifier(
                 javaType, path);
@@ -110,15 +118,15 @@ public class RelatedPatternJspMetadataListener extends
         }
 
         webScaffoldMetadata = relatedPatternMetadata.getWebScaffoldMetadata();
-        Assert.notNull(webScaffoldMetadata, "Web scaffold metadata required");
+        Validate.notNull(webScaffoldMetadata, "Web scaffold metadata required");
 
         webScaffoldAnnotationValues = webScaffoldMetadata.getAnnotationValues();
-        Assert.notNull(webScaffoldAnnotationValues,
+        Validate.notNull(webScaffoldAnnotationValues,
                 "Web scaffold annotation values required");
 
         formbackingType = webScaffoldMetadata.getAnnotationValues()
                 .getFormBackingObject();
-        Assert.notNull(formbackingType, "formbackingType required");
+        Validate.notNull(formbackingType, "formbackingType required");
         entityName = uncapitalize(formbackingType.getSimpleTypeName());
 
         MemberDetails memberDetails = webMetadataService
@@ -126,7 +134,7 @@ public class RelatedPatternJspMetadataListener extends
         JavaTypeMetadataDetails formBackingTypeMetadataDetails = webMetadataService
                 .getJavaTypeMetadataDetails(formbackingType, memberDetails,
                         metadataIdentificationString);
-        Assert.notNull(
+        Validate.notNull(
                 formBackingTypeMetadataDetails,
                 "Unable to obtain metadata for type "
                         + formbackingType.getFullyQualifiedTypeName());
@@ -142,10 +150,10 @@ public class RelatedPatternJspMetadataListener extends
 
         relatedDomainTypes = relatedPatternMetadata
                 .getRelatedApplicationTypeMetadata();
-        Assert.notNull(relatedDomainTypes, "Related domain types required");
+        Validate.notNull(relatedDomainTypes, "Related domain types required");
 
         formbackingTypeMetadata = relatedDomainTypes.get(formbackingType);
-        Assert.notNull(formbackingTypeMetadata,
+        Validate.notNull(formbackingTypeMetadata,
                 "Form backing type metadata required");
 
         formbackingTypePersistenceMetadata = formbackingTypeMetadata
@@ -172,7 +180,7 @@ public class RelatedPatternJspMetadataListener extends
             // been
             JavaType javaType = RelatedPatternMetadata
                     .getJavaType(upstreamDependency);
-            Path path = RelatedPatternMetadata.getPath(upstreamDependency);
+            LogicalPath path = RelatedPatternMetadata.getPath(upstreamDependency);
             downstreamDependency = RelatedPatternJspMetadata.createIdentifier(
                     javaType, path);
 
@@ -214,12 +222,12 @@ public class RelatedPatternJspMetadataListener extends
             String localMid = formBackingObjectTypesToLocalMids
                     .get(itdTypeDetails.getGovernor().getName());
             if (localMid != null) {
-                metadataService.get(localMid, true);
+                metadataService.evictAndGet(localMid);
             }
             return;
         }
 
-        metadataService.get(downstreamDependency, true);
+        metadataService.evictAndGet(downstreamDependency);
     }
 
     @Override

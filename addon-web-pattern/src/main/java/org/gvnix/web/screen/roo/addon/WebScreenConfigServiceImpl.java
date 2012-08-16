@@ -19,10 +19,15 @@
 package org.gvnix.web.screen.roo.addon;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -30,14 +35,13 @@ import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Repository;
-import org.springframework.roo.support.osgi.UrlFindingUtils;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.osgi.OSGiUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
 
@@ -71,10 +75,9 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
 
     /** {@inheritDoc} */
     public void setup() {
-        Assert.isTrue(isSpringMvcProject(),
+    	Validate.isTrue(isSpringMvcProject(),
                 "Project must be Spring MVC project");
-        Element configuration = XmlUtils.getConfiguration(getClass(),
-                "configuration.xml");
+        Element configuration = XmlUtils.getConfiguration(getClass());
 
         // Add addon repository and dependency to get annotations
         addAnnotations(configuration);
@@ -102,7 +105,7 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
         // resolve path for spring-mvc.xml if it hasn't been resolved yet
         if (springMvcConfigFile == null) {
             springMvcConfigFile = projectOperations.getPathResolver()
-                    .getIdentifier(Path.SRC_MAIN_WEBAPP,
+                    .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                             "WEB-INF/spring/webmvc-config.xml");
         }
         return springMvcConfigFile;
@@ -117,7 +120,7 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
         if (patternTagsFolder == null) {
             patternTagsFolder = projectOperations
                     .getPathResolver()
-                    .getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/pattern");
+                    .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/tags/pattern");
         }
         return patternTagsFolder;
     }
@@ -141,7 +144,7 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
 
-            projectOperations.addRepository(new Repository(repo));
+            projectOperations.addRepository(projectOperations.getFocusedModuleName(), new Repository(repo));
         }
 
         List<Element> depens = XmlUtils.findElements(
@@ -162,7 +165,7 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
                 "/configuration/gvnix/jasperReports/plugins/plugin",
                 configuration);
         for (Element pluginElement : jasperReportsPlugins) {
-            projectOperations.addBuildPlugin(new Plugin(pluginElement));
+            projectOperations.addBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(pluginElement));
         }
     }
 
@@ -178,8 +181,8 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
     @SuppressWarnings("unused")
     private void copyDirectoryContents(String sourceAntPath,
             String targetDirectory) {
-        Assert.hasText(sourceAntPath, "Source path required");
-        Assert.hasText(targetDirectory, "Target directory required");
+    	StringUtils.isNotBlank(sourceAntPath);
+    	StringUtils.isNotBlank(targetDirectory);
 
         if (!targetDirectory.endsWith("/")) {
             targetDirectory += "/";
@@ -189,10 +192,10 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
             fileManager.createDirectory(targetDirectory);
         }
 
-        String path = TemplateUtils.getTemplatePath(getClass(), sourceAntPath);
-        Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(
+        String path = FileUtils.getPath(getClass(), sourceAntPath);
+        Collection<URL> urls = OSGiUtils.findEntriesByPattern(
                 context.getBundleContext(), path);
-        Assert.notNull(urls,
+        Validate.notNull(urls,
                 "Could not search bundles for resources for Ant Path '" + path
                         + "'");
         for (URL url : urls) {
@@ -200,9 +203,17 @@ public class WebScreenConfigServiceImpl implements WebScreenConfigService {
                     url.getPath().lastIndexOf("/") + 1);
             if (!fileManager.exists(targetDirectory + fileName)) {
                 try {
-                    FileCopyUtils.copy(url.openStream(), fileManager
-                            .createFile(targetDirectory + fileName)
-                            .getOutputStream());
+                    InputStream inputStream = null;
+                    OutputStream outputStream = null;
+                    try {
+                    	inputStream = url.openStream();
+    	                outputStream = fileManager.createFile(targetDirectory + fileName).getOutputStream();
+    	                IOUtils.copy(inputStream, outputStream);
+                    }
+                    finally {
+                    	IOUtils.closeQuietly(inputStream);
+                    	IOUtils.closeQuietly(outputStream);
+                    }
                 } catch (IOException e) {
                     new IllegalStateException(
                             "Encountered an error during copying of resources for MVC JSP addon.",

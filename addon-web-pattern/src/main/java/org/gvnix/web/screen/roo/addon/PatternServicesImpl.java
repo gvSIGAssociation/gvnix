@@ -25,20 +25,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.support.MetadataUtils;
-import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
@@ -47,8 +45,8 @@ import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Provide common services to Screen Pattern management components. 
@@ -67,7 +65,6 @@ import org.springframework.roo.support.util.Assert;
 public class PatternServicesImpl implements PatternService {
 
     @Reference private MetadataService metadataService;
-    @Reference private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     @Reference private MemberDetailsScanner memberDetailsScanner;
     @Reference private TypeLocationService typeLocationService;
 
@@ -149,17 +146,15 @@ public class PatternServicesImpl implements PatternService {
             JavaType formBakingObjectType) {
     	
         List<FieldMetadata> toManyFields = new ArrayList<FieldMetadata>();
-        MutableClassOrInterfaceTypeDetails formBackingTypeMetadata = MetadataUtils
-                .getPhysicalTypeDetails(formBakingObjectType, metadataService,
-                        physicalTypeMetadataProvider);
+        ClassOrInterfaceTypeDetails formBackingTypeMetadata = typeLocationService.getTypeDetails(formBakingObjectType);
 
         MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(
                 getClass().getName(), formBackingTypeMetadata);
 
-        List<FieldMetadata> fields = MemberFindingUtils
-                .getFields(memberDetails);
+        List<FieldMetadata> fields = memberDetails
+                .getFields();
 
-        Assert.notNull(formBackingTypeMetadata, "Cannot locate Metadata for '"
+        Validate.notNull(formBackingTypeMetadata, "Cannot locate Metadata for '"
                 .concat(formBakingObjectType.getFullyQualifiedTypeName())
                 .concat("'."));
 
@@ -177,14 +172,14 @@ public class PatternServicesImpl implements PatternService {
     }
 
     /** {@inheritDoc} */
-    public MutableClassOrInterfaceTypeDetails getControllerMutableTypeDetails(
+    public ClassOrInterfaceTypeDetails getControllerMutableTypeDetails(
             JavaType controllerClass) {
     	
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = MetadataUtils.getPhysicalTypeDetails(
-        		controllerClass, metadataService, physicalTypeMetadataProvider);
+    	ClassOrInterfaceTypeDetails mutableTypeDetails = typeLocationService.getTypeDetails(
+        		controllerClass);
         
         // Test if has the @RooWebScaffold
-        Assert.notNull(
+        Validate.notNull(
                 MemberFindingUtils.getAnnotationOfType(
                         mutableTypeDetails.getAnnotations(),
                         WebScreenOperationsImpl.ROOWEBSCAFFOLD_ANNOTATION),
@@ -200,7 +195,7 @@ public class PatternServicesImpl implements PatternService {
         List<StringAttributeValue> patternValues = new ArrayList<StringAttributeValue>();
 
 		// Get @GvNIXPattern annotation from controller
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
+        ClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
         AnnotationMetadata patternAnnotationMetadata = MemberFindingUtils.getAnnotationOfType(
         		mutableTypeDetails.getAnnotations(), WebScreenOperationsImpl.PATTERN_ANNOTATION);
         if (patternAnnotationMetadata != null) {
@@ -226,7 +221,7 @@ public class PatternServicesImpl implements PatternService {
         List<StringAttributeValue> patternValues = new ArrayList<StringAttributeValue>();
 
 		// Get @GvNIXPattern annotation from controller
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
+        ClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
         AnnotationMetadata patternAnnotationMetadata = MemberFindingUtils.getAnnotationOfType(
         		mutableTypeDetails.getAnnotations(), WebScreenOperationsImpl.RELATED_PATTERN_ANNOTATION);
         if (patternAnnotationMetadata != null) {
@@ -358,7 +353,7 @@ public class PatternServicesImpl implements PatternService {
 			Set<JavaType> controllers = typeLocationService.findTypesWithAnnotation(new JavaType(RooWebScaffold.class.getName()));
 			for (JavaType controller : controllers) {
 				PhysicalTypeMetadata tmpControllerMetadata = (PhysicalTypeMetadata) metadataService.get(
-						PhysicalTypeIdentifier.createIdentifier(controller, Path.SRC_MAIN_JAVA));
+						PhysicalTypeIdentifier.createIdentifier(controller, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
 		        if (entity.equals(new WebScaffoldAnnotationValues(tmpControllerMetadata).getFormBackingObject())) {
 		        	controllerMetadata = tmpControllerMetadata;
 		        }
@@ -381,7 +376,7 @@ public class PatternServicesImpl implements PatternService {
 
         ClassOrInterfaceTypeDetails controllerType = 
         		(ClassOrInterfaceTypeDetails) controller.getMemberHoldingTypeDetails();
-        Assert.notNull(controllerType,
+        Validate.notNull(controllerType,
                 "Governor failed to provide class type details, in violation of superclass contract");
         
         Set<String> fields = new HashSet<String>();

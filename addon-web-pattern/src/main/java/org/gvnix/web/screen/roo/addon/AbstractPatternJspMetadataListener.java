@@ -37,20 +37,23 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Transformer;
 
-import org.gvnix.support.MetadataUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.plural.PluralMetadata;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.tiles.TilesOperations;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
-import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
+import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.customdata.CustomDataKeys;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
@@ -67,12 +70,11 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlRoundTripUtils;
 import org.springframework.roo.support.util.XmlUtils;
@@ -101,6 +103,8 @@ public abstract class AbstractPatternJspMetadataListener implements
     protected MetadataService _metadataService;
     protected PhysicalTypeMetadataProvider _physicalTypeMetadataProvider;
     protected WebScreenOperations _webScreenOperations;
+    protected PathResolver _pathResolver;
+    protected TypeLocationService _typeLocationService;
 
     protected ComponentContext context;
     protected WebScaffoldMetadata webScaffoldMetadata;
@@ -126,7 +130,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         PathResolver pathResolver = _projectOperations.getPathResolver();
         String controllerPath = webScaffoldMetadata.getAnnotationValues()
                 .getPath();
-        Assert.notNull(controllerPath,
+        Validate.notNull(controllerPath,
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + webScaffoldMetadata.getAnnotationValues()
                                 .getGovernorTypeDetails().getName() + "'");
@@ -135,13 +139,13 @@ public abstract class AbstractPatternJspMetadataListener implements
         }
 
         // Make the holding directory for this controller
-        String destinationDirectory = pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/views/" + controllerPath);
+        String destinationDirectory = pathResolver.getIdentifier(LogicalPath.getInstance(
+                Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/views/" + controllerPath);
         if (!_fileManager.exists(destinationDirectory)) {
             _fileManager.createDirectory(destinationDirectory);
         } else {
             File file = new File(destinationDirectory);
-            Assert.isTrue(file.isDirectory(), destinationDirectory
+            Validate.isTrue(file.isDirectory(), destinationDirectory
                     + " is a file, when a directory was expected");
         }
 
@@ -191,7 +195,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         writeToDiskIfNecessary(patternPath, jspDoc);
 
         // add view to views.xml
-        _tilesOperations.addViewDefinition(controllerPath, controllerPath + "/"
+        _tilesOperations.addViewDefinition(controllerPath, LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), controllerPath + "/"
                 + patternName, TilesOperations.DEFAULT_TEMPLATE,
                 "/WEB-INF/views/" + controllerPath + "/" + patternName
                         + ".jspx");
@@ -209,7 +213,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             _menuOperations.addMenuItem(categoryName, menuItemId, "menu_list_"
                     .concat(patternTypeStr).concat("_").concat(patternName),
                     "/" + controllerPath + queryString,
-                    MenuOperations.DEFAULT_MENU_ITEM_PREFIX);
+                    MenuOperations.DEFAULT_MENU_ITEM_PREFIX, _pathResolver.getFocusedPath(Path.SRC_MAIN_WEBAPP));
         }
         // add needed properties
         Map<String, String> properties = new LinkedHashMap<String, String>();
@@ -229,7 +233,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                             .getReadableSymbolName()
                             + " list ".concat(patternTypeStr).concat(" ")
                             + patternName);
-            _propFileOperations.addProperties(Path.SRC_MAIN_WEBAPP,
+            _propFileOperations.addProperties(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                     "/WEB-INF/i18n/application.properties", properties, true,
                     false);
         }
@@ -246,7 +250,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      */
     private Document getRegisterDocument(String patternName) {
         String controllerPath = webScaffoldAnnotationValues.getPath();
-        Assert.notNull(controllerPath,
+        Validate.notNull(controllerPath,
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + webScaffoldAnnotationValues.getGovernorTypeDetails()
                                 .getName() + "'");
@@ -372,8 +376,8 @@ public abstract class AbstractPatternJspMetadataListener implements
                         + "_" + fieldName.toLowerCase() + "_date_format}");
             } else if (field.getFieldType().isCommonCollectionType()
                     && (field.getCustomData().get(
-                            PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) != null || field.getCustomData().get(
-                                    PersistenceCustomDataKeys.MANY_TO_MANY_FIELD) != null)) {
+                            CustomDataKeys.ONE_TO_MANY_FIELD) != null || field.getCustomData().get(
+                            		CustomDataKeys.MANY_TO_MANY_FIELD) != null)) {
                 if (isRelationVisible(patternName, field.getFieldName()
                         .getSymbolName())) {
                     fieldsOfRelations.add(field);
@@ -472,9 +476,9 @@ public abstract class AbstractPatternJspMetadataListener implements
 		// Get field from master entity with OneToMany or ManyToMany annotation and "mappedBy" attribute has some value
 		String masterField = null;
 		
-		PhysicalTypeMetadata masterEntityDetails = (PhysicalTypeMetadata) _metadataService.get(PhysicalTypeIdentifier.createIdentifier(formbackingType, Path.SRC_MAIN_JAVA));
-        List<FieldMetadata> masterFields = MemberFindingUtils.getFieldsWithAnnotation(masterEntityDetails.getMemberHoldingTypeDetails(), new JavaType("javax.persistence.OneToMany"));
-        masterFields.addAll(MemberFindingUtils.getFieldsWithAnnotation(masterEntityDetails.getMemberHoldingTypeDetails(), new JavaType("javax.persistence.ManyToMany")));
+		PhysicalTypeMetadata masterEntityDetails = (PhysicalTypeMetadata) _metadataService.get(PhysicalTypeIdentifier.createIdentifier(formbackingType, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
+        List<FieldMetadata> masterFields = masterEntityDetails.getMemberHoldingTypeDetails().getFieldsWithAnnotation(new JavaType("javax.persistence.OneToMany"));
+        masterFields.addAll(masterEntityDetails.getMemberHoldingTypeDetails().getFieldsWithAnnotation(new JavaType("javax.persistence.ManyToMany")));
         for (FieldMetadata tmpMasterField : masterFields) {
 			
         	List<AnnotationMetadata> masterFieldAnnotations = tmpMasterField.getAnnotations();
@@ -568,10 +572,10 @@ public abstract class AbstractPatternJspMetadataListener implements
                 && !fieldEntity.getParameters().isEmpty()) {
             fieldEntity = fieldEntity.getParameters().get(0);
         }
-        ClassOrInterfaceTypeDetails cid = MetadataUtils.getPhysicalTypeDetails(
-                fieldEntity, _metadataService, _physicalTypeMetadataProvider);
+        ClassOrInterfaceTypeDetails cid = _typeLocationService.getTypeDetails(
+                fieldEntity);
         JavaType javaType = cid.getName();
-        Path path = PhysicalTypeIdentifier.getPath(cid
+        LogicalPath path = PhysicalTypeIdentifier.getPath(cid
                 .getDeclaredByMetadataId());
 
         PluralMetadata pluralMetadata = (PluralMetadata) _metadataService
@@ -640,7 +644,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      */
     private void modifyRooJsp(RooJspx rooJspx) {
         String controllerPath = webScaffoldAnnotationValues.getPath();
-        Assert.notNull(controllerPath,
+        Validate.notNull(controllerPath,
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + webScaffoldAnnotationValues.getGovernorTypeDetails()
                                 .getName() + "'");
@@ -649,7 +653,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         }
 
         PathResolver pathResolver = _projectOperations.getPathResolver();
-        String docJspx = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+        String docJspx = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/views" + controllerPath + "/" + rooJspx.name()
                         + ".jspx");
 
@@ -794,7 +798,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             }
             form.appendChild(divContentPane);
         }
-        XmlUtils.removeTextNodes(docJspXml);
+        DomUtils.removeTextNodes(docJspXml);
         _fileManager.createOrUpdateTextFileIfRequired(docJspx,
                 XmlUtils.nodeToString(docJspXml), true);
         // writeToDiskIfNecessary(docJspx, docJspXml);
@@ -827,7 +831,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     private void modifyLoadScriptsTagx() {
         PathResolver pathResolver = _projectOperations.getPathResolver();
         String loadScriptsTagx = pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/tags/util/load-scripts.tagx");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/tags/util/load-scripts.tagx");
 
         if (!_fileManager.exists(loadScriptsTagx)) {
             // load-scripts.tagx doesn't exist, so nothing to do
@@ -953,7 +957,7 @@ public abstract class AbstractPatternJspMetadataListener implements
      */
     private void addMessageBoxInLayout() {
         PathResolver pathResolver = _projectOperations.getPathResolver();
-        String defaultJspx = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+        String defaultJspx = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/layouts/default.jspx");
 
         // TODO: Check if it's necessary to add message-box in home-default.jspx
@@ -989,7 +993,7 @@ public abstract class AbstractPatternJspMetadataListener implements
         lsHtml.setAttribute("xmlns:dialog",
                 "urn:jsptagdir:/WEB-INF/tags/dialog/message");
 
-        Element messageBoxElement = XmlUtils.findFirstElementByName(
+        Element messageBoxElement = DomUtils.findFirstElementByName(
                 "dialog:message-box", lsHtml);
         if (messageBoxElement == null) {
             Element divMain = XmlUtils.findFirstElement(
@@ -1017,7 +1021,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     private Document getUpdateTabularDocument(String patternName, WebPatternType patternType) {
 
         String controllerPath = webScaffoldAnnotationValues.getPath();
-        Assert.notNull(controllerPath,
+        Validate.notNull(controllerPath,
                 "Path is not specified in the @RooWebScaffold annotation for '"
                         + webScaffoldAnnotationValues.getGovernorTypeDetails()
                                 .getName() + "'");
@@ -1139,8 +1143,8 @@ public abstract class AbstractPatternJspMetadataListener implements
         List<FieldMetadata> fieldsOfRelations = new ArrayList<FieldMetadata>();
         for (FieldMetadata field : formFields) {
         	if ((field.getCustomData().keySet()
-                    .contains(PersistenceCustomDataKeys.ONE_TO_MANY_FIELD) || field.getCustomData().keySet()
-                    .contains(PersistenceCustomDataKeys.MANY_TO_MANY_FIELD)) && 
+                    .contains(CustomDataKeys.ONE_TO_MANY_FIELD) || field.getCustomData().keySet()
+                    .contains(CustomDataKeys.MANY_TO_MANY_FIELD)) && 
                     isRelationVisible(patternName, field.getFieldName().getSymbolName())) {
         		fieldsOfRelations.add(field);
         	}
@@ -1196,7 +1200,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             // Fields contained in the embedded Id type have been added
             // separately to the field list
             if (field.getCustomData().keySet()
-                    .contains(PersistenceCustomDataKeys.EMBEDDED_ID_FIELD)) {
+                    .contains(CustomDataKeys.EMBEDDED_ID_FIELD)) {
                 continue;
             }
 
@@ -1229,7 +1233,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                         .addAttribute("path", getPathForType(fieldType))
                         .build();
             } else if (field.getCustomData().keySet()
-                    .contains(PersistenceCustomDataKeys.ONE_TO_MANY_FIELD)) {
+                    .contains(CustomDataKeys.ONE_TO_MANY_FIELD)) {
                 // OneToMany relationships are managed from the 'many' side of
                 // the relationship, therefore we provide a link to the relevant
                 // form
@@ -1252,15 +1256,15 @@ public abstract class AbstractPatternJspMetadataListener implements
                     continue;
                 }
             } else if (field.getCustomData().keySet()
-                    .contains(PersistenceCustomDataKeys.MANY_TO_ONE_FIELD)
+                    .contains(CustomDataKeys.MANY_TO_ONE_FIELD)
                     || field.getCustomData()
                             .keySet()
                             .contains(
-                                    PersistenceCustomDataKeys.MANY_TO_MANY_FIELD)
+                            		CustomDataKeys.MANY_TO_MANY_FIELD)
                     || field.getCustomData()
                             .keySet()
                             .contains(
-                                    PersistenceCustomDataKeys.ONE_TO_ONE_FIELD)) {
+                            		CustomDataKeys.ONE_TO_ONE_FIELD)) {
                 JavaType referenceType = getJavaTypeForField(field);
                 JavaTypeMetadataDetails referenceTypeMetadata = relatedDomainTypes
                         .get(referenceType);
@@ -1290,7 +1294,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                             .getCustomData()
                             .keySet()
                             .contains(
-                                    PersistenceCustomDataKeys.MANY_TO_MANY_FIELD)) {
+                            		CustomDataKeys.MANY_TO_MANY_FIELD)) {
                         fieldElement.setAttribute("multiple", "true");
                     }
                 }
@@ -1317,7 +1321,7 @@ public abstract class AbstractPatternJspMetadataListener implements
                     fieldElement.setAttribute("past", "true");
                 }
             } else if (field.getCustomData().keySet()
-                    .contains(PersistenceCustomDataKeys.LOB_FIELD)) {
+                    .contains(CustomDataKeys.LOB_FIELD)) {
                 fieldElement = new XmlElementBuilder("field:textarea", document)
                         .build();
             }
@@ -1381,7 +1385,7 @@ public abstract class AbstractPatternJspMetadataListener implements
     private String getPathForType(JavaType type) {
         JavaTypeMetadataDetails javaTypeMetadataHolder = relatedDomainTypes
                 .get(type);
-        Assert.notNull(
+        Validate.notNull(
                 javaTypeMetadataHolder,
                 "Unable to obtain metadata for type "
                         + type.getFullyQualifiedTypeName());
@@ -1512,11 +1516,11 @@ public abstract class AbstractPatternJspMetadataListener implements
             }
         }
         if (field.getCustomData().keySet()
-                .contains(PersistenceCustomDataKeys.COLUMN_FIELD)) {
+                .contains(CustomDataKeys.COLUMN_FIELD)) {
             @SuppressWarnings("unchecked")
             Map<String, Object> values = (Map<String, Object>) field
                     .getCustomData()
-                    .get(PersistenceCustomDataKeys.COLUMN_FIELD);
+                    .get(CustomDataKeys.COLUMN_FIELD);
             if (values.keySet().contains("nullable")
                     && ((Boolean) values.get("nullable")) == false) {
                 fieldElement.setAttribute("required", "true");
@@ -1541,7 +1545,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             original = XmlUtils.readXml(_fileManager
                     .getInputStream(jspFilename));
             if (XmlRoundTripUtils.compareDocuments(original, proposed)) {
-                XmlUtils.removeTextNodes(original);
+            	DomUtils.removeTextNodes(original);
                 _fileManager.createOrUpdateTextFileIfRequired(jspFilename,
                         XmlUtils.nodeToString(original), false);
             }
@@ -1575,7 +1579,7 @@ public abstract class AbstractPatternJspMetadataListener implements
             File f = new File(filePath);
             String existing = null;
             try {
-                existing = FileCopyUtils.copyToString(new FileReader(f));
+                existing = IOUtils.toString(new FileReader(f));
             } catch (IOException ignoreAndJustOverwriteIt) {
             }
 
@@ -1584,15 +1588,24 @@ public abstract class AbstractPatternJspMetadataListener implements
             }
         } else {
             mutableFile = _fileManager.createFile(filePath);
-            Assert.notNull(mutableFile, "Could not create '" + filePath + "'");
+            Validate.notNull(mutableFile, "Could not create '" + filePath + "'");
         }
 
         if (mutableFile != null) {
             try {
                 // We need to write the file out (it's a new file, or the
                 // existing file has different contents)
-                FileCopyUtils.copy(viewContent, new OutputStreamWriter(
-                        mutableFile.getOutputStream()));
+                InputStream inputStream = null;
+                OutputStreamWriter outputStream = null;
+                try {
+                	inputStream = IOUtils.toInputStream(viewContent);
+	                outputStream = new OutputStreamWriter(mutableFile.getOutputStream());
+	                IOUtils.copy(inputStream, outputStream);
+                }
+                finally {
+                	IOUtils.closeQuietly(inputStream);
+                	IOUtils.closeQuietly(outputStream);
+                }
                 // Return and indicate we wrote out the file
                 return true;
             } catch (IOException ioe) {

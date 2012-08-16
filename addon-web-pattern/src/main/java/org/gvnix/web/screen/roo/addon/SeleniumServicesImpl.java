@@ -30,13 +30,14 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.selenium.SeleniumOperationsImpl;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -55,13 +56,13 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -108,7 +109,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 */
 	public void generateTestMasterRegister(JavaType controller, String name, String serverURL) {
 
-		Assert.notNull(controller, "Controller type required");
+		Validate.notNull(controller, "Controller type required");
 
 		// Get web scaffold annotation from controller
 		WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
@@ -119,6 +120,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
 			return;
 		}
+
+		String id = webScaffoldMetadata.getId();
 
 		// Get selenium template
 		Document document = getSeleniumTemplate();
@@ -133,11 +136,11 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		if (!serverURL.endsWith("/")) {
 			serverURL = serverURL + "/";
 		}
-		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
+		String baseURL = serverURL + projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
 
 		// Add test operations
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
-		addTestMasterRegister(formBackingType, document, tbody, baseURL, name);
+		addTestMasterRegister(formBackingType, document, tbody, baseURL, name, id);
 
 		// Store the test file into project
 		String testName = "test-" + name + "-master-register";
@@ -154,7 +157,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 */
 	public void generateTestMasterTabular(JavaType controller, String name, String serverURL) {
 
-		Assert.notNull(controller, "Controller type required");
+		Validate.notNull(controller, "Controller type required");
 
 		// Get web scaffold annotation from controller
 		WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
@@ -165,6 +168,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
 			return;
 		}
+
+		String id = webScaffoldMetadata.getId();
 
 		// Get selenium template
 		Document document = getSeleniumTemplate();
@@ -179,14 +184,14 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		if (!serverURL.endsWith("/")) {
 			serverURL = serverURL + "/";
 		}
-		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
+		String baseURL = serverURL + projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
 
 		// Open tabular pattern URL 
 		tbody.appendChild(openCommandTabular(document, baseURL, name));
 
 		// Add test operations
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
-		addTestTabular(formBackingType, document, tbody, baseURL, name);
+		addTestTabular(formBackingType, document, tbody, baseURL, name, id);
 
 		// Store the test file into project
 		String testName = "test-" + name + "-master-tabular";
@@ -203,7 +208,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 */
 	public void generateTestMasterTabularEditRegister(JavaType controller, String name, String serverURL) {
 
-		Assert.notNull(controller, "Controller type required");
+		Validate.notNull(controller, "Controller type required");
 
 		// Get web scaffold annotation from controller
 		WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
@@ -214,6 +219,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
 			return;
 		}
+
+		String id = webScaffoldMetadata.getId();
 
 		// Get selenium template
 		Document document = getSeleniumTemplate();
@@ -228,14 +235,14 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		if (!serverURL.endsWith("/")) {
 			serverURL = serverURL + "/";
 		}
-		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
+		String baseURL = serverURL + projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
 
 		// Open tabular pattern URL 
 		tbody.appendChild(openCommandTabular(document, baseURL, name));
 
 		// Add test operations
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
-		addTestTabularEditRegister(formBackingType, document, tbody, baseURL, name);
+		addTestTabularEditRegister(formBackingType, document, tbody, baseURL, name, id);
 
 		// Store the test file into project
 		String testName = "test-" + name + "-master-tabular";
@@ -254,8 +261,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 */
 	public void generateTestDetailTabular(JavaType controller, WebPatternType type, JavaSymbolName fieldName, String name, String serverURL) {
 
-		Assert.notNull(controller, "Controller type required");
-		Assert.notNull(fieldName, "Field name required");
+		Validate.notNull(controller, "Controller type required");
+		Validate.notNull(fieldName, "Field name required");
 
 		// Get web scaffold annotation from controller
 		WebScaffoldMetadata webScaffoldMetadata = getWebScaffoldMetadata(controller);
@@ -267,6 +274,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			logger.warning("The controller you specified does not allow the creation of new instances of the form backing object. No Selenium tests created.");
 			return;
 		}
+		
+		String id = webScaffoldMetadata.getId();
 
 		// Get selenium template
 		Document document = getSeleniumTemplate();
@@ -281,7 +290,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		if (!serverURL.endsWith("/")) {
 			serverURL = serverURL + "/";
 		}
-		String baseURL = serverURL + projectOperations.getProjectMetadata().getProjectName() + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
+		String baseURL = serverURL + projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "/" + webScaffoldMetadata.getAnnotationValues().getPath();
 
 		// Add test operations
 		JavaType formBackingType = webScaffoldMetadata.getAnnotationValues().getFormBackingObject();
@@ -298,9 +307,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
         	tbody.appendChild(openCommandRegister(document, baseURL, name));
 
     		// Add master register
-    		addTestRegisterAdd(formBackingType, document, tbody, parentFields);
+    		addTestRegisterAdd(formBackingType, document, tbody, parentFields, id);
     		
-			addTestTabular(fieldType.getParameters().get(0), document, tbody, baseURL, name);
+			addTestTabular(fieldType.getParameters().get(0), document, tbody, baseURL, name, id);
 
 			// Delete master register
 			// TODO Commented because test fails in hudson
@@ -314,9 +323,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
         	tbody.appendChild(openCommandRegister(document, baseURL, name));
 
     		// Add master register
-    		addTestRegisterAdd(formBackingType, document, tbody, parentFields);
+    		addTestRegisterAdd(formBackingType, document, tbody, parentFields, id);
     		
-			addTestTabularEditRegister(fieldType.getParameters().get(0), document, tbody, baseURL, name);
+			addTestTabularEditRegister(fieldType.getParameters().get(0), document, tbody, baseURL, name, id);
 
 			// Delete master register
 			// TODO Commented because test fails in hudson
@@ -330,11 +339,11 @@ public class SeleniumServicesImpl implements SeleniumServices {
         	tbody.appendChild(openCommandTabular(document, baseURL, name));
 
     		// Add master register
-    		addTestTabularAdd(formBackingType, document, tbody, parentFields);
+    		addTestTabularAdd(formBackingType, document, tbody, parentFields, id);
 
     		tbody.appendChild(clickAndWaitCommand(document, "gvnix_checkbox_fu_" + XmlUtils.convertId(formBackingType.getFullyQualifiedTypeName()) + "_0"));
 
-    		addTestTabular(fieldType.getParameters().get(0), document, tbody, baseURL, name);
+    		addTestTabular(fieldType.getParameters().get(0), document, tbody, baseURL, name, id);
 
 			// Delete master register
 			// TODO Commented because test fails in hudson
@@ -348,11 +357,11 @@ public class SeleniumServicesImpl implements SeleniumServices {
         	tbody.appendChild(openCommandTabular(document, baseURL, name));
 
     		// Add master register
-    		addTestTabularAdd(formBackingType, document, tbody, parentFields);
+    		addTestTabularAdd(formBackingType, document, tbody, parentFields, id);
 
     		tbody.appendChild(clickAndWaitCommand(document, "gvnix_checkbox_fu_" + XmlUtils.convertId(formBackingType.getFullyQualifiedTypeName()) + "_0"));
 
-    		addTestTabularEditRegister(fieldType.getParameters().get(0), document, tbody, baseURL, name);
+    		addTestTabularEditRegister(fieldType.getParameters().get(0), document, tbody, baseURL, name, id);
 
 			// Delete master register
 			// TODO Commented because test fails in hudson
@@ -364,11 +373,11 @@ public class SeleniumServicesImpl implements SeleniumServices {
         	
         	tbody.appendChild(openCommandTabular(document, baseURL, name));
         	
-    		addTestTabularEditRegisterAdd(formBackingType, document, tbody, parentFields);
+    		addTestTabularEditRegisterAdd(formBackingType, document, tbody, parentFields, id);
     		
     		tbody.appendChild(clickAndWaitCommand(document, "gvnix_checkbox_fu_" + XmlUtils.convertId(formBackingType.getFullyQualifiedTypeName()) + "_0"));
  
-			addTestTabular(fieldType.getParameters().get(0), document, tbody, baseURL, name);
+			addTestTabular(fieldType.getParameters().get(0), document, tbody, baseURL, name, id);
 			
 			// TODO Commented because test fails in hudson
 //    		addTestTabularDelete(formBackingType, document, tbody);
@@ -379,11 +388,11 @@ public class SeleniumServicesImpl implements SeleniumServices {
         	
         	tbody.appendChild(openCommandTabular(document, baseURL, name));
         	
-    		addTestTabularEditRegisterAdd(formBackingType, document, tbody, parentFields);
+    		addTestTabularEditRegisterAdd(formBackingType, document, tbody, parentFields, id);
     		
     		tbody.appendChild(clickAndWaitCommand(document, "gvnix_checkbox_fu_" + XmlUtils.convertId(formBackingType.getFullyQualifiedTypeName()) + "_0"));
  
-			addTestTabularEditRegister(fieldType.getParameters().get(0), document, tbody, baseURL, name);
+			addTestTabularEditRegister(fieldType.getParameters().get(0), document, tbody, baseURL, name, id);
 			
 			// TODO Commented because test fails in hudson
 //    		addTestTabularDelete(formBackingType, document, tbody);
@@ -403,9 +412,9 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 */
 	private WebScaffoldMetadata getWebScaffoldMetadata(JavaType controller) {
 
-		String identifier = WebScaffoldMetadata.createIdentifier(controller, Path.SRC_MAIN_JAVA);
+		String identifier = WebScaffoldMetadata.createIdentifier(controller, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 		WebScaffoldMetadata metadata = (WebScaffoldMetadata) metadataService.get(identifier);
-		Assert.notNull(metadata, "Web controller '" + controller.getFullyQualifiedTypeName() + "' does not appear to be an automatic, scaffolded controller");
+		Validate.notNull(metadata, "Web controller '" + controller.getFullyQualifiedTypeName() + "' does not appear to be an automatic, scaffolded controller");
 
 		return metadata;
 	}
@@ -419,8 +428,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		try {
 
-			InputStream inputStream = TemplateUtils.getTemplate(SeleniumOperationsImpl.class, "selenium-template.xhtml");
-			Assert.notNull(inputStream, "Could not acquire selenium.xhtml template");
+			InputStream inputStream = FileUtils.getInputStream(SeleniumOperationsImpl.class, "selenium-template.xhtml");
+			Validate.notNull(inputStream, "Could not acquire selenium.xhtml template");
 			return XmlUtils.readXml(inputStream);
 
 		} catch (Exception e) {
@@ -516,7 +525,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param baseURL Server and application URL path
 	 * @param name Pattern name
 	 */
-	protected void addTestMasterRegister(JavaType entity, Document document, Element element, String baseURL, String name) {
+	protected void addTestMasterRegister(JavaType entity, Document document, Element element, String baseURL, String name, String id) {
 
 		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
 		
@@ -524,7 +533,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		element.appendChild(openCommandRegister(document, baseURL, name));
 
 		// Add register
-		addTestRegisterAdd(entity, document, element, fields);
+		addTestRegisterAdd(entity, document, element, fields, id);
 
 		// Update link access and submit opened form
 		element.appendChild(clickAndWaitCommand(document, "//a[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_update'" + "]"));
@@ -545,12 +554,12 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param baseURL Server and application URL path
 	 * @param name Pattern name
 	 */
-	protected void addTestTabularEditRegister(JavaType entity, Document document, Element element, String baseURL, String name) {
+	protected void addTestTabularEditRegister(JavaType entity, Document document, Element element, String baseURL, String name, String id) {
 
 		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
 		
 		// Add register
-		addTestTabularEditRegisterAdd(entity, document, element, fields);
+		addTestTabularEditRegisterAdd(entity, document, element, fields, id);
 		
 		// Update check table first row 
 		element.appendChild(checkCommand(document, entity));
@@ -570,14 +579,14 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param element Element where store commands
 	 * @param fields Entity fields to add values
 	 */
-	protected void addTestTabularEditRegisterAdd(JavaType entity, Document document, Element element, List<FieldMetadata> fields) {
+	protected void addTestTabularEditRegisterAdd(JavaType entity, Document document, Element element, List<FieldMetadata> fields, String id) {
 
 		// Add image push to access creation
 		String imgId = "fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create";
 		element.appendChild(clickAndWaitCommand(document, "//img[@id='" + imgId + "']"));
 
 		// Add register identifier fields
-		addCompositeIdentifierFieldsRegister(entity, document, element);
+		addCompositeIdentifierFieldsRegister(entity, document, element, id);
 
 		// Add register fields
 		addFieldsRegister(fields, document, element);
@@ -597,13 +606,13 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param element Element where store commands
 	 * @param fields Entity fields to add values
 	 */
-	protected void addTestRegisterAdd(JavaType entity, Document document, Element element, List<FieldMetadata> fields) {
+	protected void addTestRegisterAdd(JavaType entity, Document document, Element element, List<FieldMetadata> fields, String id) {
 
 		// Add link
 		element.appendChild(clickAndWaitCommand(document, "//a[@id='ps_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create'" + "]"));
 
 		// Add register identifier fields
-		addCompositeIdentifierFieldsRegister(entity, document, element);
+		addCompositeIdentifierFieldsRegister(entity, document, element, id);
 
 		// Add register fields
 		addFieldsRegister(fields, document, element);
@@ -642,11 +651,11 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param baseURL Server and application URL path
 	 * @param name Pattern name
 	 */
-	protected void addTestTabular(JavaType entity, Document document, Element element, String baseURL, String name) {
+	protected void addTestTabular(JavaType entity, Document document, Element element, String baseURL, String name, String id) {
 
 		List<FieldMetadata> fields = webMetadataService.getScaffoldEligibleFieldMetadata(entity, getMemberDetails(entity), null);
 		
-		addTestTabularAdd(entity, document, element, fields);
+		addTestTabularAdd(entity, document, element, fields, id);
 		
 		// Update check table first row 
 		element.appendChild(checkCommand(document, entity));
@@ -675,14 +684,14 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		// TODO Delete validation ?
 	}
 
-	protected void addTestTabularAdd(JavaType entity, Document document, Element element, List<FieldMetadata> fields) {
+	protected void addTestTabularAdd(JavaType entity, Document document, Element element, List<FieldMetadata> fields, String id) {
 		
 		// Add image push to access creation
 		String imgId = "fu_" + XmlUtils.convertId(entity.getFullyQualifiedTypeName()) + "_create";
 		element.appendChild(clickCommand(document, "//img[@id='" + imgId + "']"));
 
 		// Add register identifier fields
-		addCompositeIdentifierFieldsTabular(entity, document, element);
+		addCompositeIdentifierFieldsTabular(entity, document, element, id);
 
 		// TODO Check if other fields are editable (storeEditable)
 
@@ -727,8 +736,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 */
 	private MemberDetails getMemberDetails(JavaType javaType) {
 
-		PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(javaType, Path.SRC_MAIN_JAVA));
-		Assert.notNull(physicalTypeMetadata, "Unable to obtain physical type metadata for type " + javaType.getFullyQualifiedTypeName());
+		PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(javaType, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
+		Validate.notNull(physicalTypeMetadata, "Unable to obtain physical type metadata for type " + javaType.getFullyQualifiedTypeName());
 		ClassOrInterfaceTypeDetails classOrInterfaceTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeMetadata.getMemberHoldingTypeDetails();
 
 		return memberDetailsScanner.getMemberDetails(getClass().getName(), classOrInterfaceTypeDetails);
@@ -742,10 +751,10 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param element Element where add fields commands
 	 * @param memberDetails Java type member details
 	 */
-	protected void addCompositeIdentifierFieldsRegister(JavaType javaType, Document document, Element element) {
+	protected void addCompositeIdentifierFieldsRegister(JavaType javaType, Document document, Element element, String id) {
 		
 		MemberDetails memberDetails = getMemberDetails(javaType);
-		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(javaType, memberDetails, null);
+		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(javaType, memberDetails, id);
 		if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
 			for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
 				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
@@ -766,10 +775,10 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 * @param element Element where add fields commands
 	 * @param memberDetails Java type member details
 	 */
-	protected void addCompositeIdentifierFieldsTabular(JavaType javaType, Document document, Element element) {
+	protected void addCompositeIdentifierFieldsTabular(JavaType javaType, Document document, Element element, String id) {
 		
 		MemberDetails memberDetails = getMemberDetails(javaType);
-		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(javaType, memberDetails, null);
+		JavaTypePersistenceMetadataDetails javaTypePersistenceMetadataDetails = webMetadataService.getJavaTypePersistenceMetadataDetails(javaType, memberDetails, id);
 		if (javaTypePersistenceMetadataDetails != null && !javaTypePersistenceMetadataDetails.getRooIdentifierFields().isEmpty()) {
 			for (FieldMetadata field : javaTypePersistenceMetadataDetails.getRooIdentifierFields()) {
 				if (!field.getFieldType().isCommonCollectionType() && !isSpecialType(field.getFieldType())) {
@@ -790,7 +799,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	 */
 	private boolean isSpecialType(JavaType javaType) {
 
-		String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(javaType, Path.SRC_MAIN_JAVA);
+		String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(javaType, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
 		// We are only interested if the type is part of our application and if no editor exists for it already
 		if (metadataService.get(physicalTypeIdentifier) != null) {
@@ -1075,7 +1084,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	protected void installTest(String name, String serverURL, Document document, String relativePath) {
 
 		// Store new test
-		String path = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, relativePath);
+		String path = projectOperations.getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), relativePath);
 		fileManager.createOrUpdateTextFileIfRequired(path, XmlUtils.nodeToString(document), false);
 
 		// Store or update the selenium test suite (all tests list)
@@ -1095,7 +1104,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	protected void manageTestSuite(String testPath, String name, String serverURL) {
 
 		String relativePath = "selenium/test-suite.xhtml";
-		String seleniumPath = projectOperations.getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, relativePath);
+		String seleniumPath = projectOperations.getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), relativePath);
 
 		Document suite;
 		try {
@@ -1106,8 +1115,8 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 			} else {
 
-				InputStream templateInputStream = TemplateUtils.getTemplate(SeleniumOperationsImpl.class, "selenium-test-suite-template.xhtml");
-				Assert.notNull(templateInputStream, "Could not acquire selenium test suite template");
+				InputStream templateInputStream = FileUtils.getInputStream(SeleniumOperationsImpl.class, "selenium-test-suite-template.xhtml");
+				Validate.notNull(templateInputStream, "Could not acquire selenium test suite template");
 				suite = XmlUtils.readXml(templateInputStream);
 			}
 		} catch (Exception e) {
@@ -1115,18 +1124,18 @@ public class SeleniumServicesImpl implements SeleniumServices {
 			throw new IllegalStateException(e);
 		}
 
-		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata();
-		Assert.notNull(projectMetadata, "Unable to obtain project metadata");
+		ProjectMetadata projectMetadata = projectOperations.getProjectMetadata(projectOperations.getFocusedModuleName());
+		Validate.notNull(projectMetadata, "Unable to obtain project metadata");
 
 		Element root = (Element) suite.getLastChild();
 
-		XmlUtils.findRequiredElement("/html/head/title", root).setTextContent("Test suite for " + projectMetadata.getProjectName() + "project");
+		XmlUtils.findRequiredElement("/html/head/title", root).setTextContent("Test suite for " + projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "project");
 
 		Element tr = suite.createElement("tr");
 		Element td = suite.createElement("td");
 		tr.appendChild(td);
 		Element a = suite.createElement("a");
-		a.setAttribute("href", serverURL + projectMetadata.getProjectName() + "/resources/" + testPath);
+		a.setAttribute("href", serverURL + projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "/resources/" + testPath);
 		a.setTextContent(name);
 		td.appendChild(a);
 
@@ -1134,7 +1143,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		fileManager.createOrUpdateTextFileIfRequired(seleniumPath, XmlUtils.nodeToString(suite), false);
 
-		menuOperations.addMenuItem(new JavaSymbolName("SeleniumTests"), new JavaSymbolName("Test"), "Test", "selenium_menu_test_suite", "/resources/" + relativePath, "si_");
+		menuOperations.addMenuItem(new JavaSymbolName("SeleniumTests"), new JavaSymbolName("Test"), "Test", "selenium_menu_test_suite", "/resources/" + relativePath, "si_", LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""));
 	}
 
 	/**
@@ -1143,7 +1152,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 	protected void installMavenPlugin() {
 
 		PathResolver pathResolver = projectOperations.getPathResolver();
-		String pom = pathResolver.getIdentifier(Path.ROOT, "/pom.xml");
+		String pom = pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "/pom.xml");
 		Document document = XmlUtils.readXml(fileManager.getInputStream(pom));
 		Element root = (Element) document.getLastChild();
 
@@ -1157,7 +1166,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 
 		// Now install the plugin itself
 		if (plugin != null) {
-			projectOperations.addBuildPlugin(new Plugin(plugin));
+			projectOperations.addBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(plugin));
 		}
 	}
 	
@@ -1196,7 +1205,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		}
 		if (field.getFieldName().getSymbolName().contains("email") || field.getFieldName().getSymbolName().contains("Email")) {
 			initializer = "some@email.com";
-		} else if (field.getFieldType().equals(JavaType.STRING_OBJECT)) {
+		} else if (field.getFieldType().equals(JavaType.STRING)) {
 			initializer = "some" + field.getFieldName().getSymbolNameCapitalisedFirstLetter() + index;
 		} else if (field.getFieldType().equals(new JavaType(Date.class.getName())) || field.getFieldType().equals(new JavaType(Calendar.class.getName()))) {
 			Calendar cal = Calendar.getInstance();

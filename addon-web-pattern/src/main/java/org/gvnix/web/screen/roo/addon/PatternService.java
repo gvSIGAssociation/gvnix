@@ -23,13 +23,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Interface to provide common services to Screen Pattern management components
@@ -106,7 +105,7 @@ public interface PatternService {
      * @param controllerClass
      * @return
      */
-    public MutableClassOrInterfaceTypeDetails getControllerMutableTypeDetails(JavaType controllerClass);
+    public ClassOrInterfaceTypeDetails getControllerMutableTypeDetails(JavaType controllerClass);
     
     /**
      * Get pattern attributes of a controller java type.

@@ -26,7 +26,7 @@ import java.util.SortedMap;
 
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
@@ -41,7 +41,7 @@ import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * This type produces metadata for a new ITD. It uses an
@@ -158,7 +158,7 @@ public class PatternMetadata extends AbstractPatternMetadata {
                 .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
         
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         methodBuilder
@@ -211,7 +211,7 @@ public class PatternMetadata extends AbstractPatternMetadata {
                 .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         methodBuilder
@@ -229,7 +229,7 @@ public class PatternMetadata extends AbstractPatternMetadata {
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType controller, Path path) {
+    public static final String createIdentifier(JavaType controller, LogicalPath path) {
     	
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, controller, path);
     }
@@ -239,7 +239,7 @@ public class PatternMetadata extends AbstractPatternMetadata {
         return PhysicalTypeIdentifierNamingUtils.getJavaType(PROVIDES_TYPE_STRING, mid);
     }
 
-    public static final Path getPath(String mid) {
+    public static final LogicalPath getPath(String mid) {
     	
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, mid);
     }

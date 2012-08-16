@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -33,11 +34,11 @@ import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDe
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadataProvider;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.customdata.PersistenceCustomDataKeys;
+import org.springframework.roo.classpath.customdata.CustomDataKeys;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ItdTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
@@ -47,9 +48,9 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Provides {@link PatternMetadata}. This type is called by Roo to retrieve the
@@ -146,7 +147,7 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
         JavaType controllerType = PatternMetadata.getJavaType(mid);
 
         // We need to know the metadata of the controller through WebScaffoldMetada
-        Path path = PatternMetadata.getPath(mid);
+        LogicalPath path = PatternMetadata.getPath(mid);
         String webScaffoldMetadataId = WebScaffoldMetadata.createIdentifier(controllerType, path);
         WebScaffoldMetadata webScaffoldMetadata = (WebScaffoldMetadata) metadataService.get(webScaffoldMetadataId);
         if (webScaffoldMetadata == null) {
@@ -157,10 +158,10 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
 
         // We know governor type details are non-null and can be safely cast
         ClassOrInterfaceTypeDetails controllerTypeDetails = (ClassOrInterfaceTypeDetails) controllerMetadata.getMemberHoldingTypeDetails();
-        Assert.notNull(controllerTypeDetails, "Governor failed to provide class type details, in violation of superclass contract");
+        Validate.notNull(controllerTypeDetails, "Governor failed to provide class type details, in violation of superclass contract");
 
         // Check if there are pattern names used more than once in project
-        Assert.isTrue(!patternService.isPatternDuplicated(null), "There is a pattern name used more than once in the project");
+        Validate.isTrue(!patternService.isPatternDuplicated(null), "There is a pattern name used more than once in the project");
 
         // Get pattern attributes of the controller
         List<StringAttributeValue> patternList = patternService.getPatternAttributes(controllerType);
@@ -170,11 +171,11 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
 
         // Get and validate required details and metadatas
         PhysicalTypeMetadata entityMetadata = (PhysicalTypeMetadata) metadataService.get(
-        		PhysicalTypeIdentifier.createIdentifier(entity, Path.SRC_MAIN_JAVA));
-        Assert.notNull(entityMetadata, "Unable to obtain physical type metadata for type " + entity.getFullyQualifiedTypeName());
+        		PhysicalTypeIdentifier.createIdentifier(entity, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
+        Validate.notNull(entityMetadata, "Unable to obtain physical type metadata for type " + entity.getFullyQualifiedTypeName());
         MemberDetails entityDetails = getMemberDetails(entityMetadata);
         MemberHoldingTypeDetails entityPersistentDetails = MemberFindingUtils.getMostConcreteMemberHoldingTypeDetailsWithTag(
-                        entityDetails, PersistenceCustomDataKeys.PERSISTENT_TYPE);
+                        entityDetails, CustomDataKeys.PERSISTENT_TYPE);
         SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities = webMetadataService.getRelatedApplicationTypeMetadata(
         		entity, entityDetails, mid);
         if (entityPersistentDetails == null || relatedEntities == null || relatedEntities.get(entity) == null
@@ -228,13 +229,13 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
     protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
     	
         JavaType javaType = PatternMetadata.getJavaType(metadataIdentificationString);
-        Path path = PatternMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = PatternMetadata.getPath(metadataIdentificationString);
         
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
     @Override
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
     	
         return PatternMetadata.createIdentifier(javaType, path);
     }

@@ -28,14 +28,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
@@ -50,8 +50,7 @@ import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * This type produces metadata for a new ITD. It uses an
@@ -148,8 +147,8 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 	 */
 	protected MethodMetadata getCreateFormMethod(String patternName) {
 		
-        Assert.notNull(masterEntity, "Master entity required to generate createForm");
-        Assert.notNull(masterEntityJavaDetails, "Master entity metadata required to generate createForm");
+		Validate.notNull(masterEntity, "Master entity required to generate createForm");
+		Validate.notNull(masterEntityJavaDetails, "Master entity metadata required to generate createForm");
 		
 		JavaSymbolName methodName = new JavaSymbolName("createForm" + patternName);
 		
@@ -212,7 +211,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		// TODO Remove dependencies or add it from entity pattern ?
 
 		MethodMetadataBuilder method = new MethodMetadataBuilder(
-				getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT, paramTypes, paramNames, bodyBuilder);
+				getId(), Modifier.PUBLIC, methodName, JavaType.STRING, paramTypes, paramNames, bodyBuilder);
 		method.setAnnotations(methodAnnotations);
 		
 		return method.build();
@@ -439,7 +438,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
                 .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
         
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         methodBuilder
@@ -490,7 +489,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
                 .concat("?gvnixform&\" + refererQuery(httpServletRequest);"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         methodBuilder
@@ -515,7 +514,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 
 		// Get field from master entity with OneToMany or ManyToMany annotation and "mappedBy" attribute has some value
 		String masterField = null;
-        List<FieldMetadata> masterFields = MemberFindingUtils.getFields(masterEntityDetails);
+        List<FieldMetadata> masterFields = masterEntityDetails.getFields();
         for (FieldMetadata tmpMasterField : masterFields) {
 			
         	List<AnnotationMetadata> masterFieldAnnotations = tmpMasterField.getAnnotations();
@@ -535,7 +534,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         if (masterField != null) {
 
 			// Get field from entity with Column annotation and "name" attribute same as previous "mappedBy"
-	        List<FieldMetadata> fields = MemberFindingUtils.getFields(entityDetails);
+	        List<FieldMetadata> fields = entityDetails.getFields();
 	        fields.addAll(entityTypeDetails.getPersistenceDetails().getRooIdentifierFields());
 	        for (FieldMetadata tmpField : fields) {
 
@@ -581,7 +580,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType controller, Path path) {
+    public static final String createIdentifier(JavaType controller, LogicalPath path) {
     	
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, controller, path);
     }
@@ -591,7 +590,7 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         return PhysicalTypeIdentifierNamingUtils.getJavaType(PROVIDES_TYPE_STRING, mid);
     }
 
-    public static final Path getPath(String mid) {
+    public static final LogicalPath getPath(String mid) {
     	
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, mid);
     }

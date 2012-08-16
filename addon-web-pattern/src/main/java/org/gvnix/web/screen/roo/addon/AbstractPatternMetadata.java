@@ -29,20 +29,20 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.roo.addon.web.mvc.controller.details.DateTimeFormatDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypeMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.details.JavaTypePersistenceMetadataDetails;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
-import org.springframework.roo.classpath.PhysicalTypeDetails;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.FieldMetadataBuilder;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
@@ -58,9 +58,6 @@ import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 
 /**
  * This type produces metadata for a new ITD. It uses an
@@ -80,8 +77,6 @@ import org.springframework.roo.support.util.StringUtils;
  */
 public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 
-    private static final JavaType ENTITY_BATCH_ANNOTATION = new JavaType(GvNIXEntityBatch.class.getName());
-
     protected WebScaffoldMetadata webScaffoldMetadata;
     private SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities;
     protected JavaType entity;
@@ -93,7 +88,6 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
     private List<FieldMetadata> controllerFields;
     protected Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes;
     private String aspectPackage;
-    private PhysicalTypeMetadata entityMetadata;
 
     public AbstractPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, MemberDetails controllerDetails,
     		WebScaffoldMetadata webScaffoldMetadata, List<StringAttributeValue> patterns, 
@@ -104,8 +98,8 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         super(mid, aspect, controllerMetadata);
         
         // Required parameters: Web scaffold information and relatedEntities details (entity and optional master entity)
-        Assert.notNull(webScaffoldMetadata, "Web scaffold metadata required");
-        Assert.notNull(relatedEntities, "Related relatedEntities type metadata details required");
+        Validate.notNull(webScaffoldMetadata, "Web scaffold metadata required");
+        Validate.notNull(relatedEntities, "Related relatedEntities type metadata details required");
         
         if (!isValid()) {
         
@@ -115,16 +109,15 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         
         this.webScaffoldMetadata = webScaffoldMetadata;
         this.entity = entityMetadata.getMemberHoldingTypeDetails().getName();
-        this.entityMetadata = entityMetadata;
         this.relatedEntities = relatedEntities;
         this.entityTypeDetails = relatedEntities.get(entity);
         this.entityDateTypes = entityDateTypes;
         
-        this.controllerMethods = MemberFindingUtils.getMethods(controllerDetails);
-        this.controllerFields = MemberFindingUtils.getFields(controllerDetails);
+        this.controllerMethods = controllerDetails.getMethods();
+        this.controllerFields = controllerDetails.getFields();
 
-        Assert.notNull(entityTypeDetails, "Metadata holder required for form backing type: " + entity);
-        Assert.notNull(entityTypeDetails.getPersistenceDetails(), "PersistenceMetadata details required for form backing type: " + entity);
+        Validate.notNull(entityTypeDetails, "Metadata holder required for form backing type: " + entity);
+        Validate.notNull(entityTypeDetails.getPersistenceDetails(), "PersistenceMetadata details required for form backing type: " + entity);
 
         WebScaffoldAnnotationValues webScaffoldValues = new WebScaffoldAnnotationValues(controllerMetadata);
         if (webScaffoldValues.isPopulateMethods()) {
@@ -300,7 +293,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                         .concat("?gvnixform&\" + refererQuery(" + httpServletRequest.getKey() + ");"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         // Get Method RequestMapping annotation
@@ -401,7 +394,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         bodyBuilder.appendFormalLine("return url;");
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), 0, methodName, JavaType.STRING_OBJECT,
+                getId(), 0, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         method = methodBuilder.build();
@@ -474,65 +467,10 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         return patternList;
     }
 
-    /**
-     * Update the annotations in formBackingType entity adding
-     * {@link GvNIXBatchEntity}.
-     * <p>
-     * The method is <code>unused</code> until we find a way to invoke it
-     * without get any issues
-     */
-    protected void annotateFormBackingObject() {
-
-        // Test if the annotation already exists on the target type
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = getMutableTypeDetailsFormbakingObject();
-        AnnotationMetadata annotationMetadata = MemberFindingUtils
-                .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
-                        ENTITY_BATCH_ANNOTATION);
-
-        // Annotate formBackingType with GvNIXEntityBatch just if is not
-        // annotated already. We don't need to update attributes
-        if (annotationMetadata == null) {
-            // Prepare annotation builder
-            AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
-                    ENTITY_BATCH_ANNOTATION);
-            mutableTypeDetails.addTypeAnnotation(annotationBuilder.build());
-        }
-    }
-
-    /**
-     * Return the MutableClassOrInterfaceTypeDetails instance of the
-     * formbackingType
-     * 
-     * @return
-     */
-    private MutableClassOrInterfaceTypeDetails getMutableTypeDetailsFormbakingObject() {
-
-        // Obtain the physical type and itd mutable details
-        PhysicalTypeMetadata physicalTypeMetadata = this.entityMetadata;
-        Assert.notNull(physicalTypeMetadata,
-                "Java source code unavailable for type ".concat(entity
-                        .getFullyQualifiedTypeName()));
-
-        // Obtain physical type details for the target type
-        PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
-                .getMemberHoldingTypeDetails();
-        Assert.notNull(physicalTypeDetails,
-                "Java source code details unavailable for type "
-                        .concat(entity.getFullyQualifiedTypeName()));
-
-        // Test if the type is an MutableClassOrInterfaceTypeDetails instance so
-        // the annotation can be added
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
-                physicalTypeDetails, "Java source code is immutable for type "
-                        .concat(entity.getFullyQualifiedTypeName()));
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
-        return mutableTypeDetails;
-    }
-
     protected FieldMetadataBuilder getGvNIXPatternField() {
         return new FieldMetadataBuilder(getId(), Modifier.PRIVATE
                 | Modifier.STATIC | Modifier.FINAL, new JavaSymbolName(
-                "PATTERN_PARAM_NAME"), JavaType.STRING_OBJECT,
+                "PATTERN_PARAM_NAME"), JavaType.STRING,
                 "\"" + getPattern() + "\"");
     }
 
@@ -550,7 +488,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         JavaSymbolName fieldName = new JavaSymbolName("patterns");
         JavaType stringArray = new JavaType(
-                JavaType.STRING_OBJECT.getFullyQualifiedTypeName(), 1,
+                JavaType.STRING.getFullyQualifiedTypeName(), 1,
                 DataType.TYPE, null, null);
 
         FieldMetadata field = fieldExists(fieldName, stringArray);
@@ -596,18 +534,18 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
     protected void addStaticFields() {
         FieldMetadataBuilder field = new FieldMetadataBuilder(getId(),
                 Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL,
-                new JavaSymbolName("INDEX_PARAM_NAME"), JavaType.STRING_OBJECT,
+                new JavaSymbolName("INDEX_PARAM_NAME"), JavaType.STRING,
                 "\"index\"");
         builder.addField(field);
 
         field = new FieldMetadataBuilder(getId(), Modifier.PRIVATE
                 | Modifier.STATIC | Modifier.FINAL, new JavaSymbolName(
-                "FORM_PARAM_NAME"), JavaType.STRING_OBJECT, "\"gvnixform\"");
+                "FORM_PARAM_NAME"), JavaType.STRING, "\"gvnixform\"");
         builder.addField(field);
 
         field = new FieldMetadataBuilder(getId(), Modifier.PRIVATE
                 | Modifier.STATIC | Modifier.FINAL, new JavaSymbolName(
-                "REFERER_PARAM_NAME"), JavaType.STRING_OBJECT, "\"Referer\"");
+                "REFERER_PARAM_NAME"), JavaType.STRING, "\"Referer\"");
         builder.addField(field);
     }
 
@@ -671,7 +609,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                         builder.getImportRegistrationResolver()))
                 .concat(".")
                 .concat(entityTypeDetails.getPersistenceDetails()
-                        .getFindAllMethod().getMethodName().getSymbolName()
+                        .getFindAllMethod().getMethodName()
                         .concat("();")));
 
         bodyBuilder.appendFormalLine("if (".concat(
@@ -699,7 +637,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 entityNamePlural.toLowerCase()).concat("/\".concat(" + getPattern() + ");"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         // Get Method RequestMapping annotation
@@ -798,7 +736,6 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                                 .getPersistenceDetails()
                                 .getFindEntriesMethod()
                                 .getMethodName()
-                                .getSymbolName()
                                 .concat("(index == null ? 0 : (index.intValue() - 1), 1);")));
 
         bodyBuilder.appendFormalLine("if (".concat(
@@ -829,7 +766,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .concat(entity.getSimpleTypeName())
                 .concat(".")
                 .concat(entityTypeDetails.getPersistenceDetails()
-                        .getCountMethod().getMethodName().getSymbolName())
+                        .getCountMethod().getMethodName())
                 .concat("();"));
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\"maxEntities"
                 .concat("\", count == 0 ? 1 : count);"));
@@ -845,7 +782,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 entityNamePlural.toLowerCase()).concat("/\".concat(" + getPattern() + ");"));
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         // Get Method RequestMapping annotation
@@ -895,7 +832,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                                 builder.getImportRegistrationResolver()))
                         .concat(".")
                         .concat(javaTypePersistenceMd.getFindAllMethod()
-                                .getMethodName().getSymbolName())
+                                .getMethodName())
                         .concat("());"));
             } else if (javaTypeMd.isEnumType()) {
                 JavaType arrays = new JavaType("java.util.Arrays");
@@ -1035,7 +972,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(PersistenceMethod.PERSIST);
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         // Get Method RequestMapping annotation
@@ -1083,7 +1020,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(PersistenceMethod.MERGE);
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         // Get Method RequestMapping annotation
@@ -1131,7 +1068,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = getMethodBodyBuilder(PersistenceMethod.REMOVE);
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 methodParamTypes, methodParamNames, bodyBuilder);
 
         // Get Method RequestMapping annotation
@@ -1163,10 +1100,11 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
+        List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>();
         parameterTypes.add(new AnnotatedJavaType(new JavaType(entity
                 .getFullyQualifiedTypeName().concat(".")
                 .concat(entity.getSimpleTypeName()).concat("List")),
-                null));
+                annotations));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -1265,7 +1203,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         bodyBuilder.appendFormalLine("return \"redirect:\".concat(referer);");
 
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 parameterTypes, parameterNames, bodyBuilder);
 
         method = methodBuilder.build();
@@ -1376,9 +1314,10 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 	 */
 	protected Entry<JavaSymbolName, AnnotatedJavaType> getModelRequestParam() {
 		
+        List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>();
 		return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
 				new JavaSymbolName("uiModel"), 
-				new AnnotatedJavaType(new JavaType("org.springframework.ui.Model"), null));
+				new AnnotatedJavaType(new JavaType("org.springframework.ui.Model"), annotations));
 	}
 
 	/**
@@ -1455,16 +1394,18 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
 	protected Entry<JavaSymbolName, AnnotatedJavaType> getHttpServletRequest() {
 		
+        List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>();
 		return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
 				new JavaSymbolName("httpServletRequest"), 
-				new AnnotatedJavaType(new JavaType("javax.servlet.http.HttpServletRequest"), null));
+				new AnnotatedJavaType(new JavaType("javax.servlet.http.HttpServletRequest"), annotations));
 	}
 
 	protected Entry<JavaSymbolName, AnnotatedJavaType> getBindingResult() {
 		
+        List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>();
 		return new SimpleEntry<JavaSymbolName, AnnotatedJavaType>(
 				new JavaSymbolName("bindingResult"),
-				new AnnotatedJavaType(new JavaType("org.springframework.validation.BindingResult"), null));
+				new AnnotatedJavaType(new JavaType("org.springframework.validation.BindingResult"), annotations));
 	}
 	
 	// TODO Refactor method name
@@ -1614,7 +1555,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
     @Override
     public String toString() {
-        ToStringCreator tsc = new ToStringCreator(this);
+        ToStringBuilder tsc = new ToStringBuilder(this);
         tsc.append("identifier", getId());
         tsc.append("valid", valid);
         tsc.append("aspectName", aspectName);

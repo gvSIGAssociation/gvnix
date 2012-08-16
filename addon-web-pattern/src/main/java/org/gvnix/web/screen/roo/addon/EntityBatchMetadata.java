@@ -24,7 +24,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.roo.addon.entity.EntityMetadata;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
+import org.springframework.roo.addon.jpa.activerecord.JpaCrudAnnotationValues;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -43,10 +47,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Metadata for {@link GvNIXEntityBatch} annotation
@@ -68,7 +69,7 @@ public class EntityBatchMetadata extends
      * Target entity metadata. To get persitence methods (merge, persist,
      * remove)
      */
-    private final EntityMetadata entityMetadata;
+    private final JpaActiveRecordMetadata entityMetadata;
 
     /**
      * Entity list inner class
@@ -133,11 +134,11 @@ public class EntityBatchMetadata extends
      */
     public EntityBatchMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
-            EntityMetadata entityMetadata) {
+            JpaActiveRecordMetadata entityMetadata) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
-        Assert.notNull(entityMetadata, "EntityMetadata is needed.");
+        Validate.notNull(entityMetadata, "EntityMetadata is needed.");
         this.entityMetadata = entityMetadata;
 
         builder.addInnerType(getListInnerClass());
@@ -239,8 +240,9 @@ public class EntityBatchMetadata extends
                 bodyBuilder);
 
         // Adds setter parameter
+        List<AnnotationMetadata> annotations = new ArrayList<AnnotationMetadata>();
         builder.addParameterType(new AnnotatedJavaType(field.getFieldType(),
-                null));
+                annotations));
         builder.addParameterName(field.getFieldName());
 
         return builder;
@@ -343,7 +345,7 @@ public class EntityBatchMetadata extends
      * @return
      */
     private MethodMetadata getMethodFor(JavaSymbolName methodName,
-            MethodMetadata targetMethod) {
+            String targetMethod) {
 
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = getParamsTypesForMethods();
@@ -378,7 +380,7 @@ public class EntityBatchMetadata extends
                 new Object[] { destination.getSimpleTypeName() }));
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine(MessageFormat.format("entity.{0}();",
-                new Object[] { targetMethod.getMethodName().getSymbolName() }));
+                new Object[] { targetMethod }));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
 
@@ -400,8 +402,9 @@ public class EntityBatchMetadata extends
      */
     public MethodMetadata getMergeListMethod() {
         if (mergeListMethod == null) {
+        	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
             mergeListMethod = getMethodFor(mergeListMethodName,
-                    entityMetadata.getMergeMethod());
+            		annotation.getMergeMethod());
         }
         return mergeListMethod;
     }
@@ -413,8 +416,9 @@ public class EntityBatchMetadata extends
      */
     public MethodMetadata getPersistListMethod() {
         if (persistListMethod == null) {
+        	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
             persistListMethod = getMethodFor(persisListtMethodName,
-                    entityMetadata.getPersistMethod());
+            		annotation.getPersistMethod());
         }
         return persistListMethod;
     }
@@ -426,8 +430,9 @@ public class EntityBatchMetadata extends
      */
     public MethodMetadata getRemoveListMethod() {
         if (removeListMethod == null) {
+        	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
             removeListMethod = getMethodFor(removeListMethodName,
-                    entityMetadata.getRemoveMethod());
+                    annotation.getRemoveMethod());
         }
         return removeListMethod;
     }
@@ -460,7 +465,7 @@ public class EntityBatchMetadata extends
 
     @Override
     public String toString() {
-        ToStringCreator tsc = new ToStringCreator(this);
+        ToStringBuilder tsc = new ToStringBuilder(this);
         tsc.append("identifier", getId());
         tsc.append("valid", valid);
         tsc.append("aspectName", aspectName);
@@ -474,7 +479,7 @@ public class EntityBatchMetadata extends
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }
@@ -484,7 +489,7 @@ public class EntityBatchMetadata extends
                 PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
                 metadataIdentificationString);
     }
