@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,11 +34,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.web.report.roo.addon.util.ReportValidTypes;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -67,14 +71,11 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -112,7 +113,6 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
     private MetadataService metadataService;
     private MemberDetailsScanner memberDetailsScanner;
     private WebMetadataService webMetadataService;
-    private MetadataDependencyRegistry metadataDependencyRegistry;
 
     public ReportMetadata(String identifier, JavaType aspectName,
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
@@ -126,7 +126,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
             PropFileOperations propFileOperations,
             List<StringAttributeValue> definedReports) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
-        Assert.notNull(controllerMethods, "List of controller methods required");
+        Validate.notNull(controllerMethods, "List of controller methods required");
 
         this.fileManager = fileManager;
         this.projectOperations = projectOperations;
@@ -134,9 +134,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         this.metadataService = metadataService;
         this.webMetadataService = webMetadataService;
         this.memberDetailsScanner = memberDetailsScanner;
-        this.metadataDependencyRegistry = metadataDependencyRegistry;
 
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
 
         this.annotationValues = new WebScaffoldAnnotationValues(
@@ -194,7 +193,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         // Define method parameter types
         List<AnnotatedJavaType> parameterTypes = new ArrayList<AnnotatedJavaType>();
         parameterTypes.add(new AnnotatedJavaType(new JavaType(
-                "org.springframework.ui.Model"), null));
+                "org.springframework.ui.Model"), new ArrayList<AnnotationMetadata>()));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -251,7 +250,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
 
@@ -295,7 +294,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         parameterTypes.add(new AnnotatedJavaType(new JavaType(String.class
                 .getName()), reportAttributesAnnotations));
         parameterTypes.add(new AnnotatedJavaType(new JavaType(
-                "org.springframework.ui.Model"), null));
+                "org.springframework.ui.Model"), new ArrayList<AnnotationMetadata>()));
 
         // Check if a method with the same signature already exists in the
         // target type
@@ -413,7 +412,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.PUBLIC, methodName, JavaType.STRING_OBJECT,
+                getId(), Modifier.PUBLIC, methodName, JavaType.STRING,
                 parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
 
@@ -422,7 +421,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         controllerMethods.add(reportMethod);
 
         propFileOperations
-                .addProperties(Path.SRC_MAIN_WEBAPP,
+                .addProperties(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "/WEB-INF/i18n/application.properties", properties,
                         true, false);
         return reportMethod;
@@ -467,7 +466,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
         // Add config to jasper-views.xml
         String jasperReportsConfig = pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/jasper-views.xml");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/spring/jasper-views.xml");
         MutableFile mutableJasperViewsConfigFile = fileManager
                 .updateFile(jasperReportsConfig);
         Document jasperViewsConfigDocument;
@@ -491,7 +490,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         }
 
         // Create a DOM element defining the new bean for the JasperReport view
-        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+        InputStream templateInputStream = FileUtils.getInputStream(getClass(),
                 "jasperreports-bean-config-template.xml");
         Document reportBeanConfigDocument;
         try {
@@ -550,7 +549,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
             JavaType fromBackingObject) {
         // Check if a jrxml file exists
         PathResolver pathResolver = projectOperations.getPathResolver();
-        String reportJrXml = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+        String reportJrXml = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/reports/"
                         + fromBackingObject.getSimpleTypeName().toLowerCase()
                         + "_" + installedReport.toLowerCase() + ".jrxml");
@@ -580,7 +579,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
             }
         }
 
-        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+        InputStream templateInputStream = FileUtils.getInputStream(getClass(),
                 "report/JasperReport-template.jrxml");
 
         Document jrxml;
@@ -662,7 +661,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         // We are sure that reportJrXml file doesn't exist so we can write it
         // with the jrxml document content
         MutableFile mutableFile = fileManager.createFile(reportJrXml);
-        Assert.notNull(mutableFile, "Could not create jrxml file '"
+        Validate.notNull(mutableFile, "Could not create jrxml file '"
                 + reportJrXml + "'");
 
         try {
@@ -674,8 +673,17 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
 
             // We need to write the file out (it's a new file, or the existing
             // file has different contents)
-            FileCopyUtils.copy(jrxmlContent,
-                    new OutputStreamWriter(mutableFile.getOutputStream()));
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try { 
+	            inputStream = IOUtils.toInputStream(jrxmlContent);
+	            outputStream = mutableFile.getOutputStream();
+	            IOUtils.copy(inputStream, outputStream);
+            }
+            finally {
+	            IOUtils.closeQuietly(inputStream);
+	            IOUtils.closeQuietly(outputStream);
+            }
         } catch (IOException ioe) {
             throw new IllegalStateException("Could not output '"
                     + mutableFile.getCanonicalPath() + "'", ioe);
@@ -697,7 +705,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                 .concat(".servlet.view.jasperreports");
         String customMultiFormatViewPath = projectOperations.getPathResolver()
                 .getIdentifier(
-                        Path.SRC_MAIN_JAVA,
+                		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                         customMultiFormatViewPackage.replace(".",
                                 File.separator).concat(
                                 "/CustomJasperReportsMultiFormatView.java"));
@@ -706,22 +714,29 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         if (!fileManager.exists(customMultiFormatViewPath)) {
             mutableCustomMultiFormatViewClass = fileManager
                     .createFile(customMultiFormatViewPath);
-            InputStream template = TemplateUtils
-                    .getTemplate(
+            InputStream template = FileUtils.getInputStream(
                             getClass(),
                             "web/servlet/view/jasperreports/CustomJasperReportsMultiFormatView-template.java");
             String javaTemplate;
             try {
-                javaTemplate = FileCopyUtils
-                        .copyToString(new InputStreamReader(template));
+                javaTemplate = IOUtils.toString(new InputStreamReader(template));
 
                 // Replace package definition
                 javaTemplate = StringUtils.replace(javaTemplate, "${PACKAGE}",
                         customMultiFormatViewPackage);
 
                 // Write final java file
-                FileCopyUtils.copy(javaTemplate.getBytes(),
-                        mutableCustomMultiFormatViewClass.getOutputStream());
+                InputStream inputStream = null;
+                OutputStream outputStream = null;
+                try { 
+	                inputStream = IOUtils.toInputStream(javaTemplate);
+	                outputStream = mutableCustomMultiFormatViewClass.getOutputStream();
+	                IOUtils.copy(inputStream, outputStream);
+                }
+                finally {
+	                IOUtils.closeQuietly(inputStream);
+	                IOUtils.closeQuietly(outputStream);
+                }
             } catch (IOException ioe) {
                 throw new IllegalStateException(
                         "Unable load CustomJasperReportsMultiFormatView-template.java template",
@@ -750,8 +765,8 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
     private MemberDetails getMemberDetails(JavaType type) {
         PhysicalTypeMetadata formBackingObjectPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService
                 .get(PhysicalTypeIdentifier.createIdentifier(type,
-                        Path.SRC_MAIN_JAVA));
-        Assert.notNull(
+                		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
+        Validate.notNull(
                 formBackingObjectPhysicalTypeMetadata,
                 "Unable to obtain physical type metdata for type "
                         + type.getFullyQualifiedTypeName());
@@ -803,7 +818,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
      * @return string[0]=reportname, string[1]=format
      */
     public static String[] stripGvNixReportValue(String definedReport) {
-        Assert.isTrue(definedReport.contains("|"),
+        Validate.isTrue(definedReport.contains("|"),
                 "GvNixReport Annotation value must be reportName|format");
         return definedReport.toLowerCase().split("\\|");
     }
@@ -869,7 +884,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
     // Typically, no changes are required beyond this point
 
     public String toString() {
-        ToStringCreator tsc = new ToStringCreator(this);
+        ToStringBuilder tsc = new ToStringBuilder(this);
         tsc.append("identifier", getId());
         tsc.append("valid", valid);
         tsc.append("aspectName", aspectName);
@@ -884,7 +899,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }
@@ -894,7 +909,7 @@ public class ReportMetadata extends AbstractItdTypeDetailsProvidingMetadataItem 
                 PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
                 metadataIdentificationString);
     }

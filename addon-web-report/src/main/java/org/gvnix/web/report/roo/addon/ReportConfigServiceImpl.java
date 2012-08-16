@@ -21,11 +21,15 @@ package org.gvnix.web.report.roo.addon;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -35,16 +39,14 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
-import org.springframework.roo.support.osgi.UrlFindingUtils;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.osgi.OSGiUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -80,10 +82,9 @@ public class ReportConfigServiceImpl implements ReportConfigService {
 
     /** {@inheritDoc} */
     public void setup() {
-        Assert.isTrue(isSpringMvcProject(),
+        Validate.isTrue(isSpringMvcProject(),
                 "Project must be Spring MVC project");
-        Element configuration = XmlUtils.getConfiguration(getClass(),
-                "configuration.xml");
+        Element configuration = XmlUtils.getConfiguration(getClass());
 
         // Add addon repository and dependency to get annotations
         addAnnotations(configuration);
@@ -114,7 +115,7 @@ public class ReportConfigServiceImpl implements ReportConfigService {
         PathResolver pathResolver = projectOperations.getPathResolver();
 
         // Add config to MVC app context
-        String mvcConfig = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+        String mvcConfig = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/spring/webmvc-config.xml");
         MutableFile mutableMvcConfigFile = fileManager.updateFile(mvcConfig);
         Document mvcConfigDocument;
@@ -131,9 +132,9 @@ public class ReportConfigServiceImpl implements ReportConfigService {
 
         if (null == XmlUtils.findFirstElement(
                 "/beans/bean[@id='jasperReportsXmlViewResolver']", beans)) {
-            InputStream configTemplateInputStream = TemplateUtils.getTemplate(
+            InputStream configTemplateInputStream = FileUtils.getInputStream(
                     getClass(), "jasperreports-mvc-config-template.xml");
-            Assert.notNull(configTemplateInputStream,
+            Validate.notNull(configTemplateInputStream,
                     "Could not acquire jasperreports-mvc-config-template.xml file");
             Document configDoc;
             try {
@@ -159,7 +160,7 @@ public class ReportConfigServiceImpl implements ReportConfigService {
             }
         }
 
-        if (fileManager.exists(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+        if (fileManager.exists(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/spring/jasper-views.xml"))) {
             fileManager.scan();
             // This file already exists, nothing to do
@@ -168,14 +169,11 @@ public class ReportConfigServiceImpl implements ReportConfigService {
 
         // Add jasper-views.xml file
         MutableFile mutableFile;
-        byte[] jasperViewsConfigTemplate;
         InputStream jasperReportsTemplateInputStream;
 
         try {
-            jasperReportsTemplateInputStream = TemplateUtils.getTemplate(
+            jasperReportsTemplateInputStream = FileUtils.getInputStream(
                     getClass(), "jasperreports-views-config-template.xml");
-            jasperViewsConfigTemplate = FileCopyUtils
-                    .copyToByteArray(jasperReportsTemplateInputStream);
         } catch (Exception ex) {
             throw new IllegalStateException(
                     "Unable to load jasperreports-views-config-template.xml",
@@ -183,28 +181,31 @@ public class ReportConfigServiceImpl implements ReportConfigService {
         }
 
         String jasperViesFileDestination = pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/spring/jasper-views.xml");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/spring/jasper-views.xml");
         if (!fileManager.exists(jasperViesFileDestination)) {
             mutableFile = fileManager.createFile(jasperViesFileDestination);
-            Assert.notNull(mutableFile,
+            Validate.notNull(mutableFile,
                     "Could not create JasperReports views definition file '"
                             + jasperViesFileDestination + "'");
         } else {
             mutableFile = fileManager.updateFile(jasperViesFileDestination);
         }
 
-        try {
-            FileCopyUtils.copy(jasperViewsConfigTemplate,
-                    mutableFile.getOutputStream());
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try { 
+            inputStream = jasperReportsTemplateInputStream;
+            outputStream = mutableFile.getOutputStream();
+            IOUtils.copy(inputStream, outputStream);
         } catch (IOException ioe) {
             throw new IllegalStateException("Could not output '"
                     + mutableFile.getCanonicalPath() + "'", ioe);
         }
-
-        try {
-            jasperReportsTemplateInputStream.close();
-        } catch (IOException ignore) {
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
+
         fileManager.scan();
     }
 
@@ -234,7 +235,7 @@ public class ReportConfigServiceImpl implements ReportConfigService {
         // resolve path for spring-mvc.xml if it hasn't been resolved yet
         if (springMvcConfigFile == null) {
             springMvcConfigFile = projectOperations.getPathResolver()
-                    .getIdentifier(Path.SRC_MAIN_WEBAPP,
+                    .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                             "WEB-INF/spring/webmvc-config.xml");
         }
         return springMvcConfigFile;
@@ -247,7 +248,7 @@ public class ReportConfigServiceImpl implements ReportConfigService {
         // resolve path for jasper-views.xml if it hasn't been resolved yet
         if (jasperViewsConfigFile == null) {
             jasperViewsConfigFile = projectOperations.getPathResolver()
-                    .getIdentifier(Path.SRC_MAIN_WEBAPP,
+                    .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                             "WEB-INF/spring/jasper-views.xml");
         }
         return jasperViewsConfigFile;
@@ -268,7 +269,7 @@ public class ReportConfigServiceImpl implements ReportConfigService {
 
         // resolve absolute path for menu.jspx if it hasn't been resolved yet
         return projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "/WEB-INF/layouts/layouts.xml");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/WEB-INF/layouts/layouts.xml");
     }
 
     /**
@@ -286,7 +287,7 @@ public class ReportConfigServiceImpl implements ReportConfigService {
                 "/configuration/gvnix/repositories/repository", configuration);
         for (Element repo : repos) {
 
-            projectOperations.addRepository(new Repository(repo));
+            projectOperations.addRepository(projectOperations.getFocusedModuleName(), new Repository(repo));
         }
 
         List<Element> depens = XmlUtils.findElements(
@@ -320,7 +321,7 @@ public class ReportConfigServiceImpl implements ReportConfigService {
         for (Element dependencyElement : jasperReportDependencies) {
             dependencies.add(new Dependency(dependencyElement));
         }
-        projectOperations.addDependencies(dependencies);
+        projectOperations.addDependencies(projectOperations.getFocusedModuleName(), dependencies);
     }
 
     /**
@@ -334,7 +335,7 @@ public class ReportConfigServiceImpl implements ReportConfigService {
                 "/configuration/gvnix/jasperReports/plugins/plugin",
                 configuration);
         for (Element pluginElement : jasperReportsPlugins) {
-            projectOperations.addBuildPlugin(new Plugin(pluginElement));
+            projectOperations.addBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(pluginElement));
         }
     }
 
@@ -351,13 +352,11 @@ public class ReportConfigServiceImpl implements ReportConfigService {
     private void installJasperReportsExtensionFonts() {
         PathResolver pathResolver = projectOperations.getPathResolver();
 
-        InputStream configTemplateInputStream = TemplateUtils
-                .getTemplate(getClass(),
+        InputStream configTemplateInputStream = FileUtils.getInputStream(getClass(),
                         "jasperfonts-extension/jasperreports_extension-template.properties");
         String jasperReportExtensionPropTemplate;
         try {
-            jasperReportExtensionPropTemplate = FileCopyUtils
-                    .copyToString(new InputStreamReader(
+            jasperReportExtensionPropTemplate = IOUtils.toString(new InputStreamReader(
                             configTemplateInputStream));
         } catch (IOException ioe) {
             throw new IllegalStateException(
@@ -373,12 +372,12 @@ public class ReportConfigServiceImpl implements ReportConfigService {
             }
         }
         String jasperReportExtensionProp = pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP,
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                 "WEB-INF/classes/jasperreports_extension.properties");
         fileManager.createOrUpdateTextFileIfRequired(jasperReportExtensionProp,
                 jasperReportExtensionPropTemplate, false);
         String classesPathDest = projectOperations.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_WEBAPP,
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "WEB-INF/classes/jasperfonts");
 
         copyDirectoryContents("jasperfonts-extension/jasperfonts/**",
@@ -397,8 +396,8 @@ public class ReportConfigServiceImpl implements ReportConfigService {
      */
     private void copyDirectoryContents(String sourceAntPath,
             String targetDirectory) {
-        Assert.hasText(sourceAntPath, "Source path required");
-        Assert.hasText(targetDirectory, "Target directory required");
+        StringUtils.isNotBlank(sourceAntPath);
+        StringUtils.isNotBlank(targetDirectory);
 
         if (!targetDirectory.endsWith("/")) {
             targetDirectory += "/";
@@ -408,10 +407,10 @@ public class ReportConfigServiceImpl implements ReportConfigService {
             fileManager.createDirectory(targetDirectory);
         }
 
-        String path = TemplateUtils.getTemplatePath(getClass(), sourceAntPath);
-        Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(
+        String path = FileUtils.getPath(getClass(), sourceAntPath);
+        Collection<URL> urls = OSGiUtils.findEntriesByPattern(
                 context.getBundleContext(), path);
-        Assert.notNull(urls,
+        Validate.notNull(urls,
                 "Could not search bundles for resources for Ant Path '" + path
                         + "'");
         for (URL url : urls) {
@@ -419,9 +418,17 @@ public class ReportConfigServiceImpl implements ReportConfigService {
                     url.getPath().lastIndexOf("/") + 1);
             if (!fileManager.exists(targetDirectory + fileName)) {
                 try {
-                    FileCopyUtils.copy(url.openStream(), fileManager
-                            .createFile(targetDirectory + fileName)
-                            .getOutputStream());
+                    InputStream inputStream = null;
+                    OutputStream outputStream = null;
+                    try { 
+	                    inputStream = url.openStream();
+	                    outputStream = fileManager.createFile(targetDirectory + fileName).getOutputStream();
+	                    IOUtils.copy(inputStream, outputStream);
+                    }
+                    finally {
+	                    IOUtils.closeQuietly(inputStream);
+	                    IOUtils.closeQuietly(outputStream);
+                    }
                 } catch (IOException e) {
                     new IllegalStateException(
                             "Encountered an error during copying of resources for MVC JSP addon.",

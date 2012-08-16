@@ -5,14 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadata;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.mvc.WebScaffoldMetadataProvider;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadata;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldMetadataProvider;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeLocationService;
@@ -27,10 +28,9 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Provides {@link ReportMetadata}. This type is called by Roo to retrieve the
@@ -116,7 +116,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
         // We know governor type details are non-null and can be safely cast
         ClassOrInterfaceTypeDetails controllerClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) governorPhysicalTypeMetadata
                 .getMemberHoldingTypeDetails();
-        Assert.notNull(
+        Validate.notNull(
                 controllerClassOrInterfaceDetails,
                 "Governor failed to provide class type details, in violation of superclass contract");
         MemberDetails controllerMemberDetails = memberDetailsScanner
@@ -162,7 +162,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
             }
         }
 
-        Path path = ReportMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = ReportMetadata.getPath(metadataIdentificationString);
         String webScaffoldMetadataKey = WebScaffoldMetadata.createIdentifier(
                 javaType, path);
         metadataDependencyRegistry.registerDependency(webScaffoldMetadataKey,
@@ -179,7 +179,7 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
         // Pass dependencies required by the metadata in through its constructor
         return new ReportMetadata(metadataIdentificationString, aspectName,
                 governorPhysicalTypeMetadata,
-                MemberFindingUtils.getMethods(controllerMemberDetails),
+                controllerMemberDetails.getMethods(),
                 metadataService, memberDetailsScanner,
                 metadataDependencyRegistry, webScaffoldMetadata,
                 webMetadataService, fileManager,
@@ -236,12 +236,12 @@ public final class ReportMetadataProvider extends AbstractItdMetadataProvider {
             String metadataIdentificationString) {
         JavaType javaType = ReportMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = ReportMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = ReportMetadata.getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
     @Override
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
         return ReportMetadata.createIdentifier(javaType, path);
     }
 

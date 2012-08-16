@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Provides an easy way to create a {@link MutableFile} without actually
@@ -29,7 +29,7 @@ public class StubMutableFile implements MutableFile {
     }
 
     public StubMutableFile(File file) {
-        Assert.notNull(file, "File required");
+        Validate.notNull(file, "File required");
         this.file = file;
     }
 

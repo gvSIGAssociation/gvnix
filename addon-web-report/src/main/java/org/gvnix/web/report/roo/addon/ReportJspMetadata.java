@@ -6,13 +6,14 @@
  */
 package org.gvnix.web.report.roo.addon;
 
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.metadata.AbstractMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Metadata built from {@link ReportMetadata}. The metadata identifier for a
@@ -39,15 +40,15 @@ public class ReportJspMetadata extends AbstractMetadataItem {
     public ReportJspMetadata(String identifier, ReportMetadata reportMetadata) {
         super(identifier);
 
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
-        Assert.notNull(reportMetadata, "Report metadata required");
+        Validate.notNull(reportMetadata, "Report metadata required");
 
         this.reportMetadata = reportMetadata;
     }
 
     public String toString() {
-        ToStringCreator tsc = new ToStringCreator(this);
+        ToStringBuilder tsc = new ToStringBuilder(this);
         tsc.append("identifier", getId());
         tsc.append("valid", valid);
         tsc.append("report metadata id", reportMetadata.getId());
@@ -58,7 +59,7 @@ public class ReportJspMetadata extends AbstractMetadataItem {
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }
@@ -68,7 +69,7 @@ public class ReportJspMetadata extends AbstractMetadataItem {
                 PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
                 metadataIdentificationString);
     }

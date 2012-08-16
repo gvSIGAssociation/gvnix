@@ -10,10 +10,8 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
-import org.springframework.roo.classpath.TypeLocationService;
-import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
@@ -24,13 +22,6 @@ public class ReportOperationsImplTests {
     private FileManager fileManager;
     @Mock
     private ProjectOperations projectOperations;
-    @Mock
-    private TypeLocationService typeLocationService;
-    @Mock
-    private MetadataService metadataService;
-    @Mock
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
-    private ReportOperationsImpl operations;
 
     @Before
     public void setUp() {
@@ -44,7 +35,7 @@ public class ReportOperationsImplTests {
         String webMvcConfig = WEB_MVC_CONFIG;
         PathResolver pathResolver = projectOperations.getPathResolver();
         when(
-                pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+                pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
                         "WEB-INF/spring/webmvc-config.xml")).thenReturn(
                 webMvcConfig);
         StubMutableFile webMvcConfigFile = new StubMutableFile(new File(

@@ -23,16 +23,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.addon.web.mvc.controller.RooWebScaffold;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
+import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.TypeManagementService;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
@@ -43,8 +47,6 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
 
 /**
  * Implementation of operations this add-on offers.
@@ -71,12 +73,8 @@ public class ReportOperationsImpl implements ReportOperations {
     @Reference
     private MetadataService metadataService;
 
-    /**
-     * Use the PhysicalTypeMetadataProvider to access information about a
-     * physical type in the project
-     */
     @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
+    private TypeLocationService typeLocationService;
 
     /**
      * Use ProjectOperations to install new dependencies, plugins, properties,
@@ -90,41 +88,44 @@ public class ReportOperationsImpl implements ReportOperations {
      */
     @Reference
     ReportConfigService reportConfigService;
+    
+    @Reference
+    TypeManagementService typeManagementService;
 
 
     /** {@inheritDoc} */
     public boolean isCommandAvailable() {
         // Check if a project has been created
-        return projectOperations.isProjectAvailable();
+        return projectOperations.isProjectAvailable(projectOperations.getFocusedModuleName());
     }
 
     /** {@inheritDoc} */
     public boolean isProjectAvailable() {
         // Check if a project has been created
-        return projectOperations.isProjectAvailable();
+        return projectOperations.isProjectAvailable(projectOperations.getFocusedModuleName());
     }
 
 
     /** {@inheritDoc} */
     public void annotateType(JavaType javaType, String reportName, String format) {
-        Assert.isTrue(reportConfigService.isSpringMvcProject(),
+    	Validate.isTrue(reportConfigService.isSpringMvcProject(),
                 "Project must be Spring MVC project");
         reportConfigService.addJasperReportsViewResolver();
-        Assert.isTrue(reportConfigService.isJasperViewsProject(),
+        Validate.isTrue(reportConfigService.isJasperViewsProject(),
                 "WEB-INF/spring/jasper-views.xml must exists");
 
-        // Use Roo's Assert type for null checks
-        Assert.notNull(javaType, "Java type required");
-        Assert.isTrue(StringUtils.hasText(reportName), "Report Name required");
-        Assert.isTrue(StringUtils.hasText(format), "Report Name required");
+        // Use Roo's Validate type for null checks
+        Validate.notNull(javaType, "Java type required");
+        Validate.isTrue(StringUtils.isNotBlank(reportName), "Report Name required");
+        Validate.isTrue(StringUtils.isNotBlank(format), "Report Name required");
         reportName = reportName.toLowerCase();
         format = format.replaceAll(" ", "").toLowerCase();
-        Assert.isTrue(ReportMetadata.isValidFormat(format),
+        Validate.isTrue(ReportMetadata.isValidFormat(format),
                 "Format must be pdf,xls,csv,html");
 
         // Retrieve metadata for the Java source type the annotation is being
         // added to
-        String id = physicalTypeMetadataProvider.findIdentifier(javaType);
+        String id = typeLocationService.getPhysicalTypeIdentifier(javaType);
         if (id == null) {
             throw new IllegalArgumentException("Cannot locate source for '"
                     + javaType.getFullyQualifiedTypeName() + "'");
@@ -133,23 +134,23 @@ public class ReportOperationsImpl implements ReportOperations {
         // Obtain the physical type and itd mutable details
         PhysicalTypeMetadata physicalTypeMetadata = (PhysicalTypeMetadata) metadataService
                 .get(id);
-        Assert.notNull(physicalTypeMetadata,
+        Validate.notNull(physicalTypeMetadata,
                 "Java source code unavailable for type "
                         + PhysicalTypeIdentifier.getFriendlyName(id));
 
         // Obtain physical type details for the target type
         PhysicalTypeDetails physicalTypeDetails = physicalTypeMetadata
                 .getMemberHoldingTypeDetails();
-        Assert.notNull(physicalTypeDetails,
+        Validate.notNull(physicalTypeDetails,
                 "Java source code details unavailable for type "
                         + PhysicalTypeIdentifier.getFriendlyName(id));
 
         // Test if the type is an MutableClassOrInterfaceTypeDetails instance so
         // the annotation can be added
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
                 physicalTypeDetails, "Java source code is immutable for type "
                         + PhysicalTypeIdentifier.getFriendlyName(id));
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) physicalTypeDetails;
+        ClassOrInterfaceTypeDetails mutableTypeDetails = (ClassOrInterfaceTypeDetails) physicalTypeDetails;
 
         AnnotationMetadata rooWebScaffoldAnnotation = MemberFindingUtils
                 .getAnnotationOfType(mutableTypeDetails.getAnnotations(),
@@ -215,8 +216,10 @@ public class ReportOperationsImpl implements ReportOperations {
                 new JavaSymbolName("value"), desiredReports));
         AnnotationMetadataBuilder annotationBuilder = new AnnotationMetadataBuilder(
                 GVNIX_REPORTS, attributes);
-        mutableTypeDetails.updateTypeAnnotation(annotationBuilder.build(),
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
+        mutableTypeDetailsBuilder.updateTypeAnnotation(annotationBuilder.build(),
                 new HashSet<JavaSymbolName>());
+        typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
 
     }
 
