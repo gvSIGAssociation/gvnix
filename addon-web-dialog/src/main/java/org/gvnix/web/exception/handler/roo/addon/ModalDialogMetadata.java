@@ -21,13 +21,16 @@ package org.gvnix.web.exception.handler.roo.addon;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ItdTypeDetailsBuilder;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
@@ -42,12 +45,10 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.util.FileUtils;
 
 /**
  * This type produces metadata for a new ITD. It uses an
@@ -79,9 +80,9 @@ public class ModalDialogMetadata extends
             MemberDetails memberDetails, List<String> definedModalDialogs,
             FileManager fileManager, PathResolver pathResolver) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
-        Assert.notNull(memberDetails, "MemberDetails must be not null");
+        Validate.notNull(memberDetails, "MemberDetails must be not null");
 
         this.memberDetails = memberDetails;
 
@@ -171,13 +172,13 @@ public class ModalDialogMetadata extends
         JavaType dialogType = getJavaTypeForClassName("DialogType");
         paramTypes.add(new AnnotatedJavaType(dialogType,
                 new ArrayList<AnnotationMetadata>()));
-        paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
+        paramTypes.add(new AnnotatedJavaType(JavaType.STRING,
                 new ArrayList<AnnotationMetadata>()));
-        paramTypes.add(new AnnotatedJavaType(JavaType.STRING_OBJECT,
+        paramTypes.add(new AnnotatedJavaType(JavaType.STRING,
                 new ArrayList<AnnotationMetadata>()));
         if (addParamsParameter) {
             List<JavaType> typeParams = new ArrayList<JavaType>();
-            typeParams.add(JavaType.STRING_OBJECT);
+            typeParams.add(JavaType.STRING);
             typeParams.add(new JavaType("java.lang.Object"));
             JavaType hashMap = new JavaType("java.util.HashMap", 0,
                     DataType.TYPE, null, typeParams);
@@ -228,7 +229,7 @@ public class ModalDialogMetadata extends
                         builder.getImportRegistrationResolver()).concat(
                         " session = httpServletRequest.getSession();"));
         JavaType modalDialogJavaType = getJavaTypeForClassName("Dialog");
-        if (StringUtils.hasText(customModalDialogJspxName)) {
+        if (StringUtils.isNotBlank(customModalDialogJspxName)) {
             bodyBuilder
                     .appendFormalLine(modalDialogJavaType
                             .getNameIncludingTypeParameters(false,
@@ -250,7 +251,7 @@ public class ModalDialogMetadata extends
 
     private MethodMetadata methodExists(JavaSymbolName methodName,
             List<AnnotatedJavaType> parameters) {
-        return MemberFindingUtils.getMethod(memberDetails, methodName,
+        return memberDetails.getMethod(methodName,
                 AnnotatedJavaType.convertFromAnnotatedJavaTypes(parameters));
     }
 
@@ -280,19 +281,19 @@ public class ModalDialogMetadata extends
 
     private void installModalDialogSample(String modalDialog) {
         String destinationPath = pathResolver.getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/dialogs/".concat(modalDialog)
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/dialogs/".concat(modalDialog)
                         .concat(".jspx"));
         if (!fileManager.exists(destinationPath)) {
             String template;
             try {
 
-                InputStream templateInputStream = TemplateUtils.getTemplate(
+                InputStream templateInputStream = FileUtils.getInputStream(
                         getClass(), "modaldialog.jspx-template");
 
                 InputStreamReader readerFile = new InputStreamReader(
                         templateInputStream);
 
-                template = FileCopyUtils.copyToString(readerFile);
+                template = IOUtils.toString(readerFile);
             } catch (IOException ioe) {
                 throw new IllegalStateException(
                         "Unable load ITD jspx template", ioe);
@@ -302,8 +303,17 @@ public class ModalDialogMetadata extends
                     MutableFile mutableJspx = fileManager
                             .createFile(destinationPath);
                     if (mutableJspx != null) {
-                        FileCopyUtils.copy(template.getBytes(),
-                                mutableJspx.getOutputStream());
+                        InputStream inputStream = null;
+                        OutputStream outputStream = null;
+                        try { 
+                        	inputStream = IOUtils.toInputStream(template);
+                        	outputStream = mutableJspx.getOutputStream();
+                        	IOUtils.copy(inputStream, outputStream);
+                        }
+                        finally {
+                            IOUtils.closeQuietly(inputStream);
+                            IOUtils.closeQuietly(outputStream);
+                        }
                     }
                 }
             } catch (IOException ioe) {
@@ -323,7 +333,7 @@ public class ModalDialogMetadata extends
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }
@@ -333,7 +343,7 @@ public class ModalDialogMetadata extends
                 PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
                 metadataIdentificationString);
     }

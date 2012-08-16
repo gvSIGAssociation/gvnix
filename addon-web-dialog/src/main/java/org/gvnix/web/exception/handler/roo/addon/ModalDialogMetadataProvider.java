@@ -22,16 +22,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.gvnix.support.MetadataUtils;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.MemberFindingUtils;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
@@ -40,9 +39,9 @@ import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Provides {@link ModalDialogMetadata}. This type is called by Roo to retrieve
@@ -68,8 +67,6 @@ public final class ModalDialogMetadataProvider extends
 
     @Reference
     private PathResolver pathResolver;
-    @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
     @Reference
     private WebModalDialogOperations webModalDialogOperations;
 
@@ -137,14 +134,12 @@ public final class ModalDialogMetadataProvider extends
     private List<String> getDefinedModalDialogsIfAny(JavaType aspectName) {
         // Get mutableTypeDetails from controllerClass. Also checks javaType is
         // a controller
-        MutableClassOrInterfaceTypeDetails controllerDetails = MetadataUtils
-                .getPhysicalTypeDetails(aspectName, metadataService,
-                        physicalTypeMetadataProvider);
+        ClassOrInterfaceTypeDetails controllerDetails = typeLocationService.getTypeDetails(aspectName);
         if (controllerDetails == null) {
             return null;
         }
         // Test if has the @Controller
-        Assert.notNull(MemberFindingUtils.getAnnotationOfType(controllerDetails
+        Validate.notNull(MemberFindingUtils.getAnnotationOfType(controllerDetails
                 .getAnnotations(), new JavaType(
                 "org.springframework.stereotype.Controller")), aspectName
                 .getSimpleTypeName().concat(" has not @Controller annotation"));
@@ -191,7 +186,7 @@ public final class ModalDialogMetadataProvider extends
         String aspectPackage = aspectName.getPackage()
                 .getFullyQualifiedPackageName();
         String modalDialogTypePath = pathResolver.getIdentifier(
-                Path.SRC_MAIN_JAVA,
+        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                 File.separator.concat(
                         aspectPackage.replace(".", File.separator)).concat(
                         "/dialog/Dialog.java"));
@@ -209,7 +204,7 @@ public final class ModalDialogMetadataProvider extends
     }
 
     @Override
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
         return ModalDialogMetadata.createIdentifier(javaType, path);
     }
 
@@ -218,7 +213,7 @@ public final class ModalDialogMetadataProvider extends
             String metadataIdentificationString) {
         JavaType javaType = ModalDialogMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = ModalDialogMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = ModalDialogMetadata.getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 

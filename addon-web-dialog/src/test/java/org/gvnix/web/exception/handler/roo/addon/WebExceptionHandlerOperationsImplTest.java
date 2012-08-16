@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
@@ -32,7 +33,6 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.*;
-import org.springframework.roo.support.util.StringUtils;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -116,7 +116,7 @@ public class WebExceptionHandlerOperationsImplTest {
 	 * Test 1 - Encuentra excepciones instanciadas en el archivo de
 	 * configuración EXC_WEB_XML
 	 */
-	expect(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, WEB_XML_PATH))
+	expect(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), WEB_XML_PATH))
 		.andReturn(EXC_WEB_XML);
 
 	expect(fileManager.exists(EXC_WEB_XML)).andReturn(true);
@@ -145,7 +145,7 @@ public class WebExceptionHandlerOperationsImplTest {
 	 * Test 2 - No encuentra excepciones instanciadas en el archivo de
 	 * configuración NO_EXC_WEB_XML
 	 */
-	expect(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, WEB_XML_PATH))
+	expect(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), WEB_XML_PATH))
 		.andReturn(NO_EXC_WEB_XML);
 
 	expect(fileManager.exists(NO_EXC_WEB_XML)).andReturn(true);
@@ -200,7 +200,7 @@ public class WebExceptionHandlerOperationsImplTest {
 	exceptionJspxPath = EXC_JSPX_PATH.concat(
 		StringUtils.uncapitalize(expected)).concat(".jspx");
 	
-	expect(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, WEB_XML_PATH))
+	expect(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), WEB_XML_PATH))
 		.andReturn(EXC_WEB_XML);
 
 	expect(fileManager.exists(EXC_WEB_XML)).andReturn(true);
@@ -213,7 +213,7 @@ public class WebExceptionHandlerOperationsImplTest {
 
 	// Search for an existing Exception jspx mapping
 	expect(
-		pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""),
 			"WEB-INF/views/" + StringUtils.uncapitalize(expected)
 				+ ".jspx")).andReturn(exceptionJspxPath);
 
