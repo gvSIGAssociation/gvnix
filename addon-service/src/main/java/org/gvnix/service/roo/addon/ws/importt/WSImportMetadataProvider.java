@@ -34,14 +34,14 @@ import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.ProjectOperations;
 import org.w3c.dom.Element;
 
 /**
@@ -64,6 +64,9 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
     @Reference
     private SecurityService securityService;
+    
+    @Reference
+    private ProjectOperations projectOperations;
 
     protected void activate(ComponentContext context) {
 
@@ -83,7 +86,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
      * org.springframework.roo.project.Path)
      */
     @Override
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
 
         return WSImportMetadata.createIdentifier(javaType, path);
     }
@@ -100,7 +103,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
 
         JavaType javaType = WSImportMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = WSImportMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = WSImportMetadata.getPath(metadataIdentificationString);
         String physicalTypeIdentifier = PhysicalTypeIdentifier
                 .createIdentifier(javaType, path);
 
@@ -124,7 +127,7 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
         WSImportMetadata metadata = null;
 
         // Import service if project has required prerequisites
-        if (OperationUtils.isProjectAvailable(metadataService)) {
+        if (OperationUtils.isProjectAvailable(metadataService, projectOperations)) {
 
             // Check if Web Service definition is correct.
             PhysicalTypeDetails physicalTypeDetails = governorPhysicalTypeMetadata
@@ -144,9 +147,8 @@ public class WSImportMetadataProvider extends AbstractItdMetadataProvider {
             }
 
             // Get upstreamDepency Class to check.
-            AnnotationMetadata annotation = MemberFindingUtils
-                    .getTypeAnnotation(governorTypeDetails, new JavaType(
-                            GvNIXWebServiceProxy.class.getName()));
+            AnnotationMetadata annotation = governorTypeDetails
+                    .getTypeAnnotation(new JavaType(GvNIXWebServiceProxy.class.getName()));
 
             // Wsdl location
             StringAttributeValue url = (StringAttributeValue) annotation

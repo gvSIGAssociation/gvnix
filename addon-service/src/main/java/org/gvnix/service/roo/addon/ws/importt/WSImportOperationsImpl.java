@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -47,11 +49,9 @@ import org.springframework.roo.classpath.details.annotations.StringAttributeValu
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
 import org.w3c.dom.Document;
 
 /**
@@ -98,7 +98,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
         // Service class path
         String fileLocation = projectOperations.getPathResolver()
                 .getIdentifier(
-                        Path.SRC_MAIN_JAVA,
+                		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                         serviceClass.getFullyQualifiedTypeName()
                                 .replace('.', '/').concat(".java"));
 
@@ -116,7 +116,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
         // Check if import annotation is already defined
         if (javaParserService.isAnnotationIntroduced(
                 GvNIXWebServiceProxy.class.getName(),
-                typeLocationService.getClassOrInterface(serviceClass))) {
+                typeLocationService.getTypeDetails(serviceClass))) {
 
             logger.log(Level.WARNING,
                     "Provided class is already importing a service");
@@ -156,14 +156,14 @@ public class WSImportOperationsImpl implements WSImportOperations {
 
         // get class
         ClassOrInterfaceTypeDetails importedServiceDetails = typeLocationService
-                .getClassOrInterface(importedServiceClass);
+                .getTypeDetails(importedServiceClass);
 
         // checks if already has security annotation
         boolean alreadyAnnotated = javaParserService
                 .isAnnotationIntroduced(
                         GvNIXWebServiceSecurity.class.getName(),
                         importedServiceDetails);
-        Assert.isTrue(
+        Validate.isTrue(
                 !alreadyAnnotated,
                 importedServiceDetails.getName().toString()
                         .concat(" already has ")
@@ -173,15 +173,15 @@ public class WSImportOperationsImpl implements WSImportOperations {
         // checks if class is really a imported service and if it's a
         // RPC-Encoded
         Document wsdl = getWSDLFromClass(importedServiceClass);
-        Assert.notNull(wsdl, importedServiceDetails.getName().toString()
+        Validate.notNull(wsdl, importedServiceDetails.getName().toString()
                 .concat(" is not a imported service"));
-        Assert.isTrue(WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
+        Validate.isTrue(WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
                 "Only RPC-Encoded services is supported");
 
         // Check if certificate file exist
-        Assert.isTrue(certificate.exists(), certificate.getAbsolutePath()
+        Validate.isTrue(certificate.exists(), certificate.getAbsolutePath()
                 .concat(" not found"));
-        Assert.isTrue(certificate.isFile(), certificate.getAbsolutePath()
+        Validate.isTrue(certificate.isFile(), certificate.getAbsolutePath()
                 .concat(" is not a file"));
 
         // Check certificate extension
@@ -242,34 +242,21 @@ public class WSImportOperationsImpl implements WSImportOperations {
                     .getAbsolutePath());
         }
 
-        // Copy certificate file to project resource folder
-        MutableFile targetCertificatedMutableFile = fileManager
-                .createFile(targetCertificated.getAbsolutePath());
-        InputStream is = null;
-        OutputStream os = null;
-        try {
-            is = new FileInputStream(certificate);
-            os = targetCertificatedMutableFile.getOutputStream();
-
-            FileCopyUtils.copy(is, os);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception e) {
-                    // Noting to do
-                }
-            }
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (Exception e) {
-                    // Noting to do
-                }
-            }
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try { 
+            inputStream = new FileInputStream(certificate);
+            outputStream = fileManager.createFile(targetCertificated.getAbsolutePath()).getOutputStream();
+            IOUtils.copy(inputStream, outputStream);
         }
+        catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
+        }
+
         return targetCertificated;
     }
 
@@ -304,7 +291,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
         String baseNamePath = targetPath.replace(certificate.getName(), "");
 
         targetPath = projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_RESOURCES, targetPath);
+        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), targetPath);
 
         int index = 1;
 
@@ -312,7 +299,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
             targetPath = baseNamePath.concat(certificateName)
                     .concat("_" + index).concat(extension);
             targetPath = projectOperations.getPathResolver().getIdentifier(
-                    Path.SRC_MAIN_RESOURCES, targetPath);
+            		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), targetPath);
             index++;
         }
         return new File(targetPath);
@@ -327,7 +314,7 @@ public class WSImportOperationsImpl implements WSImportOperations {
     public Document getWSDLFromClass(JavaType serviceClass) {
         // get class
         ClassOrInterfaceTypeDetails importedServiceDetails = typeLocationService
-                .getClassOrInterface(serviceClass);
+                .getTypeDetails(serviceClass);
 
         AnnotationMetadata annotation = javaParserService.getAnnotation(
                 GvNIXWebServiceProxy.class.getName(), importedServiceDetails);

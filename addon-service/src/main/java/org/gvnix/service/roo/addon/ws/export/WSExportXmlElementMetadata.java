@@ -22,6 +22,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElement;
 import org.gvnix.service.roo.addon.annotations.GvNIXXmlElementField;
@@ -46,8 +47,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * <p>
@@ -75,15 +75,14 @@ public class WSExportXmlElementMetadata extends
         super(id, aspectName, physicalType);
 
         // Validate metadata identifier is of type gvNIX xml element metadata
-        Assert.isTrue(isValid(id), "Metadata identification string '" + id
+        Validate.isTrue(isValid(id), "Metadata identification string '" + id
                 + "' does not appear to be valid");
         if (!isValid()) {
             return;
         }
 
         // Get the gvNIX xml element annotation
-        AnnotationMetadata annotation = MemberFindingUtils.getTypeAnnotation(
-                governorTypeDetails,
+        AnnotationMetadata annotation = governorTypeDetails.getTypeAnnotation(
                 new JavaType(GvNIXXmlElement.class.getName()));
         if (annotation != null) {
 
@@ -137,7 +136,7 @@ public class WSExportXmlElementMetadata extends
         JavaType returnType = new JavaType(Object.class.getName());
         List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>(1);
         paramTypes.add(new AnnotatedJavaType(new JavaType(
-                "com.sun.xml.bind.CycleRecoverable.Context"), null));
+                "com.sun.xml.bind.CycleRecoverable.Context"), new ArrayList<AnnotationMetadata>()));
         List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>(1);
         paramNames.add(new JavaSymbolName("context"));
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -282,8 +281,7 @@ public class WSExportXmlElementMetadata extends
      */
     public boolean hasAnnotation(String annotation) {
         JavaType javaType = new JavaType(annotation);
-        AnnotationMetadata result = MemberFindingUtils
-                .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+        AnnotationMetadata result = governorTypeDetails.getAnnotation(javaType);
 
         return result != null;
     }
@@ -465,14 +463,14 @@ public class WSExportXmlElementMetadata extends
                 XML_ELEMENT_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
 
         // Get path related to gvNIX xml element physical type idenfifier
         return PhysicalTypeIdentifierNamingUtils.getPath(XML_ELEMENT_STRING,
                 metadataIdentificationString);
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
 
         // Get gvNIX xml element physical type idenfifier for java type in path
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(

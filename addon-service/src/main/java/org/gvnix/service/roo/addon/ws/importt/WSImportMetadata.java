@@ -35,13 +35,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceProxy;
 import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.util.WsdlParserUtils;
 import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
@@ -54,8 +54,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -97,7 +96,7 @@ public class WSImportMetadata extends
 
         this.securityService = secuirityService;
 
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be valid");
 
         if (!isValid()) {
@@ -105,9 +104,8 @@ public class WSImportMetadata extends
         }
 
         // Create the metadata.
-        AnnotationMetadata annotationMetadata = MemberFindingUtils
-                .getTypeAnnotation(governorTypeDetails, new JavaType(
-                        GvNIXWebServiceProxy.class.getName()));
+        AnnotationMetadata annotationMetadata = governorTypeDetails
+                .getTypeAnnotation(new JavaType(GvNIXWebServiceProxy.class.getName()));
 
         if (annotationMetadata != null) {
 
@@ -240,7 +238,7 @@ public class WSImportMetadata extends
             for (Parameter parameter : parameters) {
 
                 javaTypes.add(new AnnotatedJavaType(getJavaTypeByName(root,
-                        parameter.getType().toString()), null));
+                        parameter.getType().toString()), new ArrayList<AnnotationMetadata>()));
                 javaNames.add(new JavaSymbolName(parameter.getId().toString()));
             }
         }
@@ -481,12 +479,12 @@ public class WSImportMetadata extends
                 WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(
                 WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 WEB_SERVICE_TYPE_STRING, javaType, path);
     }

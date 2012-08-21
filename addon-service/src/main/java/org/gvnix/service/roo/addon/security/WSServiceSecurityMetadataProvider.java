@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -40,9 +41,9 @@ import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -168,13 +169,13 @@ public final class WSServiceSecurityMetadataProvider extends
 
         // Checks for certificated file
         String certificatePath = projectOperations.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_RESOURCES,
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
                         metadata.getCertificatePath());
 
-        Assert.isTrue(
+        Validate.isTrue(
                 fileManager.exists(certificatePath),
                 "Missing certificated file '"
-                        .concat(Path.SRC_MAIN_RESOURCES.getName()).concat("/")
+                        .concat(Path.SRC_MAIN_RESOURCES.name()).concat("/")
                         .concat(metadata.getCertificatePath()).concat("' for ")
                         .concat(governorPhysicalTypeMetadata.getId()));
 
@@ -195,7 +196,7 @@ public final class WSServiceSecurityMetadataProvider extends
 
         // Resolve absolute path
         String propertiesPath = projectOperations.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_RESOURCES,
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""),
                         metadata.getPropertiesPath());
 
         OutputStream os;
@@ -295,7 +296,7 @@ public final class WSServiceSecurityMetadataProvider extends
         // Gets WSImportMetadata id
         JavaType javaType = WSServiceSecurityMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = WSServiceSecurityMetadata
+        LogicalPath path = WSServiceSecurityMetadata
                 .getPath(metadataIdentificationString);
         String wsImportMetadataId = WSImportMetadata.createIdentifier(javaType,
                 path);
@@ -304,7 +305,7 @@ public final class WSServiceSecurityMetadataProvider extends
         WSImportMetadata wsImportMetadata = (WSImportMetadata) metadataService
                 .get(wsImportMetadataId);
 
-        Assert.notNull(wsImportMetadata,
+        Validate.notNull(wsImportMetadata,
                 "Governor must be gvNIX WS import. Can't find metadata '"
                         .concat(wsImportMetadataId).concat("'"));
 
@@ -314,9 +315,9 @@ public final class WSServiceSecurityMetadataProvider extends
         // loads wsdl
         Document wsdl = securityService.getWsdl(wsdlLocation);
 
-        Assert.notNull(wsdl, "Can't get WSDl from ".concat(wsdlLocation));
+        Validate.notNull(wsdl, "Can't get WSDl from ".concat(wsdlLocation));
 
-        Assert.isTrue(WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
+        Validate.isTrue(WsdlParserUtils.isRpcEncoded(wsdl.getDocumentElement()),
                 "Only RPC-Encoded services is supported");
 
         // Gets first port
@@ -339,13 +340,13 @@ public final class WSServiceSecurityMetadataProvider extends
             String metadataIdentificationString) {
         JavaType javaType = WSServiceSecurityMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = WSServiceSecurityMetadata
+        LogicalPath path = WSServiceSecurityMetadata
                 .getPath(metadataIdentificationString);
         return PhysicalTypeIdentifier.createIdentifier(javaType, path);
     }
 
     @Override
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
         return WSServiceSecurityMetadata.createIdentifier(javaType, path);
     }
 

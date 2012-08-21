@@ -18,8 +18,8 @@
  */
 package org.gvnix.service.roo.addon.ws.export;
 
-import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -31,16 +31,14 @@ import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.project.LogicalPath;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Metadata provider for {@link WSExportExceptionMetadata}
@@ -60,9 +58,6 @@ public class WSExportExceptionMetadataProvider extends
     @Reference
     private WSExportValidationService wSExportValidationService;
 
-    private static Logger logger = Logger
-            .getLogger(WSExportExceptionMetadataProvider.class.getName());
-
     protected void activate(ComponentContext context) {
         // Ensure we're notified of all metadata related to physical Java types,
         // in particular their initial creation
@@ -80,7 +75,7 @@ public class WSExportExceptionMetadataProvider extends
      * org.springframework.roo.project.Path)
      */
     @Override
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
         return WSExportExceptionMetadata.createIdentifier(javaType, path);
     }
 
@@ -95,7 +90,7 @@ public class WSExportExceptionMetadataProvider extends
             String metadataIdentificationString) {
         JavaType javaType = WSExportExceptionMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = WSExportExceptionMetadata
+        LogicalPath path = WSExportExceptionMetadata
                 .getPath(metadataIdentificationString);
         String physicalTypeIdentifier = PhysicalTypeIdentifier
                 .createIdentifier(javaType, path);
@@ -136,9 +131,8 @@ public class WSExportExceptionMetadataProvider extends
         }
 
         // Gets fault annotation
-        AnnotationMetadata annotationMetadata = MemberFindingUtils
-                .getTypeAnnotation(governorTypeDetails, new JavaType(
-                        GvNIXWebFault.class.getName()));
+        AnnotationMetadata annotationMetadata = governorTypeDetails
+                .getTypeAnnotation(new JavaType(GvNIXWebFault.class.getName()));
 
         // Checks attributes
         boolean correctGvNIXWebFaultAnnotation = checkGvNixWebFaultAnnotationAttributes(
@@ -177,9 +171,9 @@ public class WSExportExceptionMetadataProvider extends
                 .getAttribute(new JavaSymbolName("name"));
 
         correctName = (nameAttributeValue != null)
-                && StringUtils.hasText(nameAttributeValue.getValue());
+                && StringUtils.isNotBlank(nameAttributeValue.getValue());
 
-        Assert.isTrue(correctName,
+        Validate.isTrue(correctName,
                 "@GvNIXWebFault annotation attribute value 'name' in '"
                         + governorTypeDetails.getName() + "' must be defined.");
 
@@ -188,12 +182,12 @@ public class WSExportExceptionMetadataProvider extends
                 .getAttribute(new JavaSymbolName("targetNamespace"));
 
         correctNamespace = (namespaceAttributeValue != null)
-                && StringUtils.hasText(namespaceAttributeValue.getValue())
+                && StringUtils.isNotBlank(namespaceAttributeValue.getValue())
                 && wSExportValidationService
                         .checkNamespaceFormat(namespaceAttributeValue
                                 .getValue());
 
-        Assert.isTrue(
+        Validate.isTrue(
                 correctNamespace,
                 "@GvNIXWebFault annotation attribute value 'targetNamespace' in '"
                         + governorTypeDetails.getName()
@@ -204,11 +198,11 @@ public class WSExportExceptionMetadataProvider extends
                 .getAttribute(new JavaSymbolName("faultBean"));
 
         correctFaultBean = (faultBeanAttributeValue != null)
-                && StringUtils.hasText(faultBeanAttributeValue.getValue())
+                && StringUtils.isNotBlank(faultBeanAttributeValue.getValue())
                 && governorTypeDetails.getName().getFullyQualifiedTypeName()
                         .contentEquals(faultBeanAttributeValue.getValue());
 
-        Assert.isTrue(
+        Validate.isTrue(
                 correctFaultBean,
                 "@GvNIXWebFault annotation attribute value 'faultBean' in '"
                         + governorTypeDetails.getName()

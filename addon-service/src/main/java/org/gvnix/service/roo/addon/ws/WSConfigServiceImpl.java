@@ -23,11 +23,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -45,15 +49,16 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.process.manager.ProcessManager;
 import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.project.maven.Pom;
+import org.springframework.roo.support.util.DomUtils;
+import org.springframework.roo.support.util.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -156,7 +161,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Checks for src/main/webapp/WEB-INF/cxf-PROJECT_ID.xml
         return projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, relativePath);
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), relativePath);
     }
 
     /**
@@ -182,10 +187,10 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Project metadata from project identifier
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
-        Assert.isTrue(projectMetadata != null, "Project metadata required");
+                .get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
+        Validate.isTrue(projectMetadata != null, "Project metadata required");
 
-        return projectMetadata.getProjectName();
+        return projectOperations.getProjectName(projectOperations.getFocusedModuleName());
     }
 
     /**
@@ -205,14 +210,20 @@ public class WSConfigServiceImpl implements WSConfigService {
         }
 
         // Create the configuration file from a template
-        MutableFile file = fileManager.createFile(cxfFilePath);
-        InputStream template = TemplateUtils.getTemplate(getClass(),
-                "cxf-template.xml");
-        try {
-            FileCopyUtils.copy(template, file.getOutputStream());
-        } catch (Exception e) {
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try { 
+            inputStream = FileUtils.getInputStream(getClass(), "cxf-template.xml");
+            outputStream = fileManager.createFile(cxfFilePath).getOutputStream();
+            IOUtils.copy(inputStream, outputStream);
+        }
+        catch (Exception e) {
             // Error writting configuration file to disk
             throw new IllegalStateException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
 
         // TODO What is it for ?
@@ -230,7 +241,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Get project to check installed dependencies
         ProjectMetadata project = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
+                .get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
         if (project == null) {
             return false;
         }
@@ -239,7 +250,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         for (Element dependency : getDependencies(type)) {
 
             // Some dependency not registered: all dependencies not installed
-            if (!project.isDependencyRegistered(new Dependency(dependency))) {
+        	Pom pom = project.getPom();
+            if (!pom.isDependencyRegistered(new Dependency(dependency))) {
                 return false;
             }
         }
@@ -302,9 +314,9 @@ public class WSConfigServiceImpl implements WSConfigService {
     protected List<Element> getDependencies(WsType type) {
 
         // Get the file with dependencies list
-        InputStream dependencies = TemplateUtils.getTemplate(getClass(),
+        InputStream dependencies = FileUtils.getInputStream(getClass(),
                 getDependenciesFileName(type));
-        Assert.notNull(dependencies, "Can't adquire dependencies file " + type);
+        Validate.notNull(dependencies, "Can't adquire dependencies file " + type);
 
         // Find dependencies element list into file
         return XmlUtils.findElements("/dependencies/dependency",
@@ -330,7 +342,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Get all dependencies and add them to project (pom.xml)
         for (Element dependency : getDependencies(type)) {
-            projectOperations.addDependency(new Dependency(dependency));
+            projectOperations.addDependency(projectOperations.getFocusedModuleName(), new Dependency(dependency));
         }
     }
 
@@ -367,7 +379,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
             properties = XmlUtils
                     .findElements("/configuration/gvnix/properties/*",
-                            XmlUtils.getConfiguration(this.getClass(),
+                            XmlUtils.getRootElement(this.getClass(),
                                     "properties.xml"));
             break;
 
@@ -376,7 +388,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
             properties = XmlUtils.findElements(
                     "/configuration/gvnix/properties/*", XmlUtils
-                            .getConfiguration(this.getClass(),
+                            .getRootElement(this.getClass(),
                                     "properties-axis.xml"));
             break;
         }
@@ -518,7 +530,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     protected String getWebConfigFilePath() {
 
         return projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_WEBAPP, "WEB-INF/web.xml");
+        		LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/web.xml");
     }
 
     /**
@@ -527,7 +539,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     public boolean publishClassAsWebService(JavaType className,
             AnnotationMetadata annotationMetadata) {
 
-        Assert.isTrue(annotationMetadata != null, "Annotation '"
+        Validate.isTrue(annotationMetadata != null, "Annotation '"
                 + annotationMetadata.getAnnotationType()
                         .getFullyQualifiedTypeName() + "' in class '"
                 + className.getFullyQualifiedTypeName()
@@ -556,9 +568,9 @@ public class WSConfigServiceImpl implements WSConfigService {
         StringAttributeValue serviceName = (StringAttributeValue) annotationMetadata
                 .getAttribute(new JavaSymbolName("serviceName"));
 
-        Assert.isTrue(
+        Validate.isTrue(
                 serviceName != null
-                        && StringUtils.hasText(serviceName.getValue()),
+                        && StringUtils.isNotBlank(serviceName.getValue()),
                 "Annotation attribute 'serviceName' in "
                         + className.getFullyQualifiedTypeName()
                         + "' must be defined.");
@@ -566,8 +578,8 @@ public class WSConfigServiceImpl implements WSConfigService {
         StringAttributeValue address = (StringAttributeValue) annotationMetadata
                 .getAttribute(new JavaSymbolName("address"));
 
-        Assert.isTrue(
-                address != null && StringUtils.hasText(address.getValue()),
+        Validate.isTrue(
+                address != null && StringUtils.isNotBlank(address.getValue()),
                 "Annotation attribute 'address' in "
                         + className.getFullyQualifiedTypeName()
                         + "' must be defined.");
@@ -575,9 +587,9 @@ public class WSConfigServiceImpl implements WSConfigService {
         StringAttributeValue fullyQualifiedTypeName = (StringAttributeValue) annotationMetadata
                 .getAttribute(new JavaSymbolName("fullyQualifiedTypeName"));
 
-        Assert.isTrue(
+        Validate.isTrue(
                 fullyQualifiedTypeName != null
-                        && StringUtils.hasText(fullyQualifiedTypeName
+                        && StringUtils.isNotBlank(fullyQualifiedTypeName
                                 .getValue()),
                 "Annotation attribute 'fullyQualifiedTypeName' in "
                         + className.getFullyQualifiedTypeName()
@@ -586,7 +598,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         BooleanAttributeValue exported = (BooleanAttributeValue) annotationMetadata
                 .getAttribute(new JavaSymbolName("exported"));
 
-        Assert.isTrue(exported != null, "Annotation attribute 'exported' in "
+        Validate.isTrue(exported != null, "Annotation attribute 'exported' in "
                 + className.getFullyQualifiedTypeName() + "' must be defined.");
 
         String cxfXmlPath = getCxfConfigAbsoluteFilePath();
@@ -642,7 +654,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         Element updateClassService = classService;
                         String idValue = classService.getAttribute("id");
 
-                        if (!StringUtils.hasText(idValue)
+                        if (!StringUtils.isNotBlank(idValue)
                                 || !idValue.contentEquals(serviceName
                                         .getValue().concat("Impl"))) {
                             updateClassService.setAttribute("id", serviceName
@@ -673,7 +685,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                             updateClassService.setAttribute("class",
                                     className.getFullyQualifiedTypeName());
 
-                            if (!StringUtils.hasText(idValue)
+                            if (!StringUtils.isNotBlank(idValue)
                                     || !idValue.contentEquals(serviceName
                                             .getValue().concat("Impl"))) {
                                 updateClassService.setAttribute("id",
@@ -710,7 +722,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         Element updateClassService = classService;
                         String idValue = classService.getAttribute("id");
 
-                        if (!StringUtils.hasText(idValue)
+                        if (!StringUtils.isNotBlank(idValue)
                                 || !idValue.contentEquals(serviceName
                                         .getValue().concat("Impl"))) {
                             updateClassService.setAttribute("id", serviceName
@@ -739,7 +751,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                     Element updateIdService = idService;
                     String classNameAttribute = idService.getAttribute("class");
 
-                    if (!StringUtils.hasText(classNameAttribute)
+                    if (!StringUtils.isNotBlank(classNameAttribute)
                             || !classNameAttribute.contentEquals(className
                                     .getFullyQualifiedTypeName())) {
                         updateIdService.setAttribute("class",
@@ -800,7 +812,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                     Element updateAddressEndpoint = addressEndpoint;
                     String idAttribute = addressEndpoint.getAttribute("id");
 
-                    if (!StringUtils.hasText(idAttribute)
+                    if (!StringUtils.isNotBlank(idAttribute)
                             || !idAttribute.contentEquals(serviceName
                                     .getValue())) {
 
@@ -838,7 +850,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                     String addressAttribute = idEndpoint
                             .getAttribute("address");
 
-                    if (!StringUtils.hasText(addressAttribute)
+                    if (!StringUtils.isNotBlank(addressAttribute)
                             || !addressAttribute.contentEquals("/"
                                     .concat(address.getValue()))) {
 
@@ -891,11 +903,11 @@ public class WSConfigServiceImpl implements WSConfigService {
     public String convertPackageToTargetNamespace(String packageName) {
 
         // If there isn't package name in the class, return a blank String.
-        if (!StringUtils.hasText(packageName)) {
+        if (!StringUtils.isNotBlank(packageName)) {
             return "";
         }
 
-        String[] delimitedString = StringUtils.delimitedListToStringArray(
+        String[] delimitedString = StringUtils.split(
                 packageName, ".");
         List<String> revertedList = new ArrayList<String>();
 
@@ -905,8 +917,8 @@ public class WSConfigServiceImpl implements WSConfigService {
             revertedList.add(delimitedString[i]);
         }
 
-        revertedString = StringUtils.collectionToDelimitedString(revertedList,
-                ".");
+        revertedString = collectionToDelimitedString(revertedList,
+                ".", "", "");
 
         revertedString = "http://".concat(revertedString).concat("/");
 
@@ -922,7 +934,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Get pom
         String pomPath = getPomFilePath();
-        Assert.isTrue(pomPath != null,
+        Validate.isTrue(pomPath != null,
                 "Cxf configuration file not found, export again the service.");
         MutableFile pomMutableFile = fileManager.updateFile(pomPath);
         Document pom = getInputDocument(pomMutableFile.getInputStream());
@@ -1031,7 +1043,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         }
 
         // Checks if already exists the executions to update or create.
-        Element oldExecutions = XmlUtils.findFirstElementByName("executions",
+        Element oldExecutions = DomUtils.findFirstElementByName("executions",
                 jaxWsPlugin);
 
         Element newExecutions;
@@ -1127,9 +1139,9 @@ public class WSConfigServiceImpl implements WSConfigService {
     protected void addPlugin() {
 
         // Get the plugin from the template and write into de project (pom.xml)
-        projectOperations.updateBuildPlugin(new Plugin(XmlUtils
+        projectOperations.updateBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(XmlUtils
                 .findFirstElement("/jaxws-plugin/plugin", XmlUtils
-                        .getConfiguration(this.getClass(),
+                        .getRootElement(this.getClass(),
                                 "dependencies-export-jaxws-plugin.xml"))));
 
         // What is this for ?
@@ -1142,9 +1154,9 @@ public class WSConfigServiceImpl implements WSConfigService {
     public void installWsdl2javaPlugin() {
 
         // Add plugin and write this modifications to disk
-        projectOperations.updateBuildPlugin(new Plugin(XmlUtils
+        projectOperations.updateBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(XmlUtils
                 .findFirstElement("/cxf-codegen/cxf-codegen-plugin/plugin",
-                        XmlUtils.getConfiguration(this.getClass(),
+                        XmlUtils.getRootElement(this.getClass(),
                                 "dependencies-export-wsdl2java-plugin.xml"))));
         fileManager.commit();
     }
@@ -1198,7 +1210,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Get pom.xml
         String pomPath = getPomFilePath();
-        Assert.notNull(pomPath, "pom.xml configuration file not found.");
+        Validate.notNull(pomPath, "pom.xml configuration file not found.");
 
         // Get a mutable pom.xml reference to modify it
         MutableFile pomMutableFile = fileManager.updateFile(pomPath);
@@ -1212,7 +1224,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         root);
 
         // If plugin element not exists, error message
-        Assert.notNull(codegenWsPlugin,
+        Validate.notNull(codegenWsPlugin,
                 "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Checks if already exists the execution.
@@ -1225,7 +1237,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                 pom, wsdlDocument, wsdlLocation);
 
         // Checks if exists executions.
-        Element oldExecutions = XmlUtils.findFirstElementByName("executions",
+        Element oldExecutions = DomUtils.findFirstElementByName("executions",
                 codegenWsPlugin);
 
         Element newExecutions;
@@ -1378,7 +1390,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Get pom.xml
         String pomPath = getPomFilePath();
-        Assert.notNull(pomPath, "pom.xml configuration file not found.");
+        Validate.notNull(pomPath, "pom.xml configuration file not found.");
 
         // Get a mutable pom.xml reference to modify it
         MutableFile pomMutableFile = null;
@@ -1400,7 +1412,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         root);
 
         // If plugin element not exists, message error
-        Assert.notNull(codegenWsPlugin,
+        Validate.notNull(codegenWsPlugin,
                 "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Checks if already exists the execution.
@@ -1410,7 +1422,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         if (oldGenerateSourcesCxfServer != null) {
 
-            Element executionPhase = XmlUtils.findFirstElementByName("phase",
+            Element executionPhase = DomUtils.findFirstElementByName("phase",
                     oldGenerateSourcesCxfServer);
 
             if (executionPhase != null) {
@@ -1463,17 +1475,17 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Get plugin template
         Element pluginTemplate = XmlUtils.findFirstElement(
-                "/codegen-plugin/plugin", XmlUtils.getConfiguration(
+                "/codegen-plugin/plugin", XmlUtils.getRootElement(
                         this.getClass(),
                         "dependencies-import-codegen-plugin.xml"));
 
         // Add plugin
-        projectOperations.updateBuildPlugin(new Plugin(pluginTemplate));
+        projectOperations.updateBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(pluginTemplate));
         fileManager.commit();
 
         // Get pom.xml
         String pomPath = getPomFilePath();
-        Assert.notNull(pomPath, "pom.xml configuration file not found.");
+        Validate.notNull(pomPath, "pom.xml configuration file not found.");
 
         // Get a mutable pom.xml reference to modify it
         MutableFile pomMutableFile = fileManager.updateFile(pomPath);
@@ -1488,7 +1500,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         root);
 
         // If plugin element not exists, message error
-        Assert.notNull(plugin,
+        Validate.notNull(plugin,
                 "Codegen plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Check URL connection and WSDL format
@@ -1515,7 +1527,7 @@ public class WSConfigServiceImpl implements WSConfigService {
         }
 
         // Create global executions section if not exists already
-        Element executions = XmlUtils.findFirstElementByName("executions",
+        Element executions = DomUtils.findFirstElementByName("executions",
                 plugin);
         if (executions == null) {
             executions = pom.createElement("executions");
@@ -1542,14 +1554,14 @@ public class WSConfigServiceImpl implements WSConfigService {
         // defaultOptions.
         // Configuration, sourceRoot, wsdlOptions and defaultOptions are
         // created if not exists.
-        Element configuration = XmlUtils.findFirstElementByName(
+        Element configuration = DomUtils.findFirstElementByName(
                 "configuration", execution);
         if (configuration == null) {
 
             configuration = pom.createElement("configuration");
             execution.appendChild(configuration);
         }
-        Element sourceRoot = XmlUtils.findFirstElementByName("sourceRoot",
+        Element sourceRoot = DomUtils.findFirstElementByName("sourceRoot",
                 configuration);
         if (sourceRoot == null) {
 
@@ -1558,14 +1570,14 @@ public class WSConfigServiceImpl implements WSConfigService {
                     .setTextContent("${basedir}/target/generated-sources/client");
             configuration.appendChild(sourceRoot);
         }
-        Element defaultOptions = XmlUtils.findFirstElementByName(
+        Element defaultOptions = DomUtils.findFirstElementByName(
                 "defaultOptions", configuration);
         if (defaultOptions == null) {
 
             appendDefaultOptions(pom, configuration);
 
         }
-        Element wsdlOptions = XmlUtils.findFirstElementByName("wsdlOptions",
+        Element wsdlOptions = DomUtils.findFirstElementByName("wsdlOptions",
                 configuration);
         if (wsdlOptions == null) {
 
@@ -1614,16 +1626,16 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Get plugin template
         Element plugin = XmlUtils.findFirstElement("/axistools-plugin/plugin",
-                XmlUtils.getConfiguration(this.getClass(),
+                XmlUtils.getRootElement(this.getClass(),
                         "dependencies-import-axistools-plugin.xml"));
 
         // Add plugin
-        projectOperations.updateBuildPlugin(new Plugin(plugin));
+        projectOperations.updateBuildPlugin(projectOperations.getFocusedModuleName(), new Plugin(plugin));
         fileManager.commit();
 
         // Get pom.xml
         String pomPath = getPomFilePath();
-        Assert.notNull(pomPath, "pom.xml configuration file not found.");
+        Validate.notNull(pomPath, "pom.xml configuration file not found.");
 
         // Get a mutable pom.xml reference to modify it
         MutableFile pomMutableFile = fileManager.updateFile(pomPath);
@@ -1638,7 +1650,7 @@ public class WSConfigServiceImpl implements WSConfigService {
                         root);
 
         // If plugin element not exists, message error
-        Assert.notNull(axistoolsPlugin,
+        Validate.notNull(axistoolsPlugin,
                 "Axistools plugin is not defined in the pom.xml, relaunch again this command.");
 
         // Check URL connection and WSDL format
@@ -1665,7 +1677,7 @@ public class WSConfigServiceImpl implements WSConfigService {
 
         // Access configuration > urls element.
         // Configuration and urls are created if not exists.
-        Element executions = XmlUtils.findFirstElementByName("executions",
+        Element executions = DomUtils.findFirstElementByName("executions",
                 axistoolsPlugin);
         if (executions == null) {
 
@@ -1738,9 +1750,9 @@ public class WSConfigServiceImpl implements WSConfigService {
     public void mvn(String parameters, String message) throws IOException {
 
         PathResolver pathResolver = projectOperations.getPathResolver();
-        File root = new File(pathResolver.getRoot(Path.ROOT));
+        File root = new File(pathResolver.getRoot(LogicalPath.getInstance(Path.ROOT, "")));
 
-        Assert.isTrue(root.isDirectory() && root.exists(),
+        Validate.isTrue(root.isDirectory() && root.exists(),
                 "Project root does not currently exist as a directory ('"
                         + root.getCanonicalPath() + "')");
 
@@ -1837,16 +1849,16 @@ public class WSConfigServiceImpl implements WSConfigService {
     private String getPomFilePath() {
 
         // Project ID
-        String prjId = ProjectMetadata.getProjectIdentifier();
+        String prjId = ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName());
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
                 .get(prjId);
-        Assert.isTrue(projectMetadata != null, "Project metadata required");
+        Validate.isTrue(projectMetadata != null, "Project metadata required");
 
         String pomFileName = "pom.xml";
 
         // Checks for pom.xml
         String pomPath = projectOperations.getPathResolver().getIdentifier(
-                Path.ROOT, pomFileName);
+        		LogicalPath.getInstance(Path.ROOT, ""), pomFileName);
 
         boolean pomInstalled = fileManager.exists(pomPath);
 
@@ -1858,5 +1870,29 @@ public class WSConfigServiceImpl implements WSConfigService {
             return null;
         }
     }
+    
+	/**
+	 * Convenience method to return a Collection as a delimited (e.g. CSV)
+	 * String. E.g. useful for <code>toString()</code> implementations.
+	 * @param coll the Collection to display
+	 * @param delim the delimiter to use (probably a ",")
+	 * @param prefix the String to start each element with
+	 * @param suffix the String to end each element with
+	 * @return the delimited String
+	 */
+	public static String collectionToDelimitedString(List coll, String delim, String prefix, String suffix) {
+		if (coll == null || coll.size() == 0) {
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		Iterator it = coll.iterator();
+		while (it.hasNext()) {
+			sb.append(prefix).append(it.next()).append(suffix);
+			if (it.hasNext()) {
+				sb.append(delim);
+			}
+		}
+		return sb.toString();
+	}
 
 }

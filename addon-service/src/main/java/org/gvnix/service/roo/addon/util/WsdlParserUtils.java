@@ -30,9 +30,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.gvnix.service.roo.addon.security.SecurityService;
 import org.gvnix.service.roo.addon.ws.WSConfigService.WsType;
-import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -144,7 +145,7 @@ public class WsdlParserUtils {
 
         // Get the namespace attribute from root wsdl
         String namespace = root.getAttribute(TARGET_NAMESPACE_ATTRIBUTE);
-        Assert.hasText(namespace, "Namespace has no text");
+        StringUtils.isNotBlank(namespace);
 
         return namespace;
     }
@@ -163,7 +164,7 @@ public class WsdlParserUtils {
      */
     public static String getTargetNamespaceRelatedPackage(Element root) {
 
-        Assert.notNull(root, "Wsdl root element required");
+    	Validate.notNull(root, "Wsdl root element required");
 
         // Get the namespace attribute from root wsdl
         String namespace = getTargetNamespace(root);
@@ -364,7 +365,7 @@ public class WsdlParserUtils {
      */
     public static Element findFirstCompatibleAddress(Element root) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         // Find all address elements
         List<Element> addresses = XmlUtils.findElements(ADDRESSES_XPATH, root);
@@ -419,9 +420,9 @@ public class WsdlParserUtils {
     private static Element getReferencedElement(Element root,
             List<Element> elements, String reference) {
 
-        Assert.notNull(root, "Wsdl root element required");
-        Assert.notNull(elements, "Elements list required");
-        Assert.notNull(reference, "Reference required");
+        Validate.notNull(root, "Wsdl root element required");
+        Validate.notNull(elements, "Elements list required");
+        Validate.notNull(reference, "Reference required");
 
         String prefix = getNamespace(reference);
         String sufix = getLocalName(reference);
@@ -455,7 +456,7 @@ public class WsdlParserUtils {
     public static String getServiceClassPath(Element root,
             WsType sense) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         // Build the classpath related to the namespace
         String path = getTargetNamespaceRelatedPackage(root);
@@ -485,7 +486,7 @@ public class WsdlParserUtils {
     public static String getPortTypeClassPath(Element root,
             WsType sense) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         // Build the classpath related to the namespace
         String path = getTargetNamespaceRelatedPackage(root);
@@ -530,7 +531,7 @@ public class WsdlParserUtils {
      */
     private static String convertTypePathToJavaPath(String classPath) {
 
-        Assert.hasText(classPath, "Text in class path required");
+        StringUtils.isNotBlank(classPath);
 
         return classPath.replace(PACKAGE_SEPARATOR, FILE_SEPARATOR).concat(
                 ".java");
@@ -545,7 +546,7 @@ public class WsdlParserUtils {
      */
     private static File getGeneratedJavaFile(String path) {
 
-        Assert.hasText(path, "Text in path required");
+        StringUtils.isNotBlank(path);
 
         return new File(TARGET_GENERATED_SOURCES_PATH, path);
     }
@@ -586,14 +587,14 @@ public class WsdlParserUtils {
      */
     public static String findFirstCompatibleServiceElementName(Element root) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         Element port = findFirstCompatiblePort(root);
 
         // Get the path to the service class defined by the wsdl
         Element service = ((Element) port.getParentNode());
         String name = service.getAttribute(NAME_ATTRIBUTE);
-        Assert.hasText(name, "No name attribute in service element");
+        StringUtils.isNotBlank(name);
 
         return name;
     }
@@ -611,11 +612,11 @@ public class WsdlParserUtils {
      */
     public static Element findFirstCompatiblePort(Element root) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         // Find a compatible address element
         Element address = findFirstCompatibleAddress(root);
-        Assert.notNull(address, "No compatible SOAP 1.1 or 1.2 protocol");
+        Validate.notNull(address, "No compatible SOAP 1.1 or 1.2 protocol");
 
         // Get the port element defined by the wsdl
         Element port = ((Element) address.getParentNode());
@@ -637,11 +638,11 @@ public class WsdlParserUtils {
      */
     public static Element checkCompatiblePort(Element root) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         // Find a compatible address element
         Element address = checkCompatibleAddress(root);
-        Assert.notNull(address, "No compatible SOAP 1.1 or 1.2 protocol");
+        Validate.notNull(address, "No compatible SOAP 1.1 or 1.2 protocol");
 
         // Get the port element defined by the wsdl
         Element port = ((Element) address.getParentNode());
@@ -663,7 +664,7 @@ public class WsdlParserUtils {
      */
     public static Element checkCompatibleAddress(Element root) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         // Find all address elements
         List<Element> addresses = XmlUtils.findElements(ADDRESSES_XPATH, root);
@@ -701,7 +702,7 @@ public class WsdlParserUtils {
                         .indexOf(SOAP_11_NAMESPACE_WITHOUT_SLASH)) != -1) {
 
             if (isSoap12Compatible) {
-                Assert.state(
+                Validate.validState(
                         false,
                         "There are defined SOAP 1.1 and 1.2 protocols.\nMust be only one protocol defined.");
             }
@@ -741,7 +742,7 @@ public class WsdlParserUtils {
     public static String findFirstCompatiblePortClassName(Element root,
             WsType sense) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         // Get the the port element name
         return convertNameToJavaFormat(findFirstCompatiblePort(root)
@@ -764,19 +765,19 @@ public class WsdlParserUtils {
     private static String findFirstCompatiblePortTypeClassName(Element root,
             WsType sense) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         Element binding = findFirstCompatibleBinding(root);
 
         // Find all port types elements
         List<Element> portTypes = XmlUtils.findElements(PORT_TYPES_XPATH, root);
-        Assert.notEmpty(portTypes, "No valid port type format");
+        Validate.notEmpty(portTypes, "No valid port type format");
         String portTypeRef = binding.getAttribute(TYPE_ATTRIBUTE);
-        Assert.hasText(portTypeRef, "No type attribute in binding element");
+        StringUtils.isNotEmpty(portTypeRef);
         Element portType = getReferencedElement(root, portTypes, portTypeRef);
-        Assert.notNull(portType, "No valid port type reference");
+        Validate.notNull(portType, "No valid port type reference");
         String portTypeName = portType.getAttribute(NAME_ATTRIBUTE);
-        Assert.hasText(portTypeName, "No name attribute in port type element");
+        StringUtils.isNotEmpty(portTypeName);
 
         return convertNameToJavaFormat(portTypeName, sense);
     }
@@ -794,17 +795,17 @@ public class WsdlParserUtils {
      */
     private static Element findFirstCompatibleBinding(Element root) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         // Find all binding elements
         List<Element> bindings = XmlUtils.findElements(BINDINGS_XPATH, root);
-        Assert.notEmpty(bindings, "No valid binding format");
+        Validate.notEmpty(bindings, "No valid binding format");
 
         Element port = findFirstCompatiblePort(root);
         String bindingRef = port.getAttribute(BINDING_ATTRIBUTE);
-        Assert.hasText(bindingRef, "No binding attribute in port element");
+        StringUtils.isNotEmpty(bindingRef);
         Element binding = getReferencedElement(root, bindings, bindingRef);
-        Assert.notNull(binding, "No valid binding reference");
+        Validate.notNull(binding, "No valid binding reference");
 
         return binding;
     }
@@ -826,7 +827,7 @@ public class WsdlParserUtils {
      */
     private static String getNamespaceURI(Element root, String namespace) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         String namespaceURI = null;
 
@@ -858,7 +859,7 @@ public class WsdlParserUtils {
      */
     protected static String getNamespace(String elementName) {
 
-        Assert.notNull(elementName, "Element name required");
+        Validate.notNull(elementName, "Element name required");
 
         String prefix = "";
 
@@ -887,7 +888,7 @@ public class WsdlParserUtils {
      */
     protected static String getLocalName(String elementName) {
 
-        Assert.notNull(elementName, "Element name required");
+        Validate.notNull(elementName, "Element name required");
 
         return elementName.replaceFirst(getNamespace(elementName)
                 + NAMESPACE_SEPARATOR, "");
@@ -932,7 +933,7 @@ public class WsdlParserUtils {
      */
     private static String convertDocumentNameToJavaFormat(String name) {
 
-        Assert.notNull(name, "Name required");
+        Validate.notNull(name, "Name required");
 
         StringBuffer ostr = new StringBuffer();
 
@@ -1170,7 +1171,7 @@ public class WsdlParserUtils {
      */
     public static boolean isRpcEncoded(Element root) {
 
-        Assert.notNull(root, "Wsdl root element required");
+        Validate.notNull(root, "Wsdl root element required");
 
         // Find binding element
         Element binding = findFirstCompatibleBinding(root);
@@ -1178,7 +1179,7 @@ public class WsdlParserUtils {
         // Find all child bindings
         List<Element> childs = XmlUtils
                 .findElements(CHILD_BINDINGS_XPATH, root);
-        Assert.notEmpty(childs, "No valid child bindings format");
+        Validate.notEmpty(childs, "No valid child bindings format");
 
         // Get child binding related to binding element
         for (Element child : childs) {
@@ -1186,15 +1187,14 @@ public class WsdlParserUtils {
             // Get child parent binding element name
             Element parentBinding = ((Element) child.getParentNode());
             String name = parentBinding.getAttribute(NAME_ATTRIBUTE);
-            Assert.hasText(name, "No name attribute in child binding element");
+            StringUtils.isNotEmpty(name);
 
             // If parent binding has the same name as binding
             if (name.equals(binding.getAttribute(NAME_ATTRIBUTE))) {
 
                 // Check RPC style
                 String style = child.getAttribute(STYLE_ATTRIBUTE);
-                Assert.hasText(name,
-                        "No style attribute in child binding element");
+                StringUtils.isNotEmpty(name);
                 if ("rpc".equalsIgnoreCase(style)) {
 
                     return true;
@@ -1233,7 +1233,7 @@ public class WsdlParserUtils {
             // Parse the wsdl location to a DOM document
             Document wsdl = XmlUtils.getDocumentBuilder().parse(url);
             Element root = wsdl.getDocumentElement();
-            Assert.notNull(root, "No valid document format");
+            Validate.notNull(root, "No valid document format");
 
             return root;
 

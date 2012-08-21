@@ -35,7 +35,6 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.ArrayAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
@@ -43,7 +42,7 @@ import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * <p>
@@ -83,7 +82,7 @@ public class WSExportXmlElementMetadataProvider extends
      * org.springframework.roo.project.Path)
      */
     @Override
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
 
         // Get annotation identifier for this java type at path
         return WSExportXmlElementMetadata.createIdentifier(javaType, path);
@@ -101,7 +100,7 @@ public class WSExportXmlElementMetadataProvider extends
 
         JavaType javaType = WSExportXmlElementMetadata
                 .getJavaType(metadataIdentificationString);
-        Path path = WSExportXmlElementMetadata
+        LogicalPath path = WSExportXmlElementMetadata
                 .getPath(metadataIdentificationString);
 
         // Get physical type identifier for this java type
@@ -149,8 +148,8 @@ public class WSExportXmlElementMetadataProvider extends
         // TODO What is this for ?
         metadataDependencyRegistry.registerDependency(physicalTypeId, id);
 
-        AnnotationMetadata annotation = MemberFindingUtils.getTypeAnnotation(
-                typeDetails, new JavaType(GvNIXXmlElement.class.getName()));
+        AnnotationMetadata annotation = typeDetails.getTypeAnnotation(
+                new JavaType(GvNIXXmlElement.class.getName()));
 
         // Create metaData with field list values.
         return new WSExportXmlElementMetadata(id, aspectName, physicalType,

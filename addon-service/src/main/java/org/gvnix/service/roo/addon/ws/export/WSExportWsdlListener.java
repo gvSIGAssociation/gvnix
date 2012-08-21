@@ -41,6 +41,7 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.file.monitor.event.FileEvent;
 import org.springframework.roo.file.monitor.event.FileEventListener;
 import org.springframework.roo.file.monitor.event.FileOperation;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
 
@@ -144,7 +145,7 @@ public class WSExportWsdlListener implements FileEventListener {
         File file = event.getFileDetails().getFile();
 
         // Nothing to do when project hasn't been created
-        if (!projectOperations.isProjectAvailable()) {
+        if (!projectOperations.isProjectAvailable(projectOperations.getFocusedModuleName())) {
             return;
         }
 
@@ -326,7 +327,7 @@ public class WSExportWsdlListener implements FileEventListener {
         }
 
         genSourcesDir = projectOperations.getPathResolver().getIdentifier(
-                Path.ROOT, GENERATED_CXF_SOURCES_DIR);
+        		LogicalPath.getInstance(Path.ROOT, ""), GENERATED_CXF_SOURCES_DIR);
 
         return genSourcesDir;
     }

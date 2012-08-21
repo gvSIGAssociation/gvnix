@@ -34,12 +34,12 @@ import japa.parser.ast.expr.NormalAnnotationExpr;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.Type;
 
-import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -49,7 +49,6 @@ import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.PhysicalTypeMetadataProvider;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -60,24 +59,21 @@ import org.springframework.roo.classpath.details.IdentifiableAnnotatedJavaStruct
 import org.springframework.roo.classpath.details.MemberHoldingTypeDetails;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
-import org.springframework.roo.classpath.javaparser.JavaParserMutableClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.javaparser.JavaParserUtils;
-import org.springframework.roo.classpath.javaparser.details.JavaParserMethodMetadata;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
@@ -96,8 +92,6 @@ public class JavaParserServiceImpl implements JavaParserService {
     @Reference
     private FileManager fileManager;
     @Reference
-    private PhysicalTypeMetadataProvider physicalTypeMetadataProvider;
-    @Reference
     private ProjectOperations projectOperations;
     @Reference
     private TypeLocationService typeLocationService;
@@ -114,7 +108,7 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // Service class
         String declaredByMetadataId = PhysicalTypeIdentifier.createIdentifier(
-                serviceClass, Path.SRC_MAIN_JAVA);
+                serviceClass, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
         // Service annotations
         List<AnnotationMetadata> serviceAnnotations = new ArrayList<AnnotationMetadata>();
@@ -129,7 +123,7 @@ public class JavaParserServiceImpl implements JavaParserService {
             serviceDetails.addAnnotation(annotationMetadata);
         }
 
-        typeManagementService.generateClassFile(serviceDetails.build());
+        typeManagementService.createOrUpdateTypeOnDisk(serviceDetails.build());
     }
 
     /**
@@ -146,11 +140,11 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // Metadata Id.
         String id = PhysicalTypeIdentifier.createIdentifier(type,
-                Path.SRC_MAIN_JAVA);
+        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
         // Determine the canonical filename
         String physicalPath = typeLocationService
-                .getPhysicalLocationCanonicalPath(id);
+                .getPhysicalTypeCanonicalPath(id);
 
         // Check the file doesn't already exist
         if (!fileManager.exists(physicalPath)) {
@@ -183,7 +177,7 @@ public class JavaParserServiceImpl implements JavaParserService {
                 }
             }
 
-            typeManagementService.generateClassFile(typeDetails.build());
+            typeManagementService.createOrUpdateTypeOnDisk(typeDetails.build());
         }
     }
 
@@ -199,26 +193,26 @@ public class JavaParserServiceImpl implements JavaParserService {
             List<AnnotatedJavaType> paramTypes,
             List<JavaSymbolName> paramNames, String body) {
 
-        Assert.notNull(paramTypes, "Param type mustn't be null");
-        Assert.notNull(paramNames, "Param name mustn't be null");
+    	Validate.notNull(paramTypes, "Param type mustn't be null");
+        Validate.notNull(paramNames, "Param name mustn't be null");
 
         // MetadataID
         String targetId = PhysicalTypeIdentifier.createIdentifier(targetType,
-                Path.SRC_MAIN_JAVA);
+        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
         // Obtain the physical type and itd mutable details
         PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
                 .get(targetId);
-        Assert.notNull(ptm, "Java source class doesn't exists.");
+        Validate.notNull(ptm, "Java source class doesn't exists.");
 
         PhysicalTypeDetails ptd = ptm.getMemberHoldingTypeDetails();
 
-        Assert.notNull(ptd, "Java source code details unavailable for type "
+        Validate.notNull(ptd, "Java source code details unavailable for type "
                 + PhysicalTypeIdentifier.getFriendlyName(targetId));
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class, ptd,
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class, ptd,
                 "Java source code is immutable for type "
                         + PhysicalTypeIdentifier.getFriendlyName(targetId));
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) ptd;
+        ClassOrInterfaceTypeDetails mutableTypeDetails = (ClassOrInterfaceTypeDetails) ptd;
 
         // create method
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -234,8 +228,9 @@ public class JavaParserServiceImpl implements JavaParserService {
             operationMetadata.addThrowsType(javaType);
         }
 
-        mutableTypeDetails.addMethod(operationMetadata.build());
-
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
+        mutableTypeDetailsBuilder.addMethod(operationMetadata.build());
+        typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
     }
 
     /**
@@ -251,7 +246,7 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // MetadataID
         String targetId = PhysicalTypeIdentifier.createIdentifier(className,
-                Path.SRC_MAIN_JAVA);
+        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
         // Obtain the physical type and itd mutable details
         PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
@@ -259,13 +254,13 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         PhysicalTypeDetails ptd = ptm.getMemberHoldingTypeDetails();
 
-        Assert.notNull(ptd, "Java source code details unavailable for type "
+        Validate.notNull(ptd, "Java source code details unavailable for type "
                 + PhysicalTypeIdentifier.getFriendlyName(targetId));
-        Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
                 ptd, "Java source code is immutable for type "
                         + PhysicalTypeIdentifier.getFriendlyName(targetId));
 
-        JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
+        ClassOrInterfaceTypeDetails mutableTypeDetails = (ClassOrInterfaceTypeDetails) ptd;
 
         List<MethodMetadata> updatedMethodList = new ArrayList<MethodMetadata>();
 
@@ -300,7 +295,7 @@ public class JavaParserServiceImpl implements JavaParserService {
      * @return
      */
     protected ClassOrInterfaceTypeDetailsBuilder createTypeDetails(
-            JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails,
+            ClassOrInterfaceTypeDetails mutableTypeDetails,
             List<MethodMetadata> updatedMethodList) {
 
         List<ConstructorMetadata> contructorList = new ArrayList<ConstructorMetadata>();
@@ -364,7 +359,7 @@ public class JavaParserServiceImpl implements JavaParserService {
      */
     protected List<MethodMetadata> searchMethodsInJava(
             JavaSymbolName methodName, String targetId,
-            JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails) {
+            ClassOrInterfaceTypeDetails mutableTypeDetails) {
 
         List<MethodMetadata> methods = new ArrayList<MethodMetadata>();
 
@@ -439,7 +434,7 @@ public class JavaParserServiceImpl implements JavaParserService {
                     .compareTo(method.toString()) == 0
                     && equal) {
 
-                Assert.isTrue(
+                Validate.isTrue(
                         !isAnnotationIntroducedInMethod(
                                 GvNIXWebMethod.class.getName(), methodMetadata),
                         "The method '" + method.toString()
@@ -504,15 +499,14 @@ public class JavaParserServiceImpl implements JavaParserService {
             String paramName, JavaType paramType) throws ParseException {
 
         String targetId = PhysicalTypeIdentifier.createIdentifier(className,
-                Path.SRC_MAIN_JAVA);
+        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
-        String javaIdentifier = physicalTypeMetadataProvider
-                .findIdentifier(className);
+        String javaIdentifier = typeLocationService.getPhysicalTypeIdentifier(className);
         javaIdentifier = javaIdentifier.substring(
                 javaIdentifier.indexOf("?") + 1).replace('.', '/');
 
         String fileIdentifier = projectOperations.getPathResolver()
-                .getIdentifier(Path.SRC_MAIN_JAVA,
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
                         javaIdentifier.concat(".java"));
 
         // Retrieve class file to update.
@@ -527,13 +521,13 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         PhysicalTypeDetails ptd = ptm.getMemberHoldingTypeDetails();
 
-        Assert.notNull(ptd, "Java source code details unavailable for type "
+        Validate.notNull(ptd, "Java source code details unavailable for type "
                 + PhysicalTypeIdentifier.getFriendlyName(targetId));
-        Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
                 ptd, "Java source code is immutable for type "
                         + PhysicalTypeIdentifier.getFriendlyName(targetId));
 
-        JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
+        ClassOrInterfaceTypeDetails mutableTypeDetails = (ClassOrInterfaceTypeDetails) ptd;
 
         ClassOrInterfaceDeclaration clazz = null;
 
@@ -570,8 +564,8 @@ public class JavaParserServiceImpl implements JavaParserService {
                     } else {
                         NameExpr importedType = JavaParserUtils
                                 .importTypeIfRequired(mutableTypeDetails
-                                        .getEnclosingTypeName(),
-                                        mutableTypeDetails.getImports(),
+                                        .getType(),
+                                        new ArrayList(mutableTypeDetails.getRegisteredImports()),
                                         paramType);
 
                         ClassOrInterfaceType cit = JavaParserUtils
@@ -611,27 +605,21 @@ public class JavaParserServiceImpl implements JavaParserService {
             }
         }
 
-        try {
+        fileManager.delete(projectOperations.getPathResolver()
+                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                        javaIdentifier.concat(".java")));
 
-            fileManager.delete(projectOperations.getPathResolver()
-                    .getIdentifier(Path.SRC_MAIN_JAVA,
-                            javaIdentifier.concat(".java")));
+		// TODO From Roo 1.2.2 migration some information lost
+        ClassOrInterfaceTypeDetails details = new ClassOrInterfaceTypeDetailsBuilder(
+                mutableTypeDetails.getDeclaredByMetadataId()).build();
+//        JavaParserMutableClassOrInterfaceTypeDetails details = new JavaParserMutableClassOrInterfaceTypeDetails(
+//                compilationUnit, clazz,
+//                mutableTypeDetails.getDeclaredByMetadataId(), className,
+//                metadataService, physicalTypeMetadataProvider, fileManager,
+//                javaIdentifier);
 
-            JavaParserMutableClassOrInterfaceTypeDetails details = new JavaParserMutableClassOrInterfaceTypeDetails(
-                    compilationUnit, clazz,
-                    mutableTypeDetails.getDeclaredByMetadataId(), className,
-                    metadataService, physicalTypeMetadataProvider, fileManager,
-                    javaIdentifier);
+        typeManagementService.generateClassFile(details);
 
-            typeManagementService.generateClassFile(details);
-
-        } catch (CloneNotSupportedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -648,7 +636,7 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // MetadataID
         String targetId = PhysicalTypeIdentifier.createIdentifier(className,
-                Path.SRC_MAIN_JAVA);
+        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
         // Obtain the physical type and itd mutable details
         PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
@@ -656,13 +644,13 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         PhysicalTypeDetails ptd = ptm.getMemberHoldingTypeDetails();
 
-        Assert.notNull(ptd, "Java source code details unavailable for type "
+        Validate.notNull(ptd, "Java source code details unavailable for type "
                 + PhysicalTypeIdentifier.getFriendlyName(targetId));
-        Assert.isInstanceOf(JavaParserMutableClassOrInterfaceTypeDetails.class,
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
                 ptd, "Java source code is immutable for type "
                         + PhysicalTypeIdentifier.getFriendlyName(targetId));
 
-        JavaParserMutableClassOrInterfaceTypeDetails mutableTypeDetails = (JavaParserMutableClassOrInterfaceTypeDetails) ptd;
+        ClassOrInterfaceTypeDetails mutableTypeDetails = (ClassOrInterfaceTypeDetails) ptd;
 
         // Update method
         List<? extends MethodMetadata> methodsList = mutableTypeDetails
@@ -670,12 +658,12 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // Create param type.
         AnnotatedJavaType annotatedJavaType = new AnnotatedJavaType(paramType,
-                null);
+        		new ArrayList<AnnotationMetadata>());
 
         // Create param name.
         JavaSymbolName parameterName = new JavaSymbolName(paramName);
 
-        JavaParserMethodMetadata javaParserMethodMetadata;
+        MethodMetadata javaParserMethodMetadata;
 
         List<MethodMetadata> updatedMethodList = new ArrayList<MethodMetadata>();
         List<AnnotatedJavaType> parameterTypelist = new ArrayList<AnnotatedJavaType>();
@@ -685,12 +673,12 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         for (MethodMetadata methodMetadata : methodsList) {
 
-            javaParserMethodMetadata = (JavaParserMethodMetadata) methodMetadata;
+            javaParserMethodMetadata = (MethodMetadata) methodMetadata;
 
             if (methodMetadata.getMethodName().toString()
                     .compareTo(method.toString()) == 0) {
 
-                Assert.isTrue(!javaParserMethodMetadata.getParameterNames()
+                Validate.isTrue(!javaParserMethodMetadata.getParameterNames()
                         .contains(parameterName),
                         "There couldn't be two parameters with same name: '"
                                 + parameterName + "' in the method "
@@ -828,14 +816,14 @@ public class JavaParserServiceImpl implements JavaParserService {
             JavaSymbolName methodName) {
         // Load class details. If class not found an exception will be raised.
         ClassOrInterfaceTypeDetails tmpServiceDetails = typeLocationService
-                .getClassOrInterface(serviceClass);
+                .getTypeDetails(serviceClass);
 
         // Checks if it's mutable
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
                 tmpServiceDetails,
                 "Can't modify " + tmpServiceDetails.getName());
 
-        MutableClassOrInterfaceTypeDetails serviceDetails = (MutableClassOrInterfaceTypeDetails) tmpServiceDetails;
+        ClassOrInterfaceTypeDetails serviceDetails = (ClassOrInterfaceTypeDetails) tmpServiceDetails;
 
         List<? extends MethodMetadata> methodList = serviceDetails
                 .getDeclaredMethods();
@@ -954,7 +942,7 @@ public class JavaParserServiceImpl implements JavaParserService {
     protected List<MemberHoldingTypeDetails> getMemberDetails(JavaType name) {
 
         String identifier = PhysicalTypeIdentifier.createIdentifier(name,
-                Path.SRC_MAIN_JAVA);
+        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
         PhysicalTypeMetadata physicalType = (PhysicalTypeMetadata) metadataService
                 .get(identifier);
         String className = getClass().getName();
@@ -981,15 +969,14 @@ public class JavaParserServiceImpl implements JavaParserService {
 
         // TODO: 'ClassOrInterfaceDeclaration' mantiene el javaDoc.
 
-        String javaIdentifier = physicalTypeMetadataProvider
-                .findIdentifier(classOrInterfaceTypeDetails.getName());
+        String javaIdentifier = typeLocationService.getPhysicalTypeIdentifier(classOrInterfaceTypeDetails.getName());
         javaIdentifier = javaIdentifier.substring(
                 javaIdentifier.indexOf("?") + 1).replaceAll("\\.", "/");
 
         fileManager.delete(projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_JAVA, javaIdentifier.concat(".java")));
+        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""), javaIdentifier.concat(".java")));
 
-        typeManagementService.generateClassFile(classOrInterfaceTypeDetails);
+        typeManagementService.createOrUpdateTypeOnDisk(classOrInterfaceTypeDetails);
 
     }
 

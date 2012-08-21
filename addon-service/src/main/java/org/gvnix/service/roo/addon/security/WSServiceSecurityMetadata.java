@@ -27,6 +27,8 @@ import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
 
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebServiceSecurity;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
@@ -45,9 +47,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * <p>
@@ -117,13 +117,12 @@ public class WSServiceSecurityMetadata extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata,
             String serviceName) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
 
         // Process values from the annotation, if present (XXX ???)
-        AnnotationMetadata annotation = MemberFindingUtils
-                .getDeclaredTypeAnnotation(governorTypeDetails, new JavaType(
-                        GvNIXWebServiceSecurity.class.getName()));
+        AnnotationMetadata annotation = governorTypeDetails
+                .getAnnotation(new JavaType(GvNIXWebServiceSecurity.class.getName()));
 
         // XXX annotation null? (???)
         if (annotation != null) {
@@ -411,7 +410,7 @@ public class WSServiceSecurityMetadata extends
 
     @Override
     public String toString() {
-        ToStringCreator tsc = new ToStringCreator(this);
+        ToStringBuilder tsc = new ToStringBuilder(this);
         tsc.append("identifier", getId());
         tsc.append("valid", valid);
         tsc.append("aspectName", aspectName);
@@ -425,7 +424,7 @@ public class WSServiceSecurityMetadata extends
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 PROVIDES_TYPE_STRING, javaType, path);
     }
@@ -435,7 +434,7 @@ public class WSServiceSecurityMetadata extends
                 PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING,
                 metadataIdentificationString);
     }

@@ -50,20 +50,20 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.xml.transform.Transformer;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.service.roo.addon.AnnotationsService;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -117,7 +117,7 @@ public class SecurityServiceImpl implements SecurityService {
      */
     private String getAxisClientConfigPath() {
         return projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_RESOURCES, "client-config.wsdd");
+        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "client-config.wsdd");
     }
 
     /**
@@ -130,20 +130,20 @@ public class SecurityServiceImpl implements SecurityService {
             return;
         }
 
-        // Gets the template
-        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
-                AXIS_CLIENT_CONFIG_TEMPLATE_FILE);
-
-        // Create target file
-        MutableFile cxfXmlMutableFile = fileManager
-                .createFile(axisClientConfigPath);
-
-        try {
-            FileCopyUtils.copy(templateInputStream,
-                    cxfXmlMutableFile.getOutputStream());
-        } catch (Exception e) {
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try { 
+            inputStream = FileUtils.getInputStream(getClass(), AXIS_CLIENT_CONFIG_TEMPLATE_FILE);
+            outputStream = fileManager.createFile(axisClientConfigPath).getOutputStream();
+            IOUtils.copy(inputStream, outputStream);
+        }
+        catch (Exception e) {
 
             throw new IllegalStateException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
 
         fileManager.scan();
@@ -155,9 +155,9 @@ public class SecurityServiceImpl implements SecurityService {
     protected void addDependencies() {
 
         annotationsService.addAddonDependency();
-        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(),
+        InputStream templateInputStream = FileUtils.getInputStream(getClass(),
                 DEPENDENCIES_FILE);
-        Assert.notNull(templateInputStream,
+        Validate.notNull(templateInputStream,
                 "Can't adquire dependencies file ".concat(DEPENDENCIES_FILE));
 
         Document dependencyDoc;
@@ -179,7 +179,7 @@ public class SecurityServiceImpl implements SecurityService {
         for (Element element : dependecyElementList) {
             dependencyList.add(new Dependency(element));
         }
-        projectOperations.addDependencies(dependencyList);
+        projectOperations.addDependencies(projectOperations.getFocusedModuleName(), dependencyList);
     }
 
     /**
@@ -207,7 +207,7 @@ public class SecurityServiceImpl implements SecurityService {
 
             // Parse the wsdl location to a DOM document
             Document wsdl = XmlUtils.getDocumentBuilder().parse(loc);
-            Assert.notNull(wsdl, "No valid document format");
+            Validate.notNull(wsdl, "No valid document format");
 
             return wsdl;
 
@@ -263,7 +263,7 @@ public class SecurityServiceImpl implements SecurityService {
             UnknownHostException, SocketException, SAXException {
 
         // Passphrase of the keystore: "changeit" by default
-        char[] passArray = (StringUtils.hasText(pass) ? pass.toCharArray()
+        char[] passArray = (StringUtils.isNotBlank(pass) ? pass.toCharArray()
                 : "changeit".toCharArray());
 
         // Get the project keystore and copy it from JVM if not exists
@@ -304,7 +304,7 @@ public class SecurityServiceImpl implements SecurityService {
             invalidHostCert(passArray, keystore, host);
         }
 
-        Assert.notNull(doc, "No valid document format");
+        Validate.notNull(doc, "No valid document format");
         return doc;
     }
 
@@ -487,26 +487,32 @@ public class SecurityServiceImpl implements SecurityService {
 
         // Get path to file at resources
         String path = projectOperations.getPathResolver().getIdentifier(
-                Path.SRC_MAIN_RESOURCES, "gvnix-cacerts");
+        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), "gvnix-cacerts");
 
         // Get JVM keystore file and validate it
         File keystore = getJvmKeystore();
-        Assert.isTrue(keystore.isFile(), "JVM cacerts file does not exist");
+        Validate.isTrue(keystore.isFile(), "JVM cacerts file does not exist");
 
         // When JVM keystore is valid file and already not copied to project
         if (!fileManager.exists(path)) {
 
-            try {
-
-                // Write JVM keystore into resources file path
-                FileCopyUtils.copy(new FileInputStream(keystore), fileManager
-                        .createFile(path).getOutputStream());
+            // Write JVM keystore into resources file path
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try { 
+                inputStream = new FileInputStream(keystore);
+                outputStream = fileManager.createFile(path).getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
                 fileManager.commit();
-
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new IllegalStateException(
                         "Error creatin a copy of ".concat(keystore
                                 .getAbsolutePath()));
+            }
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
             }
         }
 

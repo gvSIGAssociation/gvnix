@@ -21,10 +21,10 @@ package org.gvnix.service.roo.addon.ws.export;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebFault;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
-import org.springframework.roo.classpath.details.MemberFindingUtils;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
@@ -33,8 +33,7 @@ import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMeta
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
@@ -55,7 +54,7 @@ public class WSExportExceptionMetadata extends
             PhysicalTypeMetadata governorPhysicalTypeMetadata) {
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
 
         if (!isValid()) {
@@ -63,9 +62,8 @@ public class WSExportExceptionMetadata extends
         }
 
         // Create the metadata.
-        AnnotationMetadata annotationMetadata = MemberFindingUtils
-                .getTypeAnnotation(governorTypeDetails, new JavaType(
-                        GvNIXWebFault.class.getName()));
+        AnnotationMetadata annotationMetadata = governorTypeDetails
+                .getTypeAnnotation(new JavaType(GvNIXWebFault.class.getName()));
 
         // Add @javax.jws.WebFault annotation to ITD.
         AnnotationMetadata webFaultAnnotationMetadata = getTypeAnnotation(annotationMetadata);
@@ -124,8 +122,7 @@ public class WSExportExceptionMetadata extends
      */
     public boolean isAnnotationIntroduced(String annotation) {
         JavaType javaType = new JavaType(annotation);
-        AnnotationMetadata result = MemberFindingUtils
-                .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+        AnnotationMetadata result = governorTypeDetails.getAnnotation(javaType);
 
         return result != null;
     }
@@ -144,12 +141,12 @@ public class WSExportExceptionMetadata extends
                 EXCEPTION_WEB_FAULT_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(
                 EXCEPTION_WEB_FAULT_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 EXCEPTION_WEB_FAULT_TYPE_STRING, javaType, path);
     }

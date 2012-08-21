@@ -21,6 +21,7 @@ package org.gvnix.service.roo.addon.ws.export;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.gvnix.service.roo.addon.JavaParserService;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebMethod;
 import org.gvnix.service.roo.addon.annotations.GvNIXWebService;
@@ -42,8 +43,7 @@ import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.EnumDetails;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * <p>
@@ -70,7 +70,7 @@ public class WSExportMetadata extends
 
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
-        Assert.isTrue(isValid(identifier), "Metadata identification string '"
+        Validate.isTrue(isValid(identifier), "Metadata identification string '"
                 + identifier + "' does not appear to be a valid");
 
         if (!isValid()) {
@@ -78,9 +78,8 @@ public class WSExportMetadata extends
         }
 
         // Create the metadata.
-        AnnotationMetadata annotationMetadata = MemberFindingUtils
-                .getTypeAnnotation(governorTypeDetails, new JavaType(
-                        GvNIXWebService.class.getName()));
+        AnnotationMetadata annotationMetadata = governorTypeDetails
+                .getTypeAnnotation(new JavaType(GvNIXWebService.class.getName()));
 
         // Check if Web Service has been exported from WSDL.
         BooleanAttributeValue exported = (BooleanAttributeValue) annotationMetadata
@@ -177,8 +176,7 @@ public class WSExportMetadata extends
                     annotationAttributeValueList).build();
         }
 
-        return MemberFindingUtils.getDeclaredTypeAnnotation(
-                governorTypeDetails, javaType);
+        return governorTypeDetails.getAnnotation(javaType);
     }
 
     /**
@@ -239,8 +237,7 @@ public class WSExportMetadata extends
                     annotationAttributeValueList).build();
         }
 
-        return MemberFindingUtils.getDeclaredTypeAnnotation(
-                governorTypeDetails, javaType);
+        return governorTypeDetails.getAnnotation(javaType);
     }
 
     /**
@@ -253,8 +250,7 @@ public class WSExportMetadata extends
      */
     public boolean isAnnotationIntroduced(String annotation) {
         JavaType javaType = new JavaType(annotation);
-        AnnotationMetadata result = MemberFindingUtils
-                .getDeclaredTypeAnnotation(governorTypeDetails, javaType);
+        AnnotationMetadata result = governorTypeDetails.getAnnotation(javaType);
 
         return result == null;
     }
@@ -735,12 +731,12 @@ public class WSExportMetadata extends
                 WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(
                 WEB_SERVICE_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(
                 WEB_SERVICE_TYPE_STRING, javaType, path);
     }

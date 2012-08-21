@@ -30,10 +30,11 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Implementation of X509TrustManager in order to deal with SSL connection
@@ -147,7 +148,7 @@ public class GvNix509TrustManager implements X509TrustManager {
 
         String aliasCerFileName = alias.concat(".cer");
         String cerFilePath = pathResolver.getIdentifier(
-                Path.SRC_MAIN_RESOURCES, aliasCerFileName);
+        		LogicalPath.getInstance(Path.SRC_MAIN_RESOURCES, ""), aliasCerFileName);
 
         if (!fileManager.exists(cerFilePath)) {
 
@@ -155,7 +156,7 @@ public class GvNix509TrustManager implements X509TrustManager {
             OutputStream os = new FileOutputStream(cerFile);
             os.write(cert.getEncoded());
             os.close();
-            logger.info("Created ".concat(Path.SRC_MAIN_RESOURCES.getName())
+            logger.info("Created ".concat(Path.SRC_MAIN_RESOURCES.name())
                     .concat("/").concat(aliasCerFileName));
         }
     }
@@ -172,7 +173,7 @@ public class GvNix509TrustManager implements X509TrustManager {
     public static KeyStore loadKeyStore(File keystore, char[] pass)
             throws Exception {
 
-        Assert.notNull(keystore, "keystore must be a vaild keystore file");
+        Validate.notNull(keystore, "keystore must be a vaild keystore file");
         InputStream in = new FileInputStream(keystore);
 
         KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());

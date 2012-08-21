@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -34,12 +35,13 @@ import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.shell.Converter;
 import org.springframework.roo.shell.MethodTarget;
-import org.springframework.roo.support.util.StringUtils;
 
 /**
  * @author Ricardo García Fernández at <a href="http://www.disid.com">DiSiD
@@ -55,6 +57,8 @@ public class JavaTypeListConverter implements Converter {
     private MetadataService metadataService;
     @Reference
     private FileManager fileManager;
+    @Reference
+    private ProjectOperations projectOperations;
 
     /*
      * (non-Javadoc)
@@ -71,7 +75,7 @@ public class JavaTypeListConverter implements Converter {
 
         String[] javaTypeStringList;
 
-        javaTypeStringList = StringUtils.commaDelimitedListToStringArray(value);
+        javaTypeStringList = StringUtils.split(value, ",");
 
         JavaType javaType;
         for (int i = 0; i <= javaTypeStringList.length - 1; i++) {
@@ -192,8 +196,7 @@ public class JavaTypeListConverter implements Converter {
         String[] existingDataList;
         String completeExistingDataList = "";
 
-        existingDataList = StringUtils
-                .commaDelimitedListToStringArray(existingData);
+        existingDataList = StringUtils.split(existingData, ",");
 
         for (int i = 0; i < existingDataList.length - 1; i++) {
             if (completeExistingDataList.compareTo("") == 0) {
@@ -227,12 +230,11 @@ public class JavaTypeListConverter implements Converter {
         String[] existingDataList;
         String tmpExistingData;
 
-        existingDataList = StringUtils
-                .commaDelimitedListToStringArray(existingData);
+        existingDataList = StringUtils.split(existingData, ",");
 
         if (existingDataList.length > 0) {
             tmpExistingData = StringUtils
-                    .trimAllWhitespace(existingDataList[existingDataList.length - 1]);
+                    .trim(existingDataList[existingDataList.length - 1]);
         } else {
             tmpExistingData = existingData;
         }
@@ -255,13 +257,13 @@ public class JavaTypeListConverter implements Converter {
 
         String topLevelPath = "";
         ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-                .get(ProjectMetadata.getProjectIdentifier());
+                .get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
 
         if (projectMetadata == null) {
             return;
         }
 
-        topLevelPath = projectMetadata.getTopLevelPackage()
+        topLevelPath = projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName())
                 .getFullyQualifiedPackageName();
 
         String newValue = tmpExistingData;
@@ -278,8 +280,8 @@ public class JavaTypeListConverter implements Converter {
             }
         }
 
-        PathResolver pathResolver = projectMetadata.getPathResolver();
-        String antPath = pathResolver.getRoot(Path.SRC_MAIN_JAVA)
+        PathResolver pathResolver = projectOperations.getPathResolver();
+        String antPath = pathResolver.getRoot(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""))
                 + File.separatorChar + newValue.replace(".", File.separator)
                 + "*";
         SortedSet<FileDetails> entries = fileManager

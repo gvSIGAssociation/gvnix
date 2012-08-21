@@ -5,13 +5,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.support.dependenciesmanager.DependenciesVersionManager;
 import org.springframework.roo.classpath.TypeLocationService;
+import org.springframework.roo.classpath.TypeManagementService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
-import org.springframework.roo.classpath.details.MutableClassOrInterfaceTypeDetails;
+import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotationAttributeValue;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
@@ -19,7 +21,6 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Repository;
-import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Element;
 
@@ -43,6 +44,8 @@ public class AnnotationsServiceImpl implements AnnotationsService {
     private MetadataService metadataService;
     @Reference
     private TypeLocationService typeLocationService;
+    @Reference
+    private TypeManagementService typeManagementService;
 
     private static Logger logger = Logger.getLogger(AnnotationsService.class
             .getName());
@@ -53,13 +56,12 @@ public class AnnotationsServiceImpl implements AnnotationsService {
     public void addAddonDependency() {
 
         // Get configuration (repository and dependency) XML element
-        Element conf = XmlUtils.getConfiguration(this.getClass(),
-                "configuration.xml");
+        Element conf = XmlUtils.getConfiguration(this.getClass());
 
         // Find repository elements and add them to the project
         for (Element repo : XmlUtils.findElements(
                 "/configuration/gvnix/repositories/repository", conf)) {
-            projectOperations.addRepository(new Repository(repo));
+            projectOperations.addRepository(projectOperations.getFocusedModuleName(), new Repository(repo));
         }
 
         // Find dependency elements and update them into the project
@@ -78,12 +80,12 @@ public class AnnotationsServiceImpl implements AnnotationsService {
         // Load class or interface details.
         // If class not found an exception will be raised.
         ClassOrInterfaceTypeDetails typeDetails = typeLocationService
-                .getClassOrInterface(serviceClass);
+                .getTypeDetails(serviceClass);
 
         // Check and get mutable instance
-        Assert.isInstanceOf(MutableClassOrInterfaceTypeDetails.class,
+        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
                 typeDetails, "Can't modify " + typeDetails.getName());
-        MutableClassOrInterfaceTypeDetails mutableTypeDetails = (MutableClassOrInterfaceTypeDetails) typeDetails;
+        ClassOrInterfaceTypeDetails mutableTypeDetails = (ClassOrInterfaceTypeDetails) typeDetails;
 
         // Check annotation defined.
         // The annotation can't be updated.
@@ -98,8 +100,9 @@ public class AnnotationsServiceImpl implements AnnotationsService {
                                 + serviceClass.getFullyQualifiedTypeName()
                                 + "' and will be updated.");
 
-                mutableTypeDetails
-                        .removeTypeAnnotation(new JavaType(annotation));
+                ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
+                mutableTypeDetailsBuilder.removeAnnotation(new JavaType(annotation));
+                typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
             } else {
                 logger.log(
                         Level.FINE,
@@ -125,7 +128,9 @@ public class AnnotationsServiceImpl implements AnnotationsService {
                 new JavaType(annotation), annotationAttributeValues).build();
 
         // Adds annotation to the entity
-        mutableTypeDetails.addTypeAnnotation(defaultAnnotationMetadata);
+        ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(mutableTypeDetails);
+        mutableTypeDetailsBuilder.addAnnotation(defaultAnnotationMetadata);
+        typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
 
         // Delete from chache to update class values.
         metadataService.evict(typeDetails.getDeclaredByMetadataId());

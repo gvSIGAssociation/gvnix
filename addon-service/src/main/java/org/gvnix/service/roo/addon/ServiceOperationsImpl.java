@@ -22,6 +22,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -30,7 +31,6 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Addon for Handle Service Layer
@@ -86,7 +86,7 @@ public class ServiceOperationsImpl implements ServiceOperations {
         // Parameter types.
         List<AnnotatedJavaType> parameterTypeList = new ArrayList<AnnotatedJavaType>();
 
-        Assert.isTrue(
+        Validate.isTrue(
                 paramTypeList != null
                         && paramTypeList.size() == paramNameList.size(),
                 "The method parameter types must have the same number of parameter names to create the method.");
@@ -100,7 +100,7 @@ public class ServiceOperationsImpl implements ServiceOperations {
         if (paramTypeList != null && paramTypeList.size() > 0) {
             for (JavaType parameterType : paramTypeList) {
                 parameterTypeList
-                        .add(new AnnotatedJavaType(parameterType, null));
+                        .add(new AnnotatedJavaType(parameterType, new ArrayList<AnnotationMetadata>()));
             }
         }
 
