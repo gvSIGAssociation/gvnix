@@ -540,7 +540,7 @@ TODO: Move to pd-addon-service-layer.rst, if updated and interesting.
     **Importante:** 
       ¿ Si no se define ni method ni name se aplica a todos los métodos con los valores por defecto. ?
 
-* service export ws --wsdl url2wsdl:
+* remote service export ws --wsdl url2wsdl:
 
 TODO: Move to pd-addon-service-layer.rst, if updated and interesting.
 
@@ -552,7 +552,7 @@ TODO: Move to pd-addon-service-layer.rst, if updated and interesting.
     
     ¿ Como paquete y clase se usará el namespace que haya definido en el contrato ? . Este comando requerirá mucho más análisis.
 
-* service entity --class nombreClase:
+* remote service entity --class nombreClase:
 
 TODO: Move to pd-addon-service-layer.rst, if updated and interesting.
 
@@ -562,7 +562,7 @@ TODO: Move to pd-addon-service-layer.rst, if updated and interesting.
     
     Añadiría las anotaciones de Spring que necesitase ``@Service`` y ``@GvNixEntityService``.
 
-* service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
+* remote service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
 
 TODO: Move to pd-addon-service-layer.rst, if updated and interesting.
 

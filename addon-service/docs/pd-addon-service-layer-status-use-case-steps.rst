@@ -81,7 +81,7 @@ To create and check a test application you have to:
   #. Create java 1.5 web project using GvNIX.
   #. Generate a server using the command::
 
-        roo> service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+        roo> remote service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
   #. Run the application::
   
         bash> mvn clean jetty:run-war -Dmaven.test.skip=true

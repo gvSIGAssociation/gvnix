@@ -205,7 +205,7 @@
 
       <programlisting>roo-gvNIX&gt; <emphasis role="bold">persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
 Created ...
-~.Timer roo-gvNIX&gt;<emphasis role="bold"> entity --class ~.Timer --testAutomatically</emphasis> 
+~.Timer roo-gvNIX&gt;<emphasis role="bold"> entity jpa --class ~.Timer --testAutomatically</emphasis> 
 Created ...
 ~.Timer roo-gvNIX&gt;<emphasis role="bold"> field string --fieldName message --notNull</emphasis>
 Managed ...</programlisting>
@@ -223,7 +223,7 @@ Managed ...</programlisting>
       generar todas las entidades de nuestra aplicación mediante el proceso de
       ingenieria inversa conta un esquema de BBDD existente.</para>
 
-      <programlisting>~.Timer roo-gvNIX&gt; <emphasis role="bold">controller all --package ~.web</emphasis>
+      <programlisting>~.Timer roo-gvNIX&gt; <emphasis role="bold">web mvc setup</emphasis> <emphasis role="bold">web mvc all --package ~.web</emphasis>
 Created ...</programlisting>
 
       <para><emphasis role="bold">controller</emphasis> crea controladores de

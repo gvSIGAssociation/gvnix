@@ -4,24 +4,24 @@ script clinic.roo
 // Code-first approach -----
 
 // Create service class, then invoke it manually
-service class --class org.gvnix.clinic.service.PetService
+remote service class --class org.gvnix.clinic.service.PetService
 
 // Create service operations without return type. 
-service operation --name findPetByWeight --service org.gvnix.clinic.service.PetService --return java.util.List --paramTypes java.lang.Float --paramNames weight
+remote service operation --name findPetByWeight --service org.gvnix.clinic.service.PetService --return java.util.List --paramTypes java.lang.Float --paramNames weight
 
 // Set service to expose via web service.
-service define ws --class org.gvnix.clinic.service.PetService
+remote service define ws --class org.gvnix.clinic.service.PetService
 
 // Expose operation
-service export operation --class org.gvnix.clinic.service.PetService --method findPetByWeight --resultName pets
+remote service export operation --class org.gvnix.clinic.service.PetService --method findPetByWeight --resultName pets
 
 // Contract-first approach -----
 
 // Create service and entities that satisfies the WSDL contract
-service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+remote service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
 
 // WSDL at HTTPS with self-signed certificate
-service export ws --wsdl https://tds2.tradelinksig.com:443/tds/services/tds_client_xchgSOAP?wsdl
+remote service export ws --wsdl https://tds2.tradelinksig.com:443/tds/services/tds_client_xchgSOAP?wsdl
 
 // (OPTION: quit, mvn tomcat:run, localhost:8080/petclinic/services)
 

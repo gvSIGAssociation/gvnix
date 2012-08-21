@@ -13,7 +13,8 @@ enum constant --class ~.domain.AnEnum --name THREE
 field enum --fieldName anEnum --class ~.domain.Entity1 --type ~.domain.AnEnum
 finder add --finderName findEntity1sByAnEnumAndfindEntity1sByField1LikeAndfindEntity1sByField2Like
 finder add --finderName findEntity1sByAnEnum
-controller all --package ~.web
+web mvc setup
+web mvc all --package ~.web
 menu setup
 
 perform tests

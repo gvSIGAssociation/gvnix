@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -38,12 +39,12 @@ import org.gvnix.support.OperationUtils;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
 import org.springframework.roo.shell.CommandMarker;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Addon for Handle Service Layer
@@ -66,14 +67,16 @@ public class ServiceCommands implements CommandMarker {
     private WSExportWsdlOperations wSExportWsdlOperations;
     @Reference
     private MetadataService metadataService;
+    @Reference
+    private ProjectOperations projectOperations;
 
-    @CliAvailabilityIndicator({ "service class", "service operation" })
+    @CliAvailabilityIndicator({ "remote service class", "remote service operation" })
     public boolean isCreateServiceClassAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService);
+        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
     }
 
-    @CliCommand(value = "service class", help = "Creates a new Service class in SRC_MAIN_JAVA.")
+    @CliCommand(value = "remote service class", help = "Creates a new Service class in SRC_MAIN_JAVA.")
     public String createServiceClass(
             @CliOption(key = "class", mandatory = true, help = "Name of the service class to create") JavaType serviceClass) {
 
@@ -81,7 +84,7 @@ public class ServiceCommands implements CommandMarker {
         return "New class can be used adding a property of this type with @Autowired annotation in the class that use it.";
     }
 
-    @CliCommand(value = "service operation", help = "Adds a new method to existing Service")
+    @CliCommand(value = "remote service operation", help = "Adds a new method to existing Service")
     public void addServiceOperation(
             @CliOption(key = { "", "name" }, mandatory = true, help = "The name of the operation to add") JavaSymbolName operationName,
             @CliOption(key = "service", mandatory = true, optionContext = "update,project", help = "The name of the service to receive this field") JavaType className,
@@ -98,23 +101,22 @@ public class ServiceCommands implements CommandMarker {
         boolean existsParamTypes = paramTypesList != null;
 
         if (existsParamTypes && paramTypesList.getJavaTypes().size() > 0) {
-            Assert.isTrue(StringUtils.hasText(paramNames),
+        	Validate.isTrue(StringUtils.isNotBlank(paramNames),
                     "You must provide parameter names to create the method.");
 
-        } else if (StringUtils.hasText(paramNames)) {
-            Assert.isTrue(existsParamTypes
+        } else if (StringUtils.isNotBlank(paramNames)) {
+            Validate.isTrue(existsParamTypes
                     && paramTypesList.getJavaTypes().size() > 0,
                     "You must provide parameter Types to create the method.");
 
         }
 
-        if (StringUtils.hasText(paramNames)
+        if (StringUtils.isNotBlank(paramNames)
                 && paramTypesList.getJavaTypes().size() > 0) {
 
-            paramNameArray = StringUtils
-                    .commaDelimitedListToStringArray(paramNames);
+            paramNameArray = StringUtils.split(paramNames, ",");
 
-            Assert.isTrue(
+            Validate.isTrue(
                     paramTypesList.getJavaTypes().size() == paramNameArray.length,
                     "The method parameter types must have the same number of parameter names to create the method.");
 
@@ -140,13 +142,13 @@ public class ServiceCommands implements CommandMarker {
 
     }
 
-    @CliAvailabilityIndicator("service define ws")
+    @CliAvailabilityIndicator("remote service define ws")
     public boolean isServiceExportAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService);
+        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
     }
 
-    @CliCommand(value = "service define ws", help = "Defines a service endpoint interface (SEI) that will be mapped to a PortType in service contract. If target class doesn't exist the add-on will create it.")
+    @CliCommand(value = "remote service define ws", help = "Defines a service endpoint interface (SEI) that will be mapped to a PortType in service contract. If target class doesn't exist the add-on will create it.")
     public String serviceExport(
             @CliOption(key = "class", mandatory = true, help = "Name of the service class to export or create") JavaType serviceClass,
             @CliOption(key = "serviceName", mandatory = false, help = "Name to publish the Web Service.") String serviceName,
@@ -164,16 +166,16 @@ public class ServiceCommands implements CommandMarker {
         return sb.toString();
     }
 
-    @CliAvailabilityIndicator("service export operation")
+    @CliAvailabilityIndicator("remote service export operation")
     public boolean isServiceExportOperationAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService);
+        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
     }
 
-    @CliAvailabilityIndicator("service list operation")
+    @CliAvailabilityIndicator("remote service list operation")
     public boolean isServiceListOperationAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService);
+        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
     }
 
     /**
@@ -205,7 +207,7 @@ public class ServiceCommands implements CommandMarker {
      * ``--requestWrapperNamespace``: Namespace of the Request Wrapper Object.</li>
      * </ul>
      */
-    @CliCommand(value = "service export operation", help = "Publish a class method as web service operation in a PortType.")
+    @CliCommand(value = "remote service export operation", help = "Publish a class method as web service operation in a PortType.")
     public void serviceExportOperation(
             @CliOption(key = "class", mandatory = true, help = "Name of the service class to export a method.") JavaType serviceClass,
             @CliOption(key = "method", mandatory = true, help = "Method to export as Web Service Operation.") JavaSymbolName methodName,
@@ -217,21 +219,21 @@ public class ServiceCommands implements CommandMarker {
             @CliOption(key = "requestWrapperName", mandatory = false, help = "Name to define the Request Wrapper Object.") String requestWrapperName,
             @CliOption(key = "requestWrapperNamespace", mandatory = false, help = "Namespace of the Request Wrapper Object. \ni.e.: 'http://services.project.service.test.gvnix.org/'. It must have URI format.") String requestWrapperNamespace) {
 
-        if (StringUtils.hasText(resultNamespace)) {
-            Assert.isTrue(StringUtils.startsWithIgnoreCase(resultNamespace,
+        if (StringUtils.isNotBlank(resultNamespace)) {
+            Validate.isTrue(StringUtils.startsWithIgnoreCase(resultNamespace,
                     "http://"),
                     "Name space for WebResult is not correctly defined. It must have URI format.");
         }
 
-        if (StringUtils.hasText(requestWrapperNamespace)) {
-            Assert.isTrue(
+        if (StringUtils.isNotBlank(requestWrapperNamespace)) {
+            Validate.isTrue(
                     StringUtils.startsWithIgnoreCase(requestWrapperNamespace,
                             "http://"),
                     "Name space for RequestWrapper is not correctly defined. It must have URI format.");
         }
 
-        if (StringUtils.hasText(responseWrapperNamespace)) {
-            Assert.isTrue(
+        if (StringUtils.isNotBlank(responseWrapperNamespace)) {
+            Validate.isTrue(
                     StringUtils.startsWithIgnoreCase(responseWrapperNamespace,
                             "http://"),
                     "Name space for ResponsetWrapper is not correctly defined. It must have URI format.");
@@ -243,7 +245,7 @@ public class ServiceCommands implements CommandMarker {
                 requestWrapperName, requestWrapperNamespace);
     }
 
-    @CliCommand(value = "service list operation", help = "Shows available methods to export as web service operation in selected class.")
+    @CliCommand(value = "remote service list operation", help = "Shows available methods to export as web service operation in selected class.")
     public String serviceExportOperationList(
             @CliOption(key = "class", mandatory = true, help = "Name of the service class to list methods available to export as web service operations.") JavaType serviceClass) {
 
@@ -251,13 +253,13 @@ public class ServiceCommands implements CommandMarker {
                 .getAvailableServiceOperationsToExport(serviceClass);
     }
 
-    @CliAvailabilityIndicator("service import ws")
+    @CliAvailabilityIndicator("remote service import ws")
     public boolean isServiceImportAvailable() {
 
-        return OperationUtils.isProjectAvailable(metadataService);
+        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
     }
 
-    @CliCommand(value = "service import ws", help = "Imports a Web Service to Service class. If the class doesn't exists the Addon will create it.")
+    @CliCommand(value = "remote service import ws", help = "Imports a Web Service to Service class. If the class doesn't exists the Addon will create it.")
     public String serviceImport(
             @CliOption(key = "class", mandatory = true, help = "Name of the service class to import or create") JavaType serviceClass,
             @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
@@ -267,18 +269,18 @@ public class ServiceCommands implements CommandMarker {
         StringBuilder sb = new StringBuilder();
         sb.append("* New service can be used adding a property of this type with @Autowired annotation in the class that use it.");
         sb.append("\n");
-        sb.append("* If new service has security requirements, use 'service security ws' command.");
+        sb.append("* If new service has security requirements, use 'remote service security ws' command.");
         sb.append("\n");
         return sb.toString();
     }
 
-    @CliAvailabilityIndicator("service export ws")
+    @CliAvailabilityIndicator("remote service export ws")
     public boolean isServiceExportWsdl() {
 
-        return OperationUtils.isProjectAvailable(metadataService);
+        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
     }
 
-    @CliCommand(value = "service export ws", help = "Exports a Web Service from WSDL to java code with gvNIX annotations to generate this Web Service in project with dummy methods.")
+    @CliCommand(value = "remote service export ws", help = "Exports a Web Service from WSDL to java code with gvNIX annotations to generate this Web Service in project with dummy methods.")
     public String serviceExportWsdl(
             @CliOption(key = "wsdl", mandatory = true, help = "Local or remote location (URL) of the web service contract") String url) {
 
@@ -307,17 +309,17 @@ public class ServiceCommands implements CommandMarker {
         return sb.toString();
     }
 
-    @CliAvailabilityIndicator("service ws list")
+    @CliAvailabilityIndicator("remote service ws list")
     public boolean isServiceWsListAvalilable() {
-        return OperationUtils.isProjectAvailable(metadataService);
+        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
     }
 
-    @CliAvailabilityIndicator("service security ws")
+    @CliAvailabilityIndicator("remote service security ws")
     public boolean isServiceSecurityWs() {
-        return OperationUtils.isProjectAvailable(metadataService);
+        return OperationUtils.isProjectAvailable(metadataService, projectOperations);
     }
 
-    @CliCommand(value = "service security ws", help = "Adds Signature to a imported Web Service request")
+    @CliCommand(value = "remote service security ws", help = "Adds Signature to a imported Web Service request")
     public void serviceSecurityWs(
             @CliOption(key = "class", mandatory = true, help = "Name of the imported service class") JavaType importedServiceClass,
             @CliOption(key = "certificate", mandatory = true, help = "pkcs12 file to use for sing the request") File certificate,
@@ -330,7 +332,7 @@ public class ServiceCommands implements CommandMarker {
                 certificate, password, alias);
     }
 
-    @CliCommand(value = "service ws list", help = "Shows a class list with imported and/or exported services")
+    @CliCommand(value = "remote service ws list", help = "Shows a class list with imported and/or exported services")
     public String serviceWsList() {
 
         // Gets imported services

@@ -356,7 +356,7 @@ public class Entity1 {
         <listitem>
           <para xml:lang="es">Topping:</para>
 
-          <programlisting>roo-gvNIX&gt; <command>entity --class ~.domain.Topping --testAutomatically</command>
+          <programlisting>roo-gvNIX&gt; <command>entity jpa --class ~.domain.Topping --testAutomatically</command>
 ~.domain.Topping roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
                 </programlisting>
         </listitem>
@@ -364,7 +364,7 @@ public class Entity1 {
         <listitem>
           <para xml:lang="es">Base:</para>
 
-          <programlisting>~.domain.Topping roo-gvNIX&gt; <command>entity --class ~.domain.Base --testAutomatically</command>
+          <programlisting>~.domain.Topping roo-gvNIX&gt; <command>entity jpa --class ~.domain.Base --testAutomatically</command>
 ~.domain.Base roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
                 </programlisting>
         </listitem>
@@ -372,7 +372,7 @@ public class Entity1 {
         <listitem>
           <para xml:lang="es">Pizza:</para>
 
-          <programlisting>~.domain.Base roo-gvNIX&gt; <command>entity --class ~.domain.Pizza --testAutomatically</command>
+          <programlisting>~.domain.Base roo-gvNIX&gt; <command>entity jpa --class ~.domain.Pizza --testAutomatically</command>
 ~.domain.Pizza roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2 
 --comment "Nombre de la pizza" --column pizza_nombre --regexp [A-Za-z0-9].*</command>
 ~.domain.Pizza roo-gvNIX&gt; <command>field number --fieldName price --type java.lang.Float</command>
@@ -435,7 +435,7 @@ public class Pizza {
         <listitem>
           <para xml:lang="es">PizzaOrder:</para>
 
-          <programlisting>~.domain.Pizza roo-gvNIX&gt; <command>entity --class ~.domain.PizzaOrder --testAutomatically</command>
+          <programlisting>~.domain.Pizza roo-gvNIX&gt; <command>entity jpa --class ~.domain.PizzaOrder --testAutomatically</command>
 ~.domain.PizzaOrder roo-gvNIX&gt; <command>field string --fieldName name --notNull --sizeMin 2</command>
 ~.domain.PizzaOrder roo-gvNIX&gt; <command>field string --fieldName address --notNull --sizeMax 30</command>
 ~.domain.PizzaOrder roo-gvNIX&gt; <command>field number --fieldName total --type java.lang.Float</command>
@@ -633,7 +633,7 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
     definida una clave primaria compuesta de varios campos se puede hacer de
     la siguiente forma.</para>
 
-    <programlisting>roo-gvNIX&gt; entity --class ~.domain.ClassWithCompisitePK --identifierType ~.domain.CompositePK</programlisting>
+    <programlisting>roo-gvNIX&gt; entity jpa --class ~.domain.ClassWithCompisitePK --identifierType ~.domain.CompositePK</programlisting>
 
     <para>De esta forma se genera una clase <emphasis>CompositePK</emphasis>
     sobre la que podemos definir los campos que conformarán la clave primaria
@@ -663,7 +663,7 @@ import org.springframework.roo.addon.tostring.RooToString;</programlisting>
 ...
 ~.domain.CompositePK roo-gvNIX&gt; field string --fieldName campo2
 ...
-~.domain.CompositePK roo-gvNIX&gt; entity --class ~.domain.ClassWithCompisitePK --identifierType ~.domain.CompositePK
+~.domain.CompositePK roo-gvNIX&gt; entity jpa --class ~.domain.ClassWithCompisitePK --identifierType ~.domain.CompositePK
 ...
 </programlisting>
   </section>

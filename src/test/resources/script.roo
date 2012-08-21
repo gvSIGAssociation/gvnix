@@ -9,12 +9,12 @@ web report setup
 //controller class --class ~.web.MyController
 //web report add --controller ~.web.MyController --reportName Report --format pdf
 menu entry add --label my_test
-service class --class ~.services.Clase
-service operation --name checkString --service ~.services.Clase
-service define ws --class ~.services.Clase
-service operation --name returnString --service ~.services.Clase --return java.lang.String --exceptions java.lang.Exception
-service export operation --class ~.services.Clase --method returnString --resultName resultado
-service import ws --class ~.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
+remote service class --class ~.services.Clase
+remote service operation --name checkString --service ~.services.Clase
+remote service define ws --class ~.services.Clase
+remote service operation --name returnString --service ~.services.Clase --return java.lang.String --exceptions java.lang.Exception
+remote service export operation --class ~.services.Clase --method returnString --resultName resultado
+remote service import ws --class ~.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
 configuration create --name test
 configuration export
 perform tests

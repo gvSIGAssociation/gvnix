@@ -40,21 +40,21 @@ Create two Operation classes, one for service layer management ``ServiceLayerOpe
 Commands
 ---------
 
-* service class --class:
+* remote service class --class:
 
-* service operation --class clase --name nombreOperacion --return clase:
+* remote service operation --class clase --name nombreOperacion --return clase:
 
-* service define ws --class clase --name nombreServicio:
+* remote service define ws --class clase --name nombreServicio:
 
-* service export operation --class clase --method nombreMetodoEntidad --name nombreAPublicar:
+* remote service export operation --class clase --method nombreMetodoEntidad --name nombreAPublicar:
 
-* service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
+* remote service import ws --endPoint urlOPropiedad --wsdl url2wsdl.xml:
 
-* service entity --class nombreClase:
+* remote service entity --class nombreClase:
 
-* service ws list : List all project services (exported/imported) in console.
+* remote service ws list : List all project services (exported/imported) in console.
 
-* service security ws --class importedServiceClass --certificate path_to_certificate_file --password password --alias alias
+* remote service security ws --class importedServiceClass --certificate path_to_certificate_file --password password --alias alias
 
   Adds message signature to a imported Axis web service. Certificate file will be copy into project resource. 
 

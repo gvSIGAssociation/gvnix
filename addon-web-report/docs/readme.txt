@@ -50,9 +50,10 @@ Create a web application with gvNIX/Roo Shell script::
 
     project --topLevelPackage org.gvnix.test.report
     persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
-    entity --class ~.domain.Person --testAutomatically
+    entity jpa --class ~.domain.Person --testAutomatically
     field string --fieldName name --notNull
-    controller all --package ~.web
+    web mvc setup
+    web mvc all --package ~.web
 
 Run the application and take a look to the menu entries::
 

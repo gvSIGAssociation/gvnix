@@ -43,7 +43,7 @@ roo-gvNIX&gt;</programlisting>
     test de integración para el <emphasis>Domain Object</emphasis>. Para
     empezar crearemos la entidad <classname>Topping:</classname></para>
 
-    <programlisting>roo-gvNIX&gt; <command>entity --class ~.domain.Topping --testAutomatically</command>
+    <programlisting>roo-gvNIX&gt; <command>entity jpa --class ~.domain.Topping --testAutomatically</command>
 <computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain
 Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Topping.java
 Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain
@@ -113,7 +113,7 @@ Created SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseDataOnDemand_Roo
 Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base_Roo_JavaBean.aj
 Managed SRC_TEST_JAVA/com/springsource/roo/pizzashop/domain/BaseDataOnDemand_Roo_DataOnDemand.aj
 Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Base_Roo_ToString.aj</computeroutput>
-~.domain.Base roo-gvNIX&gt; <command>entity --class ~.domain.Pizza --testAutomatically</command>
+~.domain.Base roo-gvNIX&gt; <command>entity jpa --class ~.domain.Pizza --testAutomatically</command>
 <computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza.java
 ...
 ...
@@ -161,7 +161,7 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/Pizza_Roo_ToString.a
     <para xml:lang="es">De la misma manera se han de crear las entidades y
     relaciones <classname>PizzaOrder</classname>:</para>
 
-    <programlisting>~.domain.Pizza roo-gvNIX&gt; <command>entity --class ~.domain.PizzaOrder --testAutomatically</command> 
+    <programlisting>~.domain.Pizza roo-gvNIX&gt; <command>entity jpa --class ~.domain.PizzaOrder --testAutomatically</command> 
 <computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder.java
 ...
 ...
@@ -203,7 +203,7 @@ Managed SRC_MAIN_JAVA/com/springsource/roo/pizzashop/domain/PizzaOrder_Roo_ToStr
     poder visualizar la aplicación web mediante el comando de Roo
     <command>controller</command>:</para>
 
-    <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>controller all --package ~.web</command>
+    <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>web mvc setup</command> <command>web mvc all --package ~.web</command>
 <computeroutput>Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/web
 Created SRC_MAIN_JAVA/com/springsource/roo/pizzashop/web/ToppingController.java
 Created SRC_MAIN_WEBAPP/WEB-INF/spring

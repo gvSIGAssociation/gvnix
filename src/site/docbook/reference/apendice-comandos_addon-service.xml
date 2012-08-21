@@ -27,7 +27,7 @@
 
       <tbody>
         <row>
-          <entry><link linkend="apendice-comandos_addon-service_class">service
+          <entry><link linkend="apendice-comandos_addon-service_class">remote service
           class</link></entry>
 
           <entry>Crea una clase de Servicio Web nueva en el proyecto</entry>
@@ -35,7 +35,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-service_define_ws">service define
+          linkend="apendice-comandos_addon-service_define_ws">remote service define
           ws</link></entry>
 
           <entry>Define una interfaz del servicio. Si la clase indicada no
@@ -44,7 +44,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-service_operation">service
+          linkend="apendice-comandos_addon-service_operation">remote service
           operation</link></entry>
 
           <entry>Añade una nueva operación a la clase del servicio web</entry>
@@ -52,7 +52,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-service_export_operation">service
+          linkend="apendice-comandos_addon-service_export_operation">remote service
           export operation</link></entry>
 
           <entry>Publica un método como operación del servicio web en un
@@ -61,7 +61,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-service_list_operation">service
+          linkend="apendice-comandos_addon-service_list_operation">remote service
           list operation</link></entry>
 
           <entry>Muestra los métodos que pueden ser exportados como
@@ -70,7 +70,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-service_export_ws">service export
+          linkend="apendice-comandos_addon-service_export_ws">remote service export
           ws</link></entry>
 
           <entry>Exporta un servicio web desde un WSDL a código Java con
@@ -79,7 +79,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-service_import_ws">service import
+          linkend="apendice-comandos_addon-service_import_ws">remote service import
           ws</link></entry>
 
           <entry>Importa un servicio web a una clase Java.</entry>
@@ -87,7 +87,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-service_ws_list">service ws
+          linkend="apendice-comandos_addon-service_ws_list">remote service ws
           list</link></entry>
 
           <entry>Lista los servicios web de la aplicación.</entry>
@@ -95,7 +95,7 @@
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-service_security_ws">service
+          linkend="apendice-comandos_addon-service_security_ws">remote service
           security ws</link></entry>
 
           <entry>Añade la configuración necesaria para firmar una petición a
@@ -106,7 +106,7 @@
   </table>
 
   <section xml:id="apendice-comandos_addon-service_class">
-    <title>service class</title>
+    <title>remote service class</title>
 
     <para xml:lang="es">Crea la clase del servicio en
     SRC_MAIN_JAVA.<variablelist>
@@ -125,7 +125,7 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-service_define_ws">
-    <title>service define ws</title>
+    <title>remote service define ws</title>
 
     <para>Define una interfaz de servicio web que será enlazada con un
     PortType en la definición del servicio. Si la clase de destino no existe,
@@ -192,7 +192,7 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-service_operation">
-    <title>service operation</title>
+    <title>remote service operation</title>
 
     <para xml:lang="es">Añade un nuevo método a la clase del servicio
     web.</para>
@@ -356,7 +356,7 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-service_list_operation">
-    <title>service list operation</title>
+    <title>remote service list operation</title>
 
     <para>Muestra los métodos de la clase seleccionada que pueden ser
     exportados como operaciones del servicio web.</para>
@@ -377,7 +377,7 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-service_export_ws">
-    <title>service export ws</title>
+    <title>remote service export ws</title>
 
     <para>Exporta un servicio web desde un WSDL a código Java con anotaciones
     gvNIX con implementación de métodos de ejemplo.</para>
@@ -397,7 +397,7 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-service_import_ws">
-    <title>service import ws</title>
+    <title>remote service import ws</title>
 
     <para>Importa un servicio web a una clase Java como cliente del servicio
     web a importar.</para>
@@ -430,13 +430,13 @@
   </section>
 
   <section xml:id="apendice-comandos_addon-service_ws_list">
-    <title>service ws list</title>
+    <title>remote service ws list</title>
 
     <para>Lista los servicios web que están registrados en la aplicación,
     tanto los exportados como los importados. El resultado se formatea de la
     siguiente forma:</para>
 
-    <programlisting>roo-gvNIX&gt; service ws list
+    <programlisting>roo-gvNIX&gt; remote service ws list
 service     exported     imported
 ---------   ---------   ----------
 Service1       X
@@ -445,7 +445,7 @@ Service3                    X </programlisting>
   </section>
 
   <section xml:id="apendice-comandos_addon-service_security_ws">
-    <title>service security ws</title>
+    <title>remote service security ws</title>
 
     <para>Añade la configuración necesaria para firmar una petición de un
     cliente de servicio web creado con la libería Axis.</para>

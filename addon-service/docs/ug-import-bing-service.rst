@@ -103,7 +103,7 @@ Create the project::
 
 Create local service from Bing WSDL that defines the service contract. This local service will act as "service proxy" and will route our local invocations to the remote service::
 
-  org.gvnix.search roo> service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
+  org.gvnix.search roo> remote service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
 
   Created SRC_MAIN_JAVA/org/gvnix/search/service
   Created SRC_MAIN_JAVA/org/gvnix/search/service/SearchService.java

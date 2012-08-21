@@ -30,14 +30,14 @@
       todos los métodos disponibles en el WS. Una vez creada la clase, debemos
       añadir las operaciones que ofrece el servicio web y exponerlos para que
       sean accesibles. Con <link
-      linkend="apendice-comandos_addon-service_class">service class</link>
+      linkend="apendice-comandos_addon-service_class">remote service class</link>
       declaramos la clase Java que ofrece los servicios.</para>
 
       <para>De momento nuestro servicio no está definido como tal, es decir,
       no se puede publicar puesto que aun no tiene ninguna anotación que el
       framework usará para exponer el servicio. Esto lo coneguimos ejecutanto
       el comando <link
-      linkend="apendice-comandos_addon-service_define_ws">service define
+      linkend="apendice-comandos_addon-service_define_ws">remote service define
       ws</link> que añadirá la anotación
       <emphasis>@GvNIXWebService</emphasis>. gvNIX generará los componentes
       necesarios para exponer el servicio web.</para>
@@ -45,9 +45,9 @@
       <para>Ahora bien, de momento el servicio tampoco tiene ninguna operación
       accesible, para ello debemos crearlas añadiendo métodos a la clase Java
       y exportarlas. Esto lo logramos mediante <link
-      linkend="apendice-comandos_addon-service_operation">service
+      linkend="apendice-comandos_addon-service_operation">remote service
       operation</link>, que añade los métodos a la clase y <link
-      linkend="apendice-comandos_addon-service_export_operation">service
+      linkend="apendice-comandos_addon-service_export_operation">remote service
       export operation</link> que añade la anotación
       <emphasis>@GvNIXWebMethod</emphasis> al método, que informará a gvNIX de
       que debe generar el código necesario para que la operación esté
@@ -64,13 +64,13 @@ public class MyWebService {
 }</programlisting>
 
       <para>El comando <link
-      linkend="apendice-comandos_addon-service_list_operation">service list
+      linkend="apendice-comandos_addon-service_list_operation">remote service list
       operations</link> muestra qué operaciones existentes en la clase
       seleccionada están disponibles para ser exportados.</para>
 
       <para>Existe otra forma para crear servicios. Consiste en generar el
       servicio basado en un archivo WSDL. Con <link
-      linkend="apendice-comandos_addon-service_export_ws">service export
+      linkend="apendice-comandos_addon-service_export_ws">remote service export
       ws</link> indicando la ruta a un archivo WSDL (archivo en local o URL en
       Internet) generamos una réplica del servicio en la que las operaciones
       son implementaciones senciallas a modo de ejemplo.</para>
@@ -85,7 +85,7 @@ public class MyWebService {
 
       <para>Podemos generar un cliente para un servicio web existente usando
       el comando <link
-      linkend="apendice-comandos_addon-service_import_ws">service import
+      linkend="apendice-comandos_addon-service_import_ws">remote service import
       ws</link>. Facilitando la ruta a un WSDL, gvNIX generará la clase que
       contendrá los métdos del cliente.</para>
 
@@ -221,7 +221,7 @@ public class MyWebService {
         </orderedlist>
 
         <para>Disponiendo de esto elementos, usaremos el comando <link
-        xlink:href="apendice-comandos_addon-service_security_ws">service
+        xlink:href="apendice-comandos_addon-service_security_ws">remote service
         security ws</link> para añadir la operación.</para>
       </section>
     </section>
@@ -230,13 +230,13 @@ public class MyWebService {
       <title>Lista de servicios web en la aplicación</title>
 
       <para>El comando <link
-      xlink:href="apendice-comandos_addon-service_ws_list">service ws
+      xlink:href="apendice-comandos_addon-service_ws_list">remote service ws
       list</link> permite obtener un listado de los servicios exportados o
       importados en la aplicación.</para>
 
       <para>El resultado es una salida como esta:</para>
 
-      <programlisting>roo-gvNIX&gt; service ws list
+      <programlisting>roo-gvNIX&gt; remote service ws list
 service     exported     imported
 ---------   ---------   ----------
 Service1       X

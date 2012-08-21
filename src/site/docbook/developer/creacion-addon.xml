@@ -399,7 +399,7 @@ public class MyServiceUser{
                 añadir mas de un key. Si se añade una cadena vacía se asumirá
                 que es el parámetro por defecto (por ejemplo es equivalente el
                 comando <command>field string campoCadena</command> que
-                <command>entity --fieldName campoCadena</command>).</para>
+                <command>entity jpa --fieldName campoCadena</command>).</para>
               </listitem>
             </varlistentry>
 

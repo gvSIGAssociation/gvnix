@@ -7,16 +7,17 @@ entity jpa --class ~.domain.Entity2
 field string otherField1
 field string otherField2
 occ checksum all
-controller all --package ~.web
+web mvc setup
+web mvc all --package ~.web
 theme install --id gvnix 
 theme set --id gvnix 
-service class --class ~.services.ClaseServicio
-service operation --name checkString --service ~.services.ClaseServicio
-service operation --name inputParameters --service ~.services.ClaseServicio --return java.lang.String --paramTypes java.lang.Integer,java.lang.String --paramNames number,name
-service define ws --class ~.services.ClaseServicio
-service export operation --class ~.services.ClaseServicio --method checkString
-service export operation --class ~.services.ClaseServicio --method inputParameters
-service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
+remote service class --class ~.services.ClaseServicio
+remote service operation --name checkString --service ~.services.ClaseServicio
+remote service operation --name inputParameters --service ~.services.ClaseServicio --return java.lang.String --paramTypes java.lang.Integer,java.lang.String --paramNames number,name
+remote service define ws --class ~.services.ClaseServicio
+remote service export operation --class ~.services.ClaseServicio --method checkString
+remote service export operation --class ~.services.ClaseServicio --method inputParameters
+remote service import ws --wsdl http://api.bing.net/search.wsdl --class ~.service.SearchService
 perform tests
 perform eclipse
 perform package

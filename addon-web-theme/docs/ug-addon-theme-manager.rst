@@ -57,9 +57,10 @@ Create a web application with gvNix/Roo Shell script::
 
     project --topLevelPackage org.gvnix.test.menu
     persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
-    entity --class ~.domain.Person --testAutomatically 
-    field string --fieldName name --notNull 
-    controller all --package ~.web
+    entity jpa --class ~.domain.Person --testAutomatically 
+    field string --fieldName name --notNull
+    web mvc setup 
+    web mvc all --package ~.web
 
 Run the application and see the actual style::
 

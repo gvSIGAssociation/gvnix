@@ -16,7 +16,8 @@ field reference --fieldName person --type org.gvnix.test.web.report.project.doma
 focus --class ~.domain.Person
 field set --fieldName coches --type org.gvnix.test.web.report.project.domain.Car --cardinality ONE_TO_MANY --mappedBy person
 
-controller all --package org.gvnix.test.web.report.project.web
+web mvc setup
+web mvc all --package org.gvnix.test.web.report.project.web
 
 web report setup
 

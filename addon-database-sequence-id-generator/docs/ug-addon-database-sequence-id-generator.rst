@@ -43,11 +43,12 @@ Create a web application with database connection (previous existing database) u
   project --topLevelPackage org.gvnix.test.generated.id.sequence--projectName generatedIdSequence
   persistence setup --provider HIBERNATE --database POSTGRES --databaseName generated-id-test
   persistence setup --provider HIBERNATE --database POSTGRES --databaseName generated-id-test --userName user --password user
-  entity --class ~.domain.Person --testAutomatically 
+  entity jpa --class ~.domain.Person --testAutomatically 
   field string --fieldName name --class org.gvnix.test.generated.id.sequence.domain.Person
-  entity --class ~.domain.RoundTable
+  entity jpa --class ~.domain.RoundTable
   field string --fieldName name --class org.gvnix.test.generated.id.sequence.domain.RoundTable
-  controller all --package org.gvnix.test.generated.id.sequence.web
+  web mvc setup
+  web mvc all --package org.gvnix.test.generated.id.sequence.web
 
 Use the command to add a sequence id to Person Entity::
 

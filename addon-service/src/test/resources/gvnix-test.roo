@@ -23,66 +23,67 @@ field reference --fieldName person --type org.gvnix.test.service.layer.project.d
 focus --class ~.domain.Person
 field set --fieldName coches --type org.gvnix.test.service.layer.project.domain.Car --cardinality ONE_TO_MANY --mappedBy person
 
-controller all --package org.gvnix.test.service.layer.project.web
+web mvc setup
+web mvc all --package org.gvnix.test.service.layer.project.web
 
 // [CORRECT] Create Service Class.
-service class --class org.gvnix.test.service.layer.project.services.Clase
+remote service class --class org.gvnix.test.service.layer.project.services.Clase
 
 // [CORRECT] Create service operations without return type.
-service operation --name checkString --service org.gvnix.test.service.layer.project.services.Clase
+remote service operation --name checkString --service org.gvnix.test.service.layer.project.services.Clase
 
 // [CORRECT] Export Class as web service.
-service define ws --class org.gvnix.test.service.layer.project.services.Clase
+remote service define ws --class org.gvnix.test.service.layer.project.services.Clase
 
 // [CORRECT] Create and Export operation Throwing an exception exception.
-service operation --name returnString --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --exceptions java.lang.Exception
-service export operation --class org.gvnix.test.service.layer.project.services.Clase --method returnString --resultName resultado
+remote service operation --name returnString --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --exceptions java.lang.Exception
+remote service export operation --class org.gvnix.test.service.layer.project.services.Clase --method returnString --resultName resultado
 
 // [CORRECT] Create and Export operation with correct input parameters.
-service operation --name inputParameters --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --paramTypes java.lang.Integer,java.lang.String --paramNames number,name
-service export operation --class org.gvnix.test.service.layer.project.services.Clase --method inputParameters
+remote service operation --name inputParameters --service org.gvnix.test.service.layer.project.services.Clase --return java.lang.String --paramTypes java.lang.Integer,java.lang.String --paramNames number,name
+remote service export operation --class org.gvnix.test.service.layer.project.services.Clase --method inputParameters
 
 // Import Remote Document Style web services: will be generated with CXF
 
 // [CORRECT] Transport: HTTP,  Operations: 2, Bindings: SOAP, SOAP12, HTTP POST, Use: Literal
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy00 --wsdl http://www.w3schools.com/webservices/tempconvert.asmx?WSDL
 
 // [CORRECT] Transport: HTTP,  Operations: 1, Bindings: SOAP, Use: Literal, Implementation: MS .NET, Authentication/Authorization: WS-Security, Complex Types,
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy02 --wsdl http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy02 --wsdl http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl
 
 // [CORRECT] Transport: HTTP,  Operations: 3, Bindings: SOAP, SOAP12, HTTP GET, HTTP POST, Use: Literal
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy03 --wsdl http://wsf.cdyne.com/WeatherWS/Weather.asmx?WSDL
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy03 --wsdl http://wsf.cdyne.com/WeatherWS/Weather.asmx?WSDL
 
 // [CORRECT] Transport: HTTP,  Operations: 4, Bindings: SOAP 1.1, Use: Literal, Implementation: Glue 4.1.2, Messaging Pattern: Synchronous
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy04 --wsdl http://soatest.parasoft.com/calculator.wsdl
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy04 --wsdl http://soatest.parasoft.com/calculator.wsdl
 
 // [CORRECT] Transport: HTTP,  Operations: 1, Bindings: SOAP, SOAP12, HTTP GET, HTTP POST, Use: Literal, Implementation: MS .NET
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy05 --wsdl http://www.ripedevelopment.com/webservices/LocalTime.asmx?WSDL
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy05 --wsdl http://www.ripedevelopment.com/webservices/LocalTime.asmx?WSDL
 
 // [CORRECT] Transport HTTPS, Operations: 4, Bindings: SOAP, Use: Literal
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy06 --wsdl http://elasticmapreduce.amazonaws.com/doc/2009-03-31/ElasticMapReduce.wsdl
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy06 --wsdl http://elasticmapreduce.amazonaws.com/doc/2009-03-31/ElasticMapReduce.wsdl
 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy07 --wsdl http://footballpool.dataaccess.eu/data/info.wso?WSDL
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy07 --wsdl http://footballpool.dataaccess.eu/data/info.wso?WSDL
 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy08 --wsdl http://ws2.fraudlabs.com/mailboxvalidator.asmx?wsdl
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy08 --wsdl http://ws2.fraudlabs.com/mailboxvalidator.asmx?wsdl
 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy09 --wsdl http://www.thomas-bayer.com/axis2/services/BLZService?wsdl
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy09 --wsdl http://www.thomas-bayer.com/axis2/services/BLZService?wsdl
 
 // Import Remote RPC Style web services: will be generated with Axis
 
 // [CORRECT] Transport: HTTP, Bindings: SOAP, Use: Encoded
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy10 --wsdl http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy10 --wsdl http://pruebas.ha.gva.es/WS_BDC/WSBDC.WebServicios?WSDL
 
 // [CORRECT] Transport: HTTP, Operations: 179, Bindings: SOAP, Use: Encoded, Implementation: AXIS
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy12 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy12 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
 
 // [CORRECT] Transport: HTTP, Operations: 1, Bindings: SOAP, Use: Encoded, Implementation: JAX-RPC, Namespace: urn
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy14 --wsdl http://www.comp.rgu.ac.uk/QueryComputing/query?WSDL
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy14 --wsdl http://www.comp.rgu.ac.uk/QueryComputing/query?WSDL
 
-service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy17 --wsdl http://www.unifiedsoftware.co.uk/freeibanvalidate.wsdl
+remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy17 --wsdl http://www.unifiedsoftware.co.uk/freeibanvalidate.wsdl
 
 // [CORRECT] Import WS from a non confident server
-service import ws --class ~.services.ServiciosMapProxy1 --wsdl https://sleipnir2.accv.es:8448/accv_map_gateway/services/ServiciosMap?wsdl
+remote service import ws --class ~.services.ServiciosMapProxy1 --wsdl https://sleipnir2.accv.es:8448/accv_map_gateway/services/ServiciosMap?wsdl
 
 perform tests
 
