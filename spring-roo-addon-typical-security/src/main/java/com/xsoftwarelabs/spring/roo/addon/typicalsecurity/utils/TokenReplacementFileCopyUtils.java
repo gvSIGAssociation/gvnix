@@ -9,17 +9,15 @@ import java.io.OutputStream;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-
 /**
  * @author rohit 
  *
  */
-public class TokenReplacementFileCopyUtils extends FileCopyUtils {
+public class TokenReplacementFileCopyUtils {
+	static int BUFFER_SIZE = 8192;
 	public static int replaceAndCopy(InputStream in, OutputStream out, Properties replacement) throws IOException {
-        Assert.notNull(in, "No InputStream specified");
-        Assert.notNull(out, "No OutputStream specified");
+        assert in != null :  "No InputStream specified";
+        assert out != null  : "No OutputStream specified";
         StringBuffer sb = new StringBuffer();
         try {
                 int byteCount = 0;

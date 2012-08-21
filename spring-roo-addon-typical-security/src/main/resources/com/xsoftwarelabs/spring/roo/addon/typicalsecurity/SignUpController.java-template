@@ -99,16 +99,16 @@ public class SignUpController {
         }
     }
 
-    @RequestMapping
+    @RequestMapping(value = "/index")
     public String index() {
         return "signup/index";
     }
 
-    @RequestMapping
+    @RequestMapping(value = "/thanks")
     public String thanks() {
         return "signup/thanks";
     }
-    @RequestMapping
+    @RequestMapping(value = "/error")
     public String error() {
         return "signup/error";
     }

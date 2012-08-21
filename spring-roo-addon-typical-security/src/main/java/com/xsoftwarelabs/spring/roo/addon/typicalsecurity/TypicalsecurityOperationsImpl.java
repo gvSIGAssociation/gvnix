@@ -24,13 +24,13 @@ import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.shell.Shell;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
@@ -71,7 +71,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		 *		return getPathResolver() != null
 		 *				&& classpathOperations.isPersistentClassAvailable();
 		 */
-		return projectOperations.isProjectAvailable();
+		return projectOperations.isFocusedProjectAvailable();
 	}
 
 	public String setup(String entityPackage, String controllerPackage) {
@@ -90,9 +90,8 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		// <artifactId>recaptcha4j</artifactId>
 		// <version>0.0.7</version>
 		// </dependency>
-		projectOperations.addDependency(new Dependency(
-				"net.tanesha.recaptcha4j", "recaptcha4j", "0.0.7"));
-
+		projectOperations.addDependency(projectOperations.getFocusedModuleName(), 
+				new Dependency("net.tanesha.recaptcha4j", "recaptcha4j", "0.0.7"));
 	}
 
 	/**
@@ -105,7 +104,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		// -----------------------------------------------------------------------------------
 		// Create User entity
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("entity --class " + entityPackage
+		shell.executeCommand("entity jpa --class " + entityPackage
 				+ ".User --testAutomatically --permitReservedWords");
 		shell.executeCommand("field string --fieldName firstName --sizeMin 1 --notNull");
 		shell.executeCommand("field string --fieldName lastName --sizeMin 1 --notNull");
@@ -119,7 +118,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		// -----------------------------------------------------------------------------------
 		// Create Role entity
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("entity --class " + entityPackage
+		shell.executeCommand("entity jpa --class " + entityPackage
 				+ ".Role --testAutomatically --permitReservedWords");
 		shell.executeCommand("field string --fieldName roleName --sizeMin 1 --notNull --unique");
 		shell.executeCommand("field string --fieldName roleDescription --sizeMin --sizeMax 200 --notNull");
@@ -127,7 +126,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		// -----------------------------------------------------------------------------------
 		// Create User Role Mapping
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("entity --class " + entityPackage
+		shell.executeCommand("entity jpa --class " + entityPackage
 				+ ".UserRole --testAutomatically");
 		shell.executeCommand("field reference --fieldName userEntry --type "
 				+ entityPackage + ".User --notNull");
@@ -159,22 +158,22 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		// -----------------------------------------------------------------------------------
 		// Controller for User
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("controller scaffold --class " + controllerPackage
-				+ ".UserController --entity " + entityPackage
+		shell.executeCommand("web mvc scaffold --class " + controllerPackage
+				+ ".UserController --backingType " + entityPackage
 				+ ".User");
 
 		// -----------------------------------------------------------------------------------
 		// Controller for Role
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("controller scaffold --class " + controllerPackage
-				+ ".RoleController --entity " + entityPackage
+		shell.executeCommand("web mvc scaffold --class " + controllerPackage
+				+ ".RoleController --backingType " + entityPackage
 				+ ".Role");
 
 		// -----------------------------------------------------------------------------------
 		// Controller for User Role
 		// -----------------------------------------------------------------------------------
-		shell.executeCommand("controller scaffold --class " + controllerPackage
-				+ ".UserRoleController --entity " + entityPackage
+		shell.executeCommand("web mvc scaffold --class " + controllerPackage
+				+ ".UserRoleController --backingType " + entityPackage
 				+ ".UserRole");
 
 	}
@@ -215,7 +214,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
 	private void createMailSender() {
 		shell.executeCommand("email sender setup --hostServer smtp.gmail.com --port 587 --protocol SMTP --username rohitsghatoltest@gmail.com --password password4me");
-		shell.executeCommand("email template setup --from rohitsghatoltest@gmail.com --subject Password Recovery");
+		shell.executeCommand("email template setup --from rohitsghatoltest@gmail.com --subject \"Password Recovery\"");
 
 	}
 
@@ -226,7 +225,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 	 * @param entityPackage
 	 */
 	private void injectDatabasebasedAuthProviderInXml(String entityPackage) {
-		String springSecurity = pathResolver.getIdentifier(
+		String springSecurity = pathResolver.getFocusedIdentifier(
 				Path.SRC_MAIN_RESOURCES,
 				"META-INF/spring/applicationContext-security.xml");
 
@@ -247,8 +246,8 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
 		Element firstInterceptUrl = XmlUtils.findFirstElementByName(
 				"intercept-url", webConfigDoc.getDocumentElement());
-		Assert.notNull(firstInterceptUrl, "Could not find intercept-url in "
-				+ springSecurity);
+		assert firstInterceptUrl != null : "Could not find intercept-url in "
+				+ springSecurity;
 
 		firstInterceptUrl.getParentNode().insertBefore(
 				new XmlElementBuilder("intercept-url", webConfigDoc)
@@ -256,7 +255,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 						.addAttribute("access", "isAuthenticated()").build(),
 				firstInterceptUrl);
 
-		JavaPackage topLevelPackage = getProjectMetadata().getTopLevelPackage();
+		JavaPackage topLevelPackage = projectOperations.getFocusedTopLevelPackage();
 
 		String authenticationProviderClass = topLevelPackage
 				.getFullyQualifiedPackageName()
@@ -293,9 +292,9 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		
 		authenticationManager.replaceChild(newAuthProvider, oldAuthProvider);
 
-		newAuthProvider.appendChild(
-				new XmlElementBuilder("password-encoder", webConfigDoc)
-					.addAttribute("hash", "sha-256").build());
+//		newAuthProvider.appendChild(
+//				new XmlElementBuilder("password-encoder", webConfigDoc)
+//					.addAttribute("hash", "sha-256").build());
 
 		XmlUtils.writeXml(mutableConfigXml.getOutputStream(), webConfigDoc);
 
@@ -307,30 +306,30 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 	 * @param entityPackage
 	 */
 	private void autowireMessageDigestPasswordEncoder(String entityPackage) {
-		String applicationContext = pathResolver.getIdentifier(
+		String applicationContextSecurity = pathResolver.getFocusedIdentifier(
 				Path.SRC_MAIN_RESOURCES,
-				"META-INF/spring/applicationContext.xml");
+				"META-INF/spring/applicationContext-security.xml");
 
 		MutableFile mutableConfigXml = null;
 		Document webConfigDoc;
 		try {
-			if (fileManager.exists(applicationContext)) {
-				mutableConfigXml = fileManager.updateFile(applicationContext);
+			if (fileManager.exists(applicationContextSecurity)) {
+				mutableConfigXml = fileManager.updateFile(applicationContextSecurity);
 				webConfigDoc = XmlUtils.getDocumentBuilder().parse(
 						mutableConfigXml.getInputStream());
 			} else {
 				throw new IllegalStateException("Could not acquire "
-						+ applicationContext);
+						+ applicationContextSecurity);
 			}
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 
-		Element messageDigestPasswordEncoder = new XmlElementBuilder("bean", webConfigDoc)
+		Element messageDigestPasswordEncoder = new XmlElementBuilder("beans:bean", webConfigDoc)
 			.addAttribute("id", "messageDigestPasswordEncoder")
 			.addAttribute("class", "org.springframework.security.authentication.encoding.MessageDigestPasswordEncoder")
 			.addChild(
-				new XmlElementBuilder("constructor-arg", webConfigDoc)
+				new XmlElementBuilder("beans:constructor-arg", webConfigDoc)
 						.addAttribute("value", "sha-256").build()).build();
 		
 		webConfigDoc.getDocumentElement().appendChild(messageDigestPasswordEncoder);
@@ -347,7 +346,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 	private void createAuthenticationProvider(String entityPackage,
 			String controllerPackage) {
 
-		JavaPackage topLevelPackage = getProjectMetadata().getTopLevelPackage();
+		JavaPackage topLevelPackage = projectOperations.getFocusedTopLevelPackage();
 
 		String packagePath = topLevelPackage.getFullyQualifiedPackageName()
 				.replace('.', separator);
@@ -366,88 +365,88 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
 		Map<String, String> map = new HashMap<String, String>();
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
 				finalControllerPackage.replace('.', separator) + separator
 						+ "ChangePasswordController.java"),
 				"ChangePasswordController.java-template");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
 				finalControllerPackage.replace('.', separator) + separator
 						+ "ChangePasswordForm.java"),
 				"ChangePasswordForm.java-template");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
 				finalControllerPackage.replace('.', separator) + separator
 						+ "ChangePasswordValidator.java"),
 				"ChangePasswordValidator.java-template");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
 				finalControllerPackage.replace('.', separator) + separator
 						+ "SignUpController.java"),
 				"SignUpController.java-template");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
 				finalControllerPackage.replace('.', separator) + separator
 						+ "UserRegistrationForm.java"),
 				"UserRegistrationForm.java-template");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
 				finalControllerPackage.replace('.', separator) + separator
 						+ "SignUpValidator.java"),
 				"SignUpValidator.java-template");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
 				finalControllerPackage.replace('.', separator) + separator
 						+ "ForgotPasswordController.java"),
 				"ForgotPasswordController.java-template");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
 				finalControllerPackage.replace('.', separator) + separator
 						+ "ForgotPasswordForm.java"),
 				"ForgotPasswordForm.java-template");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA, packagePath
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA, packagePath
 				+ separator + "provider" + separator
 				+ "DatabaseAuthenticationProvider.java"),
 				"DatabaseAuthenticationProvider.java-template");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_JAVA,
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_JAVA,
 				finalControllerPackage.replace('.', separator) + separator
 						+ "UserController.java"),
 				"UserController.java-template");
 
 		String prefix = separator + "WEB-INF/views";
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, prefix
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
 				+ separator + "signup" + separator + "index.jspx"),
 				"signup/index.jspx");
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, prefix
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
 				+ separator + "signup" + separator + "thanks.jspx"),
 				"signup/thanks.jspx");
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, prefix
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
 				+ separator + "signup" + separator + "error.jspx"),
 				"signup/error.jspx");
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, prefix
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
 				+ separator + "signup" + separator + "views.xml"),
 				"signup/views.xml");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, prefix
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
 				+ separator + "forgotpassword" + separator + "index.jspx"),
 				"forgotpassword/index.jspx");
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, prefix
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
 				+ separator + "forgotpassword" + separator + "thanks.jspx"),
 				"forgotpassword/thanks.jspx");
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, prefix
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
 				+ separator + "forgotpassword" + separator + "views.xml"),
 				"forgotpassword/views.xml");
 
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, prefix
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
 				+ separator + "changepassword" + separator + "index.jspx"),
 				"changepassword/index.jspx");
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, prefix
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
 				+ separator + "changepassword" + separator + "thanks.jspx"),
 				"changepassword/thanks.jspx");
-		map.put(pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, prefix
+		map.put(pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP, prefix
 				+ separator + "changepassword" + separator + "views.xml"),
 				"changepassword/views.xml");
 
@@ -465,7 +464,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 					mutableFile = fileManager.createFile(path);
 
 				TokenReplacementFileCopyUtils.replaceAndCopy(
-						TemplateUtils.getTemplate(getClass(), file),
+						FileUtils.getInputStream(getClass(), file),
 						mutableFile.getOutputStream(), properties);
 				
 				insertI18nMessages();
@@ -485,7 +484,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		// and append
 		// <a href="changePassword/index">Change Password</a>
 
-		String footerJspx = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		String footerJspx = pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
 				"WEB-INF/views/footer.jspx");
 
 		MutableFile mutableFooterJspx = null;
@@ -498,14 +497,14 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 				Element logout = XmlUtils.findFirstElement(
 						"//a[@href=\"${logout}\"]",
 						footerJspxDoc.getDocumentElement());
-				Assert.notNull(logout,
+				assert logout != null :
 						"Could not find <a href=\"${logout}\"> in "
-								+ footerJspx);
+								+ footerJspx;
 
 				logout.getParentNode().appendChild(
 						new XmlElementBuilder("div", footerJspxDoc).addChild(
 								footerJspxDoc.createTextNode("|")).build());
-				String contextPath = getProjectMetadata().getProjectName();
+				String contextPath = projectOperations.getFocusedProjectName();
 				logout.getParentNode().appendChild(
 						new XmlElementBuilder("a", footerJspxDoc)
 								.addAttribute(
@@ -536,7 +535,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 		// | Not a User Yet? <a href ="/TypicalSecurity/signup?form">Sign In</a>
 		// </div>
 
-		String loginJspx = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP,
+		String loginJspx = pathResolver.getFocusedIdentifier(Path.SRC_MAIN_WEBAPP,
 				"WEB-INF/views/login.jspx");
 
 		MutableFile mutableLoginJspx = null;
@@ -548,9 +547,9 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 						mutableLoginJspx.getInputStream());
 				Element form = XmlUtils.findFirstElementByName("form",
 						loginJspxDoc.getDocumentElement());
-				Assert.notNull(form, "Could not find form in " + loginJspx);
+				assert form != null : "Could not find form in " + loginJspx;
 
-				String contextPath = getProjectMetadata().getProjectName();
+				String contextPath = projectOperations.getFocusedProjectName();
 				form.appendChild(new XmlElementBuilder("div", loginJspxDoc)
 						.addChild(
 								loginJspxDoc
@@ -575,7 +574,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 	}
 
 	private void insertI18nMessages() {
-		String applicationProperties = pathResolver.getIdentifier(
+		String applicationProperties = pathResolver.getFocusedIdentifier(
 				Path.SRC_MAIN_WEBAPP, "WEB-INF/i18n/application.properties");
 
 		MutableFile mutableApplicationProperties = null;
@@ -653,11 +652,11 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 	 */
 	private PathResolver getPathResolver() {
 		ProjectMetadata projectMetadata = (ProjectMetadata) metadataService
-				.get(ProjectMetadata.getProjectIdentifier());
+				.get(ProjectMetadata.getProjectIdentifier(null));
 		if (projectMetadata == null) {
 			return null;
 		}
-		return projectMetadata.getPathResolver();
+		return projectOperations.getPathResolver();
 	}
 
 	/**
@@ -666,7 +665,7 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 	 */
 	private ProjectMetadata getProjectMetadata() {
 		return (ProjectMetadata) metadataService.get(ProjectMetadata
-				.getProjectIdentifier());
+				.getProjectIdentifier(projectOperations.getFocusedModuleName()));
 	}
 
 }
