@@ -59,8 +59,8 @@
     <module>addon-web-pattern</module>
     <module>addon-web-mvc-binding</module>
     <module>addon-web-dialog</module>
-<!--
     <module>spring-roo-addon-typical-security</module>
+<!--
     <module>spring-flex-roo</module>
 -->
   </modules>
