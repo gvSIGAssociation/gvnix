@@ -24,6 +24,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeCategory;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeMetadata;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeMetadataProvider;
@@ -42,11 +45,7 @@ import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.support.util.Assert;
 import org.springframework.roo.support.util.CollectionUtils;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
 
 import uk.co.badgersinfoil.metaas.ActionScriptFactory;
 import uk.co.badgersinfoil.metaas.dom.ASClassType;
@@ -102,13 +101,13 @@ public class As3ParserMutableClassOrInterfaceTypeDetails implements ASMutableCla
     @SuppressWarnings("unchecked")
     public As3ParserMutableClassOrInterfaceTypeDetails(ASCompilationUnit compilationUnit, FileManager fileManager, String declaredByMetadataId,
         String fileIdentifier, ActionScriptType typeName, MetadataService metadataService, ASPhysicalTypeMetadataProvider physicalTypeMetadataProvider) {
-        Assert.notNull(compilationUnit, "Compilation unit required");
-        Assert.notNull(fileManager, "File manager requried");
-        Assert.notNull(declaredByMetadataId, "Declared by metadata ID required");
-        Assert.notNull(fileIdentifier, "File identifier (canonical path) required");
-        Assert.notNull(typeName, "Name required");
-        Assert.notNull(metadataService, "Metadata service required");
-        Assert.notNull(physicalTypeMetadataProvider, "Physical type metadata provider required");
+        Validate.notNull(compilationUnit, "Compilation unit required");
+        Validate.notNull(fileManager, "File manager requried");
+        Validate.notNull(declaredByMetadataId, "Declared by metadata ID required");
+        Validate.notNull(fileIdentifier, "File identifier (canonical path) required");
+        Validate.notNull(typeName, "Name required");
+        Validate.notNull(metadataService, "Metadata service required");
+        Validate.notNull(physicalTypeMetadataProvider, "Physical type metadata provider required");
 
         this.name = typeName;
 
@@ -121,7 +120,7 @@ public class As3ParserMutableClassOrInterfaceTypeDetails implements ASMutableCla
 
         this.compilationUnitPackage = typeName.getPackage();
 
-        Assert.notNull(compilationUnit.getType(), "No types in compilation unit, so unable to continue parsing");
+        Validate.notNull(compilationUnit.getType(), "No types in compilation unit, so unable to continue parsing");
 
         this.clazz = compilationUnit.getType();
 
@@ -141,12 +140,12 @@ public class As3ParserMutableClassOrInterfaceTypeDetails implements ASMutableCla
         }
 
         // Verify the package declaration appears to be correct
-        Assert.isTrue(this.compilationUnitPackage.equals(this.name.getPackage()), "Compilation unit package '" + this.compilationUnitPackage
+        Validate.isTrue(this.compilationUnitPackage.equals(this.name.getPackage()), "Compilation unit package '" + this.compilationUnitPackage
             + "' unexpected for type '" + this.name.getPackage() + "'");
 
         if (this.clazz instanceof ASClassType) {
             ASClassType classDef = (ASClassType) this.clazz;
-            if (StringUtils.hasLength(classDef.getSuperclass())) {
+            if (classDef.getSuperclass() != null && classDef.getSuperclass().length() > 0) {
                 ActionScriptType superType = As3ParserUtils.getActionScriptType(this.compilationUnitPackage, getImports(), classDef.getSuperclass());
                 this.extendsTypes.add(superType);
                 String superclassId = physicalTypeMetadataProvider.findIdentifier(superType);
@@ -185,7 +184,7 @@ public class As3ParserMutableClassOrInterfaceTypeDetails implements ASMutableCla
 
         for (ASMethod method : (List<ASMethod>) this.clazz.getMethods()) {
             if (method.getName().equals(this.name.getSimpleTypeName())) {
-                Assert.isNull(this.declaredConstructor, "ActionScript classes may only have one constructor method.");
+                Validate.isTrue(this.declaredConstructor == null, "ActionScript classes may only have one constructor method.");
                 this.declaredConstructor = new As3ParserConstructorMetadata(declaredByMetadataId, method, this);
             } else {
                 this.declaredMethods.add(new As3ParserMethodMetadata(declaredByMetadataId, method, this));
@@ -203,7 +202,7 @@ public class As3ParserMutableClassOrInterfaceTypeDetails implements ASMutableCla
     }
 
     public void addField(ASFieldMetadata fieldMetadata, boolean flush) {
-        Assert.isInstanceOf(ASClassType.class, this.clazz, "Cannot add a field to an interface");
+        Validate.isInstanceOf(ASClassType.class, this.clazz, "Cannot add a field to an interface");
         As3ParserFieldMetadata.addField(this, ((ASClassType) this.clazz), fieldMetadata, flush);
         if (!flush) {
             this.isDirty = true;
@@ -225,8 +224,8 @@ public class As3ParserMutableClassOrInterfaceTypeDetails implements ASMutableCla
     }
 
     public void updateField(ASFieldMetadata fieldMetadata, boolean flush) {
-        Assert.isInstanceOf(ASClassType.class, this.clazz, "Cannot update a field on an interface");
-        Assert.isTrue(getDeclaredFields().contains(fieldMetadata), "Field does not exist.");
+        Validate.isInstanceOf(ASClassType.class, this.clazz, "Cannot update a field on an interface");
+        Validate.isTrue(getDeclaredFields().contains(fieldMetadata), "Field does not exist.");
         As3ParserFieldMetadata.updateField(this, ((ASClassType) this.clazz), fieldMetadata, flush);
         if (!flush) {
             this.isDirty = true;
@@ -262,7 +261,7 @@ public class As3ParserMutableClassOrInterfaceTypeDetails implements ASMutableCla
     }
 
     public void removeField(ActionScriptSymbolName fieldName, boolean flush) {
-        Assert.isInstanceOf(ASClassType.class, this.clazz, "Cannot remove a field from an interface");
+        Validate.isInstanceOf(ASClassType.class, this.clazz, "Cannot remove a field from an interface");
         As3ParserFieldMetadata.removeField(this, ((ASClassType) this.clazz), fieldName, flush);
         if (!flush) {
             this.isDirty = true;
@@ -289,12 +288,18 @@ public class As3ParserMutableClassOrInterfaceTypeDetails implements ASMutableCla
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        Reader compilationUnitReader = new StringReader(writer.toString());
-        MutableFile mutableFile = this.fileManager.updateFile(this.fileIdentifier);
-        try {
-            FileCopyUtils.copy(compilationUnitReader, new OutputStreamWriter(mutableFile.getOutputStream()));
+        Reader inputStream = null;
+        OutputStreamWriter outputStream = null;
+        try { 
+            inputStream = new StringReader(writer.toString());
+            outputStream = new OutputStreamWriter(this.fileManager.updateFile(this.fileIdentifier).getOutputStream());
+            IOUtils.copy(inputStream, outputStream);
         } catch (IOException ioe) {
             throw new IllegalStateException("Could not update '" + this.fileIdentifier + "'", ioe);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
     }
 
@@ -316,9 +321,9 @@ public class As3ParserMutableClassOrInterfaceTypeDetails implements ASMutableCla
     }
 
     public static final void createType(FileManager fileManager, final ASClassOrInterfaceTypeDetails cit, String fileIdentifier) {
-        Assert.notNull(fileManager, "File manager required");
-        Assert.notNull(cit, "Class or interface type details required");
-        Assert.hasText(fileIdentifier, "File identifier required");
+        Validate.notNull(fileManager, "File manager required");
+        Validate.notNull(cit, "Class or interface type details required");
+        StringUtils.isNotBlank(fileIdentifier);
 
         final String newContents = getOutput(cit);
 
@@ -357,7 +362,7 @@ public class As3ParserMutableClassOrInterfaceTypeDetails implements ASMutableCla
         for (ActionScriptType extendsType : cit.getExtendsTypes()) {
             As3ParserUtils.importTypeIfRequired(compilationUnitServices, extendsType);
             if (compilationUnit.getType() instanceof ASClassType) {
-                Assert.isNull(((ASClassType) compilationUnit.getType()).getSuperclass(), "An ActionScript class may only extend one type.");
+                Validate.isTrue(((ASClassType) compilationUnit.getType()).getSuperclass() == null, "An ActionScript class may only extend one type.");
                 ((ASClassType) compilationUnit.getType()).setSuperclass(extendsType.getSimpleTypeName());
             } else {
                 ((ASInterfaceType) compilationUnit.getType()).addSuperInterface(extendsType.getSimpleTypeName());

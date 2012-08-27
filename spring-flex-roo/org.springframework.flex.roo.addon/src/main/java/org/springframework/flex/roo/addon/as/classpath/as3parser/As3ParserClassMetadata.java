@@ -20,6 +20,8 @@ import java.io.FileReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeDetails;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeIdentifier;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeMetadata;
@@ -30,8 +32,6 @@ import org.springframework.roo.process.manager.ActiveProcessManager;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.ProcessManager;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.style.ToStringCreator;
-import org.springframework.roo.support.util.Assert;
 
 import uk.co.badgersinfoil.metaas.ActionScriptFactory;
 import uk.co.badgersinfoil.metaas.dom.ASCompilationUnit;
@@ -54,17 +54,17 @@ public class As3ParserClassMetadata extends AbstractMetadataItem implements ASPh
     public As3ParserClassMetadata(FileManager fileManager, String fileIdentifier, String metadataIdentificationString,
         MetadataService metadataService, ASPhysicalTypeMetadataProvider asPhysicalTypeMetadataProvider) {
         super(metadataIdentificationString);
-        Assert.isTrue(ASPhysicalTypeIdentifier.isValid(metadataIdentificationString), "Metadata identification string '"
+        Validate.isTrue(ASPhysicalTypeIdentifier.isValid(metadataIdentificationString), "Metadata identification string '"
             + metadataIdentificationString + "' does not appear to be a valid actionscript type identifier");
-        Assert.notNull(fileManager, "File manager required");
-        Assert.notNull(fileIdentifier, "File identifier required");
-        Assert.notNull(metadataService, "Metadata service required");
-        Assert.notNull(asPhysicalTypeMetadataProvider, "Physical type metadata provider required");
+        Validate.notNull(fileManager, "File manager required");
+        Validate.notNull(fileIdentifier, "File identifier required");
+        Validate.notNull(metadataService, "Metadata service required");
+        Validate.notNull(asPhysicalTypeMetadataProvider, "Physical type metadata provider required");
 
         this.fileIdentifier = fileIdentifier;
 
         try {
-            Assert.isTrue(fileManager.exists(fileIdentifier), "Path '" + fileIdentifier + "' must exist");
+            Validate.isTrue(fileManager.exists(fileIdentifier), "Path '" + fileIdentifier + "' must exist");
             FileReader asFileReader = new FileReader(fileManager.readFile(fileIdentifier).getFile());
             ASCompilationUnit compilationUnit = asFactory.newParser().parse(asFileReader);
 
@@ -108,7 +108,7 @@ public class As3ParserClassMetadata extends AbstractMetadataItem implements ASPh
 
     @Override
     public String toString() {
-        ToStringCreator tsc = new ToStringCreator(this);
+        ToStringBuilder tsc = new ToStringBuilder(this);
         tsc.append("identifier", getId());
         tsc.append("valid", this.valid);
         tsc.append("fileIdentifier", this.fileIdentifier);

@@ -18,6 +18,7 @@ package org.springframework.flex.roo.addon.as.classpath.as3parser;
 
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.details.metatag.BooleanAttributeValue;
 import org.springframework.flex.roo.addon.as.classpath.details.metatag.IntegerAttributeValue;
 import org.springframework.flex.roo.addon.as.classpath.details.metatag.MetaTagAttributeValue;
@@ -26,7 +27,6 @@ import org.springframework.flex.roo.addon.as.model.ASTypeVisibility;
 import org.springframework.flex.roo.addon.as.model.ActionScriptPackage;
 import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.roo.support.util.Assert;
 
 import uk.co.badgersinfoil.metaas.dom.ASType;
 import uk.co.badgersinfoil.metaas.dom.Visibility;
@@ -42,17 +42,17 @@ public class As3ParserUtils {
     // private static final ActionScriptFactory factory = new ActionScriptFactory();
 
     public static final ActionScriptType getActionScriptType(ActionScriptPackage compilationUnitPackage, List<String> imports, ASType type) {
-        Assert.notNull(imports, "Compilation unit imports required");
-        Assert.notNull(compilationUnitPackage, "Compilation unit package required");
-        Assert.notNull(type, "ASType required");
+        Validate.notNull(imports, "Compilation unit imports required");
+        Validate.notNull(compilationUnitPackage, "Compilation unit package required");
+        Validate.notNull(type, "ASType required");
 
         return getActionScriptType(compilationUnitPackage, imports, type.getName());
     }
 
     public static final ActionScriptType getActionScriptType(ActionScriptPackage compilationUnitPackage, List<String> imports, String nameToFind) {
-        Assert.notNull(imports, "Compilation unit imports required");
-        Assert.notNull(compilationUnitPackage, "Compilation unit package required");
-        Assert.notNull(nameToFind, "Name to find is required");
+        Validate.notNull(imports, "Compilation unit imports required");
+        Validate.notNull(compilationUnitPackage, "Compilation unit package required");
+        Validate.notNull(nameToFind, "Name to find is required");
 
         int offset = nameToFind.lastIndexOf('.');
         if (offset > -1) {
@@ -74,13 +74,13 @@ public class As3ParserUtils {
     }
 
     /*
-     * public static final ASType getASType(String typeName) { Assert.notNull(typeName, "ActionScript type required");
+     * public static final ASType getASType(String typeName) { Validate.notNull(typeName, "ActionScript type required");
      * return factory.newClass(typeName).getType(); }
      */
 
     private static final String getImportDeclarationFor(List<String> imports, String typeName) {
-        Assert.notNull(imports, "Compilation unit imports required");
-        Assert.notNull(typeName, "Type name required");
+        Validate.notNull(imports, "Compilation unit imports required");
+        Validate.notNull(typeName, "Type name required");
         for (String candidate : imports) {
             int offset = candidate.lastIndexOf('.');
             if (typeName.equals(candidate.substring(offset + 1))) {
@@ -91,8 +91,8 @@ public class As3ParserUtils {
     }
 
     public static void importTypeIfRequired(CompilationUnitServices compilationUnitServices, ActionScriptType typeToImport) {
-        Assert.notNull(compilationUnitServices, "Compilation unit services is required");
-        Assert.notNull(typeToImport, "ActionScript type to import is required");
+        Validate.notNull(compilationUnitServices, "Compilation unit services is required");
+        Validate.notNull(typeToImport, "ActionScript type to import is required");
 
         if (ActionScriptType.isImplicitType(typeToImport.getFullyQualifiedTypeName())) {
             return;

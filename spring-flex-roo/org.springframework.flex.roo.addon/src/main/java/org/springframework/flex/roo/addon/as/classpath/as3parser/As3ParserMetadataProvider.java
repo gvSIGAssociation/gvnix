@@ -18,6 +18,8 @@ package org.springframework.flex.roo.addon.as.classpath.as3parser;
 
 import java.io.File;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -38,8 +40,7 @@ import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.metadata.MetadataItem;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Parser-based {@link MetadataProvider} for ActionScript source files.
@@ -67,18 +68,18 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
     }
 
     public void createPhysicalType(ASPhysicalTypeMetadata toCreate) {
-        Assert.notNull(toCreate, "Metadata to create is required");
+        Validate.notNull(toCreate, "Metadata to create is required");
         ASPhysicalTypeDetails physicalTypeDetails = toCreate.getPhysicalTypeDetails();
-        Assert.notNull(physicalTypeDetails, "Unable to parse '" + toCreate + "'");
-        Assert.isInstanceOf(ASClassOrInterfaceTypeDetails.class, physicalTypeDetails, "This implementation can only create class or interface types");
+        Validate.notNull(physicalTypeDetails, "Unable to parse '" + toCreate + "'");
+        Validate.isInstanceOf(ASClassOrInterfaceTypeDetails.class, physicalTypeDetails, "This implementation can only create class or interface types");
         ASClassOrInterfaceTypeDetails cit = (ASClassOrInterfaceTypeDetails) physicalTypeDetails;
         String fileIdentifier = toCreate.getPhysicalLocationCanonicalPath();
         As3ParserMutableClassOrInterfaceTypeDetails.createType(this.fileManager, cit, fileIdentifier);
     }
 
     public String findIdentifier(ActionScriptType actionScriptType) {
-        Assert.notNull(actionScriptType, "ActionScript type to locate is required");
-        for (Path sourcePath : this.pathResolver.getFlexSourcePaths()) {
+        Validate.notNull(actionScriptType, "ActionScript type to locate is required");
+        for (LogicalPath sourcePath : this.pathResolver.getFlexSourcePaths()) {
             String relativePath = actionScriptType.getFullyQualifiedTypeName().replace('.', File.separatorChar) + ".as";
             String fileIdentifier = this.pathResolver.getIdentifier(sourcePath, relativePath);
             if (this.fileManager.exists(fileIdentifier)) {
@@ -90,7 +91,7 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
     }
 
     public MetadataItem get(String metadataIdentificationString) {
-        Assert.isTrue(ASPhysicalTypeIdentifier.isValid(metadataIdentificationString), "Metadata identification string '"
+        Validate.isTrue(ASPhysicalTypeIdentifier.isValid(metadataIdentificationString), "Metadata identification string '"
             + metadataIdentificationString + "' is not valid for this metadata provider");
         String fileIdentifier = obtainPathToIdentifier(metadataIdentificationString);
         this.metadataDependencyRegistry.deregisterDependencies(metadataIdentificationString);
@@ -117,7 +118,7 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
                     // We have a dependency on the superclass, but no metadata is available
                     // We're left with no choice but to register for every physical type change, in the hope we discover
                     // our parent someday (sad, isn't it? :-) )
-                    for (Path sourcePath : this.pathResolver.getSourcePaths()) {
+                    for (LogicalPath sourcePath : this.pathResolver.getSourcePaths()) {
                         String possibleSuperclass = ASPhysicalTypeIdentifier.createIdentifier(details.getExtendsTypes().get(0), sourcePath);
                         this.metadataDependencyRegistry.registerDependency(possibleSuperclass, result.getId());
                     }
@@ -138,8 +139,8 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
             // file is of interest
 
             // figure out the ActionScriptType this should be
-            Path sourcePath = null;
-            for (Path path : this.pathResolver.getFlexSourcePaths()) {
+            LogicalPath sourcePath = null;
+            for (LogicalPath path : this.pathResolver.getFlexSourcePaths()) {
                 if (new FileDetails(new File(this.pathResolver.getRoot(path)), null).isParentOf(fileIdentifier)) {
                     sourcePath = path;
                     break;
@@ -151,11 +152,11 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
             }
             // determine the ActionScriptType for this file
             String relativePath = this.pathResolver.getRelativeSegment(fileIdentifier);
-            Assert.hasText(relativePath, "Could not determine compilation unit name for file '" + fileIdentifier + "'");
-            Assert.isTrue(relativePath.startsWith(File.separator), "Relative path unexpectedly dropped the '" + File.separator
+            StringUtils.isNotBlank(relativePath);
+            Validate.isTrue(relativePath.startsWith(File.separator), "Relative path unexpectedly dropped the '" + File.separator
                 + "' prefix (received '" + relativePath + "' from '" + fileIdentifier + "'");
             relativePath = relativePath.substring(1);
-            Assert.isTrue(relativePath.endsWith(".as"), "The relative path unexpectedly dropped the .as extension for file '" + fileIdentifier + "'");
+            Validate.isTrue(relativePath.endsWith(".as"), "The relative path unexpectedly dropped the .as extension for file '" + fileIdentifier + "'");
             relativePath = relativePath.substring(0, relativePath.lastIndexOf(".as"));
 
             ActionScriptType actionScriptType = new ActionScriptType(relativePath.replace(File.separatorChar, '.'));
@@ -172,18 +173,18 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
 
     /*
      * private FlexPathResolver getPathResolver() { ProjectMetadata projectMetadata = (ProjectMetadata)
-     * metadataService.get(ProjectMetadata.getProjectIdentifier()); Assert.notNull(projectMetadata,
+     * metadataService.get(ProjectMetadata.getProjectIdentifier()); Validate.notNull(projectMetadata,
      * "Project metadata unavailable"); PathResolver pathResolver = projectMetadata.getPathResolver();
-     * Assert.notNull(pathResolver, "Path resolver unavailable because valid project metadata not currently available");
-     * Assert.isInstanceOf(FlexPathResolver.class,
+     * Validate.notNull(pathResolver, "Path resolver unavailable because valid project metadata not currently available");
+     * Validate.isInstanceOf(FlexPathResolver.class,
      * "Path resolver is of an unexpected type, not appropriate for a Flex project."); return (FlexPathResolver)
      * pathResolver; }
      */
 
     private String obtainPathToIdentifier(String physicalTypeIdentifier) {
-        Assert.isTrue(ASPhysicalTypeIdentifier.isValid(physicalTypeIdentifier), "Metadata identification string '" + physicalTypeIdentifier
+        Validate.isTrue(ASPhysicalTypeIdentifier.isValid(physicalTypeIdentifier), "Metadata identification string '" + physicalTypeIdentifier
             + "' is not valid for this metadata provider");
-        Path path = ASPhysicalTypeIdentifier.getPath(physicalTypeIdentifier);
+        LogicalPath path = ASPhysicalTypeIdentifier.getPath(physicalTypeIdentifier);
         ActionScriptType type = ASPhysicalTypeIdentifier.getActionScriptType(physicalTypeIdentifier);
         String relativePath = type.getFullyQualifiedTypeName().replace('.', File.separatorChar) + ".as";
         String fileIdentifier = this.pathResolver.getIdentifier(path, relativePath);
