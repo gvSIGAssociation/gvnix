@@ -1,5 +1,6 @@
 package org.springframework.flex.roo.addon;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -14,9 +15,9 @@ import org.springframework.roo.metadata.MetadataItem;
 import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.support.util.Assert;
 
 @Component(immediate = true)
 @Service
@@ -44,11 +45,11 @@ public class FlexProjectMetadataProvider implements MetadataProvider, FileEventL
     private String servicesConfig;
 
     protected void activate(ComponentContext context) {
-        this.servicesConfig = pathResolver.getIdentifier(Path.SRC_MAIN_WEBAPP, "WEB-INF/flex/services-config.xml");
+        this.servicesConfig = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/flex/services-config.xml");
     }
     
     public MetadataItem get(String metadataIdentificationString) {
-        Assert.isTrue(FlexProjectMetadata.getProjectIdentifier().equals(metadataIdentificationString), "Unexpected metadata request '" + metadataIdentificationString + "' for this provider");
+        Validate.isTrue(FlexProjectMetadata.getProjectIdentifier().equals(metadataIdentificationString), "Unexpected metadata request '" + metadataIdentificationString + "' for this provider");
         
         if (!fileManager.exists(servicesConfig)) {
             return null;
@@ -58,7 +59,7 @@ public class FlexProjectMetadataProvider implements MetadataProvider, FileEventL
     }
     
     /*public void notify(String upstreamDependency, String downstreamDependency) {
-        Assert.isTrue(MetadataIdentificationUtils.isValid(upstreamDependency), "Upstream dependency is an invalid metadata identification string ('"
+        Validate.isTrue(MetadataIdentificationUtils.isValid(upstreamDependency), "Upstream dependency is an invalid metadata identification string ('"
             + upstreamDependency + "')");
 
         if (upstreamDependency.equals(ProjectMetadata.getProjectIdentifier())) {
@@ -73,7 +74,7 @@ public class FlexProjectMetadataProvider implements MetadataProvider, FileEventL
     }
 
     public void onFileEvent(FileEvent fileEvent) {
-        Assert.notNull(fileEvent, "File event required");
+        Validate.notNull(fileEvent, "File event required");
 
         if (fileEvent.getFileDetails().getCanonicalPath().equals(servicesConfig)) {
             // Something happened to the services-config
