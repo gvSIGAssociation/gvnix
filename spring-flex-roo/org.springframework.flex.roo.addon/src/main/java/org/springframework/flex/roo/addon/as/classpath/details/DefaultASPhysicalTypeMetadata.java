@@ -16,11 +16,12 @@
 
 package org.springframework.flex.roo.addon.as.classpath.details;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeDetails;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeIdentifier;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeMetadata;
 import org.springframework.roo.metadata.AbstractMetadataItem;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Default metadata representation of an ActionScript source file.
@@ -36,10 +37,10 @@ public class DefaultASPhysicalTypeMetadata extends AbstractMetadataItem implemen
     public DefaultASPhysicalTypeMetadata(String metadataIdentificationString, String physicalLocationCanonicalPath,
         ASPhysicalTypeDetails physicalTypeDetails) {
         super(metadataIdentificationString);
-        Assert.isTrue(ASPhysicalTypeIdentifier.isValid(metadataIdentificationString), "Metadata identification string '"
+        Validate.isTrue(ASPhysicalTypeIdentifier.isValid(metadataIdentificationString), "Metadata identification string '"
             + metadataIdentificationString + "' does not appear to be a valid physical type identifier");
-        Assert.hasText(physicalLocationCanonicalPath, "Physical location canonical path required");
-        Assert.notNull(physicalTypeDetails, "Physical type details required");
+        StringUtils.isNotBlank(physicalLocationCanonicalPath);
+        Validate.notNull(physicalTypeDetails, "Physical type details required");
         this.physicalTypeDetails = physicalTypeDetails;
         this.physicalLocationCanonicalPath = physicalLocationCanonicalPath;
     }

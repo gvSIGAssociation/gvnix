@@ -19,11 +19,12 @@ package org.springframework.flex.roo.addon.as.classpath.details;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.details.metatag.ASMetaTagMetadata;
 import org.springframework.flex.roo.addon.as.model.ASTypeVisibility;
 import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Default metadata representation of an ActionScript field.
@@ -46,9 +47,9 @@ public class DefaultASFieldMetadata extends AbstractASFieldMetadata {
 
     public DefaultASFieldMetadata(String declaredByMetadataId, ActionScriptType fieldType, ActionScriptSymbolName fieldName,
         ASTypeVisibility visibility, String fieldInitializer, List<ASMetaTagMetadata> metaTags) {
-        Assert.hasText(declaredByMetadataId, "Declared by metadata ID required");
-        Assert.notNull(fieldName, "Field name required");
-        Assert.notNull(fieldType, "Field type required");
+    	StringUtils.isNotBlank(declaredByMetadataId);
+        Validate.notNull(fieldName, "Field name required");
+        Validate.notNull(fieldType, "Field type required");
 
         this.declaredByMetadataId = declaredByMetadataId;
         this.fieldType = fieldType;

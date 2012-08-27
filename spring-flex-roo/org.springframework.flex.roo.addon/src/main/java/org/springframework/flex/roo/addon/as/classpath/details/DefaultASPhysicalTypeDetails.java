@@ -16,10 +16,10 @@
 
 package org.springframework.flex.roo.addon.as.classpath.details;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeCategory;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeDetails;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Default detail representation of an ActionScript source file.
@@ -33,8 +33,8 @@ public class DefaultASPhysicalTypeDetails implements ASPhysicalTypeDetails {
     private final ActionScriptType name;
 
     public DefaultASPhysicalTypeDetails(ASPhysicalTypeCategory physicalTypeCategory, ActionScriptType name) {
-        Assert.notNull(physicalTypeCategory, "Physical type category required");
-        Assert.notNull(name, "Name required");
+        Validate.notNull(physicalTypeCategory, "Physical type category required");
+        Validate.notNull(name, "Name required");
         this.physicalTypeCategory = physicalTypeCategory;
         this.name = name;
     }

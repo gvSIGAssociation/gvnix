@@ -19,10 +19,11 @@ package org.springframework.flex.roo.addon.as.classpath.details;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeCategory;
 import org.springframework.flex.roo.addon.as.classpath.details.metatag.ASMetaTagMetadata;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Default detail representation of an ActionScript class or interface.
@@ -53,9 +54,9 @@ public class DefaultASClassOrInterfaceTypeDetails implements ASClassOrInterfaceT
 
     public DefaultASClassOrInterfaceTypeDetails(String declaredByMetadataId, ActionScriptType name, ASPhysicalTypeCategory physicalTypeCategory,
         List<ASMetaTagMetadata> typeMetaTags) {
-        Assert.hasText(declaredByMetadataId, "Declared by metadata ID required");
-        Assert.notNull(name, "Name required");
-        Assert.notNull(physicalTypeCategory, "Physical type category required");
+    	StringUtils.isNotBlank(declaredByMetadataId);
+        Validate.notNull(name, "Name required");
+        Validate.notNull(physicalTypeCategory, "Physical type category required");
 
         this.declaredByMetadataId = declaredByMetadataId;
         this.name = name;
@@ -70,9 +71,9 @@ public class DefaultASClassOrInterfaceTypeDetails implements ASClassOrInterfaceT
         List<ASFieldMetadata> declaredFields, ASConstructorMetadata declaredConstructor, List<ASMethodMetadata> declaredMethods,
         ASClassOrInterfaceTypeDetails superClass, List<ActionScriptType> extendsTypes, List<ActionScriptType> implementsTypes,
         List<ASMetaTagMetadata> typeMetaTags) {
-        Assert.hasText(declaredByMetadataId, "Declared by metadata ID required");
-        Assert.notNull(name, "Name required");
-        Assert.notNull(physicalTypeCategory, "Physical type category required");
+    	StringUtils.isNotBlank(declaredByMetadataId);
+        Validate.notNull(name, "Name required");
+        Validate.notNull(physicalTypeCategory, "Physical type category required");
 
         this.declaredByMetadataId = declaredByMetadataId;
         this.name = name;
