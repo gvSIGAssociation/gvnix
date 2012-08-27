@@ -16,6 +16,7 @@
 
 package org.springframework.flex.roo.addon.entity;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeIdentifierNamingUtils;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
 import org.springframework.flex.roo.addon.mojos.FlexPath;
@@ -23,8 +24,7 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.metadata.AbstractMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Metadata representation of the root of a managed mapping between an ActionScript entity and a Java entity.
@@ -43,8 +43,8 @@ public class ActionScriptEntityMetadata extends AbstractMetadataItem {
 
     public ActionScriptEntityMetadata(String id, ActionScriptType actionScriptType, JavaType javaType) {
         super(id);
-        Assert.notNull(actionScriptType, "The ActionScript type is required.");
-        Assert.notNull(javaType, "The Java type is required.");
+        Validate.notNull(actionScriptType, "The ActionScript type is required.");
+        Validate.notNull(javaType, "The Java type is required.");
 
         this.actionScriptType = actionScriptType;
         this.javaType = javaType;
@@ -63,14 +63,14 @@ public class ActionScriptEntityMetadata extends AbstractMetadataItem {
     }
 
     public static final String createTypeIdentifier(ActionScriptType asType, FlexPath path) {
-        return ASPhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, asType, path);
+        return ASPhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, asType, path.getLogicalPath());
     }
 
     public static final JavaType getJavaType(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getJavaType(PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getJavaPath(String metadataIdentificationString) {
+    public static final LogicalPath getJavaPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
