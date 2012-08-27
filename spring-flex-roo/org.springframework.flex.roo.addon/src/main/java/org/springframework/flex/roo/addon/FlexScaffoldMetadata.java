@@ -21,23 +21,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.roo.addon.entity.EntityMetadata;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
+import org.springframework.roo.addon.jpa.activerecord.JpaCrudAnnotationValues;
 import org.springframework.roo.addon.web.mvc.controller.details.FinderMetadataDetails;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
+import org.springframework.roo.classpath.details.FieldMetadata;
 import org.springframework.roo.classpath.details.MethodMetadata;
 import org.springframework.roo.classpath.details.MethodMetadataBuilder;
 import org.springframework.roo.classpath.details.annotations.AnnotatedJavaType;
+import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.itd.AbstractItdTypeDetailsProvidingMetadataItem;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
 import org.springframework.roo.classpath.itd.ItdSourceFileComposer;
+import org.springframework.roo.classpath.persistence.PersistenceMemberLocator;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.DataType;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Metadata for a scaffolded Flex remoting destination.
@@ -50,19 +54,21 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
 
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils.create(PROVIDES_TYPE_STRING);
 
-    private EntityMetadata entityMetadata;
+    private JpaActiveRecordMetadata entityMetadata;
     
     private JavaType entity;
 
     private String entityReference;
+    
+    private PersistenceMemberLocator persistenceMemberLocator;
 
     public FlexScaffoldMetadata(String identifier, JavaType aspectName, PhysicalTypeMetadata governorPhysicalTypeMetadata, FlexScaffoldAnnotationValues annotationValues,
-        EntityMetadata entityMetadata, Set<FinderMetadataDetails> dynamicFinderMethods) {
+    		JpaActiveRecordMetadata entityMetadata, Set<FinderMetadataDetails> dynamicFinderMethods, PersistenceMemberLocator persistenceMemberLocator) {
 
         super(identifier, aspectName, governorPhysicalTypeMetadata);
 
-        Assert.isTrue(isValid(identifier), "Metadata identification string '" + identifier + "' does not appear to be a valid");
-        Assert.notNull(entityMetadata, "Entity metadata required");
+        Validate.isTrue(isValid(identifier), "Metadata identification string '" + identifier + "' does not appear to be a valid");
+        Validate.notNull(entityMetadata, "Entity metadata required");
 
         if (!isValid()) {
             return;
@@ -71,6 +77,7 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         this.entityMetadata = entityMetadata;
         this.entity = annotationValues.getEntity();
         this.entityReference = StringUtils.uncapitalize(this.entity.getSimpleTypeName());
+        this.persistenceMemberLocator = persistenceMemberLocator;
 
         this.builder.addMethod(getCreateMethod());
         this.builder.addMethod(getShowMethod());
@@ -88,7 +95,7 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(JavaType javaType, Path path) {
+    public static final String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, javaType, path);
     }
 
@@ -96,7 +103,7 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         return PhysicalTypeIdentifierNamingUtils.getJavaType(PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public EntityMetadata getEntityMetadata() {
+    public JpaActiveRecordMetadata getEntityMetadata() {
         return this.entityMetadata;
     }
     
@@ -108,7 +115,7 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         return this.entityReference;
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
@@ -124,16 +131,19 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         if (method != null) {
             return method;
         }
+        
+        // TODO In Roo 1.2.2 migration the identifier fields are multiple: temporary get first element
+        FieldMetadata identifierField = persistenceMemberLocator.getIdentifierFields(entity).get(0);
 
         List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>();
-        paramTypes.add(new AnnotatedJavaType(this.entityMetadata.getIdentifierField().getFieldType(), null));
+        paramTypes.add(new AnnotatedJavaType(identifierField.getFieldType(), new ArrayList<AnnotationMetadata>()));
 
         List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
-        paramNames.add(new JavaSymbolName(this.entityMetadata.getIdentifierField().getFieldName().getSymbolName()));
+        paramNames.add(new JavaSymbolName(identifierField.getFieldName().getSymbolName()));
 
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        if (!this.entityMetadata.getIdentifierField().getFieldType().isPrimitive()) {
-            bodyBuilder.appendFormalLine("if (" + this.entityMetadata.getIdentifierField().getFieldName().getSymbolName()
+        if (!identifierField.getFieldType().isPrimitive()) {
+            bodyBuilder.appendFormalLine("if (" + identifierField.getFieldName().getSymbolName()
                 + " == null) throw new IllegalArgumentException(\"An Identifier is required\");");
         }
 
@@ -142,9 +152,9 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
             + "."
             + this.entityMetadata.getFindMethod().getMethodName()
             + "("
-            + this.entityMetadata.getIdentifierField().getFieldName().getSymbolName()
+            + identifierField.getFieldName().getSymbolName()
             + ")."
-            + this.entityMetadata.getRemoveMethod().getMethodName()
+            + new JpaCrudAnnotationValues(this.entityMetadata).getRemoveMethod()
             + "();");
 
         return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, JavaType.VOID_PRIMITIVE, paramTypes, paramNames, bodyBuilder).build();
@@ -165,7 +175,7 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         bodyBuilder.appendFormalLine("return "
             + this.entity.getNameIncludingTypeParameters(false, this.builder.getImportRegistrationResolver()) + "."
-            + this.entityMetadata.getFindAllMethod().getMethodName() + "();");
+            + new JpaCrudAnnotationValues(this.entityMetadata).getFindAllMethod() + "();");
         return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, returnType, null, null, bodyBuilder).build();
     }
 
@@ -182,8 +192,8 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         JavaType returnType = new JavaType("java.util.List", 0, DataType.TYPE, null, typeParams);
 
         List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>();
-        paramTypes.add(new AnnotatedJavaType(new JavaType("Integer"), null));
-        paramTypes.add(new AnnotatedJavaType(new JavaType("Integer"), null));
+        paramTypes.add(new AnnotatedJavaType(new JavaType("Integer"), new ArrayList<AnnotationMetadata>()));
+        paramTypes.add(new AnnotatedJavaType(new JavaType("Integer"), new ArrayList<AnnotationMetadata>()));
 
         List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
         paramNames.add(new JavaSymbolName("page"));
@@ -195,7 +205,7 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         bodyBuilder.appendFormalLine("int sizeNo = size == null ? 10 : size.intValue();");
         bodyBuilder.appendFormalLine("return "
             + this.entity.getNameIncludingTypeParameters(false, this.builder.getImportRegistrationResolver()) + "."
-            + this.entityMetadata.getFindEntriesMethod().getMethodName() + "(page == null ? 0 : (page.intValue() - 1) * sizeNo, sizeNo);");
+            + new JpaCrudAnnotationValues(this.entityMetadata).getFindEntriesMethod() + "(page == null ? 0 : (page.intValue() - 1) * sizeNo, sizeNo);");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("} else {");
         bodyBuilder.indent();
@@ -213,21 +223,24 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         if (method != null) {
             return method;
         }
+        
+        // TODO In Roo 1.2.2 migration the identifier fields are multiple: temporary get first element
+        FieldMetadata identifierField = persistenceMemberLocator.getIdentifierFields(entity).get(0);
 
         List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>();
-        paramTypes.add(new AnnotatedJavaType(this.entityMetadata.getIdentifierField().getFieldType(), null));
+        paramTypes.add(new AnnotatedJavaType(identifierField.getFieldType(), new ArrayList<AnnotationMetadata>()));
 
         List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
-        paramNames.add(new JavaSymbolName(this.entityMetadata.getIdentifierField().getFieldName().getSymbolName()));
+        paramNames.add(new JavaSymbolName(identifierField.getFieldName().getSymbolName()));
 
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        if (!this.entityMetadata.getIdentifierField().getFieldType().isPrimitive()) {
-            bodyBuilder.appendFormalLine("if (" + this.entityMetadata.getIdentifierField().getFieldName().getSymbolName()
+        if (!identifierField.getFieldType().isPrimitive()) {
+            bodyBuilder.appendFormalLine("if (" + identifierField.getFieldName().getSymbolName()
                 + " == null) throw new IllegalArgumentException(\"An Identifier is required\");");
         }
         bodyBuilder.appendFormalLine("return "
             + this.entity.getNameIncludingTypeParameters(false, this.builder.getImportRegistrationResolver()) + "."
-            + this.entityMetadata.getFindMethod().getMethodName() + "(" + this.entityMetadata.getIdentifierField().getFieldName().getSymbolName()
+            + this.entityMetadata.getFindMethod().getMethodName() + "(" + identifierField.getFieldName().getSymbolName()
             + ");");
 
         return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, this.entity, paramTypes, paramNames, bodyBuilder).build();
@@ -242,13 +255,13 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         }
 
         List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>();
-        paramTypes.add(new AnnotatedJavaType(this.entity, null));
+        paramTypes.add(new AnnotatedJavaType(this.entity, new ArrayList<AnnotationMetadata>()));
 
         List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
         paramNames.add(new JavaSymbolName(this.entityReference));
 
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
-        bodyBuilder.appendFormalLine(this.entityReference + "." + this.entityMetadata.getPersistMethod().getMethodName() + "();");
+        bodyBuilder.appendFormalLine(this.entityReference + "." + new JpaCrudAnnotationValues(this.entityMetadata).getPersistMethod() + "();");
         bodyBuilder.appendFormalLine("return " + this.entityReference + ";");
 
         return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, this.entity, paramTypes, paramNames, bodyBuilder).build();
@@ -263,7 +276,7 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         }
 
         List<AnnotatedJavaType> paramTypes = new ArrayList<AnnotatedJavaType>();
-        paramTypes.add(new AnnotatedJavaType(this.entity, null));
+        paramTypes.add(new AnnotatedJavaType(this.entity, new ArrayList<AnnotationMetadata>()));
 
         List<JavaSymbolName> paramNames = new ArrayList<JavaSymbolName>();
         paramNames.add(new JavaSymbolName(this.entityReference));
@@ -272,7 +285,7 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         bodyBuilder.appendFormalLine("if (" + this.entityReference + " == null) throw new IllegalArgumentException(\"A " + this.entityReference
             + " is required\");");
         // fix for https://jira.springsource.org/browse/ROOFLEX-16
-        bodyBuilder.appendFormalLine(this.entityReference + "=" + this.entityReference + "." + this.entityMetadata.getMergeMethod().getMethodName() + "();");
+        bodyBuilder.appendFormalLine(this.entityReference + "=" + this.entityReference + "." + new JpaCrudAnnotationValues(this.entityMetadata).getMergeMethod() + "();");
         bodyBuilder.appendFormalLine("return " + this.entityReference + ";");
 
         return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, this.entity, paramTypes, paramNames, bodyBuilder).build();
