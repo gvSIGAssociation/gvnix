@@ -21,8 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Default metadata representation of an ActionScript meta-tag.
@@ -49,7 +49,7 @@ public class DefaultASMetaTagMetadata implements ASMetaTagMetadata {
     }
 
     public MetaTagAttributeValue<?> getAttribute(ActionScriptSymbolName attributeName) {
-        Assert.notNull(attributeName, "Attribute name required");
+        Validate.notNull(attributeName, "Attribute name required");
         return this.attributes.get(attributeName);
     }
 
