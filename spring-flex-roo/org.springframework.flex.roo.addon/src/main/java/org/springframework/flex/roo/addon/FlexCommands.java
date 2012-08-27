@@ -18,6 +18,7 @@ package org.springframework.flex.roo.addon;
 
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -25,12 +26,12 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaPackage;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.ProjectMetadata;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.shell.CliAvailabilityIndicator;
 import org.springframework.roo.shell.CliCommand;
 import org.springframework.roo.shell.CliOption;
 import org.springframework.roo.shell.CommandMarker;
 import org.springframework.roo.support.logging.HandlerUtils;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * Roo CLI commands for working with Flex projects.
@@ -48,6 +49,9 @@ public class FlexCommands implements CommandMarker {
 
     @Reference
     private MetadataService metadataService;
+    
+    @Reference
+    private ProjectOperations projectOperations;
 
     @CliAvailabilityIndicator( { "flex setup" })
     public boolean isFlexAvailable() {
@@ -74,9 +78,9 @@ public class FlexCommands implements CommandMarker {
     @CliCommand(value = "flex remoting all", help = "Scaffold a Service for all entities without an existing Remoting Destination")
     public void generateAll(
         @CliOption(key = "package", mandatory = true, help = "The package in which new services will be placed") JavaPackage javaPackage) {
-        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier());
-        Assert.notNull(projectMetadata, "Could not obtain ProjectMetadata");
-        if (!javaPackage.getFullyQualifiedPackageName().startsWith(projectMetadata.getTopLevelPackage().getFullyQualifiedPackageName())) {
+        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
+        Validate.notNull(projectMetadata, "Could not obtain ProjectMetadata");
+        if (!javaPackage.getFullyQualifiedPackageName().startsWith(projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName())) {
             logger.warning("Your service was created outside of the project's top level package and is therefore not included in the preconfigured component scanning. Please adjust your component scanning manually in applicationContext.xml");
         }
         this.operations.generateAll(javaPackage);
