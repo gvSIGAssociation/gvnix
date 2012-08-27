@@ -19,6 +19,7 @@ package org.springframework.flex.roo.addon;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,6 +29,9 @@ import java.util.UUID;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -37,8 +41,8 @@ import org.springframework.flex.roo.addon.as.model.ActionScriptType;
 import org.springframework.flex.roo.addon.entity.ActionScriptEntityMetadata;
 import org.springframework.flex.roo.addon.mojos.FlexPath;
 import org.springframework.flex.roo.addon.mojos.FlexPathResolver;
-import org.springframework.roo.addon.entity.EntityMetadata;
-import org.springframework.roo.addon.entity.RooEntity;
+import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
+import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.addon.web.mvc.controller.WebMvcOperations;
 import org.springframework.roo.classpath.PhysicalTypeCategory;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
@@ -58,6 +62,7 @@ import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.Dependency;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
@@ -67,9 +72,7 @@ import org.springframework.roo.project.ProjectType;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.project.Repository;
 import org.springframework.roo.support.osgi.UrlFindingUtils;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.TemplateUtils;
+import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -138,9 +141,9 @@ public class FlexOperationsImpl implements FlexOperations {
     }
 
     public void createScaffoldApp() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier());
-        String scaffoldAppFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX, projectMetadata.getProjectName() + "_scaffold.mxml");
-        String presentationPackage = projectMetadata.getTopLevelPackage() + ".presentation";
+        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
+        String scaffoldAppFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "_scaffold.mxml");
+        String presentationPackage = projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()) + ".presentation";
         StringTemplate scaffoldTemplate = this.templateGroup.getInstanceOf(TEMPLATE_PATH + "/appname_scaffold");
         scaffoldTemplate.setAttribute("presentationPackage", presentationPackage);
         // TODO - Extract this value from services-config.xml?
@@ -148,34 +151,41 @@ public class FlexOperationsImpl implements FlexOperations {
         this.fileManager.createOrUpdateTextFileIfRequired(scaffoldAppFileId, scaffoldTemplate.toString(), true);
 
         // Create the HTML wrapper
-        String htmlWrapperFileId = getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, projectMetadata.getProjectName() + "_scaffold.html");
+        String htmlWrapperFileId = getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "_scaffold.html");
         StringTemplate htmlWrapperTemplate = this.templateGroup.getInstanceOf(TEMPLATE_PATH + "/appname_scaffold_html");
-        htmlWrapperTemplate.setAttribute("projectName", projectMetadata.getProjectName());
+        htmlWrapperTemplate.setAttribute("projectName", projectOperations.getProjectName(projectOperations.getFocusedModuleName()));
         this.fileManager.createOrUpdateTextFileIfRequired(htmlWrapperFileId, htmlWrapperTemplate.toString(), true);
 
-        copyDirectoryContents("htmlwrapper/*.*", getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "/"));
-        copyDirectoryContents("htmlwrapper/history/*.*", getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "/history"));
-        copyDirectoryContents("flashbuilder/html-template/*.*", getPathResolver().getIdentifier(Path.ROOT, "/html-template"));
-        copyDirectoryContents("htmlwrapper/history/*.*", getPathResolver().getIdentifier(Path.ROOT, "/html-template/history"));
+        copyDirectoryContents("htmlwrapper/*.*", getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/"));
+        copyDirectoryContents("htmlwrapper/history/*.*", getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/history"));
+        copyDirectoryContents("flashbuilder/html-template/*.*", getPathResolver().getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "/html-template"));
+        copyDirectoryContents("htmlwrapper/history/*.*", getPathResolver().getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "/html-template/history"));
     }
 
     public void createFlexCompilerConfig() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier());
-        String compilerConfigFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX, projectMetadata.getProjectName()
+        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
+        String compilerConfigFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), projectOperations.getProjectName(projectOperations.getFocusedModuleName())
             + "_scaffold-config.xml");
-        try {
-            if (!this.fileManager.exists(compilerConfigFileId)) {
-                FileCopyUtils.copy(TemplateUtils.getTemplate(getClass(), "flex-compiler-config.xml"),
-                    this.fileManager.createFile(compilerConfigFileId).getOutputStream());
+        if (!this.fileManager.exists(compilerConfigFileId)) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try { 
+                inputStream = FileUtils.getInputStream(getClass(), "flex-compiler-config.xml");
+                outputStream = this.fileManager.createFile(compilerConfigFileId).getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
             }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
         }
     }
 
     public void generateAll(JavaPackage javaPackage) {
         Set<ClassOrInterfaceTypeDetails> cids = typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(new JavaType(
-            RooEntity.class.getName()));
+            RooJpaActiveRecord.class.getName()));
 
         for (ClassOrInterfaceTypeDetails cid : cids) {
 
@@ -184,9 +194,9 @@ public class FlexOperationsImpl implements FlexOperations {
             }
 
             JavaType javaType = cid.getName();
-            Path path = PhysicalTypeIdentifier.getPath(cid.getDeclaredByMetadataId());
+            LogicalPath path = PhysicalTypeIdentifier.getPath(cid.getDeclaredByMetadataId());
 
-           EntityMetadata entityMetadata = (EntityMetadata) metadataService.get(EntityMetadata.createIdentifier(javaType, path));
+            JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) metadataService.get(JpaActiveRecordMetadata.createIdentifier(javaType, path));
 
             if (entityMetadata == null || (!entityMetadata.isValid())) {
                 continue;
@@ -207,10 +217,10 @@ public class FlexOperationsImpl implements FlexOperations {
     }
 
     public void createRemotingDestination(JavaType service, JavaType entity) {
-        Assert.notNull(service, "Remoting Destination Java Type required");
-        Assert.notNull(entity, "Entity Java Type required");
+        Validate.notNull(service, "Remoting Destination Java Type required");
+        Validate.notNull(entity, "Entity Java Type required");
 
-        String resourceIdentifier = this.typeLocationService.getPhysicalLocationCanonicalPath(service, Path.SRC_MAIN_JAVA);
+        String resourceIdentifier = this.typeLocationService.getPhysicalTypeCanonicalPath(service, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
 
         // create annotation @RooFlexScaffold
         List<AnnotationAttributeValue<?>> rooFlexScaffoldAttributes = new ArrayList<AnnotationAttributeValue<?>>();
@@ -245,16 +255,23 @@ public class FlexOperationsImpl implements FlexOperations {
     private void createServicesConfig() {
         String servicesConfigFilename = "WEB-INF/flex/services-config.xml";
 
-        if (this.fileManager.exists(getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, servicesConfigFilename))) {
+        if (this.fileManager.exists(getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), servicesConfigFilename))) {
             // file exists, so nothing to do
             return;
         }
 
-        try {
-            FileCopyUtils.copy(TemplateUtils.getTemplate(getClass(), "services-config-template.xml"),
-                this.fileManager.createFile(getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, servicesConfigFilename)).getOutputStream());
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try { 
+            inputStream = FileUtils.getInputStream(getClass(), "services-config-template.xml");
+            outputStream = this.fileManager.createFile(getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), servicesConfigFilename)).getOutputStream();
+            IOUtils.copy(inputStream, outputStream);
         } catch (IOException e) {
             new IllegalStateException("Encountered an error during copying of resources for maven addon.", e);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
         
         fileManager.scan();
@@ -264,18 +281,25 @@ public class FlexOperationsImpl implements FlexOperations {
 
         String flexConfigFilename = "/WEB-INF/spring/flex-config.xml";
 
-        try {
-            if (!this.fileManager.exists(getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, flexConfigFilename))) {
-                FileCopyUtils.copy(TemplateUtils.getTemplate(getClass(), "flex-config.xml"),
-                    this.fileManager.createFile(getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, flexConfigFilename)).getOutputStream());
+        if (!this.fileManager.exists(getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), flexConfigFilename))) {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try { 
+                inputStream = FileUtils.getInputStream(getClass(), "flex-config.xml");
+                outputStream = this.fileManager.createFile(getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), flexConfigFilename)).getOutputStream();
+                IOUtils.copy(inputStream, outputStream);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
             }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+            finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(outputStream);
+            }
         }
 
         // TODO - possible to do this without hardcoding the path?
         // adjust MVC config to accommodate Spring Flex
-        String mvcContextPath = getPathResolver().getIdentifier(Path.SRC_MAIN_WEBAPP, "/WEB-INF/spring/webmvc-config.xml");
+        String mvcContextPath = getPathResolver().getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "/WEB-INF/spring/webmvc-config.xml");
         MutableFile mvcContextMutableFile = null;
 
         Document mvcAppCtx;
@@ -300,8 +324,8 @@ public class FlexOperationsImpl implements FlexOperations {
     }
 
     private void updateDependencies() {
-        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "dependencies.xml");
-        Assert.notNull(templateInputStream, "Could not acquire dependencies.xml file");
+        InputStream templateInputStream = FileUtils.getInputStream(getClass(), "dependencies.xml");
+        Validate.notNull(templateInputStream, "Could not acquire dependencies.xml file");
         Document dependencyDoc;
         try {
             dependencyDoc = XmlUtils.getDocumentBuilder().parse(templateInputStream);
@@ -316,18 +340,18 @@ public class FlexOperationsImpl implements FlexOperations {
         for (Element dependency : flexDependencies) {
             dependencies.add(new Dependency(dependency));
         }
-        this.projectOperations.addDependencies(dependencies);
-        this.projectOperations.addProperty(new Property("flex.version", "4.0.0.14159"));
+        this.projectOperations.addDependencies(projectOperations.getFocusedModuleName(), dependencies);
+        this.projectOperations.addProperty(projectOperations.getFocusedModuleName(), new Property("flex.version", "4.0.0.14159"));
 
         fixBrokenFlexDependency();
 
-        this.projectOperations.updateProjectType(ProjectType.WAR);
+        this.projectOperations.updateProjectType(projectOperations.getFocusedModuleName(), ProjectType.WAR);
     }
 
     // TODO - ProjectMetadata doesn't support all artifact types, in this case "pom" is needed for flex-framework - this
     // ultimately should be fixed in Roo itself
     private void fixBrokenFlexDependency() {
-        String pomPath = getPathResolver().getIdentifier(Path.ROOT, "pom.xml");
+        String pomPath = getPathResolver().getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "pom.xml");
 
         Document pomDoc;
         try {
@@ -338,7 +362,7 @@ public class FlexOperationsImpl implements FlexOperations {
 
         Element typeElement = XmlUtils.findFirstElement("/project/dependencies/dependency[artifactId='flex-framework']/type",
             pomDoc.getDocumentElement());
-        Assert.notNull(typeElement, "Could not find the flex-framework dependency type.");
+        Validate.notNull(typeElement, "Could not find the flex-framework dependency type.");
         typeElement.setTextContent("pom");
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -357,7 +381,7 @@ public class FlexOperationsImpl implements FlexOperations {
     // TODO - The plugin metamodel doesn't support configuration per-execution - this ultimately should be fixed in Roo
     // itself
     private void fixBrokenFlexPlugin() {
-        String pomPath = getPathResolver().getIdentifier(Path.ROOT, "pom.xml");
+        String pomPath = getPathResolver().getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "pom.xml");
 
         Document pomDoc;
         try {
@@ -368,14 +392,14 @@ public class FlexOperationsImpl implements FlexOperations {
 
         Element pluginDependencyElement = XmlUtils.findFirstElement(
             "/project/build/plugins/plugin[artifactId='flexmojos-maven-plugin']/dependencies/dependency", pomDoc.getDocumentElement());
-        Assert.notNull(pluginDependencyElement, "Could not find the flexmojos-maven-plugin's dependency element.");
+        Validate.notNull(pluginDependencyElement, "Could not find the flexmojos-maven-plugin's dependency element.");
         Element newTypeNode = pomDoc.createElement("type");
         newTypeNode.setTextContent("pom");
         pluginDependencyElement.appendChild(newTypeNode);
 
         Element pluginExecutionElement = XmlUtils.findFirstElement(
             "/project/build/plugins/plugin[artifactId='flexmojos-maven-plugin']/executions/execution", pomDoc.getDocumentElement());
-        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "pluginsFix.xml");
+        InputStream templateInputStream = FileUtils.getInputStream(getClass(), "pluginsFix.xml");
         Document configurationTemplate;
         try {
             configurationTemplate = XmlUtils.getDocumentBuilder().parse(templateInputStream);
@@ -383,7 +407,7 @@ public class FlexOperationsImpl implements FlexOperations {
             throw new IllegalStateException(e);
         }
         Element configurationElement = XmlUtils.findFirstElement("/configuration", configurationTemplate.getDocumentElement());
-        Assert.notNull(configurationElement, "flexmojos-maven-plugin configuration did not parse as expected.");
+        Validate.notNull(configurationElement, "flexmojos-maven-plugin configuration did not parse as expected.");
 
         pluginExecutionElement.appendChild(pomDoc.importNode(configurationElement, true));
 
@@ -399,23 +423,23 @@ public class FlexOperationsImpl implements FlexOperations {
     }
 
     private void configureFlexBuild() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier());
+        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
 
         Repository externalRepository = new Repository("spring-external", "Spring External Repository", "http://maven.springframework.org/external");
-        if (!projectMetadata.isRepositoryRegistered(externalRepository)) {
-            this.projectOperations.addRepository(externalRepository);
+        if (!projectOperations.getFocusedModule().isRepositoryRegistered(externalRepository)) {
+            this.projectOperations.addRepository(projectOperations.getFocusedModuleName(), externalRepository);
         }
 
         Repository flexRepository = new Repository("flex", "Sonatype Flex Repo", "http://repository.sonatype.org/content/groups/flexgroup");
-        if (!projectMetadata.isRepositoryRegistered(flexRepository)) {
-            this.projectOperations.addRepository(flexRepository);
+        if (!projectOperations.getFocusedModule().isRepositoryRegistered(flexRepository)) {
+            this.projectOperations.addRepository(projectOperations.getFocusedModuleName(), flexRepository);
         }
-        if (!projectMetadata.isPluginRepositoryRegistered(flexRepository)) {
-            this.projectOperations.addPluginRepository(flexRepository);
+        if (!projectOperations.getFocusedModule().isPluginRepositoryRegistered(flexRepository)) {
+            this.projectOperations.addPluginRepository(projectOperations.getFocusedModuleName(), flexRepository);
         }
 
-        InputStream templateInputStream = TemplateUtils.getTemplate(getClass(), "plugins.xml");
-        Assert.notNull(templateInputStream, "Could not acquire plugins.xml file");
+        InputStream templateInputStream = FileUtils.getInputStream(getClass(), "plugins.xml");
+        Validate.notNull(templateInputStream, "Could not acquire plugins.xml file");
         Document pluginDoc;
         try {
             pluginDoc = XmlUtils.getDocumentBuilder().parse(templateInputStream);
@@ -429,25 +453,25 @@ public class FlexOperationsImpl implements FlexOperations {
         for (Element pluginElement : flexPlugins) {
             // TODO - this is a temporary hack - currently it's the only easy way to update an existing plugin
             Plugin flexPlugin = new Plugin(pluginElement);
-            if (projectMetadata.isBuildPluginRegistered(flexPlugin)) {
-                this.projectOperations.removeBuildPlugin(flexPlugin);
+            if (projectOperations.getFocusedModule().isBuildPluginRegistered(flexPlugin)) {
+                this.projectOperations.removeBuildPlugin(projectOperations.getFocusedModuleName(), flexPlugin);
             }
-            this.projectOperations.addBuildPlugin(flexPlugin);
+            this.projectOperations.addBuildPlugin(projectOperations.getFocusedModuleName(), flexPlugin);
         }
 
         fixBrokenFlexPlugin();
 
-        String flexPropertiesFileId = getPathResolver().getIdentifier(Path.ROOT, ".flexProperties");
+        String flexPropertiesFileId = getPathResolver().getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), ".flexProperties");
         if (!this.fileManager.exists(flexPropertiesFileId)) {
             StringTemplate flexPropertiesTemplate = this.templateGroup.getInstanceOf(TEMPLATE_PATH + "/flex_properties");
-            flexPropertiesTemplate.setAttribute("projectName", projectMetadata.getProjectName());
+            flexPropertiesTemplate.setAttribute("projectName", projectOperations.getProjectName(projectOperations.getFocusedModuleName()));
             this.fileManager.createOrUpdateTextFileIfRequired(flexPropertiesFileId, flexPropertiesTemplate.toString(), true);
         }
 
-        String actionScriptPropertiesFiledId = getPathResolver().getIdentifier(Path.ROOT, ".actionScriptProperties");
+        String actionScriptPropertiesFiledId = getPathResolver().getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), ".actionScriptProperties");
         if (!this.fileManager.exists(actionScriptPropertiesFiledId)) {
             StringTemplate actionScriptPropertiesTemplate = this.templateGroup.getInstanceOf(TEMPLATE_PATH + "/actionscript_properties");
-            actionScriptPropertiesTemplate.setAttribute("projectName", projectMetadata.getProjectName());
+            actionScriptPropertiesTemplate.setAttribute("projectName", projectOperations.getProjectName(projectOperations.getFocusedModuleName()));
             actionScriptPropertiesTemplate.setAttribute("projectUUID", UUID.randomUUID());
             this.fileManager.createOrUpdateTextFileIfRequired(actionScriptPropertiesFiledId, actionScriptPropertiesTemplate.toString(), true);
         }
@@ -457,11 +481,11 @@ public class FlexOperationsImpl implements FlexOperations {
      * @return the path resolver or null if there is no user project
      */
     private PathResolver getPathResolver() {
-        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier());
+        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
         if (projectMetadata == null) {
             return null;
         }
-        return projectMetadata.getPathResolver();
+        return projectOperations.getPathResolver();
     }
 
     /**
@@ -472,8 +496,8 @@ public class FlexOperationsImpl implements FlexOperations {
      * @param target directory
      */
     private void copyDirectoryContents(String sourceAntPath, String targetDirectory) {
-        Assert.hasText(sourceAntPath, "Source path required");
-        Assert.hasText(targetDirectory, "Target directory required");
+        StringUtils.isNotBlank(sourceAntPath);
+        StringUtils.isNotBlank(targetDirectory);
 
         if (!targetDirectory.endsWith("/")) {
             targetDirectory += "/";
@@ -483,16 +507,24 @@ public class FlexOperationsImpl implements FlexOperations {
             this.fileManager.createDirectory(targetDirectory);
         }
 
-        String path = TemplateUtils.getTemplatePath(getClass(), sourceAntPath);
+        String path = FileUtils.getPath(getClass(), sourceAntPath);
         Set<URL> urls = UrlFindingUtils.findMatchingClasspathResources(this.context.getBundleContext(), path);
-        Assert.notNull(urls, "Could not search bundles for resources for Ant Path '" + path + "'");
+        Validate.notNull(urls, "Could not search bundles for resources for Ant Path '" + path + "'");
         for (URL url : urls) {
             String fileName = url.getPath().substring(url.getPath().lastIndexOf("/") + 1);
             if (!this.fileManager.exists(targetDirectory + fileName)) {
-                try {
-                    FileCopyUtils.copy(url.openStream(), this.fileManager.createFile(targetDirectory + fileName).getOutputStream());
+                InputStream inputStream = null;
+                OutputStream outputStream = null;
+                try { 
+                    inputStream = url.openStream();
+                    outputStream = this.fileManager.createFile(targetDirectory + fileName).getOutputStream();
+                    IOUtils.copy(inputStream, outputStream);
                 } catch (IOException e) {
                     new IllegalStateException("Encountered an error during copying of resources for Flex addon.", e);
+                }
+                finally {
+                    IOUtils.closeQuietly(inputStream);
+                    IOUtils.closeQuietly(outputStream);
                 }
             }
         }
