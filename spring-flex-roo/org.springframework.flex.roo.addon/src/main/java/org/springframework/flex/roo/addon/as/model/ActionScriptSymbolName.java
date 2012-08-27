@@ -19,8 +19,7 @@ package org.springframework.flex.roo.addon.as.model;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * An ActionScript symbol (i.e., a field).
@@ -32,7 +31,7 @@ public final class ActionScriptSymbolName implements Comparable<ActionScriptSymb
     private final String symbolName;
 
     public ActionScriptSymbolName(String symbolName) {
-        Assert.hasText(symbolName, "Fully qualified type name required");
+    	StringUtils.isNotBlank(symbolName);
         assertActionScriptNameLegal(symbolName);
         this.symbolName = symbolName;
     }

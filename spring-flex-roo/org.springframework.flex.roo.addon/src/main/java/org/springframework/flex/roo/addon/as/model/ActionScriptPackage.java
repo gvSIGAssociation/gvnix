@@ -16,7 +16,7 @@
 
 package org.springframework.flex.roo.addon.as.model;
 
-import org.springframework.roo.support.util.Assert;
+import org.apache.commons.lang3.Validate;
 
 /**
  * An ActionScript source package.
@@ -28,9 +28,9 @@ public class ActionScriptPackage implements Comparable<ActionScriptPackage> {
     private final String fullyQualifiedPackageName;
 
     public ActionScriptPackage(String fullyQualifiedPackageName) {
-        Assert.notNull(fullyQualifiedPackageName, "Fully qualified package name required");
+        Validate.notNull(fullyQualifiedPackageName, "Fully qualified package name required");
         ActionScriptSymbolName.assertActionScriptNameLegal(fullyQualifiedPackageName);
-        Assert.isTrue(fullyQualifiedPackageName.toLowerCase().equals(fullyQualifiedPackageName), "The entire package name must be lowercase");
+        Validate.isTrue(fullyQualifiedPackageName.toLowerCase().equals(fullyQualifiedPackageName), "The entire package name must be lowercase");
         this.fullyQualifiedPackageName = fullyQualifiedPackageName;
     }
 
