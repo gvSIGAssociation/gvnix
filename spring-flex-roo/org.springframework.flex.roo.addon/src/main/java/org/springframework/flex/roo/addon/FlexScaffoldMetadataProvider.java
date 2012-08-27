@@ -16,22 +16,24 @@
 
 package org.springframework.flex.roo.addon;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.roo.addon.entity.EntityMetadata;
+import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.web.mvc.controller.details.WebMetadataService;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
+import org.springframework.roo.classpath.persistence.PersistenceMemberLocator;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * {@link MetadataProvider} for scaffolded Flex remoting destinations.
@@ -43,6 +45,8 @@ import org.springframework.roo.support.util.Assert;
 public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
 
     @Reference private WebMetadataService webMetadataService;
+    
+    @Reference private PersistenceMemberLocator persistenceMemberLocator;
 
     protected void activate(ComponentContext context) {
         this.metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
@@ -50,14 +54,14 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
     }
 
     @Override
-    protected String createLocalIdentifier(JavaType javaType, Path path) {
+    protected String createLocalIdentifier(JavaType javaType, LogicalPath path) {
         return FlexScaffoldMetadata.createIdentifier(javaType, path);
     }
 
     @Override
     protected String getGovernorPhysicalTypeIdentifier(String metadataIdentificationString) {
         JavaType javaType = FlexScaffoldMetadata.getJavaType(metadataIdentificationString);
-        Path path = FlexScaffoldMetadata.getPath(metadataIdentificationString);
+        LogicalPath path = FlexScaffoldMetadata.getPath(metadataIdentificationString);
         String physicalTypeIdentifier = PhysicalTypeIdentifier.createIdentifier(javaType, path);
         return physicalTypeIdentifier;
     }
@@ -75,10 +79,10 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
         // Lookup the form backing object's metadata
         JavaType entityType = annotationValues.entity;
         Path path = Path.SRC_MAIN_JAVA;
-        String entityMetadataKey = EntityMetadata.createIdentifier(entityType, path);
+        String entityMetadataKey = JpaActiveRecordMetadata.createIdentifier(entityType, LogicalPath.getInstance(path, ""));
         
         // We need to lookup the metadata we depend on
-        EntityMetadata entityMetadata = (EntityMetadata) this.metadataService.get(entityMetadataKey);
+        JpaActiveRecordMetadata entityMetadata = (JpaActiveRecordMetadata) this.metadataService.get(entityMetadataKey);
         // We need to abort if we couldn't find dependent metadata
         if (entityMetadata == null || !entityMetadata.isValid()) {
             return null;
@@ -87,13 +91,13 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
         // We need to be informed if our dependent metadata changes
         this.metadataDependencyRegistry.registerDependency(entityMetadataKey, metadataIdentificationString);
         
-        PhysicalTypeMetadata entityPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(entityType, path));
-        Assert.notNull(entityPhysicalTypeMetadata, "Unable to obtain physical type metdata for type " + entityType.getFullyQualifiedTypeName());
+        PhysicalTypeMetadata entityPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(entityType, LogicalPath.getInstance(path, "")));
+        Validate.notNull(entityPhysicalTypeMetadata, "Unable to obtain physical type metdata for type " + entityType.getFullyQualifiedTypeName());
         ClassOrInterfaceTypeDetails entityClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) entityPhysicalTypeMetadata.getMemberHoldingTypeDetails();
         MemberDetails entityMemberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), entityClassOrInterfaceDetails);
 
         return new FlexScaffoldMetadata(metadataIdentificationString, aspectName, governorPhysicalTypeMetadata, annotationValues, entityMetadata,
-            webMetadataService.getDynamicFinderMethodsAndFields(entityType, entityMemberDetails, metadataIdentificationString));
+            webMetadataService.getDynamicFinderMethodsAndFields(entityType, entityMemberDetails, metadataIdentificationString), persistenceMemberLocator);
     }
 
     public String getItdUniquenessFilenameSuffix() {
