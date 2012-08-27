@@ -16,10 +16,10 @@
 
 package org.springframework.flex.roo.addon.as.classpath;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Utility methods for manipulation of metadata id's for ActionScript source files.
@@ -28,26 +28,26 @@ import org.springframework.roo.support.util.Assert;
  */
 public class ASPhysicalTypeIdentifierNamingUtils {
 
-    public static final String createIdentifier(String providesType, ActionScriptType actionScriptType, Path path) {
-        Assert.notNull(actionScriptType, "ActionScript type required");
-        Assert.notNull(path, "Path required");
+    public static final String createIdentifier(String providesType, ActionScriptType actionScriptType, LogicalPath path) {
+        Validate.notNull(actionScriptType, "ActionScript type required");
+        Validate.notNull(path, "Path required");
         return MetadataIdentificationUtils.create(providesType, path.getName() + "?" + actionScriptType.getFullyQualifiedTypeName());
     }
 
     public static final ActionScriptType getActionScriptType(String providesType, String metadataIdentificationString) {
-        Assert.isTrue(isValid(providesType, metadataIdentificationString), "Metadata identification string '" + metadataIdentificationString
+        Validate.isTrue(isValid(providesType, metadataIdentificationString), "Metadata identification string '" + metadataIdentificationString
             + "' does not appear to be a valid actionscript type identifier");
         String instance = MetadataIdentificationUtils.getMetadataInstance(metadataIdentificationString);
         int index = instance.indexOf("?");
         return new ActionScriptType(instance.substring(index + 1));
     }
 
-    public static final Path getPath(String providesType, String metadataIdentificationString) {
-        Assert.isTrue(isValid(providesType, metadataIdentificationString), "Metadata identification string '" + metadataIdentificationString
+    public static final LogicalPath getPath(String providesType, String metadataIdentificationString) {
+        Validate.isTrue(isValid(providesType, metadataIdentificationString), "Metadata identification string '" + metadataIdentificationString
             + "' does not appear to be a valid actionscript type identifier");
         String instance = MetadataIdentificationUtils.getMetadataInstance(metadataIdentificationString);
         int index = instance.indexOf("?");
-        return new Path(instance.substring(0, index));
+        return LogicalPath.getInstance(instance.substring(0, index));
     }
 
     /**

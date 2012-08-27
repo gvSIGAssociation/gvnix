@@ -18,7 +18,6 @@ package org.springframework.flex.roo.addon.as.classpath;
 
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
 import org.springframework.roo.metadata.MetadataProvider;
-import org.springframework.roo.project.ClasspathProvidingProjectMetadata;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;

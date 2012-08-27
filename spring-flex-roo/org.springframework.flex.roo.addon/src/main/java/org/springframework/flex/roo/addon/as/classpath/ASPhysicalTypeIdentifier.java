@@ -16,10 +16,10 @@
 
 package org.springframework.flex.roo.addon.as.classpath;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.support.util.Assert;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Helper class for working with metadata id's for ActionScript source files.
@@ -36,7 +36,7 @@ public final class ASPhysicalTypeIdentifier {
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(ActionScriptType actionScriptType, Path path) {
+    public static final String createIdentifier(ActionScriptType actionScriptType, LogicalPath path) {
         return ASPhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, actionScriptType, path);
     }
 
@@ -44,7 +44,7 @@ public final class ASPhysicalTypeIdentifier {
         return ASPhysicalTypeIdentifierNamingUtils.getActionScriptType(PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return ASPhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
@@ -53,7 +53,7 @@ public final class ASPhysicalTypeIdentifier {
     }
 
     public static String getFriendlyName(String metadataIdentificationString) {
-        Assert.isTrue(isValid(metadataIdentificationString), "Invalid metadata identification string '" + metadataIdentificationString + "' provided");
+        Validate.isTrue(isValid(metadataIdentificationString), "Invalid metadata identification string '" + metadataIdentificationString + "' provided");
         return getPath(metadataIdentificationString) + "/" + getActionScriptType(metadataIdentificationString);
     }
 }
