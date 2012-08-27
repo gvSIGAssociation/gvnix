@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -35,10 +36,10 @@ import org.springframework.roo.metadata.MetadataDependencyRegistry;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.metadata.MetadataNotificationListener;
 import org.springframework.roo.metadata.MetadataService;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.UndoableMonitoringRequest;
-import org.springframework.roo.support.util.Assert;
 
 /**
  * {@link MetadataNotificationListener} that monitors the filesystem for changes to Flex source files.
@@ -81,7 +82,7 @@ public class FlexProjectListener implements MetadataNotificationListener {
             return;
         }
 
-        Assert.isTrue(MetadataIdentificationUtils.isValid(upstreamDependency), "Upstream dependency is an invalid metadata identification string ('"
+        Validate.isTrue(MetadataIdentificationUtils.isValid(upstreamDependency), "Upstream dependency is an invalid metadata identification string ('"
             + upstreamDependency + "')");
 
         if (upstreamDependency.equals(FlexProjectMetadata.getProjectIdentifier())) {
@@ -92,7 +93,7 @@ public class FlexProjectListener implements MetadataNotificationListener {
             }
 
             PathResolver pathResolver = md.getPathResolver();
-            Assert.notNull(pathResolver, "Path resolver could not be acquired from changed metadata '" + md + "'");
+            Validate.notNull(pathResolver, "Path resolver could not be acquired from changed metadata '" + md + "'");
 
             Set<FileOperation> notifyOn = new HashSet<FileOperation>();
             notifyOn.add(FileOperation.MONITORING_START);
@@ -102,12 +103,12 @@ public class FlexProjectListener implements MetadataNotificationListener {
             notifyOn.add(FileOperation.UPDATED);
             notifyOn.add(FileOperation.DELETED);
 
-            for (Path p : pathResolver.getPaths()) {
+            for (LogicalPath p : pathResolver.getPaths()) {
                 // Verify path exists and ensure it's monitored, except root (which we assume is already monitored via ProcessManager)
                 if (!Path.ROOT.equals(p)) {
                     String fileIdentifier = pathResolver.getRoot(p);
                     File file = new File(fileIdentifier);
-                    Assert.isTrue(!file.exists() || (file.exists() && file.isDirectory()), "Path '" + fileIdentifier + "' must either not exist or be a directory");
+                    Validate.isTrue(!file.exists() || (file.exists() && file.isDirectory()), "Path '" + fileIdentifier + "' must either not exist or be a directory");
                     if (!file.exists()) {
                         // Create directory, but no notifications as that will happen once we start monitoring it below
                         new CreateDirectory(undoManager, filenameResolver, file);
@@ -128,7 +129,7 @@ public class FlexProjectListener implements MetadataNotificationListener {
     /*private final class PathResolvingAwareFilenameResolver implements FilenameResolver {
 
         public String getMeaningfulName(File file) {
-            Assert.notNull(file, "File required");
+            Validate.notNull(file, "File required");
             return FlexProjectListener.this.pathResolver.getFriendlyName(FileDetails.getCanonicalPath(file));
         }
     }*/
