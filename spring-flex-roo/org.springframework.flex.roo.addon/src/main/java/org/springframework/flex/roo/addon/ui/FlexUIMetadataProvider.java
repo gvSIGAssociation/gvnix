@@ -20,7 +20,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -30,6 +31,9 @@ import java.util.Set;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
@@ -66,11 +70,10 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.ProjectMetadata;
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.FileCopyUtils;
-import org.springframework.roo.support.util.StringUtils;
+import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -104,6 +107,9 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
 
     @Reference
     private MemberDetailsScanner memberDetailsScanner;
+    
+    @Reference
+    private ProjectOperations projectOperations;
 
     private StringTemplateGroup templateGroup;
 
@@ -123,27 +129,27 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         // pluralCache = new HashMap<JavaType, String>();
 
         JavaType javaType = FlexUIMetadata.getJavaType(metadataId);
-        Path path = FlexUIMetadata.getPath(metadataId);
+        LogicalPath path = FlexUIMetadata.getPath(metadataId);
         String flexScaffoldMetadataKey = FlexScaffoldMetadata.createIdentifier(javaType, path);
         FlexScaffoldMetadata flexScaffoldMetadata = (FlexScaffoldMetadata) this.metadataService.get(flexScaffoldMetadataKey);
-        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier());
+        ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
 
         if (flexScaffoldMetadata == null || !flexScaffoldMetadata.isValid() || projectMetadata == null || !projectMetadata.isValid()) {
             return null;
         }
 
-        String presentationPackage = projectMetadata.getTopLevelPackage() + ".presentation";
+        String presentationPackage = projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()) + ".presentation";
         String entityPresentationPackage = presentationPackage + "." + flexScaffoldMetadata.getEntityReference().toLowerCase();
 
         // Install the root application MXML document if it doesn't already exist
-        String scaffoldAppFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX, projectMetadata.getProjectName() + "_scaffold.mxml");
+        String scaffoldAppFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "_scaffold.mxml");
         if (!this.fileManager.exists(scaffoldAppFileId)) {
             this.flexOperations.createScaffoldApp();
         }
 
         updateScaffoldIfNecessary(scaffoldAppFileId, flexScaffoldMetadata);
 
-        String flexConfigFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX, projectMetadata.getProjectName()
+        String flexConfigFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), projectOperations.getProjectName(projectOperations.getFocusedModuleName())
             + "_scaffold-config.xml");
         if (!this.fileManager.exists(flexConfigFileId)) {
             this.flexOperations.createFlexCompilerConfig();
@@ -154,7 +160,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         // Install the entity event class if it doesn't already exist
         ActionScriptType entityEventType = new ActionScriptType(entityPresentationPackage + "."
             + flexScaffoldMetadata.getEntity().getSimpleTypeName() + "Event");
-        if (!StringUtils.hasText(this.asPhysicalTypeProvider.findIdentifier(entityEventType))) {
+        if (!StringUtils.isNotBlank(this.asPhysicalTypeProvider.findIdentifier(entityEventType))) {
             createEntityEventType(entityEventType, flexScaffoldMetadata);
         }
 
@@ -162,7 +168,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         String listViewRelativePath = (entityPresentationPackage + "." + flexScaffoldMetadata.getEntity().getSimpleTypeName() + "View").replace(
             '.', File.separatorChar)
             + ".mxml";
-        String listViewPath = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX, listViewRelativePath);
+        String listViewPath = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), listViewRelativePath);
         writeToDiskIfNecessary(listViewPath,
             buildListViewDocument(flexScaffoldMetadata, getElegibleListFields(projectMetadata, flexScaffoldMetadata)));
 
@@ -170,7 +176,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         String formRelativePath = (entityPresentationPackage + "." + flexScaffoldMetadata.getEntity().getSimpleTypeName() + "Form").replace(
             '.', File.separatorChar)
             + ".mxml";
-        String formPath = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX, formRelativePath);
+        String formPath = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), formRelativePath);
         writeToDiskIfNecessary(formPath, buildFormDocument(flexScaffoldMetadata, getElegibleFormFields(projectMetadata, flexScaffoldMetadata)));
 
         return new FlexUIMetadata(metadataId);
@@ -195,7 +201,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         }
 
         Element entitiesElement = XmlUtils.findFirstElement("/Application/Declarations/ArrayList[@id='entities']", scaffoldDoc.getDocumentElement());
-        Assert.notNull(entitiesElement, "Could not find the entities element in the main scaffold mxml.");
+        Validate.notNull(entitiesElement, "Could not find the entities element in the main scaffold mxml.");
         Element entityElement = scaffoldDoc.createElement("fx:String");
         entityElement.setTextContent(entityName);
         entitiesElement.appendChild(entityElement);
@@ -205,10 +211,18 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         XmlUtils.writeXml(XmlUtils.createIndentingTransformer(), byteArrayOutputStream, scaffoldDoc);
         String mxmlContent = byteArrayOutputStream.toString();
 
-        try {
-            FileCopyUtils.copy(mxmlContent, new OutputStreamWriter(scaffoldMutableFile.getOutputStream()));
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try { 
+            inputStream = IOUtils.toInputStream(mxmlContent);
+            outputStream = scaffoldMutableFile.getOutputStream();
+            IOUtils.copy(inputStream, outputStream);
         } catch (Exception e) {
             throw new IllegalStateException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
     }
 
@@ -230,7 +244,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         }
 
         Element includesElement = XmlUtils.findFirstElement("/flex-config/includes", flexConfigDoc.getDocumentElement());
-        Assert.notNull(includesElement, "Could not find the includes element in the flex compiler config.");
+        Validate.notNull(includesElement, "Could not find the includes element in the flex compiler config.");
 
         Element entityElement = flexConfigDoc.createElement("symbol");
         entityElement.setTextContent(viewName);
@@ -241,10 +255,18 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         XmlUtils.writeXml(XmlUtils.createIndentingTransformer(), byteArrayOutputStream, flexConfigDoc);
         String mxmlContent = byteArrayOutputStream.toString();
 
-        try {
-            FileCopyUtils.copy(mxmlContent, new OutputStreamWriter(flexConfigMutableFile.getOutputStream()));
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try { 
+            inputStream = IOUtils.toInputStream(mxmlContent);
+            outputStream = flexConfigMutableFile.getOutputStream();
+            IOUtils.copy(inputStream, outputStream);
         } catch (Exception e) {
             throw new IllegalStateException(e);
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
     }
 
@@ -254,14 +276,14 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
 
     public void notify(String upstreamDependency, String downstreamDependency) {
         if (MetadataIdentificationUtils.isIdentifyingClass(downstreamDependency)) {
-            Assert.isTrue(MetadataIdentificationUtils.getMetadataClass(upstreamDependency).equals(
+            Validate.isTrue(MetadataIdentificationUtils.getMetadataClass(upstreamDependency).equals(
                 MetadataIdentificationUtils.getMetadataClass(FlexScaffoldMetadata.getMetadataIdentiferType())),
                 "Expected class-level notifications only for web scaffold metadata (not '" + upstreamDependency + "')");
 
             // A physical Java type has changed, and determine what the corresponding local metadata identification
             // string would have been
             JavaType javaType = FlexScaffoldMetadata.getJavaType(upstreamDependency);
-            Path path = FlexScaffoldMetadata.getPath(upstreamDependency);
+            LogicalPath path = FlexScaffoldMetadata.getPath(upstreamDependency);
             downstreamDependency = FlexUIMetadata.createIdentifier(javaType, path);
 
             // We only need to proceed if the downstream dependency relationship is not already registered
@@ -272,7 +294,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         }
 
         // We should now have an instance-specific "downstream dependency" that can be processed by this class
-        Assert.isTrue(MetadataIdentificationUtils.getMetadataClass(downstreamDependency).equals(
+        Validate.isTrue(MetadataIdentificationUtils.getMetadataClass(downstreamDependency).equals(
             MetadataIdentificationUtils.getMetadataClass(getProvidesType())), "Unexpected downstream notification for '" + downstreamDependency
             + "' to this provider (which uses '" + getProvidesType() + "'");
 
@@ -291,7 +313,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         entityEventTemplate.setAttribute("flexScaffoldMetadata", flexScaffoldMetadata);
 
         String relativePath = entityEventType.getFullyQualifiedTypeName().replace('.', File.separatorChar) + ".as";
-        String fileIdentifier = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX, relativePath);
+        String fileIdentifier = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), relativePath);
         this.fileManager.createOrUpdateTextFileIfRequired(fileIdentifier, entityEventTemplate.toString(), true);
     }
 
@@ -332,7 +354,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         Map<String, String> labelFields = new HashMap<String, String>();
         for (RelatedTypeWrapper relatedType : relatedTypes) {
             String labelField = "id"; // Default in case we don't find a better candidate
-            String asPhysicalTypeMetadataKey = ASPhysicalTypeIdentifier.createIdentifier(relatedType.getType(), FlexPath.SRC_MAIN_FLEX);
+            String asPhysicalTypeMetadataKey = ASPhysicalTypeIdentifier.createIdentifier(relatedType.getType(), FlexPath.SRC_MAIN_FLEX.getLogicalPath());
             ASMutableClassOrInterfaceTypeDetails details = getASClassDetails(asPhysicalTypeMetadataKey);
             if (details == null) {
                 continue;
@@ -355,7 +377,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         if (metadata == null) {
             return null;
         }
-        Assert.isInstanceOf(ASMutableClassOrInterfaceTypeDetails.class, metadata.getPhysicalTypeDetails(),
+        Validate.isInstanceOf(ASMutableClassOrInterfaceTypeDetails.class, metadata.getPhysicalTypeDetails(),
             "ActionScript entity must be a class or interface.");
         return (ASMutableClassOrInterfaceTypeDetails) metadata.getPhysicalTypeDetails();
     }
@@ -399,7 +421,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
                 if (!javaField.getFieldType().isCommonCollectionType()
                     && !javaField.getFieldType().isArray()
                     && !javaField.getFieldType().getPackage().getFullyQualifiedPackageName().startsWith(
-                        projectMetadata.getTopLevelPackage().getFullyQualifiedPackageName())) {
+                    		projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()).getFullyQualifiedPackageName())) {
                     // Never include id field
                     if (MemberFindingUtils.getAnnotationOfType(javaField.getAnnotations(), new JavaType("javax.persistence.Id")) != null) {
                         continue;
@@ -453,7 +475,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
             } catch (Exception e) {
                 new IllegalStateException("Could not parse file: " + mxmlFilename);
             }
-            Assert.notNull(original, "Unable to parse " + mxmlFilename);
+            Validate.notNull(original, "Unable to parse " + mxmlFilename);
             if (MxmlRoundTripUtils.compareDocuments(original, proposed)) { // TODO - need to actually implement the
                                                                            // comparison algorithm in a way that works
                                                                            // for MXML to allow non-destructive editing
@@ -462,7 +484,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         } else {
             original = proposed;
             mutableFile = this.fileManager.createFile(mxmlFilename);
-            Assert.notNull(mutableFile, "Could not create MXML file '" + mxmlFilename + "'");
+            Validate.notNull(mutableFile, "Could not create MXML file '" + mxmlFilename + "'");
         }
 
         try {
@@ -473,7 +495,18 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
                 String mxmlContent = byteArrayOutputStream.toString();
 
                 // We need to write the file out (it's a new file, or the existing file has different contents)
-                FileCopyUtils.copy(mxmlContent, new OutputStreamWriter(mutableFile.getOutputStream()));
+                InputStream inputStream = null;
+                OutputStream outputStream = null;
+                try { 
+	                inputStream = IOUtils.toInputStream(mxmlContent);
+	                outputStream = mutableFile.getOutputStream();
+	                IOUtils.copy(inputStream, outputStream);
+                }
+                finally {
+	                IOUtils.closeQuietly(inputStream);
+	                IOUtils.closeQuietly(outputStream);
+                }
+                
                 // Return and indicate we wrote out the file
                 return true;
             }
@@ -486,8 +519,8 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
     }
     
     private MemberDetails getMemberDetails(JavaType entityType) {
-        PhysicalTypeMetadata entityPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(entityType, Path.SRC_MAIN_JAVA));
-        Assert.notNull(entityPhysicalTypeMetadata, "Unable to obtain physical type metdata for type " + entityType.getFullyQualifiedTypeName());
+        PhysicalTypeMetadata entityPhysicalTypeMetadata = (PhysicalTypeMetadata) metadataService.get(PhysicalTypeIdentifier.createIdentifier(entityType, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
+        Validate.notNull(entityPhysicalTypeMetadata, "Unable to obtain physical type metdata for type " + entityType.getFullyQualifiedTypeName());
         ClassOrInterfaceTypeDetails entityClassOrInterfaceDetails = (ClassOrInterfaceTypeDetails) entityPhysicalTypeMetadata.getMemberHoldingTypeDetails();
         return scanForMemberDetails(entityClassOrInterfaceDetails);
     }

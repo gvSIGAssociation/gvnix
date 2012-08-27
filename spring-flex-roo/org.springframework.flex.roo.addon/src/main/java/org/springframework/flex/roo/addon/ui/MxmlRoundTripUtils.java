@@ -23,8 +23,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.springframework.roo.support.util.Assert;
-import org.springframework.roo.support.util.Base64;
+import org.apache.commons.lang3.Validate;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.roo.support.util.XmlUtils;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
@@ -318,11 +318,11 @@ public abstract class MxmlRoundTripUtils {
      * @return byte[] hash of the input data
      */
     private static byte[] sha1(byte[] data) {
-        Assert.notNull(digest, "Could not create hash key for identifier");
+        Validate.notNull(digest, "Could not create hash key for identifier");
         return digest.digest(data);
     }
 
     private static String base64(byte[] data) {
-        return Base64.encodeBytes(data);
+        return Base64.encodeBase64String(data);
     }
 }

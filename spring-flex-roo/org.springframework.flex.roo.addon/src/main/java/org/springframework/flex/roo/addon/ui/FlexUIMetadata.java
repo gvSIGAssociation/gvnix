@@ -20,7 +20,7 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.metadata.AbstractMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.Path;
+import org.springframework.roo.project.LogicalPath;
 
 /**
  * Metadata representation of the user interface scaffolding generated for a particular Flex entity.
@@ -45,7 +45,7 @@ public class FlexUIMetadata extends AbstractMetadataItem {
         return PhysicalTypeIdentifierNamingUtils.getJavaType(PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static final Path getPath(String metadataIdentificationString) {
+    public static final LogicalPath getPath(String metadataIdentificationString) {
         return PhysicalTypeIdentifierNamingUtils.getPath(PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
@@ -53,7 +53,7 @@ public class FlexUIMetadata extends AbstractMetadataItem {
         return PhysicalTypeIdentifierNamingUtils.isValid(PROVIDES_TYPE_STRING, metadataIdentificationString);
     }
 
-    public static String createIdentifier(JavaType javaType, Path path) {
+    public static String createIdentifier(JavaType javaType, LogicalPath path) {
         return PhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, javaType, path);
     }
 
