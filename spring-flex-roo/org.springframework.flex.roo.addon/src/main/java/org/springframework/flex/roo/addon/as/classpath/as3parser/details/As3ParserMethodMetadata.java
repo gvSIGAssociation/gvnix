@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.as3parser.As3ParserUtils;
 import org.springframework.flex.roo.addon.as.classpath.as3parser.CompilationUnitServices;
 import org.springframework.flex.roo.addon.as.classpath.details.ASMethodMetadata;
@@ -28,7 +29,6 @@ import org.springframework.flex.roo.addon.as.classpath.details.metatag.ASMetaTag
 import org.springframework.flex.roo.addon.as.model.ASTypeVisibility;
 import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.roo.support.util.Assert;
 
 import uk.co.badgersinfoil.metaas.dom.ASArg;
 import uk.co.badgersinfoil.metaas.dom.ASMetaTag;
@@ -59,9 +59,9 @@ public class As3ParserMethodMetadata implements ASMethodMetadata {
 
     @SuppressWarnings("unchecked")
     public As3ParserMethodMetadata(String declaredByMetadataId, ASMethod method, CompilationUnitServices compilationUnitServices) {
-        Assert.notNull(declaredByMetadataId, "Declared by metadata ID required");
-        Assert.notNull(method, "Method declaration required");
-        Assert.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(declaredByMetadataId, "Declared by metadata ID required");
+        Validate.notNull(method, "Method declaration required");
+        Validate.notNull(compilationUnitServices, "Compilation unit services required");
 
         this.declaredByMetadataId = declaredByMetadataId;
 
@@ -127,7 +127,7 @@ public class As3ParserMethodMetadata implements ASMethodMetadata {
 
     public static void addMethod(CompilationUnitServices compilationUnitServices, ASType type, ASMethodMetadata declaredMethod, boolean permitFlush) {
 
-        Assert.isNull(type.getMethod(declaredMethod.getMethodName().getSymbolName()), "Method with name "
+        Validate.isTrue(type.getMethod(declaredMethod.getMethodName().getSymbolName()) == null, "Method with name "
             + declaredMethod.getMethodName().getSymbolName() + " already exists and ActionScript does not allow method overloading.");
 
         As3ParserUtils.importTypeIfRequired(compilationUnitServices, declaredMethod.getReturnType());

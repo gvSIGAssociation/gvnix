@@ -19,6 +19,7 @@ package org.springframework.flex.roo.addon.as.classpath.as3parser.details;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.as3parser.As3ParserUtils;
 import org.springframework.flex.roo.addon.as.classpath.as3parser.CompilationUnitServices;
 import org.springframework.flex.roo.addon.as.classpath.details.ASFieldMetadata;
@@ -27,7 +28,6 @@ import org.springframework.flex.roo.addon.as.classpath.details.metatag.ASMetaTag
 import org.springframework.flex.roo.addon.as.model.ASTypeVisibility;
 import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.roo.support.util.Assert;
 
 import uk.co.badgersinfoil.metaas.dom.ASClassType;
 import uk.co.badgersinfoil.metaas.dom.ASField;
@@ -54,9 +54,9 @@ public class As3ParserFieldMetadata extends AbstractASFieldMetadata {
 
     @SuppressWarnings("unchecked")
     public As3ParserFieldMetadata(String declaredByMetadataId, ASField field, CompilationUnitServices compilationUnitServices) {
-        Assert.notNull(declaredByMetadataId, "Declared by metadata ID required");
-        Assert.notNull(field, "ActionScript field is required");
-        Assert.notNull(compilationUnitServices, "Compilation unit services are required");
+        Validate.notNull(declaredByMetadataId, "Declared by metadata ID required");
+        Validate.notNull(field, "ActionScript field is required");
+        Validate.notNull(compilationUnitServices, "Compilation unit services are required");
 
         this.setDeclaredByMetadataId(declaredByMetadataId);
 
@@ -99,9 +99,9 @@ public class As3ParserFieldMetadata extends AbstractASFieldMetadata {
 
     public static void addField(CompilationUnitServices compilationUnitServices, ASClassType clazz, ASFieldMetadata field, boolean permitFlush) {
 
-        Assert.notNull(compilationUnitServices, "Compilation unit services required");
-        Assert.notNull(clazz, "Class required");
-        Assert.notNull(field, "Field required");
+        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(clazz, "Class required");
+        Validate.notNull(field, "Field required");
 
         // Import the field type into the compilation unit
         As3ParserUtils.importTypeIfRequired(compilationUnitServices, field.getFieldType());
@@ -126,9 +126,9 @@ public class As3ParserFieldMetadata extends AbstractASFieldMetadata {
 
     public static void updateField(CompilationUnitServices compilationUnitServices, ASClassType clazz, ASFieldMetadata field, boolean permitFlush) {
 
-        Assert.notNull(compilationUnitServices, "Compilation unit services required");
-        Assert.notNull(clazz, "Class required");
-        Assert.notNull(field, "Field required");
+        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(clazz, "Class required");
+        Validate.notNull(field, "Field required");
 
         // Import the field type into the compilation unit
         As3ParserUtils.importTypeIfRequired(compilationUnitServices, field.getFieldType());
@@ -153,11 +153,11 @@ public class As3ParserFieldMetadata extends AbstractASFieldMetadata {
 
     public static void removeField(CompilationUnitServices compilationUnitServices, ASClassType clazz, ActionScriptSymbolName fieldName,
         boolean permitFlush) {
-        Assert.notNull(compilationUnitServices, "Compilation unit services required");
-        Assert.notNull(clazz, "Class required");
-        Assert.notNull(fieldName, "Field name required");
+        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(clazz, "Class required");
+        Validate.notNull(fieldName, "Field name required");
 
-        Assert.notNull(clazz.getField(fieldName.getSymbolName()), "Could not locate field '" + fieldName + "' to delete");
+        Validate.notNull(clazz.getField(fieldName.getSymbolName()), "Could not locate field '" + fieldName + "' to delete");
 
         clazz.removeField(fieldName.getSymbolName());
 

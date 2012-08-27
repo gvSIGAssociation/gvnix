@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.as3parser.As3ParserUtils;
 import org.springframework.flex.roo.addon.as.classpath.as3parser.CompilationUnitServices;
 import org.springframework.flex.roo.addon.as.classpath.details.metatag.ASMetaTagMetadata;
@@ -29,7 +30,6 @@ import org.springframework.flex.roo.addon.as.classpath.details.metatag.IntegerAt
 import org.springframework.flex.roo.addon.as.classpath.details.metatag.MetaTagAttributeValue;
 import org.springframework.flex.roo.addon.as.classpath.details.metatag.StringAttributeValue;
 import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
-import org.springframework.roo.support.util.Assert;
 
 import uk.co.badgersinfoil.metaas.dom.ASMetaTag;
 import uk.co.badgersinfoil.metaas.dom.MetaTagable;
@@ -48,7 +48,7 @@ public class As3ParserMetaTagMetadata implements ASMetaTagMetadata {
 
     @SuppressWarnings("unchecked")
     public As3ParserMetaTagMetadata(ASMetaTag metaTag) {
-        Assert.notNull(metaTag, "Meta Tag required");
+        Validate.notNull(metaTag, "Meta Tag required");
 
         this.name = metaTag.getName();
         for (ASMetaTag.Param param : (List<ASMetaTag.Param>) metaTag.getParams()) {
@@ -62,7 +62,7 @@ public class As3ParserMetaTagMetadata implements ASMetaTagMetadata {
     }
 
     public MetaTagAttributeValue<?> getAttribute(ActionScriptSymbolName attributeName) {
-        Assert.notNull(attributeName, "Attribute name required");
+        Validate.notNull(attributeName, "Attribute name required");
         return this.attributes.get(attributeName);
     }
 
@@ -74,12 +74,12 @@ public class As3ParserMetaTagMetadata implements ASMetaTagMetadata {
     public static void addMetaTagToElement(CompilationUnitServices compilationUnitServices, ASMetaTagMetadata metaTag, MetaTagable element,
         boolean permitFlush) {
 
-        Assert.notNull(compilationUnitServices, "Compilation unit services required");
-        Assert.notNull(metaTag, "Metatag required");
-        Assert.notNull(element, "Element required");
+        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(metaTag, "Metatag required");
+        Validate.notNull(element, "Element required");
 
         for (ASMetaTag existingTag : (List<ASMetaTag>) element.getAllMetaTags()) {
-            Assert.isTrue(!metaTag.getName().equals(existingTag.getName()), "Found an existing meta tag of type '" + metaTag.getName() + "'");
+            Validate.isTrue(!metaTag.getName().equals(existingTag.getName()), "Found an existing meta tag of type '" + metaTag.getName() + "'");
         }
 
         ASMetaTag newMetaTag = element.newMetaTag(metaTag.getName());
@@ -102,13 +102,13 @@ public class As3ParserMetaTagMetadata implements ASMetaTagMetadata {
     }
 
     public static void removeMetatagFromElement(CompilationUnitServices compilationUnitServices, MetaTagable element, String name, boolean permitFlush) {
-        Assert.notNull(compilationUnitServices, "Compilation unit services required");
-        Assert.notNull(name, "Name required");
-        Assert.notNull(element, "Element required");
+        Validate.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(name, "Name required");
+        Validate.notNull(element, "Element required");
 
         ASMetaTag tag = element.getFirstMetatag(name);
 
-        Assert.notNull(tag, "Could not locate metatag '" + name + "' to delete");
+        Validate.notNull(tag, "Could not locate metatag '" + name + "' to delete");
 
         // TODO - this doesn't actually work as the getAllMetaTags list is an unmodifiable collections
         element.getAllMetaTags().remove(tag);

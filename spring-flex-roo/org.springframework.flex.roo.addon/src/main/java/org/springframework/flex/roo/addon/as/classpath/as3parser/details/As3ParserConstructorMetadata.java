@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.as3parser.As3ParserUtils;
 import org.springframework.flex.roo.addon.as.classpath.as3parser.CompilationUnitServices;
 import org.springframework.flex.roo.addon.as.classpath.details.ASConstructorMetadata;
@@ -28,7 +29,6 @@ import org.springframework.flex.roo.addon.as.classpath.details.metatag.ASMetaTag
 import org.springframework.flex.roo.addon.as.model.ASTypeVisibility;
 import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.roo.support.util.Assert;
 
 import uk.co.badgersinfoil.metaas.dom.ASArg;
 import uk.co.badgersinfoil.metaas.dom.ASMetaTag;
@@ -55,9 +55,9 @@ public class As3ParserConstructorMetadata implements ASConstructorMetadata {
 
     @SuppressWarnings("unchecked")
     public As3ParserConstructorMetadata(String declaredByMetadataId, ASMethod method, CompilationUnitServices compilationUnitServices) {
-        Assert.notNull(declaredByMetadataId, "Declared by metadata ID required");
-        Assert.notNull(method, "Method declaration required");
-        Assert.notNull(compilationUnitServices, "Compilation unit services required");
+        Validate.notNull(declaredByMetadataId, "Declared by metadata ID required");
+        Validate.notNull(method, "Method declaration required");
+        Validate.notNull(compilationUnitServices, "Compilation unit services required");
 
         this.declaredByMetadataId = declaredByMetadataId;
 
@@ -112,7 +112,7 @@ public class As3ParserConstructorMetadata implements ASConstructorMetadata {
     public static void addConstructor(CompilationUnitServices compilationUnitServices, ASType type, ASConstructorMetadata declaredConstructor,
         boolean permitFlush) {
 
-        Assert.isNull(type.getMethod(type.getName()), "ActionScript classes may only have one constructor method.");
+        Validate.isTrue(type.getMethod(type.getName()) == null, "ActionScript classes may only have one constructor method.");
 
         ASMethod constructor = type.newMethod(type.getName(), As3ParserUtils.getAs3ParserVisiblity(declaredConstructor.getVisibility()), null);
 
