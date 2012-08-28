@@ -42,16 +42,13 @@ public class FlexProjectMetadataProvider implements MetadataProvider, FileEventL
     @Reference
     private PathResolver pathResolver;
     
-    private String servicesConfig;
-
     protected void activate(ComponentContext context) {
-        this.servicesConfig = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/flex/services-config.xml");
     }
     
     public MetadataItem get(String metadataIdentificationString) {
         Validate.isTrue(FlexProjectMetadata.getProjectIdentifier().equals(metadataIdentificationString), "Unexpected metadata request '" + metadataIdentificationString + "' for this provider");
         
-        if (!fileManager.exists(servicesConfig)) {
+        if (!fileManager.exists(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/flex/services-config.xml"))) {
             return null;
         }
         
@@ -76,7 +73,7 @@ public class FlexProjectMetadataProvider implements MetadataProvider, FileEventL
     public void onFileEvent(FileEvent fileEvent) {
         Validate.notNull(fileEvent, "File event required");
 
-        if (fileEvent.getFileDetails().getCanonicalPath().equals(servicesConfig)) {
+        if (fileEvent.getFileDetails().getCanonicalPath().equals(pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "WEB-INF/flex/services-config.xml"))) {
             // Something happened to the services-config
 
             // Don't notify if we're shutting down

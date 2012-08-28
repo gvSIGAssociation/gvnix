@@ -28,7 +28,6 @@ import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.itd.AbstractItdMetadataProvider;
 import org.springframework.roo.classpath.itd.ItdTypeDetailsProvidingMetadataItem;
-import org.springframework.roo.classpath.persistence.PersistenceMemberLocator;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.model.JavaType;
@@ -46,8 +45,6 @@ public class FlexScaffoldMetadataProvider extends AbstractItdMetadataProvider {
 
     @Reference private WebMetadataService webMetadataService;
     
-    @Reference private PersistenceMemberLocator persistenceMemberLocator;
-
     protected void activate(ComponentContext context) {
         this.metadataDependencyRegistry.registerDependency(PhysicalTypeIdentifier.getMetadataIdentiferType(), getProvidesType());
         addMetadataTrigger(new JavaType(RooFlexScaffold.class.getName()));
