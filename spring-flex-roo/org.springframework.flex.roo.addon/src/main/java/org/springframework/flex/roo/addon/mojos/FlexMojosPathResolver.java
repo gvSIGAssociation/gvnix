@@ -47,6 +47,8 @@ public class FlexMojosPathResolver extends DelegatePathResolver implements FlexP
         // TODO Changed from PathInformation to PhysicalPath and from Path to LogicalPath, it's ok ?
         this.pathInformation.add(new PhysicalPath(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), new File(root, "src/main/flex")));
         this.pathInformation.add(new PhysicalPath(FlexPath.LIBS.getLogicalPath(), new File(root, "libs")));
+        // TODO Init  method invocation required ?
+//        init();
     }
 
     public List<LogicalPath> getFlexSourcePaths() {
