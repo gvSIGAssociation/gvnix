@@ -60,9 +60,7 @@
     <module>addon-web-mvc-binding</module>
     <module>addon-web-dialog</module>
     <module>spring-roo-addon-typical-security</module>
-<!--
     <module>spring-flex-roo</module>
--->
   </modules>
 
   <!-- Note when doing releases: tagBase is set in release plugin configuration 
@@ -152,6 +150,18 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
     </dependency>
   </dependencies>
 
@@ -286,6 +296,21 @@
         <groupId>org.springframework.uaa</groupId>
         <artifactId>org.springframework.uaa.client</artifactId>
         <version>1.0.0.RELEASE</version>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+          <version>3.1</version>
+      </dependency>
+      <dependency>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+          <version>2.1</version>
+      </dependency>
+      <dependency>
+          <groupId>commons-codec</groupId>
+          <artifactId>commons-codec</artifactId>
+          <version>1.6</version>
       </dependency>
       <!-- Wrapped JARs -->
       <dependency>
