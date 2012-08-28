@@ -24,41 +24,43 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.file.monitor.MonitoringRequest;
-import org.springframework.roo.project.AbstractPathResolver;
-import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathInformation;
+import org.springframework.roo.project.DelegatePathResolver;
+import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.PhysicalPath;
 
 /**
  * {@link PathResolver} implementation that resolves paths using the conventions of the Flex Mojos Maven plugin.
+ * 
+ * TODO Changed extends type from AbstractPathResolver to DelegatePathResolver, it's ok ?
  *
  * @author Jeremy Grelle
  */
 @Component(immediate = true)
 @Service(FlexPathResolver.class)
-public class FlexMojosPathResolver extends AbstractPathResolver implements FlexPathResolver {
+public class FlexMojosPathResolver extends DelegatePathResolver implements FlexPathResolver {
 
-    private final List<PathInformation> pathInformation = new ArrayList<PathInformation>();
+    private final List<PhysicalPath> pathInformation = new ArrayList<PhysicalPath>();
 
     protected void activate(ComponentContext context) {
         String workingDir = context.getBundleContext().getProperty("roo.working.directory");
         File root = MonitoringRequest.getInitialMonitoringRequest(workingDir).getFile();
-        this.pathInformation.add(new PathInformation(FlexPath.SRC_MAIN_FLEX, true, new File(root, "src/main/flex")));
-        this.pathInformation.add(new PathInformation(FlexPath.LIBS, false, new File(root, "libs")));
-        init();
+        // TODO Changed from PathInformation to PhysicalPath and from Path to LogicalPath, it's ok ?
+        this.pathInformation.add(new PhysicalPath(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), new File(root, "src/main/flex")));
+        this.pathInformation.add(new PhysicalPath(FlexPath.LIBS.getLogicalPath(), new File(root, "libs")));
     }
 
-    public List<Path> getFlexSourcePaths() {
-        List<Path> flexSourcePaths = new ArrayList<Path>();
-        for (Path path : getPaths()) {
-            if (path instanceof FlexPath) {
+    public List<LogicalPath> getFlexSourcePaths() {
+        List<LogicalPath> flexSourcePaths = new ArrayList<LogicalPath>();
+        for (LogicalPath path : getPaths()) {
+        	// TODO Is this comparation like "path instanceof FlexPath" when FlexPath was a class ?
+            if (path.equals(FlexPath.SRC_MAIN_FLEX.getLogicalPath()) || path.equals(FlexPath.LIBS.getLogicalPath())) {
                 flexSourcePaths.add(path);
             }
         }
         return flexSourcePaths;
     }
 
-    @Override
-    protected List<PathInformation> getPathInformation() {
+    protected List<PhysicalPath> getPathInformation() {
         return this.pathInformation;
     }
 

@@ -16,21 +16,40 @@
 
 package org.springframework.flex.roo.addon.mojos;
 
+import org.apache.commons.lang3.Validate;
+import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 
 /**
  * Representation of a conventional Flex Mojos source path.
+ * 
+ * TODO Location on each enumeration element is required ?
  *
  * @author Jeremy Grelle
  */
-public class FlexPath extends Path {
+public enum FlexPath {
 
-    public static final FlexPath SRC_MAIN_FLEX = new FlexPath("SRC_MAIN_FLEX");
+    SRC_MAIN_FLEX("src/main/flex"),
+    
+    LIBS("libs");
 
-    public static final FlexPath LIBS = new FlexPath("LIBS");
+    private final String defaultLocation;
 
-    public FlexPath(String name) {
-        super(name);
+    /**
+     * Constructor
+     * 
+     * @param defaultLocation the location relative to the module's root
+     *            directory in which this path is located by default (can't be
+     *            <code>null</code>)
+     */
+    private FlexPath(final String defaultLocation) {
+        Validate.notNull(defaultLocation, "Default location is required");
+        this.defaultLocation = defaultLocation;
     }
-
+    
+    public LogicalPath getLogicalPath() {
+    	// TODO Is this method to obtain the LogicalPath the best ?
+    	return LogicalPath.getInstance(Path.ROOT, this.defaultLocation);
+    }
+    
 }
