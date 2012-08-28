@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
@@ -64,9 +65,8 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.ActiveProcessManager;
 import org.springframework.roo.process.manager.ProcessManager;
 import org.springframework.roo.process.manager.internal.DefaultFileManager;
-import org.springframework.roo.project.PathInformation;
+import org.springframework.roo.project.PhysicalPath;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.util.StringUtils;
 
 import uk.co.badgersinfoil.metaas.ActionScriptFactory;
 import uk.co.badgersinfoil.metaas.dom.ASClassType;
@@ -117,7 +117,7 @@ public class As3ParserMetadataProviderTests {
 	
 	@After
 	public void logFileContents() {
-		if (StringUtils.hasText(fileManager.lastFile)){
+		if (StringUtils.isNotBlank(fileManager.lastFile)){
 			if (log.isDebugEnabled()) {
 				log.debug("\n"+fileManager.lastFile);
 			}
@@ -138,7 +138,7 @@ public class As3ParserMetadataProviderTests {
 				ASPhysicalTypeCategory.CLASS, null);
 		ASPhysicalTypeMetadata type = new DefaultASPhysicalTypeMetadata(metadataId, fileIdentifier, details);
 		provider.createPhysicalType(type);
-		assertTrue(StringUtils.hasText(fileManager.lastFile));
+		assertTrue(StringUtils.isNotBlank(fileManager.lastFile));
 		
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(fileManager.lastFile));
 		assertEquals("com.foo.stuff", compUnit.getPackageName());
@@ -153,7 +153,7 @@ public class As3ParserMetadataProviderTests {
 				ASPhysicalTypeCategory.INTERFACE, null);
 		ASPhysicalTypeMetadata type = new DefaultASPhysicalTypeMetadata(metadataId, fileIdentifier, details);
 		provider.createPhysicalType(type);
-		assertTrue(StringUtils.hasText(fileManager.lastFile));
+		assertTrue(StringUtils.isNotBlank(fileManager.lastFile));
 		
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(fileManager.lastFile));
 		assertEquals("com.foo.stuff", compUnit.getPackageName());
@@ -175,7 +175,7 @@ public class As3ParserMetadataProviderTests {
 				ASPhysicalTypeCategory.CLASS, typeMetaTags);
 		ASPhysicalTypeMetadata type = new DefaultASPhysicalTypeMetadata(metadataId, fileIdentifier, details);
 		provider.createPhysicalType(type);
-		assertTrue(StringUtils.hasText(fileManager.lastFile));
+		assertTrue(StringUtils.isNotBlank(fileManager.lastFile));
 		
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(fileManager.lastFile));
 		assertNotNull(compUnit.getType().getFirstMetatag("RemoteClass"));
@@ -194,7 +194,7 @@ public class As3ParserMetadataProviderTests {
 				ASPhysicalTypeCategory.CLASS, null, null, null, null, extendsTypes, null, null);
 		ASPhysicalTypeMetadata type = new DefaultASPhysicalTypeMetadata(metadataId, fileIdentifier, details);
 		provider.createPhysicalType(type);
-		assertTrue(StringUtils.hasText(fileManager.lastFile));
+		assertTrue(StringUtils.isNotBlank(fileManager.lastFile));
 		
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(fileManager.lastFile));
 		assertEquals("com.foo.stuff", compUnit.getPackageName());
@@ -217,7 +217,7 @@ public class As3ParserMetadataProviderTests {
 				ASPhysicalTypeCategory.CLASS, null, null, null, null, null, implementsTypes, null);
 		ASPhysicalTypeMetadata type = new DefaultASPhysicalTypeMetadata(metadataId, fileIdentifier, details);
 		provider.createPhysicalType(type);
-		assertTrue(StringUtils.hasText(fileManager.lastFile));
+		assertTrue(StringUtils.isNotBlank(fileManager.lastFile));
 		
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(fileManager.lastFile));
 		assertEquals("com.foo.stuff", compUnit.getPackageName());
@@ -240,7 +240,7 @@ public class As3ParserMetadataProviderTests {
 				ASPhysicalTypeCategory.CLASS, null, constructor, null, null, null, null, null);
 		ASPhysicalTypeMetadata type = new DefaultASPhysicalTypeMetadata(metadataId, fileIdentifier, details);
 		provider.createPhysicalType(type);
-		assertTrue(StringUtils.hasText(fileManager.lastFile));
+		assertTrue(StringUtils.isNotBlank(fileManager.lastFile));
 		
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(fileManager.lastFile));
 		ASClassType clazz = (ASClassType) compUnit.getType();
@@ -271,7 +271,7 @@ public class As3ParserMetadataProviderTests {
 				ASPhysicalTypeCategory.CLASS, null, constructor, null, null, null, null, null);
 		ASPhysicalTypeMetadata type = new DefaultASPhysicalTypeMetadata(metadataId, fileIdentifier, details);
 		provider.createPhysicalType(type);
-		assertTrue(StringUtils.hasText(fileManager.lastFile));
+		assertTrue(StringUtils.isNotBlank(fileManager.lastFile));
 		
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(fileManager.lastFile));
 		ASClassType clazz = (ASClassType) compUnit.getType();
@@ -294,7 +294,7 @@ public class As3ParserMetadataProviderTests {
 				ASPhysicalTypeCategory.CLASS, null, null, methods, null, null, null, null);
 		ASPhysicalTypeMetadata type = new DefaultASPhysicalTypeMetadata(metadataId, fileIdentifier, details);
 		provider.createPhysicalType(type);
-		assertTrue(StringUtils.hasText(fileManager.lastFile));
+		assertTrue(StringUtils.isNotBlank(fileManager.lastFile));
 		
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(fileManager.lastFile));
 		ASClassType clazz = (ASClassType) compUnit.getType();
@@ -329,7 +329,7 @@ public class As3ParserMetadataProviderTests {
 				ASPhysicalTypeCategory.CLASS, null, null, methods, null, null, null, null);
 		ASPhysicalTypeMetadata type = new DefaultASPhysicalTypeMetadata(metadataId, fileIdentifier, details);
 		provider.createPhysicalType(type);
-		assertTrue(StringUtils.hasText(fileManager.lastFile));
+		assertTrue(StringUtils.isNotBlank(fileManager.lastFile));
 		
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(fileManager.lastFile));
 		ASClassType clazz = (ASClassType) compUnit.getType();
@@ -362,7 +362,7 @@ public class As3ParserMetadataProviderTests {
 				ASPhysicalTypeCategory.CLASS, fields, null, null, null, null, null, null);
 		ASPhysicalTypeMetadata type = new DefaultASPhysicalTypeMetadata(metadataId, fileIdentifier, details);
 		provider.createPhysicalType(type);
-		assertTrue(StringUtils.hasText(fileManager.lastFile));
+		assertTrue(StringUtils.isNotBlank(fileManager.lastFile));
 		
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(fileManager.lastFile));
 		ASClassType clazz = (ASClassType) compUnit.getType();
@@ -378,7 +378,7 @@ public class As3ParserMetadataProviderTests {
 		String expectedId = "MID:"+ASPhysicalTypeIdentifier.class.getName()+"#SRC_MAIN_FLEX?com.foo.stuff.FooImpl";
 		String id = provider.findIdentifier(new ActionScriptType("com.foo.stuff.FooImpl"));
 		
-		assertTrue(StringUtils.hasText(id));
+		assertTrue(StringUtils.isNotBlank(id));
 		assertEquals(expectedId, id);
 	}
 	
@@ -399,8 +399,9 @@ public class As3ParserMetadataProviderTests {
 		
 		public TestPathResolver() throws IOException {
 			File file = new ClassPathResource("").getFile();
-			getPathInformation().add(new PathInformation(FlexPath.SRC_MAIN_FLEX, true, file));
-			init();
+			// TODO Replaced PathInformation with PhysicalPath, Path with LogicalPath and removed init() method: it's ok ?
+			getPathInformation().add(new PhysicalPath(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), file));
+//			init();
 		}
 	}
 	

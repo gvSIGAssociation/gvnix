@@ -29,6 +29,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
@@ -59,9 +60,8 @@ import org.springframework.roo.process.manager.ActiveProcessManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.process.manager.ProcessManager;
 import org.springframework.roo.process.manager.internal.DefaultFileManager;
-import org.springframework.roo.project.PathInformation;
+import org.springframework.roo.project.PhysicalPath;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.util.StringUtils;
 
 import uk.co.badgersinfoil.metaas.ActionScriptFactory;
 import uk.co.badgersinfoil.metaas.dom.ASClassType;
@@ -134,7 +134,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 	
 	@After
 	public void logFileContents() {
-		if (StringUtils.hasText(lastFile)){
+		if (StringUtils.isNotBlank(lastFile)){
 			if (log.isDebugEnabled()) {
 				log.debug("\n"+lastFile);
 			}
@@ -150,7 +150,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		details.addField(fieldMetadata);
 		
 		readLastFile();
-		assertTrue(StringUtils.hasText(lastFile));
+		assertTrue(StringUtils.isNotBlank(lastFile));
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(lastFile));
 		assertTrue(compUnit.getType() instanceof ASClassType);
 		ASClassType clazz = (ASClassType) compUnit.getType();
@@ -166,7 +166,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		details.addField(fieldMetadata);
 		
 		readLastFile();
-		assertTrue(StringUtils.hasText(lastFile));
+		assertTrue(StringUtils.isNotBlank(lastFile));
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(lastFile));
 		assertTrue(compUnit.getType() instanceof ASClassType);
 		ASClassType clazz = (ASClassType) compUnit.getType();
@@ -187,7 +187,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		details.addField(fieldMetadata);
 		
 		readLastFile();
-		assertTrue(StringUtils.hasText(lastFile));
+		assertTrue(StringUtils.isNotBlank(lastFile));
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(lastFile));
 		assertTrue(compUnit.getType() instanceof ASClassType);
 		ASClassType clazz = (ASClassType) compUnit.getType();
@@ -202,7 +202,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		details.removeField(new ActionScriptSymbolName("field1"));
 		
 		readLastFile();
-		assertTrue(StringUtils.hasText(lastFile));
+		assertTrue(StringUtils.isNotBlank(lastFile));
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(lastFile));
 		assertTrue(compUnit.getType() instanceof ASClassType);
 		ASClassType clazz = (ASClassType) compUnit.getType();
@@ -217,7 +217,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		details.addMethod(method);
 		
 		readLastFile();
-		assertTrue(StringUtils.hasText(lastFile));
+		assertTrue(StringUtils.isNotBlank(lastFile));
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(lastFile));
 		ASClassType clazz = (ASClassType) compUnit.getType();
 		assertNotNull(clazz.getMethod("doStuff"));
@@ -246,7 +246,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		details.addMethod(method);
 		
 		readLastFile();
-		assertTrue(StringUtils.hasText(lastFile));
+		assertTrue(StringUtils.isNotBlank(lastFile));
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(lastFile));
 		ASClassType clazz = (ASClassType) compUnit.getType();
 		assertNotNull(clazz.getMethod("doStuff"));
@@ -267,7 +267,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		details.addTypeMetaTag(metaTag);
 		
 		readLastFile();
-		assertTrue(StringUtils.hasText(lastFile));
+		assertTrue(StringUtils.isNotBlank(lastFile));
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(lastFile));
 		assertNotNull(compUnit.getType().getFirstMetatag("RemoteClass"));
 		ASMetaTag tag = compUnit.getType().getFirstMetatag("RemoteClass");
@@ -280,7 +280,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		details.removeTypeMetaTag("ClassLevelTag1");
 		
 		readLastFile();
-		assertTrue(StringUtils.hasText(lastFile));
+		assertTrue(StringUtils.isNotBlank(lastFile));
 		ASCompilationUnit compUnit = factory.newParser().parse(new StringReader(lastFile));
 		assertNull(compUnit.getType().getFirstMetatag("ClassLevelTag1"));
 	}
@@ -293,8 +293,9 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		
 		public TestPathResolver() throws IOException {
 			File file = new ClassPathResource("").getFile();
-			getPathInformation().add(new PathInformation(FlexPath.SRC_MAIN_FLEX, true, file));
-			init();
+			// TODO Replaced PathInformation with PhysicalPath, Path with LogicalPath and removed init() method: it's ok ?
+			getPathInformation().add(new PhysicalPath(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), file));
+//			init();
 		}
 	}
 	
