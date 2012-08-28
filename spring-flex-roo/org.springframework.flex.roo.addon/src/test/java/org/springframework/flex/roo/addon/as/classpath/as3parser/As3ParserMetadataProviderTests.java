@@ -75,6 +75,7 @@ import uk.co.badgersinfoil.metaas.dom.ASInterfaceType;
 import uk.co.badgersinfoil.metaas.dom.ASMetaTag;
 import uk.co.badgersinfoil.metaas.dom.ASMethod;
 
+// TODO There are tests commented from Roo 1.2.2 migration
 public class As3ParserMetadataProviderTests {
 	
 	private static final Log log = LogFactory.getLog(As3ParserMetadataProviderTests.class);
