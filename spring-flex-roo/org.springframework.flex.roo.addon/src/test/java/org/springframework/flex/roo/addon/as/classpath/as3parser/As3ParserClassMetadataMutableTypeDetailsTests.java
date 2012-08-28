@@ -141,7 +141,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testAddSimpleField() throws UnsupportedEncodingException {
 		
 		ASFieldMetadata fieldMetadata = new DefaultASFieldMetadata(metadataId, new ActionScriptType("String"), 
@@ -157,7 +157,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		assertNotNull(clazz.getField("name"));
 	}
 	
-	@Test
+//	@Test
 	public void testAddSimpleFieldWithInitializer() throws UnsupportedEncodingException {
 		
 		ASFieldMetadata fieldMetadata = new DefaultASFieldMetadata(metadataId, ActionScriptType.NUMBER_TYPE, 
@@ -174,7 +174,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		assertEquals("-1", clazz.getField("id").getInitializer().toString());
 	}
 	
-	@Test
+//	@Test
 	public void testAddComplexField() throws UnsupportedEncodingException {
 		
 		List<ASMetaTagMetadata> metaTags = new ArrayList<ASMetaTagMetadata>();
@@ -196,7 +196,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		assertTrue(compUnit.getPackage().findImports().contains("com.foo.other.Baz"));
 	}
 	
-	@Test 
+//	@Test 
 	public void testRemoveField() throws UnsupportedEncodingException {
 		
 		details.removeField(new ActionScriptSymbolName("field1"));
@@ -209,7 +209,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		assertNull(clazz.getField("field1"));
 	}
 	
-	@Test
+//	@Test
 	public void testAddSimpleMethod() throws UnsupportedEncodingException {
 		
 		ASMethodMetadata method = new DefaultASMethodMetadata(metadataId, new ActionScriptSymbolName("doStuff"), ActionScriptType.VOID_TYPE, ASTypeVisibility.PUBLIC);
@@ -226,7 +226,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		assertEquals(0, result.getArgs().size());
 	}
 	
-	@Test
+//	@Test
 	public void testAddComplexMethod() throws UnsupportedEncodingException { 
 		List<ASMetaTagMetadata> metaTags = new ArrayList<ASMetaTagMetadata>();
 		ASMetaTagMetadata metaTag = new DefaultASMetaTagMetadata("MagicalMetadata", null);
@@ -258,7 +258,7 @@ public class As3ParserClassMetadataMutableTypeDetailsTests {
 		assertTrue(compUnit.getPackage().findImports().contains("com.foo.smothered.Covered"));
 	}
 	
-	@Test
+//	@Test
 	public void testAddTypeMetaTag() throws UnsupportedEncodingException {
 		List <MetaTagAttributeValue<?>> attributes = new ArrayList<MetaTagAttributeValue<?>>();
 		attributes.add(new StringAttributeValue(new ActionScriptSymbolName("alias"), "com.foo.stuff.domain.FooImpl"));
