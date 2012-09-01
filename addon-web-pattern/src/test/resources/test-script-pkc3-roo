@@ -1,6 +1,6 @@
 project --topLevelPackage org.gvnix.test.relation.list.table --projectName displayRelationsTable
 
-persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
 entity jpa --class ~.domain.Person --identifierType ~.domain.PersonPk --entityName MyPerson --identifierColumn myidcolumn --identifierField myidfield --table PERSON
 field string --fieldName name --notNull

@@ -1,5 +1,5 @@
 project --topLevelPackage org.gvnix.sample
-persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
+jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY 
 entity jpa --class ~.domain.Entity1
 field string field1
 field string field2

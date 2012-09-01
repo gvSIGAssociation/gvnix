@@ -41,8 +41,8 @@ Create a web application with database connection (previous existing database) u
 
   // Spring Roo 1.1.0.M1 log opened at 2010-05-10 11:08:03
   project --topLevelPackage org.gvnix.test.generated.id.sequence--projectName generatedIdSequence
-  persistence setup --provider HIBERNATE --database POSTGRES --databaseName generated-id-test
-  persistence setup --provider HIBERNATE --database POSTGRES --databaseName generated-id-test --userName user --password user
+  jpa setup --provider HIBERNATE --database POSTGRES --databaseName generated-id-test
+  jpa setup --provider HIBERNATE --database POSTGRES --databaseName generated-id-test --userName user --password user
   entity jpa --class ~.domain.Person --testAutomatically 
   field string --fieldName name --class org.gvnix.test.generated.id.sequence.domain.Person
   entity jpa --class ~.domain.RoundTable

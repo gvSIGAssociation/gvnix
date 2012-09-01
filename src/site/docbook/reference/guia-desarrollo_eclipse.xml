@@ -203,7 +203,7 @@
       <para xml:lang="es">En este punto ya tiene un proyecto Maven de
       aplicación web preparado.</para>
 
-      <programlisting>roo-gvNIX&gt; <emphasis role="bold">persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
+      <programlisting>roo-gvNIX&gt; <emphasis role="bold">jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
 Created ...
 ~.Timer roo-gvNIX&gt;<emphasis role="bold"> entity jpa --class ~.Timer --testAutomatically</emphasis> 
 Created ...

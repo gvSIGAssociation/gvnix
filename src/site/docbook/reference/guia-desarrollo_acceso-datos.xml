@@ -16,12 +16,12 @@
     <para xml:lang="es">Trabajar en un entorno orientado a objetos con acceso
     a fuentes de datos relacionales (lo habitual en tecnología Java) puede
     suponer un incremento de los tiempos de desarrollo porque debemos incluir
-    la lógica necesaria para hacer corresponder el modelo relacional, que
-    trata con relaciones y conjuntos, con el paradigma orientado a objetos,
-    que trata con objetos, atributos y asociaciones de unos con otros. Esta
-    problemática es la que se conoce como <emphasis>desajuste
-    objeto-relacional</emphasis> (object-relational impedance
-    mismatch).</para>
+    la lógica necesaria para hacer corresponder el modelo relacional de la
+    base de datos, que trata con relaciones y conjuntos, con el paradigma
+    orientado a objetos de las entidades del proyecto, que trata con objetos,
+    atributos y asociaciones de unos con otros. Esta problemática es la que se
+    conoce como <emphasis>desajuste objeto-relacional</emphasis>
+    (object-relational impedance mismatch).</para>
 
     <important>
       <title xml:lang="es">Desajuste objeto-relacional</title>
@@ -79,39 +79,35 @@
     dar:</para>
 
     <programlisting>roo-gvNIX&gt; <command>hint</command>
-<computeroutput>Roo requires the installation of a JPA provider and associated database.
+Roo requires the installation of a persistence configuration,
+for example, JPA or MongoDB.
 
-Type 'persistence setup' and then hit TAB three times.
+For JPA, type 'jpa setup' and then hit TAB three times.
 We suggest you type 'H' then TAB to complete "HIBERNATE".
 After the --provider, press TAB twice for database choices.
 For testing purposes, type (or TAB) HYPERSONIC_IN_MEMORY.
 If you press TAB again, you'll see there are no more options.
 As such, you're ready to press ENTER to execute the command.
 
-Once JPA is installed, type 'hint' and ENTER for the next suggestion.</computeroutput>
+Once JPA is installed, type 'hint' and ENTER for the next suggestion.
+
+Similarly, for MongoDB persistence, type 'mongo setup' and ENTER.
+
 roo-gvNIX&gt;</programlisting>
 
     <para xml:lang="es">En el ámbito de este tutorial es suficiente con
     conectar la aplicación a una base de datos en memoria e Hibernate
     implementación del sistema de persistencia:</para>
 
-    <programlisting>roo-gvNIX&gt; <command>persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</command>
-<computeroutput>Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
-Created SRC_MAIN_RESOURCES/META-INF/spring/database.properties
-Managed SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
-Managed ROOT/pom.xml [Added dependency org.hsqldb:hsqldb:1.8.0.10]
-Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-core:3.5.0-Final]
-Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-entitymanager:3.5.0-Final]
-Managed ROOT/pom.xml [Added dependency org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.0.Final]
-Managed ROOT/pom.xml [Added dependency org.hibernate:hibernate-validator:4.0.2.GA]
-Managed ROOT/pom.xml [Added dependency javax.validation:validation-api:1.0.0.GA]
-Managed ROOT/pom.xml [Added dependency cglib:cglib-nodep:2.2]
-Managed ROOT/pom.xml [Added dependency javax.transaction:jta:1.1]
-Managed ROOT/pom.xml [Added dependency org.springframework:spring-jdbc:${spring.version}]
-Managed ROOT/pom.xml [Added dependency org.springframework:spring-orm:${spring.version}]
-Managed ROOT/pom.xml [Added dependency commons-pool:commons-pool:1.5.4]
-Managed ROOT/pom.xml [Added dependency commons-dbcp:commons-dbcp:1.3]
-Managed ROOT/pom.xml</computeroutput>
+    <programlisting>roo-gvNIX&gt; <command>jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</command>
+Created SPRING_CONFIG_ROOT/database.properties
+Updated SPRING_CONFIG_ROOT/applicationContext.xml
+Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
+Updated ROOT/pom.xml [added dependencies org.hsqldb:hsqldb:1.8.0.10, org.hibernate:hibernate-core:3.6.9.Final,
+org.hibernate:hibernate-entitymanager:3.6.9.Final, org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final,
+commons-collections:commons-collections:3.2.1, org.hibernate:hibernate-validator:4.2.0.Final, javax.validation:validation-api:1.0.0.GA,
+cglib:cglib-nodep:2.2.2, javax.transaction:jta:1.1, org.springframework:spring-jdbc:${spring.version},
+org.springframework:spring-orm:${spring.version}, commons-pool:commons-pool:1.5.6, commons-dbcp:commons-dbcp:1.3]
 roo-gvNIX&gt;</programlisting>
 
     <warning>
@@ -124,7 +120,9 @@ roo-gvNIX&gt;</programlisting>
       <para xml:lang="es">Por defecto, gvNIX configura el sistema de
       persistencia para borrar y crear la base de datos cada vez que se
       arranca la aplicación, por lo que los datos de la demo se perderán cada
-      vez que paremos la aplicación.</para>
+      vez que paremos la aplicación. Esto no es así cuando utilizamos la
+      ingeniería inversa a partir de un esquema de base de datos ya
+      existente.</para>
 
       <para xml:lang="es">Esto se puede cambiar en la configuración del
       sistema de persistencia:
@@ -140,14 +138,15 @@ roo-gvNIX&gt;</programlisting>
     <title xml:lang="es">Configurar la conexión con la base de datos</title>
 
     <para xml:lang="es">En cualquier punto del ciclo de vida de una aplicación
-    puede surgir la necesidad de cambiar de base de datos (paso de desarrollo
-    a producción, nuevo sistema con mejor rendimiento, etc), para estos casos
-    gvNIX ofrece una serie de comandos que simplificarán la actualización de
-    la configuración de acceso a la base de datos:</para>
+    puede surgir la necesidad de cambiar de base de datos (distinta tecnología
+    de bases de datos, cambio de la clave de acceso, cambio del equipo donde
+    se encuentra de la base de datos, etc), para estos casos gvNIX ofrece una
+    serie de comandos que simplificarán la actualización de la configuración
+    de acceso a la base de datos:</para>
 
     <itemizedlist>
       <listitem>
-        <para><command>persistence setup</command></para>
+        <para><command>jpa setup</command></para>
       </listitem>
 
       <listitem>
@@ -156,9 +155,10 @@ roo-gvNIX&gt;</programlisting>
     </itemizedlist>
 
     <section>
-      <title>persistence setup</title>
+      <title>jpa setup</title>
 
-      <para xml:lang="es">Configurar el acceso a datos. Entre los parámetros
+      <para xml:lang="es">Configurar o actualizar el acceso a datos (base de
+      datos y proveedor de persistencia o ORM). Entre los parámetros
       necesitaremos la herramienta ORM y la base de datos a usar.</para>
 
       <para xml:lang="es">Los parámetros que admite este comando son:</para>
@@ -264,6 +264,18 @@ roo-gvNIX&gt;</programlisting>
               <listitem>
                 <para>SYBASE.</para>
               </listitem>
+
+              <listitem>
+                <para>FIREBIRD.</para>
+              </listitem>
+
+              <listitem>
+                <para>MYSQL.</para>
+              </listitem>
+
+              <listitem>
+                <para>DATABASE_DOT_COM.</para>
+              </listitem>
             </itemizedlist>
           </listitem>
         </varlistentry>
@@ -282,6 +294,15 @@ roo-gvNIX&gt;</programlisting>
 
           <listitem>
             <para xml:lang="es">Fuente de datos JNDI a usar.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--hostName</term>
+
+          <listitem>
+            <para>El nombre DNS o la dirección IP del ordenador en el que se
+            encuentra la base de datos a utilizar.</para>
           </listitem>
         </varlistentry>
 
@@ -308,6 +329,23 @@ roo-gvNIX&gt;</programlisting>
             <para xml:lang="es">Contraseña del usuario de la conexión.</para>
           </listitem>
         </varlistentry>
+
+        <varlistentry>
+          <term>--transactionManager</term>
+
+          <listitem>
+            <para>Nombre del gestor de transacciones a utilizar.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>--persistenceUnit</term>
+
+          <listitem>
+            <para>Nombre de la unidad de persistencia a utilizar en el fichero
+            persistence.xml.</para>
+          </listitem>
+        </varlistentry>
       </variablelist>
 
       <para xml:lang="es">Dependiendo del tipo de base de datos pueden ser
@@ -321,10 +359,10 @@ roo-gvNIX&gt;</programlisting>
     <section>
       <title>database properties</title>
 
-      <para xml:lang="es">Permite la consulta, eliminación y actualización de
-      las propiedades de conexión a la base de datos (a diferencia del comando
-      anterior que configura el sistema de persitencia en su totalidad). Estas
-      propiedades se almacenan el fichero
+      <para xml:lang="es">Permite la consulta, eliminación, actualización y
+      creación de las propiedades de conexión a la base de datos (a diferencia
+      del comando anterior que configura el sistema de persitencia en su
+      totalidad). Estas propiedades se almacenan el fichero
       <filename>src/main/resources/META-INF/spring/database.properties</filename>
       de la aplicación.</para>
 
@@ -406,19 +444,25 @@ roo-gvNIX&gt;</programlisting>
           <para xml:lang="es">Usar el comando <command>persistence
           setup</command> con los parámetros que disponemos:</para>
 
-          <programlisting>roo-gvNIX&gt; <command>persistence setup --provider HIBERNATE --database POSTGRES --databaseName my_db --userName user1 --password 1234</command>
+          <programlisting>roo-gvNIX&gt; <command>jpa setup --provider HIBERNATE --database POSTGRES --databaseName my_db --userName user1 --password 1234</command><emphasis
+              role="bold"> --hostName dbserver</emphasis>
+Created SPRING_CONFIG_ROOT/database.properties
+Please update your database details in src/main/resources/META-INF/spring/database.properties.
+Updated SPRING_CONFIG_ROOT/applicationContext.xml
 Created SRC_MAIN_RESOURCES/META-INF/persistence.xml
-Please enter your database details in src/main/resources/META-INF/spring/database.properties.
-Created SRC_MAIN_RESOURCES/META-INF/spring/database.properties
-Managed SRC_MAIN_RESOURCES/META-INF/spring/applicationContext.xml
-Managed ROOT/pom.xml ...
+Updated ROOT/pom.xml [added dependencies postgresql:postgresql:9.1-901.jdbc3, org.hibernate:hibernate-core:3.6.9.Final,
+org.hibernate:hibernate-entitymanager:3.6.9.Final, org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final,
+commons-collections:commons-collections:3.2.1, org.hibernate:hibernate-validator:4.2.0.Final,
+javax.validation:validation-api:1.0.0.GA, cglib:cglib-nodep:2.2.2, javax.transaction:jta:1.1,
+org.springframework:spring-jdbc:${spring.version}, org.springframework:spring-orm:${spring.version},
+commons-pool:commons-pool:1.5.6, commons-dbcp:commons-dbcp:1.3]
 roo-gvNIX&gt; </programlisting>
 
           <para xml:lang="es">Podemos observar que ya se nos sugiere que es
           necesario actualizar el fichero
           <filename>database.properties</filename>. Esto es debido a que el
-          comando no contempla todas las opciones necesarias para completar la
-          configuración.</para>
+          comando puede no contemplar todas las opciones necesarias para
+          completar la configuración.</para>
         </listitem>
 
         <listitem>
@@ -429,13 +473,16 @@ roo-gvNIX&gt; </programlisting>
           <programlisting>roo-gvNIX&gt; <command>database properties list</command>
 database.driverClassName = org.postgresql.Driver
 database.password = 1234
-database.url = jdbc:postgresql://localhost:5432/my_db
+database.url = jdbc:postgresql://dbserver:5432/my_db
 database.username = user1
 roo-gvNIX&gt; </programlisting>
 
           <para>Podemos observar que lo único que nos falta es configurar el
-          servidor y el puerto de la base de datos en la propiedad
-          <literal>database.url</literal>.</para>
+          puerto de la base de datos en la propiedad
+          <literal>database.url</literal>. Observar que el puerto que nos ha
+          configurado automáticamente es el puerto por defecto de la base de
+          datos, sin embargo en el ejemplo nuestro servidor de base de datos
+          utiliza uno distinto.</para>
         </listitem>
 
         <listitem>
@@ -444,7 +491,7 @@ roo-gvNIX&gt; </programlisting>
           set</command>:</para>
 
           <programlisting>roo-gvNIX&gt; <command>database properties set --key database.url --value jdbc:postgresql://dbserver:5438/my_db </command>
-Managed SRC_MAIN_RESOURCES/META-INF/spring/database.properties
+Updated SPRING_CONFIG_ROOT/database.properties
 roo-gvNIX&gt; </programlisting>
         </listitem>
 
@@ -472,7 +519,9 @@ roo-gvNIX&gt; </programlisting>
       de datos necesario para el modelo de entidades creado con gvNIX, por lo
       que si conectamos nuestra aplicación con una base de datos existente
       <emphasis>debemos</emphasis> revisar la configuración del sistema de
-      persistencia antes de pasar al siguiente capítulo.</para>
+      persistencia antes de pasar al siguiente capítulo. Esto no es necesario
+      cuando realizamos la ingeniería inversa a partir de un esquema de base
+      de datos ya existente.</para>
 
       <para xml:lang="es"><emphasis>Si conectamos a una base de datos
       existente se debe deshabilitar la actualización automática del
@@ -490,10 +539,10 @@ roo-gvNIX&gt; </programlisting>
 
           <programlisting>&lt;-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
 
-          <para>Existen cuatro opciones <emphasis>validate, update, create,
-          create-drop</emphasis>. Estas opciones están orientadas a entornos
-          de desarrollo por el "peligro" que ello puede suponer para la
-          integridad de la BBDD.</para>
+          <para>Existen cinco opciones <emphasis>validate, update, create,
+          create-drop y none</emphasis>. Estas opciones están orientadas a
+          entornos de desarrollo por el "peligro" que ello puede suponer para
+          la integridad de la BBDD.</para>
 
           <itemizedlist>
             <listitem>
@@ -515,6 +564,11 @@ roo-gvNIX&gt; </programlisting>
               <para><emphasis>create-drop</emphasis>: hace un
               <emphasis>drop</emphasis> de las tablas al parar la
               aplicación.</para>
+            </listitem>
+
+            <listitem>
+              <para>none: no hace absolutamente ninguna validación ni
+              modificación del esquema.</para>
             </listitem>
           </itemizedlist>
         </listitem>

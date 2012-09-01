@@ -49,7 +49,7 @@ Create a web application
 Create a web application with gvNIX/Roo Shell script::
 
     project --topLevelPackage org.gvnix.test.report
-    persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+    jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
     entity jpa --class ~.domain.Person --testAutomatically
     field string --fieldName name --notNull
     web mvc setup

@@ -4,7 +4,7 @@
 
 project --topLevelPackage org.gvnix.test.service.layer.project --projectName service-layer-test
 
-persistence setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 
 // logging setup --level INFO
 

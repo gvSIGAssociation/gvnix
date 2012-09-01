@@ -1,6 +1,6 @@
 // Spring Roo 1.1.5.RELEASE [rev d3a68c3] log opened
 project --topLevelPackage org.gvnix.tiendavirtual --java 6
-persistence setup --provider HIBERNATE --database POSTGRES
+jpa setup --provider HIBERNATE --database POSTGRES
 database properties list
 database properties set --key database.url --value jdbc:postgresql://localhost:5432/tiendavirtualDB
 database properties set --key database.username --value tiendavirtual

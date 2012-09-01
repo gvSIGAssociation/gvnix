@@ -1,5 +1,5 @@
 project --topLevelPackage org.example.rootunes
-persistence setup --provider HIBERNATE --database H2_IN_MEMORY 
+jpa setup --provider HIBERNATE --database H2_IN_MEMORY 
 flex setup
 entity jpa --class ~.domain.Artist
 field string --fieldName name --notNull
