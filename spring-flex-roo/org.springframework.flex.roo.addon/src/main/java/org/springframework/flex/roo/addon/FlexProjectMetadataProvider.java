@@ -5,7 +5,6 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.osgi.service.component.ComponentContext;
-import org.springframework.flex.roo.addon.mojos.FlexPathResolver;
 import org.springframework.roo.file.monitor.event.FileEvent;
 import org.springframework.roo.file.monitor.event.FileEventListener;
 import org.springframework.roo.file.monitor.event.FileOperation;
@@ -37,9 +36,6 @@ public class FlexProjectMetadataProvider implements MetadataProvider, FileEventL
     private FileManager fileManager;
     
     @Reference
-    private FlexPathResolver flexPathResolver;
-    
-    @Reference
     private PathResolver pathResolver;
     
     protected void activate(ComponentContext context) {
@@ -52,7 +48,7 @@ public class FlexProjectMetadataProvider implements MetadataProvider, FileEventL
             return null;
         }
         
-        return new FlexProjectMetadata(flexPathResolver);
+        return new FlexProjectMetadata(pathResolver);
     }
     
     /*public void notify(String upstreamDependency, String downstreamDependency) {

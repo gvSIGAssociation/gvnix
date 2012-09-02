@@ -20,6 +20,7 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Path;
 
 /**
  * Utility methods for manipulation of metadata id's for ActionScript source files.
@@ -28,10 +29,10 @@ import org.springframework.roo.project.LogicalPath;
  */
 public class ASPhysicalTypeIdentifierNamingUtils {
 
-    public static final String createIdentifier(String providesType, ActionScriptType actionScriptType, LogicalPath path) {
+    public static final String createIdentifier(String providesType, ActionScriptType actionScriptType, String path) {
         Validate.notNull(actionScriptType, "ActionScript type required");
         Validate.notNull(path, "Path required");
-        return MetadataIdentificationUtils.create(providesType, path.getName() + "?" + actionScriptType.getFullyQualifiedTypeName());
+        return MetadataIdentificationUtils.create(providesType, Path.ROOT + "?" + actionScriptType.getFullyQualifiedTypeName());
     }
 
     public static final ActionScriptType getActionScriptType(String providesType, String metadataIdentificationString) {

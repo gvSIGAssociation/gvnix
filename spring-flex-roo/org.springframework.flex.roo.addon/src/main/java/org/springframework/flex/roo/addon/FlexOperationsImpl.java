@@ -39,8 +39,6 @@ import org.osgi.service.component.ComponentContext;
 import org.springframework.flex.roo.addon.as.model.ActionScriptMappingUtils;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
 import org.springframework.flex.roo.addon.entity.ActionScriptEntityMetadata;
-import org.springframework.flex.roo.addon.mojos.FlexPath;
-import org.springframework.flex.roo.addon.mojos.FlexPathResolver;
 import org.springframework.roo.addon.jpa.activerecord.JpaActiveRecordMetadata;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.addon.web.mvc.controller.WebMvcOperations;
@@ -103,7 +101,7 @@ public class FlexOperationsImpl implements FlexOperations {
     private WebMvcOperations webMvcOperations;
 
     @Reference
-    private FlexPathResolver flexPathResolver;
+    private PathResolver pathResolver;
 
     @Reference
     private MetadataDependencyRegistry dependencyRegistry;
@@ -142,7 +140,7 @@ public class FlexOperationsImpl implements FlexOperations {
 
     public void createScaffoldApp() {
         ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
-        String scaffoldAppFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "_scaffold.mxml");
+        String scaffoldAppFileId = this.pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/" + projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "_scaffold.mxml");
         String presentationPackage = projectOperations.getTopLevelPackage(projectOperations.getFocusedModuleName()) + ".presentation";
         StringTemplate scaffoldTemplate = this.templateGroup.getInstanceOf(TEMPLATE_PATH + "/appname_scaffold");
         scaffoldTemplate.setAttribute("presentationPackage", presentationPackage);
@@ -164,7 +162,7 @@ public class FlexOperationsImpl implements FlexOperations {
 
     public void createFlexCompilerConfig() {
         ProjectMetadata projectMetadata = (ProjectMetadata) this.metadataService.get(ProjectMetadata.getProjectIdentifier(projectOperations.getFocusedModuleName()));
-        String compilerConfigFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), projectOperations.getProjectName(projectOperations.getFocusedModuleName())
+        String compilerConfigFileId = pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/" + projectOperations.getProjectName(projectOperations.getFocusedModuleName())
             + "_scaffold-config.xml");
         if (!this.fileManager.exists(compilerConfigFileId)) {
             InputStream inputStream = null;
@@ -249,7 +247,7 @@ public class FlexOperationsImpl implements FlexOperations {
         ActionScriptType asType = ActionScriptMappingUtils.toActionScriptType(entity);
 
         // Trigger creation of corresponding ActionScript entities
-        this.metadataService.get(ActionScriptEntityMetadata.createTypeIdentifier(asType, FlexPath.SRC_MAIN_FLEX));
+        this.metadataService.get(ActionScriptEntityMetadata.createTypeIdentifier(asType, "src/main/flex"));
     }
 
     private void createServicesConfig() {
@@ -437,6 +435,12 @@ public class FlexOperationsImpl implements FlexOperations {
         if (!projectOperations.getFocusedModule().isPluginRepositoryRegistered(flexRepository)) {
             this.projectOperations.addPluginRepository(projectOperations.getFocusedModuleName(), flexRepository);
         }
+        
+        // Tag repository of spring flex 1.5.0.RELEASE to download blazeds 4.0.0.14931 dependencies
+        Repository springFlexRepository = new Repository("spring-flex", "Spring Flex Repository", "https://github.com/SpringSource/spring-flex/raw/spring-flex-1.5.0.RELEASE/local-repo");
+        if (!projectOperations.getFocusedModule().isRepositoryRegistered(springFlexRepository)) {
+            this.projectOperations.addRepository(projectOperations.getFocusedModuleName(), springFlexRepository);
+        }        
 
         InputStream templateInputStream = FileUtils.getInputStream(getClass(), "plugins.xml");
         Validate.notNull(templateInputStream, "Could not acquire plugins.xml file");

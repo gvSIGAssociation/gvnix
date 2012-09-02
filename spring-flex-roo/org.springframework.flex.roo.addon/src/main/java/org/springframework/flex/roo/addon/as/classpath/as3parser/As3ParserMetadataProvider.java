@@ -31,7 +31,6 @@ import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeIdentifier;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeMetadata;
 import org.springframework.flex.roo.addon.as.classpath.details.ASClassOrInterfaceTypeDetails;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.flex.roo.addon.mojos.FlexPathResolver;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.file.monitor.event.FileEvent;
 import org.springframework.roo.file.monitor.event.FileEventListener;
@@ -41,6 +40,8 @@ import org.springframework.roo.metadata.MetadataItem;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
 
 /**
  * Parser-based {@link MetadataProvider} for ActionScript source files.
@@ -61,7 +62,7 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
     private MetadataDependencyRegistry metadataDependencyRegistry;
 
     @Reference
-    private FlexPathResolver pathResolver; // TODO - Is this the correct way to get the FlexPathResolver, or should we
+    private PathResolver pathResolver; // TODO - Is this the correct way to get the FlexPathResolver, or should we
                                            // look it up the way JavaParserMetadataProvider does
 
     protected void activate(ComponentContext context) {
@@ -79,14 +80,15 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
 
     public String findIdentifier(ActionScriptType actionScriptType) {
         Validate.notNull(actionScriptType, "ActionScript type to locate is required");
-        for (LogicalPath sourcePath : this.pathResolver.getFlexSourcePaths()) {
-            String relativePath = actionScriptType.getFullyQualifiedTypeName().replace('.', File.separatorChar) + ".as";
-            String fileIdentifier = this.pathResolver.getIdentifier(sourcePath, relativePath);
-            if (this.fileManager.exists(fileIdentifier)) {
-                // found the file, so use this one
-                return ASPhysicalTypeIdentifier.createIdentifier(actionScriptType, sourcePath);
-            }
+        // TODO Removed for, it's ok ?
+//        for (LogicalPath sourcePath : this.pathResolver.getFlexSourcePaths()) {
+        String relativePath = actionScriptType.getFullyQualifiedTypeName().replace('.', File.separatorChar) + ".as";
+        String fileIdentifier = this.pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/" + relativePath);
+        if (this.fileManager.exists(fileIdentifier)) {
+            // found the file, so use this one
+            return ASPhysicalTypeIdentifier.createIdentifier(actionScriptType, "src/main/flex");
         }
+//        }
         return null;
     }
 
@@ -118,10 +120,11 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
                     // We have a dependency on the superclass, but no metadata is available
                     // We're left with no choice but to register for every physical type change, in the hope we discover
                     // our parent someday (sad, isn't it? :-) )
-                    for (LogicalPath sourcePath : this.pathResolver.getSourcePaths()) {
-                        String possibleSuperclass = ASPhysicalTypeIdentifier.createIdentifier(details.getExtendsTypes().get(0), sourcePath);
-                        this.metadataDependencyRegistry.registerDependency(possibleSuperclass, result.getId());
-                    }
+                    // TODO Removed for, it's ok ?
+//                    for (LogicalPath sourcePath : this.pathResolver.getSourcePaths()) {
+                    String possibleSuperclass = ASPhysicalTypeIdentifier.createIdentifier(details.getExtendsTypes().get(0), "src/main/flex");
+                    this.metadataDependencyRegistry.registerDependency(possibleSuperclass, result.getId());
+//                }
                 }
             }
         }
@@ -140,12 +143,14 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
 
             // figure out the ActionScriptType this should be
             LogicalPath sourcePath = null;
-            for (LogicalPath path : this.pathResolver.getFlexSourcePaths()) {
-                if (new FileDetails(new File(this.pathResolver.getRoot(path)), null).isParentOf(fileIdentifier)) {
-                    sourcePath = path;
-                    break;
-                }
+            // TODO Removed for, it's ok ?
+//            for (LogicalPath path : this.pathResolver.getFlexSourcePaths()) {
+            LogicalPath path = LogicalPath.getInstance(Path.ROOT, "");
+            if (new FileDetails(new File(this.pathResolver.getRoot(path)), null).isParentOf(fileIdentifier)) {
+                sourcePath = path;
+//                break;
             }
+//            }
             if (sourcePath == null) {
                 // the .as file is not under a source path, so ignore it
                 return;
@@ -162,7 +167,7 @@ public class As3ParserMetadataProvider implements ASMutablePhysicalTypeMetadataP
             ActionScriptType actionScriptType = new ActionScriptType(relativePath.replace(File.separatorChar, '.'));
 
             // figure out the PhysicalTypeIdentifier
-            String id = ASPhysicalTypeIdentifier.createIdentifier(actionScriptType, sourcePath);
+            String id = ASPhysicalTypeIdentifier.createIdentifier(actionScriptType, "src/main/flex");
 
             // Now we've worked out the id, we can publish the event in case others were interested
             this.metadataService.evict(id);

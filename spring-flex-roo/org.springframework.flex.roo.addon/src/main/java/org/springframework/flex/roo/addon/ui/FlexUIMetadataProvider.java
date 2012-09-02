@@ -47,8 +47,6 @@ import org.springframework.flex.roo.addon.as.classpath.details.ASFieldMetadata;
 import org.springframework.flex.roo.addon.as.classpath.details.ASMutableClassOrInterfaceTypeDetails;
 import org.springframework.flex.roo.addon.as.model.ActionScriptMappingUtils;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.flex.roo.addon.mojos.FlexPath;
-import org.springframework.flex.roo.addon.mojos.FlexPathResolver;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.BeanInfoUtils;
@@ -72,6 +70,7 @@ import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.XmlUtils;
@@ -88,7 +87,7 @@ import org.w3c.dom.Element;
 public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotificationListener {
 
     @Reference
-    private FlexPathResolver flexPathResolver;
+    private PathResolver pathResolver;
 
     @Reference
     private MetadataDependencyRegistry metadataDependencyRegistry;
@@ -142,14 +141,14 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         String entityPresentationPackage = presentationPackage + "." + flexScaffoldMetadata.getEntityReference().toLowerCase();
 
         // Install the root application MXML document if it doesn't already exist
-        String scaffoldAppFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "_scaffold.mxml");
+        String scaffoldAppFileId = this.pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/" + projectOperations.getProjectName(projectOperations.getFocusedModuleName()) + "_scaffold.mxml");
         if (!this.fileManager.exists(scaffoldAppFileId)) {
             this.flexOperations.createScaffoldApp();
         }
 
         updateScaffoldIfNecessary(scaffoldAppFileId, flexScaffoldMetadata);
 
-        String flexConfigFileId = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), projectOperations.getProjectName(projectOperations.getFocusedModuleName())
+        String flexConfigFileId = this.pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/" + projectOperations.getProjectName(projectOperations.getFocusedModuleName())
             + "_scaffold-config.xml");
         if (!this.fileManager.exists(flexConfigFileId)) {
             this.flexOperations.createFlexCompilerConfig();
@@ -168,7 +167,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         String listViewRelativePath = (entityPresentationPackage + "." + flexScaffoldMetadata.getEntity().getSimpleTypeName() + "View").replace(
             '.', File.separatorChar)
             + ".mxml";
-        String listViewPath = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), listViewRelativePath);
+        String listViewPath = this.pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/" + listViewRelativePath);
         writeToDiskIfNecessary(listViewPath,
             buildListViewDocument(flexScaffoldMetadata, getElegibleListFields(projectMetadata, flexScaffoldMetadata)));
 
@@ -176,7 +175,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         String formRelativePath = (entityPresentationPackage + "." + flexScaffoldMetadata.getEntity().getSimpleTypeName() + "Form").replace(
             '.', File.separatorChar)
             + ".mxml";
-        String formPath = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), formRelativePath);
+        String formPath = this.pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/" + formRelativePath);
         writeToDiskIfNecessary(formPath, buildFormDocument(flexScaffoldMetadata, getElegibleFormFields(projectMetadata, flexScaffoldMetadata)));
 
         return new FlexUIMetadata(metadataId);
@@ -313,7 +312,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         entityEventTemplate.setAttribute("flexScaffoldMetadata", flexScaffoldMetadata);
 
         String relativePath = entityEventType.getFullyQualifiedTypeName().replace('.', File.separatorChar) + ".as";
-        String fileIdentifier = this.flexPathResolver.getIdentifier(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), relativePath);
+        String fileIdentifier = this.pathResolver.getIdentifier(LogicalPath.getInstance(Path.ROOT, ""), "src/main/flex/" + relativePath);
         this.fileManager.createOrUpdateTextFileIfRequired(fileIdentifier, entityEventTemplate.toString(), true);
     }
 
@@ -354,7 +353,7 @@ public class FlexUIMetadataProvider implements MetadataProvider, MetadataNotific
         Map<String, String> labelFields = new HashMap<String, String>();
         for (RelatedTypeWrapper relatedType : relatedTypes) {
             String labelField = "id"; // Default in case we don't find a better candidate
-            String asPhysicalTypeMetadataKey = ASPhysicalTypeIdentifier.createIdentifier(relatedType.getType(), FlexPath.SRC_MAIN_FLEX.getLogicalPath());
+            String asPhysicalTypeMetadataKey = ASPhysicalTypeIdentifier.createIdentifier(relatedType.getType(), "src/main/flex");
             ASMutableClassOrInterfaceTypeDetails details = getASClassDetails(asPhysicalTypeMetadataKey);
             if (details == null) {
                 continue;

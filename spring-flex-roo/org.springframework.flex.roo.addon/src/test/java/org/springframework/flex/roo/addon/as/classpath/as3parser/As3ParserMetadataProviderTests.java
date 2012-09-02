@@ -20,7 +20,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -54,9 +53,6 @@ import org.springframework.flex.roo.addon.as.classpath.details.metatag.StringAtt
 import org.springframework.flex.roo.addon.as.model.ASTypeVisibility;
 import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.flex.roo.addon.mojos.FlexMojosPathResolver;
-import org.springframework.flex.roo.addon.mojos.FlexPath;
-import org.springframework.flex.roo.addon.mojos.FlexPathResolver;
 import org.springframework.roo.file.monitor.event.FileDetails;
 import org.springframework.roo.file.monitor.event.FileEvent;
 import org.springframework.roo.file.monitor.event.FileOperation;
@@ -65,7 +61,7 @@ import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.ActiveProcessManager;
 import org.springframework.roo.process.manager.ProcessManager;
 import org.springframework.roo.process.manager.internal.DefaultFileManager;
-import org.springframework.roo.project.PhysicalPath;
+import org.springframework.roo.project.PathResolver;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import uk.co.badgersinfoil.metaas.ActionScriptFactory;
@@ -91,7 +87,8 @@ public class As3ParserMetadataProviderTests {
 	@Mock
 	private ProcessManager processManager;
 		
-	private FlexPathResolver pathResolver;
+	@Mock
+	private PathResolver pathResolver;
 
 	private String metadataId;
 	
@@ -107,7 +104,6 @@ public class As3ParserMetadataProviderTests {
 		metadataId = "MID:"+ASPhysicalTypeIdentifier.class.getName()+"#SRC_MAIN_FLEX?com.foo.stuff.FooImpl";
 		
 		fileManager = new TestFileManager();
-		pathResolver = new TestPathResolver();
 		
 		provider = new As3ParserMetadataProvider();
 		ReflectionTestUtils.setField(provider, "fileManager", fileManager);
@@ -394,16 +390,6 @@ public class As3ParserMetadataProviderTests {
 		
 		verify(metadataService).evict(expectedId);
 		verify(registry).notifyDownstream(expectedId);
-	}
-	
-	private static class TestPathResolver extends FlexMojosPathResolver {
-		
-		public TestPathResolver() throws IOException {
-			File file = new ClassPathResource("").getFile();
-			// TODO Replaced PathInformation with PhysicalPath, Path with LogicalPath and removed init() method: it's ok ?
-			getPathInformation().add(new PhysicalPath(FlexPath.SRC_MAIN_FLEX.getLogicalPath(), file));
-//			init();
-		}
 	}
 	
 	private static class TestFileManager extends DefaultFileManager {

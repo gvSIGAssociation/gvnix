@@ -19,7 +19,6 @@ package org.springframework.flex.roo.addon.entity;
 import org.apache.commons.lang3.Validate;
 import org.springframework.flex.roo.addon.as.classpath.ASPhysicalTypeIdentifierNamingUtils;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.flex.roo.addon.mojos.FlexPath;
 import org.springframework.roo.classpath.PhysicalTypeIdentifierNamingUtils;
 import org.springframework.roo.metadata.AbstractMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
@@ -62,8 +61,8 @@ public class ActionScriptEntityMetadata extends AbstractMetadataItem {
         return PROVIDES_TYPE;
     }
 
-    public static final String createTypeIdentifier(ActionScriptType asType, FlexPath path) {
-        return ASPhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, asType, path.getLogicalPath());
+    public static final String createTypeIdentifier(ActionScriptType asType, String path) {
+        return ASPhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, asType, path);
     }
 
     public static final JavaType getJavaType(String metadataIdentificationString) {

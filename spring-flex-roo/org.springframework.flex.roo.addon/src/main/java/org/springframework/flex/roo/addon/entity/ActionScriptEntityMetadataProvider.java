@@ -44,8 +44,6 @@ import org.springframework.flex.roo.addon.as.classpath.details.metatag.StringAtt
 import org.springframework.flex.roo.addon.as.model.ActionScriptMappingUtils;
 import org.springframework.flex.roo.addon.as.model.ActionScriptSymbolName;
 import org.springframework.flex.roo.addon.as.model.ActionScriptType;
-import org.springframework.flex.roo.addon.mojos.FlexPath;
-import org.springframework.flex.roo.addon.mojos.FlexPathResolver;
 import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeManagementService;
@@ -68,6 +66,7 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
+import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.support.util.CollectionUtils;
 
 /**
@@ -92,7 +91,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider, Met
     private static final String ALIAS_ATTR = "alias";
 
     @Reference
-    private FlexPathResolver flexPathResolver;
+    private PathResolver pathResolver;
 
     @Reference
     private MetadataService metadataService;
@@ -134,7 +133,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider, Met
             return new ActionScriptEntityMetadata(metadataId, asType, javaType);
         }
 
-        asEntityId = ASPhysicalTypeIdentifier.createIdentifier(asType, FlexPath.SRC_MAIN_FLEX.getLogicalPath());
+        asEntityId = ASPhysicalTypeIdentifier.createIdentifier(asType, "src/main/flex");
 
         createActionScriptMirrorClass(asEntityId, asType, javaType);
 
@@ -217,11 +216,11 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider, Met
 
     private String getPhysicalLocationCanonicalPath(String physicalTypeIdentifier) {
         Validate.isTrue(ASPhysicalTypeIdentifier.isValid(physicalTypeIdentifier), "Physical type identifier is invalid");
-        Validate.notNull(this.flexPathResolver, "Cannot computed metadata ID of a type because the path resolver is presently unavailable");
+        Validate.notNull(this.pathResolver, "Cannot computed metadata ID of a type because the path resolver is presently unavailable");
         ActionScriptType asType = ASPhysicalTypeIdentifier.getActionScriptType(physicalTypeIdentifier);
         LogicalPath path = ASPhysicalTypeIdentifier.getPath(physicalTypeIdentifier);
         String relativePath = asType.getFullyQualifiedTypeName().replace('.', File.separatorChar) + ".as";
-        String physicalLocationCanonicalPath = this.flexPathResolver.getIdentifier(path, relativePath);
+        String physicalLocationCanonicalPath = this.pathResolver.getIdentifier(path, "src/main/flex/" + relativePath);
         return physicalLocationCanonicalPath;
     }
 
@@ -264,6 +263,9 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider, Met
                 javaPropertyNames.add(StringUtils.uncapitalize(BeanInfoUtils.getPropertyNameForJavaBeanMethod(method).getSymbolName()));
             }
         }
+        
+        // TODO Next two fors refactored: it's ok ?
+    	ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(javaTypeDetails);
 
         // TODO - don't currently handle changing of field types because there is no updateField() method on
         // MutablePhysicalTypeDetails
@@ -273,12 +275,11 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider, Met
         // Add new fields - here we compare directly against property names instead of fields so that we don't
         // mistakenly add fields that
         // might be ITD-only like version and id
+    	List<FieldMetadataBuilder> fields = new ArrayList<FieldMetadataBuilder>();
         for (ASFieldMetadata asField : asTypeDetails.getDeclaredFields()) {
             String fieldName = asField.getFieldName().getSymbolName();
             if (!javaPropertyNames.contains(fieldName)) {
-            	ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(javaTypeDetails);
-            	mutableTypeDetailsBuilder.addField(ActionScriptMappingUtils.toFieldMetadata(javaEntityId, asField, true));
-            	typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
+            	fields.add(new FieldMetadataBuilder(ActionScriptMappingUtils.toFieldMetadata(javaEntityId, asField, true)));
             }
             processedFields.add(fieldName);
         }
@@ -290,13 +291,17 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider, Met
         // Remove missing fields - here we are careful to only remove things for wich there is an actual field in the
         // Java source, so the user
         // can't accidentally remove ITD-required fields like version and id
-    	ClassOrInterfaceTypeDetailsBuilder mutableTypeDetailsBuilder = new ClassOrInterfaceTypeDetailsBuilder(javaTypeDetails);
-    	List<FieldMetadataBuilder> fields = new ArrayList<FieldMetadataBuilder>();
         for (String javaFieldName : javaFieldNames) {
             if (!processedFields.contains(javaFieldName)) {
-            	fields.add(new FieldMetadataBuilder(javaTypeDetails.getDeclaredField(new JavaSymbolName(javaFieldName))));
+            	for (FieldMetadataBuilder fieldMetadata : fields) {
+					if (fieldMetadata.getFieldName().getSymbolName().equals(javaFieldName)) {
+						fields.remove(fieldMetadata);
+					}
+				}
             }
         }
+        
+        fields.addAll(mutableTypeDetailsBuilder.getDeclaredFields());
     	mutableTypeDetailsBuilder.setDeclaredFields(fields);
     	typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
 
@@ -309,7 +314,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider, Met
         JavaType javaType = PhysicalTypeIdentifier.getJavaType(javaEntityId);
 
         ActionScriptType asType = ActionScriptMappingUtils.toActionScriptType(javaType);
-        String asEntityId = ASPhysicalTypeIdentifier.createIdentifier(asType, FlexPath.SRC_MAIN_FLEX.getLogicalPath());
+        String asEntityId = ASPhysicalTypeIdentifier.createIdentifier(asType, "src/main/flex");
 
         ASMutableClassOrInterfaceTypeDetails asTypeDetails = getASClassDetails(asEntityId);
 
@@ -394,7 +399,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider, Met
         List<TypeMapping> relatedTypes = new ArrayList<TypeMapping>();
         if (ActionScriptMappingUtils.isMappableType(asField.getFieldType())) {
             if (!StringUtils.isNotBlank(this.asPhysicalTypeProvider.findIdentifier(asField.getFieldType()))) {
-                String relatedEntityId = ASPhysicalTypeIdentifier.createIdentifier(asField.getFieldType(), FlexPath.SRC_MAIN_FLEX.getLogicalPath());
+                String relatedEntityId = ASPhysicalTypeIdentifier.createIdentifier(asField.getFieldType(), "src/main/flex");
                 if (!asField.getDeclaredByMetadataId().equals(relatedEntityId)) {
                     relatedTypes.add(new TypeMapping(relatedEntityId, asField.getFieldType(), javaField.getFieldType()));
                 }
@@ -403,7 +408,7 @@ public class ActionScriptEntityMetadataProvider implements MetadataProvider, Met
             for (JavaType javaParamType : javaField.getFieldType().getParameters()) {
                 ActionScriptType asParamType = ActionScriptMappingUtils.toActionScriptType(javaParamType);
                 if (!StringUtils.isNotBlank(this.asPhysicalTypeProvider.findIdentifier(asField.getFieldType()))) {
-                    String relatedEntityId = ASPhysicalTypeIdentifier.createIdentifier(asParamType, FlexPath.SRC_MAIN_FLEX.getLogicalPath());
+                    String relatedEntityId = ASPhysicalTypeIdentifier.createIdentifier(asParamType, "src/main/flex");
                     if (!asField.getDeclaredByMetadataId().equals(relatedEntityId)) {
                         relatedTypes.add(new TypeMapping(relatedEntityId, asParamType, javaParamType));
                     }

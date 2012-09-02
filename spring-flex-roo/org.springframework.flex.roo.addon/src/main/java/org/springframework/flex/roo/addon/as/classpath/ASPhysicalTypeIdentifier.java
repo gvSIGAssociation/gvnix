@@ -36,7 +36,7 @@ public final class ASPhysicalTypeIdentifier {
         return PROVIDES_TYPE;
     }
 
-    public static final String createIdentifier(ActionScriptType actionScriptType, LogicalPath path) {
+    public static final String createIdentifier(ActionScriptType actionScriptType, String path) {
         return ASPhysicalTypeIdentifierNamingUtils.createIdentifier(PROVIDES_TYPE_STRING, actionScriptType, path);
     }
 

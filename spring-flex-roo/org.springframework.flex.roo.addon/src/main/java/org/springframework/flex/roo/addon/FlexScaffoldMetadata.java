@@ -175,7 +175,7 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         bodyBuilder.appendFormalLine("return "
             + this.entity.getNameIncludingTypeParameters(false, this.builder.getImportRegistrationResolver()) + "."
-            + new JpaCrudAnnotationValues(this.entityMetadata).getFindAllMethod() + "();");
+            + new JpaCrudAnnotationValues(this.entityMetadata).getFindAllMethod().concat(this.entityMetadata.getPlural()) + "();");
         return new MethodMetadataBuilder(getId(), Modifier.PUBLIC, methodName, returnType, null, null, bodyBuilder).build();
     }
 
@@ -205,7 +205,7 @@ public class FlexScaffoldMetadata extends AbstractItdTypeDetailsProvidingMetadat
         bodyBuilder.appendFormalLine("int sizeNo = size == null ? 10 : size.intValue();");
         bodyBuilder.appendFormalLine("return "
             + this.entity.getNameIncludingTypeParameters(false, this.builder.getImportRegistrationResolver()) + "."
-            + new JpaCrudAnnotationValues(this.entityMetadata).getFindEntriesMethod() + "(page == null ? 0 : (page.intValue() - 1) * sizeNo, sizeNo);");
+            + new JpaCrudAnnotationValues(this.entityMetadata).getFindEntriesMethod().concat(this.entityMetadata.getEntityName()).concat("Entries") + "(page == null ? 0 : (page.intValue() - 1) * sizeNo, sizeNo);");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("} else {");
         bodyBuilder.indent();

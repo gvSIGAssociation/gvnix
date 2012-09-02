@@ -1,22 +1,22 @@
 package org.springframework.flex.roo.addon;
 
-import org.springframework.flex.roo.addon.mojos.FlexPathResolver;
 import org.springframework.roo.metadata.AbstractMetadataItem;
 import org.springframework.roo.metadata.MetadataIdentificationUtils;
+import org.springframework.roo.project.PathResolver;
 
 
 public class FlexProjectMetadata extends AbstractMetadataItem {
 
     private static final String FLEX_PROJECT_IDENTIFIER = MetadataIdentificationUtils.create(FlexProjectMetadata.class.getName(), "flex_project");
     
-    private FlexPathResolver pathResolver;
+    private PathResolver pathResolver;
 
-    public FlexProjectMetadata(FlexPathResolver flexPathResolver) {
+    public FlexProjectMetadata(PathResolver flexPathResolver) {
         super(FLEX_PROJECT_IDENTIFIER);
         this.pathResolver = flexPathResolver;
     }
     
-    public FlexPathResolver getPathResolver() {
+    public PathResolver getPathResolver() {
         return pathResolver;
     }
     
