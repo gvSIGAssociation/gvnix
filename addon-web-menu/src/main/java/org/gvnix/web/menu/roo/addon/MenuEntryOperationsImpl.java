@@ -130,12 +130,6 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     /** {@inheritDoc} */
     protected void activate(ComponentContext context) {
         componentContext = context;
-
-        // if gvNIX menu is available, we can disable Roo MenuOperations to
-        // get requests from clients and update our menu.xml
-        if (isGvNixMenuAvailable()) {
-            disableRooMenuOperations();
-        }
     }
 
     // Public operations -----
@@ -1173,12 +1167,9 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     }
 
     /**
-     * Disables Roo MenuOperationsImpl service.
-     * <p>
-     * <em>IMPORTANT:</em> OSGi container will inject gvNIX MenuOperationsImpl
-     * service to clients.
+     * {@inheritDoc}
      */
-    protected void disableRooMenuOperations() {
+    public void disableRooMenuOperations() {
         logger.fine("Disable Roo MenuOperationsImpl");
 
         ServiceReference rooServiceRef = componentContext.getBundleContext()

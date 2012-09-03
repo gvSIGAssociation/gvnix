@@ -62,6 +62,14 @@ public interface MenuEntryOperations {
      *         false.
      */
     boolean isGvNixMenuAvailable();
+    
+    /**
+     * Disables Roo MenuOperationsImpl service.
+     * <p>
+     * <em>IMPORTANT:</em> OSGi container will inject gvNIX MenuOperationsImpl
+     * service to clients.
+     */
+    public void disableRooMenuOperations();
 
     /**
      * Checks if Spring Security 3.0.5.RELEASE is installed.
