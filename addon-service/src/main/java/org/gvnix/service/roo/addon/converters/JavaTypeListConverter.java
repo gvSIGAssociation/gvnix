@@ -40,6 +40,7 @@ import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
+import org.springframework.roo.shell.Completion;
 import org.springframework.roo.shell.Converter;
 import org.springframework.roo.shell.MethodTarget;
 
@@ -51,7 +52,7 @@ import org.springframework.roo.shell.MethodTarget;
  */
 @Component
 @Service
-public class JavaTypeListConverter implements Converter {
+public class JavaTypeListConverter implements Converter<JavaTypeList> {
 
     @Reference
     private MetadataService metadataService;
@@ -67,7 +68,7 @@ public class JavaTypeListConverter implements Converter {
      * org.springframework.roo.shell.Converter#convertFromText(java.lang.String,
      * java.lang.Class, java.lang.String)
      */
-    public Object convertFromText(String value, Class requiredType,
+    public JavaTypeList convertFromText(String value, Class<?> requiredType,
             String optionContext) {
 
         JavaTypeList javaTypeList = new JavaTypeList();
@@ -96,7 +97,7 @@ public class JavaTypeListConverter implements Converter {
      * .List, java.lang.Class, java.lang.String, java.lang.String,
      * org.springframework.roo.shell.MethodTarget)
      */
-    public boolean getAllPossibleValues(List completions, Class requiredType,
+    public boolean getAllPossibleValues(List<Completion> completions, Class<?> requiredType,
             String existingData, String optionContext, MethodTarget target) {
 
         if (existingData == null) {
@@ -132,7 +133,7 @@ public class JavaTypeListConverter implements Converter {
      * @see org.springframework.roo.shell.Converter#supports(java.lang.Class,
      * java.lang.String)
      */
-    public boolean supports(Class requiredType, String optionContext) {
+    public boolean supports(Class<?> requiredType, String optionContext) {
         return JavaTypeList.class.isAssignableFrom(requiredType);
     }
 
@@ -151,7 +152,7 @@ public class JavaTypeListConverter implements Converter {
      * @param tmpExistingData
      *            The last JavaType from console Input to auto complete.
      */
-    private void completeJavaSpecificPaths(List<String> completions,
+    private void completeJavaSpecificPaths(List<Completion> completions,
             String existingData, String optionContext,
             String completeExistingDataList, String tmpExistingData) {
 
@@ -179,7 +180,7 @@ public class JavaTypeListConverter implements Converter {
         for (String type : types) {
             if (type.startsWith(tmpExistingData)
                     || tmpExistingData.startsWith(type)) {
-                completions.add(completeExistingDataList.concat(type));
+                completions.add(new Completion(completeExistingDataList.concat(type)));
             }
         }
     }
@@ -251,7 +252,7 @@ public class JavaTypeListConverter implements Converter {
      * @param completeExistingDataList
      * @param tmpExistingData
      */
-    private void completeProjectSpecificPaths(List<String> completions,
+    private void completeProjectSpecificPaths(List<Completion> completions,
             String existingData, String completeExistingDataList,
             String tmpExistingData) {
 
@@ -333,7 +334,7 @@ public class JavaTypeListConverter implements Converter {
                 if (directory) {
                     candidate = candidate + ".";
                 }
-                completions.add(completeExistingDataList.concat(candidate));
+                completions.add(new Completion(completeExistingDataList.concat(candidate)));
             }
         }
     }

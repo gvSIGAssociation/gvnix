@@ -24,6 +24,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
 import org.gvnix.web.menu.roo.addon.MenuEntryOperations;
+import org.springframework.roo.shell.Completion;
 import org.springframework.roo.shell.Converter;
 import org.springframework.roo.shell.MethodTarget;
 import org.springframework.roo.support.util.XmlUtils;
@@ -45,7 +46,7 @@ import org.w3c.dom.Element;
  */
 @Component
 @Service
-public class MenuEntryConverter implements Converter {
+public class MenuEntryConverter implements Converter<MenuEntry> {
 
     @Reference
     private MenuEntryOperations operations;
@@ -57,7 +58,7 @@ public class MenuEntryConverter implements Converter {
      *            Can this type be converted?
      * @param optionContext
      */
-    public boolean supports(Class requiredType, String optionContext) {
+    public boolean supports(Class<?> requiredType, String optionContext) {
         return MenuEntry.class.isAssignableFrom(requiredType);
     }
 
@@ -71,7 +72,7 @@ public class MenuEntryConverter implements Converter {
      * @param optionContext
      *            [Not used]
      */
-    public Object convertFromText(String value, Class requiredType,
+    public MenuEntry convertFromText(String value, Class<?> requiredType,
             String optionContext) {
         return new MenuEntry(value);
     }
@@ -85,7 +86,7 @@ public class MenuEntryConverter implements Converter {
      * @param optionContext
      * @param target
      */
-    public boolean getAllPossibleValues(List completions, Class requiredType,
+    public boolean getAllPossibleValues(List<Completion> completions, Class<?> requiredType,
             String existingData, String optionContext, MethodTarget target) {
         Document document = operations.getMenuDocument();
 
@@ -108,7 +109,7 @@ public class MenuEntryConverter implements Converter {
         }
 
         for (Element element : elements) {
-            completions.add(element.getAttribute("id"));
+            completions.add(new Completion(element.getAttribute("id")));
         }
 
         return false;

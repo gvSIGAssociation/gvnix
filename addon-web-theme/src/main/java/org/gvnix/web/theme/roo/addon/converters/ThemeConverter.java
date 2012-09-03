@@ -45,7 +45,7 @@ import org.springframework.roo.shell.MethodTarget;
  */
 @Component
 @Service
-public class ThemeConverter implements Converter {
+public class ThemeConverter implements Converter<Theme> {
 
     /**
      * Use PageOperations to execute operations
@@ -60,7 +60,7 @@ public class ThemeConverter implements Converter {
      *            Can this type be converted?
      * @param optionContext
      */
-    public boolean supports(Class requiredType, String optionContext) {
+    public boolean supports(Class<?> requiredType, String optionContext) {
         return Theme.class.isAssignableFrom(requiredType);
     }
 
@@ -74,7 +74,7 @@ public class ThemeConverter implements Converter {
      * @param optionContext
      *            [Not used]
      */
-    public Object convertFromText(String value, Class requiredType,
+    public Theme convertFromText(String value, Class<?> requiredType,
             String optionContext) {
         List<Theme> themes = new ArrayList<Theme>();
 
@@ -106,7 +106,7 @@ public class ThemeConverter implements Converter {
      * @param target
      * @return
      */
-    public boolean getAllPossibleValues(List completions, Class requiredType,
+    public boolean getAllPossibleValues(List<Completion> completions, Class<?> requiredType,
             String existingData, String optionContext, MethodTarget target) {
         List<Theme> themes = new ArrayList<Theme>();
 

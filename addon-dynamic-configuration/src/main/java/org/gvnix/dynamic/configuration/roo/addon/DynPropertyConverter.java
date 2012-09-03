@@ -28,6 +28,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynComponent;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynConfiguration;
 import org.gvnix.dynamic.configuration.roo.addon.entity.DynProperty;
+import org.springframework.roo.shell.Completion;
 import org.springframework.roo.shell.Converter;
 import org.springframework.roo.shell.MethodTarget;
 import org.springframework.roo.support.logging.HandlerUtils;
@@ -42,7 +43,7 @@ import org.springframework.roo.support.logging.HandlerUtils;
  */
 @Component
 @Service
-public class DynPropertyConverter implements Converter {
+public class DynPropertyConverter implements Converter<DynProperty> {
 
     public static final String SOURCE_FILES = "source";
     public static final String CONFIGURATION_FILE = "config";
@@ -58,7 +59,7 @@ public class DynPropertyConverter implements Converter {
     /**
      * {@inheritDoc}
      */
-    public Object convertFromText(String value, Class requiredType,
+    public DynProperty convertFromText(String value, Class<?> requiredType,
             String optionContext) {
 
         // Create a dynamic property with key and without value
@@ -68,7 +69,7 @@ public class DynPropertyConverter implements Converter {
     /**
      * {@inheritDoc}
      */
-    public boolean getAllPossibleValues(List completions, Class requiredType,
+    public boolean getAllPossibleValues(List<Completion> completions, Class<?> requiredType,
             String existingData, String optionContext, MethodTarget target) {
 
         // Option context mark property completions origin
@@ -100,13 +101,13 @@ public class DynPropertyConverter implements Converter {
      *            Dynamic configuration
      * @return Completions list exists
      */
-    private boolean addPropertyCompletions(List<String> completions,
+    private boolean addPropertyCompletions(List<Completion> completions,
             DynConfiguration dynConf) {
         boolean any = false;
         for (DynComponent dynComp : dynConf.getComponents()) {
             for (DynProperty dynProp : dynComp.getProperties()) {
 
-                completions.add(dynProp.getKey());
+                completions.add(new Completion(dynProp.getKey()));
                 any = true;
             }
         }
@@ -117,7 +118,7 @@ public class DynPropertyConverter implements Converter {
     /**
      * {@inheritDoc}
      */
-    public boolean supports(Class requiredType, String optionContext) {
+    public boolean supports(Class<?> requiredType, String optionContext) {
 
         // This converter supports dynamic property
         return DynProperty.class.isAssignableFrom(requiredType);
