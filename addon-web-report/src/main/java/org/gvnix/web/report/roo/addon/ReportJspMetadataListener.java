@@ -52,7 +52,6 @@ import org.springframework.roo.process.manager.MutableFile;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.project.Path;
 import org.springframework.roo.project.PathResolver;
-import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlRoundTripUtils;
 import org.springframework.roo.support.util.XmlUtils;
@@ -87,7 +86,7 @@ public final class ReportJspMetadataListener implements MetadataProvider,
     @Reference
     private MenuOperations menuOperations;
     @Reference
-    private ProjectOperations projectOperations;
+    private PathResolver pathResolver;
     @Reference
     private PropFileOperations propFileOperations;
 
@@ -142,7 +141,6 @@ public final class ReportJspMetadataListener implements MetadataProvider,
         String[] reportNameFormat = ReportMetadata
                 .stripGvNixReportValue(report);
 
-        PathResolver pathResolver = projectOperations.getPathResolver();
         String controllerPath = webScaffoldMetadata.getAnnotationValues()
                 .getPath();
         // Make the holding directory for this controller
