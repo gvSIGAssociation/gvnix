@@ -550,7 +550,8 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         for (StringAttributeValue definedPattern : patternList) {
             definedPatternsList.add(definedPattern.getValue());
         }
-        if (patternService.isPatternTypeDefined(WebPatternType.tabular, definedPatternsList)) {
+        if (patternService.isPatternTypeDefined(WebPatternType.tabular, definedPatternsList)
+        		|| patternService.isPatternTypeDefined(WebPatternType.tabular_edit_register, definedPatternsList)) {
             annotateTypeWithGvNIXEntityBatch(getFormBakingObject(controllerDetails));
         }
     }

@@ -67,9 +67,6 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
     /** {@link RooWebScaffold} java type */
     protected static final JavaType ROOWEBSCAFFOLD_ANNOTATION = new JavaType(RooWebScaffold.class.getName());
 
-    /** {@link GvNIXEntityBatch} java type */
-    protected static final JavaType ENTITYBATCH_ANNOTATION = new JavaType(GvNIXEntityBatch.class.getName());
-    
     protected PatternService _patternService;
 
     /**

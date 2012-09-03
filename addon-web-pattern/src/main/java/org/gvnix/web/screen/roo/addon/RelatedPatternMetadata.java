@@ -522,9 +522,16 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         		
         		// TODO May be more fields on relationsField var
 				AnnotationAttributeValue<?> masterFieldMappedBy = masterFieldAnnotation.getAttribute(new JavaSymbolName("mappedBy"));
-				if ((masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.OneToMany")) || 
-						masterFieldAnnotation.getAnnotationType().equals(new JavaType("javax.persistence.ManyToMany")) ) &&
-						tmpMasterField.getFieldName().getSymbolName().equals(relationsFields.iterator().next())) {
+				JavaType annotationType = masterFieldAnnotation.getAnnotationType();
+				boolean isOneToMany = annotationType.equals(new JavaType("javax.persistence.OneToMany"));
+				boolean isManyToMany = annotationType.equals(new JavaType("javax.persistence.ManyToMany"));
+				String fieldName = tmpMasterField.getFieldName().getSymbolName();
+				Iterator<String> fieldRelations = relationsFields.iterator();
+				boolean isRelation = false;
+				if(fieldRelations.hasNext()) {
+					isRelation = fieldName.equals(fieldRelations.next());
+				}
+				if ((isOneToMany || isManyToMany) && isRelation) {
 					
 					masterField = masterFieldMappedBy.getValue().toString();
 				}
