@@ -24,8 +24,8 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
+import org.springframework.roo.addon.web.mvc.jsp.roundtrip.XmlRoundTripFileManager;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.project.LogicalPath;
 import org.springframework.roo.support.util.XmlUtils;
@@ -50,16 +50,7 @@ public class MenuOperationsImpl implements MenuOperations {
    * Use AddonOperations delegate to operations this add-on offers
    */
   @Reference private MenuEntryOperations operations;
-
-  /** {@inheritDoc} */
-  protected void activate(ComponentContext context) {
-  	
-      // if gvNIX menu is available, we can disable Roo MenuOperations to
-      // get requests from clients and update our menu.xml
-      if (operations.isGvNixMenuAvailable()) {
-      	operations.disableRooMenuOperations();
-      }
-  }
+  @Reference private XmlRoundTripFileManager xmlRoundTripFileManager;
 
   /** {@inheritDoc} */
   public void addMenuItem(JavaSymbolName menuCategoryName,
@@ -105,7 +96,8 @@ public class MenuOperationsImpl implements MenuOperations {
         element.getParentNode().removeChild(element);
       }
     }
-    operations.writeXMLConfigIfNeeded(document);
+    xmlRoundTripFileManager.writeToDiskIfNecessary(
+    		operations.getMenuConfigFile(), document);
   }
 
   /**
