@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,10 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.apache.felix.shell.ShellService;
 import org.gvnix.web.menu.roo.addon.util.FilenameUtils;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.propfiles.PropFileOperations;
 import org.springframework.roo.addon.web.mvc.jsp.i18n.I18n;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
@@ -54,6 +58,7 @@ import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.ProjectOperations;
 import org.springframework.roo.project.Property;
 import org.springframework.roo.support.logging.HandlerUtils;
+import org.springframework.roo.support.logging.LoggingOutputStream;
 import org.springframework.roo.support.util.FileUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlUtils;
@@ -103,13 +108,37 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
     @Reference
     private PropFileOperations propFileOperations;
 
+    /**
+     * Use to to interact with Felix to have some sort of interactive shell that
+     * allows you to issue commands to the OSGi framework
+     */
+    @Reference
+    private ShellService shellService;
+    
+    /**
+     * Use to interact with the OSGi execution context including locating
+     * and disabling services by reference name.
+     */
+    private ComponentContext componentContext;
+
     /** menu.jspx file path */
     private String menuFile;
 
     /** menu.xml file path */
     private String menuConfigFile;
-    
+
+    /**
+     * Is OSGI Roo menu component already disabled ?
+     * In other words, is OSGI gvNIX menu component already activated ?
+     */
+    public static boolean isRooMenuDisabled = false;
+
     // Public operations -----
+
+    /** {@inheritDoc} */
+    protected void activate(ComponentContext context) {
+        componentContext = context;
+    }
 
     /**
      * {@inheritDoc}
@@ -170,6 +199,11 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
 
         // Add dependencies to POM
         updateDependencies(configuration);
+
+        // disable Roo MenuOperations to receive requests from clients
+        // note we disable Roo MenuOp before start reading menu.jspx to avoid
+        // clients create page whereas we are reading menu.jspx
+        disableRooMenuOperations();
 
         // populate menu.xml from Roo menu.jspx
         createMenu();
@@ -1135,6 +1169,51 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
             }
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void disableRooMenuOperations() {
+        logger.fine("Disable Roo MenuOperationsImpl");
+
+        ServiceReference rooServiceRef = componentContext.getBundleContext()
+                .getServiceReference(MenuOperations.class.getName());
+        if (rooServiceRef != null) {
+        	
+  	        Long componentId = (Long) rooServiceRef.getProperty("component.id");
+  	
+  	        try {
+  	            executeFelixCommand("scr disable ".concat(componentId.toString()));
+  				isRooMenuDisabled = true;
+  	        } catch (Exception e) {
+  	            throw new IllegalStateException(
+  	                    "Exception disabling Roo MenuOperationsImpl service", e);
+  	        }
+        }
+    }
+
+    /**
+     * Execute Felix shell commands
+     * 
+     * @param commandLine
+     * @throws Exception
+     */
+    private void executeFelixCommand(String commandLine) throws Exception {
+        LoggingOutputStream sysOut = new LoggingOutputStream(Level.INFO);
+        LoggingOutputStream sysErr = new LoggingOutputStream(Level.SEVERE);
+        sysOut.setSourceClassName(MenuEntryOperationsImpl.class.getName());
+        sysErr.setSourceClassName(MenuEntryOperationsImpl.class.getName());
+
+        PrintStream printStreamOut = new PrintStream(sysOut);
+        PrintStream printErrOut = new PrintStream(sysErr);
+        try {
+            shellService.executeCommand(commandLine, printStreamOut,
+                    printErrOut);
+        } finally {
+            printStreamOut.close();
+            printErrOut.close();
         }
     }
 

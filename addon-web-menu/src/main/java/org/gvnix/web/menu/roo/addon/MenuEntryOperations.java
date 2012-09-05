@@ -302,4 +302,9 @@ public interface MenuEntryOperations {
      * @return the absolute path to the file (never null)
      */
     String getMenuConfigFile();
+    
+    /**
+     * Disable OSGI Roo menu component and then OSGI gvNIX menu component will be used automatically.</p>
+     */
+    public void disableRooMenuOperations();
 }
