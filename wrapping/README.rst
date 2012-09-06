@@ -59,8 +59,8 @@ Oracle JDBC Driver
 
 *ArtifactId distinto a groupId*
 
-* JAR original: ojdbc14-10.2.0.4.0.jar
-* Bundle de gvNIX: org.gvnix.com.oracle.ojdbc14-10.2.0.4.0.jar
+* JAR original: ojdbc14-10.2.0.5.jar
+* Bundle de gvNIX: org.gvnix.com.oracle.ojdbc14-10.2.0.5.jar
 
 JavaBeans(TM) Activation Framework
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
