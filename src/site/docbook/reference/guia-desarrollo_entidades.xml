@@ -1389,7 +1389,7 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
         propiedad <emphasis>hibernate.hbm2ddl.auto</emphasis> por el de
         <emphasis>validate</emphasis> para evitar que pongamos en peligro la
         integridad de la BBDD a la que estamos conectados en nuestro proyecto.
-        Si hemos utilizado la opción --includeNonPortableAttributes
+        Si no hemos utilizado la opción --includeNonPortableAttributes
         necesitaremos cambiar el valor de esta propiedad por
         <emphasis>none</emphasis> para evitar la fase de validación del
         esquema.</para>
