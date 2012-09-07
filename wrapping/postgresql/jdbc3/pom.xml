@@ -50,8 +50,8 @@
   <properties>
     <pkgGroupId>postgresql</pkgGroupId>
     <pkgArtifactId>postgresql</pkgArtifactId>
-    <pkgVersion>9.0.801.jdbc3</pkgVersion><!-- Bundle plugin change -901 to .0 for Bundle-Version, so change -901 to .901 -->
-    <depVersion>9.0-801.jdbc3</depVersion>
+    <pkgVersion>9.1.902.jdbc3</pkgVersion><!-- Bundle plugin change -901 to .0 for Bundle-Version, so change -901 to .901 -->
+    <depVersion>9.1-902.jdbc3</depVersion>
     <pkgVendor>PostgreSQL Global Development Group</pkgVendor>
     <pkgDocUrl>http://jdbc.postgresql.org/documentation/docs.html</pkgDocUrl>
     <pkgLicense>http://jdbc.postgresql.org/license.html</pkgLicense>
