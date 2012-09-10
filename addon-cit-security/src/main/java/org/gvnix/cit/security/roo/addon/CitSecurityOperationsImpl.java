@@ -35,7 +35,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.security.SecurityOperations;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.process.manager.FileManager;
@@ -67,18 +66,7 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
 	static final Integer DEFAUL_SESSION_TIMEOUT = 45;
 
-    static final String CLASSES_PACKAGE = "org.gvnix.security.authentication.wscit";
-
-    static final String PROVIDER_CLASS_SHORT_NAME = "WscitAuthenticationProvider";
-
-    static final String CLASSES_PATH = CLASSES_PACKAGE.replace(".",
-            File.separator);
-
-    private static final String PROVIDER_CLASS_FILENAME = PROVIDER_CLASS_SHORT_NAME
-            + ".java";
-
-    private static final String PROVIDER_TARGET_CLASS_FILENAME = CLASSES_PATH
-            + PROVIDER_CLASS_FILENAME;
+    private static final String PROVIDER_CLASS_FILENAME = "WscitAuthenticationProvider.java";
 
     private static final String[] JAVA_CLASS_FILENAMES = new String[] {
             PROVIDER_CLASS_FILENAME, "WscitAuthenticationProvider.java",
@@ -115,12 +103,32 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
     @Reference
     private SecurityOperations securityOperations;
 
-    private Boolean alreadyInstaled = null;
+    /**
+     * Get java package of cit security classes into destination project.
+     * 
+     * @return Cit security classes java package
+     */
+    protected String getClassesPackage() {
+    	return projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE);
+    }
+    
+    /**
+     * Get folder path of cit security files into destination project.
+     * 
+     * @return Cit security files folder path
+     */
+    protected String getClassesPath() {
 
-    private ComponentContext context;
-
-    protected void activate(ComponentContext context) {
-        this.context = context;
+        return getClassesPackage().replace(".", File.separator);
+    }
+    
+    /**
+     * Get file path of cit security provider file into destination project.
+     * 
+     * @return Cit security provider file path
+     */
+    protected String getProviderTargetClassFileName() {
+        return getClassesPath() + File.separator + PROVIDER_CLASS_FILENAME;
     }
 
     public boolean isSetupAvailable() {
@@ -142,35 +150,22 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
         // Esta configurada la seguridad, pero si ya esta ejecutado
         // este comando no estamos disponibles
 
-        return !isAlreadyInstalled();
-    }
-
-    public boolean isAlreadyInstalled() {
-        if (alreadyInstaled == null) {
-            alreadyInstaled = checkIsAlredyInstalled() ? Boolean.TRUE
-                    : Boolean.FALSE;
-        }
-        return alreadyInstaled.booleanValue();
-
-    }
-
-    public void clearAlreadyInstalled() {
-        alreadyInstaled = null;
+        return !checkIsAlredyInstalled();
     }
 
     public boolean checkIsAlredyInstalled() {
         // Si no existe la ruta de nuestas clases no estan instaladas: estamos
         // disponibles
-        String classPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
-                CLASSES_PATH);
-        if (!fileManager.exists(classPath)) {
+        String folderPath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
+                getClassesPath());
+        if (!fileManager.exists(folderPath)) {
             return false;
         }
 
         // si no existe la clase provider no estamos instalados: estamos
         // disonible
-        return fileManager.exists(pathResolver.getIdentifier(
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""), PROVIDER_TARGET_CLASS_FILENAME));
+        String filePath = pathResolver.getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""), getProviderTargetClassFileName());
+        return fileManager.exists(filePath);
     }
 
     /**
@@ -362,13 +357,13 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
                     "/beans/bean[@id='wscitAuthenticationProvider']", root);
             String clazz = bean.getAttribute("class");
             bean.setAttribute("class",
-                    clazz.replace("__TARGET_PACKAGE__", projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE)));
+                    clazz.replace("__TARGET_PACKAGE__", getClassesPackage()));
 
             bean = XmlUtils.findFirstElement(
                     "/beans/bean[@id='serverWSAuthPortProxy']", root);
             clazz = bean.getAttribute("class");
             bean.setAttribute("class",
-                    clazz.replace("__TARGET_PACKAGE__", projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE)));
+                    clazz.replace("__TARGET_PACKAGE__", getClassesPackage()));
 
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
@@ -427,20 +422,20 @@ public class CitSecurityOperationsImpl implements CitSecurityOperations {
 
         // Copiamos los ficheros del cliente del servicio WSAuth
         for (String className : JAVA_WS_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE),
+            installTemplate("java-src-templates", className, getClassesPackage(),
                     projectMetadata, null, false);
         }
 
         // Copiamos los ficheros del Provider, usuarios y el cliente del
         // servicio WSAuth
         for (String className : JAVA_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE),
+            installTemplate("java-src-templates", className, getClassesPackage(),
                     projectMetadata, null, false);
         }
 
         // Copiamos los ficheros de los xsd del servicio WSAuth
         for (String className : JAVA_XSD_CLASS_FILENAMES) {
-            installTemplate("java-src-templates", className, projectOperations.getFocusedTopLevelPackage().getFullyQualifiedPackageName().concat(AUTHENTICATION_SUBPACKAGE),
+            installTemplate("java-src-templates", className, getClassesPackage(),
                     projectMetadata, null, false);
         }
     }

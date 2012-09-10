@@ -40,12 +40,6 @@ public interface CitSecurityOperations {
     boolean isSpringMvcTilesProject();
 
     /**
-     * Informs if CIT Security is already installed
-     *
-     */
-    public boolean isAlreadyInstalled();
-
-    /**
      * Install CIT Security in this projet
      *
      * @param url
