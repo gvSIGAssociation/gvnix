@@ -308,6 +308,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
         requestMappingAttributes.add(getMethodRequestMapping(RequestMethod.DELETE));
+        requestMappingAttributes.add(getProducesParamRequestMapping());
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
                 new JavaType(
                         "org.springframework.web.bind.annotation.RequestMapping"),
@@ -412,6 +413,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
         requestMappingAttributes.add(getMethodRequestMapping(requestMethod));
+        requestMappingAttributes.add(getProducesParamRequestMapping());
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
                 new JavaType(
                         "org.springframework.web.bind.annotation.RequestMapping"),
@@ -486,7 +488,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         FieldMetadataBuilder fmb = null;
 
-        JavaSymbolName fieldName = new JavaSymbolName("patterns");
+        JavaSymbolName fieldName = new JavaSymbolName("definedPatterns");
         JavaType stringArray = new JavaType(
                 JavaType.STRING.getFullyQualifiedTypeName(), 1,
                 DataType.TYPE, null, null);
@@ -627,7 +629,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         bodyBuilder.appendFormalLine("}");
 
         // May we need to populate some Model Attributes with the data of
-        // related relatedEntities
+        // related entities
         addBodyLinesPopulatingRelatedEntitiesData(bodyBuilder);
 
         bodyBuilder.appendFormalLine("uiModel.addAttribute(\""
@@ -645,10 +647,11 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         List<AnnotationAttributeValue<? extends Object>> paramValues = new ArrayList<AnnotationAttributeValue<? extends Object>>();
         paramValues.add(getPatternParamRequestMapping(patternName));
         paramValues.add(getFormParamRequestMapping(false));
+        paramValues.add(new StringAttributeValue(new JavaSymbolName("value"), "!find"));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
-        requestMappingAttributes.add(getMethodRequestMapping(RequestMethod.GET));
+        requestMappingAttributes.add(getProducesParamRequestMapping());
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
                 new JavaType(
                         "org.springframework.web.bind.annotation.RequestMapping"),
@@ -772,7 +775,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .concat("\", count == 0 ? 1 : count);"));
 
         // May we need to populate some Model Attributes with the data of
-        // related relatedEntities
+        // related entities
         addBodyLinesPopulatingRelatedEntitiesData(bodyBuilder);
 
         // Add date validation pattern to model if some date type field exists
@@ -791,10 +794,11 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         paramValues.add(getPatternParamRequestMapping(patternName));
         paramValues.add(new StringAttributeValue(new JavaSymbolName("ignored"),
                 "gvnixform"));
+        paramValues.add(new StringAttributeValue(new JavaSymbolName("value"), "!find"));
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
-        requestMappingAttributes.add(getMethodRequestMapping(RequestMethod.GET));
+        requestMappingAttributes.add(getProducesParamRequestMapping());
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
                 new JavaType(
                         "org.springframework.web.bind.annotation.RequestMapping"),
@@ -809,11 +813,11 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
     }
 
     /**
-     * Adds body lines which populates required data for the related relatedEntities.
+     * Adds body lines which populates required data for the related entities.
      * <p>
      * This lines are like Roo's ModelAttribute methods but registering the
      * model attributes directly in the method. The model attributes are set
-     * with data (usually Sets) needed by the entity related relatedEntities.
+     * with data (usually Sets) needed by the entity related entities.
      * 
      * @param bodyBuilder
      */
@@ -850,7 +854,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
     }
 
     /**
-     * Adds body lines registering DateTime formats of the related relatedEntities.
+     * Adds body lines registering DateTime formats of the related entities.
      * <p>
      * If related entity has DateTime fields, we need to register, as model
      * attribute, the DateTime format in order to render, validate and send
@@ -1117,7 +1121,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 
         // Define method parameter names
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-        parameterNames.add(new JavaSymbolName("relatedEntities"));
+        parameterNames.add(new JavaSymbolName("entities"));
 
         // Create method body
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
@@ -1125,13 +1129,13 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .concat("List list = new ")
                 .concat(entity.getSimpleTypeName()).concat("List();"));
         bodyBuilder
-                .appendFormalLine("for ( Integer select : relatedEntities.getSelected() ) {");
+                .appendFormalLine("for ( Integer select : entities.getSelected() ) {");
 
         bodyBuilder.indent();
         bodyBuilder.appendFormalLine("if ( select != null ) {");
         bodyBuilder.indent();
         bodyBuilder
-                .appendFormalLine("list.getList().add(relatedEntities.getList().get(select));");
+                .appendFormalLine("list.getList().add(entities.getList().get(select));");
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("}");
         bodyBuilder.indentRemove();
@@ -1231,6 +1235,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         requestMappingAttributes.add(new StringAttributeValue(
                 new JavaSymbolName("value"), "/list"));
         requestMappingAttributes.add(getMethodRequestMapping(requestMethod));
+        requestMappingAttributes.add(getProducesParamRequestMapping());
 
         return requestMappingAttributes;
     }
@@ -1262,16 +1267,16 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
      * Returns the list of parameter names for the methods
      * <p>
      * Returns:<br/>
-     * <code>relatedEntities, bindingResult, httpServletRequest</code>
+     * <code>entities, bindingResult, httpServletRequest</code>
      * </p>
      * 
      * @return
      */
     private List<JavaSymbolName> getMethodParameterNames() {
     	
-        // Define method parameter names (relatedEntities, bindingResult, httpServletRequest)
+        // Define method parameter names (entities, bindingResult, httpServletRequest)
         List<JavaSymbolName> parameterNames = new ArrayList<JavaSymbolName>();
-        parameterNames.add(new JavaSymbolName("relatedEntities"));
+        parameterNames.add(new JavaSymbolName("entities"));
         parameterNames.add(getBindingResult().getKey());
         parameterNames.add(getHttpServletRequest().getKey());
         
@@ -1323,16 +1328,15 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 	/**
 	 * Get request mapping annotation for a method.
 	 * 
-	 * <code>@RequestMapping(params = { "form", "gvnixpattern=AplicacionListados2", "gvnixreference" }, method = RequestMethod.GET)</code>
+	 * <code>@RequestMapping(params = { "form", "gvnixpattern=AplicacionListados2", "gvnixreference" })</code>
 	 * 
 	 * @param patternName Pattern name to match on request mapping with "gvnixpattern" attribute name.
 	 * @return
 	 */
-	protected AnnotationMetadataBuilder getRequestMapping(String patternName, RequestMethod method) {
+	protected AnnotationMetadataBuilder getRequestMapping(String patternName) {
 		
 		List<AnnotationAttributeValue<?>> requestMappingAnnotation = getParamsRequestMapping(patternName);
-		requestMappingAnnotation.add(getMethodRequestMapping(method));
-		
+		requestMappingAnnotation.add(getProducesParamRequestMapping());
 		return new AnnotationMetadataBuilder(
 				new JavaType("org.springframework.web.bind.annotation.RequestMapping"), requestMappingAnnotation);
 	}
@@ -1367,6 +1371,12 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 		
 		// TODO Refactor 
 		return new StringAttributeValue(new JavaSymbolName("value"), getPattern() + "=" + patternName);
+	}
+	
+	protected StringAttributeValue getProducesParamRequestMapping() {
+		
+		// TODO Refactor
+		return new StringAttributeValue(new JavaSymbolName("produces"), "text/html");
 	}
 	
 	protected String getPattern() {
@@ -1448,7 +1458,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
      * Example:<br/>
      * <code>
      * if ( !bindingResult.hasErrors() ) {<br/>
-     * &nbsp;&nbsp;Car.persist(filterList(relatedEntities));<br/>
+     * &nbsp;&nbsp;Car.persist(filterList(entities));<br/>
      * }<br/>
      * return getRefererRedirectViewName(httpServletRequest);
      * </code>
@@ -1467,7 +1477,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
                 .getNameIncludingTypeParameters(false,
                         builder.getImportRegistrationResolver()).concat(".")
                 .concat(persistenceMethod.getName())
-                .concat("(filterList(relatedEntities));"));
+                .concat("(filterList(entities));"));
         bodyBuilder.indentRemove();
         bodyBuilder.appendFormalLine("} else {");
         bodyBuilder.indent();
