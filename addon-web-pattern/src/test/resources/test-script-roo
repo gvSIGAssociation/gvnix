@@ -1,3 +1,11 @@
+#
+# Master entity with two one to many detail entities.
+# Master and details have single identifier.
+# Use command parameters to change default values (entity name, identifier, fields, ...) 
+# Create all master and master/detail screen patterns combinations. 
+# Generate automatic test for every screen pattern.
+#
+
 project --topLevelPackage org.gvnix.test.relation.list.table --projectName displayRelationsTable
 
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY

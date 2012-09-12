@@ -1,3 +1,12 @@
+#
+# Master entity with two one to many detail entities.
+# Master has single identifier and details composite identifier.
+# Use command parameters to change default values (entity name, identifier, fields, ...) 
+# Create one finder for each entity (check URL mapping with patterns and finders works)
+# Create all master and master/detail screen patterns combinations. 
+# Generate automatic test for every screen pattern.
+#
+
 project --topLevelPackage org.gvnix.test.relation.list.table --projectName displayRelationsTable
 
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
@@ -6,11 +15,16 @@ entity jpa --class ~.domain.Person --entityName MyPerson --identifierType java.l
 field number --fieldName age --type java.lang.Short --column my_age
 field date --fieldName birthDate --type java.util.Calendar --notNull --column birthDate
 
+finder add --finderName findPeopleByAgeBetween
+
 entity jpa --class ~.domain.Horse --identifierType ~.domain.HorsePk --entityName horse --identifierColumn oneId --identifierField myidhorse --table horsetable
 field string --fieldName name --notNull --column horsename
 field reference --fieldName person2 --type ~.domain.Person --joinColumnName oneColumn --referencedColumnName Myid
 field date --fieldName birthDate --type java.util.Calendar --column adate
 field number --fieldName age --type java.lang.Integer --column age
+
+finder add --finderName findHorsesByNameLike
+
 field string --fieldName pkc1 --class ~.domain.HorsePk --column myid
 
 focus --class ~.domain.Person
@@ -19,6 +33,9 @@ field set --fieldName horses --type ~.domain.Horse --cardinality ONE_TO_MANY --m
 entity jpa --class ~.domain.Car --identifierType ~.domain.CarPk
 field string --fieldName name --notNull
 field reference --fieldName person --type ~.domain.Person --joinColumnName OneColumn --referencedColumnName Myid
+
+finder add --finderName findCarsByNameIsNotNull
+
 field string --fieldName pkc1 --class ~.domain.CarPk
 
 focus --class ~.domain.Person

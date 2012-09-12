@@ -1,3 +1,10 @@
+#
+# Master entity with one many to many detail entity.
+# Master and detail has single identifier.
+# Create one master register / detail tabular screen pattern. 
+# Generate automatic test for the screen pattern.
+#
+
 project --topLevelPackage org.gvnix.test.relation.list.table --projectName displayRelationsTable
 
 jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
