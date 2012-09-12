@@ -651,6 +651,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
+        requestMappingAttributes.add(getMethodRequestMapping(RequestMethod.GET));
         requestMappingAttributes.add(getProducesParamRequestMapping());
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
                 new JavaType(
@@ -798,6 +799,7 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
         requestMappingAttributes
                 .add(new ArrayAttributeValue<AnnotationAttributeValue<? extends Object>>(
                         new JavaSymbolName("params"), paramValues));
+        requestMappingAttributes.add(getMethodRequestMapping(RequestMethod.GET));
         requestMappingAttributes.add(getProducesParamRequestMapping());
         AnnotationMetadataBuilder requestMapping = new AnnotationMetadataBuilder(
                 new JavaType(
@@ -1328,14 +1330,15 @@ public abstract class AbstractPatternMetadata extends AbstractItdTypeDetailsProv
 	/**
 	 * Get request mapping annotation for a method.
 	 * 
-	 * <code>@RequestMapping(params = { "form", "gvnixpattern=AplicacionListados2", "gvnixreference" })</code>
+	 * <code>@RequestMapping(params = { "form", "gvnixpattern=AplicacionListados2", "gvnixreference" }, method = RequestMethod.GET)</code>
 	 * 
 	 * @param patternName Pattern name to match on request mapping with "gvnixpattern" attribute name.
 	 * @return
 	 */
-	protected AnnotationMetadataBuilder getRequestMapping(String patternName) {
+	protected AnnotationMetadataBuilder getRequestMapping(String patternName, RequestMethod method) {
 		
 		List<AnnotationAttributeValue<?>> requestMappingAnnotation = getParamsRequestMapping(patternName);
+		requestMappingAnnotation.add(getMethodRequestMapping(method));
 		requestMappingAnnotation.add(getProducesParamRequestMapping());
 		return new AnnotationMetadataBuilder(
 				new JavaType("org.springframework.web.bind.annotation.RequestMapping"), requestMappingAnnotation);

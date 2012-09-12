@@ -176,8 +176,8 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
 		
 		List<AnnotationMetadataBuilder> methodAnnotations = new ArrayList<AnnotationMetadataBuilder>();
 
-		// @RequestMapping(params = { "form", "gvnixpattern=AplicacionListados2", "gvnixreference" })
-		methodAnnotations.add(getRequestMapping(patternName));
+		// @RequestMapping(params = { "form", "gvnixpattern=AplicacionListados2", "gvnixreference" }, method = RequestMethod.GET)
+		methodAnnotations.add(getRequestMapping(patternName, RequestMethod.GET));
 
 		// If method exists (in java file, by example) no create it in AspectJ file
 		if (methodExists(methodName, paramTypes) != null) {
