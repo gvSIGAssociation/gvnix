@@ -204,14 +204,6 @@ public interface PatternService {
      */
     public boolean isPatternTypeDefined(WebPatternType patternType, List<String> definedPatternsList);
     
-	/**
-	 * Get entity fields names defined into relations pattern annotation on its related controller. 
-	 * 
-	 * @param entity Entity java type
-	 * @return Relations pattern fields names
-	 */
-    public Set<String> getRelationsFields(JavaType entity);
-    
     /**
      * Read the values of GvNIXRelationsPattern and for each field defined as relation retrieve its name.
      * 

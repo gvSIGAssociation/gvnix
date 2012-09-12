@@ -22,7 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -225,15 +224,12 @@ public final class RelatedPatternMetadataProvider extends AbstractPatternMetadat
         
         JavaTypeMetadataDetails masterEntityJavaDetails = relatedEntities.get(masterEntity);
         
-        // Get entity fields names defined into relations pattern annotation on its related controller
-		Set<String> relationsFields = patternService.getRelationsFields(masterEntity);
-		
 		// Get master entity details
 		MemberDetails masterEntityDetails = getMemberDetails(masterEntity);
 		
         // Pass dependencies required by the metadata in through its constructor
         return new RelatedPatternMetadata(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patternList,
-        		entityMetadata, entityDetails, masterEntityJavaDetails, masterEntityDetails, relationsFields, relatedEntities, relatedFields, 
+        		entityMetadata, entityDetails, masterEntityJavaDetails, masterEntityDetails, relatedEntities, relatedFields, 
         		relatedDates, entityDateTypes);
     }
 

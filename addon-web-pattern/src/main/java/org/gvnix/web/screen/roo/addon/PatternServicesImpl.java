@@ -29,9 +29,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
-import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -42,11 +40,8 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
-import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
-import org.springframework.roo.project.LogicalPath;
-import org.springframework.roo.project.Path;
 
 /**
  * Provide common services to Screen Pattern management components. 
@@ -64,7 +59,6 @@ import org.springframework.roo.project.Path;
 @Service
 public class PatternServicesImpl implements PatternService {
 
-    @Reference private MetadataService metadataService;
     @Reference private MemberDetailsScanner memberDetailsScanner;
     @Reference private TypeLocationService typeLocationService;
 
@@ -343,25 +337,6 @@ public class PatternServicesImpl implements PatternService {
         
         return false;
     }
-
-    /** {@inheritDoc} */
-	public Set<String> getRelationsFields(JavaType entity) {
-		
-		// Master controller metadata is the unique controller with a form backing object of master entity type
-		PhysicalTypeMetadata controllerMetadata = null;
-		if (entity != null) {
-			Set<JavaType> controllers = typeLocationService.findTypesWithAnnotation(new JavaType(RooWebScaffold.class.getName()));
-			for (JavaType controller : controllers) {
-				PhysicalTypeMetadata tmpControllerMetadata = (PhysicalTypeMetadata) metadataService.get(
-						PhysicalTypeIdentifier.createIdentifier(controller, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
-		        if (entity.equals(new WebScaffoldAnnotationValues(tmpControllerMetadata).getFormBackingObject())) {
-		        	controllerMetadata = tmpControllerMetadata;
-		        }
-			}
-		}
-		
-		return getRelationsFields(controllerMetadata);
-	}
 
     /** {@inheritDoc} */
     public Set<String> getRelationsFields(PhysicalTypeMetadata controller) {

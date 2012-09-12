@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.commons.lang3.Validate;
@@ -71,13 +70,12 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
     
     private MemberDetails entityDetails;
     private MemberDetails masterEntityDetails;
-    private Set<String> relationsFields;
     private JavaType masterEntity;
     private JavaTypeMetadataDetails masterEntityJavaDetails;
  
     public RelatedPatternMetadata(String mid, JavaType aspect, PhysicalTypeMetadata controllerMetadata, MemberDetails controllerDetails,
     		WebScaffoldMetadata webScaffoldMetadata, List<StringAttributeValue> patterns, PhysicalTypeMetadata entityMetadata, MemberDetails entityDetails,
-    		JavaTypeMetadataDetails masterEntityJavaDetails, MemberDetails masterEntityDetails, Set<String> relationsFields,
+    		JavaTypeMetadataDetails masterEntityJavaDetails, MemberDetails masterEntityDetails,
     		SortedMap<JavaType, JavaTypeMetadataDetails> relatedEntities, SortedMap<JavaType, JavaTypeMetadataDetails> relatedFields,
     		Map<JavaType, Map<JavaSymbolName, DateTimeFormatDetails>> relatedDates, Map<JavaSymbolName, DateTimeFormatDetails> entityDateTypes) {
     	
@@ -92,7 +90,6 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         
         this.entityDetails = entityDetails;
         this.masterEntityDetails = masterEntityDetails;
-        this.relationsFields = relationsFields;
         this.masterEntityJavaDetails = masterEntityJavaDetails;
         if (masterEntityDetails != null) {
         	this.masterEntity = masterEntityJavaDetails.getJavaType();
@@ -520,18 +517,12 @@ public class RelatedPatternMetadata extends AbstractPatternMetadata {
         	List<AnnotationMetadata> masterFieldAnnotations = tmpMasterField.getAnnotations();
         	for (AnnotationMetadata masterFieldAnnotation : masterFieldAnnotations) {
         		
-        		// TODO May be more fields on relationsField var
+        		// TODO May be more fields on relationsFields var
 				AnnotationAttributeValue<?> masterFieldMappedBy = masterFieldAnnotation.getAttribute(new JavaSymbolName("mappedBy"));
 				JavaType annotationType = masterFieldAnnotation.getAnnotationType();
 				boolean isOneToMany = annotationType.equals(new JavaType("javax.persistence.OneToMany"));
 				boolean isManyToMany = annotationType.equals(new JavaType("javax.persistence.ManyToMany"));
-				String fieldName = tmpMasterField.getFieldName().getSymbolName();
-				Iterator<String> fieldRelations = relationsFields.iterator();
-				boolean isRelation = false;
-				if(fieldRelations.hasNext()) {
-					isRelation = fieldName.equals(fieldRelations.next());
-				}
-				if ((isOneToMany || isManyToMany) && isRelation) {
+				if (isOneToMany || isManyToMany) {
 					
 					masterField = masterFieldMappedBy.getValue().toString();
 				}
