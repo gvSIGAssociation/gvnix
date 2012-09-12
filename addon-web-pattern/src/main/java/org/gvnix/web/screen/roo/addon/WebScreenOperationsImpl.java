@@ -414,8 +414,12 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                     AnnotationMetadata relatedPattern = getGvNIXRelatedPattern(fieldsPatternIdAndType
                             .get(field.getFieldName().getSymbolName()));
                     if (relatedPattern != null) {
-                        annotateEntityController(field.getFieldType()
-                                .getParameters().get(0), relatedPattern);
+                        if (!annotateEntityController(field.getFieldType()
+                                .getParameters().get(0), relatedPattern)) {
+                        	// Related entity has not a controller: Alert message and rollback 
+                        	throw new IllegalArgumentException("Cannot add a detail pattern into a field whose entity type has not a controller." +
+                        			" Please, run command 'web mvc scaffold' for field entity type first.");
+                        }
                     }
                 }
             }
@@ -427,11 +431,19 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
      * Given a Entity this method look for the WebScaffold exposing it and adds
      * {@link GvNIXRelatedPattern} in parameter annotation
      * 
+     * <p>The entity controller can't be annotated if entity has not a controller.
+     * Then this method return false.</p>
+     * 
      * @param entity
      * @param annotation
+     * @return Entity controller annotated ?
      */
-    private void annotateEntityController(JavaType entity,
+    private boolean annotateEntityController(JavaType entity,
             AnnotationMetadata annotation) {
+    	
+    	// If entity has not a controller, 'success' will be false
+    	boolean success = false;
+    	
         AnnotationMetadata annotationMetadata = null;
         for (ClassOrInterfaceTypeDetails cid : typeLocationService
                 .findClassesOrInterfaceDetailsWithAnnotation(ROOWEBSCAFFOLD_ANNOTATION)) {
@@ -449,10 +461,12 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                                             entity.getFullyQualifiedTypeName())) {
                         addOrUpdateGvNIXRelatedPatternToController(
                                 cid.getName(), annotation);
+                        success = true;
                     }
                 }
             }
         }
+        return success;
     }
 
     /**
