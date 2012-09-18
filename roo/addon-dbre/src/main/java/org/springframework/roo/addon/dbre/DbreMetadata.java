@@ -764,9 +764,21 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
         return getJoinColumnAnnotation(reference, referencedColumn, null);
     }
 
+    // XXX DiSiD: Old method. Works as before with nullable=null
+    // http://projects.disid.com/issues/7454
     private AnnotationMetadataBuilder getJoinColumnAnnotation(
             final Reference reference, final boolean referencedColumn,
             final JavaType fieldType) {
+        return getJoinColumnAnnotation(reference, referencedColumn, fieldType,
+                null);
+    }
+
+    // XXX DiSiD: New method
+    // If null works as before, else set nullable with new parameter value
+    // http://projects.disid.com/issues/7454
+    private AnnotationMetadataBuilder getJoinColumnAnnotation(
+            final Reference reference, final boolean referencedColumn,
+            final JavaType fieldType, final Boolean nullable) {
         final Column localColumn = reference.getLocalColumn();
         Validate.notNull(localColumn, "Foreign-key reference local column '"
                 + reference.getLocalColumnName() + "' must not be null");
@@ -786,8 +798,13 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
                     foreignColumn.getEscapedName());
         }
 
-        if (localColumn.isRequired()) {
-            joinColumnBuilder.addBooleanAttribute("nullable", false);
+        if (nullable == null) {
+            if (localColumn.isRequired()) {
+                joinColumnBuilder.addBooleanAttribute("nullable", false);
+            }
+        }
+        else {
+            joinColumnBuilder.addBooleanAttribute("nullable", nullable);
         }
 
         if (fieldType != null) {
@@ -804,9 +821,19 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
     private AnnotationMetadataBuilder getJoinColumnsAnnotation(
             final Set<Reference> references, final JavaType fieldType) {
         final List<NestedAnnotationAttributeValue> arrayValues = new ArrayList<NestedAnnotationAttributeValue>();
+
+        // XXX DiSiD: Nullable attribute will have same value for each
+        // If some column not required, all JoinColumn will be nullable
+        boolean nullable = false;
+        for (final Reference reference : references) {
+            if (!reference.getLocalColumn().isRequired()) {
+                nullable = true;
+            }
+        }
+
         for (final Reference reference : references) {
             final AnnotationMetadataBuilder joinColumnAnnotation = getJoinColumnAnnotation(
-                    reference, true, fieldType);
+                    reference, true, fieldType, nullable);
             arrayValues.add(new NestedAnnotationAttributeValue(
                     new JavaSymbolName(VALUE), joinColumnAnnotation.build()));
         }
