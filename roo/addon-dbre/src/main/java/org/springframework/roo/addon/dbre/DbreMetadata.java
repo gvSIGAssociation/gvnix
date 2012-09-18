@@ -619,10 +619,15 @@ public class DbreMetadata extends AbstractItdTypeDetailsProvidingMetadataItem {
 
         // Copy the existing attributes, excluding the "ignoreFields" attribute
         boolean alreadyAdded = false;
-        final AnnotationAttributeValue<?> value = toStringAnnotation
+        AnnotationAttributeValue<?> value = toStringAnnotation
                 .getAttribute(new JavaSymbolName("excludeFields"));
         if (value == null) {
-            return;
+            // XXX DiSiD: If no excludeFields attribute
+            // Create new empty one to add new fields
+            // http://projects.disid.com/issues/7455
+            value = new ArrayAttributeValue<StringAttributeValue>(
+                    new JavaSymbolName("excludeFields"),
+                    new ArrayList<StringAttributeValue>());
         }
 
         // Ensure we have an array of strings
