@@ -56,6 +56,7 @@ public class DbreOperationsImpl implements DbreOperations {
                 view, Collections.<String> emptySet(),
                 Collections.<String> emptySet());
         database.setIncludeNonPortableAttributes(true);
+        database.setDisableVersionFields(true);
         outputSchemaXml(database, schemas, file, true);
     }
 
@@ -104,7 +105,7 @@ public class DbreOperationsImpl implements DbreOperations {
             final boolean testAutomatically, final boolean view,
             final Set<String> includeTables, final Set<String> excludeTables,
             final boolean includeNonPortableAttributes,
-            final boolean activeRecord) {
+            final boolean disableVersionFields, final boolean activeRecord) {
         // Force it to refresh the database from the actual JDBC connection
         final Database database = dbreModelService.refreshDatabase(schemas,
                 view, includeTables, excludeTables);
@@ -112,6 +113,7 @@ public class DbreOperationsImpl implements DbreOperations {
         database.setActiveRecord(activeRecord);
         database.setDestinationPackage(destinationPackage);
         database.setIncludeNonPortableAttributes(includeNonPortableAttributes);
+        database.setDisableVersionFields(disableVersionFields);
         database.setTestAutomatically(testAutomatically);
         outputSchemaXml(database, schemas, null, false);
 

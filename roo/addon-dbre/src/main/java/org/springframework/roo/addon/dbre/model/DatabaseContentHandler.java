@@ -54,6 +54,8 @@ public class DatabaseContentHandler extends DefaultHandler {
     private Database database;
     private JavaPackage destinationPackage;
     private boolean includeNonPortableAttributes;
+    // XXX DiSiD Disable version fields
+    private boolean disableVersionFields;
     private String moduleName;
     private final Stack<Object> stack = new Stack<Object>();
     private final Set<Table> tables = new LinkedHashSet<Table>();
@@ -90,6 +92,9 @@ public class DatabaseContentHandler extends DefaultHandler {
             if (option.getKey().equals("includeNonPortableAttributes")) {
                 includeNonPortableAttributes = Boolean.parseBoolean(option
                         .getValue());
+            }
+            if (option.getKey().equals("disableVersionFields")) {
+                disableVersionFields = Boolean.parseBoolean(option.getValue());
             }
             if (option.getKey().equals("activeRecord")) {
                 activeRecord = Boolean.parseBoolean(option.getValue());
@@ -128,6 +133,7 @@ public class DatabaseContentHandler extends DefaultHandler {
             database.setModuleName(moduleName);
             database.setDestinationPackage(destinationPackage);
             database.setIncludeNonPortableAttributes(includeNonPortableAttributes);
+            database.setDisableVersionFields(disableVersionFields);
             database.setActiveRecord(activeRecord);
             database.setTestAutomatically(testAutomatically);
         }

@@ -32,6 +32,12 @@ public class Database {
      */
     private boolean includeNonPortableAttributes;
 
+    /**
+     * XXX DiSiD Disable version fields
+     * Whether or not to disable tables version column as concurrency control
+     */
+    private boolean disableVersionFields;
+
     /** The module where the entities are created */
     private String moduleName;
 
@@ -301,6 +307,10 @@ public class Database {
         return includeNonPortableAttributes;
     }
 
+    public boolean isDisableVersionFields() {
+        return disableVersionFields;
+    }
+
     public boolean isTestAutomatically() {
         return testAutomatically;
     }
@@ -325,6 +335,10 @@ public class Database {
         this.includeNonPortableAttributes = includeNonPortableAttributes;
     }
 
+    public void setDisableVersionFields(final boolean disableVersionFields) {
+        this.disableVersionFields = disableVersionFields;
+    }
+
     public void setModuleName(final String moduleName) {
         this.moduleName = moduleName;
     }
@@ -336,8 +350,8 @@ public class Database {
     @Override
     public String toString() {
         return String
-                .format("Database [tables=%s, destinationPackage=%s, testAutomatically=%s, includeNonPortableAttributes=%s]",
+                .format("Database [tables=%s, destinationPackage=%s, testAutomatically=%s, includeNonPortableAttributes=%s, disableVersionFields=%s]",
                         tables, destinationPackage, testAutomatically,
-                        includeNonPortableAttributes);
+                        includeNonPortableAttributes, disableVersionFields);
     }
 }

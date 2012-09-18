@@ -137,6 +137,8 @@ public abstract class DatabaseXmlUtils {
         addBooleanOptionElement(document, databaseElement,
                 "includeNonPortableAttributes",
                 database.isIncludeNonPortableAttributes());
+        addBooleanOptionElement(document, databaseElement,
+                "disableVersionFields", database.isDisableVersionFields());
         addBooleanOptionElement(document, databaseElement, "testAutomatically",
                 database.isTestAutomatically());
 
@@ -343,6 +345,11 @@ public abstract class DatabaseXmlUtils {
             if (optionElement.getAttribute("key").equals(
                     "includeNonPortableAttributes")) {
                 database.setIncludeNonPortableAttributes(Boolean
+                        .parseBoolean(optionElement.getAttribute("value")));
+            }
+            if (optionElement.getAttribute("key")
+                    .equals("disableVersionFields")) {
+                database.setDisableVersionFields(Boolean
                         .parseBoolean(optionElement.getAttribute("value")));
             }
         }

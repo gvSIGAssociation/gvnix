@@ -412,9 +412,13 @@ public class DbreDatabaseListenerImpl extends
     }
 
     private boolean hasVersionField(final Table table) {
-        for (final Column column : table.getColumns()) {
-            if (VERSION.equalsIgnoreCase(column.getName())) {
-                return true;
+        // XXX DiSiD: Search version column name only if enabled
+        if (!table.isDisableVersionFields()) {
+
+            for (final Column column : table.getColumns()) {
+                if (VERSION.equalsIgnoreCase(column.getName())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -609,6 +613,8 @@ public class DbreDatabaseListenerImpl extends
                 if (typeLocationService.getTypeDetails(javaType) == null) {
                     table.setIncludeNonPortableAttributes(database
                             .isIncludeNonPortableAttributes());
+                    table.setDisableVersionFields(database
+                            .isDisableVersionFields());
                     newEntities.add(createNewManagedEntityFromTable(javaType,
                             table, database.isActiveRecord()));
                 }
@@ -667,6 +673,7 @@ public class DbreDatabaseListenerImpl extends
 
         table.setIncludeNonPortableAttributes(database
                 .isIncludeNonPortableAttributes());
+        table.setDisableVersionFields(database.isDisableVersionFields());
 
         // Update the @RooJpaEntity/@RooJpaActiveRecord attributes
         final AnnotationMetadataBuilder jpaAnnotationBuilder = new AnnotationMetadataBuilder(
