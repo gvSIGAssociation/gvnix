@@ -373,7 +373,7 @@ public class JpaActiveRecordMetadata extends
         else {
             // XXX DiSiD: Replace in JPA query 'o' with '*' because Hibernate
             // error when transform it to Oracle native SQL: no rigth ')'
-        	// http://projects.disid.com/issues/7457
+            // http://projects.disid.com/issues/7457
             bodyBuilder.appendFormalLine("return " + ENTITY_MANAGER_METHOD_NAME
                     + "().createQuery(\"SELECT COUNT(*) FROM " + entityName
                     + " o\", Long.class).getSingleResult();");
