@@ -56,6 +56,8 @@ public class DatabaseContentHandler extends DefaultHandler {
     private boolean includeNonPortableAttributes;
     // XXX DiSiD Disable version fields
     private boolean disableVersionFields;
+    // XXX DiSiD Disable generated identifiers
+    private boolean disableGeneratedIdentifiers;
     private String moduleName;
     private final Stack<Object> stack = new Stack<Object>();
     private final Set<Table> tables = new LinkedHashSet<Table>();
@@ -96,6 +98,10 @@ public class DatabaseContentHandler extends DefaultHandler {
             if (option.getKey().equals("disableVersionFields")) {
                 disableVersionFields = Boolean.parseBoolean(option.getValue());
             }
+            if (option.getKey().equals("disableGeneratedIdentifiers")) {
+                disableGeneratedIdentifiers = Boolean.parseBoolean(option
+                        .getValue());
+            }
             if (option.getKey().equals("activeRecord")) {
                 activeRecord = Boolean.parseBoolean(option.getValue());
             }
@@ -134,6 +140,7 @@ public class DatabaseContentHandler extends DefaultHandler {
             database.setDestinationPackage(destinationPackage);
             database.setIncludeNonPortableAttributes(includeNonPortableAttributes);
             database.setDisableVersionFields(disableVersionFields);
+            database.setDisableGeneratedIdentifiers(disableGeneratedIdentifiers);
             database.setActiveRecord(activeRecord);
             database.setTestAutomatically(testAutomatically);
         }

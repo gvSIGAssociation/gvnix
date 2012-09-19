@@ -49,6 +49,8 @@ public interface DbreOperations {
      *            non-portable JPA @Column attributes such as 'columnDefinition'
      * @param disableVersionFields whether or not to disable tables version
      *            column such as concurrency control field
+     * @param disableGeneratedIdentifiers whether or not to disable identifiers
+     *            auto generation value
      * @param activeRecord whether to generate CRUD active record methods for
      *            each entity
      */
@@ -56,5 +58,5 @@ public interface DbreOperations {
             JavaPackage destinationPackage, boolean testAutomatically,
             boolean view, Set<String> includeTables, Set<String> excludeTables,
             boolean includeNonPortableAttributes, boolean disableVersionFields,
-            boolean activeRecord);
+            boolean disableGeneratedIdentifiers, boolean activeRecord);
 }

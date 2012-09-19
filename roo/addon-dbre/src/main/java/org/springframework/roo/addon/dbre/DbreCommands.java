@@ -50,11 +50,12 @@ public class DbreCommands implements CommandMarker {
             @CliOption(key = "excludeTables", mandatory = false, specifiedDefaultValue = "", optionContext = "exclude-tables", help = "The tables to exclude from reverse engineering. Multiple table names must be a double-quoted list separated by spaces") final Set<String> excludeTables,
             @CliOption(key = "includeNonPortableAttributes", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false", help = "Include non-portable JPA @Column attributes such as 'columnDefinition'") final boolean includeNonPortableAttributes,
             @CliOption(key = "disableVersionFields", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false", help = "Disable tables version column such as concurrency control field") final boolean disableVersionFields,
+            @CliOption(key = "disableGeneratedIdentifiers", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false", help = "Disable identifiers value auto generation (manual assignment)") final boolean disableGeneratedIdentifiers,
             @CliOption(key = "activeRecord", mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "true", help = "Generate CRUD active record methods for each entity") final boolean activeRecord) {
 
         dbreOperations.reverseEngineerDatabase(schemas, destinationPackage,
                 testAutomatically, view, includeTables, excludeTables,
                 includeNonPortableAttributes, disableVersionFields,
-                activeRecord);
+                disableGeneratedIdentifiers, activeRecord);
     }
 }

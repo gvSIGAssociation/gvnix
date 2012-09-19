@@ -33,10 +33,16 @@ public class Database {
     private boolean includeNonPortableAttributes;
 
     /**
-     * XXX DiSiD Disable version fields
-     * Whether or not to disable tables version column as concurrency control
+     * XXX DiSiD Disable version fields Whether or not to disable tables version
+     * column as concurrency control
      */
     private boolean disableVersionFields;
+
+    /**
+     * XXX DiSiD Disable identifier generated values Whether or not to disable
+     * tables identifier auto generation
+     */
+    private boolean disableGeneratedIdentifiers;
 
     /** The module where the entities are created */
     private String moduleName;
@@ -311,6 +317,10 @@ public class Database {
         return disableVersionFields;
     }
 
+    public boolean isDisableGeneratedIdentifiers() {
+        return disableGeneratedIdentifiers;
+    }
+
     public boolean isTestAutomatically() {
         return testAutomatically;
     }
@@ -339,6 +349,11 @@ public class Database {
         this.disableVersionFields = disableVersionFields;
     }
 
+    public void setDisableGeneratedIdentifiers(
+            final boolean disableGeneratedIdentifiers) {
+        this.disableGeneratedIdentifiers = disableGeneratedIdentifiers;
+    }
+
     public void setModuleName(final String moduleName) {
         this.moduleName = moduleName;
     }
@@ -350,8 +365,9 @@ public class Database {
     @Override
     public String toString() {
         return String
-                .format("Database [tables=%s, destinationPackage=%s, testAutomatically=%s, includeNonPortableAttributes=%s, disableVersionFields=%s]",
+                .format("Database [tables=%s, destinationPackage=%s, testAutomatically=%s, includeNonPortableAttributes=%s, disableVersionFields=%s, disableGeneratedIdentifiers=%s]",
                         tables, destinationPackage, testAutomatically,
-                        includeNonPortableAttributes, disableVersionFields);
+                        includeNonPortableAttributes, disableVersionFields,
+                        disableGeneratedIdentifiers);
     }
 }

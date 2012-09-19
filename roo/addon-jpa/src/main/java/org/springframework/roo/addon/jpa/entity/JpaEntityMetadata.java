@@ -299,56 +299,65 @@ public class JpaEntityMetadata extends
 
         // Compute the column name, as required
         if (!hasIdClass) {
-            String generationType = isGaeEnabled || isDatabaseDotComEnabled ? "IDENTITY"
-                    : "AUTO";
 
-            // ROO-746: Use @GeneratedValue(strategy = GenerationType.TABLE) if
-            // the root of the governor declares @Inheritance(strategy =
-            // InheritanceType.TABLE_PER_CLASS)
-            if ("AUTO".equals(generationType)) {
-                AnnotationMetadata inheritance = governorTypeDetails
-                        .getAnnotation(INHERITANCE);
-                if (inheritance == null) {
-                    inheritance = getInheritanceAnnotation();
-                }
-                if (inheritance != null) {
-                    final AnnotationAttributeValue<?> value = inheritance
-                            .getAttribute(new JavaSymbolName("strategy"));
-                    if (value instanceof EnumAttributeValue) {
-                        final EnumAttributeValue enumAttributeValue = (EnumAttributeValue) value;
-                        final EnumDetails details = enumAttributeValue
-                                .getValue();
-                        if (details != null
-                                && details.getType().equals(INHERITANCE_TYPE)) {
-                            if ("TABLE_PER_CLASS".equals(details.getField()
-                                    .getSymbolName())) {
-                                generationType = "TABLE";
+            // XXX DiSiD: No auto generated identifier when empty sequence name
+            if (!"".equals(annotationValues.getSequenceName())) {
+
+                String generationType = isGaeEnabled || isDatabaseDotComEnabled ? "IDENTITY"
+                        : "AUTO";
+
+                // ROO-746: Use @GeneratedValue(strategy = GenerationType.TABLE)
+                // if
+                // the root of the governor declares @Inheritance(strategy =
+                // InheritanceType.TABLE_PER_CLASS)
+                if ("AUTO".equals(generationType)) {
+                    AnnotationMetadata inheritance = governorTypeDetails
+                            .getAnnotation(INHERITANCE);
+                    if (inheritance == null) {
+                        inheritance = getInheritanceAnnotation();
+                    }
+                    if (inheritance != null) {
+                        final AnnotationAttributeValue<?> value = inheritance
+                                .getAttribute(new JavaSymbolName("strategy"));
+                        if (value instanceof EnumAttributeValue) {
+                            final EnumAttributeValue enumAttributeValue = (EnumAttributeValue) value;
+                            final EnumDetails details = enumAttributeValue
+                                    .getValue();
+                            if (details != null
+                                    && details.getType().equals(
+                                            INHERITANCE_TYPE)) {
+                                if ("TABLE_PER_CLASS".equals(details.getField()
+                                        .getSymbolName())) {
+                                    generationType = "TABLE";
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            final AnnotationMetadataBuilder generatedValueBuilder = new AnnotationMetadataBuilder(
-                    GENERATED_VALUE);
-            generatedValueBuilder.addEnumAttribute("strategy", new EnumDetails(
-                    GENERATION_TYPE, new JavaSymbolName(generationType)));
+                final AnnotationMetadataBuilder generatedValueBuilder = new AnnotationMetadataBuilder(
+                        GENERATED_VALUE);
+                generatedValueBuilder.addEnumAttribute("strategy",
+                        new EnumDetails(GENERATION_TYPE, new JavaSymbolName(
+                                generationType)));
 
-            if (StringUtils.isNotBlank(annotationValues.getSequenceName())
-                    && !(isGaeEnabled || isDatabaseDotComEnabled)) {
-                final String sequenceKey = StringUtils.uncapitalize(destination
-                        .getSimpleTypeName()) + "Gen";
-                generatedValueBuilder.addStringAttribute("generator",
-                        sequenceKey);
-                final AnnotationMetadataBuilder sequenceGeneratorBuilder = new AnnotationMetadataBuilder(
-                        SEQUENCE_GENERATOR);
-                sequenceGeneratorBuilder
-                        .addStringAttribute("name", sequenceKey);
-                sequenceGeneratorBuilder.addStringAttribute("sequenceName",
-                        annotationValues.getSequenceName());
-                annotations.add(sequenceGeneratorBuilder);
+                if (StringUtils.isNotBlank(annotationValues.getSequenceName())
+                        && !(isGaeEnabled || isDatabaseDotComEnabled)) {
+                    final String sequenceKey = StringUtils
+                            .uncapitalize(destination.getSimpleTypeName())
+                            + "Gen";
+                    generatedValueBuilder.addStringAttribute("generator",
+                            sequenceKey);
+                    final AnnotationMetadataBuilder sequenceGeneratorBuilder = new AnnotationMetadataBuilder(
+                            SEQUENCE_GENERATOR);
+                    sequenceGeneratorBuilder.addStringAttribute("name",
+                            sequenceKey);
+                    sequenceGeneratorBuilder.addStringAttribute("sequenceName",
+                            annotationValues.getSequenceName());
+                    annotations.add(sequenceGeneratorBuilder);
+                }
+                annotations.add(generatedValueBuilder);
             }
-            annotations.add(generatedValueBuilder);
 
             final String identifierColumn = StringUtils
                     .stripToEmpty(getIdentifierColumn());

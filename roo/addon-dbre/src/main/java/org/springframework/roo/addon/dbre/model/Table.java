@@ -21,6 +21,8 @@ public class Table {
     private boolean includeNonPortableAttributes;
     // XXX DiSiD Disable version fields
     private boolean disableVersionFields;
+    // XXX DiSiD Disable generated identifiers
+    private boolean disableGeneratedIdentifiers;
     private final Set<Index> indices = new LinkedHashSet<Index>();
     private boolean joinTable;
     private final String name;
@@ -217,6 +219,10 @@ public class Table {
         return disableVersionFields;
     }
 
+    public boolean isDisableGeneratedIdentifiers() {
+        return disableGeneratedIdentifiers;
+    }
+
     public boolean isJoinTable() {
         return joinTable;
     }
@@ -238,6 +244,11 @@ public class Table {
         this.disableVersionFields = disableVersionFields;
     }
 
+    public void setDisableGeneratedIdentifiers(
+            final boolean disableGeneratedIdentifiers) {
+        this.disableGeneratedIdentifiers = disableGeneratedIdentifiers;
+    }
+
     public void setJoinTable(final boolean joinTable) {
         this.joinTable = joinTable;
     }
@@ -245,9 +256,10 @@ public class Table {
     @Override
     public String toString() {
         return String
-                .format("Table [name=%s, schema=%s, catalog=%s, description=%s, columns=%s, importedKeys=%s, exportedKeys=%s, indices=%s, includeNonPortableAttributes=%s, disableVersionFields=%s]",
+                .format("Table [name=%s, schema=%s, catalog=%s, description=%s, columns=%s, importedKeys=%s, exportedKeys=%s, indices=%s, includeNonPortableAttributes=%s, disableVersionFields=%s, disableGeneratedIdentifiers=%s]",
                         name, schema.getName(), catalog, description, columns,
                         importedKeys, exportedKeys, indices,
-                        includeNonPortableAttributes, disableVersionFields);
+                        includeNonPortableAttributes, disableVersionFields,
+                        disableGeneratedIdentifiers);
     }
 }

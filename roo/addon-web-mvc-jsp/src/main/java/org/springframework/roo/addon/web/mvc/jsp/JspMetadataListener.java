@@ -48,6 +48,7 @@ import org.springframework.roo.metadata.MetadataProvider;
 import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.JpaJavaType;
 import org.springframework.roo.model.RooJavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.project.LogicalPath;
@@ -308,6 +309,20 @@ public class JspMetadataListener implements MetadataProvider,
                                         .toLowerCase()), idField.getFieldName()
                                 .getReadableSymbolName());
             }
+        }
+
+        // XXX DiSiD: If no auto generated value for id, put name in i18n
+        if (javaTypePersistenceMetadataDetails.getIdentifierField()
+                .getAnnotation(JpaJavaType.GENERATED_VALUE) == null) {
+
+            properties.put(
+                    XmlUtils.convertId(resourceId
+                            + "."
+                            + javaTypePersistenceMetadataDetails
+                                    .getIdentifierField().getFieldName()
+                                    .getSymbolName().toLowerCase()),
+                    javaTypePersistenceMetadataDetails.getIdentifierField()
+                            .getFieldName().getReadableSymbolName());
         }
 
         for (final MethodMetadata method : memberDetails.getMethods()) {

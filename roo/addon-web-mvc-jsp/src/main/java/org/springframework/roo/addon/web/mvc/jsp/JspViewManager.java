@@ -45,6 +45,7 @@ import org.springframework.roo.classpath.details.annotations.AnnotationAttribute
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.model.JpaJavaType;
 import org.springframework.roo.support.util.DomUtils;
 import org.springframework.roo.support.util.XmlElementBuilder;
 import org.springframework.roo.support.util.XmlRoundTripUtils;
@@ -395,6 +396,14 @@ public class JspViewManager {
                     XmlUtils.convertId("c:"
                             + formBackingType.getFullyQualifiedTypeName() + "."
                             + field.getFieldName().getSymbolName()));
+
+            // XXX DiSiD: If identifier manual assignment, then required
+            if (formBackingTypePersistenceMetadata.getIdentifierField()
+                    .getFieldName().equals(field.getFieldName())
+                    && field.getAnnotation(JpaJavaType.GENERATED_VALUE) == null) {
+                fieldElement.setAttribute("required", "true");
+            }
+
             fieldElement.setAttribute("z",
                     XmlRoundTripUtils.calculateUniqueKeyFor(fieldElement));
 
@@ -475,6 +484,14 @@ public class JspViewManager {
             }
         }
         formFields.addAll(fieldCopy);
+
+        // XXX DiSiD: If identifier manual assignment, show it in creation
+        if (formBackingTypePersistenceMetadata.getIdentifierField()
+                .getAnnotation(JpaJavaType.GENERATED_VALUE) == null) {
+
+            formFields.add(formBackingTypePersistenceMetadata
+                    .getIdentifierField());
+        }
 
         createFieldsForCreateAndUpdate(formFields, document, formCreate, true);
         formCreate.setAttribute("z",

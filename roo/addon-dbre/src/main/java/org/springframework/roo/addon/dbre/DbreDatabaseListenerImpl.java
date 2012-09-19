@@ -75,6 +75,7 @@ public class DbreDatabaseListenerImpl extends
     private static final String PRIMARY_KEY_SUFFIX = "PK";
     private static final String VERSION = "version";
     private static final String VERSION_FIELD = "versionField";
+    private static final String SEQUENCE_NAME_FIELD = "sequenceName";
 
     @Reference private DbreModelService dbreModelService;
     @Reference private FileManager fileManager;
@@ -136,6 +137,9 @@ public class DbreDatabaseListenerImpl extends
 
         if (!hasVersionField(table)) {
             jpaAnnotationBuilder.addStringAttribute(VERSION_FIELD, "");
+        }
+        if (table.isDisableGeneratedIdentifiers()) {
+            jpaAnnotationBuilder.addStringAttribute(SEQUENCE_NAME_FIELD, "");
         }
 
         jpaAnnotationBuilder.addStringAttribute("table", table.getName());
@@ -615,6 +619,8 @@ public class DbreDatabaseListenerImpl extends
                             .isIncludeNonPortableAttributes());
                     table.setDisableVersionFields(database
                             .isDisableVersionFields());
+                    table.setDisableGeneratedIdentifiers(database
+                            .isDisableGeneratedIdentifiers());
                     newEntities.add(createNewManagedEntityFromTable(javaType,
                             table, database.isActiveRecord()));
                 }
@@ -674,6 +680,8 @@ public class DbreDatabaseListenerImpl extends
         table.setIncludeNonPortableAttributes(database
                 .isIncludeNonPortableAttributes());
         table.setDisableVersionFields(database.isDisableVersionFields());
+        table.setDisableGeneratedIdentifiers(database
+                .isDisableGeneratedIdentifiers());
 
         // Update the @RooJpaEntity/@RooJpaActiveRecord attributes
         final AnnotationMetadataBuilder jpaAnnotationBuilder = new AnnotationMetadataBuilder(
@@ -702,6 +710,28 @@ public class DbreDatabaseListenerImpl extends
                             .equals(versionFieldValue))) {
                 attributesToDeleteIfPresent.add(new JavaSymbolName(
                         VERSION_FIELD));
+            }
+        }
+
+        final AnnotationAttributeValue<?> sequenceNameFieldAttribute = jpaAnnotation
+                .getAttribute(new JavaSymbolName(SEQUENCE_NAME_FIELD));
+        if (sequenceNameFieldAttribute == null) {
+            if (!table.isDisableGeneratedIdentifiers()) {
+                attributesToDeleteIfPresent.add(new JavaSymbolName(
+                        SEQUENCE_NAME_FIELD));
+            }
+            else {
+                jpaAnnotationBuilder
+                        .addStringAttribute(SEQUENCE_NAME_FIELD, "");
+            }
+        }
+        else {
+            final String sequenceNameFieldValue = (String) sequenceNameFieldAttribute
+                    .getValue();
+            if (!table.isDisableGeneratedIdentifiers()
+                    && ("".equals(sequenceNameFieldValue))) {
+                attributesToDeleteIfPresent.add(new JavaSymbolName(
+                        SEQUENCE_NAME_FIELD));
             }
         }
 
