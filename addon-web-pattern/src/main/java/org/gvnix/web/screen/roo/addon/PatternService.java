@@ -20,8 +20,8 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.FieldMetadata;
@@ -45,172 +45,200 @@ public interface PatternService {
     /** {@link GvNIXPattern} java type */
     public static final JavaType PATTERN_ANNOTATION = new JavaType(GvNIXPattern.class.getName());
     
-    /** Name of {@link GvNIXPattern} attribute value */
-    public static final JavaSymbolName PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
-
     /** {@link GvNIXRelatedPattern} JavaType */
     public static final JavaType RELATED_PATTERN_ANNOTATION = new JavaType(GvNIXRelatedPattern.class.getName());
     
-    /** Name of {@link GvNIXRelatedPattern} attribute value */
-    public static final JavaSymbolName RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME = new JavaSymbolName("value");
-
     /** {@link GvNIXRelationsPattern} java type */
     public static final JavaType RELATIONSPATTERN_ANNOTATION = new JavaType(GvNIXRelationsPattern.class.getName());
     
-    /** Name of {@link GvNIXRelationsPattern} attribute value */
-    public static final JavaSymbolName RELATIONSPATTERN_ANNOTATION_VALUE = new JavaSymbolName("value");
-
     public static final JavaType ONETOMANY_ANNOTATION = new JavaType("javax.persistence.OneToMany");
     public static final JavaType MANYTOMANY_ANNOTATION = new JavaType("javax.persistence.ManyToMany");
+
 
     /**
      * Check if there is a pattern name used already in project.
      * 
-     * <p>Check if supplied pattern name exists and checks in all project if there is already repeated names.</p>
-     * 
-     * @param Pattern name (can be null)
-     * @return duplicated pattern found
+     * <p>Pattern names are get from {@link GvNIXPattern} annotation.</p>
+     *  
+     * @param patternName Pattern name to search
+     * @return Pattern name already used ?
      * 
      */
-    boolean isPatternDuplicated(String name);
+    boolean existsMasterPatternDefined(String patternName);
 
     /**
-     * Look at Entity for a One-to-many field by name
+     * Checks if there is repeated pattern names in project.
      * 
-     * @param entityJavaType
-     * @param fieldName
-     * @return
+     * <p>Pattern names are get from {@link GvNIXPattern} annotation.</p>
+     * 
+     * @return Duplicated pattern found ?
      */
-    public FieldMetadata getToManyFieldFromEntityJavaType(
-            JavaType entityJavaType, String fieldName);
+    boolean existsMasterPatternDuplicated();
 
     /**
-     * Returns the list of fields metadata of those fields annotated with
-     * OneToMany or ManyToMany
+     * Get used pattern names in project.
      * 
-     * @param formBakingObjectType
-     * @return
+     * <p>Pattern names are get from {@link GvNIXPattern} annotation.</p>
+     * 
+     * @return Pattern names.
      */
-    public List<FieldMetadata> getToManyFieldsFromEntityJavaType(
-            JavaType formBakingObjectType);
+    public List<String> getMasterPatternNames();
+
+    /**
+     * Get related patterns attributes of a controller java type.
+     *
+     * <p>Pattern attributes are get from {@link GvNIXRelatedPattern} annotation.</p>
+     * 
+     * @param controller Controller java type
+     * @return Related patterns attributes list
+     */
+    public List<StringAttributeValue> getControllerRelatedPatternsValueAttributes(JavaType controller);
     
     /**
-     * Gets controller's mutableType physical detail
+     * Get related patterns attributes of a entity java type related controller.
+     *
+     * <p>Pattern attributes are get from {@link GvNIXRelatedPattern} annotation.</p>
      * 
-     * <p>
-     * Also checks if <code>controllerClass</code> is really a controller
-     * (annotated with @RooWebScaffold using {@link Assert})
-     * </p>
-     * 
-     * @param controllerClass
-     * @return
+     * @param controller Controller java type
+     * @return Related patterns attributes list
      */
-    public ClassOrInterfaceTypeDetails getControllerMutableTypeDetails(JavaType controllerClass);
+	public List<StringAttributeValue> getEntityRelatedPatternsValueAttributes(JavaType entity);
+	
+    /**
+     * Get controller type details.
+     * 
+     * <p>Checks if <code>controller</code> is really a controller (annotated with {@link RooWebScaffold} using {@link Assert}).</p>
+     * 
+     * @param controller Controller java type
+     * @return Controller type details
+     */
+    public ClassOrInterfaceTypeDetails getControllerTypeDetails(JavaType controller);
     
     /**
-     * Get pattern attributes of a controller java type.
+     * Get master pattern attributes of a controller java type.
      * 
-     * <p>Get pattern attributes from @GvNIXPattern</p>
+     * <p>Pattern attributes are get from {@link GvNIXPattern} annotation.</p>
      * 
-     * @param controllerClass Controller java type
+     * @param controller Controller java type
      * @return Pattern attributes list
      */
-    public List<StringAttributeValue> getPatternAttributes(JavaType controllerClass);
+    public List<StringAttributeValue> getControllerMasterPattern(JavaType controller);
     
     /**
-     * Get related pattern attributes of a controller java type.
-     *
-     * <p>Get pattern attributes from @GvNIXRelatedPattern</p>
+     * Exists a master pattern name defined in a controller ?.
      * 
-     * @param controllerClass Controller java type
-     * @return Related pattern attributes list
-     */
-    public List<StringAttributeValue> getRelatedPatternAttributes(JavaType controllerClass);
-
-    /**
-     * Given a pattern name says if it exists defined as Master pattern in
-     * GvNIXPattern attributes
+     * <p>Pattern name is get from {@link GvNIXPattern} annotation.</p>
      * 
-     * @param patternValues Pattern annotation attributes
-     * @param name Pattern name
+     * @param controller Controller java type
+     * @param patternName Pattern name to search
      * @return true if exists
      */
-    public boolean patternExists(List<StringAttributeValue> patternValues, JavaSymbolName name);
+    public boolean existsControllerMasterPattern(JavaType controller, JavaSymbolName patternName);
     
     /**
-     * Get the type of a pattern name from attributes.
+     * Get the type of a master pattern name in a controller.
      * 
-     * @param patternValues
-     *            pattern attributes
-     * @param name
-     *            identifier to compare
-     * @return pattern type of pattern name from attributes
+     * <p>Pattern name is get from {@link GvNIXPattern} annotation.</p>
+     * 
+     * @param controller Controller java type
+     * @param patternName Pattern name
+     * @return Pattern type
      */
-    public String patternType(List<StringAttributeValue> patternValues, JavaSymbolName name);
+    public String getControllerMasterPatternType(JavaType controller, JavaSymbolName patternName);
+    
+    /**
+     * Get OneToMany or ManyToMany annotated field with some name from an entity.
+     * 
+     * @param entity Entity
+     * @param fieldName Field name
+     * @return Field metadata if field is annotated with OneToMany or ManyToMany annotations.
+     */
+    public FieldMetadata getEntityToManyField(JavaType entity, String fieldName);
 
     /**
-     * Given a pattern name says if it exists defined as Master pattern in
-     * GvNIXPattern attributes, return this pattern attribute
+     * Get the list of fields metadata of fields annotated with OneToMany or ManyToMany in a entity.
      * 
-     * @param patternValues Pattern annotation attributes
-     * @param name Pattern name
-     * @return Pattern attribute (i.e. name=type)
+     * @param entity Entity
+     * @return Field metadata with OneToMany or ManyToMany annotation in a entity.
      */
-    public String pattern(List<StringAttributeValue> patternValues, JavaSymbolName name);
+    public List<FieldMetadata> getEntityToManyFields(JavaType entity);
 
     /**
-     * Checks if pattern annotation attribute uses the very same identifier
-     * than <code>name</code>
+     * Exists a pattern of given {@link WebPatternType} defined in master pattern ?.
      * 
-     * @param value
-     *            pattern annotation value item
-     * @param name
-     *            identifier to compare
-     * @return true if pattern name exists in attributes
+     * @param patternType Pattern type
+     * @param relatedPattern Related patterns
+     * @return Exists a pattern in list with some type
      */
-    public boolean equalsPatternName(StringAttributeValue value, JavaSymbolName name);
+    public boolean existsRelatedPatternType(String patternType, List<StringAttributeValue> relatedPattern);
     
     /**
-     * Get pattern type with some name defined into attribute value.
+     * Get used pattern names in project.
      * 
-     * @param value
-     *            pattern annotation attribute value (i.e. name=type)
-     * @param name
-     *            pattern name to search
-     * @return type of pattern name from attribute value
+     * <p>Pattern names are get from {@link GvNIXRelatedPattern} annotation.</p>
+     * 
+     * @return Pattern names.
      */
-    public String patternType(String value, JavaSymbolName name);
-
-    /**
-     * Given the param relationsPatternValues it returns a Map where keys are
-     * the fieldName part and values are patternId=patternType. That is, for:<br/>
+    public List<String> getRelatedPatternNames();
+    
+	/**
+	 * Get related pattern names from a controller.
+	 * 
+     * <p>Patterns are get from {@link GvNIXRelatedPattern} annotation.</p>
+	 * 
+	 * @param controller Controller
+	 * @return Related pattern names
+	 */
+    public List<String> getControllerRelatedPatternNames(JavaType controller);
+    
+	/**
+	 * Get entity fields defined into relations pattern annotation on its related controller. 
+	 * 
+     * <p>Patterns are get from {@link GvNIXRelationsPattern} annotation.
+     * Returns empty set if not relations pattern annotation or null if no entity or controller.</p>
      * 
-     * relationsPatternValues = {"patternId: field1=tabular, field2=register"}
-     * it returns <br/>
-     * {field1 => "patternId=tabular", field2 => "patternId=register"}
-     * 
-     * @param relationsPatternValues
-     * @return
-     */
-    public Map<String, String> getFieldsPatternIdAndType(AnnotationAttributeValue<?> relationsPatternValues);
+	 * @param entity Entity java type
+	 * @return Relations pattern fields
+	 */
+    public List<String> getEntityRelationsPatternsFields(JavaType entity);
     
     /**
-     * If there is a pattern of given WebPatternType defined in GvNIXPattern it
-     * returns true, false otherwise
+     * Get controller fields defined into relations pattern annotation.
      * 
-     * @param patternType
-     * @param definedPatternsList
-     * @return
-     */
-    public boolean isPatternTypeDefined(WebPatternType patternType, List<String> definedPatternsList);
-    
-    /**
-     * Read the values of GvNIXRelationsPattern and for each field defined as relation retrieve its name.
+     * <p>Patterns are get from {@link GvNIXRelationsPattern} annotation.
+     * Returns empty set if not relations pattern annotation or null if no controller.</p>
      * 
      * @param controller Controller metadata
-     * @return Set with the defined relations field names or null if controller is not a valid web scaffold class or 
-     * empty set if not relations pattern annotation
+     * @return Relations pattern fields
      */
-    public Set<String> getRelationsFields(PhysicalTypeMetadata controller);
- 
+    public List<String> getControllerRelationsPatternsFields(PhysicalTypeMetadata controller);
+
+    /**
+     * Get a Map where keys is the field and value is the relations pattern for this field.<br/>
+     * 
+     * <p>Patterns are get from {@link GvNIXRelationsPattern} annotation.</p>
+     * 
+     * <code>
+     * For {"patternId: field1=tabular, field2=register"}
+     * it returns
+     * {field1 => "patternId=tabular", field2 => "patternId=register"}
+     * </code>
+     * 
+     * @param relationsPatternAttributes Relations pattern attributes
+     * @return Map with relations fields and patterns
+     */
+    public Map<String, String> getRelationsPatternFieldAndRelatedPattern(AnnotationAttributeValue<?> relationsPatternAttributes);
+    
+    /**
+     * Get the controller related with some entity.
+     * 
+     * <p>Related controller is a class with RooWebScaffold annotation with form backing object attribute that points to entity.
+     * Return null if not exists entity or related controller.</p>
+     * 
+     * TODO Can exists more than one controller related to an entity.
+     * 
+     * @param entity Entity to get it controller
+     * @return Controller type metadata
+     */
+    public PhysicalTypeMetadata getEntityController(JavaType entity);
 }

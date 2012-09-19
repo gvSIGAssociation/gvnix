@@ -161,10 +161,10 @@ public final class PatternMetadataProvider extends AbstractPatternMetadataProvid
         Validate.notNull(controllerTypeDetails, "Governor failed to provide class type details, in violation of superclass contract");
 
         // Check if there are pattern names used more than once in project
-        Validate.isTrue(!patternService.isPatternDuplicated(null), "There is a pattern name used more than once in the project");
+        Validate.isTrue(!patternService.existsMasterPatternDuplicated(), "There is a pattern name used more than once in the project");
 
         // Get pattern attributes of the controller
-        List<StringAttributeValue> patternList = patternService.getPatternAttributes(controllerType);
+        List<StringAttributeValue> patternList = patternService.getControllerMasterPattern(controllerType);
 
         // Lookup the form backing object's metadata and check that
         JavaType entity = webScaffoldAnnotationValues.getFormBackingObject();

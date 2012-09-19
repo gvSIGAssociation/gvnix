@@ -146,10 +146,11 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     	Validate.notNull(pattern, "pattern type is required");
 
         // Get mutableTypeDetails from controllerClass. Also checks javaType is a controller
-    	ClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerMutableTypeDetails(controllerClass);
+    	ClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerTypeDetails(controllerClass);
 
         // Check if there are pattern names used more than once in project
-        Validate.isTrue(!patternService.isPatternDuplicated(name.getSymbolName()),
+        Validate.isTrue(!patternService.existsMasterPatternDuplicated() &&
+        		!patternService.existsMasterPatternDefined(name.getSymbolName()),
         		"There is a pattern name used more than once in the project");
 
         // All checks passed OK
@@ -163,7 +164,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                         PATTERN_ANNOTATION);
 
         // Get pattern attributes of the controller
-        List<StringAttributeValue> patternList = patternService.getPatternAttributes(controllerClass);
+        List<StringAttributeValue> patternList = patternService.getControllerMasterPattern(controllerClass);
 
         // Build string parameter for the pattern
         String patternParameter = name.toString().concat("=").concat(pattern.toString());
@@ -214,13 +215,12 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         // Get mutableTypeDetails from controllerClass. Also checks javaType is
         // a controller
-        ClassOrInterfaceTypeDetails mutableTypeDetails = patternService.getControllerMutableTypeDetails(controllerClass);
+        ClassOrInterfaceTypeDetails mutableTypeDetails = patternService.getControllerTypeDetails(controllerClass);
 
-		List<StringAttributeValue> patternValues = patternService.getPatternAttributes(controllerClass);
 
         // Check if pattern name is already used as value of @GvNIXPattern
 		Validate.isTrue(
-        		patternService.patternExists(patternValues, name),
+        		patternService.existsControllerMasterPattern(controllerClass, name),
                 "Pattern name '".concat(name.getSymbolName())
                         .concat("' not found in values of ")
                         .concat(PATTERN_ANNOTATION.getSimpleTypeName())
@@ -229,6 +229,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
 
         // Check if user is setting Detail register
         // if so, this is not supported yet, so abort
+		List<StringAttributeValue> patternValues = patternService.getControllerMasterPattern(controllerClass);
         if (!patternValues.isEmpty() && type == WebPatternType.register) {
         	
             logger.warning("For pattern name '"
@@ -248,7 +249,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
                         ROOWEBSCAFFOLD_ANNOTATION_ATTR_VALUE_FORMBACKINGOBJECT)
                 .getValue();
         Validate.notNull(
-                patternService.getToManyFieldFromEntityJavaType(
+                patternService.getEntityToManyField(
                         formBackingObject, field.getSymbolName()),
                 "Field '".concat(field.getSymbolName())
                         .concat("' not found or is not *ToMany in '")
@@ -404,8 +405,8 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         }
 
         List<FieldMetadata> toManyFields = patternService
-                .getToManyFieldsFromEntityJavaType(formBakingObjectType);
-        Map<String, String> fieldsPatternIdAndType = patternService.getFieldsPatternIdAndType(relationsPatternValues);
+                .getEntityToManyFields(formBakingObjectType);
+        Map<String, String> fieldsPatternIdAndType = patternService.getRelationsPatternFieldAndRelatedPattern(relationsPatternValues);
         if (!fieldsPatternIdAndType.keySet().isEmpty()) {
             for (FieldMetadata field : toManyFields) {
                 if (fieldsPatternIdAndType.keySet().contains(
@@ -480,7 +481,7 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
     private void addOrUpdateGvNIXRelatedPatternToController(
             JavaType controllerClass, AnnotationMetadata annotation) {
 
-    	ClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerMutableTypeDetails(controllerClass);
+    	ClassOrInterfaceTypeDetails controllerDetails = patternService.getControllerTypeDetails(controllerClass);
 
         // Test if has the @RooWebScaffold
         Validate.notNull(
@@ -560,12 +561,8 @@ public class WebScreenOperationsImpl extends AbstractOperations implements
         }
         typeManagementService.createOrUpdateTypeOnDisk(mutableTypeDetailsBuilder.build());
 
-        List<String> definedPatternsList = new ArrayList<String>();
-        for (StringAttributeValue definedPattern : patternList) {
-            definedPatternsList.add(definedPattern.getValue());
-        }
-        if (patternService.isPatternTypeDefined(WebPatternType.tabular, definedPatternsList)
-        		|| patternService.isPatternTypeDefined(WebPatternType.tabular_edit_register, definedPatternsList)) {
+        if (patternService.existsRelatedPatternType(WebPatternType.tabular.name(), patternList)
+        		|| patternService.existsRelatedPatternType(WebPatternType.tabular_edit_register.name(), patternList)) {
             annotateTypeWithGvNIXEntityBatch(getFormBakingObject(controllerDetails));
         }
     }

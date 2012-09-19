@@ -20,7 +20,6 @@ package org.gvnix.web.screen.roo.addon;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +28,9 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.WebScaffoldAnnotationValues;
+import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
@@ -40,8 +41,11 @@ import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
+import org.springframework.roo.metadata.MetadataService;
 import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
+import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.Path;
 
 /**
  * Provide common services to Screen Pattern management components. 
@@ -59,76 +63,184 @@ import org.springframework.roo.model.JavaType;
 @Service
 public class PatternServicesImpl implements PatternService {
 
+    @Reference private MetadataService metadataService;
     @Reference private MemberDetailsScanner memberDetailsScanner;
     @Reference private TypeLocationService typeLocationService;
 
     /** {@inheritDoc} */
-    public boolean isPatternDuplicated(String name) {
+    public boolean existsMasterPatternDefined(String patternName) {
     	
-        List<String> definedPatterns = new ArrayList<String>();
-        AnnotationMetadata patternAnnotation = null;
-        for (ClassOrInterfaceTypeDetails patternAnnotationClass : typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(
-        		PATTERN_ANNOTATION)) {
+        // Get all pattern names
+    	if (patternName != null) {
+	        for (String tmpPatternName : getMasterPatternNames()) {
+	        	if (patternName.equals(tmpPatternName)) {
+	        		
+	        		// Supplied name already exists in project
+	        		return true;
+	        	}
+	        }
+    	}
+        
+        return false;
+    }
+    
+    /** {@inheritDoc} */
+    public boolean existsMasterPatternDuplicated() {
+    	
+        List<String> patternNames = new ArrayList<String>();
+        
+        // Get all master pattern names
+        for (String tmpPatternName : getMasterPatternNames()) {
         	
-            patternAnnotation = MemberFindingUtils.getAnnotationOfType(
-            		patternAnnotationClass.getAnnotations(), PATTERN_ANNOTATION);
-            if (patternAnnotation != null) {
+            if (patternNames.contains(tmpPatternName)) {
             	
-                AnnotationAttributeValue<?> patternAnnotationValue = patternAnnotation.getAttribute(
-                		PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-                for (String patternName : getPatternNames(patternAnnotationValue)) {
-                	
-                	if (name != null && name.equals(patternName)) {
-                		
-                		// Supplied name already exists in project
-                		return true;
-                	}
-                    if (definedPatterns.contains(patternName)) {
-                    	
-                    	// There is already duplicated pattern names in project 
-                        return true;
-                        
-                    } else {
-                    	
-                    	// No duplicated
-                        definedPatterns.add(patternName);
-                    }
-                }
+            	// There is already duplicated pattern names in project 
+                return true;
+                
+            } else {
+            	
+            	// No duplicated
+                patternNames.add(tmpPatternName);
             }
         }
         
         return false;
     }
 
-    protected List<String> getPatternNames(AnnotationAttributeValue<?> values) {
+    /** {@inheritDoc} */
+    public List<String> getMasterPatternNames() {
     	
         List<String> patternNames = new ArrayList<String>();
-        if (values != null) {
-        	
-            @SuppressWarnings("unchecked")
-            List<StringAttributeValue> attrValues = (List<StringAttributeValue>) values.getValue();
+        
+        for (ClassOrInterfaceTypeDetails typeDetails : typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(PATTERN_ANNOTATION)) {
 
-            if (attrValues != null) {
-            	
-                String[] pattern = {};
-                for (StringAttributeValue strAttrValue : attrValues) {
-                	
-                    pattern = strAttrValue.getValue().split("=");
-                    patternNames.add(pattern[0]);
-                }
-            }
+        	patternNames.addAll(getMasterPatternsNames(typeDetails));
         }
         
         return patternNames;
     }
 
+	/**
+	 * Get master patterns names defined into a controller.
+	 * 
+	 * @param controller Controller type details
+	 * @return Master patterns list names
+	 */
+	protected List<String> getMasterPatternsNames(ClassOrInterfaceTypeDetails controller) {
+		
+        List<String> patternNames = new ArrayList<String>();
+
+		// { "PatternName1=tabular", "PatternName2=register", "PatternName3=tabular_edit_register" }
+		List<StringAttributeValue> patternAttributes = getAnnotationValueStringAttributes(controller, WebScreenOperationsImpl.PATTERN_ANNOTATION);
+		for (StringAttributeValue tmpPatternAttribute : patternAttributes) {
+			
+		    patternNames.add(getMasterPatternName(tmpPatternAttribute));
+		}
+		
+		return patternNames;
+	}
+
+	/**
+	 * Get master pattern name defined into a master pattern attribute.
+	 * 
+	 * @param patternAttribute Master pattern attribute
+	 * @return Master pattern name
+	 */
+	protected String getMasterPatternName(StringAttributeValue patternAttribute) {
+		
+		// "PatternName1: tabular"
+		String patternValue = patternAttribute.getValue();
+		String[] patternName = patternValue.split("=");
+		
+		// "PatternName1"
+		return patternName[0];
+	}
+
+    /**
+     * Get string attributes of a annotation from a type details.
+     *  
+     * @param typeDetails Type details
+     * @param annotation Annotation java type
+     * @return Type details annotation string attributes
+     */
+	protected List<StringAttributeValue> getAnnotationValueStringAttributes(ClassOrInterfaceTypeDetails typeDetails, JavaType annotation) {
+		
+        List<StringAttributeValue> patternAttributes = new ArrayList<StringAttributeValue>();
+
+        AnnotationMetadata patternAnnotation = MemberFindingUtils.getAnnotationOfType(typeDetails.getAnnotations(), annotation);
+        if (patternAnnotation != null) {
+
+	        // look for pattern name in @GvNIXPattern values
+	        AnnotationAttributeValue<?> patternValues = patternAnnotation.getAttribute("value");
+	        if (patternValues != null) {
+	        
+	        	@SuppressWarnings("unchecked")
+	        	List<StringAttributeValue> patternValue = (List<StringAttributeValue>)patternValues.getValue();
+	        	patternAttributes.addAll(patternValue);
+	        }
+        }
+        
+		return patternAttributes;
+	}
+
     /** {@inheritDoc} */
-    public FieldMetadata getToManyFieldFromEntityJavaType(JavaType formBakingObjectType, String fieldName) {
+	public List<StringAttributeValue> getControllerRelatedPatternsValueAttributes(JavaType controller) {
+
+		return getControllerAnnotationValueAttributes(controller, WebScreenOperationsImpl.RELATED_PATTERN_ANNOTATION);
+	}
+	
+    /** {@inheritDoc} */
+	public List<StringAttributeValue> getEntityRelatedPatternsValueAttributes(JavaType entity) {
+
+		PhysicalTypeMetadata controller = getEntityController(entity);
+		return getControllerAnnotationValueAttributes(controller.getType(), WebScreenOperationsImpl.RELATED_PATTERN_ANNOTATION);
+	}
+
+    /**
+     * Get string attributes of a annotation from a java type.
+     *  
+     * @param controller Java type
+     * @param annotation Annotation java type
+     * @return Java type annotation string attributes
+     */
+	protected List<StringAttributeValue> getControllerAnnotationValueAttributes(JavaType controller, JavaType annotation) {
+		
+		// Get @GvNIXPattern annotation from controller
+        ClassOrInterfaceTypeDetails controllerDetails = getControllerTypeDetails(controller);
+        return getAnnotationValueStringAttributes(controllerDetails, annotation);
+	}
+
+    /** {@inheritDoc} */
+    public ClassOrInterfaceTypeDetails getControllerTypeDetails(JavaType controller) {
     	
-        List<FieldMetadata> toManyFields = getToManyFieldsFromEntityJavaType(formBakingObjectType);
-        for (FieldMetadata field : toManyFields) {
-            if (field.getFieldName().getSymbolName().equals(fieldName)) {
-                return field;
+    	ClassOrInterfaceTypeDetails controllerDetails = typeLocationService.getTypeDetails(controller);
+        
+        // Test if has the @RooWebScaffold
+        Validate.notNull(
+        		MemberFindingUtils.getAnnotationOfType(controllerDetails.getAnnotations(), WebScreenOperationsImpl.ROOWEBSCAFFOLD_ANNOTATION),
+                controller.getSimpleTypeName().concat(" has not @RooWebScaffold annotation"));
+        
+        return controllerDetails;
+    }
+
+    /**
+     * Given a pattern name says if it exists defined as Master pattern in
+     * GvNIXPattern attributes, return this pattern attribute
+     * 
+     * @param patternAttributes Pattern annotation attributes
+     * @param patternName Pattern name
+     * @return Pattern attribute (i.e. name=type)
+     */
+    protected String getControllerMasterPattern(JavaType controller, JavaSymbolName patternName) {
+    	
+        List<StringAttributeValue> patternAttributes = getControllerMasterPattern(controller);
+        for (StringAttributeValue patternAttribute : patternAttributes) {
+        	
+            // Check if pattern has defined pattern name
+        	String pattern = patternAttribute.getValue();
+            if (existsMasterPatternName(pattern, patternName)) {
+            	
+                return pattern;
             }
         }
         
@@ -136,28 +248,83 @@ public class PatternServicesImpl implements PatternService {
     }
 
     /** {@inheritDoc} */
-    public List<FieldMetadata> getToManyFieldsFromEntityJavaType(
-            JavaType formBakingObjectType) {
+	public List<StringAttributeValue> getControllerMasterPattern(JavaType controller) {
+
+		return getControllerAnnotationValueAttributes(controller, WebScreenOperationsImpl.PATTERN_ANNOTATION);
+	}
+
+    /**
+     * Get the pattern type with some name from pattern value.
+     * 
+     * <p>If pattern has not defined pattern name, return null.</p>
+     * 
+     * @param pattern
+     *            pattern annotation attribute value (i.e. name=type)
+     * @param patternName
+     *            pattern name (i.e. name) to search
+     * @return Pattern type (i.e. type) or null if distinct name
+     */
+    protected boolean existsMasterPatternName(String pattern, JavaSymbolName patternName) {
+    	
+        String current = pattern.replace(" ", "");
+        String patternPrefix = patternName.getSymbolName().concat("=");
+        if (current.startsWith(patternPrefix)) {
+        
+        	return true;
+        }
+        
+        return false;
+    }
+
+	/** {@inheritDoc} */
+    public boolean existsControllerMasterPattern(JavaType controller, JavaSymbolName patternName) {
+    	
+    	return getControllerMasterPattern(controller, patternName) == null ? false : true;
+    }
+
+    /** {@inheritDoc} */
+    public String getControllerMasterPatternType(JavaType controller, JavaSymbolName patternName) {
+    	
+        String pattern = getControllerMasterPattern(controller, patternName);
+        if (existsMasterPatternName(pattern, patternName)) {
+            
+            String current = pattern.replace(" ", "");
+            String patternPrefix = patternName.getSymbolName().concat("=");
+        	return current.substring(patternPrefix.length(), current.length());
+        }
+        
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public FieldMetadata getEntityToManyField(JavaType entity, String fieldName) {
+    	
+        List<FieldMetadata> toManyFields = getEntityToManyFields(entity);
+        for (FieldMetadata toManyField : toManyFields) {
+            if (toManyField.getFieldName().getSymbolName().equals(fieldName)) {
+                return toManyField;
+            }
+        }
+        
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    public List<FieldMetadata> getEntityToManyFields(JavaType entity) {
     	
         List<FieldMetadata> toManyFields = new ArrayList<FieldMetadata>();
-        ClassOrInterfaceTypeDetails formBackingTypeMetadata = typeLocationService.getTypeDetails(formBakingObjectType);
+        
+        ClassOrInterfaceTypeDetails entityTypeDetails = typeLocationService.getTypeDetails(entity);
+        Validate.notNull(entityTypeDetails, "Cannot locate Metadata for '".concat(entity.getFullyQualifiedTypeName()).concat("'."));
+        MemberDetails entityMemberDetails = memberDetailsScanner.getMemberDetails(getClass().getName(), entityTypeDetails);
+        List<FieldMetadata> entityFields = entityMemberDetails.getFields();
 
-        MemberDetails memberDetails = memberDetailsScanner.getMemberDetails(
-                getClass().getName(), formBackingTypeMetadata);
-
-        List<FieldMetadata> fields = memberDetails
-                .getFields();
-
-        Validate.notNull(formBackingTypeMetadata, "Cannot locate Metadata for '"
-                .concat(formBakingObjectType.getFullyQualifiedTypeName())
-                .concat("'."));
-
-        for (FieldMetadata field : fields) {
-            for (AnnotationMetadata fieldAnnotation : field.getAnnotations()) {
-                if (fieldAnnotation.getAnnotationType().equals(
-                        ONETOMANY_ANNOTATION) || fieldAnnotation.getAnnotationType().equals(
-                                MANYTOMANY_ANNOTATION)) {
-                    toManyFields.add(field);
+        for (FieldMetadata entityField : entityFields) {
+            for (AnnotationMetadata entityFieldAnnotation : entityField.getAnnotations()) {
+                if (entityFieldAnnotation.getAnnotationType().equals(ONETOMANY_ANNOTATION)
+                		|| entityFieldAnnotation.getAnnotationType().equals(MANYTOMANY_ANNOTATION)) {
+                	
+                    toManyFields.add(entityField);
                 }
             }
         }
@@ -166,155 +333,229 @@ public class PatternServicesImpl implements PatternService {
     }
 
     /** {@inheritDoc} */
-    public ClassOrInterfaceTypeDetails getControllerMutableTypeDetails(
-            JavaType controllerClass) {
+    public boolean existsRelatedPatternType(String patternType, List<StringAttributeValue> relatedPattern) {
     	
-    	ClassOrInterfaceTypeDetails mutableTypeDetails = typeLocationService.getTypeDetails(
-        		controllerClass);
-        
-        // Test if has the @RooWebScaffold
-        Validate.notNull(
-                MemberFindingUtils.getAnnotationOfType(
-                        mutableTypeDetails.getAnnotations(),
-                        WebScreenOperationsImpl.ROOWEBSCAFFOLD_ANNOTATION),
-                controllerClass.getSimpleTypeName().concat(
-                        " has not @RooWebScaffold annotation"));
-        
-        return mutableTypeDetails;
-    }
-
-    /** {@inheritDoc} */
-	public List<StringAttributeValue> getPatternAttributes(JavaType controllerClass) {
-		
-        List<StringAttributeValue> patternValues = new ArrayList<StringAttributeValue>();
-
-		// Get @GvNIXPattern annotation from controller
-        ClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
-        AnnotationMetadata patternAnnotationMetadata = MemberFindingUtils.getAnnotationOfType(
-        		mutableTypeDetails.getAnnotations(), WebScreenOperationsImpl.PATTERN_ANNOTATION);
-        if (patternAnnotationMetadata != null) {
-
-	        // look for pattern name in @GvNIXPattern values
-	        AnnotationAttributeValue<?> patternAnnotationValues = patternAnnotationMetadata
-	                .getAttribute(WebScreenOperationsImpl.PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-	        
-	        if (patternAnnotationValues != null) {
-	        
-	        	@SuppressWarnings("unchecked")
-	        	List<StringAttributeValue> values = (List<StringAttributeValue>)patternAnnotationValues.getValue();
-	        	patternValues.addAll(values);
-	        }
-        }
-        
-		return patternValues;
-	}
-	
-    /** {@inheritDoc} */
-	public List<StringAttributeValue> getRelatedPatternAttributes(JavaType controllerClass) {
-		
-        List<StringAttributeValue> patternValues = new ArrayList<StringAttributeValue>();
-
-		// Get @GvNIXPattern annotation from controller
-        ClassOrInterfaceTypeDetails mutableTypeDetails = getControllerMutableTypeDetails(controllerClass);
-        AnnotationMetadata patternAnnotationMetadata = MemberFindingUtils.getAnnotationOfType(
-        		mutableTypeDetails.getAnnotations(), WebScreenOperationsImpl.RELATED_PATTERN_ANNOTATION);
-        if (patternAnnotationMetadata != null) {
-
-	        // look for pattern name in @GvNIXPattern values
-	        AnnotationAttributeValue<?> patternAnnotationValues = patternAnnotationMetadata
-	                .getAttribute(WebScreenOperationsImpl.RELATED_PATTERN_ANNOTATION_ATTR_VALUE_NAME);
-	        
-	        if (patternAnnotationValues != null) {
-	        
-	        	@SuppressWarnings("unchecked")
-	        	List<StringAttributeValue> values = (List<StringAttributeValue>)patternAnnotationValues.getValue();
-	        	patternValues.addAll(values);
-	        }
-        }
-        
-		return patternValues;
-	}
-
-	/** {@inheritDoc} */
-    public boolean patternExists(List<StringAttributeValue> patternValues, JavaSymbolName name) {
-    	
-        if (pattern(patternValues, name) == null) {
-        	return false;
-        }
-        else {
-        	return true;
-        }
-    }
-
-    /** {@inheritDoc} */
-    public String patternType(List<StringAttributeValue> patternValues, JavaSymbolName name) {
-    	
-        String pattern = pattern(patternValues, name);
-        return patternType(pattern, name);
-    }
-   
-    /** {@inheritDoc} */
-    public String pattern(List<StringAttributeValue> patternValues, JavaSymbolName name) {
-    	
-        for (StringAttributeValue value : patternValues) {
-            // Check if name is already used
-            if (equalsPatternName(value, name)) {
-                return value.getValue();
+        for (StringAttributeValue relatedPatternAttribute : relatedPattern) {
+        	
+            if (getRelatedPatternType(relatedPatternAttribute).equalsIgnoreCase(patternType)) {
+            	
+                return true;
             }
-        }
-        
-        return null;
-    }
-     
-    /** {@inheritDoc} */
-    public boolean equalsPatternName(StringAttributeValue value, JavaSymbolName name) {
-    	
-        if (patternType(value.getValue(), name) != null) {
-        	return true;
         }
         
         return false;
     }
-
+    
     /** {@inheritDoc} */
-    public String patternType(String value, JavaSymbolName name) {
+    public List<String> getRelatedPatternNames() {
     	
-        String current = value.replace(" ", "");
-        String patternName = name.getSymbolName().concat("=");
-        if (current.startsWith(patternName)) {
+        List<String> patternNames = new ArrayList<String>();
         
-        	return current.substring(patternName.length(), current.length());
+        for (ClassOrInterfaceTypeDetails typeDetails : typeLocationService.findClassesOrInterfaceDetailsWithAnnotation(RELATED_PATTERN_ANNOTATION)) {
+
+        	patternNames.addAll(getControllerRelatedPatternNames(typeDetails.getType()));
         }
         
-        return null;
+        return patternNames;
+    }
+    
+    /** {@inheritDoc} */
+    public List<String> getControllerRelatedPatternNames(JavaType controller) {
+    	
+		return getRelatedPatternNames(getControllerAnnotationValueAttributes(controller, WebScreenOperationsImpl.RELATED_PATTERN_ANNOTATION));
+    }
+    
+	/**
+	 * Get relateds pattern types from a controller.
+	 * 
+     * <p>Patterns are get from {@link GvNIXRelatedPattern} annotation.</p>
+	 * 
+	 * @param controller Controller
+	 * @return Related pattern types
+	 */
+    public List<String> getControllerRelatedPatternTypes(JavaType controller) {
+    	
+		return getRelatedPatternTypes(getControllerAnnotationValueAttributes(controller, WebScreenOperationsImpl.RELATED_PATTERN_ANNOTATION));
+    }
+
+    
+	/**
+	 * Get related pattern names from related patterns attributes.
+	 * 
+	 * @param relatedPattern Related pattern attributes
+	 * @return Related pattern names
+	 */
+    protected List<String> getRelatedPatternNames(List<StringAttributeValue> relatedPattern) {
+    	
+        List<String> names = new ArrayList<String>();
+
+    	for (StringAttributeValue relatedAttribute : relatedPattern) {
+			
+    		names.add(getRelatedPatternName(relatedAttribute));
+		}
+    	
+    	return names;
+    }
+    
+	/**
+	 * Get relateds patterns types from related pattern attributes.
+	 * 
+	 * @param relatedPattern Relateds patterns attributes
+	 * @return Relateds patterns types
+	 */
+    protected List<String> getRelatedPatternTypes(List<StringAttributeValue> relatedPattern) {
+    	
+        List<String> names = new ArrayList<String>();
+
+    	for (StringAttributeValue relatedPatternAttribute : relatedPattern) {
+			
+    		names.add(getRelatedPatternType(relatedPatternAttribute));
+		}
+    	
+    	return names;
+    }
+
+	/**
+	 * Get related pattern type from a related pattern attribute.
+	 * 
+	 * @param relatedPattern Related pattern attribute
+	 * @return Related pattern type
+	 */
+    protected String getRelatedPatternType(StringAttributeValue relatedPattern) {
+    	
+		// For "PatternName1=register"
+		// Obtains "register"
+		return relatedPattern.getValue().split("=")[1];
+    }
+   
+	/**
+	 * Get related pattern name from a related pattern attribute.
+	 * 
+	 * @param relatedPattern Related pattern attribute
+	 * @return Related pattern name
+	 */
+    protected String getRelatedPatternName(StringAttributeValue relatedPattern) {
+    	
+		// For "PatternName1=register"
+		// Obtains "PatternName1"
+		return relatedPattern.getValue().split("=")[0];
     }
 
     /** {@inheritDoc} */
-    public Map<String, String> getFieldsPatternIdAndType(AnnotationAttributeValue<?> relationsPatternValues) {
+	public List<String> getEntityRelationsPatternsFields(JavaType entity) {
+		
+		return getControllerRelationsPatternsFields(getEntityController(entity));
+	}
+
+    /** {@inheritDoc} */
+    public List<String> getControllerRelationsPatternsFields(PhysicalTypeMetadata controller) {
     	
-    	// TODO Unify with other methods here ?
+    	// Must be a valid web scaffold controller 
+        WebScaffoldAnnotationValues webScaffold = new WebScaffoldAnnotationValues(controller);
+        if (!webScaffold.isAnnotationFound() || webScaffold.getFormBackingObject() == null || controller.getMemberHoldingTypeDetails() == null) {
+        	
+            return null;
+        }
+
+        ClassOrInterfaceTypeDetails controllerType = (ClassOrInterfaceTypeDetails) controller.getMemberHoldingTypeDetails();
+        Validate.notNull(controllerType, "Governor failed to provide class type details, in violation of superclass contract");
+        
+        List<String> fields = new ArrayList<String>();
+
+        // Retrieve the fields defined as relationships in GvNIXRelationsPattern
+        AnnotationMetadata relationsAnnotation = MemberFindingUtils.getAnnotationOfType(controllerType.getAnnotations(), RELATIONSPATTERN_ANNOTATION);
+        if (relationsAnnotation != null) {
+        	
+            AnnotationAttributeValue<?> relationsAttribute = relationsAnnotation.getAttribute(new JavaSymbolName("value"));
+            if (relationsAttribute != null) {
+                
+                fields.addAll(getRelationsPatternFields(relationsAttribute));
+            }
+        }
+
+        return fields;
+    }
+    
+	/**
+	 * Get relations pattern fields defined into a relations pattern attribute.
+	 * 
+	 * @param relationsPattern Relations pattern attribute
+	 * @return Relations pattern fields
+	 */
+	protected List<String> getRelationsPatternFields(AnnotationAttributeValue<?> relationsPattern) {
+		
+        List<String> fields = new ArrayList<String>();
+
+        // For { "PatternName1: field1=tabular, field2=register", "PatternName2: field3=tabular_edit_register" }
+        // Obtains "field1", "field2" and "field3" 
+
+		@SuppressWarnings("unchecked")
+		List<StringAttributeValue> relations = (List<StringAttributeValue>) relationsPattern.getValue();
+		for (StringAttributeValue relation : relations) {
+			
+			fields.addAll(getRelationsPatternFields(relation));
+		}
+		
+		return fields;
+	}
+
+	/**
+	 * Get relations pattern fields defined into a relations pattern attribute.
+	 * 
+	 * @param relationsAttributes Relations pattern attribute
+	 * @return Relations pattern fields
+	 */
+	protected List<String> getRelationsPatternFields(StringAttributeValue relationsPattern) {
+		
+        List<String> fields = new ArrayList<String>();
+
+		// For "PatternName1: field1=tabular, field2=register"
+		// Obtains "field1" and "field2"
+		String[] patternsDefinition = relationsPattern.getValue().split(":");
+		String[] fieldsDefinition = patternsDefinition[1].trim().split(",");
+		for (String fieldDefinition : fieldsDefinition) {
+			
+			fields.add(fieldDefinition.trim().split("=")[0]);
+		}
+		
+		return fields;
+	}
+
+	/**
+	 * Get relations pattern name defined into a relations pattern attribute.
+	 * 
+	 * @param relationsAttributes Relations pattern attribute
+	 * @return Relations pattern name
+	 */
+	protected String getRelationsPatternName(StringAttributeValue relationsPattern) {
+		
+		// For "PatternName1: field1=tabular, field2=register"
+		// Obtains "PatternName1"
+		return relationsPattern.getValue().split(":")[0].trim();
+	}
+
+    /** {@inheritDoc} */
+    public Map<String, String> getRelationsPatternFieldAndRelatedPattern(AnnotationAttributeValue<?> relationsPattern) {
     	
         Map<String, String> fieldsPatternIdAndType = new HashMap<String, String>();
         
-        // Parse annotationValues finding the field interesting part
+        // For { "PatternName1: field1=tabular, field2=register", "PatternName2: field3=tabular_edit_register" }
+        // Obtains "field1"="PatternName1=tabular", "field2"="PatternName1=register" and "field3"="PatternName2=tabular_edit_register" 
+
         @SuppressWarnings("unchecked")
-        List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPatternValues.getValue();
+        List<StringAttributeValue> relationsPatternList = (List<StringAttributeValue>) relationsPattern.getValue();
         if (relationsPatternList != null) {
         	
-            String[] patternDef = {};
-            String[] fieldDefinitions = {};
-            String[] fieldPatternType = {};
-            
             for (StringAttributeValue strAttrValue : relationsPatternList) {
             	
-                patternDef = strAttrValue.getValue().split(":");
-                fieldDefinitions = patternDef[1].trim().split(",");
-                for (String fieldDef : fieldDefinitions) {
+            	String[] patternsDefinition = strAttrValue.getValue().split(":");
+            	String[] fieldsDefinition = patternsDefinition[1].trim().split(",");
+                for (String fieldDefinition : fieldsDefinition) {
                 	
-                    fieldPatternType = fieldDef.trim().split("=");
+                	String[] fieldPatternType = fieldDefinition.trim().split("=");
                     fieldsPatternIdAndType.put(
                     		fieldPatternType[0].trim(), 
-                    		patternDef[0].trim().concat("=").concat(fieldPatternType[1].trim()));
+                    		patternsDefinition[0].trim().concat("=").concat(fieldPatternType[1].trim()));
                 }
             }
         }
@@ -323,75 +564,23 @@ public class PatternServicesImpl implements PatternService {
     }
 
     /** {@inheritDoc} */
-    public boolean isPatternTypeDefined(WebPatternType patternType, List<String> definedPatternsList) {
-    	
-    	// TODO Unify with other methods here ?
-    	
-        for (String definedPattern : definedPatternsList) {
-        	
-            if (definedPattern.split("=")[1].equalsIgnoreCase(patternType.name())) {
-            	
-                return true;
-            }
-        }
-        
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    public Set<String> getRelationsFields(PhysicalTypeMetadata controller) {
-    	
-    	// Must be a valid web scaffold controller 
-        WebScaffoldAnnotationValues webScaffold = new WebScaffoldAnnotationValues(controller);
-        if (!webScaffold.isAnnotationFound() || webScaffold.getFormBackingObject() == null
-        		|| controller.getMemberHoldingTypeDetails() == null) {
-        	
-            return null;
-        }
-
-        ClassOrInterfaceTypeDetails controllerType = 
-        		(ClassOrInterfaceTypeDetails) controller.getMemberHoldingTypeDetails();
-        Validate.notNull(controllerType,
-                "Governor failed to provide class type details, in violation of superclass contract");
-        
-        Set<String> fields = new HashSet<String>();
-
-        // Retrieve the fields defined as relationships in GvNIXRelationsPattern
-        AnnotationMetadata relationsAnnotation = MemberFindingUtils.getAnnotationOfType(
-        		controllerType.getAnnotations(), RELATIONSPATTERN_ANNOTATION);
-        if (relationsAnnotation != null) {
-        	
-            AnnotationAttributeValue<?> relationsAttribute = relationsAnnotation.getAttribute(
-            		RELATIONSPATTERN_ANNOTATION_VALUE);
-            if (relationsAttribute != null) {
-
-                // From this relations pattern annotation example:
-                // { "PatternName1: field1=tabular, field2=register", "PatternName2: field3=tabular_edit_register" }
-                // Obtains "field1", "field2" and "field3" 
-                
-            	// Will store portions of relations pattern annotation values
-                String[] patternDefinition = {};
-                String[] fieldDefinition = {};
-                String[] fieldName = {};
-                
-                @SuppressWarnings("unchecked")
-                List<StringAttributeValue> relations = (List<StringAttributeValue>) relationsAttribute.getValue();
-                for (StringAttributeValue relation : relations) {
-                	
-                	// "PatternName1: field1=tabular, field2=register"
-                    patternDefinition = relation.getValue().split(":");
-                    fieldDefinition = patternDefinition[1].trim().split(",");
-                    for (String fieldDef : fieldDefinition) {
-                    	
-                    	// "field1=tabular"
-                        fieldName = fieldDef.trim().split("=");
-                        fields.add(fieldName[0]);
-                    }
-                }
-            }
-        }
-
-        return fields;
-    }
+	public PhysicalTypeMetadata getEntityController(JavaType entity) {
+		
+		// Master controller metadata is the unique controller with a form backing object of master entity type
+		PhysicalTypeMetadata controller = null;
+		
+		if (entity != null) {
+			Set<JavaType> controllers = typeLocationService.findTypesWithAnnotation(new JavaType(RooWebScaffold.class.getName()));
+			for (JavaType tmpComtroller : controllers) {
+				PhysicalTypeMetadata tmpControllerMetadata = (PhysicalTypeMetadata) metadataService.get(
+						PhysicalTypeIdentifier.createIdentifier(tmpComtroller, LogicalPath.getInstance(Path.SRC_MAIN_JAVA, "")));
+		        if (entity.equals(new WebScaffoldAnnotationValues(tmpControllerMetadata).getFormBackingObject())) {
+		        	controller = tmpControllerMetadata;
+		        }
+			}
+		}
+		
+		return controller;
+	}
 
 }

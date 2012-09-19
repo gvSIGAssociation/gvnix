@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -145,7 +144,7 @@ public abstract class AbstractPatternMetadataProvider extends AbstractMemberDisc
 			String mid, PhysicalTypeMetadata controller, JavaType entity, WebMetadataService webMetadataService) {
 		
 		// Fields name defined into relations pattern annotation
-        Set<String> relations = _patternService.getRelationsFields(controller);
+        List<String> relations = _patternService.getControllerRelationsPatternsFields(controller);
 
         // Get each relation java type from eligible scaffolding fields
         List<FieldMetadata> scaffoldFields = getScaffoldEligibleFields(entity, mid, webMetadataService);

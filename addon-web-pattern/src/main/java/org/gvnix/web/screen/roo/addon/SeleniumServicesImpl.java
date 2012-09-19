@@ -297,8 +297,7 @@ public class SeleniumServicesImpl implements SeleniumServices {
 		JavaType fieldType = getEntityFieldNameJavaType(fieldName, formBackingType);
 		List<FieldMetadata> parentFields = webMetadataService.getScaffoldEligibleFieldMetadata(formBackingType, getMemberDetails(formBackingType), null);
 
-        List<StringAttributeValue> attributes = patternService.getPatternAttributes(controller);
-        String patternType = patternService.patternType(attributes, new JavaSymbolName(name));
+        String patternType = patternService.getControllerMasterPatternType(controller, new JavaSymbolName(name));
         if (patternType.equalsIgnoreCase(WebPatternType.register.name()) && type.equals(WebPatternType.tabular)) {
         	
         	// Master register / detail tabular

@@ -166,10 +166,10 @@ public final class RelatedPatternMetadataProvider extends AbstractPatternMetadat
         Validate.notNull(controllerTypeDetails, "Governor failed to provide class type details, in violation of superclass contract");
 
         // Check if there are pattern names used more than once in project
-        Validate.isTrue(!patternService.isPatternDuplicated(null), "There is a pattern name used more than once in the project");
+        Validate.isTrue(!patternService.existsMasterPatternDuplicated(), "There is a pattern name used more than once in the project");
 
         // Get pattern attributes of the controller
-        List<StringAttributeValue> patternList = patternService.getRelatedPatternAttributes(controllerType);
+        List<StringAttributeValue> patternList = patternService.getControllerRelatedPatternsValueAttributes(controllerType);
 
         // Lookup the form backing object's metadata and check that
         JavaType entity = annotationValues.getFormBackingObject();
@@ -224,12 +224,15 @@ public final class RelatedPatternMetadataProvider extends AbstractPatternMetadat
         
         JavaTypeMetadataDetails masterEntityJavaDetails = relatedEntities.get(masterEntity);
         
+        // Get entity fields names defined into relations pattern annotation on its related controller
+		List<String> relationsFields = patternService.getEntityRelationsPatternsFields(masterEntity);
+		
 		// Get master entity details
 		MemberDetails masterEntityDetails = getMemberDetails(masterEntity);
 		
         // Pass dependencies required by the metadata in through its constructor
         return new RelatedPatternMetadata(mid, aspect, controllerMetadata, controllerDetails, webScaffoldMetadata, patternList,
-        		entityMetadata, entityDetails, masterEntityJavaDetails, masterEntityDetails, relatedEntities, relatedFields, 
+        		entityMetadata, entityDetails, masterEntityJavaDetails, masterEntityDetails, relationsFields, relatedEntities, relatedFields, 
         		relatedDates, entityDateTypes);
     }
 
