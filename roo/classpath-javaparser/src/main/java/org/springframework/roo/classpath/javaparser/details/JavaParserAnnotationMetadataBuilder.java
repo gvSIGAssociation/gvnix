@@ -229,9 +229,11 @@ public class JavaParserAnnotationMetadataBuilder implements
             final AnnotationAttributeValue<?> value) {
         if (value instanceof NestedAnnotationAttributeValue) {
             final NestedAnnotationAttributeValue castValue = (NestedAnnotationAttributeValue) value;
-            Validate.isInstanceOf(JavaParserAnnotationMetadataBuilder.class,
-                    castValue.getValue(),
-                    "Cannot present nested annotations unless created by this class");
+            // XXX DiSiD: Continue execution, if not class will not be managed
+            // http://projects.disid.com/issues/7471
+            // Validate.isInstanceOf(JavaParserAnnotationMetadataBuilder.class,
+            // castValue.getValue(),
+            // "Cannot present nested annotations unless created by this class");
             AnnotationExpr annotationExpr;
             final AnnotationMetadata nestedAnnotation = castValue.getValue();
             if (castValue.getValue().getAttributeNames().size() == 0) {
