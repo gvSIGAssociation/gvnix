@@ -227,13 +227,15 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
      * Currently it uses all the entity's properties that fulfill this
      * conditions:
      * <ol>
-     * <li>has accessor and muttator</li>
+     * <li>has accessor</li>
      * <li>no {@link javax.persistence.Version} annotated</li>
+     * <li>no {@link javax.persistence.EmbeddedId} annotated</li>
      * <li>no relationship</li>
      * <li>no transient</li>
      * <li></li>
      * </ol>
      * 
+     * TODO Include support for relationship and embeddedId
      * 
      * @return
      */
@@ -285,6 +287,12 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
                         if (MemberFindingUtils.getAnnotationOfType(field
                                 .getAnnotations(), new JavaType(
                                 "javax.persistence.ManyToOne")) != null) {
+                            continue;
+                        }
+                        
+                        if (MemberFindingUtils.getAnnotationOfType(field
+                                .getAnnotations(), new JavaType(
+                                "javax.persistence.EmbeddedId")) != null) {
                             continue;
                         }
 
