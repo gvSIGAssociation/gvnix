@@ -77,9 +77,6 @@ remote service import ws --class org.gvnix.test.service.layer.project.services.C
 // [CORRECT] Transport: HTTP, Operations: 179, Bindings: SOAP, Use: Encoded, Implementation: AXIS
 remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy12 --wsdl http://www.konakart.com/konakart/services/KKWebServiceEng?wsdl
 
-// [CORRECT] Transport: HTTP, Operations: 1, Bindings: SOAP, Use: Encoded, Implementation: JAX-RPC, Namespace: urn
-remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy14 --wsdl http://www.comp.rgu.ac.uk/QueryComputing/query?WSDL
-
 remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy17 --wsdl http://www.unifiedsoftware.co.uk/freeibanvalidate.wsdl
 
 // [CORRECT] Import WS from a non confident server
