@@ -1,0 +1,19 @@
+//project --topLevelPackage org.gvnix.petclinic.jsf
+
+/*
+  Note that the --equals attribute should be specified as true on the 
+  entity jpa command for all entities intended to be scaffolded with JSF.
+*/
+// script --file clinic_model.roo
+
+web jsf setup --implementation ORACLE_MOJARRA 
+/*
+  Other options:
+    --implementation APACHE_MYFACES
+    --library PRIMEFACES (UNIQUE AVAILABLE VALUE AT LEAST TILL ROO 1.2.2)
+    --theme (ONE OF THE 30 PRIMEFACES AVAILABLE THEMES)
+*/
+
+web jsf all --package ~.web
+
+logging setup --level INFO

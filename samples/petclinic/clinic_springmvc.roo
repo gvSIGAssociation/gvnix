@@ -1,0 +1,17 @@
+// project --topLevelPackage org.gvnix.petclinic.springmvc
+
+// script --file clinic_model.roo
+
+web mvc setup
+web mvc all --package ~.web
+web mvc finder all
+
+web mvc language --code de
+web mvc language --code es
+
+selenium test --controller ~.web.OwnerController
+selenium test --controller ~.web.PetController
+selenium test --controller ~.web.VetController
+selenium test --controller ~.web.VisitController
+
+logging setup --level INFO

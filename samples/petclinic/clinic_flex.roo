@@ -1,0 +1,50 @@
+jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
+
+entity jpa --class ~.domain.TheOwner --testAutomatically
+field string --fieldName firstName --sizeMin 3 --sizeMax 30
+field string --fieldName lastName --notNull --sizeMin 3 --sizeMax 30
+field string --fieldName address --notNull --sizeMax 50 --sizeMin 1
+field string --fieldName city --notNull --sizeMax 30
+field string --fieldName telephone --notNull
+field string --fieldName homePage --sizeMax 30
+field string --fieldName email --sizeMax 30 --sizeMin 6
+field date --fieldName birthDay --type java.util.Date --notNull
+
+entity jpa --class ~.domain.Pet --testAutomatically
+field boolean --fieldName sendReminders --notNull --primitive
+field string --fieldName name --notNull --sizeMin 1
+field number --fieldName weight --type java.lang.Float --notNull
+field reference --fieldName theOwner --type ~.domain.TheOwner
+field string --fieldName type --notNull --sizeMin 3 --sizeMax 30
+
+field set --class ~.domain.TheOwner --fieldName pets --type ~.domain.Pet --mappedBy theOwner --notNull false --cardinality ONE_TO_MANY
+
+entity jpa --class ~.domain.Vet --testAutomatically
+field string --fieldName firstName --sizeMin 3 --sizeMax 30 
+field string --fieldName lastName --notNull --sizeMin 3 --sizeMax 30
+field string --fieldName address --notNull --sizeMax 50 --sizeMin 1
+field string --fieldName city --notNull --sizeMax 30
+field string --fieldName telephone --notNull
+field string --fieldName homePage --sizeMax 30
+field string --fieldName email --sizeMax 30 --sizeMin 6
+field date --fieldName birthDay --type java.util.Date --notNull
+field date --fieldName employedSince --type java.util.Date --notNull --past
+field string --fieldName specialty --notNull false --sizeMin 3 --sizeMax 30
+
+entity jpa --class ~.domain.Visit --testAutomatically
+field string --fieldName description --sizeMax 255
+field date --fieldName visitDate --type java.util.Date --notNull --past
+field reference --fieldName pet --type ~.domain.Pet --notNull
+field reference --fieldName vet --type ~.domain.Vet
+
+finder add --finderName findPetsByNameAndWeight --class ~.domain.Pet
+finder add --finderName findPetsByTheOwner
+finder add --finderName findPetsBySendRemindersAndWeightLessThan
+finder add --finderName findPetsByTypeAndNameLike
+finder add --finderName findVisitsByDescriptionAndVisitDate --class ~.domain.Visit
+finder add --finderName findVisitsByVisitDateBetween
+finder add --finderName findVisitsByDescriptionLike
+
+flex setup
+flex remoting all --package ~.web
+
