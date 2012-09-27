@@ -1,0 +1,10 @@
+
+// Configuramos el soporte de informes de JasperReports
+web report setup
+
+// Creamos la base de un informe de pedidos
+web report add --controller ~.web.PedidoController --reportName informepedidos --format pdf,xls,html,csv
+
+// Visitamos la opción de menu: Pedidos > Pedido informepedido Report
+
+backup
