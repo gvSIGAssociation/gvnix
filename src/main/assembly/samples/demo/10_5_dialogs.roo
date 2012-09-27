@@ -2,6 +2,11 @@
 // Añadimos la funcionalidad de gestión de dialogos
 web mvc dialog setup
 
+// Configuramos diálogos para excepciones generales
+web mvc dialog exception add --exception java.lang.Exception --title "Ha ocurrido un error" --description "Se ha producido un error deconocido" --language es
+web mvc dialog exception set language --exception java.lang.Exception --title "Error" --description "Unknown error" --language en
+web mvc dialog exception set language --exception java.lang.Exception --title "Error" --description "S'ha produit un error desconegut." --language ca
+
 // Hacer un Maven > Update Project Configuration
 
 // Mostrar página de un patrón con lista de elementos vacía o simular de nuevo el error
