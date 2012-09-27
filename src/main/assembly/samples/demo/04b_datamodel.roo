@@ -1,0 +1,16 @@
+
+// SLIDE 4.B: Análisis y diseño del dominio - Ingeniería inversa
+ 
+// ATENCIÓN: Asegurarse de crear otro proyecto en STS
+// con Project name "tiendavirtual_datamodel" y Top level package name "org.gvnix.tiendavirtual"
+
+jpa setup --provider HIBERNATE --database POSTGRES
+
+// Configurar los valores de conexión con la base de datos existente 
+database properties set --key database.username --value tiendavirtual
+database properties set --key database.password --value tiendavirtual
+database properties set --key database.url --value jdbc:postgresql://127.0.0.1:5432/tiendavirtualDB
+
+database introspect --schema public
+
+database reverse engineer --schema public --package ~.domain --testAutomatically
