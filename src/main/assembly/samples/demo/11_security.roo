@@ -6,14 +6,16 @@
 // 1. Autenticación
 typicalsecurity setup
 
-// Hacer un Maven > Update Project Configuration
-
-// Acceder con el usuario admin/admin  
-
+// Permitir el acceso en el menú a las categorías de seguridad solo para el rol ADMIN
 menu entry roles --id c_user --roles ROLE_ADMIN
 menu entry roles --id c_userrole --roles ROLE_ADMIN
 menu entry roles --id c_cliente --roles ROLE_ADMIN
 menu entry roles --id c_role --roles ROLE_ADMIN
+
+// Hacer un Maven > Update Project Configuration
+// Reiniciar el servidor para que recarge el menu.xml
+
+// Acceder con el usuario admin/admin
 
 backup
 
