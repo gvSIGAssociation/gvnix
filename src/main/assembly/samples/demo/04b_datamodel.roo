@@ -17,8 +17,9 @@ database introspect --schema public
 addon install id --searchResultId 01
 
 // Realizar la ingeniería inversa: a partir de las tablas de base de datos
-// crear en el proyecto el modelo de entidades que lo representa  
-database reverse engineer --schema public --package ~.domain --testAutomatically
+// crear en el proyecto el modelo de entidades que lo representa. 
+// Se utiliza capa DAO en lugar de registro activo
+database reverse engineer --schema public --package ~.domain --testAutomatically --activeRecord false
 
 backup
 

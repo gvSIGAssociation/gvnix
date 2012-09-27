@@ -5,7 +5,7 @@
 jpa setup --provider HIBERNATE --database HYPERSONIC_PERSISTENT
 
 // Crear entidad Producto generando automáticamente sus tests de integración
-entity jpa --class ~.domain.Producto --testAutomatically
+entity jpa --class ~.domain.Producto --testAutomatically --equals
 
 // Añadir varios campos de tipo cadena al Producto con algunas características: no nulo, tamaño mínimo
 field string --fieldName identificador --notNull
@@ -34,7 +34,7 @@ field date --fieldName fin --type java.util.Date
 field number --fieldName precio --type java.lang.Float --notNull --value 0.0
 
 // Crear entidad Cliente y sus campos
-entity jpa --class ~.domain.Cliente --testAutomatically
+entity jpa --class ~.domain.Cliente --testAutomatically --equals
 field string --fieldName username --notNull
 field string --fieldName password --notNull
 field string --fieldName nombreCompleto
@@ -42,7 +42,7 @@ field string --fieldName direccionPostal
 field boolean --fieldName activo --value true --notNull
 
 // Crear entidad Pedido y sus campos
-entity jpa --class ~.domain.Pedido --testAutomatically
+entity jpa --class ~.domain.Pedido --testAutomatically --equals
 field string --fieldName identificadorPedido --notNull
 field number --fieldName total --type java.lang.Float
 
@@ -50,8 +50,8 @@ field number --fieldName total --type java.lang.Float
 field reference --fieldName cliente --type ~.domain.Cliente --notNull
 
 // Crear entidad Línea Pedido y sus campos
-entity jpa --class ~.domain.LineaPedido --testAutomatically
-field number --fieldName cantidad --type int --notNull --min 1 --max 99 --value 1
+entity jpa --class ~.domain.LineaPedido --testAutomatically --equals
+field number --fieldName cantidad --type int --notNull --min 1 --max 9999 --value 1
 field number --fieldName precio --type java.lang.Float
 field reference --fieldName pedido  --class ~.domain.LineaPedido --type ~.domain.Pedido --cardinality MANY_TO_ONE
 field reference --fieldName producto --type ~.domain.Producto

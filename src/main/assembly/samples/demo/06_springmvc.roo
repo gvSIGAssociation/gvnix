@@ -7,4 +7,6 @@ web mvc setup
 // Realizar el scaffold (andamiaje): creará las pantallas que permiten hacer el CRUD para cada entidad
 web mvc all --package ~.web
 
+// Añadir la aplicación al servidor de aplicaciones y arrancarla
+
 backup

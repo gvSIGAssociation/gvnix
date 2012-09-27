@@ -1,0 +1,32 @@
+
+// SLIDE 7: Generación de la capa web con JSF
+
+project --topLevelPackage org.gvnix.tiendavirtual --projectName tiendavirtual_jsf --java 6 --packaging JAR
+
+jpa setup --provider HIBERNATE --database POSTGRES --databaseName tiendavirtualDB --userName tiendavirtual --password tiendavirtual
+
+addon list
+addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc3
+
+database reverse engineer --schema public --package ~.domain --testAutomatically
+
+finder add --finderName findProductoesByPrecioBetween --class ~.domain.Producto
+
+// Instalar JSF en el proyecto
+web jsf setup --implementation ORACLE_MOJARRA
+
+/*
+  Otras opciones de instalación de JSF:
+    --implementation APACHE_MYFACES
+    --library PRIMEFACES (UNIQUE AVAILABLE VALUE AT LEAST TILL ROO 1.2.2)
+    --theme (ONE OF THE 30 PRIMEFACES AVAILABLE THEMES)
+*/ 
+
+// Realizar el scaffold (andamiaje): creará las pantallas que permiten hacer el CRUD para cada entidad
+web jsf all --package ~.web
+
+// Comentar que se podría cambiar el tema visual con "web jsf setup --theme ..."
+
+// Añadir la aplicación al servidor de aplicaciones Tomcat 7 y arrancarla
+
+backup
