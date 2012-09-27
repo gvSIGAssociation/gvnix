@@ -18,11 +18,9 @@
  */
 package org.gvnix.service.roo.addon.ws;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,11 +45,10 @@ import org.springframework.roo.model.JavaSymbolName;
 import org.springframework.roo.model.JavaType;
 import org.springframework.roo.process.manager.FileManager;
 import org.springframework.roo.process.manager.MutableFile;
-import org.springframework.roo.process.manager.ProcessManager;
 import org.springframework.roo.project.Dependency;
 import org.springframework.roo.project.LogicalPath;
+import org.springframework.roo.project.MavenOperations;
 import org.springframework.roo.project.Path;
-import org.springframework.roo.project.PathResolver;
 import org.springframework.roo.project.Plugin;
 import org.springframework.roo.project.ProjectMetadata;
 import org.springframework.roo.project.ProjectOperations;
@@ -90,7 +87,7 @@ public class WSConfigServiceImpl implements WSConfigService {
     @Reference
     private AnnotationsService annotationsService;
     @Reference
-    private ProcessManager processManager;
+    private MavenOperations mavenOperations;
 
     private static final String CXF_WSDL2JAVA_EXECUTION_ID = "generate-sources-cxf-server";
 
@@ -1748,93 +1745,20 @@ public class WSConfigServiceImpl implements WSConfigService {
      * {@inheritDoc}
      */
     public void mvn(String parameters, String message) throws IOException {
-
-        PathResolver pathResolver = projectOperations.getPathResolver();
-        File root = new File(pathResolver.getRoot(LogicalPath.getInstance(Path.ROOT, "")));
-
-        Validate.isTrue(root.isDirectory() && root.exists(),
-                "Project root does not currently exist as a directory ('"
-                        + root.getCanonicalPath() + "')");
-
-        String cmd = null;
-        if (File.separatorChar == '\\') {
-            cmd = "mvn.bat " + parameters;
-        } else {
-            cmd = "mvn " + parameters;
-        }
-
-        Process p = Runtime.getRuntime().exec(cmd, null, root);
-
-        // Show maven command details only in development mode
-        if (processManager.isDevelopmentMode()) {
-
-            // Ensure separate threads are used for logging, as per ROO-652
-            LoggingInputStream input = new LoggingInputStream(
-                    p.getInputStream());
-            LoggingInputStream errors = new LoggingInputStream(
-                    p.getErrorStream());
-
-            input.start();
-            errors.start();
-        } else {
-
-            logger.log(Level.INFO, message + " ...");
-        }
-
-        try {
-
-            if (p.waitFor() != 0) {
-
-                throw new IllegalStateException(message + " error !");
-            }
-
-        } catch (InterruptedException e) {
-
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private class LoggingInputStream extends Thread {
-
-        private final BufferedReader inputStream;
-
-        public LoggingInputStream(InputStream inputStream) {
-            this.inputStream = new BufferedReader(new InputStreamReader(
-                    inputStream));
-        }
-
-        @Override
-        public void run() {
-            String line;
-            try {
-                while ((line = inputStream.readLine()) != null) {
-                    if (line.startsWith("[ERROR]")) {
-                        logger.severe(line);
-                    } else if (line.startsWith("[WARNING]")) {
-                        logger.warning(line);
-                    } else {
-                        logger.info(line);
-                    }
-                }
-            } catch (IOException ioe) {
-                if (ioe.getMessage().contains("No such file or directory") || // for
-                        // *nix/Mac
-                        ioe.getMessage().contains("CreateProcess error=2")) // for
-                // Windows
-                {
-                    logger.severe("Could not locate Maven executable; please ensure mvn command is in your path");
-                }
-            } finally {
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException ignore) {
-                    }
-                }
-            }
-
-        }
-
+    	
+    	logger.log(Level.INFO, message + " ...");
+    	try {
+    		
+    		mavenOperations.executeMvnCommand(parameters);
+    	}
+    	catch (IOException e) {
+    		logger.log(Level.WARNING, message + " error !");
+    		throw e;
+		}
+    	catch (RuntimeException e) {
+    		logger.log(Level.WARNING, message + " error !");
+    		throw e;
+		}
     }
 
     /**
