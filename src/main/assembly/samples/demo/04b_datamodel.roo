@@ -17,6 +17,9 @@ database introspect --schema public
 // Instalar la primera y única opción de la lista (01 - 9.1.0.901_0001 Postgres #jdbcdriver...)
 addon install id --searchResultId 01
 
+// Si no está disponible el servicio de instalación automática de addons, instalarlo a mano con:
+// osgi start --url file:/ruta/al/fichero.jar
+
 // Realizar la ingeniería inversa: a partir de las tablas de base de datos
 // crear en el proyecto el modelo de entidades que lo representa. 
 // Se utiliza capa DAO en lugar de registro activo
