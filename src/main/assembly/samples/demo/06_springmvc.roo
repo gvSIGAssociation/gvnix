@@ -7,6 +7,9 @@ web mvc setup
 // Realizar el scaffold (andamiaje): creará las pantallas que permiten hacer el CRUD para cada entidad
 web mvc all --package ~.web
 
+// Crear las páginas de los finders creados en el paso anterior
+web mvc finder all
+
 // Añadir la aplicación al servidor de aplicaciones y arrancarla
 
 // Generar los tests funcionales
