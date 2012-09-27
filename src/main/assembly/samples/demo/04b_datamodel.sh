@@ -9,6 +9,7 @@ createuser -W -D -P tiendavirtual
 
 createdb -E UTF-8 -O tiendavirtual tiendavirtualDB
 
-# Now you can load the database dump using command below:
-# pg_restore -v -h localhost -U tiendavirtual --no-owner -F c -d tiendavirtualDB 04b_datamodel.dump
+# Load the database dump using command below:
+psql -h localhost -f 04b_datamodel.sql -U tiendavirtual tiendavirtualDB
+# Contraseña para usuario tiendavirtual: tiendavirtual
 
