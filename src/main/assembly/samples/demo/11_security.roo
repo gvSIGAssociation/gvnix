@@ -1,0 +1,11 @@
+
+// SLIDE 9: Seguridad
+
+// Instalar la autorización y autenticación basada en base de datos
+typicalsecurity setup
+
+// Hacer un Maven > Update Project Configuration
+
+// Acceder con el usuario admin/admin  
+
+backup
