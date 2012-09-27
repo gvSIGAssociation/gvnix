@@ -1,6 +1,9 @@
 
 // SLIDE 4.A: Análisis y diseño del dominio - Ingeniería directa
 
+// Configura el proveedor de persistencia JPA y la base de datos con los datos de conexión estándar
+jpa setup --provider HIBERNATE --database HYPERSONIC_PERSISTENT
+
 // Crear entidad Producto generando automáticamente sus tests de integración
 entity jpa --class ~.domain.Producto --testAutomatically
 

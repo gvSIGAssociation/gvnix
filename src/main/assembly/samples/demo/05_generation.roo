@@ -1,0 +1,7 @@
+
+// SLIDE 5: Generación de código
+
+// Añadir un buscador de Productos cuyo precio esté entre dos valores  
+finder add --finderName findProductoesByPrecioBetween --class ~.domain.Producto
+
+backup

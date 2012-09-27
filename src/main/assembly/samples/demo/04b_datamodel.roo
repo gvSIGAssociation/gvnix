@@ -4,19 +4,23 @@
 // ATENCIÓN: Asegurarse de crear otro proyecto en STS
 // con Project name "tiendavirtual_datamodel" y Top level package name "org.gvnix.tiendavirtual"
 
-jpa setup --provider HIBERNATE --database POSTGRES
+// Configura el proveedor de persistencia JPA y la base de datos con los datos de conexión de la base de datos existente
+// (usuario, clave y nombre de la base de datos)
+jpa setup --provider HIBERNATE --database POSTGRES --databaseName tiendavirtualDB --userName tiendavirtual --password tiendavirtual
 
-// Configurar los valores de conexión con la base de datos existente 
-database properties set --key database.username --value tiendavirtual
-database properties set --key database.password --value tiendavirtual
-database properties set --key database.url --value jdbc:postgresql://127.0.0.1:5432/tiendavirtualDB
-
-// Inspeccionar las tablas de la base de datos configurada 
+// Mostrar información de las tablas y sus columnas encontradas en la base de datos 
 database introspect --schema public
 
-// ATENCIÓN: La consola alerta que no está disponible el driver JDBC y muestra un add-on que lo proporciona
+// ATENCIÓN: La consola alerta que no está disponible el driver JDBC y ofrece la instalación de  un add-on que lo proporciona
 
-// Instalar la primera y única opción de la lista (01) Y Y 9.1.0.901_0001 Postgres #jdbcdriver...
+// Instalar la primera y única opción de la lista (01 - 9.1.0.901_0001 Postgres #jdbcdriver...)
 addon install id --searchResultId 01
 
+// Realizar la ingeniería inversa: a partir de las tablas de base de datos
+// crear en el proyecto el modelo de entidades que lo representa  
 database reverse engineer --schema public --package ~.domain --testAutomatically
+
+backup
+
+// Cerrar la consola y el proyecto en STS, no lo volveremos a utilizar y continuaremos con el de ingeniería directa
+exit
