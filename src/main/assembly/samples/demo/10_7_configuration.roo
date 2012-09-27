@@ -1,0 +1,20 @@
+
+// Creamos la configuración del entorno de desarrollo
+configuration create --name dev
+configuration property add --name database.url
+configuration property add --name hibernate.hbm2ddl.auto
+configuration property add --name log4j.rootLogger
+configuration property add --name database.username
+configuration list
+configuration export
+
+// Creamos la configuración del entorno de pre-producción
+configuration create --name pre
+configuration property value --configuration pre --property database.url --value jdbc:hsqldb:file:tiendavirtual_preDB;shutdown=true
+configuration property value --configuration pre --property hibernate.hbm2ddl.auto --value update
+configuration property value --configuration pre --property log4j.rootLogger --value error
+configuration property undefined --configuration pre --property database.username
+configuration list
+configuration export
+
+backup
