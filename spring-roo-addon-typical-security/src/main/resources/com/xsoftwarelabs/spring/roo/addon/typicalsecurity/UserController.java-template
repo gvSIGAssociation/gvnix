@@ -21,7 +21,7 @@ public class UserController {
 	@Autowired
 	private MessageDigestPasswordEncoder messageDigestPasswordEncoder;
 
-	@RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST, produces = "text/html")
     public String create(@Valid User user, BindingResult result, Model model, HttpServletRequest request) {
         if (result.hasErrors()) {
             model.addAttribute("user", user);

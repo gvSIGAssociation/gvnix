@@ -251,6 +251,18 @@ public class TypicalsecurityOperationsImpl implements TypicalsecurityOperations 
 
 		firstInterceptUrl.getParentNode().insertBefore(
 				new XmlElementBuilder("intercept-url", webConfigDoc)
+						.addAttribute("pattern", "/forgotpassword/**")
+						.addAttribute("access", "permitAll").build(),
+				firstInterceptUrl);
+
+		firstInterceptUrl.getParentNode().insertBefore(
+				new XmlElementBuilder("intercept-url", webConfigDoc)
+						.addAttribute("pattern", "/signup/**")
+						.addAttribute("access", "permitAll").build(),
+				firstInterceptUrl);
+		
+		firstInterceptUrl.getParentNode().insertBefore(
+				new XmlElementBuilder("intercept-url", webConfigDoc)
 						.addAttribute("pattern", "/")
 						.addAttribute("access", "isAuthenticated()").build(),
 				firstInterceptUrl);

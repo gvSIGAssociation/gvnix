@@ -44,7 +44,7 @@ public class SignUpController {
         return new UserRegistrationForm();
     }
 
-    @RequestMapping(params = "form", method = RequestMethod.GET)
+    @RequestMapping(params = "form", method = RequestMethod.GET, produces = "text/html")
     public String createForm(Model model) {
     	UserRegistrationForm form = new UserRegistrationForm();
         model.addAttribute("User", form);
@@ -52,7 +52,7 @@ public class SignUpController {
         return "signup/index";
     }
     
-    @RequestMapping(params = "activate", method = RequestMethod.GET)
+    @RequestMapping(params = "activate", method = RequestMethod.GET, produces = "text/html")
     public String activateUser(@RequestParam(value = "activate", required = true) String activationKey,@RequestParam(value = "emailAddress", required = true) String emailAddress,Model model) {
         TypedQuery<User> query = User.findUsersByActivationKeyAndEmailAddress(activationKey, emailAddress);
         User User=query.getSingleResult();
@@ -68,7 +68,7 @@ public class SignUpController {
 
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, produces = "text/html")
     public String create(@Valid UserRegistrationForm userRegistration, BindingResult result, Model model, HttpServletRequest request) {
         validator.validate(userRegistration, result);
         if (result.hasErrors()) {
@@ -99,16 +99,16 @@ public class SignUpController {
         }
     }
 
-    @RequestMapping(value = "/index")
+    @RequestMapping(value = "/index", produces = "text/html")
     public String index() {
         return "signup/index";
     }
 
-    @RequestMapping(value = "/thanks")
+    @RequestMapping(value = "/thanks", produces = "text/html")
     public String thanks() {
         return "signup/thanks";
     }
-    @RequestMapping(value = "/error")
+    @RequestMapping(value = "/error", produces = "text/html")
     public String error() {
         return "signup/error";
     }
