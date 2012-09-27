@@ -29,7 +29,7 @@ field string --fieldName direccionPostal
 field boolean --fieldName activo --value true --notNull
 
 // Crear entidad Pedido y sus campos
-entity jpa --class ~.domain.Pedido --testAutomatically --equals
+entity jpa --class ~.domain.Pedido --equals 
 field string --fieldName identificadorPedido --notNull
 field number --fieldName total --type java.lang.Float
 
