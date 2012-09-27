@@ -20,6 +20,6 @@ selenium test --controller ~.web.LineaPedidoController
 
 // Ejecutar los tests funcionales (abrirá un navegador web)
 // Como alternativa ejecutar "mvn selenium:selenese"
-perform command --mavenCommand "selenium:selenese"
+// perform command --mavenCommand "selenium:selenese"
 
 backup
