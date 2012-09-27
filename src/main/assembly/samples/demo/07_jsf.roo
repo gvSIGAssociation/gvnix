@@ -22,6 +22,6 @@ web jsf all --package ~.web
 
 // Comentar que se podría cambiar el tema visual con "web jsf setup --theme ..."
 
-// Añadir la aplicación al servidor de aplicaciones Tomcat 7 y arrancarla
+// Añadir la aplicación al servidor de aplicaciones Tomcat y arrancarla
 
 backup

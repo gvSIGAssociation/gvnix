@@ -1,5 +1,5 @@
 
-// SLIDE 7: Generación de la capa web con JSF
+// SLIDE 8: Generación de la capa web con FLEX
 
 // Este comando será el que se habrá ejecutado al crear el proyecto desde STS 
 // con Project name "tiendavirtual_flex" y Top level package name "org.gvnix.tiendavirtual"
@@ -12,7 +12,7 @@ flex remoting all --package ~.web
 
 // Hacer un Run As > maven install
 
-// Añadir la aplicación al servidor de aplicaciones Tomcat 7 y arrancarla
+// Añadir la aplicación al servidor de aplicaciones Tomcat y arrancarla
 // Acceder mediante http://localhost:8080/tiendavirtual_flex/tiendavirtual_flex_scaffold.html
 
 backup

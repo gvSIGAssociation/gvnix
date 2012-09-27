@@ -9,4 +9,14 @@ web mvc all --package ~.web
 
 // Añadir la aplicación al servidor de aplicaciones y arrancarla
 
+// Generar los tests funcionales
+selenium test --controller ~.web.ProductoController
+selenium test --controller ~.web.ClienteController
+selenium test --controller ~.web.PedidoController
+selenium test --controller ~.web.LineaPedidoController
+
+// Ejecutar los tests funcionales (abrirá un navegador web)
+// Como alternativa ejecutar "mvn selenium:selenese"
+perform command --mavenCommand "selenium:selenese"
+
 backup
