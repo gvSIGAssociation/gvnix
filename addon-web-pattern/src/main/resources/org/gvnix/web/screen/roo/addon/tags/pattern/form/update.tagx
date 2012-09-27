@@ -235,8 +235,8 @@
           <form:form id="gvnix_add_form_${secId}" action="${fn:escapeXml(formUrl)}/?form" method="POST">
 
             <!-- Include at last table positions 5 empty rows to create new items -->
-            <c:forEach begin="0" end="4" varStatus="new">
-              <c:set var="fieldPos" value="${new.count - 1}" scope="request" />
+            <c:forEach begin="0" end="4" varStatus="newItem">
+              <c:set var="fieldPos" value="${newItem.count - 1}" scope="request" />
               <tr id="gvnix_add_row_${secId}[${fieldPos}]" style="display: none;">
 
                 <!-- Add a checkbox field on each row with a known id -->
@@ -246,7 +246,7 @@
 
                 <!-- Add an empty row (id and body columns) in some pos with a parent id -->
                 <c:set var="item" value="" scope="request" />
-                <c:set var="pos" value="${new}" scope="request" />
+                <c:set var="pos" value="${newItem}" scope="request" />
                 <c:set var="parentId" value="${id}" scope="request" />
                 <c:set var="compositePkField" value="${compositePkField}" scope="request" />
                 <!-- Identifier input field: always can be specified on create -->
