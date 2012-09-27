@@ -1,0 +1,8 @@
+
+// Añadimos control de concurrencia sobre los pedidos
+occ checksum set --entity ~.domain.Pedido
+
+// NOTA: a veces no se aplican todos los cambios sino se reinicia el shell 
+// de Roo tras este comando
+
+backup
