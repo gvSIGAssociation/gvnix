@@ -1,16 +1,11 @@
 
 // SLIDE 7: Generación de la capa web con JSF
 
-project --topLevelPackage org.gvnix.tiendavirtual --projectName tiendavirtual_jsf --java 6 --packaging JAR
+// Este comando será el que se habrá ejecutado al crear el proyecto desde STS 
+// con Project name "tiendavirtual_jsf" y Top level package name "org.gvnix.tiendavirtual"
+//project --topLevelPackage org.gvnix.tiendavirtual --projectName tiendavirtual_jsf --java 6 --packaging JAR
 
-jpa setup --provider HIBERNATE --database POSTGRES --databaseName tiendavirtualDB --userName tiendavirtual --password tiendavirtual
-
-addon list
-addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc3
-
-database reverse engineer --schema public --package ~.domain --testAutomatically
-
-finder add --finderName findProductoesByPrecioBetween --class ~.domain.Producto
+// IMPORTANTE: Ejecutar el script 04a_entitymodel.roo para reaprovechar el modelo de entidades 
 
 // Instalar JSF en el proyecto
 web jsf setup --implementation ORACLE_MOJARRA

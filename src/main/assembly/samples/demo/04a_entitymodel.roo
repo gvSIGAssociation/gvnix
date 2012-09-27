@@ -15,19 +15,6 @@ field string --fieldName descripcion
 // NOTA: Los comandos de creación de campos por defecto aplican sobre la última entidad creada (contexto)
 // Se puede cambiar el contexto mediante el comando "focus" o utilizar la opción del comando "class"
 
-// Crear un tipo enumerado con sus posibles valores
-enum type --class ~.domain.enumerated.Detalles
-enum constant --name Verde
-enum constant --name Rojo
-enum constant --name Azul
-enum constant --name S
-enum constant --name M
-enum constant --name L
-enum constant --name XL
-
-// Añadir un campo del tipo enumerado creado anteriormente al Producto
-field enum --fieldName detalles --type ~.domain.enumerated.Detalles --enumType STRING --class ~.domain.Producto
-
 // Añadir varios campos de tipo fecha y numérico al Producto con algunas características: valor por defecto 
 field date --fieldName inicio --type java.util.Date
 field date --fieldName fin --type java.util.Date
