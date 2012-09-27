@@ -8,4 +8,9 @@ typicalsecurity setup
 
 // Acceder con el usuario admin/admin  
 
+menu entry roles --id c_user --roles ROLE_ADMIN
+menu entry roles --id c_userrole --roles ROLE_ADMIN
+menu entry roles --id c_cliente --roles ROLE_ADMIN
+menu entry roles --id c_role --roles ROLE_ADMIN
+
 backup
