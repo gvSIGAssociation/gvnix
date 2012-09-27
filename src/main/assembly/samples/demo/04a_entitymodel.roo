@@ -46,9 +46,10 @@ field reference --fieldName producto --type ~.domain.Producto
 // Añadir una relación del Pedido con sus Línea Pedido (1 a N)
 field set --fieldName lineasPedido --class ~.domain.Pedido --type ~.domain.LineaPedido --mappedBy pedido --cardinality ONE_TO_MANY
 
-// Ejecutar los tests de integración sobre las entidades
-perform tests
-
 // Hacer un Maven > Update Project Configuration
+
+// Ejecutar los tests de integración sobre las entidades
+// perform tests
+// Run as > Maven tests
 
 backup
