@@ -18,22 +18,6 @@
  */
 package org.gvnix.service.roo.addon;
 
-import japa.parser.JavaParser;
-import japa.parser.ParseException;
-import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.BodyDeclaration;
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
-import japa.parser.ast.body.MethodDeclaration;
-import japa.parser.ast.body.Parameter;
-import japa.parser.ast.body.TypeDeclaration;
-import japa.parser.ast.body.VariableDeclaratorId;
-import japa.parser.ast.expr.AnnotationExpr;
-import japa.parser.ast.expr.MemberValuePair;
-import japa.parser.ast.expr.NameExpr;
-import japa.parser.ast.expr.NormalAnnotationExpr;
-import japa.parser.ast.type.ClassOrInterfaceType;
-import japa.parser.ast.type.Type;
-
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,6 +35,7 @@ import org.springframework.roo.classpath.PhysicalTypeIdentifier;
 import org.springframework.roo.classpath.PhysicalTypeMetadata;
 import org.springframework.roo.classpath.TypeLocationService;
 import org.springframework.roo.classpath.TypeManagementService;
+import org.springframework.roo.classpath.TypeParsingService;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetails;
 import org.springframework.roo.classpath.details.ClassOrInterfaceTypeDetailsBuilder;
 import org.springframework.roo.classpath.details.ConstructorMetadata;
@@ -64,7 +49,6 @@ import org.springframework.roo.classpath.details.annotations.AnnotationAttribute
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadata;
 import org.springframework.roo.classpath.details.annotations.AnnotationMetadataBuilder;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
-import org.springframework.roo.classpath.javaparser.JavaParserUtils;
 import org.springframework.roo.classpath.scanner.MemberDetails;
 import org.springframework.roo.classpath.scanner.MemberDetailsScanner;
 import org.springframework.roo.metadata.MetadataService;
@@ -97,6 +81,8 @@ public class JavaParserServiceImpl implements JavaParserService {
     private TypeLocationService typeLocationService;
     @Reference
     protected MemberDetailsScanner memberDetailsScanner;
+    @Reference
+    protected TypeParsingService typeParsingService;
 
     /**
      * {@inheritDoc}
@@ -483,143 +469,6 @@ public class JavaParserServiceImpl implements JavaParserService {
                 .substring(
                         metadata.getDeclaredByMetadataId().lastIndexOf("?") + 1)
                 .equals(id.substring(id.lastIndexOf("?") + 1));
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Updates method using 'CompilationUnit'
-     * </p>
-     * <p>
-     * TODO: Method to improve. Unused.
-     * </p>
-     */
-    @Deprecated
-    public void updateWithJavaDoc(JavaType className, JavaSymbolName method,
-            String paramName, JavaType paramType) throws ParseException {
-
-        String targetId = PhysicalTypeIdentifier.createIdentifier(className,
-        		LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""));
-
-        String javaIdentifier = typeLocationService.getPhysicalTypeIdentifier(className);
-        javaIdentifier = javaIdentifier.substring(
-                javaIdentifier.indexOf("?") + 1).replace('.', '/');
-
-        String fileIdentifier = projectOperations.getPathResolver()
-                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
-                        javaIdentifier.concat(".java"));
-
-        // Retrieve class file to update.
-        CompilationUnit compilationUnit;
-
-        compilationUnit = JavaParser.parse(fileManager
-                .getInputStream(fileIdentifier));
-
-        // Obtain the physical type and itd mutable details
-        PhysicalTypeMetadata ptm = (PhysicalTypeMetadata) metadataService
-                .get(targetId);
-
-        PhysicalTypeDetails ptd = ptm.getMemberHoldingTypeDetails();
-
-        Validate.notNull(ptd, "Java source code details unavailable for type "
-                + PhysicalTypeIdentifier.getFriendlyName(targetId));
-        Validate.isInstanceOf(ClassOrInterfaceTypeDetails.class,
-                ptd, "Java source code is immutable for type "
-                        + PhysicalTypeIdentifier.getFriendlyName(targetId));
-
-        ClassOrInterfaceTypeDetails mutableTypeDetails = (ClassOrInterfaceTypeDetails) ptd;
-
-        ClassOrInterfaceDeclaration clazz = null;
-
-        for (TypeDeclaration classType : compilationUnit.getTypes()) {
-            if (classType instanceof ClassOrInterfaceDeclaration) {
-                clazz = (ClassOrInterfaceDeclaration) classType;
-                break;
-            }
-        }
-
-        if (clazz == null) {
-            return;
-        }
-
-        List<BodyDeclaration> members = clazz.getMembers();
-
-        MethodDeclaration methodToUpdate = null;
-
-        for (BodyDeclaration bodyMember : members) {
-
-            if (bodyMember instanceof MethodDeclaration) {
-
-                methodToUpdate = (MethodDeclaration) bodyMember;
-
-                if (methodToUpdate.getName().equals(method.getSymbolName())) {
-
-                    List<Parameter> methodParameters = methodToUpdate
-                            .getParameters();
-
-                    // Compute the parameter type
-                    Type parameterType = null;
-                    if (paramType.isPrimitive()) {
-                        parameterType = JavaParserUtils.getType(paramType);
-                    } else {
-                        NameExpr importedType = JavaParserUtils
-                                .importTypeIfRequired(mutableTypeDetails
-                                        .getType(),
-                                        new ArrayList(mutableTypeDetails.getRegisteredImports()),
-                                        paramType);
-
-                        ClassOrInterfaceType cit = JavaParserUtils
-                                .getClassOrInterfaceType(importedType);
-
-                        parameterType = cit;
-                    }
-
-                    // TODO: Add annotations.
-                    /*
-                     * p.setAnnotations(parameterAnnotations);
-                     */
-                    List<AnnotationExpr> methodAnnotationList = new ArrayList<AnnotationExpr>();
-                    methodAnnotationList
-                            .addAll(methodToUpdate.getAnnotations());
-
-                    List<MemberValuePair> memberList = new ArrayList<MemberValuePair>();
-                    MemberValuePair annotationAttribute = new MemberValuePair();
-                    annotationAttribute.setName("nuevo");
-                    annotationAttribute.setValue(new NameExpr("nombre"));
-
-                    memberList.add(annotationAttribute);
-
-                    NormalAnnotationExpr annotationExpr = new NormalAnnotationExpr(
-                            new NameExpr("GvNIXWebService"), memberList);
-
-                    methodAnnotationList.add(annotationExpr);
-
-                    methodToUpdate.setAnnotations(methodAnnotationList);
-
-                    methodParameters.add(new Parameter(parameterType,
-                            new VariableDeclaratorId(paramName)));
-
-                    break;
-                }
-
-            }
-        }
-
-        fileManager.delete(projectOperations.getPathResolver()
-                .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_JAVA, ""),
-                        javaIdentifier.concat(".java")));
-
-		// TODO From Roo 1.2.2 migration some information lost
-        ClassOrInterfaceTypeDetails details = new ClassOrInterfaceTypeDetailsBuilder(
-                mutableTypeDetails.getDeclaredByMetadataId()).build();
-//        JavaParserMutableClassOrInterfaceTypeDetails details = new JavaParserMutableClassOrInterfaceTypeDetails(
-//                compilationUnit, clazz,
-//                mutableTypeDetails.getDeclaredByMetadataId(), className,
-//                metadataService, physicalTypeMetadataProvider, fileManager,
-//                javaIdentifier);
-
-        typeManagementService.generateClassFile(details);
-
     }
 
     /**

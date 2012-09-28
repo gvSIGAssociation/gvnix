@@ -91,6 +91,9 @@ import org.springframework.roo.classpath.details.annotations.ClassAttributeValue
 import org.springframework.roo.classpath.details.annotations.EnumAttributeValue;
 import org.springframework.roo.classpath.details.annotations.StringAttributeValue;
 import org.springframework.roo.classpath.itd.InvocableMemberBodyBuilder;
+import org.springframework.roo.classpath.javaparser.details.JavaParserConstructorMetadataBuilder;
+import org.springframework.roo.classpath.javaparser.details.JavaParserFieldMetadataBuilder;
+import org.springframework.roo.classpath.javaparser.details.JavaParserMethodMetadataBuilder;
 import org.springframework.roo.file.monitor.DirectoryMonitoringRequest;
 import org.springframework.roo.file.monitor.NotifiableFileMonitorService;
 import org.springframework.roo.file.monitor.event.FileOperation;
@@ -419,11 +422,8 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
             // interface the class is not well generated.
             var.setInit(null);
             
-            // TODO From Roo 1.2.2 migration some information lost
-            fields.add(getGvNIXXmlElementFieldAnnotation(new FieldMetadataBuilder(
-                    id).build()));
-//            fields.add(getGvNIXXmlElementFieldAnnotation(new JavaParserFieldMetadata(
-//                    id, fieldDecl, var, compUnit, new HashSet<JavaSymbolName>())));
+            fields.add(getGvNIXXmlElementFieldAnnotation(JavaParserFieldMetadataBuilder.getInstance(
+                    id, fieldDecl, var, compUnit, new HashSet<JavaSymbolName>()).build()));
         }
     }
 
@@ -516,7 +516,7 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                                 loadFaultMethodDeclaration(
                                         declaredByMetadataId,
                                         compilationUnitServices,
-                                        methodMetadataList, bodyDeclaration);
+                                        methodMetadataList, (MethodDeclaration)bodyDeclaration);
                             }
                         }
 
@@ -563,14 +563,12 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
     private void loadFaultMethodDeclaration(String declaredByMetadataId,
             WSCompilationUnit compilationUnitServices,
             List<MethodMetadata> methodMetadataList,
-            BodyDeclaration bodyDeclaration) {
+            MethodDeclaration methodDeclaration) {
         MethodMetadata tmpMethodMetadata;
 
-		// TODO From Roo 1.2.2 migration some information lost
-        tmpMethodMetadata = new MethodMetadataBuilder(declaredByMetadataId).build();
-//        tmpMethodMetadata = new JavaParserMethodMetadata(declaredByMetadataId,
-//                methodDeclaration, compilationUnitServices,
-//                new HashSet<JavaSymbolName>());
+        tmpMethodMetadata = JavaParserMethodMetadataBuilder.getInstance(declaredByMetadataId,
+                methodDeclaration, compilationUnitServices,
+                new HashSet<JavaSymbolName>()).build();
 
         InvocableMemberBodyBuilder bodyBuilder = new InvocableMemberBodyBuilder();
         bodyBuilder.appendFormalLine(tmpMethodMetadata.getBody());
@@ -605,15 +603,13 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
             List<ConstructorMetadata> constructorMetadataList,
             BodyDeclaration bodyDeclaration) {
         ConstructorMetadata constructorMetadata;
-//        ConstructorDeclaration constructorDeclaration;
-//        constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
+        ConstructorDeclaration constructorDeclaration;
+        constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
 
         // TODO ??? what is this for? !!!
-		// TODO From Roo 1.2.2 migration some information lost
-        new ConstructorMetadataBuilder(declaredByMetadataId).build();
-//        new JavaParserConstructorMetadata(declaredByMetadataId,
-//                constructorDeclaration, compilationUnitServices,
-//                new HashSet<JavaSymbolName>());
+        JavaParserConstructorMetadataBuilder.getInstance(declaredByMetadataId,
+                constructorDeclaration, compilationUnitServices,
+                new HashSet<JavaSymbolName>());
 
         ConstructorMetadataBuilder constructorMetadataBuilder = new ConstructorMetadataBuilder(
                 declaredByMetadataId);
@@ -639,14 +635,11 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         FieldDeclaration fieldDeclaration;
         fieldDeclaration = (FieldDeclaration) bodyDeclaration;
 
-        // TODO Now all list FieldMetadata elements are the same  
         for (VariableDeclarator var : fieldDeclaration.getVariables()) {
 
-			// TODO From Roo 1.2.2 migration some information lost
-            fieldMetadata = new FieldMetadataBuilder(declaredByMetadataId).build();
-//            fieldMetadata = new JavaParserFieldMetadata(declaredByMetadataId,
-//                    fieldDeclaration, var, compilationUnitServices,
-//                    new HashSet<JavaSymbolName>());
+            fieldMetadata = JavaParserFieldMetadataBuilder.getInstance(declaredByMetadataId,
+                    fieldDeclaration, var, compilationUnitServices,
+                    new HashSet<JavaSymbolName>()).build();
 
             fieldMetadataList.add(fieldMetadata);
         }
@@ -813,11 +806,9 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
         MethodDeclaration methodDeclaration;
         methodDeclaration = (MethodDeclaration) bodyDeclaration;
 
-		// TODO From Roo 1.2.2 migration some information lost
-        tmpMethodMetadata = new MethodMetadataBuilder(declaredByMetadataId).build();
-//        tmpMethodMetadata = new JavaParserMethodMetadata(declaredByMetadataId,
-//                methodDeclaration, compilationUnitServices,
-//                new HashSet<JavaSymbolName>());
+        tmpMethodMetadata = JavaParserMethodMetadataBuilder.getInstance(declaredByMetadataId,
+                methodDeclaration, compilationUnitServices,
+                new HashSet<JavaSymbolName>()).build();
                 
         // Check method from interface because Web
         // Service
@@ -834,13 +825,10 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                 if (interfaceMethodDeclaration.getName().contentEquals(
                         methodDeclaration.getName())) {
 
-					// TODO From Roo 1.2.2 migration some information lost
-                    MethodMetadata interfaceTmpMethodMetadata = new MethodMetadataBuilder(
-                            declaredByMetadataId).build();
-//                    MethodMetadata interfaceTmpMethodMetadata = new JavaParserMethodMetadata(
-//                            declaredByMetadataId, interfaceMethodDeclaration,
-//                            compilationUnitServices,
-//                            new HashSet<JavaSymbolName>());
+                    MethodMetadata interfaceTmpMethodMetadata = JavaParserMethodMetadataBuilder.getInstance(
+                            declaredByMetadataId, interfaceMethodDeclaration,
+                            compilationUnitServices,
+                            new HashSet<JavaSymbolName>()).build();
 
                     MethodMetadataBuilder methodMetadataBuilder = new MethodMetadataBuilder(
                             declaredByMetadataId,
@@ -895,14 +883,11 @@ public class WSExportWsdlConfigServiceImpl implements WSExportWsdlConfigService 
                 new ArrayList<AnnotationExpr>(), tmpFieldDeclaration.getType(),
                 tmpFieldDeclaration.getVariables());
 
-        // TODO Now all the list FieldMetadata elements are the same
         for (VariableDeclarator var : fieldDeclaration.getVariables()) {
 
-			// TODO From Roo 1.2.2 migration some information lost
-            fieldMetadata = new FieldMetadataBuilder(declaredByMetadataId).build();
-//            fieldMetadata = new JavaParserFieldMetadata(declaredByMetadataId,
-//                    fieldDeclaration, var, compilationUnitServices,
-//                    new HashSet<JavaSymbolName>());
+            fieldMetadata = JavaParserFieldMetadataBuilder.getInstance(declaredByMetadataId,
+                    fieldDeclaration, var, compilationUnitServices,
+                    new HashSet<JavaSymbolName>()).build();
 
             fieldMetadataList.add(fieldMetadata);
         }

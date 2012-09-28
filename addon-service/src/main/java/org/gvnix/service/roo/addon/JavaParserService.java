@@ -18,8 +18,6 @@
  */
 package org.gvnix.service.roo.addon;
 
-import japa.parser.ParseException;
-
 import java.util.List;
 
 import org.gvnix.service.roo.addon.ws.export.WSExportWsdlConfigService.GvNIXAnnotationType;
@@ -110,21 +108,6 @@ public interface JavaParserService {
      */
     public void updateMethodParameters(JavaType className,
             JavaSymbolName method, String paramName, JavaType paramType);
-
-    /**
-     * Adds an input parameter into selected class method.
-     * 
-     * @param className
-     *            Class to update the method with the new parameter.
-     * @param method
-     *            Method name.
-     * @param paramName
-     *            Input parameter names.
-     * @param paramType
-     *            Input parameter Type.
-     */
-    public void updateWithJavaDoc(JavaType className, JavaSymbolName method,
-            String paramName, JavaType paramType) throws ParseException;
 
     /**
      * Updates the class with the new values.
