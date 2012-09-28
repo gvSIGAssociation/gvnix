@@ -19,11 +19,10 @@ remote service export operation --class ~.ws.CatalogWebService --method catalog
 // Lista los servicios disponibles en el proyecto
 remote service ws list
 
-// Crear la estructura java para ofrecer un servicio a partir de su descriptor
-//remote service export ws --wsdl http://www.gvnix.org/test/09_service.wsdl
-
-// Importar un servicio web de validación de email en un servicio local para su uso en la aplicación 
+// Importar un servicio web de validación de email en un servicio local para su uso en la aplicación
+// NOTA: Hay que ejecutarlo desde la consola del sistema 
 //remote service import ws --class ~.ws.EmailValidation --wsdl http://ws.xwebservices.com/XWebEmailValidation/V2/XWebEmailValidation.wsdl
+//remote service import ws --class ~.ws.SearchService --wsdl http://api.bing.net/search.wsdl
 
 // Hacer un Maven > Update Project Configuration
 
