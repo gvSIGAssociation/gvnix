@@ -1,0 +1,7 @@
+
+// SLIDE XX: EMAIL
+
+// inserta un campo "plantilla de mail" en una clase y añade también el método ``sendMessage()` para realizar el envío del mail
+field email template --class ~.web.PedidoController
+
+backup

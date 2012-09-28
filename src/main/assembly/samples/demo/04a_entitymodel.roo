@@ -49,7 +49,6 @@ field set --fieldName lineasPedido --class ~.domain.Pedido --type ~.domain.Linea
 // Hacer un Maven > Update Project Configuration
 
 // Ejecutar los tests de integración sobre las entidades
-// perform tests
-// Run as > Maven tests
+// Run as > JUnit tests
 
 backup

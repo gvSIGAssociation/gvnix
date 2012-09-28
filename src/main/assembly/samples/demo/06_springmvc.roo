@@ -11,6 +11,10 @@ web mvc all --package ~.web
 web mvc finder all
 
 // Añadir la aplicación al servidor de aplicaciones y arrancarla
+// http://localhost:8080/tiendavirtual
+
+// NOTA: a veces al crear un entidad da error por no saber convertir una cadena a una entidad
+// Se resuelve haciendo un touch de alguna entidad que rehace el Conversion Service
 
 // Generar los tests funcionales
 selenium test --controller ~.web.ProductoController
@@ -18,8 +22,10 @@ selenium test --controller ~.web.ClienteController
 selenium test --controller ~.web.PedidoController
 selenium test --controller ~.web.LineaPedidoController
 
+backup
+
 // Ejecutar los tests funcionales (abrirá un navegador web)
 // Como alternativa ejecutar "mvn selenium:selenese"
 // perform command --mavenCommand "selenium:selenese"
 
-backup
+// IMPORTANTE: Parar el servidor y quitar la aplicación tiendavirtual

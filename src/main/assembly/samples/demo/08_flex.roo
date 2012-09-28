@@ -10,9 +10,13 @@
 flex setup
 flex remoting all --package ~.web
 
+// Es necesario compilar la película flash
 // Hacer un Run As > maven install
 
 // Añadir la aplicación al servidor de aplicaciones Tomcat y arrancarla
 // Acceder mediante http://localhost:8080/tiendavirtual_flex/tiendavirtual_flex_scaffold.html
 
 backup
+
+// IMPORTANTE: Parar el servidor y quitar la aplicación tiendavirtual_flex
+// ATENCION: Cerrar la consola tiendavirtual_flex y el proyecto en STS para que no hayan confusiones

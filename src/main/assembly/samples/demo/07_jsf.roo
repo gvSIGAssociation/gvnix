@@ -23,5 +23,9 @@ web jsf all --package ~.web
 // Comentar que se podría cambiar el tema visual con "web jsf setup --theme ..."
 
 // Añadir la aplicación al servidor de aplicaciones Tomcat y arrancarla
+// http://localhost:8080/tiendavirtual_jsf
 
 backup
+
+// IMPORTANTE: Parar el servidor y quitar la aplicación tiendavirtual_jsf
+// ATENCION: Cerrar la consola tiendavirtual_jsf y el proyecto en STS para que no hayan confusiones

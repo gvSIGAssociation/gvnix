@@ -12,5 +12,6 @@ web mvc pattern master --class ~.web.PedidoController --name pedido --type regis
 web mvc pattern detail --class ~.web.PedidoController --name pedido --field lineasPedido --type tabular
 
 // Hacer un Maven > Update Project Configuration y visualizar cambios
+// Reiniciar el servidor de aplicaciones
 
 backup

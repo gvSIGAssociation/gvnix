@@ -9,16 +9,14 @@
 // (usuario, clave y nombre de la base de datos)
 jpa setup --provider HIBERNATE --database POSTGRES --databaseName tiendavirtualDB --userName tiendavirtual --password tiendavirtual
 
+// Instalar el driver jdbc para postgres
+osgi start --url http://spring-roo-repository.springsource.org/release/org/springframework/roo/wrapping/org.springframework.roo.wrapping.postgresql-jdbc3/9.1-901.0001/org.springframework.roo.wrapping.postgresql-jdbc3-9.1-901.0001.jar
+
+// Si no está accesible el jar en dicha URL, instalarlo a mano con:
+// osgi start --url file:/ruta/al/fichero.jar
+
 // Mostrar información de las tablas y sus columnas encontradas en la base de datos 
 database introspect --schema public
-
-// ATENCIÓN: La consola alerta que no está disponible el driver JDBC y ofrece la instalación de  un add-on que lo proporciona
-
-// Instalar la primera y única opción de la lista (01 - 9.1.0.901_0001 Postgres #jdbcdriver...)
-addon install id --searchResultId 01
-
-// Si no está disponible el servicio de instalación automática de addons, instalarlo a mano con:
-// osgi start --url file:/ruta/al/fichero.jar
 
 // Realizar la ingeniería inversa: a partir de las tablas de base de datos
 // crear en el proyecto el modelo de entidades que lo representa. 
@@ -27,5 +25,7 @@ database reverse engineer --schema public --package ~.domain --testAutomatically
 
 backup
 
-// Cerrar la consola y el proyecto en STS, no lo volveremos a utilizar y continuaremos con el de ingeniería directa
-exit
+// Hacer un Maven > Update Project Configuration
+
+// ATENCION: Cerrar la consola y el proyecto en STS para que no hayan confusiones
+// Continuaremos con el de proyecto de ingeniería directa

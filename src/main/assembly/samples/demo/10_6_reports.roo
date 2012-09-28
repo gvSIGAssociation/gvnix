@@ -5,6 +5,10 @@ web report setup
 // Creamos la base de un informe de pedidos
 web report add --controller ~.web.PedidoController --reportName informepedidos --format pdf,xls,html,csv
 
+// Hacer un Maven > Update Project Configuration
+
 // Visitamos la opción de menu: Pedidos > Pedido informepedido Report
+// Debe haber algún pedido creado para que se generé el report
+// El navegador obliga a guardar el fichero en disco, abrirlo luego para mostrarlo
 
 backup
