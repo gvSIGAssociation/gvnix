@@ -57,11 +57,39 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
     </varlistentry>
 
     <varlistentry>
+      <term>multimodule.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo pero separando la aplicación en
+        tres módulos: core, ui y mvc.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>pizzashop.roo</term>
+
+      <listitem>
+        <para>Ejemplo de una aplicación de venta de pizzas usando Eclipse
+        Link, DAO y ofreciendo acceso remoto con JSON a través de Spring
+        MVC.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
       <term>embedding.roo</term>
 
       <listitem>
         <para>Ejemplo de una aplicación sin persistencia con elementos web
         ricos (documentos, mapas, imágenes y videos) en Spring MVC.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>vote.roo</term>
+
+      <listitem>
+        <para>Ejemplo de una aplicación de voto usando Hibernate, Registro
+        Activo, Spring MVC y Seguridad.</para>
       </listitem>
     </varlistentry>
 
@@ -72,10 +100,63 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
         <para>Ejemplo de aplicación con uso de correo electrónico.</para>
       </listitem>
     </varlistentry>
+
+    <varlistentry>
+      <term>report.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo con generación de informes mediante
+        Jasper Reports.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>theme.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo, pero aplicando distinto tema
+        visual.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>es-i18n.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo incluyendo la lengua
+        Valenciana.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>occ.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo añadiendo control de concurrencia
+        sin columnas adicionales en base de datos.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>menu.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo, pero utilizando un sistema de
+        menús gestionable desde la consola</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>service.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo incluyendo servicios web</para>
+      </listitem>
+    </varlistentry>
   </variablelist>
 
   <para>La mayoría de esto ejemplos utilizan bases de datos en memoria por lo
   que no necesitan configuración adicional. Ejecutar el comando <emphasis
-  role="bold">mvn tomcat:run</emphasis> para poner en marcha la aplicación web
-  ejemplo.</para>
+  role="bold">mvn tomcat:run</emphasis> en la consola del sistema para poner
+  en marcha la aplicación web ejemplo.</para>
 </chapter>
