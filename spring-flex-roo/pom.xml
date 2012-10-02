@@ -6,7 +6,7 @@
     <artifactId>org.springframework.flex.roo.root</artifactId>
     <packaging>pom</packaging>
     <name>Spring Flex Roo Addon Distribution</name>
-    <version>1.0.0.BUILD-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <modules>
         <module>org.springframework.flex.roo.addon</module>

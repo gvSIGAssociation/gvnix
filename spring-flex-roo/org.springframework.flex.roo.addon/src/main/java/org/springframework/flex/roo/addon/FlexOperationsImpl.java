@@ -442,6 +442,12 @@ public class FlexOperationsImpl implements FlexOperations {
             this.projectOperations.addRepository(projectOperations.getFocusedModuleName(), springFlexRepository);
         }        
 
+        // gvNIX repositoy to download Flex addon annotations dependency
+        Repository gvNixRepository = new Repository("gvnix", "gvNIX Repository", "https://gvnix.googlecode.com/svn/repo");
+        if (!projectOperations.getFocusedModule().isRepositoryRegistered(gvNixRepository)) {
+            this.projectOperations.addRepository(projectOperations.getFocusedModuleName(), gvNixRepository);
+        }        
+        
         InputStream templateInputStream = FileUtils.getInputStream(getClass(), "plugins.xml");
         Validate.notNull(templateInputStream, "Could not acquire plugins.xml file");
         Document pluginDoc;
