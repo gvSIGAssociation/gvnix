@@ -17,7 +17,7 @@
 
   <programlisting>bash$ <emphasis role="bold">mkdir sample</emphasis>
 bash$ <emphasis role="bold">cd sample</emphasis>
-bash:sample$ <emphasis role="bold">gvnix</emphasis>
+bash:sample$ <emphasis role="bold">gvnix.sh</emphasis>
 roo-gvNIX&gt; <emphasis role="bold">script --file SCRIPT.roo</emphasis>
 project ...
 ...
@@ -33,7 +33,17 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
       <term><filename>clinic.roo</filename></term>
 
       <listitem>
-        <para>Ejemplo de una aplicación de Clinica Veterinaria.</para>
+        <para>Ejemplo de una aplicación de clinica veterinaria usando
+        Hibernate, Registro Activo y Spring MVC</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>bikeshop.roo</term>
+
+      <listitem>
+        <para>Ejemplo de una aplicación de tienda de bicicletas usando Eclipse
+        Link, DAO y JSF.</para>
       </listitem>
     </varlistentry>
 
@@ -41,7 +51,17 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
       <term><filename>expenses.roo</filename></term>
 
       <listitem>
-        <para>Ejemplo usando GWT como librería de visualización.</para>
+        <para>Ejemplo de una aplicación de control de gastos usando Hibernate,
+        Registro Activo y GWT.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>embedding.roo</term>
+
+      <listitem>
+        <para>Ejemplo de una aplicación sin persistencia con elementos web
+        ricos (documentos, mapas, imágenes y videos) en Spring MVC.</para>
       </listitem>
     </varlistentry>
 

@@ -22,7 +22,7 @@
     </authorgroup>
 
     <legalnotice>
-      <para>Copyright 2010, 2011 Conselleria d'Infraestructures i Transport -
+      <para>Copyright 2010 - 2012 Conselleria d'Infraestructures i Transport -
       Generalitat Valenciana</para>
 
       <para>This work is licensed under the Creative Commons Attribution-Share
@@ -33,7 +33,7 @@
     </legalnotice>
   </info>
 
-  <toc></toc>
+  <toc/>
 
   <part xml:id="introduccion-part">
     <title xml:lang="es">Introducción</title>
@@ -44,13 +44,13 @@
       utilizarlo</para>
     </partintro>
 
-    <xi:include href="intro_introduccion.xml" />
+    <xi:include href="intro_introduccion.xml"/>
 
-    <xi:include href="intro_instalacion.xml" />
+    <xi:include href="intro_instalacion.xml"/>
 
-    <xi:include href="guia-desarrollo_eclipse.xml" />
+    <xi:include href="guia-desarrollo_eclipse.xml"/>
 
-    <xi:include href="intro_ejemplos.xml" />
+    <xi:include href="intro_ejemplos.xml"/>
   </part>
 
   <part xml:id="desarrollo">
@@ -96,15 +96,15 @@
       </itemizedlist>
     </partintro>
 
-    <xi:include href="guia-desarrollo_crear-app.xml" />
+    <xi:include href="guia-desarrollo_crear-app.xml"/>
 
-    <xi:include href="guia-desarrollo_acceso-datos.xml" />
+    <xi:include href="guia-desarrollo_acceso-datos.xml"/>
 
-    <xi:include href="guia-desarrollo_generacion-codigo.xml" />
+    <xi:include href="guia-desarrollo_generacion-codigo.xml"/>
 
-    <xi:include href="guia-desarrollo_entidades.xml" />
+    <xi:include href="guia-desarrollo_entidades.xml"/>
 
-    <xi:include href="guia-desarrollo_capa-web.xml" />
+    <xi:include href="guia-desarrollo_capa-web.xml"/>
   </part>
 
   <part xml:id="addons-gvnix">
@@ -158,33 +158,33 @@
     <xi:include href="resumen-addons.xml" />
 -->
 
-    <xi:include href="addon-theme-manager.xml" />
+    <xi:include href="addon-theme-manager.xml"/>
 
-    <xi:include href="addon-web-menu.xml" />
+    <xi:include href="addon-web-menu.xml"/>
 
-    <xi:include href="addon-web-screen-pattern.xml" />
+    <xi:include href="addon-web-screen-pattern.xml"/>
 
-    <xi:include href="addon-occ.xml" />
+    <xi:include href="addon-occ.xml"/>
 
-    <xi:include href="addon-web-dialog.xml" />
+    <xi:include href="addon-web-dialog.xml"/>
 
-    <xi:include href="addon-cit-security.xml" />
+    <xi:include href="addon-cit-security.xml"/>
 
-    <xi:include href="addon-web-report.xml" />
+    <xi:include href="addon-web-report.xml"/>
 
-    <xi:include href="addon-service.xml" />
+    <xi:include href="addon-service.xml"/>
 
-    <xi:include href="addon-web-i18n.xml" />
+    <xi:include href="addon-web-i18n.xml"/>
 
-    <xi:include href="addon-dynamic-config.xml" />
+    <xi:include href="addon-dynamic-config.xml"/>
 
-    <xi:include href="addon-web-mvc-binding.xml" />
+    <xi:include href="addon-web-mvc-binding.xml"/>
   </part>
 
   <part>
     <title>Recetas de desarrollo</title>
 
-    <xi:include href="recetas.xml" />
+    <xi:include href="recetas.xml"/>
   </part>
 
   <part xml:id="desarrollo-addons">
@@ -195,7 +195,7 @@
       gvNIX y desarrollo de add-ons de Spring Roo</para>
     </partintro>
 
-    <xi:include href="guia-desarrollo-addon-roo.xml" />
+    <xi:include href="guia-desarrollo-addon-roo.xml"/>
   </part>
 
   <part xml:id="apendices">
@@ -208,12 +208,12 @@
       <para xml:lang="es">TBC Integración con MOSKitt<!-- (vore com s'explica en Roo integració amb STS) --></para>
     </partintro>
 
-    <xi:include href="apendice-comandos.xml" />
+    <xi:include href="apendice-comandos.xml"/>
   </part>
 
   <part>
     <title>Recursos</title>
 
-    <xi:include href="recursos.xml" />
+    <xi:include href="recursos.xml"/>
   </part>
 </book>
