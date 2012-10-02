@@ -18,23 +18,22 @@
 
     <itemizedlist>
       <listitem>
-        <para>Java JDK 5 o 6. <link
+        <para>Java JDK 5, 6 o 7. <link
         xlink:href="http://www.oracle.com/technetwork/java/javase/downloads/jdk6-jsp-136632.html">http://www.oracle.com/technetwork/java/javase/downloads/jdk6-jsp-136632.html</link></para>
       </listitem>
 
       <listitem>
-        <para xlink:href="http://maven.apache.org/">Maven 2.0.9 o superior,
-        incluida en el <emphasis>PATH</emphasis> del sistema. <link
+        <para xlink:href="http://maven.apache.org/">Maven 2.0.9 o superior.
+        <link
         xlink:href="http://maven.apache.org/">http://maven.apache.org/</link></para>
 
         <para xlink:href="http://maven.apache.org/"><emphasis
         role="bold">Importante</emphasis>: usar las versiones de Maven 2.0.x o
-        Maven 3.0.x. La versión Maven 2.2.x falla al descargar alguna
-        dependencia.</para>
+        Maven 3.0.x. La versión Maven 2.2.x no es compatible.</para>
       </listitem>
 
       <listitem>
-        <para>Conexión a Interntet para descargar las dependencias de los
+        <para>Conexión a Internet para descargar las dependencias de los
         proyectos.</para>
       </listitem>
     </itemizedlist>
@@ -42,8 +41,13 @@
     <section>
       <title>Configuración del entorno</title>
 
+      <para>La configuración del entorno solo será necesaria si vamos a
+      utilizar gvNIX desde la consola del sistema. Por lo tanto, no será
+      necesario realizar todos los pasos indicados en este punto si vamos a
+      utilizar gvNIX desde Eclipse o STS.</para>
+
       <para>Una vez descargado el archivo de instalación de Java JDK y Maven
-      veamos como configura nuestro entorno de trabajo para usar estas
+      veamos como configurar nuestro entorno de trabajo para usar estas
       herramientas.</para>
 
       <note>
@@ -56,32 +60,36 @@
         <orderedlist>
           <listitem>
             <para>Java JDK 1.6 instalada en:
-            <emphasis>/home/usuario/software/java/jdk1.6_0_22</emphasis></para>
+            <emphasis>/home/usuario/software/jdk1.6.0_35</emphasis></para>
           </listitem>
 
           <listitem>
-            <para>Maven instalado en:
-            <emphasis>/home/usuario/software/java/apache-maven-3.0.2</emphasis></para>
+            <para>Maven 3 instalado en:
+            <emphasis>/home/usuario/software/apache-maven-3.0.4</emphasis></para>
           </listitem>
         </orderedlist>
       </note>
 
       <itemizedlist>
         <listitem>
-          <para><emphasis role="bold">Varialbles de entorno</emphasis>.</para>
+          <para><emphasis role="bold">Variables de entorno</emphasis>.</para>
 
           <para>En entornos Linux, se puede utilizar
-          <emphasis>$HOME/.bashrc</emphasis> para definir esas variables y
-          automáticamente se cargarán al abrir una nueva consola. Es una buena
-          práctica definirlas en nuestro propio archivo y cargarlo desde el
-          <emphasis>.bashrc</emphasis>, en nuestro caso este archivo lo
-          llamaremos <emphasis>.bash_devel</emphasis>.</para>
+          <emphasis>$HOME/.bashrc</emphasis> para definir las variables de
+          entorno y automáticamente se cargarán al abrir una nueva consola. Es
+          una buena práctica definirlas en nuestro propio archivo y cargarlo
+          desde el <emphasis>$HOME/.bashrc</emphasis>, en nuestro caso este
+          archivo lo llamaremos <emphasis>$HOME/.bash_devel</emphasis>.</para>
+
+          <para>En sistemas Windows, establecer en las propiedades de "Mi PC"
+          únicamente las variables de entorno que se definen a continuación en
+          el segundo punto.</para>
 
           <itemizedlist>
             <listitem>
               <para><emphasis role="bold">Modificar
-              <emphasis>.bashrc</emphasis> para que cargue el archivo
-              <emphasis>.bash_devel</emphasis></emphasis>:</para>
+              <emphasis>$HOME/.bashrc</emphasis> para que cargue el archivo
+              <emphasis>$HOME/.bash_devel</emphasis></emphasis>:</para>
 
               <para>Añadir al final del archivo .bashrc las siguientes
               líneas:</para>
@@ -94,12 +102,12 @@ fi</programlisting>
 
             <listitem>
               <para><emphasis role="bold">Crear/Modificar
-              <emphasis>.bash_devel</emphasis> para añadir las variables de
-              entorno</emphasis>:</para>
+              <emphasis>$HOME/.bash_devel</emphasis> para añadir las variables
+              de entorno</emphasis>:</para>
 
-              <programlisting>export JAVA_HOME=$HOME/software/java/jdk1.6_0_22
+              <programlisting>export JAVA_HOME=$HOME/software/jdk1.6.0_35
 
-export M2_HOME=$HOME/software/java/apache-maven-3.0.2
+export M2_HOME=$HOME/software/apache-maven-3.0.4
 
 export M2=$M2_HOME/bin
 
@@ -111,33 +119,29 @@ export PATH=$JAVA_HOME/bin:$M2:$PATH</programlisting>
 
           <para>Con estos cambios cada vez que abramos una consola del sistema
           tendremos cargadas las variables de entorno. También podemos cargar
-          los cambios en estos ficheros ejecutando el comando
+          los cambios realizados en estos ficheros ejecutando el comando
           <emphasis>source</emphasis>:</para>
 
           <programlisting>bash:~$ source .bashrc</programlisting>
-
-          <para>recarga el archivo .bashrc por completo. <emphasis>source
-          .bash_devel</emphasis> cargará solo este fichero lo cual es muy útil
-          para cargar nuevas variables de entorno.</para>
 
           <para>Una vez realizados estos cambios podemos comprobar su
           funcionamiento: (Ejecutando los comandos siguientes veremos salidas
           similares a las que se muestran)</para>
 
           <programlisting>bash:~$ <emphasis role="bold">java -version</emphasis>
-java version "1.6.0_22"
-Java(TM) SE Runtime Environment (build 1.6.0_22-b04)
-Java HotSpot(TM) 64-Bit Server VM (build 17.1-b03, mixed mode)
+java version "1.6.0_35"
+Java(TM) SE Runtime Environment (build 1.6.0_35-b04)
+Java HotSpot(TM) 64-Bit Server VM (build 20.8-b03, mixed mode)
 bash:~$ <emphasis role="bold">mvn -version</emphasis>
-Apache Maven 3.0.2 (r1056850; 2011-01-09 01:58:10+0100)
-Java version: 1.6.0_22, vendor: Sun Microsystems Inc.
-Java home: /home/usuario/software/java/jdk1.6.0_22/jre
+Apache Maven 3.0.4 (r1056850; 2012-01-09 17:58:10+0100)
+Java version: 1.6.0_35, vendor: Sun Microsystems Inc.
+Java home: /home/usuario/software/jdk1.6.0_35/jre
 Default locale: es_ES, platform encoding: UTF-8
-OS name: "linux", version: "2.6.35-28-generic", arch: "amd64", family: "unix"</programlisting>
+OS name: "linux", version: "3.2.0-30-generic", arch: "amd64", family: "unix"</programlisting>
         </listitem>
 
         <listitem>
-          <para><emphasis role="bold">Maven a través de
+          <para><emphasis role="bold">Java a través de
           proxy</emphasis>.</para>
 
           <para>Es posible que nuestra red de trabajo requiera de la
@@ -145,7 +149,7 @@ OS name: "linux", version: "2.6.35-28-generic", arch: "amd64", family: "unix"</p
 
           <para>gvNIX/Roo dispone de un comando que nos indica si nuestra
           instalación de Java está, o no, configurada para conectar a Internet
-          através de un proxy.</para>
+          a través de un proxy.</para>
 
           <programlisting>roo-gvNIX&gt; <emphasis role="bold">proxy configuration</emphasis>
                      *** Your system has no proxy setup ***
@@ -154,30 +158,74 @@ For most people, simply edit /etc/java-6-openjdk/net.properties (or equivalent) 
 java.net.useSystemProxies=true property to use your operating system-defined proxy settings.</programlisting>
 
           <para>En el ejemplo anterior nos indica que no tenemos ningún proxy
-          configurado. Si necesitamos hacerlo podemos podemos seguir la guía
-          tal y como indica la salida del comando o, igualmente, usar la
-          propiedad <emphasis>java.net.useSystemProxies=true</emphasis>. En
-          resumen la configuración se hace a nivel de JRE. Si hemos seguido
-          las recomendaciones para instalar Java, podemos ir a
-          /home/usuario/software/java/jdk1.&lt;version&gt;/jre/lib. Aquí
-          tenemos el archivo net.properties que debemos editar y configurarlo
-          según nuestras necesidades (buscar las propiedades descritas a
-          continución y si no existen añadirlas):</para>
+          configurado. Si necesitamos hacerlo podemos seguir la guía tal y
+          como indica la salida del comando. </para>
 
-          <programlisting>java.net.useSystemProxies=false|true
+          <para>Si se han seguido las recomendaciones para instalar Java, ir a
+          /home/usuario/software/jdk1.6.0_35/jre/lib. Aquí estará el archivo
+          net.properties que debemos editar y configurarlo según nuestras
+          necesidades.</para>
 
-http.proxyHost=&lt;host_del_proxy_de_red (ejemplo: proxy.mired.com)&gt;
-http.proxyPort=&lt;puerto_del_proxy&gt;
-http.nonProxyHosts=&lt;hosts para los cuales no queremos pasar por el proxy (ejemplo: localhost|127.0.0.1|192.168.1.*|*.mired.com)&gt;
+          <para>La opción más sencilla es establecer la propiedad
+          <emphasis>java.net.useSystemProxies=true</emphasis>. Esto le indica
+          a Java que debe utilizar la configuración del proxy que previamente
+          hayamos definido en el sistema operativo. Sin embargo puede no
+          funcionar en todos los sistemas.</para>
 
-https.proxyHost=&lt;host_del_proxy_para_protocolo_HTTPS&gt;
-https.proxyPort=&lt;puerto_del_proxy&gt;</programlisting>
+          <para>En caso de no funcionar lo anterior, definir la configuración
+          específica del proxy buscando las propiedades descritas a
+          continuación y añadiéndolas si no existen:</para>
 
-          <para>Estas son las más comunes.</para>
+          <programlisting>java.net.useSystemProxies=false
 
-          <para>Si configuramos alguna de estas porpiedades el comando
-          <emphasis>proxy configuration</emphasis> nos devolverá la propiedad
-          y el valor configurado.</para>
+http.proxyHost=host.proxy.de.red (ejemplo: proxy.mired.com)
+http.proxyPort=puerto (ejemplo: 8080)
+http.nonProxyHosts=hosts.a.ignorar.1|host.a.ignorar.2 (ejemplo: localhost|127.0.0.1|192.168.1.*|*.mired.com)
+
+https.proxyHost=host.proxy.de.red (ejemplo: proxy.mired.com)
+https.proxyPort=puerto (ejemplo: 8080)
+http.nonProxyHosts=hosts.a.ignorar.1|host.a.ignorar.2 (ejemplo: localhost|127.0.0.1|192.168.1.*|*.mired.com)</programlisting>
+
+          <para>Si configuramos alguna de estas propiedades el comando
+          <emphasis>proxy configuration</emphasis> nos informará de los
+          valores configurados.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Maven a través de
+          proxy.</emphasis></para>
+
+          <para>Algunos comandos de gvNIX/Roo utilizan la herramienta Maven y
+          dicha herramienta en algunos casos necesita conexión con Internet
+          para, por ejemplo, descargar las dependencias de los proyectos
+          generados.</para>
+
+          <para>Es por ello que si accedemos a Internet a través de un proxy
+          deberemos configurar en el fichero $M2_HOME/conf/settings.xml las
+          siguientes secciones en el lugar adecuado del fichero. Revisar las
+          secciones comentadas porque existirá ya una sección de este tipo
+          como ejemplo:</para>
+
+          <para><programlisting>&lt;proxy&gt;
+        &lt;id&gt;Proxyhttp&lt;/id&gt;
+        &lt;active&gt;true&lt;/active&gt;
+        &lt;protocol&gt;http&lt;/protocol&gt;
+        &lt;host&gt;host.proxy.de.red (ejemplo: proxy.mired.com)&lt;/host&gt;
+        &lt;port&gt;puerto (ejemplo: 8080)&lt;/port&gt;
+&lt;/proxy&gt;
+&lt;proxy&gt;
+        &lt;id&gt;Proxyhttps&lt;/id&gt;
+        &lt;active&gt;true&lt;/active&gt;
+        &lt;protocol&gt;https&lt;/protocol&gt;
+        &lt;host&gt;host.proxy.de.red (ejemplo: proxy.mired.com)&lt;/host&gt;
+        &lt;port&gt;puerto (ejemplo: 8080)&lt;/port&gt;
+&lt;/proxy&gt;</programlisting></para>
+
+          <itemizedlist>
+            <listitem>
+              <para/>
+            </listitem>
+          </itemizedlist>
         </listitem>
       </itemizedlist>
     </section>
@@ -188,7 +236,9 @@ https.proxyPort=&lt;puerto_del_proxy&gt;</programlisting>
 
     <orderedlist>
       <listitem>
-        <para>Descomprimir el fichero ZIP de la versión de gvNIX, por ejemplo
+        <para>Descargar (<link
+        xlink:href="???">https://code.google.com/p/gvnix/downloads/list</link>)
+        y descomprimir el fichero ZIP de la versión de gvNIX, por ejemplo
         gvNIX-X.Y.Z.RELEASE.zip</para>
 
         <itemizedlist>
@@ -209,7 +259,12 @@ https.proxyPort=&lt;puerto_del_proxy&gt;</programlisting>
 
       <listitem>
         <para>Incluir el directorio <emphasis>bin</emphasis> de gvNIX en la
-        variable de entorno <emphasis>PATH</emphasis></para>
+        variable de entorno <emphasis>PATH.</emphasis></para>
+
+        <para><emphasis>Solo será necesaroa si vamos a utilizar gvNIX desde la
+        consola del sistema. Por lo tanto, no será necesario realizar todos
+        los pasos indicados en este punto si vamos a utilizar gvNIX desde
+        Eclipse o STS.</emphasis></para>
 
         <itemizedlist>
           <listitem>
@@ -219,12 +274,19 @@ https.proxyPort=&lt;puerto_del_proxy&gt;</programlisting>
 bash:~/gvNIX-X.Y.Z.RELEASE$ export PATH=$PWD/bin:$PATH</programlisting>
 
             <para>Podemos definir la variable <emphasis>GVNIX_HOME</emphasis>
-            en el archivo <emphasis>.bash_devel</emphasis> y así tenerla
-            disponible de manera permanente. Para ello modificamos el archivo
-            para que quede como sigue:</para>
+            y su inclusión en el PATH del sistema mediante el archivo
+            <emphasis>.bash_devel</emphasis> y así tenerla disponible de
+            manera permanente.</para>
+
+            <para>Recordar que en sistemas Windows, se pueden establecer en
+            las propiedades de "Mi PC" las variables de entorno que se definen
+            a continuación.</para>
+
+            <para>Para ello modificamos el archivo para que quede como
+            sigue:</para>
 
             <programlisting>...
-export GVNIX_HOME=$HOME/software/java/gvNIX-X.Y.Z.RELEASE
+export GVNIX_HOME=$HOME/software/gvNIX-X.Y.Z.RELEASE
 
 export PATH=$JAVA_HOME/bin:$M2:$GVNIX_HOME/bin:$PATH</programlisting>
 
@@ -242,16 +304,63 @@ export PATH=$JAVA_HOME/bin:$M2:$GVNIX_HOME/bin:$PATH</programlisting>
 
     <itemizedlist>
       <listitem>
-        <para>Cambia al directorio del proyecto Java:</para>
+        <para>Cambiar al directorio donde se encuentre el proyecto
+        Java:</para>
 
         <programlisting>bash:~$ cd ~/project-directory</programlisting>
       </listitem>
 
       <listitem>
-        <para>Ejecuta el intérprete de comando de gvNIX para interactuar con
+        <para>Ejecutar el intérprete de comando de gvNIX para interactuar con
         el proyecto Java:</para>
 
-        <programlisting>bash:~/project-directory$ gvnix.sh</programlisting>
+        <programlisting>bash:~/project-directory$ gvnix.sh
+
+(En sistemas windows el intérprete se abre con gvnix.bat)</programlisting>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
+    <title>IDE (Eclipse y STS)</title>
+
+    <para>Spring ha desarrollado una extensión para Eclipse llamada
+    SpringSource Tool Suite <link
+    xlink:href="???">http://www.springsource.com/products/sts</link> o STS,
+    que ofrece soporte para trabajar en Eclipse con aplicaciones de Spring,
+    entre ellas Spring Roo y, por tanto, gvNIX.</para>
+
+    <para>Para configurar el IDE realiza los siguientes pasos:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para> Descárgate la última versión de Springsource Tool Suite desde
+        <link
+        xlink:href="???">http://www.springsource.org/springsource-tool-suite-download</link>.
+        Elige la versión comprimida que se adapte a tu Sistema Operativo y
+        arquitectura de 32bits o 64bits).</para>
+      </listitem>
+
+      <listitem>
+        <para>Descomprime el archivo descargado y muevelo a la carpeta
+        $HOME/software.</para>
+      </listitem>
+
+      <listitem>
+        <para>Ejecuta STS mediante
+        $HOME/software/springsource-X.X.X/sts-X.X.X.RELEASE/STS.</para>
+
+        <para>Tener en cuenta que Eclipse y STS son aplicaciones Java por lo
+        que requiere tener una máquina virtual Java instalada en el
+        sistema.</para>
+      </listitem>
+
+      <listitem>
+        <para>Existe otra forma de instalar STS que consiste en instalarlo
+        como plugin en un Eclipse que ya se encuentre instalado en nuestro
+        sistema. Se recomienda utilizar directamente la distribución de STS,
+        pero si se desea instalar el plugin se puede consultar la sección de
+        desarrolo con Eclipse en esta misma documentación.</para>
       </listitem>
     </itemizedlist>
   </section>
