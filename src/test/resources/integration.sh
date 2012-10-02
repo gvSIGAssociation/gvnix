@@ -60,6 +60,8 @@ $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/org.springframework.
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/org.springframework.flex.roo.addon/src/test/resources/remoting-scaffold-all-test.roo
 rm -rf /tmp/gvnixtest$1/*
+$2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/org.springframework.flex.roo.addon/src/main/resources/flex.roo
+rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/rootunes.roo
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-pattern/src/test/resources/test-script-roo
