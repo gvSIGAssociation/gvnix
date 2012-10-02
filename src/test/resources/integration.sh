@@ -62,9 +62,11 @@ $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/org.springframework.
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/org.springframework.flex.roo.addon/src/main/resources/flex.roo
 rm -rf /tmp/gvnixtest$1/*
+$2/code/bin/gvnix-dev script --file $2/code/addon-web-mvc-binding/src/main/resources/binding.roo
+rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/rootunes.roo
 rm -rf /tmp/gvnixtest$1/*
-$2/code/bin/gvnix-dev script --file $2/code/addon-web-pattern/src/test/resources/test-script-roo
+$2/code/bin/gvnix-dev script --file $2/code/addon-web-pattern/src/main/resources/pattern.roo
 $2/code/bin/gvnix-dev hint
 startx -- `which Xvfb` :1 -screen 0 1024x768x24 2>&1 >/dev/null &
 export DISPLAY=:1

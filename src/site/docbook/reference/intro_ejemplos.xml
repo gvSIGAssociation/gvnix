@@ -9,8 +9,8 @@
   <title xml:lang="es">Ejemplos gvNIX/Roo</title>
 
   <para xml:lang="es">En el fichero zip se incluye un directorio
-  <filename>samples</filename> donde se puede encontrar scripts que generan
-  proyectos de aplicaciones de ejemplo.</para>
+  <filename>samples</filename> donde se puede encontrar algunos scripts que
+  generan proyectos de aplicaciones de ejemplo.</para>
 
   <para xml:lang="es">Para ejecutarlo puede realizarlo de la siguiente
   forma:</para>
@@ -26,7 +26,10 @@ Milliseconds required:
 $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
 
   <para>Donde <filename>SCRIPT.roo</filename> es el nombre del fichero de
-  ejemplo que desea ejecutar:</para>
+  ejemplo que se desea ejecutar.</para>
+
+  <para>No todos los scripts se pueden ser en el directorio samples, pero
+  todos sí pueden ser ejecutados.</para>
 
   <variablelist>
     <varlistentry>
@@ -142,7 +145,7 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
 
       <listitem>
         <para>Mismo ejemplo que clinic.roo, pero utilizando un sistema de
-        menús gestionable desde la consola</para>
+        menús gestionable desde la consola.</para>
       </listitem>
     </varlistentry>
 
@@ -150,7 +153,57 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
       <term>service.roo</term>
 
       <listitem>
-        <para>Mismo ejemplo que clinic.roo incluyendo servicios web</para>
+        <para>Mismo ejemplo que clinic.roo incluyendo servicios web.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>configuration.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo con dos perfiles de configuración
+        distintos: uno para desarrollo y otro para producción.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>dialog.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo con visualización de diálogos en
+        ventana emergente y gestión de excepciones.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>flex.roo</term>
+
+      <listitem>
+        <para>Ejemplo de una aplicación de agenda de personas y direcciones
+        usando Hibernate, Registro Activo y Flex.</para>
+
+        <para>El acceso a la aplicación se debe realizar a través de la
+        siguiente dirección:
+        http://localhost:8080/flexrocks/flexrocks_scaffold.html</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>binding.roo</term>
+
+      <listitem>
+        <para>Mismo ejemplo que clinic.roo configurando el guardadi de nulo en
+        lugar de cadenas vacías en base de datos.</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>pattern.roo</term>
+
+      <listitem>
+        <para>Ejemplo de una aplicación aplicando distintos patrones de
+        visualización de la información en pantalla de entidades y sus
+        relaciones.</para>
       </listitem>
     </varlistentry>
   </variablelist>
