@@ -24,6 +24,8 @@ $2/code/bin/gvnix-dev script --file embedding.roo
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-report/src/main/resources/report.roo
 rm -rf /tmp/gvnixtest$1/*
+$2/code/bin/gvnix-dev script --file $2/code/addon-dynamic-configuration/src/main/resources/configuration.roo
+rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-report/src/test/resources/gvnix-test.roo
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/src/main/assembly/samples/gvnix-sample.roo
