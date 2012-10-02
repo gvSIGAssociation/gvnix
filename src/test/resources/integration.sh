@@ -40,7 +40,7 @@ $2/code/bin/gvnix-dev script --file $2/code/addon-web-theme/src/main/resources/t
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-i18n/src/main/resources/es-i18n.roo
 rm -rf /tmp/gvnixtest$1/*
-$2/code/bin/gvnix-dev script --file $2/code/addon-dynamic-configuration/src/test/resources/test.roo
+$2/code/bin/gvnix-dev script --file $2/code/addon-dynamic-configuration/src/main/resources/configuration.roo
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-occ/src/main/resources/occ.roo
 rm -rf /tmp/gvnixtest$1/*
