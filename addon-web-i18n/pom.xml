@@ -44,7 +44,7 @@
   <url>http://www.gvnix.org</url>
   
   <properties>
-    <gvnix.version>${parent.version}</gvnix.version>
+    <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/web/i18n/roo/addon</repo.folder>
   </properties>

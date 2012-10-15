@@ -81,7 +81,7 @@
 
   <!-- DiSiD: Add google code project name and repo folder values -->
   <properties>
-    <gvnix.version>${parent.version}</gvnix.version>
+    <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/occ/roo/addon</repo.folder>
   </properties>

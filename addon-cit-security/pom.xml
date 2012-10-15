@@ -44,7 +44,7 @@
   <url>http://www.gvnix.org</url>
   
   <properties>
-    <gvnix.version>${parent.version}</gvnix.version>
+    <gvnix.version>${project.parent.version}</gvnix.version>
     <google.code.project.name>gvnix</google.code.project.name>
     <repo.folder>org/gvnix/cit/security/roo/addon</repo.folder>
   </properties>
@@ -114,12 +114,6 @@
       <artifactId>org.springframework.roo.model</artifactId>
       <version>${roo.version}</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.roo</groupId>
-      <artifactId>org.springframework.roo.metadata</artifactId>
-      <version>${roo.version}</version>
-      <type>bundle</type>
     </dependency>
     <dependency>
       <groupId>org.springframework.roo</groupId>
