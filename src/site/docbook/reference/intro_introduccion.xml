@@ -12,39 +12,45 @@
     <title xml:lang="es">¿Qué es gvNIX?</title>
 
     <para xml:lang="es">gvNIX es un entorno de trabajo Java de código abierto
-    para el desarrollo rápido de aplicaciones web, altamente productivo,
+    para el desarrollo rápido de aplicaciones web altamente productivo,
     flexible y que no compromete la calidad de los proyectos.</para>
 
     <para xml:lang="es">Está compuesto de un conjunto de herramientas de
     código abierto entre las que destaca su núcleo, <link
-    xlink:href="http://www.springsource.org/roo">Spring Roo</link>. Esto le
-    proporciona un amplio apoyo por parte de importantes organizaciones como
-    Spring Source y VMWare. Añade funcionalidades de productividad de alto
+    xlink:href="http://www.springsource.org/spring-roo">Spring Roo</link>.
+    Esto le proporciona un amplio apoyo por parte de importantes
+    organizaciones como Spring Source y VMWare. Añade funcionalidades de alto
     nivel a las prestaciones que ya se obtienen con <link
-    xlink:href="http://www.springsource.org/roo">Spring Roo</link>.</para>
+    xlink:href="http://www.springsource.org/spring-roo"> Spring Roo</link>
+    para mejorar la productividad.</para>
 
     <para xml:lang="es">gvNIX es un proyecto subvencionado y liderado por la
-    Conselleria de Infraestructuras, Transporte y Medio Ambiente de la
-    Generalitat Valenciana.</para>
+    Consejería de Infraestructuras, Transporte y Medio Ambiente (CITMA) de la
+    Generalidad Valenciana.</para>
 
     <para xml:lang="es">gvNIX está disponible dentro del proyecto de Migración
-    a Software de fuentes abiertas de la Conselleria d'Infraestructures i
-    Transports: <link
+    a Software de fuentes abiertas <link
     xlink:href="http://www.gvpontis.gva.es">gvPONTIS</link>.</para>
 
     <itemizedlist>
       <listitem>
         <para xml:lang="es"><link xlink:href="http://www.gvnix.org">Comunidad
         online de gvNIX</link></para>
+      </listitem>
 
+      <listitem>
         <para xml:lang="es"><link
         xlink:href="http://gvnix.googlecode.com">Proyecto gvNIX en Google
         Code</link></para>
+      </listitem>
 
+      <listitem>
         <para xml:lang="es"><link
         xlink:href="http://www.gvpontis.gva.es/cast/gvnix/">Página de gvNIX
         dentro del proyecto gvPONTIS</link></para>
+      </listitem>
 
+      <listitem>
         <para xml:lang="es"><link
         xlink:href="http://www.springsource.org/spring-roo">Página oficial de
         Spring Roo</link></para>
@@ -55,10 +61,9 @@
   <section>
     <title xml:lang="es">¿Qué es Spring Roo?</title>
 
-    <para xml:lang="es"><citation xml:lang="es"><author>
-        <personname>Ben Alex</personname>
-      </author> "Roo es un pequeño genio que observa desde un segundo plano y
-    gestiona todo aquello de lo que no me quiero preocupar" </citation></para>
+    <para xml:lang="es">Según su creador, Ben Alex: "Roo es un pequeño genio
+    que observa desde un segundo plano y gestiona todo aquello de lo que no me
+    quiero preocupar".</para>
 
     <para xml:lang="es">Spring Roo es un entorno de trabajo Java que permite
     el desarrollo de aplicaciones web de forma rápida y cómoda para el
@@ -67,7 +72,7 @@
     <itemizedlist>
       <listitem>
         <para xml:lang="es">Generación de código en Java (lenguaje
-        estático)</para>
+        estático).</para>
       </listitem>
 
       <listitem>
@@ -81,7 +86,7 @@
 
       <listitem>
         <para xml:lang="es">Desarrollo dirigido por el dominio (Domain-Driven
-        Development).</para>
+        Development):</para>
 
         <itemizedlist>
           <listitem>
@@ -91,7 +96,7 @@
 
           <listitem>
             <para xml:lang="es">Lógica en las entidades (Real Object
-            Oriented), elimina capas redundantes.</para>
+            Oriented), eliminando capas redundantes.</para>
           </listitem>
 
           <listitem>
@@ -112,7 +117,7 @@
 
       <listitem>
         <para>No incorpora elementos adicionales al entorno de ejecución, por
-        lo que no penaliza la velocidad de la aplicación.</para>
+        lo que no penaliza la velocidad ni la memoria de la aplicación.</para>
       </listitem>
 
       <listitem>
@@ -136,52 +141,134 @@
   </section>
 
   <section>
+    <title>¿Qué ofrece gvNIX?</title>
+
+    <para>gvNIX aprovecha las características de Spring Roo y aporta su propia
+    filosofía, ofrecer al desarrollador componentes de alto valor funcional
+    para aplicaciones corporativas:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Control de concurrencia a nivel de aplicación sin campos en base
+        de datos.</para>
+      </listitem>
+
+      <listitem>
+        <para>Gestión de temas visuales.</para>
+      </listitem>
+
+      <listitem>
+        <para>Gestión de la visualización de excepciones.</para>
+      </listitem>
+
+      <listitem>
+        <para>Gestión de mensajes de usuario en ventana modal.</para>
+      </listitem>
+
+      <listitem>
+        <para>Gestión de la estructura de páginas en el menú.</para>
+      </listitem>
+
+      <listitem>
+        <para>Gestión de patrones de visualización de entidades y sus
+        relaciones.</para>
+      </listitem>
+
+      <listitem>
+        <para>Gestión de transformación de cadenas vacías a valores
+        nulos.</para>
+      </listitem>
+
+      <listitem>
+        <para>Gestión de servicios locales y servicios web (importación y
+        exposición).</para>
+      </listitem>
+
+      <listitem>
+        <para>Control de acceso (autenticación y autorización).</para>
+      </listitem>
+
+      <listitem>
+        <para>Gestión de configuraciones por entorno.</para>
+      </listitem>
+
+      <listitem>
+        <para>Generación de documentos (reportes).</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+
+  <section>
     <title xml:lang="es">Arquitectura</title>
 
-    <para xml:lang="es">Spring Roo se centra en el desarrollo de aplicaciones
-    escritas en Java para entornos corporativos.</para>
+    <para xml:lang="es">gvNIX se centra en el desarrollo de aplicaciones Java
+    para entornos corporativos.</para>
 
-    <para xml:lang="es">La arquitectura de Roo se subdivide en 2 grandes
-    bloques: el entorno de desarrollo y el entorno de ejecución</para>
+    <para xml:lang="es">La arquitectura de Roo y gvNIX se subdivide en 2
+    grandes bloques: el entorno de desarrollo y el entorno de ejecución</para>
 
     <itemizedlist>
       <listitem>
         <para xml:lang="es">El entorno de desarrollo incorpora distintas
         herramientas enfocadas al desarrollo rápido de aplicaciones Java. La
         característica más importante del entorno de desarrollo es que no
-        introduce ningún tipo de librería propia de Roo, de tal forma que en
-        tiempo de ejecución no añade sobre coste de rendimiento a las
+        introduce ningún tipo de librería propia, de tal forma que en tiempo
+        de ejecución no añade sobre coste alguno al rendimiento a las
         aplicaciones.</para>
       </listitem>
 
       <listitem>
         <para xml:lang="es">El entorno de ejecución es un entorno típico de
-        aplicaciones basadas en Spring 3: acceso a bases de datos relacionales
-        usando el API Java Persistence (JPA), inyección de dependencias,
-        gestión de transacciones propia de Spring, pruebas unitarias con
-        JUnit, configuración Maven para construir las aplicaciones y vistas
-        JSP usando Spring MVC como front-end. Este tipo de aplicaciones
-        basadas en Spring son probablemente las aplicaciones Java más
-        populares seguidas de JSF, Struts y GWT según el <link
+        aplicaciones basadas en Spring 3:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Acceso a bases de datos relacionales usando el API Java
+            Persistence (JPA).</para>
+          </listitem>
+
+          <listitem>
+            <para>Inyección de dependencias.</para>
+          </listitem>
+
+          <listitem>
+            <para>Gestión de transacciones propia de Spring.</para>
+          </listitem>
+
+          <listitem>
+            <para>Pruebas unitarias con JUnit.</para>
+          </listitem>
+
+          <listitem>
+            <para>Configuración Maven para la construcción de las
+            aplicaciones.</para>
+          </listitem>
+
+          <listitem>
+            <para>Vistas JSP usando Spring MVC. Además, se pueden utilizar
+            otras tecnologías de visualización tales como Flex, GWT, JSF y
+            Vaadin.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para xml:lang="es">Las aplicaciones basadas en Spring son
+        probablemente las aplicaciones Java más populares seguidas de JSF,
+        Struts y GWT según el <link
         xlink:href="http://twitpic.com/9mgnd5">Developer Productivity Report
         2012</link>.</para>
-
-        <para xml:lang="es">Así mismo, en el entorno de ejecución permite
-        utilizar, además de Spring MVC, otras tecnologías de visualización
-        tales como Flex, GWT, JSF y Vaadin.</para>
       </listitem>
     </itemizedlist>
 
-    <para xml:lang="es">Es importante destacar que Roo no impone ninguna
-    restrición sobre el tipo de aplicaciones que se pueden generar con este
-    entorno. Algunos ejemplos de las funcionalidades que se pueden cubrir
-    fácilmente con la versión actual son (notar que no están limitados
+    <para xml:lang="es">Es importante destacar que Roo y gvNIX no imponen
+    ninguna restricción sobre el tipo de aplicaciones que se pueden generar
+    con este entorno. Algunos ejemplos de las funcionalidades que se pueden
+    cubrir fácilmente con la versión actual son (notar que no están limitadas
     únicamente a estas):</para>
 
     <itemizedlist>
       <listitem>
-        <para xml:lang="es">Intercambio de mensajes por JMS o envío por SMTP.
-        </para>
+        <para xml:lang="es">Intercambio de mensajes por JMS o envío por
+        SMTP.</para>
       </listitem>
 
       <listitem>
@@ -195,26 +282,27 @@
       </listitem>
     </itemizedlist>
 
-    <para xml:lang="es">Una de las mayores diferencias entre Spring Roo y las
-    aplicaciones tradicionales generadas a mano es que, por defecto, Roo no
-    añade capas de abstracción innecesarias. Las aplicaciones Java más
-    tradicionales tienen una capa DAO, capas de servicios, capa de dominio y
-    una capa de control. En una aplicación típica de Roo inicialmente solo se
-    usa una <link linkend="guia-desarrollo_gestion-entidades">capa de
+    <para xml:lang="es">Una de las mayores diferencias entre Roo/gvNIX y las
+    aplicaciones tradicionales generadas a mano es que, por defecto, no añade
+    capas de abstracción innecesarias. Las aplicaciones Java más tradicionales
+    tienen una capa DAO, capas de servicios, capa de dominio y una capa de
+    control. En una aplicación generada con Roo/gvNIX inicialmente solo se usa
+    una <link linkend="guia-desarrollo_gestion-entidades">capa de
     Entidad</link> (que es similar a la capa de dominio) y una <link
-    linkend="guia-desarrollo_capa-web">capa Web</link>. Como se indica en la
-    lista anterior, si fuera necesario se podría añadir una capa de Servicios
-    y/o DAO si fuese necesario.</para>
+    linkend="guia-desarrollo_capa-web">capa Web</link>. Se podrá generar
+    también una capa de Servicios y/o DAO si fuese necesario.</para>
 
-    <para xml:lang="es">Aquí podemos ver un diagrama de los componentes de la
-    arquitectura de Roo, capas y tecnologías relacionadas:</para>
+    <para xml:lang="es">A continuación se puede ver un diagrama de los
+    componentes de la arquitectura, capas y tecnologías relacionadas en
+    Roo/gvNIX:</para>
 
     <figure>
       <title xml:lang="es">Diagrama Arquitectura</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/gvnix-arquitectura-v1.0.png"/>
+          <imagedata align="center"
+                     fileref="images/gvnix-arquitectura-v1.0.png"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -224,9 +312,9 @@
     <title xml:lang="es">El intérprete de comandos</title>
 
     <para>Para que el entorno empiece a funcionar, hay que arrancar un
-    intérprete de comandos (<emphasis>Roo shell</emphasis>) con el que
-    interactuaremos con el entorno de desarrollo. Este intérprete de comandos
-    tiene dos funciones básicas:</para>
+    intérprete de comandos (<emphasis>Roo shell</emphasis>) mediante el que se
+    interactuará con el entorno de desarrollo. Este intérprete de comandos o
+    consola tiene dos funciones básicas:</para>
 
     <itemizedlist>
       <listitem>
@@ -241,138 +329,20 @@
       </listitem>
     </itemizedlist>
 
-    <para>La consola tiene este aspecto:</para>
+    <para>La consola tiene el siguiente aspecto:</para>
 
     <programlisting>    ____  ____  ____  
    / __ \/ __ \/ __ \ 
   / /_/ / / / / / / / 
- / _, _/ /_/ / /_/ /  
-/_/ |_|\____/\____/    1.x.x-RELEASE
+ / _, _/ /_/ / /_/ /   gvNIX distribution x.x.x
+/_/ |_|\____/\____/    x.x.x-RELEASE
 
 Welcome to Spring Roo. For assistance press TAB or type "hint" then hit ENTER.
 roo-gvNIX&gt;</programlisting>
-  </section>
-
-  <section>
-    <title xml:lang="es">¿Cómo funciona Roo?</title>
-
-    <para>Este diagrama muestra a alto nivel el modelo funcional de
-    Roo:</para>
-
-    <figure xml:lang="es">
-      <title xml:lang="es">Diagrama de modelo funcional de Roo</title>
-
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="images/modelo-roo.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
-
-    <variablelist>
-      <varlistentry>
-        <term xml:lang="es">Proyecto Java</term>
-
-        <listitem>
-          <para xml:lang="es">Es el contenido de nuestra aplicación formada
-          por todos los archivos necesarios.</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term xml:lang="es">Infraestructura de Roo</term>
-
-        <listitem>
-          <para xml:lang="es">Toda la infraestructura de Roo que forma el
-          entorno de desarrollo, autocontenida y separada del proyecto final.
-          Se compone de:</para>
-
-          <variablelist>
-            <varlistentry>
-              <term xml:lang="es">Add-ons</term>
-
-              <listitem>
-                <para xml:lang="es">Componentes que automáticamente
-                monitorizan y realizan cambios en nuestro proyecto.</para>
-
-                <para>También ofrecen un conjunto de comandos para que los
-                desarrolladores puedan realizar operaciones a través del
-                intérprete de comandos.</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">Intérprete de comandos (Shell)</term>
-
-              <listitem>
-                <para xml:lang="es">Componente que permite la recepción y
-                ejecución de órdenes del desarrollador</para>
-              </listitem>
-            </varlistentry>
-
-            <varlistentry>
-              <term xml:lang="es">STS: SpringSource Tool Suite</term>
-
-              <listitem>
-                <para xml:lang="es">Plugin/Aplicación Eclipse de SpringSource
-                para trabajar con proyectos Spring. Entre otras, dispone de
-                herramientas para trabajar con Roo.</para>
-              </listitem>
-            </varlistentry>
-          </variablelist>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term xml:lang="es">Anotaciones</term>
-
-        <listitem>
-          <para xml:lang="es">Conjunto de <link
-          xlink:href="http://hartocodigo.blogspot.com/2009/02/anotaciones-en-java-5.html">anotaciones
-          JAVA</link> que utiliza Roo para poder identificar un tipo de
-          artefacto concreto y su configuración. Tienen una política de
-          retención <emphasis>SOURCE</emphasis> por lo que el compilador Java
-          no las incluirá en la clases compiladas.</para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-
-    <section>
-      <title xml:lang="es">Generación de código</title>
-
-      <para xml:lang="es"><emphasis>Spring Roo s un generador de código
-      híbrido, puesto que intenta combinar lo mejor de los modelos de
-      generación pasiva y activa.</emphasis></para>
-
-      <itemizedlist>
-        <listitem>
-          <para>Generación pasiva: el desarrollador indica a la herramienta
-          qué es lo que debe generar, y una vez generado finaliza el trabajo
-          de la herramienta. No se asume un mantenimiento a largo plazo del
-          código generado. El desarrollador interactúa mediante el intérprete
-          de comandos, desde ahí se realiza y termina el proceso de generación
-          de código, que genera archivos xml y java.</para>
-        </listitem>
-
-        <listitem>
-          <para>Generación activa: Es una realimentación automática que genera
-          un modelo detallado de metadatos con la ayuda de las anotaciones
-          @Roo y @GvNIX e incrementalmente actualiza archivos aj y jsp.
-          Permite mantener automáticamente elementos del proyecto en respuesta
-          a cambios, este tipo de generación nunca modifica archivos java,
-          estos solo se modifican por indicación expresa del desarrollador y
-          solo a través del intérprete de comandos.</para>
-        </listitem>
-      </itemizedlist>
-    </section>
-  </section>
-
-  <section>
-    <title xml:lang="es">Usabilidad</title>
 
     <para xml:lang="es">La usabilidad es un factor clave en el entorno de
-    trabajo. Entre las principales características de usabilidad
-    encontramos:</para>
+    trabajo. Entre las principales características de usabilidad que
+    proporciona la consola se encuentran:</para>
 
     <itemizedlist>
       <listitem>
@@ -393,14 +363,14 @@ roo-gvNIX&gt;</programlisting>
 
       <listitem>
         <para xml:lang="es">Si se produce algún error en alguna operación, Roo
-        deshará todos los cambios generados dejando la aplicación como
-        estaba.</para>
+        deshará todos los cambios generados dejando la aplicación como se
+        encontraba inicialmente.</para>
       </listitem>
 
       <listitem>
         <para xml:lang="es">Ejecución de <emphasis>scripts</emphasis>: Se
         puede guardar una secuencia de comandos en un archivo de texto y
-        ejecutarlos en bloque cuantas veces se necesite. Por ejemplo, podemos
+        ejecutarlos en bloque cuantas veces se necesite. Por ejemplo, se puede
         hacer un guión para crear una aplicación completa y ejecutarlo en el
         intérprete de Roo.</para>
       </listitem>
@@ -412,5 +382,113 @@ roo-gvNIX&gt;</programlisting>
         desarrollador no debe perder nunca el control del proyecto.</para>
       </listitem>
     </itemizedlist>
+  </section>
+
+  <section>
+    <title xml:lang="es">¿Cómo funciona?</title>
+
+    <para>Este diagrama muestra a alto nivel el modelo funcional de Roo y
+    gvNIX:</para>
+
+    <figure xml:lang="es">
+      <title xml:lang="es">Diagrama de modelo funcional de Roo y gvNIX</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata align="center" fileref="images/modelo-roo.png"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">Proyecto Java</para>
+
+        <para xml:lang="es">Es el contenido de nuestra aplicación formada por
+        todos los archivos necesarios.</para>
+      </listitem>
+
+      <listitem>
+        <itemizedlist>
+          <para xml:lang="es">Infraestructura de Roo/gvNIX</para>
+
+           <para xml:lang="es">Toda la infraestructura de Roo/gvNIX que forma
+           el entorno de desarrollo, autocontenida y separada del proyecto
+           final. Se compone de:</para>
+
+          <listitem>
+            <para xml:lang="es">Add-ons</para>
+
+            <para xml:lang="es">Componentes que automáticamente monitorizan y
+            realizan cambios en nuestro proyecto.</para>
+
+            <para>También ofrecen un conjunto de comandos para que los
+            desarrolladores puedan realizar operaciones a través del
+            intérprete de comandos.</para>
+          </listitem>
+
+          <listitem>
+            <para xml:lang="es">Intérprete de comandos (Shell)</para>
+
+            <para xml:lang="es">Componente que permite la recepción y
+            ejecución de órdenes del desarrollador</para>
+          </listitem>
+
+          <listitem>
+            <para xml:lang="es">STS: SpringSource Tool Suite</para>
+
+            <para xml:lang="es">Plugin/Aplicación Eclipse de SpringSource para
+            trabajar con proyectos Spring. Entre otras, dispone de
+            herramientas para trabajar con Roo/gvNIX.</para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <itemizedlist>
+        <listitem>
+          <para xml:lang="es">Anotaciones</para>
+
+          <para xml:lang="es">Conjunto de <link
+          xlink:href="http://hartocodigo.blogspot.com/2009/02/anotaciones-en-java-5.html">anotaciones
+          JAVA</link> que utilizan Roo y gvNIX para poder identificar un tipo de
+          artefacto concreto y su configuración. Tienen una política de
+          retención <emphasis>SOURCE</emphasis> por lo que el compilador Java
+          no las incluirá en la clases compiladas.</para>
+        </listitem>
+      </itemizedlist>
+    </itemizedlist>
+
+    <section>
+      <title xml:lang="es">Generación de código</title>
+
+      <para xml:lang="es"><emphasis>Roo y gvNIX es un generador de código
+      híbrido, puesto que intenta combinar lo mejor de los modelos de
+      generación pasiva y activa.</emphasis></para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Generación pasiva:</para>
+
+          <para>El desarrollador indica a la herramienta qué es lo que debe
+          generar, y una vez generado finaliza el trabajo de la herramienta.
+          No se asume un mantenimiento a largo plazo del código generado. El
+          desarrollador interactúa mediante el intérprete de comandos, desde
+          ahí se realiza y termina el proceso de generación de código, que
+          genera archivos xml y java.</para>
+        </listitem>
+
+        <listitem>
+          <para>Generación activa:</para>
+
+          <para>Es una realimentación automática que genera un modelo
+          detallado de metadatos con la ayuda de las anotaciones @Roo y @GvNIX
+          e incrementalmente actualiza archivos aj y jsp. Permite mantener
+          automáticamente elementos del proyecto en respuesta a cambios, este
+          tipo de generación nunca modifica archivos java, estos solo se
+          modifican por indicación expresa del desarrollador y solo a través
+          del intérprete de comandos.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
   </section>
 </chapter>

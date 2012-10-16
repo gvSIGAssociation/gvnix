@@ -8,22 +8,18 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Ejemplos gvNIX/Roo</title>
 
-  <para xml:lang="es">En el fichero zip se incluye un directorio
+  <para xml:lang="es">En el fichero zip de gvNIX se incluye un directorio
   <filename>samples</filename> donde se puede encontrar algunos scripts que
   generan proyectos de aplicaciones de ejemplo.</para>
 
-  <para xml:lang="es">Para ejecutarlo puede realizarlo de la siguiente
-  forma:</para>
+  <para xml:lang="es">Para ejecutarlo puede crearse un nuevo proyecto 
+  y ejecutarlo de la siguiente forma:</para>
 
-  <programlisting>bash$ <emphasis role="bold">mkdir sample</emphasis>
-bash$ <emphasis role="bold">cd sample</emphasis>
-bash:sample$ <emphasis role="bold">gvnix.sh</emphasis>
+<programlisting>
 roo-gvNIX&gt; <emphasis role="bold">script --file SCRIPT.roo</emphasis>
 project ...
 ...
-Milliseconds required:
-~.web roo-gvNIX&gt; <emphasis role="bold">quit</emphasis>
-$ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
+</programlisting>
 
   <para>Donde <filename>SCRIPT.roo</filename> es el nombre del fichero de
   ejemplo que se desea ejecutar.</para>
@@ -33,7 +29,7 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
 
   <variablelist>
     <varlistentry>
-      <term><filename>clinic.roo</filename></term>
+      <term>clinic.roo</term>
 
       <listitem>
         <para>Ejemplo de una aplicación de clinica veterinaria usando
@@ -51,7 +47,7 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
     </varlistentry>
 
     <varlistentry>
-      <term><filename>expenses.roo</filename></term>
+      <term>expenses.roo</term>
 
       <listitem>
         <para>Ejemplo de una aplicación de control de gastos usando Hibernate,
@@ -97,7 +93,7 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
     </varlistentry>
 
     <varlistentry>
-      <term><filename>wedding.roo</filename></term>
+      <term>wedding.roo</term>
 
       <listitem>
         <para>Ejemplo de aplicación con uso de correo electrónico.</para>
@@ -209,7 +205,5 @@ $ <emphasis role="bold">mvn tomcat:run</emphasis></programlisting>
   </variablelist>
 
   <para>La mayoría de esto ejemplos utilizan bases de datos en memoria por lo
-  que no necesitan configuración adicional. Ejecutar el comando <emphasis
-  role="bold">mvn tomcat:run</emphasis> en la consola del sistema para poner
-  en marcha la aplicación web ejemplo.</para>
+  que no necesitan configuración adicional.</para>
 </chapter>

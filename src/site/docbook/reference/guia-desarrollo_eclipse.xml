@@ -9,16 +9,68 @@
   <title xml:lang="es">Desarrollo con Eclipse</title>
 
   <section xml:id="guia-desarrollo_eclipse-instalar">
-    <title xml:lang="es">Prerrequisitos</title>
+     
+    <title xml:lang="es">Instalación</title>
 
-    <para><emphasis><emphasis>Necesitas lo
-    siguiente:</emphasis></emphasis></para>
+    <para>
+        <emphasis>Spring ha desarrollado una extensión para Eclipse llamada
+        SpringSource Tool Suite o STS, que ofrece soporte para trabajar en
+        Eclipse con aplicaciones de Spring, entre ellas Spring Roo y por tanto
+        gvNIX. Entre otras funcionalidades incorpora un intérprete de comandos
+        de Roo que permite ejecutar órdenes sin necesidad de salir de
+        Eclipse.</emphasis>
+    </para>
+
+    <para>Hay dos formas de instalar STS, la primera es como una distribución
+    propia y la segunda es como un plugin de un Eclipse ya existente. 
+    Se recomienda encarecidamente utilizar la primera de ellas por su 
+    facilidad de instalación y mejor rendimiento.</para>
+
+    <section xml:id="guia-desarrollo_eclipse-instalar1">
+      <title xml:id="es">STS como distribución</title>
+
+      <para>
+        <emphasis>
+          <emphasis>Para instalar el IDE como una distribución propia realizar
+          los siguientes pasos:</emphasis>
+        </emphasis>
+      </para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Descargar la última versión de Springsource Tool Suite desde
+          <link xlink:href="http://www.springsource.org/springsource-tool-suite-download">
+          http://www.springsource.org/springsource-tool-suite-download</link>. Elegir
+          la versión comprimida que se adapte al sistema operativo y
+          arquitectura de 32bits o 64bits.</para>
+        </listitem>
+
+        <listitem>Descomprimir el archivo descargado y moverlo a una carpeta,
+        por ejemplo $HOME/software.</listitem>
+
+        <listitem>Ejecutar STS
+        ($HOME/software/springsource-X.X.X/sts-X.X.X.RELEASE/STS). Tener en
+        cuenta que STS es una aplicación Java por lo que requiere tener una
+        máquina virtual Java instalada en el sistema.</listitem>
+      </itemizedlist>
+    </section>
+
+    <section xml:id="guia-desarrollo_eclipse-instalar2">
+      <title xml:id="es">STS como plugin</title>
+    </section>
+
+    <para>
+      <emphasis>
+        <emphasis>Para instalar el IDE en un Eclipse existente seguir los
+        siguientes pasos:</emphasis>
+      </emphasis>
+    </para>
 
     <itemizedlist>
       <listitem>
-        <para>Descargar Eclipse IDE for Java EE Developers, versión Indigo SR2
-        (3.7.0): <link
-        xlink:href="http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/indigor">http://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/indigor</link></para>
+        <para>Si no se dispone todavía de él, descargar Eclipse IDE for Java
+        EE Developers de <link xlink:href="http://www.eclipse.org/downloads/">
+        http://www.eclipse.org/downloads/</link></para>
       </listitem>
 
       <listitem>
@@ -27,26 +79,41 @@
 
         <orderedlist>
           <listitem>
-            <para><emphasis role="bold"><emphasis><literal>Window &gt;
-            Preferences &gt; Java &gt; Build Path &gt; Classpath
-            Variables</literal></emphasis></emphasis>, botón
-            <emphasis><emphasis><literal>New...</literal></emphasis></emphasis>.</para>
+            <para><emphasis role="bold">
+                <emphasis>
+                  <literal>Window &gt; Preferences &gt; Java &gt; Build Path
+                  &gt; Classpath Variables</literal>
+                </emphasis>
+              </emphasis>, botón <emphasis>
+                <emphasis>
+                  <literal>New...</literal>
+                </emphasis>
+              </emphasis>.</para>
           </listitem>
 
           <listitem>
-            <para>Ponemos los siguientes valores:</para>
+            <para>Definir los siguientes valores:</para>
 
             <itemizedlist>
               <listitem>
-                <para><emphasis><emphasis><literal>Name</literal></emphasis></emphasis>
-                =
-                <emphasis><emphasis><literal>M2_REPO</literal></emphasis></emphasis>.</para>
+                <para><emphasis>
+                    <emphasis>
+                      <literal>Name</literal>
+                    </emphasis>
+                  </emphasis> = <emphasis>
+                    <emphasis>
+                      <literal>M2_REPO</literal>
+                    </emphasis>
+                  </emphasis>.</para>
               </listitem>
 
               <listitem>
-                <para><emphasis><emphasis><literal>Path</literal></emphasis></emphasis>
-                = directorio correspondiente al repositorio de Maven
-                (normalmente en Linux: ~/.m2/repository)</para>
+                <para><emphasis>
+                    <emphasis>
+                      <literal>Path</literal>
+                    </emphasis>
+                  </emphasis> = directorio correspondiente al repositorio de
+                Maven (normalmente en Unix: $HOME/.m2/repository)</para>
               </listitem>
             </itemizedlist>
           </listitem>
@@ -63,104 +130,100 @@
         <para>Instalar plugin M2Eclipse para Eclipse
         (http://m2eclipse.sonatype.org/installing-m2eclipse.html)</para>
 
-        <para>En el menú Help &gt; Install New Software. En el campo de texto
+        <para>En el menú Help &gt; Install New Software, en el campo de texto
         "Work with:" indicar que se usará el site:
-        http://m2eclipse.sonatype.org/sites/m2e. A continución se nos mostrará
-        para seleccionar "Maven Integration for Eclipse". Lo selecionamos,
-        pulsamos en siguiente y tras aceptar la licencia del plugin
-        instalamos.</para>
+        <link xlink:href="http://m2eclipse.sonatype.org/sites/m2e">
+        http://m2eclipse.sonatype.org/sites/m2e</link>.
+        A continución eleccionar "Maven Integration for Eclipse". 
+        Pulsar en siguiente y tras aceptar la licencia del plugin instalar.</para>
       </listitem>
 
       <listitem>
-        <para>Activa la opción <emphasis><emphasis><literal>Enable Window &gt;
-        Preferences &gt; General &gt; Workspace &gt; Refresh
-        Automatically</literal></emphasis></emphasis>.</para>
+        <para>Activa la opción <emphasis>
+            <emphasis>
+              <literal>Enable Window &gt; Preferences &gt; General &gt;
+              Workspace &gt; Refresh Automatically</literal>
+            </emphasis>
+          </emphasis>.</para>
       </listitem>
 
       <listitem>
-        <para>Opcionalmente podemos instalar el plugin Subeclipse que trabaja
-        sobre el sistema de control de versiones Subversion (SVN).</para>
+        <para>Opcionalmente, instalar el plugin Subeclipse para trabajar sobre
+        el sistema de control de versiones Subversion (SVN).</para>
 
         <para>Para ello en Eclipse, en el menú <emphasis>Help &gt; Install New
         Software</emphasis>. En la ventana que se abre hacer click sobre el
         botón <emphasis>Add</emphasis> que hay a la derecha de <emphasis>Work
-        with</emphasis>. Se nos abre un diálogo en el que indicamos como
-        nombre Subeclipse por ejemplo y en la URL indicamos
+        with</emphasis>. Se abre un diálogo en el que se indicará como
+        nombre Subeclipse por ejemplo y en la URL indicar
         <emphasis>http://subclipse.tigris.org/update_1.6.x</emphasis>
-        guardamos con <emphasis>OK</emphasis> y la ventana anterior empezará
-        la carga de los plugins que hay disponibles. Los seleccionamos y
-        seguimos con haciendo click en <emphasis>Next</emphasis>. (La URL
+        guardar con <emphasis>OK</emphasis> y la ventana anterior empezará
+        la carga de los plugins que hay disponibles. Seleccionarlos y
+        seguir haciendo click en <emphasis>Next</emphasis>. La URL
         indicada es de la versión actual, revisar el sitio oficial de <link
         xlink:href="http://subclipse.tigris.org/servlets/ProjectProcess?pageID=p4wYuA">Subeclipse</link>
-        para más información y futuras versiones).</para>
+        para más información y futuras versiones.</para>
       </listitem>
+
+      <listitem>Para instalar el plugin STS seguir las instrucciones del punto
+      "UPDATE SITE INSTALLATION" del documento <link
+      xlink:href="http://dist.springsource.com/release/STS/doc/STS-installation_instructions.pdf">Spring
+      Source Tool Suite Installation Instructions</link>.</listitem>
     </itemizedlist>
 
-    <para>Para utilizar Eclipse como IDE de desarrollo de los proyectos gvNIX
-    se recomienda utilizar la extensión <link
-    xlink:href="http://www.springsource.com/products/sts">SpringSource Tool
-    Suite</link> (o STS).</para>
-
-    <para>Entre otras funcionalidades incorpora un intérprete de comandos de
-    Roo que permite ejecutar órdenes sin necesidad de salir de Eclipse.</para>
-
-    <para>Existen 2 distribuciones del STS (se recomienda la segunda):</para>
-
-    <orderedlist>
-      <listitem>
-        <para>Instalación como <link
-        xlink:href="http://www.springsource.com/products/springsource-tool-suite-download">RCP</link>.</para>
-      </listitem>
-
-      <listitem>
-        <para>Instalación como plugin de nuestro Eclipse: para instalar el
-        plugin STS sigue las instrucciones del punto "UPDATE SITE
-        INSTALLATION" del documento <link
-        xlink:href="http://dist.springsource.com/release/STS/doc/STS-installation_instructions.pdf">Spring
-        Source Tool Suite Installation Instructions</link>.</para>
-      </listitem>
-    </orderedlist>
+     
   </section>
 
   <section>
     <title>Consola gvNIX / Roo integrada en Eclipse</title>
 
-    <para>El plugin STS que hemos instalado en nuestro IDE nos ofrece la
-    posibilidad de incluir la consola de gvNIX en el propio entrono de
-    desarrollo. Para ello antes tendremos que indicarle a Eclipse donde
-    tenemos instalada la nueva versión de gvNIX.</para>
+    <para>El plugin o distribución de STS instalado ofrece la posibilidad de
+    incluir la consola de gvNIX en el propio entorno de desarrollo. Para ello
+    antes hay que indicarle a Eclipse donde está instalada la nueva versión de
+    gvNIX.</para>
 
-    <para>En el menú Window &gt; Preferences &gt; Spring &gt; Roo Support.
-    Pulsamos el botón Add y buscamos en el navegador de archivos donde está el
-    directorio gvNIX. Veremos una pantalla similar a esta:</para>
+    <para>En el menú <emphasis>Window &gt; Preferences &gt; Spring &gt; 
+    Roo Support</emphasis>.
+    Pulsar sobre el botón Add y buscar en el navegador de archivos el lugar
+    donde está instalado gvNIX. Aparecerá una pantalla similar a la
+    siguiente:</para>
 
     <figure>
       <title>Configuración del soporte gvNIX en Eclipse</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/preferences_roo.png"/>
+          <imagedata align="center" fileref="images/preferences_roo.png"/>
         </imageobject>
       </mediaobject>
     </figure>
 
-    <para>Dandole a OK en las dos pantallas que tenemos abiertas ya tendremos
+    <para>Presionando en OK sobre las dos pantallas que abiertas ya estará
     configurado el soporte para la linea de comandos de gvNIX. Para poder
-    usarlo tendremos que abrir la perspectiva de Spring (Window &gt; Open
-    Perspective &gt; Other &gt; Spring). En la parte inferior de la pantalla
-    tendremos una pestaña Roo Shell.</para>
+    usarlo abrir la perspectiva de Spring con <emphasis>Window &gt; Open 
+    Perspective &gt; Other &gt; Spring</emphasis>.
+    En la parte inferior de la pantalla aparecerá una
+    pestaña llamada Roo Shell. Si no apareciese la pestaña, puede abrirse
+    seleccionando <emphasis>Window &gt; Show View &gt; Roo Shell.
+    </emphasis></para>
 
-    <para>Nos pedirá que le indiquemos para que proyectos queremos que esté
-    disponible la línea de comandos (<emphasis>Open Roo Shell for projects
-    ...</emphasis>). Selecionamos el proyecto en el que estamos trabajando y
-    ya podremos empezar a ejecutar comandos.</para>
+    <para>Para abrir la consola pulsar en el botón que aparece en la parte
+    superior derecha de la pestaña con el título <emphasis>Open Roo
+    Shell.</emphasis> Entonces seleccionar el proyecto en el que se va a
+    trabajar y ya se puede empezar a ejecutar comandos. Si no se dispone
+    todavía de ningún proyecto, en el punto siguiente se verá como crear un
+    nuevo proyecto.</para>
+
+    <para>La ejecución de comandos también se puede hacer de forma gráfica
+    pulsando en el botón que aparece en la parte superior derecha de la
+    pestaña con el título Open Roo Command Wizard.</para>
 
     <figure>
       <title>Consola gvNIX en Eclipse</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/eclipse_gvNIX_shell.png"/>
+          <imagedata align="center" fileref="images/eclipse_gvNIX_shell.png"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -169,8 +232,8 @@
       <para>Hay que tener en cuenta una pequeña diferencia a la hora de usar
       la línea de comandos desde Eclipse con respecto a la linea de comandos
       de gvNIX en la consola del sistema. Mientras en una consola del sistema
-      usamos la tecla TAB para que nos ayude a completar los comandos, en el
-      IDE usaremos Ctrl+Space que es el atajo por defecto usado en
+      se utiliza la tecla TAB para completar los comandos, en el IDE se
+      utilizará Ctrl+Space que es el atajo por defecto usado en
       Eclipse.</para>
     </note>
   </section>
@@ -181,84 +244,92 @@
     <section xml:id="guia-desarrollo_eclipse-usar">
       <title xml:id="es">Crear proyecto gvNIX/Roo en Eclipse IDE</title>
 
-      <para xml:lang="es">Podemos crear un proyecto gvNIX desde Eclipse a
-      través del menú: <emphasis>File &gt; New &gt; Spring Roo
-      Project</emphasis>:</para>
+      <para xml:lang="es">Crear un proyecto gvNIX desde Eclipse a través del
+      menú: <emphasis>File &gt; New &gt; Spring Roo Project</emphasis>:</para>
 
       <figure>
         <title>Nuevo proyecto Srping Roo con soporte gvNIX</title>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_new_roo_project.png"/>
+            <imagedata align="center" fileref="images/eclipse_new_roo_project.png"/>
           </imageobject>
         </mediaobject>
       </figure>
 
-      <para xml:lang="es">Ahora añadiremos el soporte para el manejo de la
-      persistencia de datos a traves de JPA. El siguiente ejemplo muestra los
-      comandos que debe usar para configurar el soporte JPA. Recuerde que
-      puede usar Ctrl+Space como ayuda a la escritura en los comandos:</para>
+      <para xml:lang="es">Esta primera pantalla habrá ejecutado de forma
+      automática el comando de creación de un nuevo proyecto:</para>
 
-      <para xml:lang="es">En este punto ya tiene un proyecto Maven de
-      aplicación web preparado.</para>
+      <para xml:lang="es"><programlisting><emphasis role="bold">project --topLevelPackage com.gvnix.tenminutes</emphasis></programlisting></para>
+
+      <para xml:lang="es">En este punto ya se dispone de un proyecto Maven
+      preparado.</para>
+
+      <para xml:lang="es">A continuación, añadir el soporte para el manejo de
+      la persistencia de datos a través de JPA. El siguiente ejemplo muestra
+      los comandos que se deben usar para configurar el soporte JPA. Recordar
+      que se puede usar Ctrl+Space como ayuda a la escritura en los
+      comandos:</para>
 
       <programlisting>roo-gvNIX&gt; <emphasis role="bold">jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY</emphasis>
 Created ...
-~.Timer roo-gvNIX&gt;<emphasis role="bold"> entity jpa --class ~.Timer --testAutomatically</emphasis> 
+roo-gvNIX&gt;<emphasis role="bold"> entity jpa --class ~.domain.Timer --testAutomatically</emphasis> 
 Created ...
-~.Timer roo-gvNIX&gt;<emphasis role="bold"> field string --fieldName message --notNull</emphasis>
+~.domain.Timer roo-gvNIX&gt;<emphasis role="bold"> field string --fieldName message --notNull</emphasis>
 Managed ...</programlisting>
 
       <para xml:lang="es">El comando <emphasis role="bold">persistence
-      setup</emphasis> nos permite configurar la capa de accesso a datos de
-      manera sencilla. <emphasis role="bold">entitiy</emphasis> sirve para
+      setup</emphasis> permite configurar la capa de acceso a datos de manera
+      sencilla. El comando <emphasis role="bold">entitiy</emphasis> sirve para
       crear una nueva entidad y <emphasis role="bold">field</emphasis> crea
-      atributos de la entidad. Veremos estos comandos con un poco más de
+      atributos en la entidad. Estos comandos se verán con más
       detalle en la sección <link
       linkend="guia-desarrollo-acceso-datos_persistencia-objetos">Persistencia
       de objetos</link> y <link
       linkend="guia-desarrollo_gestion-entidades_definicion_crear-con-comando">Crear
-      una entidad con el intérprete de comandos</link>, también veremos como
-      generar todas las entidades de nuestra aplicación mediante el proceso de
-      ingenieria inversa conta un esquema de BBDD existente.</para>
+      una entidad con el intérprete de comandos</link>, también se verá como
+      generar todas las entidades de una aplicación mediante el proceso de
+      ingeniería inversa contra un esquema de BBDD existente.</para>
 
-      <programlisting>~.Timer roo-gvNIX&gt; <emphasis role="bold">web mvc setup</emphasis> <emphasis role="bold">web mvc all --package ~.web</emphasis>
+      <programlisting>~.domain.Timer roo-gvNIX&gt; <emphasis role="bold">web mvc setup</emphasis>
+~.domain.Timer roo-gvNIX&gt; <emphasis role="bold">web mvc all --package ~.web</emphasis>
 Created ...</programlisting>
 
-      <para><emphasis role="bold">controller</emphasis> crea controladores de
-      la capa web que gestionaran la interacción del usuario con la
-      aplicación. Lo veremos en <link
+      <para>Los comandos <emphasis role="bold">web mvc</emphasis> crean la
+      capa capa web que gestionaran la interacción del usuario con la
+      aplicación. Se verán con más detalle en <link
       linkend="guia-desarrollo_web_definir-controller">Crear la capa web con
       el intérprete de comandos</link>.</para>
 
       <programlisting>~.web roo-gvNIX&gt; <emphasis role="bold">selenium test --controller ~.web.TimerController</emphasis>
 Created ...</programlisting>
 
-      <para>Si queremos incluir en el proyecto test de integración tenemos a
-      nuestra disposición el comando <emphasis role="bold">selenium
-      test</emphasis> que generará los scripts necesarios para probar la
-      interfaz web de la aplicación. Mediante <emphasis role="bold">mvn
-      selenium:selenese</emphasis>, estando el servidor de la aplicación
-      corriendo, se ejecutará el conjunto de tests sobre una nueva instancia
-      del navegador FireFox.</para>
+      <para>Si se desea incluir en el proyecto los tests funcionales existe el
+      comando <emphasis role="bold">selenium test</emphasis> que generará los
+      scripts necesarios para probar la interfaz web de la aplicación.
+      Ejecutando <emphasis role="bold">mvn selenium:selenese</emphasis>
+      desde una consola del sistema que tenga configurada Maven, estando
+      el servidor de aplicaciones en marcha, se ejecutará el conjunto de
+      tests sobre una nueva instancia del navegador web FireFox. Más adelante se
+      verá como poner en marcha la aplicación y como ejecutar
+      los tests.</para>
 
       <programlisting>~.web roo-gvNIX&gt; <emphasis role="bold">theme install --id cit</emphasis>
 ~.web roo-gvNIX&gt; <emphasis role="bold">theme set --id cit</emphasis></programlisting>
 
       <para>Mediante el comando <emphasis role="bold">theme</emphasis>, del
-      <emphasis>Add-on Theme Manager</emphasis> propio de gvNIX, podemos
+      <emphasis>Add-on Theme Manager</emphasis> propio de gvNIX, se puede
       configurar el tema visual que presentará la aplicación.</para>
     </section>
 
     <section>
-      <title>Importar proyecto gvNIX a Eclipse IDE</title>
+      <title>Importar proyecto gvNIX en Eclipse</title>
 
-      <para>Como gvNIX/Roo permite crear proyectos desde la linea de comandos,
-      podemos vernos en la situación de que queramos importar un proyecto
-      existente al IDE. Si estamos ejecutando gvNIX en la línea de comandos,
-      bastaría con ejecutar el comando <command>perform eclipse</command> para
-      crear una estructura de proyecto Eclipse:</para>
+      <para>gvNIX/Roo permite crear proyectos desde la linea de comandos, aunque
+      puede suceder que se necesite importar un proyecto ya existente en el
+      IDE. Si se está ejecutando gvNIX en la línea de comandos, bastaría con
+      ejecutar el comando <command>perform eclipse</command> para crear una
+      estructura de proyecto Eclipse:</para>
 
       <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>perform eclipse</command>
 <computeroutput>[Thread-6] Warning: JAVA_HOME environment variable is not set.
@@ -281,44 +352,67 @@ Created ...</programlisting>
 [Thread-6] [INFO] ------------------------------------------------------------------------</computeroutput>
 ~.domain.PizzaOrder roo-gvNIX&gt;</programlisting>
 
-      <para xml:lang="es">Este comando termina ejecutando un <command>mvn
-      eclipse:eclipse</command> para el proyecto, por lo que es indiferente el
-      uso de ambos métodos.</para>
+      <para xml:lang="es">Este comando termina ejecutando el comando del
+      sistema<command>mvn eclipse:eclipse</command> en el proyecto, por 
+      lo que es indiferente el uso de cualquiera de los dos métodos.
+      Tener en cuenta que este último comando necesita tener configurado
+      Maven.</para>
 
-      <para xml:lang="es">Ahora se ha de importar al entorno de trabajo
-      mediante <command>File -&gt; Import -&gt; General -&gt; Existing
-      Projects into workSpace</command>. Si aparece el mensaje <emphasis>Turn
-      Weaving Service on?</emphasis>, marca la casilla <emphasis>Don't ask
-      again until next upgrade</emphasis> y clic en <emphasis>Yes</emphasis>
-      (tendrás que reiniciar Eclipse).</para>
+      <para xml:lang="es">Ahora se puede importar en el entorno de trabajo
+      mediante <command>File &gt; Import &gt; General &gt; Existing Projects
+      into workSpace</command>. Si aparece el mensaje <emphasis>Turn Weaving
+      Service on?</emphasis>, marcar la casilla <emphasis>Don't ask again until
+      next upgrade</emphasis> y clic en <emphasis>Yes</emphasis> (será
+      necesario reiniciar Eclipse).</para>
 
       <para xml:lang="es">También es posible borrar la configuración de
-      eclipse ejecutando el comando <command>mvn eclipse:clean</command>. Para
-      regenerar la configuración de eclipse en un solo comando usar
+      eclipse ejecutando el comando <command>mvn eclipse:clean</command>
+	  en una consola del sistema que tenga configurada Maven.
+      Para regenerar la configuración de eclipse en un solo comando usar
       <command>mvn eclipse:clean eclipse:eclipse</command>.</para>
+
+      <para xml:lang="es">Al importar un proyecto en Eclipse es importante
+      comprobar que dicho proyecto tiene configuradas las características de
+      proyecto Maven y proyecto AspectJ. Esto aparece de forma visual en el
+      proyecto mediante unas pequeñas letras M y AJ. Si no apareciesen se
+      pueden añadir estas características seleccionando el proyecto y con el
+      segundo botón del ratón eligiendo la opción <emphasis>Configure
+      </emphasis>. Esto es muy importante ya que en el caso de no estar
+      correctamente configurado nos aparecerán falsos errores en el proyecto.
+      </para>
     </section>
   </section>
 
   <section xml:id="guia-desarrollo_eclipse-pruebas-unitarias">
-    <title xml:lang="es">Desarollo de pruebas unitarias</title>
+    <title xml:lang="es">Generación de pruebas de integración</title>
 
-    <para><emphasis>TBC</emphasis></para>
+    <para>El comando <emphasis>entity</emphasis> dispone de la opción testAutomatically
+    que al ser especificado generará los test de integración para dicha entidad
+    usando JUnit.</para>
+    
+    <para>Si los tests no fueron creados en el momento de la ejecución
+    del comando <emphasis>entity</emphasis>, pueden ser generados con 
+    posterioridad mediante otro comando:</para>
+    
+    <programlisting>
+    test integration --entity ~.domain.Timer
+    </programlisting>
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse">
     <title xml:lang="es">Arrancar la aplicación con Eclipse</title>
 
     <para xml:lang="es">Es posible arrancar la aplicación desde el propio
-    Eclipse y que, además de permitir depurarla, nos permita hacer algunos
-    cambios en caliente sobre la aplicación.</para>
+    Eclipse y, además de permitir depurarla, permite hacer cambios en
+    caliente sobre la aplicación.</para>
 
     <para xml:lang="es">Para ello, debemos tener la aplicación importada en un
     <emphasis>workspace</emphasis> de Eclipse y configurar el servidor dónde
-    queremos ejecutarlo. Eclipse es capaz de gestionar distinto tipos de
+    ejecutarlo. Eclipse es capaz de gestionar distinto tipos de
     servidores, generando sus propios directorio y ficheros de
     configuración.</para>
 
-    <para xml:lang="es">Para prepara un servidor seguiremos los siguiente
+    <para xml:lang="es">Para prepara un servidor seguir los siguiente
     pasos:</para>
 
     <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_mostrar-vista-servidores">
@@ -326,13 +420,9 @@ Created ...</programlisting>
 
       <para>Eclipse tiene una vista que permite ver los distintos servidores
       configurados y gestionarlos desde ahí. Estos son los pasos para mostrar
-      la vista:</para>
+      la vista</para>
 
       <orderedlist>
-        <listitem>
-          <para>Abra una perspectiva de desarrollo Java (Java o java).</para>
-        </listitem>
-
         <listitem>
           <para>Abra la opción del menú <literal>Window &gt; Show view &gt;
           Other..</literal>..</para>
@@ -346,8 +436,7 @@ Created ...</programlisting>
     </section>
 
     <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_crear-entorno-ejecucion">
-      <title xml:lang="es">Crear un entrono de ejecución de Server (Server
-      Runtime environment)</title>
+      <title xml:lang="es">Crear un nuevo Servidor</title>
 
       <para xml:lang="es">Se pueden definir múltiples entornos de ejecución
       para los servidores. Esta configuración incluye el tipo de servidor
@@ -361,32 +450,17 @@ Created ...</programlisting>
       workspace.</para>
 
       <para xml:lang="es">En este caso, vamos a preparar el entorno para
-      Tomcat 6.</para>
-
-      <para xml:lang="es">Asumimos que disponemos de una instalación de Tomcat
-      6 en nuestra máquina, no importa que esté configurada o no, y seguiremos
-      los siguientes pasos:</para>
+      Tomcat 6 siguiendo los pasos indicados a continuación:</para>
 
       <orderedlist>
         <listitem>
-          <para xml:lang="es">Abrir el diálogo de preferencias de Eclipse
-          desde el menú <literal>Window &gt; Preferences</literal>.</para>
+          <para xml:lang="es">Dentro de la pestaña Servers, pinchar con el
+          segundo botón del ratón y seleccionar New &gt; Server.</para>
         </listitem>
 
         <listitem>
-          <para xml:lang="es">Ir al Panel de configuración de los entornos de
-          servidor que se encuentra en <literal>Server &gt;Runtime
-          environments</literal>.</para>
-        </listitem>
-
-        <listitem>
-          <para xml:lang="es">Pulsar el botón
-          <literal>Add...</literal>.</para>
-        </listitem>
-
-        <listitem>
-          <para xml:lang="es">Seleccione <literal>Apache Tomcat v6.0</literal>
-          de la lista de tipos y pulse el botón
+          <para xml:lang="es">Seleccionar <literal>Apache Tomcat
+          v6.0 Server</literal> de la lista de tipos y pulsar el botón
           <literal>Next</literal>.</para>
 
           <para xml:lang="es">En el caso en que no aparezca ningún tipo de
@@ -428,62 +502,29 @@ Created ...</programlisting>
         </listitem>
 
         <listitem>
-          <para xml:lang="es">Introduzca un nombre para la
+          <para xml:lang="es">Introducir un nombre para la
           configuración.</para>
         </listitem>
 
         <listitem>
-          <para xml:lang="es">Seleccione el directorio donde se encuentra la
-          instalación de Tomcat 6.</para>
+          <para xml:lang="es">Seleccionar el directorio donde se encuentra una
+          instalación de Tomcat 6. Si no se dispone de ninguna instalación de
+          Tomcat 6 crear un nuevo directorio, seleccionarlo y pulsar
+          sobre el botón Download and Install ... que pasados unos segundos
+          terminará la descarga y permitirá continuar.</para>
         </listitem>
 
         <listitem>
-          <para xml:lang="es">Seleccione la máquina virtual Java con la que
+          <para xml:lang="es">Seleccionar la máquina virtual Java con la que
           ejecutar el servidor.</para>
         </listitem>
 
         <listitem>
-          <para xml:lang="es">Pulse el botón <literal>Finish</literal>.</para>
-        </listitem>
-      </orderedlist>
-    </section>
-
-    <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_crear-servidor">
-      <title xml:lang="es">Crear una configuración de Servidor</title>
-
-      <para xml:lang="es">Una configuración de servidor se compone del entorno
-      de ejecución, una o varias aplicaciones a arrancar y una configuración
-      del servicio (puertos, parámetros de memoria, recursos, variables...).
-      Eclipse permite crear todas las configuraciones que necesitemos con las
-      combinaciones posibles.</para>
-
-      <para xml:lang="es">Para crear una nueva configuración siga los pasos
-      siguientes:</para>
-
-      <orderedlist>
-        <listitem>
-          <para xml:lang="es">En vista de servidores, pulsar botón derecho
-          sobre el fondo y seleccionar <literal>New/Server</literal>.</para>
+          <para xml:lang="es">Pulsar el botón Next.</para>
         </listitem>
 
         <listitem>
-          <para xml:lang="es">Seleccione el tipo de servidor (<literal>Tomcat
-          v6.0</literal> en nuestro caso) del la lista <literal>server
-          type</literal>.</para>
-        </listitem>
-
-        <listitem>
-          <para xml:lang="es">Establezca el nombre para el nuevo
-          servidor.</para>
-        </listitem>
-
-        <listitem>
-          <para xml:lang="es">Seleccione el entorno de ejecución que debe usar
-          el servidor.</para>
-        </listitem>
-
-        <listitem>
-          <para>Añada las aplicaciones a ejecutar en este servidor de entre
+          <para>Añadir las aplicaciones a ejecutar en este servidor de entre
           las disponibles.</para>
         </listitem>
       </orderedlist>
@@ -494,8 +535,8 @@ Created ...</programlisting>
 
       <para xml:lang="es">Puede ser necesario ajustar algunas opciones de la
       configuración del servidor. Para poder acceder a dichas opciones hay que
-      seleccionar el servidor desde la vista de servidores y, con el botón
-      derecho del ratón sobre el pulsar <literal>Open</literal>.</para>
+      seleccionar el servidor desde la pestaña de servidores y, con el botón
+      derecho del ratón sobre él pulsar <literal>Open</literal>.</para>
 
       <para xml:lang="es">Desde el panel abierto podremos gestionar:</para>
 
@@ -534,100 +575,91 @@ Created ...</programlisting>
           dejar de funcionar. Para evitar esto, se puede incrementar la
           cantidad de memoria con la que arranca Tomcat.</para>
 
-          <important>
-            <para>Puede ser interesante modificar los parámetros de memoría
-            con los que trabaja el servidor. Para ello:</para>
-
-            <itemizedlist>
-              <listitem>
-                <para>En la pantalla en la que estamos acceder a
-                <emphasis>Open launch configuration</emphasis></para>
-              </listitem>
-
-              <listitem>
-                <para>En la nueva ventana, en la pestaña
-                <emphasis>Arguments</emphasis> añadir al final del texo que
-                aparece en el apartado <emphasis>VM Arguments</emphasis> lo
-                siguiente: <filename>-Xms64m -Xmx256m -XX:MaxPermSize=128m
-                -XX:PermSize=128m</filename></para>
-              </listitem>
-            </itemizedlist>
-          </important>
         </listitem>
       </itemizedlist>
+
+      <important>
+        <para>Es muy interesante modificar los parámetros de memoría
+        con los que trabaja el servidor. Para ello:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>En la pantalla de opciones de la configuración del 
+            servidor acceder a <emphasis>Open launch configuration
+            </emphasis></para>
+          </listitem>
+
+          <listitem>
+            <para>En la nueva ventana, en la pestaña
+            <emphasis>Arguments</emphasis> añadir al final del texo que
+            aparece en el apartado <emphasis>VM Arguments</emphasis> lo
+            siguiente: <filename>-Xms64m -Xmx256m -XX:MaxPermSize=128m
+            -XX:PermSize=128m</filename></para>
+          </listitem>
+        </itemizedlist>
+      </important>
+      
     </section>
 
     <section>
       <title>Ejecución de la aplicación en el Servidor</title>
 
-      <para xml:lang="es">Para que Eclipse nos permita arrancar la aplicación
-      desde el servidor, nuestro proyecto tienen que tener constancia de que
-      puede usar el plugin de Tomcat. Si hemos creado el proyecto desde
-      Eclipse, nuestro poyecto no tiene esta información. La forma más
-      sencilla de conseguir esto es ejecutando el comando <emphasis
-      role="bold">mvn eclipse:eclipse</emphasis>. Esta operación se puede
-      ejecutar tanto desde Eclipse con la ayuda del plugin <emphasis
-      role="bold">M2Eclipse</emphasis> como desde la linea de comandos del
-      sistema en el directorio raiz del proyecto. En Eclipse desde el menú
-      contextual <emphasis>Run As &gt; Maven build</emphasis> nos mostrará la
-      ventana <emphasis role="bold">Edit configuration</emphasis> en la que
-      podemos indicar como <emphasis role="bold">Goal</emphasis>
-      <emphasis>eclipse:eclipse</emphasis>. Esta configuaración se guardará
-      para próximas veces. Tras ejecutarlo tendremos nuestra aplicación lista
-      para arrancarla en el Tomcat que hemos configurado en el IDE.</para>
-
-      <para>Una vez configurado el servidor, debemos añadir a este la
-      aplicación que queremos ejecutar en él. Podemos ejecutar más de una a la
-      vez. En la vista Servers, debemos pulsar con el botón derecho y
-      seleccionar la opción "Add and Remove ...". En el diálogo que se abre
-      seleccionamos de la lista de la izquierda nuestra aplicación y pulsamos
-      el botón "Add &gt;". Cerramos el diálogo con Finish.</para>
+      <para xml:lang="es">Una vez configurado el servidor, se podrá añadir a
+      este la aplicación que se desea ejecutar en él. Se puede ejecutar más de
+      una a la vez. En la vista Servers, pulsar con el botón derecho sobre el
+      servidor deseado y seleccionar la opción <emphasis>Add and Remove ...
+      </emphasis>. En el diálogo que se abre seleccionar de la lista de la 
+      izquierda la aplicación y pulsar el botón <emphasis>Add</emphasis>.
+      Por último, cerrar el diálogo con <emphasis>Finish</emphasis>.</para>
 
       <figure>
         <title>Añadir / Eliminar aplicaciones al Servidor</title>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_servers-addremoveapp.png"/>
+            <imagedata align="center" fileref="images/eclipse_servers-addremoveapp.png"/>
           </imageobject>
         </mediaobject>
       </figure>
 
-      <para>Ya podemos arracar el servidor y probar nuestra aplicación.</para>
+      <para>Ya es posible arrancar el servidor y probar la aplicación.</para>
 
       <figure>
-        <title>Vista de servidores disponibles en nuestro workspace de
+        <title>Vista de servidores disponibles en el workspace de
         Eclipse</title>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_servers.png"/>
+            <imagedata align="center" fileref="images/eclipse_servers.png"/>
           </imageobject>
         </mediaobject>
       </figure>
 
-      <para>En la imagen anterior vemos disponible un servidor Tomcat 6 con
-      nuestra aplicación <emphasis>tenminutes</emphasis> disponible para
-      ejecutar. Con los botones que tenemos a nuestra disposición podemos,
-      arrancar la aplicación en modo debug, arrancar la aplicación de manera
-      normal (botón verde con triángulo blanco en el centro), arrancar en modo
-      profile, pararlo o re-publicar los cambios que tengamos en la aplicación
-      si estamos haciendo modificaciones.</para>
+      <para>En la imagen anterior se observa un servidor Tomcat 6 con la
+      aplicación <emphasis>tenminutes</emphasis> disponible para ejecutar. Con
+      los botones disponibles se puede arrancar la aplicación en modo debug,
+      arrancar la aplicación de manera normal (botón verde con triángulo
+      blanco en el centro), arrancar en modo profile, pararlo o re-publicar
+      los cambios del proyecto en el servidor.</para>
 
       <figure>
         <title>Botones de la vista servidores de Eclipse</title>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_servers-buttons.png"/>
+            <imagedata align="center" fileref="images/eclipse_servers-buttons.png"/>
           </imageobject>
         </mediaobject>
       </figure>
 
-      <para>Una vez arrancado nuestro servidor podemos navegar por nuestra
-      aplicación bien desde un navegador externo (Firefox) o bien desde un
-      navegador que incorpora Eclipse. Para abrir el navegador interno de
-      Eclipse: <emphasis>Window &gt; Show view &gt; Internal Web
+      <para>Una vez arrancado el servidor se podrá navegar por la aplicación
+      bien desde un navegador externo (Firefox) o bien desde un navegador
+      propio que incorpora Eclipse accediendo a la dirección 
+      <link xlink:href="http://localhost:8080/tenminutes">
+      http://localhost:8080/tenminutes</link>. Observar que el final de la
+      dirección se corresponde con el nombre de la aplicación proporcionado
+      al crear el proyecto. Para abrir el navegador interno 
+      de Eclipse utilizar <emphasis>Window &gt; Show view &gt; Internal Web
       Browser</emphasis>.</para>
 
       <figure>
@@ -635,7 +667,7 @@ Created ...</programlisting>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_browser.png"/>
+            <imagedata align="center" fileref="images/eclipse_browser.png"/>
           </imageobject>
         </mediaobject>
       </figure>
@@ -643,66 +675,44 @@ Created ...</programlisting>
       <para>Ejecutar la apliación desde Eclipse puede ser muy útil a la hora
       de hacer cambios en el proyecto, modificaciones en las vistas, en los
       objetos de aplicación, bien desde el propio IDE o desde la línea de
-      comandos de gvNIX, ya que automáticamente veremos reflejados los cambios
-      en el navegador.</para>
+      comandos de gvNIX, ya que automáticamente se verán reflejados los
+      cambios en el navegador.</para>
     </section>
-  </section>
-
-  <section xml:id="guia-desarrollo_eclipse-importante">
-    <title>IMPORTANTE</title>
-
-    <important>
-      <para><emphasis role="bold">A lo largo de la presente guía de referencia
-      se realizan ejemplos mediante la ejecución de comandos desde la línea de
-      comandos de gvNIX en la consola del sistema. Estos ejemplos pueden
-      ejecutarse igualmente desde la consola gvNIX/Roo que integra el plugin
-      SpringSource Tool Suite de Eclipse.</emphasis></para>
-    </important>
-
-    <important>
-      <para><emphasis role="bold">Los comandos <emphasis>perform</emphasis> de
-      gvNIX/Roo hacen uso de la herraminta Maven. Ya que tenemos instalado en
-      Eclipse el plugin M2Eclipse, estos comandos no pueden ser ejecutados
-      desde la consola gvNIX/Roo. Estos comandos pueden lanzarse desde la
-      consola gvNIX/Roo en la linea de comandos del sistema o bien crear
-      configuraciones de ejecución de tareas Maven desde <emphasis>Run As &gt;
-      Maven build ... </emphasis>en Eclipse.</emphasis></para>
-    </important>
   </section>
 
   <section>
     <title>Trabajando con el código de la aplicación en Eclipse</title>
 
-    <para>Cuando hemos generado un proyecto con gvNIX/Roo tendremos que
-    trabajar sobre el código de la aplicación para añadir más funcionalidades
-    y/o modificar alguna de las que "mágicamente" se ha generado. Vamos a
-    explicar un par de detalles que nos simplificaran esta tarea usando
-    Eclipse y el plugin STS que hemos instalado.</para>
+    <para>Al generar un proyecto con gvNIX/Roo habrá que trabajar sobre el
+    código de la aplicación para añadir más funcionalidades y/o modificar
+    alguna de las que se han generado. A continuación se explicarán un par de
+    detalles que simplificaran esta tarea usando Eclipse y el plugin STS
+    instalado.</para>
 
     <figure>
       <title>Vista de editor y Cross References en Eclipse</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/eclipse_crossreference.png"/>
+          <imagedata align="center" fileref="images/eclipse_crossreference.png"/>
         </imageobject>
       </mediaobject>
     </figure>
 
-    <para>En la imagen anterior vemos el editor de Eclipse con el archivo
-    Timer.java que se ha generado cuando hemos ejecutado los comandos
-    <emphasis>entity</emphasis> y <emphasis>field</emphasis> anteriormente. En
-    la parte derecha de la captura podemos ver una ventana que muestra
-    información de la clase Timer. Se trata de la vista <emphasis>Cross
-    Reference</emphasis>. Si no la tenemos disponible en nuestra perspectiva
-    de trabajo, la podemos incorporar desde el menú <emphasis>Window &gt; Show
-    view &gt; Cross References</emphasis>. Esta vista es similar a la vista
-    <emphasis>Outline</emphasis> que nos muestra los campos y métodos
-    declarados en una clase.</para>
+    <para>En la imagen anterior se observa el editor de Eclipse con el archivo
+    Timer.java que se ha generado al ejecutar los comandos
+    <emphasis>entity</emphasis> y <emphasis>field</emphasis> anteriores. En la
+    parte derecha de la captura se ve una ventana que muestra información de
+    la clase Timer. Se trata de la vista <emphasis>Cross Reference</emphasis>.
+    Si no está disponible en la perspectiva de trabajo, se puede incorporar
+    desde el menú <emphasis>Window &gt; Show view &gt; Cross
+    References</emphasis>. Esta vista es similar a la vista
+    <emphasis>Outline</emphasis> que muestra los campos y métodos declarados
+    en una clase.</para>
 
-    <para>La particularidad de la vista Cross References es que nos muestra
-    los campos y métodos asociados a la clase Java mediante AspectJ de los que
-    hablaremos en el Cápitulo sobre el <link
+    <para>La particularidad de la vista Cross References es que muestra los
+    campos y métodos asociados a la clase Java mediante AspectJ que se verán
+    en el Cápitulo sobre el <link
     linkend="guia-desarrollo_generacion-codigo">código que genera
     gvNIX/Roo</link>.</para>
 
@@ -716,16 +726,16 @@ Created ...</programlisting>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/eclipse_cross-contextual.png"/>
+          <imagedata align="center" fileref="images/eclipse_cross-contextual.png"/>
         </imageobject>
       </mediaobject>
     </figure>
 
-    <para>Si hacemos click sobre una de las entradas que aparecen en la
-    ventana <emphasis>Cross References</emphasis> o en el menú contextual, se
-    abrirá el fichero .aj que tiene declarado ese campo o método. Por ejemplo,
-    si accedemos al <emphasis>Timer.toString()</emphasis> se abrirá el editor
-    con el archivo <emphasis>Timer_Roo_ToString.aj</emphasis>.</para>
+    <para>Haciendo click sobre una de las entradas que aparecen en la ventana
+    <emphasis>Cross References</emphasis> o en el menú contextual, se abrirá
+    el fichero .aj que tiene declarado ese campo o método. Por ejemplo, si se
+    accede al método <emphasis>Timer.toString()</emphasis> se abrirá el
+    editor con el archivo <emphasis>Timer_Roo_ToString.aj</emphasis>.</para>
 
     <important>
       <para>Cabe destacar que para que aparezca esta información sobre el
@@ -736,15 +746,15 @@ Created ...</programlisting>
     <section xml:id="guia-desarrollo_eclipse-modificar-codigo">
       <title>Modificación del código generado</title>
 
-      <para>Como hemos comentado, seguramente necesitemos añadir nuevas
+      <para>Como se ha comentado, seguramente será necesario añadir nuevas
       funcionalidades o modificar algunas de las que se han generado
-      automáticamente para adapatar el código a los requisitos de la
+      automáticamente para adaptar el código a los requisitos de la
       aplicación. En estos casos hay que tener en cuenta que <emphasis
-      role="bold">no debemos hacer ningún cambio sobre los AspectJ asociados a
-      una clase Java</emphasis>. gvNIX/Roo ya nos lo avisa en la primera línea
-      del archivo .aj. El motivo de esto es, que teniendo la consola gvNIX
-      funcionando, o al arrancarl, gvNIX/Roo volvería a generar el código
-      automáticamente perdiendo las modificaciones que hubiésemos
+      role="bold">no se debe hacer ningún cambio sobre los AspectJ (ficheros
+      aj) asociados a una clase Java</emphasis>. gvNIX/Roo ya nos lo avisa en
+      la primera línea del archivo .aj. El motivo de esto es, que teniendo la
+      consola gvNIX funcionando, o al arrancar, gvNIX/Roo volvería a generar
+      el código automáticamente perdiendo las modificaciones que hubiésemos
       realizado.</para>
 
       <figure>
@@ -752,37 +762,39 @@ Created ...</programlisting>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_edicion-aj.png"/>
+            <imagedata align="center" fileref="images/eclipse_edicion-aj.png"/>
           </imageobject>
         </mediaobject>
       </figure>
 
       <para>Para modificar el código de un método o la declaración de un campo
-      que se encuentre en un AspectJ, debemos mover el método, o el campo, a
-      la clase Java, al archivo .java, del que depende el AspectJ. En el
-      ejemplo, moveríamos lo que quisieramos modificar a la clase
-      <emphasis>Timer.java</emphasis>. Podemos hacerlo mediante cortar y
-      pegar, pero Eclipse con el plugin STS nos ofrece una opción para
-      hacerlo.</para>
+      que se encuentre en un AspectJ, se puede mover el método o el campo a
+      la clase Java, del que depende el AspectJ. En el ejemplo, se movería a
+      la clase <emphasis>Timer.java</emphasis>. Puede realizarse cortando y
+      pegando, pero Eclipse con el plugin STS ofrece una opción mucho más
+      adecuada para esto.</para>
 
-      <para>Selecionando el nombre del método que queremos mover y a través
-      del menú contextual <emphasis>AspectJ Refactoring &gt; Push In
-      ...</emphasis> Eclipse se ocupará de eliminar el código del .aj y
-      moverlo al .java.</para>
+      <para>Seleccionando el nombre del método a mover y a través del menú
+      contextual <emphasis>AspectJ Refactoring &gt; Push In ...</emphasis>
+      Eclipse se ocupará de eliminar el código del .aj y moverlo al
+      .java.</para>
 
       <figure>
         <title>Menú contextual AspecJ Refactoring</title>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/eclipse_pushincontextual.png"/>
+            <imagedata align="center" fileref="images/eclipse_pushincontextual.png"/>
           </imageobject>
         </mediaobject>
       </figure>
 
-      <para>Una vez en el .java, podemos hacer cuantas modificaciones
-      necesitemos sin peligro de que se pierdan por la acción de
+      <para>Una vez en el .java, se podrá hacer cuantas modificaciones se
+      necesiten sin peligro de que se pierdan por la acción de
       gvNIX/Roo.</para>
+
+      <para>Del mismo modo, si se necesita añadir nuevos métodos o campos a la
+      clase Java, se debe hacer directamente en el .java.</para>
 
       <important>
         <para>Es interesante tener abierta la consola gvNIX para que los
@@ -790,8 +802,6 @@ Created ...</programlisting>
         cambios automáticos que realiza gvNIX/Roo.</para>
       </important>
 
-      <para>Del mismo modo, si necesitamos añadir nuevos métodos o campos a la
-      clase Java, lo podemos hacer directamente en el .java.</para>
     </section>
   </section>
 </chapter>
