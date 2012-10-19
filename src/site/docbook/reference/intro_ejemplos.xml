@@ -176,10 +176,8 @@ project ...
 
       <listitem>
         <para>Ejemplo de una aplicación de agenda de personas y direcciones
-        usando Hibernate, Registro Activo y Flex.</para>
-
-        <para>El acceso a la aplicación se debe realizar a través de la
-        siguiente dirección:
+        usando Hibernate, Registro Activo y Flex. El acceso a la aplicación
+        se debe realizar a través de la siguiente dirección:
         http://localhost:8080/flexrocks/flexrocks_scaffold.html</para>
       </listitem>
     </varlistentry>

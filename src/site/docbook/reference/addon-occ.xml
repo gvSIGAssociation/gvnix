@@ -56,7 +56,7 @@
     Checksum</emphasis> con el que se calculó en el momento de la carga del
     elemento editado o a eliminar. <emphasis>Si no coincide se lanza una
     Excepción </emphasis>(<link
-    xlink:href="http://java.sun.com/javaee/5/docs/api/javax/persistence/OptimisticLockException.html">javax.persistence.OptimisticLockException</link>)
+    xlink:href="http://docs.oracle.com/javaee/6/docs/api/javax/persistence/OptimisticLockException.html">javax.persistence.OptimisticLockException</link>)
     y la operación no se realizará.</para>
 
     <para xml:lang="es">Esta operación supone un coste adicional en las tareas

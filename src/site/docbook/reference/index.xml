@@ -60,18 +60,18 @@
     <title xml:lang="es">Desarrollo de aplicaciones con gvNIX</title>
 
     <partintro>
-      <para xml:lang="es">En esta sección veremos paso a paso cómo desarrollar
-      una aplicación web desde cero para mostrar cómo utilizar gvNIX en
+      <para xml:lang="es">En esta sección se verá paso a paso cómo desarrollar
+      una aplicación web desde cero demostrando cómo utilizar gvNIX en
       cualquier proyecto web. Algunas de las características de gvNIX que se
-      muestran son:</para>
+      verán son:</para>
 
       <itemizedlist>
         <listitem>
-          <para>Crear un nuevo proyecto.</para>
+          <para>Creación de un nuevo proyecto.</para>
         </listitem>
 
         <listitem>
-          <para>Gestión de acceso a datos.</para>
+          <para>Configuración del acceso a datos.</para>
         </listitem>
 
         <listitem>
@@ -80,21 +80,10 @@
 
         <listitem>
           <para>Gestión del modelo de entidades.</para>
-
-          <itemizedlist>
-            <listitem>
-              <para>Enlazar el modelo de entidades con una base de datos
-              existente</para>
-            </listitem>
-          </itemizedlist>
         </listitem>
 
         <listitem>
           <para>Gestión de la capa web.</para>
-        </listitem>
-
-        <listitem>
-          <para>Desarrollo con Eclipse.</para>
         </listitem>
       </itemizedlist>
     </partintro>

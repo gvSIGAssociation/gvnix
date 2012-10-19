@@ -242,13 +242,13 @@
     <title>Utilizar Eclipse como IDE</title>
 
     <section xml:id="guia-desarrollo_eclipse-usar">
-      <title xml:id="es">Crear proyecto gvNIX/Roo en Eclipse IDE</title>
+      <title xml:id="es">Crear proyecto gvNIX en Eclipse IDE</title>
 
       <para xml:lang="es">Crear un proyecto gvNIX desde Eclipse a través del
       menú: <emphasis>File &gt; New &gt; Spring Roo Project</emphasis>:</para>
 
       <figure>
-        <title>Nuevo proyecto Srping Roo con soporte gvNIX</title>
+        <title>Nuevo proyecto Spring Roo con soporte gvNIX</title>
 
         <mediaobject>
           <imageobject>
@@ -387,7 +387,7 @@ Created ...</programlisting>
     <title xml:lang="es">Generación de pruebas de integración</title>
 
     <para>El comando <emphasis>entity</emphasis> dispone de la opción testAutomatically
-    que al ser especificado generará los test de integración para dicha entidad
+    que al ser especificada generará los test de integración para dicha entidad
     usando JUnit.</para>
     
     <para>Si los tests no fueron creados en el momento de la ejecución
@@ -416,7 +416,7 @@ Created ...</programlisting>
     pasos:</para>
 
     <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse_mostrar-vista-servidores">
-      <title>Mostrar la Vista de Servidores de Eclipse</title>
+      <title>Mostrar la Vista de Servidores en Eclipse</title>
 
       <para>Eclipse tiene una vista que permite ver los distintos servidores
       configurados y gestionarlos desde ahí. Estos son los pasos para mostrar

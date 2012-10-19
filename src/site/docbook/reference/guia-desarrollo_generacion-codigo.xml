@@ -9,28 +9,26 @@
   <title>Código generado por gvNIX/Roo</title>
 
   <section>
-    <title>Clases Java</title>
+    <title>Clases Java y ficheros AspectJ</title>
 
     <section>
-      <title>Archivos .java</title>
-
-      <para>TBC: anotaciones, campos, métodos</para>
+      <title>Archivos Java</title>
 
       <para>Por lo general, la norma que sigue gvNIX/Roo es mantener la clase
       Java, el archivo .java, lo más sencillo posible y por ello, muchas
-      veces, nos podemos encontrar con que el archivo .java está casi vacio.
+      veces, nos podemos encontrar con que el archivo .java está prácticamente vacio.
       Contiene poco más que la declaración de la clase y anotaciones asociadas
       a la misma. El resto del código, campos y métodos se declaran en sus
       ITD, que son AspectJ de los que vamos a hablar a continuación.</para>
     </section>
 
     <section>
-      <title>ITDs de la clase: archivos .aj</title>
+      <title>Archivos AspectJ</title>
 
       <para>Asociados a una clase java aparecen ciertos ficheros con nombre
-      *_Roo_*.aj. Se trata de AspcetJ que no son más que porciones de código
+      *_Roo_*.aj y *_gvNIX_*aj. Se trata de AspectJ que no son más que porciones de código
       que al compilar el proyecto, se asocian como código de la propia clase
-      Java a la que están vinculados.</para>
+      Java a la que están vinculadas.</para>
     </section>
   </section>
 </chapter>
