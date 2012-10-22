@@ -1082,7 +1082,7 @@ public class Entity1 {
        valores, no volverá a solicitar el siguiente valor de la secuencia.
        Para más información sobre la optimización de generadores de
        secuencia consultar la <link
-       xlink:href="http://docs.jboss.org/hibernate/core/3.3/reference/en/html/mapping.html#mapping-declaration-id-enhanced-optimizers">documenteación
+       xlink:href="http://docs.jboss.org/hibernate/core/3.3/reference/en/html/mapping.html#mapping-declaration-id-enhanced-optimizers">documentación
        de Hibernate</link>. Es posible modificar este comportamiento 
        haciendo push-in de la propiedad id y añadiendo 
        a la anotación <emphasis>@SequenceGenerator</emphasis> el atributo
@@ -1093,36 +1093,53 @@ public class Entity1 {
     <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_campo-control-optimista">
       <title>Campo para el control de concurrencia optimista.</title>
 
-      <para>Por defecto, se genera un campo de control de concurrencia
-      optimista llamado <literal>version</literal> de tipo
-      <classname>java.lang.Integer</classname>. Para ajustarlo disponemos de
-      tres opciones:</para>
+      <para>En la ingeniería directa, por defecto, para cada entidad 
+      se genera un campo de control de concurrencia
+      optimista con nombre <literal>version</literal> y de tipo
+      <classname>java.lang.Integer</classname></para>
+      
+	<para>El control por versión utiliza números de versión, o sellos de fecha
+	(timestamps), para detectar actualizaciones en conflicto y prevenir la
+	pérdida de actualizaciones. Cuando 2 usuarios actualizan el mismo registro de
+	forma simultánea, sin control de concurrencia, los cambios del segundo usuario
+	en actualizar sobreescriben los datos actualizados por el primer, dando la
+	sensación al primer usuario que sus datos se perdieron o nunca existieron.</para>
+	
+	<para>En el control de concurrencia por versión hay una columna <emphasis>Version</emphasis> en la
+	tabla de base de datos que se mapea a un atributo de la entidad anotado con
+	<emphasis>@Version</emphasis>. Al hacer update o delete se añade al WHERE la clave primaria
+	y la comparación de versión, <emphasis>si version != VERSION_DB</emphasis> no se actualiza nada.
+	</para>
+	
+	<para>Observar que todas estas características se pueden especificar en el 
+	momento de la creación de la entidad mediante el comando entity.
+	Para ajustarlo posteriormente existen otras opciones:</para>
 
       <orderedlist>
         <listitem>
-          <para>Configurar la anotación @RooEntity, ajustar el nombre del
-          campo, y tipo. Si dejamos el nombre de campo a <emphasis>cadena
-          vacía</emphasis> (<literal>""</literal>) no se generará ningún
-          campo. Un ejemplo de esto:</para>
+          <para>Configurar la anotación @RooJpaActiveRecord para ajustar el nombre del
+          campo, el nombre de la columna y el tipo de datos.</para>
 
-          <programlisting>@Entity
+          <programlisting>
 @RooJavaBean
 @RooToString
-@RooEntity(versionField="version", 
-        versionType=Long.class, identifierColumn="ENT_ID")
+@RooJpaActiveRecord(versionField="version", 
+        versionType=Long.class, versionColumn="ENT_ID")
 public class Entity1 {
 
     private String field1;
 
 }</programlisting>
+        </listitem>
 
+        <listitem>
           <para>Otro ejemplo desactivando el control de concurrencia
           optimista:</para>
 
-          <programlisting>@Entity
+          <programlisting>
 @RooJavaBean
 @RooToString
-@RooEntity(versionField="")
+@RooJpaActiveRecord(versionField="")
 public class Entity1 {
 
     private String field1;
@@ -1130,110 +1147,65 @@ public class Entity1 {
 }</programlisting>
         </listitem>
 
-        <listitem>
-          <para>Añadir manualmente el campo en la clase java. La declaración
-          se detectará por el framework que no la generará automáticamente. Un
-          ejemplo de esto:</para>
-
-          <programlisting>@Entity
-@RooJavaBean
-@RooToString
-@RooEntity
-public class Entity1 {
-
-    @Version
-    @Column(name = "ENT1_VERSION")
-    private Integer version;
-
-    public Integer getVersion(){
-        return ent1Id;
-    }
-
-    public void setVersion(Integer version){
-        this.version = version;
-    }
-
-    private String field1;
-
-}</programlisting>
-        </listitem>
-
-        <listitem>
-          <para>Usar el control de concurrencia optimista de gvNIX. Para ello
-          se debe usar el comando <command><link
-          linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
-          checksum set</link></command>. Con este comando la clase se quedará
-          así:</para>
-
-          <programlisting>@Entity
-@RooJavaBean
-@RooToString
-@RooEntity
-public class Entity1 {
-
-    @Version
-    @Transient
-    private String occChekcsum;
-
-    public String getOccChekcsum() {
-        return this.occChekcsum;
-    }
-
-    public void setOccChekcsum(String checksum) {
-        this.occChekcsum = checksum;
-    }
-
-    private String field1;
-
-}</programlisting>
-        </listitem>
       </orderedlist>
+      
+      <para>Mas adelante se verán otros mecanismos para realizar un
+      control de concurrencia optimista. Para más información
+      consultar el comando <command><link
+      linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">
+      occ checksum set</link></command>.</para>
+          
     </section>
 
     <section xml:id="guia-desarrollo_gestion-entidades_enlazar-base-datos-existente_regeneracion-bbdd">
       <title xml:lang="es">Regeneración de la Base de datos en cada
       arranque.</title>
 
-      <para xml:lang="es">Recordar que por defecto, la configuración de Roo
+      <para xml:lang="es">Recordar que por defecto, en la ingeniería directa, 
+      la configuración que se genera
       <emphasis role="bold">reconstruye la base de datos en cada ejecución de
-      la aplicación</emphasis>. Cuando usamos una base de datos existente o
-      compartida debemos cambiar este comportamiento.</para>
-
-      <para xml:lang="es">Modificar el fichero
-      <filename>src/main/resources/META-INF/persistence.xml</filename> y
-      comentar la siguiente linea:</para>
-
-      <programlisting>    &lt;!-- &lt;property name="hibernate.hbm2ddl.auto" value="create"/&gt; --&gt;</programlisting>
+      la aplicación</emphasis>. Si se desea modificar este comportamiento
+      consultar la sección 
+      <link linkend="guia-desarrollo_acceso-datos_actualizacion-esquema">
+      Actualización automática del esquema</link>
+      .</para>
     </section>
 
     <section>
-      <title>Clase Repartidor para nuestro proyecto de ejemplo</title>
+      <title>Creación de una nueva entidad sin los comandos</title>
+      
+      <para>En el ejemplo que se está siguiendo a lo largo de la documentación,
+      se puede definir una nueva entidad <emphasis>Repartidor</emphasis>
+      creando la siguiente clase Java. También se puede realizar
+      su creación mediante los comandos <emphasis>entity</emphasis> y 
+      <emphasis>field</emphasis>.</para>
 
-      <programlisting>@RooJavaBean
+      <programlisting>package com.springsource.roo.pizzashop.domain;
+
+import org.springframework.roo.addon.javabean.RooJavaBean;
+import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
+import org.springframework.roo.addon.tostring.RooToString;
+
+@RooJavaBean
 @RooToString
-@RooEntity
+@RooJpaActiveRecord
 public class Repartidor {
 
-    @NotNull
-    @Size(min = 2)
-    private java.lang.String name;
-
+        private String name;
 }</programlisting>
 
-      <para>Generamos los test de integración para la nueva entidad y
-      definimos la relación entre PizzaOrder y el Repartidor del pedido.
-      También generamos el controlador que gestionará la nueva entidad.</para>
+      <para>Observar que al salvar la clase Java con las anotaciones correspondientes,
+      en la consola aparecen mensajes informando de la creación de distintos ficheros
+      de aspectos java (*.aj). A continuación, se puede generar los test de integración
+      para la nueva entidad y definir una relación entre PizzaOrder y el Repartidor del pedido.</para>
 
-      <programlisting>roo-gvNIX&gt; <command>test integration --entity ~.domain.Repartidor</command>
+      <programlisting><command>test integration --entity ~.domain.Repartidor</command>
 ...
-roo-gvNIX&gt; <command>field reference --class ~.domain.PizzaOrder --fieldName repartidor --type ~.domain.Repartidor
-</command>...
-roo-gvNIX&gt; <command>controller scaffold --entity ~.domain.Repartidor --class ~.web.RepartidorController</command>
-...
-</programlisting>
+<command>field reference --class ~.domain.PizzaOrder --fieldName repartidor --type ~.domain.Repartidor</command>
+...</programlisting>
 
-      <para>Podemos volver a lanzar los test de integración para confirmar que
-      todo se ha generado correctamente.</para>
+      <para>Finalmente, lanzar los test de integración para confirmar que
+      todo se ha generado y funciona correctamente.</para>
 
       <programlisting>roo-gvNIX&gt; <command>perform tests
 </command>...
@@ -1244,166 +1216,156 @@ roo-gvNIX&gt; <command>controller scaffold --entity ~.domain.Repartidor --class 
   <section xml:id="guia-desarrollo_gestion-entidades_ingenieria-inversa">
     <title xml:lang="es">Ingeniería inversa de entidades</title>
 
-    <para xml:lang="es">gvNIX permite la utilización de ingeniería inversa
-    para gestionar las entidades JPA del proyecto, lo cual nos ofrece la
-    opción de, que basado en la metainformación recopilada de la BBDD
-    configurada en nuestro proyecto, nos genere todas las entidades con sus
-    campos de manera automática. El encargado de esta funcionalidad es el
-    Add-on <emphasis>Database Reverse Engineering</emphasis> (DBRE) que se
-    instala en el proyecto mediante el comando <emphasis>addon
-    install</emphasis>.</para>
+    <para xml:lang="es">El framework permite realizar una ingeniería inversa
+    multiesquema e incremental de un modelo relacional de base de datos existente,
+    de forma que basándose en la metainformación recopilada de la BBDD se generarán todas 
+    las entidades con sus respectivos campos de manera automática.
+    El encargado de esta funcionalidad es el
+    Add-on <emphasis>Database Reverse Engineering</emphasis> disponible
+    en el framework de forma automática.</para>
 
     <section xml:id="guia-desarrollo_ingenieria-inversa_instalacion">
-      <title>Instalación del Add-on</title>
+      <title>Instalación del driver JDBC</title>
 
-      <para>El Add-on DBRE soporta la mayoria de las Bases de Datos
-      relacionales que pueden ser gestionadas por gvNIX (MySQL, MS SQL,
-      PostgreSQL). El driver a utilizar lo detecta gvNIX y nos pregunta si
-      queremos descargarlo e instalarlo la primera vez que invocamos los
-      comandos <emphasis>database introspect</emphasis> o <emphasis>database
-      reverse engineer.</emphasis></para>
+      <para>El Add-on DBRE soporta las principales bases de datos
+      relacionales del mercado (MySQL, MS SQL, PostgreSQL, Oracle, ...).
+      El driver a necesario será detecta y se ofrecerá
+      su descargar e instalación automática la primera vez que lo requiera
+      alguno de los comandos <emphasis>database introspect</emphasis> o
+      <emphasis>database reverse engineer.</emphasis></para>
 
       <para><warning>
-          <para>Si estás trabajando en el entorno de la CIT, antes de seguir
-          adelante es recomendable que añadas el repositorio Maven de la CIT
+          <para>Si se está trabajando en el entorno de la CITMA, antes de seguir
+          adelante es recomendable añadir el repositorio Maven de la CITMA
           al pom.xml del proyecto. En la <link
-          linkend="recetas-repositorio_maven">sección de recetas</link> hay un
+          linkend="recetas-repositorio_maven">sección de recetas</link> existe un
           ejemplo de como hacerlo.</para>
         </warning><warning>
-          <para>Si lanzamos este comando con la configuración actual del
-          proyecto que usa HYPERSONIC_IN_MEMORY como BBDD nos indicará que no
+          <para>Si se lanza este comando con la configuración actual del
+          proyecto que usa HYPERSONIC_PERSISTENT como BBDD indicará que no
           hay driver disponible para HSQLDB.</para>
-        </warning>Si lo hacemos en un proyecto que tenga PostgreSQL como
-      BBDD:<programlisting>roo-gvNIX&gt; <emphasis role="bold">database introspect --schema unable-to-obtain-connection</emphasis>
-Located add-ons that may offer this JDBC driver
-2 found, sorted by rank; T = trusted developer; R = Roo 1.1 compatible
-<emphasis role="bold">ID T R DESCRIPTION -------------------------------------------------------------
-</emphasis><emphasis role="bold">01 - Y 9.0.0.801_jdbc4_0001 PostgreSQL #jdbcdriver...
-02 Y Y 9.0.801.0001 Postgres #jdbcdriver driverclass:org.postgresql.Driver....</emphasis>
+        </warning>Por ejemplo, si se ejecuta la ingeniería inversa en un proyecto con
+        PostgreSQL configurado como sistema de base de datos:
+        
+        <programlisting>roo-gvNIX&gt; <emphasis role="bold">database introspect --schema unable-to-obtain-connection</emphasis>
+Located add-on that may offer this JDBC driver
+1 found, sorted by rank; T = trusted developer; R = Roo 1.2 compatible
+ID T R DESCRIPTION -------------------------------------------------------------
+01 Y Y 9.1.0.901_0001 Postgres #jdbcdriver...
 --------------------------------------------------------------------------------
 [HINT] use 'addon info id --searchResultId ..' to see details about a search result
 [HINT] use 'addon install id --searchResultId ..' to install a specific search result, or
 [HINT] use 'addon install bundle --bundleSymbolicName TAB' to install a specific add-on version
-JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programlisting>ID T R DESCRIPTION ------------------------------------------------------------- 
-01 - Y 9.0.0.801_jdbc4_0001 PostgreSQL #jdbcdriver...
-02 Y Y 9.0.801.0001 Postgres #jdbcdriver driverclass:org.postgresql.Driver....</programlisting>esta
-      sección de la salida del comando <emphasis>database
-      introspect</emphasis> nos indica que hay disponible dos drivers para el
-      soporte de DBRE y nos sugiere que hacer a continuación (lineas que
+JDBC driver not available for 'org.postgresql.Driver'</programlisting>Esta
+      salida del comando <emphasis>database
+      introspect</emphasis> informa que hay disponible un driver para el
+      soporte de DBRE y sugiere qué hacer a continuación (lineas que
       empiezan con [HINT]).</para>
 
-      <para>Podemos obtener más información sobre el dirver mediante:</para>
+      <para>Se puede obtener más información sobre el driver mediante:</para>
 
-      <programlisting>roo-gvNIX&gt; <command>addon info id --searchResultId 01</command></programlisting>
+      <programlisting>roo-gvNIX&gt; <command>addon info id --searchResultId 01</command>
+Name.........: Spring Roo - Wrapping - postgresql-jdbc3
+BSN..........: org.springframework.roo.wrapping.postgresql-jdbc3
+Version......: 9.1.0.901_0001 [available versions: 9.0.801.0001,
+               9.1.0.901_0001]
+Roo Version..: 1.2
+Ranking......: 0.0
+JAR Size.....: 513073 bytes
+PGP Signature: 0xEC67B395 signed by Alan Stewart (stewarta@vmware.com)
+OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</programlisting>
 
-      <para>Donde le estamos diciendo que nos ofreca más información
-      (--searchResultId) del Add-on 01 que nos ha devuelto el comando
+      <para>Donde se está pidiendo más información
+      (--searchResultId) del Add-on 01 que ha devuelto el comando
       anterior.</para>
 
-      <para>Para instalarlo se puede hacer usando el id del Add-on o bien su
-      nombre simbólico.<programlisting>roo-gvNIX&gt; <command>addon install id --searchResultId 01</command></programlisting></para>
+      <para>Para instalarlo usar el id del Add-on o bien su
+      nombre simbólico.<programlisting><command>addon install id --searchResultId 01</command></programlisting></para>
 
       <para>o</para>
 
-      <programlisting>roo-gvNIX&gt; <command>addon install bundle --bundleSymbolicName org.postgresql.roo.wrapper.postgresql</command></programlisting>
+      <programlisting><command>addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc3</command></programlisting>
 
-      <para>Al instante tendremos disponible el driver JDBC y podremos empezar
-      a usar los comandos <emphasis>database introspect</emphasis> o
+      <para>Al instante estará disponible el driver JDBC y se podrá empezar
+      a usar los comandos <emphasis>database introspect</emphasis> y
       <emphasis>database reverse.</emphasis></para>
 
-      <note>
-        <para><emphasis role="bold">Sobre los drivers de PostgreSQL
-        disponibles</emphasis>: como hemos visto en el ejemplo anterior hay
-        disponibles dos drivers para PosgreSQL:</para>
-
-        <orderedlist>
-          <listitem>
-            <para>9.0.0.801_jdbc4_0001</para>
-          </listitem>
-
-          <listitem>
-            <para>9.0.801.0001</para>
-          </listitem>
-        </orderedlist>
-
-        <para>Ambos ofrecen compatibilidad con BBDD PostgreSQL 7.2 ó más
-        modernas, la diferencia entre ambos es que el primero es el indicado
-        para trabajar con JVMs 1.6 ó 1.7 y el segundo con 1.5 ó
-        anteriores.</para>
-      </note>
     </section>
 
     <section>
-      <title>Comandos del Add-on DBRE</title>
+      <title>Comandos de la ingeniería inversa</title>
 
       <para>DBRE ofrece dos comandos: <emphasis>database introspect</emphasis>
       o <emphasis>database reverse engineer.</emphasis></para>
 
-      <programlisting>roo-gvNIX&gt; <command>database introspect --schema</command> &lt;nombre del esquema&gt; --file &lt;nombre del fichero&gt; --enableViews</programlisting>
+      <programlisting><command>database introspect --schema</command> &lt;nombre del esquema&gt; --file &lt;nombre del fichero&gt; --enableViews</programlisting>
 
-      <para>el comando nos mostrará la estructura de la BBDD en formato XML.
-      Es obligatorio indicar el esquema al que nos referimos, para ello
-      presionado la tecla TAB nos mostrará una lista de esquemas de nuestra
+      <para>El comando mostrará la estructura de la BBDD en formato XML.
+      Es obligatorio indicar el esquema, para ello
+      presionado la tecla TAB se mostrará la lista de esquemas de la
       BBDD. Algunas BBDD no usan el concepto de esquema, MySQL entre ellas,
-      aun así la opción --schema es necesaria y por ello el asistente nos
-      mostraría como esquema "no-schema-required". La opción --file indica que
+      aun así la opción --schema es necesaria y por ello el asistente
+      mostrará como esquema "no-schema-required". La opción --file indica que
       guarde la información también en un fichero determinado y --enableViews
-      especifica que también debe recoger información sobre las vistas.</para>
+      especifica que también debe obtener información sobre las vistas.</para>
 
-      <programlisting>roo-gvNIX&gt; <command>database reverse engineer --schema</command> --package --testAutomatically --enableViews --includeTables --excludeTables --includeNonPortableAttributes</programlisting>
+      <programlisting><command>database reverse engineer --schema</command> --package --testAutomatically --enableViews --includeTables --excludeTables --includeNonPortableAttributes</programlisting>
 
-      <para>este comando crea las entidades JPA de nuestro proyecto
-      representando las tablas y columnas de nuestra BBDD. Al igual que antes
-      --schema es obligatorio. Podemos usar --package para indicar el nombre
-      del paquete de nuestro proyecto donde crear las clases Java, si no lo
-      hacemos en las siguientes ejecuciones del comando, las clases se crearan
-      en el mismo paquete que en la primera vez.</para>
+      <para>Este comando crea las entidades JPA del proyecto
+      representando las tablas y columnas de la BBDD. Al igual que antes
+      --schema es obligatorio. Se debe usar --package para indicar el nombre
+      del paquete del proyecto donde crear las clases Java, como convención
+      se recomienda utilizar el subpaquete domain dentro del paquete base, 
+      ese decir, <emphasis>~.domain</emphasis>.</para>
 
-      <para>Podemos indicarle que genere automáticamente los test de
+      <para>Podemos indicar también que se generen automáticamente los test de
       integración para cada una de las nuevas entidades creadas con
       --testAutomatically.</para>
 
-      <para>Si indicamos la opción --enableViews en este comando, se crearan
-      entidades JPA que representes las vistas que se encuentren en la
-      introspección de la BBDD. Esto solo debería usarse en casos especiales
-      como pueden ser aquellas BBDD que dispongan de disparadores
-      (<emphasis>triggers</emphasis>).</para>
+      <para>Si se especifica la opción --enableViews en este comando, se crearan
+      entidades JPA que representen las vistas que se encuentren en la
+      introspección de la BBDD.</para>
 
-      <para>Podemos filtrar las tablas que se van a tener en cuenta en la
-      operación. --includeTables indicará cuales son las tablas que queremos
-      que sean tenidas en cuenta. Podemos indicar uno o varios nombres de
-      tabla, si indicamos más de uno deberemos indicarlos entre comillas
-      dobles. Se permite el uso de * para hacer matching de uno o varios
+      <para>Se pueden filtrar las tablas que se van a considerar en la
+      operación. --includeTables indicará cuales son las tablas que deben
+      ser tenidas en cuenta. Se pueden indicar uno o varios nombres de
+      tabla, si se indican más de uno, se deberán especificar separadas por
+      espacios y todas ellas entre comillas dobles.
+      Se permite el uso de * para hacer matching de uno o varios
       caracteres en la búsqueda o el uso de ? para indicar un único caracter.
-      De manera opuesta --excludeTables indica que tablas no han de ser
+      De manera opuesta --excludeTables indica qué tablas no han de ser
       tenidas en cuenta durante la ingeniería inversa y admite el mismo uso de
-      * y ?. Por ejemplo:</para>
+      * y ?. Las exclusiones de tablas son requeridas especialmente en aquellas
+      ocasiones en las que tablas incluidas en la ingeniería inversa tienen
+      relaciones con otras tablas no incluidas, por lo que estas segundas deberán
+      excluirse. Un ejemplo:</para>
 
-      <programlisting>roo-gvNIX&gt; database reverse engineer --schema no-schema-required --package ~.domain --includeTables "foo* bar?"</programlisting>
+      <programlisting>database reverse engineer --schema no-schema-required --package ~.domain --includeTables "foo* bar?"</programlisting>
 
       <para>Con este comando se generarían las entidades de aquellas tablas de
       la BBDD que tengan como nombre foo&lt;cualquier cosa&gt; y bar&lt;otro
       caracter más&gt;, por ejemplo 'foo_tabla_cool' y 'bars'.</para>
 
       <warning>
-        <para>al excluir tablas, además de evitar que se creen las entidades
-        de estas tablas se evita tabmién que no se creen las asociaciones y
+        <para>Al excluir tablas, además de evitar que se creen las entidades
+        de estas tablas se evita también que se creen las asociaciones y
         relaciones en otras entidades. Esto se hace para evitar problemas de
         compilación en el código del proyecto.</para>
       </warning>
 
       <para>Como DBRE ofrece ingeniería inversa incremental, se puede ejecutar
-      este comando tantas veces como se necesite y de esta forma gvNIX
+      este comando tantas veces como sea necesario y de esta forma se
       mantendrá todas las entidades JPA de manera automática.</para>
 
       <para>El parámetro <emphasis
       role="bold">--includeNonPortableAttributes</emphasis> puede ser de
       utilidad. En versiones anteriores de la funcionalidad de ingeniería
       inversa de BBDD este parámetro no existía y, por defecto, cuando se
-      generaban las entidades se incluía en las anotaciones JPA uno atributo
+      generaban las entidades se incluía en las anotaciones JPA un atributo
       que rompía la portabilidad del código Java para trabajar con BBDD
       distintas a la de origen. El atributo en cuestión es
-      <emphasis>columnDefinition</emphasis>, que sirve para indicar el tipo de
+      <emphasis>columnDefinition</emphasis> en la anotación <emphasis>@Column</emphasis>,
+      que sirve para indicar el tipo de
       dato usado para crear la columna en la BBDD. Este atributo se utiliza en
       dos fases: cuando se delega en JPA la creación de las tablas de la BBDD
       (propiedad <emphasis>hibernate.hbm2ddl.auto</emphasis> con valor
@@ -1411,28 +1373,28 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
       tipo de dato físico utilizado en la BBDD y también se utiliza en la fase
       de validación del esquema de BBDD en el arranque de la aplicación
       (propiedad <emphasis>hibernate.hbm2ddl.auto</emphasis> con valor
-      <emphasis>validate</emphasis>), que comprueba que las entidades de
-      nuestro proyecto cumplen en esquema de BBDD y por tanto son
+      <emphasis>validate</emphasis>), que comprueba que las entidades del
+      proyecto cumplen con el esquema de BBDD y por tanto son
       compatibles.</para>
 
       <para>Por tanto hay que tener en cuenta este detalle al hacer la
-      ingeniería inversa de la BBDD. Si vamos a seguir trabajando con la misma
-      BBDD original, podemos optar por requerir que se incluyan los atributos
-      "no portables" en la generación de las entidades. Por contra, si nuestra
-      aplicación se va a ejecutar en una BBDD distinta, es mejor no incluir
+      ingeniería inversa de la BBDD. Si se va a seguir trabajando con la mismo
+      BBDD, se puede optar por requerir que se incluyan los atributos
+      "no portables" en la generación de las entidades. Por contra, si la
+      aplicación se va a ejecutar en distintas bases de datos, es mejor no incluir
       estos atributos y no usar este parámetro del comando <emphasis>database
       reverse engineer</emphasis>.</para>
 
       <important>
-        <para>Cuando empezamos a usar el Add-on de ingeniería inversa se
+        <para>Cuando se utiliza el Add-on de ingeniería inversa se
         modifica el fichero META-INF/persistence.xml cambiando el valor de la
         propiedad <emphasis>hibernate.hbm2ddl.auto</emphasis> por el de
-        <emphasis>validate</emphasis> para evitar que pongamos en peligro la
-        integridad de la BBDD a la que estamos conectados en nuestro proyecto.
-        Si no hemos utilizado la opción --includeNonPortableAttributes
-        necesitaremos cambiar el valor de esta propiedad por
-        <emphasis>none</emphasis> para evitar la fase de validación del
-        esquema.</para>
+        <emphasis>none</emphasis> para evitar poner en peligro la
+        integridad de la BBDD a la que se está conectando desde el proyecto.
+        Si se ha utilizado la opción --includeNonPortableAttributes
+        el valor de esta propiedad será
+        <emphasis>validate</emphasis> de modo que en el arranque de la aplicación
+        se realizará la fase de validación del esquema.</para>
       </important>
     </section>
 
@@ -1442,25 +1404,23 @@ JDBC driver not available for 'com.mysql.jdbc.Driver'</programlisting><programli
       <para>Tal y como se ha comentado en la sección <link
       linkend="guia-desarrollo_gestion-entidades_definicion_crear-a-mano">Crear
       una entidad con un IDE</link> se hace uso de una serie de anotaciones
-      Java para que gvNIX gestione el código del proyecto. A las anotaciones
-      descritas anteriormente añadimos ahora la anotación @RooDbManaged que se
-      le añade a todas las entidades creadas durante el proceso de ingeniería
+      Java para que el framework gestione el código del proyecto. A las anotaciones
+      descritas anteriormente se suma ahora la anotación @RooDbManaged que se
+      añade a todas las entidades creadas durante el proceso de ingeniería
       inversa.</para>
 
       <programlisting>@RooJavaBean
 @RooToString
 <command>@RooDbManaged</command>(automaticallyDelete = true)
-@RooEntity(table = "pizza")
+@RooJpaActiveRecord
 public class Pizza {
 }</programlisting>
 
       <para>El atributo <emphasis>automaticallyDelete</emphasis> que acompaña
-      a la anotación y que toma el valor <emphasis>true</emphasis> indica a
-      gvNIX que puede eliminar la entidad en el caso de que la tabla de la
+      a la anotación y que toma el valor <emphasis>true</emphasis> indica
+      que se debe eliminar la entidad en el caso de que la tabla de la
       BBDD a la cual hace referencia sea eliminada. Si el atributo toma el
-      valor <emphasis>false</emphasis>, o si cualquier otra parte del código
-      de esta entidad es modificado (elimnamos una anotación, añadimos algún
-      método, ...) la entidad no se eliminará en caso de que la tabla
+      valor <emphasis>false</emphasis> la entidad no se eliminará en caso de que la tabla
       desaparezca de la BBDD.</para>
     </section>
 
@@ -1468,30 +1428,32 @@ public class Pizza {
       <title>Soporte de funcionalidades JPA 2.0</title>
 
       <para>El Add-on DBRE crea y mantiene claves primarias simples,
-      compuestas y relaciones entre entidades.</para>
+      claves primarias compuestas, relaciones entre entidades,
+      restricciones tamaño, gestión de valores nulos, etc. A continuación,
+      se verá como realiza la gestión de algunos de estos elementos.</para>
 
       <section>
         <title>Claves primarias simples</title>
 
         <para>Para el caso de claves primarias simples DBRE genera un campo
-        identificador en el ITD de la entidad anotado con las anotaciones @Id
-        y @Column tal como se hace al ejecutar el comando
+        identificador en el aspecto java de la entidad marcado con la anotación @Id
+        de forma similar a como se hace al ejecutar el comando
         <emphasis>entity</emphasis>.</para>
       </section>
 
       <section xml:id="guia-desarrollo_entidades-dbre_clave_compuesta">
         <title>Claves primarias compuestas</title>
 
-        <para>En este caso DBRE realiza una solución más elaborada. Crea una
-        clase Java que representa la clave primaria anotandala con
+        <para>En este caso DBRE utiliza una solución más elaborada. Crea una
+        clase Java que representa la clave primaria anotándola con
         @RooIdentifier(dbManaged = true) y añade el atributo "identifierType"
-        con el nombre de la clase del identificador a la anotación @RooEntity
-        en la clase de la entidad. Veamos un ejemplo:</para>
+        con el nombre de la clase del identificador a la anotación @RooJpaActiveRecord
+        en la clase de la entidad. Por ejemplo:</para>
 
         <programlisting>@RooJavaBean
 @RooToString
 @RooDbManaged(automaticallyDelete = true)
-@RooEntity(identifierType = LineItemPK.class, table = "line_item", schema = "order")
+@RooJpaActiveRecord(identifierType = LineItemPK.class, table = "line_item", schema = "order")
 public class LineItem {
 }</programlisting>
 
@@ -1499,10 +1461,10 @@ public class LineItem {
 public class LineItemPK {
 }</programlisting>
 
-        <para>En el ITD de la entidad LineItem existirá un campo anotado con
+        <para>En el aspecto java de la entidad LineItem existirá un campo anotado con
         @EmbeddedId del tipo LineItemPK:</para>
 
-        <programlisting>privileged aspect LineItem_Roo_Entity {
+        <programlisting>privileged aspect LineItem_Roo_Jpa_ActiveRecord {
     
     declare @type: LineItem: @Entity;
     
@@ -1525,8 +1487,8 @@ public class LineItemPK {
     ...
 }</programlisting>
 
-        <para>Y en el ITD de la clase que representa la clave compuesta
-        tendremos los campos de la clave primaria con la anotación
+        <para>Y en el aspecto java de la clase que representa la clave compuesta
+        estarán los campos de la clave primaria con la anotación
         @Embeddable:</para>
 
         <programlisting>privileged aspect LineItemPK_Roo_Identifier {
@@ -1557,85 +1519,52 @@ public class LineItemPK {
     <section>
       <title>Ingeniería inversa multi esquema</title>
 
-      <para>Cosas que se deben de tener en cuenta cuando realizamos la
-      ingenieria inversa de entidades de varios esquemas. </para>
-
-      <orderedlist>
-        <listitem>
-          <para>Antes de hacer la ingenieria inversa de tablas de un segundo
-          esquema deberemos cerrar la consola de gvnix y hacer los siguientes
-          cambios: </para>
-
-          <orderedlist>
-            <listitem>
-              <para>En las entidades ya creadas con clave primaria simple:
-              </para>
-
-              <para>En el fichero java asociado a la entidad : </para>
-
-              <para>En la anotación @RooDbManaged modificamos la propiedad
-              automaticallyDelete a false.</para>
-
-              <para>En la anotación @RooEntity, eliminamos el esquema.</para>
-
-              <para>Añadir en la anotación @RooEntity la propiedad
-              identifierField = "Nombre campo clave primaria" (Caso de
-              entidades con clave primaria simple).</para>
-
-              <para>Ir al fichero Roo_Entity.aj asociado a la entidad que
-              estamos modificando y hacer push-in del campo de la clave
-              primaria y de sus setters and getters. </para>
-
-              <para>Ir al fichero .java de la entidad y eliminar la anotación
-              @GeneratedValue(strategy = GenerationType.AUTO) que hay en el
-              campo identificador.</para>
-            </listitem>
-
-            <listitem>
-              <para>En las entidades ya creadas con clave primaria compuesta:
-              </para>
-
-              <para>En el fichero PK java asociado a la entidad:</para>
-
-              <para>En la anotación @RooIdentifier moddificamos la propiedad
-              dbManaged a false.</para>
-
-              <para>Ir al fichero PK_Roo_Identifier.aj asociado a la entidad
-              que estamos modificando y hacer push-in de los campos que
-              componen la clave primaria y del constructor con campos.</para>
-            </listitem>
-
-            <listitem>
-              <para>Borrar el fichero dbre.xml </para>
-            </listitem>
-          </orderedlist>
-        </listitem>
-
-        <listitem>
-          <para>Arrancar de nuevo la consola de gvnix y ver que no se realizan
-          cambios al arrancar la consola sobre los ficheros que hemos
-          modificado. </para>
-        </listitem>
-
-        <listitem>
-          <para>Abrir la consola, hacer ingenieria inversa del nuevo esquema y
-          repetir el punto 1.</para>
-        </listitem>
-      </orderedlist>
+      <para>La ingeniería inversa proporcionada por el framework
+      ofrece soporte para la conexión con múltiples esquemas de la
+      misma base de datos de forma automática.</para>
+      
+      <para>El opción <emphasis>--schema</emphasis> de los comandos
+      de la ingeniería inversa permiten especificar una lista de esquemas
+      separados por espacios y englobados todos ellos por dobles comillas.</para>
+      
+      <para>La ingeniería inversa también se puede hacer de
+      distintas fuentes de datos utilizando para ello la documentación
+      de la sección <link
+      linkend="guia-desarrollo_gestion-acceso-datos_multiples-fuentes-datos">
+      Múltiples fuentes de datos</link>.</para>
 
       <para/>
     </section>
+    
+    <section>
+      <title>Ingeniería inversa incremental</title>
+
+      <para>La ingeniería inversa proporcionada por el framework
+      permite ejecutarse todas las veces que sea necesario de forma
+      que se pueden modificar las características y elementos
+      incluidos en ingenierías inversas anteriores.</para>
+      
+      <para>Si al ahcer una ingeniería inversa no se incluyó
+      alguna tabla que posteriormente se ha visto necesario,
+      basta con volver a ejecutar el comando de ingeniería
+      inversa incluyendo la nueva tabla. Todas las modificaciones
+      realizadas sobre las entidades que ya existían no se perderán.</para>
+
+      <para/>
+    </section>
+
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_test-integracion">
     <title xml:lang="es">Pruebas unitarias</title>
 
-    <para xml:lang="es">En la creación de entidades, especificando el
-    parámetro <command>--testAutomatically</command> se generarán
-    automáticamente las plantillas de pruebas unitarias que nos permitirán
-    validar el buen funcionamiento de nuestro código.</para>
+    <para xml:lang="es">En la creación de entidades, al especificar el
+    parámetro <command>--testAutomatically</command> se generan
+    automáticamente las pruebas de integración que permitirán
+    validar el buen funcionamiento del código de persistencia
+    de la entidad.</para>
 
-    <para>Para ejecutar los test utilizaremos el comando <command>perform
+    <para>Para ejecutar los test utilizar el comando <command>perform
     tests</command>:</para>
 
     <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>perform test</command>
