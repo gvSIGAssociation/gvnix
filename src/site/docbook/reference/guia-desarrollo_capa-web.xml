@@ -10,14 +10,21 @@
   <title xml:lang="es">Gestión de la capa web</title>
 
   <para xml:lang="es">La capa web de la aplicación contiene la infraestructura
-  necesaria gestionar peticiones HTTP. Actualmente esta capa puede
+  necesaria para gestionar las peticiones HTTP y visualizar cierta información
+  al usuario como respuesta. Actualmente esta capa puede
   desarrollarse con <link
   xlink:href="http:///spring/docs/3.0.x/spring-framework-reference/html/mvc.html">Spring
-  MVC</link> y con <link
-  xlink:href="http://code.google.com/webtoolkit/">GWT</link>. Este último,
-  aunque es funcional, todavía está en fase de refinamiento, por lo que en
-  este apartado nos centraremos en cómo se genera la capa web con Spring
-  MVC.</para>
+  MVC</link>, 
+  <link xlink:href="http://code.google.com/webtoolkit/">GWT</link>,
+  <link xlink:href="http://www.adobe.com/es/products/flex.html">Flex</link>,
+  <link xlink:href="http://javaserverfaces.java.net/">JSF</link> y
+  <link xlink:href="https://vaadin.com/">Vaadin</link>.
+  Cada una de estas tecnologías está integrada a distinto nivel con la
+  generación de código del framework por lo que cada una de ellas ofrecerá
+  ciertas características. Este capítulo se centrará en la 
+  generación de la capa web con Spring MVC ya que se trata de la tecnología
+  más evolucionada dentro de la generación de código del framework y para
+  la que gvNIX ha añadido la mayoría de sus nuevas funcionalidades.</para>
 
   <para xml:lang="es">La gestión de peticiones en Spring MVC se basa en los
   controladores, clases en las que, mediante anotaciones, se definen los
@@ -38,10 +45,14 @@
     <title xml:lang="es">Crear la capa web con el intérprete de
     comandos</title>
 
-    <para xml:lang="es">Desde el intérprete de comandos podemos crear la capa
-    web de forma sencilla, con los comandos siguientes:</para>
+    <para xml:lang="es">Desde el intérprete de comandos se puede crear la capa
+    web en Spring MVC de forma sencilla, con los comandos siguientes:</para>
 
     <itemizedlist>
+      <listitem>
+        <para><command>web mvc setup</command></para>
+      </listitem>
+      
       <listitem>
         <para><command>web mvc scaffold</command></para>
       </listitem>
@@ -55,18 +66,31 @@
       </listitem>
     </itemizedlist>
 
+    <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-setup">
+      <title>web mvc setup</title>
+      
+      <para xml:lang="es">Este comando crea toda la configuración
+      necesaria para el funcionamiento de Spring MVC en el proyecto.
+      Esto implica varios ficheros de configuración preparados para
+      su correcto funcionamiento en el proyecto actual, recursos gráficos,
+      hojas de estilo, soporte multidioma, páginas iniciales, tags, menú, etc.
+      </para>
+	</section>
+	
     <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-scaffold">
       <title>web mvc scaffold</title>
 
-      <para xml:lang="es">Este comando crear un controlador con el CRUDS de
-      entidad especifica. No hay restricciones para crear varios controllers
+      <para xml:lang="es">Este comando crea un controlador con el CRUD
+      (creación, lectura, actualización y borrado)
+      de la entidad especificada. No hay restricciones para crear varios controladores
       para la misma entidad.</para>
 
-      <para xml:lang="es">Este comando, además de generar el controlador
-      genera las vistas para la creación, visualización, listado,
-      actualización, búsquedas de los registros de la entidad y toda la
+      <para xml:lang="es">Este comando, además de generar el controlador,
+      genera también las vistas para la creación, visualización, listado y
+      actualización de los registros de la entidad y toda la
       configuración necesaria para que las peticiones del usuario lleguen al
-      controlador.</para>
+      controlador y se visualize al usuario la respuesta (página)
+      correspondiente.</para>
 
       <para xml:lang="es">Las URL de las peticiones que acepta el Controller
       generado siguen el convenio <link
@@ -77,7 +101,7 @@
       <filename>*_Roo_*.aj</filename> asociado al controller, de forma que la
       clase Java queda limpia de los métodos generados automáticamente.</para>
 
-      <para xml:lang="es">Los parámetros para este comando son:</para>
+      <para xml:lang="es">Los parámetros obligatorios para este comando son:</para>
 
       <variablelist>
         <varlistentry>
@@ -85,18 +109,26 @@
 
           <listitem>
             <para xml:lang="es">Nombre de la clase java para el controller
-            (incluido su paquete) (recordar que se puede usar el
+            (incluido su paquete). Recordar que se puede usar el
             <literal>~</literal> para especificar el paquete base de la
-            aplicación).</para>
+            aplicación. Por convención, estas clases se suelen
+            emplazar en el paquete <literal>~.web</literal> y con el
+            formato <literal>EntidadController</literal>.</para>
           </listitem>
         </varlistentry>
+      </variablelist>
 
+      <para xml:lang="es">Los parámetros opcionales para este comando son:</para>
+
+      <variablelist>
         <varlistentry>
           <term xml:lang="es">--backingType</term>
 
           <listitem>
             <para xml:lang="es">Nombre de la clase Entidad que manejará el
-            Controller.</para>
+            controlador. Si no se especifica este parámetro, se tomará
+            como valor la clase en la cual se encuentre el contexto de la
+            consola.</para>
           </listitem>
         </varlistentry>
 
@@ -138,18 +170,26 @@
 
           <listitem>
             <para xml:lang="es">Nombre del paquete donde se generarán los
-            controllers.</para>
+            controladores. Por convención, se suele
+            utilizar el nombre de paquete <literal>~.web</literal>.</para>
           </listitem>
         </varlistentry>
       </variablelist>
+      
+
+      <para>Un ejemplo:</para>
+
+      <programlisting>roo-gvNIX&gt; <command>web mvc setup</command>
+roo-gvNIX&gt; <command>web mvc all --package ~.web</command></programlisting>
+
     </section>
 
     <section xml:id="guia-desarrollo_web_definir-controller_comandos_controller-class">
       <title>web mvc controller</title>
 
-      <para xml:lang="es">Este comando permite crear un controller plantilla
-      no vinculado a ninguna entidad en concreto para su implementación
-      manual.</para>
+      <para xml:lang="es">Este comando permite crear un controlador de uso general
+      no vinculado a ninguna entidad. Servirá para realizar implementaciones
+      a medida.</para>
 
       <para xml:lang="es">Los parámetros para este comando son:</para>
 
@@ -158,10 +198,11 @@
           <term xml:lang="es">--class</term>
 
           <listitem>
-            <para xml:lang="es">Nombre de la clase java para el controller
-            (incluido su paquete) (recordar que se puede usar el
+            <para xml:lang="es">Nombre de la clase java para el controlador
+            (incluido su paquete). Recordar que se puede usar el
             <literal>~</literal> para especificar el paquete base de la
-            aplicación).</para>
+            aplicación.Por convención, estas clases se suelen
+            emplazar en el paquete <literal>~.web</literal>.</para>
           </listitem>
         </varlistentry>
 
@@ -169,7 +210,7 @@
           <term xml:lang="es">--preferredMapping</term>
 
           <listitem>
-            <para xml:lang="es">Permite la ruta de la petición para este
+            <para xml:lang="es">Permite definir la ruta de la petición para este
             controller.</para>
           </listitem>
         </varlistentry>
@@ -177,7 +218,8 @@
 
       <para>Un ejemplo:</para>
 
-      <programlisting>roo-gvNIX&gt; <command>web mvc controller --class ~.web.MyController</command></programlisting>
+      <programlisting>roo-gvNIX&gt; <command>web mvc setup</command>
+roo-gvNIX&gt; <command>web mvc controller --class ~.web.MyController</command></programlisting>
 
       <para>Genera una clase como esta:</para>
 
@@ -186,11 +228,13 @@
 public class MyController {
 
     @RequestMapping
-    public void get(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+    public void get(ModelMap modelMap, HttpServletRequest request, 
+    		HttpServletResponse response) {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "{id}")
-    public void post(@PathVariable Long id, ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+    public void post(@PathVariable Long id, ModelMap modelMap, HttpServletRequest request,
+    		HttpServletResponse response) {
     }
 
     @RequestMapping
@@ -201,9 +245,9 @@ public class MyController {
 
       <para xml:lang="es">En este ejemplo la clase atenderá cualquier petición
       cuya URL comience por <filename>{URLBase}/my</filename> definido por la
-      anotación <classname>@RequestMapping</classname>. El método receptor,
-      tal cual están definidas las anotaciones
-      <classname>@RequestMapping</classname> en los métodos cumplirán estas
+      anotación <classname>@RequestMapping</classname> asociada a la clase.
+      El método receptor, tal cual están definidas las anotaciones
+      <classname>@RequestMapping</classname> en los métodos, cumplirán las siguientes
       reglas:</para>
 
       <orderedlist>
@@ -214,8 +258,8 @@ public class MyController {
         </listitem>
 
         <listitem>
-          <para>las peticiones a <filename>{URLBase}/my/index</filename> que
-          se atenderán en el método <methodname>index</methodname> que muestra
+          <para>Las peticiones a <filename>{URLBase}/my/index</filename>
+          se atenderán en el método <methodname>index</methodname> que mostrará
           la vista <filename>my/index</filename>.</para>
         </listitem>
 
@@ -241,11 +285,12 @@ public class MyController {
       <title xml:lang="es">Proyecto ejemplo</title>
 
       <para xml:lang="es">Continuando con el proyecto del tutorial, la capa
-      web de la aplicación de venta de pizzas la crearemos con la siguiente
+      web de la aplicación de venta de pizzas se creará con la siguiente
       secuencia de comandos:</para>
 
-      <programlisting>
+      <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>web mvc setup</command>
 ~.domain.PizzaOrder roo-gvNIX&gt; <command>web mvc all --package ~.web</command></programlisting>
+
     </section>
   </section>
 
@@ -255,30 +300,32 @@ public class MyController {
     <para xml:lang="es">Para que una clase <literal>Java</literal> sea un
     controlador de Spring MVC debe estar anotada con la anotación
     <classname>@Controller</classname> y añadir la anotación <link
-    xlink:href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping"><classname>@RequestMapping</classname></link>
-    como convenga para definir la correspondencia entre URL y métodos. Los
-    controladores puedes ser propios, para realizar las operaciones que
-    deseemos o podemos crear controladores para la gestión de entidades
-    (CRUD).</para>
+    xlink:href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/mvc.html#mvc-ann-requestmapping">
+    <classname>@RequestMapping</classname></link>
+    como convenga para definir la correspondencia entre una URL y
+    los métodos del controlador. Los controladores pueden ser a medida,
+    para realizar las operaciones específicas
+    o se pueden crear controladores para la gestión del CRUD
+    (creación, lectura, actualización y borrado) de las entidades.</para>
 
     <section xml:id="guia-desarrollo_web_definir-controller_a-mano_propio">
-      <title>Controladores propios</title>
+      <title>Controlador a medida</title>
 
-      <para>Para crear un controller manual, además de generar la clase con la
-      anotaciones pertinentes, debemos tener en cuenta las siguientes
+      <para>Para crear un controlador a medida, además de generar la clase con la
+      anotaciones pertinentes, se debe tener en cuenta las siguientes
       cuestiones:</para>
 
       <itemizedlist>
         <listitem>
-          <para xml:lang="es">Si usamos vista, deberemos crearlas dentro de
+          <para xml:lang="es">Si se utiliza una vista, crearla dentro de
           <filename>WEB-INF/views/{path}</filename> junto con un fichero
           <filename>WEB-INF/views/{path}/views.xml</filename> de configuración
           del <literal>Tiles</literal>.</para>
         </listitem>
 
         <listitem>
-          <para>Si usamos cadenas de literales susceptibles de
-          internacionalización deberíamos darlas de alta en los ficheros
+          <para>Si se utilizan cadenas de literales susceptibles de
+          internacionalización, darlas de alta en los ficheros
           <filename>WEB-INF/i18n/*.properties</filename> para los idiomas
           disponibles.</para>
         </listitem>
@@ -286,19 +333,28 @@ public class MyController {
     </section>
 
     <section xml:id="guia-desarrollo_web_definir-controller_a-mano_automatico">
-      <title xml:lang="es">CRUDS automático</title>
+      <title xml:lang="es">Controlador CRUD</title>
 
-      <para xml:lang="es">Para crear un controller automático de Spring MVC
-      hay que añadir, además de las anotaciones ya explicadas, la anotación
-      <classname>@RooWebScaffold</classname> que admite la siguiente
-      configuración:</para>
+      <para xml:lang="es">Se puede crear un controlador en Spring MVC
+      que realice de forma automática la creación, lectura, actualización y borrado
+      de registros de la entidad. Estas clases tienen el siguiente aspecto:</para>
+
+<programlisting>@RequestMapping("/bases")
+@Controller
+@RooWebScaffold(path = "bases", formBackingObject = Base.class)
+public class BaseController {
+}</programlisting>
+      
+      <para xml:lang="es">Estas clases contienen, además de las anotaciones ya
+      explicadas, la anotación <classname>@RooWebScaffold</classname> que
+      admite los siguientes atributos obligatorios:</para>
 
       <variablelist>
         <varlistentry>
           <term>path</term>
 
           <listitem>
-            <para xml:lang="es">Ruta base del controller. Debe coincidir con
+            <para xml:lang="es">Ruta base del controlador. Debe coincidir con
             la ruta de la anotación <classname>@RequestMapping</classname> de
             la clase. También se usará como ruta base para crear las vistas
             automáticas a partir de <filename>WEB-INF/views/</filename> en la
@@ -310,36 +366,31 @@ public class MyController {
           <term>formBackingObject</term>
 
           <listitem>
-            <para xml:lang="es">Objeto que maneja el controller. Debe ser una
-            clase java anotada como entidad de Roo.</para>
+            <para xml:lang="es">Objeto que maneja el controlador. Debe ser una
+            clase java anotada como entidad.</para>
+          </listitem>
+        </varlistentry>
+      <variablelist>
+      
+      <para xml:lang="es">Y también admite los siguientes atributos opcionales:</para>
+      
+      </variablelist>
+        <varlistentry>
+          <term>update, delete y create</term>
+
+          <listitem>
+            <para xml:lang="es">Define si deben permitirse estas operaciones en el
+            controlador. Por defecto <literal>true</literal>.</para>
           </listitem>
         </varlistentry>
 
         <varlistentry>
-          <term>update delete create</term>
+          <term>populateMethods</term>
 
           <listitem>
-            <para xml:lang="es">Establece si hay que crear esto métodos en el
-            controller. Por defecto <literal>True</literal>.</para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>exposeFinders</term>
-
-          <listitem>
-            <para xml:lang="es">Generar vistas para las búsquedas declaradas
-            en la entidad o no. Por defecto <literal>True</literal>.</para>
-          </listitem>
-        </varlistentry>
-
-        <varlistentry>
-          <term>registerConverters</term>
-
-          <listitem>
-            <para xml:lang="es">Crear un método
-            <classname>@InitBinder</classname> para registrar convertidores de
-            Objetos a cadenas. Por defecto <literal>True</literal>.</para>
+            <para xml:lang="es">Indica si deben generarse los métodos encargados de
+            publicar las listas de valores que sean necesarias en las vistas.
+            Por defecto <literal>True</literal>.</para>
           </listitem>
         </varlistentry>
       </variablelist>
@@ -350,24 +401,25 @@ public class MyController {
       <orderedlist>
         <listitem>
           <para xml:lang="es">Creará un fichero *_Roo_Controller.aj donde
-          generará todos los método para gestionar las peticiones automáticas
+          generará todos los métodos para gestionar las peticiones que lleguen
           al controller.</para>
         </listitem>
 
         <listitem>
-          <para>Añadirá las vista necesaria en
+          <para>Añadirá las vistas necesarias en
           <filename>WEB-INF/views/{nombre_controller}</filename> para
-          gestionar las acciones configuradas en la anotación.</para>
+          gestionar las acciones configuradas en la anotación
+          (creación, actualización y/o borrado).</para>
         </listitem>
 
         <listitem>
-          <para>Añadirá las entradas de menú pertinentes.</para>
+          <para>Añadirá las entradas de menú necesarias.</para>
         </listitem>
 
         <listitem>
           <para>Añadirá en el fichero
-          <filename>WEB-INF/i18n/application.properties</filename> entradas
-          para los literales</para>
+          <filename>WEB-INF/i18n/application.properties</filename> las
+          entradas multidioma necesarias.</para>
         </listitem>
       </orderedlist>
     </section>
@@ -375,14 +427,15 @@ public class MyController {
     <section>
       <title>Código generado en las vistas de la capa web</title>
 
-      <para>Cuando gvNIX genera la pare de front-end de la capa web de nuestra
+      <para>Cuando se genera capa web de la
       aplicación lo hace generando ficheros jspx y tagx. Los ficheros jspx no
-      son más que JSPs que a su vez hacen uso de tags de las librerías JSTL,
-      Spring Framework y otras que se generán también como parte de nuestra
+      son más que JSPs que tienen un formato XML válido.
+      A su vez las jspx hacen uso de tags de las librerías JSTL,
+      Spring Framework y otras que se generán también como parte de la
       aplicación ubicadas en WEB-INF/tags.</para>
 
       <para>Ya que es una buena práctica la reutilización de código o de
-      componentes de la vista web, gvNIX utiliza el motor de plantillas <link
+      componentes de la vista web, se utiliza el motor de plantillas <link
       xlink:href="http://tiles.apache.org/">Apache Tiles</link>. Este motor de
       plantillas permite definir fragmentos que pueden ser integrados en una
       página completa en tiempo de ejecución, facilitando el desarrollo de la
@@ -390,63 +443,57 @@ public class MyController {
       aplicación.</para>
 
       <section>
-        <title>Estructura de archivos de las vistas de la capa web</title>
+        <title>Estructura de archivos de las vistas en la capa web</title>
 
-        <para>Para nuestro proyecto de ejemplo PizzaShop, se ha creado la
-        estructura de directorios y archivos que podemos ver en la imagen
-        siguiente:</para>
+        <para>En el proyecto de ejemplo PizzaShop, se habrá creado hasta el
+        momento la estructura de directorios y archivos que se puede ver en la
+        siguiente imagen:</para>
 
         <figure>
           <title>Estructura archivos Pizza Shop</title>
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/webinf-tree.png"></imagedata>
+              <imagedata align="center" fileref="images/webinf-tree.png"></imagedata>
             </imageobject>
           </mediaobject>
         </figure>
 
-        <para>de todas las carpetas nos centraremos en <emphasis>layouts, tags
-        y views</emphasis>.</para>
+        <para>De todas las carpetas anteriores el desarrollo se centrará en
+        <emphasis>layouts, tags y views</emphasis>.</para>
       </section>
 
       <section>
         <title>Motor de plantillas: Tiles</title>
 
         <para>Dentro de <emphasis>views</emphasis> hay varios ficheros jspx y
-        varias carpetas. De entre los ficheros comentemos la función de
-        <emphasis>views.xm</emphasis>l. Este fichero es el que establece la
+        varias carpetas. Entre los ficheros se encuentra
+        <emphasis>views.xml</emphasis>. Este fichero establece la
         configuración de vistas que Tiles deberá generar. Tiles se basa en que
         todas las vistas de una aplicación web son similares, tienen el mismo
         diseño y estructura, pero cada página está compuesta de distintos
         trozos que conforman el contenido pero siempre colocados de la misma
-        forma. Al mismo tiempo nos permite modificar ciertos aspectos del
-        diseño para adaptarnos a las necesidades de una vista concreta. Por
+        forma. Al mismo tiempo permite modificar ciertos aspectos del
+        diseño para adaptarlos a las necesidades de una vista concreta. Por
         ejemplo, es común que una página web tenga una cabecera, donde se
         puede ver el título de la misma, un menú con las distintas secciones
         que hay en el site, un pie de página y una parte principal con el
         contenido. Tiles nos brinda la posibilidad de especificar que una
-        disposición de nuestra página contiene estos cuatro bloques, pero por
+        disposición de la página contiene estos cuatro bloques, pero por
         contra en alguna sección o situación (por ejemplo: el usuario de la
-        web está o no logado en la aplicación) queremos que el menú no se
+        web está o no logado en la aplicación) se desea que el menú no se
         muestre.</para>
 
-        <informalexample>
           <programlisting>&lt;definition name="index" extends="default"&gt;
   &lt;put-attribute name="body" value="/WEB-INF/views/index.jspx" /&gt;
 &lt;/definition&gt;</programlisting>
 
-          <epigraph>
-            <para><emphasis>Def. index.</emphasis></para>
-          </epigraph>
-        </informalexample>
-
         <para>El código anterior, extraido de <emphasis>view.xml</emphasis>,
         define una vista llamada <emphasis>index</emphasis> que se basa en,
-        extiende de, otra vista <emphasis>default</emphasis> y al que se le
+        extiende de, otra vista <emphasis>default</emphasis> y a la que se le
         pasa como atributo <emphasis>body</emphasis> la página definida por el
         fichero <emphasis>index.jspx.</emphasis> La definición de la vista
-        <emphasis>default</emphasis> nos ayudará a entender esta otra.
+        <emphasis>default</emphasis> ayudará a entender esta otra.
         <emphasis>default</emphasis> se define en el fichero
         <emphasis>WEB-INF/layouts/layouts.xml</emphasis>.</para>
 
@@ -457,27 +504,30 @@ public class MyController {
 &lt;/definition&gt;</programlisting>
 
         <para>En la definición de esta vista se indica que la plantilla
-        (<emphasis>template</emphasis>) que va a dibujar está parte de nuestra
+        (<emphasis>template</emphasis>) que va a dibujar está parte de la
         web está programada en la JSP <emphasis>default.jspx</emphasis>.
-        Además, aquí ya vemos otros fragmentos que van a definir la
-        composición de nuestra vista, la cabecera
-        (<emphasis>header</emphasis>), menú y pie de página
+        Además, aquí ya se observan otros fragmentos que van a definir la
+        composición de la vista: la cabecera
+        (<emphasis>header</emphasis>), menú (<emphasis>menu</emphasis>)
+        y pie de página
         (<emphasis>footer</emphasis>), los cuales serán dibujados por las
-        respectivas páginas jspx. Si volvemos a la definición de la vista
-        <emphasis>index</emphasis> del fragmento de código anterior
-        (<emphasis>Def. index</emphasis>), veremos como uniendo los atributos
-        de las dos definiciones tendremos que la vista
+        respectivas páginas jspx. Volviendo a la definición de la vista
+        <emphasis>index</emphasis> del fragmento de código anterior,
+        se observa cómo uniendo los atributos
+        de las dos definiciones se obtiene que la vista
         <emphasis>index</emphasis> se compone de los cuatro fragmentos que
-        habíamos comentado anteriormente: cabecera, menú, pie de página y
-        cuerpo. Así pues, sería sencillo definir una nueva vista con esta
+        comentados anteriormente: cabecera, menú, pie de página y
+        cuerpo. Así pues, es sencillo definir una nueva vista con esta
         misma estructura simplemente indicando que el contenido principal, el
-        cuerpo, viniera definido por otra JSP cualquiera.</para>
+        cuerpo, viene definido por otra JSP cualquiera.</para>
 
-        <para>Para acabar de entenderlo veamos el contenido de
+        <para>Como aclaración, se puede analizar el contenido del fichero
         <emphasis>default.jspx</emphasis>:</para>
 
-        <programlisting>&lt;html xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" 
- xmlns:tiles="http://tiles.apache.org/tags-tiles" xmlns:spring="http://www.springframework.org/tags" 
+        <programlisting>&lt;html xmlns:jsp="http://java.sun.com/JSP/Page"
+ xmlns:c="http://java.sun.com/jsp/jstl/core" 
+ xmlns:tiles="http://tiles.apache.org/tags-tiles"
+ xmlns:spring="http://www.springframework.org/tags" 
  xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" &gt;  
 
   &lt;jsp:output doctype-root-element="HTML" doctype-system="about:legacy-compat" /&gt;
@@ -491,7 +541,7 @@ public class MyController {
 
     <emphasis role="bold">&lt;util:load-scripts /&gt;</emphasis>
 
-    <emphasis role="bold">&lt;spring:message code="application_name" var="app_name"/&gt;</emphasis>
+    <emphasis role="bold">&lt;spring:message code="application_name" var="app_name" htmlEscape="false"/&gt;</emphasis>
     &lt;title&gt;&lt;spring:message code="welcome_h3" arguments="${app_name}" /&gt;&lt;/title&gt;
   &lt;/head&gt;
 
@@ -507,17 +557,17 @@ public class MyController {
   &lt;/body&gt;
 &lt;/html&gt;</programlisting>
 
-        <para>En el fragmento de código anterior ya vemos etiquetas de HTML y
-        algunas otras que hemos resaltado en negrita. <emphasis
+        <para>En el fragmento de código anterior aparecen etiquetas de HTML y
+        algunas otras etiquetas resaltadas en negrita. <emphasis
         role="bold">&lt;util:load-scripts /&gt;</emphasis> es una etiqueta
-        definida en nuestro propio proyecto, luego comentaremos cual es su
+        definida dentro del proyecto, luego se verá su
         finalidad. Las etiquetas <emphasis role="bold">&lt;spring:message
         .../&gt; </emphasis>son de Spring Framework y sirven para mostrar
-        texto traducido a los distintos idiomas soportados por nuestra
-        aplicación. Por último las <emphasis
+        texto traducido a los distintos idiomas soportados por la
+        aplicación. Por último las etiquetas <emphasis
         role="bold">&lt;tiles:insertAttribute ... ignore="true"
-        /&gt;</emphasis> son las propias de Tiles que simplemente lo que hacen
-        es insertar en esa posición de la página JSP el contenido del fichero
+        /&gt;</emphasis> son propias de Tiles y permiten
+        insertar en esa posición de la página JSP el contenido del fichero
         que se ha especificado en la definición de las vistas como parámetro
         (<emphasis>head, menu, body, footer</emphasis>). Cabe destacar el
         atributo <emphasis>ignore</emphasis> que acompaña a alguna de estas
@@ -530,20 +580,20 @@ public class MyController {
         insertar no está definido, se produciría una excepción en tiempo de
         ejecución y por tanto no se dibujaría la página.</para>
 
-        <para>Ahora ya conocemos el funcionamiento del motor de plantillas
-        usado por gvNIX, veamos, a continuación, el resto de directorios y
-        ficheros que componen el front-end de nuestra aplicación.</para>
+        <para>Con esto ya se conoce el funcionamiento del motor de plantillas
+        usado en el framework, a continuación se verá el resto de directorios y
+        ficheros que componen la capa web de la aplicación.</para>
       </section>
 
       <section>
         <title>Vistas CRUD (Create, Read, Update, Delete)</title>
 
-        <para>Si miramos entre las carpetas contenidas en la carpeta views
-        vemos que hay una carpeta por cada una de las entidades de nuestra
+        <para>Observando las carpetas contenidas en la carpeta views,
+        se puede observar que hay una carpeta por cada una de las entidades de la
         lógica de negocio. Cada una de estas carpetas contiene las páginas JSP
         que dibujarán las vistas para las operaciones de Creación (Create),
-        Lectura (Read), Modificación (Update) y Borrado (Delete). Fijémonos en
-        uno de ellos, por ejemplo <emphasis>bases</emphasis>:</para>
+        Lectura (Read), Modificación (Update) y Borrado (Delete). Tomando como
+        ejemplo la entidad <emphasis>bases</emphasis>:</para>
 
         <programlisting>bases
 |-- create.jspx
@@ -552,13 +602,11 @@ public class MyController {
 |-- update.jspx
 `-- views.xml</programlisting>
 
-        <para>Lo primero a destacar es que también existe un archivo
-        <emphasis>views.xml</emphasis>. En este caso, al igual que el otro del
-        que hemos hablado que está contenido en el directorio
-        <emphasis>WEB-INF/views</emphasis>, también se trata de un archivo de
-        definiciones de vistas. Mirando su contendo vemos que se definen
-        varias vistas que se basan en <emphasis>default</emphasis> que hemos
-        comentado anteriormente pero cada una de ellas define un
+        <para>Cabe destacar que también existe un archivo
+        <emphasis>views.xml</emphasis>. También se trata de un archivo de
+        definiciones de vistas. Mirando su contendo se observa que define
+        varias vistas que se basan en <emphasis>default</emphasis> tal y como se
+        ha comentado anteriormente pero cada una de ellas define un
         <emphasis>body</emphasis> con una JSP distinta.</para>
 
         <para>Parece bastante evidente cual es el cometido de cada una de las
@@ -566,8 +614,8 @@ public class MyController {
 
         <itemizedlist>
           <listitem>
-            <para><emphasis>create.jspx</emphasis> muestra el formulario para
-            crear un nuevo registro de la entidad Base,</para>
+            <para><emphasis>create.jspx</emphasis> muestra el formulario de
+            creación de un nuevo registro de la entidad Base,</para>
           </listitem>
 
           <listitem>
@@ -577,30 +625,30 @@ public class MyController {
 
           <listitem>
             <para><emphasis>show.jspx</emphasis> mostrará la información
-            detallada de la base de pizza que hemos seleccionado</para>
+            detallada de la base de pizza seleccionada</para>
           </listitem>
 
           <listitem>
             <para>y por último <emphasis>update.jspx</emphasis> muestra el
-            formulario para realizar la modificación del registro.</para>
+            formulario de actualización del registro.</para>
           </listitem>
         </itemizedlist>
 
-        <para>No hay una JSP dedicada al borrado de registros porque gvNIX
-        incluye un botón para borrado en las vistas <emphasis>show</emphasis>
-        y <emphasis>list</emphasis>.</para>
+        <para>No hay una JSP dedicada al borrado de registros porque ya se
+        incluye un botón para el borrado de un registro tanto en <emphasis>show</emphasis>
+        como en <emphasis>list</emphasis>.</para>
       </section>
 
       <section>
         <title>Componentes de las JSP de las vistas CRUD</title>
 
-        <para>Veamos ahora los componentes que forman las vistas CRUD de
-        nuestro proyecto.</para>
+        <para>Se van a analizar los componentes que forman las vistas CRUD del
+        proyecto.</para>
 
         <note>
-          <para>Se listan los componentes que pueden aparecer en cada vista
-          pero cada uno de estos componentes puede aparecer varias veces
-          dependiendo de los campos a informar.</para>
+          <para>Se listan algunos componentes que pueden aparecer en cada vista
+          aunque cada uno de estos componentes puede no aparecer, aparecer varias veces
+          o aparecer otros distintos dependiendo de los campos a informar.</para>
         </note>
 
         <para><emphasis role="bold">create.jspx</emphasis></para>
@@ -613,10 +661,14 @@ public class MyController {
 &lt;form:dependency/&gt;</programlisting>
 
         <para><emphasis>&lt;form:create/&gt;</emphasis> define un formulario
-        en el que los campos de entrada vienen definidos por las etiquetas
-        <emphasis>&lt;field:xxxx/&gt;</emphasis>. Las etiquetas
-        <emphasis>field</emphasis> generan el código HTML para mostrar campos
-        de texto, selección de fechas o desplegables de selección.</para>
+        en el que los campos vienen definidos por las etiquetas
+        <emphasis>&lt;field:xxxx/&gt;</emphasis>. Las etiquetas <emphasis>form</emphasis>
+        generan el código HTML correspondiente a la infraestructura de un formulario
+        de creación siguiendo la definición RESTful. Las etiquetas
+        <emphasis>field</emphasis> generan el código HTML necesario para mostrar campos
+        de texto, introducción de fechas o desplegables de selección. En este caso cada
+        campo puede utilizar una etiqueta distinta en función del tipo de datos que
+        contenga y la forma en la que se desee presentar su información en pantalla.</para>
 
         <para><emphasis role="bold">list.jspx</emphasis></para>
 
@@ -626,10 +678,14 @@ public class MyController {
   &lt;/table:table&gt;
 &lt;/page:list&gt;</programlisting>
 
-        <para><emphasis>&lt;table:table/&gt;</emphasis> generará el HTML de
-        una tabla donde las distintas columnas serán los campos mostrados
-        através de la etiqueta
-        <emphasis>&lt;table:column/&gt;</emphasis>.</para>
+        <para><emphasis>&lt;table:table/&gt;</emphasis> y
+        <emphasis>&lt;page:list/&gt;</emphasis> generarán el HTML de una página y
+        una tabla donde las distintas columnas serán los campos indicados
+        a través de la etiqueta
+        <emphasis>&lt;table:column/&gt;</emphasis> y en cada fila se emplazará
+        cada uno de los registros de la entidad paginados. Puesto que esta página
+        solo proporciona la visualización de los valores de cada campo sin edición, no es
+        necesario especificar distintos tipos de columna para cada campo.</para>
 
         <para><emphasis role="bold">show.jspx</emphasis></para>
 
@@ -637,8 +693,11 @@ public class MyController {
   &lt;field:display/&gt;
 &lt;/page:show&gt;</programlisting>
 
-        <para>Para mostrar campos del objeto en formato texto en una vesta web
-        usaremos <emphasis>&lt;field:display/&gt;</emphasis>.</para>
+        <para>Muestra los campos de un registro concreto de la entidad 
+        en formato texto en la que cada campo se representa mediante la etiqueta
+        <emphasis>&lt;field:display/&gt;</emphasis>. Esta página también solo proporciona
+        visualización de valores, por lo que tampoco es
+        necesario especificar distintos tipos de columna para cada campo.</para>
 
         <para><emphasis role="bold">update.jspx</emphasis></para>
 
@@ -648,8 +707,10 @@ public class MyController {
   &lt;field:select/&gt;
 &lt;/form:update&gt;</programlisting>
 
-        <para>Los <emphasis>field</emphasis> que aparecen para la modificación
-        de un registro son los mismos que en el caso del alta de un nuevo
+        <para>Se comporta de forma muy parecida a la página <emphasis>create.jspx</emphasis>
+        pero esta página permite la actualización de los datos de un registro.
+        Las etiquetas <emphasis>field</emphasis> que aparecen sirven en este caso para la modificación
+        de un registro y son exáctamente las mismas que en el caso del alta de un nuevo
         registro.</para>
       </section>
     </section>
@@ -658,83 +719,113 @@ public class MyController {
   <section>
     <title>Visualización de entidades en la capa web</title>
 
-    <para>Con los componentes &lt;table:table/&gt;, &lt;table:column/&gt; y
-    &lt;fiedl:.../&gt; se consigue que se muestren datos de las entidades de
-    la aplicación, es decir, en nuestro proyecto de ejemplo de PizzaShop, si
-    tenemos en una jspx el siguiente componente:</para>
+    <para>Con los componentes &lt;field:display/&gt;, &lt;table:column/&gt; y
+    &lt;field:.../&gt; se consigue mostrar datos de las entidades de
+    la aplicación, es decir, en el proyecto PizzaShop de ejemplo, tomando
+    la definición de la página jspx de listado de como la entidad PizzaOrder:</para>
 
-    <programlisting>&lt;field:display <emphasis role="bold">field="pizzas"</emphasis> id="s_com_disid_roo_pizzashop_domain_<emphasis
-        role="bold">PizzaOrder</emphasis>_pizzas" object="${pizzaorder}" \
-       z="WSxjsiiEWhA5vo8ecxRoox5EjKA="/&gt;</programlisting>
+    <programlisting>&lt;field:display <emphasis role="bold">field="pizzas"</emphasis> 
+		id="s_com_disid_roo_pizzashop_domain_<emphasis role="bold">PizzaOrder</emphasis>_pizzas" object="${pizzaorder}"
+		z="WSxjsiiEWhA5vo8ecxRoox5EjKA="/&gt;</programlisting>
 
-    <para>en la página se mostraría información sobre las Pizzas ligadas a un
-    PizzaOrder. gvNIX/Roo usa para la visualización de estos objetos en la
-    capa web los <emphasis role="bold">Conveters</emphasis>. Los Conveters son
+    <para>En la página se mostrará información de las Pizzas ligadas a un
+    PizzaOrder. El framework utilizará para la visualización en la
+    capa web de estos objetos relacionados los llamados
+    <emphasis role="bold">Converters</emphasis>. Los Converters son
     clases java que, como su nombre indica, convierten un objeto dado en otro.
-    En este uso particular de los Converters, el framework convierte un objeto
-    de nuestro modelo en una cadena, en un String.</para>
+    En este caso particular de los Converters, el framework los utiliza para convertir un objeto
+    del modelo (cada Pizza) en una cadena de forma que sea legible para un humano.</para>
 
     <para>Este mecanismo está implementado en la clase java
     <emphasis>ApplicationConversionServiceFactoryBean.java</emphasis> que
-    podemos encontrar en el mismo paquete donde están los controladores de la
-    aplicación. Esta clase la genera gvNIX/Roo automáticamente al generar la
-    capa web. Como hemos comentado en el apartado de <link
+    se puede encontrar en el mismo paquete donde están los controladores de la
+    aplicación. Esta clase la genera el framework de manera automática al generar la
+    capa web. Tal y como se ha comentado en el apartado de <link
     linkend="guia-desarrollo_generacion-codigo">generación de código</link>,
     asociado al
     <emphasis>ApplicationConversionServiceFactoryBean.java</emphasis> existe
-    un AspectJ con la declaración de los Converters y un método que los
+    un Aspecto Java (fichero aj) con la declaración de los Converters y un método que los
     registra para que estén disponibles a la hora de "convertir" una entidad
-    del modelo a la cadena que se mostrara en la página web.</para>
+    del modelo a la cadena que se mostrara en página.</para>
 
-    <para>Si la cadena que vemos en la página web, no muestra la información
-    que queremos de una entidad podemos modificar el Conveter de esa entidad y
-    adaptarlo a nuestro gusto. En la sección sobre modificación de código se
-    explica como hacerlo. Solo hay que tener en cuenta que al hacer el push In
-    del Controller que vamos a modificar, se elimina, del método
-    <emphasis>installLabelConverters(..)</emphasis> que está declarado en el
-    .aj, la línea de código que registra el Converter para que esté
-    disponible. Por ello, debemos añadir la línea necesaria en el método
-    <emphasis>installFormatters(..)</emphasis> que hay declarado en
-    <emphasis>ApplicationConversionServiceFactoryBean.java.</emphasis><programlisting>protected void installFormatters(FormatterRegistry registry) {
-    super.installFormatters(registry);
-    // Register application converters and formatters
-    <emphasis role="bold">registry.addConverter(new PizzaConverter());</emphasis>
-}
-
-static class PizzaConverter implements Converter&lt;Pizza, String&gt; {
-    public String convert(Pizza pizza) {
-        return new StringBuilder().append(pizza.getName()).append(" ").append(pizza.getPrice()).toString();
-    }
-}</programlisting></para>
+    <para>Si la cadena que se visualiza en la página web no muestra la información
+    deseada para una entidad, se puede modificar el Converter de esa entidad y
+    adaptarlo a sus requerimientos. En la sección sobre modificación de código se
+    explica como hacerlo.</para>
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_test-funcional">
     <title xml:lang="es">Pruebas funcionales</title>
 
-    <para xml:lang="es">Una vez creada la capa web podemos generar
-    automáticamente un conjunto plantillas de pruebas funcionales que nos
-    permitirán realizar pruebas de aceptación</para>
+    <para xml:lang="es">Una vez creada la capa web es posible generar
+    automáticamente un conjunto de pruebas funcionales que
+    permitirán realizar pruebas de aceptación de la aplicación.</para>
 
-    <para>Para crear las pruebas funcionales utilizaremos el comando
+    <para>La creación de las pruebas funcionales se realizan a través del comando
     <command>selenium test</command></para>
 
-    <para>TBC Ejemplo</para>
+    <para>En el siguiente ejemplo se está generando las pruebas funcionales para
+    el controlador de la entidad <emphasis>Pizza</emphasis>:</para>
+    
+    <programlisting>selenium test --controller ~.web.PizzaController</programlisting>
+    
+    <para>Los test generados estarán en <emphasis>src/main/webapp/selenium</emphasis>.
+    La opción <emphasis>--controller</emphasis> especifica la clase
+    controladora para la que se desea generar el test. Existen dos parámetros opcionales,
+    uno es <emphasis>--serverUrl</emphasis> que permite indicar la dirección
+    base de la aplicación sobre la que deben ejecutarse los tests y el otro es
+    <emphasis>--name</emphasis> que permite dar un nombre específico al test.
+    Habitualmente, no será necesario especificar estos parámetros opcionales.</para>
+    
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion">
     <title xml:lang="es">Arrancar la aplicación web</title>
 
-    <para xml:lang="es">Ahora solamente queda poner en marcha la aplicación
-    web para esto debemos salir del intérprete de comandos con el comando
-    <command>quit</command>. Cambiar a la carpeta raíz del proyecto y ejecutar
-    la orden <command>mvn tomcat:run</command>.</para>
+    <para xml:lang="es">Desde que se creó la capa web, ya era posible poner en
+    marcha la aplicación y visualizarla en un navegador web. La puesta en marcha
+    de la aplicación se puede realizar de dos formas distintas.</para>
+    
+    <para xml:lang="es">Si la consola del framework se está ejecutando desde un
+    Eclipse o un STS, consultar la sección de la documentación
+    <link linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse">
+    Arrancar la aplicación con Eclipse</link> en la que se explica tanto la instalación
+    de un servidor en el IDE como el modo de arrancar la aplicación.</para>
+    
+    <para xml:lang="es">Si la consola del framework se está ejecutando desde 
+    la consola del sistema, salir de la consola del framework con el comando
+    <command>quit</command> y ejecutar
+    la orden <command>mvn tomcat:run</command>. Observar que en la consola del
+    sistema debe estar configurado y por lo tanto disponible la herramienta Maven.</para>
 
-    <para>Para poder ver en funcionamiento la aplicación debemos acceder a la
-    dirección: <uri>http://localhost:8080/pizzashop</uri></para>
+    <para>Para poder ver en funcionamiento la aplicación se debe acceder a la
+    dirección: <uri>http://localhost:8080/pizzashop</uri> con un navegador
+    web.</para>
 
-    <para>Una vez iniciada la aplicación podemos lanzar las pruebas
-    funcionales con la orden <command>mvn selenium:selenese</command></para>
-
-    <para><emphasis>TBC Ejemplo</emphasis></para>
   </section>
+  
+
+  <section xml:id="guia-desarrollo_aplicacion-base_ejecutar-tests-funcionales">
+    <title xml:lang="es">Ejecutar los tests funcionales</title>
+
+	<para xml:lang="es">Para lanzar las pruebas, la aplicación debe estar en marcha 
+	y entonces pueden ejecutarse 
+	utilizando el plugin M2Eclipse de STS o Eclipse. Para ello, seleccionar la opción
+	<command>Run As > Maven build ...</command> del menú contextual del proyecto o del menú superior e
+	introducir como <command>Goals</command> el valor <command>selenium:selenese</command>.
+	Darle un nombre a esta
+	configuración y a partir de entonces utilizar esta configuración guardada para ejecutar
+	los test funcionales mediante el botón <command>Run As...</command>.</para>
+	
+    <para>También es posible lanzar las pruebas
+    funcionales con la orden <command>mvn selenium:selenese</command> desde
+    la consola del sistema.</para>
+	
+	<para xml:lang="es">De este modo se ejecutará el conjunto de tests sobre una nueva instancia del navegador
+	FireFox (obviamente, es necesario tener instalado dicho navegador en la máquina).</para>
+	
+	<para xml:lang="es">Los resultados de los tests se guardarán en
+	<emphasis>target/selenium.html</emphasis> en formato HTML.</para>
+	</section>
+  
 </chapter>

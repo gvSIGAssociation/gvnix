@@ -9,10 +9,22 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Gestión de entidades</title>
 
-  <para xml:lang="es">Las entidades del modelo del dominio son uno de los
-  elementos más importantes de gvNIX.</para>
+	<para>El acceso a datos de una aplicación contiene la infraestructura necesaria para obtener y
+	almacenar la información en, por ejemplo, una base de datos.
+	Este acceso se puede estructurar en una sola capa en la que las entidades definen tanto
+	el modelo de los datos, como sus métodos de interacción con la base de datos y la lógica
+	de negocio utilizando entonces un modelo llamado <emphasis>Registro Activo</emphasis>. 
+	Existen otros casos más clásicos como la estructuración en una capa de entidades, otra
+	de acceso a datos (DAO) y una última de servicios con la lógica de negocio; todo ello 
+	llamado <emphasis>Servicios y Repositorios</emphasis>.
+	Este capítulo se centrará en la generación de la capa de entidades ya que es el método
+	que se utiliza habitualmente en las aplicaciones desarrolladas con gvNIX y para el cual
+	ha añadido la mayoría de sus nuevas funcionalidades.
+	</para>
 
-  <para xml:lang="es">En Java una entidad se corresponde con una clase,
+
+  <para xml:lang="es">Las entidades del modelo del dominio son uno de los
+  elementos más importantes del framework. En Java una entidad se corresponde con una clase,
   definida en un archivo <filename>.java</filename>.</para>
 
   <para>Además de la lógica de negocio, cada clase contiene una serie de
@@ -55,14 +67,14 @@ public class Entity1 {
     </programlistingco>
   </example>
 
-  <para xml:lang="es">gvNIX añadirá todos los métodos estándar necesarios para
+  <para xml:lang="es">El framework añadirá todos los métodos estándar necesarios para
   completar la definición de entidad, como los de persistencia (almacenamiento
   y recuperación), gets/sets y métodos auxiliares como toString.
   Como se vió en la sección de generación de código se
   crearán una serie de archivos <filename>.aj</filename> que en tiempo de
   compilación se incluyen en la clase de forma transparente.</para>
 
-  <para xml:lang="es">Si por algún motivo necesitamos <emphasis>personalizar
+  <para xml:lang="es">Si por algún motivo es necesario <emphasis>personalizar
   el comportamiento</emphasis> de alguno de los <emphasis>métodos estándar que
   se generan</emphasis>, simplemente hay que <emphasis>definirlos en la
   clase java</emphasis>. Cuando el framework detecta el cambio actualiza el
@@ -1556,7 +1568,7 @@ public class LineItemPK {
   </section>
 
   <section xml:id="guia-desarrollo_aplicacion-base_test-integracion">
-    <title xml:lang="es">Pruebas unitarias</title>
+    <title xml:lang="es">Pruebas de integración</title>
 
     <para xml:lang="es">En la creación de entidades, al especificar el
     parámetro <command>--testAutomatically</command> se generan

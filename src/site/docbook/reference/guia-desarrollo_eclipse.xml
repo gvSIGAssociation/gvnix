@@ -307,12 +307,8 @@ Created ...</programlisting>
       <para>Si se desea incluir en el proyecto los tests funcionales existe el
       comando <emphasis role="bold">selenium test</emphasis> que generará los
       scripts necesarios para probar la interfaz web de la aplicación.
-      Ejecutando <emphasis role="bold">mvn selenium:selenese</emphasis>
-      desde una consola del sistema que tenga configurada Maven, estando
-      el servidor de aplicaciones en marcha, se ejecutará el conjunto de
-      tests sobre una nueva instancia del navegador web FireFox. Más adelante se
-      verá como poner en marcha la aplicación y como ejecutar
-      los tests.</para>
+      Más adelante se verá como poner en marcha la aplicación y como ejecutar
+      estos tests.</para>
 
       <programlisting>~.web roo-gvNIX&gt; <emphasis role="bold">theme install --id cit</emphasis>
 ~.web roo-gvNIX&gt; <emphasis role="bold">theme set --id cit</emphasis></programlisting>
