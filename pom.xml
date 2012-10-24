@@ -751,6 +751,7 @@
             <configuration>
               <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
               <sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
+              <admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
               <postProcess>
                 <move todir="${basedir}/target/site/reference/html-single">
                   <fileset dir="${basedir}/target/docbkx/html">
