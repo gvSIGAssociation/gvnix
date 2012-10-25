@@ -13,19 +13,22 @@
   <section xml:id="addon-web-menu_descripcion">
     <title>Descripción</title>
 
-    <para xml:lang="es">Este Add-on instala un sistema nuevo de menú Web en la
-    aplicación sobre la que trabajamos.</para>
+    <para xml:lang="es">Este Add-on instala un nuevo sistema de gestión del menú web
+    de la aplicación sobre la que se está trabajando para facilitar la organización de
+    su estructura de páginas.</para>
 
     <para xml:lang="es">Las principales características de este sistema
     son:</para>
 
     <variablelist>
       <varlistentry>
-        <term xml:lang="es">Modelo de menú separado de visualización</term>
+        <term xml:lang="es">Modelo de menú separado de su formato de visualización.</term>
 
         <listitem>
           <para xml:lang="es">El modelo de menú no está ubicado en la misma
-          página que lo visualiza.</para>
+          página que lo visualiza como ocurre por defecto en Spring Roo.
+          Actualmente se define en un archivo XML y en un futuro podrá
+          estar almacenada en base de datos.</para>
         </listitem>
       </varlistentry>
 
@@ -33,8 +36,9 @@
         <term xml:lang="es">Múltiples niveles de menú</term>
 
         <listitem>
-          <para xml:lang="es">Soporte para crear elementos agrupados a
-          distintos niveles.</para>
+          <para xml:lang="es">Soporte para crear elementos jerarquizados con
+          múltiples niveles. Permite añadir, mover y anidar en varios niveles
+          los elementos del menú.</para>
         </listitem>
       </varlistentry>
 
@@ -42,8 +46,9 @@
         <term xml:lang="es">Gestión de elementos desde consola</term>
 
         <listitem>
-          <para xml:lang="es">Permite añadir,quitar,mover y actualizar lo
-          elementos de menú desde la consola de Spring Roo.</para>
+          <para xml:lang="es">Permite añadir, quitar, mover, actualizar,
+          definir permisos, ocultar, crear enlaces externos, etc. para 
+          cada uno de los elementos del menú desde la consola del framework.</para>
         </listitem>
       </varlistentry>
 
@@ -51,9 +56,9 @@
         <term xml:lang="es">Integración con Spring Security</term>
 
         <listitem>
-          <para xml:lang="es">Si está instalado, los elementos de menú no
-          serán visualizados si el usuario no tiene permiso de acceso a la
-          página o no está entre los roles predefinidos.</para>
+          <para xml:lang="es">Si está instalado el sistema de seguridad,
+          se puede definir que ciertos elementos de menú no sean visibles si el
+          usuario no no está entre los roles permitidos para ello.</para>
         </listitem>
       </varlistentry>
 
@@ -61,9 +66,9 @@
         <term xml:lang="es">Gestiona las peticiones de Roo</term>
 
         <listitem>
-          <para xml:lang="es">Aunque el sistema de menú cambia, el add-on
-          gestiona las peticiones de generación de elementos de menú
-          realizadas por las herramientas estándar de Spring Roo.</para>
+          <para xml:lang="es">Aunque el sistema de menú de gvNIX es distintos al de Roo,
+          este nuevo sistema también gestiona las peticiones de generación de elementos
+          del menú realizadas por los comandos de Spring Roo.</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -80,10 +85,10 @@
         <term xml:lang="es">Página</term>
 
         <listitem>
-          <para xml:lang="es">Representación e una URL. El destino puede ser
+          <para xml:lang="es">Representación de una URL. El destino puede ser
           interno (dentro de la propia aplicación) o externo. <emphasis
           role="bold">Los destinos internos deben de ser únicos</emphasis>: no
-          pueden dos páginas con el mismo destino.</para>
+          pueden existir dos páginas con exáctamente el mismo destino.</para>
         </listitem>
       </varlistentry>
 
@@ -91,7 +96,7 @@
         <term xml:lang="es">Grupo</term>
 
         <listitem>
-          <para xml:lang="es">Contenedor de páginas. El contenido pueden ser
+          <para xml:lang="es">Contenedor de páginas. El contenido de un grupo puede ser
           también otros grupos. También puede tener asociado una URL pero con
           las misma restricciones que la Página.</para>
         </listitem>
@@ -117,10 +122,10 @@
   </section>
 
   <section>
-    <title xml:lang="es">Instalar la gestión de menús.</title>
+    <title xml:lang="es">Instalación de la gestión de menús</title>
 
     <para xml:lang="es">El uso de el sistema de menús aportado por esta
-    herramienta es opcional. Por ello, par ponerlo en marcha es necesario usar
+    herramienta es opcional. Por ello, para ponerlo en marcha es necesario utilizar
     el comando <command><link
     linkend="apendice-comandos_addon-web-menu_page-menu-setup">menu
     setup</link></command>. Este comando añadirá lo siguiente:</para>
@@ -140,8 +145,8 @@
 
       <listitem>
         <para xml:lang="es">Archivo XML para almacenar el modelo de datos del
-        menú, rellenado con los menú que existiese en ese momento creado por
-        Roo.</para>
+        menú, rellenado previamente con la información del menú de Roo que existiese
+        en ese momento.</para>
       </listitem>
 
       <listitem>
@@ -160,7 +165,7 @@
       </listitem>
     </orderedlist>
 
-    <para xml:lang="es">Para más información ver sobre el comando
+    <para xml:lang="es">Para más información sobre el comando ver
     <command><link
     linkend="apendice-comandos_addon-web-menu_page-menu-setup">menu
     setup</link></command> en el <link
@@ -175,11 +180,11 @@
   <section>
     <title xml:lang="es">Modificación del menú.</title>
 
-    <para xml:lang="es">Para hacer cambios en el menú se debe usar los comando
-    disponibles en la consola, que estarán disponibles después de haber
-    instalado la gestión de menú.</para>
+    <para xml:lang="es">Para hacer cambios en el menú se deben utilizar los comando
+    disponibles en la consola, que serán accesibles después de haber
+    instalado la nueva gestión de menú.</para>
 
-    <para xml:lang="es">Para mas información sobre los comandos ver <link
+    <para xml:lang="es">Para mas información sobre los comandos ver el <link
     linkend="apendice-comandos_addon-web-menu">apéndice de comandos de este
     add-on</link>.</para>
   </section>

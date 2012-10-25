@@ -8,7 +8,7 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title>Add-on Theme Manager</title>
 
-  <para xml:lang="es">Add-on para el manejo de temas visuales.</para>
+  <para xml:lang="es">Add-on para la gestión de distintos temas visuales.</para>
 
   <section xml:id="addon-theme-manager_descripcion">
     <title xml:lang="es">Descripción</title>
@@ -21,15 +21,17 @@
     instalar en la aplicación sobre la que se trabaja. Tiene también un
     fichero XML de descripción con el identificador del tema.</para>
 
-    <para xml:lang="es">Los temas pueden estar:</para>
+    <para xml:lang="es">Cada uno de los temas que ofrece gvNIX
+    puede estar en alguno de los siguientes estados:</para>
 
     <variablelist>
       <varlistentry>
         <term xml:lang="es">Establecido</term>
 
         <listitem>
-          <para xml:lang="es">Último tema que se ha aplicado a la
-          aplicación.</para>
+          <para xml:lang="es">Último tema que se ha aplicado en la
+          aplicación y por lo tanto el tema que se estará
+          visualizando.</para>
         </listitem>
       </varlistentry>
 
@@ -47,43 +49,43 @@
 
         <listitem>
           <para xml:lang="es">Temas que se pueden instalar en la aplicación
-          que están incluido en la instalación de gvNIX.</para>
+          y que están incluidos en la instalación de gvNIX.</para>
         </listitem>
       </varlistentry>
     </variablelist>
 
     <para xml:lang="es">Un Tema, para poder ser
-    <emphasis>establecido</emphasis> en la aplicación de trabajo, debe de
+    <emphasis>establecido</emphasis> en la aplicación en desarrollo, debe de
     estar <emphasis>Instalado</emphasis>. La instalación de un Tema puede
     hacerse mediante el comando <link
     linkend="apendice-comandos_addon-theme-manager_theme-install"><command>theme
     install</command></link> o copiando el tema en el directorio
     <filename>themes</filename> de la aplicación con la que se está
-    trabajando. gvNIX detectará la instalación manual de un tema y la hará
-    accesible.</para>
+    trabajando. gvNIX detectará la instalación manual de un tema y por lo
+    tanto se podrá establecer en la aplicación.</para>
 
-    <para xml:lang="es">Para establecer un tema se realiza usando el comando
+    <para xml:lang="es">Para establecer un tema se utiliza el comando
     <link
     linkend="apendice-comandos_addon-theme-manager_theme-set"><command>theme
     set</command></link>. Este comando copiará el contenido del tema al
     directorio de la aplicación, sobreescribiendo los fichero ya existentes.
-    Este comando <emphasis role="bold">es acumulativo y no implementa ningún
-    mecanismo para revertir los cambios</emphasis>. Por tanto para acutalizar
-    un tema (estilos, recursos gráficos, ...) es suficiente con instalar la
-    nueva versión (comando <emphasis>theme install</emphasis>) y establecerlo
-    (<emphasis>theme set</emphasis>)</para>
+    Este comando <emphasis role="bold">sobreescribe los ficheros y no implementa
+    ningún mecanismo para revertir los cambios</emphasis>.</para>
+    
+    <para xml:lang="es">Si se desea actualizar
+    un tema (estilos, recursos gráficos, ...) a una versión más actual
+    que tenga disponible una nueva versión de gvNIX
+    es suficiente con instalar la nueva versión (comando 
+    <emphasis>theme install</emphasis>) y establecerla
+    (<emphasis>theme set</emphasis>). Es decir, los comandos de este
+    add-on permiten la actualización del tema.</para>
 
-    <para xml:lang="es">Además, con el comando <emphasis>theme set</emphasis>
+    <para xml:lang="es">Por otro lado, con el comando <emphasis>theme set</emphasis>
     se instala en el directorio <emphasis>styles</emphasis> del proyecto un
     archivo (<emphasis>application.css</emphasis>) que permitirá personalizar
-    la hoja de estilos de la aplicación sin tener que modificar las CSS
-    originales de los themas o que instala el <emphasis>framework</emphasis>
-    en otros Add-ons. Esta hoja de estilos no se reemplaza al reinstalar un
-    tema.</para>
-
-    <para xml:lang="es">Los temas <emphasis>disponibles</emphasis> están
-    ubicados en el directorio <filename>themes</filename> de la instalación de
-    gvNIX.</para>
+    los estilos de la aplicación sin necesidad de modificar directamente las CSS
+    de los temas o de otros addons. Esta hoja de estilos no se reemplaza
+    al reinstalar un tema.</para>
 
     <para xml:lang="es">Para ver todos los comandos y sus opciones ver el
     <link linkend="apendice-comandos_addon-theme-manager">apéndice de
@@ -101,7 +103,9 @@
         <term>cit-theme</term>
 
         <listitem>
-          <para xml:lang="es">Tema por defecto para la CIT.</para>
+          <para xml:lang="es">Tema visual utilizado en las aplicaciones de
+          la CITMA (Consejería de Infraestructuras, Transporte y Medio
+          Ambiente del Govierno de Valencia).</para>
         </listitem>
       </varlistentry>
 
@@ -110,7 +114,7 @@
 
         <listitem>
           <para xml:lang="es">Tema de ejemplo con una personalización del
-          estándar de Spring Roo.</para>
+          tema estándar de Spring Roo.</para>
         </listitem>
       </varlistentry>
     </variablelist>

@@ -9,7 +9,7 @@
   <title xml:lang="es">Add-on Web Screen Patterns</title>
 
   <para xml:lang="es">Add-on para aplicar patrones de visualización sobre
-  entidades.</para>
+  entidades y sus relaciones.</para>
 
   <para xml:lang="es">¿Qué entendemos por patrón de visualización? <link
   xlink:href="http://designingwebinterfaces.com/designing-web-interfaces-12-screen-patterns">"12
@@ -19,12 +19,16 @@
     <title xml:lang="es">Descripción</title>
 
     <para xml:lang="es">Este Add-on permite aplicar patrones de visualización
-    sobre las entidades de un proyecto determinado. Los patrones actualmente
-    soportados son:</para>
+    sobre las entidad determinada del proyecto y una o varias de sus relaciones
+    con otras entidades. Los patrones actualmente soportados son:</para>
 
     <itemizedlist>
       <listitem>
         <para>Maestro tabular</para>
+      </listitem>
+
+      <listitem>
+        <para>Maestro tabular con edición registro</para>
       </listitem>
 
       <listitem>
@@ -34,12 +38,35 @@
       <listitem>
         <para>Maestro registro - Detalle tabular</para>
       </listitem>
+      
+      <listitem>
+        <para>Maestro registro - Detalle tabular con edición registro</para>
+      </listitem>
+      
+      <listitem>
+        <para>Maestro tabular - Detalle tabular</para>
+      </listitem>
+      
+      <listitem>
+        <para>Maestro tabular - Detalle tabular con edición registro</para>
+      </listitem>
+
+      <listitem>
+        <para>Maestro tabular con edición registro - Detalle tabular</para>
+      </listitem>
+      
+      <listitem>
+        <para>Maestro tabular con edición registro - Detalle tabular con edición registro</para>
+      </listitem>
     </itemizedlist>
 
-    <para xml:lang="es">En el patrón Maestro registro - Detalle tabular se
-    tienen en cuenta las relaciones 1 a n, <emphasis>ONE_TO_MANY,</emphasis>
-    de una entidad para agruparlas mediante pestañas separadas mostrando la
-    información en una tabla con la información paginada.</para>
+    <para xml:lang="es">Cuando un patrón maestro tiene algún detalle,
+    el detalle de una entidad se corresponde con las relaciones 1 a n
+    <emphasis>ONE_TO_MANY</emphasis> o las relaciones n a n 
+    <emphasis>MANY_TO_MANY</emphasis> que tiene con otras entidades.
+    Así mismo, un maestro puede tener múltiples detalles y serán visualizados
+    en la parte inferior de la pantalla mediante una pestaña por cada
+    una de las relaciones.</para>
   </section>
 
   <section xml:id="addon-web-relation-styles_instalacion">

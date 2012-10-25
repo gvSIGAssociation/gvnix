@@ -103,52 +103,76 @@
     <title xml:lang="es">Desarrollo avanzado con gvNIX</title>
 
     <partintro>
-      <para xml:lang="es">En esta sección veremos cómo ampliar una aplicación
-      web básica creada con gvNIX para cumplir con los requerimientos de
+      <para xml:lang="es">En esta se va a ver cómo ampliar una aplicación
+      web básica creada con el framework para cumplir con los requerimientos de
       cualquier proyecto real.</para>
 
-      <para xml:lang="es">Revisaremos las características distintivas de gvNIX
-      enfocadas al desarrollo de funcionalidades próximas al usuario
-      final:</para>
+      <para xml:lang="es">Se revisará las características distintivas que ofrece gvNIX
+      y que van enfocadas al desarrollo de funcionalidades de alto nivel para facilitar
+      el desarrollo y proporcionar una mejor experiencia de uso al usuario:</para>
 
       <itemizedlist>
         <listitem>
-          <para>Control de concurrencia</para>
+          <para>Gestión de distintos temas visuales.</para>
         </listitem>
 
         <listitem>
-          <para>Gestión de temas</para>
+          <para>Organización de la estructura de páginas en el menú.</para>
         </listitem>
 
         <listitem>
-          <para>Gestión de excepciones</para>
+          <para>Gestión de patrones de visualización de entidades y sus relaciones.</para>
         </listitem>
 
         <listitem>
-          <para>Gestión de la estructura de páginas</para>
+          <para>Control de concurrencia a nivel de aplicación sin campos en base de datos.</para>
         </listitem>
 
         <listitem>
-          <para>Soporte para JSP 2.0</para>
+          <para>Gestión de la visualización de excepciones y
+          gestión de mensajes de usuario en ventana modal.</para>
         </listitem>
 
         <listitem>
-          <para>Gestión de la visualización de relaciones</para>
+          <para>Control de acceso (autenticación y autorización) y seguridad.</para>
+        </listitem>
+        
+        <listitem>
+          <para>Generación de documentos (reportes).</para>
+        </listitem>
+        
+        <listitem>
+          <para>Gestión de servicios locales y servicios web (importación y exposición).</para>
+        </listitem>
+        
+        <listitem>
+          <para>Soporte de idiomas oficiales para el estado Español
+          (inicialmente incluido el Valenciano).</para>
         </listitem>
 
         <listitem>
-          <para>Gestión de transformación de cadenas</para>
+          <para>Gestión de configuraciones por entorno.</para>
+        </listitem>
+        
+        <listitem>
+          <para>Gestión de transformación de cadenas vacías a valores nulos.</para>
         </listitem>
 
-        <listitem>
-          <para>Control de acceso</para>
-        </listitem>
       </itemizedlist>
-    </partintro>
+      
+      <para xml:lang="es">Cada uno de estos elementos son añadidos (add-ons) que
+      gvNIX incluye de forma adicional a todas las funcionalidades que ya
+      proporciona su núcleo Spring Roo. Cada uno de estos addons pueden ser también
+      utilizados en cualquier distribución de Spring Roo estándar.</para>
 
-    <!--
-    <xi:include href="resumen-addons.xml" />
--->
+      <para xml:lang="es">Estos add-ons han sido inicialmente diseñados para
+      ser aplicados en un modelo de dominio del tipo registro activo y una capa
+      visual del tipo spring MVC. Sin embargo, pueden funcionar también con otros
+      modelos de dominio y visuales y en futuras versiones se irá incrementando
+      dicha compatibilidad.
+      .</para>
+      
+    </partintro>
 
     <xi:include href="addon-theme-manager.xml"/>
 

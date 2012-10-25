@@ -50,17 +50,6 @@
     </section>
   </section>
 
-  <section xml:id="resumen-addons_theme-manager">
-    <title>Theme Manager</title>
-
-    <para>Este add-on permite el manejo de <emphasis>Temas Web</emphasis> en
-    la aplicación. Los <emphasis>Temas</emphasis> son un conjunto de ficheros
-    de la aplicación <emphasis>(css, imágenes, paginas por defecto, layout de
-    tails, tagx,...)</emphasis> que permiten personalizar su estilo de
-    visualización. Para más información ver <link
-    linkend="addon-theme-manager">Add-on Theme Manager</link>.</para>
-  </section>
-
   <section xml:id="resumen-addons_web-exception-handler">
     <title>Web Exception Handler</title>
 
@@ -68,75 +57,6 @@
     error que el desarrollador no ha tenido en cuenta y por tanto no gestiona.
     Par más información ver <link linkend="addon-web-exception-handler">Add-on
     Web Exception Handler</link>.</para>
-  </section>
-
-  <section xml:id="resumen-addons_web-menu">
-    <title>Web Menu</title>
-
-    <para>Este add-on permite gestionar la estructura o mapa de páginas de la
-    aplicación y los permisos asociados a cada página. Las principales
-    características del nuevo mecanismo son:</para>
-
-    <variablelist>
-      <varlistentry>
-        <term>Modelo de datos en XML</term>
-
-        <listitem>
-          <para>La estructura del menú es independiente de la visualización.
-          Actualmente se define en un archivo XML y en un futuro podrá estar
-          almacenada en base de datos.</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term>Modelo gestionable desde la consola</term>
-
-        <listitem>
-          <para>Se registran <emphasis>comandos en la consola de
-          Roo</emphasis> que permiten manejar la estructura, información y
-          visibilidad de los elementos, así como crear enlaces
-          externos.</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term>Varios niveles de anidación</term>
-
-        <listitem>
-          <para>Permite añadir, mover y anidar en varios niveles los elementos
-          del menú.</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term>Integración con Spring Security</term>
-
-        <listitem>
-          <para>Permite gestionar los permisos de acceso a las páginas y no
-          muestrar aquellas opciones de menú para las que no se tiene permiso
-          de acceso.</para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-  </section>
-
-  <section xml:id="resumen-addons_web-mvc-jsp-2.0">
-    <title>Web MVC JSP 2.0</title>
-
-    <para>Spring Roo por defecto utiliza elementos JSP 2.1. Esto es un
-    problema en algunas instalaciones que usan contenedores de servlets que no
-    soportan esta versión de la especificación (como por ejemplo Tomcat
-    5.5).</para>
-  </section>
-
-  <section xml:id="resumen-addons_web-relation-styles">
-    <title>Web Relation Styles</title>
-
-    <para>Este Add-on permite gestionar el estilo de visualización de las
-    relaciones 1:N, por ejemplo usando tablas para contener los elementos
-    relacionados. Para ver más información consultar <link
-    linkend="addon-web-relation-styles">Add-on Web Relation
-    Styles</link>.</para>
   </section>
 
   <section xml:id="resumen-addons_web-mvc-binding">
