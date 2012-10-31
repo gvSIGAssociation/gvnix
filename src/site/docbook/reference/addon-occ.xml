@@ -11,61 +11,52 @@
   <para xml:lang="es">Add-on de utilidades enfocadas a la persistencia de las
   entidades.</para>
 
-  <para xml:lang="es">Este add-on contiene un conjunto de herramientas
-  enfocadas a la persistencia de Entidades del modelo de datos.</para>
+  <para xml:lang="es">Este add-on proporciona un sistema
+  que facilita la detección de modificaciones concurrentes
+  en la persistencia de entidades del modelo de datos.</para>
 
-  <para xml:lang="es">La herramientas disponibles son:</para>
-
-  <variablelist>
-    <varlistentry>
-      <term><link
-      linkend="addon-persistence_occchecksum">OCCCheckSum</link></term>
-
-      <listitem>
-        <para xml:lang="es">Control de <emphasis>Concurrencia
-        Optimista</emphasis> basada en <emphasis>CheckSum</emphasis> de los
-        datos.</para>
-      </listitem>
-    </varlistentry>
-  </variablelist>
+  <para xml:lang="es">El sistema consiste en un control de
+  <emphasis>Concurrencia Optimista</emphasis> basada en un
+  <emphasis>CheckSum o suma</emphasis> de los datos.</para>
 
   <section xml:id="addon-persistence_occchecksum">
-    <title>OCCCheckSum</title>
+    <title>OCC Checksum</title>
 
-    <para xml:lang="es">Esta utilidad añade a las entidades la funcionalidad
-    de <emphasis>Control de Concurrencia</emphasis> basada una operación de
-    <emphasis>Checksum</emphasis> sobre todos los campos persistentes que
+    <para xml:lang="es">Esta utilidad añade a las entidades un sistema
+    de <emphasis>Control de Concurrencia</emphasis> basado en una operación de
+    <emphasis>Checksum o suma</emphasis> sobre todos los campos persistentes que
     contiene la entidad.</para>
 
-    <para xml:lang="es">Esta funcionalidad nace de la necesidad de Controlar
+    <para xml:lang="es">Esta funcionalidad nace de la necesidad de controlar
     la concurrencia sobre modelos de datos heredados en los que, por
-    requerimientos del sistema, no podemos alterar el modelo para añadir un
-    campos de control como <emphasis>version</emphasis> (numérico que
+    requerimientos del sistema, no es posible alterar el modelo relacional de 
+    base de datos para añadir campos de control
+    conocidos como <emphasis>version</emphasis> (numérico que
     identifica la versión del objeto) o <emphasis>lastUpdate</emphasis> (fecha
     de la última actualización) en los que se basa el mecanismo de
     <emphasis>Control de Concurrencia</emphasis> de la especificación <link
     xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr220/index.html">JPA</link>.</para>
 
     <para xml:lang="es">El checksum <emphasis>se calcula en el momento de la
-    carga</emphasis> de la entidad desde la base de datos es almacenado en una
-    <emphasis>propiedad no persistente</emphasis>.</para>
+    carga</emphasis> de un registro de la entidad desde la base de datos y es
+    almacenado en una <emphasis>propiedad no persistente</emphasis>.</para>
 
     <para xml:lang="es">En el momento de <emphasis>actualizar o
-    eliminar</emphasis> un elemento de dicha entidad se carga el elemento que
-    está persistido en la Base de dato y <emphasis>se compara el valor de
-    Checksum</emphasis> con el que se calculó en el momento de la carga del
-    elemento editado o a eliminar. <emphasis>Si no coincide se lanza una
+    eliminar</emphasis> un registro de dicha entidad se carga el elemento que
+    está persistido en la base de datos y <emphasis>se compara el valor de
+    checksum</emphasis> actual con el que se calculó en el momento de la carga del
+    elemento a actualizar o eliminar. <emphasis>Si no coincide se lanza una
     Excepción </emphasis>(<link
-    xlink:href="http://docs.oracle.com/javaee/6/docs/api/javax/persistence/OptimisticLockException.html">javax.persistence.OptimisticLockException</link>)
-    y la operación no se realizará.</para>
+    xlink:href="http://docs.oracle.com/javaee/6/docs/api/javax/persistence/OptimisticLockException.html">
+    javax.persistence.OptimisticLockException</link>) y la operación no se realizará.</para>
 
     <para xml:lang="es">Esta operación supone un coste adicional en las tareas
     de persistencia, pero no debería ser apreciable en condiciones del uso
-    cotidiano de la aplicación excepto de procesos de actualizaciones masivas
+    cuotidiano de la aplicación excepto de procesos de actualizaciones masivas
     de registros.</para>
 
-    <para xml:lang="es">Para activar este comportamiento en una Entidad se
-    puede usar los comandos:</para>
+    <para xml:lang="es">Para activar esta característica sobre una entidad se
+    pueden utilizar los siguientes comandos:</para>
 
     <variablelist>
       <varlistentry>
@@ -74,7 +65,7 @@
         checksum set</link></term>
 
         <listitem>
-          <para xml:lang="es">Establecer el control de concurrencia a una
+          <para xml:lang="es">Aplica el control de concurrencia a una
           entidad.</para>
         </listitem>
       </varlistentry>
@@ -85,24 +76,28 @@
         checksum all</link></term>
 
         <listitem>
-          <para xml:lang="es">Establecer el control de concurrencia a todas
+          <para xml:lang="es">Aplica el control de concurrencia a todas
           las entidades de la aplicación.</para>
         </listitem>
       </varlistentry>
     </variablelist>
 
-    <para xml:lang="es">Estos comandos añaden a los ficheros
+    <para xml:lang="es">Estos comandos añaden a uno o a todos los ficheros
     <filename>.java</filename> de las entidades una anotación
     <classname>@GvNIXEntityOCCChecksum</classname> y un campo no persistente
-    para almacenar el Checksum de la lectura. En base a esta anotación se
-    generará un <emphasis>ITD</emphasis> (fichero
-    <filename>*_gvNIX_occChecksum.aj</filename>) con toda la lógica necesaria.
-    Está lógica sera manejada automáticamente por el add-on.</para>
+    para almacenar el checksum. En base a esta anotación se
+    generará un <emphasis>aspecto java</emphasis> (fichero
+    <filename>*_gvNIX_occChecksum.aj</filename>) con toda la lógica necesaria
+    para calcular el checksum en base a las propiedades de un registro de
+    la entidad y para controlar antes de una actualización o borrado si el
+    registro ha cambiado desde que se cargo inicialmente.
+    Toda esta lógica sera manejada automáticamente por el add-on.</para>
 
-    <para xml:lang="es">Si se intenta aplicar el control de concurrencia sobre
-    una entidad que extiende de otra y en en la clase padre existe un campo
-    anotado con @javax.persistence.Version, el Add-on detectará esta
-    circunstancia y entonces aplicará el control de concurrencia sobre la
+    <para xml:lang="es">Si se aplica el control de concurrencia sobre
+    una entidad que extiende de otra y en la clase padre existe un campo
+    anotado como campo de control de persistencia con 
+    @javax.persistence.Version, el add-on detectará esta
+    circunstancia y aplicará el control de concurrencia sobre la
     clase padre.</para>
 
     <para xml:lang="es">Para ver todos los comandos y sus opciones ver el
@@ -110,17 +105,18 @@
     de comandos</link>.</para>
 
     <note>
-      <para>Se ha detectado que al aplicar la funcionalidad de este Add-on
+      <para>Se ha detectado que al aplicar este control de concurrencia
       sobre entidades que tienen generados, o sobre los que se van a generar,
-      tests unitarios e integración (mediante el comando <emphasis>test
-      integration</emphasis>) los tests de integración se generan con errores
-      de compilación. Se debe a como el Add-on Integration Tests de Roo genera
-      el código de los tests. De momento, solo hay dos opciones para
-      solucionarlo:</para>
+      tests de integración (mediante el comando <emphasis>test
+      integration</emphasis> o mediante la opción <emphasis>--testAutomatically</emphasis>
+      del comando <emphasis>entity jpa</emphasis>) los tests de integración presentarán un error
+      de compilación. Se debe a que el add-on que genera los tests de integración no
+      considera el caso en el que el campo que hace de control de concurrencia sea
+      del tipo cadena. Hay varias opciones para evitar estos errores de compilación:</para>
 
       <orderedlist>
         <listitem>
-          <para>La menos recomendable: Desactivar la generación de los tests
+          <para>No es recomendable, pero se pueden desactivar los tests
           de los métodos <emphasis>flush()</emphasis> y
           <emphasis>merge()</emphasis> (métodos
           <emphasis>testFlush()</emphasis> y
@@ -129,25 +125,28 @@
           y añadir a la anotación <emphasis>@RooIntegrationTest</emphasis> los
           atributos <emphasis>flush = false</emphasis> y <emphasis>merge =
           false</emphasis>, de esta manera estos dos tests no se generan
-          quedando la batería de pruebas incompleta:</para>
+          en sus aspecto Java correspondiente quedando la batería de pruebas
+          incompleta pero compilando correctamente:</para>
 
           <programlisting>@RooIntegrationTest(entity = MiClase.class, <emphasis
               role="bold">flush = false, merge = false</emphasis>)</programlisting>
         </listitem>
 
         <listitem>
-          <para>La más recomendable: Corregir los dos test mencionados en el
-          punto anterior. Para ello debemos hacer <emphasis>pushin</emphasis>
+          <para>La más recomendable es corregir los dos test mencionados en el
+          punto anterior. Para ello se debe realizar un <emphasis>pushin</emphasis>
           de estos dos métodos que se encuentran declarados en
           <emphasis>src/test/java/**/*IntegrationTest_Roo_IntegrationTest.aj</emphasis>
           y también el campo &lt;nombre_entidad&gt;DataOnDemand dod, anotado
-          con @Autowired, y llevarlo todo a la clase Java del test de
-          integración. Una vez tengamos los test en la clase Java, corregimos
-          los errores de compilación cambiando el operador
+          con @Autowired, llevandolos a la clase Java del test de
+          integración. Una vez los test están en la clase Java, se pueden corregir
+          los errores de compilación reemplazando el operador
           <emphasis>"&gt;"</emphasis> por el método
-          <emphasis>equals</emphasis>. A continuación vemos un ejemplo
-          extraido del proyecto de ejemplo PetClinic que se distribuye junto a
-          gvNIX/Roo.</para>
+          <emphasis>equals</emphasis>. A continuación se muestra un ejemplo
+          extraido del proyecto de ejemplo petclinic que se distribuye junto a
+          gvNIX/Roo en el que se han corregido las líneas marcadas en negrita
+          para los métodos <emphasis>testFlush()</emphasis> y
+          <emphasis>testMerge()</emphasis>.</para>
 
           <programlisting>package com.springsource.petclinic.domain;
 
@@ -168,34 +167,47 @@ public class OwnerIntegrationTest {
     @Test
     public void testFlush() {
         com.springsource.petclinic.domain.Owner obj = dod.getRandomOwner();
-        org.junit.Assert.assertNotNull("Data on demand for 'Owner' failed to initialize correctly", obj);
+        org.junit.Assert.assertNotNull(
+        		"Data on demand for 'Owner' failed to initialize correctly", obj);
         java.lang.Long id = obj.getId();
-        org.junit.Assert.assertNotNull("Data on demand for 'Owner' failed to provide an identifier", id);
+        org.junit.Assert.assertNotNull(
+        		"Data on demand for 'Owner' failed to provide an identifier", id);
         obj = com.springsource.petclinic.domain.Owner.findOwner(id);
-        org.junit.Assert.assertNotNull("Find method for 'Owner' illegally returned null for id '" + id + "'", obj);
+        org.junit.Assert.assertNotNull(
+        		"Find method for 'Owner' illegally returned null for id '"
+        		+ id + "'", obj);
         boolean modified =  dod.modifyOwner(obj);
         java.lang.String currentVersion = obj.getOccChekcsum();
         obj.flush();
-        org.junit.Assert.assertTrue("OccCheckSum for 'Owner' failed to modify on flush directive", 
-                                 (currentVersion != null &amp;&amp; <emphasis
-              role="bold">obj.getOccChekcsum().equals(currentVersion)</emphasis>) || !modified);
+        org.junit.Assert.assertTrue(
+        		"OccCheckSum for 'Owner' failed to modify on flush directive", 
+        		(currentVersion != null &amp;&amp;
+        		<emphasis role="bold">obj.getOccChekcsum().equals(currentVersion)</emphasis>) ||
+        		!modified);
     }
 
     @Test
     public void testMerge() {
         com.springsource.petclinic.domain.Owner obj = dod.getRandomOwner();
-        org.junit.Assert.assertNotNull("Data on demand for 'Owner' failed to initialize correctly", obj);
+        org.junit.Assert.assertNotNull(
+        		"Data on demand for 'Owner' failed to initialize correctly", obj);
         java.lang.Long id = obj.getId();
-        org.junit.Assert.assertNotNull("Data on demand for 'Owner' failed to provide an identifier", id);
+        org.junit.Assert.assertNotNull(
+        		"Data on demand for 'Owner' failed to provide an identifier", id);
         obj = com.springsource.petclinic.domain.Owner.findOwner(id);
         boolean modified =  dod.modifyOwner(obj);
         java.lang.String currentVersion = obj.getOccChekcsum();
-        com.springsource.petclinic.domain.Owner merged = (com.springsource.petclinic.domain.Owner) obj.merge();
+        com.springsource.petclinic.domain.Owner merged = (
+        		com.springsource.petclinic.domain.Owner) obj.merge();
         obj.flush();
-        org.junit.Assert.assertEquals("Identifier of merged object not the same as identifier of original object", merged.getId(), id);
-        org.junit.Assert.assertTrue("OccCheckSum for 'Owner' failed to modify on merge and flush directive", 
-                                (currentVersion != null &amp;&amp; <emphasis
-              role="bold">obj.getOccChekcsum().equals(currentVersion)</emphasis>) || !modified);
+        org.junit.Assert.assertEquals(
+        		"Identifier of merged object not the same as identifier of original object",
+        		merged.getId(), id);
+        org.junit.Assert.assertTrue(
+        		"OccCheckSum for 'Owner' failed to modify on merge and flush directive", 
+        		(currentVersion != null &amp;&amp;
+        		<emphasis role="bold">obj.getOccChekcsum().equals(currentVersion)</emphasis>)
+        		|| !modified);
     }
 }</programlisting>
         </listitem>

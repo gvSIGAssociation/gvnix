@@ -256,7 +256,7 @@
       </listitem>
 
       <listitem>
-        <para>Crear el ITD
+        <para>Crear el aspecto Java
         <emphasis>&lt;controller&gt;_Roo_GvNIXReport.aj</emphasis> que
         contiene los métodos que atienden las peticiones relacionadas con el
         informe añadido. Se añaden dos métodos por informe:</para>

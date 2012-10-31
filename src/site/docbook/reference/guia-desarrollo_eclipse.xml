@@ -369,7 +369,7 @@ Created ...</programlisting>
 
       <para xml:lang="es">Al importar un proyecto en Eclipse es importante
       comprobar que dicho proyecto tiene configuradas las características de
-      proyecto Maven y proyecto AspectJ. Esto aparece de forma visual en el
+      proyecto Maven y proyecto de aspectos java. Esto aparece de forma visual en el
       proyecto mediante unas pequeñas letras M y AJ. Si no apareciesen se
       pueden añadir estas características seleccionando el proyecto y con el
       segundo botón del ratón eligiendo la opción <emphasis>Configure
@@ -707,7 +707,7 @@ Created ...</programlisting>
     en una clase.</para>
 
     <para>La particularidad de la vista Cross References es que muestra los
-    campos y métodos asociados a la clase Java mediante AspectJ que se verán
+    campos y métodos asociados a la clase Java mediante aspectos java que se verán
     en el Cápitulo sobre el <link
     linkend="guia-desarrollo_generacion-codigo">código que genera
     gvNIX/Roo</link>.</para>
@@ -735,7 +735,7 @@ Created ...</programlisting>
 
     <important>
       <para>Cabe destacar que para que aparezca esta información sobre el
-      código asociado a una clase Java mediante AspectJ, la clase debe estar
+      código asociado a una clase Java mediante aspectos java, la clase debe estar
       libre de errores de compilación.</para>
     </important>
 
@@ -746,7 +746,7 @@ Created ...</programlisting>
       funcionalidades o modificar algunas de las que se han generado
       automáticamente para adaptar el código a los requisitos de la
       aplicación. En estos casos hay que tener en cuenta que <emphasis
-      role="bold">no se debe hacer ningún cambio sobre los AspectJ (ficheros
+      role="bold">no se debe hacer ningún cambio sobre los aspectos java (ficheros
       aj) asociados a una clase Java</emphasis>. gvNIX/Roo ya nos lo avisa en
       la primera línea del archivo .aj. El motivo de esto es, que teniendo la
       consola gvNIX funcionando, o al arrancar, gvNIX/Roo volvería a generar
@@ -764,8 +764,8 @@ Created ...</programlisting>
       </figure>
 
       <para>Para modificar el código de un método o la declaración de un campo
-      que se encuentre en un AspectJ, se puede mover el método o el campo a
-      la clase Java, del que depende el AspectJ. En el ejemplo, se movería a
+      que se encuentre en un aspecto java, se puede mover el método o el campo a
+      la clase Java, del que depende el aspecto java. En el ejemplo, se movería a
       la clase <emphasis>Timer.java</emphasis>. Puede realizarse cortando y
       pegando, pero Eclipse con el plugin STS ofrece una opción mucho más
       adecuada para esto.</para>
