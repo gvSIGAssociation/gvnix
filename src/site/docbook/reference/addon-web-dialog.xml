@@ -8,99 +8,126 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Add-on Web Dialog</title>
 
-  <para>Add-on para la gestión de excepciones no controladas.</para>
+  <para>Add-on para la gestión de excepciones no controladas
+  y de mensajes de usuario.</para>
 
   <section xml:id="addon-web-exception-handler_descripcion">
     <title xml:lang="es">Descripción</title>
 
-    <para xml:lang="es">Este Add-on permite gestionar las excepciones no
-    controladas en la aplicación en tiempo de ejecución para mostrar mensajes
-    inteligibles al usuario en una página jspx nueva en un idioma
-    definido.</para>
+    <para xml:lang="es">Este add-on permite gestionar las excepciones no
+    controladas en el código de la aplicación para mostrar
+    mensajes inteligibles al usuario en una ventana modal (pop-up)
+    y en el idioma del usuario sin necesidad de realizar ningún desarrollo
+    en la parte visual.</para>
 
-    <para xml:lang="es">Después de la definición de la excepción se pueden
-    añadir mensajes para cada idioma disponible en la aplicación.</para>
+    <para xml:lang="es">El add-on al aplicarse sobre un proyecto configura por defecto
+    ciertas excepciones que serán visualizadas de forma amigable al usuario
+    en el caso de no ser gestionadas desde el código de la aplicación. Así mismo, se
+    pueden incluir nuevas excepciones y modificar los textos amigables que se mostrarán
+    en lugar de la excepción para cada idioma disponible en la aplicación.</para>
+    
+    <para xml:lang="es">El add-on también permite mostrar mensajes de
+    usuario sin implementar ningún elemento visual mediante la invocación
+    de métodos desde el controlador que son los encargados de mostrar
+    dichos mensajes en la pantalla del usuario.</para>
 
-    <para xml:lang="es">Desde la versión 0.8.0 de gvNIX, los mensajes de
-    excepciones se muestran dentro de un dialogo modal. Además permite crear
-    nuevos dialogos modales usando una página jspx como contenido.</para>
+    <para xml:lang="es">Los mensajes de excepción y de usuario se
+    muestran en un diálogo o ventana modal. Se permite además la personalización
+    de las ventanas modales de excepción o de mensaje de usuario por
+    si es necesario personalizarlas por algún motivo.</para>
   </section>
 
   <section>
     <title>Instalación</title>
 
-    <para>Para tener esta funcionalidad se debe ejecutar el comando <link
-    linkend="apendice-comandos_addon-web-dialog">web mvc dialog setup</link>.
+    <para>Para aplicar esta característica sobre un proyecto se debe ejecutar el comando
+    <link linkend="apendice-comandos_addon-web-dialog">web mvc dialog setup</link>.
     Al hacerlo se añade soporte para diálogos modales en la aplicación y a los
     controladores web se les añade la anotación GvNIXModalDialogs sin ningún
-    valor establecido. Esto hará que se genere un método llamado modalDialog
-    que facilitará al desarrollador mostrar un diálogo modal de manera
-    controlada. La signatura de este método es:</para>
+    atributo establecido. Esto hará que se genere un método llamado modalDialog
+    que facilitará al desarrollador la posibilidad de mostrar un diálogo modal
+    en la parte visual directamente desde el código Java del controlador.
+    La signatura de este método es:</para>
 
-    <programlisting>modalDialog(DialogType dialogType, String title, String description, HttpServletRequest httpRequest)</programlisting>
+    <programlisting>modalDialog(DialogType dialogType, String title, String description,
+    		HttpServletRequest httpServletRequest)</programlisting>
 
-    <para>donde:</para>
+    <para>donde cada uno de los parámetros del método define:</para>
 
-    <para><variablelist>
-        <varlistentry>
-          <term>dialogType</term>
+    <variablelist>
+      <varlistentry>
+        <term>dialogType</term>
 
-          <listitem>
-            <para xml:lang="es"><emphasis>es un tipo enumerado que puede tomar
-            como valores: Error, Info, Alert, Suggest. Cada uno define un
-            nivel de severidad en el diálogo.</emphasis></para>
-          </listitem>
-        </varlistentry>
+        <listitem>
+          <para xml:lang="es">es un tipo enumerado que puede tomar
+          como valores: Error, Info, Alert, Suggest. Cada uno define un
+          nivel de severidad en el diálogo y producirá en el aspecto visual
+          del diálogo que aparezca con distinto color e icono.</para>
+        </listitem>
+      </varlistentry>
 
-        <varlistentry>
-          <term>title</term>
+      <varlistentry>
+        <term>title</term>
 
-          <listitem>
-            <para xml:lang="es"><emphasis>es el código del recurso i18n que se
-            usará como título del diálogo modal.</emphasis></para>
-          </listitem>
-        </varlistentry>
+        <listitem>
+          <para xml:lang="es">es el código del recurso i18n que se
+          usará como título del diálogo modal.</para>
+        </listitem>
+      </varlistentry>
 
-        <varlistentry>
-          <term>description</term>
+      <varlistentry>
+        <term>description</term>
 
-          <listitem>
-            <para xml:lang="es"><emphasis>es el código del recurso i18n que se
-            usará como descripción del diálogo modal.</emphasis></para>
-          </listitem>
-        </varlistentry>
+        <listitem>
+          <para xml:lang="es">es el código del recurso i18n que se
+          usará como descripción del diálogo modal.</para>
+        </listitem>
+      </varlistentry>
 
-        <varlistentry>
-          <term>httpRequest</term>
+      <varlistentry>
+        <term>httpServletRequest</term>
 
-          <listitem>
-            <para xml:lang="es"><emphasis>de este objeto se usa internamente
-            en el método para obtener la sesión del usuario y establecer un
-            atributo que será leido por el componente message-box.tagx para
-            mostrar el diálogo.</emphasis></para>
-          </listitem>
-        </varlistentry>
-      </variablelist>Estos diálogos son útilies para mostrar mensajes al
+        <listitem>
+          <para xml:lang="es">este parámetro se usa internamente
+          en el método para obtener la sesión del usuario y así establecer en
+          ella un atributo que será leido por el componente visual message-box.tagx
+          para mostrar el diálogo. Si al invocar el método no se dispone de
+          este parámetro, se puede obtener añadiendo el parámetro
+          <emphasis>HttpServletRequest httpServletRequest</emphasis>
+          a los parámetros del método que contiene la invocación
+          (esta es una característica especial de los métodos
+          que gestionan las URLs en Spring MVC y que permite declarar
+          distintos parámetros de entre algunos dados).</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para xml:lang="es">Al invocar este método desde cualquier lugar
+    del controlador, cuando se visualize la página en el lado
+    cliente aparecerá el mensaje modal solicitado.</para>
+
+    <para>Estos diálogos son útiles para mostrar mensajes al
     usuario informando de cualquier circunstancía tras una operación
     determinada.</para>
 
-    <para>Al mismo tiempo, tras ejecutar el comando se definen una serie de
-    excepciones y se mapean con sus respectivos diálogos modales. En las
-    siguiente secciones vemos más detalladamente las excepciones y el uso de
-    los diálogos modales.</para>
+    <para>Al mismo tiempo, la ejecución de este comando configura una serie de
+    excepciones que serán mapeadas con sus respectivos diálogos modales y mensajes
+    multi idioma. En las siguiente secciones se verá más detalladamente
+    las excepciones controladas y el uso de los diálogos modales.</para>
   </section>
 
   <section xml:id="addon-web-exception-handler_excptiones-de-gvnix">
-    <title xml:lang="es">Excepciones de gvNIX</title>
+    <title xml:lang="es">Excepciones controladas por gvNIX</title>
 
-    <para xml:lang="es">Conjunto de excepciones iniciales definidas para
-    gvNIX.</para>
+    <para xml:lang="es">Conjunto de excepciones inicialmente definidas y
+    controladas por gvNIX al ejecutar el comando
+    <emphasis>web mvc dialog setup</emphasis>.</para>
 
     <para xml:lang="es"><itemizedlist>
         <listitem>
           <para xml:lang="es">java.sql.SQLException.</para>
 
-          <para xml:lang="es">Se ha producido un error en el acceso a la Base
+          <para xml:lang="es">Se ha producido un error en el acceso a la base
           de datos.</para>
         </listitem>
 
@@ -134,43 +161,45 @@
         </listitem>
       </itemizedlist></para>
 
-    <para>Desde la versión 0.8.0 de gvNIX, las excepciones se muestran
-    mediante un dialogo modal. Para ello, se modifica la definición, en el
+    <para>Las excepciones se muestran mediante un dialogo modal.
+    Para ello, se modifica la definición, en el
     archivo webmvc-config.xml, del bean
-    <emphasis>SimpleMappingExceptionResolver</emphasis> cambiando la clase por
-    una propia que se instala en el proyecto (subpaquete
-    <emphasis>servlet.handler</emphasis>, clase
-    <emphasis>MessageMappingExceptionResolver.java</emphasis>). En el mismo
-    subpaquete se instala también <emphasis>Dialog.java</emphasis>, un bean
-    que contendrá la información necesaria para visualizar la excepción en la
+    <emphasis>SimpleMappingExceptionResolver</emphasis> reemplazando la clase 
+    que se define por
+    una propia. La clase propia se encontrará instalada en el proyecto 
+    en la clase <emphasis>MessageMappingExceptionResolver.java</emphasis>
+    del subpaquete <emphasis>web.servlet.handler</emphasis>. En el
+    subpaquete <emphasis>web.dialog</emphasis> se instala también 
+    la clase <emphasis>Dialog.java</emphasis>, la cual es un bean
+    que representa la información necesaria para visualizar una excepción en la
     ventana modal renderizada por el componente
-    <emphasis>dialog-box.tagx</emphasis>.</para>
+    <emphasis>message-box.tagx</emphasis>.</para>
 
     <section xml:id="addon-web-exception-handler_funcionalidad">
       <title xml:lang="es">Añadir más excepciones a la gestión</title>
 
-      <para xml:lang="es">Pasos a seguir para gestionar una excepción en la
-      aplicación.</para>
+      <para xml:lang="es">Pasos a seguir para incluir en la gestión
+      automática de excepciones de la aplicación una nueva excepción.</para>
 
-      <para xml:lang="es">El Add-on nos proporciona las siguientes opciones
-      para gestionar las excepciones:</para>
+      <para xml:lang="es">El Add-on proporciona ciertos comandos que permiten realizar
+      de forma automática las siguientes operaciones para la gestión de excepciones:</para>
 
       <orderedlist>
         <listitem>
-          <para xml:lang="es">Añadir una excepción a la aplicación</para>
+          <para xml:lang="es">Añadir el control de una excepción a la aplicación:</para>
 
           <itemizedlist>
             <listitem>
               <para xml:lang="es">Define la excepción a capturar en el bean
-              <emphasis>SimpleMappingExceptionResolver</emphasis> del archivo
+              <emphasis>messageMappingExceptionResolverBean</emphasis> del archivo
               <emphasis>webmvc-config.xml</emphasis>.</para>
             </listitem>
 
             <listitem>
-              <para xml:lang="es">Crea una dirección asociada a la excepcion
+              <para xml:lang="es">Asocia una dirección a la excepcion
               en un nuevo bean
-              <emphasis>&lt;mvc:view-controller&gt;</emphasis> con la
-              dirección específica.</para>
+              <emphasis>&lt;mvc:view-controller&gt;</emphasis> en el archivo
+              <emphasis>webmvc-config.xml</emphasis>.</para>
             </listitem>
 
             <listitem>
@@ -183,30 +212,36 @@
               <emphasis>views.xml</emphasis> en el directorio
               <emphasis>WEB-INF</emphasis> la aplicación.</para>
             </listitem>
+            
+            <listitem>
+              <para xml:lang="es">Crear las etiquetas multi idioma
+              en los ficheros de propiedades de todos los idiomas
+              que estén instalados en la aplicación.</para>
+            </listitem>
           </itemizedlist>
         </listitem>
 
         <listitem>
-          <para xml:lang="es">Muestra las excepciones gestionadas por la
-          aplicación.</para>
+          <para xml:lang="es">Mostrar las excepciones gestionadas por la
+          aplicación:</para>
 
           <itemizedlist>
             <listitem>
               <para xml:lang="es">Muestra la lista de excepciones definidas en
-              el bean <emphasis>MessageMappingExceptionResolver</emphasis> del
+              el bean <emphasis>messageMappingExceptionResolver</emphasis> del
               archivo <emphasis>webmvc-config.xml</emphasis>.</para>
             </listitem>
           </itemizedlist>
         </listitem>
 
         <listitem>
-          <para xml:lang="es">Elimina las excepciones de la aplicación.</para>
+          <para xml:lang="es">Eliminar excepciones controladas por la aplicación:</para>
 
           <itemizedlist>
             <listitem>
-              <para xml:lang="es">Elimina la excepción a partir del nombre que
-              se muestra en la lista de excepciones gestionadas por la
-              aplicación.</para>
+              <para xml:lang="es">Elimina del fichero <emphasis>webmvc-config.xml</emphasis>
+              las referencias a la excepción y por lo tanto la quita de las excepciones
+              gestionadas por la aplicación.</para>
             </listitem>
 
             <listitem>
@@ -221,7 +256,7 @@
         </listitem>
       </orderedlist>
 
-      <para>Para más informción sobre estos comnados para gestionar las
+      <para>Para obtener más información sobre estos comandos de gestión de
       excepciones consultar el apendice <link
       linkend="apendice-comandos_addon-web-dialog">Comandos del Add-on Web
       Dialog</link>.</para>
@@ -232,40 +267,51 @@
     <title>Nuevos diálogos modales</title>
 
     <para>Mediante el componente visual <emphasis>message-box.tagx</emphasis>
-    que instala este add-on es posible mostrar en pantalla un diálogo
-    modal.</para>
+    que instala el add-on es posible mostrar en pantalla un diálogo
+    modal al usuario desde la clase java del controlador.</para>
 
-    <para>Para tener esta funcionalidad se debe ejecutar el comando <link
-    linkend="apendice-comandos_addon-web-exception-handler_dialog-setup">web
-    mvc dialog setup</link>. Al hacerlo se añade soporte para diálogos modales
+    <para>Para aplicar esta funcionalidad sobre el proyecto primero se debe haber ejecutado
+    el comando <link linkend="apendice-comandos_addon-web-exception-handler_dialog-setup">web
+    mvc dialog setup</link>. Al hacerlo se añade el soporte para diálogos modales
     en la aplicación y a los controladores web se les añade la anotación
-    GvNIXModalDialogs</para>
+    GvNIXModalDialogs. La ejecución este comando hace que ya esté disponible un
+    método para mostrar mensajes genéricos tal y como se ha visto anteriormente:</para>
+    
+    <programlisting>modalDialog(DialogType dialogType, String title, String description,
+    		HttpServletRequest httpServletRequest)</programlisting>
 
     <para>El comando <link
     linkend="apendice-comandos_addon-web-exception-handler_dialog-add">web mvc
-    dialog add</link> se ocupa de ofrecer esta funcionalidad. Al ejecutarlo se
-    añade o modifica el valor de la anotación
-    <emphasis>GvNIXModalDialogs</emphasis>, esto hace que se genere un método
-    que toma como nombre el valor del parámetro <emphasis>name</emphasis> dado
-    en el comando y se crea una JSPx en <emphasis>WEB-INF/dialogs</emphasis>
-    con el mismo nombre dado al método que se usará como contenido del diálogo
-    modal.<programlisting><emphasis role="bold">roo-gvNIX&gt;</emphasis> web mvc dialog add --class ~.web.PetController --name petsdialog</programlisting>En
-    el ejemplo anterior se está definiendo el diálogo modal petsdialog que
-    será mostrado por el controlador PetController. El método que facilita
-    esta función en el controlador tiene como signatura:</para>
+    dialog add</link> modifica los atributos de la anotación
+    <emphasis>GvNIXModalDialogs</emphasis>, generando un método
+    que toma como nombre el valor del parámetro <emphasis>name</emphasis> proporcionado
+    mediante en el comando y creando una JSPx en <emphasis>WEB-INF/dialogs</emphasis>
+    con el mismo nombre. Este método servirá para mostrar mensajes específico a
+    diferencia del método <emphasis>modalDialog</emphasis> que sirve para mostrar
+    mensajes genéricos. La diferencia principal es que este nuevo método tiene su
+    propia página jspx y permite proporcionar parámetros adicionales a dicha página,
+    cosa que no permite el método <emphasis>modalDialog</emphasis>.</para>
+    
+    <programlisting><emphasis role="bold">roo-gvNIX&gt;</emphasis> web mvc dialog add --class ~.web.PetController --name petsdialog</programlisting>
+    
+    <para>En el ejemplo anterior se define el diálogo modal petsdialog que
+    podrá ser mostrado desde el controlador PetController. El método que facilita
+    esta función en el controlador tiene la siguiente signatura:</para>
 
-    <programlisting>petsdialog(DialogType dialogType, String title, String description, HashMap&lt;String, Object&gt; params, HttpServletRequest httpRequest)</programlisting>
+    <programlisting>petsdialog(DialogType dialogType, String title, String description,
+    		HashMap&lt;String, Object&gt; params, HttpServletRequest httpServletRequest)</programlisting>
 
-    <para>donde:</para>
+    <para>donde cada uno de los parámetros del método define:</para>
 
     <variablelist>
       <varlistentry>
         <term>dialogType</term>
 
         <listitem>
-          <para xml:lang="es"><emphasis>es un tipo enumerado que puede tomar
-          como valores: Error, Info, Alert, Suggest. Cada uno define un nivel
-          de severidad en el diálogo.</emphasis></para>
+          <para xml:lang="es">es un tipo enumerado que puede tomar
+          como valores: Error, Info, Alert, Suggest. Cada uno define un
+          nivel de severidad en el diálogo y producirá en el aspecto visual
+          del diálogo que aparezca con distinto color e icono.</para>
         </listitem>
       </varlistentry>
 
@@ -273,8 +319,8 @@
         <term>title</term>
 
         <listitem>
-          <para xml:lang="es"><emphasis>es el código del recurso i18n que se
-          usará como título del diálogo modal.</emphasis></para>
+          <para xml:lang="es">es el código del recurso i18n que se
+          usará como título del diálogo modal.</para>
         </listitem>
       </varlistentry>
 
@@ -282,8 +328,8 @@
         <term>description</term>
 
         <listitem>
-          <para xml:lang="es"><emphasis>es el código del recurso i18n que se
-          usará como descripción del diálogo modal.</emphasis></para>
+          <para xml:lang="es">es el código del recurso i18n que se
+          usará como descripción del diálogo modal.</para>
         </listitem>
       </varlistentry>
 
@@ -291,102 +337,111 @@
         <term>params</term>
 
         <listitem>
-          <para xml:lang="es"><emphasis>es un Map que se puede usar para pasar
-          tantos parámetros queramos al componente del diálogo modal para
-          confeccionarlo y mostrar en él la información que se
-          necesite.</emphasis></para>
+          <para xml:lang="es">es un Map que se puede utilizar para proporcionar
+          tantos parámetros como sea necesario al componente visual del diálogo modal para
+          confeccionarlo y mostrar en él cualquier información necesaria.</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term>httpRequest</term>
+        <term>httpServletRequest</term>
 
         <listitem>
-          <para xml:lang="es"><emphasis>de este objeto se usa internamente en
+          <para xml:lang="es">este parámetro se usa internamente en
           el método para obtener la sesión del usuario y establecer un
           atributo que será leido por el componente message-box.tagx para
-          mostrar el diálogo.</emphasis></para>
+          mostrar el diálogo. Si al invocar el método no se dispone de
+          este parámetro, se puede obtener añadiendo el parámetro
+          <emphasis>HttpServletRequest httpServletRequest</emphasis>
+          a los parámetros del método que contiene la invocación
+          (esta es una característica especial de los métodos
+          que gestionan las URLs en Spring MVC y que permite declarar
+          distintos parámetros de entre algunos dados).</para>
         </listitem>
       </varlistentry>
     </variablelist>
+    
+    <para xml:lang="es">Al invocar este método desde cualquier lugar
+    del controlador, cuando se visualize la página en el lado
+    cliente aparecerá el mensaje modal solicitado.</para>
 
     <para>También con la ejecución del comando del ejemplo se habrá creado en
     <emphasis>WEB-INF/dialogs</emphasis> una jspx con el nombre
-    <emphasis>petsdialog.jspx</emphasis> que el usuario debería personalizar a
-    su gusto. El Map <emphasis>params</emphasis> llega hasta esta jspx y por
-    tanto el desarrollador puede acceder a él para obtener la información
-    deseada y confeccionar el diálogo que necesite.</para>
+    <emphasis>petsdialog.jspx</emphasis> que podría personalizarse según
+    las necesidades. El Map <emphasis>params</emphasis> llega hasta esta jspx y por
+    lo tanto el desarrollador puede acceder a él para obtener la información
+    que almacena y utilizar sus valores en el diálogo.</para>
 
     <section>
       <title>Ejemplos de dialogos personalizados</title>
 
-      <para>Con este nuevo soporte para crear diálogos modales gvNIX nos
+      <para>Con este nuevo soporte para crear diálogos modales gvNIX
       ofrece una gran libertad para maquetar multitud de mensajes de usuario o
       diálogos de la aplicación (avisos, errores, mensajes de confirmación,
-      formularios ...).</para>
+      formularios, etc.).</para>
 
-      <para>Aquí vamos a ofrecer una pequeña guía para implementar alguna de
-      estos mensajes personalizados.</para>
+      <para>A continuación se muestra una pequeña demostración de implementación
+      de algunos de estos mensajes personalizados.</para>
 
       <section>
         <title>Mensaje de aviso de aplicación</title>
 
-        <para>En ocasiones podemos necesitar que tras una acción (una
-        petición) se muestre en la respuesta algún mensaje a cerca del
+        <para>En ocasiones puede ser necesario que tras una acción (una
+        petición al servidor) se muestre en la respuesta algún mensaje acerca del
         resultado de la operación solicitada o, en el caso de pantallas de
         búsqueda, indicar que no se han encontrado resultados.</para>
 
-        <para>Con el soporte de este add-on podemos incluir la siguiente línea
+        <para>Con el soporte de este add-on se puede incluir la siguiente línea
         de código en cualquier punto de un método de un controlador para
         definir un mensaje informativo.</para>
 
-        <programlisting>modalDialog(DialogType.Info, "message_info_title", "message_description_key", httpServletRequest);</programlisting>
+        <programlisting>modalDialog(DialogType.Info, "message_info_title", "message_description_key",
+        		httpServletRequest);</programlisting>
 
-        <para>Este caso es el mismo que se ha comentado anteriormente.</para>
       </section>
 
       <section>
         <title>Mensaje de confirmación</title>
 
-        <para>Tal vez queramos que tras una acción, la apliacación nos
-        pregunte si queremos ir a una página en concreto. A continuación
-        veamos cuales son los pasos y cambios en el código de un controller
+        <para>Puede ser necesario que tras una acción, la aplicación deba
+        preguntar si se desea ir a una página en concreto. A continuación
+        se verán los pasos y cambios en el código de un controlador
         para definir este mensaje de confirmación.</para>
 
-        <para>En el ejemplo, vamos a añadir a la aplicación Pet Clinic un
-        mensaje de cofirmación que preguntará al usuario si quiere ir al
+        <para>En el ejemplo, se va a añadir a la aplicación de ejemplo petclinic un
+        mensaje de confirmación que consultará al usuario si quiere ir al
         formulario de mascotas (Pets) tras actualizar la información de un
         propietario (Owner).</para>
 
         <orderedlist>
           <listitem>
-            <para>Añadir un diálogo modal a la apliacaión mediante
+            <para>Añadir un diálogo modal a la aplicación mediante
             "<emphasis>web mvc dialog message add</emphasis>"</para>
 
             <programlisting>web mvc dialog add --class ~.web.OwnerController --name confirmgopets</programlisting>
 
-            <para>Esto nos genera un método <emphasis>confirmgopets</emphasis>
+            <para>Esto generará un método <emphasis>confirmgopets</emphasis>
             disponible en <emphasis>OwnerController</emphasis> y una jspx base
             llamada <emphasis>confirmgopets</emphasis> en
-            <emphasis>WEB-INF/dialogs</emphasis> que personalizaremos.</para>
+            <emphasis>WEB-INF/dialogs</emphasis> que será personalizada.</para>
           </listitem>
 
           <listitem>
-            <para>Modificamos el método <emphasis>update</emphasis> de
+            <para>Modificar el método <emphasis>update</emphasis> de
             <emphasis>OwnerController</emphasis> para añadir la llamada al
             método <emphasis>confirmgopets</emphasis> justo antes de la línea
-            de <emphasis>return</emphasis>. Para ello deberemos llevar el
+            de <emphasis>return</emphasis>. Para ello se debe llevar el
             método <emphasis>update</emphasis> desde
             <emphasis>OwnerController_Roo_Controller.aj</emphasis> hasta
             <emphasis>OwnerController.java</emphasis>, podemos usar la opción
-            Push-in que nos ofrece Eclipse. Una vez movido el método, lo
-            modificamos quedando así:</para>
+            push-in que ofrece Eclipse. Una vez movido el método, 
+            será modificado quedando como sigue:</para>
 
-            <programlisting>@RequestMapping(method = RequestMethod.PUT)
-public String update(@Valid Owner owner, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
+            <programlisting>@RequestMapping(method = RequestMethod.PUT, produces = "text/html")
+public String update(@Valid Owner owner, BindingResult bindingResult, Model uiModel,
+		HttpServletRequest httpServletRequest) {
     if (bindingResult.hasErrors()) {
-        uiModel.addAttribute("owner", owner);
-        addDateTimeFormatPatterns(uiModel);
+        populateEditForm(uiModel, owner);
         return "owners/update";
     }
     uiModel.asMap().clear();
@@ -394,42 +449,48 @@ public String update(@Valid Owner owner, BindingResult bindingResult, Model uiMo
 
     <emphasis role="bold">HashMap&lt;String, Object&gt; dialogParams = new HashMap&lt;String, Object&gt;();
     dialogParams.put("petsFormLink", "/pets?form");
-    confirmgopets(DialogType.Info, "message_confirm_action_title", "message_confirm_action_desc", dialogParams, httpServletRequest);</emphasis>
+    confirmgopets(DialogType.Info, "message_confirm_action_title", 
+    		"message_confirm_action_desc", dialogParams, httpServletRequest);</emphasis>
 
-    return "redirect:/owners/" + encodeUrlPathSegment(owner.getId().toString(), httpServletRequest);
+    return "redirect:/owners/" + encodeUrlPathSegment(owner.getId().toString(),
+    		httpServletRequest);
 }</programlisting>
 
-            <para>Se ha resaltado en negrita la parte específica para definir
-            el diálogo modal.</para>
+            <para>Se ha resaltado en negrita la parte específica que ha de modificarse
+            para mostrar el diálogo modal.</para>
 
-            <para>El HashMap <emphasis>dialogParams</emphasis> nos permite
-            pasar al componente message-box.tagx más información para
-            mostrarla, o usarla, como necesitemos. En este caso, necesitamos
+            <para>El HashMap <emphasis>dialogParams</emphasis> permite
+            proporcionar al componente message-box.tagx información adicional
+            para mostrarla o utilizarla como sea necesario. En este caso, es necesario
             indicar a qué página dirigir al usuario en caso de que responda
-            afirmativamente a la pregunta de confirmación, pero podríamos
+            afirmativamente a la pregunta de confirmación, pero se podría
             definir cualquier tipo de parámetro, desde un String hasta objetos
-            del Modelo de nuestra aplicación o listas de objetos. En la
-            llamada al método confirgopets vemos que un parámetro indica que
-            se usará la página jspx que nos ha creado el add-on y que se pasa
-            el HashMap con los parámetros para el diálogo.</para>
+            del Modelo de la aplicación o listas de objetos.</para>
           </listitem>
 
           <listitem>
-            <para>Modificamos la jspx que nos ha creado el add-on
-            (confirmgopets.jspx) para adecuarla a nuestras necesidades:</para>
+            <para>Modificar la jspx que ha creado el add-on
+            (confirmgopets.jspx) para adecuarla a las necesidades del proyecto:</para>
 
-            <programlisting>&lt;div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:fn="http://java.sun.com/jsp/jstl/functions"  xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"&gt;
+            <programlisting>&lt;div xmlns:c="http://java.sun.com/jsp/jstl/core"
+            		xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
+            		xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+            		xmlns:spring="http://www.springframework.org/tags"
+            		xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"&gt;
   &lt;jsp:directive.page contentType="text/html;charset=UTF-8" /&gt;
   &lt;jsp:output omit-xml-declaration="yes" /&gt;
-  &lt;spring:message var="title" code="${titleCode}" text="Message title" htmlEscape="false" /&gt;
+  &lt;spring:message var="title" code="${titleCode}" text="Message title"
+  		htmlEscape="false" /&gt;
   &lt;util:panel id="title" title="${title}"&gt;
     &lt;h2&gt;${fn:escapeXml(title)}&lt;/h2&gt;
     &lt;p&gt;
-      &lt;spring:message code="${descriptionCode}" text="This is part of the message to show" /&gt;
+     &lt;spring:message code=&quot;${descriptionCode}&quot;
+     		text=&quot;This is the dialog description ...&quot; htmlEscape=&quot;false&quot;/&gt;
     &lt;/p&gt;
     &lt;div class="closeMessage"&gt;
-      &lt;button class="boton" dojoType="dijit.form.Button" type="button"
-        onClick="dijit.byId('${dialogId}').hide();"&gt;No&lt;/button&gt;
+     &lt;spring:message var=&quot;closeButtonValue&quot; code=&quot;button_close&quot;/&gt;
+     &lt;button class=&quot;boton&quot; dojoType=&quot;dijit.form.Button&quot; type=&quot;button&quot;
+       onClick=&quot;dijit.byId('${dialogId}').hide();&quot;&gt;${closeButtonValue}&lt;/button&gt;
       &lt;spring:url value="<emphasis role="bold">${dialogParams['petsFormLink']}</emphasis>" var="locationUrl"/&gt;
       &lt;spring:message var="confirmButtonValue" code="confirmButtonValue"/&gt;
       &lt;button class="boton" dojoType="dijit.form.Button" type="button"
@@ -438,9 +499,9 @@ public String update(@Valid Owner owner, BindingResult bindingResult, Model uiMo
   &lt;/util:panel&gt;
 &lt;/div&gt;</programlisting>
 
-            <para>En este caso hemos resaltado el accesso al HashMap de
-            parámetros del diálogo (dialogParams) para mostrar como extraer
-            los datos que hemos querido que le llegaran al diálogo.</para>
+            <para>En este caso se ha resaltado el accesso al HashMap de
+            parámetros del diálogo (dialogParams) para demostrar el modo en que 
+            se debe extraer los datos que le llegan al diálogo desde el controlador.</para>
           </listitem>
         </orderedlist>
       </section>
@@ -448,11 +509,11 @@ public String update(@Valid Owner owner, BindingResult bindingResult, Model uiMo
       <section>
         <title>Diálogo modal con formulario</title>
 
-        <para>En alguna ocasión podemos necesitar mostrar un formulario en un
+        <para>En alguna ocasión puede ser necesario mostrar un formulario en un
         diálogo modal para solicitar información al usuario, siguiendo el
-        ejemplo anterior, podríamos modificar la jspx que nos crea el add-on
+        ejemplo anterior, se debería modificar la jspx que crea el add-on
         para incluir un formulario. En este ejemplo, tras crear un nuevo Owner
-        en nuestra aplicación, le mostraremos un formulario para que cree su
+        en la aplicación, se mostrará un formulario para que cree su
         primera mascota.</para>
 
         <orderedlist>
@@ -462,19 +523,20 @@ public String update(@Valid Owner owner, BindingResult bindingResult, Model uiMo
 
             <programlisting>web mvc dialog add --class ~.web.OwnerController --name createPetInModal</programlisting>
 
-            <para>Esto nos genera un método <emphasis>confirmgopets</emphasis>
+            <para>Esto genera un método <emphasis>createPetInModal</emphasis>
             disponible en <emphasis>OwnerController</emphasis> y una jspx base
             llamada <emphasis>createPetInModal</emphasis> en
-            <emphasis>WEB-INF/dialogs</emphasis> que personalizaremos.</para>
+            <emphasis>WEB-INF/dialogs</emphasis> que será personalizada.</para>
           </listitem>
 
           <listitem>
-            <para>Modificamos el método create de OwnerController. Al igual
+            <para>Modifica el método create de OwnerController. Al igual
             que en el ejemplo anterior debemos hacer el Push-in del método. Lo
             modificamos para que quede como se muestra:</para>
 
-            <programlisting>@RequestMapping(method = RequestMethod.POST)
-public String create(@Valid Owner owner, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
+            <programlisting>@RequestMapping(method = RequestMethod.POST, produces = "text/html")
+public String create(@Valid Owner owner, BindingResult bindingResult, Model uiModel,
+		HttpServletRequest httpServletRequest) {
     if (bindingResult.hasErrors()) {
         uiModel.addAttribute("owner", owner);
         addDateTimeFormatPatterns(uiModel);
@@ -487,33 +549,53 @@ public String create(@Valid Owner owner, BindingResult bindingResult, Model uiMo
     Pet firstPetOfOwner = new Pet();
     dialogParams.put("pet", firstPetOfOwner);
     dialogParams.put("pettypes",  Arrays.asList(PetType.class.getEnumConstants()));
-    createPetInModal(DialogType.Info, "message_create_pet_title", "message_create_pet_desc", dialogParams, httpServletRequest);</emphasis>
+    createPetInModal(DialogType.Info, "message_create_pet_title",
+    		"message_create_pet_desc", dialogParams, httpServletRequest);</emphasis>
 
-    return "redirect:/owners/" + encodeUrlPathSegment(owner.getId().toString(), httpServletRequest);
+    return "redirect:/owners/" + encodeUrlPathSegment(owner.getId().toString(),
+    		httpServletRequest);
 }</programlisting>
           </listitem>
 
           <listitem>
-            <para>Modificamos la jspx, definiendo el forumulario de creación
+            <para>Modificar la jspx incluyendo el formulario de creación
             de mascotas (Pets):</para>
 
             <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
-&lt;div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0"&gt;
+&lt;div xmlns:c="http://java.sun.com/jsp/jstl/core"
+		xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields"
+		xmlns:form="urn:jsptagdir:/WEB-INF/tags/form"
+		xmlns:jsp="http://java.sun.com/JSP/Page"
+		xmlns:spring="http://www.springframework.org/tags"
+		version="2.0"&gt;
     &lt;jsp:directive.page contentType="text/html;charset=UTF-8"/&gt;
     &lt;jsp:output omit-xml-declaration="yes"/&gt;
 
     <emphasis role="bold">&lt;c:set scope="request" var="pet" value="${dialogParams['pet']}" /&gt;
     &lt;c:set scope="request" var="pettypes" value="${dialogParams['pettypes']}" /&gt;
 </emphasis>
-    &lt;form:create id="fc_com_springsource_petclinic_domain_Pet" modelAttribute="pet" path="/pets" render="${empty dependencies}" z="lgvEyAlAYOudDmaPjwU0ABseTIk="&gt;
-        &lt;field:checkbox field="sendReminders" id="c_com_springsource_petclinic_domain_Pet_sendReminders" z="uPpMX+IWb0KONpvd11fpG8x4/4Q="/&gt;
-        &lt;field:input field="name" id="c_com_springsource_petclinic_domain_Pet_name" min="1" required="true" z="ZY+k75JeSo9RmejYZRFNIvs2aBg="/&gt;
-        &lt;field:input field="weight" id="c_com_springsource_petclinic_domain_Pet_weight" min="0" required="true" validationMessageCode="field_invalid_number" z="cOD5zE/z7gy+RZu5kVSPuxCa+/I="/&gt;
-        &lt;input type="hidden" id="c_com_springsource_petclinic_domain_Pet_owner" name="owner" value="${owner.id}" /&gt;
-        &lt;field:select field="owner" id="c_com_springsource_petclinic_domain_Pet_owner" itemValue="id" items="${owners}" path="/owners" render="false" z="fGzswAP4XXvhPhowJKsRVve929c="/&gt;
-        &lt;field:select field="type" id="c_com_springsource_petclinic_domain_Pet_type" items="${pettypes}" path="pettypes" required="true" z="+hDCnUp+Y+A1RlT+AjH07sgipOo="/&gt;
+    &lt;form:create id="fc_com_springsource_petclinic_domain_Pet" modelAttribute="pet"
+    		path="/pets" render="${empty dependencies}" z="lgvEyAlAYOudDmaPjwU0ABseTIk="&gt;
+        &lt;field:checkbox field="sendReminders"
+        		id="c_com_springsource_petclinic_domain_Pet_sendReminders"
+        		z="uPpMX+IWb0KONpvd11fpG8x4/4Q="/&gt;
+        &lt;field:input field="name" id="c_com_springsource_petclinic_domain_Pet_name"
+        		min="1" required="true" z="ZY+k75JeSo9RmejYZRFNIvs2aBg="/&gt;
+        &lt;field:input field="weight" id="c_com_springsource_petclinic_domain_Pet_weight"
+        		min="0" required="true" validationMessageCode="field_invalid_number"
+        		z="cOD5zE/z7gy+RZu5kVSPuxCa+/I="/&gt;
+        &lt;input type="hidden" id="c_com_springsource_petclinic_domain_Pet_owner"
+        		name="owner" value="${owner.id}" /&gt;
+        &lt;field:select field="owner" id="c_com_springsource_petclinic_domain_Pet_owner"
+        		itemValue="id" items="${owners}" path="/owners" render="false" 
+        		z="fGzswAP4XXvhPhowJKsRVve929c="/&gt;
+        &lt;field:select field="type" id="c_com_springsource_petclinic_domain_Pet_type"
+        		items="${pettypes}" path="pettypes" required="true" 
+        		z="+hDCnUp+Y+A1RlT+AjH07sgipOo="/&gt;
     &lt;/form:create&gt;
-    &lt;form:dependency dependencies="${dependencies}" id="d_com_springsource_petclinic_domain_Pet" render="${not empty dependencies}" z="kThDNIW+69h9nI/69ynY1WyUieo="/&gt;
+    &lt;form:dependency dependencies="${dependencies}" 
+    		id="d_com_springsource_petclinic_domain_Pet" render="${not empty dependencies}"
+    		z="kThDNIW+69h9nI/69ynY1WyUieo="/&gt;
 &lt;/div&gt;</programlisting>
           </listitem>
         </orderedlist>
@@ -525,17 +607,21 @@ public String create(@Valid Owner owner, BindingResult bindingResult, Model uiMo
     <title xml:lang="es">Futuras versiones</title>
 
     <para xml:lang="es">Mejoras a incluir en futuras versiones del
-    Add-on.</para>
+    add-on.</para>
 
     <itemizedlist xml:lang="es">
       <listitem>
-        <para xml:lang="es">Obtención de los mensajes de las excepciones desde
-        un Base de datos.</para>
+        <para xml:lang="es">Obtención de las excepciones y los mensajes multi
+        idioma de las excepciones no controladas que deben visualizarse de forma
+        amigable desde una base de datos en la que se encuentra almacenada
+        dicha información. Así podría definirse un repositorio central de
+        excepciones para múltiples aplicaciones y sus mensajes amigables.</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Envío de un informe de la excepción que se ha
-        producido por email.</para>
+        <para xml:lang="es">Envío de un informe por email al responsable de la 
+        aplicación con información detallada cuando se ha producido una
+        excepción.</para>
       </listitem>
     </itemizedlist>
   </section>
