@@ -203,17 +203,6 @@
     <xi:include href="recetas.xml"/>
   </part>
 
-  <part xml:id="desarrollo-addons">
-    <title xml:lang="es">Desarrollo de nuevos add-ons</title>
-
-    <partintro>
-      <para xml:lang="es">Documentos útiles para el desarrollo de add-ons para
-      gvNIX y desarrollo de add-ons de Spring Roo</para>
-    </partintro>
-
-    <xi:include href="guia-desarrollo-addon-roo.xml"/>
-  </part>
-
   <part xml:id="apendices">
     <title xml:lang="es">Apéndices</title>
 

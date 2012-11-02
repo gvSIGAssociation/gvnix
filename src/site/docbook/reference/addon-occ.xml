@@ -16,30 +16,41 @@
   en la persistencia de entidades del modelo de datos.</para>
 
   <para xml:lang="es">El sistema consiste en un control de
-  <emphasis>Concurrencia Optimista</emphasis> basada en un
-  <emphasis>CheckSum o suma</emphasis> de los datos.</para>
+  <emphasis>concurrencia optimista</emphasis> basada en un
+  <emphasis>checkSum o suma de control</emphasis> de los
+  valores de una entidad dada.</para>
 
   <section xml:id="addon-persistence_occchecksum">
     <title>OCC Checksum</title>
 
     <para xml:lang="es">Esta utilidad añade a las entidades un sistema
-    de <emphasis>Control de Concurrencia</emphasis> basado en una operación de
-    <emphasis>Checksum o suma</emphasis> sobre todos los campos persistentes que
-    contiene la entidad.</para>
+    de <emphasis>control de concurrencia</emphasis> basado en una operación de
+    <emphasis>checksum o suma de control</emphasis> sobre todos los campos persistentes
+    que contiene la entidad.</para>
+
+    <para xml:lang="es">El <emphasis>control de concurrencia optimista</emphasis>
+    ya es ofrecido por defecto por el núcleo de Spring Roo. Sin embargo, el sistema que proporciona
+    se basa en la existencia de un campo en cada una de las tabla de base de datos
+    que se desea controlar. Este campo se suele definir como <emphasis>version</emphasis>
+    (numérico que identifica la versión del objeto) o <emphasis>lastupdate</emphasis> (fecha
+    de la última actualización). Esto es un problema para aquellas bases de datos ya
+    existentes y en las que no se puede o no se quiere alterar su estructura.</para>
 
     <para xml:lang="es">Esta funcionalidad nace de la necesidad de controlar
-    la concurrencia sobre modelos de datos heredados en los que, por
-    requerimientos del sistema, no es posible alterar el modelo relacional de 
-    base de datos para añadir campos de control
-    conocidos como <emphasis>version</emphasis> (numérico que
-    identifica la versión del objeto) o <emphasis>lastUpdate</emphasis> (fecha
-    de la última actualización) en los que se basa el mecanismo de
-    <emphasis>Control de Concurrencia</emphasis> de la especificación <link
-    xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr220/index.html">JPA</link>.</para>
+    la concurrencia sobre modelos de datos heredados en los que no es posible
+    alterar el modelo relacional de base de datos para añadir los campos de control
+    en los que se basa el mecanismo de <emphasis>control de concurrencia</emphasis>
+    del núcleo de Spring Roo que sigue la especificación <link
+    xlink:href="http://jcp.org/aboutJava/communityprocess/final/jsr220/index.html">
+    JPA</link>.</para>
 
-    <para xml:lang="es">El checksum <emphasis>se calcula en el momento de la
-    carga</emphasis> de un registro de la entidad desde la base de datos y es
-    almacenado en una <emphasis>propiedad no persistente</emphasis>.</para>
+    <para xml:lang="es">El checksum consiste en una operación matemática
+    de los distintos valores que contiene un registro (instancia) de una entidad.
+    El cálculo tiene en cuenta todas las propiedad de tipo simple de la entidad,
+    es decir, no se incluye en el cálculo propiedad que represente una relación con otro
+    u otros objetos. El cálculo se realiza en el momento de la carga
+    del registro de la entidad desde la base de datos y es
+    almacenado en una propiedad no persistente de la misma entidad.</para>
 
     <para xml:lang="es">En el momento de <emphasis>actualizar o
     eliminar</emphasis> un registro de dicha entidad se carga el elemento que

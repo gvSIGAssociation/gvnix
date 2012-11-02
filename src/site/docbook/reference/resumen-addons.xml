@@ -8,57 +8,6 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title>Descripción de los Add-ons de gvNIX</title>
 
-  <section xml:id="resumen-addons_persistence">
-    <title>OCC (Optimistic Concurrency Control)</title>
-
-    <para>Este Add-on contiene las utilidades realcionadas con la
-    persistencia. En este momento incluye:</para>
-
-    <variablelist>
-      <varlistentry>
-        <term><link
-        linkend="resumen-addons_persistence_occchecksum">OCCChecksum</link></term>
-
-        <listitem>
-          <para>Soporte para <emphasis>Control de Concurrencia
-          Optimista</emphasis> basado en <emphasis>suma de
-          control</emphasis>.</para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-
-    <section xml:id="resumen-addons_persistence_occchecksum">
-      <title>OCCChecksum</title>
-
-      <para>El <emphasis>Control de Concurrencia Optimista</emphasis> está
-      pervisto e implementado en Spring Roo. El problema es que se basa en la
-      existencia de un campo de <emphasis>version</emphasis> o
-      <emphasis>lastupdate</emphasis> en la tabla. Esto es un problema para
-      aquellas bases de datos ya existentes y que no podemos alterar su
-      estructura.</para>
-
-      <para>Este mecanismo permite usar un sistema de control de concurrencia
-      sin necesidad de alterar la estructura de base de datos.</para>
-
-      <para>Se basa en el cálculo de una <emphasis role="bold">suma de
-      control</emphasis> de los valores de todos los campos persistentes y en
-      su comprobación posterior para validar si ha habido algún cambio por
-      terceras partes, en cuyo caso ha habido un conflicto de concurrencia.
-      Para más información ver <link
-      linkend="addon-persistence_occchecksum">Descripción de
-      OCCChecksum</link>.</para>
-    </section>
-  </section>
-
-  <section xml:id="resumen-addons_web-exception-handler">
-    <title>Web Exception Handler</title>
-
-    <para>Permite definir qué mensaje se muestra al usuario cuando sucede una
-    error que el desarrollador no ha tenido en cuenta y por tanto no gestiona.
-    Par más información ver <link linkend="addon-web-exception-handler">Add-on
-    Web Exception Handler</link>.</para>
-  </section>
-
   <section xml:id="resumen-addons_web-mvc-binding">
     <title xml:lang="es">Web MVC Binding</title>
 
@@ -66,15 +15,6 @@
     Spring MVC. Incluye la inicialización del editor de cadenas que transforma
     las cadenas vacías a Nulos. Para ver más informaicón consultar <link
     linkend="addon-web-mvc-binding">Add-on Web MVC Binding</link>.</para>
-  </section>
-
-  <section xml:id="resumen-addons_cit-security">
-    <title>CIT Security</title>
-
-    <para>Instala y configura el sistema de autenticación y autorización sobre
-    Spring Security que utilizado en la Conselleria d'Infraestructures i
-    Transport. Para ver más información ver <link
-    linkend="addon-cit-security">Add-on CIT Security</link>.</para>
   </section>
 
   <section>
