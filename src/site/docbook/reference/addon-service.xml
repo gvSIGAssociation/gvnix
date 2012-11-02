@@ -14,16 +14,17 @@
   <section xml:id="addon-service_descripcion">
     <title xml:lang="es">Descripción</title>
 
-	<para>Permite crear de forma automática servidores de servicios web a partir de un método
-	previamente existente en el código fuente, crear servidores de servicios web basándose
+	<para>Permite crear de forma automática servidores de servicios web a partir de
+	un método del código fuente, crear servidores de servicios web basándose
 	en un archivo de descripción de servicios (WSDL) y crear clientes de servicios
 	web a partir de un archivo de descripción de servicios (WSDL).</para>
   </section>
   
   <section xml:id="addon-service_crear-desde-java">
-      <title xml:lang="es">Creación de servicios</title>
+      <title xml:lang="es">Creación de servidores desde WSDL</title>
 
-      <para xml:lang="es">La creación de servicios se hace mediante el uso de anotaciones.
+      <para xml:lang="es">La creación de servicios, del mismo modo que todas las 
+      funcionalidades que proporciona el framework, se realiza mediante anotaciones.
       Para simplificar esta tarea se puede hacer uso de los comandos que
       ofrece gvNIX. A medida que se van ejecutando comandos del add-on, se va
       modificando anotaciones y métodos de la clase Java de forma que acabará
@@ -45,16 +46,17 @@
       linkend="apendice-comandos_addon-service_define_ws">remote service define
       ws</link> que incluirá la anotación <emphasis>@GvNIXWebService</emphasis>
       en la clase Java indicada. gvNIX generará los componentes
-      necesarios para exponer el servicio web.</para>
+      necesarios para exponer la clase como un servicio web.</para>
 
       <para xml:lang="es">En este momento el servicio web ya está publicado y accesible,
       sin embargo no dispondrá de ninguna operación accesible ya que por defecto todos
-      los métodos de la clase publicada estarán configurados para que no sean accesibles.
+      los métodos de la clase publicada estarán configurados para que no sean accesibles
+      por motivos de seguridad.
       Se podrá hacer accesible cada uno de los métodos de la clase por separado mediante el 
       comando <link linkend="apendice-comandos_addon-service_export_operation">remote service
       export operation</link> que añade la anotación
       <emphasis>@GvNIXWebMethod</emphasis> al método, de forma que informará a gvNIX de
-      de que debe generarse el código necesario para que la operación esté
+      que debe generarse el código necesario para que la operación esté
       accesible.</para>
 
       <programlisting><emphasis role="bold">@GvNIXWebService</emphasis>(name = "MyWebServicePortType",
@@ -71,28 +73,20 @@ public class MyWebService {
     }
 }</programlisting>
 
-      <para xml:lang="es">El comando <link
-      linkend="apendice-comandos_addon-service_list_operation">remote service list
-      operation</link> muestra los métodos existentes de una clase
-      que están disponibles para ser exportados siempre y cuando la clase esté
-      definida como un servicio web.</para>
-
   </section>
 
   <section xml:id="addon-service_crear-desde-wsdl">
+  
+      <title xml:lang="es">Creación de servidores desde WSDL</title>
 
       <para xml:lang="es">Existe otra forma de realizar la creación de servidores de 
       servicios web. Consiste en generar el servicio basándose en un archivo
-      contrato de servicio conocido como WSDL. Con <link
+      de contrato de servicio conocido como WSDL. Con el comando <link
       linkend="apendice-comandos_addon-service_export_ws">remote service export
       ws</link> se proporciona la ruta a un archivo WSDL (archivo en local o URL en
       Internet) y se generará una réplica del servicio en la que las operaciones
       son implementaciones vacía a modo de ejemplo que posteriormente deberán
-      ser personalizadas con la lógica de negocio que sea adecuada.</para>
-
-      <para xml:lang="es">Para obtener información sobre este comando acceder a la 
-      sección <link linkend="apendice-comandos_addon-service_export_ws">remote
-      service export ws</link>.</para>
+      ser personalizadas con la lógica de negocio adecuada.</para>
   </section>
 
     <section>
@@ -242,7 +236,13 @@ public class MyWebService {
     </section>
 
     <section>
-      <title xml:lang="es">Lista de servicios web en la aplicación</title>
+      <title xml:lang="es">Listar los servicios</title>
+
+      <para xml:lang="es">El comando <link
+      linkend="apendice-comandos_addon-service_list_operation">remote service list
+      operation</link> muestra los métodos existentes de una clase
+      que están disponibles para ser exportados siempre y cuando la clase esté
+      definida como un servicio web.</para>
 
       <para xml:lang="es">El comando <link
       xlink:href="apendice-comandos_addon-service_ws_list">remote service ws
