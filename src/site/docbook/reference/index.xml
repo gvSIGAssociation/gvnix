@@ -44,7 +44,7 @@
     <partintro>
       <para xml:lang="es">Esta parte de la documentación contiene la
       información necesaria para entender qué es gvNIX y cómo empezar a
-      utilizarlo</para>
+      utilizarlo.</para>
     </partintro>
 
     <xi:include href="intro_introduccion.xml"/>

@@ -6,27 +6,39 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title>Add-on CIT Securty</title>
+  <title xml:lang="es">Add-on CIT Securty</title>
 
   <section xml:id="addon-cit-security_descripcion">
-    <title>Descripción</title>
+    <title xml:lang="es">Descripción</title>
 
-    <para>Este add-on instala el cliente del servicio Web de Autenticación y
-    Autorización que usa la Conselleria d'Infraestructures i Transport (CIT),
-    y lo integra con el modelo de datos que utiliza Spring Security.</para>
+    <para xml:lang="es">El add-on instala el cliente del servicio Web de Autenticación y
+    Autorización que utiliza la Consejería de Infraestructuras, Transporte y
+    Medio Ambiente (CITMA) y lo integra con el modelo de datos definido por
+    Spring Security.</para>
 
-    <para>Para poder activarlo hay que utilizar el comando <command><link
+    <para xml:lang="es">Para instalarlo hay que utilizar el comando <command><link
     linkend="apendice-comandos_addon-cit-security_cit-security-setup">cit
     security setup</link></command> con los parámetro adecuados (url del
-    servicio, nombre de aplicación y clave de acceso al servicio) y el add-on
-    instalará las clases necesaria para hacer la llamada al servicio, el
-    modelo de datos de usuario con la envoltura de los Interfaces de Spring
+    servicio, nombre de aplicación y usuario/clave de acceso al servicio). El add-on
+    instalará las clases necesarias para hacer la llamada al servicio, el
+    modelo de datos de usuario cumpliendo con los interfaces de Spring
     Security y el proveedor de autentificación que sirve de pasarela entre los
     dos elementos.</para>
 
-    <para>Los parámetro de configuración del cliente se quedan almacenados en
-    el fichero
+    <para xml:lang="es">Los parámetro de configuración del cliente proporcionados
+    a través del comando quedarán almacenados en el fichero de configuración
     <filename>src/main/resources/META-INF/spring/CITWSAuth.properties</filename>
     del proyecto destino.</para>
+    
+    <para xml:lang="es">En el caso de que alguna organización disponga de un
+    sistema de seguridad propio, puede hacer uso de esta funcionalidad si 
+    ofrece a través de un servidor de servicios web la información de autorización
+    y autenticación de sus usuarios respetando el contrato definido por este
+    servicio.
+    </para>
+    
+    <para xml:lang="es">Para ver con mas detalle el comando que proporciona el add-on
+    consultas la sección <link linkend="apendice-comandos_cit-security">
+    Comandos del Add-on CIT Security</link></para>
   </section>
 </chapter>
