@@ -8,89 +8,104 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Add-on Service</title>
 
-  <para xml:lang="es">Add-on que permite generar servidores y clientes de
-  servicios web (WS) de forma automática.</para>
+    <para xml:lang="es">Permite crear servidores y clientes de servicios
+    web de forma automática.</para>
 
-  <section xml:id="addon-service_funcionality">
-    <title>Funcionalidad del Add-on.</title>
+  <section xml:id="addon-service_descripcion">
+    <title xml:lang="es">Descripción</title>
 
-    <para>Permite crear servicios web desde cero o importarlos basándose en
-    archivos de descripción de servicios WSDL.</para>
+	<para>Permite crear de forma automática servidores de servicios web a partir de un método
+	previamente existente en el código fuente, crear servidores de servicios web basándose
+	en un archivo de descripción de servicios (WSDL) y crear clientes de servicios
+	web a partir de un archivo de descripción de servicios (WSDL).</para>
+  </section>
+  
+  <section xml:id="addon-service_crear-desde-java">
+      <title xml:lang="es">Creación de servicios</title>
 
-    <section>
-      <title>Creación de servicios</title>
+      <para xml:lang="es">La creación de servicios se hace mediante el uso de anotaciones.
+      Para simplificar esta tarea se puede hacer uso de los comandos que
+      ofrece gvNIX. A medida que se van ejecutando comandos del add-on, se va
+      modificando anotaciones y métodos de la clase Java de forma que acabará
+      conformando el servicio web que se desea publicar.</para>
 
-      <para>La creción de servicios se hace mediante el uso de anotaciones y
-      para simplificar esta tarea se puede hacer uso de los comandos que
-      ofrece gvNIX. A medida que se van ejecutando comandos del add-on se va
-      modificando la clase Java añadiendo anotaciones y métodos (operaciones)
-      que conformarán el servicio web que se quiere publicar.</para>
+      <para xml:lang="es">Lo primero es elegir una clase Java que contendrá los
+      métodos que se desea ofrecer al exterior mediante el servicio web. La clase
+      puede ser una existente o se puede crear una nueva con el comando <link
+      linkend="apendice-comandos_addon-service_class">remote service class</link></para>
+      
+      <para>Una vez creada la clase se pueden crear los métodos que se
+      desea ofrecer a través del servicio web si todavía no existen.
+      Si los métodos todavía no existen, se pueden crear mediante el comando <link
+      linkend="apendice-comandos_addon-service_operation">remote service
+      operation</link> que permite añadir métodos en una clase.</para>
 
-      <para>Lo primero que se necesita es definir una clase Java que contendrá
-      todos los métodos disponibles en el WS. Una vez creada la clase, debemos
-      añadir las operaciones que ofrece el servicio web y exponerlos para que
-      sean accesibles. Con <link
-      linkend="apendice-comandos_addon-service_class">remote service class</link>
-      declaramos la clase Java que ofrece los servicios.</para>
-
-      <para>De momento nuestro servicio no está definido como tal, es decir,
-      no se puede publicar puesto que aun no tiene ninguna anotación que el
-      framework usará para exponer el servicio. Esto lo coneguimos ejecutanto
-      el comando <link
+      <para xml:lang="es">De momento la clase no se está publicando a través de
+      un servicio web. Para ello se debe ejecutar el comando <link
       linkend="apendice-comandos_addon-service_define_ws">remote service define
-      ws</link> que añadirá la anotación
-      <emphasis>@GvNIXWebService</emphasis>. gvNIX generará los componentes
+      ws</link> que incluirá la anotación <emphasis>@GvNIXWebService</emphasis>
+      en la clase Java indicada. gvNIX generará los componentes
       necesarios para exponer el servicio web.</para>
 
-      <para>Ahora bien, de momento el servicio tampoco tiene ninguna operación
-      accesible, para ello debemos crearlas añadiendo métodos a la clase Java
-      y exportarlas. Esto lo logramos mediante <link
-      linkend="apendice-comandos_addon-service_operation">remote service
-      operation</link>, que añade los métodos a la clase y <link
-      linkend="apendice-comandos_addon-service_export_operation">remote service
+      <para xml:lang="es">En este momento el servicio web ya está publicado y accesible,
+      sin embargo no dispondrá de ninguna operación accesible ya que por defecto todos
+      los métodos de la clase publicada estarán configurados para que no sean accesibles.
+      Se podrá hacer accesible cada uno de los métodos de la clase por separado mediante el 
+      comando <link linkend="apendice-comandos_addon-service_export_operation">remote service
       export operation</link> que añade la anotación
-      <emphasis>@GvNIXWebMethod</emphasis> al método, que informará a gvNIX de
-      que debe generar el código necesario para que la operación esté
+      <emphasis>@GvNIXWebMethod</emphasis> al método, de forma que informará a gvNIX de
+      de que debe generarse el código necesario para que la operación esté
       accesible.</para>
 
-      <programlisting><emphasis role="bold">@GvNIXWebService</emphasis>(name = "MyWebServicePortType", targetNamespace = "http://services.project.layer.service.test.gvnix.org/", serviceName = "MyWebService", 
-                 address = "MyWebService", fullyQualifiedTypeName = "org.gvnix.test.service.layer.project.services.MyWebService", exported = false)
+      <programlisting><emphasis role="bold">@GvNIXWebService</emphasis>(name = "MyWebServicePortType",
+      		targetNamespace = "http://services.project.layer.service.test.gvnix.org/",
+      		serviceName = "MyWebService", address = "MyWebService",
+      		fullyQualifiedTypeName = "org.gvnix.test.service.layer.project.services.MyWebService",
+      		exported = false)
 public class MyWebService {
 
-    <emphasis role="bold">@GvNIXWebMethod</emphasis>(operationName = "sayHello", resultName = "void", webResultType = Void.class)
+    <emphasis role="bold">@GvNIXWebMethod</emphasis>(operationName = "sayHello", resultName = "void",
+    		webResultType = Void.class)
     public void sayHello() {
         return;
     }
 }</programlisting>
 
-      <para>El comando <link
+      <para xml:lang="es">El comando <link
       linkend="apendice-comandos_addon-service_list_operation">remote service list
-      operations</link> muestra qué operaciones existentes en la clase
-      seleccionada están disponibles para ser exportados.</para>
+      operation</link> muestra los métodos existentes de una clase
+      que están disponibles para ser exportados siempre y cuando la clase esté
+      definida como un servicio web.</para>
 
-      <para>Existe otra forma para crear servicios. Consiste en generar el
-      servicio basado en un archivo WSDL. Con <link
+  </section>
+
+  <section xml:id="addon-service_crear-desde-wsdl">
+
+      <para xml:lang="es">Existe otra forma de realizar la creación de servidores de 
+      servicios web. Consiste en generar el servicio basándose en un archivo
+      contrato de servicio conocido como WSDL. Con <link
       linkend="apendice-comandos_addon-service_export_ws">remote service export
-      ws</link> indicando la ruta a un archivo WSDL (archivo en local o URL en
-      Internet) generamos una réplica del servicio en la que las operaciones
-      son implementaciones senciallas a modo de ejemplo.</para>
+      ws</link> se proporciona la ruta a un archivo WSDL (archivo en local o URL en
+      Internet) y se generará una réplica del servicio en la que las operaciones
+      son implementaciones vacía a modo de ejemplo que posteriormente deberán
+      ser personalizadas con la lógica de negocio que sea adecuada.</para>
 
-      <para>Para más información sobre estos comandos ver el <link
-      linkend="apendice-comandos_addon-service">apendice de comandos
-      service</link>.</para>
-    </section>
+      <para xml:lang="es">Para obtener información sobre este comando acceder a la 
+      sección <link linkend="apendice-comandos_addon-service_export_ws">remote
+      service export ws</link>.</para>
+  </section>
 
     <section>
-      <title>Creación de clientes</title>
+      <title xml:lang="es">Creación de clientes</title>
 
-      <para>Podemos generar un cliente para un servicio web existente usando
-      el comando <link
+      <para xml:lang="es">Es posible generar un cliente de un servicio web
+      existente utilizando para ello el comando <link
       linkend="apendice-comandos_addon-service_import_ws">remote service import
       ws</link>. Facilitando la ruta a un WSDL, gvNIX generará la clase que
       contendrá los métdos del cliente.</para>
 
-      <para>Para usar este cliente simplemente hay que crear un campo en la
-      clase donde queramos hacer uso de él y añadirle la anotación
+      <para xml:lang="es">Para usar este cliente simplemente hay que crear una propiedad en la
+      clase donde se desea hacer uso de ella y añadirle la anotación
       <emphasis>@Autowired</emphasis>.</para>
 
       <programlisting>public class MyClassUsingWebService {
@@ -105,68 +120,69 @@ public class MyWebService {
   }
 }</programlisting>
 
-      <para>La ruta al WSDL puede ser tanto un archivo local (file://) como
-      una URL a un por HTTP o HTTPS.</para>
+      <para xml:lang="es">La ruta al WSDL puede ser tanto un archivo local (file://) como
+      una URL mediante protocolo HTTP o HTTPS.</para>
 
-      <para>Cuando el WSDL es un archivo local o un recurso que se encuentre
+      <para xml:lang="es">Cuando el WSDL es un archivo local o un recurso que se encuentre
       en un servidor no seguro (acceso HTTP), gvNIX accede al WSLD y tras
       procesarlo realiza las tareas necesarias para generar un servicio local
       que hará las veces de cliente del WS remoto.</para>
 
-      <para>En el caso de que el WSDL lo sirva un servidor seguro al que se
+      <para xml:lang="es">En el caso de que el WSDL lo sirva un servidor seguro al que se
       accede por HTTPS pueden darse dos posibles escenarios:</para>
 
       <orderedlist>
         <listitem>
-          <para>El certificado del servidor ha sido creado por una <emphasis
+          <para xml:lang="es">El certificado del servidor ha sido creado por una <emphasis
           role="bold">Autoridad de certificación (CA) confiable por la
           JVM</emphasis>.</para>
 
-          <para>En este caso, el procesado del WSDL funciona de la misma
+          <para xml:lang="es">En este caso, el procesado del WSDL funciona de la misma
           manera que en el caso de acceso por HTTP, transparente para el
           usuario.</para>
         </listitem>
 
         <listitem>
-          <para>El certificado de servidor ha sido creado por un <emphasis
+          <para xml:lang="es">El certificado de servidor ha sido creado por un <emphasis
           role="bold">CA no confiable</emphasis> (caso de certificados
           autofirmados).</para>
 
-          <para>Aquí, es responsabilidad del usuario el aceptar las
+          <para xml:lang="es">Aquí, es responsabilidad del usuario el aceptar las
           credenciales del servidor para poder acceder al WSDL. Recordando
-          como trabajan los navegadores web, cuando intentamos acceder a un
+          como trabajan los navegadores web, cuando se intenta acceder a un
           recurso seguro, si el certificado del servidor no ha sido creado por
           un CA que se encuentre entre la lista de CAs conocida (Verisign,
-          Thwate, Equfax, ...), el navegador nos muestra un mensaje de
-          advertencia y nos pregunta si queremos confiar en la identidad del
-          servidor. Nosotros podemos, o no, aceptar el certificado.</para>
+          Thwate, Equfax, ...), el navegador muestra un mensaje de
+          advertencia y pregunta si se desea confiar en la identidad del
+          servidor. Cada usuario decide aceptar o no el certificado.</para>
 
-          <para>Para simplificar el proceso de importación de WS, gvNIX
-          intenta hacer esta tarea de "confiar" en el certificado de manera
+          <para xml:lang="es">Para simplificar el proceso de importación de servicios web,
+          gvNIX intenta hacer esta tarea de "confiar" en el certificado de manera
           transparente para el usuario.</para>
 
-          <para>Para ello, gvNIX manipula el almacen de certificados de la JVM
+          <para xml:lang="es">Para ello, gvNIX manipula el almacen de certificados de la JVM
           siempre que sea posible. Esto es:</para>
 
           <orderedlist>
             <listitem>
-              <para>Existe el archivo de <emphasis>keystore
+              <para xml:lang="es">Existe el archivo de keystore en el directorio
+              donde está instalado Java, por ejemplo en sistemas linux <emphasis> 
               $JAVA_HOME/jre/lib/security/cacerts</emphasis> y es modificable
               por el usuario del sistema que está ejecutando gvNIX.</para>
             </listitem>
 
             <listitem>
-              <para>La contraseña del <emphasis>keystore</emphasis> es
+              <para xml:lang="es">La contraseña del <emphasis>keystore</emphasis> es
               changeit (la contraseña por defecto del keystore).</para>
             </listitem>
           </orderedlist>
 
-          <para>Si gvNIX puede modificar el keystore, importará los
+          <para xml:lang="es">Si gvNIX puede modificar el keystore, importará los
           certificados implicados en la autenticación del servidor y entonces
           podrá acceder al WSDL requerido para generar el cliente del
           WS.</para>
 
-          <para>Al mismo tiempo, se crea en
+          <para xml:lang="es">Al mismo tiempo, se crea en
           <emphasis>src/main/resources</emphasis> una copia del almacen de
           certificados en el archivo gvnix-cacerts y una copia local de los
           certificados importados con el nombre
@@ -175,66 +191,65 @@ public class MyWebService {
           de archivos del proyecto para que puedan ser instalados en otros
           entornos.</para>
 
-          <para>Si gvNIX no puede modificar el keystore de la JVM, porque no
-          se cumplen las 2 condiciones enumeradas anteriormente, creará de
+          <para xml:lang="es">Si gvNIX no puede modificar el keystore de la JVM, porque no
+          se cumplen alguna de las 2 condiciones enumeradas anteriormente, creará de
           todas formas la copia de los certificados necesarios para que sea el
           usuario quien instale los mismos en el almacen de certificados de su
           JVM. Para ello se puede hacer uso de la herramienta <link
           xlink:href="http://download.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html">keytool</link>
           (distribuida también con el JDK). La operación de importar los
-          certificados equivale a la aceptación que hacemos con el
-          navegador.</para>
+          certificados equivale a la aceptación que se hace con el navegador.</para>
         </listitem>
       </orderedlist>
 
       <section>
-        <title>Añadir firmado de petición a un cliente</title>
+        <title xml:lang="es">Creación de clientes con firma</title>
 
-        <para>El add-on incorpora una implementación que permite añadir una
+        <para xml:lang="es">El add-on incorpora una implementación que permite añadir una
         firma digital a la peticiones realizadas a un servicio web
         importado.</para>
 
-        <para>Actualmente esta opción sólo está disponible para los servicio
-        web que utilicen la librería Axis. En futuras versiones se añadirá
-        servicio para CXF y otra operaciones relacionadas con
-        seguridad.</para>
+        <para xml:lang="es">Actualmente esta opción sólo está disponible para los servicio
+        web que utilicen la librería Axis (RPC/Encoded). En futuras versiones se añadirá
+        esta misma opción para servicios que utilicen la librería CXF (Document/Literal)
+        y otra operaciones relacionadas con la seguridad en servicios web.</para>
 
-        <para>Para ello necesitamos disponer de:</para>
+        <para xml:lang="es">Para ello se necesita disponer de:</para>
 
         <orderedlist>
           <listitem>
-            <para>Servicio web importado en la aplicación.</para>
+            <para xml:lang="es">Servicio web importado en la aplicación.</para>
           </listitem>
 
           <listitem>
-            <para>Fichero <emphasis>pkc12</emphasis> con el certificado a usar
+            <para xml:lang="es">Fichero <emphasis>pkc12</emphasis> con el certificado a usar
             para firmar la petición.</para>
           </listitem>
 
           <listitem>
-            <para>Contraseña del certificado.</para>
+            <para xml:lang="es">Contraseña del certificado.</para>
           </listitem>
 
           <listitem>
-            <para>Alias a usar con el certificado</para>
+            <para xml:lang="es">Alias a usar con el certificado</para>
           </listitem>
         </orderedlist>
 
-        <para>Disponiendo de esto elementos, usaremos el comando <link
+        <para xml:lang="es">Disponiendo de esto elementos, se puede hacer uso del comando <link
         xlink:href="apendice-comandos_addon-service_security_ws">remote service
-        security ws</link> para añadir la operación.</para>
+        security ws</link> para añadir la firma en las peticiones del cliente.</para>
       </section>
     </section>
 
     <section>
-      <title>Lista de servicios web en la aplicación</title>
+      <title xml:lang="es">Lista de servicios web en la aplicación</title>
 
-      <para>El comando <link
+      <para xml:lang="es">El comando <link
       xlink:href="apendice-comandos_addon-service_ws_list">remote service ws
       list</link> permite obtener un listado de los servicios exportados o
       importados en la aplicación.</para>
 
-      <para>El resultado es una salida como esta:</para>
+      <para xml:lang="es">El resultado es una salida como esta:</para>
 
       <programlisting>roo-gvNIX&gt; remote service ws list
 service     exported     imported
@@ -243,5 +258,4 @@ Service1       X
 Service2                    X   
 Service3                    X   </programlisting>
     </section>
-  </section>
 </chapter>

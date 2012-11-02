@@ -11,7 +11,9 @@
 
   <para xml:lang="es">El add-on añade soporte para la generación de
   informes con Jasper Reports y genera sobre una entidad informes
-  totalmente funcionales que posteriormente pueden ser personalizados.</para>
+  totalmente funcionales que posteriormente pueden ser personalizados.
+  Los informes son accesibles desde la web mediante un 
+  formulario que se crea para tal efecto.</para>
 
   <section xml:id="addon-web-report_descripcion">
     <title xml:lang="es">Descripción</title>
@@ -282,9 +284,11 @@ p:subReportDataKeys-ref="subReportDataKeys" /&gt;</programlisting>
       </listitem>
       
       <listitem>
-        <para xml:lang="es">Incluye las etiquetas multidioma necesarias
-        y un nuevo enlace en el menú para acceder a la página de
-        generación del informe.</para>
+        <para xml:lang="es">Incluye las etiquetas multidioma que necesita
+        visualizar la generación de informes en
+        <emphasis>src/main/webapp/WEB-INF/i18n/application.properties</emphasis>
+        y un nuevo enlace del menú en <emphasis>src/main/webapp/WEB-INF/views/menu.jspx
+        </emphasis> para poder acceder a la página de generación del informe.</para>
       </listitem>
 
       <listitem>
