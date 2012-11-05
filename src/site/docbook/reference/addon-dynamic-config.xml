@@ -10,36 +10,41 @@
   <title>Add-on Dynamic Configuration</title>
 
   <section>
-    <title>Descripción</title>
+    <title xml:lang="es">Descripción</title>
 
-    <para>El add-on pretende simplificar la gestión de distintos valores de
-    configuración por entorno. Cuando usamos Maven como gestor del ciclo de
-    desarrollo del proyecto nos encontramos con la posibilidad de usar <link
-    xlink:href="http://maven.apache.org/guides/introduction/introduction-to-profiles.html">perfiles</link>
-    para definir los ditintos entornos de
-    ejecución que tendrá la aplicación (desarrollo, pruebas, preproducción, producción, ...).</para>
+    <para xml:lang="es">Este add-on pretende simplificar la gestión de distintos valores de
+    configuración por entorno. Cuando se utiliza Maven como gestor del ciclo de
+    desarrollo del proyecto existe la posibilidad de utilizar <link
+    xlink:href="http://maven.apache.org/guides/introduction/introduction-to-profiles.html">
+    perfiles</link> para definir los distintos entornos de
+    ejecución que tendrá la aplicación (desarrollo, pruebas, integración,
+    preproducción, producción, ...).</para>
+    
+    <para xml:lang="es">A continuación se muestra un ejemplo de parte
+    de la configuración necesaria para la definición de perfiles en el
+    fichero <emphasis>pom.xml</emphasis>.</para>
 
     <programlisting>   &lt;profiles&gt;
      &lt;profile&gt;
-       &lt;id&gt;environment-name&lt;/id&gt;
+       &lt;id&gt;nombre-entorno&lt;/id&gt;
        &lt;properties&gt;
-         &lt;property.name&gt;property-value&lt;/name&gt;
+         &lt;nombre.propiedad&gt;valor&lt;/nombre.propiedad&gt;
          ...
        &lt;/properties&gt;
      &lt;/profile&gt;
    &lt;/profiles&gt;</programlisting>
 
-    <para>Esta funcionalidad nos permite configurar el comportamiento de la aplicación 
-    de manera distinta según donde vaya a ser ejecutado. Por
-    ejemplo, la conexión a la BBDD de la aplicación será a una URL distinta
-    según estemos trabajando en desarrollo (en la máquina del programador) o
-    si la aplicación va a ser desplegada en el entorno de producción. </para>
+    <para xml:lang="es">Esta funcionalidad permite configurar el comportamiento de la aplicación 
+    de manera distinta según donde vaya a ser ejecutada. Por ejemplo,
+    la configuracíón de la conexión con la base de datos de la aplicación
+    posiblemente será una URL distinta según se esté trabajando en un entorno de
+    desarrollo o un entorno de producción. </para>
 
-    <para>Para esto en la sección <emphasis>&lt;properties/&gt;</emphasis> de
-    cada sección profile podemos declarar tantas propiedades como queramos de
-    forma que al generar el paquete de distribución del proyecto, se
+    <para xml:lang="es">Para esto, en la sección <emphasis>&lt;properties&gt;</emphasis> de
+    cada sección <emphasis>&lt;profile&gt;</emphasis> se pueden declarar tantas propiedades como se desee de
+    forma que al empaquetar la aplicación (habitualmente en formato WAR), se
     reemplace el valor de estas propiedades en los ficheros adecuados. Esto
-    implica que en distintos archivos de configuración, como puede ser
+    implica que en distintos archivos del proyecto, como puede ser
     <emphasis>database.properties</emphasis>, empiecen a aparecer definidas
     variables con el formato <emphasis>${nombre.propiedad}</emphasis>. Esta
     circunstancia, a la larga, puede complicar la comprensión de la
@@ -47,53 +52,59 @@
   </section>
 
   <section>
-    <title>Funcionalidad</title>
+    <title xml:lang="es">Funcionalidad</title>
 
-    <para>Vista la problemática descrita en el punto anterior, el add-on
-    dynamic configuration simplifica esta gestión.
-    Podemos modificar las configuraciones de manera más rápida que haciéndolo
-    a mano y además es independiente del sistema de gestión del ciclo de vida
-    del proyecto (actualmente las configuraciones se pueden exportar a perfiles
-    Maven, pero el add-on podría exportar a otros formatos como los de Ant, etc.).</para>
+    <para xml:lang="es">Vista la problemática descrita en el punto anterior, el add-on
+    dynamic configuration pretende simplificar esta gestión.
+    Permite definir distintas configuraciones de manera rápida y simple.
+    Además, es independiente del sistema de gestión del ciclo de vida
+    del proyecto, ya que aunque actualmente las configuraciones solo se pueden exportar
+    a perfiles Maven, el add-on es lo suficientemente general como para poder
+    exportar a formatos Ant, etc.</para>
 
-    <para>A medida que vamos ejecutando comandos del add-on veremos que se
-    crea/modifica el archivo
-    <emphasis>src/main/resources/dynamic-configuration.xml</emphasis></para>
+    <para xml:lang="es">A medida que se van ejecutando comandos del add-on se
+    irá modificando el archivo
+    <emphasis>src/main/resources/dynamic-configuration.xml</emphasis>
+    que almacena la información sobre las distintas configuraciones definidas
+    hasta el momento.</para>
 
-    <para>Podemos crear una nueva configuración con el comando <link
+    <para xml:lang="es">La creación de una nueva configuración se realiza con el comando <link
     linkend="apendice-comandos_addon-dynamic_config-config_save">configuration
-    create</link> que tiene un parámetro obligatorio (<emphasis>name</emphasis>)
-    que define el nombre que se le da a la nueva configuración.</para>
+    create</link> que tiene un único parámetro obligatorio (<emphasis>name</emphasis>)
+    que define el nombre para la nueva configuración.</para>
 
-    <para>A partir de este momento podemos añadir nuevas propiedades para que estén
+    <para xml:lang="es">A partir de este momento es posible añadir nuevas propiedades para que estén
     disponibles para su gestión desde todas las configuraciones con <link
     linkend="apendice-comandos_addon-dynamic_config-config_prop_add">configuration
-    property add</link>. Las propiedades inicialmente tomarán el valor que tuviesen
-    definido en el proyecto y podremos modificar dichos valores con <link
+    property add</link>. Las propiedades inicialmente tomarán el valor que tengan
+    definido en el proyecto y se podrán modificar dichos valores con <link
     linkend="apendice-comandos_addon-dynamic_config-config_prop_update">configuration
-    property value</link>. En algunos casos, por seguridad, se desea que el valor de
+    property value</link>. En algunos casos, por seguridad, puede ser necesario que el valor de
     una propiedad no esté almacenado en el proyecto, para ello puede utilizarse el
     comando <link linkend="apendice-comandos_addon-dynamic_config-config_prop_undefined">
-    configuration property undefined</link> de forma que el valor se proporcionará desde
-    la línea de comandos con <emphasis>-D nombre=valor</emphasis>.</para>
+    configuration property undefined</link> de forma que el valor se tendrá que proporcionar
+    al empaquetar la aplicación con Maven como un parámetro mediante el modificador
+    <emphasis>-D nombre=valor</emphasis>.</para>
     
-    <para>Si queremos ver las distintas configuraciones que hemos creado, sus
-    propiedades y los valores definidos para cada una de ellas usaremos <link
+    <para xml:lang="es">Si se desea ver las distintas configuraciones que creadas, sus
+    propiedades y los valores definidos para cada una de ellas utilizar el comando <link
     linkend="apendice-comandos_addon-dynamic_config-config_list">configuration
     list</link>.</para>
 
-    <para>Para escribir las configuraciones actuales en el proyecto
-    debemos utilizar el comando <link
+    <para xml:lang="es">Para escribir las configuraciones actuales en el proyecto
+    se debe utilizar el comando <link
     linkend="apendice-comandos_addon-dynamic_config-config_export">configuration
-    export</link>.</para>
+    export</link>. Es muy importante destacar que hasta que no se haya ejecutado
+    este comando, las configuraciones no serán escritas en los ficheros destino
+    y por lo tanto hasta ese momento no se podrán utilizar las configuraciones.</para>
     
-    <para>Una vez exportadas las configuraciones, pueden utilizarse desde maven
-    con el modificador <emphasis>-P nombre</emphasis> siendo el nombre el valor
-    definido para la configuración en el comando <link
+    <para xml:lang="es">Una vez exportadas las configuraciones, pueden utilizarse desde Maven
+    mediante el modificador <emphasis>-P nombre</emphasis> utilizando como nombre el valor
+    que se definió para la configuración con el comando <link
     linkend="apendice-comandos_addon-dynamic_config-config_save">configuration
-    create</link></para>
+    create</link>.</para>
 
-    <para>Veamoslo en funcionamiento:</para>
+    <para xml:lang="es">Viéndolo en funcionamiento:</para>
 
     <programlisting>roo-gvNIX&gt; <emphasis role="bold">script --file clinic.roo</emphasis>
 ...
@@ -123,7 +134,8 @@ Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
 (use 'configuration property undefined' to set property with no values)
-roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration dev --property database.url --value jdbc:hsqldb:mem:mydevdb</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration dev --property database.url
+		--value jdbc:hsqldb:mem:mydevdb</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
@@ -157,19 +169,23 @@ Configuration created with currently available properties
  * Logging Service Properties
    - log4j.rootLogger = "INFO, stdout"
 (use 'configuration property add' to make a property available for all configurations)
-roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration pro --property database.url --value jdbc:hsqldb:file:myprodb</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration pro
+		--property database.url --value jdbc:hsqldb:file:myprodb</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration pro --property hibernate.hbm2ddl.auto --value update</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration pro
+		--property hibernate.hbm2ddl.auto --value update</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration pro --property log4j.rootLogger --value "ERROR, stdout"</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration pro
+		--property log4j.rootLogger --value "ERROR, stdout"</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo-gvNIX&gt; <emphasis role="bold">configuration property undefined --configuration pro --property database.password</emphasis>
+roo-gvNIX&gt; <emphasis role="bold">configuration property undefined --configuration pro
+		--property database.password</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value undefined
 (use '-D propname=propvalue' on maven commands to set the property value)
@@ -206,13 +222,34 @@ Updated SRC_MAIN_RESOURCES/META-INF/persistence.xml
 Configurations exported into project
 (use '-P name' on maven commands to use a configuration)
 (use 'configuration create' to define a new configuration)
-roo-gvNIX&gt; <emphasis role="bold">quit</emphasis>
-Total execution time 1657 seconds
-Roo exited with code 0
-shell&gt; <emphasis role="bold">mvn clean tomcat:run -P dev</emphasis>
-... (Ejecutando aplicación con la configuración llamada dev) ...
-shell&gt; <emphasis role="bold">mvn clean tomcat:run -P pro -D database.password=</emphasis>
-... (Ejecutando aplicación con la configuración llamada pro) ...
+</programlisting>
+
+	<para xml:lang="es">Una vez exportadas las configuraciones, es posible
+	elegir la configuración (perfil) a utilizar desde Eclipse/STS
+	desde las propiedades del proyecto accediendo a la opción
+	<emphasis>Maven</emphasis> del menú.</para>
+
+	<figure>
+	  <title xml:lang="es">Selección del perfil Maven desde Eclipse</title>
+	
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata align="center" fileref="images/eclipse_maven_profiles.png"></imagedata>
+	    </imageobject>
+	  </mediaobject>
+	</figure>
+	
+	<para xml:lang="es">Por otro lado, al empaquetar la aplicación para
+	desplegarla en uno u otro entorno, debe especificarse el nombre de la configuración
+	y opcionalmente el valor de los parámetros que se crearon como indefinidos
+	en la configuración.</para>
+	
+<programlisting>
+shell&gt; <emphasis role="bold">mvn clean package -P dev</emphasis>
+... (Empaquetando la aplicación con la configuración llamada dev) ...
+shell&gt; <emphasis role="bold">mvn clean package -P pro -D database.password=mypassword</emphasis>
+... (Empaquetando la aplicación con la configuración llamada pro) ...
+... (Se utilizará como clave de acceso a la base de datos "mypassword") ...
 </programlisting>
   </section>
 </chapter>
