@@ -8,28 +8,63 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title>Add-on Web MVC i18n</title>
 
-  <para>Añade soporte para idiomas en el proyecto.</para>
+  <para>Permite añadir soporte para nuevos idiomas en el proyecto.</para>
 
   <section xml:id="addon-web-i18n_descripcion">
     <title>Descripción</title>
-
-    <para xml:lang="es">Este Add-on instala el fichero de traducciones del
-    idioma solicitado en el proyecto.</para>
+    
+    <para xml:lang="es">Este add-on permite añadir en el proyecto
+    soporte para nuevas lenguas utilizando para ello una infraestructura común
+    para la inclusión de nuevos idiomas. Al incluir un nuevo idioma, se
+    añaden en la aplicación de forma automática los textos traducidos a
+    dicho idioma.</para>
 
     <para xml:lang="es">Los idiomas soportados son: de (Alemán), en (Inglés),
     es (Español), it (Italiano), nl (Holandés), sv (Finlandés), <emphasis
-    role="bold">ca (Valenciano/Catalán)</emphasis>. Este último es el que
-    añade gvNIX con su add-on.</para>
+    role="bold">ca (Valenciano/Catalán)</emphasis>. Este último es
+    añadido por gvNIX utilizando la base del add-on de idiomas de su
+    núcleo Spring Roo.</para>
+    
   </section>
 
   <section>
-    <title xml:lang="es">Instalar un idioma.</title>
+    <title xml:lang="es">Instalación de un idioma</title>
 
     <para xml:lang="es">Para instalar uno de los idiomas soportados hay que
-    ejecutar el comando web mvc install language.</para>
+    ejecutar el comando web mvc install language y proporcionar como parámetro
+    <emphasis>code</emphasis> el código del idioma deseado.</para>
 
-    <para xml:lang="es">Para mas información sobre los comandos ver <link
+    <para xml:lang="es">Este comando instala un fichero de propiedades en el proyecto
+    con la traducción de las etiquetas necesarias para el idioma que se requiera.
+    También realiza las modificaciones necesarias para poder solicitar el cambio
+    de idioma desde la interfaz visual, lo que implica la inclusión de una imagen
+    con la bandera del idioma solicitado y la modificación del pie de página
+    para mostrar el cambio a dicho idioma.</para>
+
+	<programlisting>roo-gvNIX> <command>web mvc install language --code ca</command>
+	Created SRC_MAIN_WEBAPP/WEB-INF/i18n/messages_ca.properties
+	Created SRC_MAIN_WEBAPP/images/ca.png
+	Updated SRC_MAIN_WEBAPP/WEB-INF/views/footer.jspx</programlisting>
+    
+    <para xml:lang="es">Para mas información sobre este comando ver el <link
     linkend="apendice-comandos_addon-web_i18n">apéndice de comandos de este
     add-on</link>.</para>
   </section>
+  
+  <section xml:id="addon-web-i18n_futuras-versiones">
+    <title xml:lang="es">Futuras versiones</title>
+
+    <para xml:lang="es">Mejoras a incluir en futuras versiones del
+    add-on.</para>
+
+    <itemizedlist xml:lang="es">
+      <listitem>
+        <para xml:lang="es">Incluir el soporte para el resto de lenguas
+        cooficiales del estado español, es decir, Gallego y Euskera.
+        Se deja abierta la posibilidad de añadir idiomas de otros
+        estados que pudiesen ser de utilidad.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+  
 </chapter>

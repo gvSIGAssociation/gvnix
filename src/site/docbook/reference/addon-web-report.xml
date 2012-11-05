@@ -375,13 +375,17 @@ public String EntityController.generateInforme(
     </note>
   </section>
 
-  <section>
+  <section xml:id="addon-web-report_futuras-versiones">>
     <title xml:lang="es">Futuras versiones</title>
 
-    <para xml:lang="es">Incrementar la funcionalidad del informe generado, 
-    incluyendo la visualización de las relaciones que pueda tener la entidad sobre
-    la que se declara el informe. En la sección de recetas se muestra una forma de
-    mostrar las relaciones de una entidad en el informe mediante el 
-    <link linkend="recetas-reports">uso de subinformes</link>.</para>
+	<itemizedlist xml:lang="es">
+	      <listitem>
+		    <para xml:lang="es">Incrementar la funcionalidad del informe generado, 
+		    incluyendo la visualización de las relaciones que pueda tener la entidad sobre
+		    la que se declara el informe. En la sección de recetas se muestra una forma de
+		    mostrar las relaciones de una entidad en el informe mediante el 
+		    <link linkend="recetas-reports">uso de subinformes</link>.</para>
+		 </listitem>
+	</itemizedlist>
   </section>
 </chapter>
