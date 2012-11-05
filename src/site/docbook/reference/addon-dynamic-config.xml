@@ -41,14 +41,23 @@
     desarrollo o un entorno de producción. </para>
 
     <para xml:lang="es">Para esto, en la sección <emphasis>&lt;properties&gt;</emphasis> de
-    cada sección <emphasis>&lt;profile&gt;</emphasis> se pueden declarar tantas propiedades como se desee de
+    cada sección <emphasis>&lt;profile&gt;</emphasis> se pueden declarar tantas
+    propiedades como se desee de
     forma que al empaquetar la aplicación (habitualmente en formato WAR), se
     reemplace el valor de estas propiedades en los ficheros adecuados. Esto
     implica que en distintos archivos del proyecto, como puede ser
-    <emphasis>database.properties</emphasis>, empiecen a aparecer definidas
+    <emphasis>persistence.xml</emphasis>, empiecen a aparecer definidas
     variables con el formato <emphasis>${nombre.propiedad}</emphasis>. Esta
     circunstancia, a la larga, puede complicar la comprensión de la
-    configuración del proyecto o dificultar su gestión.</para>
+    configuración del proyecto o dificultar su gestión. Por ejemplo, podría
+    aparecer la siguiente modificación en el fichero 
+    <emphasis>src/main/resources/META-INF/persistence.xm</emphasis>:</para>
+    
+	<programlisting>&lt;property name=&quot;hibernate.hbm2ddl.auto&quot; value=&quot;${hibernate.hbm2ddl.auto}&quot;/&gt;</programlisting>
+	
+	<para xml:lang="es">Esta circunstancia, a la larga, puede complicar la comprensión
+	de la configuración del proyecto o dificultar su gestión.</para>
+    
   </section>
 
   <section>
@@ -72,48 +81,29 @@
     linkend="apendice-comandos_addon-dynamic_config-config_save">configuration
     create</link> que tiene un único parámetro obligatorio (<emphasis>name</emphasis>)
     que define el nombre para la nueva configuración.</para>
-
-    <para xml:lang="es">A partir de este momento es posible añadir nuevas propiedades para que estén
-    disponibles para su gestión desde todas las configuraciones con <link
-    linkend="apendice-comandos_addon-dynamic_config-config_prop_add">configuration
-    property add</link>. Las propiedades inicialmente tomarán el valor que tengan
-    definido en el proyecto y se podrán modificar dichos valores con <link
-    linkend="apendice-comandos_addon-dynamic_config-config_prop_update">configuration
-    property value</link>. En algunos casos, por seguridad, puede ser necesario que el valor de
-    una propiedad no esté almacenado en el proyecto, para ello puede utilizarse el
-    comando <link linkend="apendice-comandos_addon-dynamic_config-config_prop_undefined">
-    configuration property undefined</link> de forma que el valor se tendrá que proporcionar
-    al empaquetar la aplicación con Maven como un parámetro mediante el modificador
-    <emphasis>-D nombre=valor</emphasis>.</para>
     
-    <para xml:lang="es">Si se desea ver las distintas configuraciones que creadas, sus
-    propiedades y los valores definidos para cada una de ellas utilizar el comando <link
-    linkend="apendice-comandos_addon-dynamic_config-config_list">configuration
-    list</link>.</para>
-
-    <para xml:lang="es">Para escribir las configuraciones actuales en el proyecto
-    se debe utilizar el comando <link
-    linkend="apendice-comandos_addon-dynamic_config-config_export">configuration
-    export</link>. Es muy importante destacar que hasta que no se haya ejecutado
-    este comando, las configuraciones no serán escritas en los ficheros destino
-    y por lo tanto hasta ese momento no se podrán utilizar las configuraciones.</para>
-    
-    <para xml:lang="es">Una vez exportadas las configuraciones, pueden utilizarse desde Maven
-    mediante el modificador <emphasis>-P nombre</emphasis> utilizando como nombre el valor
-    que se definió para la configuración con el comando <link
-    linkend="apendice-comandos_addon-dynamic_config-config_save">configuration
-    create</link>.</para>
-
-    <para xml:lang="es">Viéndolo en funcionamiento:</para>
-
     <programlisting>roo-gvNIX&gt; <emphasis role="bold">script --file clinic.roo</emphasis>
 ...
 roo-gvNIX&gt; <emphasis role="bold">configuration create --name dev</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Configuration created with currently available properties
 First created configuration set as default
-(use 'configuration property add' to make a property available for all configurations
-roo-gvNIX&gt; <emphasis role="bold">configuration property add --name database.url</emphasis>
+(use 'configuration property add' to make a property available for all configurations)
+roo-gvNIX&gt; <emphasis role="bold">configuration create --name pro</emphasis>
+Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
+Configuration created with currently available properties
+(use 'configuration property add' to make a property available for all configurations)</programlisting>
+
+	<para xml:lang="es">Resaltar que la creación de las configuraciones no es
+	obligatorio realizarlas al inicio y podrán realizarse en cualquier momento.</para>
+
+    <para xml:lang="es">A partir de este momento es posible añadir nuevas propiedades para que estén
+    disponibles para su gestión desde todas las configuraciones con <link
+    linkend="apendice-comandos_addon-dynamic_config-config_prop_add">configuration
+    property add</link>. Las propiedades inicialmente tomarán el valor que tengan
+    definido en el proyecto.</para>
+    
+    <programlisting>roo-gvNIX&gt; <emphasis role="bold">configuration property add --name database.url</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
@@ -133,42 +123,17 @@ Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property available for all configurations
 (use 'configuration property value' to set property new values)
-(use 'configuration property undefined' to set property with no values)
-roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration dev --property database.url
+(use 'configuration property undefined' to set property with no values)</programlisting>
+    
+    <para xml:lang="es">A continuación, se podrán modificar los valores de cada propiedad con <link
+    linkend="apendice-comandos_addon-dynamic_config-config_prop_update">configuration
+    property value</link>.</para>
+    
+    <programlisting>roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration dev --property database.url
 		--value jdbc:hsqldb:mem:mydevdb</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
 (use 'configuration list' to show configurations and their properties)
-roo-gvNIX&gt; <emphasis role="bold">configuration list</emphasis>
-      (Active)      dev
-----------------------------------------
- * Database Connection Properties
-   - database.url = "jdbc:hsqldb:mem:mydevdb"
-   - database.password = ""
- * Persistence Property Attributes XML
-   - hibernate.hbm2ddl.auto = "create"
- * Logging Service Properties
-   - log4j.rootLogger = "INFO, stdout"
-(use 'configuration export' to write configurations into the project)
-roo-gvNIX&gt; <emphasis role="bold">configuration export</emphasis>
-Updated ROOT/pom.xml
-Updated SRC_MAIN_RESOURCES/META-INF/spring/database.properties
-Updated SRC_MAIN_RESOURCES/log4j.properties
-Updated SRC_MAIN_RESOURCES/META-INF/persistence.xml
-Configurations exported into project
-(use '-P name' on maven commands to use a configuration)
-(use 'configuration create' to define a new configuration)
-roo-gvNIX&gt; <emphasis role="bold">configuration create --name pro</emphasis>
-Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
-Configuration created with currently available properties
- * Database Connection Properties
-   - database.url = "jdbc:hsqldb:mem:petclinic"
-   - database.password = ""
- * Persistence Property Attributes XML
-   - hibernate.hbm2ddl.auto = "create"
- * Logging Service Properties
-   - log4j.rootLogger = "INFO, stdout"
-(use 'configuration property add' to make a property available for all configurations)
 roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration pro
 		--property database.url --value jdbc:hsqldb:file:myprodb</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
@@ -183,14 +148,28 @@ roo-gvNIX&gt; <emphasis role="bold">configuration property value --configuration
 		--property log4j.rootLogger --value "ERROR, stdout"</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value seted
-(use 'configuration list' to show configurations and their properties)
-roo-gvNIX&gt; <emphasis role="bold">configuration property undefined --configuration pro
+(use 'configuration list' to show configurations and their properties)</programlisting>
+    
+    <para xml:lang="es">En algunos casos, por seguridad, puede ser necesario que el valor de
+    una propiedad no esté almacenado en el proyecto, para ello puede utilizarse el
+    comando <link linkend="apendice-comandos_addon-dynamic_config-config_prop_undefined">
+    configuration property undefined</link> de forma que el valor se tendrá que proporcionar
+    al empaquetar la aplicación con Maven como un parámetro mediante el modificador
+    <emphasis>-D nombre=valor</emphasis>.</para>
+    
+	<programlisting>roo-gvNIX&gt; <emphasis role="bold">configuration property undefined --configuration pro
 		--property database.password</emphasis>
 Updated SRC_MAIN_RESOURCES/dynamic-configuration.xml
 Property value undefined
 (use '-D propname=propvalue' on maven commands to set the property value)
-(use 'configuration list' to show configurations and their properties)
-roo-gvNIX&gt; <emphasis role="bold">configuration list</emphasis>
+(use 'configuration list' to show configurations and their properties)</programlisting>
+    
+    <para xml:lang="es">Si se desea ver las distintas configuraciones que creadas, sus
+    propiedades y los valores definidos para cada una de ellas utilizar el comando <link
+    linkend="apendice-comandos_addon-dynamic_config-config_list">configuration
+    list</link>.</para>
+
+    <programlisting>roo-gvNIX&gt; <emphasis role="bold">configuration list</emphasis>
       (Active)      dev
 ----------------------------------------
  * Database Connection Properties
@@ -209,8 +188,16 @@ roo-gvNIX&gt; <emphasis role="bold">configuration list</emphasis>
    - hibernate.hbm2ddl.auto = "update"
  * Logging Service Properties
    - log4j.rootLogger = "ERROR, stdout"
-(use 'configuration export' to write configurations into the project)
-roo-gvNIX&gt; <emphasis role="bold">configuration export</emphasis>
+(use 'configuration export' to write configurations into the project)</programlisting>
+    
+    <para xml:lang="es">Para escribir las configuraciones actuales en el proyecto
+    se debe utilizar el comando <link
+    linkend="apendice-comandos_addon-dynamic_config-config_export">configuration
+    export</link>. Es muy importante destacar que hasta que no se haya ejecutado
+    este comando, las configuraciones no serán escritas en los ficheros destino
+    y por lo tanto hasta ese momento no se podrán utilizar las configuraciones.</para>
+    
+    <programlisting>roo-gvNIX&gt; <emphasis role="bold">configuration export</emphasis>
 Updated ROOT/pom.xml
 Updated ROOT/pom.xml
 Updated SRC_MAIN_RESOURCES/META-INF/spring/database.properties
@@ -223,8 +210,23 @@ Configurations exported into project
 (use '-P name' on maven commands to use a configuration)
 (use 'configuration create' to define a new configuration)
 </programlisting>
+    
+    <para xml:lang="es">Una vez exportadas las configuraciones, pueden utilizarse
+    como perfiles desde Maven mediante el modificador <emphasis>-P nombre</emphasis>
+    utilizando como nombre el valor que se definió para la configuración con el comando
+    <link linkend="apendice-comandos_addon-dynamic_config-config_save">configuration
+    create</link>. Por ejemplo, al empaquetar la aplicación para
+	desplegarla en uno u otro entorno, debe especificarse el nombre de la configuración
+	y opcionalmente el valor de los parámetros que se crearon como indefinidos
+	en la configuración.</para>
+	
+<programlisting>shell&gt; <emphasis role="bold">mvn clean package -P dev</emphasis>
+... (Empaquetando la aplicación con la configuración llamada dev) ...
+shell&gt; <emphasis role="bold">mvn clean package -P pro -D database.password=mypassword</emphasis>
+... (Empaquetando la aplicación con la configuración llamada pro) ...
+... (Se utilizará como clave de acceso a la base de datos "mypassword") ...</programlisting>
 
-	<para xml:lang="es">Una vez exportadas las configuraciones, es posible
+	<para xml:lang="es">También es posible
 	elegir la configuración (perfil) a utilizar desde Eclipse/STS
 	desde las propiedades del proyecto accediendo a la opción
 	<emphasis>Maven</emphasis> del menú.</para>
@@ -239,17 +241,5 @@ Configurations exported into project
 	  </mediaobject>
 	</figure>
 	
-	<para xml:lang="es">Por otro lado, al empaquetar la aplicación para
-	desplegarla en uno u otro entorno, debe especificarse el nombre de la configuración
-	y opcionalmente el valor de los parámetros que se crearon como indefinidos
-	en la configuración.</para>
-	
-<programlisting>
-shell&gt; <emphasis role="bold">mvn clean package -P dev</emphasis>
-... (Empaquetando la aplicación con la configuración llamada dev) ...
-shell&gt; <emphasis role="bold">mvn clean package -P pro -D database.password=mypassword</emphasis>
-... (Empaquetando la aplicación con la configuración llamada pro) ...
-... (Se utilizará como clave de acceso a la base de datos "mypassword") ...
-</programlisting>
   </section>
 </chapter>
