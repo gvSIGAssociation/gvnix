@@ -10,8 +10,8 @@
 
 	<para xml:lang="es">En la sección de recetas se puede encontrar
 	información adicional para <link linkend="recetas-finders-multitud-campos">
-	desarrollar buscadores con gran cantidad de campos</link> y también para
-	<link linkend="recetas-finders-modificar">modificar buscadores generados</link>
+	desarrollar buscadores con gran cantidad de campos</link> y también para hacer los
+	<link linkend="recetas-finders-modificar">campos opcionales en los buscadores</link>
 	.</para>
 
 	<section xml:id="guia-desarrollo_entidades-buscadores-descripcion">

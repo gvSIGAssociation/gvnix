@@ -55,14 +55,13 @@ Updated ROOT/pom.xml [
   </section>
 
   <section xml:id="recetas-finders-multitud-campos">
-    <title xml:lang="es">Desarrollar buscadores con gran cantidad de campos</title>
+    <title xml:lang="es">Desarrollo de buscadores con gran cantidad de campos</title>
 
-    <para xml:lang="es"><emphasis role="bold">El add-on finder tiene una limitación
+    <para xml:lang="es">El add-on de los buscadores (finder) tiene una limitación
     impuesta por el sistema operativo Windows en el tamaño máximo del nombre de
-    archivos</emphasis>. En el ejemplo anterior se genera el
-    archivo <emphasis>findOwnersByLastNameLikeAndCityLike.jspx</emphasis>. La
-    limitación del tamaño máximo de nombre de archivo limita el comando finder
-    add a nombres de buscadores que generen paths a archivo jspx de tamaño
+    archivos. La limitación del tamaño máximo del nombre de
+    archivo limita al comando <emphasis>finder add</emphasis> a generar
+    nombres de buscadores que generen paths a archivos jspx de tamaño
     menor de 244 caracteres.</para>
 
     <para xml:lang="es">Existe una forma para generar buscadores con un tamaño
@@ -81,205 +80,201 @@ Updated ROOT/pom.xml [
         todos los parámetros que reciben los métodos de los buscadores
         parciales que se hayan generado. Del mismo modo, el cuerpo de este nuevo
         método es la unión de la implementación de todos los buscadores
-        parciales. Es posible aprovechar y modificar el código, según se explica
+        parciales. Es posible modificar el código, según se explica
         en el siguiente apartado, de forma que los parámetros sean
         opcionales.</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">De manera similar en el fichero Java del controlador de la
+        <para xml:lang="es">De manera similar, en el fichero Java del controlador de la
         entidad crear dos métodos: uno <emphasis>findByTodoForm</emphasis> que
-        devolverá la vista del formulario del buscador, y otro
-        <emphasis>findByTodo</emphasis> que servirá las peticiones que lleguen
-        desde el formulario del buscador. En este último caso, al igual que en
-        el caso del método que creado en la entidad, tendrá como parámetros
-        la unión de todos los de los buscadores parciales. El cuerpo de este
-        método deberá invocar al método <emphasis>findByTodo</emphasis>
+        devolverá la vista del formulario del buscador y otro
+        <emphasis>findByTodo</emphasis> que responderá a las peticiones que lleguen
+        desde el formulario del buscador. Este segundo método, al igual que
+        en el método creado en la entidad, deberá tener como parámetros la unión de
+        todos parámetros de los métodos de los buscadores parciales en el controlador.
+        El cuerpo de este método deberá invocar al método <emphasis>findByTodo</emphasis>
         creado en la entidad. Para definir la anotación @RequestMapping de estos dos
-        métodos se recomienda guiarse mediante los buscadores existentes.</para>
+        métodos se recomienda utilizar como guía los buscadores parciales ya existentes.</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Finalmente crear una jspx (por ejemplo, con nombre
+        <para xml:lang="es">Finalmente, crear una página jspx (por ejemplo, con nombre
         findByTodo.jspx) en el directorio WEB-INF/views/&lt;entidad&gt; que
-        contendrá el formulario del buscador. Por tanto incluye todos
+        contendrá el formulario del buscador. Esta página debe incluir todos
         los campos que hayan en el resto de páginas jspx de los buscadores parciales.
-        Hay que recordar, que esta vista se ha de definir también en el fichero views.xml
-        que hay en la carpeta de vistas de la entidad y que esta vista es la
-        que devuelve el método findByTodoForm creada antes en el controlador.</para>
+        Recordar, que esta vista se ha de definir también en el fichero views.xml
+        que hay en la misma carpeta y que esta vista es la que devuelve
+        el método findByTodoForm creada anteriormente en el controlador.</para>
       </listitem>
     </itemizedlist>
 
-    <para xml:lang="es">Con todo lo anterior se ha descrito un trabajo un tanto manual,
-    pero que permite montar buscadores por todos los campos necesarios.</para>
+    <para xml:lang="es">Con todo lo anterior se ha descrito un proceso manual
+    que permite montar buscadores con cualquier cantidad de campos.</para>
+	
+  </section>
+	
+  <section xml:id="recetas-finders-modificar">
+    <title xml:lang="es">Campos opcionales en los buscadores</title>
 
-    <section xml:id="recetas-finders-modificar">
-      <title xml:lang="es">Modificar buscadores generados</title>
+    <para xml:lang="es">El comportamiento que implementa automáticamente la generación
+    de buscadores es hacer todos los campos de busqueda obligatorios.
+    Por lo tanto, si no se proporciona alguno de los parámetros
+    se generará una excepción indicando la falta de un parámetro
+    obligatorio. En ocasiones no es lo deseado, es decir,
+    puede necesario que los parámetros no informados simplemente
+    no se incluyan en la consulta si no se especifican. Para ello se debe
+    modificar el código del método <emphasis>finderByXxxx</emphasis>
+    declarado en el aspecto Java <emphasis>*_Roo_Finder.aj</emphasis>.
+    A continuación se ejemplifica como hacer este cambio.</para>
 
-      <para xml:lang="es">El comportamiento que implementa automáticamente la generación
-      de buscadores es hacer todos los campos de busqueda obligatorios,
-      es decir, en el ejemplo anterior, el buscador siempre intentará ejecutar
-      la consulta "<emphasis>SELECT * FROM Owners WHERE lastName LIKE '%xxx%'
-      AND city LIKE '%yyyy%'</emphasis>", pero si no se indica alguno de los
-      parámetros se devolverá una excepción indicando que falta un parámetro
-      requerido. En ocasiones no esto no es lo deseado, es decir,
-      se puede requerir que los parámetros no informados simplemente
-      no se incluyeran en la consulta. Para hacer esto se debe
-      modificar el código del método <emphasis>finderByXxxx</emphasis> que se
-      encuentra declarado en <emphasis>*_Roo_Finder.aj</emphasis>.
-      A continuación se verá un ejemplo de como hacerlo.</para>
+    <para xml:lang="es">Hacer <emphasis>push-in</emphasis> del método tal y como
+    se comenta en la sección sobre <link
+    linkend="guia-desarrollo_generacion-codigo">modificación del código
+    generado</link> y llevarlo al fichero Java de la entidad. Una vez allí
+    modificarlo para que no requiera los campos y así construir la consulta
+    considerando tan solo los parámetros que lleguen informados:</para>
 
-      <para xml:lang="es">Hacer <emphasis>push-in</emphasis> del método tal y como
-      se comenta en la sección sobre <link
-      linkend="guia-desarrollo_generacion-codigo">modificación del código
-      generado</link> y llevarlo al fichero Java de la entidad. Una vez allí
-      modificarlo para que no requiera los campos y así construya la consulta
-      considerando tan solo los parámetros que lleguen rellenados:</para>
+    <programlisting>public static TypedQuery&lt;Owner&gt; findOwnersByLastNameLikeAndCityLike(
+    		String lastName, String city) {
+  <command>StringBuilder query = new StringBuilder("SELECT o FROM Owner AS o");</command>
+  <command>StringBuilder whereClause = new StringBuilder();</command>
 
-      <programlisting>public static TypedQuery&lt;Owner&gt; findOwnersByLastNameLikeAndCityLike(
-      		String lastName, String city) {
-    StringBuilder query = new StringBuilder("SELECT o FROM Owner AS o");
-    StringBuilder whereClause = new StringBuilder();
-
-    if (lastName != null &amp;&amp; lastName.length() &gt; 0) {
-      lastName = lastName.replace('*', '%');
-      if (lastName.charAt(0) != '%') {
-          lastName = "%" + lastName;
-      }
-      if (lastName.charAt(lastName.length() - 1) != '%') {
-          lastName = lastName + "%";
-      }
-      whereClause.append(" WHERE LOWER(o.lastName) LIKE LOWER(:lastName)");
+  <command>// if (lastName == null || lastName.length() == 0)
+  // throw new IllegalArgumentException(&quot;The lastName argument is required&quot;);
+  if (lastName != null &amp;&amp; lastName.length() &gt; 0) {</command>
+    lastName = lastName.replace('*', '%');
+    if (lastName.charAt(0) != '%') {
+        lastName = "%" + lastName;
     }
+    if (lastName.charAt(lastName.length() - 1) != '%') {
+        lastName = lastName + "%";
+    }
+    <command>whereClause.append(" WHERE LOWER(o.lastName) LIKE LOWER(:lastName)");</command>
+  }
 
-    if (city != null &amp;&amp; city.length() &gt; 0) {
-      city = city.replace('*', '%');
-      if (city.charAt(0) != '%') {
-          city = "%" + city;
-      }
-      if (city.charAt(city.length() - 1) != '%') {
-          city = city + "%";
-      }
-      if (whereClause.length() &gt; 0) {
-        whereClause.append(" AND LOWER(o.city) LIKE LOWER(:city)");
-      } else {
-        whereClause.append(" WHERE LOWER(o.city) LIKE LOWER(:city)");
-      }
+  <command>// if (city == null || city.length() == 0)
+  // throw new IllegalArgumentException(&quot;The city argument is required&quot;);
+  if (city != null &amp;&amp; city.length() &gt; 0) {</command>
+    city = city.replace('*', '%');
+    if (city.charAt(0) != '%') {
+        city = "%" + city;
     }
-    query.append(whereClause);
+    if (city.charAt(city.length() - 1) != '%') {
+        city = city + "%";
+    }
+    <command>if (whereClause.length() &gt; 0) {
+      whereClause.append(" AND LOWER(o.city) LIKE LOWER(:city)");
+    } else {
+      whereClause.append(" WHERE LOWER(o.city) LIKE LOWER(:city)");
+    }</command>
+  }
+  <command>query.append(whereClause);</command>
 
-    EntityManager em = Owner.entityManager();
-    TypedQuery&lt;Owner&gt; q = em.createQuery(query.toString(), Owner.class);
-    if (lastName != null &amp;&amp; lastName.length() &gt; 0) {
-      q.setParameter("lastName", lastName);
-    }
-    if (city != null &amp;&amp; city.length() &gt; 0) {
-      q.setParameter("city", city);
-    }
-    return q;
+  EntityManager em = Owner.entityManager();
+  TypedQuery&lt;Owner&gt; q = em.createQuery(<command>query.toString()</command>, Owner.class);
+  <command>if (lastName != null &amp;&amp; lastName.length() &gt; 0) {</command>
+    q.setParameter("lastName", lastName);
+  }
+  <command>if (city != null &amp;&amp; city.length() &gt; 0) {</command>
+    q.setParameter("city", city);
+  }
+  return q;
 }</programlisting>
 
-      <para xml:lang="es">En este ejemplo se ha construido la consulta usando un
-      StringBuilder en el que se genera la consulta deseada, pero se podría
-      haber utilizado cualquier otra tecnología como por ejemplo Hibernate
-      Criteria Builder.</para>
+    <para xml:lang="es">Se han marcado en negrita las líneas de código modificadas.
+    Como puede observarse, se construye la consulta de forma dinámica de forma
+    que se añaden los distintos filtros al <emphasis>where</emphasis> de la consulta
+    solo si el campo asociado al filtro tiene algún valor y se elimina la generación
+    de excepciones al detectar alguno de dichos campos como vacío.</para>
 
-      <para xml:lang="es">Las condiciones</para>
+    <para xml:lang="es">En este ejemplo se ha construido la consulta usando un
+    StringBuilder en el que se genera la consulta deseada, pero se podría
+    utilizar cualquier otra tecnología como por ejemplo Hibernate
+    Criteria Builder.</para>
 
-      <programlisting>if (city != null &amp;&amp; city.length() &gt; 0)</programlisting>
+    <para xml:lang="es">Como ya se ha comentado, el código generado fuerza que todos los
+    parámetros de búsqueda sean obligatorios, esto implica también al
+    formulario situadao en la página jspx. Tal como se genera, si alguno de los campos no se
+    rellena, no dejará enviar la petición. Se debe editar la jspx y
+    modificar el atributo <emphasis>required</emphasis> de los campos
+    <emphasis>field</emphasis> y establecer su valor a
+    <emphasis>false</emphasis>, no olvidar cambiar el valor
+    del atributo <emphasis>z</emphasis> a
+    "<emphasis>user-managed</emphasis>" para indicar que este campo ha sido
+    personalizado.</para>
 
-      <para xml:lang="es">podrían simplificarse a</para>
+    <programlisting>&lt;field:input disableFormBinding="true" field="city"
+    		id="f_com_springsource_petclinic_domain_Owner_city" max="30" <emphasis
+        role="bold">
+        		required="false" z="user-managed"</emphasis>/&gt;</programlisting>
 
-      <programlisting>if (city != null)</programlisting>
+    <para xml:lang="es">En los buscadores en los que uno de los parámetros sea
+    una entidad del modelo, es decir una relación con otra entidad del modelo,
+    será necesario realizar un cambio adicional.
+    En estos casos se visualiza un selector desplegable, mediante el
+    componente <emphasis>select.tagx</emphasis>. Sin embargo, este selector
+    tiene el inconveniente de que no incluye una opción vacía
+    entre las disponibles, con lo que obliga a elegir siempre algún valor.
+    Un ejemplo de este caso se encuentra en el buscador findPetsByOwner generado
+    para la entidad Pet en el ejemplo de <emphasis>clinic.roo</emphasis>
+    .</para>
 
-      <para xml:lang="es">Si se utiliza la funcionalidad que ofrece el <link
-      linkend="addon-web-mvc-binding">Add-on Web MVC Binding</link>, que
-      establece el StringTrimmerEditor y que en dicho caso al llegar un parámetro
-      con una cadena vacía sería convertido a nulo.</para>
+    <para xml:lang="es">La forma de tratar estas peticiones en Spring MVC es intentar
+    cargar el registro asociado con el valor del selector que llega como parámetro.
+    Por tanto si llega como parámetro un dato que no concuerda con ningún registro de
+    la entidad parámetro, usará null como valor. Como se ha comentado,
+    el componente <emphasis>select.tagx</emphasis> no ofrece una opción
+    vacía. gvNIX en su <link linkend="addon-web-screen-patterns">Add-on Web
+    MVC Pattern</link> incluye un componente
+    <emphasis>select-withempty.tagx</emphasis> que sí lo ofrece. Mediante el
+    comando <emphasis>web mvc pattern install</emphasis> se instalan los
+    componentes de MVC Pattern entre los que se incluye el selector con
+    opción vacía. Entonces es posible modificar la jspx del buscador findPetsByOwner
+    para que utilice <emphasis>select-withempty</emphasis> en lugar del original
+    de la siguiente forma:</para>
 
-      <para xml:lang="es">Como ya se ha comentado, el código generado fuerza que todos los
-      parámetros de búsqueda sean obligatorios, esto implica también al
-      formulario situadao en la página jspx. Tal como se genera, si alguno de los campos no se
-      rellena, no dejará enviar la petición. Se debe editar la jspx y
-      modificar el atributo <emphasis>required</emphasis> de los campos
-      <emphasis>field</emphasis> y establecer su valor a
-      <emphasis>false</emphasis>, no olvidar cambiar el valor
-      del atributo <emphasis>z</emphasis> a
-      "<emphasis>user-managed</emphasis>" para indicar que ha sido
-      personalizado.</para>
-
-      <programlisting>&lt;field:input disableFormBinding="true" field="city"
-      		id="f_com_springsource_petclinic_domain_Owner_city" max="30" <emphasis
-          role="bold">
-          		required="false" z="user-managed"</emphasis>/&gt;</programlisting>
-
-      <para xml:lang="es">En los buscadores en los que uno de los parámetros sea
-      una entidad del modelo, es decir una entidad relacionada con la entidad sobre la
-      que se está realizando la búsqueda será necesario realizar un cambio adicional.
-      En estos casos es se utiliza un selector desplegable, pero el
-      componente <emphasis>select.tagx</emphasis> que se usa en los
-      formularios tiene el inconveniente de que no añade una opción vacía
-      entre las disponibles, con lo que obliga a elegir siempre alguna.
-      Un ejemplo de este caso se encuentra en el buscador findPetsByOwner generado
-      para la entidad Pet en el ejemplo de <emphasis>clinic.roo</emphasis>
-      .</para>
-
-      <para xml:lang="es">La forma de tratar estas peticiones de Spring MVC es intentar
-      cargar el registro asociado con la entidad que llega como parámetro. Por tanto si
-      llega como parámetro un dato que no concuerda con ningún registro de
-      la entidad parámetro, usará null como parámetro. Como se ha comentado,
-      el componente <emphasis>select.tagx</emphasis> no ofrece una opción
-      vacía. gvNIX en su <link linkend="addon-web-screen-patterns">Add-on Web
-      MVC Pattern</link> tiene un componente
-      <emphasis>select-withempty.tagx</emphasis> que sí lo ofrece. Mediante el
-      comando <emphasis>web mvc pattern install</emphasis> se instalan los
-      componentes de MVC Pattern entre los que se incluye el selector con
-      opción vacía. Entonces es posible modificar la jspx del buscador findPetsByOwner
-      para que utilice <emphasis>select-withempty</emphasis> en lugar del original
-      de la siguiente forma:</para>
-
-      <programlisting>&lt;div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" ... 
-      		<emphasis role="bold">xmlns:pattern-field="urn:jsptagdir:/WEB-INF/tags/pattern/form/fields"</emphasis>
-      		version="2.0"&gt;
-    &lt;jsp:directive.page contentType="text/html;charset=UTF-8"/&gt;
-    &lt;jsp:output omit-xml-declaration="yes"/&gt;
-    &lt;form:find finderName="ByOwner" id="ff_com_springsource_petclinic_domain_Pet"
-    		path="/pets" z="ThIGSmua6R7WM6q2P1BpNC3zMi4="&gt;
-        <emphasis role="bold">&lt;pattern-field:select-withempty disableFormBinding="true" field="owner"
-        		emptyValueEnable="true" emptyValue="0"
-        		id="f_com_springsource_petclinic_domain_Pet_owner" itemValue="id"
-        		items="${owners}" path="/owners" required="false" z="user-managed"/&gt;</emphasis>
-    &lt;/form:find&gt;
+    <programlisting>&lt;div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" ... 
+    		<emphasis role="bold">xmlns:pattern-field="urn:jsptagdir:/WEB-INF/tags/pattern/form/fields"</emphasis>
+    		version="2.0"&gt;
+  &lt;jsp:directive.page contentType="text/html;charset=UTF-8"/&gt;
+  &lt;jsp:output omit-xml-declaration="yes"/&gt;
+  &lt;form:find finderName="ByOwner" id="ff_com_springsource_petclinic_domain_Pet"
+  		path="/pets" z="ThIGSmua6R7WM6q2P1BpNC3zMi4="&gt;
+      <emphasis role="bold">&lt;pattern-field:select-withempty disableFormBinding="true" field="owner"
+      		emptyValueEnable="true" emptyValue="0"
+      		id="f_com_springsource_petclinic_domain_Pet_owner" itemValue="id"
+      		items="${owners}" path="/owners" required="false" z="user-managed"/&gt;</emphasis>
+  &lt;/form:find&gt;
 &lt;/div&gt;</programlisting>
 
-      <para xml:lang="es">El componente select-withempty tiene los mismos atributos que el
-      select.tagx y otros tres adicionales:</para>
+    <para xml:lang="es">El componente select-withempty.tagx tiene los mismos atributos que el
+    select.tagx y otros tres adicionales:</para>
 
-      <itemizedlist>
-        <listitem>
-          <para xml:lang="es"><emphasis>emptyValueEnable</emphasis>: Valor booleano que habilita la
-          opción vacía en el selector.</para>
-        </listitem>
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es"><emphasis>emptyValueEnable</emphasis>: Valor booleano que habilita la
+        opción vacía en el selector.</para>
+      </listitem>
 
-        <listitem>
-          <para xml:lang="es"><emphasis>emtpyValue</emphasis>: Indica que valor se quiere dar
-          a la opción vacía del selector. Si se corresponde con una entidad,
-          este valor no debería corresponder a ningún identificador existente
-          para esa entidad, de esta forma el valor que llega al buscador es
-          nulo.</para>
-        </listitem>
+      <listitem>
+        <para xml:lang="es"><emphasis>emtpyValue</emphasis>: Valor a dar
+        para la opción vacía del selector. Si se corresponde con una entidad,
+        este valor no debería corresponder con ningún identificador existente
+        para esa entidad, de esta forma el valor que llega al buscador es
+        nulo.</para>
+      </listitem>
 
-        <listitem>
-          <para xml:lang="es"><emphasis>emptyLabel</emphasis>: Descripción a mostrar para la
-          opción vacía del selector.</para>
-        </listitem>
-      </itemizedlist>
+      <listitem>
+        <para xml:lang="es"><emphasis>emptyLabel</emphasis>: Descripción a mostrar para la
+        opción vacía del selector.</para>
+      </listitem>
+    </itemizedlist>
 
-      <para xml:lang="es">Con este cambio y con el método findPetsByOwner modificado
-      para que no sea requerido el parámetro Owner, de la misma forma
-      que se explicado antes, se consigue realizar búsquedas por parámetros opcionales
-      sea cual sea el tipo del parámetro.</para>
-    </section>
+    <para xml:lang="es">Con este cambio y con el método findPetsByOwner modificado
+    para que no sea requerido el parámetro Owner, de la misma forma
+    que se explicado antes, se consigue realizar búsquedas por parámetros opcionales
+    sea cual sea el tipo del parámetro.</para>
   </section>
 
   <section xml:id="recetas-reports">
