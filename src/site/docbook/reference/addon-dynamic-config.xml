@@ -51,7 +51,7 @@
     circunstancia, a la larga, puede complicar la comprensión de la
     configuración del proyecto o dificultar su gestión. Por ejemplo, podría
     aparecer la siguiente modificación en el fichero 
-    <emphasis>src/main/resources/META-INF/persistence.xm</emphasis>:</para>
+    <emphasis>src/main/resources/META-INF/persistence.xml</emphasis>:</para>
     
 	<programlisting>&lt;property name=&quot;hibernate.hbm2ddl.auto&quot; value=&quot;${hibernate.hbm2ddl.auto}&quot;/&gt;</programlisting>
 	

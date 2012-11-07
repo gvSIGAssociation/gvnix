@@ -278,177 +278,180 @@ Updated ROOT/pom.xml [
   </section>
 
   <section xml:id="recetas-reports">
-    <title xml:lang="es">Diseño de Informes que contienen sub-informes</title>
+    <title xml:lang="es">Diseño de informes con sub informes</title>
 
-    <para xml:lang="es">gvNIX ofrece un add-on (<link linkend="addon-web-report">Add-on Web
-    Report</link>) que facilita la definición de informes sobre una entidad.
-    El add-on genera el diseño básico de un informe JasperReports el cual
-    podemos modificar usando un diseñador como iReport.</para>
+    <para xml:lang="es">gvNIX mediante el <link linkend="addon-web-report">Add-on Web
+    Report</link> facilita la creación de informes sobre una entidad.
+    El add-on genera el diseño de un informe Jasper Reports básico el cual
+    se puede modificar utilizando un diseñador gráfico como iReport.</para>
 
-    <para xml:lang="es">Podemos necesitar que el informe definido muestre los elementos de
-    una entidad relacionada con la entidad sobre la que se ha declarado el
-    informe. Por ejemplo, en la aplicación PetClinic, podríamos definir un
-    informe sobre la entidad Owner y queremos que, para cada Owner, se muestre
-    en el reporte, se muestre también la lista de mascotas que le pertenecen,
-    es decir, listar la relación definida por el campo
-    <emphasis>pets</emphasis> de la entidad Owner.</para>
+    <para xml:lang="es">Puede ser necesario mostrar en un informe una lista de
+    entidades relacionadas con la entidad sobre la que se ha generado el
+    informe. Por ejemplo, en la aplicación del script de ejemplo clinic.roo, se podría
+    definir un informe sobre la entidad Owner y desear mostrar para cada Owner
+    la lista de mascotas que le pertenecen, es decir, listar la relación definida por el campo
+    <emphasis>Set&lt;Pet&gt; pets</emphasis> de la entidad Owner.</para>
 
     <note>
-      <para xml:lang="es">Para esta receta usaremos la versión 4.0.1 de iReport.</para>
+      <para xml:lang="es">Para este ejemplo se utilizará la versión 4.0.1 de iReport.</para>
     </note>
 
-    <para xml:lang="es">Partamos del informe definido por el comando gvNIX:</para>
+    <para xml:lang="es">Partiendo del informe definido por el siguiente comando de gvNIX:</para>
 
     <programlisting>roo-gvNIX&gt; web report add --controller ~.web.OwnerController --reportName ownerpets</programlisting>
 
-    <para xml:lang="es">En src/main/webapp/WEB-INF/reports se ha creado el archivo de diseño
-    de informe <emphasis>owner_ownerpets.jrxml</emphasis>. Abrimos este
-    archivo usando iReport (<emphasis>Archivo &gt; Open</emphasis>).</para>
+    <para xml:lang="es">En src/main/webapp/WEB-INF/reports se creará el archivo con el diseño
+    del informe <emphasis>owner_ownerpets.jrxml</emphasis>. Abriendo este
+    archivo usando iReport (<emphasis>Archivo &gt; Open</emphasis>) aparecerá
+    una pantalla como la que se muestra a continuación.</para>
 
     <figure>
       <title xml:lang="es">iReport - Diseñador</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/recetas-subreport-ireport-1.png"></imagedata>
+          <imagedata align="center" fileref="images/recetas-subreport-ireport-1.png"></imagedata>
         </imageobject>
       </mediaobject>
     </figure>
 
-    <para xml:lang="es">En la parte izquierda, en la ventana de Report Inspector podemos ver
-    los elementos principales de diseño del informe JasperReports. </para>
+    <para xml:lang="es">En la parte izquierda, en la pestaña con título
+    <emphasis>Report Inspector</emphasis> se pueden observar
+    los elementos principales del diseño de informes. </para>
 
     <figure>
       <title xml:lang="es">iReport - Report Inspector</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/recetas-subreport-ireport-2.png"></imagedata>
+          <imagedata align="center" fileref="images/recetas-subreport-ireport-2.png"></imagedata>
         </imageobject>
       </mediaobject>
     </figure>
 
-    <para xml:lang="es">Lo primero que tenemos que hacer es declarar un nuevo Parámetro con
-    el nombre <emphasis>SubReportPetsLocation</emphasis>. Para ello hacer
+    <para xml:lang="es">Lo primero que se debe hacer es declarar un nuevo parámetro con,
+    por ejemplo, el nombre <emphasis>SubReportPetsLocation</emphasis>. Para ello hacer
     click con el botón derecho sobre el elemento
-    <emphasis>Parameters</emphasis> y seleccionamos la opción
+    <emphasis>Parameters</emphasis> y seleccionar la opción
     <emphasis>Agregar Parameter</emphasis>. Justo debajo del último parámetro
-    aparecerá el que estoms añadiendo (<emphasis>parameter1</emphasis>), si lo
-    seleccionamos, en la parte derecha de la ventana de iReport podremos ver
-    sus propiedades. En <emphasis role="bold">Name</emphasis> indicamos
-    <emphasis>SubReportPetsLocation</emphasis> y <emphasis
-    role="bold">Parameter Class</emphasis> establecemos
+    aparecerá uno nuevo con nombre <emphasis>parameter1</emphasis>. Al seleccionarlo,
+    en la parte derecha de la ventana de iReport se podrán ver
+    sus propiedades. Modificar sus propiedades estableciendo en la
+    propiedad<emphasis>Name</emphasis> el valor
+    <emphasis>SubReportPetsLocation</emphasis> y en la propiedad
+    <emphasis>Parameter Class</emphasis> el valor
     <emphasis>net.sf.jasperreports.engine.JasperReport</emphasis>.</para>
 
-    <para xml:lang="es">Ahora debemos añadir un elemento Subreport a nuestro diseño, y como
-    queremos que aparezca para cada elemento de la lista de Owners, debemos
-    hacerlo en la banda de detalle (<emphasis>Detail1</emphasis>) del informe.
-    Necesitaremos aumentar la altura de la banda <emphasis>Detail1</emphasis>.
-    La seleccionamos y en sus propiedades indicamos <emphasis role="bold">Band
-    height</emphasis> <emphasis>55</emphasis>. De la paleta de elementos
-    seleccionamos <emphasis role="bold">Subreport</emphasis> y lo arrastramos
-    a la banda de detalle. Se nos abrirá un asistente, seleccionamos la opción
-    <emphasis>"Just create the subreport element"</emphasis> y cerramos con
-    Terminar. Podemos modificar las dimensiones del elemento Subreport
-    arrastrando las esquinas de la caja del elemento.</para>
+    <para xml:lang="es">A continuación, añadir un elemento <emphasis>Subreport</emphasis>
+    al diseño. Para que aparezca el <emphasis>Subreport</emphasis>
+    para cada elemento de la lista de Owners,
+    se debe añadir en la banda de detalle <emphasis>Detail1</emphasis> del informe.
+    Será necesario aumentar la altura de la banda <emphasis>Detail1</emphasis>.
+    Para ello, seleccionarla y en sus propiedad <emphasis>Band
+    height</emphasis> especificar el valor <emphasis>55</emphasis>.
+    De la paleta de elementos
+    seleccionar el <emphasis>Subreport</emphasis> y arrastrarlo
+    a la banda de detalle. Se abrirá un asistente, seleccionar la opción
+    <emphasis>Just create the subreport element</emphasis> y cerrar con
+    <emphasis>Terminar</emphasis>. Es posible modificar las dimensiones del elemento
+    <emphasis>Subreport</emphasis> arrastrando las esquinas de la caja del elemento.</para>
 
     <figure>
       <title xml:lang="es">iReport - Subreport</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/recetas-subreport-ireport-3.png"></imagedata>
+          <imagedata align="center" fileref="images/recetas-subreport-ireport-3.png"></imagedata>
         </imageobject>
       </mediaobject>
     </figure>
 
     <para xml:lang="es">Antes de seguir con el establecimiento de las propiedades del
-    Subreport, necesitamos declarar un campo del informe que nos permitirá
+    Subreport, es necesario declarar un campo del informe que permitirá
     acceder al campo <emphasis>pets</emphasis> de la Entidad
-    <emphasis>Owner</emphasis>. En "<emphasis>Report Inspector</emphasis>",
-    seleccionamos <emphasis>Fields</emphasis> y con el botón derecho
-    <emphasis>Agregar Field</emphasis>. Al igual que con el parámetro
-    SubReportPetsLocation indicamos <emphasis role="bold">Name</emphasis>
-    <emphasis>pets</emphasis> y <emphasis role="bold">Field Class</emphasis>
-    <emphasis>java.util.Collection</emphasis>.</para>
+    <emphasis>Owner</emphasis>. En <emphasis>Report Inspector</emphasis>,
+    seleccionar <emphasis>Fields</emphasis> y con el botón derecho
+    <emphasis>Agregar Field</emphasis>. Modificar también este elemento
+    estableciendo en la propiedad <emphasis>Name</emphasis> el valor
+    <emphasis>pets</emphasis> y en la propiedad <emphasis>Field Class</emphasis>
+    el valor <emphasis>java.util.Collection</emphasis>.</para>
 
-    <para xml:lang="es">Debemos indicar cuales son las propiedades del Subreport. En la
-    ventana de propiedades de la derecha buscamos las siguientes propiedades y
-    establecemos los valores correspondientes:</para>
+    <para xml:lang="es">Se debe indicar cuales son las propiedades del 
+    <emphasis>Subreport</emphasis>. Para ello, en la
+    ventana de propiedades de la derecha buscar las siguientes propiedades y
+    establecer los valores que se especifican a continuación:</para>
 
     <orderedlist>
       <listitem>
-        <para xml:lang="es"><emphasis role="bold">Subreport Expression</emphasis> =
-        <emphasis>$P{SubReportPetsLocation}</emphasis></para>
+        <para xml:lang="es">Subreport Expression = $P{SubReportPetsLocation}</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es"><emphasis role="bold">Expression Class</emphasis> =
-        <emphasis>net.sf.jasperreports.engine.JasperReport</emphasis></para>
+        <para xml:lang="es">Expression Class = net.sf.jasperreports.engine.JasperReport</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es"><emphasis role="bold">Connection type</emphasis> = <emphasis>Use
-        a datasource expression</emphasis></para>
+        <para xml:lang="es">Connection type = Use a datasource expression</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es"><emphasis role="bold">Data Source Expression</emphasis> =
-        <emphasis>new
-        net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{pets})</emphasis></para>
+        <para xml:lang="es">Data Source Expression = 
+        new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{pets})</para>
       </listitem>
     </orderedlist>
 
-    <para xml:lang="es">En el flujo de ejecución de un informe JasperReports, los parámetros
-    del mismo han de ser informados antes de la operación
-    <emphasis>print</emphasis> o, de lo contrario, cojerán valores por defecto
-    que se hayan definido o <emphasis>null</emphasis> en su defecto. Hemos de
-    fijarnos que hemos definido el parámetro
-    <emphasis>SubReportPetsLocation</emphasis>, el valor que toma este
-    parámetro en tiempo de ejecución ha de ser un path absoluto en el sistema
-    de archivos o en el classpath de la aplicación. En <link
-    linkend="addon-web-report">Add-on Web Report</link> se indicaba que al
-    añadir un informe a la aplicación, usando el comando <emphasis>web report
+    <para xml:lang="es">En el flujo de ejecución de un informe en Jasper Reports,
+    los parámetros del mismo han de ser informados antes de su
+    visualización o, de lo contrario, se tomarán los valores por defecto
+    que se hubiesen definido o <emphasis>null</emphasis> en su defecto.
+    Observar que se ha definido el parámetro
+    <emphasis>SubReportPetsLocation</emphasis> y el valor que toma este
+    parámetro en tiempo de ejecución ha de ser una ruta absoluta al sistema
+    de archivos o al classpath de la aplicación. En la sección del <link
+    linkend="addon-web-report">Add-on Web Report</link> se explicó que al
+    añadir un informe a la aplicación, utilizando el comando <emphasis>web report
     add</emphasis>, en el archivo
     <emphasis>src/main/webapp/WEB-INF/spring/jasper-views.xml</emphasis> se
-    declaraba un bean que indicaba la ruta hasta el fichero jrxml del informe
-    añadido. Este bean tiene un atributo que indica donde se declaran la
-    localización de los subreports que se usan en los distintos informes
-    (atributo p:subReportsUrls-ref).</para>
+    declara un bean que establece la ruta hasta el fichero jrxml del informe
+    añadido. Este bean tiene un atributo que indica el lugar donde se declaran
+    los subreports que se usan en los distintos informes mediante el atributo
+    <emphasis>p:subReportsUrls-ref</emphasis>.</para>
 
     <programlisting>&lt;bean id="owner_ownerpets"
-      class="com.springsource.petclinic.web.servlet.view.jasperreports.CustomJasperReportsMultiFormatView" 
-      p:reportDataKey="ownerpetsList" p:url="/WEB-INF/reports/owner_ownerpets.jrxml"
-      p:subReportDataKeys-ref="subReportDataKeys" <emphasis role="bold">p:subReportUrls-ref="subReportUrls"</emphasis> /&gt;</programlisting>
+class=
+ "com.springsource.petclinic.web.servlet.view.jasperreports.CustomJasperReportsMultiFormatView" 
+p:reportDataKey="ownerpetsList" p:url="/WEB-INF/reports/owner_ownerpets.jrxml"
+p:subReportDataKeys-ref="subReportDataKeys" <emphasis role="bold">p:subReportUrls-ref="subReportUrls"</emphasis> /&gt;</programlisting>
 
-    <para xml:lang="es">Es en el &lt;util:map/&gt;, declarado en el mismo jasper-views.xml,
-    al que apunta el valor del atributo
-    <emphasis>p:subReportsUrls-ref</emphasis> donde estbleceremos el valor que
-    ha de tomar el parámetro <emphasis>SubReportPetsLocation.</emphasis>
-    Modificamos este elemento añadiendo una entrada, quedando como se muestra
-    a continuación:</para>
+    <para xml:lang="es">El elemento anterior marcado en negrita apunta 
+    al elemento <emphasis>&lt;util:map/&gt;</emphasis>, declarado también
+    en el fichero jasper-views.xml. Aquí se ha de especificar el valor que
+    debe tomar el parámetro <emphasis>SubReportPetsLocation.</emphasis>
+    Modificar este elemento añadiendo una entrada, quedando como se muestra
+    a continuación.</para>
 
     <programlisting>&lt;util:map id="<emphasis role="bold">subReportUrls</emphasis>"&gt;
-  &lt;!-- This entry key must be declared exactly as you declared it in the master JRXML file --&gt;
+  &lt;!-- This entry key must be declared exactly as declared in the master JRXML file --&gt;
   &lt;!-- Add one &lt;entry /&gt; node for each sub-report you need to define --&gt;
-  &lt;!-- &lt;entry key="mySubReportLocation" value="/WEB-INF/reports/my-sub-report-file.jasper"/&gt; --&gt;
-  <emphasis role="bold">&lt;entry key="SubReportPetsLocation" value="/WEB-INF/reports/owner_ownerpets_sub_pets.jrxml"/&gt;</emphasis>
+  <emphasis role="bold">&lt;entry key="SubReportPetsLocation"
+  		value="/WEB-INF/reports/owner_ownerpets_sub_pets.jrxml"/&gt;</emphasis>
 &lt;/util:map&gt;</programlisting>
 
-    <para xml:lang="es">En este elemento &lt;util:map/&gt; podemos añadir tantos
-    &lt;entry/&gt; como necesitemos para definir los valores de los parámetros
-    que indican donde se localizan los archivos jrxml de los distintos
-    subreports que precisemos en nuestra aplicación.</para>
+    <para xml:lang="es">En el elemento <emphasis>&lt;util:map/&gt;</emphasis>
+    se pueden definir tantos elementos <emphasis>&lt;entry/&gt;</emphasis> como 
+    sea necesario para definir los parámetros que indican el lugar donde se
+    localizan los archivos jrxml de los distintos
+    subreports.</para>
 
-    <para xml:lang="es">Ahora nos queda diseñar el informe que mostrará el listado de
-    mascotas (pets) y que conformará nuestro subreport.</para>
+    <para xml:lang="es">Ahora se debe diseñar el informe que mostrará el
+    listado de mascotas (pets) que conformará el subreport.</para>
 
-    <para xml:lang="es">Creamos un nuevo diseño de informe (<emphasis>Archivo &gt;
-    Nuevo</emphasis>), y en el asistente que se nos muestra seleccionamos
+    <para xml:lang="es">Crear un nuevo diseño de informe (<emphasis>Archivo &gt;
+    Nuevo</emphasis>), y en el asistente seleccionar
     <emphasis>Blank A4</emphasis> y <emphasis>Open This Template</emphasis>.
-    Nos pedirá que demos un nombre al diseño y donde queremos guardarlo.
-    Indicamos <emphasis>owner_ownerpets_sub_pets.jrxml</emphasis> y lo
-    guardamos en el mismo directorio donde tenemos el report padre
+    Se solicitará un nombre para el diseño y el lugar donde guardarlo.
+    Indicar, por ejemplo <emphasis>owner_ownerpets_sub_pets.jrxml</emphasis> y
+    guardarlo en el mismo directorio donde se encuentre el report padre
     (<emphasis>owner_ownerpets.jrxml</emphasis>).</para>
 
     <figure>
@@ -456,107 +459,105 @@ Updated ROOT/pom.xml [
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/recetas-subreport-ireport-4.png"></imagedata>
+          <imagedata align="center" fileref="images/recetas-subreport-ireport-4.png"></imagedata>
         </imageobject>
       </mediaobject>
     </figure>
 
     <important>
-      <para xml:lang="es">Debemos asegurarnos que el nuevo informe se crea para usar Java
-      como lenguaje para las expresiones. En <emphasis>Report
-      Inspector</emphasis>, si seleccionamos el primer elemento (el nombre del
-      informe) y miramos en sus propiedades (parte derecha de la pantalla de
-      iReport) debemos buscar la propiedad <emphasis>Language</emphasis>, si
-      no tiene el valor Java, debemos cambiarlo usando el desplegable.</para>
+      <para xml:lang="es">Se debe validar que el nuevo informe se crea con
+      el lenguage Java configurado para las expresiones. En <emphasis>Report
+      Inspector</emphasis>, al seleccionar el primer elemento (el nombre del
+      informe) y mirar en sus propiedades (parte derecha de la pantalla de
+      iReport) se debe buscar la propiedad <emphasis>Language</emphasis>, si
+      no tiene el valor Java, cambiarla usando el desplegable.</para>
     </important>
 
-    <para xml:lang="es">Este nuevo informe, que constituirá nuestro subreport, es un informe
-    a todos los efectos, por tanto debemos definir aquellos campos (elemento
-    Fields del diseño), parámetros (elemento Parameters) y todo aquello que
-    necesitemos.</para>
+    <para xml:lang="es">Este nuevo informe, que constituirá el subreport, es un informe
+    a todos los efectos, por tanto se debe definir los campos (elemento
+    Fields del diseño), parámetros (elemento Parameters), etc.</para>
 
-    <para xml:lang="es">Al igual que hemos hecho antes con el campo pets del informe padre,
-    definamos los campos que nos permitirán acceder a los campos de la entidad
-    Pet que mostraremos en el subreport. Click con el botón derecho sobre
+    <para xml:lang="es">Al igual que se ha hecho anteriormente con el
+    campo pets del informe padre,
+    definir los campos que permiten acceder a los valores de la entidad
+    Pet que se visualizarán en el subreport. Click con el botón derecho sobre
     Fields y Agregar Field:</para>
 
     <orderedlist>
       <listitem>
-        <para xml:lang="es">Creamos field <emphasis role="bold">Name</emphasis>
-        <emphasis>name</emphasis> - <emphasis role="bold">Field
-        Class</emphasis> <emphasis>java.lang.String</emphasis> </para>
+        <para xml:lang="es">Crear field con nombre
+        <emphasis>name</emphasis> y clase 
+        <emphasis>java.lang.String</emphasis> </para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Creamos field <emphasis role="bold">Name</emphasis>
-        <emphasis>weight</emphasis> - <emphasis role="bold">Field
-        Class</emphasis> <emphasis>java.lang.Float</emphasis></para>
+        <para xml:lang="es">Crear field con nombre
+        <emphasis>weight</emphasis> y clase
+        <emphasis>java.lang.Float</emphasis></para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Creamos field <emphasis role="bold">Name</emphasis>
-        <emphasis>type</emphasis> - <emphasis role="bold">Field
-        Class</emphasis>
+        <para xml:lang="es">Crear field con nombre
+        <emphasis>type</emphasis> y clase
         <emphasis>com.springsource.petclinic.reference.PetType</emphasis>
-        (enumerado declarado en nuestro proyecto PetClinic)</para>
+        (enumerado declarado en el proyecto clinic.roo)</para>
       </listitem>
     </orderedlist>
 
     <para xml:lang="es">El diseño del informe se compone de distitnas bandas, donde se
-    colocan los elementos que queremos mostrar (<emphasis>Title, Page Header,
-    Collumn Header, Detail1, Collumn Footer, ...</emphasis>). Para un
-    subreport como el que necesitamos para este ejemplo, algunas bandas son
-    innecesarias y podemos eliminarlas. Esto nos permitirá ajustar mejor el
-    diseño completo de nuestro informe (informe padre ownerpets + subreport
+    colocan los elementos a mostrar (<emphasis>Title, Page Header,
+    Column Header, Detail1, Column Footer, ...</emphasis>). Para un
+    subreport como el de este ejemplo, algunas bandas son
+    innecesarias y pueden ser eliminadas. Esto permitirá ajustar mejor el
+    diseño completo del informe (informe padre ownerpets + subreport
     pets). Si se hace click con el botón derecho sobre
     <emphasis>Title</emphasis> y se selecciona <emphasis>Delete
-    Band</emphasis>, es eliminada. Haciéndolo con todas excepto
-    <emphasis>Collumn Header, Detail1 y Summary</emphasis>.</para>
+    Band</emphasis>, es eliminada. Hacerlo con todas las bandas excepto con
+    <emphasis>Column Header, Detail1 y Summary</emphasis>.</para>
 
     <figure>
       <title xml:lang="es">iReport - Bandas subreport</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/recetas-subreport-ireport-6.png"></imagedata>
+          <imagedata align="center" fileref="images/recetas-subreport-ireport-6.png"></imagedata>
         </imageobject>
       </mediaobject>
     </figure>
 
-    <para xml:lang="es"><emphasis>Collumn Header</emphasis> es una banda que se dibujará
-    solo al inicio de la columna del informe (en nuestro caso solo tenemos
-    una). Aquí añadiremos textos estáticos que harán las veces de cabecera de
-    tabla. Para ello de la paleta de componentes, seleccionamos
-    <emphasis>Static Text</emphasis> y lo arrastramos hasta la banda
-    <emphasis>Collumn Header</emphasis>.</para>
+    <para xml:lang="es"><emphasis>Column Header</emphasis> es una banda que se dibujará
+    solo al inicio de la columna del informe (en este caso solo existirá
+    una). Añadir textos estáticos que harán las veces de cabecera de
+    tabla. Para ello, de la paleta de componentes, seleccionar
+    <emphasis>Static Text</emphasis> y arrastrarlo hasta la banda
+    <emphasis>Column Header</emphasis>.</para>
 
     <figure>
       <title xml:lang="es">iReport - Paleta</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/recetas-subreport-ireport-5.png"></imagedata>
+          <imagedata align="center" fileref="images/recetas-subreport-ireport-5.png"></imagedata>
         </imageobject>
       </mediaobject>
     </figure>
 
-    <para xml:lang="es">En el primer <emphasis>Static Text</emphasis> establecemo el valor
-    <emphasis>Nombre</emphasis> y repetimos la misma operación para definir un
-    texto para el campo <emphasis>Peso</emphasis> y para el
-    <emphasis>Tipo</emphasis>. Podemos distribuir las etiquetas para que quede
-    como en la captura anterior.</para>
+    <para xml:lang="es">En el primer <emphasis>Static Text</emphasis> establecer el
+    valor <emphasis>Nombre</emphasis> y repetir la misma operación para definir un
+    texto para el campo <emphasis>Peso</emphasis> y para el campo
+    <emphasis>Tipo</emphasis>. Es posible distribuir las etiquetas para que quede
+    tal y como se muestra en la captura anterior.</para>
 
-    <para xml:lang="es">A continuación, haremos lo mismo pero usando el elemento
+    <para xml:lang="es">A continuación, hacer lo mismo pero usando el elemento
     <emphasis>Text Field</emphasis>. Este elemento sirve para mostrar el valor
     de un campo de la entidad <emphasis>Pet</emphasis> y se ha de corresponder
     con los field definidos anteriormente (<emphasis>name, weight,
-    type</emphasis>). Estos elementos <emphasis>Text Field</emphasis> los
-    definiremos en la banda <emphasis>Detail1</emphasis>, puesto que se
+    type</emphasis>). Estos elementos <emphasis>Text Field</emphasis> se
+    definirán en la banda <emphasis>Detail1</emphasis>, puesto que se
     repetirán para cada uno de los elementos de la fuente de datos del
-    subreport. Recordemos que la fuente de datos de este subreport la habíamos
-    definido anteriormente como <emphasis
-    role="bold">JRBeanCollectionDataSource</emphasis> usando la colección de
-    <emphasis>Pets</emphasis> que pertenecen a un
+    subreport. Recordar que la fuente de datos de este subreport se había
+    definido anteriormente como <emphasis>JRBeanCollectionDataSource</emphasis> 
+    usando la colección de <emphasis>Pets</emphasis> que pertenecen a un
     <emphasis>Owner</emphasis>.</para>
 
     <para xml:lang="es">En los Text Field, es importante establecer correctamente la
@@ -567,72 +568,69 @@ Updated ROOT/pom.xml [
 
     <itemizedlist>
       <listitem>
-        <para xml:lang="es"><emphasis role="bold">Text Field Expression</emphasis>
-        <emphasis>$F{weight}</emphasis></para>
+        <para xml:lang="es">Text Field Expression = $F{weight}</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es"><emphasis role="bold">Expression Class</emphasis>
-        <emphasis>java.lang.Float</emphasis></para>
+        <para xml:lang="es">Expression Class = java.lang.Float</para>
       </listitem>
     </itemizedlist>
 
-    <para>Para establecer el Text Field Expression podemos usar el diálogo
-    pertinente que nos permite seleccionar de entre los campos definidos en el
-    informe, o entre los parámetros, e incluso acceder a alguna de las
-    operaciones típicas sobre objetos Java.</para>
+    <para>Para establecer el Text Field Expression se puede utilizar el diálogo
+    que se muestra a continuación Este diálogo permite seleccionar elementos de 
+    los campos definidos en el informe, de los parámetros e incluso acceder a
+    alguna de las operaciones que proporcionan estos objetos.</para>
 
     <figure>
       <title xml:lang="es">iReport - Diálogo Text Field Expression</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/recetas-subreport-ireport-7.png"></imagedata>
+          <imagedata align="center" fileref="images/recetas-subreport-ireport-7.png"></imagedata>
         </imageobject>
       </mediaobject>
     </figure>
 
-    <para xml:lang="es">Obviamente en un <emphasis>Text Field</emphasis> podemos establecer
-    expresiones más elaboradas, como añadirle la cadena de las unidades de
-    peso. Pero debemos tener en cuenta que la propiedad <emphasis>Expression
+    <para xml:lang="es">Obviamente, en un <emphasis>Text Field</emphasis> es posible
+    establecer expresiones más elaboradas, como añadir a la cadena las unidades de
+    peso. Se debe tener en cuenta que la propiedad <emphasis>Expression
     Class</emphasis> deberá establecerse al tipo Java resultante de la
-    expresión. (<emphasis>Ej.: $F{weight} + "kg" resulta en un
-    java.lang.String</emphasis>). Por ejemplo, en el <emphasis>Text
-    Field</emphasis> que mostará el tipo de mascota, definiremos como
-    expresión: <emphasis>$F{type}.toString()</emphasis> y clase
+    expresión (por ejemplo, $F{weight} + "kg" da como resultado un
+    java.lang.String). Establecer en el <emphasis>Text
+    Field</emphasis> asociado con el tipo de mascota la expresión
+    <emphasis>$F{type}.toString()</emphasis> y la clase
     <emphasis>java.lang.String</emphasis>.</para>
 
-    <para xml:lang="es">Ya tenemos diseñado nuestra banda de detalle y para terminar el
-    subreport, opcionalmente, podemos definir un <emphasis>Text
-    Field</emphasis> que nos indique cuantos registros de
+    <para xml:lang="es">Ya está diseñada la banda de detalle y para terminar el
+    subreport, opcionalmente, se puede definir un <emphasis>Text
+    Field</emphasis> que indique cuantos registros de
     <emphasis>Pet</emphasis> se han impreso cada vez que se ejecuta el
-    subreport. Esto lo tenemos incluido en el informe padre (el de los
-    propietarios) y se trata de usar la variable del report <emphasis
-    role="bold">REPORT_COUNT</emphasis>, ya difinida por defecto. La
-    incluimos, en la banda <emphasis role="bold">Summary</emphasis>, con un
-    <emphasis>Text Field</emphasis> en la que <emphasis>Expression</emphasis>
-    toma el valor <emphasis>$V{REPORT_COUNT}</emphasis> y <emphasis
-    role="bold">Class</emphasis>
-    <emphasis>java.lang.Integer</emphasis>.</para>
+    subreport. Esto ya se encuentra incluido en el informe padre (owners)
+    y se consigue utilizando la variable del report
+    <emphasis>REPORT_COUNT</emphasis>, ya difinida por defecto.
+    Incluirla en la banda <emphasis>Summary</emphasis> con un
+    <emphasis>Text Field</emphasis> en la que el <emphasis>Expression</emphasis>
+    tome el valor <emphasis>$V{REPORT_COUNT}</emphasis> y el <emphasis>Class</emphasis>
+    sea <emphasis>java.lang.Integer</emphasis>.</para>
 
-    <para xml:lang="es">Solo nos queda arrancar de nuevo la aplicación, desde el plugin
-    Tomcat de Eclipse o desde la línea de comandos con <emphasis>mvn
-    tomcat:run</emphasis> y probar la generación del informe de Owners.</para>
+    <para xml:lang="es">Solo queda arrancar de nuevo la aplicación, desde el
+    Tomcat de Eclipse o desde la línea de comandos y probar la generación
+    del informe de Owners.</para>
 
     <figure>
       <title xml:lang="es">Informe Owners con subreport Pets</title>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/recetas-subreport-ireport-8.png"></imagedata>
+          <imagedata align="center" fileref="images/recetas-subreport-ireport-8.png"></imagedata>
         </imageobject>
       </mediaobject>
     </figure>
 
-    <para xml:lang="es">JasperReports permite hacer muchas cosas al trabajar con subreports
+    <para xml:lang="es">JasperReports permite gran cantidad de opciones al trabajar con subreports
     (paso de parámetros desde el informe padre a los subinformes, devolución
     de parámetros desde los subinformes al informe padre, actualización de
-    variables, ...). Lo mejor que podemos hacer para profundizar es mirar la
-    documentación de referencia de JasperReports e iReport.</para>
+    variables, ...). Para conocerlas con profundidad consultar la
+    documentación de referencia de Jasper Reports e iReport.</para>
   </section>
 </chapter>

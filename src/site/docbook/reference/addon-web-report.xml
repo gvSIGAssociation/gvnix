@@ -14,6 +14,10 @@
   totalmente funcionales que posteriormente pueden ser personalizados.
   Los informes son accesibles desde la web mediante un 
   formulario que se crea para tal efecto.</para>
+  
+	<para xml:lang="es">En la sección de recetas se puede encontrar
+	información adicional para realizar el <link linkend="recetas-reports">
+	diseño de informes con sub informes</link>.</para>
 
   <section xml:id="addon-web-report_descripcion">
     <title xml:lang="es">Descripción</title>
