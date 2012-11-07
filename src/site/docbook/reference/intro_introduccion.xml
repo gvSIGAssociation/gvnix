@@ -457,38 +457,38 @@ roo-gvNIX&gt;</programlisting>
         </listitem>
       </itemizedlist>
     </itemizedlist>
+  </section>
 
-    <section>
-      <title xml:lang="es">Generación de código</title>
+  <section>
+    <title xml:lang="es">Generación de código</title>
 
-      <para xml:lang="es"><emphasis>Roo y gvNIX es un generador de código
-      híbrido, puesto que intenta combinar lo mejor de los modelos de
-      generación pasiva y activa.</emphasis></para>
+    <para xml:lang="es"><emphasis>Roo y gvNIX es un generador de código
+    híbrido, puesto que intenta combinar lo mejor de los modelos de
+    generación pasiva y activa.</emphasis></para>
 
-      <itemizedlist>
-        <listitem>
-          <para>Generación pasiva:</para>
+    <itemizedlist>
+      <listitem>
+        <para>Generación pasiva:</para>
 
-          <para>El desarrollador indica a la herramienta qué es lo que debe
-          generar, y una vez generado finaliza el trabajo de la herramienta.
-          No se asume un mantenimiento a largo plazo del código generado. El
-          desarrollador interactúa mediante el intérprete de comandos, desde
-          ahí se realiza y termina el proceso de generación de código, que
-          genera archivos xml y java.</para>
-        </listitem>
+        <para>El desarrollador indica a la herramienta qué es lo que debe
+        generar, y una vez generado finaliza el trabajo de la herramienta.
+        No se asume un mantenimiento a largo plazo del código generado. El
+        desarrollador interactúa mediante el intérprete de comandos, desde
+        ahí se realiza y termina el proceso de generación de código, que
+        genera archivos xml y java.</para>
+      </listitem>
 
-        <listitem>
-          <para>Generación activa:</para>
+      <listitem>
+        <para>Generación activa:</para>
 
-          <para>Es una realimentación automática que genera un modelo
-          detallado de metadatos con la ayuda de las anotaciones @Roo y @GvNIX
-          e incrementalmente actualiza archivos aj y jsp. Permite mantener
-          automáticamente elementos del proyecto en respuesta a cambios, este
-          tipo de generación nunca modifica archivos java, estos solo se
-          modifican por indicación expresa del desarrollador y solo a través
-          del intérprete de comandos.</para>
-        </listitem>
-      </itemizedlist>
-    </section>
+        <para>Es una realimentación automática que genera un modelo
+        detallado de metadatos con la ayuda de las anotaciones @Roo y @GvNIX
+        e incrementalmente actualiza archivos aj y jsp. Permite mantener
+        automáticamente elementos del proyecto en respuesta a cambios, este
+        tipo de generación nunca modifica archivos java, estos solo se
+        modifican por indicación expresa del desarrollador y solo a través
+        del intérprete de comandos.</para>
+      </listitem>
+    </itemizedlist>
   </section>
 </chapter>

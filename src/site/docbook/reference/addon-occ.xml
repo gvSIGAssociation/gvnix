@@ -212,10 +212,12 @@ public class OwnerIntegrationTest {
         		com.springsource.petclinic.domain.Owner) obj.merge();
         obj.flush();
         org.junit.Assert.assertEquals(
-        		"Identifier of merged object not the same as identifier of original object",
+        		"Identifier of merged object not the same as identifier of " + 
+        				"original object",
         		merged.getId(), id);
         org.junit.Assert.assertTrue(
-        		"OccCheckSum for 'Owner' failed to modify on merge and flush directive", 
+        		"OccCheckSum for 'Owner' failed to modify on merge and flush " + 
+        				"directive", 
         		(currentVersion != null &amp;&amp;
         		<emphasis role="bold">obj.getOccChekcsum().equals(currentVersion)</emphasis>)
         		|| !modified);

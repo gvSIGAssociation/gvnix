@@ -62,7 +62,8 @@
       <programlisting><emphasis role="bold">@GvNIXWebService</emphasis>(name = "MyWebServicePortType",
       		targetNamespace = "http://services.project.layer.service.test.gvnix.org/",
       		serviceName = "MyWebService", address = "MyWebService",
-      		fullyQualifiedTypeName = "org.gvnix.test.service.layer.project.services.MyWebService",
+      		fullyQualifiedTypeName =
+      				"org.gvnix.test.service.layer.project.services.MyWebService",
       		exported = false)
 public class MyWebService {
 

@@ -1184,7 +1184,7 @@ public class Entity1 {
     </section>
 
     <section>
-      <title>Creación de una nueva entidad sin los comandos</title>
+      <title>Creación de una nueva entidad sin comandos</title>
       
       <para>En el ejemplo que se está siguiendo a lo largo de la documentación,
       se puede definir una nueva entidad <emphasis>Repartidor</emphasis>
@@ -1213,7 +1213,8 @@ public class Repartidor {
 
       <programlisting><command>test integration --entity ~.domain.Repartidor</command>
 ...
-<command>field reference --class ~.domain.PizzaOrder --fieldName repartidor --type ~.domain.Repartidor</command>
+<command>field reference --class ~.domain.PizzaOrder --fieldName repartidor
+		--type ~.domain.Repartidor</command>
 ...</programlisting>
 
       <para>Finalmente, lanzar los test de integración para confirmar que
@@ -1267,7 +1268,8 @@ ID T R DESCRIPTION -------------------------------------------------------------
 --------------------------------------------------------------------------------
 [HINT] use 'addon info id --searchResultId ..' to see details about a search result
 [HINT] use 'addon install id --searchResultId ..' to install a specific search result, or
-[HINT] use 'addon install bundle --bundleSymbolicName TAB' to install a specific add-on version
+[HINT] use 'addon install bundle --bundleSymbolicName TAB' to install a specific
+		add-on version
 JDBC driver not available for 'org.postgresql.Driver'</programlisting>Esta
       salida del comando <emphasis>database
       introspect</emphasis> informa que hay disponible un driver para el
@@ -1296,7 +1298,8 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
 
       <para>o</para>
 
-      <programlisting><command>addon install bundle --bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc3</command></programlisting>
+      <programlisting><command>addon install bundle
+      		--bundleSymbolicName org.springframework.roo.wrapping.postgresql-jdbc3</command></programlisting>
 
       <para>Al instante estará disponible el driver JDBC y se podrá empezar
       a usar los comandos <emphasis>database introspect</emphasis> y
@@ -1310,7 +1313,8 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
       <para>DBRE ofrece dos comandos: <emphasis>database introspect</emphasis>
       o <emphasis>database reverse engineer.</emphasis></para>
 
-      <programlisting><command>database introspect --schema</command> &lt;nombre del esquema&gt; --file &lt;nombre del fichero&gt; --enableViews</programlisting>
+      <programlisting><command>database introspect --schema</command> &lt;nombre del esquema&gt;
+      		--file &lt;nombre del fichero&gt; --enableViews</programlisting>
 
       <para>El comando mostrará la estructura de la BBDD en formato XML.
       Es obligatorio indicar el esquema, para ello
@@ -1321,7 +1325,9 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
       guarde la información también en un fichero determinado y --enableViews
       especifica que también debe obtener información sobre las vistas.</para>
 
-      <programlisting><command>database reverse engineer --schema</command> --package --testAutomatically --enableViews --includeTables --excludeTables --includeNonPortableAttributes</programlisting>
+      <programlisting><command>database reverse engineer --schema</command>
+      		--package --testAutomatically --enableViews --includeTables
+      		--excludeTables --includeNonPortableAttributes</programlisting>
 
       <para>Este comando crea las entidades JPA del proyecto
       representando las tablas y columnas de la BBDD. Al igual que antes
@@ -1352,7 +1358,8 @@ OBR URL......: http://spring-roo-repository.springsource.org/repository.xml</pro
       relaciones con otras tablas no incluidas, por lo que estas segundas deberán
       excluirse. Un ejemplo:</para>
 
-      <programlisting>database reverse engineer --schema no-schema-required --package ~.domain --includeTables "foo* bar?"</programlisting>
+      <programlisting>database reverse engineer --schema no-schema-required
+      		--package ~.domain --includeTables "foo* bar?"</programlisting>
 
       <para>Con este comando se generarían las entidades de aquellas tablas de
       la BBDD que tengan como nombre foo&lt;cualquier cosa&gt; y bar&lt;otro
@@ -1465,7 +1472,8 @@ public class Pizza {
         <programlisting>@RooJavaBean
 @RooToString
 @RooDbManaged(automaticallyDelete = true)
-@RooJpaActiveRecord(identifierType = LineItemPK.class, table = "line_item", schema = "order")
+@RooJpaActiveRecord(identifierType = LineItemPK.class, table = "line_item",
+		schema = "order")
 public class LineItem {
 }</programlisting>
 
@@ -1567,50 +1575,4 @@ public class LineItemPK {
 
   </section>
 
-  <section xml:id="guia-desarrollo_aplicacion-base_test-integracion">
-    <title xml:lang="es">Pruebas de integración</title>
-
-    <para xml:lang="es">En la creación de entidades, al especificar el
-    parámetro <command>--testAutomatically</command> se generan
-    automáticamente las pruebas de integración que permitirán
-    validar el buen funcionamiento del código de persistencia
-    de la entidad.</para>
-
-    <para>Para ejecutar los test utilizar el comando <command>perform
-    tests</command>:</para>
-
-    <programlisting>~.domain.PizzaOrder roo-gvNIX&gt; <command>perform test</command>
-<computeroutput>[Thread-4] [INFO] Scanning for projects...
-[Thread-4] [INFO] ------------------------------------------------------------------------
-[Thread-4] [INFO] Building pizzashop
-[Thread-4] [INFO]    task-segment: [test]
-[Thread-4] [INFO] ------------------------------------------------------------------------
-[Thread-4] [INFO] [aspectj:compile {execution: default}]
-...
-...
-[Thread-4] -------------------------------------------------------
-[Thread-4]  T E S T Soo&gt; 
-[Thread-4] -------------------------------------------------------
-[Thread-4] Running com.springsource.roo.pizzashop.domain.PizzaOrderIntegrationTest
-[Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.389 sec
-[Thread-4] Running com.springsource.roo.pizzashop.domain.ToppingIntegrationTest
-[Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.174 sec
-[Thread-4] Running com.springsource.roo.pizzashop.domain.PizzaIntegrationTest
-[Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.145 sec
-[Thread-4] Running com.springsource.roo.pizzashop.domain.BaseIntegrationTest
-[Thread-4] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.137 sec
-[Thread-4] zzaOrder roo-gvNIX&gt; 
-[Thread-4] Results :roo-gvNIX&gt; 
-[Thread-4] zzaOrder roo-gvNIX&gt; 
-[Thread-4] Tests run: 36, Failures: 0, Errors: 0, Skipped: 0
-[Thread-4] zzaOrder roo-gvNIX&gt; 
-[Thread-4] [INFO] ------------------------------------------------------------------------
-[Thread-4] [INFO] BUILD SUCCESSFUL
-[Thread-4] [INFO] ------------------------------------------------------------------------
-[Thread-4] [INFO] Total time: 17 seconds
-[Thread-4] [INFO] Finished at: Wed Jun 16 21:10:22 CEST 2010
-[Thread-4] [INFO] Final Memory: 45M/299M
-[Thread-4] [INFO] ------------------------------------------------------------------------</computeroutput>
-~.domain.PizzaOrder roo-gvNIX&gt;</programlisting>
-  </section>
 </chapter>

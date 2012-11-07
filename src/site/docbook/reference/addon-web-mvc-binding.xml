@@ -29,14 +29,14 @@
     <para xml:lang="es">El comando <link
     linkend="apendice-comandos_addon-web-mvc-binding_web-binding-setup">
     web mvc binding stringTrimmer</link> permite registrar un editor
-    especialmente útil que elimina los espacios en blanco al principio
-    y al final de las cadenas y que además permite transformar las
+    especialmente útil. Este editor elimina los espacios en blanco al principio
+    y al final de las cadenas y además permite transformar las
     cadenas vacías en valores nulos.
     </para>
 
 <programlisting>roo-gvNIX> <command>web mvc binding stringTrimmer --class ~.web.EntityController</command>
 Updated SRC_MAIN_JAVA/org/gvnix/test/web/EntityController.java
-Updated ROOT/pom.xml [added dependency org.gvnix:org.gvnix.web.mvc.binding.roo.addon:1.0.0]
+Updated ROOT/pom.xml added dependency org.gvnix:org.gvnix.web.mvc.binding.roo.addon:1.0.0
 Created SRC_MAIN_JAVA/org/gvnix/test/web/EntityController_Roo_GvNIXStringTrimmerBinder.aj</programlisting>
 
     <para xml:lang="es">Al ejecutar el comando, el add-on incluirá la
@@ -52,7 +52,8 @@ Created SRC_MAIN_JAVA/org/gvnix/test/web/EntityController_Roo_GvNIXStringTrimmer
 public class EntityController {
 }</programlisting>
 
-    <para xml:lang="es">Esto generará el código necesario para registrar el 
+    <para xml:lang="es">Esto generará en un aspecto Java propio 
+    todo el código necesario para registrar el 
     editor, representado en Spring MVC mediante la clase <link
     xlink:href="http://static.springsource.org/spring/docs/3.1.x/javadoc-api/org/springframework/beans/propertyeditors/StringTrimmerEditor.html">
     StringTrimmerEditor</link>.</para>
@@ -71,7 +72,7 @@ public class EntityController {
 	un tipo de datos adecuado, como se hace en el ejemplo anterior asociando
 	<emphasis>String</emphasis> con <emphasis>StringTrimmerEditor</emphasis>.</para>
 
-    <para xml:lang="es">Para ver mas detalles ver el <link
+    <para xml:lang="es">Para obtener mas detalles sobre el comando ver el <link
     linkend="apendice-comandos_addon-web-mvc-binding">apéndice de
     comandos</link> de este add-on.</para>
   </section>

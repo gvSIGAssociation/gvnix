@@ -41,7 +41,7 @@
     <section>
       <title>Configuración del entorno</title>
 
-      <para>La configuración del entorno solo será necesaria si se va a
+      <para>La configuración del entorno solo será necesario si se va a
       utilizar gvNIX desde la consola del sistema. Por lo tanto, no será
       necesario realizar todos los pasos indicados en este punto si se va a
       utilizar gvNIX desde Eclipse o STS tal y como se detallará posteriomente.</para>

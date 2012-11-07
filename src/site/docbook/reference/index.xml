@@ -10,7 +10,7 @@
   <info>
     <title xml:lang="es">gvNIX - Documentación de referencia</title>
 
-    <productname>gvNIX. Spring Roo based RAD tool</productname>
+    <productname>gvNIX: Spring Roo based Java development framework.</productname>
 
     <releaseinfo>1.0.0-RELEASE</releaseinfo>
 
@@ -22,10 +22,10 @@
     </authorgroup>
 
     <legalnotice>
-      <para>Copyright 2010 - 2013 Conselleria d'Infraestructures i Transport -
-      Generalitat Valenciana</para>
+      <para xml:lang="es">Copyright 2010 - 2013 Consejería de Infraestructuras, Transporte
+      y Medio Ambiende - Generalidad Valenciana</para>
 
-      <para>Esta obra está bajo la licencia Reconocimiento-Compartir bajo la
+      <para xml:lang="es">Esta obra está bajo la licencia Reconocimiento-Compartir bajo la
       misma licencia 3.0 España <link
       xlink:href="???">http://creativecommons.org/licenses/by-sa/3.0/es/</link>
       de Creative Commons. Puede copiarla, distribuirla y comunicarla
@@ -39,7 +39,7 @@
   <toc/>
 
   <part xml:id="introduccion-part">
-    <title xml:lang="es">Introducción</title>
+    <title xml:lang="es">Primeros pasos con gvNIX</title>
 
     <partintro>
       <para xml:lang="es">Esta parte de la documentación contiene la
@@ -67,19 +67,19 @@
 
       <itemizedlist>
         <listitem>
-          <para>Creación de un nuevo proyecto.</para>
+          <para xml:lang="es">Creación de un nuevo proyecto.</para>
         </listitem>
 
         <listitem>
-          <para>Configuración del acceso a datos.</para>
+          <para xml:lang="es">Configuración del acceso a datos.</para>
         </listitem>
 
         <listitem>
-          <para>Código genereado automáticamente.</para>
+          <para xml:lang="es">Código genereado automáticamente.</para>
         </listitem>
 
         <listitem>
-          <para>Gestión del modelo de entidades.</para>
+          <para xml:lang="es">Gestión del modelo de entidades.</para>
         </listitem>
 
         <listitem>
@@ -95,8 +95,16 @@
     <xi:include href="guia-desarrollo_generacion-codigo.xml"/>
 
     <xi:include href="guia-desarrollo_entidades.xml"/>
+    
+    <xi:include href="guia-desarrollo_entidades-buscadores.xml"/>
+    
+    <xi:include href="guia-desarrollo_entidades-pruebas.xml"/>
 
     <xi:include href="guia-desarrollo_capa-web.xml"/>
+    
+    <xi:include href="guia-desarrollo_capa-web-buscadores.xml"/>
+    
+    <xi:include href="guia-desarrollo_capa-web-arranque-pruebas.xml"/>
   </part>
 
   <part xml:id="addons-gvnix">
@@ -113,49 +121,49 @@
 
       <itemizedlist>
         <listitem>
-          <para>Gestión de distintos temas visuales.</para>
+          <para xml:lang="es">Gestión de distintos temas visuales.</para>
         </listitem>
 
         <listitem>
-          <para>Organización de la estructura de páginas en el menú.</para>
+          <para xml:lang="es">Organización de la estructura de páginas en el menú.</para>
         </listitem>
 
         <listitem>
-          <para>Gestión de patrones de visualización de entidades y sus relaciones.</para>
+          <para xml:lang="es">Gestión de patrones de visualización de entidades y sus relaciones.</para>
         </listitem>
 
         <listitem>
-          <para>Control de concurrencia a nivel de aplicación sin campos en base de datos.</para>
+          <para xml:lang="es">Control de concurrencia a nivel de aplicación sin campos en base de datos.</para>
         </listitem>
 
         <listitem>
-          <para>Gestión de la visualización de excepciones y
+          <para xml:lang="es">Gestión de la visualización de excepciones y
           gestión de mensajes de usuario en ventana modal.</para>
         </listitem>
 
         <listitem>
-          <para>Control de acceso (autenticación y autorización) y seguridad.</para>
+          <para xml:lang="es">Control de acceso (autenticación y autorización) y seguridad.</para>
         </listitem>
         
         <listitem>
-          <para>Generación de documentos (reportes).</para>
+          <para xml:lang="es">Generación de documentos (reportes).</para>
         </listitem>
         
         <listitem>
-          <para>Gestión de servicios locales y servicios web (importación y exposición).</para>
+          <para xml:lang="es">Gestión de servicios locales y servicios web (importación y exposición).</para>
         </listitem>
         
         <listitem>
-          <para>Soporte de idiomas oficiales para el estado Español
+          <para xml:lang="es">Soporte de idiomas oficiales para el estado Español
           (inicialmente incluido el Valenciano).</para>
         </listitem>
 
         <listitem>
-          <para>Gestión de configuraciones por entorno.</para>
+          <para xml:lang="es">Gestión de configuraciones por entorno.</para>
         </listitem>
         
         <listitem>
-          <para>Gestión de transformación de cadenas vacías a valores nulos.</para>
+          <para xml:lang="es">Gestión de transformación de cadenas vacías a valores nulos.</para>
         </listitem>
 
       </itemizedlist>
@@ -198,8 +206,13 @@
   </part>
 
   <part>
-    <title>Recetas de desarrollo</title>
+    <title xml:lang="es">Recetas de desarrollo</title>
 
+    <partintro>
+      <para xml:lang="es">En esta parte se verán distintas guías para realizar ciertas
+      modificaciones sobre el código generado para adaptarlo a distintas necesidades.</para>
+	</partintro>
+	
     <xi:include href="recetas.xml"/>
   </part>
 
@@ -217,7 +230,7 @@
   </part>
 
   <part>
-    <title>Recursos</title>
+    <title xml:lang="es">Recursos</title>
 
     <xi:include href="recursos.xml"/>
   </part>

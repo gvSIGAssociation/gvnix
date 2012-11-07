@@ -8,176 +8,136 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Recetas</title>
 
-  <para>En este capítulo veremos como hacer algunas modificaciones sobre el
-  código que genera gvNIX para adaptarlo a nuestras necesidades.</para>
+  <para xml:lang="es">En este capítulo se verá como realizar algunas modificaciones 
+  sobre el código generado para adaptar la aplicación a distintos
+  requerimientos habituales dada la experiencia de uso del framework.</para>
 
   <section xml:id="recetas-repositorio_maven">
-    <title>Repositorios Maven</title>
+    <title xml:lang="es">Repositorios Maven</title>
 
-    <para>En la mayoria de casos, cuando una funcionalidad ofrecida por gvNIX
-    requiere de librerías externas, el Add-on en cuestión registra un nuevo
-    repositorio de arterfactos Maven en el pom.xml que gestiona el proyecto.
-    Sin embargo podemos vernos con la necesidad de tener que añadir alguno
-    manualmente.</para>
+    <para xml:lang="es">Cuando una funcionalidad generada por el framework
+    requiere de librerías externas, el add-on correspondiente registrará
+    el repositorio de artefactos Maven necesario en el fichero
+    <emphasis>pom.xml</emphasis>, si todavía no lo estaba.</para>
+    
+    <para xml:lang="es">No es habitual, pero en el caso de ser necesario añadir algún
+    repositorio adicional al proyecto puede realizarse mediante el comando de la consola <link
+    xlink:href="http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-maven-repository-add">
+    maven repository add </link>. El siguiente ejemplo define el repositorio Maven
+    interno de la Consejería de Infraestructuras, Transporte y Medio
+    Ambiente. Este repositorio es accesible únicamente desde la red interna
+    de la Consejería.</para>
 
-    <section>
-      <title>Editando pom.xml manualmente</title>
+<programlisting>roo-gvNIX> maven repository add --id citma-maven --name "CITMA Maven Repository" 
+		--url http://benigno.coput.gva.es:8081/nexus/content/groups/public
+Updated ROOT/pom.xml [
+		added repository http://benigno.coput.gva.es:8081/nexus/content/groups/public]</programlisting>
 
-      <para>Para hacerlo tenemos que editar el fichero pom.xml y en la sección
-      &lt;repositories/&gt; añadir la definición de repositorio que
-      necesitemos. Por ejemplo, veamos como definir el repositorio Maven
-      interno de la Conselleria de Infraestructuras, Transportes y Medio
-      Ambiente <emphasis role="bold">(este repositorio es accesible únicamente
-      desde las oficinas de la Conselleria)</emphasis>.</para>
+    <para xml:lang="es">El comando modificará el fichero pom.xml y en la sección
+    <emphasis>&lt;repositories&gt;</emphasis> añadirá la definición del repositorio
+    indicado.</para>
 
-      <programlisting>&lt;repositories&gt;
+    <programlisting>&lt;repositories&gt;
     ...
     &lt;repository&gt;
         &lt;id&gt;citma-maven&lt;/id&gt;
-        &lt;name&gt;CITMA Maven Repository&lt;/name&gt;
         &lt;url&gt;http://benigno.coput.gva.es:8081/nexus/content/groups/public&lt;/url&gt;
+        &lt;name&gt;CITMA Maven Repository&lt;/name&gt;
     &lt;/repository&gt;
     ...
 &lt;/repositories&gt;</programlisting>
-    </section>
 
-    <section>
-      <title>Mediante plugin M2Eclipse en Eclipse IDE</title>
+    <para xml:lang="es">En el lado opuesto, también es posible eliminar repositorios
+    Maven del proyecto mediante el comando <link
+    xlink:href="http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-maven-repository-remove">
+    maven repository remove </link>. </para>
 
-      <para><emphasis>TBD</emphasis></para>
-    </section>
   </section>
 
-  <section xml:id="recetas-finders">
-    <title>Desarrollo de buscadores</title>
+  <section xml:id="recetas-finders-multitud-campos">
+    <title xml:lang="es">Desarrollar buscadores con gran cantidad de campos</title>
 
-    <para>gvNIX/Roo ofrece la funcionalidad de generar buscadores por
-    entidades del modelo de la aplicación mediante el comando <emphasis>finder
-    add</emphasis>. El comando espera que especifiquemos el buscador a generar
-    en un formato determinado. Para conocer el formato nos podemos ayudar del
-    comando <emphasis>finder list</emphasis>. Veamos como generar un buscador
-    sobre una de las entidades del proyecto de ejemplo PetClinic que viene con
-    la distribución de gvNIX. Usaremos la entidad Owner.</para>
-
-    <para>Ejecutamos el comando finder list sobre Owner</para>
-
-    <programlisting>roo-gvNIX&gt; finder list --class ~.domain.Owner --depth 2 --filter LastName
-...
-findOwnersByLastNameLikeAndCityLike(String lastName, String city)
-...</programlisting>
-
-    <para>En el comando indicamos sobre que entidad queremos generar el
-    buscador (<emphasis>--class</emphasis>). El resto de parámetros son
-    opcionales, <emphasis>--depth</emphasis> indica que nivel de "profundidad"
-    queremos que tenga en cuenta (debido a una limitación auque indiquemos una
-    profundidad mayor que 3 siempre nos mostrará como máximo 3 niveles) y
-    <emphasis>--filter</emphasis> indica un filtro para hacer que solo se
-    muestren opciones de buscador que contengan la cadena indicada en su
-    definición.</para>
-
-    <para>Nos devuelve varias posibilidades, de ellas para este ejemplo
-    escogemos findOwnersByLastNameLikeAndCityLike que genera un buscador de
-    Owners cuyo <emphasis>lastName</emphasis> contenga la cadena que se le
-    pase como parámetro y cuya <emphasis>city</emphasis> también contenga la
-    cadena dada usando el operador <emphasis>LIKE</emphasis>.</para>
-
-    <para>Si ejecutamos el comando finder add nos generará el buscador a nivel
-    de la entidad y si tenemos definida la capa Web creará el controller y la
-    JSPX necesaria para el formulario que invocará el buscador que hemos
-    definido.</para>
-
-    <programlisting>~.domain.Owner roo-gvNIX&gt; finder add --class ~.domain.Owner --finderName <emphasis
-        role="bold">findOwnersByLastNameLikeAndCityLike</emphasis>
-2840bdf Updated SRC_MAIN_JAVA/com/springsource/petclinic/domain/Owner.java
-eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
-9f5b38e Updated SRC_MAIN_WEBAPP/WEB-INF/views/owners/views.xml
-105ec93 Updated SRC_MAIN_WEBAPP/WEB-INF/i18n/application.properties
-7047c54 <emphasis role="bold">Created SRC_MAIN_JAVA/com/springsource/petclinic/web/OwnerController_Roo_Controller_Finder.aj</emphasis>
-9b1f4dc <emphasis role="bold">Created SRC_MAIN_JAVA/com/springsource/petclinic/domain/Owner_Roo_Finder.aj</emphasis>
-38002fb <emphasis role="bold">Created SRC_MAIN_WEBAPP/WEB-INF/views/owners/findOwnersByLastNameLikeAndCityLike.jspx</emphasis></programlisting>
-
-    <para><emphasis role="bold">El Add-on Finder tiene una limitación que
-    impone el SO Windows en el tamaño máximo del nombre de
-    archivos</emphasis>. Como vemos en el ejemplo anterior se genera el
+    <para xml:lang="es"><emphasis role="bold">El add-on finder tiene una limitación
+    impuesta por el sistema operativo Windows en el tamaño máximo del nombre de
+    archivos</emphasis>. En el ejemplo anterior se genera el
     archivo <emphasis>findOwnersByLastNameLikeAndCityLike.jspx</emphasis>. La
     limitación del tamaño máximo de nombre de archivo limita el comando finder
     add a nombres de buscadores que generen paths a archivo jspx de tamaño
     menor de 244 caracteres.</para>
 
-    <para>Hay un truco para poder generar estos buscadores. Consiste en
-    dividir el buscador que queremos en varios más pequeños, parciales de unos
+    <para xml:lang="es">Existe una forma para generar buscadores con un tamaño
+    superior al de la limitación impuesta. Consiste en
+    dividir el buscador necesario en varios más pequeños, parciales de unos
     pocos campos cada uno, y al final unir el código que se genera para cada
     uno de ellos en un unico método. Esto implica tener que modificar el
-    código que se ha generado para el buscador en la Entidad, el Controller y
+    código que se ha generado para el buscador en la entidad, el controlador y
     la jspx de la siguiente forma:</para>
 
     <itemizedlist>
       <listitem>
-        <para>En el .java de la Entidad para la que estamos generando el
-        buscador crear un método al que podemos llamar
+        <para xml:lang="es">En el archivo Java de la entidad para la que se está
+        generando el buscador crear un método con el nombre, por ejemplo, 
         <emphasis>findByTodo</emphasis> y cuyos parámetros de entrada serán
         todos los parámetros que reciben los métodos de los buscadores
-        parciales que hemos generado. Del mismo modo, el cuerpo de este nuevo
+        parciales que se hayan generado. Del mismo modo, el cuerpo de este nuevo
         método es la unión de la implementación de todos los buscadores
-        parciales. Podemos aprovechar y modificar el código, según se explica
+        parciales. Es posible aprovechar y modificar el código, según se explica
         en el siguiente apartado, de forma que los parámetros sean
         opcionales.</para>
       </listitem>
 
       <listitem>
-        <para>De manera similar en el .java del Controller de la entidad
-        crearemos dos métodos: uno <emphasis>findByTodoForm</emphasis> que nos
-        devolverá a la vista del formulario de este buscador, y otro
+        <para xml:lang="es">De manera similar en el fichero Java del controlador de la
+        entidad crear dos métodos: uno <emphasis>findByTodoForm</emphasis> que
+        devolverá la vista del formulario del buscador, y otro
         <emphasis>findByTodo</emphasis> que servirá las peticiones que lleguen
         desde el formulario del buscador. En este último caso, al igual que en
-        caso del método que hemos creado en la Entidad, tendrá como parámetros
+        el caso del método que creado en la entidad, tendrá como parámetros
         la unión de todos los de los buscadores parciales. El cuerpo de este
-        método deberá invocar al <emphasis>findByTodo</emphasis> que hemos
-        creado en la Entidad. Para la anotación @RequestMapping de estos dos
-        métodos nos podemos guiar como se define en los buscadores
-        existentes.</para>
+        método deberá invocar al método <emphasis>findByTodo</emphasis>
+        creado en la entidad. Para definir la anotación @RequestMapping de estos dos
+        métodos se recomienda guiarse mediante los buscadores existentes.</para>
       </listitem>
 
       <listitem>
-        <para>Finalmente debemos crear una jspx (la podemos llamar
+        <para xml:lang="es">Finalmente crear una jspx (por ejemplo, con nombre
         findByTodo.jspx) en el directorio WEB-INF/views/&lt;entidad&gt; que
-        contendrá el formulario de nuestro buscador. Por tanto incluye todos
-        los campos que hayan en el resto de buscadores parciales. Hay que
-        recordar, que esta vista se ha de definir también el fichero views.xml
+        contendrá el formulario del buscador. Por tanto incluye todos
+        los campos que hayan en el resto de páginas jspx de los buscadores parciales.
+        Hay que recordar, que esta vista se ha de definir también en el fichero views.xml
         que hay en la carpeta de vistas de la entidad y que esta vista es la
-        que devuelve el método findByTodoForm que hemos creado antes en el
-        Controller.</para>
+        que devuelve el método findByTodoForm creada antes en el controlador.</para>
       </listitem>
     </itemizedlist>
 
-    <para>Hemos descrito un trabajo manual, y en parte tedioso, que puede
-    ayudarnos a la hora de montar buscadores por tantos campos como
-    queramos.</para>
+    <para xml:lang="es">Con todo lo anterior se ha descrito un trabajo un tanto manual,
+    pero que permite montar buscadores por todos los campos necesarios.</para>
 
-    <section>
-      <title>Modificar buscadores generados</title>
+    <section xml:id="recetas-finders-modificar">
+      <title xml:lang="es">Modificar buscadores generados</title>
 
-      <para>El comportamiento que se implementa automáticamente al generar un
-      buscador es esperar que todos los campos de busqueda son obligatorios,
+      <para xml:lang="es">El comportamiento que implementa automáticamente la generación
+      de buscadores es hacer todos los campos de busqueda obligatorios,
       es decir, en el ejemplo anterior, el buscador siempre intentará ejecutar
       la consulta "<emphasis>SELECT * FROM Owners WHERE lastName LIKE '%xxx%'
-      AND city LIKE '%yyyy%'</emphasis>", pero si no indicaramos alguno de los
-      parámetros devolverá una excepción indicando que falta un parámetro
-      requerido. En ocasiones no queremos que esto suceda así, es decir,
-      podríamos querer que los filtros del WHERE cuyos parámetros no se han
-      informado no se incluyeran en la consulta. Para hacerlo debemos
+      AND city LIKE '%yyyy%'</emphasis>", pero si no se indica alguno de los
+      parámetros se devolverá una excepción indicando que falta un parámetro
+      requerido. En ocasiones no esto no es lo deseado, es decir,
+      se puede requerir que los parámetros no informados simplemente
+      no se incluyeran en la consulta. Para hacer esto se debe
       modificar el código del método <emphasis>finderByXxxx</emphasis> que se
-      encuentra declarado en <emphasis>*_Roo_Finder.aj</emphasis>. Veamos como
-      hacerlo.</para>
+      encuentra declarado en <emphasis>*_Roo_Finder.aj</emphasis>.
+      A continuación se verá un ejemplo de como hacerlo.</para>
 
-      <para>Hacemos <emphasis>Push In</emphasis> del método tal y como
-      comentamos en la sección sobre <link
+      <para xml:lang="es">Hacer <emphasis>push-in</emphasis> del método tal y como
+      se comenta en la sección sobre <link
       linkend="guia-desarrollo_generacion-codigo">modificación del código
-      generado</link> y lo llevamos al .java de la entidad. Una vez allí lo
-      modificamos para que no requiera los campos y que construya la consulta
-      dependiendo de que parámetros se han informado:</para>
+      generado</link> y llevarlo al fichero Java de la entidad. Una vez allí
+      modificarlo para que no requiera los campos y así construya la consulta
+      considerando tan solo los parámetros que lleguen rellenados:</para>
 
-      <programlisting>public static TypedQuery&lt;Owner&gt; findOwnersByLastNameLikeAndCityLike(String lastName, String city) {
+      <programlisting>public static TypedQuery&lt;Owner&gt; findOwnersByLastNameLikeAndCityLike(
+      		String lastName, String city) {
     StringBuilder query = new StringBuilder("SELECT o FROM Owner AS o");
     StringBuilder whereClause = new StringBuilder();
 
@@ -219,114 +179,118 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     return q;
 }</programlisting>
 
-      <para>En este ejemplo se ha construido la consulta usando un
-      StringBuilder en el que generamos la consulta deseada, pero se podría
-      haber usado cualquier otro como por ejemplo usar Hibernate Criteria
-      Builder.</para>
+      <para xml:lang="es">En este ejemplo se ha construido la consulta usando un
+      StringBuilder en el que se genera la consulta deseada, pero se podría
+      haber utilizado cualquier otra tecnología como por ejemplo Hibernate
+      Criteria Builder.</para>
 
-      <para>Las condiciones</para>
+      <para xml:lang="es">Las condiciones</para>
 
       <programlisting>if (city != null &amp;&amp; city.length() &gt; 0)</programlisting>
 
-      <para>podrían simplificarse a</para>
+      <para xml:lang="es">podrían simplificarse a</para>
 
       <programlisting>if (city != null)</programlisting>
 
-      <para>si usáramos la funcionalidad que ofrece el <link
+      <para xml:lang="es">Si se utiliza la funcionalidad que ofrece el <link
       linkend="addon-web-mvc-binding">Add-on Web MVC Binding</link>, que
-      establece el StringTrimmerEditor y que en caso de llegar un parámetro
-      con una cadena vacía la convierte a null.</para>
+      establece el StringTrimmerEditor y que en dicho caso al llegar un parámetro
+      con una cadena vacía sería convertido a nulo.</para>
 
-      <para>Como ya hemos dicho, el código generado indica que todos los
-      parámetros de búsqueda son obligatorios, esto implica también al
-      formulario en la jspx. Tal como se genera, si alguno de los campos no se
-      rellena, no nos deja enviar la petición. Debemos editar la jspx y
+      <para xml:lang="es">Como ya se ha comentado, el código generado fuerza que todos los
+      parámetros de búsqueda sean obligatorios, esto implica también al
+      formulario situadao en la página jspx. Tal como se genera, si alguno de los campos no se
+      rellena, no dejará enviar la petición. Se debe editar la jspx y
       modificar el atributo <emphasis>required</emphasis> de los campos
       <emphasis>field</emphasis> y establecer su valor a
-      <emphasis>false</emphasis>, no debemos olvidarnos de cambiar el valor
+      <emphasis>false</emphasis>, no olvidar cambiar el valor
       del atributo <emphasis>z</emphasis> a
-      "<emphasis>user-managed</emphasis>" para indicar que lo hemos
-      modificado.</para>
+      "<emphasis>user-managed</emphasis>" para indicar que ha sido
+      personalizado.</para>
 
-      <programlisting>&lt;field:input disableFormBinding="true" field="city" id="f_com_springsource_petclinic_domain_Owner_city" max="30" <emphasis
-          role="bold">required="false" z="user-managed"</emphasis>/&gt;</programlisting>
+      <programlisting>&lt;field:input disableFormBinding="true" field="city"
+      		id="f_com_springsource_petclinic_domain_Owner_city" max="30" <emphasis
+          role="bold">
+          		required="false" z="user-managed"</emphasis>/&gt;</programlisting>
 
-      <para>Bueno ya tenemos modificado el buscador para que los parámetros no
-      sean obligatorios.</para>
-
-      <para>En algunos buscadores necesitaremos que uno de los parámetros sea
-      una entidad del modelo, una entidad relacionada con la entidad sobre la
-      que estamos buscando. En estos casos es útil el uso de un selector
-      desplegable en el que indicaremos cual es el registro de la relación que
-      indicará el filtro sobre la entidad que estamos buscando. Pero, el
+      <para xml:lang="es">En los buscadores en los que uno de los parámetros sea
+      una entidad del modelo, es decir una entidad relacionada con la entidad sobre la
+      que se está realizando la búsqueda será necesario realizar un cambio adicional.
+      En estos casos es se utiliza un selector desplegable, pero el
       componente <emphasis>select.tagx</emphasis> que se usa en los
       formularios tiene el inconveniente de que no añade una opción vacía
-      entre las disponibles, con lo que nos vemos obligados a elegir siempre
-      una. Un ejemplo de este caso lo tenemos en el buscador por Owner que se
-      genera para la entidad Pet en el ejemplo de PetClinic.</para>
+      entre las disponibles, con lo que obliga a elegir siempre alguna.
+      Un ejemplo de este caso se encuentra en el buscador findPetsByOwner generado
+      para la entidad Pet en el ejemplo de <emphasis>clinic.roo</emphasis>
+      .</para>
 
-      <para>La forma de tratar estas peticiones de Spring MVC es intentar
-      cargar el registro de la entidad que llega como parámetro. Por tanto si
-      le llega como parámetro un dato que no concuerda con ningún registro de
-      la entidad parámetro, usará null como parámetro. Pero como hemos dicho
+      <para xml:lang="es">La forma de tratar estas peticiones de Spring MVC es intentar
+      cargar el registro asociado con la entidad que llega como parámetro. Por tanto si
+      llega como parámetro un dato que no concuerda con ningún registro de
+      la entidad parámetro, usará null como parámetro. Como se ha comentado,
       el componente <emphasis>select.tagx</emphasis> no ofrece una opción
       vacía. gvNIX en su <link linkend="addon-web-screen-patterns">Add-on Web
       MVC Pattern</link> tiene un componente
-      <emphasis>select-withempty.tagx</emphasis> que si lo ofrece. Mediante el
-      comando <emphasis>web mvc pattern install</emphasis> instalamos los
+      <emphasis>select-withempty.tagx</emphasis> que sí lo ofrece. Mediante el
+      comando <emphasis>web mvc pattern install</emphasis> se instalan los
       componentes de MVC Pattern entre los que se incluye el selector con
-      opción vacía. Podemos modificar la jspx del buscador de Pet por Owner
-      para que use <emphasis>select-withempty</emphasis> en lugar del original
+      opción vacía. Entonces es posible modificar la jspx del buscador findPetsByOwner
+      para que utilice <emphasis>select-withempty</emphasis> en lugar del original
       de la siguiente forma:</para>
 
-      <programlisting>&lt;div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" ... <emphasis
-          role="bold">xmlns:pattern-field="urn:jsptagdir:/WEB-INF/tags/pattern/form/fields"</emphasis> version="2.0"&gt;
+      <programlisting>&lt;div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" ... 
+      		<emphasis role="bold">xmlns:pattern-field="urn:jsptagdir:/WEB-INF/tags/pattern/form/fields"</emphasis>
+      		version="2.0"&gt;
     &lt;jsp:directive.page contentType="text/html;charset=UTF-8"/&gt;
     &lt;jsp:output omit-xml-declaration="yes"/&gt;
-    &lt;form:find finderName="ByOwner" id="ff_com_springsource_petclinic_domain_Pet" path="/pets" z="ThIGSmua6R7WM6q2P1BpNC3zMi4="&gt;
-        <emphasis role="bold">&lt;pattern-field:select-withempty disableFormBinding="true" field="owner" emptyValueEnable="true" emptyValue="0" id="f_com_springsource_petclinic_domain_Pet_owner" itemValue="id" items="${owners}" path="/owners" required="false" z="user-managed"/&gt;</emphasis>
+    &lt;form:find finderName="ByOwner" id="ff_com_springsource_petclinic_domain_Pet"
+    		path="/pets" z="ThIGSmua6R7WM6q2P1BpNC3zMi4="&gt;
+        <emphasis role="bold">&lt;pattern-field:select-withempty disableFormBinding="true" field="owner"
+        		emptyValueEnable="true" emptyValue="0"
+        		id="f_com_springsource_petclinic_domain_Pet_owner" itemValue="id"
+        		items="${owners}" path="/owners" required="false" z="user-managed"/&gt;</emphasis>
     &lt;/form:find&gt;
 &lt;/div&gt;</programlisting>
 
-      <para>El componente select-withempty tiene los mismos atributos que el
-      select.tagx y otro tres más:</para>
+      <para xml:lang="es">El componente select-withempty tiene los mismos atributos que el
+      select.tagx y otros tres adicionales:</para>
 
       <itemizedlist>
         <listitem>
-          <para><emphasis>emptyValueEnable</emphasis> true|false habilita la
+          <para xml:lang="es"><emphasis>emptyValueEnable</emphasis>: Valor booleano que habilita la
           opción vacía en el selector.</para>
         </listitem>
 
         <listitem>
-          <para><emphasis>emtpyValue</emphasis> indica que valor se quiere dar
+          <para xml:lang="es"><emphasis>emtpyValue</emphasis>: Indica que valor se quiere dar
           a la opción vacía del selector. Si se corresponde con una entidad,
           este valor no debería corresponder a ningún identificador existente
           para esa entidad, de esta forma el valor que llega al buscador es
-          null.</para>
+          nulo.</para>
         </listitem>
 
         <listitem>
-          <para><emphasis>emptyLabel</emphasis> cadena a mostrar para la
+          <para xml:lang="es"><emphasis>emptyLabel</emphasis>: Descripción a mostrar para la
           opción vacía del selector.</para>
         </listitem>
       </itemizedlist>
 
-      <para>Con este cambio y si tenemos modificado el método finder de Pet
-      para que no sea necesario que llegue el parámetro Owner, de manera
-      similar a lcomo lo hemos explicado antes, nos aseguramos de que podemos
-      hacer búsquedas por parámetros opcionales.</para>
+      <para xml:lang="es">Con este cambio y con el método findPetsByOwner modificado
+      para que no sea requerido el parámetro Owner, de la misma forma
+      que se explicado antes, se consigue realizar búsquedas por parámetros opcionales
+      sea cual sea el tipo del parámetro.</para>
     </section>
   </section>
 
   <section xml:id="recetas-reports">
-    <title>Diseño de Informes que contienen sub-informes</title>
+    <title xml:lang="es">Diseño de Informes que contienen sub-informes</title>
 
-    <para>gvNIX ofrece un add-on (<link linkend="addon-web-report">Add-on Web
+    <para xml:lang="es">gvNIX ofrece un add-on (<link linkend="addon-web-report">Add-on Web
     Report</link>) que facilita la definición de informes sobre una entidad.
     El add-on genera el diseño básico de un informe JasperReports el cual
     podemos modificar usando un diseñador como iReport.</para>
 
-    <para>Podemos necesitar que el informe definido muestre los elementos de
+    <para xml:lang="es">Podemos necesitar que el informe definido muestre los elementos de
     una entidad relacionada con la entidad sobre la que se ha declarado el
     informe. Por ejemplo, en la aplicación PetClinic, podríamos definir un
     informe sobre la entidad Owner y queremos que, para cada Owner, se muestre
@@ -335,19 +299,19 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     <emphasis>pets</emphasis> de la entidad Owner.</para>
 
     <note>
-      <para>Para esta receta usaremos la versión 4.0.1 de iReport.</para>
+      <para xml:lang="es">Para esta receta usaremos la versión 4.0.1 de iReport.</para>
     </note>
 
-    <para>Partamos del informe definido por el comando gvNIX:</para>
+    <para xml:lang="es">Partamos del informe definido por el comando gvNIX:</para>
 
     <programlisting>roo-gvNIX&gt; web report add --controller ~.web.OwnerController --reportName ownerpets</programlisting>
 
-    <para>En src/main/webapp/WEB-INF/reports se ha creado el archivo de diseño
+    <para xml:lang="es">En src/main/webapp/WEB-INF/reports se ha creado el archivo de diseño
     de informe <emphasis>owner_ownerpets.jrxml</emphasis>. Abrimos este
     archivo usando iReport (<emphasis>Archivo &gt; Open</emphasis>).</para>
 
     <figure>
-      <title>iReport - Diseñador</title>
+      <title xml:lang="es">iReport - Diseñador</title>
 
       <mediaobject>
         <imageobject>
@@ -356,11 +320,11 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       </mediaobject>
     </figure>
 
-    <para>En la parte izquierda, en la ventana de Report Inspector podemos ver
+    <para xml:lang="es">En la parte izquierda, en la ventana de Report Inspector podemos ver
     los elementos principales de diseño del informe JasperReports. </para>
 
     <figure>
-      <title>iReport - Report Inspector</title>
+      <title xml:lang="es">iReport - Report Inspector</title>
 
       <mediaobject>
         <imageobject>
@@ -369,8 +333,8 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       </mediaobject>
     </figure>
 
-    <para>Lo primero que tenemos que hacer es declarar un nuevo Parámetro con
-    el nombre <emphasis>SubReportPetsLocation</emphasis>. Para ello hacemos
+    <para xml:lang="es">Lo primero que tenemos que hacer es declarar un nuevo Parámetro con
+    el nombre <emphasis>SubReportPetsLocation</emphasis>. Para ello hacer
     click con el botón derecho sobre el elemento
     <emphasis>Parameters</emphasis> y seleccionamos la opción
     <emphasis>Agregar Parameter</emphasis>. Justo debajo del último parámetro
@@ -381,7 +345,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     role="bold">Parameter Class</emphasis> establecemos
     <emphasis>net.sf.jasperreports.engine.JasperReport</emphasis>.</para>
 
-    <para>Ahora debemos añadir un elemento Subreport a nuestro diseño, y como
+    <para xml:lang="es">Ahora debemos añadir un elemento Subreport a nuestro diseño, y como
     queremos que aparezca para cada elemento de la lista de Owners, debemos
     hacerlo en la banda de detalle (<emphasis>Detail1</emphasis>) del informe.
     Necesitaremos aumentar la altura de la banda <emphasis>Detail1</emphasis>.
@@ -394,7 +358,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     arrastrando las esquinas de la caja del elemento.</para>
 
     <figure>
-      <title>iReport - Subreport</title>
+      <title xml:lang="es">iReport - Subreport</title>
 
       <mediaobject>
         <imageobject>
@@ -403,7 +367,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       </mediaobject>
     </figure>
 
-    <para>Antes de seguir con el establecimiento de las propiedades del
+    <para xml:lang="es">Antes de seguir con el establecimiento de las propiedades del
     Subreport, necesitamos declarar un campo del informe que nos permitirá
     acceder al campo <emphasis>pets</emphasis> de la Entidad
     <emphasis>Owner</emphasis>. En "<emphasis>Report Inspector</emphasis>",
@@ -413,34 +377,34 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     <emphasis>pets</emphasis> y <emphasis role="bold">Field Class</emphasis>
     <emphasis>java.util.Collection</emphasis>.</para>
 
-    <para>Debemos indicar cuales son las propiedades del Subreport. En la
+    <para xml:lang="es">Debemos indicar cuales son las propiedades del Subreport. En la
     ventana de propiedades de la derecha buscamos las siguientes propiedades y
     establecemos los valores correspondientes:</para>
 
     <orderedlist>
       <listitem>
-        <para><emphasis role="bold">Subreport Expression</emphasis> =
+        <para xml:lang="es"><emphasis role="bold">Subreport Expression</emphasis> =
         <emphasis>$P{SubReportPetsLocation}</emphasis></para>
       </listitem>
 
       <listitem>
-        <para><emphasis role="bold">Expression Class</emphasis> =
+        <para xml:lang="es"><emphasis role="bold">Expression Class</emphasis> =
         <emphasis>net.sf.jasperreports.engine.JasperReport</emphasis></para>
       </listitem>
 
       <listitem>
-        <para><emphasis role="bold">Connection type</emphasis> = <emphasis>Use
+        <para xml:lang="es"><emphasis role="bold">Connection type</emphasis> = <emphasis>Use
         a datasource expression</emphasis></para>
       </listitem>
 
       <listitem>
-        <para><emphasis role="bold">Data Source Expression</emphasis> =
+        <para xml:lang="es"><emphasis role="bold">Data Source Expression</emphasis> =
         <emphasis>new
         net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{pets})</emphasis></para>
       </listitem>
     </orderedlist>
 
-    <para>En el flujo de ejecución de un informe JasperReports, los parámetros
+    <para xml:lang="es">En el flujo de ejecución de un informe JasperReports, los parámetros
     del mismo han de ser informados antes de la operación
     <emphasis>print</emphasis> o, de lo contrario, cojerán valores por defecto
     que se hayan definido o <emphasis>null</emphasis> en su defecto. Hemos de
@@ -462,7 +426,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       p:reportDataKey="ownerpetsList" p:url="/WEB-INF/reports/owner_ownerpets.jrxml"
       p:subReportDataKeys-ref="subReportDataKeys" <emphasis role="bold">p:subReportUrls-ref="subReportUrls"</emphasis> /&gt;</programlisting>
 
-    <para>Es en el &lt;util:map/&gt;, declarado en el mismo jasper-views.xml,
+    <para xml:lang="es">Es en el &lt;util:map/&gt;, declarado en el mismo jasper-views.xml,
     al que apunta el valor del atributo
     <emphasis>p:subReportsUrls-ref</emphasis> donde estbleceremos el valor que
     ha de tomar el parámetro <emphasis>SubReportPetsLocation.</emphasis>
@@ -476,15 +440,15 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
   <emphasis role="bold">&lt;entry key="SubReportPetsLocation" value="/WEB-INF/reports/owner_ownerpets_sub_pets.jrxml"/&gt;</emphasis>
 &lt;/util:map&gt;</programlisting>
 
-    <para>En este elemento &lt;util:map/&gt; podemos añadir tantos
+    <para xml:lang="es">En este elemento &lt;util:map/&gt; podemos añadir tantos
     &lt;entry/&gt; como necesitemos para definir los valores de los parámetros
     que indican donde se localizan los archivos jrxml de los distintos
     subreports que precisemos en nuestra aplicación.</para>
 
-    <para>Ahora nos queda diseñar el informe que mostrará el listado de
+    <para xml:lang="es">Ahora nos queda diseñar el informe que mostrará el listado de
     mascotas (pets) y que conformará nuestro subreport.</para>
 
-    <para>Creamos un nuevo diseño de informe (<emphasis>Archivo &gt;
+    <para xml:lang="es">Creamos un nuevo diseño de informe (<emphasis>Archivo &gt;
     Nuevo</emphasis>), y en el asistente que se nos muestra seleccionamos
     <emphasis>Blank A4</emphasis> y <emphasis>Open This Template</emphasis>.
     Nos pedirá que demos un nombre al diseño y donde queremos guardarlo.
@@ -493,7 +457,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     (<emphasis>owner_ownerpets.jrxml</emphasis>).</para>
 
     <figure>
-      <title>iReport - Nuevo diseño</title>
+      <title xml:lang="es">iReport - Nuevo diseño</title>
 
       <mediaobject>
         <imageobject>
@@ -503,7 +467,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     </figure>
 
     <important>
-      <para>Debemos asegurarnos que el nuevo informe se crea para usar Java
+      <para xml:lang="es">Debemos asegurarnos que el nuevo informe se crea para usar Java
       como lenguaje para las expresiones. En <emphasis>Report
       Inspector</emphasis>, si seleccionamos el primer elemento (el nombre del
       informe) y miramos en sus propiedades (parte derecha de la pantalla de
@@ -511,31 +475,31 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       no tiene el valor Java, debemos cambiarlo usando el desplegable.</para>
     </important>
 
-    <para>Este nuevo informe, que constituirá nuestro subreport, es un informe
+    <para xml:lang="es">Este nuevo informe, que constituirá nuestro subreport, es un informe
     a todos los efectos, por tanto debemos definir aquellos campos (elemento
     Fields del diseño), parámetros (elemento Parameters) y todo aquello que
     necesitemos.</para>
 
-    <para>Al igual que hemos hecho antes con el campo pets del informe padre,
+    <para xml:lang="es">Al igual que hemos hecho antes con el campo pets del informe padre,
     definamos los campos que nos permitirán acceder a los campos de la entidad
     Pet que mostraremos en el subreport. Click con el botón derecho sobre
     Fields y Agregar Field:</para>
 
     <orderedlist>
       <listitem>
-        <para>Creamos field <emphasis role="bold">Name</emphasis>
+        <para xml:lang="es">Creamos field <emphasis role="bold">Name</emphasis>
         <emphasis>name</emphasis> - <emphasis role="bold">Field
         Class</emphasis> <emphasis>java.lang.String</emphasis> </para>
       </listitem>
 
       <listitem>
-        <para>Creamos field <emphasis role="bold">Name</emphasis>
+        <para xml:lang="es">Creamos field <emphasis role="bold">Name</emphasis>
         <emphasis>weight</emphasis> - <emphasis role="bold">Field
         Class</emphasis> <emphasis>java.lang.Float</emphasis></para>
       </listitem>
 
       <listitem>
-        <para>Creamos field <emphasis role="bold">Name</emphasis>
+        <para xml:lang="es">Creamos field <emphasis role="bold">Name</emphasis>
         <emphasis>type</emphasis> - <emphasis role="bold">Field
         Class</emphasis>
         <emphasis>com.springsource.petclinic.reference.PetType</emphasis>
@@ -543,19 +507,19 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       </listitem>
     </orderedlist>
 
-    <para>El diseño del informe se compone de distitnas bandas, donde se
+    <para xml:lang="es">El diseño del informe se compone de distitnas bandas, donde se
     colocan los elementos que queremos mostrar (<emphasis>Title, Page Header,
     Collumn Header, Detail1, Collumn Footer, ...</emphasis>). Para un
     subreport como el que necesitamos para este ejemplo, algunas bandas son
     innecesarias y podemos eliminarlas. Esto nos permitirá ajustar mejor el
     diseño completo de nuestro informe (informe padre ownerpets + subreport
-    pets). Si hacemos click con el botón derecho sobre
-    <emphasis>Title</emphasis> y seleccionamos <emphasis>Delete
-    Band</emphasis>, la eliminamos. Hagámoslo con todas excepto
+    pets). Si se hace click con el botón derecho sobre
+    <emphasis>Title</emphasis> y se selecciona <emphasis>Delete
+    Band</emphasis>, es eliminada. Haciéndolo con todas excepto
     <emphasis>Collumn Header, Detail1 y Summary</emphasis>.</para>
 
     <figure>
-      <title>iReport - Bandas subreport</title>
+      <title xml:lang="es">iReport - Bandas subreport</title>
 
       <mediaobject>
         <imageobject>
@@ -564,7 +528,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       </mediaobject>
     </figure>
 
-    <para><emphasis>Collumn Header</emphasis> es una banda que se dibujará
+    <para xml:lang="es"><emphasis>Collumn Header</emphasis> es una banda que se dibujará
     solo al inicio de la columna del informe (en nuestro caso solo tenemos
     una). Aquí añadiremos textos estáticos que harán las veces de cabecera de
     tabla. Para ello de la paleta de componentes, seleccionamos
@@ -572,7 +536,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     <emphasis>Collumn Header</emphasis>.</para>
 
     <figure>
-      <title>iReport - Paleta</title>
+      <title xml:lang="es">iReport - Paleta</title>
 
       <mediaobject>
         <imageobject>
@@ -581,13 +545,13 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       </mediaobject>
     </figure>
 
-    <para>En el primer <emphasis>Static Text</emphasis> establecemo el valor
+    <para xml:lang="es">En el primer <emphasis>Static Text</emphasis> establecemo el valor
     <emphasis>Nombre</emphasis> y repetimos la misma operación para definir un
     texto para el campo <emphasis>Peso</emphasis> y para el
     <emphasis>Tipo</emphasis>. Podemos distribuir las etiquetas para que quede
     como en la captura anterior.</para>
 
-    <para>A continuación, haremos lo mismo pero usando el elemento
+    <para xml:lang="es">A continuación, haremos lo mismo pero usando el elemento
     <emphasis>Text Field</emphasis>. Este elemento sirve para mostrar el valor
     de un campo de la entidad <emphasis>Pet</emphasis> y se ha de corresponder
     con los field definidos anteriormente (<emphasis>name, weight,
@@ -600,7 +564,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     <emphasis>Pets</emphasis> que pertenecen a un
     <emphasis>Owner</emphasis>.</para>
 
-    <para>En los Text Field, es importante establecer correctamente la
+    <para xml:lang="es">En los Text Field, es importante establecer correctamente la
     propiedad Expression Class, esta se ha de corresponder con el tipo Java
     del field definido y que se va a usar para mostrarlo. Por ejemplo, el Text
     Field que mostará el peso de la mascota tendría las propiedades como
@@ -608,12 +572,12 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
 
     <itemizedlist>
       <listitem>
-        <para><emphasis role="bold">Text Field Expression</emphasis>
+        <para xml:lang="es"><emphasis role="bold">Text Field Expression</emphasis>
         <emphasis>$F{weight}</emphasis></para>
       </listitem>
 
       <listitem>
-        <para><emphasis role="bold">Expression Class</emphasis>
+        <para xml:lang="es"><emphasis role="bold">Expression Class</emphasis>
         <emphasis>java.lang.Float</emphasis></para>
       </listitem>
     </itemizedlist>
@@ -624,7 +588,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     operaciones típicas sobre objetos Java.</para>
 
     <figure>
-      <title>iReport - Diálogo Text Field Expression</title>
+      <title xml:lang="es">iReport - Diálogo Text Field Expression</title>
 
       <mediaobject>
         <imageobject>
@@ -633,7 +597,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       </mediaobject>
     </figure>
 
-    <para>Obviamente en un <emphasis>Text Field</emphasis> podemos establecer
+    <para xml:lang="es">Obviamente en un <emphasis>Text Field</emphasis> podemos establecer
     expresiones más elaboradas, como añadirle la cadena de las unidades de
     peso. Pero debemos tener en cuenta que la propiedad <emphasis>Expression
     Class</emphasis> deberá establecerse al tipo Java resultante de la
@@ -643,7 +607,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     expresión: <emphasis>$F{type}.toString()</emphasis> y clase
     <emphasis>java.lang.String</emphasis>.</para>
 
-    <para>Ya tenemos diseñado nuestra banda de detalle y para terminar el
+    <para xml:lang="es">Ya tenemos diseñado nuestra banda de detalle y para terminar el
     subreport, opcionalmente, podemos definir un <emphasis>Text
     Field</emphasis> que nos indique cuantos registros de
     <emphasis>Pet</emphasis> se han impreso cada vez que se ejecuta el
@@ -656,12 +620,12 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
     role="bold">Class</emphasis>
     <emphasis>java.lang.Integer</emphasis>.</para>
 
-    <para>Solo nos queda arrancar de nuevo la aplicación, desde el plugin
+    <para xml:lang="es">Solo nos queda arrancar de nuevo la aplicación, desde el plugin
     Tomcat de Eclipse o desde la línea de comandos con <emphasis>mvn
     tomcat:run</emphasis> y probar la generación del informe de Owners.</para>
 
     <figure>
-      <title>Informe Owners con subreport Pets</title>
+      <title xml:lang="es">Informe Owners con subreport Pets</title>
 
       <mediaobject>
         <imageobject>
@@ -670,7 +634,7 @@ eb708be Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
       </mediaobject>
     </figure>
 
-    <para>JasperReports permite hacer muchas cosas al trabajar con subreports
+    <para xml:lang="es">JasperReports permite hacer muchas cosas al trabajar con subreports
     (paso de parámetros desde el informe padre a los subinformes, devolución
     de parámetros desde los subinformes al informe padre, actualización de
     variables, ...). Lo mejor que podemos hacer para profundizar es mirar la

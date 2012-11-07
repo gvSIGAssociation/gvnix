@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter version="5.0" xml:id="guia-desarrollo_capa-web-arranque-pruebas" xml:lang="es"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+  <title xml:lang="es">Arranque y pruebas de la aplicación web</title>
+
+  <section xml:id="guia-desarrollo_aplicacion-base_test-funcional">
+    <title xml:lang="es">Pruebas funcionales</title>
+
+    <para xml:lang="es">Una vez creada la capa web es posible generar
+    automáticamente un conjunto de pruebas funcionales que
+    permitirán realizar pruebas de aceptación de la aplicación.</para>
+
+    <para>La creación de las pruebas funcionales se realizan a través del comando
+    <command>selenium test</command></para>
+
+    <para>En el siguiente ejemplo se está generando las pruebas funcionales para
+    el controlador de la entidad <emphasis>Pizza</emphasis>:</para>
+    
+    <programlisting>selenium test --controller ~.web.PizzaController</programlisting>
+    
+    <para>Los test generados estarán en <emphasis>src/main/webapp/selenium</emphasis>.
+    La opción <emphasis>--controller</emphasis> especifica la clase
+    controladora para la que se desea generar el test. Existen dos parámetros opcionales,
+    uno es <emphasis>--serverUrl</emphasis> que permite indicar la dirección
+    base de la aplicación sobre la que deben ejecutarse los tests y el otro es
+    <emphasis>--name</emphasis> que permite dar un nombre específico al test.
+    Habitualmente, no será necesario especificar estos parámetros opcionales.</para>
+    
+  </section>
+
+  <section xml:id="guia-desarrollo_aplicacion-base_arrancar-aplicacion">
+    <title xml:lang="es">Arrancar la aplicación web</title>
+
+    <para xml:lang="es">Desde que se creó la capa web, ya era posible poner en
+    marcha la aplicación y visualizarla en un navegador web. La puesta en marcha
+    de la aplicación se puede realizar de dos formas distintas.</para>
+    
+    <para xml:lang="es">Si la consola del framework se está ejecutando desde un
+    Eclipse o un STS, consultar la sección de la documentación
+    <link linkend="guia-desarrollo_aplicacion-base_arrancar-aplicacion-eclipse">
+    Arrancar la aplicación con Eclipse</link> en la que se explica tanto la instalación
+    de un servidor en el IDE como el modo de arrancar la aplicación.</para>
+    
+    <para xml:lang="es">Si la consola del framework se está ejecutando desde 
+    la consola del sistema, salir de la consola del framework con el comando
+    <command>quit</command> y ejecutar
+    la orden <command>mvn tomcat:run</command>. Observar que en la consola del
+    sistema debe estar configurado y por lo tanto disponible la herramienta Maven.</para>
+
+    <para>Para poder ver en funcionamiento la aplicación se debe acceder a la
+    dirección: <uri>http://localhost:8080/pizzashop</uri> con un navegador
+    web.</para>
+
+  </section>
+  
+
+  <section xml:id="guia-desarrollo_aplicacion-base_ejecutar-tests-funcionales">
+    <title xml:lang="es">Ejecutar los tests funcionales</title>
+
+	<para xml:lang="es">Para lanzar las pruebas, la aplicación debe estar en marcha 
+	y entonces pueden ejecutarse 
+	utilizando el plugin M2Eclipse de STS o Eclipse. Para ello, seleccionar la opción
+	<command>Run As > Maven build ...</command> del menú contextual del proyecto o del menú superior e
+	introducir como <command>Goals</command> el valor <command>selenium:selenese</command>.
+	Darle un nombre a esta
+	configuración y a partir de entonces utilizar esta configuración guardada para ejecutar
+	los test funcionales mediante el botón <command>Run As...</command>.</para>
+	
+    <para>También es posible lanzar las pruebas
+    funcionales con la orden <command>mvn selenium:selenese</command> desde
+    la consola del sistema.</para>
+	
+	<para xml:lang="es">De este modo se ejecutará el conjunto de tests sobre una nueva instancia del navegador
+	FireFox (obviamente, es necesario tener instalado dicho navegador en la máquina).</para>
+	
+	<para xml:lang="es">Los resultados de los tests se guardarán en
+	<emphasis>target/selenium.html</emphasis> en formato HTML.</para>
+	</section>
+</chapter>

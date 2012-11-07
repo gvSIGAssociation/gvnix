@@ -12,14 +12,12 @@
      
     <title xml:lang="es">Instalación</title>
 
-    <para>
-        <emphasis>Spring ha desarrollado una extensión para Eclipse llamada
-        SpringSource Tool Suite o STS, que ofrece soporte para trabajar en
-        Eclipse con aplicaciones de Spring, entre ellas Spring Roo y por tanto
-        gvNIX. Entre otras funcionalidades incorpora un intérprete de comandos
-        de Roo que permite ejecutar órdenes sin necesidad de salir de
-        Eclipse.</emphasis>
-    </para>
+    <para>Spring ha desarrollado una extensión para Eclipse llamada
+    SpringSource Tool Suite o STS, que ofrece soporte para trabajar en
+    Eclipse con aplicaciones de Spring, entre ellas Spring Roo y por tanto
+    gvNIX. Entre otras funcionalidades incorpora un intérprete de comandos
+    de Roo que permite ejecutar órdenes sin necesidad de salir de
+    Eclipse.</para>
 
     <para>Hay dos formas de instalar STS, la primera es como una distribución
     propia y la segunda es como un plugin de un Eclipse ya existente. 
