@@ -92,7 +92,15 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
     private static final String PROVIDES_TYPE = MetadataIdentificationUtils
             .create(PROVIDES_TYPE_STRING);
 
-    private static final String ITD_TEMPLATE = "Entity_gvnix_persistence_occ.aj_template";
+    // Template portions to create *_Roo_GvNIXRelatedPattern.aj when replacing vars with values and concatenated in order
+    private static final String ITD_TEMPLATE_CLASS_START = "Entity_gvnix_persistence_occ.aj_template1";
+    private static final String ITD_TEMPLATE_METHODGET_MESSAGE_DIGEST = "Entity_gvnix_persistence_occ.aj_template2";
+    private static final String ITD_TEMPLATE_METHOD_REMOVE = "Entity_gvnix_persistence_occ.aj_template3";
+    private static final String ITD_TEMPLATE_METHOD_MERGE = "Entity_gvnix_persistence_occ.aj_template4";
+    private static final String ITD_TEMPLATE_METHOD_CHECK_CONCURRENCY = "Entity_gvnix_persistence_occ.aj_template5";
+    private static final String ITD_TEMPLATE_METHOD_LOAD_CHECKSUM = "Entity_gvnix_persistence_occ.aj_template6";
+    private static final String ITD_TEMPLATE_METHOD_CHECKSUM_DIGEST = "Entity_gvnix_persistence_occ.aj_template7";
+    private static final String ITD_TEMPLATE_CLASS_END = "Entity_gvnix_persistence_occ.aj_template8";
 
     private static final String TO_STRING_CODE_LINE_FORMAT = "\tsb.append((String.valueOf(${property}).equals(\"null\") ? nullstr : String.valueOf(${property})) + separator);\n";
 
@@ -170,8 +178,60 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
             itdFileContents = generateITDContents(field, persistenceMemberLocator);
         }
     }
-
+    
+    /**
+     * Replace some vars with values in all AspectJ template portions and concat results in order into one string. 
+     * 
+     * <p>Vars has next format: ${entity_package}.
+     * Template portions will be placed at same package in src/main/resources.
+     * If some method placed in a portion already defined (push-in), don't add it to result string.</p>
+     * 
+     * @param checksumField Checksum field to get field name (one var value).
+     * @param persistenceMemberLocator To get identifier field (one var value).
+     * @return All template portions replacing vars with values and concatenated in order.
+     */
     private String generateITDContents(FieldMetadata checksumField, PersistenceMemberLocator persistenceMemberLocator) {
+
+    	StringBuilder contents = new StringBuilder();
+    	
+    	contents.append(generateITDContent(ITD_TEMPLATE_CLASS_START, checksumField, persistenceMemberLocator));
+    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("getMessageDigest"), null) == null) {
+    		contents.append(generateITDContent(ITD_TEMPLATE_METHODGET_MESSAGE_DIGEST, checksumField, persistenceMemberLocator));
+    	}
+    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("remove"), null) == null) {
+    		contents.append(generateITDContent(ITD_TEMPLATE_METHOD_REMOVE, checksumField, persistenceMemberLocator));
+    	}
+    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("merge"), null) == null) {
+    		contents.append(generateITDContent(ITD_TEMPLATE_METHOD_MERGE, checksumField, persistenceMemberLocator));
+    	}
+    	List<JavaType> parameters = new ArrayList<JavaType>();
+    	parameters.add(new JavaType(governorTypeDetails.getName().getSimpleTypeName()));
+    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("checkConcurrency")) == null) {
+    		contents.append(generateITDContent(ITD_TEMPLATE_METHOD_CHECK_CONCURRENCY, checksumField, persistenceMemberLocator));
+    	}
+    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("loadChecksum"), null) == null) {
+    		contents.append(generateITDContent(ITD_TEMPLATE_METHOD_LOAD_CHECKSUM, checksumField, persistenceMemberLocator));
+    	}
+    	if (MemberFindingUtils.getDeclaredMethod(governorTypeDetails, new JavaSymbolName("checksumDigest"), null) == null) {
+    		contents.append(generateITDContent(ITD_TEMPLATE_METHOD_CHECKSUM_DIGEST, checksumField, persistenceMemberLocator));
+    	}
+    	contents.append(generateITDContent(ITD_TEMPLATE_CLASS_END, checksumField, persistenceMemberLocator));
+        
+        return contents.toString();
+    }
+
+    /**
+     * Replace some vars with values in a template file name. 
+     * 
+     * <p>Vars has next format: ${entity_package}.
+     * Template will be placed at same package in src/main/resources.</p>
+     * 
+     * @param templateName File name with a template.
+     * @param checksumField Checksum field to get field name (one var value).
+     * @param persistenceMemberLocator To get identifier field (one var value).
+     * @return String replacing vars with values.
+     */
+    private String generateITDContent(String templateName, FieldMetadata checksumField, PersistenceMemberLocator persistenceMemberLocator) {
 
         // We use a template for generate ITD because the class
         // org.springframework.roo.classpath.details.DefaultItdTypeDetailsBuilder
@@ -180,10 +240,10 @@ public class OCCChecksumMetadata extends AbstractMetadataItem implements
         String template;
         try {
             template = IOUtils.toString(new InputStreamReader(this
-                    .getClass().getResourceAsStream(ITD_TEMPLATE)));
+                    .getClass().getResourceAsStream(templateName)));
         } catch (IOException ioe) {
             throw new IllegalStateException(
-                    "Unable load ITD Checksum_occ template", ioe);
+                    "Unable load " + templateName, ioe);
         }
 
         Map<String, String> params = new HashMap<String, String>(10);

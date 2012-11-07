@@ -1,0 +1,18 @@
+
+    public void ${entity_class}.checkConcurrency(${entity_class} attached) {
+        if (attached == null){
+            attached = this.entityManager.find(${entity_class}.class, this.${id_field});
+            if (attached == null) {
+			    // TODO Customize this Exception to add more information
+                throw new OptimisticLockException(
+                    "${entity_class} has been deleted (${id_field}: " + this.${id_field} + ")");
+            }
+        }
+        if (this.${checksum_field} != null && // We haven the old checksum and
+            !this.${checksum_field}.equals(attached.${checksum_field})) { // checksum is not equals
+	    	// TODO Customize this Exception to add more information
+	    	throw new OptimisticLockException(
+		    	"This ${entity_class} has been modified by another user (${id_field}: " + this.${id_field} + ")");
+		}
+    }
+

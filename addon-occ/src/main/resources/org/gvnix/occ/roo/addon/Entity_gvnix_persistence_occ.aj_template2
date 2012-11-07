@@ -1,0 +1,12 @@
+
+    private static MessageDigest getMessageDigest() {
+        if (MESSAGE_DIGEST == null) {
+            try {
+                MESSAGE_DIGEST = MessageDigest.getInstance("${digest_method}");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return MESSAGE_DIGEST;
+    }
+

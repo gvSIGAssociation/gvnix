@@ -1,0 +1,9 @@
+
+    @Transactional
+    public ${entity_class} ${entity_class}.merge() {
+        if (this.entityManager == null) this.entityManager = entityManager();
+        this.checkConcurrency(null);
+        ${entity_class} merged = this.entityManager.merge(this);
+        this.entityManager.flush();
+        return merged;
+    }
