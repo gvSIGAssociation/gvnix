@@ -186,7 +186,7 @@ public class OCCChecksumMetadataProvider implements
                 throw new IllegalStateException(
                         "You are trying to apply OCC Checksum on an Entity "
                                 .concat("that extends of another one with a ")
-                                .concat("@javax.persistence.Version fiel. ")
+                                .concat("@javax.persistence.Version field. ")
                                 .concat("You should to apply OCC Checksum ")
                                 .concat("over that Entity in your class: ")
                                 .concat(declaredByType));
