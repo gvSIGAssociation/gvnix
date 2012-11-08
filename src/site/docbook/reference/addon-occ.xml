@@ -21,7 +21,7 @@
   valores de una entidad dada.</para>
 
   <section xml:id="addon-persistence_occchecksum">
-    <title>OCC Checksum</title>
+    <title>Introducción</title>
 
     <para xml:lang="es">Esta utilidad añade a las entidades un sistema
     de <emphasis>control de concurrencia</emphasis> basado en una operación de
@@ -62,9 +62,13 @@
     javax.persistence.OptimisticLockException</link>) y la operación no se realizará.</para>
 
     <para xml:lang="es">Esta operación supone un coste adicional en las tareas
-    de persistencia, pero no debería ser apreciable en condiciones del uso
-    cuotidiano de la aplicación excepto de procesos de actualizaciones masivas
+    de persistencia, pero no es apreciable en condiciones del uso
+    cuotidiano de la aplicación excepto en procesos de actualizaciones masivas
     de registros.</para>
+    
+  </section>
+  <section xml:id="addon-persistence_incluir">
+    <title>Añadir el control en las entidades</title>
 
     <para xml:lang="es">Para activar esta característica sobre una entidad se
     pueden utilizar los siguientes comandos:</para>
@@ -112,7 +116,7 @@
     clase padre.</para>
 
     <para xml:lang="es">Para ver todos los comandos y sus opciones ver el
-    <link linkend="apendice-comandos_addon-persistence_occchecksum">apéndice
+    <link linkend="apendice-comandos_addon-persistence">apéndice
     de comandos</link>.</para>
 
     <note>

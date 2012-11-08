@@ -220,10 +220,8 @@
     <title xml:lang="es">Apéndices</title>
 
     <partintro>
-      <para xml:lang="es">Documentación adicional (TBC Integración con
-      MOSKitt)</para>
-
-      <para xml:lang="es">TBC Integración con MOSKitt<!-- (vore com s'explica en Roo integració amb STS) --></para>
+      <para xml:lang="es">Listado de comandos adicionales incluidos
+      en gvNIX detallando cada uno de sus parámetros.</para>
     </partintro>
 
     <xi:include href="apendice-comandos.xml"/>

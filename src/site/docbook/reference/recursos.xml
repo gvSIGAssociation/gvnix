@@ -13,18 +13,13 @@
   <section xml:id="recursos_cit">
     <title xml:lang="es">Proyectos relacionados con gvNIX</title>
 
-    <para xml:lang="es">Proyectos relacionados con gvNIX y la Conselleria
-    d'Infraestructures i Transport de la Generalitat Valenciana.</para>
+    <para xml:lang="es">Proyectos relacionados con gvNIX y con la Consejería
+    de Infraestructuras, Transporte y Medio Ambiente de la Generalidad Valenciana.</para>
 
     <itemizedlist>
       <listitem>
         <para xml:lang="es"><link
         xlink:href="http://www.gvpontis.gva.es/">gvPONTIS</link></para>
-      </listitem>
-
-      <listitem>
-        <para xml:lang="es"><link
-        xlink:href="http://www.moskitt.org/">Moskitt</link></para>
       </listitem>
 
       <listitem>
@@ -36,18 +31,23 @@
         <para xml:lang="es"><link
         xlink:href="http://www.gvpontis.gva.es/proyectos-integra/proy-desarrollo/gvhidra-herramienta/">gvHIDRA</link></para>
       </listitem>
+
+      <listitem>
+        <para xml:lang="es"><link
+        xlink:href="http://www.moskitt.org/">Moskitt</link></para>
+      </listitem>
     </itemizedlist>
   </section>
 
   <section xml:id="recursos_roo">
     <title xml:lang="es">Recursos de Spring Roo</title>
 
-    <para xml:lang="es">Esta es una lista de recursos sobre Spring Roo:</para>
+    <para xml:lang="es">Esta es una lista de recursos relacionados con Spring Roo:</para>
 
     <itemizedlist>
       <listitem>
         <para xml:lang="es"><link
-        xlink:href="http://static.springsource.org/spring-roo/reference/html/index.html">Documentación
+        xlink:href="http://static.springsource.org/spring-roo/reference/html-single/index.html">Documentación
         de referencia Spring Roo (<emphasis>on-line</emphasis>)</link></para>
       </listitem>
     </itemizedlist>
@@ -57,12 +57,6 @@
         <para xml:lang="es"><link
         xlink:href="http://www.springsource.org/roo">Página del
         proyecto</link></para>
-      </listitem>
-
-      <listitem>
-        <para xml:lang="es"><link
-        xlink:href="http://forum.springsource.org/showthread.php?t=71985">Página
-        con recursos para Roo</link></para>
       </listitem>
 
       <listitem>
@@ -82,6 +76,12 @@
         xlink:href="http://www.springsource.com/products/sts">Spring STS
         (Spring Tools Suite)</link></para>
       </listitem>
+
+      <listitem>
+        <para xml:lang="es"><link
+        xlink:href="http://forum.springsource.org/showthread.php?t=71985">Página
+        con recursos para Roo</link></para>
+      </listitem>
     </itemizedlist>
   </section>
 
@@ -96,6 +96,18 @@
         <para><link
         xlink:href="http://www.springsource.org/about">Spring</link></para>
       </listitem>
+      
+      <listitem>
+        <para><link
+        xlink:href="http://static.springsource.org/spring/docs/3.0.x/reference/index.html">
+        Documentación de Spring Framework</link></para>
+      </listitem>
+
+      <listitem>
+        <para><link
+        xlink:href="http://static.springsource.org/spring/docs/3.0.x/reference/mvc.html">
+        Documentación de Spring MVC</link></para>
+      </listitem>      
 
       <listitem>
         <para><link
