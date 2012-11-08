@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section version="5.0" xml:id="apendice-comandos_addon-persistence"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:ns5="http://www.w3.org/1998/Math/MathML"
+         xmlns:ns4="http://www.w3.org/2000/svg"
+         xmlns:ns3="http://www.w3.org/1999/xhtml"
+         xmlns:ns="http://docbook.org/ns/docbook">
+
+    <title xml:lang="es">Comandos del add-on OCC</title>
+
+    <para xml:lang="es">Para una descripción detallada de las
+    características del add-on consultar la documentación del <link
+    linkend="addon-persistence">add-on OCC
+    (Optimistic Concurrency Control)</link>.</para>
+
+    <table>
+      <title xml:lang="es">Comandos del add-on OCC</title>
+
+      <tgroup cols="2">
+        <colspec colwidth="145" />
+        <colspec colwidth="300" />
+        <thead>
+          <row>
+            <entry align="center" xml:lang="es">Comando</entry>
+
+            <entry align="center" xml:lang="es">Descripción</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">occ
+            checksum set</link></entry>
+
+            <entry xml:lang="es">Establece un control de concurrencia optimista mediante
+            una suma de comprobación (checksum) para una determinada entidad
+            del proyecto</entry>
+          </row>
+
+          <row>
+            <entry><link
+            linkend="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">occ
+            checksum all</link></entry>
+
+            <entry xml:lang="es">Establece un control de concurrencia optimista mediante
+            una suma de comprobación (checksum) para todas las entidades del
+            proyecto</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <section xml:id="apendice-comandos_addon-persistence_occchecksum_occ-checksum-set">
+      <title>occ checksum set</title>
+
+      <para xml:lang="es">Establece un control de concurrencia optimista
+      mediante una suma de comprobación (checksum) en una entidad
+      del modelo. Si la entidad ya tiene configurado este sistema de control,
+      el comando no permitirá sobreescribir su configuración y
+      cualquier modificación deberá realizarse sobre la anotación relacionada
+      <emphasis>@GvNIXEntityOCCChecksum</emphasis>
+      que se habrá incluido en la clase Java de la entidad.</para>
+
+      <para xml:lang="es">Sus parámetros son:<variablelist>
+          <varlistentry>
+            <term>--entity</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Requerido si está en el
+              contexto] [Clase Java] [Autocompletado]</emphasis></para>
+
+              <para xml:lang="es">Entidad sobre la que establecer el sistema de control
+              de concurrencia optimista mediante una suma de comprobación (checksum).</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--fieldName</term>
+
+            <listitem>
+              <para xml:lang="es"><emphasis>[Opcional]
+              [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Nombre del campo de la entidad en donde almacenar
+              la suma de comprobación (checksum). Habitualmente este parámetro no necesita
+              ser establecido. Si no se especifica, tomará por convención el nombre
+              <emphasis>occChekcsum</emphasis> para dicha propiedad.
+              </para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--digestMethod</term>
+
+            <listitem>
+              <para><emphasis>[Opcional] [Cadena]</emphasis></para>
+
+              <para xml:lang="es">Método a utilizar en el cálculo de la suma de comprobación (checksum).
+              Habitualmente este parámetro no necesita ser establecido.
+              Los posibles valores vienen definidos por los algoritmos aceptados por 
+              <link xlink:href="http://docs.oracle.com/javase/1.5.0/docs/api/java/security/MessageDigest.html">
+              MessageDigest.getInstance(String algorithm)</link>. Por defecto, se utilizará
+              el algoritmo <emphasis>md5</emphasis>, pero pueden utilizarse otros como por
+              ejemplo <emphasis>sha</emphasis>.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+    </section>
+
+    <section xml:id="apendice-comandos_addon-persistence_occchecksum_occ-checksum-all">
+      <title xml:lang="es">occ checksum all</title>
+
+      <para xml:lang="es">Estable un control de concurrencia optimista
+      mediante una suma de comprobación (checksum) en todas las
+      entidades de la aplicación que no la tuviesen todavía establecida.
+      Cualquier modificación una vez establecido el control
+      deberá realizarse sobre la anotación relacionada
+      <emphasis>@GvNIXEntityOCCChecksum</emphasis>
+      que se habrá incluido en todas las clases Java de entidad.</para>
+
+      <para xml:lang="es">Sus parámetros son:<variablelist>
+          <varlistentry>
+            <term>--fieldName</term>
+
+            <listitem>
+              <para><emphasis>[Opcional] [Cadena]</emphasis></para>
+
+              <para>Nombre del campo en cada entidad en donde almacenar
+              la suma de comprobación (checksum). Habitualmente este parámetro no necesita
+              ser establecido. Si no se especifica, tomará por convención el nombre
+              <emphasis>occChekcsum</emphasis> para dicha propiedad.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>--digestMethod</term>
+
+            <listitem>
+              <para><emphasis>[Opcional] [Cadena]</emphasis></para>
+
+              <para>Método a utilizar en el cálculo de la suma de comprobación (checksum).
+              Habitualmente este parámetro no necesita ser establecido.
+              Los posibles valores vienen definidos por los algoritmos aceptados por 
+              <link xlink:href="http://docs.oracle.com/javase/1.5.0/docs/api/java/security/MessageDigest.html">
+              MessageDigest.getInstance(String algorithm)</link>. Por defecto, se utilizará
+              el algoritmo <emphasis>md5</emphasis>, pero pueden utilizarse otros como por
+              ejemplo <emphasis>sha</emphasis>.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+    </section>
+
+</section>
