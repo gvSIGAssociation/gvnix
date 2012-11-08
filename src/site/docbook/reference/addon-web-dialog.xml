@@ -15,104 +15,44 @@
     <title xml:lang="es">Descripción</title>
 
     <para xml:lang="es">Este add-on permite gestionar las excepciones no
-    controladas en el código de la aplicación para mostrar
+    controladas en el código de la aplicación y así mostrar
     mensajes inteligibles al usuario en una ventana modal (pop-up)
-    y en el idioma del usuario sin necesidad de realizar ningún desarrollo
-    en la parte visual.</para>
+    y en el idioma actual de la aplicación sin necesidad de realizar ningún
+    desarrollo en la capa web.</para>
 
-    <para xml:lang="es">El add-on al aplicarse sobre un proyecto configura por defecto
+    <para xml:lang="es">El add-on, al aplicarse sobre un proyecto, por defecto configura
     ciertas excepciones que serán visualizadas de forma amigable al usuario
-    en el caso de no ser gestionadas desde el código de la aplicación. Así mismo, se
+    en el caso de no ser gestionadas directamente desde la aplicación. Así mismo, se
     pueden incluir nuevas excepciones y modificar los textos amigables que se mostrarán
     en lugar de la excepción para cada idioma disponible en la aplicación.</para>
     
     <para xml:lang="es">El add-on también permite mostrar mensajes de
-    usuario sin implementar ningún elemento visual mediante la invocación
+    usuario sin realizar ninguna implementación en la capa web mediante la invocación
     de métodos desde el controlador que son los encargados de mostrar
     dichos mensajes en la pantalla del usuario.</para>
 
     <para xml:lang="es">Los mensajes de excepción y de usuario se
-    muestran en un diálogo o ventana modal. Se permite además la personalización
-    de las ventanas modales de excepción o de mensaje de usuario por
-    si es necesario personalizarlas por algún motivo.</para>
+    muestran en un diálogo o ventana modal. Se permite además la modificación
+    de las ventanas modales de excepción y de mensaje de usuario para
+    que puedan ser personalizadas de acuerdo a los requerimientos
+    que sean necesarios.</para>
   </section>
 
   <section>
     <title>Instalación</title>
 
-    <para>Para aplicar esta característica sobre un proyecto se debe ejecutar el comando
+    <para>Para aplicar esta funcionalidad sobre un proyecto se debe
+    ejecutar en primer lugar el comando
     <link linkend="apendice-comandos_addon-web-dialog">web mvc dialog setup</link>.
-    Al hacerlo se añade soporte para diálogos modales en la aplicación y a los
-    controladores web se les añade la anotación GvNIXModalDialogs sin ningún
-    atributo establecido. Esto hará que se genere un método llamado modalDialog
-    que facilitará al desarrollador la posibilidad de mostrar un diálogo modal
-    en la parte visual directamente desde el código Java del controlador.
-    La signatura de este método es:</para>
-
-    <programlisting>modalDialog(DialogType dialogType, String title, String description,
-    		HttpServletRequest httpServletRequest)</programlisting>
-
-    <para>donde cada uno de los parámetros del método define:</para>
-
-    <variablelist>
-      <varlistentry>
-        <term>dialogType</term>
-
-        <listitem>
-          <para xml:lang="es">es un tipo enumerado que puede tomar
-          como valores: Error, Info, Alert, Suggest. Cada uno define un
-          nivel de severidad en el diálogo y producirá en el aspecto visual
-          del diálogo que aparezca con distinto color e icono.</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term>title</term>
-
-        <listitem>
-          <para xml:lang="es">es el código del recurso i18n que se
-          usará como título del diálogo modal.</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term>description</term>
-
-        <listitem>
-          <para xml:lang="es">es el código del recurso i18n que se
-          usará como descripción del diálogo modal.</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term>httpServletRequest</term>
-
-        <listitem>
-          <para xml:lang="es">este parámetro se usa internamente
-          en el método para obtener la sesión del usuario y así establecer en
-          ella un atributo que será leido por el componente visual message-box.tagx
-          para mostrar el diálogo. Si al invocar el método no se dispone de
-          este parámetro, se puede obtener añadiendo el parámetro
-          <emphasis>HttpServletRequest httpServletRequest</emphasis>
-          a los parámetros del método que contiene la invocación
-          (esta es una característica especial de los métodos
-          que gestionan las URLs en Spring MVC y que permite declarar
-          distintos parámetros de entre algunos dados).</para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-
-    <para xml:lang="es">Al invocar este método desde cualquier lugar
-    del controlador, cuando se visualize la página en el lado
-    cliente aparecerá el mensaje modal solicitado.</para>
-
-    <para>Estos diálogos son útiles para mostrar mensajes al
-    usuario informando de cualquier circunstancía tras una operación
-    determinada.</para>
-
+    Al hacerlo se incluye el soporte para diálogos modales en la aplicación.</para>
+    
+    <para>El componente visual <emphasis>message-box.tagx</emphasis>
+    que instala el add-on es el encargado de mostrar en pantalla un diálogo
+    modal al usuario.</para>
+    
     <para>Al mismo tiempo, la ejecución de este comando configura una serie de
     excepciones que serán mapeadas con sus respectivos diálogos modales y mensajes
-    multi idioma. En las siguiente secciones se verá más detalladamente
+    amigables en múltiples idiomas. En las siguiente secciones se verá más detalladamente
     las excepciones controladas y el uso de los diálogos modales.</para>
   </section>
 
@@ -176,7 +116,7 @@
     <emphasis>message-box.tagx</emphasis>.</para>
 
     <section xml:id="addon-web-exception-handler_funcionalidad">
-      <title xml:lang="es">Añadir más excepciones a la gestión</title>
+      <title xml:lang="es">Añadir nuevas excepciones a la gestión</title>
 
       <para xml:lang="es">Pasos a seguir para incluir en la gestión
       automática de excepciones de la aplicación una nueva excepción.</para>
@@ -263,45 +203,57 @@
     </section>
   </section>
 
-  <section>
+  <section xml:id="addon-web-exception-handler_nuevos-dialogos">
     <title>Nuevos diálogos modales</title>
 
-    <para>Mediante el componente visual <emphasis>message-box.tagx</emphasis>
-    que instala el add-on es posible mostrar en pantalla un diálogo
-    modal al usuario desde la clase java del controlador.</para>
+    <para>Estos diálogos son útiles para mostrar mensajes al
+    usuario informando de cualquier circunstancía tras una operación
+    determinada.</para>
 
     <para>Para aplicar esta funcionalidad sobre el proyecto primero se debe haber ejecutado
     el comando <link linkend="apendice-comandos_addon-web-exception-handler_dialog-setup">web
-    mvc dialog setup</link>. Al hacerlo se añade el soporte para diálogos modales
-    en la aplicación y a los controladores web se les añade la anotación
-    GvNIXModalDialogs. La ejecución este comando hace que ya esté disponible un
-    método para mostrar mensajes genéricos tal y como se ha visto anteriormente:</para>
+    mvc dialog setup</link>.</para>
     
-    <programlisting>modalDialog(DialogType dialogType, String title, String description,
-    		HttpServletRequest httpServletRequest)</programlisting>
-
     <para>El comando <link
     linkend="apendice-comandos_addon-web-exception-handler_dialog-add">web mvc
-    dialog add</link> modifica los atributos de la anotación
-    <emphasis>GvNIXModalDialogs</emphasis>, generando un método
-    que toma como nombre el valor del parámetro <emphasis>name</emphasis> proporcionado
-    mediante en el comando y creando una JSPx en <emphasis>WEB-INF/dialogs</emphasis>
-    con el mismo nombre. Este método servirá para mostrar mensajes específico a
-    diferencia del método <emphasis>modalDialog</emphasis> que sirve para mostrar
-    mensajes genéricos. La diferencia principal es que este nuevo método tiene su
-    propia página jspx y permite proporcionar parámetros adicionales a dicha página,
-    cosa que no permite el método <emphasis>modalDialog</emphasis>.</para>
+    dialog add</link> añade la anotación <emphasis>GvNIXModalDialogs</emphasis>
+    en la clase controladora que se le indica.</para>
     
     <programlisting><emphasis role="bold">roo-gvNIX&gt;</emphasis> web mvc dialog add --class ~.web.PetController --name petsdialog</programlisting>
     
-    <para>En el ejemplo anterior se define el diálogo modal petsdialog que
-    podrá ser mostrado desde el controlador PetController. El método que facilita
-    esta función en el controlador tiene la siguiente signatura:</para>
-
+    <para>La anotación generará dos métodos asociados con el controlador.
+    Un método con el nombre <emphasis>modalDialog</emphasis> y otro que tomará
+    como nombre el valor del parámetro <emphasis>name</emphasis> del
+    comando y una página jspx en <emphasis>WEB-INF/dialogs</emphasis>
+    con también el mismo nombre.</para>
+    
+	<para>El método <emphasis>modalDialog</emphasis>
+    permite al desarrollador mostrar diálogos modales genéricos
+    en la parte visual directamente desde el código Java del controlador.
+    Para ello, el desarrollador proporcionará un título, una descripción y un tipo de mensaje
+    que será mostrado en la página al usuario. La signatura del método es:</para>
+    
+    <programlisting>modalDialog(DialogType dialogType, String title, String description,
+    		HttpServletRequest httpServletRequest)</programlisting>
+    
+    <para>El segundo método servirá para mostrar un mensaje específico.
+    La diferencia principal es que este nuevo método tiene su
+    propia página jspx asociada y además permite proporcionar
+    parámetros adicionales a dicha página,
+    cosa que no permite el método <emphasis>modalDialog</emphasis>.</para>
+    
     <programlisting>petsdialog(DialogType dialogType, String title, String description,
     		HashMap&lt;String, Object&gt; params, HttpServletRequest httpServletRequest)</programlisting>
-
-    <para>donde cada uno de los parámetros del método define:</para>
+    
+    <para>Asociado a este método también se habrá creado en
+    <emphasis>WEB-INF/dialogs</emphasis> una página jspx con el nombre
+    <emphasis>petsdialog.jspx</emphasis> que podrá personalizarse según
+    las necesidades. El Map <emphasis>params</emphasis> será proporcionado
+    a la página y por lo tanto el desarrollador puede insertar valores
+    desde el controlador para utilizarlos en el diálogo.</para>
+    
+    <para>Los parámetros de cada uno de los dos métodos anteriores
+    definen la siguiente información:</para>
 
     <variablelist>
       <varlistentry>
@@ -361,17 +313,6 @@
       </varlistentry>
     </variablelist>
     
-    <para xml:lang="es">Al invocar este método desde cualquier lugar
-    del controlador, cuando se visualize la página en el lado
-    cliente aparecerá el mensaje modal solicitado.</para>
-
-    <para>También con la ejecución del comando del ejemplo se habrá creado en
-    <emphasis>WEB-INF/dialogs</emphasis> una jspx con el nombre
-    <emphasis>petsdialog.jspx</emphasis> que podría personalizarse según
-    las necesidades. El Map <emphasis>params</emphasis> llega hasta esta jspx y por
-    lo tanto el desarrollador puede acceder a él para obtener la información
-    que almacena y utilizar sus valores en el diálogo.</para>
-
     <section>
       <title>Ejemplos de dialogos personalizados</title>
 

@@ -96,7 +96,7 @@
       Este comando sobreescribe los ficheros que existan en el proyecto
       sin comprobar si ya había algún tema establecido previamente.</para>
 
-      <para xml:lang="es">Los parámetros son:<variablelist>
+      <para xml:lang="es">Sus parámetros son:<variablelist>
           <varlistentry>
             <term>--id</term>
 
@@ -108,6 +108,11 @@
             </listitem>
           </varlistentry>
         </variablelist></para>
+        
+        <para xml:lang="es">Es interesante borrar las cookies del navegador
+        antes de recargar la página para ver el tema activo de forma
+        correcta.</para>
+        
     </section>
 
     <section xml:id="apendice-comandos_addon-theme-manager_theme-list">
