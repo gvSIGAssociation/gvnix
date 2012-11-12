@@ -6,74 +6,91 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title xml:lang="es">Comandos del Add-on Web Screen Patterns</title>
+         
+  <title xml:lang="es">Comandos del add-on Web Screen Patterns</title>
 
-  <para xml:lang="es">Para una descripción general ver <link
-  linkend="addon-web-screen-patterns">Add-on Web Screen
+  <para xml:lang="es">Para una descripción detallada de las
+  características del add-on consultar la documentación del
+  <link linkend="addon-web-screen-patterns">add-on Web Screen
   Patterns</link>.</para>
 
   <table>
-    <title xml:lang="es">Comandos Add-on Web Screen Patterns</title>
+    <title xml:lang="es">Comandos del add-on Web Screen Patterns</title>
 
     <tgroup cols="2">
+      <colspec colwidth="145" />
+      <colspec colwidth="300" />
       <thead>
-        <colspec colwidth="150"/>
-
         <row>
-          <entry align="center">Comando</entry>
+          <entry xml:lang="es" align="center">Comando</entry>
 
-          <entry align="center">Descripción</entry>
+          <entry xml:lang="es" align="center">Descripción</entry>
         </row>
       </thead>
 
       <tbody>
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web_mvc_pattern"><emphasis>web mvc
-          pattern master</emphasis></link></entry>
+          linkend="apendice-comandos_addon-web_mvc_relation_pattern">web
+          mvc pattern install</link></entry>
 
-          <entry>Define un patrón de visualización sobre una entidad
-          dada</entry>
+          <entry xml:lang="es">Crea o actualiza en el proyecto los ficheros que
+          utilizarán los patrones de visualización</entry>
+        </row>
+        
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-web_mvc_pattern">web mvc
+          pattern master</link></entry>
+
+          <entry xml:lang="es">Crea un patrón de visualización maestro en el
+          controlador que gestiona una entidad del proyecto</entry>
         </row>
 
         <row>
           <entry><link
-          linkend="apendice-comandos_addon-web_mvc_relation_pattern"><emphasis>web
-          mvc pattern detail</emphasis></link></entry>
+          linkend="apendice-comandos_addon-web_mvc_relation_pattern">web
+          mvc pattern detail</link></entry>
 
-          <entry>Define un patrón de visualización sobre una entidad
-          relacionada con su entidad maestro.</entry>
+          <entry xml:lang="es">Crea un patrón de visualización detalle en el
+          controlador que gestiona una entidad del proyecto dada una de las
+          relaciones de la entidad</entry>
         </row>
 
-        <row>
-          <entry><link
-          linkend="apendice-comandos_addon-web_mvc_relation_pattern"><emphasis>web
-          mvc pattern install</emphasis></link></entry>
-
-          <entry>Instala los componentes usados por los patrones.</entry>
-        </row>
       </tbody>
     </tgroup>
   </table>
 
+  <section xml:id="apendice-comandos_addon-web_mvc_pattern_install">
+    <title>web mvc pattern install</title>
+
+    <para xml:lang="es">Crea o actualiza en el proyecto los ficheros que
+    utilizarán los patrones de visualización. El comando no tiene ningún
+    parámetro obligatorio ni opcional.</para>
+    
+    <para xml:lang="es">Para una descripción detallada de los ficheros
+    que instala este comando en el proyecto consultar la sección de
+    <link linkend="addon-web-screen-patterns">instalación</link>
+    del add-on Web Screen Patterns.</para>
+    
+  </section>
+  
   <section xml:id="apendice-comandos_addon-web_mvc_pattern">
     <title xml:lang="es">web mvc pattern master</title>
 
-    <para xml:lang="es">Define un patron de visualización sobre la entidad
-    expuesta por el Controlador seleccionado.</para>
+    <para xml:lang="es">Crea un patrón de visualización maestro en el
+    controlador que gestiona una entidad del proyecto. El patrón maestro
+    mostrará los registros de la entidad gestionada por este controlador.</para>
 
-    <para xml:lang="es">Los parámetros son:<variablelist>
+    <para xml:lang="es">Sus parámetros son:<variablelist>
         <varlistentry>
           <term>--class</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Ruta canónica a la clase del
-            Controlador] [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Clase Java] [Autocompletado]</emphasis></para>
 
-            <para>Ruta canónica a la clase del Controlador de la entidad sobre
-            la que se quiere definir el patrón de visualización. Admite el uso
-            de ~ para indicar el <emphasis>top level package</emphasis> del
-            proyecto.</para>
+            <para xml:lang="es">Controlador en el cual generar el patrón de visualización
+            maestro.</para>
           </listitem>
         </varlistentry>
 
@@ -81,13 +98,11 @@
           <term>--name</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [cadena del nombre dado al
-            patrón]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
 
-            <para>Nombre para identificar el patrón. No admite espacios.
-            <emphasis role="bold">El nombre elegido sólo se podrá usar una vez
-            en todo el proyecto para evitar colisiones con los patrones
-            definidos en otras entidades.</emphasis></para>
+            <para xml:lang="es">Nombre que identificará de forma única al patrón.
+            No permite espacios. El nombre elegido sólo se podrá utilizar una vez
+            en todo el proyecto para evitar colisiones con otros patrones.</para>
           </listitem>
         </varlistentry>
 
@@ -95,10 +110,9 @@
           <term>--type</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [tipo de patrón a aplicar (tabular ó
-            register)] [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Tipo de patrón] [Autocompletado]</emphasis></para>
 
-            <para>Tipo de patrón a aplicar sobre la entidad.</para>
+            <para xml:lang="es">Tipo de patrón de visualización a aplicar.</para>
           </listitem>
         </varlistentry>
 
@@ -106,10 +120,10 @@
           <term>--testAutomatically</term>
 
           <listitem>
-            <para>[Opcional] ¿ Crear de forma automática los tests funcionales
-            de Selenium para este patrón del controlador ?</para>
+            <para xml:lang="es"><emphasis>[Opcional] [Booleano] [Autocompletado]</emphasis></para>
 
-            <para>Por defecto los tests no se generan.</para>
+            <para xml:lang="es">Crear los tests funcionales de Selenium
+            para este patrón. Por defecto los tests no se generan.</para>
           </listitem>
         </varlistentry>
 
@@ -117,11 +131,11 @@
           <term>--testName</term>
 
           <listitem>
-            <para>[Opcional] Nombre con el que crear el test funcional de
-            Selenium.</para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Por defecto, si no se especifica nombre para el test, el
-            test tendrá el mismo nombre que el patrón.</para>
+            <para xml:lang="es">Nombre con el que crear el test funcional de
+            Selenium. Por defecto, si no se especifica, el test tomará el
+            mismo nombre que el proporcionado para el patrón.</para>
           </listitem>
         </varlistentry>
 
@@ -129,11 +143,12 @@
           <term>--testServerUrl</term>
 
           <listitem>
-            <para>[Opcional] Dirección donde responde la aplicación en la que
-            ejecutar los tests; incluyendo protocolo, servidor, puerto y ruta
-            de la aplicación.</para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Por defecto, toma el valor "http://localhost:8080/".</para>
+            <para xml:lang="es">Dirección donde responde la aplicación donde se
+            ejecutan los tests; incluyendo protocolo, servidor, puerto y ruta
+            a la aplicación. Por defecto, toma el valor 
+            <emphasis>http://localhost:8080/</emphasis>.</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
@@ -142,22 +157,29 @@
   <section xml:id="apendice-comandos_addon-web_mvc_relation_pattern">
     <title>web mvc pattern detail</title>
 
-    <para>Define un patrón de visualización sobre una entidad relacionada con
-    su entidad maestro.</para>
+    <para xml:lang="es">Crea un patrón de visualización detalle en el
+    controlador que gestiona una entidad del proyecto dada una de las
+    relaciones de la entidad. El patrón detalle mostrará los registros
+    de la entidad relacionada que estén asociados con los registros
+    de la entidad maestra. La entidad maestra en la entidad gestionada
+    por este controlador.</para>
+    
+    <para xml:lang="es">Para aplicar un patrón detalle sobre un
+    controlador, es necesario definir previamente un patrón
+    maestro sobre el mismo controlador.</para>
 
-    <para xml:lang="es">Los parámetros son:<variablelist>
+    <para xml:lang="es">Sus parámetros son:
+      <variablelist>
         <varlistentry>
           <term>--class</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Ruta canónica a la clase del
-            Controlador] [autocompletado]</emphasis></para>
+          
+            <para xml:lang="es"><emphasis>[Requerido] [Clase Java] [Autocompletado]</emphasis></para>
 
-            <para>Ruta canónica a la clase del Controlador de la entidad sobre
-            la que se quiere definir el patrón de visualización de la
-            relación. Admite el uso de ~ para indicar el <emphasis>top level
-            package</emphasis> del proyecto. El controlador seleccionado
-            deberá tener apicada la anotación GvNIXPattern</para>
+            <para xml:lang="es">Controlador en el cual generar el patrón de visualización
+            detalle. Es necesario que previamente se haya definido un patrón maestro
+            sobre este mismo controlador.</para>
           </listitem>
         </varlistentry>
 
@@ -165,13 +187,13 @@
           <term>--name</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [cadena del nombre dado al
-            patrón]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
 
-            <para>Nombre para identificar el patrón. No admite espacios.
-            <emphasis role="bold">En este caso el nombre dado debe conicidir
-            con el definido anteriormente mediante el comando <emphasis>web
-            mvc pattern</emphasis>.</emphasis></para>
+            <para xml:lang="es">Nombre de un patrón maestro, previamente definido
+            en el controlador, sobre el que se desea aplicar el patrón detalle.
+            El patrón maestro se debe haber definido previamente mediante el
+            comando <emphasis>web mvc pattern master</emphasis>.</para>
+            
           </listitem>
         </varlistentry>
 
@@ -179,12 +201,14 @@
           <term>--field</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [cadena del nombre del campo sobre el
-            que se desea definir el patrón detalle]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
 
-            <para>Nombre del campo de la entidad maestro. <emphasis
-            role="bold">El campo debe definir una relación 1 a n, por tanto
-            debe estar anotado con @OneToMany.</emphasis></para>
+            <para xml:lang="es">Nombre del campo de la entidad maestra de la que obtener
+            los registros a mostrar en el patrón detalle. Es decir, el nombre de una
+            propiedad de la clase Java de la entidad gestionada por el controlador.
+            El campo debe definir una relación a muchos, es decir, debe estar anotado con 
+            <emphasis>@OneToMany</emphasis> o <emphasis>@ManyToMany</emphasis>.
+            </para>
           </listitem>
         </varlistentry>
 
@@ -192,11 +216,11 @@
           <term>--type</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [tipo de patrón a aplicar (tabular ó
-            register)] [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Tipo de patrón] [Autocompletado]</emphasis></para>
 
-            <para>Tipo de patrón a aplicar sobre la entidad
-            relacionada.</para>
+            <para xml:lang="es">Tipo de patrón de visualización a aplicar
+            en el detalle.</para>
+            
           </listitem>
         </varlistentry>
 
@@ -204,10 +228,10 @@
           <term>--testAutomatically</term>
 
           <listitem>
-            <para>[Opcional] ¿ Crear de forma automática los tests funcionales
-            de Selenium para este patrón del controlador ?</para>
+            <para xml:lang="es"><emphasis>[Opcional] [Booleano] [Autocompletado]</emphasis></para>
 
-            <para>Por defecto los tests no se generan.</para>
+            <para xml:lang="es">Crear los tests funcionales de Selenium
+            para este patrón. Por defecto los tests no se generan.</para>
           </listitem>
         </varlistentry>
 
@@ -215,11 +239,11 @@
           <term>--testName</term>
 
           <listitem>
-            <para>[Opcional] Nombre con el que crear el test funcional de
-            Selenium.</para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Por defecto, si no se especifica nombre para el test, el
-            test tendrá el mismo nombre que el patrón.</para>
+            <para xml:lang="es">Nombre con el que crear el test funcional de
+            Selenium. Por defecto, si no se especifica, el test tomará el
+            mismo nombre que el proporcionado para el patrón.</para>
           </listitem>
         </varlistentry>
 
@@ -227,42 +251,16 @@
           <term>--testServerUrl</term>
 
           <listitem>
-            <para>[Opcional] Dirección donde responde la aplicación en la que
-            ejecutar los tests; incluyendo protocolo, servidor, puerto y ruta
-            de la aplicación.</para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Por defecto, toma el valor "http://localhost:8080/".</para>
+            <para xml:lang="es">Dirección donde responde la aplicación donde se
+            ejecutan los tests; incluyendo protocolo, servidor, puerto y ruta
+            a la aplicación. Por defecto, toma el valor 
+            <emphasis>http://localhost:8080/</emphasis>.</para>
           </listitem>
         </varlistentry>
-      </variablelist></para>
+      </variablelist>
+    </para>
   </section>
 
-  <section>
-    <title>web mvc pattern install</title>
-
-    <para>Fuerza la instalación/actualización de los componentes utilizados
-    por los patrones. Los componentes son:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>TAGx</para>
-      </listitem>
-
-      <listitem>
-        <para>Imágenes</para>
-      </listitem>
-
-      <listitem>
-        <para>Javascript</para>
-      </listitem>
-
-      <listitem>
-        <para>Hojas de estilo CSS</para>
-      </listitem>
-
-      <listitem>
-        <para>Propiedades de i18n de idiomas</para>
-      </listitem>
-    </itemizedlist>
-  </section>
 </section>

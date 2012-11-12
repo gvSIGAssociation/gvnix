@@ -20,8 +20,6 @@
       <colspec colwidth="145" />
       <colspec colwidth="300" />
       <thead>
-        <colspec colwidth="150" />
-
         <row>
           <entry align="center">Comando</entry>
 
@@ -230,7 +228,7 @@
           <term>--hidden</term>
 
           <listitem>
-            <para xml:lang="es">[Requerido] [Booleano] [Autocompletado]</para>
+            <para xml:lang="es"><emphasis>[Requerido] [Booleano] [Autocompletado]</emphasis></para>
 
             <para xml:lang="es">Indica si este elemento del menú debe ocultarse.
             Si se especifica este parámetro sin ningún valor, tomará el

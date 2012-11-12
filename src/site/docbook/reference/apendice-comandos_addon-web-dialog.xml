@@ -20,8 +20,6 @@
       <colspec colwidth="145" />
       <colspec colwidth="300" />
       <thead>
-        <colspec colwidth="200" />
-
         <row>
           <entry align="center">Comando</entry>
 

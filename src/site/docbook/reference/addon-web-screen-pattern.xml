@@ -18,8 +18,8 @@
   <section xml:id="addon-web-relation-styles_descripcion">
     <title xml:lang="es">Descripción</title>
 
-    <para xml:lang="es">Este Add-on permite aplicar patrones de visualización
-    sobre las entidad determinada del proyecto y una o varias de sus relaciones
+    <para xml:lang="es">El add-on permite aplicar patrones de visualización
+    sobre una entidad determinada del proyecto y una o varias de sus relaciones
     con otras entidades. Los patrones actualmente soportados son:</para>
 
     <itemizedlist>
@@ -68,9 +68,103 @@
     en la parte inferior de la pantalla mediante una pestaña por cada
     una de las relaciones.</para>
   </section>
-
+  
   <section xml:id="addon-web-relation-styles_instalacion">
-    <title xml:lang="es">Funcionalidad</title>
+    <title xml:lang="es">Instalación</title>
+    
+  	<para xml:lang="es">El add-on ofrece el comando <link
+    linkend="apendice-comandos_addon-web_mvc_pattern_install">
+    web mvc pattern install</link> que crea en el proyecto los
+    ficheros que utilizarán los patrones de visualización.</para>
+    
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">Nuevas librerías de tags e inclusión de nuevos tags en librerías existentes</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Imágenes utilizadas para mostrar distintos controles y mensajes</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Librerías javascript para realizar ciertas acciones en el lado cliente</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Hojas de estilo css con la definición de los estilos visuales</para>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Propiedades para el soporte de múltiples idiomas</para>
+      </listitem>
+    </itemizedlist>
+    
+	<para xml:lang="es">Si los ficheros ya se encontraban instalados en el
+	proyecto, el comando los actualizará en el caso de existir una nueva
+    versión de dichos ficheros.</para>
+    
+  	<para xml:lang="es">La ejecución del comando realizará las siguientes
+  	modificaciones en el proyecto.</para>
+    
+	<programlisting>roo-gvNIX> <command>web mvc pattern install</command>
+	Created SRC_MAIN_WEBAPP/images/pattern
+	Created SRC_MAIN_WEBAPP/images/pattern/enEdicion.gif
+	Created SRC_MAIN_WEBAPP/images/pattern/pedi_off.gif
+	Created SRC_MAIN_WEBAPP/images/pattern/pedi_on.gif
+	Created SRC_MAIN_WEBAPP/images/pattern/pfil_off.gif
+	Created SRC_MAIN_WEBAPP/images/pattern/pfil_on.gif
+	Created SRC_MAIN_WEBAPP/images/pattern/plis_off.gif
+	Created SRC_MAIN_WEBAPP/images/pattern/plis_on.gif
+	Created SRC_MAIN_WEBAPP/images/pattern/refresh.gif
+	Created SRC_MAIN_WEBAPP/scripts
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/dialog/message
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields
+	Created SRC_MAIN_WEBAPP/WEB-INF/i18n/messages_ca.properties
+	Updated SRC_MAIN_WEBAPP/WEB-INF/i18n/messages_ca.properties
+	Updated SRC_MAIN_WEBAPP/WEB-INF/i18n/messages_es.properties
+	Updated SRC_MAIN_WEBAPP/WEB-INF/i18n/messages.properties
+	Created SRC_MAIN_WEBAPP/scripts/quicklinks.js
+	Created SRC_MAIN_WEBAPP/styles/pattern.css
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/util/changes-control.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/util/panel-tab.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/util/panel-tabs.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/util/quicklink.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/util/quicklinks.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/util/slider.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/dialog/message/message-box.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/cancelbutton.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/contentpane.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/hiddengvnixpattern.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/paginationadd.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/paginationview.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/relation.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/relations.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/tabcontainer.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/show.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/update.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/updateregister.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/checkbox.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/contentpane.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/datetime.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/input.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/select-withempty.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/select.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/selectFinder.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/selectRelated.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/simple.tagx
+	Created SRC_MAIN_WEBAPP/WEB-INF/tags/pattern/form/fields/textarea.tagx</programlisting>
+  	
+    <para xml:lang="es">Algunos de los componentes que se incluyen en el
+    proyecto no son utilizados automáticamente por los patrones de visualización,
+    sino que serán útiles para modificar el comportamiento de ciertas
+    funcionalidades en la aplicación.</para>
+  	
+  </section>
+
+  <section xml:id="addon-web-relation-styles_creacion">
+    <title xml:lang="es">Creación de un patrón</title>
 
     <para xml:lang="es">El add-on proporciona una serie de anotaciones que
     sirven para definir patrones de visualización sobre el controlador de una
@@ -79,29 +173,28 @@
     facilitar la aplicación de estas anotaciones en las clases Java
     necesarias.</para>
 
-    <para xml:lang="es">Se definirá un patrón de visualización sobre
-    el controlador de una entidad (tabular, tabular con edición registro
-    o registro) entendiéndose como el maestro en el patrón de visualización.
-    Se definirá sobre las relaciones de la entidad del controlador sus propios 
-    patrones de visualización (tabular, tabular con edición registro o registro)
-    entendiéndose como el detalle del patrón.</para>
+    <para xml:lang="es">Al definir un patrón de visualización sobre un
+    controlador, se está definiendo un patrón maestro para la entidad gestionada
+    por dicho controlador. Al definir un patrón de visualización sobre un
+    controlador y una relación, se está definiendo un patrón detalle 
+    para la entidad relacionada.</para>
 
     <para xml:lang="es">Suponiendo el siguiente escenario codificado en Java
     :</para>
 
     <programlisting>@RooJpaActiveRecord
-public class Entidad1 {
-  @OneToMany
-  Set&lt;Entidad2&gt; campo2;
-  @OneToMany
-  Set&lt;Entidad3&gt; campo3;
-  ...
-}
-
-@RooJpaActiveRecord
-public class Entidad2 {
-  ...
-}</programlisting>
+	public class Entidad1 {
+	  @OneToMany
+	  Set&lt;Entidad2&gt; campo2;
+	  @OneToMany
+	  Set&lt;Entidad3&gt; campo3;
+	  ...
+	}
+	
+	@RooJpaActiveRecord
+	public class Entidad2 {
+	  ...
+	}</programlisting>
 
     <para xml:lang="es">El código anterior declara una
     <emphasis>Entidad1</emphasis> que tiene un <emphasis>campo2</emphasis> que
@@ -113,49 +206,66 @@ public class Entidad2 {
     <emphasis>Controlador2</emphasis>.</para>
 
     <programlisting>@RooWebScaffold(..., formBakingObject=Entidad1.class)
-@Controller
-public class Controlador1 {
-  ...
-}
+	@Controller
+	public class Controlador1 {
+	  ...
+	}
+	
+	@RooWebScaffold(..., formBackingObject=Entidad2.class)
+	@Controller
+	public class Controlador2 {
+	  ...
+	}
+	</programlisting>
 
-@RooWebScaffold(..., formBackingObject=Entidad2.class)
-@Controller
-public class Controlador2 {
-  ...
-}
-</programlisting>
+  	<section xml:id="addon-web-relation-styles_creacion-maestro">
+  		<title xml:lang="es">Creación de un patrón maestro</title>
 
-    <para xml:lang="es">Así pues, mediante el commando <emphasis>web mvc
-    pattern</emphasis> es posible definir un patrón de visualización maestro
-    sobre el controlador de cualquier entidad. Al usar el comando,
-    además de añadir la anotación <emphasis>@GvNIXPattern</emphasis> al
-    controlador elegido, se instalarán / crearán / modificarán los componentes
-    Spring MVC necesarios (diferentes archivos tagx, jspx, imágenes, javascript,
-    ...) y se generarán los aspectos Java apropiados para lograr
-    visualizar el patrón elegido.</para>
+	    <para xml:lang="es">Mediante el commando <emphasis>web mvc
+	    pattern</emphasis> es posible definir un patrón de visualización maestro
+	    sobre el controlador de cualquier entidad. Al usar el comando,
+	    además de añadir la anotación <emphasis>@GvNIXPattern</emphasis> al
+	    controlador elegido, se instalarán / crearán / modificarán los componentes
+	    Spring MVC necesarios (diferentes archivos tagx, jspx, imágenes, javascript,
+	    ...) y se generarán los aspectos Java apropiados para lograr
+	    visualizar el patrón elegido.</para>
+	</section>
 
-    <para xml:lang="es">A continuación, el comando <emphasis>web mvc relation
-    pattern</emphasis> permite definir el formato de visualización del detalle
-    de una entidad dado su controlador, esto es, como se visualizarán las entidades
-    relacionadas al visualizar la entidad maestra. Notar que el comando se
-    aplica sobre un campo, una relación, determinada de la entidad maestra (en
-    el ejemplo propuesto, se aplicaría el comando una vez sobre
-    <emphasis>campo2</emphasis> y opcionalmente otra vez sobre
-    <emphasis>campo3</emphasis>). Este comando también instala / crea /
-    modifica componentes Spring MVC, añade la anotación
-    <emphasis>@GvNIXRelationsPattern</emphasis> en el controlador de la
-    entidad maestra y añade la anotación
-    <emphasis>@GvNIXRelatedPattern</emphasis> sobre el controlador de la
-    entidad detalle. Estas anotaciones harán que se genere, en caso
-    necesario, los aspectos Java que hacen posible la visualización
-    del patrón seleccionado.</para>
+  	<section xml:id="addon-web-relation-styles_creacion-detalle">
+  		<title xml:lang="es">Creación de un patrón detalle</title>
+
+	    <para xml:lang="es">El comando <emphasis>web mvc pattern
+	    detail</emphasis> permite definir el formato de visualización del detalle
+	    de una entidad dado su controlador, esto es, como se visualizarán las entidades
+	    relacionadas al visualizar la entidad maestra. Notar que el comando se
+	    aplica sobre un campo, una relación, determinada de la entidad maestra (en
+	    el ejemplo propuesto, se aplicaría el comando una vez sobre
+	    <emphasis>campo2</emphasis> y opcionalmente otra vez sobre
+	    <emphasis>campo3</emphasis>). Este comando también instala / crea /
+	    modifica componentes Spring MVC, añade la anotación
+	    <emphasis>@GvNIXRelationsPattern</emphasis> en el controlador de la
+	    entidad maestra y añade la anotación
+	    <emphasis>@GvNIXRelatedPattern</emphasis> sobre el controlador de la
+	    entidad detalle. Estas anotaciones harán que se genere, en caso
+	    necesario, los aspectos Java que hacen posible la visualización
+	    del patrón seleccionado.</para>
+
+	    <para xml:lang="es">Para aplicar un patrón detalle sobre un
+	    controlador, es necesario definir previamente un patrón
+	    maestro sobre el mismo controlador. Es decir, el controlador
+	    debe tener definida la anotación <emphasis>@GvNIXPattern</emphasis>.
+	    </para>
+	</section>
   </section>
 
   <section>
-    <title>Patrón Tabular y Registro</title>
+    <title>Tipos de patrones</title>
 
     <section>
       <title>Tabular</title>
+      
+      <para>Este patrón se identifica mediante el código
+      <emphasis>tabular</emphasis>.</para>
 
       <para>El patrón tabular define una visualización de varios registros
       simultaneos con la posibilidad de desplazarse a lo largo de todos los
@@ -199,6 +309,9 @@ public class Controlador2 {
 
     <section>
       <title>Registro</title>
+
+      <para>Este patrón se identifica mediante el código
+      <emphasis>register</emphasis>.</para>
 
       <para>Este patrón realiza la visualización de un único registro pero con la
       posibilidad de avanzar, mediante paginación de uno en uno, entre todos

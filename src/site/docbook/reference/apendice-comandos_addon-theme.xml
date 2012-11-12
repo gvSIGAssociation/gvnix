@@ -7,126 +7,124 @@
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
 
+  <title xml:lang="es">Comandos del add-on Theme Manager</title>
+
+  <para xml:lang="es">Para una descripción detallada de las
+  características del add-on consultar la documentación del <link
+  linkend="addon-theme-manager">Add-on Theme Manager</link>.</para>
+
+  <table>
     <title xml:lang="es">Comandos del add-on Theme Manager</title>
 
-    <para xml:lang="es">Para una descripción detallada de las
-    características del add-on consultar la documentación del <link
-    linkend="addon-theme-manager">Add-on Theme Manager</link>.</para>
+    <tgroup cols="2">
+      <colspec colwidth="145" />
+      <colspec colwidth="300" />
+      <thead>
+        <row>
+          <entry align="center">Comando</entry>
 
-    <table>
-      <title xml:lang="es">Comandos del add-on Theme Manager</title>
+          <entry align="center">Descripción</entry>
+        </row>
+      </thead>
 
-      <tgroup cols="2">
-        <colspec colwidth="145" />
-        <colspec colwidth="300" />
-        <thead>
-          <colspec colwidth="150" />
+      <tbody>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-theme-manager_theme-install">theme
+          install</link></entry>
 
-          <row>
-            <entry align="center">Comando</entry>
+          <entry xml:lang="es">Instala un tema en el proyecto de
+          forma que será un candidato para establecerlo como tema
+          visible</entry>
+        </row>
 
-            <entry align="center">Descripción</entry>
-          </row>
-        </thead>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-theme-manager_theme-set">theme
+          set</link></entry>
 
-        <tbody>
-          <row>
-            <entry><link
-            linkend="apendice-comandos_addon-theme-manager_theme-install">theme
-            install</link></entry>
+          <entry xml:lang="es">Establece el tema en la aplicación de
+          forma que será el tema visible a partir de ese momento</entry>
+        </row>
 
-            <entry xml:lang="es">Instala un tema en el proyecto de
-            forma que será un candidato para establecerlo como tema
-            visible</entry>
-          </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-theme-manager_theme-list">theme
+          list</link></entry>
 
-          <row>
-            <entry><link
-            linkend="apendice-comandos_addon-theme-manager_theme-set">theme
-            set</link></entry>
+          <entry xml:lang="es">Lista los temas disponible para instalar,
+          los temas instalados en el proyecto y el tema actualmente
+          establecido que se está visualizando en la aplicación</entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </table>
 
-            <entry xml:lang="es">Establece el tema en la aplicación de
-            forma que será el tema visible a partir de ese momento</entry>
-          </row>
+  <section xml:id="apendice-comandos_addon-theme-manager_theme-install">
+    <title>theme install</title>
 
-          <row>
-            <entry><link
-            linkend="apendice-comandos_addon-theme-manager_theme-list">theme
-            list</link></entry>
+    <para xml:lang="es">Coje un tema que el framework detecte que está
+    disponible y lo copia en el directorio <filename>themes</filename>
+    del proyecto. A partir de ese momento el tema estará disponible
+    para establecerlo como tema visible mediante el comando
+    <link linkend="apendice-comandos_addon-theme-manager_theme-set">
+    theme set</link>.</para>
 
-            <entry xml:lang="es">Lista los temas disponible para instalar,
-            los temas instalados en el proyecto y el tema actualmente
-            establecido que se está visualizando en la aplicación</entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </table>
+    <para xml:lang="es">Sus parámetros son:<variablelist>
+        <varlistentry>
+          <term>--id</term>
 
-    <section xml:id="apendice-comandos_addon-theme-manager_theme-install">
-      <title>theme install</title>
+          <listitem>
+            <para><emphasis>[Requerido] [Tema] [Autocompletado]</emphasis></para>
 
-      <para xml:lang="es">Coje un tema que el framework detecte que está
-      disponible y lo copia en el directorio <filename>themes</filename>
-      del proyecto. A partir de ese momento el tema estará disponible
-      para establecerlo como tema visible mediante el comando
-      <link linkend="apendice-comandos_addon-theme-manager_theme-set">
-      theme set</link>.</para>
+            <para>Identificador del tema a instalar.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+  </section>
 
-      <para xml:lang="es">Sus parámetros son:<variablelist>
-          <varlistentry>
-            <term>--id</term>
+  <section xml:id="apendice-comandos_addon-theme-manager_theme-set">
+    <title xml:lang="es">theme set</title>
 
-            <listitem>
-              <para><emphasis>[Requerido] [Tema] [Autocompletado]</emphasis></para>
+    <para xml:lang="es">Coje un tema que se encuentre instalado
+    en el proyecto y lo establece como visible en la aplicación 
+    actualizando la información del fichero
+    <filename>src/main/webapp/WEB-INF/theme.xml</filename>.
+    Este comando sobreescribe los ficheros que existan en el proyecto
+    sin comprobar si ya había algún tema establecido previamente.</para>
 
-              <para>Identificador del tema a instalar.</para>
-            </listitem>
-          </varlistentry>
-        </variablelist></para>
-    </section>
+    <para xml:lang="es">Sus parámetros son:<variablelist>
+        <varlistentry>
+          <term>--id</term>
 
-    <section xml:id="apendice-comandos_addon-theme-manager_theme-set">
-      <title xml:lang="es">theme set</title>
+          <listitem>
+            <para><emphasis>[Requerido] [Identificador de tema]
+            [Autocompletado]</emphasis></para>
 
-      <para xml:lang="es">Coje un tema que se encuentre instalado
-      en el proyecto y lo establece como visible en la aplicación 
-      actualizando la información del fichero
-      <filename>src/main/webapp/WEB-INF/theme.xml</filename>.
-      Este comando sobreescribe los ficheros que existan en el proyecto
-      sin comprobar si ya había algún tema establecido previamente.</para>
+            <para>Identificador del tema a establecer.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist></para>
+      
+      <para xml:lang="es">Es interesante borrar las cookies del navegador
+      antes de recargar la página para ver el tema activo de forma
+      correcta.</para>
+      
+  </section>
 
-      <para xml:lang="es">Sus parámetros son:<variablelist>
-          <varlistentry>
-            <term>--id</term>
+  <section xml:id="apendice-comandos_addon-theme-manager_theme-list">
+    <title>theme list</title>
 
-            <listitem>
-              <para><emphasis>[Requerido] [Identificador de tema]
-              [Autocompletado]</emphasis></para>
+    <para xml:lang="es">Lista por consola todos los temas
+    <emphasis>disponibles</emphasis>, <emphasis>instalados</emphasis> y el
+    <emphasis>establecido</emphasis>. La salida del comando es similar a la
+    siguiente:</para>
 
-              <para>Identificador del tema a establecer.</para>
-            </listitem>
-          </varlistentry>
-        </variablelist></para>
-        
-        <para xml:lang="es">Es interesante borrar las cookies del navegador
-        antes de recargar la página para ver el tema activo de forma
-        correcta.</para>
-        
-    </section>
-
-    <section xml:id="apendice-comandos_addon-theme-manager_theme-list">
-      <title>theme list</title>
-
-      <para xml:lang="es">Lista por consola todos los temas
-      <emphasis>disponibles</emphasis>, <emphasis>instalados</emphasis> y el
-      <emphasis>establecido</emphasis>. La salida del comando es similar a la
-      siguiente:</para>
-
-      <programlisting>	     ID          Avail  Instal  Active          Description
+    <programlisting>	     ID          Avail  Instal  Active          Description
 	---------------  -----  ------  ------  --------------------------------
 	gvnix             Yes     Yes     Yes   gvNIX example theme
 	cit               Yes     Yes     No    CIT theme for Roo applications
 	blue              Yes     No      No    Blue color theme</programlisting>
-    </section>
+  </section>
 
 </section>
