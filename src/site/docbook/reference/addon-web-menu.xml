@@ -8,32 +8,32 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title>Add-on Web Menu</title>
 
-  <para>Sistema de menú Web de gvNIX</para>
+  <para>Sistema de gestión del menú web</para>
 
   <section xml:id="addon-web-menu_descripcion">
     <title>Descripción</title>
 
     <para xml:lang="es">Este Add-on instala un nuevo sistema de gestión del menú web
     de la aplicación sobre la que se está trabajando para facilitar la organización de
-    su estructura de páginas.</para>
+    su estructura de páginas y grupos.</para>
 
     <para xml:lang="es">Las principales características de este sistema
     son:</para>
 
     <variablelist>
       <varlistentry>
-        <term xml:lang="es">Modelo de menú separado de su formato de visualización.</term>
+        <term xml:lang="es">Modelo de datos del menú separado de su formato de visualización.</term>
 
         <listitem>
-          <para xml:lang="es">El modelo de menú no está ubicado en la misma
-          página que lo visualiza como ocurre por defecto en Spring Roo.
-          Actualmente se define en un archivo XML y en un futuro podrá
-          estar almacenada en base de datos.</para>
+          <para xml:lang="es">El modelo de datos del menú no está ubicado en la misma
+          página que lo visualiza como ocurre en el modelo de menú que se proporciona
+          por defecto. El modelo del menú estará definido en un archivo XML
+          independiente.</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term xml:lang="es">Múltiples niveles de menú</term>
+        <term xml:lang="es">Múltiples niveles en el menú</term>
 
         <listitem>
           <para xml:lang="es">Soporte para crear elementos jerarquizados con
@@ -47,7 +47,7 @@
 
         <listitem>
           <para xml:lang="es">Permite añadir, quitar, mover, actualizar,
-          definir permisos, ocultar, crear enlaces externos, etc. para 
+          definir permisos, ocultar, definir enlaces, etc. para 
           cada uno de los elementos del menú desde la consola del framework.</para>
         </listitem>
       </varlistentry>
@@ -57,8 +57,8 @@
 
         <listitem>
           <para xml:lang="es">Si está instalado el sistema de seguridad,
-          se puede definir que ciertos elementos de menú no sean visibles si el
-          usuario no no está entre los roles permitidos para ello.</para>
+          se puede establecer que ciertos elementos del menú no sean visibles
+          si el usuario no está entre los roles permitidos para ello.</para>
         </listitem>
       </varlistentry>
 
@@ -66,9 +66,13 @@
         <term xml:lang="es">Gestiona las peticiones de Roo</term>
 
         <listitem>
-          <para xml:lang="es">Aunque el sistema de menú de gvNIX es distintos al de Roo,
-          este nuevo sistema también gestiona las peticiones de generación de elementos
-          del menú realizadas por los comandos de Spring Roo.</para>
+          <para xml:lang="es">Aunque el sistema de gestión del menú es distinto al
+          que se proporciona por defecto, este nuevo sistema también gestiona 
+          las peticiones de generación de elementos del menú realizadas
+          por el resto de comandos. Es decir, si se encuentra
+          instalada la nueva gestión del menú y cualquier otro comando solicita
+          crear o actualizar un elemento del menú, la solicitud se realizará
+          correctamente utilizando el nuevo sistema de gestión.</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -77,8 +81,9 @@
   <section>
     <title xml:lang="es">Definiciones</title>
 
-    <para xml:lang="es">Antes de continuar explicando las funcionalidades de
-    la herramienta vamos a dar una lista de definiciones:</para>
+    <para xml:lang="es">Antes de continuar explicando las funcionalidades del
+    add-on es interesante tener clara las siguientes definiciones de los
+    elementos que conforman un menú.</para>
 
     <variablelist>
       <varlistentry>
@@ -86,9 +91,12 @@
 
         <listitem>
           <para xml:lang="es">Representación de una URL. El destino puede ser
-          interno (dentro de la propia aplicación) o externo. <emphasis
-          role="bold">Los destinos internos deben de ser únicos</emphasis>: no
-          pueden existir dos páginas con exáctamente el mismo destino.</para>
+          interno o externo. Los destinos internos apuntan dentro de la propia
+          aplicación mediante una ruta relativa, por ejemplo
+          <emphasis>/entity1s/entity1?id=1</emphasis>.
+          Los enlaces externos apuntan a cualquier dirección web mediante una
+          ruta absoluta, por ejemplo <emphasis>https://www.cit.gva.es</emphasis>.
+          </para>
         </listitem>
       </varlistentry>
 
@@ -98,7 +106,7 @@
         <listitem>
           <para xml:lang="es">Contenedor de páginas. El contenido de un grupo puede ser
           también otros grupos. También puede tener asociado una URL pero con
-          las misma restricciones que la Página.</para>
+          las mismas restricciones que la página.</para>
         </listitem>
       </varlistentry>
 
@@ -106,62 +114,88 @@
         <term xml:lang="es">Menú</term>
 
         <listitem>
-          <para xml:lang="es">Estructura de árbol de páginas y grupos.</para>
+          <para xml:lang="es">Estructura en árbol de páginas y grupos.</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term xml:lang="es">Ítem de menú</term>
+        <term xml:lang="es">Ítem del menú</term>
 
         <listitem>
-          <para xml:lang="es">Un elemento del menú que puede ser una Página o
-          un Grupo.</para>
+          <para xml:lang="es">Un elemento del menú que puede ser una página o
+          un grupo.</para>
         </listitem>
       </varlistentry>
     </variablelist>
   </section>
 
-  <section>
-    <title xml:lang="es">Instalación de la gestión de menús</title>
+  <section xml:id="addon-web-menu_instalacion">
+    <title xml:lang="es">Instalación de la gestión del menú</title>
 
-    <para xml:lang="es">El uso de el sistema de menús aportado por esta
-    herramienta es opcional. Por ello, para ponerlo en marcha es necesario utilizar
-    el comando <command><link
+    <para xml:lang="es">El uso del sistema de gestión del menú aportado por esta
+    herramienta es opcional. Por ello, para instalarlo y activarlo es
+    necesario ejecutar en primer lugar el comando <command><link
     linkend="apendice-comandos_addon-web-menu_page-menu-setup">menu
-    setup</link></command>. Este comando añadirá lo siguiente:</para>
+    setup</link></command>.</para>
+    
+	<programlisting>roo-gvNIX> <command>menu setup</command>
+Component org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperationsImpl disabled
+
+Created SRC_MAIN_WEBAPP/WEB-INF/views/menu.xml
+Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.xml
+Created SRC_MAIN_JAVA/org/gvnix/test/web/menu
+Created SRC_MAIN_JAVA/org/gvnix/test/web/menu/MenuItem.java
+Created SRC_MAIN_JAVA/org/gvnix/test/web/menu/Menu.java
+Created SRC_MAIN_JAVA/org/gvnix/test/web/menu/MenuLoader.java
+Created SRC_MAIN_JAVA/org/gvnix/test/web/menu/ContextMenuStrategy.java
+Created SRC_MAIN_JAVA/org/gvnix/test/web/menu/BaseURLContextMenuStrategy.java
+Created SRC_MAIN_JAVA/org/gvnix/test/web/menu/URLBrothersContextMenuStrategy.java
+Created SRC_MAIN_JAVA/org/gvnix/test/web/menu/URLChildrenContextMenuStrategy.java
+Created SRC_MAIN_WEBAPP/WEB-INF/tags/menu/gvnixmenu.tagx
+Created SRC_MAIN_WEBAPP/WEB-INF/tags/menu/gvnixitem.tagx
+Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx
+Updated ROOT/pom.xml [added property 'gvnix.version' = '1.0.0']</programlisting>
+    
+    <para>Este comando añadirá los siguientes elementos:</para>
 
     <orderedlist>
       <listitem>
-        <para xml:lang="es">Clases para el modelo de datos del menú. Cada una
-        de estas clases están anotadas con una anotación
-        <classname>@GvNIXMenu*</classname> para poder ser
-        identificadas.</para>
+        <para xml:lang="es">Clases que representan el modelo de datos del menú.
+        Cada una de estas clases estarán anotadas con
+        <classname>@GvNIXMenu*</classname> para poder ser identificadas.
+        Estas clases se crearán en el subpaquete
+        <filename>web.menu</filename>.</para>
       </listitem>
 
       <listitem>
         <para xml:lang="es">Una Clase para la carga del menú y hacerlo
-        disponible para su pintado en la vista.</para>
+        disponible para su pintado en la vista. Esta clase se creará
+        en el subpaquete <filename>web.menu</filename>.</para>
       </listitem>
 
       <listitem>
         <para xml:lang="es">Archivo XML para almacenar el modelo de datos del
         menú, rellenado previamente con la información del menú de Roo que existiese
-        en ese momento.</para>
+        en ese momento. Por defecto se creará en
+        <filename>WEB-INF/views/menu.xml</filename>.</para>
       </listitem>
 
       <listitem>
         <para xml:lang="es"><emphasis>Tagx</emphasis> necesarios para el
-        pintado del menú.</para>
+        pintado del menú, almacenados en
+        <filename>WEB-INF/tags/menu</filename>.</para>
       </listitem>
 
       <listitem xml:lang="es">
-        <para>Una nueva página de menú en la que utiliza los
-        <emphasis>tagx</emphasis> de pintado del menú.</para>
+        <para>Una nueva página jspx de la gestión del menú en la que se utilizan
+        los <emphasis>tagx</emphasis> de pintado del menú, creada en
+        <filename>WEB-INF/views/menu.jspx</filename>.</para>
       </listitem>
 
       <listitem>
         <para xml:lang="es">Clases para el uso de los menús
-        contextuales.</para>
+        contextuales. Estas clases se crearán en el subpaquete
+        <filename>web.menu</filename>.</para>
       </listitem>
     </orderedlist>
 
@@ -172,20 +206,37 @@
     linkend="apendice-comandos_addon-web-menu">apéndice de comandos de este
     add-on</link>.</para>
 
-    <para xml:lang="es">El nombre del fichero XML que contiene el modelo es
-    tomado de la constante <constant>MENU_CONFIG_FILE</constant> de la clase
-    anotada como <classname>@GvNIXMenuLoader</classname>.</para>
+    <para xml:lang="es">El nombre del fichero XML que contiene el modelo de datos
+    del menú se toma de la constante <constant>MENU_CONFIG_FILE</constant> de la
+    clase anotada como <classname>@GvNIXMenuLoader</classname>.</para>
   </section>
 
   <section>
     <title xml:lang="es">Modificación del menú.</title>
 
-    <para xml:lang="es">Para hacer cambios en el menú se deben utilizar los comando
+    <para xml:lang="es">Para hacer cambios en el menú se deben utilizar los comandos
     disponibles en la consola, que serán accesibles después de haber
-    instalado la nueva gestión de menú.</para>
+    instalado la nueva gestión del menú.</para>
 
     <para xml:lang="es">Para mas información sobre los comandos ver el <link
     linkend="apendice-comandos_addon-web-menu">apéndice de comandos de este
     add-on</link>.</para>
   </section>
+  
+
+  <section xml:id="addon-web-menu_futuras-versiones">
+    <title xml:lang="es">Futuras versiones</title>
+
+    <para xml:lang="es">Mejoras a incluir en futuras versiones del
+    add-on.</para>
+
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">El modelo de datos del menú actualmente se
+        define en un archivo XML y en un futuro podrá
+        estar almacenada en la base de datos.</para>
+      </listitem>
+    </itemizedlist>
+  </section>
+  
 </chapter>

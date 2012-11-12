@@ -219,7 +219,7 @@
     dialog add</link> añade la anotación <emphasis>GvNIXModalDialogs</emphasis>
     en la clase controladora que se le indica.</para>
     
-    <programlisting><emphasis role="bold">roo-gvNIX&gt;</emphasis> web mvc dialog add --class ~.web.PetController --name petsdialog</programlisting>
+    <programlisting>roo-gvNIX&gt; <command>web mvc dialog add --class ~.web.PetController --name petsdialog</command></programlisting>
     
     <para>La anotación generará dos métodos asociados con el controlador.
     Un método con el nombre <emphasis>modalDialog</emphasis> y otro que tomará

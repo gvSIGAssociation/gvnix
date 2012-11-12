@@ -77,8 +77,7 @@
             <term>--id</term>
 
             <listitem>
-              <para><emphasis>[Requerido] [Identificador de tema]
-              [Autocompletado]</emphasis></para>
+              <para><emphasis>[Requerido] [Tema] [Autocompletado]</emphasis></para>
 
               <para>Identificador del tema a instalar.</para>
             </listitem>

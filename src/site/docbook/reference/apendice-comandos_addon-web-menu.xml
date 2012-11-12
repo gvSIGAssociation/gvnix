@@ -6,15 +6,19 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title xml:lang="es">Comandos del Add-on Web Menu</title>
+         
+  <title xml:lang="es">Comandos del add-on Web Menu</title>
 
-  <para xml:lang="es">Para una descripción general ver <link
-  linkend="addon-web-menu">Add-on Web Menu</link>.</para>
+  <para xml:lang="es">Para una descripción detallada de las
+  características del add-on consultar la documentación del
+  <link linkend="addon-web-menu">add-on Web Menu</link>.</para>
 
   <table>
-    <title xml:lang="es">Comandos de Add-on Web Menu</title>
+    <title xml:lang="es">Comandos del add-on Web Menu</title>
 
     <tgroup cols="2">
+      <colspec colwidth="145" />
+      <colspec colwidth="300" />
       <thead>
         <colspec colwidth="150" />
 
@@ -31,7 +35,8 @@
           linkend="apendice-comandos_addon-web-menu_page-menu-setup">menu
           setup</link></entry>
 
-          <entry>Instala el sistema de menú de gvNIX en la aplicación</entry>
+          <entry xml:lang="es">Instala el sistema de gestión del menú web que permite
+          organizar de forma sencilla su estructura de páginas y permisos</entry>
         </row>
 
         <row>
@@ -39,7 +44,7 @@
           linkend="apendice-comandos_addon-web-menu_page-add">menu entry
           add</link></entry>
 
-          <entry>Añade una página</entry>
+          <entry xml:lang="es">Añade un elemento al menú, sea una página o un grupo</entry>
         </row>
 
         <row>
@@ -47,7 +52,7 @@
           linkend="apendice-comandos_addon-web-menu_page-hide">menu entry
           visibility</link></entry>
 
-          <entry>Oculta/Muestra una página</entry>
+          <entry xml:lang="es">Define un elemento del menú como visible o oculto</entry>
         </row>
 
         <row>
@@ -55,8 +60,8 @@
           linkend="apendice-comandos_addon-web-menu_page-show">menu entry
           roles</link></entry>
 
-          <entry>Establece los roles de los usuarios que pueden visulizar esta
-          entrada</entry>
+          <entry xml:lang="es">Establece una lista de perfiles de usuario
+          para los que se mostrará una entrada del menú</entry>
         </row>
 
         <row>
@@ -64,7 +69,8 @@
           linkend="apendice-comandos_addon-web-menu_page-move">menu entry
           move</link></entry>
 
-          <entry>Cambia la posición de una página</entry>
+          <entry xml:lang="es">Mueve un elemento del menú y todos los hijos
+          que pueda tener</entry>
         </row>
 
         <row>
@@ -72,7 +78,7 @@
           linkend="apendice-comandos_addon-web-menu_page-update">menu entry
           update</link></entry>
 
-          <entry>Cambia los valore de una página</entry>
+          <entry xml:lang="es">Actualiza un elemento del menú</entry>
         </row>
 
         <row>
@@ -80,7 +86,8 @@
           linkend="apendice-comandos_addon-web-menu_page-info">menu entry
           info</link></entry>
 
-          <entry>Muestra información de una página por la consola</entry>
+          <entry xml:lang="es">Muestra por consola los valores establecidos
+          en un elemento del menú y en todos los hijos que pueda tener</entry>
         </row>
 
         <row>
@@ -88,7 +95,8 @@
           linkend="apendice-comandos_addon-web-menu_page-list">menu
           tree</link></entry>
 
-          <entry>Lista las páginas actuales por la consola</entry>
+          <entry xml:lang="es">Muestra por consola un árbol con un resumen de los
+          elementos del menú.</entry>
         </row>
       </tbody>
     </tgroup>
@@ -97,32 +105,46 @@
   <section xml:id="apendice-comandos_addon-web-menu_page-menu-setup">
     <title>menu setup</title>
 
-    <para xml:lang="es">Instala el sistema de menú de gvNIX en la aplicación
-    actual.</para>
+    <para xml:lang="es">Instala y activa en la aplicación el sistema de
+    gestión del menú web para la organización de su estructura de
+    páginas y la definición de permisos. A partir de este momento se
+    podrán utilizar todos los comandos de gestión
+    del menú para modificar su modelo de datos y definir
+    permisos de visualización sobre las distintas opciones del menú en función
+    del perfil de cada usuario. El modelo de datos se encuentra definido en
+    el fichero <filename>src/main/webapp/WEB-INF/views/menu.xml</filename>.
+    </para>
+    
+    <para xml:lang="es">Para una descripción detallada de las tareas que
+    realiza este comando consultar la documentación de
+    <link linkend="addon-web-menu_instalacion">
+    instalación de la gestión del menú</link>.</para>
+
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-add">
     <title>menu entry add</title>
 
-    <para xml:lang="es">Añade una página. Esta opción <emphasis
-    role="bold">sólo crea el elemento de menú</emphasis> asociado. Con este
-    comando se pueden añadir página que puedan ser grupos de páginas.</para>
-
-    <para xml:lang="es"><emphasis role="bold">No permite</emphasis> añadir
-    páginas con <emphasis role="bold">destinos internos duplicados</emphasis>.
-    para mas información ver <link linkend="addon-web-menu">Add-on Web
-    Menu</link>.</para>
-
-    <para xml:lang="es">Los parámetros son:<variablelist>
+    <para xml:lang="es">Añade un elemento al menú, sea una página o un grupo.  
+    La diferencia entre ambos es que una página tiene asociada una URL y un
+    grupo no. Este comando crea un elemento del menú, pero no crea una
+    nueva vista en el proyecto. La creación de una vista puede realizarse
+    con el comando <link xlink:href=
+    "http://static.springsource.org/spring-roo/reference/html-single/index.html#command-index-web-mvc-view">
+    web mvc view</link>.</para>
+    
+    <para xml:lang="es">Sus parámetros son:<variablelist>
         <varlistentry>
           <term>--category</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [Valor por defecto: "/"] [Identificador
-            al elemento del menú] [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Elemento del menú] [Autocompletado]</emphasis></para>
 
-            <para>Identificador del grupo del menú donde queremos incluir la
-            nueva entrada. Por defecto es la <emphasis>raíz</emphasis>.</para>
+            <para xml:lang="es">Identificador del elemento del menú donde incluir la nueva
+            entrada. El elemento del menú puede ser una página o un grupo.
+            Si no se especifica este parámetro la nueva entrada se
+            incluirá en el grupo <emphasis>Page</emphasis> que si no existe
+            será creado al final del menú.</para>
           </listitem>
         </varlistentry>
 
@@ -130,11 +152,9 @@
           <term>--url</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [cadena URL del
-            enlace]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>URL de la página a la que da acceso la entrada del
-            menú.</para>
+            <para xml:lang="es">URL con la que enlazará el elemento del menú.</para>
           </listitem>
         </varlistentry>
 
@@ -142,12 +162,13 @@
           <term>--label</term>
 
           <listitem>
-            <para><emphasis>[Requerido si no se especifica <emphasis
-            role="bold">messageCode</emphasis>]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
 
-            <para>Cadena a mostrar en el elemento de menú. Valor que toma la
-            propiedad <emphasis>"Label Code"</emphasis> en el archivo
-            i18n.</para>
+            <para xml:lang="es">Título para el elemento del menú. Se creará una etiqueta
+            con este título en el fichero
+            <filename>src/main/webapp/WEB-INF/i18n/application.properties
+            </filename>. Este título será ignorado si se define el
+            parámetro <emphasis>messageCode</emphasis>.</para>
           </listitem>
         </varlistentry>
 
@@ -155,14 +176,14 @@
           <term>--messageCode</term>
 
           <listitem>
-            <para><emphasis>[Requerido si no se especifica <emphasis
-            role="bold">label</emphasis>]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Identificado del la cadena a mostrar en el elemento de menú.
-            El identificador debe estar declarado en los ficheros de
-            internacionalización de la aplicación. Toma preferencia sobre el
-            atributo <emphasis>--label</emphasis> (si está definido, se
-            muestra este el valor de este propiedad).</para>
+            <para xml:lang="es">Etiqueta que representará la traducción en múltiples
+            idiomas del título del elemento del menú. Si todavía no existe, se
+            deberá crear dicha etiqueta en cada fichero de idioma
+            que exista configurado en el proyecto en 
+            <filename>src/main/webapp/WEB-INF/i18n/messages_xx.properties
+            </filename>.</para>
           </listitem>
         </varlistentry>
 
@@ -170,30 +191,38 @@
           <term>--roles</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [cadena con lista de roles separado por
-            comas]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Lista de roles a los que se permite ver la opción. Si no se
-            establece se muestra siempre.</para>
+            <para xml:lang="es">Lista de perfiles con permiso para ver el elemento del menú.
+            Los distintos elementos de la lista de perfiles deben estar separados por comas.
+            Si no se establece este parámetro, el elemento del menú 
+            aparecerá para todos los perfiles.</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
+      
+      <para xml:lang="es">Al finalizar la ejecución de este comando se informará del
+      identificador del nuevo elemento del menú añadido con un texto similar
+      al siguiente.</para>
+      
+      <programlisting>New page 'i_page_xxxx_xxxx' added.</programlisting>
+      
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-hide">
     <title xml:lang="es">menu entry visibility</title>
 
-    <para xml:lang="es">Cambia la visibilidad del elemento.</para>
+    <para xml:lang="es">Cambia la visibilidad de un elemento del menú, es decir,
+    permite definirlo como visible o oculto.</para>
 
-    <para xml:lang="es">Los parámetros son:<variablelist>
+    <para xml:lang="es">Sus parámetros son:<variablelist>
         <varlistentry>
           <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Identificador del elemento del menú]
-            [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Elemento del menú] [Autocompletado]</emphasis></para>
 
-            <para>Identificador de la página a cambiar la visibilidad.</para>
+            <para xml:lang="es">Identificador del elemento del menú, sea página o grupo.</para>
           </listitem>
         </varlistentry>
 
@@ -201,11 +230,13 @@
           <term>--hidden</term>
 
           <listitem>
-            <para>[Requerido][true/false]</para>
+            <para xml:lang="es">[Requerido] [Booleano] [Autocompletado]</para>
 
-            <para>Si se especifica su valor por defecto es true (oculta la
-            entrada del menú), si no se especifica el valor por defecto es
-            false (muestra la entrada en el menú).</para>
+            <para xml:lang="es">Indica si este elemento del menú debe ocultarse.
+            Si se especifica este parámetro sin ningún valor, tomará el
+            valor <emphasis>true</emphasis> y ocultará el elemento del menú.
+            Si no se especifica este parámetro, tomará el valor
+            <emphasis>false</emphasis> y mostrará el elemento del menú.</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
@@ -214,18 +245,18 @@
   <section xml:id="apendice-comandos_addon-web-menu_page-show">
     <title xml:lang="es">menu entry roles</title>
 
-    <para xml:lang="es">Establece los roles de los usuarios que pueden
-    visulizar esta entrada.</para>
+    <para xml:lang="es">Establece una lista de perfiles de usuario
+    para los que se mostrará una entrada del menú. No se mostrará
+    a los usuarios que no tengan algún perfil de la lista.</para>
 
-    <para xml:lang="es">Los parámetros son:<variablelist>
+    <para xml:lang="es">Sus parámetros son:<variablelist>
         <varlistentry>
           <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido][Identificador del elemento del menú]
-            [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Elemento del menú] [Autocompletado]</emphasis></para>
 
-            <para>Identificador de la página a cambiar la visibilidad.</para>
+            <para xml:lang="es">Identificador del elemento del menú, sea página o grupo.</para>
           </listitem>
         </varlistentry>
 
@@ -233,30 +264,31 @@
           <term>--roles</term>
 
           <listitem>
-            <para>[Requerido][Lista de roles]</para>
+            <para xml:lang="es">[Requerido] [Cadena]</para>
 
-            <para>Lista (separados por comas sin espacios) de roles de
-            usuarios que pueden ver esta entrada dle menú.</para>
+            <para xml:lang="es">Lista de perfiles con permiso para ver el elemento del menú.
+            Los distintos elementos de la lista de perfiles deben estar separados por comas.
+            </para>
           </listitem>
         </varlistentry>
       </variablelist></para>
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-move">
-    <title xml:lang="es">menu entry move</title>
+    <title>menu entry move</title>
 
-    <para xml:lang="es">Mueve una página, incluidos sus hijos si los tuviese,
-    dentro o antes de otra página.</para>
+    <para xml:lang="es">Mueve un elemento del menú y todos los hijos
+    que pueda tener. Se puede cambiar su posición en el orden de elementos
+    del menú o se puede mover dentro de otro elemento del menú.</para>
 
-    <para xml:lang="es">Los parámetros son:<variablelist>
+    <para xml:lang="es">Sus parámetros son:<variablelist>
         <varlistentry>
           <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Identificador del elemento del menú]
-            [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Elemento del menú] [Autocompletado]</emphasis></para>
 
-            <para>Ruta de la página a mover.</para>
+            <para xml:lang="es">Identificador del elemento del menú, sea página o grupo.</para>
           </listitem>
         </varlistentry>
 
@@ -264,11 +296,12 @@
           <term>--into</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [Ruta al elemento del menú]
-            [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Elemento del menú] [Autocompletado]</emphasis></para>
 
-            <para>Ruta del elemento donde añadir la página a mover. La página
-            se insertará en la última posición de los elementos.</para>
+            <para xml:lang="es">Identificador de un elemento del menú donde añadir
+            como hijo el elemento del menú. El elemento se insertará en la última
+            posición de la lista de hijos. Este parámetro no se puede especificar
+            simultaneamente junto al parámetro <emphasis>before</emphasis>.</para>
           </listitem>
         </varlistentry>
 
@@ -276,12 +309,11 @@
           <term>--before</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [Ruta al elemento del menú]
-            [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Elemento del menú] [Autocompletado]</emphasis></para>
 
-            <para>Ruta del elemento de referencia donde insertar la página a
-            mover. La página se insertará antes del elemento
-            especificado.</para>
+            <para xml:lang="es">Identificador de un elemento del menú antes del cual
+            insertar el elemento del menú. Este parámetro no se puede especificar
+            simultaneamente junto al parámetro <emphasis>into</emphasis>.</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
@@ -290,31 +322,29 @@
   <section xml:id="apendice-comandos_addon-web-menu_page-update">
     <title xml:lang="es">menu entry update</title>
 
-    <para xml:lang="es">Actualiza los valores de una página. Para los valores
-    no especificado se mantendrá el valor anterior.</para>
+    <para xml:lang="es">Actualiza un elemento del menú, sea una página o un grupo. 
+    Los valores no especificados en el comando se mantendrán con su valor original.</para>
 
-    <para xml:lang="es">Los parámetros son:<variablelist>
+    <para xml:lang="es">Sus parámetros son:<variablelist>
         <varlistentry>
           <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Valor por defecto: "/"]
-            [Identificador del elemento del menú]
-            [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Elemento del menú] [Autocompletado]</emphasis></para>
 
-            <para>Ruta de la página que se usará como padre de la nueva
-            página. Por defecto es la <emphasis>raíz</emphasis>.</para>
+            <para xml:lang="es">Identificador del elemento del menú, sea página o grupo.</para>
           </listitem>
         </varlistentry>
 
         <varlistentry>
-          <term>--name</term>
+          <term>--nid</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [cadena identificador
-            válido]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Nombre para identificar la página.</para>
+            <para xml:lang="es">Nuevo identificador para el elemento del menú.
+            Por convención, se utiliza el prefijo <emphasis>c_</emphasis> para
+            los grupos e <emphasis>i_</emphasis> para las páginas.</para>
           </listitem>
         </varlistentry>
 
@@ -322,11 +352,13 @@
           <term>--label</term>
 
           <listitem>
-            <para><emphasis>[Opcional]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Cadena a mostrar en el elemento de menú. Valor que toma la
-            propiedad <emphasis>"Label Code"</emphasis> en el archivo
-            i18n.</para>
+            <para xml:lang="es">Título para el elemento del menú. Se actualizará
+            con el nuevo título la etiqueta correspondiente en el fichero
+            <filename>src/main/webapp/WEB-INF/i18n/application.properties
+            </filename>. Este título será ignorado si se define o ya estaba
+            definido el parámetro <emphasis>messageCode</emphasis>.</para>
           </listitem>
         </varlistentry>
 
@@ -334,23 +366,24 @@
           <term>--messageCode</term>
 
           <listitem>
-            <para><emphasis>[Opcional]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Identificado del la cadena a mostrar en el elemento de menú.
-            El identificador debe estar declarado en los ficheros de
-            internacionalización de la aplicación.</para>
+            <para xml:lang="es">Etiqueta que representará la traducción en múltiples
+            idiomas del título del elemento del menú. Si todavía no existe, se
+            deberá crear dicha etiqueta en cada fichero de idioma
+            que exista configurado en el proyecto en 
+            <filename>src/main/webapp/WEB-INF/i18n/messages_xx.properties
+            </filename>.</para>
           </listitem>
         </varlistentry>
 
         <varlistentry>
-          <term>--destination</term>
+          <term>--url</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [URL]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Destino del elemento. Pude ser una ruta dentro de la
-            aplicación (ejemplo <code>/entity1s/entity1?id=1</code>) o externa
-            (ejemplo <code>https://www.cit.gva.es</code>) .</para>
+            <para xml:lang="es">URL con la que enlazará el elemento del menú.</para>
           </listitem>
         </varlistentry>
 
@@ -358,11 +391,24 @@
           <term>--roles</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [cadena con lista de roles separado por
-            comas]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
-            <para>Lista de roles a los que se permite ver la opción. Si no se
-            establece se muestra siempre.</para>
+            <para xml:lang="es">Lista de perfiles con permiso para ver el elemento del menú.
+            Los distintos elementos de la lista de perfiles deben estar separados por comas.</para>
+          </listitem>
+        </varlistentry>
+        
+        <varlistentry>
+          <term>--hidden</term>
+
+          <listitem>
+            <para xml:lang="es">[Requerido] [Booleano] [Autocompletado]</para>
+
+            <para xml:lang="es">Indica si este elemento del menú debe ocultarse.
+            Si se especifica este parámetro sin ningún valor, tomará el
+            valor <emphasis>true</emphasis> y ocultará el elemento del menú.
+            Si no se especifica este parámetro, tomará el valor
+            <emphasis>false</emphasis> y mostrará el elemento del menú.</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
@@ -371,18 +417,18 @@
   <section xml:id="apendice-comandos_addon-web-menu_page-info">
     <title xml:lang="es">menu entry info</title>
 
-    <para xml:lang="es">Muestra por consola la información de una página
-    formateada.</para>
+    <para xml:lang="es">Muestra por consola los valores establecidos 
+    en un elemento del menú y en todos los hijos que pueda tener,
+    formateados de forma amigable para su fácil lectura.</para>
 
-    <para xml:lang="es">Los parámetros son:<variablelist>
+    <para xml:lang="es">Sus parámetros son:<variablelist>
         <varlistentry>
           <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Requerido] [Identificador del elemento del menú]
-            [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Elemento del menú] [Autocompletado]</emphasis></para>
 
-            <para>Ruta de la página.</para>
+            <para xml:lang="es">Identificador del elemento del menú, sea página o grupo.</para>
           </listitem>
         </varlistentry>
 
@@ -390,15 +436,17 @@
           <term>--lang</term>
 
           <listitem>
-            <para>[Opcional] [Identificador de idioma]</para>
+            <para xml:lang="es">[Opcional] [Idioma]</para>
 
-            <para>Muestra los mensajes en el idioma solicitado.</para>
+            <para xml:lang="es">Idioma en el que mostrar los valores de las
+            distintas etiquetas definidas para cada elemento del menú.</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
 
-    <para>Estos son ejemplos que muestran la salida del
-    comando:<programlisting>[c_person]
+    <para xml:lang="es">El comando mostrará un resultado similar al siguiente:
+	<programlisting><command>roo-gvNIX> menu entry info --id c_person</command>
+[c_person]
 URL          : No
 Label Code   : menu_category_person_label
 Label        : Person
@@ -423,34 +471,62 @@ Children     :
                Message Code : global_menu_list
                Message      : List all {0}
                Roles        : 
-               Hidden       : false</programlisting></para>
+               Hidden       : false</programlisting>
+	</para>
   </section>
 
   <section xml:id="apendice-comandos_addon-web-menu_page-list">
     <title xml:lang="es">menu tree</title>
 
-    <para xml:lang="es">Muestra por consola una lista con las páginas
-    registradas a partir de un elemento del menú.</para>
+    <para xml:lang="es">Muestra por consola un árbol con un resumen de los
+    elementos del menú, opcionalmente a partir de un determinado elemento del
+    menú.</para>
 
-    <para xml:lang="es">Los parámetros son:<variablelist>
+    <para xml:lang="es">Sus parámetros son:<variablelist>
         <varlistentry>
           <term>--id</term>
 
           <listitem>
-            <para><emphasis>[Opcional] [Valor por defecto "/"] [Identificador
-            del elemento del menú] [autocompletado]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Opcional] [Elemento del menú] [Autocompletado]</emphasis></para>
 
-            <para>Ruta de la página donde empezar el listado. Si no se
-            especifica se muestran todas las página del menú.</para>
+            <para xml:lang="es">Identificador del elemento del menú, sea página o grupo,
+            a partir del cual comenzar a mostrar el árbol resumen.
+            Si no se especifica, se muestran todas las página del menú.</para>
           </listitem>
         </varlistentry>
       </variablelist></para>
 
-    <para>Estos son ejemplos que muestran la salida del
-    comando:<programlisting>roo-gvNIX&gt; <emphasis role="bold">menu tree --id c_owner</emphasis>
+    <para xml:lang="es">El comando mostrará un resultado similar al siguiente:
+<programlisting>roo-gvNIX&gt; <command>menu tree</command>
+[c_pet, visible, no-URL]
+          /pets?form  [i_pet_new, visible]
+          /pets?page=1&amp;size=${empty param.size ? 10 : param.size}  [i_pet_list, visible]
+          /pets?find=ByNameAndWeight&amp;form  [fi_pet_nameandweight, visible]
+          /pets?find=ByOwner&amp;form  [fi_pet_owner, visible]
+          /pets?find=BySendRemindersAndWeightLessThan&amp;form
+          		[fi_pet_sendremindersandweightlessthan, visible]
+          /pets?find=ByTypeAndNameLike&amp;form  [fi_pet_typeandnamelike, visible]
+
 [c_owner, visible, no-URL]
           /owners?form  [i_owner_new, visible]
-          /owners?page=1&amp;size=${empty param.size ? 10 : param.size}  [i_owner_list, visible]
+          /owners?page=1&amp;size=${empty param.size ? 10 : param.size}
+          		[i_owner_list, visible]
+
+[c_visit, visible, no-URL]
+          /visits?form  [i_visit_new, visible]
+          /visits?page=1&amp;size=${empty param.size ? 10 : param.size}
+          		[i_visit_list, visible]
+          /visits?find=ByDescriptionAndVisitDate&amp;form
+          		[fi_visit_descriptionandvisitdate, visible]
+          /visits?find=ByDescriptionLike&amp;form  [fi_visit_descriptionlike, visible]
+          /visits?find=ByVisitDateBetween&amp;form  [fi_visit_visitdatebetween, visible]
+
+[c_vet, visible, no-URL]
+          /vets?form  [i_vet_new, visible]
+          /vets?page=1&amp;size=${empty param.size ? 10 : param.size}  [i_vet_list, visible]
+
+[c_seleniumtests, visible, no-URL]
+          /resources/selenium/test-suite.xhtml  [si_seleniumtests_test, visible]
 </programlisting></para>
   </section>
 </section>

@@ -68,7 +68,7 @@
             <term>--entity</term>
 
             <listitem>
-              <para xml:lang="es"><emphasis>[Requerido si está en el
+              <para xml:lang="es"><emphasis>[Requerido si no está en el
               contexto] [Clase Java] [Autocompletado]</emphasis></para>
 
               <para xml:lang="es">Entidad sobre la que establecer el sistema de control
@@ -80,8 +80,7 @@
             <term>--fieldName</term>
 
             <listitem>
-              <para xml:lang="es"><emphasis>[Opcional]
-              [Cadena]</emphasis></para>
+              <para xml:lang="es"><emphasis>[Opcional] [Cadena]</emphasis></para>
 
               <para xml:lang="es">Nombre del campo de la entidad en donde almacenar
               la suma de comprobación (checksum). Habitualmente este parámetro no necesita
