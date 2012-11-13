@@ -267,8 +267,13 @@ function gvnix_get_value(inputId) {
     }
     else if (input.getAttribute("aria-autocomplete") == "list") {
 	
-		// If select type, get the real value (input value is only for visualization)
+		// If dojo autocomplete list type, get the real value (input value is only for visualization)
     	return inputDijit.get("value");
+    }
+    else if (input.selectedIndex != null) {
+    
+    	// If select, get the real value from selected option value
+    	return input.options[input.selectedIndex].value;
     }
     else {
 	    // Set visible value to hidden input
@@ -281,9 +286,9 @@ function gvnix_get_value(inputId) {
  */
 function gvnix_encode_pk(prefix, mode) {
   var obj = new Object();
-  dojo.query("input[id^=\"_" + prefix + ".\"]").forEach(function(node, index, nodelist){
+  dojo.query("*[id^=\"_" + prefix + ".\"]").forEach(function(node, index, nodelist){
 	if (node.id.substring(node.id.length - mode.length, node.id.length) == mode) {
-	  obj[node.id.substring(prefix.length + 2, node.id.length - 10)] = gvnix_get_value(node.id);;
+	  obj[node.id.substring(prefix.length + 2, node.id.length - 10)] = gvnix_get_value(node.id);
 	}
   });
   var json = dojo.toJson(obj);
