@@ -232,40 +232,58 @@ function gvnix_copy_values(element, compositePkField, mode) {
   var hiddens = dojo.query('input[id^="' + element + '"]');
   hiddens.forEach(function(hidden, index, arr) {
 
-    // Get different representations of visible input type related to hidden type
-    var inputId = "_" + hidden.id;
-    var input = dojo.byId(inputId);
-    var inputDijit = dijit.byId(inputId);
+	// Get field value to submit from dojo visible field and set it on dojo related hidden field value
+	hidden.value = gvnix_get_value("_" + hidden.id);
 
-    if (compositePkField != '' && hidden.name.indexOf("." + compositePkField) != -1) {
-    	encodePk2(hidden.id.substring(0, hidden.id.length - "_id_xxxxxx".length), mode);
-    }
-    else if (input.type == 'checkbox') {
-
-      // If checkbox type, convert possible null value to unchecked value
-      var press = input.getAttribute("aria-pressed");
-      if (press == null) {
-        press = 'off';
-      }
-      hidden.value = press;
-    }
-    else if (input.getAttribute("aria-autocomplete") == "list") {
-
-      // If select type, get the real value (input value is only for visualization)
-      hidden.value = inputDijit.get("value");
-    }
-    else {
-      // Set visible value to hidden input
-      hidden.value = input.value;
-    }
+	// When field is part of a composite primary key, encode them into a unique hidden field for this register 
+	if (compositePkField != '' && hidden.name.indexOf("." + compositePkField) != -1) {
+		gvnix_encode_pk(hidden.id.substring(0, hidden.id.length - "_id_xxxxxx".length), mode);
+	}
   });
 }
 
-function encodePk2(prefix, mode) {
+/*
+ * Get field value related with some field.
+ * 
+ * Obtain field value is different according with dojo field type. 
+ */
+function gvnix_get_value(inputId) {
+
+    // Get different representations of visible input type related to hidden type
+    var input = dojo.byId(inputId);
+    var inputDijit = dijit.byId(inputId);
+    
+    if (input == null) {
+    	return;
+    }
+    else if (input.type == 'checkbox') {
+
+    	// If checkbox type, convert possible null value to unchecked value
+    	var press = input.getAttribute("aria-pressed");
+		if (press == null) {
+			press = 'off';
+    	}
+	    return press;
+    }
+    else if (input.getAttribute("aria-autocomplete") == "list") {
+	
+		// If select type, get the real value (input value is only for visualization)
+    	return inputDijit.get("value");
+    }
+    else {
+	    // Set visible value to hidden input
+    	return input.value;
+    }
+}
+
+/*
+ * Get composite primary key values and encode it in one field.
+ */
+function gvnix_encode_pk(prefix, mode) {
   var obj = new Object();
   dojo.query("input[id^=\"_" + prefix + ".\"]").forEach(function(node, index, nodelist){
 	if (node.id.substring(node.id.length - mode.length, node.id.length) == mode) {
-	  obj[node.id.substring(prefix.length + 2, node.id.length - 10)] = node.value;
+	  obj[node.id.substring(prefix.length + 2, node.id.length - 10)] = gvnix_get_value(node.id);;
 	}
   });
   var json = dojo.toJson(obj);
@@ -281,7 +299,7 @@ function encodePk2(prefix, mode) {
 }
 
 /*
- * Enable update form if any row selected
+ * Enable update form if any row selected.
  */
 function gvnix_edit_ward(element) {
   if ( gvnix_any_selected(element) && !gvNixEditMode ) {
@@ -291,7 +309,7 @@ function gvnix_edit_ward(element) {
 }
 
 /*
- * Enable create form if we're not in edit mode
+ * Enable create form if we're not in edit mode.
  */
 function gvnix_create_ward(element) {
   if ( !gvNixEditMode ) {
@@ -300,10 +318,16 @@ function gvnix_create_ward(element) {
   }
 }
 
+/*
+ * Go to some URL to create item.
+ */
 function gvnix_create_item(url) {
   location.href = url;
 }
 
+/*
+ * Get selected checkbox and reload page with this one identifier value placed in a URL param.
+ */
 function gvnix_edit_item(detailPath, element, urlParams, compositePkField, idField) {
 
   // Before edit, copy each visible field value to it related hidden field
