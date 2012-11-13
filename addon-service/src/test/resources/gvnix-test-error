@@ -73,6 +73,6 @@ remote service export ws --wsdl file:AmazonFPS.wsdl
 
 // [ERROR] Conflicts with existing member
 // Transport: HTTPS, Operations: 1, Bindings: SOAP, Use: Literal, Implementation: MS .NET, Authentication/Authorization: SOAP Headers (SSL available), Primitive Types
-remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy01 --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
-remote service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+#remote service import ws --class org.gvnix.test.service.layer.project.services.ClaseProxy01 --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+#remote service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
 

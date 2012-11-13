@@ -18,7 +18,7 @@ remote service export operation --class org.gvnix.clinic.service.PetService --me
 // Contract-first approach -----
 
 // Create service and entities that satisfies the WSDL contract
-remote service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
+#remote service export ws --wsdl https://ws.xwebservices.com/XWebEmailValidation/XWebEmailValidation.asmx?wsdl
 
 // WSDL at HTTPS with self-signed certificate
 remote service export ws --wsdl https://tds2.tradelinksig.com:443/tds/services/tds_client_xchgSOAP?wsdl
