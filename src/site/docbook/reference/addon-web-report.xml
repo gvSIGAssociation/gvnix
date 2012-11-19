@@ -9,28 +9,30 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Add-on Web Report</title>
 
-  <para xml:lang="es">El add-on añade soporte para la generación de
-  informes con Jasper Reports y genera sobre una entidad informes
-  totalmente funcionales que posteriormente pueden ser personalizados.
-  Los informes son accesibles desde la web mediante un 
+  <para xml:lang="es">El add-on añade soporte para la generación de informes
+  con <emphasis>Jasper Reports</emphasis> y genera informes totalmente
+  funcionales para una entidad que posteriormente pueden ser personalizados.
+  Los informes son accesibles desde la interfaz web mediante un 
   formulario que se crea para tal efecto.</para>
   
-	<para xml:lang="es">En la sección de recetas se puede encontrar
-	información adicional para realizar el <link linkend="recetas-reports">
-	diseño de informes con sub informes</link>.</para>
+  <para xml:lang="es">En la sección de recetas se puede encontrar
+  información adicional para realizar el <link linkend="recetas-reports-subinforme">
+  diseño de informes con sub informes</link>.</para>
 
   <section xml:id="addon-web-report_descripcion">
     <title xml:lang="es">Descripción</title>
 
     <para xml:lang="es">El add-on añade por un lado el soporte necesario para trabajar
     con Jasper Reports y por otro es capaz de generar informes asociados con una
-    cualquier entidad de la aplicación.</para>
+    entidad cualquiera de la aplicación.</para>
 
-    <para xml:lang="es">Un informe de <emphasis
-    role="bold">Jasper Reports</emphasis> se basa en un archivo de diseño del
-    informe (jrxml) que al procesarse, proporcionándole una fuente de datos, genera
+    <para xml:lang="es">Un informe de <emphasis>Jasper Reports</emphasis>
+    se se define principalmente mediante un archivo de diseño de informe (jrxml).
+    El diseño de informe al procesarse junto con una fuente de datos, genera
     un fichero de salida en un formato determinado incluyendo en él la
-    información disponible en la fuente de datos.</para>
+    información existente en la fuente de datos. La fuente de datos puede
+    provenir de distintos orígenes, aunque en este caso siempre será
+    una lista de entidades proporcionada directamente desde la aplicación.</para>
 
     <para xml:lang="es">El archivo de diseño es un documento XML con un
     formato determinado que se puede editar de manera sencilla y gráfica
@@ -48,14 +50,18 @@
     </figure>
   </section>
 
-  <section>
+  <section xml:id="addon-web-report_instalacion">
     <title xml:lang="es">Instalación</title>
 
     <para xml:lang="es">Jasper Reports requiere varias librerías y configuraciones para funcionar,
-    el add-on incluye las dependencias de la librería en el proyecto modificando el pom.xml
+    el add-on incluye en el proyecto las dependencias de la librería modificando el pom.xml
     del mismo e incluye varios ficheros de configuración que se verán a continuación
     con mas detalle.</para>
 
+    <para xml:lang="es">El comando sólo estará disponible si el proyecto utiliza Spring MVC en
+    la capa web. Esto es, el archivo de configuración <emphasis>webmvc-config.xml</emphasis>
+    debe existir en <emphasis>/WEB-INF/spring</emphasis>.</para>
+    
     <para xml:lang="es">Estas operaciones de configuración las realiza el comando del add-on
     <link linkend="apendice-comandos_addon-web-report_setup">web report setup</link>:</para>
 
@@ -79,10 +85,42 @@
 	Created SRC_MAIN_WEBAPP/WEB-INF/classes/jasperreports_extension.properties
 	</programlisting>
 
+    <para xml:lang="es">El comando configura los siguientes archivos:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><emphasis>pom.xml</emphasis>: añade la dependencia JasperReports,
+        la dependencia Apache POI para informes en formato Excel y una
+        dependencia con el propio add-on para así reconocer la anotación
+        <emphasis>@GvNIXReports</emphasis> que se utilizará en el proyecto.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>webmvc-config.xml</emphasis>: añade un bean para
+        configurar el sitema de vistas de informes.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>jasper-views.xml</emphasis>: añade una definición de
+        vistas por informe.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>jasperfonts</emphasis>: directorio que contiene
+        fuentes True Type que usará JasperReports para confeccionar el
+        informe.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis>jasperreports_extension.properties</emphasis>: define
+        el lugar donde se encuentran las fuentes a utilizar.</para>
+      </listitem>
+    </itemizedlist>
+
     <para xml:lang="es">Cada uno de los informes se comporta como una vista más de la aplicación y 
     por tanto el add-on habrá incluido en el fichero de configuración de la capa web
-    <emphasis role="bold">webmvc-config.xml</emphasis> el componente que para 
-    este tipo de peticiones devolverá el nuevo tipo de salida (un informe). Esto se hace
+    <emphasis>webmvc-config.xml</emphasis> un componente que para cada  petición
+    de este tipo devolverá el nuevo tipo de salida (un informe). Esto se logra
     añadiendo un nuevo <emphasis>bean</emphasis>:</para>
 
     <programlisting>&lt;bean id="jasperReportsXmlViewResolver"
@@ -105,69 +143,14 @@
     <emphasis>gvnix_reportfonts.xml</emphasis>. En el archivo
     <emphasis>src/main/webapp/WEB-INF/classes/jasperreports_extension.properties</emphasis>
     se indica a Jasper Reports que utilice estas fuentes a la hora de generar el informe.</para>
-
-    <important>
-      <para xml:lang="es">Las fuentes instaladas automáticamente proporcionan soporte para la inclusión
-      de texto en negrita y cursiva. El desarrollador debe instalar cualquier otro tipo de fuente
-      que se utilice en los informes que diseñe. Para ello, basta con
-      ampliar las definiciones <emphasis>fontFamily</emphasis> realizadas en el archivo
-      <emphasis>gvnix_reportfonts.xml</emphasis> y copiar los archivos de
-      fuente en la carpeta <emphasis>jasperfonts</emphasis>. La inclusión de nuevas
-      fuentes se puede realizar utilizando una utilidad que ofrece iReport.
-      Desde el menú <emphasis>Herramientas &gt; Opciones > Pestaña
-      Fonts</emphasis> se accederá a la siguiente pantalla:</para>
-
-      <figure>
-        <title xml:lang="es">Herramienta de gestión de fuentes de IReport</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata align="center" fileref="images/iReportFonts.png"></imagedata>
-          </imageobject>
-        </mediaobject>
-      </figure>
-
-      <para>Desde esta pantalla, seleccionando una fuente de la lista de
-      fuentes instaladas en iReports y con el botón <emphasis>"Export as
-      extension"</emphasis> se creará un archivo JAR que al descomprimirlo
-      contiene:</para>
-
-      <itemizedlist>
-        <listitem>
-          <para xml:lang="es">Directorio fonts</para>
-
-          <itemizedlist>
-            <listitem>
-              <para xml:lang="es">Archivos de fuentes en formato TTF.</para>
-            </listitem>
-
-            <listitem>
-              <para xml:lang="es">Archivo
-              <emphasis>fontsfamily&lt;IdentificadorAleatorio&gt;.xml</emphasis></para>
-            </listitem>
-          </itemizedlist>
-        </listitem>
-
-        <listitem>
-          <para xml:lang="es">Archivo
-          <emphasis>jasperreports_extension.properties</emphasis></para>
-        </listitem>
-      </itemizedlist>
-
-      <para xml:lang="es">Para instalar esta fuente en la aplicación se deben
-      copiar los ficheros con extensión TTF a 
-      <emphasis>/WEB-INF/classes/jasperfonts</emphasis> y del archivo
-      <emphasis>fontsfamily&lt;IdentificadorAleatorio&gt;.xml</emphasis>
-      adaptar el elemento &lt;fontFamily/&gt; para copiarlo en el archivo del proyecto
-      <emphasis>gvnix_reportfonts.xml</emphasis> (modificando las rutas para
-      que apunten a <emphasis>jasperfonts</emphasis>). El archivo <emphasis>
-      jasperreports_extension.properties</emphasis> se puede ignorar porque
-      ya se encuentra definido en el proyecto en
-      <emphasis>/WEB-INF/classes.</emphasis></para>
-    </important>
+    
+    <para xml:lang="es">Si se desean utilizar fuentes de letra adicionales a parte de
+    las incluidas por defecto por el add-on, deberán ser instaladas de forma manual en el
+    proyecto. Para ello se puede consultar la sección <link linkend="recetas-reports-fuentes">
+    Instalar fuentes de letra para los informes</link> de la sección de recetas.</para>
 
   </section>
-  <section>
+  <section xml:id="addon-web-report_generacion">
     <title xml:lang="es">Generación de un informe</title>
 
     <para xml:lang="es">El add-on realiza la generación automática de informes
@@ -177,7 +160,7 @@
     modificando o bien lo lógica de negocio o bien el estilo visual como se desee.</para>
 
     <para xml:lang="es">La petición de un informe, al tratarse de una vista más de la
-    aplicación, la ha de atender un controlador. No obstante, los informes
+    aplicación, ha de ser atendida por un controlador. No obstante, los informes
     muestran información referente a una entidad del modelo de datos de la
     aplicación, por tanto el controlador debe atender peticiones
     referentes a una determinada entidad. Esto, como se comentó en <link
@@ -191,42 +174,50 @@
     <para xml:lang="es">La generación de un informe se realiza mediante el comando <link
     linkend="apendice-comandos_addon-web-report_add">web report add</link> o
     incluyendo la anotación @GvNIXReports en la clase del controlador.
-    El comando web report add posee tres parámetros:</para>
-
+    Los formatos de fichero en los que se puede generar el informe son:</para>
+        
     <itemizedlist>
+
       <listitem>
-        <para xml:lang="es">controller: referencia a un controlador existente en el proyecto.
-        Como se ha comentado anteriormente, este controlador ha de tener la
-        anotación <emphasis>@RooWebScaffold</emphasis> y su atributo
-        <emphasis>formBackingObject</emphasis> indicará la entidad para la que
-        se generará el informe. Es obligatorio y no tiene valor por defecto.</para>
+		<emphasis>PDF</emphasis>: Portable Document Format.
       </listitem>
 
       <listitem>
-        <para xml:lang="es">reportName: indica el nombre que se le quiere dar al informe. Es
-        un string sin espacios y su valor será transformado a minúsculas.
-        Es obligatorio y no tiene valor por defecto.</para>
+		<emphasis>XLS</emphasis>: Excel.
       </listitem>
-
+      
       <listitem>
-        <para xml:lang="es">format: Su valor puede ser
-        <emphasis>pdf</emphasis> (Portable Document Format),
-        <emphasis>xls</emphasis> (Excel), <emphasis>csv</emphasis> (Comma
-        Separated Values) y/o <emphasis>html</emphasis> (HyperText Markup
-        Language) o varios de ellos separados por comas para permitir la generación del
-        mismo informe en varios formatos. El parámetro es opcional y
-        su valor por defecto es <emphasis>pdf</emphasis>.</para>
+		<emphasis>CSV</emphasis>: Comma Separated Values.
+      </listitem>
+      
+      <listitem>
+		<emphasis>HTML</emphasis>: Hyper Text Markup Language.
       </listitem>
     </itemizedlist>
+    
+	<programlisting>roo-gvNIX> <command>web report add --controller ~.web.EntityController --reportName informe</command>
+	Updated SRC_MAIN_JAVA/org/gvnix/test/web/EntityController.java
+	Created SRC_MAIN_WEBAPP/WEB-INF/reports
+	Created SRC_MAIN_WEBAPP/WEB-INF/reports/entity_informe.jrxml
+	Created SRC_MAIN_JAVA/org/gvnix/test/web/servlet/view/jasperreports
+	Created SRC_MAIN_JAVA/org/gvnix/test/web/servlet/view/jasperreports/
+			CustomJasperReportsMultiFormatView.java
+	Updated SRC_MAIN_WEBAPP/WEB-INF/spring/jasper-views.xml
+	Updated SRC_MAIN_WEBAPP/WEB-INF/i18n/application.properties
+	Created SRC_MAIN_WEBAPP/WEB-INF/views/pets/informe.jspx
+	Updated SRC_MAIN_WEBAPP/WEB-INF/views/pets/views.xml
+	Updated SRC_MAIN_WEBAPP/WEB-INF/i18n/application.properties
+	Created SRC_MAIN_JAVA/org/gvnix/test/web/EntityController_Roo_GvNIXReport.aj
+	Updated SRC_MAIN_WEBAPP/WEB-INF/views/menu.jspx</programlisting>
 
     <para xml:lang="es">El comando incluirá la anotación <emphasis>@GvNIXReports</emphasis>
     en la clase controladora e incluira como atributo un array de cadenas en la que cada
     elemento define un informe y los formatos en los que se podrá generar dicho informe.
     Así pues, la anotación:</para>
 
-    <programlisting>@GvNIXReports({ "myfirstreport|pdf,xls,csv" })</programlisting>
+    <programlisting>@GvNIXReports({ "informe|pdf,xls,csv" })</programlisting>
 
-    <para xml:lang="es">define un informe cuyo nombre es <emphasis>myfirstreport</emphasis>
+    <para xml:lang="es">Define un informe cuyo nombre es <emphasis>informe</emphasis>
     y estará disponible en los formatos pdf, xls y csv.</para>
 
     <para xml:lang="es">Al lanzar el comando <emphasis>web report add</emphasis> o anotar
@@ -248,7 +239,7 @@
       </listitem>
 
       <listitem>
-        <para xml:lang="es">En el archivo <emphasis role="bold">jasper-views.xml</emphasis>
+        <para xml:lang="es">En el archivo <filename>jasper-views.xml</filename>
         añade la definición de una nueva vista que será el nuevo informe
         añadido a la aplicación. Se define para ello un bean cuyo id es
         <emphasis>&lt;fromBackingObject&gt;_&lt;reportname&gt;</emphasis> y
@@ -269,19 +260,19 @@ p:subReportDataKeys-ref="subReportDataKeys" /&gt;</programlisting>
         <para xml:lang="es">Crea un archivo de diseño de informe (jrxml) con 
         carios campos de la clase Entity (siguiendo el ejemplo anterior).
         El archivo se creará en
-        <emphasis role="bold">src/main/webapp/WEB-INF/reports</emphasis> con
-        el nombre <emphasis>entity_informe.jrxml</emphasis>. Este
+        <filename>src/main/webapp/WEB-INF/reports</filename> con
+        el nombre <filename>entity_informe.jrxml</filename>. Este
         archivo se referenciará en el <emphasis>bean</emphasis> del fichero
-        <emphasis>jasper-views.xml</emphasis> desde el atributo
+        <filename>jasper-views.xml</filename> desde el atributo
         <emphasis>p:url</emphasis>.</para>
       </listitem>
 
       <listitem>
-        <para xml:lang="es">Crea un formulario web bajo <emphasis
-        role="bold">src/main/webapp/WEB-INF/views/&lt;entity&gt;
-        </emphasis>con nombre <emphasis>&lt;reportname&gt;.jspx</emphasis>
-        (informe.jspx siguiendo el ejemplo). Y define esta nueva
-        vista en el fichero <emphasis role="bold">views.xml</emphasis>
+        <para xml:lang="es">Crea un formulario web bajo <filename>
+        src/main/webapp/WEB-INF/views/&lt;entity&gt;
+        </filename>con nombre <emphasis>informe.jspx</emphasis>
+        siguiendo con el ejemplo anterior. Y define esta nueva
+        vista en el fichero <filename>views.xml</filename>
         situado en el mismo directorio. Esta página permitirá solicitar
         la generación del informe y por defecto lo hará incluyendo los 10
         primeros registros de la entidad.</para>
@@ -357,13 +348,13 @@ public String EntityController.generateInforme(
 
     <note>
       <para xml:lang="es">El comando web report add puede ejecutarse tantas veces como se
-      desee sobre el mismo controador. Si el nombre del informe a añadir ya
+      desee sobre el mismo controlador. Si el nombre del informe a añadir ya
       existe previamente, se añadirán los formatos especificados
       a los ya definidos. Si el nombre dado al nuevo informe
       definido no existía, se añadirá su definición en la anotación
       <emphasis>@GvNIXReports</emphasis>.</para>
 
-      <programlisting>@GvNIXReports({ "myfirstreport|pdf,xls,csv", "mysecondreport|pdf" })</programlisting>
+      <programlisting>@GvNIXReports({ "informe|pdf,xls,csv", "otroinforme|pdf" })</programlisting>
 	</note>
 	
     <note>
@@ -371,24 +362,24 @@ public String EntityController.generateInforme(
       <emphasis role="bold">no son sensibles</emphasis> a mayúsculas por tanto si
       manualmente se establecen los valores de la anotación como:</para>
 
-      <programlisting>@GvNIXReports({ "myfirstreport|pdf", "myFirstREPORT|xls,csv" })</programlisting>
+      <programlisting>@GvNIXReports({ "informe|pdf", "INFORME|xls,csv" })</programlisting>
 
       <para xml:lang="es">es equivalente a:</para>
 
-      <programlisting>@GvNIXReports({ "myfirstreport|pdf,xls,csv" })</programlisting>
+      <programlisting>@GvNIXReports({ "informe|pdf,xls,csv" })</programlisting>
     </note>
   </section>
 
   <section xml:id="addon-web-report_futuras-versiones">>
     <title xml:lang="es">Futuras versiones</title>
 
-	<itemizedlist xml:lang="es">
+	<itemizedlist>
 	      <listitem>
 		    <para xml:lang="es">Incrementar la funcionalidad del informe generado, 
 		    incluyendo la visualización de las relaciones que pueda tener la entidad sobre
 		    la que se declara el informe. En la sección de recetas se muestra una forma de
 		    mostrar las relaciones de una entidad en el informe mediante el 
-		    <link linkend="recetas-reports">uso de subinformes</link>.</para>
+		    <link linkend="recetas-reports-subinforme">uso de subinformes</link>.</para>
 		 </listitem>
 	</itemizedlist>
   </section>

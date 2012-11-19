@@ -276,8 +276,70 @@ Updated ROOT/pom.xml [
     que se explicado antes, se consigue realizar búsquedas por parámetros opcionales
     sea cual sea el tipo del parámetro.</para>
   </section>
+  
+  <section xml:id="recetas-reports-fuentes">
+    <title xml:lang="es">Instalar fuentes de letra para los informes</title>
 
-  <section xml:id="recetas-reports">
+    <para xml:lang="es">Las fuentes instaladas automáticamente proporcionan soporte para
+    la inclusión de texto en negrita y cursiva. El desarrollador debe instalar cualquier
+    otro tipo de fuente que se utilice en los informes que diseñe. Para ello, basta con
+    ampliar las definiciones <emphasis>fontFamily</emphasis> realizadas en el archivo
+    <emphasis>gvnix_reportfonts.xml</emphasis> y copiar los archivos de
+    fuente en la carpeta <emphasis>jasperfonts</emphasis>. La inclusión de nuevas
+    fuentes se puede realizar utilizando una utilidad que ofrece iReport.
+    Desde el menú <emphasis>Herramientas &gt; Opciones > Pestaña
+    Fonts</emphasis> se accederá a la siguiente pantalla:</para>
+
+    <figure>
+      <title xml:lang="es">Herramienta de gestión de fuentes de IReport</title>
+
+      <mediaobject>
+        <imageobject>
+          <imagedata align="center" fileref="images/iReportFonts.png"></imagedata>
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <para>Desde esta pantalla, seleccionando una fuente de la lista de
+    fuentes instaladas en iReports y con el botón <emphasis>"Export as
+    extension"</emphasis> se creará un archivo JAR que al descomprimirlo
+    contiene:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para xml:lang="es">Directorio fonts</para>
+
+        <itemizedlist>
+          <listitem>
+            <para xml:lang="es">Archivos de fuentes en formato TTF.</para>
+          </listitem>
+
+          <listitem>
+            <para xml:lang="es">Archivo
+            <emphasis>fontsfamily&lt;IdentificadorAleatorio&gt;.xml</emphasis></para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+
+      <listitem>
+        <para xml:lang="es">Archivo
+        <emphasis>jasperreports_extension.properties</emphasis></para>
+      </listitem>
+    </itemizedlist>
+
+    <para xml:lang="es">Para instalar esta fuente en la aplicación se deben
+    copiar los ficheros con extensión TTF a 
+    <emphasis>/WEB-INF/classes/jasperfonts</emphasis> y del archivo
+    <emphasis>fontsfamily&lt;IdentificadorAleatorio&gt;.xml</emphasis>
+    adaptar el elemento &lt;fontFamily/&gt; para copiarlo en el archivo del proyecto
+    <emphasis>gvnix_reportfonts.xml</emphasis> (modificando las rutas para
+    que apunten a <emphasis>jasperfonts</emphasis>). El archivo <emphasis>
+    jasperreports_extension.properties</emphasis> se puede ignorar porque
+    ya se encuentra definido en el proyecto en
+    <emphasis>/WEB-INF/classes.</emphasis></para>
+  </section>
+
+  <section xml:id="recetas-reports-subinforme">
     <title xml:lang="es">Diseño de informes con sub informes</title>
 
     <para xml:lang="es">gvNIX mediante el <link linkend="addon-web-report">Add-on Web

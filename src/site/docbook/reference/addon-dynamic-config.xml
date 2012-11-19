@@ -242,4 +242,26 @@ shell&gt; <emphasis role="bold">mvn clean package -P pro -D database.password=my
 	</figure>
 	
   </section>
+  
+  <section xml:id="addon-dynamic_config_futuras-versiones">
+    <title xml:lang="es">Futuras versiones</title>
+
+	<itemizedlist xml:lang="es">
+	      <listitem>
+		    <para xml:lang="es">Incluir nuevas propiedades a la lista de propiedades
+		    disponibles para las configuraciones. O por contra, permitir cierta libertad
+		    para añadir cualquier propiedad del proyecto como configurable.</para>
+		 </listitem>
+	     <listitem>
+		    <para xml:lang="es">Posibilidad de incluir otro tipo de elementos
+		    en las configuraciones como, por ejemplo, distintas dependencias.</para>
+		 </listitem>
+	     <listitem>
+		    <para xml:lang="es">Definir plantillas de configuración de modo
+		    que establezcan unos valores estándar que se consideren adecuados
+		    para una determinada configuración. Por ejemplo, establecer el
+		    formato de los logs en producción para reducir el consumo de recursos.</para>
+		 </listitem>
+	</itemizedlist>
+  </section>
 </chapter>

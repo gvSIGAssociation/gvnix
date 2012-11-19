@@ -463,7 +463,7 @@ public class BaseController {
         <emphasis>layouts, tags y views</emphasis>.</para>
       </section>
 
-      <section>
+      <section xml:id="guia-desarrollo_web_tiles">
         <title>Motor de plantillas: Tiles</title>
 
         <para>Dentro de <emphasis>views</emphasis> hay varios ficheros jspx y
