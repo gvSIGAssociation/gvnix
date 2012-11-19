@@ -72,57 +72,22 @@ public class EntityBatchMetadata extends
     private final JpaActiveRecordMetadata entityMetadata;
 
     /**
-     * Entity list inner class
-     */
-    private ClassOrInterfaceTypeDetails listInnerClass;
-
-    /**
      * Merge Method name
      */
     private final JavaSymbolName mergeListMethodName = new JavaSymbolName(
             "merge");
 
     /**
-     * Merge list Method definition
-     */
-    private MethodMetadata mergeListMethod;
-
-    /**
      * Persist list method name
      */
-    private final JavaSymbolName persisListtMethodName = new JavaSymbolName(
+    private final JavaSymbolName persistListMethodName = new JavaSymbolName(
             "persist");
-
-    /**
-     * Persist method definition
-     */
-    private MethodMetadata persistListMethod;
 
     /**
      * Remove list method name
      */
     private final JavaSymbolName removeListMethodName = new JavaSymbolName(
             "remove");
-
-    /**
-     * Revome list method definition
-     */
-    private MethodMetadata removeListMethod;
-
-    /**
-     * Parameters types for all methods
-     */
-    private List<AnnotatedJavaType> paramTypesForMethod;
-
-    /**
-     * Parameters names for all methods
-     */
-    private List<JavaSymbolName> paramNamesForMethod;
-
-    /**
-     * Annotation for all methods (@Transactional)
-     */
-    private List<AnnotationMetadataBuilder> annotationsForMethod;
 
     /**
      * Metadata constructor
@@ -157,39 +122,34 @@ public class EntityBatchMetadata extends
      * @return
      */
     public ClassOrInterfaceTypeDetails getListInnerClass() {
-        if (listInnerClass == null) {
-            // Generate inner class name
-            JavaType listInnerClassJavaType = new JavaType(destination
-                    .getSimpleTypeName().concat("List"), 0, DataType.TYPE,
-                    null, null);
+        // Generate inner class name
+        JavaType listInnerClassJavaType = new JavaType(destination
+                .getSimpleTypeName().concat("List"), 0, DataType.TYPE,
+                null, null);
 
-            // Create class builder
-            ClassOrInterfaceTypeDetailsBuilder classBuilder = new ClassOrInterfaceTypeDetailsBuilder(
-                    getId(), Modifier.STATIC | Modifier.PUBLIC,
-                    listInnerClassJavaType, PhysicalTypeCategory.CLASS);
+        // Create class builder
+        ClassOrInterfaceTypeDetailsBuilder classBuilder = new ClassOrInterfaceTypeDetailsBuilder(
+                getId(), Modifier.STATIC | Modifier.PUBLIC,
+                listInnerClassJavaType, PhysicalTypeCategory.CLASS);
 
-            // Add fields
-            FieldMetadata listField = getListInner_field("list", destination)
-                    .build();
-            FieldMetadata selectedField = getListInner_field("selected",
-                    new JavaType("Integer")).build();
-            classBuilder.addField(listField);
-            classBuilder.addField(selectedField);
+        // Add fields
+        FieldMetadata listField = getListInner_field("list", destination)
+                .build();
+        FieldMetadata selectedField = getListInner_field("selected",
+                new JavaType("Integer")).build();
+        classBuilder.addField(listField);
+        classBuilder.addField(selectedField);
 
-            // Adds getter/setter for list field
-            classBuilder.addMethod(getListInner_getter(listField));
-            classBuilder.addMethod(getListInner_setter(listField));
+        // Adds getter/setter for list field
+        classBuilder.addMethod(getListInner_getter(listField));
+        classBuilder.addMethod(getListInner_setter(listField));
 
-            // Adds getter/setter for selected field
-            classBuilder.addMethod(getListInner_getter(selectedField));
-            classBuilder.addMethod(getListInner_setter(selectedField));
+        // Adds getter/setter for selected field
+        classBuilder.addMethod(getListInner_getter(selectedField));
+        classBuilder.addMethod(getListInner_setter(selectedField));
 
-            // Store generated class in a field
-            listInnerClass = classBuilder.build();
-
-        }
-        return listInnerClass;
-
+        // Return generated class
+        return classBuilder.build();
     }
 
     /**
@@ -290,15 +250,11 @@ public class EntityBatchMetadata extends
      * @return
      */
     private List<AnnotatedJavaType> getParamsTypesForMethods() {
-        if (paramTypesForMethod == null) {
-            List<AnnotatedJavaType> list = new ArrayList<AnnotatedJavaType>();
+        List<AnnotatedJavaType> list = new ArrayList<AnnotatedJavaType>();
 
-            list.add(new AnnotatedJavaType(getListInnerClass().getName(),
-                    new ArrayList<AnnotationMetadata>()));
-            paramTypesForMethod = Collections.unmodifiableList(list);
-
-        }
-        return paramTypesForMethod;
+        list.add(new AnnotatedJavaType(getListInnerClass().getName(),
+                new ArrayList<AnnotationMetadata>()));
+        return Collections.unmodifiableList(list);
     }
 
     /**
@@ -307,28 +263,20 @@ public class EntityBatchMetadata extends
      * @return
      */
     private List<JavaSymbolName> getParamsNamesForMethods() {
-        if (paramNamesForMethod == null) {
-            List<JavaSymbolName> list = new ArrayList<JavaSymbolName>();
+        List<JavaSymbolName> list = new ArrayList<JavaSymbolName>();
 
-            list.add(new JavaSymbolName("entities"));
-            paramNamesForMethod = Collections.unmodifiableList(list);
-
-        }
-        return paramNamesForMethod;
+        list.add(new JavaSymbolName("entities"));
+        return Collections.unmodifiableList(list);
     }
 
     private List<AnnotationMetadataBuilder> getAnnotationsForMethods() {
-        if (annotationsForMethod == null) {
-            List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
-                    1);
-            annotations
-                    .add(new AnnotationMetadataBuilder(
-                            new JavaType(
-                                    "org.springframework.transaction.annotation.Transactional")));
-            annotationsForMethod = Collections.unmodifiableList(annotations);
-
-        }
-        return annotationsForMethod;
+        List<AnnotationMetadataBuilder> annotations = new ArrayList<AnnotationMetadataBuilder>(
+                1);
+        annotations
+                .add(new AnnotationMetadataBuilder(
+                        new JavaType(
+                                "org.springframework.transaction.annotation.Transactional")));
+        return Collections.unmodifiableList(annotations);
     }
 
     /**
@@ -352,12 +300,12 @@ public class EntityBatchMetadata extends
 
         // Check if a method with the same signature already exists in the
         // target type
-        MethodMetadata method = methodExists(mergeListMethodName,
-                parameterTypes);
+        MethodMetadata method = methodExists(methodName,
+        		parameterTypes.get(0).getJavaType());
         if (method != null) {
-            // If it already exists, just return the method and omit its
+            // If it already exists, just return null and omit its
             // generation via the ITD
-            return method;
+            return null;
         }
 
         // Define method annotations
@@ -386,7 +334,7 @@ public class EntityBatchMetadata extends
 
         // Use the MethodMetadataBuilder for easy creation of MethodMetadata
         MethodMetadataBuilder methodBuilder = new MethodMetadataBuilder(
-                getId(), Modifier.STATIC, methodName, JavaType.VOID_PRIMITIVE,
+                getId(),  Modifier.PUBLIC | Modifier.STATIC, methodName, JavaType.VOID_PRIMITIVE,
                 parameterTypes, parameterNames, bodyBuilder);
         methodBuilder.setAnnotations(annotations);
         methodBuilder.setThrowsTypes(throwsTypes);
@@ -401,12 +349,8 @@ public class EntityBatchMetadata extends
      * @return
      */
     public MethodMetadata getMergeListMethod() {
-        if (mergeListMethod == null) {
-        	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
-            mergeListMethod = getMethodFor(mergeListMethodName,
-            		annotation.getMergeMethod());
-        }
-        return mergeListMethod;
+    	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
+        return getMethodFor(mergeListMethodName, annotation.getMergeMethod());
     }
 
     /**
@@ -415,12 +359,8 @@ public class EntityBatchMetadata extends
      * @return
      */
     public MethodMetadata getPersistListMethod() {
-        if (persistListMethod == null) {
-        	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
-            persistListMethod = getMethodFor(persisListtMethodName,
-            		annotation.getPersistMethod());
-        }
-        return persistListMethod;
+    	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
+        return getMethodFor(persistListMethodName, annotation.getPersistMethod());
     }
 
     /**
@@ -429,12 +369,8 @@ public class EntityBatchMetadata extends
      * @return
      */
     public MethodMetadata getRemoveListMethod() {
-        if (removeListMethod == null) {
-        	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
-            removeListMethod = getMethodFor(removeListMethodName,
-                    annotation.getRemoveMethod());
-        }
-        return removeListMethod;
+    	JpaCrudAnnotationValues annotation =  new JpaCrudAnnotationValues(entityMetadata);
+        return getMethodFor(removeListMethodName, annotation.getRemoveMethod());
     }
 
     /**
@@ -445,14 +381,15 @@ public class EntityBatchMetadata extends
      * @return
      */
     private MethodMetadata methodExists(JavaSymbolName methodName,
-            List<AnnotatedJavaType> paramTypes) {
+            JavaType paramType) {
         // We have no access to method parameter information, so we scan by name
         // alone and treat any match as authoritative
         // We do not scan the superclass, as the caller is expected to know
         // we'll only scan the current class
         for (MethodMetadata method : governorTypeDetails.getDeclaredMethods()) {
             if (method.getMethodName().equals(methodName)
-                    && method.getParameterTypes().equals(paramTypes)) {
+                    && method.getParameterTypes().get(0).getJavaType().getSimpleTypeName().equals(
+                    		paramType.getSimpleTypeName())) {
                 // Found a method of the expected name; we won't check method
                 // parameters though
                 return method;
