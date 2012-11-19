@@ -388,6 +388,7 @@ public class EntityBatchMetadata extends
         // we'll only scan the current class
         for (MethodMetadata method : governorTypeDetails.getDeclaredMethods()) {
             if (method.getMethodName().equals(methodName)
+            		&& method.getParameterTypes().size() > 0
                     && method.getParameterTypes().get(0).getJavaType().getSimpleTypeName().equals(
                     		paramType.getSimpleTypeName())) {
                 // Found a method of the expected name; we won't check method
