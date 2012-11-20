@@ -6,22 +6,24 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
-  <title xml:lang="es">Comandos del Add-on Web MVC i18n</title>
+         
+  <title xml:lang="es">Comandos del add-on Web MVC i18n</title>
 
-  <para xml:lang="es">Para una descripción general ver <link
-  linkend="addon-web-i18n">Add-on Web MVC i18n</link>.</para>
-
+  <para xml:lang="es">Para una descripción detallada de las características
+  del add-on consultar la documentación del <link linkend="addon-web-i18n">
+  add-on Web MVC i18n</link>.</para>
+  
   <table>
-    <title xml:lang="es">Comandos de Add-on Service</title>
+    <title xml:lang="es">Comandos de add-on Web MVC i18n</title>
 
     <tgroup cols="2">
+      <colspec colwidth="145" />
+      <colspec colwidth="300" />
       <thead>
-        <colspec colwidth="150" />
-
         <row>
-          <entry align="center">Comando</entry>
+          <entry xml:lang="es" align="center">Comando</entry>
 
-          <entry align="center">Descripción</entry>
+          <entry xml:lang="es" align="center">Descripción</entry>
         </row>
       </thead>
 
@@ -31,7 +33,7 @@
           linkend="apendice-comandos_addon-web_i18n_install_language">web mvc
           install language</link></entry>
 
-          <entry>Instala la internacionalización del idioma.</entry>
+          <entry xml:lang="es">Instala el soporte para un nuevo idioma en el proyecto</entry>
         </row>
       </tbody>
     </tgroup>
@@ -40,16 +42,20 @@
   <section xml:id="apendice-comandos_addon-web_i18n_install_language">
     <title>web mvc install language</title>
 
-    <para xml:lang="es">Crea la clase del servicio en
-    SRC_MAIN_JAVA.<variablelist>
+    <para xml:lang="es">Crea un fichero de propiedades con las traducciones
+    de las etiquetas multi idioma del proyecto en el lenguage solicitado y
+    configura en la capa web un acceso para cambiar a dicho idioma.</para>
+    
+    <para xml:lang="es">Sus parámetros son:
+    <variablelist>
         <varlistentry>
           <term>--code</term>
 
           <listitem>
-            <para><emphasis>[Requerido][identificador del
-            idioma]</emphasis></para>
+            <para xml:lang="es"><emphasis>[Requerido] [Idioma] [Autocompletado]</emphasis></para>
 
-            <para>Código del idioma a instalar.</para>
+            <para xml:lang="es">Código del idioma a instalar. Los idiomas
+            disponibles son <emphasis>de, en, es, it, nl y sv.</emphasis></para>
           </listitem>
         </varlistentry>
       </variablelist></para>

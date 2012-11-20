@@ -328,6 +328,7 @@
     la máxima interoperabilidad de la operación del servicio web
     con el exterior.</para>
 
+    <para xml:lang="es">Sus parámetros son:
     <variablelist>
       <varlistentry>
         <term>--class</term>
@@ -449,6 +450,7 @@
       </varlistentry>
 
     </variablelist>
+    </para>
   </section>
 
   <section xml:id="apendice-comandos_addon-service_list_operation">
@@ -458,12 +460,13 @@
     ser ofrecidos como operaciones del servicio web. La clase Java debe haber sido
     previamente definida como accesible a través de un servicio web.</para>
 
+    <para xml:lang="es">Sus parámetros son:
     <variablelist>
       <varlistentry>
         <term>--class</term>
 
         <listitem>
-          <para xml:lang="es"><emphasis>[Requerido] [Clase Java]</emphasis></para>
+          <para xml:lang="es"><emphasis>[Requerido] [Clase Java] [Autocompletado]</emphasis></para>
 
           <para xml:lang="es">Paquete y nombre de la clase Java de la que obtener
           el listado de métodos que podrían ser ofrecidos como operaciones del
@@ -472,6 +475,7 @@
         </listitem>
       </varlistentry>
     </variablelist>
+    </para>
   </section>
 
   <section xml:id="apendice-comandos_addon-service_export_ws">
@@ -489,6 +493,7 @@
     Será responsabilidad del desarrollador el implementar la lógica de
     negocio de cada método.</para>
     
+    <para xml:lang="es">Sus parámetros son:    
     <variablelist>
       <varlistentry>
         <term>--wsdl</term>
@@ -505,6 +510,7 @@
         </listitem>
       </varlistentry>
     </variablelist>
+    </para>
   </section>
 
   <section xml:id="apendice-comandos_addon-service_import_ws">
@@ -521,6 +527,7 @@
     a alguno de estos métodos se estará accediendo a la operación
     correspondiente del sistema externo.</para>
     
+    <para xml:lang="es">Sus parámetros son:
     <variablelist>
       <varlistentry>
         <term>--wsld</term>
@@ -552,6 +559,7 @@
         </listitem>
       </varlistentry>
     </variablelist>
+    </para>
   </section>
 
   <section xml:id="apendice-comandos_addon-service_ws_list">
@@ -572,6 +580,7 @@
     <para xml:lang="es">Añade la configuración necesaria para firmar las
     peticiones que se hacen a un servicio web remoto.</para>
 
+    <para xml:lang="es">Sus parámetros son:
     <variablelist>
       <varlistentry>
         <term>--class</term>
@@ -621,5 +630,6 @@
         </listitem>
       </varlistentry>
     </variablelist>
+    </para>
   </section>
 </section>

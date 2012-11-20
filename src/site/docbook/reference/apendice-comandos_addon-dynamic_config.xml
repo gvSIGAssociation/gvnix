@@ -2,27 +2,28 @@
 <section version="5.0" xml:id="apendice-comandos_addon-dynamic_config"
          xmlns="http://docbook.org/ns/docbook"
          xmlns:xlink="http://www.w3.org/1999/xlink"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:svg="http://www.w3.org/2000/svg"
          xmlns:m="http://www.w3.org/1998/Math/MathML"
          xmlns:html="http://www.w3.org/1999/xhtml"
          xmlns:db="http://docbook.org/ns/docbook">
-  <title>Comandos del Add-on Dynamic Configuration</title>
+         
+  <title>Comandos del add-on Dynamic Configuration</title>
 
-  <para xml:lang="es">Para una descripción general ver <link
-  linkend="addon-dynamic_config">Add-on Dynamic Configuration</link>.</para>
-
+  <para xml:lang="es">Para una descripción detallada de las características
+  del add-on consultar la documentación del <link linkend="addon-dynamic_config">
+  add-on Dynamic Configuration</link>.</para>
+  
   <table>
-    <title xml:lang="es">Comandos del Add-on Dynamic Configuration</title>
+    <title xml:lang="es">Comandos del add-on Dynamic Configuration</title>
 
     <tgroup cols="2">
-      <thead>
-        <colspec colwidth="150" />
-
+      <colspec colwidth="145" />
+      <colspec colwidth="300" />
+       <thead>
         <row>
-          <entry align="center">Comando</entry>
+          <entry xml:lang="es" align="center">Comando</entry>
 
-          <entry align="center">Descripción</entry>
+          <entry xml:lang="es" align="center">Descripción</entry>
         </row>
       </thead>
 
@@ -32,7 +33,7 @@
           linkend="apendice-comandos_addon-dynamic_config-config_save">configuration
           create</link></entry>
 
-          <entry>Define una nueva configuración con un nombre dado</entry>
+          <entry xml:lang="es">Crea una nueva configuración con un determinado nombre</entry>
         </row>
 
         <row>
@@ -40,7 +41,7 @@
           linkend="apendice-comandos_addon-dynamic_config-config_prop_add">configuration
           property add</link></entry>
 
-          <entry>Hace que una propiedad esté disponible para su gestión en
+          <entry xml:lang="es">Hace que una propiedad esté disponible para su gestión en
           todas las configuraciones</entry>
         </row>
 
@@ -49,7 +50,7 @@
           linkend="apendice-comandos_addon-dynamic_config-config_prop_update">configuration
           property value</link></entry>
 
-          <entry>Establece el valor de una propiedad en una
+          <entry xml:lang="es">Establece el valor de una propiedad en una
           configuración</entry>
         </row>
 
@@ -58,7 +59,7 @@
           linkend="apendice-comandos_addon-dynamic_config-config_list">configuration
           list</link></entry>
 
-          <entry>Lista todas las configuraciones creadas juntos con sus
+          <entry xml:lang="es">Lista todas las configuraciones creadas juntos con sus
           propiedades y valores</entry>
         </row>
 
@@ -67,7 +68,7 @@
           linkend="apendice-comandos_addon-dynamic_config-config_export">configuration
           export</link></entry>
 
-          <entry>Escribe todas todas las configuraciones en el proyecto.
+          <entry xml:lang="es">Escribe todas todas las configuraciones en el proyecto.
           Actualmente se escriben en el formato de perfiles de Maven.</entry>
         </row>
 
@@ -76,7 +77,7 @@
           linkend="apendice-comandos_addon-dynamic_config-config_prop_undefined">configuration
           property undefined</link></entry>
 
-          <entry>Deja sin valor una propiedad en la configuración de forma que
+          <entry xml:lang="es">Deja sin valor una propiedad en la configuración de forma que
           se ha de establecer manualmente al ejecutar un objetivo
           Maven.</entry>
         </row>
@@ -87,52 +88,74 @@
   <section xml:id="apendice-comandos_addon-dynamic_config-config_save">
     <title>configuration create</title>
 
-    <para>Define una nueva configuración con un nombre dado.</para>
+    <para xml:lang="es">Crea una nueva configuración con un determinado nombre.</para>
+    
+    <para xml:lang="es">La primera configuración creada quedará marcada
+    como la configuración por defecto de modo que en el caso de empaquetar
+    la aplicación sin elegir ninguna configuración, será esta la que se
+    aplique.</para>
 
-    <para>Los parámetros son:</para>
-
+    <para xml:lang="es">Sus parámetros son:
     <variablelist>
       <varlistentry>
         <term>--name</term>
 
         <listitem>
-          <para>[Requerido] Cadena que quiere usarse como nombre de la nueva
-          configuración.</para>
+          <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
+          
+          <para xml:lang="es">Nombre para la nueva configuración que la
+          referenciará de forma unívoca.</para>
         </listitem>
       </varlistentry>
     </variablelist>
+    </para>
   </section>
 
   <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_add">
     <title>configuration property add</title>
 
-    <para>Hace que una propiedad esté disponible para su gestión en todas las
-    configuraciones.</para>
+    <para xml:lang="es">Añade una propiedad a la gestión de
+    configuraciones de modo que dicha propiedad podrá tener distinto
+    valor para cada configuración.</para>
+    
+    <para xml:lang="es">Al añadir una nueva propiedad, quedará
+    almacenado internamente el valor que tubiese en dicho momento.
+    En todas las configuraciones existentes en ese momento
+    y en aquellas que se creen en un futuro la propiedad tendrá
+    por defecto dicho valor.</para>
 
+    <para xml:lang="es">Sus parámetros son:
     <variablelist>
       <varlistentry>
         <term>--name</term>
 
         <listitem>
-          <para><emphasis>[Requerido] Nombre de la propiedad que se quiere
-          gestionar.</emphasis></para>
+          <para xml:lang="es"><emphasis>[Requerido] [Propiedad] [Autocompletado]</emphasis></para>
+          
+          <para xml:lang="es">Nombre de la propiedad cuyo valor puede
+          tomar distinto valor en cada configuración.</para>
         </listitem>
       </varlistentry>
     </variablelist>
+    </para>
   </section>
 
   <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_update">
     <title>configuration property value</title>
 
-    <para>Establece el valor de una propiedad en una configuración.</para>
+    <para xml:lang="es">Cambia el valor que tiene una propiedad en una determinada
+    configuración.</para>
 
+    <para xml:lang="es">Sus parámetros son:
     <variablelist>
       <varlistentry>
         <term>--configuration</term>
 
         <listitem>
-          <para><emphasis>[Requerido] Nombre de la configuración en la que se
-          quiere establecer el valor de la propiedad.</emphasis></para>
+          <para xml:lang="es"><emphasis>[Requerido] [Configuración] [Autocompletado]</emphasis></para>
+          
+          <para xml:lang="es">Nombre de la configuración cuyo
+          valor para una propiedad se quiere modificar.</para>
         </listitem>
       </varlistentry>
 
@@ -140,8 +163,10 @@
         <term>--property</term>
 
         <listitem>
-          <para><emphasis>[Requerido] Nombre de la propiedad cuyo valor se
-          desea modificar.</emphasis></para>
+          <para xml:lang="es"><emphasis>[Requerido] [Propiedad] [Autocompletado]</emphasis></para>
+          
+          <para xml:lang="es">Nombre de la propiedad cuyo valor se
+          desea modificar.</para>
         </listitem>
       </varlistentry>
 
@@ -149,25 +174,36 @@
         <term>--value</term>
 
         <listitem>
-          <para><emphasis>[Requerido] Valor que quiere darse a la
-          propiedad.</emphasis></para>
+          <para xml:lang="es"><emphasis>[Requerido] [Cadena]</emphasis></para>
+          
+          <para xml:lang="es">Nuevo valor para la propiedad en la configuración.</para>
         </listitem>
       </varlistentry>
     </variablelist>
+    </para>
   </section>
 
   <section xml:id="apendice-comandos_addon-dynamic_config-config_prop_undefined">
     <title>configuration property undefined</title>
 
-    <para>Deja sin valor una propiedad en una configuración.</para>
+    <para xml:lang="es">Deja sin valor una propiedad en una determinada configuración.</para>
+    
+    <para xml:lang="es">Esto es útil para evitar que quede almacenado en el código fuente del
+    proyecto algunos valores críticos como puede ser la clave de conexión con la base de
+    datos de producción. El valor se tendrá que proporcionar al empaquetar
+    la aplicación con Maven como un parámetro mediante el modificador
+    <emphasis>-Dnombre.propiedad=valor</emphasis>.</para>
 
+    <para xml:lang="es">Sus parámetros son:
     <variablelist>
       <varlistentry>
         <term>--configuration</term>
 
         <listitem>
-          <para><emphasis>[Requerido] Nombre de la configuración en la que se
-          quiere dejar sin valor una propiedad.</emphasis></para>
+          <para xml:lang="es"><emphasis>[Requerido] [Configuración] [Autocompletado]</emphasis></para>
+          
+          <para xml:lang="es">Nombre de la configuración cuyo
+          valor para una propiedad se desea dejar sin valor.</para>
         </listitem>
       </varlistentry>
 
@@ -175,24 +211,36 @@
         <term>--property</term>
 
         <listitem>
-          <para><emphasis>[Requerido] Nombre de la propiedad cuyo valor se
-          desea dejar sin valor.</emphasis></para>
+          <para xml:lang="es"><emphasis>[Requerido] [Propiedad] [Autocompletado]</emphasis></para>
+          
+          <para xml:lang="es">Nombre de la propiedad cuyo valor se
+          desea dejar sin valor.</para>
         </listitem>
       </varlistentry>
     </variablelist>
+    </para>
   </section>
 
   <section xml:id="apendice-comandos_addon-dynamic_config-config_list">
     <title>configuration list</title>
 
-    <para>Lista todas las configuraciones creadas juntos con sus propiedades y
-    valores.</para>
+    <para xml:lang="es">Lista todas las configuraciones definidas junto con las
+    propiedades incluidas y lso valores definidos para cada una de ellas.</para>
+    
+    <para xml:lang="es">Este comando no tiene ningún parámetro obligatorio
+    ni opcional.</para>
   </section>
 
   <section xml:id="apendice-comandos_addon-dynamic_config-config_export">
     <title>configuration export</title>
 
-    <para>Escribe las configuraciones definidas actualmente en el proyecto
-    utilizando para ello el sistema de perfiles de Maven.</para>
+    <para xml:lang="es">Escribe en el proyecto los cambios definidos
+    hasta el momento en las configuraciones mediante todos los comandos 
+    anteriores utilizando para ello el sistema de perfiles de Maven. Mientras
+    no se ejecute este comando, las configuraciones no serán aplicadas en el
+    proyecto y por lo tanto no podrán ser utilizadas.</para>
+    
+    <para xml:lang="es">Este comando no tiene ningún parámetro obligatorio
+    ni opcional.</para>
   </section>
 </section>
