@@ -8,71 +8,190 @@
          xmlns:ns="http://docbook.org/ns/docbook">
   <title xml:lang="es">Add-on Service</title>
 
-    <para xml:lang="es">Permite crear servidores y clientes de servicios
-    web de forma automática.</para>
+    <para xml:lang="es">Permite crear servicios locales, servidores de
+    servicios web y clientes de servicios web de forma automática.</para>
 
   <section xml:id="addon-service_descripcion">
     <title xml:lang="es">Descripción</title>
 
-	<para>Permite crear de forma automática servidores de servicios web a partir de
-	un método del código fuente, crear servidores de servicios web basándose
-	en un archivo de descripción de servicios (WSDL) y crear clientes de servicios
-	web a partir de un archivo de descripción de servicios (WSDL).</para>
+	<para xml:lang="es">Permite crear de forma automática servicios locales,
+	servidores de servicios web a partir de un método del
+	código fuente, crear servidores de servicios web basándose
+	en un archivo de descripción de servicios <emphasis>WSDL</emphasis> y crear clientes de servicios
+	web a partir de un archivo de descripción de servicios <emphasis>WSDL</emphasis>.</para>
+
+    <para xml:lang="es">La creación de servicios, del mismo modo que todas las 
+    funcionalidades que proporciona el framework, se realiza mediante anotaciones.
+    Para simplificar esta tarea se puede hacer uso de los comandos que
+    ofrece. A medida que se van ejecutando comandos del add-on, se van
+    modificando anotaciones y métodos de la clase Java de forma que acabará
+    conformando el servicio web que se desea publicar.</para>
+
+  </section>
+
+  <section xml:id="addon-service_crear-local">
+      <title xml:lang="es">Creación de servicios locales</title>
+
+      <para xml:lang="es">Un servicio local es una clase Java con una serie de métodos
+      que se desea que estén disponibles de forma interna para toda la aplicación. La clase
+      se puede crear con el comando <link linkend="apendice-comandos_addon-service_class">
+      remote service class</link>.</para>
+      
+      <programlisting>roo-gvNIX> <command>remote service class --class ~.service.Service</command>
+Created SRC_MAIN_JAVA/org/gvnix/test/service/Service.java</programlisting>
+      
+      <para xml:lang="es">La ejecución del comando creará una clase en la ruta
+      especificada con la anotación <emphasis>@Service</emphasis> que le
+      proporciona unas características especiales y facilita su uso como servicio
+      local dentro de la aplicación.</para>
+      
+      <programlisting>...
+@Service
+public class Service {
+}</programlisting>
+		
+	  <para xml:lang="es">De esta forma, el servicio puede ser utilizar desde
+	  cualquier otra clase Java definiendo una propiedad del tipo de la clase
+	  de servicio con la anotación <emphasis>@Autowired</emphasis>.</para>
+	  
+	  <programlisting>@Autowired
+Service service;</programlisting>
+      
+      <para xml:lang="es">Una vez creada la clase se pueden crear los métodos que se
+      desea ofrecer en el servicio. Los métodos se pueden crear mediante el comando
+      <link linkend="apendice-comandos_addon-service_operation">remote service
+      operation</link> que permite añadir métodos en una clase.</para>
+      
+      <programlisting>roo-gvNIX> <command>remote service operation</command> --name myMethod --service ~.service.Service
+		--return java.lang.Long --paramNames param1,param2
+		--paramTypes "java.lang.String,java.util.List"
+Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java</programlisting>
+      
+      <para xml:lang="es">El comando anterior creará el método con las características
+      solicitadas en la clase que se le indica como parámetro.</para>
+      
+      <programlisting>public Long myMethod(String param1, List param2) {
+  return null;
+}</programlisting>
+      
+      <para xml:lang="es">Como se puede observar, la implementación del método
+      está vacía y como es obvio deberá ser definida por el desarrollador.</para>
+      		
   </section>
   
   <section xml:id="addon-service_crear-desde-java">
-      <title xml:lang="es">Creación de servidores desde WSDL</title>
-
-      <para xml:lang="es">La creación de servicios, del mismo modo que todas las 
-      funcionalidades que proporciona el framework, se realiza mediante anotaciones.
-      Para simplificar esta tarea se puede hacer uso de los comandos que
-      ofrece gvNIX. A medida que se van ejecutando comandos del add-on, se va
-      modificando anotaciones y métodos de la clase Java de forma que acabará
-      conformando el servicio web que se desea publicar.</para>
-
-      <para xml:lang="es">Lo primero es elegir una clase Java que contendrá los
-      métodos que se desea ofrecer al exterior mediante el servicio web. La clase
-      puede ser una existente o se puede crear una nueva con el comando <link
-      linkend="apendice-comandos_addon-service_class">remote service class</link></para>
+      <title xml:lang="es">Creación de servidores desde Java</title>
       
-      <para>Una vez creada la clase se pueden crear los métodos que se
-      desea ofrecer a través del servicio web si todavía no existen.
-      Si los métodos todavía no existen, se pueden crear mediante el comando <link
-      linkend="apendice-comandos_addon-service_operation">remote service
-      operation</link> que permite añadir métodos en una clase.</para>
+      <para xml:lang="es">Permite que los métodos de una clase Java puedan ser
+      accedidos desde el exterior mediante operaciones de un servicio web.</para>
 
-      <para xml:lang="es">De momento la clase no se está publicando a través de
+      <para xml:lang="es">En primer lugar se debe elegir una clase Java que contendrá los
+      métodos que se desea ofrecer al exterior mediante el servicio web. La clase puede ser
+      cualquiera existiente previamente o se puede crear una nueva mediante el comando <link
+      linkend="apendice-comandos_addon-service_class">remote service class</link>.</para>
+      
+      <para xml:lang="es">A continuación, se debe elegir los métodos a
+      ofrecer a través del servicio web. Si todavía no existen,
+      se pueden crear mediante el comando <link 
+      linkend="apendice-comandos_addon-service_operation">remote service
+      operation</link>.</para>
+
+      <para xml:lang="es">De momento la clase no es accesible mediante
       un servicio web. Para ello se debe ejecutar el comando <link
       linkend="apendice-comandos_addon-service_define_ws">remote service define
-      ws</link> que incluirá la anotación <emphasis>@GvNIXWebService</emphasis>
-      en la clase Java indicada. gvNIX generará los componentes
-      necesarios para exponer la clase como un servicio web.</para>
+      ws</link>.</para>
+      
+      <programlisting>roo-gvNIX> <command>remote service define ws --class ~.service.Service</command>
+Updated ROOT/pom.xml [
+		added repository https://gvnix.googlecode.com/svn/repo; 
+		added dependency org.gvnix:org.gvnix.service.roo.addon:1.0.0; 
+		added plugin org.apache.cxf:cxf-java2ws-plugin:${cxf.version}]
+Created SRC_MAIN_WEBAPP/WEB-INF/cxf-appname.xml
+Updated SRC_MAIN_WEBAPP/WEB-INF/web.xml
+Creating a new class 'Service' to export web service.
+Created SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
+Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
+Updated ROOT/pom.xml [
+		added dependency org.apache.cxf:cxf-rt-core:${cxf.version};
+		added dependency org.apache.cxf:cxf-rt-bindings-soap:${cxf.version};
+		added dependency org.apache.cxf:cxf-rt-databinding-jaxb:${cxf.version};
+		added dependency org.apache.cxf:cxf-rt-frontend-jaxws:${cxf.version};
+		added dependency org.apache.cxf:cxf-rt-transports-http:${cxf.version};
+		added dependency javax.xml.bind:jaxb-api:2.1;
+		added dependency javax.xml.ws:jaxws-api:2.1;
+		added property 'cxf.version' = '2.4.2']
+Updated SRC_MAIN_WEBAPP/WEB-INF/cxf-petclinic.xml
+Updated ROOT/pom.xml
+Created SRC_MAIN_JAVA/org/gvnix/test/service/Service_Roo_GvNix_WebService.aj
+* New service defined without operations, use 'service export operation' command to add it
+* New service can be shown adding '/services/' suffix to your base application URL</programlisting>
 
-      <para xml:lang="es">En este momento el servicio web ya está publicado y accesible,
-      sin embargo no dispondrá de ninguna operación accesible ya que por defecto todos
-      los métodos de la clase publicada estarán configurados para que no sean accesibles
-      por motivos de seguridad.
-      Se podrá hacer accesible cada uno de los métodos de la clase por separado mediante el 
-      comando <link linkend="apendice-comandos_addon-service_export_operation">remote service
-      export operation</link> que añade la anotación
-      <emphasis>@GvNIXWebMethod</emphasis> al método, de forma que informará a gvNIX de
-      que debe generarse el código necesario para que la operación esté
-      accesible.</para>
-
-      <programlisting><emphasis role="bold">@GvNIXWebService</emphasis>(name = "MyWebServicePortType",
-      		targetNamespace = "http://services.project.layer.service.test.gvnix.org/",
-      		serviceName = "MyWebService", address = "MyWebService",
-      		fullyQualifiedTypeName =
-      				"org.gvnix.test.service.layer.project.services.MyWebService",
-      		exported = false)
-public class MyWebService {
-
-    <emphasis role="bold">@GvNIXWebMethod</emphasis>(operationName = "sayHello", resultName = "void",
-    		webResultType = Void.class)
-    public void sayHello() {
-        return;
-    }
+	  <para xml:lang="es">El comando incluirá la anotación <emphasis>@GvNIXWebService</emphasis>
+      en la clase Java indicada. También generará los componentes necesarios para exponer la
+      clase como un servicio web a partir de los atributos de la anotación.</para>
+      
+      <programlisting>...
+@GvNIXWebService(name = "ServicePortType",
+		targetNamespace = "http://service.test.gvnix.org/",
+		serviceName = "Service", address = "Service",
+		fullyQualifiedTypeName = "org.gvnix.test.service.Service", exported = false)
+public class Service {
 }</programlisting>
+      
+      <para xml:lang="es">La clase Java será enlazada en la definición del servicio
+      con un <emphasis>PortType </emphasis> lo que permitirá la comunicación 
+      con la clase desde el exterior mediante los protocolos y tecnologías de
+      servicios web.</para>
+      
+      <programlisting>privileged aspect Service_Roo_GvNix_WebService {
+declare @type: Service: @WebService(name = "ServicePortType",
+		targetNamespace = "http://service.test.gvnix.org/",
+		serviceName = "Service", portName = "ServicePortType");
+declare @type: Service: @SOAPBinding(style = Style.DOCUMENT, use = Use.LITERAL, 
+		parameterStyle = ParameterStyle.WRAPPED);
+}</programlisting>
+
+      <para xml:lang="es">En este momento el servicio web ya está publicado y es accesible,
+      sin embargo no dispondrá de ninguna operación ya que por defecto todos
+      los métodos de la clase publicada son configurados inicialmente como no accesibles
+      por motivos de seguridad. Se podrá hacer accesible
+      cada uno de los métodos de la clase por separado mediante el 
+      comando <link linkend="apendice-comandos_addon-service_export_operation">remote service
+      export operation</link></para>
+      
+      <programlisting>roo-gvNIX> <command>remote service export operation --class ~.service.Service --method method</command>
+Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
+Updated SRC_MAIN_WEBAPP/WEB-INF/cxf-appname.xml
+Updated ROOT/pom.xml
+Deleted SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
+Created SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
+Created SRC_MAIN_JAVA/org/gvnix/test/service/Service_Roo_GvNix_WebService.aj
+Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service_Roo_GvNix_WebService.aj
+      </programlisting>
+      
+      <para xml:lang="es">El comando anterior añade la anotación <emphasis>@GvNIXWebMethod
+      </emphasis> al método, de forma que que se generará el código necesario para que
+      la operación esté disponible en el servicio web.</para>
+
+      <programlisting>@GvNIXWebMethod(operationName = "method", requestWrapperName = "method",
+      		requestWrapperNamespace = "http://service.test.gvnix.org/",
+      		requestWrapperClassName = "org.gvnix.test.service.MethodRequestWrapper",
+      		resultName = "return", resultNamespace = "http://service.test.gvnix.org/",
+      		webResultType = Long.class, responseWrapperName = "methodResponse",
+      		responseWrapperNamespace = "http://service.test.gvnix.org/",
+      		responseWrapperClassName = "org.gvnix.test.service.MethodResponse")
+public Long method(@GvNIXWebParam(name = "param1", type = String.class) 
+		@WebParam(name = "param1", partName = "parameters", mode = Mode.IN, header = false)
+		String param1,
+		@GvNIXWebParam(name = "param2", type = List.class)
+		@WebParam(name = "param2", partName = "parameters", mode = Mode.IN, header = false)
+		List param2) {
+    return null;
+}</programlisting>
+
+    <para xml:lang="es">Como es obvio, el método no dispone de ningún código 
+    en su cuerpo y será responsabilidad del desarrollador el implementar la lógica
+    de negocio que sea necesaria.</para>
 
   </section>
 
@@ -80,51 +199,107 @@ public class MyWebService {
   
       <title xml:lang="es">Creación de servidores desde WSDL</title>
 
-      <para xml:lang="es">Existe otra forma de realizar la creación de servidores de 
-      servicios web. Consiste en generar el servicio basándose en un archivo
-      de contrato de servicio conocido como WSDL. Con el comando <link
+      <para xml:lang="es">Existe otro modo para crear servidores de 
+      servicios web. Consiste en ofrecer al exterior un servicio web partiendo de un
+      archivo de contrato de servicio conocido como <emphasis>WSDL</emphasis>. Con el comando <link
       linkend="apendice-comandos_addon-service_export_ws">remote service export
-      ws</link> se proporciona la ruta a un archivo WSDL (archivo en local o URL en
-      Internet) y se generará una réplica del servicio en la que las operaciones
-      son implementaciones vacía a modo de ejemplo que posteriormente deberán
+      ws</link> se proporciona la ruta a un archivo <emphasis>WSDL</emphasis>
+      y se generará una réplica del servicio en la que las operaciones
+      son métodos vacios que posteriormente deberán
       ser personalizadas con la lógica de negocio adecuada.</para>
+      
+      <programlisting>roo-gvNIX> <command>remote service export ws --wsdl ruta</command></programlisting>
+      
+      <para xml:lang="es">La ruta al <emphasis>WSDL</emphasis> puede ser un archivo local 
+      mediante <emphasis>file://ruta</emphasis>, una dirección web mediante
+      <emphasis>http://ruta</emphasis> o una dirección web segura mediante
+      <emphasis>https://ruta</emphasis>.</para>
+      
+      <para xml:lang="es">Este modo es especialmente cómodo para realizar
+      la migración de servicios que están implementados en otras aplicaciones
+      o tecnologías o que se desean integrar en otra aplicación.</para>
   </section>
 
     <section>
       <title xml:lang="es">Creación de clientes</title>
 
-      <para xml:lang="es">Es posible generar un cliente de un servicio web
-      existente utilizando para ello el comando <link
+      <para xml:lang="es">Es posible generar un cliente que permita realizar
+      peticiones a un servicio web remoto existente utilizando para ello el comando <link
       linkend="apendice-comandos_addon-service_import_ws">remote service import
-      ws</link>. Facilitando la ruta a un WSDL, gvNIX generará la clase que
-      contendrá los métdos del cliente.</para>
+      ws</link>. Facilitando la ruta a un <emphasis>WSDL</emphasis>, se generará una clase 
+      en la ruta que se especifique y que contendrá los métodos del cliente que darán
+      acceso al servicio web remoto.</para>
+      
+      <programlisting>remote service import ws --class org.gvnix.test.service.Service
+      		--wsdl ruta
+Created SRC_MAIN_JAVA/org/gvnix/test/service/
+Created SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
+Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
+Updated ROOT/pom.xml [
+		added dependency org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.0.Final;
+		removed dependency org.hibernate.javax.persistence:hibernate-jpa-2.0-api:1.0.1.Final;
+		added plugin org.apache.cxf:cxf-codegen-plugin:${cxf.version}]
+Updated ROOT/pom.xml
+</programlisting>
 
-      <para xml:lang="es">Para usar este cliente simplemente hay que crear una propiedad en la
-      clase donde se desea hacer uso de ella y añadirle la anotación
-      <emphasis>@Autowired</emphasis>.</para>
+	  <para xml:lang="es">El comandoe dará lugar a la creación, si no existía, de
+	  la clase Java y a la inclusión de la anotación <emphasis>@GvNIXWebServiceProxy
+	  </emphasis> que define el servicio web al que da acceso la clase.</para>
 
-      <programlisting>public class MyClassUsingWebService {
+	  <programlisting>...
+@Service
+@GvNIXWebServiceProxy(wsdlLocation = "ruta")
+public class Service {
+}</programlisting>
+
+	  <para xml:lang="es">La anotación desencadenará la creación en el aspecto
+	  Java correspondiente de tantos métodos como operaciones ofrece el
+	  servicio web y que enmascaran la comunicación con el sistema
+	  remoto.</para>
+
+	  <programlisting>privileged aspect Service_Roo_GvNix_WebServiceProxy {
+	  
+	public String Service.method(String param1) {
+			org.web.service.RemoteService s = new org.web.service.RemoteService();
+		org.web.service.RemoteServiceSoap p = s.getRemoteServiceSoap12();
+		return p.method(param1);
+	}
+
+}</programlisting>
+
+      <para xml:lang="es">Esta clase se podrá utilizar como si de un
+      servicio local se tratase. Para usar esta clase simplemente habrá que crear
+      una propiedad en la clase donde se desea hacer uso de ella y añadirle
+      la anotación <emphasis>@Autowired</emphasis>.</para>
+
+      <programlisting>public class MyClass {
   ...
   @Autowired
-  private ClassOfWebServiceClient classOfWebServiceClient;
+  private Service service;
   ...
-  public void methodUsingWebService() {
+  public void myMethod() {
     ...
-    classOfWebServiceClient.wsOperation(..);
+    service.method(..);
     ...
   }
 }</programlisting>
 
-      <para xml:lang="es">La ruta al WSDL puede ser tanto un archivo local (file://) como
-      una URL mediante protocolo HTTP o HTTPS.</para>
+      <para xml:lang="es">La ruta al <emphasis>WSDL</emphasis> puede ser un archivo local 
+      mediante <emphasis>file://ruta</emphasis>, una dirección web mediante
+      <emphasis>http://ruta</emphasis> o una dirección web segura mediante
+      <emphasis>https://ruta</emphasis>.</para>
 
-      <para xml:lang="es">Cuando el WSDL es un archivo local o un recurso que se encuentre
-      en un servidor no seguro (acceso HTTP), gvNIX accede al WSLD y tras
-      procesarlo realiza las tareas necesarias para generar un servicio local
-      que hará las veces de cliente del WS remoto.</para>
+	</section>
+    <section>
+      <title xml:lang="es">Acceso a un WSDL en un servidor seguro</title>
 
-      <para xml:lang="es">En el caso de que el WSDL lo sirva un servidor seguro al que se
-      accede por HTTPS pueden darse dos posibles escenarios:</para>
+      <para xml:lang="es">Cuando el <emphasis>WSDL</emphasis> se encuentra en un
+      archivo local o en un servidor no seguro como HTTP, se puede acceder
+      directamente sin ningún problema.</para>
+
+      <para xml:lang="es">En el caso que un <emphasis>WSDL</emphasis>
+      se encuentra en un servidor seguro al que se
+      accede mediante HTTPS pueden darse dos posibles escenarios:</para>
 
       <orderedlist>
         <listitem>
@@ -132,7 +307,7 @@ public class MyWebService {
           role="bold">Autoridad de certificación (CA) confiable por la
           JVM</emphasis>.</para>
 
-          <para xml:lang="es">En este caso, el procesado del WSDL funciona de la misma
+          <para xml:lang="es">En este caso, el procesado del <emphasis>WSDL</emphasis> funciona de la misma
           manera que en el caso de acceso por HTTP, transparente para el
           usuario.</para>
         </listitem>
@@ -143,7 +318,7 @@ public class MyWebService {
           autofirmados).</para>
 
           <para xml:lang="es">Aquí, es responsabilidad del usuario el aceptar las
-          credenciales del servidor para poder acceder al WSDL. Recordando
+          credenciales del servidor para poder acceder al <emphasis>WSDL</emphasis>. Recordando
           como trabajan los navegadores web, cuando se intenta acceder a un
           recurso seguro, si el certificado del servidor no ha sido creado por
           un CA que se encuentre entre la lista de CAs conocida (Verisign,
@@ -152,11 +327,10 @@ public class MyWebService {
           servidor. Cada usuario decide aceptar o no el certificado.</para>
 
           <para xml:lang="es">Para simplificar el proceso de importación de servicios web,
-          gvNIX intenta hacer esta tarea de "confiar" en el certificado de manera
-          transparente para el usuario.</para>
+          se intenta hacer esta tarea de manera transparente para el usuario.</para>
 
-          <para xml:lang="es">Para ello, gvNIX manipula el almacen de certificados de la JVM
-          siempre que sea posible. Esto es:</para>
+          <para xml:lang="es">Para ello, se manipula el almacen de certificados de la
+          máquina virtual Java siempre que sea posible. Esto es:</para>
 
           <orderedlist>
             <listitem>
@@ -172,9 +346,9 @@ public class MyWebService {
             </listitem>
           </orderedlist>
 
-          <para xml:lang="es">Si gvNIX puede modificar el keystore, importará los
-          certificados implicados en la autenticación del servidor y entonces
-          podrá acceder al WSDL requerido para generar el cliente del
+          <para xml:lang="es">Si se puede modificar el keystore, se importarán los
+          certificados implicados en la autenticación del servidor y entonces se
+          podrá acceder al <emphasis>WSDL</emphasis> requerido para generar el cliente del
           WS.</para>
 
           <para xml:lang="es">Al mismo tiempo, se crea en
@@ -186,9 +360,9 @@ public class MyWebService {
           de archivos del proyecto para que puedan ser instalados en otros
           entornos.</para>
 
-          <para xml:lang="es">Si gvNIX no puede modificar el keystore de la JVM, porque no
-          se cumplen alguna de las 2 condiciones enumeradas anteriormente, creará de
-          todas formas la copia de los certificados necesarios para que sea el
+          <para xml:lang="es">Si no puede modificar el keystore de la JVM, porque no
+          se cumplen alguna de las 2 condiciones enumeradas anteriormente, de todas
+          formas realizará la copia de los certificados necesarios para que sea el
           usuario quien instale los mismos en el almacen de certificados de su
           JVM. Para ello se puede hacer uso de la herramienta <link
           xlink:href="http://download.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html">keytool</link>
@@ -200,16 +374,16 @@ public class MyWebService {
       <section>
         <title xml:lang="es">Creación de clientes con firma</title>
 
-        <para xml:lang="es">El add-on incorpora una implementación que permite añadir una
-        firma digital a la peticiones realizadas a un servicio web
-        importado.</para>
+        <para xml:lang="es">El add-on permite añadir una
+        firma digital a las peticiones realizadas a un servicio web
+        externo que se encuentra importado en la aplicación.</para>
 
         <para xml:lang="es">Actualmente esta opción sólo está disponible para los servicio
         web que utilicen la librería Axis (RPC/Encoded). En futuras versiones se añadirá
         esta misma opción para servicios que utilicen la librería CXF (Document/Literal)
         y otra operaciones relacionadas con la seguridad en servicios web.</para>
 
-        <para xml:lang="es">Para ello se necesita disponer de:</para>
+        <para xml:lang="es">Para ello se debe disponer de:</para>
 
         <orderedlist>
           <listitem>
@@ -231,8 +405,54 @@ public class MyWebService {
         </orderedlist>
 
         <para xml:lang="es">Disponiendo de esto elementos, se puede hacer uso del comando <link
-        xlink:href="apendice-comandos_addon-service_security_ws">remote service
+        linkend="apendice-comandos_addon-service_security_ws">remote service
         security ws</link> para añadir la firma en las peticiones del cliente.</para>
+        
+        <programlisting>roo-gvNIX> <command>remote service security ws --class org.gvnix.test.service.Service
+        		--alias alias --certificate /tmp/certificate.p12 --password clave</command>
+Created ROOT/src/main/resources/org/gvnix/test/service
+Created ROOT/src/main/resources/org/gvnix/test/service/certificate.p12
+Updated SRC_MAIN_JAVA/org/gvnix/test/service/Service.java
+Created ROOT/src/main/resources/client-config.wsdd
+Created ROOT/src/main/resources/org/gvnix/test/service/ServiceSecurity.properties
+Updated ROOT/pom.xml [added dependency org.apache.ws.security:wss4j:1.5.11]
+Updated ROOT/src/main/resources/client-config.wsdd
+Created SRC_MAIN_JAVA/org/gvnix/test/service/Service_Roo_GvNIX_WebSecurity.aj
+</programlisting>
+
+		<para xml:lang="es">Se crearán dos ficheros con distintos parámetros
+		de configuración en <filename>src/main/resources/org/gvnix/test/service/ServiceSecurity.properties</filename>
+		y <filename>src/main/resources/client-config.wsdd</filename>.</para>
+
+		<para xml:lang="es">También dará lugar a la inclusión de la
+		anotación <emphasis>@GvNIXWebServiceSecurity</emphasis> con los
+		mismos valores que los atributos que se proporcionaron desde el comando.
+		</para>
+		
+		<programlisting>...
+@GvNIXWebServiceSecurity(certificate = "certificate.p12",
+		password = "clave", alias = "alias")
+public class Service {
+}</programlisting>
+
+		<para xml:lang="es">La anotación anterior dará lugar a la generación
+		del aspecto Java correspondiente que establece la clave de acceso
+		al certificado.</para>
+
+		<programlisting>privileged aspect Service_Roo_GvNIX_WebSecurity {
+
+    declare parents: Service implements CallbackHandler;
+
+    public Service.new() {
+        super();
+    }
+
+    public void Service.handle(Callback[] callbacks)
+    		throws IOException, UnsupportedCallbackException {
+        ((org.apache.ws.security.WSPasswordCallback) callbacks[0]).setPassword("clave");
+    }
+}</programlisting>
+        
       </section>
     </section>
 
@@ -241,22 +461,26 @@ public class MyWebService {
 
       <para xml:lang="es">El comando <link
       linkend="apendice-comandos_addon-service_list_operation">remote service list
-      operation</link> muestra los métodos existentes de una clase
-      que están disponibles para ser exportados siempre y cuando la clase esté
+      operation</link> muestra los métodos existentes en una clase
+      que están disponibles para ser ofrecidos al exterior siempre y cuando la clase esté
       definida como un servicio web.</para>
+      
+<programlisting>roo-gvNIX> <command>remote service list operation --class ~.service.Service</command>
+Method list to export as web service operation in '~.service.Service':
+    * myMethod2</programlisting>
 
       <para xml:lang="es">El comando <link
-      xlink:href="apendice-comandos_addon-service_ws_list">remote service ws
-      list</link> permite obtener un listado de los servicios exportados o
-      importados en la aplicación.</para>
+      linkend="apendice-comandos_addon-service_ws_list">remote service ws
+      list</link> permite obtener un listado de los servicios ofrecidos al
+      exterior o aquellos servicios externos que son utilizados en la aplicación.</para>
 
       <para xml:lang="es">El resultado es una salida como esta:</para>
 
       <programlisting>roo-gvNIX&gt; remote service ws list
-service     exported     imported
----------   ---------   ----------
-Service1       X
-Service2                    X   
-Service3                    X   </programlisting>
+Services                         exported    imported
+-------------------------------  ---------   ----------
+org.gvnix.test.service.Service1      X
+org.gvnix.test.service.Service2                 X 
+org.gvnix.test.service.Service3                 X</programlisting>
     </section>
 </chapter>
