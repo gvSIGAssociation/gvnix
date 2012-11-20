@@ -31,8 +31,14 @@
     web mvc binding stringTrimmer</link> permite registrar un editor
     especialmente útil. Este editor elimina los espacios en blanco al principio
     y al final de las cadenas y además permite transformar las
-    cadenas vacías en valores nulos.
-    </para>
+    cadenas vacías en valores nulos.</para>
+    
+    <para xml:lang="es">Este editor es especialmente interesante al
+    realizar mantenimientos de valores almacenados en bases de datos.
+    Por defecto, cuando se deja vacío un valor de un formulario y está
+    relacionado con una columna de base de datos del tipo cadena, al
+    almacenar se escribe una cadena vacía. En estos casos puede suele
+    ser más interesante almacenar un valor nulo.</para>
 
 <programlisting>roo-gvNIX> <command>web mvc binding stringTrimmer --class ~.web.EntityController</command>
 Updated SRC_MAIN_JAVA/org/gvnix/test/web/EntityController.java

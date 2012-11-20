@@ -41,8 +41,7 @@
           linkend="apendice-comandos_addon-dynamic_config-config_prop_add">configuration
           property add</link></entry>
 
-          <entry xml:lang="es">Hace que una propiedad esté disponible para su gestión en
-          todas las configuraciones</entry>
+          <entry xml:lang="es">Añade una propiedad a la gestión de configuraciones</entry>
         </row>
 
         <row>
@@ -50,26 +49,8 @@
           linkend="apendice-comandos_addon-dynamic_config-config_prop_update">configuration
           property value</link></entry>
 
-          <entry xml:lang="es">Establece el valor de una propiedad en una
+          <entry xml:lang="es">Cambia el valor que tiene una propiedad en una determinada
           configuración</entry>
-        </row>
-
-        <row>
-          <entry><link
-          linkend="apendice-comandos_addon-dynamic_config-config_list">configuration
-          list</link></entry>
-
-          <entry xml:lang="es">Lista todas las configuraciones creadas juntos con sus
-          propiedades y valores</entry>
-        </row>
-
-        <row>
-          <entry><link
-          linkend="apendice-comandos_addon-dynamic_config-config_export">configuration
-          export</link></entry>
-
-          <entry xml:lang="es">Escribe todas todas las configuraciones en el proyecto.
-          Actualmente se escriben en el formato de perfiles de Maven.</entry>
         </row>
 
         <row>
@@ -77,10 +58,26 @@
           linkend="apendice-comandos_addon-dynamic_config-config_prop_undefined">configuration
           property undefined</link></entry>
 
-          <entry xml:lang="es">Deja sin valor una propiedad en la configuración de forma que
-          se ha de establecer manualmente al ejecutar un objetivo
-          Maven.</entry>
+          <entry xml:lang="es">Deja sin valor una propiedad en una determinada
+          configuración</entry>
         </row>
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-dynamic_config-config_list">configuration
+          list</link></entry>
+
+          <entry xml:lang="es">Lista todas las configuraciones definidas</entry>
+        </row>
+
+        <row>
+          <entry><link
+          linkend="apendice-comandos_addon-dynamic_config-config_export">configuration
+          export</link></entry>
+
+          <entry xml:lang="es">Escribe en el proyecto los cambios definidos hasta el
+          momento en las configuraciones</entry>
+        </row>
+
       </tbody>
     </tgroup>
   </table>
@@ -225,7 +222,7 @@
     <title>configuration list</title>
 
     <para xml:lang="es">Lista todas las configuraciones definidas junto con las
-    propiedades incluidas y lso valores definidos para cada una de ellas.</para>
+    propiedades incluidas y los valores definidos para cada una de ellas.</para>
     
     <para xml:lang="es">Este comando no tiene ningún parámetro obligatorio
     ni opcional.</para>
