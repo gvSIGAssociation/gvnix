@@ -695,4 +695,38 @@ p:subReportDataKeys-ref="subReportDataKeys" <emphasis role="bold">p:subReportUrl
     variables, ...). Para conocerlas con profundidad consultar la
     documentación de referencia de Jasper Reports e iReport.</para>
   </section>
+  
+
+  <section xml:id="recetas-inicializacion-aplicacion">
+    <title xml:lang="es">Operaciones durante el inicio de la aplicación</title>
+
+    <para xml:lang="es">Se pueden crear clases que se invoquen durante
+    la inicialización de una aplicación.</para>
+    
+    <para xml:lang="es">En alguna aplicación puede ser necesario realizar
+    alguna acción durante el inicio de una aplicación, como por ejemplo.
+    Existen diversas formas para hacer esto en Spring.</para>
+    
+    <para xml:lang="es">Sino se va a interaccionar con datos, se puede usar
+    la anotación @PostConstruct en un método de una clase anotada con 
+    <emphasis>@Component</emphasis>.
+    Hay que tener en cuenta que la inicialización del soporte de datos y
+    transacciones puede no estar todavía listo en este punto.</para>
+
+    <para xml:lang="es">Crear un listener del contexto de Spring de la
+    siguiente forma:</para>
+
+    <programlisting>@Component
+  public class DataSeeder implements ApplicationListener&lt;ContextRefreshedEvent&gt; {
+
+    @Override
+        @Transactional
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (Model.countModels() == 0) {
+            // Create initial Model values
+        }
+    }</programlisting>
+
+  </section>
+
 </chapter>
