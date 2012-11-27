@@ -6,6 +6,7 @@
          xmlns:ns4="http://www.w3.org/2000/svg"
          xmlns:ns3="http://www.w3.org/1999/xhtml"
          xmlns:ns="http://docbook.org/ns/docbook">
+         
   <title xml:lang="es">Add-on Web Screen Patterns</title>
 
   <para xml:lang="es">Add-on para aplicar patrones de visualización sobre
@@ -305,6 +306,42 @@
       buscador al que se podrá acceder mediante la <emphasis>pestaña lupa</emphasis>
       que se muestra a la derecha de la caja principal de la vista del patrón
       tabular.</para>
+
+      <para>Este componente acepta, entre otros, algunos atributos interesantes:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>list = true|false</emphasis> indica si se desea
+          mostrar una pestaña con la imagen de una tabla en la parte
+          derecha de la pantalla que permite
+          acceder a este patrón. Es útil para volver a este patrón si en la
+          misma pantalla se permite visualizar la misma información con
+          distintos patrones o tiene un buscador asociado. Por defecto, su
+          valor será <emphasis>true</emphasis>.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>finder = NombreBuscador</emphasis> si está establecido,
+          se mostrará una pestaña con la imagen de una lupa en la parte
+          derecha de la pantalla que permite acceder al buscador indicado
+          en el valor del atributo. Es útil para realizar un filtrado de los
+          datos que se están mostrando en el patrón. Por defecto, no tiene valor
+          alguno y por lo tanto no mostrará la pestaña.
+          Por ejemplo, <emphasis>finder="ByOwner"</emphasis>.</para>
+        </listitem>
+        
+		<listitem>
+          <para><emphasis>idRender = true|false</emphasis>
+          booleano que indica si el campo se debe ver en pantalla.</para>
+        </listitem>
+        
+		<listitem>
+          <para><emphasis>idDisabled = true|false</emphasis>
+          booleano que indica si el campo debe estar desactivado,
+          es decir, el usuario no debe poder modificarlo.</para>
+        </listitem>
+      </itemizedlist>
+      
     </section>
 
     <section>
