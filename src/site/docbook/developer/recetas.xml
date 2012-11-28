@@ -1189,4 +1189,23 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
   	prácticamente los mismo.</para>
   </section>
   
+  <section>
+  	<title>Evitar parseado XML en metadatas y listeners</title>
+  	
+  	<para>Tal y como se ha detectado en #5800, los metadata y
+  	listeners se ejecutan gran cantidad de veces, principalmente en
+  	el arranque de la consola. Esto sucede en los addons de gvNIX y
+  	también en los de Roo.</para>
+
+	<para>Es por ello, que no se deben hacer operaciones computacionalmente
+	muy costosas como, por ejemplo, parseado de XMLs. Un caso habitual
+	de este tipo son los setup que suelen existir en todos los addons
+	que se encargan de añadir dependencias, propiedades, plugins, etc.
+	en el pom.xml o en otros ficheros de configuración como web.xml,
+	webmvc-config.xml, etc.</para>
+
+	<para>La recomendación a partir de ahora es que los setup solo se
+	realicen desde los comandos y nunca desde los metadata o listeners.</para>
+  </section>
+  
 </chapter>
