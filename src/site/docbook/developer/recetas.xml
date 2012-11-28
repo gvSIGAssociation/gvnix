@@ -1152,4 +1152,41 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
 
     <para>org.springframework.roo.addon.web.selenium.SeleniumOperationsImpl</para>
   </section>
+  
+  <section>
+    <title>No se añade un elemento en Java o AJ</title>
+
+    <para>Si no se añade alguna propiedad, método, etc. 
+    a un fichero Java o AJ puede ser debido a que dicho elemento
+    no está asociado al metadataId adecuado.</para>
+
+  </section>
+  
+  <section>
+    <title>No se añade un elemento en Java o AJ</title>
+
+    <para>Si no se añade alguna propiedad, método, etc. 
+    a un fichero Java o AJ puede ser debido a que dicho elemento
+    no está asociado al metadataId adecuado.</para>
+
+  </section>
+  
+  <section>
+  	<title>Múltiples modificaciones mismo fichero</title>
+  	
+  	<para>Si se producen múltiples modificaciones sucesivas de un
+  	mismo fichero en la consola al ejecutar un comando, puede evitarse
+  	cambiando a false la variable writeImmediately de los métodos del
+  	fileManager.</para>
+  </section>
+  
+  <section>
+  	<title>Utilidades XML</title>
+  	
+  	<para>Existen ahora código de Roo que facilita la escritura de
+  	algunos archivos como, por ejemplo, XML (xmlRoundTripFileManager)
+  	y que puede que haya implementaciones propias de gvNIX que hacen
+  	prácticamente los mismo.</para>
+  </section>
+  
 </chapter>
