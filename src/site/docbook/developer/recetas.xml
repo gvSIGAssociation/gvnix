@@ -1208,4 +1208,21 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
 	realicen desde los comandos y nunca desde los metadata o listeners.</para>
   </section>
   
+  <section>
+  	<title>Clases OSGi con anotación @Service y/o @Component</title>
+  	
+  	<para>Cuando anotamos una clase con @Service y/o @Component estamos
+  	definiendo una clase servidor, es decir todos sus atributos de clase
+  	tienen valor durante toda la vida de la clase.</para>
+
+	<para>Hay que tener mucho cuidado con la lógica que actúa sobre atributos:
+	Si el atributo es otro servicio o componente no habrá mayor problema.
+	Si el atributo es interno (no es componente), se inicializa en una petición
+	y en sucesivas peticiones se ejecuta lógica sobre ese atributo.
+	En estos casos podría producirse errores si el atributo no se reinicializa
+	adecuadamente. Para estas situaciones sería interesante trabajar como si
+	fuera un entorno web: cada petición debe obtener todo lo necesario para una
+	respuesta correcta.</para>
+  </section>
+  
 </chapter>
