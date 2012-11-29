@@ -306,10 +306,6 @@ Tomcat5:
 TODO
 ====
 
-* Remove all @Reference PathResolver declarations from classes and retrieve PathResolver from ProjectMetadata instead
-
-  https://jira.springsource.org/browse/ROO-2097
-
 * Roo refactor at web layer commands:
 
    web xyz install
@@ -386,10 +382,6 @@ TODO
 * Validate bin/ scripts.
   ¿ Replace GVNIX_HOME and ROO_HOME vars with GVNIX_DEV and ROO_DEV ?
 
-* Hibernate: PostLoad method invoked before collection initialised
-
-  https://issues.jboss.org/browse/JBAS-5474
-
 * Make uniform generated "aj" file names (examples):
 
   + OCCChecksumMetadataProvider.java:  "gvNIX_occChecksum" 
@@ -405,9 +397,6 @@ TODO
   
   Decidido utilizar formato GvNIX_${nombre de la anotación sin el prefijo GvNIX}
   
-* Some add-ons has duplicated resources section at pom.xml to correct replacing.
-  However, mvn eclipse:eclipse not works.
-
 * Los proyectos gvNIX por defecto configuran DBCP, probar que funciona aunque se reinicie la BBDD
 
 * Revisar los pom.xml de los add-ons (ver que tengan la dependencias correctas y hereden las del pom padre
