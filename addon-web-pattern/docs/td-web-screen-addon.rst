@@ -334,12 +334,10 @@ TODO
   Revisar lo que se comenta en http://anaturb.net/dojo/my/dojoTabContainer.htm por si puede
   servir como mejor solución.
 
-* Rename 'screen' with 'pattern'.
-
 * Los patrones de las entidades relacionadas actualmente funcionan para @OneToMany y @ManyToMany
-  y deberían funcionan para ManyToOne y OneToOne con algún pequeño cambio.
+  y podrían funcionan para ManyToOne y OneToOne con algún pequeño cambio.
 
-* Ampliar la ejecución del comando de "pattern relation" para que se pueda ejecutar recursivamente.
+* Ampliar la ejecución del comando de "pattern detail" para que se pueda ejecutar recursivamente.
 
 * La generación del ITD debe considerar los atributos mergeMethod, persistMethod y removeMethod de la
   anotación @Entity ya que si se especifica un nombre distinto de método deberá utilizarse dicho nombre
