@@ -161,7 +161,60 @@ web binding setup // Comando de gvNIX</programlisting>
    * @author DEVELOPER_NAME (DEVELOPER_USERNAME at CIT_PROVIDER dot com) at &lt;a href="http://www.CIT_PROVIDER.com"&gt;CIT_PROVIDER&lt;/a&gt; made for &lt;a href="http://www.cit.gva.es"&gt;Conselleria d'Infraestructures i Transport&lt;/a&gt;
    */</programlisting>
   </section>
+  
+  <section xml:id="escritura_javadoc" xml:lang="es">
+    <title>Documentación del proyecto</title>
+    
+	<para xml:lang="es">Ya está accesible y actualizado a media noche
+	el javadoc de todos los módulos de gvNIX:</para>
+	
+	http://projects.disid.com/projects/fwjava/wiki/Javadoc
+	
+	<para xml:lang="es">En el proyecto gvNIX ha llegado un momento
+	que la documentación de cada módulo en su directorio "doc" se queda
+	anticuada rápidamente debido a que es fácil olvidarse de actualizarla
+	al hacer algún cambio en el código, a parte de ser un "coñazo" cambiar
+	código en un sitio y documentación en otro.</para>
+	
+	<para xml:lang="es">Es por ello, que hemos llegado a la conclusión de
+	mantener toda la documentación en javadoc.</para>
+	
+	<para xml:lang="es">Para cada módulo, a parte de la documentación
+	javadoc que se incluye en cada clase java, existen ficheros especiales
+	del proyecto que se incluyen en el javadoc:</para>
+	
+	<para xml:lang="es">package.html: se puede añadir en cada paquete
+	java y se incluirá como documentación adicional en la página javadoc 
+	de cada paquete</para>
+	<para xml:lang="es">overview.html: se puede añadir en src/main/javadoc 
+	y se incluirá como documentación adicional en la página principal del
+	javadoc</para>
+	
+	<para xml:lang="es">Con esto, creo que podemos dejar de mantener la 
+	documentación por separado (javadoc y rst en docs). Además, tenemos
+	la posibilidad de consultar la última versión de la documentación de
+	todos los módulos vía web.</para>
+	
+	<para xml:lang="es">Poco a poco, iremos migrando la documentación de
+	docs a javadoc y mejorando el javadoc que existe actualmente.</para>
 
+    <para xml:lang="es">La doc estará en inglés.
+    Hay que definir una guía para el documentador que evite que
+    cada uno documente como mejor le parezca,
+    es decir, qué doc se pone en la clase, qué doc en el package, qué
+    doc se pone en cada tipo de clase (por ejemplo la lista de comandos
+    debe estar en la doc de la clase Command), etc.
+    Lo que comentas aplica a documentación muy dinámica, 
+    habrá documentación que no cambia a lo largo del tiempo y que
+    quizás no vale la pena llevar a Javadoc. Habrá que ver cada caso.</para>
+
+	<para xml:lang="es">El javadoc de Springframework está lleno de ejemplos de buena doc:</para>
+
+    <para xml:lang="es">http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/web/servlet/mvc/AbstractController.html (workflow y propiedades en cabecera de clase)</para>
+	<para xml:lang="es">http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/orm/hibernate3/HibernateInterceptor.html (ejemplo de código)</para>
+	
+  </section>
+  
   <section xml:id="convenciones_nombre-addon" xml:lang="es">
     <title>Nombre de add-ons</title>
 
