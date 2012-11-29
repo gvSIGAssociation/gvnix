@@ -729,4 +729,15 @@ p:subReportDataKeys-ref="subReportDataKeys" <emphasis role="bold">p:subReportUrl
 
   </section>
 
+
+  <section xml:id="recetas-obtener-bind-status-atributo">
+    <title xml:lang="es">Obtener el BindStatus de un atributo dentro de un formulario</title>
+
+    <para xml:lang="es">Obtener el BindStatus de un atributo dentro de un formulario:</para>
+    
+    <programlisting>&lt;spring:bind path=&quot;${field}&quot;&gt;
+        &lt;c:set var=&quot;fieldValue&quot; value=&quot;${status.value}&quot; /&gt;
+    &lt;/spring:bind&gt;</programlisting>
+  </section>
+
 </chapter>
