@@ -120,7 +120,6 @@ Proof of Concept
 TODO
 ====
 
-* Review the packages of the WS client and Authentication artifacts
 * Change the login i18n description to avoid "admin" username and "admin" password. 
 * applicationContext-security should be generated from Roo service instead of use this addon template.
 
