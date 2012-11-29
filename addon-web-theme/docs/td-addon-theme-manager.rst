@@ -237,10 +237,3 @@ Proof of Concept
 * https://svn.disid.com/svn/disid/proof/gvnix/theme-cit-app
 * https://svn.disid.com/svn/disid/proof/gvnix/theme-gvnix-app
 * https://svn.disid.com/svn/disid/proof/spring_roo/cit_style
-
-TODO
-=====
-
-* Review work done in Sentencias issue #5030 (r22) in order to port it to the add-on. Using the maven-resources-plugin
-copy-resources mojo we create (filtering from src/main/resources/applicationversion.properties) a file into
-``WEB-INF/i18n/theme`` with the property used to show the application version number.
