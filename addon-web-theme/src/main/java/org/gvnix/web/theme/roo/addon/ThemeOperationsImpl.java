@@ -1146,7 +1146,7 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                 // System
                 continue;
             }
-            File targetFile = new File(targetDirectory, filePath);
+            File targetFile = new File(url.getPath());
 
             try {
                 // only copy files and if target file doesn't exist or overwrite
@@ -1513,7 +1513,8 @@ public class ThemeOperationsImpl extends AbstractOperations implements
                 .getIdentifier(LogicalPath.getInstance(Path.SRC_MAIN_WEBAPP, ""), "");
         // Language definition
         String footerFileLocation = targetDirectory
-                + "/WEB-INF/views/footer.jspx";
+                + "WEB-INF" + File.separator +
+                "views" + File.separator + "footer.jspx";
         Document footer = null;
         try {
             if (fileManager.exists(footerFileLocation)) {
