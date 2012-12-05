@@ -42,6 +42,11 @@
           la versión comprimida que se adapte al sistema operativo y
           arquitectura de 32bits o 64bits.</para>
         </listitem>
+        
+	    <note>
+	      <para>Se recomienda descargar la versión basada en Eclipse 3.x debido
+	      a ciertos problemas observados en la versión 4.x de Eclipse.</para>
+	    </note>
 
         <listitem>Descomprimir el archivo descargado y moverlo a una carpeta,
         por ejemplo $HOME/software.</listitem>
