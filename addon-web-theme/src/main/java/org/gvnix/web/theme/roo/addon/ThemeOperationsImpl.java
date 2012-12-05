@@ -1140,8 +1140,8 @@ public class ThemeOperationsImpl extends AbstractOperations implements
         // iterate over Theme resources and copy them with same dir layout
         for (URL url : urls) {
         	// Remove source directory prefix from absolute url: relative file path
-            String filePath = url.getPath().substring(
-                    sourceDirectory.getPath().length());
+            String filePath = url.toString().substring(
+                    sourceDirectory.toString().length());
             if (isVersionControlSystemFile(filePath)) {
                 // nothing to do if the URL is of a file from a Version Control
                 // System
