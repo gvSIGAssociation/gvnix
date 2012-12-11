@@ -1105,6 +1105,12 @@ public class MenuEntryOperationsImpl implements MenuEntryOperations {
                     rooMenuInput);
             Element root = rooMenuDoc.getDocumentElement();
             Element menu = XmlUtils.findFirstElement("/div/menu", root);
+            if (menu == null) {
+            	// Roo menu exists but is still empty: there is no menu element into div element already
+            	// Avoid error when execute "web mvc setup" and next "menu setup"
+            	return;
+            }
+            
             // root categories and items
             NodeList menuElements = menu.getChildNodes();
             for (int i = 0; i < menuElements.getLength(); i++) {

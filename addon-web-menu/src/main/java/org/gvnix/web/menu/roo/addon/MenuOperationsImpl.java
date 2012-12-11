@@ -24,6 +24,7 @@ import org.apache.commons.lang3.Validate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.osgi.service.component.ComponentContext;
 import org.springframework.roo.addon.web.mvc.jsp.menu.MenuOperations;
 import org.springframework.roo.addon.web.mvc.jsp.roundtrip.XmlRoundTripFileManager;
 import org.springframework.roo.model.JavaSymbolName;
@@ -42,7 +43,9 @@ import org.w3c.dom.Element;
  * @author Jose Manuel Vivó (jmvivo at disid dot com) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
  * @author Enrique Ruiz (eruiz at disid dot com) at <a href="http://www.disid.com">DiSiD Technologies S.L.</a> made for <a href="http://www.cit.gva.es">Conselleria d'Infraestructures i Transport</a>
  */
-@Component
+
+//Immediate required to avoid invalid gvNIX menu activation
+@Component(immediate=true)
 @Service
 public class MenuOperationsImpl implements MenuOperations { 
 
@@ -51,6 +54,15 @@ public class MenuOperationsImpl implements MenuOperations {
    */
   @Reference private MenuEntryOperations operations;
   @Reference private XmlRoundTripFileManager xmlRoundTripFileManager;
+
+  /** {@inheritDoc} */
+  protected void activate(ComponentContext context) {
+	  
+	  // Avoid invalid gvNIX menu activation: if Roo menu enabled, wait until this service is started
+	  if (!MenuEntryOperationsImpl.isRooMenuDisabled) {
+		  while (context.getBundleContext().getServiceReference(MenuOperations.class.getName()) == null);
+	  }
+  }
 
   /** {@inheritDoc} */
   public void addMenuItem(JavaSymbolName menuCategoryName,

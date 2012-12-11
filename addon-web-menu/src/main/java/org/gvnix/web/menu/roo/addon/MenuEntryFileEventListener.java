@@ -39,7 +39,9 @@ import org.springframework.roo.process.manager.FileManager;
  *         Transport</a>
  * @since 1.0
  */
-@Component
+
+// Immediate required to avoid invalid gvNIX menu activation
+@Component(immediate=true)
 @Service
 public class MenuEntryFileEventListener implements FileEventListener {
 
