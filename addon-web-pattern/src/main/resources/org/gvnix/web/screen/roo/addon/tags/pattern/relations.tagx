@@ -21,9 +21,12 @@
               },
               n);
           });
+          // Persist keep the same tab between different loaded pages:
+          // Useful to remain in same tab in detail patterns when master pattern changes
           var tc = new dijit.layout.TabContainer({
               style: dojo.attr("tab_container_relations_${patternName}", "style") + "height:620px;",
-              tabPosition: 'top'
+              tabPosition: 'top',
+              persist:"true"
           },
           "tab_container_relations_${patternName}");
           tc.startup();
