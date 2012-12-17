@@ -190,7 +190,9 @@
 		      <spring:url value="${path}" var="selectUrl" htmlEscape="false">
 		      	<spring:param name="index" value="${idValue}" />
 		        <c:forEach var="p" items="${param}">
-		          <c:if test="${p.key ne 'index'}">
+		          <!-- Ignore index and ignore pagination parameters (*Page & *PageSize) only for detail patterns -->
+		          <!-- Remove pagination parameters resets positioned page in detail when new master element is selected -->
+		          <c:if test="${p.key ne 'index' and !fn:endsWith(p.key, 'Page') and !fn:endsWith(p.key, 'PageSize') or fn:startsWith(p.key, id)}">
 		            <spring:param name="${p.key}" value="${p.value}" />
 		          </c:if>
 		        </c:forEach>
