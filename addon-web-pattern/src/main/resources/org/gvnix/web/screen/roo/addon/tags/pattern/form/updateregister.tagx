@@ -90,9 +90,9 @@
       <!-- Show quick links to make available actions over table rows (create, update, delete, ...) -->
       <spring:message code="entity_delete" arguments="${label}" var="delete_label" htmlEscape="false"/>
       <spring:message code="entity_delete_confirm" var="delete_confirm_label" htmlEscape="false"/>
-      <spring:message code="entity_create" arguments="${label}" var="create_label" />
-      <spring:message code="entity_update" arguments="${label}" var="update_label" />
-      <spring:message code="entity_reset" arguments="${label}" var="reset_label" />
+      <spring:message code="entity_create" arguments="${label}" var="create_label" htmlEscape="false" />
+      <spring:message code="entity_update" arguments="${label}" var="update_label" htmlEscape="false" />
+      <spring:message code="entity_reset" arguments="${label}" var="reset_label" htmlEscape="false" />
       <spring:url value="${path}" var="createUrl" htmlEscape="false">
         <spring:param name="form" />
         <!-- Put on create URL the reference to the master pattern, if exists -->
