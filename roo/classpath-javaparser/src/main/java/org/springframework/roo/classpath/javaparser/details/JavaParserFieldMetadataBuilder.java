@@ -13,7 +13,6 @@ import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.ObjectCreationExpr;
 import japa.parser.ast.type.ClassOrInterfaceType;
-import japa.parser.ast.type.ReferenceType;
 import japa.parser.ast.type.Type;
 
 import java.io.ByteArrayInputStream;
