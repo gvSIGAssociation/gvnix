@@ -181,8 +181,12 @@ public class JavaParserTypeParsingService implements TypeParsingService {
                                     .getFullyQualifiedTypeName()), importType
                             .getImportType().getSimpleTypeName());
                 }
+                // DiSiD: Fixed lose static modifier (Solved in ROO-3340)
+//                compilationUnit.getImports().add(
+//                        new ImportDeclaration(typeToImportExpr, false, false));                
                 compilationUnit.getImports().add(
-                        new ImportDeclaration(typeToImportExpr, false, false));
+                        new ImportDeclaration(typeToImportExpr, importType
+                                .isStatic(), false)); // DiSiD Fix static lose
             }
             else {
                 compilationUnit.getImports().add(
