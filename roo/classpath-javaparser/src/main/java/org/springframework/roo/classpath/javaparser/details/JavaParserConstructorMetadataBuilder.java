@@ -101,6 +101,7 @@ public class JavaParserConstructorMetadataBuilder implements
                         .getJavaType());
             }
             else {
+                /* DiSiD #7728 Fixed problem with arrays fields
                 final NameExpr importedType = JavaParserUtils
                         .importTypeIfRequired(
                                 compilationUnitServices.getEnclosingTypeName(),
@@ -108,6 +109,13 @@ public class JavaParserConstructorMetadataBuilder implements
                                 constructorParameter.getJavaType());
                 final ClassOrInterfaceType cit = JavaParserUtils
                         .getClassOrInterfaceType(importedType);
+                */            
+                final Type finalType = JavaParserUtils.getResolvedName(
+                        constructorParameter.getJavaType(),
+                        constructorParameter.getJavaType(),
+                        compilationUnitServices);
+                final ClassOrInterfaceType cit = JavaParserUtils
+                        .getClassOrInterfaceType(finalType);
 
                 // Add any type arguments presented for the return type
                 if (constructorParameter.getJavaType().getParameters().size() > 0) {
@@ -125,7 +133,9 @@ public class JavaParserConstructorMetadataBuilder implements
                     }
 
                 }
-                parameterType = cit;
+                // DiSiD #7728 Fixed problem with arrays fields
+//              parameterType = cit;
+                parameterType = finalType;
             }
 
             // Create a Java Parser constructor parameter and add it to the list

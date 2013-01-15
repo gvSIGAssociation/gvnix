@@ -13,6 +13,7 @@ import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.NameExpr;
 import japa.parser.ast.expr.ObjectCreationExpr;
 import japa.parser.ast.type.ClassOrInterfaceType;
+import japa.parser.ast.type.ReferenceType;
 import japa.parser.ast.type.Type;
 
 import java.io.ByteArrayInputStream;
@@ -50,9 +51,17 @@ public class JavaParserFieldMetadataBuilder implements Builder<FieldMetadata> {
         JavaParserUtils.importTypeIfRequired(
                 compilationUnitServices.getEnclosingTypeName(),
                 compilationUnitServices.getImports(), field.getFieldType());
-        final ClassOrInterfaceType initType = JavaParserUtils.getResolvedName(
+
+        // DiSiD #7728 Fixed problem with arrays fields
+//      final ClassOrInterfaceType initType = JavaParserUtils.getResolvedName(
+//              compilationUnitServices.getEnclosingTypeName(),
+//              field.getFieldType(), compilationUnitServices);        
+        final Type initType = JavaParserUtils.getResolvedName(
                 compilationUnitServices.getEnclosingTypeName(),
                 field.getFieldType(), compilationUnitServices);
+        // DiSiD #7728 Fixed problem with arrays fields
+        ClassOrInterfaceType finalType = JavaParserUtils
+                .getClassOrInterfaceType(initType);
 
         final FieldDeclaration newField = ASTHelper.createFieldDeclaration(
                 JavaParserUtils.getJavaParserModifier(field.getModifier()),
@@ -61,7 +70,9 @@ public class JavaParserFieldMetadataBuilder implements Builder<FieldMetadata> {
         // Add parameterized types for the field type (not initializer)
         if (field.getFieldType().getParameters().size() > 0) {
             final List<Type> fieldTypeArgs = new ArrayList<Type>();
-            initType.setTypeArgs(fieldTypeArgs);
+            // DiSiD #7728 Fixed problem with arrays fields
+//          initType.setTypeArgs(fieldTypeArgs);
+            finalType.setTypeArgs(fieldTypeArgs);            
             for (final JavaType parameter : field.getFieldType()
                     .getParameters()) {
                 final NameExpr importedParameterType = JavaParserUtils
@@ -138,7 +149,9 @@ public class JavaParserFieldMetadataBuilder implements Builder<FieldMetadata> {
 
                 if (typeToImport.getParameters().size() > 0) {
                     final List<Type> initTypeArgs = new ArrayList<Type>();
-                    initType.setTypeArgs(initTypeArgs);
+                    // DiSiD #7728 Fixed problem with arrays fields
+                    //initType.setTypeArgs(initTypeArgs);
+                    finalType.setTypeArgs(initTypeArgs);
                     for (final JavaType parameter : typeToImport
                             .getParameters()) {
                         final NameExpr importedParameterType = JavaParserUtils
