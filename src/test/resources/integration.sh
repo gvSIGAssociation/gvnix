@@ -24,7 +24,7 @@ rm -rf /tmp/gvnixtest$1/*
 
 ## Roo embedding
 $2/code/bin/gvnix-dev script --file embedding.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## Roo expenses
@@ -34,17 +34,17 @@ rm -rf /tmp/gvnixtest$1/*
 
 ## Roo multimodule
 $2/code/bin/gvnix-dev script --file multimodule.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## Roo pizzashop
 $2/code/bin/gvnix-dev script --file pizzashop.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## Roo vote
 $2/code/bin/gvnix-dev script --file vote.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## Roo wedding
@@ -74,22 +74,22 @@ rm -rf /tmp/gvnixtest$1/*
 
 ## gvNIX flex add-on
 $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/org.springframework.flex.roo.addon/src/test/resources/basic-flex-scaffold-test.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## gvNIX flex add-on
 $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/org.springframework.flex.roo.addon/src/test/resources/remoting-scaffold-all-test.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## gvNIX flex add-on
 $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/org.springframework.flex.roo.addon/src/main/resources/flex.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## gvNIX flex add-on
 $2/code/bin/gvnix-dev script --file $2/code/spring-flex-roo/rootunes.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## gvNIX i18n add-on
