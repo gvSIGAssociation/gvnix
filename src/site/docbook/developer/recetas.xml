@@ -1232,5 +1232,12 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
   	and retrieve PathResolver from ProjectMetadata instead.
   	https://jira.springsource.org/browse/ROO-2097.</para>
   </section>
+
+  <section>
+  	<title xml:lang="es">Build continuo</title>
+  	
+  	<para xml:lang="es">Antiguo: http://v-pre01.disid.com:8081</para>
+  	<para xml:lang="es">Nuevo: http://hq02.disid.com:8080/</para>
+  </section>  
   
 </chapter>
