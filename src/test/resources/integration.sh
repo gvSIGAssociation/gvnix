@@ -7,20 +7,28 @@ rm -rf /tmp/gvnixtest*
 mkdir /tmp/gvnixtest$1
 cd /tmp/gvnixtest$1
 $2/code/bin/gvnix-dev script --file clinic.roo
+mvn compile
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file vote.roo
+mvn compile
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file expenses.roo
+mvn compile
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file wedding.roo
+mvn compile
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file pizzashop.roo
+mvn compile
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file multimodule.roo
+mvn compile
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file bikeshop.roo
+mvn compile
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file embedding.roo
+mvn compile
 rm -rf /tmp/gvnixtest$1/*
 $2/code/bin/gvnix-dev script --file $2/code/addon-web-report/src/main/resources/report.roo
 rm -rf /tmp/gvnixtest$1/*
