@@ -190,7 +190,6 @@ public class JavaParserClassOrInterfaceTypeDetailsBuilder implements
                 final JavaType type = new JavaType(fullName);
                 // DiSiD #7728: Fixed a problem with asterisk imports
                 // 'import java.util.*;' --> 'import java.*;'
-//              final JavaPackage typePackage = type.getPackage();
                 final JavaPackage typePackage = importDeclaration.isAsterisk() ? new JavaPackage(
                         fullName) : type.getPackage();
                 final ImportMetadataBuilder newImport = new ImportMetadataBuilder(

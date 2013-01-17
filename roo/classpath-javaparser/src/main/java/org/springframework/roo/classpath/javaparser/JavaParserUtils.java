@@ -698,7 +698,10 @@ public final class JavaParserUtils {
         }
         // DiSiD #7728: Fixed a problem with arrays types
         if (current.getArray() > 0) {
-            return new ReferenceType(resolvedName, current.getArray());
+            // Primitives includes array declaration in resolvedName
+            if (!current.isPrimitive()) {
+                return new ReferenceType(resolvedName, current.getArray());
+            }
         }
 
         return resolvedName;
@@ -830,8 +833,20 @@ public final class JavaParserUtils {
         Validate.notNull(imports, "Compilation unit imports required");
         Validate.notNull(typeToImport, "Java type to import is required");
 
-        return new ReferenceType(getClassOrInterfaceType(importTypeIfRequired(
-                targetType, imports, typeToImport)));
+        // DiSiD #7728: Resolve parameters of types with parameters
+        final ClassOrInterfaceType cit = getClassOrInterfaceType(importTypeIfRequired(
+                targetType, imports, typeToImport));
+
+        // Add any type arguments presented for the return type
+        if (typeToImport.getParameters().size() > 0) {
+            final List<Type> typeArgs = new ArrayList<Type>();
+            cit.setTypeArgs(typeArgs);
+            for (final JavaType parameter : typeToImport.getParameters()) {
+                typeArgs.add(JavaParserUtils.importParametersForType(
+                        targetType, imports, parameter));
+            }
+        }
+        return new ReferenceType(cit);
     }
 
     /**
@@ -873,7 +888,9 @@ public final class JavaParserUtils {
             return new NameExpr(typeToImport.getSimpleTypeName());
         }
 
-        if (typeToImport.isDefaultPackage()) {
+        // DiSiD #7728: Fixed problems with arrays in primitive types
+        final JavaPackage typeToImportPackage = typeToImport.getPackage();
+        if (typeToImportPackage.equals(compilationUnitPackage)) {
             return new NameExpr(typeToImport.getSimpleTypeName());
         }
 
@@ -1022,21 +1039,22 @@ public final class JavaParserUtils {
     private JavaParserUtils() {
     }
 
-    // DiSiD 
+    // DiSiD
     /**
      * Returns the final {@link ClassOrInterfaceType} from a {@link Type}
      * 
      * @param initType
-     * @return the final {@link ClassOrInterfaceType} or null if no {@link ClassOrInterfaceType} found
-     * 
+     * @return the final {@link ClassOrInterfaceType} or null if no
+     *         {@link ClassOrInterfaceType} found
      */
     public static ClassOrInterfaceType getClassOrInterfaceType(Type type) {
         Type tmp = type;
         while (tmp instanceof ReferenceType) {
-               tmp = ((ReferenceType) tmp).getType();
-        };
-        if (tmp instanceof ClassOrInterfaceType){
-        	return (ClassOrInterfaceType) tmp;
+            tmp = ((ReferenceType) tmp).getType();
+        }
+        ;
+        if (tmp instanceof ClassOrInterfaceType) {
+            return (ClassOrInterfaceType) tmp;
         }
         return null;
     }

@@ -50,11 +50,7 @@ public class JavaParserFieldMetadataBuilder implements Builder<FieldMetadata> {
         JavaParserUtils.importTypeIfRequired(
                 compilationUnitServices.getEnclosingTypeName(),
                 compilationUnitServices.getImports(), field.getFieldType());
-
         // DiSiD #7728 Fixed problem with arrays fields
-//      final ClassOrInterfaceType initType = JavaParserUtils.getResolvedName(
-//              compilationUnitServices.getEnclosingTypeName(),
-//              field.getFieldType(), compilationUnitServices);        
         final Type initType = JavaParserUtils.getResolvedName(
                 compilationUnitServices.getEnclosingTypeName(),
                 field.getFieldType(), compilationUnitServices);
@@ -70,16 +66,12 @@ public class JavaParserFieldMetadataBuilder implements Builder<FieldMetadata> {
         if (field.getFieldType().getParameters().size() > 0) {
             final List<Type> fieldTypeArgs = new ArrayList<Type>();
             // DiSiD #7728 Fixed problem with arrays fields
-//          initType.setTypeArgs(fieldTypeArgs);
-            finalType.setTypeArgs(fieldTypeArgs);            
+            finalType.setTypeArgs(fieldTypeArgs);
             for (final JavaType parameter : field.getFieldType()
                     .getParameters()) {
-                final NameExpr importedParameterType = JavaParserUtils
-                        .importTypeIfRequired(
-                                compilationUnitServices.getEnclosingTypeName(),
-                                compilationUnitServices.getImports(), parameter);
-                fieldTypeArgs.add(JavaParserUtils
-                        .getReferenceType(importedParameterType));
+                fieldTypeArgs.add(JavaParserUtils.importParametersForType(
+                        compilationUnitServices.getEnclosingTypeName(),
+                        compilationUnitServices.getImports(), parameter));
             }
         }
 
@@ -149,17 +141,15 @@ public class JavaParserFieldMetadataBuilder implements Builder<FieldMetadata> {
                 if (typeToImport.getParameters().size() > 0) {
                     final List<Type> initTypeArgs = new ArrayList<Type>();
                     // DiSiD #7728 Fixed problem with arrays fields
-                    //initType.setTypeArgs(initTypeArgs);
                     finalType.setTypeArgs(initTypeArgs);
                     for (final JavaType parameter : typeToImport
                             .getParameters()) {
-                        final NameExpr importedParameterType = JavaParserUtils
-                                .importTypeIfRequired(compilationUnitServices
-                                        .getEnclosingTypeName(),
-                                        compilationUnitServices.getImports(),
-                                        parameter);
                         initTypeArgs.add(JavaParserUtils
-                                .getReferenceType(importedParameterType));
+                                .importParametersForType(
+                                        compilationUnitServices
+                                                .getEnclosingTypeName(),
+                                        compilationUnitServices.getImports(),
+                                        parameter));
                     }
                     classOrInterfaceType.setTypeArgs(initTypeArgs);
                 }
