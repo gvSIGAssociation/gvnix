@@ -14,7 +14,7 @@ cd /tmp/gvnixtest$1
 
 ## Roo bikeshop
 $2/code/bin/gvnix-dev script --file bikeshop.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## Roo clinic
@@ -29,7 +29,7 @@ rm -rf /tmp/gvnixtest$1/*
 
 ## Roo expenses
 $2/code/bin/gvnix-dev script --file expenses.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## Roo multimodule
