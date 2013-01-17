@@ -10,24 +10,29 @@
   <info>
     <title xml:lang="es">gvNIX - Documentación de desarrollo</title>
 
-    <productname>gvNIX. Spring Roo based RAD tool</productname>
+    <productname>gvNIX: Spring Roo based Java development framework.</productname>
 
-    <releaseinfo>0.3.0</releaseinfo>
+    <releaseinfo>1.0.0-RELEASE</releaseinfo>
 
-    <author>
-      <personname>DiSiD Technologies S.L. <link
-      xlink:href="http://www.disid.com">DiSiD Technologies</link></personname>
-    </author>
+    <authorgroup>
+      <author>
+        <personname><link xlink:href="http://www.disid.com"
+        xlink:show="new">DiSiD Technologies S.L.</link></personname>
+      </author>
+    </authorgroup>
 
     <legalnotice>
-      <para>Copyright 2010 Conselleria d'Infraestructures i Transport -
-      Generalitat Valenciana</para>
+      <para xml:lang="es">Copyright 2010 - 2013 Consejería de Infraestructuras, Transporte
+      y Medio Ambiende - Generalidad Valenciana</para>
 
-      <para>This work is licensed under the Creative Commons Attribution-Share
-      Alike 3.0 Unported License. To view a copy of this license, visit
-      http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to
-      Creative Commons, 171 Second Street, Suite 300, San Francisco,
-      California, 94105, USA.</para>
+      <para xml:lang="es">Esta obra está bajo la licencia Reconocimiento-Compartir bajo la
+      misma licencia 3.0 España <link
+      xlink:href="???">http://creativecommons.org/licenses/by-sa/3.0/es/</link>
+      de Creative Commons. Puede copiarla, distribuirla y comunicarla
+      públicamente siempre que especifique sus autores y comparta cualquier
+      obra derivada bajo la misma licencia. La licencia completa se puede
+      consultar en <link
+      xlink:href="???">http://creativecommons.org/licenses/by-sa/3.0/es/</link></para>
     </legalnotice>
   </info>
 

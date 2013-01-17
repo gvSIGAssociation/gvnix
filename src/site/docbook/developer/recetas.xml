@@ -1259,6 +1259,8 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
   	
   	<para xml:lang="es">Se avisa por correo de ejecucions erróneas al responsable técnico del proyecto 
   	y a las personas que hayan producido el error.</para>
+  	
+  	<para xml:lang="es">Actualmente, el test tarda aproximadamente 2 horas.</para>
   </section>  
   
 </chapter>

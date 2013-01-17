@@ -59,6 +59,7 @@ And your SSH public key from your account settings (http://help.github.com/linux
 Roo source code is commited on gvNIX project at ``roo`` folder.
 However, Roo source code can be updated to a new tag with next commands:
 
+* Ask which branch is current:	git status
 * Update git info:				git pull
 * List available tags:			git tag -l
 * Store our Roo modifications:	git stash
