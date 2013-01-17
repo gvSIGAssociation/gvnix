@@ -1235,9 +1235,30 @@ public class JavaClassMetadataListener implements MetadataNotificationListener {
 
   <section>
   	<title xml:lang="es">Build continuo</title>
+
+  	<para xml:lang="es">Servidor Hudson (antiguo): http://v-pre01.disid.com:8081</para>
+  	<para xml:lang="es">Servidor Jenkins (nuevo): http://hq02.disid.com:8080/</para>
   	
-  	<para xml:lang="es">Antiguo: http://v-pre01.disid.com:8081</para>
-  	<para xml:lang="es">Nuevo: http://hq02.disid.com:8080/</para>
+  	<para xml:lang="es">En el servidor será necesario tener instalado en el sistema y disponible desde la consola:
+  	Maven 3.0.X (mayor revisión), Java 1.6.X (mayor revisión) y Xvfb (simulador de interfaces gráficas)
+  	ya que los utiliza el script de shell que ejecuta todas las pruebas.</para>
+  	
+  	<para xml:lang="es">Se descarga el código de http://scmcit.gva.es/svn/gvnix/trunk/code
+  	haciendo siempre un revertido y actualización del código para ejecutar el test con la
+  	última versión de código disponible y sin posibles cambios locales.</para>
+  	
+  	<para xml:lang="es">La tarea de prueba se ejecuta todos los días cada 2 horas entre las 6 y las 20 horas.</para>
+  	
+  	<para xml:lang="es">Se ejecuta con Maven 3.0.X (a poder ser con su última revisión) en comando:
+  	<command>mvn -f pom.xml -Dgpg.passphrase=${clave} -Dgpg.skip=true clean install</command>
+  	siendo ${clave} una clave válida según explica Roo en su documentación y se utiliza para firmar el código compilado.
+  	</para>
+  	
+  	<para xml:lang="es">Se ejecuta el siguiente script: code/src/test/resources/integration.sh mediante un comando de consola:
+  	${WORKSPACE}/code/src/test/resources/integration.sh ${BUILD_NUMBER} ${WORKSPACE}</para>
+  	
+  	<para xml:lang="es">Se avisa por correo de ejecucions erróneas al responsable técnico del proyecto 
+  	y a las personas que hayan producido el error.</para>
   </section>  
   
 </chapter>
