@@ -169,7 +169,7 @@ rm -rf /tmp/gvnixtest$1/*
 
 ## gvNIX service add-on
 $2/code/bin/gvnix-dev script --file $2/code/addon-service/src/test/resources/gvnix-test.roo
-mvn test tomcat:run selenium:xvfb selenium:selenese -Dmaven.tomcat.fork=true 
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
 ## gvNIX theme add-on 

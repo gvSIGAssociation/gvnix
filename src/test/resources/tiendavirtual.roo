@@ -1,13 +1,9 @@
 // Spring Roo 1.1.5.RELEASE [rev d3a68c3] log opened
 project --topLevelPackage org.gvnix.tiendavirtual --java 6
-jpa setup --provider HIBERNATE --database POSTGRES
+jpa setup --provider HIBERNATE --database HYPERSONIC_IN_MEMORY
 database properties list
-database properties set --key database.url --value jdbc:postgresql://localhost:5432/tiendavirtualDB
-database properties set --key database.username --value tiendavirtual
-database properties set --key database.password --value tiendavirtual
-perform eclipse
 backup
-// scrip --file practica04.roo
+// script --file practica04.roo
 hint
 help entity jpa
 entity jpa --class ~.domain.Producto --testAutomatically
@@ -84,7 +80,6 @@ help web mvc setup
 web mvc setup
 help web mvc all
 web mvc all --package ~.web
-perform eclipse
 hint finders
 help finder
 help finder list
@@ -124,7 +119,6 @@ web mvc pattern detail --class ~.web.PedidoController --name pedido --field line
 web mvc pattern master --class ~.web.ProductoController --name ficha --type register
 web mvc pattern master --class ~.web.ProductoController --name productos --type tabular
 web mvc pattern master --class ~.web.ClienteController --name clientes --type tabular
-perform eclipse
 backup
 // script --file practica08.2.roo
 help menu
@@ -156,18 +150,15 @@ backup
 help occ checksum
 help occ checksum set
 occ checksum set --entity ~.domain.Pedido
-perform eclipse
 help occ checksum all
 occ checksum all
 //quit
 // Salimos de la consola para corregir los errores de compilación de los ITDs y para que se apliquen algunos cambios en las vistas
-perform eclipse
 backup
 // script --file practica10.roo
 help web mvc dialog
 help web mvc dialog setup
 web mvc dialog setup
-perform eclipse
 web mvc dialog exception list
 help web mvc dialog exception add
 web mvc dialog exception add --exception java.lang.Exception --title "Ha ocurrido un error" --description "Se ha producido un error deconocido" --language es
