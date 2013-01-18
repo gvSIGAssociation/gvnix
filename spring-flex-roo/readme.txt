@@ -1,6 +1,6 @@
-FLEX ADDON FOR SPRING ROO 1.0.0.M2 (? 2011)
+FLEX ADDON FOR SPRING ROO 1.1.0 (? 2013)
 ----------------------------------
-http://www.springsource.org/spring-flex
+https://code.google.com/p/gvnix/wiki/DocFlex
 
 1. INTRODUCTION
 ---------------

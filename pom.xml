@@ -32,7 +32,7 @@
   <groupId>org.gvnix</groupId>
   <artifactId>org.gvnix.root</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <name>gvNIX</name>
   <description>Spring Roo based RAD tool for Conselleria d'Infraestructures i Transport - Generalitat Valenciana</description>
 

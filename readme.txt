@@ -60,6 +60,8 @@ Roo source code is commited on gvNIX project at ``roo`` folder.
 However, Roo source code can be updated to a new tag with next commands:
 
 * Ask which branch is current:	git status
+* Revert working copy changes:  git checkout .
+* Revert index (adedd) changes: git reset
 * Update git info:				git pull
 * List available tags:			git tag -l
 * Store our Roo modifications:	git stash
@@ -120,7 +122,11 @@ Package gvNIX
 
    roo/shell/src/main/java/org/springframework/roo/shell/AbstractShell.java
 
-* Update if necessary the Roo source code version (tag or head) into 'roo' folder with git and update this Roo version reference into gvNIX parent pom.xml (roo.version).
+* Update if necessary the Roo source code version (tag or head) into 'roo' folder with git
+
+* Update Roo version reference into gvNIX parent pom.xml (roo.version) and into gvNIX childs pom.xml (parent.version)
+
+* Update Roo version reference into gvNIX wrapping parent and childs pom.xml
 
 * Update if necessary the Flex addon source code version (tag or head) into 'spring-flex-roo' folder with git.
 
