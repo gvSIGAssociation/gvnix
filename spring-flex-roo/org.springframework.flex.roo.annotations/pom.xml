@@ -36,7 +36,7 @@
 	</build>
 
 	<properties>
-		<roo.version>1.2.2.RELEASE</roo.version>
+		<roo.version>1.2.3.RELEASE</roo.version>
         <google.code.project.name>gvnix</google.code.project.name>
         <repo.folder>org/springframework/flex/roo/annotations</repo.folder>
 	</properties>
