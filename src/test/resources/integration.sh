@@ -32,6 +32,11 @@ $2/code/bin/gvnix-dev script --file expenses.roo
 mvn test tomcat:run -Dmaven.tomcat.fork=true 
 rm -rf /tmp/gvnixtest$1/*
 
+## Roo gae-expenses
+$2/code/bin/gvnix-dev script --file gae-expenses.roo
+mvn test tomcat:run -Dmaven.tomcat.fork=true 
+rm -rf /tmp/gvnixtest$1/*
+
 ## Roo multimodule
 $2/code/bin/gvnix-dev script --file multimodule.roo
 mvn test tomcat:run -Dmaven.tomcat.fork=true 
